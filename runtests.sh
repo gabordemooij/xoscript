@@ -36,12 +36,12 @@ unittest() {
 	export CITRINE_MEMORY_MODE
 
 	if [[ $os = "lin" ]]; then
-		echo "test"  | ./ctren ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err
+		echo "test"  | ./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err
 		cat /tmp/rs /tmp/err > /tmp/out
 	fi
 
 	if [[ $os = "win" ]]; then
-		echo "test"  | wine ./ctren.exe ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err
+		echo "test"  | wine ./xo.exe ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err
 		cat /tmp/rs /tmp/err > /tmp/out
 	fi
 
@@ -91,10 +91,13 @@ unittest() {
 
 }
 
+# select range
+FROM=1
+TIL=620
 
 # run tests for linux
 pushd build/Linux/bin
-for i in $(seq -f "%04g" 1 597);
+for i in $(seq -f "%04g" $FROM $TIL);
 do
     unittest $i 1 lin
     unittest $i 4 lin
@@ -104,7 +107,7 @@ popd
 
 # run tests for win
 pushd build/Win64/bin
-for i in $(seq -f "%04g" 1 597);
+for i in $(seq -f "%04g" $FROM $TIL);
 do
     unittest $i 1 win
     unittest $i 4 win

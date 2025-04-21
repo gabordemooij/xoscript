@@ -1295,7 +1295,7 @@ ctr_object* ctr_clock_new( ctr_object* myself, ctr_argument* argumentList ) {
 
 /**
  * @def
- * ✎ write: [ String ]
+ * [ Out ] write: [ String ]
  *
  *
  * @test595
@@ -1310,7 +1310,7 @@ ctr_object* ctr_console_write(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * ✎ stop
+ * [ Out ] stop
  *
  *
  * @test596
