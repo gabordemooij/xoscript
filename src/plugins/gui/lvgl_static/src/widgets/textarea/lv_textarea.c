@@ -21,6 +21,10 @@
 #include "../../misc/lv_math.h"
 #include "../../stdlib/lv_string.h"
 
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+
 /*********************
  *      DEFINES
  *********************/
