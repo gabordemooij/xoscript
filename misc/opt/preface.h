@@ -1,5 +1,5 @@
 static char* embedded_program = "\
-Media _datastart.\
+Gui _datastart.\
 ";
 
 int main(int argc, char *argv[]) {

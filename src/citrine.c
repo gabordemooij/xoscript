@@ -1,7 +1,7 @@
 #include "citrine.h"
 
 #ifdef EMBED
-	#include "misc/opt/embed.h"
+	#include "../misc/opt/embed.h"
 #endif
 
 int ctr_argc;

@@ -12,11 +12,11 @@ cat misc/opt/preface.h > misc/opt/embed.h
 xxd -i -n CtrBlob data >> misc/opt/embed.h
 
 # compile media plugin
-PACKAGE="media" \
+PACKAGE="gui" \
 NAME=$MEDIALIB \
 make -f $MAKEFILE clean
 
-PACKAGE="media" NAME=$MEDIALIB EXTRACFLAGS=" -D DESKTOP_FULLSCREEN " \
+PACKAGE="gui" NAME=$MEDIALIB EXTRACFLAGS=" " \
 make -f $MAKEFILE plugin
 
 # compile Citrine with embed options
