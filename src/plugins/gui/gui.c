@@ -304,13 +304,9 @@ const void* ctr_internal_gui_render_glyph(lv_font_glyph_dsc_t* d, lv_draw_buf_t 
 
 /**
  * @def
- * [ Font ] new
+ * [ Font ] source: [String] size: [Number]
  *
- * @example
- * gui font: (Font new source: ['font.ttf'] size: 20).
- *
- * @result
- * @info-font-source-size
+ * @test621
  */
 ctr_object* ctr_font_font(ctr_object* myself, ctr_argument* argumentList) {
 	GUIFNT* fnt = ctr_internal_get_font_from_object(myself);
@@ -323,7 +319,7 @@ ctr_object* ctr_font_font(ctr_object* myself, ctr_argument* argumentList) {
 		return myself;
 	}
 	fnt->font = TTF_OpenFontRW(res, 1, (int)ctr_internal_cast2number(argumentList->next->object)->value.nvalue);
-	fnt->lvfont = ctr_heap_allocate(sizeof(lv_font_t));
+	fnt->lvfont = ctr_heap_allocate_tracked(sizeof(lv_font_t));
 	fnt->lvfont->get_glyph_dsc = ctr_internal_gui_describe_glyph;
 	fnt->lvfont->get_glyph_bitmap = ctr_internal_gui_render_glyph;
 	fnt->lvfont->line_height = TTF_FontHeight(fnt->font);
