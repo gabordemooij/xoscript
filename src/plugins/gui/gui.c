@@ -541,7 +541,7 @@ ctr_object* ctr_gui_xml_at_set(ctr_object* myself, ctr_argument* argumentList) {
 	}
 	if (argumentList->next->next->object != CtrStdNil) {
 		id = ctr_tonum(argumentList->next->next->object);
-		child = lv_obj_get_child_by_id(root, id);
+		child = lv_obj_get_child_by_id(root, (const void*) id);
 		if (!child) child = root;
 	}
 	uint32_t n = lv_obj_get_child_count(child);
@@ -622,7 +622,7 @@ ctr_object* ctr_gui_form_field_value(ctr_object* myself, ctr_argument* argumentL
 	id = (int) ctr_tonum(argumentList->object);
 	if (id == 0) return CtrStdNil;
 	root = lv_screen_active();
-	child = lv_obj_get_child_by_id(root, id);
+	child = lv_obj_get_child_by_id(root, (const void*)id);
 	if (!child) return CtrStdNil;
 	if (!lv_obj_is_valid(child)) return CtrStdNil;
 	if (lv_obj_has_class(child, &lv_textarea_class)) {
@@ -897,7 +897,7 @@ ctr_object* ctr_img_img(ctr_object* myself, ctr_argument* argumentList) {
 	img->image_descriptor->data = img->surface->pixels;
 	img->image_descriptor->header.magic = LV_IMAGE_HEADER_MAGIC;
 	img->image_descriptor->header.cf = LV_COLOR_FORMAT_ARGB8888;
-	img->image_descriptor->header.flags = NULL;
+	img->image_descriptor->header.flags = 0;
 	img->image_descriptor->header.w = img->surface->w;
 	img->image_descriptor->header.h = img->surface->h;
 	img->image_descriptor->header.stride = img->surface->pitch;

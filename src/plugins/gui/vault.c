@@ -150,6 +150,10 @@ void ctr_gui_vault_platform_destroy(char** password) {
 #ifdef ANDROID_EXPORT
 
 /* Android vault is in citrine_gui.c and goes through JNI */
+
+int ctr_gui_vault_platform_retrieve(char* vault_name, char* lookup_name, char** password);
+int ctr_gui_vault_platform_store(char* vault_name, char* lookup_name, char* password);
+
 void ctr_gui_internal_vault_init() {
 	/* not needed for android */
 }
