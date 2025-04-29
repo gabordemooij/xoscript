@@ -1,0 +1,29 @@
+BUILD_DIR         = ./build
+BUILD_OBJ_DIR     = $(BUILD_DIR)/Mac/obj
+BUILD_BIN_DIR     = $(BUILD_DIR)/Mac/bin
+BIN               = xo
+CFLAGS            = -O2 -std=c99 -mtune=native -Wall -I src/i18n/en -D CTRLANG=en -D INCLUDETESTS -D PATH_MAX=1024 -D REPLACE_PLUGIN_SYSTEM -D MACOS_PLUGIN_SYSTEM
+LDFLAGS           = -rdynamic -undefined dynamic_lookup
+CSRCS             = $(shell find ./src -maxdepth 1 -type f -name '*.c')
+COBJS             = $(patsubst ./src/%.c, $(BUILD_OBJ_DIR)/%.o, $(CSRCS))
+TARGET            = $(COBJS)
+
+all: xo
+
+xo: $(TARGET)
+	@mkdir -p $(BUILD_BIN_DIR)
+	$(CC) $(TARGET) $(LDFLAGS) -o $(BUILD_BIN_DIR)/$(BIN)
+
+$(BUILD_OBJ_DIR)/%.o: ./src/%.c
+	@mkdir -p $(BUILD_OBJ_DIR)
+	$(CC) $(CFLAGS) $(EXTRACFLAGS) -c $< -o $@
+
+clean:
+	rm  $(BUILD_OBJ_DIR)/* $(BUILD_BIN_DIR)/$(BIN)
+
+plugin:
+	cd src/plugins/${PACKAGE} ; make -f makefile.mac all
+
+plugin-clean:
+	cd src/plugins/${PACKAGE} ; make -f makefile.mac clean
+

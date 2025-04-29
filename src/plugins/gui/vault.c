@@ -147,6 +147,31 @@ void ctr_gui_vault_platform_destroy(char** password) {
 
 #endif
 
+
+/* Mac implementation */
+#ifdef MACPASS
+
+void ctr_gui_internal_vault_init() {
+	/* not implemented yet */
+}
+
+int ctr_gui_vault_platform_store(char* vault_name, char* lookup_name, char* password) {
+	printf("Vault is not implmented on this platform yet.");
+	return -1;
+}
+
+int ctr_gui_vault_platform_retrieve(char* vault_name, char* lookup_name, char** password) {
+	printf("Vault is not implmented on this platform yet.");
+	return -1;
+}
+
+void ctr_gui_vault_platform_destroy(char** password) {
+	/* not implemented yet */
+}
+
+#endif
+
+
 #ifdef ANDROID_EXPORT
 
 /* Android vault is in citrine_gui.c and goes through JNI */

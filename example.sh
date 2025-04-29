@@ -35,3 +35,16 @@ if [[ $OS = "Win64" ]]; then
 	ln -s ../../build/Win64/bin/mods mods
 	wine ../../build/Win64/bin/xo.exe ${EXAMPLE}.ctr 
 fi
+
+if [[ $OS = "Mac" ]]; then
+	if [[ $CLEAN = "clean" ]]; then
+		make -f makefile.mac clean
+		PACKAGE="gui" NAME="libctrgui.dylib" make -f makefile.mac plugin-clean
+	fi
+	make -f makefile.mac
+	PACKAGE="gui" NAME="libctrgui.dylib" make -f makefile.mac plugin
+	cd examples/${EXAMPLE}
+	rm mods
+	ln -s ../../build/Mac/bin/mods mods
+	../../build/Mac/bin/xo ${EXAMPLE}.ctr
+fi
