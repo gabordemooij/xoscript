@@ -1497,6 +1497,15 @@ gui field-value: ['1'].
 
 As a parameter, pass the id of the form field element.
 
+
+## Dialogs
+
+To show a simple dialog using the GUI:
+
+```
+Gui show: ['hello world!'].
+```
+
 ## Network
 
 To send a POST-request to a website:
@@ -1554,9 +1563,84 @@ fonts, images and colors. You can create these as follows:
 Attach them to your GUI using the attributes listed above,
 i.e. border-color, background-color, background, font etc.
 
+## Datapaks
 
+Instead of loading code, images or music from files you can also add them to a data package and
+have your program retrieve them from this package as well. The advantage of a data package that
+your resources are bundled in one, opaque package (so people can’t see the images or listen to the
+music files separately). Data packages are also required for exports to other platforms like mobile.
 
+With the Package object, you can place files into a data package. You can then link this package to
+Media, and from that moment, all files will be retrieved from your data package:
 
+```
+>> data := Package new: ['datapackage'].
+data add: ['rabbit.png'].
+```
+
+To use the data package:
+
+```
+Gui link: ['datapackage'].
+```
+
+## FFI
+
+FFI stands for Foreign Function Interface. It allows you to use functionality written by others in
+different programming languages, provided through DLL files, SO files, or Dylib files. These could
+be a variety of functions, and there's a vast range of available functionality through this method.
+Let's start with an example:
+
+>> gui := Gui new.
+gui link: (
+ List new ;
+ ['/usr/lib/x86_64-linux-gnu/libc.so.6'] ;
+ ['printf'] ;
+ ( List new ; ['pointer'] ; ['int'] ) ;
+ ['void'] ;
+ ['Printf'] ;
+ ['template:number:']
+).
+>> s := Blob utf8: ['FFI has %d letters.\n'].
+Printf template: s number: 3.
+s free.
+
+The result of this code is that you’ll see the following on the command line:
+FFI has 3 letters.
+Now, you're probably thinking, "That's a lot of code for something so simple."
+I mean, couldn't we just solve this with a Gui show command? The answer is a resounding yes!
+But this is meant as an illustrative example.
+FFI is usually used for more complex tasks, but those don't make good
+examples, so I chose something trivial.
+
+The arguments for link method:
+
+- Argument #1: The DLL or SO file you want to use.
+- Argument #2: The function in that file you want to link.
+- Argument #3: A sequence with the names of the data types of the function’s arguments.
+- Argument #4: The name of the function's return type.
+- Argument #5: The name of the object you want to link this function to (if it doesn’t exist, it will be created
+automatically).
+- Argument #6: The message that this function should be linked to.
+
+In the example above, we want to link the printf function from libc.so. You can find the data
+type names in the documentation of the software you are linking to. The available types are:
+void, pointer, float, double, int, uint, char, uchar, intX, and uintX,
+where X can be 8, 16, 32, or 64.
+
+These types refer to the number of bytes required to store the data. For printf, we are linking to a
+new object called Printf and the message template:number:. You translate the external
+function into the Xoscript dialect before using it. The message template:number: expects a
+buffer with the template text as its first parameter. We create this buffer using a Blob object, which
+allows you to manually allocate memory. You are responsible for freeing this memory afterward
+with the free message.
+
+You can fill a memory blob in various ways. In our example, we fill it with text, so we use the
+utf8: message (UTF-8 is an encoding to convert text into bytes). You can also fill a blob with
+fill:, passing a sequence of byte values. To read the contents of a blob, use from:length:.
+You’ll get the bytes back as a sequence. You can even create a C-struct with a Blob using the
+struct: message, passing a sequence of C types. This may be necessary when calling a C
+function in an external software library that expects a pointer to a struct.
 
 
 
