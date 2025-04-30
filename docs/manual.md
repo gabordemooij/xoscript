@@ -1591,6 +1591,7 @@ different programming languages, provided through DLL files, SO files, or Dylib 
 be a variety of functions, and there's a vast range of available functionality through this method.
 Let's start with an example:
 
+```
 >> gui := Gui new.
 gui link: (
  List new ;
@@ -1604,6 +1605,7 @@ gui link: (
 >> s := Blob utf8: ['FFI has %d letters.\n'].
 Printf template: s number: 3.
 s free.
+```
 
 The result of this code is that you’ll see the following on the command line:
 FFI has 3 letters.
