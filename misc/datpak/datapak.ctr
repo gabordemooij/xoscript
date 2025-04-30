@@ -25,12 +25,14 @@ except: {
 }, start.
 
 >> package := Package new: datpak.
+>> SEP := (Program platform = ['Win64']) bool either: ['\\'] or: ['/'].
 
 files each: { :i :filename
-	>> file := File new: ( path + ['/'] + filename ).
+	>> file := File new: ( path + SEP + filename ).
 	>> name := i bool either: filename or: ['__1__'].
 	Out write: (
-		['adding: <name>']
+		['adding: <path> as: <name>']
+		<path>: file path,
 		<name>: name
 	), stop.
 	package append: file as: name.
