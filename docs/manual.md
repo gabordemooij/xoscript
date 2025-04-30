@@ -1563,7 +1563,7 @@ fonts, images and colors. You can create these as follows:
 Attach them to your GUI using the attributes listed above,
 i.e. border-color, background-color, background, font etc.
 
-## Datapaks
+## Datapacks
 
 Instead of loading code, images or music from files you can also add them to a data package and
 have your program retrieve them from this package as well. The advantage of a data package that
@@ -1583,6 +1583,38 @@ To use the data package:
 ```
 Gui link: ['datapackage'].
 ```
+
+## Building a datapack
+
+To make your own datapack, simply do:
+
+```
+
+>> package := Package new: ['mydatapack'].
+package append: (File new: ['__1__']).
+package append: (File new: ['file2']).
+etc...
+
+```
+
+The main file should be named:
+
+```
+__1__
+```
+
+This way, the self-executing binary/app knows how to start your app.
+
+You can also use the datapack generator tool (available on download page):
+
+```
+xo datapack.xo /path/to/app myapp.xo image.png etc...
+```
+
+The reason you have to specify a base path is to avoid having to type
+the same path over and over again.
+
+
 
 ## FFI
 
