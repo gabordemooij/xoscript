@@ -813,6 +813,7 @@ ctr_object* ctr_package_add_as(ctr_object* myself, ctr_argument* argumentList) {
 			ctr_error( CTR_ERR_OPEN, errno );
 			ctr_heap_free(path);
 			ctr_heap_free(pkgpath);
+			ctr_heap_free(alias);
 			fclose(outfile);
 			return CtrStdNil;
 		}
