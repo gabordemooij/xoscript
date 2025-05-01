@@ -833,6 +833,7 @@ ctr_object* ctr_package_add_as(ctr_object* myself, ctr_argument* argumentList) {
 		fclose(outfile);
 		fclose(f);
 		ctr_heap_free(path);
+		ctr_heap_free(alias);
 	} else {
 		ctr_error("Invalid argument\n", 0);
 	}
