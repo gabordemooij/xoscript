@@ -2,6 +2,11 @@
 #include <libsecret/secret.h>
 #endif
 
+#ifdef MACPASS
+#include <Security/Security.h>
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 #ifdef WINPASS
 #include <windows.h>
 #include <wincrypt.h>
@@ -156,17 +161,112 @@ void ctr_gui_internal_vault_init() {
 }
 
 int ctr_gui_vault_platform_store(char* vault_name, char* lookup_name, char* password) {
-	printf("Vault is not implmented on this platform yet.");
-	return -1;
+	
+    CFStringRef serviceRef = CFStringCreateWithCString(NULL, vault_name, kCFStringEncodingUTF8);
+    CFStringRef accountRef = CFStringCreateWithCString(NULL, lookup_name, kCFStringEncodingUTF8);
+    CFDataRef tokenData = CFDataCreate(NULL, (const UInt8 *)password, (CFIndex)strlen(password));
+
+    const void *keys[] = {
+        kSecClass,
+        kSecAttrService,
+        kSecAttrAccount,
+        kSecValueData,
+    };
+    const void *values[] = {
+        kSecClassGenericPassword,
+        serviceRef,
+        accountRef,
+        tokenData,
+    };
+
+    CFDictionaryRef query = CFDictionaryCreate(NULL, keys, values, 4,
+                                               &kCFTypeDictionaryKeyCallBacks,
+                                               &kCFTypeDictionaryValueCallBacks);
+
+    OSStatus status = SecItemAdd(query, NULL);
+
+   
+	if (status == errSecDuplicateItem) {
+		const void *ukeys[] = {
+			kSecClass,
+			kSecAttrService,
+			kSecAttrAccount,
+		};
+		const void *uvalues[] = {
+			kSecClassGenericPassword,
+			serviceRef,
+			accountRef,
+		};
+		query = CFDictionaryCreate(NULL, ukeys, uvalues, 3,
+                                               &kCFTypeDictionaryKeyCallBacks,
+                                               &kCFTypeDictionaryValueCallBacks);
+                                             
+		const void* uAttrKeys[] = { kSecValueData };
+		const void* uAttrValues[] = { tokenData };
+		
+		CFDictionaryRef uAttrs = CFDictionaryCreate(NULL, uAttrKeys, uAttrValues, 1,
+                                               &kCFTypeDictionaryKeyCallBacks,
+                                               &kCFTypeDictionaryValueCallBacks);
+                                             
+		status = SecItemUpdate(query, uAttrs);  
+	}
+    
+    CFRelease(serviceRef);
+    CFRelease(accountRef);
+    CFRelease(tokenData);
+    CFRelease(query);
+    if (status != errSecSuccess) return -1;
+    return 0;
 }
 
 int ctr_gui_vault_platform_retrieve(char* vault_name, char* lookup_name, char** password) {
-	printf("Vault is not implmented on this platform yet.");
-	return -1;
+	
+	CFStringRef serviceRef = CFStringCreateWithCString(NULL, vault_name, kCFStringEncodingUTF8);
+    CFStringRef accountRef = CFStringCreateWithCString(NULL, lookup_name, kCFStringEncodingUTF8);
+    const void *keys[] = {
+        kSecClass,
+        kSecAttrService,
+        kSecAttrAccount,
+        kSecReturnData,
+        kSecMatchLimit
+    };
+    const void *values[] = {
+        kSecClassGenericPassword,
+        serviceRef,
+        accountRef,
+        kCFBooleanTrue,
+        kSecMatchLimitOne
+    };
+
+    CFDictionaryRef query = CFDictionaryCreate(NULL, keys, values, 5,
+                                               &kCFTypeDictionaryKeyCallBacks,
+                                               &kCFTypeDictionaryValueCallBacks);
+
+    CFDataRef resultData = NULL;
+    OSStatus status = SecItemCopyMatching(query, (CFTypeRef *)&resultData);
+
+    if (status == errSecSuccess && resultData) {
+        const UInt8 *dataPtr = CFDataGetBytePtr(resultData);
+        CFIndex dataLen = CFDataGetLength(resultData);
+        
+        *password = ctr_heap_allocate(dataLen+1);
+        memcpy(*password, dataPtr, dataLen);
+        
+
+        CFRelease(resultData);
+    } 
+    CFRelease(serviceRef);
+    CFRelease(accountRef);
+    CFRelease(query);
+    
+    if (status == errSecItemNotFound) return -1;
+    if (status != errSecSuccess || !resultData) return -1;
+    return 0;
 }
 
 void ctr_gui_vault_platform_destroy(char** password) {
 	/* not implemented yet */
+	if (*password) ctr_heap_free(*password);
 }
 
 #endif
