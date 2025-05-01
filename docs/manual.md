@@ -1614,7 +1614,7 @@ xo datapack.xo /path/to/app myapp.xo image.png etc...
 The reason you have to specify a base path is to avoid having to type
 the same path over and over again.
 
-
+{{gif}}datapack{{/gif}}
 
 ## FFI
 
