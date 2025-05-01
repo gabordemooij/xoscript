@@ -8,20 +8,25 @@
 (Program platform = ['win64']) true: {
 	libname := ['msvcrt.dll'].
 }.
- 
+
+(Program platform = ['mac64']) true: {
+	libname := ['/usr/lib/libSystem.dylib'].
+}.
+
+Out write:libname, stop.
 
 g link: (
  List new ;
  libname ;
- ['printf'] ;
- ( List new ; ['pointer'] ; ['int'] ) ;
+ ['puts'] ;
+ ( List new ; ['pointer'] ) ;
  ['void'] ;
- ['Printf'] ;
- ['template:number:']
+ ['Puts'] ;
+ ['str:']
 ).
 
->> s := Blob utf8: ['FFI has %d letters.\n'].
-Printf template: s number: 3.
+>> s := Blob utf8: ['Hello from FFI!\n'].
+Puts str: s.
 s free.
 
 
