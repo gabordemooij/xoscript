@@ -52,3 +52,33 @@ simply do:
 xo counter_example.xo
 ```
 
+To build from source on Linux:
+
+```
+ISO="en" make clean
+ISO="en" make
+ISO="en" PACKAGE="gui" NAME="libctrgui.so" make plugin-clean
+ISO="en" PACKAGE="gui" NAME="libctrgui.so" make plugin
+```
+
+for Win64/mingw32:
+
+```
+ISO="en" make -f makefile.win64 clean
+ISO="en" make -f makefile.win64
+ISO="en" PACKAGE="gui" NAME="libctrgui.so" make -f makefile.win64 plugin-clean
+ISO="en" PACKAGE="gui" NAME="libctrgui.so" make -f makefile.win64 plugin
+```
+
+on macos:
+
+```
+ISO="en" make -f makefile.mac clean
+ISO="en" make -f makefile.mac
+ISO="en" PACKAGE="gui" NAME="libctrgui.so" make -f makefile.mac plugin-clean
+ISO="en" PACKAGE="gui" NAME="libctrgui.so" make -f makefile.mac plugin
+```
+
+Of course you may also just export the vars (ISO etc..).
+Just a matter of style.
+
