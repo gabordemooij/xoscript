@@ -66,8 +66,8 @@ for Win64/mingw32:
 ```
 ISO="en" make -f makefile.win64 clean
 ISO="en" make -f makefile.win64
-ISO="en" PACKAGE="gui" NAME="libctrgui.so" make -f makefile.win64 plugin-clean
-ISO="en" PACKAGE="gui" NAME="libctrgui.so" make -f makefile.win64 plugin
+ISO="en" PACKAGE="gui" NAME="libctrgui.dll" make -f makefile.win64 plugin-clean
+ISO="en" PACKAGE="gui" NAME="libctrgui.dll" make -f makefile.win64 plugin
 ```
 
 on macos:
@@ -75,8 +75,8 @@ on macos:
 ```
 ISO="en" make -f makefile.mac clean
 ISO="en" make -f makefile.mac
-ISO="en" PACKAGE="gui" NAME="libctrgui.so" make -f makefile.mac plugin-clean
-ISO="en" PACKAGE="gui" NAME="libctrgui.so" make -f makefile.mac plugin
+ISO="en" PACKAGE="gui" NAME="libctrgui.dylib" make -f makefile.mac plugin-clean
+ISO="en" PACKAGE="gui" NAME="libctrgui.dylib" make -f makefile.mac plugin
 ```
 
 Of course you may also just export the vars (ISO etc..).
