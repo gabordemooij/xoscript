@@ -80,6 +80,9 @@ static lv_timer_t * event_handler_timer;
  *   GLOBAL FUNCTIONS
  **********************/
 
+int32_t orig_hor_res;
+int32_t orig_ver_res;
+
 lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
 {
     if(!inited) {
@@ -88,10 +91,11 @@ lv_display_t * lv_sdl_window_create(int32_t hor_res, int32_t ver_res)
         event_handler_timer = lv_timer_create(sdl_event_handler, 5, NULL);
         lv_tick_set_cb(SDL_GetTicks);
         lv_delay_set_cb(SDL_Delay);
-
         inited = true;
     }
 
+	orig_hor_res = hor_res;
+	orig_ver_res = ver_res;
     lv_sdl_window_t * dsc = lv_malloc_zeroed(sizeof(lv_sdl_window_t));
     LV_ASSERT_MALLOC(dsc);
     if(dsc == NULL) return NULL;
@@ -282,6 +286,12 @@ static void flush_cb(lv_display_t * disp, const lv_area_t * area, uint8_t * px_m
     lv_display_flush_ready(disp);
 }
 
+static void post_resize_fix_cb(lv_timer_t * t) {
+    lv_display_t * disp = (lv_display_t *) t->user_data;
+    window_update(disp);
+	lv_timer_delete(t);
+}
+
 /**
  * SDL main thread. All SDL related task have to be handled here!
  * It initializes SDL, handles drawing and the mouse.
@@ -314,9 +324,15 @@ static void sdl_event_handler(lv_timer_t * t)
                     dsc->ignore_size_chg = 1;
                     int32_t hres = (int32_t)((float)(event.window.data1) / dsc->zoom);
                     int32_t vres = (int32_t)((float)(event.window.data2) / dsc->zoom);
+                    if (hres > orig_hor_res || vres > orig_ver_res) {
+						hres = orig_hor_res;
+						vres = orig_ver_res;
+                    }
                     lv_display_set_resolution(disp, hres, vres);
                     dsc->ignore_size_chg = 0;
                     lv_refr_now(disp);
+                    // trigger redraw after delay to avoid align issues with android statusbar
+                    lv_timer_create(post_resize_fix_cb, 250, disp);
                     break;
                 case SDL_WINDOWEVENT_CLOSE:
                     lv_display_delete(disp);
