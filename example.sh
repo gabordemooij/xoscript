@@ -20,7 +20,7 @@ if [[ $OS = "Linux" ]]; then
 	cd examples/${EXAMPLE}
 	rm mods
 	ln -s ../../build/Linux/bin/mods mods
-	../../build/Linux/bin/xo ${EXAMPLE}.ctr 
+	../../build/Linux/bin/xo ${EXAMPLE}.xo 
 fi
 
 if [[ $OS = "Win64" ]]; then
@@ -33,7 +33,7 @@ if [[ $OS = "Win64" ]]; then
 	cd examples/${EXAMPLE}
 	rm mods
 	ln -s ../../build/Win64/bin/mods mods
-	wine ../../build/Win64/bin/xo.exe ${EXAMPLE}.ctr 
+	wine ../../build/Win64/bin/xo.exe ${EXAMPLE}.xo 
 fi
 
 if [[ $OS = "Mac" ]]; then
@@ -46,5 +46,5 @@ if [[ $OS = "Mac" ]]; then
 	cd examples/${EXAMPLE}
 	rm mods
 	ln -s ../../build/Mac/bin/mods mods
-	../../build/Mac/bin/xo ${EXAMPLE}.ctr
+	../../build/Mac/bin/xo ${EXAMPLE}.xo
 fi
