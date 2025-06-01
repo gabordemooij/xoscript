@@ -643,6 +643,12 @@ ctr_object* ctr_gui_form_field_value(ctr_object* myself, ctr_argument* argumentL
 			(int) ctr_internal_gui_form_field_value_checkable( child )
 		);
 	}
+	else if ( lv_obj_has_class(child, &lv_buttonmatrix_class) ) {
+		uint32_t id = lv_buttonmatrix_get_selected_button( child );
+		char* txt = lv_buttonmatrix_get_button_text(child, id);
+		return ctr_build_string_from_cstring( txt );
+	}
+	return CtrStdNil;
 }
 
 /**
