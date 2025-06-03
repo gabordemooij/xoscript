@@ -13,6 +13,8 @@
 #include "lvgl/src/widgets/switch/lv_switch.h"
 #include "lvgl/src/widgets/textarea/lv_textarea.h"
 
+
+
 #include "../../citrine.h"
 #include <gui.h>
 #include <guimsg.h>
@@ -1086,6 +1088,11 @@ void begin() {
 	#ifdef LIBCURL
 	ctr_internal_create_func(CtrGUINetworkObject, ctr_build_string_from_cstring(CTR_DICT_SEND_TEXT_MESSAGE), &ctr_network_basic_text_send );
 	#endif
+	
+	#ifdef ANDROID_EXPORT
+	ctr_internal_create_func(CtrGUINetworkObject, ctr_build_string_from_cstring(CTR_DICT_SEND_TEXT_MESSAGE), &ctr_network_basic_text_send );
+	#endif
+	
 	CtrGUIAssetPackage = NULL;
 	packageObject = ctr_package_new(CtrStdObject, NULL);
 	packageObject->link = CtrStdObject;
