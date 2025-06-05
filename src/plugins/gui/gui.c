@@ -57,6 +57,8 @@ lv_obj_t* CtrGUIContextMenuLabelCut;
 lv_obj_t* CtrGUIContextMenuItemSelAll;
 lv_obj_t* CtrGUIContextMenuLabelSelAll;
 lv_obj_t* CtrGUIContextFocus;
+lv_obj_t* CtrGUIMessageBox = NULL;
+
 
 struct GUIIMG {
 	ctr_object* ref;
@@ -1065,6 +1067,47 @@ ctr_object* ctr_gui_timer(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
+void ctr_internal_gui_CtrGUIMessageBox_event(lv_event_t* CtrGUIMessageBox_event) {
+	ctr_object* function = (ctr_object*) lv_event_get_user_data(CtrGUIMessageBox_event);
+	ctr_argument* arg = ctr_heap_allocate(sizeof(ctr_argument));
+	arg->object = CtrStdNil;
+	arg->next = NULL;
+	ctr_send_message( function, CTR_DICT_RUN, strlen(CTR_DICT_RUN), arg );
+	//argument can now be gc'ed
+	function->info.sticky = 0;
+	lv_msgbox_close(CtrGUIMessageBox);
+	CtrGUIMessageBox = NULL;
+	ctr_heap_free(arg);
+}
+
+void ctr_internal_gui_CtrGUIMessageBox_close(lv_event_t* CtrGUIMessageBox_event) {
+	CtrGUIMessageBox  = (lv_obj_t*) lv_event_get_user_data(CtrGUIMessageBox_event);
+	lv_msgbox_close(CtrGUIMessageBox);
+	CtrGUIMessageBox = NULL;
+}
+
+ctr_object* ctr_gui_confirm(ctr_object* myself, ctr_argument* argumentList) {
+	char* text = ctr_heap_allocate_cstring(
+		ctr_internal_cast2string( argumentList->object )
+	);
+	if (CtrGUIMessageBox != NULL) {
+		lv_msgbox_close(CtrGUIMessageBox);
+	}
+	//protect argument from gc
+	argumentList->next->object->info.sticky = 1;
+	CtrGUIMessageBox = lv_msgbox_create(NULL);
+    lv_msgbox_add_title(CtrGUIMessageBox, "confirm");
+    lv_msgbox_add_text(CtrGUIMessageBox, text);
+    lv_msgbox_add_close_button(CtrGUIMessageBox);
+	lv_obj_t * btn;
+    btn = lv_msgbox_add_footer_button(CtrGUIMessageBox, "yes");
+    lv_obj_add_event_cb(btn, ctr_internal_gui_CtrGUIMessageBox_event, LV_EVENT_CLICKED, argumentList->next->object);
+    btn = lv_msgbox_add_footer_button(CtrGUIMessageBox, "no");
+    lv_obj_add_event_cb(btn, ctr_internal_gui_CtrGUIMessageBox_close, LV_EVENT_CLICKED, CtrGUIMessageBox);
+    ctr_heap_free(text);
+    return myself;
+}
+
 void begin() {
 	ctr_internal_gui_init();
 	colorObject = ctr_color_new(CtrStdObject, NULL);
@@ -1118,6 +1161,7 @@ void begin() {
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_LINK_SET ), &ctr_gui_link_package );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_SCREEN ), &ctr_gui_screen );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_DIALOG_SET ), &ctr_gui_dialog );
+	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( "confirm:do:" ), &ctr_gui_confirm );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_TIMER_SET ), &ctr_gui_timer );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( "use:" ), &ctr_gui_include );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( "website:" ), &ctr_gui_website );
