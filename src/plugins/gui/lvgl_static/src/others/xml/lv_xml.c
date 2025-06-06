@@ -28,6 +28,8 @@
 #include "parsers/lv_xml_slider_parser.h"
 #include "parsers/lv_xml_tabview_parser.h"
 #include "parsers/lv_xml_chart_parser.h"
+#include "parsers/lv_xml_checkbox_parser.h"
+#include "parsers/lv_xml_switch_parser.h"
 #include "parsers/lv_xml_table_parser.h"
 #include "parsers/lv_xml_dropdown_parser.h"
 #include "parsers/lv_xml_roller_parser.h"
@@ -102,6 +104,8 @@ void lv_xml_init(void)
     lv_xml_widget_register("lv_spangroup-span", lv_xml_spangroup_span_create, lv_xml_spangroup_span_apply);
     lv_xml_widget_register("lv_buttonmatrix", lv_xml_buttonmatrix_create, lv_xml_buttonmatrix_apply);
     lv_xml_widget_register("lv_textarea", lv_xml_textarea_create, lv_xml_textarea_apply);
+    lv_xml_widget_register("lv_checkbox", lv_xml_checkbox_create, lv_xml_checkbox_apply);
+    lv_xml_widget_register("lv_switch", lv_xml_switch_create, lv_xml_switch_apply);
     lv_xml_widget_register("lv_event-call_function", lv_xml_event_call_function_create, lv_xml_event_call_function_apply);
 }
 

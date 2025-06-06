@@ -106,7 +106,7 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
                                                                                lv_xml_to_bool(value));
         else if(lv_streq("flex_in_new_track", name))    lv_obj_update_flag(item, LV_OBJ_FLAG_FLEX_IN_NEW_TRACK,
                                                                                lv_xml_to_bool(value));
-
+		else if(lv_streq("checked", name))  lv_obj_set_state(item, LV_STATE_CHECKED, lv_xml_to_bool(value));
         else if(lv_streq("styles", name)) lv_xml_style_add_to_obj(state, item, value);
 
         else if(lv_strlen(name) > 6 && lv_memcmp("style_", name, 6) == 0) {
