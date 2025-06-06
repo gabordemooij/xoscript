@@ -496,6 +496,7 @@ ctr_object* ctr_gui_vault_set(ctr_object* myself, ctr_argument* argumentList) {
 ctr_object* ctr_gui_vault_get(ctr_object* myself, ctr_argument* argumentList) {
 	char* password;
 	char* vault_name;
+	ctr_object* password_str = CtrStdNil;
 	vault_name = ctr_internal_gui_vault_name(myself);
 	char* lookup_name = ctr_heap_allocate_cstring( ctr_internal_copy2string( argumentList->object ) );
 	int error = ctr_gui_vault_platform_retrieve(vault_name, lookup_name, &password);
@@ -505,8 +506,10 @@ ctr_object* ctr_gui_vault_get(ctr_object* myself, ctr_argument* argumentList) {
         ctr_error("Unable to retrieve password from secret store.", 0);
         return CtrStdNil;
     }
-    ctr_object* password_str = ctr_build_string_from_cstring(password);
-	ctr_gui_vault_platform_destroy(&password);
+	if (password != NULL) {
+		password_str = ctr_build_string_from_cstring(password);
+		ctr_gui_vault_platform_destroy(&password);
+	}
 	return password_str;
 }
 
