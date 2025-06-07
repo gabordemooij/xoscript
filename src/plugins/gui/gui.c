@@ -479,7 +479,7 @@ void ctr_gui_internal_event_handler(lv_event_t* e) {
 #ifdef ANDROID_EXPORT
 	if (event_code == LV_EVENT_LONG_PRESSED) {
 #else
-	if (event_code == LV_EVENT_RIGHT) {
+	if (event_code == LV_EVENT_RIGHT) { //@todo not always detected properly
 #endif
 		CtrGUIContextFocus = lv_indev_get_active_obj();
 		if (CtrGUIContextFocus) {
@@ -600,7 +600,7 @@ ctr_object* ctr_gui_screen(ctr_object* myself, ctr_argument* argumentList) {
 	arguments->object = CtrStdNil;
 	ctr_send_message(guiObject, CTR_DICT_RUN, strlen(CTR_DICT_RUN), arguments);
 	ctr_heap_free(arguments);
-    while(1) {
+    while(!CtrStdFlow) {
 		idle_time = lv_timer_handler(); /*Returns the time to the next timer execution*/
         usleep(idle_time * 1000);
     }
@@ -1108,6 +1108,36 @@ ctr_object* ctr_gui_confirm(ctr_object* myself, ctr_argument* argumentList) {
     return myself;
 }
 
+ctr_object* ctr_gui_clipboard(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* text;
+	char* buffer;
+	buffer = SDL_GetClipboardText();
+	if (buffer != NULL) {
+		int len = strlen(buffer);
+		char* copy = ctr_heap_allocate(len);
+		char* normalized;
+		//We copy the SDL buffer first because we don't want to interfere with SDL memory.
+		memcpy(copy, buffer, len);
+		SDL_free(buffer);
+		/* Normalize line endings */
+		normalized = copy; //ctr_internal_media_normalize_line_endings(copy); // This will destroy the copy buffer, no free needed!
+		text = ctr_build_string_from_cstring(normalized);
+		/* Prevent leak, normalized buffer no longer needed. */
+		ctr_heap_free(normalized);
+	} else {
+		text = ctr_build_empty_string();
+	}
+	return text;
+}
+
+ctr_object* ctr_gui_clipboard_set(ctr_object* myself, ctr_argument* argumentList) {
+	char* buffer;
+	buffer = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	SDL_SetClipboardText(buffer);
+	ctr_heap_free(buffer); /* SetClipboardText strdups the string */
+	return myself;
+}
+
 void begin() {
 	ctr_internal_gui_init();
 	colorObject = ctr_color_new(CtrStdObject, NULL);
@@ -1163,6 +1193,8 @@ void begin() {
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_DIALOG_SET ), &ctr_gui_dialog );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( "confirm:do:" ), &ctr_gui_confirm );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_TIMER_SET ), &ctr_gui_timer );
+	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_CLIPBOARD ), &ctr_gui_clipboard );
+	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_CLIPBOARD ":" ), &ctr_gui_clipboard_set );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( "use:" ), &ctr_gui_include );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( "website:" ), &ctr_gui_website );
 	if (strcmp(CTR_DICT_USE_SET,"use:")!=0) {
