@@ -1179,7 +1179,7 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_proc_press(lv_indev_t * indev, lv_indev_data_t* data)
 {
-    LV_LOG_INFO("pressed at x:%d y:%d", (int)indev->pointer.act_point.x,
+    printf("pressed at x:%d y:%d", (int)indev->pointer.act_point.x,
                 (int)indev->pointer.act_point.y);
     indev_obj_act = indev->pointer.act_obj;
 
@@ -1188,16 +1188,19 @@ static void indev_proc_press(lv_indev_t * indev, lv_indev_data_t* data)
     lv_display_t * disp = indev_act->disp;
     bool new_obj_searched = false;
 
-	 if (data && data->btn_id == 2) {
-        send_event(LV_EVENT_RIGHT, indev_act);
-        return;
-    }
+	 
 
     /*If there is no last object then search*/
     if(indev_obj_act == NULL) {
         indev_obj_act = pointer_search_obj(disp, &indev->pointer.act_point);
         new_obj_searched = true;
     }
+    
+    if (indev_obj_act && data && data->btn_id == 2) {
+        send_event(LV_EVENT_RIGHT, indev_obj_act);
+        return;
+    }
+    
     /*If there is an active object it's not scrolled and not press locked also search*/
     else if(indev->pointer.scroll_obj == NULL &&
             lv_obj_has_flag(indev_obj_act, LV_OBJ_FLAG_PRESS_LOCK) == false) {
