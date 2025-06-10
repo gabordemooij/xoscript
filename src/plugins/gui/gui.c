@@ -482,7 +482,7 @@ void ctr_gui_internal_event_handler(lv_event_t* e) {
 	if (event_code == LV_EVENT_RIGHT) { //@todo not always detected properly
 #endif
 		CtrGUIContextFocus = lv_indev_get_active_obj();
-		if (CtrGUIContextFocus) {
+		if (CtrGUIContextFocus && lv_obj_has_class(CtrGUIContextFocus, &lv_textarea_class)) {
 			lv_obj_add_event_cb(CtrGUIContextFocus, &ctr_gui_internal_context_menu_reset_focus, LV_EVENT_DELETE, NULL);
 			lv_point_t point;
 			lv_indev_get_point(lv_indev_get_act(), &point);
@@ -492,6 +492,10 @@ void ctr_gui_internal_event_handler(lv_event_t* e) {
 	if (event_code == LV_EVENT_PRESSED) {
 		ctr_internal_gui_context_menu_close();
 	}
+	if (event_code == LV_EVENT_FOCUSED && lv_obj_has_class(target, &lv_textarea_class)) {
+		SDL_StartTextInput();
+	}
+	
 	if (id != 0) {
 		arguments = ctr_heap_allocate(sizeof(ctr_argument));
 		arguments->object = ctr_build_number_from_float( (double) id );
