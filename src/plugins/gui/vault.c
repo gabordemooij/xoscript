@@ -7,6 +7,8 @@
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 
+#include <SDL2/SDL.h>
+
 #ifdef WINPASS
 #include <windows.h>
 #include <wincrypt.h>
@@ -438,6 +440,7 @@ void ctr_gui_vault_platform_destroy(char** password) {
 
 #endif
 
+//@todo protect against using Vault itself, always make instance, need name
 
 char* ctr_internal_gui_vault_name(ctr_object* myself) {
 	return ctr_heap_allocate_cstring(
@@ -502,11 +505,8 @@ ctr_object* ctr_gui_vault_get(ctr_object* myself, ctr_argument* argumentList) {
 	int error = ctr_gui_vault_platform_retrieve(vault_name, lookup_name, &password);
 	ctr_heap_free(vault_name);
 	ctr_heap_free(lookup_name);
-	if (error) {
-        ctr_error("Unable to retrieve password from secret store.", 0);
-        return CtrStdNil;
-    }
-	if (password != NULL) {
+	//@todo differentiate between error and not found
+	if (!error && password != NULL) {
 		password_str = ctr_build_string_from_cstring(password);
 		ctr_gui_vault_platform_destroy(&password);
 	}
