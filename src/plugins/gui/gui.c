@@ -715,9 +715,11 @@ ctr_object* ctr_gui_include(ctr_object* myself, ctr_argument* argumentList) {
     prg[offset + 1] = '\0';
     ctr_program_length = offset;
 	parsedCode = ctr_cparse_parse(prg, pathString);
-	ctr_cwlk_subprogram++;
-	ctr_cwlk_run(parsedCode);
-	ctr_cwlk_subprogram--;
+	if (parsedCode) {
+		ctr_cwlk_subprogram++;
+		ctr_cwlk_run(parsedCode);
+		ctr_cwlk_subprogram--;
+	}
 	return myself;
 }
 
