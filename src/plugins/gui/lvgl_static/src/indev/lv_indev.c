@@ -1179,8 +1179,6 @@ static void indev_button_proc(lv_indev_t * i, lv_indev_data_t * data)
  */
 static void indev_proc_press(lv_indev_t * indev, lv_indev_data_t* data)
 {
-    printf("pressed at x:%d y:%d", (int)indev->pointer.act_point.x,
-                (int)indev->pointer.act_point.y);
     indev_obj_act = indev->pointer.act_obj;
 
     if(indev->wait_until_release != 0) return;
