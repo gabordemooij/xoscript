@@ -635,8 +635,8 @@ ctr_object* ctr_gui_vault_decrypt(ctr_object* myself, ctr_argument* argumentList
 	ctr_gui_vault_internal_derive_key(password, &key, &salt);
 	out = ctr_heap_allocate((int)mlen + 1);
 	if (crypto_aead_unlock(out, mac, key, nonce, NULL, 0, message, (int)mlen)) {
-		printf("corrupted\n");
-		exit(1);
+		ctr_error("Unable to decrypt string, invalid format, password or algorithm.", 0);
+		return myself;
 	}
 	crypto_wipe(key, 32);
 	result = ctr_build_string_from_cstring(out);
@@ -658,7 +658,7 @@ void begin_vault() {
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "name" ), &ctr_gui_vault_name );
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "set:password:" ), &ctr_gui_vault_set );
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "get:" ), &ctr_gui_vault_get );
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "encrypt:password:" ), &ctr_gui_vault_encrypt );
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "decrypt:password:" ), &ctr_gui_vault_decrypt );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "encrypt:key:" ), &ctr_gui_vault_encrypt );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "decrypt:key:" ), &ctr_gui_vault_decrypt );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Vault" ), vaultObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 }
