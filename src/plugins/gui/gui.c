@@ -554,7 +554,9 @@ ctr_object* ctr_gui_xml_at_set(ctr_object* myself, ctr_argument* argumentList) {
 	}
 	uint32_t n = lv_obj_get_child_count(child);
 	lv_obj_t* old;
-	while (old = lv_obj_get_child(child, -1)) lv_obj_delete(old);
+	while (old = lv_obj_get_child(child, -1)) {
+		lv_obj_delete(old);
+	}
 	lv_xml_component_register_from_data(name, xml);
 	lv_xml_create(child, name, NULL);
 	ctr_heap_free(xml);
@@ -1104,8 +1106,7 @@ ctr_object* ctr_gui_confirm(ctr_object* myself, ctr_argument* argumentList) {
 	CtrGUIMessageBox = lv_msgbox_create(NULL);
     lv_msgbox_add_title(CtrGUIMessageBox, "confirm");
     lv_msgbox_add_text(CtrGUIMessageBox, text);
-    lv_msgbox_add_close_button(CtrGUIMessageBox);
-	lv_obj_t * btn;
+    lv_obj_t * btn;
     btn = lv_msgbox_add_footer_button(CtrGUIMessageBox, "yes");
     lv_obj_add_event_cb(btn, ctr_internal_gui_CtrGUIMessageBox_event, LV_EVENT_CLICKED, argumentList->next->object);
     btn = lv_msgbox_add_footer_button(CtrGUIMessageBox, "no");
