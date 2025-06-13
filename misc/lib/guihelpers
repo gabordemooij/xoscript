@@ -1,9 +1,5 @@
-
 # GUI helper library
 # provides helper objects for easy development
-
-# version 1.0
-# written by Gabor de Mooij
 
 None on: ['otherwise:'] do: { :fallback <- fallback. }.
 
@@ -113,6 +109,8 @@ LVGLEN on: ['new'] do: {
 			dropdown: ['lv_dropdown'],
 			scale: ['lv_scale'],
 			slider: ['lv_slider'],
+			checkbox: ['lv_checkbox'],
+			switch: ['lv_switch'],
 			table: ['lv_table'],
 			table-column: ['lv_table-column'],
 			table-cell: ['lv_table-cell'],
@@ -122,7 +120,9 @@ LVGLEN on: ['new'] do: {
 	)
 	attributes: ( 
 		Dict new
+			checked: ['checked'],
 			events: ['event_bubble'],
+			hidden: ['hidden'],
 			one-line: ['one_line'],
 			tab-bar-position:['tab_bar_position'],
 			pad-left: ['style_pad_left'],
@@ -143,9 +143,12 @@ LVGLEN on: ['new'] do: {
 			border: ['style_border_width'],
 			border-color: ['style_border_color'],
 			shadow: ['style_shadow_width'],
+			shadow-spread: ['style_shadow_spread'],
+			shadow-color: ['style_shadow_color'],
 			outline: ['style_outline_width'],
 			radius: ['style_radius'],
-			bg-opa: ['style_bg_opa']
+			bg-opa: ['style_bg_opa'],
+			text-align: ['style_text_align']
 	)
 	values: (
 		Dict new
@@ -194,6 +197,10 @@ LVGLEN on: ['background-color:'] do: { :color
 	self style_bg_color: color rgbhex.
 }.
 
+LVGLEN on: ['src:'] do: { :image
+	self src: image name.
+}.
+
 LVGLEN on: ['padding:'] do: { :padding
 	self
 	padding-left: padding,
@@ -210,12 +217,30 @@ LVGLEN on: ['margin:'] do: { :margin
 	margin-bottom: margin.
 }.
 
+LVGLEN on: ['width-height:'] do: { :wh
+	self
+	width: wh,
+	height: wh.
+}.
+
+LVGLEN on: ['flex:'] do: { :flow
+	self
+	layout: ['flex'],
+	flex-flow: flow.
+}.
+
 LVGLEN on: ['maxwh'] do: {
 	self 
 	width: ['100%'],
 	height: ['100%'].
 }.
 
+LVGLEN on: ['margin-padding-border:'] do: { :margin
+	self
+	margin: margin,
+	padding: margin,
+	border: margin.
+}.
 
 LVGLEN on: ['maxcontainer'] do: {
 	self 
@@ -230,3 +255,54 @@ LVGLEN on: ['maxcontainer'] do: {
 # Alias for friendly use
 
 >> View := LVGLEN.
+
+# ID generator
+
+>> ID-Generator := Dict new.
+
+ID-Generator on: ['new'] do: {
+	<- self new init: 0.
+}.
+
+ID-Generator on: ['init:'] do: { :start
+	own start := start copy.
+	own counter := start copy.
+}.
+
+ID-Generator on: ['respond:and:'] do: { :key :value
+	own counter := value copy.
+	>> a := self respond: key and: value.
+	own counter add: 1.
+	<- a.
+}.
+
+ID-Generator on: ['respond:'] do: { :key
+	>> code := self ? key.
+	code None? true: { 
+		code := own counter copy.
+		self put: code at: key.
+		own counter add: 1.
+	}.
+	<- code.
+}.
+
+ID-Generator on: ['range'] do: { <- own counter - own start. }.
+
+# View Query functions, to query elements.
+
+# Given a base and an id calculates the sub id
+ID-Generator on: ['base:id:'] do: { :base :id
+	<- (id - base % self range).
+}.
+
+# Given a base and an id, calculates the index-base
+ID-Generator on: ['base:index:'] do: { :base :id
+	<- (((id - base) / self range) floor) * self range.
+}.
+
+# Given a base, an id and a sub id, calculates the absolute id
+ID-Generator on: ['base:id:find:'] do: { :base :id :target
+	<- ( base + ((((id - base) / self range) floor) * self range) + target ).
+}.
+
+
