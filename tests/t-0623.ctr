@@ -1,0 +1,43 @@
+
+
+>> g  := Gui new.
+>> v  := Vault new.
+>> ok := 0.
+
+>> secrets := List new ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets copy.
+passwords each: { :i :p
+	secrets each: { :n :s
+		{
+			>> encrypted := v encrypt: s key: p.
+			>> decrypted := v decrypt: encrypted key: p.
+			(decrypted = s) true: {
+				ok add: 1.
+			}, else: {
+				Out write: ['failed encrypting/decrypting: '], stop.
+				Out write: s, stop.
+				Out write: ['encrypted: '] + encrypted, stop.
+				Out write: ['decrypted: '] + encrypted, stop.
+				Program end.
+			}.
+		} except: { :err
+			(s = [''] or: p = ['']) true: {
+				ok add: 1.
+			}, else: {
+				Out write: err, stop.
+				Program end.
+			}.
+		}, start.
+	}.
+}.
+
+Out write: ( ok + [' vault encryptions tested.'] ), stop.

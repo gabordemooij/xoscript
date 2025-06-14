@@ -1,5 +1,5 @@
 #define CTR_MSG_LANG_CODE "en_us"
-#define CTR_MSG_WELCOME   "xoscript 1.1.0\n"
+#define CTR_MSG_WELCOME   "xoscript 1.2.0\n"
 #define CTR_MSG_COPYRIGHT "Written by Gabor de Mooij © copyright 2025, Licensed BSD.\n"
 #define CTR_MSG_USAGE_G   "Not enough arguments. Usage: ctr -g file1.h file2.h"
 #define CTR_MSG_USAGE_T   "Not enough arguments. Usage: ctr -t d.dict program.ctr"
