@@ -1,0 +1,308 @@
+# GUI helper library
+# provides helper objects for easy development
+
+None on: ['otherwise:'] do: { :fallback <- fallback. }.
+
+# XML-tree
+
+>> XML-tree := Object new.
+
+XML-tree on: ['new'] do: { 
+	<- self new init.
+}.
+
+XML-tree on: ['init'] do: {
+	own attrs       := Dict new.
+	own values      := Dict new.
+	own names       := Dict new.
+	self clear.	
+}.
+
+XML-tree on: ['clear'] do: {
+	own textmode    := False.
+	own str         := [''].
+	own tags        := List new.
+	own elementmode := False.
+}.
+
+XML-tree on: ['names:attributes:values:'] do: { :names :attrs :values
+	own attrs := attrs.
+	own values := values.
+	own names := names.
+}.
+
+
+XML-tree on: ['respond:'] do: { :message
+	>> tag := (own names ? message otherwise: message).
+	own tags append: tag.
+	own str append: (
+		['<tag '] tag: tag 
+	).
+	own elementmode := False.
+}.
+
+XML-tree on: ['respond:and:'] do: { :message :arg
+	message := message - [':'].
+	own textmode true: {
+		own textmode := False.
+		own str append: arg.
+	}, else: {
+		own str append: (
+			['%attribute%="%value%" ']
+				%attribute%: (own attrs ? message otherwise: message),
+				%value%: (own values ? arg otherwise: arg)
+		).
+	}.
+}.
+
+
+XML-tree on: ['elements'] do: { :message :arg
+	own str append: ['>\n'].
+	own elementmode := True.
+}.
+
+XML-tree on: ['textual'] do: { :message :arg
+	own textmode := True.
+}.
+
+XML-tree on: ['close'] do: { :message :arg
+	>> end := own tags pop.
+	own elementmode true: {
+		own str append: (['\n</tag>'] tag: end).
+	}, else: {
+		own str append: (['></tag>'] tag: end).
+		own elementmode := True.
+	}.
+}.
+
+XML-tree on: ['string'] do: { <- own str. }.
+
+XML-tree on: ['no-xml:'] do: { :str
+	<- str text
+	replace: ['&'] with: ['&amp;'],
+	replace: ['<'] with: ['&lt;'],
+	replace: ['>'] with: ['&gt;'],
+	replace: ['"'] with: ['&quot;'],
+	replace: ['''] with: ['&apos;'].
+}.
+
+# English LVGL-XML wrapper
+
+>> LVGLEN := XML-tree new.
+
+LVGLEN on: ['new'] do: {
+
+	>> xml := self new.
+	
+	xml
+	names: (
+		Dict new
+			object: ['lv_obj'],
+			button: ['lv_button'],
+			label: ['lv_label'],
+			image: ['lv_image'],
+			textarea: ['lv_textarea'],
+			buttonmatrix: ['lv_buttonmatrix'],
+			bar: ['lv_bar'],
+			chart: ['lv_chart'],
+			roller: ['lv_roller'],
+			dropdown: ['lv_dropdown'],
+			scale: ['lv_scale'],
+			slider: ['lv_slider'],
+			checkbox: ['lv_checkbox'],
+			switch: ['lv_switch'],
+			table: ['lv_table'],
+			table-column: ['lv_table-column'],
+			table-cell: ['lv_table-cell'],
+			tabview: ['lv_tabview'],
+			tabview-tab-bar:['lv_tabview-tab_bar'],
+			tabview-tab: ['lv_tabview-tab']
+	)
+	attributes: ( 
+		Dict new
+			checked: ['checked'],
+			events: ['event_bubble'],
+			hidden: ['hidden'],
+			one-line: ['one_line'],
+			tab-bar-position:['tab_bar_position'],
+			pad-left: ['style_pad_left'],
+			pad-right: ['style_pad_right'],
+			pad-bottom: ['style_pad_bottom'],
+			pad-top: ['style_pad_top'],
+			padding-left: ['style_pad_left'],
+			padding-right: ['style_pad_right'],
+			padding-bottom: ['style_pad_bottom'],
+			padding-top: ['style_pad_top'],
+			margin-left: ['style_margin_left'],
+			margin-right: ['style_margin_right'],
+			margin-top: ['style_margin_top'],
+			margin-bottom: ['style_margin_bottom'],
+			layout: ['style_layout'],
+			flex-flow: ['style_flex_flow'],
+			flex-align: ['style_flex_align'],
+			border: ['style_border_width'],
+			border-color: ['style_border_color'],
+			shadow: ['style_shadow_width'],
+			shadow-spread: ['style_shadow_spread'],
+			shadow-color: ['style_shadow_color'],
+			outline: ['style_outline_width'],
+			radius: ['style_radius'],
+			bg-opa: ['style_bg_opa'],
+			text-align: ['style_text_align']
+	)
+	values: (
+		Dict new
+			True: ['true'],
+			False: ['false'],
+			object: ['lv_obj'],
+			button: ['lv_button'],
+			label: ['lv_label'],
+			left: ['left'],
+			right: ['right'],
+			bottom: ['bottom'],
+			top: ['top'],
+			row: ['row'],
+			column: ['column']
+	).
+	
+	<- xml.
+}.
+
+
+LVGLEN on: ['font:'] do: { :font
+	self style_text_font: font name.
+}.
+
+LVGLEN on: ['image:'] do: { :image
+	self src: image name.
+}.
+
+LVGLEN on: ['background:'] do: { :image
+	self style_bg_image_src: image name.
+}.
+
+LVGLEN on: ['color:'] do: { :color
+	self style_text_color: color rgbhex.
+}.
+
+LVGLEN on: ['ink:'] do: { :color
+	self style_text_color: color rgbhex.
+}.
+
+LVGLEN on: ['border-color:'] do: { :color
+	self style_border_color: color rgbhex.
+}.
+
+LVGLEN on: ['background-color:'] do: { :color
+	self style_bg_color: color rgbhex.
+}.
+
+LVGLEN on: ['src:'] do: { :image
+	self src: image name.
+}.
+
+LVGLEN on: ['padding:'] do: { :padding
+	self
+	padding-left: padding,
+	padding-right: padding,
+	padding-top: padding,
+	padding-bottom: padding.
+}.
+
+LVGLEN on: ['margin:'] do: { :margin
+	self
+	margin-left: margin,
+	margin-right: margin,
+	margin-top: margin,
+	margin-bottom: margin.
+}.
+
+LVGLEN on: ['width-height:'] do: { :wh
+	self
+	width: wh,
+	height: wh.
+}.
+
+LVGLEN on: ['flex:'] do: { :flow
+	self
+	layout: ['flex'],
+	flex-flow: flow.
+}.
+
+LVGLEN on: ['maxwh'] do: {
+	self 
+	width: ['100%'],
+	height: ['100%'].
+}.
+
+LVGLEN on: ['margin-padding-border:'] do: { :margin
+	self
+	margin: margin,
+	padding: margin,
+	border: margin.
+}.
+
+LVGLEN on: ['maxcontainer'] do: {
+	self 
+	object
+	width: ['100%'],
+	height: ['100%'],
+	margin: 0,
+	padding: 0,
+	border: 0.
+}.
+
+# Alias for friendly use
+
+>> View := LVGLEN.
+
+# ID generator
+
+>> ID-Generator := Dict new.
+
+ID-Generator on: ['new'] do: {
+	<- self new init: 0.
+}.
+
+ID-Generator on: ['init:'] do: { :start
+	own start := start copy.
+	own counter := start copy.
+}.
+
+ID-Generator on: ['respond:and:'] do: { :key :value
+	own counter := value copy.
+	>> a := self respond: key and: value.
+	own counter add: 1.
+	<- a.
+}.
+
+ID-Generator on: ['respond:'] do: { :key
+	>> code := self ? key.
+	code None? true: { 
+		code := own counter copy.
+		self put: code at: key.
+		own counter add: 1.
+	}.
+	<- code.
+}.
+
+ID-Generator on: ['range'] do: { <- own counter - own start. }.
+
+# View Query functions, to query elements.
+
+# Given a base and an id calculates the sub id
+ID-Generator on: ['base:id:'] do: { :base :id
+	<- (id - base % self range).
+}.
+
+# Given a base and an id, calculates the index-base
+ID-Generator on: ['base:index:'] do: { :base :id
+	<- (((id - base) / self range) floor) * self range.
+}.
+
+# Given a base, an id and a sub id, calculates the absolute id
+ID-Generator on: ['base:id:find:'] do: { :base :id :target
+	<- ( base + ((((id - base) / self range) floor) * self range) + target ).
+}.
+
+
