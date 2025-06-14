@@ -1,6 +1,7 @@
 #!/bin/bash
 #set -x
 #set -v
+ulimit -S -c unlimited
 
 CITRINE_MEMORY_LIMIT_MB=10
 export CITRINE_MEMORY_LIMIT_MB
@@ -93,7 +94,7 @@ unittest() {
 
 # select range
 FROM=1
-TIL=622
+TIL=623
 
 # run tests for linux
 pushd build/Linux/bin
