@@ -308,7 +308,6 @@ static void sdl_event_handler(lv_timer_t * t)
         lv_sdl_mousewheel_handler(&event);
 #endif
         lv_sdl_keyboard_handler(&event);
-
         if(event.type == SDL_WINDOWEVENT) {
             lv_display_t * disp = lv_sdl_get_disp_from_win_id(event.window.windowID);
             if(disp == NULL) continue;
@@ -321,17 +320,29 @@ static void sdl_event_handler(lv_timer_t * t)
                     window_update(disp);
                     break;
                 case SDL_WINDOWEVENT_RESIZED:
-                    dsc->ignore_size_chg = 1;
-                    int32_t hres = (int32_t)((float)(event.window.data1) / dsc->zoom);
-                    int32_t vres = (int32_t)((float)(event.window.data2) / dsc->zoom);
-                    if (hres > orig_hor_res || vres > orig_ver_res) {
-						hres = orig_hor_res;
-						vres = orig_ver_res;
-                    }
-                    lv_display_set_resolution(disp, hres, vres);
+					dsc->ignore_size_chg = 1;
+
+#ifndef REPLACE_RESIZE_WINDOW
+					int32_t hres = (int32_t)((float)(event.window.data1) / dsc->zoom);
+					int32_t vres = (int32_t)((float)(event.window.data2) / dsc->zoom);
+					if (hres > orig_hor_res || vres > orig_ver_res) {
+					   hres = orig_hor_res;
+					   vres = orig_ver_res;
+					}
+					lv_display_set_resolution(disp, hres, vres);
+#endif
+
+#ifdef WITH_RESIZE_PHONE_ROTATE
+					//android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|uiMode"
+					SDL_SetWindowSize(dsc->window, orig_hor_res, orig_ver_res);
+					lv_display_set_resolution(disp, orig_hor_res, orig_ver_res);
+					SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
+					SDL_RenderSetLogicalSize(lv_sdl_window_get_renderer(disp), orig_hor_res, orig_ver_res);
+#endif
+
+					lv_refr_now(disp);
                     dsc->ignore_size_chg = 0;
-                    lv_refr_now(disp);
-                    // trigger redraw after delay to avoid align issues with android statusbar
+					// trigger redraw after delay to avoid align issues with android statusbar
                     lv_timer_create(post_resize_fix_cb, 250, disp);
                     break;
                 case SDL_WINDOWEVENT_CLOSE:
