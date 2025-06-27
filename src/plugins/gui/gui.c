@@ -492,8 +492,12 @@ void ctr_gui_internal_event_handler(lv_event_t* e) {
 	if (event_code == LV_EVENT_PRESSED) {
 		ctr_internal_gui_context_menu_close();
 	}
-	if (event_code == LV_EVENT_FOCUSED && lv_obj_has_class(target, &lv_textarea_class)) {
-		SDL_StartTextInput();
+	if (event_code == LV_EVENT_FOCUSED) {
+		if (lv_obj_has_class(target, &lv_textarea_class)) {
+			SDL_StartTextInput();
+		} else {
+			SDL_StopTextInput();
+		}
 	}
 	
 	if (id != 0) {
