@@ -12,6 +12,8 @@
 #include "lvgl/src/widgets/checkbox/lv_checkbox.h"
 #include "lvgl/src/widgets/switch/lv_switch.h"
 #include "lvgl/src/widgets/textarea/lv_textarea.h"
+#include "lvgl/src/others/xml/lv_xml_style.h"
+
 
 
 
@@ -1098,7 +1100,24 @@ void ctr_internal_gui_CtrGUIMessageBox_close(lv_event_t* CtrGUIMessageBox_event)
 	CtrGUIMessageBox = NULL;
 }
 
+lv_xml_style_t* ctr_gui_internal_load_style(char* style_name) {
+	lv_xml_component_ctx_t* ctx = lv_xml_component_get_ctx("root");
+	lv_xml_style_t* style = lv_xml_get_style_by_name(ctx, style_name);
+	return style;
+}
+
+lv_obj_t* ctr_gui_internal_apply_style(lv_obj_t* widget, lv_xml_style_t* style) {
+	if (style != NULL) {
+		lv_obj_add_style(widget, &style->style, 0);
+	}
+	return widget;
+}
+
 ctr_object* ctr_gui_confirm(ctr_object* myself, ctr_argument* argumentList) {
+	static lv_style_t* dialog_style = NULL;
+	static lv_style_t* dialog_footer_style = NULL;
+	static lv_style_t* dialog_button_style = NULL;
+	static lv_style_t* dialog_header_style = NULL;
 	char* text = ctr_heap_allocate_cstring(
 		ctr_internal_cast2string( argumentList->object )
 	);
@@ -1107,14 +1126,26 @@ ctr_object* ctr_gui_confirm(ctr_object* myself, ctr_argument* argumentList) {
 	}
 	//protect argument from gc
 	argumentList->next->object->info.sticky = 1;
-	CtrGUIMessageBox = lv_msgbox_create(NULL);
-    lv_msgbox_add_title(CtrGUIMessageBox, "confirm");
+	CtrGUIMessageBox = (lv_msgbox_t*) lv_msgbox_create(NULL);
+	if (dialog_style == NULL) {
+		dialog_style = ctr_gui_internal_load_style("dialog");
+		dialog_footer_style = ctr_gui_internal_load_style("dialog-footer");
+		dialog_header_style = ctr_gui_internal_load_style("dialog-header");
+		dialog_button_style = ctr_gui_internal_load_style("dialog-button");
+	}
+	lv_msgbox_add_title(CtrGUIMessageBox, "confirm");
+	ctr_gui_internal_apply_style(CtrGUIMessageBox, dialog_style);
     lv_msgbox_add_text(CtrGUIMessageBox, text);
-    lv_obj_t * btn;
-    btn = lv_msgbox_add_footer_button(CtrGUIMessageBox, "yes");
-    lv_obj_add_event_cb(btn, ctr_internal_gui_CtrGUIMessageBox_event, LV_EVENT_CLICKED, argumentList->next->object);
-    btn = lv_msgbox_add_footer_button(CtrGUIMessageBox, "no");
-    lv_obj_add_event_cb(btn, ctr_internal_gui_CtrGUIMessageBox_close, LV_EVENT_CLICKED, CtrGUIMessageBox);
+    lv_obj_add_event_cb(
+		ctr_gui_internal_apply_style(lv_msgbox_add_footer_button(CtrGUIMessageBox, "yes"), dialog_button_style),
+		ctr_internal_gui_CtrGUIMessageBox_event, LV_EVENT_CLICKED, argumentList->next->object
+	);
+    lv_obj_add_event_cb(
+		ctr_gui_internal_apply_style(lv_msgbox_add_footer_button(CtrGUIMessageBox, "no"), dialog_button_style),
+		ctr_internal_gui_CtrGUIMessageBox_close, LV_EVENT_CLICKED, CtrGUIMessageBox
+	);
+    ctr_gui_internal_apply_style(lv_msgbox_get_footer(CtrGUIMessageBox), dialog_footer_style);
+    ctr_gui_internal_apply_style(lv_msgbox_get_header(CtrGUIMessageBox), dialog_header_style);
     ctr_heap_free(text);
     return myself;
 }
