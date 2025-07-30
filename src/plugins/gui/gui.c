@@ -465,7 +465,16 @@ void ctr_internal_gui_context_menu_open(lv_point_t point) {
 	if (ctxmenu_style == NULL) {
 		lv_obj_set_size(CtrGUIContextMenu, 230, 150);
 	}
-	lv_obj_align(CtrGUIContextMenu, LV_ALIGN_TOP_LEFT, point.x, point.y );
+	int32_t ofsx;
+	int32_t ofsy;
+	int32_t calch;
+	int32_t calcw;
+	lv_obj_update_layout(CtrGUIContextMenu);
+	calch = lv_obj_get_height(CtrGUIContextMenu);
+	calcw = lv_obj_get_width(CtrGUIContextMenu);
+	if (point.y > CtrGUIHeight/2) ofsy = point.y - calch; else ofsy = point.y;
+	if (point.x > CtrGUIWidth/2) ofsx = point.x - calcw; else ofsx = point.x;
+	lv_obj_align(CtrGUIContextMenu, LV_ALIGN_TOP_LEFT, ofsx, ofsy);
 	CtrGUIContextMenuMainPage = lv_menu_page_create(CtrGUIContextMenu, NULL);
 	ctr_internal_gui_context_menu_add(&CtrGUIContextMenuItemCopy, &CtrGUIContextMenuLabelCopy, LV_SYMBOL_COPY " " CTR_MSG_GUI_CONTEXTMENU_COPY);
 	ctr_internal_gui_context_menu_add(&CtrGUIContextMenuItemPaste, &CtrGUIContextMenuLabelPaste, LV_SYMBOL_PASTE " " CTR_MSG_GUI_CONTEXTMENU_PASTE);
