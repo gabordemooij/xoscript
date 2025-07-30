@@ -23,6 +23,7 @@ XML-tree on: ['clear'] do: {
 	own str         := [''].
 	own tags        := List new.
 	own elementmode := False.
+	own stylemode   := False.
 }.
 
 XML-tree on: ['names:attributes:values:'] do: { :names :attrs :values
@@ -43,13 +44,18 @@ XML-tree on: ['respond:'] do: { :message
 
 XML-tree on: ['respond:and:'] do: { :message :arg
 	message := message - [':'].
+
+	own stylemode and: ( ( message find: ['style_'] ) = 0 ), true: {
+		message := message offset: 6.
+	}.
+
 	own textmode true: {
 		own textmode := False.
 		own str append: arg.
 	}, else: {
 		own str append: (
 			['%attribute%="%value%" ']
-				%attribute%: (own attrs ? message otherwise: message),
+				%attribute%: ( own stylemode either: message or: (own attrs ? message otherwise: message) ),
 				%value%: (own values ? arg otherwise: arg)
 		).
 	}.
@@ -66,6 +72,7 @@ XML-tree on: ['textual'] do: { :message :arg
 }.
 
 XML-tree on: ['close'] do: { :message :arg
+	own stylemode := False.
 	>> end := own tags pop.
 	own elementmode true: {
 		own str append: (['\n</tag>'] tag: end).
@@ -98,6 +105,7 @@ LVGLEN on: ['new'] do: {
 	names: (
 		Dict new
 			object: ['lv_obj'],
+			theme: ['lv_widgettheme'],
 			button: ['lv_button'],
 			label: ['lv_label'],
 			image: ['lv_image'],
@@ -123,6 +131,8 @@ LVGLEN on: ['new'] do: {
 			checked: ['checked'],
 			events: ['event_bubble'],
 			hidden: ['hidden'],
+			text-color: ['style_text_color'],
+			color: ['style_text_color'],
 			one-line: ['one_line'],
 			tab-bar-position:['tab_bar_position'],
 			pad-left: ['style_pad_left'],
@@ -168,6 +178,10 @@ LVGLEN on: ['new'] do: {
 	<- xml.
 }.
 
+LVGLEN on: ['style'] do: {
+	own stylemode := True.
+	self respond: ['style'].
+}.
 
 LVGLEN on: ['font:'] do: { :font
 	self style_text_font: font name.
