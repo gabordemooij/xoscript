@@ -601,7 +601,6 @@ void ctr_internal_gui_init(void) {
 	lv_xml_register_font("montserrat46", &lv_font_montserrat_46);
 	lv_xml_register_font("montserrat44", &lv_font_montserrat_44);
 	lv_xml_register_font("montserrat42", &lv_font_montserrat_42);
-	lv_xml_register_font("montserrat40", &lv_font_montserrat_40);
 	lv_xml_register_font("montserrat38", &lv_font_montserrat_38);
 	lv_xml_register_font("montserrat36", &lv_font_montserrat_36);
 	lv_xml_register_font("montserrat34", &lv_font_montserrat_34);
@@ -616,7 +615,6 @@ void ctr_internal_gui_init(void) {
 	lv_xml_register_font("montserrat14", &lv_font_montserrat_14);
 	lv_xml_register_font("montserrat12", &lv_font_montserrat_12);
 	lv_xml_register_font("montserrat10", &lv_font_montserrat_10);
-	lv_xml_register_font("montserrat8", &lv_font_montserrat_8);
 }
 
 ctr_object* ctr_gui_screen(ctr_object* myself, ctr_argument* argumentList) {
