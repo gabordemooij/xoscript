@@ -462,7 +462,9 @@ void ctr_internal_gui_context_menu_open(lv_point_t point) {
 		ctxmenu_item_label_style = ctr_gui_internal_load_style("context-menu-item-label");
 	}
 	lv_obj_add_event_cb(CtrGUIContextMenu, ctr_internal_gui_context_actions, LV_EVENT_CLICKED, CtrGUIContextMenu);
-	lv_obj_set_size(CtrGUIContextMenu, 230, 150);
+	if (ctxmenu_style == NULL) {
+		lv_obj_set_size(CtrGUIContextMenu, 230, 150);
+	}
 	lv_obj_align(CtrGUIContextMenu, LV_ALIGN_TOP_LEFT, point.x, point.y );
 	CtrGUIContextMenuMainPage = lv_menu_page_create(CtrGUIContextMenu, NULL);
 	ctr_internal_gui_context_menu_add(&CtrGUIContextMenuItemCopy, &CtrGUIContextMenuLabelCopy, LV_SYMBOL_COPY " " CTR_MSG_GUI_CONTEXTMENU_COPY);
@@ -595,6 +597,26 @@ void ctr_internal_gui_init(void) {
 	if (TTF_Init() < 0) {
 		ctr_internal_gui_fatalerror("TTF_Init", SDL_GetError());
 	}
+	lv_xml_register_font("montserrat48", &lv_font_montserrat_48);
+	lv_xml_register_font("montserrat46", &lv_font_montserrat_46);
+	lv_xml_register_font("montserrat44", &lv_font_montserrat_44);
+	lv_xml_register_font("montserrat42", &lv_font_montserrat_42);
+	lv_xml_register_font("montserrat40", &lv_font_montserrat_40);
+	lv_xml_register_font("montserrat38", &lv_font_montserrat_38);
+	lv_xml_register_font("montserrat36", &lv_font_montserrat_36);
+	lv_xml_register_font("montserrat34", &lv_font_montserrat_34);
+	lv_xml_register_font("montserrat32", &lv_font_montserrat_32);
+	lv_xml_register_font("montserrat30", &lv_font_montserrat_30);
+	lv_xml_register_font("montserrat28", &lv_font_montserrat_28);
+	lv_xml_register_font("montserrat24", &lv_font_montserrat_24);
+	lv_xml_register_font("montserrat22", &lv_font_montserrat_22);
+	lv_xml_register_font("montserrat20", &lv_font_montserrat_20);
+	lv_xml_register_font("montserrat18", &lv_font_montserrat_18);
+	lv_xml_register_font("montserrat16", &lv_font_montserrat_16);
+	lv_xml_register_font("montserrat14", &lv_font_montserrat_14);
+	lv_xml_register_font("montserrat12", &lv_font_montserrat_12);
+	lv_xml_register_font("montserrat10", &lv_font_montserrat_10);
+	lv_xml_register_font("montserrat8", &lv_font_montserrat_8);
 }
 
 ctr_object* ctr_gui_screen(ctr_object* myself, ctr_argument* argumentList) {
