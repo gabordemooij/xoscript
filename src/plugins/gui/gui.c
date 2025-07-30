@@ -447,9 +447,20 @@ void ctr_internal_gui_context_menu_add(lv_obj_t** ret_item, lv_obj_t** ret_label
 	*ret_item = item;
 }
 
+lv_xml_style_t* ctr_gui_internal_load_style(char* style_name);
+lv_obj_t* ctr_gui_internal_apply_style(lv_obj_t* widget, lv_xml_style_t* style);
+
 void ctr_internal_gui_context_menu_open(lv_point_t point) {
+	static lv_style_t* ctxmenu_style = NULL;
+	static lv_style_t* ctxmenu_item_style = NULL;
+	static lv_style_t* ctxmenu_item_label_style = NULL;
 	ctr_internal_gui_context_menu_close();
 	CtrGUIContextMenu = lv_menu_create(lv_scr_act());
+	if (ctxmenu_style == NULL) {
+		ctxmenu_style = ctr_gui_internal_load_style("context-menu");
+		ctxmenu_item_style = ctr_gui_internal_load_style("context-menu-item");
+		ctxmenu_item_label_style = ctr_gui_internal_load_style("context-menu-item-label");
+	}
 	lv_obj_add_event_cb(CtrGUIContextMenu, ctr_internal_gui_context_actions, LV_EVENT_CLICKED, CtrGUIContextMenu);
 	lv_obj_set_size(CtrGUIContextMenu, 230, 150);
 	lv_obj_align(CtrGUIContextMenu, LV_ALIGN_TOP_LEFT, point.x, point.y );
@@ -459,6 +470,15 @@ void ctr_internal_gui_context_menu_open(lv_point_t point) {
 	ctr_internal_gui_context_menu_add(&CtrGUIContextMenuItemCut, &CtrGUIContextMenuLabelCut, LV_SYMBOL_CUT " " CTR_MSG_GUI_CONTEXTMENU_CUT);
 	ctr_internal_gui_context_menu_add(&CtrGUIContextMenuItemSelAll, &CtrGUIContextMenuLabelSelAll, CTR_MSG_GUI_CONTEXTMENU_SELALL);
 	lv_menu_set_page(CtrGUIContextMenu, CtrGUIContextMenuMainPage);
+	ctr_gui_internal_apply_style(CtrGUIContextMenu, ctxmenu_style);
+	ctr_gui_internal_apply_style(CtrGUIContextMenuItemCopy, ctxmenu_item_style);
+	ctr_gui_internal_apply_style(CtrGUIContextMenuLabelCopy, ctxmenu_item_label_style);
+	ctr_gui_internal_apply_style(CtrGUIContextMenuItemPaste, ctxmenu_item_style);
+	ctr_gui_internal_apply_style(CtrGUIContextMenuLabelPaste, ctxmenu_item_label_style);
+	ctr_gui_internal_apply_style(CtrGUIContextMenuItemCut, ctxmenu_item_style);
+	ctr_gui_internal_apply_style(CtrGUIContextMenuLabelCut, ctxmenu_item_label_style);
+	ctr_gui_internal_apply_style(CtrGUIContextMenuItemSelAll, ctxmenu_item_style);
+	ctr_gui_internal_apply_style(CtrGUIContextMenuLabelSelAll, ctxmenu_item_label_style);
 }
 
 void ctr_gui_internal_context_menu_reset_focus(lv_event_t* e) {
