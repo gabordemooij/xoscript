@@ -1182,22 +1182,35 @@ ctr_object* ctr_gui_confirm(ctr_object* myself, ctr_argument* argumentList) {
 		dialog_header_style = ctr_gui_internal_load_style("dialog-header");
 		dialog_button_style = ctr_gui_internal_load_style("dialog-button");
 	}
-	lv_msgbox_add_title(CtrGUIMessageBox, "confirm");
+	if (argumentList->next->object == CtrStdNil) {
+		lv_msgbox_add_title(CtrGUIMessageBox, "alert");
+	} else {
+		lv_msgbox_add_title(CtrGUIMessageBox, "confirm");
+	}
 	ctr_gui_internal_apply_style(CtrGUIMessageBox, dialog_style);
     lv_msgbox_add_text(CtrGUIMessageBox, text);
-    lv_obj_add_event_cb(
-		ctr_gui_internal_apply_style(lv_msgbox_add_footer_button(CtrGUIMessageBox, "yes"), dialog_button_style),
-		ctr_internal_gui_CtrGUIMessageBox_event, LV_EVENT_CLICKED, argumentList->next->object
-	);
-    lv_obj_add_event_cb(
-		ctr_gui_internal_apply_style(lv_msgbox_add_footer_button(CtrGUIMessageBox, "no"), dialog_button_style),
-		ctr_internal_gui_CtrGUIMessageBox_close, LV_EVENT_CLICKED, CtrGUIMessageBox
-	);
+    if (argumentList->next->object == CtrStdNil) {
+		lv_obj_add_event_cb(
+			ctr_gui_internal_apply_style(lv_msgbox_add_footer_button(CtrGUIMessageBox, "ok"), dialog_button_style),
+			ctr_internal_gui_CtrGUIMessageBox_close, LV_EVENT_CLICKED, CtrGUIMessageBox
+		);
+	} else {
+		lv_obj_add_event_cb(
+			ctr_gui_internal_apply_style(lv_msgbox_add_footer_button(CtrGUIMessageBox, "yes"), dialog_button_style),
+			ctr_internal_gui_CtrGUIMessageBox_event, LV_EVENT_CLICKED, argumentList->next->object
+		);
+		lv_obj_add_event_cb(
+			ctr_gui_internal_apply_style(lv_msgbox_add_footer_button(CtrGUIMessageBox, "no"), dialog_button_style),
+			ctr_internal_gui_CtrGUIMessageBox_close, LV_EVENT_CLICKED, CtrGUIMessageBox
+		);
+	}
     ctr_gui_internal_apply_style(lv_msgbox_get_footer(CtrGUIMessageBox), dialog_footer_style);
     ctr_gui_internal_apply_style(lv_msgbox_get_header(CtrGUIMessageBox), dialog_header_style);
     ctr_heap_free(text);
     return myself;
 }
+
+
 
 ctr_object* ctr_gui_clipboard(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* text;
@@ -1283,6 +1296,7 @@ void begin() {
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_SCREEN ), &ctr_gui_screen );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_DIALOG_SET ), &ctr_gui_dialog );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( "confirm:do:" ), &ctr_gui_confirm );
+	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( "alert:" ), &ctr_gui_confirm );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_TIMER_SET ), &ctr_gui_timer );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_CLIPBOARD ), &ctr_gui_clipboard );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_CLIPBOARD ":" ), &ctr_gui_clipboard_set );
