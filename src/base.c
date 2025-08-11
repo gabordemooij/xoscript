@@ -1125,6 +1125,7 @@ ctr_object* ctr_block_procedure(ctr_object* myself, ctr_argument* argumentList) 
 	ctr_block_run(block, arguments, NULL);
 	ctr_heap_free( arguments );
 	if (CtrStdFlow == CtrStdBreak) CtrStdFlow = NULL; /* consume break */
+	if (CtrStdFlow == CtrStdContinue) CtrStdFlow = NULL; /* should not be used, but is accepted anyway */
 	block->info.mark = 0;
 	block->info.sticky = 0;
 	return myself;
@@ -1957,11 +1958,14 @@ ctr_object* ctr_string_fill_in(ctr_object* myself, ctr_argument* argumentList) {
 
 	if ( message->value.svalue->value[message->value.svalue->vlen - 1] == ctr_clex_param_prefix_char ) {
 		slot = ctr_build_string( message->value.svalue->value, message->value.svalue->vlen - 1);
+		slot->info.sticky = 1;
 	} else {
 		slot = message;
 	}
 	argumentList->object = slot;
-	return ctr_string_replace_with( myself, argumentList );
+	ctr_object* result = ctr_string_replace_with( myself, argumentList );
+	slot->info.sticky = 0;
+	return result;
 }
 
 /**

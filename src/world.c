@@ -887,6 +887,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdArray, ctr_build_string_from_cstring( CTR_DICT_BY_SET ), &ctr_array_combine );
 	ctr_internal_create_func(CtrStdArray, ctr_build_string_from_cstring( CTR_DICT_INDEX_OF ), &ctr_array_index_of );
 	ctr_internal_create_func(CtrStdArray, ctr_build_string_from_cstring( CTR_DICT_COPY ), &ctr_array_copy );
+	ctr_internal_create_func(CtrStdArray, ctr_build_string_from_cstring( CTR_DICT_HAS ), &ctr_array_has );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_ARRAY_OBJECT ), CtrStdArray, 0 );
 	CtrStdArray->link = CtrStdObject;
 	CtrStdArray->info.sticky = 1;
@@ -964,6 +965,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_TONUMBER ), &ctr_program_tonumber );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_TOSTRING ), &ctr_program_tostring );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "platform" ), &ctr_program_platform );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_VERSION_SET ), &ctr_program_timemachine );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PROGRAM ), CtrStdCommand, 0 );
 	CtrStdCommand->link = CtrStdObject;
 	CtrStdCommand->info.sticky = 1;
@@ -1046,7 +1048,7 @@ void ctr_initialize_world() {
  *
  * Sends a message to a receiver object.
  */
-ctr_object* ctr_internal_tmp_msg;
+ctr_object* ctr_internal_tmp_msg = NULL;
 ctr_object* ctr_send_message(ctr_object* receiverObject, char* message, long vlen, ctr_argument* argumentList) {
 	ctr_object* methodObject;
 	ctr_object* searchObject;
