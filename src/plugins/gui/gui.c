@@ -32,6 +32,9 @@
 #include "fficonnect.h"
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 uint16_t CtrGUIWidth = 800;
 uint16_t CtrGUIHeight = 400;
@@ -663,7 +666,11 @@ ctr_object* ctr_gui_screen(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_heap_free(arguments);
     while(!CtrStdFlow) {
 		idle_time = lv_timer_handler(); /*Returns the time to the next timer execution*/
-        usleep(idle_time * 1000);
+ #ifdef __EMSCRIPTEN__
+		emscripten_sleep(1);
+ #else
+		usleep(idle_time * 1000);
+ #endif
     }
 	return myself;
 }
@@ -1314,9 +1321,11 @@ void begin() {
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PACKAGE_OBJECT ), packageObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Gui" ), guiObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	begin_json();
+	#ifndef __EMSCRIPTEN__
 	begin_vault();
 	#ifdef FFI
 	begin_ffi();
+	#endif
 	#endif
 }
 
