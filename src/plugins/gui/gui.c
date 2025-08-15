@@ -1066,6 +1066,58 @@ ctr_object* ctr_network_basic_text_send(ctr_object* myself, ctr_argument* argume
 extern ctr_object* ctr_network_basic_text_send(ctr_object* myself, ctr_argument* argumentList);
 #endif
 
+#ifdef __EMSCRIPTEN__
+EM_ASYNC_JS(int, ctr_internal_js_xhr, (char* url, char* data, char** out), {
+	var status_code = 0;
+	var request_data = {};
+	try {
+		request_data.method = (data === 0) ? "GET" : "POST";
+		if (data !== 0) {
+			request_data.body = UTF8ToString(data);
+			var headers = new Headers();
+			headers.append("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+			request_data.headers = headers;
+		}
+		var request = new Request(UTF8ToString(url), request_data);
+		var a = await fetch(request);
+		if (!a.ok) { // equals (a.status < 200 || a.status >= 300)
+			throw new Error("HTTP " + a.status + " " + a.statusText);
+		}
+		var b = await a.text();
+		HEAP32[out >> 2] = stringToNewUTF8(b);
+	} catch(e) {
+		status_code = -1;
+		HEAP32[out >> 2] = stringToNewUTF8(e.message);
+	}
+	return status_code;
+});
+ctr_object* ctr_network_basic_text_send(ctr_object* myself, ctr_argument* argumentList) {
+	char* url;
+	char* payload = NULL;
+	char* result_text;
+	int err;
+	ctr_object* result_object;
+	if (argumentList->object != CtrStdNil) {
+		payload = ctr_heap_allocate_cstring(
+			ctr_internal_cast2string(argumentList->object)
+		);
+	}
+	url = ctr_heap_allocate_cstring(
+		ctr_internal_cast2string(argumentList->next->object)
+	);
+	err = ctr_internal_js_xhr(url, payload, &result_text);
+	result_object = ctr_build_string_from_cstring(result_text);
+	if (err) {
+		ctr_error(result_text,0);
+	}
+	ctr_heap_free(url);
+	if (payload) {
+		ctr_heap_free(payload);
+	}
+	free(result_text);
+	return result_object;
+}
+#endif
 
 ctr_object* ctr_gui_dialog(ctr_object* myself, ctr_argument* argumentList) {
 	char* message = ctr_heap_allocate_cstring(
@@ -1269,14 +1321,9 @@ void begin() {
 	CtrGUINetworkObject = ctr_network_new(CtrStdObject, NULL);
 	CtrGUINetworkObject->link = CtrStdObject;
 	ctr_internal_create_func(CtrGUINetworkObject, ctr_build_string_from_cstring( CTR_DICT_NEW ), &ctr_network_new );
-	#ifdef LIBCURL
+	#if defined(LIBCURL) || defined(ANDROID_EXPORT) || defined(__EMSCRIPTEN__)
 	ctr_internal_create_func(CtrGUINetworkObject, ctr_build_string_from_cstring(CTR_DICT_SEND_TEXT_MESSAGE), &ctr_network_basic_text_send );
 	#endif
-	
-	#ifdef ANDROID_EXPORT
-	ctr_internal_create_func(CtrGUINetworkObject, ctr_build_string_from_cstring(CTR_DICT_SEND_TEXT_MESSAGE), &ctr_network_basic_text_send );
-	#endif
-	
 	CtrGUIAssetPackage = NULL;
 	packageObject = ctr_package_new(CtrStdObject, NULL);
 	packageObject->link = CtrStdObject;
