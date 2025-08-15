@@ -1119,6 +1119,40 @@ ctr_object* ctr_network_basic_text_send(ctr_object* myself, ctr_argument* argume
 }
 #endif
 
+#ifdef __EMSCRIPTEN__
+EM_JS(int, ctr_gui_rawjs, (char* code, char** out), {
+	var js_code = UTF8ToString(code);
+	var result = "";
+	var err = 0;
+	try {
+		result = ''+(eval(js_code));
+	} catch(e) {
+		result = String(e.message);
+		err = -1;
+	}
+	HEAP32[out >> 2] = stringToNewUTF8(result);
+	return err;
+});
+ctr_object* ctr_gui_js(ctr_object* myself, ctr_argument* argumentList) {
+	char* jscode;
+	char* out;
+	char* errmsg;
+	int err = 0;
+	ctr_object* result = CtrStdNil;
+	jscode = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	err = ctr_gui_rawjs(jscode, &out);
+	if (err) {
+		strcpy(errmsg, out);
+		ctr_error(errmsg,0);
+	} else {
+		result = ctr_build_string_from_cstring(out);
+	}
+	free(out);
+	ctr_heap_free(jscode);
+	return result;
+}
+#endif
+
 ctr_object* ctr_gui_dialog(ctr_object* myself, ctr_argument* argumentList) {
 	char* message = ctr_heap_allocate_cstring(
 		ctr_internal_cast2string(argumentList->object)
@@ -1356,6 +1390,9 @@ void begin() {
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_CLIPBOARD ":" ), &ctr_gui_clipboard_set );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( "use:" ), &ctr_gui_include );
 	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( "website:" ), &ctr_gui_website );
+	#ifdef __EMSCRIPTEN__
+	ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( "js:" ), ctr_gui_js);
+	#endif
 	if (strcmp(CTR_DICT_USE_SET,"use:")!=0) {
 		ctr_internal_create_func(guiObject, ctr_build_string_from_cstring( CTR_DICT_USE_SET ), &ctr_gui_include );
 	}
