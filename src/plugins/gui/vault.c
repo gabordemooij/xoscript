@@ -37,13 +37,26 @@ int random_buf(void *buf, size_t len) {
 #include <stdlib.h>
 #include <string.h>
 #include <gui.h>
+
 #include "../../citrine.h"
 #include "vault.h"
 #include "monocypher/src/monocypher.h"
 
-#ifndef WINPASS
+#ifdef LIBSECRET
 int random_buf(void *buf, size_t n) {
     arc4random_buf(buf, n);
+    return 0;
+}
+#endif
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+EM_JS(int, wasm_random_buf, (uint8_t* buf, size_t len), {
+    crypto.getRandomValues(HEAPU8.subarray(buf, buf + len));
+    return 0;
+});
+int random_buf(void *buf, size_t n) {
+    wasm_random_buf((uint8_t*) buf, (size_t) n);
     return 0;
 }
 #endif
@@ -432,6 +445,57 @@ int ctr_gui_vault_platform_store(char* vault_name, char* lookup_name, char* pass
 
 void ctr_gui_internal_vault_init() {
 	/* not needed for android */
+}
+
+void ctr_gui_vault_platform_destroy(char** password) {
+	return;
+}
+
+#endif
+
+#ifdef __EMSCRIPTEN__
+EM_ASYNC_JS(int, ctr_gui_vault_platform_retrieve_js, (char** out), {
+	var err = 0;
+	var password = await navigator.credentials.get({
+		password: true,
+		mediation: 'optional'
+	});
+	if (!password) {
+		err = -1;
+	} else {
+		HEAP32[out >> 2] = stringToNewUTF8(password.password);
+	}
+	return err;
+});
+int ctr_gui_vault_platform_retrieve(char* vault_name, char* lookup_name, char** password) {
+	char* js_password;
+	int err;
+	err = ctr_gui_vault_platform_retrieve_js(&js_password);
+	if (err) return err;
+	strcpy(*password, js_password);
+	return 0;
+}
+
+EM_ASYNC_JS(int, ctr_gui_vault_platform_store_js, (char* label, char* password), {
+	var cred = new PasswordCredential({
+	  id: UTF8ToString(label),
+	  password: UTF8ToString(password),
+	});
+	try {
+		await navigator.credentials.store(cred);
+	} catch(e) {
+		alert(e.message); // show error message (likely https missing)
+		return -1;
+	}
+	return 0;
+});
+
+int ctr_gui_vault_platform_store(char* vault_name, char* lookup_name, char* password) {
+	return ctr_gui_vault_platform_store_js(lookup_name, password);
+}
+
+void ctr_gui_internal_vault_init() {
+	/* not needed for wasm */
 }
 
 void ctr_gui_vault_platform_destroy(char** password) {

@@ -1368,11 +1368,9 @@ void begin() {
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PACKAGE_OBJECT ), packageObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Gui" ), guiObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	begin_json();
-	#ifndef __EMSCRIPTEN__
 	begin_vault();
 	#ifdef FFI
 	begin_ffi();
-	#endif
 	#endif
 }
 
