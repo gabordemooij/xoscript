@@ -64,6 +64,7 @@ void lv_xml_obj_apply(lv_xml_parser_state_t * state, const char ** attrs)
         else if(lv_streq("height", name)) lv_obj_set_height(item, lv_xml_to_size(value));
         else if(lv_streq("align", name)) lv_obj_set_align(item, lv_xml_align_to_enum(value));
         else if(lv_streq("flex_flow", name)) lv_obj_set_flex_flow(item, lv_xml_flex_flow_to_enum(value));
+
         else if(lv_streq("flex_grow", name)) lv_obj_set_flex_grow(item, lv_xml_atoi(value));
 #if (LV_USE_OBJ_ID && !LV_OBJ_ID_AUTO_ASSIGN)
         else if(lv_streq("id", name)) lv_obj_set_id(item, (void*)lv_xml_atoi(value));
