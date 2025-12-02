@@ -842,3 +842,39 @@ int ctr_init();
 void init_embedded_media_plugin();
 void init_embedded_gui_plugin();
 void* ctr_data_blob(unsigned int* blob_len);
+
+/* macros */
+#define CTR_DEFINE_SETTER_CAST(funcname, propname, castfunc) \
+ctr_object* funcname(ctr_object* myself, ctr_argument* argumentList) { \
+    ctr_internal_object_property( \
+        myself, \
+        propname, \
+        castfunc(argumentList->object) \
+    ); \
+    return myself; \
+}
+
+#define CTR_DEFINE_SETTER(funcname, propname) \
+ctr_object* funcname(ctr_object* myself, ctr_argument* argumentList) { \
+    ctr_internal_object_property( \
+        myself, \
+        propname, \
+        argumentList->object \
+    ); \
+    return myself; \
+}
+
+#define CTR_DEFINE_CLASS_OTEX(classname, resource_type, destructor_call) \
+ctr_object* classname(ctr_object* myself, ctr_argument* argumentList) { \
+	ctr_object* instance; \
+	ctr_resource* rs; \
+	rs = ctr_heap_allocate( sizeof(ctr_resource) ); \
+	rs->type = resource_type; \
+	rs->ptr = NULL; \
+	rs->destructor = destructor_call; \
+	instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX); \
+	instance->link = myself; \
+	instance->value.rvalue = rs; \
+	return instance; \
+}
+

@@ -1,2 +1,60 @@
-# Hello world in dialog
-Gui show: ['Hello world'].
+# Server Demo
+#
+# - HTTP Request Handler
+# - Basic Session Handler
+# - Database Object (MariaDB)
+# - CURL
+# - JSON
+# - Encryption
+#
+# SQL Example:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+
+# HTTP Requests
+Server init.
+>> rq := HTTP-Request new.
+Out write: ['HTTP-GET a='] + ( rq get: ['a'] ), stop. # GET
+Out write: ['HTTP-POST c='] + ( rq post: ['c'] ), stop. # POST
+
+# Session handler (just sets or gets id)
+Out write: rq session, stop.  # uses COOKIE
+
+# Database
+>> db := Maria-DB new
+	host: ['localhost'],
+	username: ['xo'],
+	password: ['pass123'],
+	dbname: ['xobase'],
+	connect.
+
+>> query := db query: ['
+	INSERT INTO 
+		book 
+		(id, description, price, rating) 
+		VALUES (NULL, ?, ?, ?)
+	'],
+	parameters: (
+		List new ; ['abc'] ; 12.35 ; 6
+	).
+
+{  query execute. } except: { :e 
+
+	Out write: e, stop.
+	db rollback. 
+
+}, start.
+
+Out write: ['INSERTED: '] + query insert-id, stop.
+
+>> query := db query: ['
+		SELECT * FROM book order by id desc limit 2
+	'], 
+	fetch: { :row
+		Out write: row description + [': '] + row price, stop.
+	}.
