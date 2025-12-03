@@ -27,29 +27,45 @@ Out write: ['HTTP-POST c='] + ( rq post: ['c'] ), stop. # POST
 Out write: rq session, stop.  # uses COOKIE
 
 # ~ Database ~
->> db := Maria-DB new
-	host: ['localhost'],
-	username: ['xo'],
-	password: ['pass123'],
-	dbname: ['xobase'],
-	connect.
+>> db := Maria-DB new host: ['localhost'],
+	username: ['xo'], password: ['pass123'], dbname: ['xobase'], connect.
 
-# parameterized queries
 >> query := db query: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parameters: ( List new ; ['abc'] ; 12.35 ; 6 ).
+'], parameters: ( List new ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
 
-# transactions
-{  query execute. db commit. } except: { :e db rollback.  }, start.
+{  query execute. db commit. } except: { :e db rollback.  }, start. # transactions
+Out write: ['INSERTED: '] + query insert-id, stop. # insert id
 
-# insert id
-Out write: ['INSERTED: '] + query insert-id, stop.
+>> query :=
+db query: ['SELECT * FROM book order by id desc limit 2'], 
+fetch: { :row Out write: row id + [' '] + row description + [': '] + row price, stop. }. # fetching rows
 
-# fetching rows
->> query := db query: ['
-		SELECT * FROM book order by id desc limit 2
-	'], 
-	fetch: { :row
-		Out write: row id + [' '] + row description + [': '] + row price, stop.
-	}.
+# ~ CURL ~
+Out write: ( Net post: None to: ['https://xoscript.com'] ) length, stop. # post none = GET
+
+# ~ JSON ~
+>> json := (JSON jsonify: (Dict new put: (List new ; 1 ; 2 ; 3) at: ['abc'])).
+Out write: json, stop.
+Out write: ((JSON object: json) abc ? 1), stop.
+
+# ~ Encryption ~
+>> vault := Vault new: ['Encryptor'].
+Out write: (Vault encrypt: ['hello'] key: ['world']), stop.
+
+# ~ Template ~
+Program use: ['template.xo'].
+>> html := ['
+    <p>
+		<!-- cut:greeting -->
+			<b>{% greeting %}</b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+    </p>
+'].
+
+>> tpl := Template new content: html.
+>> greeting := tpl cut: ['greeting'], copy greeting: ['Hello World!'].
+tpl paste: greeting at: ['greetings'].
+Out write: tpl clean, stop.

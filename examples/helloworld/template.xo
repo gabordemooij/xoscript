@@ -1,0 +1,76 @@
+
+# ~ Simple template engine ~
+
+>> Template := Object new.
+
+Template on: ['new'] do: {
+	<- self new content: [''].
+}.
+
+Template on: ['content:'] do: { :content
+	own content := content. 
+}.
+
+Template on: ['new:'] do: { :content
+	<- self new content: content.
+}.
+
+Template on: ['cut:'] do: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker   := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := own content split: startmarker.
+	
+	
+	>> prefix := parts first.
+	>> parts2 := parts last split: endmarker.
+	>> suffix := parts2 last.
+	>> part   := parts2 first.
+	>> rest := prefix + suffix.
+	own content := rest.
+	
+	<- Template new: part.
+	
+}.
+
+Template on: ['copy'] do: {
+	<- self new: self string copy.
+}.
+	
+Template on: ['paste:at:'] do: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	own content replace: pastemarker with: ( snippet string + pastemarker ).
+}.
+
+Template on: ['set:value:'] do: { :slot :value
+	value
+	replace: ['&'] with: ['&amp;'],
+	replace: ['<'] with: ['&lt;'],
+	replace: ['>'] with: ['&gt;'],
+	replace: ['"'] with: ['&quot;'].
+	own content replace: slot with: value.
+}.
+
+Template on: ['respond:and:'] do: { :slot :value
+	>> full-slot := ['{% '] + (slot from: 0 length: (slot length - 1)) + [' %}'].
+	self set: full-slot value: value.
+}.
+	
+Template on: ['nl2br'] do: {
+	own content replace: ['\n'] with: ['<br>'].
+}.
+
+
+Template on: ['clean'] do: {
+	>> parts := own content split: ['<!-- paste:'].
+	>> clean := [''].
+	parts each: { :i :part
+		clean append: ( part split: [' -->'], pop ).
+	}.
+	own content := clean.
+}.
+	
+Template on: ['string'] do: {
+		<- own content.
+}.
+
+

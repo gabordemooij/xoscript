@@ -34,7 +34,7 @@ bindir ?= $(prefix)/bin
 #Collect the files to compile
 MAINSRC = ./server.c
 
-CSRCS += mariadb.c json.c vault.c http.c fficonnect.c ccgi/ccgi.c jsmn/jsmn.c monocypher/src/monocypher.c
+CSRCS += net.c mariadb.c json.c vault.c http.c fficonnect.c ccgi/ccgi.c jsmn/jsmn.c monocypher/src/monocypher.c
 OBJEXT ?= .o
 
 AOBJS = $(ASRCS:.S=$(OBJEXT))
