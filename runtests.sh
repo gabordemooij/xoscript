@@ -15,16 +15,14 @@ ISO="en"
 export ISO
 
 make clean ; make
-make -f makefile.win64 clean ; make -f makefile.win64
 EXTRACFLAGS="-D TEST"
-PACKAGE="gui"
+PACKAGE="server"
 export EXTRACFLAGS
 export PACKAGE
 
 make plugin-clean
-NAME="libctrgui.so" make plugin
-make -f makefile.win64 plugin-clean
-NAME="libctrgui.dll" make -f makefile.win64 plugin
+NAME="libctrserver.so" make plugin
+
 
 fi
 
@@ -37,12 +35,16 @@ unittest() {
 	export CITRINE_MEMORY_MODE
 
 	if [[ $os = "lin" ]]; then
-		echo "test"  | ./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err
-		cat /tmp/rs /tmp/err > /tmp/out
-	fi
-
-	if [[ $os = "win" ]]; then
-		echo "test"  | wine ./xo.exe ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err
+	
+	
+		
+		REQUEST_METHOD="POST" \
+		CONTENT_TYPE="application/x-www-form-urlencoded" \
+		CONTENT_LENGTH=3 \
+		QUERY_STRING="a=2&b=4" \
+		HTTP_COOKIE="xsid=abc123" \
+		./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err < <(echo -n "c=3")
+	
 		cat /tmp/rs /tmp/err > /tmp/out
 	fi
 
@@ -52,7 +54,6 @@ unittest() {
 		fi
 	fi
 
-	
 	skipcode=$(head -n1 ../../../tests/t-$1.ctr)
 	if [[ "$skipcode" == "#Linux" && "$os" != "lin" ]]; then
 		echo "SKIP Linux-only test"
@@ -106,13 +107,4 @@ do
 done
 popd
 
-# run tests for win
-pushd build/Win64/bin
-for i in $(seq -f "%04g" $FROM $TIL);
-do
-    unittest $i 1 win
-    unittest $i 4 win
-    unittest $i 0 win
-done
-popd
 

@@ -15,17 +15,18 @@
 # ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
 # CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
 
+Program memory-management: 4.
 
-# HTTP Requests
+# ~ HTTP Requests ~
 Server init.
 >> rq := HTTP-Request new.
 Out write: ['HTTP-GET a='] + ( rq get: ['a'] ), stop. # GET
 Out write: ['HTTP-POST c='] + ( rq post: ['c'] ), stop. # POST
 
-# Session handler (just sets or gets id)
+# ~ Session handler (just sets or gets id) ~
 Out write: rq session, stop.  # uses COOKIE
 
-# Database
+# ~ Database ~
 >> db := Maria-DB new
 	host: ['localhost'],
 	username: ['xo'],
@@ -33,28 +34,22 @@ Out write: rq session, stop.  # uses COOKIE
 	dbname: ['xobase'],
 	connect.
 
+# parameterized queries
 >> query := db query: ['
-	INSERT INTO 
-		book 
-		(id, description, price, rating) 
-		VALUES (NULL, ?, ?, ?)
-	'],
-	parameters: (
-		List new ; ['abc'] ; 12.35 ; 6
-	).
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameters: ( List new ; ['abc'] ; 12.35 ; 6 ).
 
-{  query execute. } except: { :e 
+# transactions
+{  query execute. db commit. } except: { :e db rollback.  }, start.
 
-	Out write: e, stop.
-	db rollback. 
-
-}, start.
-
+# insert id
 Out write: ['INSERTED: '] + query insert-id, stop.
 
+# fetching rows
 >> query := db query: ['
 		SELECT * FROM book order by id desc limit 2
 	'], 
 	fetch: { :row
-		Out write: row description + [': '] + row price, stop.
+		Out write: row id + [' '] + row description + [': '] + row price, stop.
 	}.

@@ -354,5 +354,4 @@ void begin_http(){
 	varlistGet = CGI_get_query(NULL);
 	varlistPost = CGI_get_post(NULL,"/tmp/_upXXXXXX");
 	varlistCookie = CGI_get_cookie(NULL);
-	printf("=====\n");
 }
