@@ -10,12 +10,11 @@
 #include "vault.h"
 #include "monocypher/src/monocypher.h"
 
-#ifdef LIBSECRET
+// either provided by libsecret or bsd
 int random_buf(void *buf, size_t n) {
     arc4random_buf(buf, n);
     return 0;
 }
-#endif
 
 static void print_hex(char* name, unsigned char *data, size_t length) {
     for (size_t i = 0; i < length; ++i) {
