@@ -12,13 +12,13 @@ WARNINGS ?= -Wall -Wshadow -Wundef -Wno-discarded-qualifiers -Wextra -Wno-unused
 					-Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security \
 					-Wno-ignored-qualifiers -Wno-error=pedantic -Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion -Wclobbered -Wdeprecated -Wempty-body \
 					-Wshift-negative-value -Wstack-usage=2048 -Wno-unused-value -std=gnu99
-CFLAGS 			?= ${EXTRACFLAGS} -D LIBSECRET -D FFI -D LIBCURL -shared -O3 -g0 -I/usr/include/mariadb -I ./i18n/${ISO}/ -I ../../i18n/${ISO} -I ../media/i18n/${ISO} -I$(LVGL_DIR)/ $(WARNINGS) -fPIC
+CFLAGS 			?= ${EXTRACFLAGS} -D PCRE2 -D LIBSECRET -D FFI -D LIBCURL -shared -O3 -g0 -I/usr/include/mariadb -I ./i18n/${ISO}/ -I ../../i18n/${ISO} -I ../media/i18n/${ISO} -I$(LVGL_DIR)/ $(WARNINGS) -fPIC
 
 
 CFLAGS += `pkg-config --cflags libsecret-1`
 
 CXXFLAGS        ?= -fPIC
-LDFLAGS 		=  -lmariadb -lcurl -lm -shared
+LDFLAGS 		=  -lpcre2-8 -lmariadb -lcurl -lm -shared
 LDFLAGS += `pkg-config --libs libsecret-1`
 
 
@@ -34,7 +34,7 @@ bindir ?= $(prefix)/bin
 #Collect the files to compile
 MAINSRC = ./server.c
 
-CSRCS += net.c mariadb.c json.c vault.c http.c fficonnect.c ccgi/ccgi.c jsmn/jsmn.c monocypher/src/monocypher.c
+CSRCS += pattern.c net.c mariadb.c json.c vault.c http.c fficonnect.c ccgi/ccgi.c jsmn/jsmn.c monocypher/src/monocypher.c
 OBJEXT ?= .o
 
 AOBJS = $(ASRCS:.S=$(OBJEXT))

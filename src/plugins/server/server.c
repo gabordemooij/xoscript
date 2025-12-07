@@ -15,6 +15,8 @@
 #include "vault.h"
 #include "http.h"
 #include "mariadb.h"
+#include "pattern.h"
+
 
 
 #ifdef FFI
@@ -57,6 +59,9 @@ void begin() {
 	begin_mariadb();
 	#ifdef FFI
 	begin_ffi();
+	#endif
+	#ifdef PCRE2
+	begin_pcre2();
 	#endif
 }
 
