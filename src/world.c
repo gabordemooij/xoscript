@@ -378,7 +378,7 @@ ctr_object* ctr_internal_create_object(int type) {
 	if (type==CTR_OBJECT_TYPE_OTNUMBER) o->value.nvalue = 0;
 	if (type==CTR_OBJECT_TYPE_OTSTRING) {
 		o->value.svalue = ctr_heap_allocate(sizeof(ctr_string));
-		o->value.svalue->value = "";
+		o->value.svalue->value = NULL;
 		o->value.svalue->vlen = 0;
 	}
 	if (type==CTR_OBJECT_TYPE_OTBLOCK) {
