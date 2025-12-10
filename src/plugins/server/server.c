@@ -94,6 +94,42 @@ ctr_object* ctr_server_htmlencode_set(ctr_object* myself, ctr_argument* argument
     return dest_obj;
 }
 
+ctr_object* ctr_server_urlencode_set(ctr_object* myself, ctr_argument* argumentList) {
+    char* source = ctr_heap_allocate_cstring(
+		ctr_internal_cast2string(argumentList->object)
+	);
+    size_t len = 0;
+	char *p;
+    for (p = source; *p; p++) {
+        if (*p == ' ' || *p == '-' || *p == '_' || *p == '.' || *p == '~' || isalnum((unsigned char)*p)) { //RFC 3986 unreserved characters
+            len += 1;
+        } else {
+            len += 3; // %HH
+        }
+    }
+	char* dest = ctr_heap_allocate(len + 1);
+	if (!dest) {
+		ctr_error("Out of memory while creating urlencoded output buffer.", 0);
+		ctr_heap_free(source);
+		return CtrStdNil;
+	}
+    char *o = dest;
+    for (p = source; *p; p++) {
+        if (*p == ' ') {
+            *o++ = '+';
+        } else if (*p == '-' || *p == '_' || *p == '.' || *p == '~' || isalnum((unsigned char)*p)) {
+			*o++ = *p;
+        } else {
+            sprintf(o, "%%%02X", (unsigned char)*p);
+            o += 3;
+        }
+    }
+    *o = '\0';
+    ctr_object* dest_obj = ctr_build_string_from_cstring(dest);
+    ctr_heap_free(dest);
+    ctr_heap_free(source);
+    return dest_obj;
+}
 
 void begin() {
 	ctr_internal_server_init();
@@ -102,6 +138,7 @@ void begin() {
 	serverObject->link = CtrStdObject;
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( CTR_DICT_NEW ), &ctr_server_new );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "html-encode:" ), &ctr_server_htmlencode_set );
+	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "url-encode:" ), &ctr_server_urlencode_set );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Server" ), serverObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	#ifdef LIBCURL
 	begin_net();
