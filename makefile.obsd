@@ -1,0 +1,29 @@
+BUILD_DIR         = ./build
+BUILD_OBJ_DIR     = $(BUILD_DIR)/OpenBSD/obj
+BUILD_BIN_DIR     = $(BUILD_DIR)/OpenBSD/bin
+BIN               = xo
+CFLAGS            = -O2 -std=c99 -g -mtune=native  -Wall -D CTRLANG=${ISO} -D PATH_MAX=1024 -I src/i18n/en  -D INCLUDETESTS
+LDFLAGS           = -g -rdynamic -lm
+CSRCS             = $(shell find ./src -maxdepth 1 -type f -name '*.c')
+COBJS             = $(patsubst ./src/%.c, $(BUILD_OBJ_DIR)/%.o, $(CSRCS))
+TARGET            = $(COBJS)
+
+all: xo
+
+xo: $(TARGET)
+	@mkdir -p $(BUILD_BIN_DIR)
+	$(CC) $(TARGET) $(LDFLAGS) -o $(BUILD_BIN_DIR)/$(BIN)
+
+$(BUILD_OBJ_DIR)/%.o: ./src/%.c
+	@mkdir -p $(BUILD_OBJ_DIR)
+	$(CC) $(CFLAGS) $(EXTRACFLAGS) -c $< -o $@
+
+clean:
+	rm  $(BUILD_OBJ_DIR)/* $(BUILD_BIN_DIR)/$(BIN)
+
+plugin:
+	cd src/plugins/${PACKAGE} ; gmake -f makefile.obsd all
+
+plugin-clean:
+	cd src/plugins/${PACKAGE} ; gmake -f makefile.obsd clean
+
