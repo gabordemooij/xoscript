@@ -43,7 +43,7 @@ db query: ['SELECT * FROM book order by id desc limit 2'],
 fetch: { :row Out write: row id + [' '] + row description + [': '] + row price, stop. }. # fetching rows
 
 # ~ CURL ~
-Out write: ( Net post: None to: ['https://xoscript.com'] ) length, stop. # post none = GET
+Out write: ( Net post: None to: ['https://redbeanphp.com'] ) length, stop. # post none = GET
 
 # ~ JSON ~
 >> json := (JSON jsonify: (Dict new put: (List new ; 1 ; 2 ; 3) at: ['abc'])).
@@ -72,15 +72,15 @@ Out write: tpl clean, stop.
 
 # ~ Regex ~
 >> subject := ['<html>
-	<a href="http://link1">
-	<a href="http://link2">
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Pattern new: ['href='].
->> result  := pattern match: subject do: { :m
+>> pattern := Pattern new: ['href="([^"]+)" target="([^"]+)"'].
+>> result  := pattern match: subject do: { :m :x
 	Out write: m, stop.
-	<- ['XXX='].
+	Out write: x, stop.
+	<- ['XXX'].
 }.
-
 Out write: result, stop.
 
 # ~ Utilities ~
