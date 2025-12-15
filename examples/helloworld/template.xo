@@ -19,8 +19,6 @@ Template on: ['cut:'] do: { :marker
 	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
 	>> endmarker   := (['<!-- /cut:%id% -->'] %id%: marker).
 	>> parts := own content split: startmarker.
-	
-	
 	>> prefix := parts first.
 	>> parts2 := parts last split: endmarker.
 	>> suffix := parts2 last.
@@ -42,31 +40,24 @@ Template on: ['paste:at:'] do: { :snippet :id
 }.
 
 Template on: ['set:value:'] do: { :slot :value
-	value
-	replace: ['&'] with: ['&amp;'],
-	replace: ['<'] with: ['&lt;'],
-	replace: ['>'] with: ['&gt;'],
-	replace: ['"'] with: ['&quot;'].
-	own content replace: slot with: value.
+
+	own content replace: ['<!-- slot:'] + slot + [' -->'] with: ( Server html-encode: value ).
 }.
 
 Template on: ['respond:and:'] do: { :slot :value
-	>> full-slot := ['{% '] + (slot from: 0 length: (slot length - 1)) + [' %}'].
-	self set: full-slot value: value.
+	self set: (slot from: 0 length: (slot length - 1)) value: value.
 }.
-	
+
 Template on: ['nl2br'] do: {
 	own content replace: ['\n'] with: ['<br>'].
 }.
 
-
 Template on: ['clean'] do: {
-	>> parts := own content split: ['<!-- paste:'].
-	>> clean := [''].
-	parts each: { :i :part
-		clean append: ( part split: [' -->'], pop ).
-	}.
-	own content := clean.
+	own content := 
+		Pattern
+		new: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		match: own content
+		do: { <- ['']. }.
 }.
 	
 Template on: ['string'] do: {
