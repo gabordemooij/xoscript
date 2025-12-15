@@ -70,8 +70,30 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
         char *replacement;
         ctr_object* matchobj = ctr_build_string(mstr, mlen);
         ctr_argument arguments;
+        ctr_argument argument2;
         arguments.object = matchobj;
-        arguments.next = NULL;
+        arguments.next = &argument2;
+        ctr_object* matches = ctr_array_new(CtrStdArray, &arguments);
+        uint32_t cnt;
+        pcre2_pattern_info(re, PCRE2_INFO_CAPTURECOUNT, (void*) &cnt);
+        for (int j = 0; j<=cnt; j++) {
+			PCRE2_SIZE l;
+			int q = pcre2_substring_length_bynumber(match, j, &l);
+			size_t room = (l * 4 * sizeof(PCRE2_UCHAR)) + 1;
+			PCRE2_UCHAR* pbuf = ctr_heap_allocate(room);
+			int qq = pcre2_substring_copy_bynumber(match, j, pbuf, &room);
+			if (qq) continue;
+			ctr_object* subgroup = ctr_build_string_from_cstring(pbuf);
+			subgroup->info.sticky = 1;
+			ctr_argument pusharg;
+			pusharg.object = subgroup;
+			pusharg.next = NULL;
+			ctr_array_push(matches, &pusharg);
+			ctr_heap_free(pbuf);
+		}
+        matches->info.sticky = 1;
+	    argument2.object = matches;
+        argument2.next = NULL;
         matchobj->info.sticky = 1;
         ctr_object* result = ctr_block_run(callback, &arguments, callback);
         matchobj->info.sticky = 0;
