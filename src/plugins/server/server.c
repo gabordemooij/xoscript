@@ -1,3 +1,5 @@
+#define _GNU_SOURCE 
+
 #include <unistd.h>
 #include <pthread.h>
 #include <time.h>
@@ -24,6 +26,7 @@
 #endif
 
 ctr_object* serverObject;
+ctr_object* formatObject;
 
 /**
  * Use this error handler if init or critical operation fails.
@@ -94,6 +97,52 @@ ctr_object* ctr_server_htmlencode_set(ctr_object* myself, ctr_argument* argument
     return dest_obj;
 }
 
+
+ctr_object* ctr_format_new(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
+	instance->link = myself;
+	return instance;
+}
+
+ctr_object* ctr_format_format_set(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_internal_object_property(myself,
+		"_format",
+		ctr_internal_cast2string(argumentList->object)
+	);
+	return myself;
+}
+
+ctr_object* ctr_format_new_set(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* instance = ctr_format_new(myself, argumentList);
+	ctr_format_format_set(instance, argumentList);
+	return instance;
+}
+
+ctr_object* ctr_format_apply_to(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* format = ctr_internal_object_property(myself, "_format", NULL);
+	char* format_str = ctr_heap_allocate_cstring(format);
+	ctr_object* value = argumentList->object;
+	char* result = "";
+	char* s;
+	ctr_object* answer;
+	if (value->info.type == CTR_OBJECT_TYPE_OTSTRING) {
+		s = ctr_heap_allocate_cstring(value);
+		asprintf(&result, format_str, s);
+		ctr_heap_free(s);
+		answer = ctr_build_string_from_cstring(result);
+		free(result);
+	} else if (value->info.type == CTR_OBJECT_TYPE_OTNUMBER)  {
+		asprintf(&result, format_str, (double) value->value.nvalue);
+		answer = ctr_build_string_from_cstring(result);
+		free(result);
+	} else {
+		answer = ctr_build_string_from_cstring(format_str);
+	}
+	ctr_heap_free(format_str);
+	return answer;
+}
+
+
 ctr_object* ctr_server_urlencode_set(ctr_object* myself, ctr_argument* argumentList) {
     char* source = ctr_heap_allocate_cstring(
 		ctr_internal_cast2string(argumentList->object)
@@ -140,6 +189,15 @@ void begin() {
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "html-encode:" ), &ctr_server_htmlencode_set );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "url-encode:" ), &ctr_server_urlencode_set );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Server" ), serverObject, CTR_CATEGORY_PUBLIC_PROPERTY);
+	//@todo move to core
+	formatObject = NULL;
+	formatObject = ctr_format_new(CtrStdObject, NULL);
+	formatObject->link = CtrStdObject;
+	ctr_internal_create_func(formatObject, ctr_build_string_from_cstring( CTR_DICT_NEW ), &ctr_format_new );
+	ctr_internal_create_func(formatObject, ctr_build_string_from_cstring( CTR_DICT_NEW_SET ), &ctr_format_new_set );
+	ctr_internal_create_func(formatObject, ctr_build_string_from_cstring( "format:" ), &ctr_format_format_set );
+	ctr_internal_create_func(formatObject, ctr_build_string_from_cstring( "apply:" ), &ctr_format_apply_to );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Format" ), formatObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	#ifdef LIBCURL
 	begin_net();
 	#endif
