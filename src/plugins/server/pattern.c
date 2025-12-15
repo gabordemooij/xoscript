@@ -76,6 +76,7 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
         ctr_object* matches = ctr_array_new(CtrStdArray, &arguments);
         uint32_t cnt;
         pcre2_pattern_info(re, PCRE2_INFO_CAPTURECOUNT, (void*) &cnt);
+        //@todo fix memory usage
         for (int j = 0; j<=cnt; j++) {
 			PCRE2_SIZE l;
 			int q = pcre2_substring_length_bynumber(match, j, &l);
