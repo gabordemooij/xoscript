@@ -10,6 +10,10 @@
 #include "vault.h"
 #include "monocypher/src/monocypher.h"
 
+
+#define SERVER_VAULT_TOKENCHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+#define SERVER_VAULT_TOKENCHARS_NUM 62
+
 // either provided by libsecret or bsd
 int random_buf(void *buf, size_t n) {
     arc4random_buf(buf, n);
@@ -336,6 +340,48 @@ ctr_object* ctr_gui_vault_decrypt(ctr_object* myself, ctr_argument* argumentList
 	return result;
 }
 
+
+/*
+ * cryptographically secure random token
+ */
+ctr_object* ctr_server_vault_token_set(ctr_object* myself, ctr_argument* argumentList) {
+	int length = ctr_tonum(argumentList->object);
+	if (length < 20 || length > 400) {
+		ctr_error("Token length must be between 20-400 to be secure.",0);
+		return CtrStdNil;
+	}
+	size_t rnd_len = length + (length / 4) + 1;
+	uint8_t* rnd = ctr_heap_allocate(rnd_len);
+    char* out = ctr_heap_allocate(length + 1);
+    if (random_buf(rnd, rnd_len) != 0) {
+		ctr_error("Unable to generate random token", 0);
+		ctr_heap_free(rnd);
+		ctr_heap_free(out);
+		return CtrStdNil;
+	}
+	size_t out_i = 0;
+    size_t rnd_i = 0;
+    while (out_i < length) {
+        if (rnd_i >= rnd_len) {
+            if (random_buf(rnd, rnd_len) != 0) { // extremely unlikely, but refill if needed
+				ctr_error("Unable to generate random token", 0);
+				ctr_heap_free(rnd);
+				ctr_heap_free(out);
+				return CtrStdNil;
+			}
+            rnd_i = 0;
+        }
+        uint8_t v = rnd[rnd_i++];
+        if (v >= 248)  continue; // avoid modulo bias (256 % 62 = 8)
+        out[out_i++] = SERVER_VAULT_TOKENCHARS[v % SERVER_VAULT_TOKENCHARS_NUM];
+    }
+    out[length] = '\0';
+    ctr_object* answer = ctr_build_string_from_cstring(out);
+    ctr_heap_free(rnd);
+	ctr_heap_free(out);
+    return answer;
+}
+
 ctr_object* vaultObject;
 void begin_vault() {
 	//ctr_gui_internal_vault_init();
@@ -346,5 +392,6 @@ void begin_vault() {
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "name" ), &ctr_gui_vault_name );
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "encrypt:key:" ), &ctr_gui_vault_encrypt );
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "decrypt:key:" ), &ctr_gui_vault_decrypt );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "token:" ), &ctr_server_vault_token_set );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Vault" ), vaultObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 }
