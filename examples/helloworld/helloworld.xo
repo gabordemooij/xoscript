@@ -23,8 +23,6 @@ Server init.
 Out write: ['HTTP-GET a='] + ( rq get: ['a'] ), stop. # GET
 Out write: ['HTTP-POST c='] + ( rq post: ['c'] ), stop. # POST
 
-# ~ Session handler (just sets or gets id) ~
-Out write: rq session, stop.  # uses COOKIE
 
 # ~ Database ~
 >> db := Maria-DB new host: ['localhost'],
@@ -54,6 +52,15 @@ Out write: ((JSON object: json) abc ? 1), stop.
 >> vault := Vault new: ['Encryptor'].
 Out write: (Vault encrypt: ['hello'] key: ['world']), stop.
 
+# ~ Session handler (by default stored in /tmp) ~
+Program use: ['webtools.xo'].
+>> web := Web-Document new.
+>> x := web session-start.
+Out write: x, stop.
+x user: 123.
+web session-destroy.
+web goto: ['/'].
+
 # ~ Template ~
 Program use: ['template.xo'].
 >> html := ['
@@ -68,7 +75,7 @@ Program use: ['template.xo'].
 >> tpl := Template new content: html.
 >> greeting := tpl cut: ['greeting'], copy greeting: ['Hello World!'].
 tpl paste: greeting at: ['greetings'].
-Out write: tpl clean, stop.
+web out: tpl clean.
 
 # ~ Regex ~
 >> subject := ['<html>

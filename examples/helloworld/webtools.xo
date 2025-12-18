@@ -1,0 +1,210 @@
+>> HTTP-Header := Object new.
+
+HTTP-Header on: ['new'] do: {
+	<- self new init.
+}.
+
+HTTP-Header on: ['init'] do: {
+	own key   := None.
+	own value := None.
+}.
+
+HTTP-Header on: ['key:value:'] do: { :key :value
+	own key := key.
+	own value := value.
+}.
+
+HTTP-Header on: ['key'] do: { 
+	<- own key.
+}.
+
+HTTP-Header on: ['value'] do: { 
+	<- own value.
+}.
+
+HTTP-Header on: ['string'] do: { 
+	<- own key + [': '] + own value + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Object new.
+
+Web-Document on: ['new'] do: {
+	<- self new init.
+}.
+
+Web-Document on: ['init'] do: {
+	own headers := List new.
+	own headers append: ( 
+		HTTP-Header new 
+		key: ['Content-type'] value: ['text/html; charset=utf-8']
+	).
+	own sess-id := None.
+	own session-manager := Tempfile-Session new.
+	own sessdata := None.
+	own secure := True.
+	own same-site := ['Strict'].
+	own headers-out := False.
+}.
+
+Web-Document on: ['secure-session-cookie:'] do: { :secure
+	self check-headers.
+	own secure := secure.
+}.
+
+Web-Document on: ['same-site-session-cookie:'] do: { :value
+	self check-headers.
+	>> options := List new 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options contains: value, false: {
+		this-task error: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	own same-site := value.
+}.
+
+Web-Document on: ['header:'] do: { :header
+	self check-headers.
+	own headers append: header.
+}.
+
+Web-Document on: ['clear-headers'] do: {
+	self check-headers.
+	own headers := List new.
+}.
+
+Web-Document on: ['session-manager:'] do: { :manager
+	self check-headers.
+	own session-manager := manager.
+}.
+
+Web-Document on: ['check-headers'] do: {
+	own headers-out true: {
+		this-task error: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document on: ['session-start'] do: {
+	self check-headers.
+	>> request := HTTP-Request new.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id None? true: {
+		sess-id := Vault token: 30.
+		>> session-header := HTTP-Header new
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (own secure either: ['Secure'] or: ['']),
+		SSITE: (own same-site),
+		XSID: sess-id
+		).
+		own headers append: session-header.
+	}.
+	own sessdata := own session-manager for: sess-id, load.
+	<- own sessdata. # reference
+}.
+
+Web-Document on: ['goto:'] do: { :url
+	self check-headers.
+	self clear-headers.
+	own headers
+	append: (
+		HTTP-Header new
+		key: ['Status'] value: ['303 See Other']
+	),
+	append: (
+		HTTP-Header new
+		key: ['Location'] value: url
+	).
+	self out: ['Redirect'].
+}.
+
+Web-Document on: ['session-destroy'] do: {
+	self check-headers.
+	>> request := HTTP-Request new.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id None? false: {
+		>> session-header := HTTP-Header new.
+		>> when := Moment new year: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (own secure either: ['Secure'] or: ['']),
+			SSITE: (own same-site),
+			XSID: sess-id
+		).
+		own session-manager destroy.
+		own headers append: session-header.
+	}.
+}.
+
+Web-Document on: ['out:'] do: { :output
+	own headers-out false: {
+		own sessdata None? false: {
+			own session-manager save: own sessdata.
+		}.
+		own headers each: { :_ :header
+			Out write: header.
+		}.
+		own headers-out =: True.
+		Out write: ['\r\n'].
+	}.
+	Out write: output.
+}.
+
+# Interface
+
+>> Session := Object new.
+
+Session on: ['new'] do: {
+	<- self new for: None.
+}.
+
+Session on: ['for:'] do: { :id
+	own id := id.
+}.
+
+Session on: ['load'] do: {
+	this-task error: ['Not implemented.'].
+}.
+
+Session on: ['save:'] do: {
+	this-task error: ['Not implemented.'].
+}.
+
+Session on: ['destroy'] do: {
+	this-task error: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session new.
+
+Tempfile-Session on: ['file'] do: {
+	<- ( File new: ( ['/tmp/sess-'] + own id + ['.txt'] ) ).
+}.
+
+Tempfile-Session on: ['load'] do: {
+	>> file := self file.
+	file exists false: {
+		file write: (Dict new code).
+	}.
+	<- file read object.
+}.
+
+Tempfile-Session on: ['save:'] do: { :data
+	>> file := self file.
+	file exists true: {
+		file write: data code.
+	}.
+}.
+
+Tempfile-Session on: ['destroy'] do: {
+	>> file := self file.
+	file exists true: {
+		file delete.
+	}.
+}.
+
