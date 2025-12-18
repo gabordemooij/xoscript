@@ -737,6 +737,7 @@ extern ctr_object* ctr_clock_set_time( ctr_object* myself, ctr_argument* argumen
 extern ctr_object* ctr_clock_set_zone( ctr_object* myself, ctr_argument* argumentList );
 extern ctr_object* ctr_clock_get_zone( ctr_object* myself, ctr_argument* argumentList );
 extern ctr_object* ctr_clock_to_string( ctr_object* myself, ctr_argument* argumentList );
+extern ctr_object* ctr_clock_format_set( ctr_object* myself, ctr_argument* argumentList );
 extern ctr_object* ctr_clock_add( ctr_object* myself, ctr_argument* argumentList );
 extern ctr_object* ctr_clock_subtract( ctr_object* myself, ctr_argument* argumentList );
 extern ctr_object* ctr_clock_to_number( ctr_object* myself, ctr_argument* argumentList );

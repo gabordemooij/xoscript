@@ -1159,6 +1159,39 @@ ctr_object* ctr_clock_week( ctr_object* myself, ctr_argument* argumentList ) {
 	return weekNumber;
 }
 
+ctr_object* ctr_clock_format_set( ctr_object* myself, ctr_argument* argumentList ) {
+	char* format;
+	char* zone;
+	char* description;
+	time_t timeStamp;
+	ctr_object* answer = CtrStdNil;
+	format = ctr_heap_allocate_cstring(
+		ctr_internal_cast2string(argumentList->object)
+	);
+	zone = ctr_heap_allocate_cstring(
+		ctr_internal_cast2string(
+			ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_ZONE), CTR_CATEGORY_PRIVATE_PROPERTY )
+		)
+	);
+	timeStamp = (time_t) ctr_internal_cast2number(
+		ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_TIME), 0 )
+	)->value.nvalue;
+	description = ctr_heap_allocate( 201 );
+	setenv( "TZ", zone, 1 );
+	size_t written = strftime( description, 200, format, localtime( &timeStamp ) );
+	setenv( "TZ", "UTC", 1 );
+	if (written > 0) {
+		answer = ctr_build_string_from_cstring( description );
+	} else {
+		ctr_error("Format exceeds buffer limit of 200 bytes.", 0);
+	}
+	ctr_heap_free( description );
+	ctr_heap_free( zone );
+	ctr_heap_free( format );
+	return answer;
+}
+
+
 /**
  * @def
  * [ Moment ] string
@@ -1168,28 +1201,10 @@ ctr_object* ctr_clock_week( ctr_object* myself, ctr_argument* argumentList ) {
  */
 
 ctr_object* ctr_clock_to_string( ctr_object* myself, ctr_argument* argumentList ) {
-	char*       zone;
-	char*       description;
-	ctr_object* answer;
-	time_t      timeStamp;
-	char*       format;
-	format = CTR_STDDATEFRMT;
-	zone = ctr_heap_allocate_cstring(
-		ctr_internal_cast2string(
-			ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_ZONE), CTR_CATEGORY_PRIVATE_PROPERTY )
-		)
-	);
-	timeStamp = (time_t) ctr_internal_cast2number(
-		ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_TIME), 0 )
-	)->value.nvalue;
-	description = ctr_heap_allocate( 41 );
-	setenv( "TZ", zone, 1 );
-	strftime( description, 40, format, localtime( &timeStamp ) );
-	setenv( "TZ", "UTC", 1 );
-	answer = ctr_build_string_from_cstring( description );
-	ctr_heap_free( description );
-	ctr_heap_free( zone );
-	return answer;
+	ctr_argument a;
+	a.object = ctr_build_string_from_cstring(CTR_STDDATEFRMT);
+	a.next = NULL;
+	return ctr_clock_format_set(myself, &a);
 }
 
 /**
@@ -1333,8 +1348,6 @@ ctr_object* ctr_console_brk(ctr_object* myself, ctr_argument* argumentList) {
 	fflush(stdout);
 	return myself;
 }
-
-
 
 /**
  * @internal
