@@ -1303,7 +1303,289 @@ Program Number: ['between:and:'], stop.
 @api_Program_system
 
 
-# GUI
+# server
+
+{{messages}}
+
+The Server plugin in xoscript offers functionality to
+create server-side applications. To load the server
+plugin use:
+
+```
+Server init.
+```
+
+For your convenience it's also recommended to load
+the webtools.xo and template.xo files.
+
+```
+Program use: ['webtools.xo'].
+Program use: ['template.xo'].
+
+```
+
+## Request
+
+The HTTP-Request object can be used to obtain GET/POST/COOKIE and
+UPLOAD data:
+
+```
+>> request  := HTTP-Request new.
+>> search   := request get: ['search']. # ?search=books
+>> password := request post: ['password']. # from form
+>> selected := request get-list: ['sel[]']. #?sel[]=1&sel[]=2
+>> selected := request post-list: ['sel[]'].
+>> cookie   := request cookie: ['session-id'].
+>> upload   := request upload: ['file'].
+>> temppath := upload ? 0.
+>> filename := upload ? 1.
+```
+
+## Database
+
+The Database object can be used to query MariaDB/MySQL.
+To connect to a database do:
+
+```
+>> db := Maria-DB new host: ['localhost'],
+	username: ['xo'],
+	password: ['pass123'],
+	dbname: ['xobase'],
+	connect.
+
+```
+
+To insert a record use:
+
+```
+>> query := db query: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameters: ( List new ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  query execute. db commit. }
+except: { :e db rollback.  }, start.
+```
+
+Note that xoscript *only* works with transactions and never autocommits.
+If autocommit cannot be disabled you will get a connection error.
+Always use parameter binding for queries, never add user input directly
+to the SQL.
+
+Obtain the inserted id like this:
+
+``
+Out write: ['INSERTED: '] + query insert-id, stop. # insert id
+```
+
+To fetch records:
+
+```
+>> query :=
+db
+	query: ['SELECT * FROM book order by id desc limit 2'], 
+	fetch: { :row 
+		Out write: row id + [' '] + row description + [': '] + row price, stop.
+	}. # fetching rows
+
+```
+
+## Sessions
+
+For persistence you can store and fetch data from a session object.
+
+```
+>> web := Web-Document new.
+>> session := web session-start.
+session userid: 123.
+```
+
+To destroy the session:
+
+```
+web session-destroy.
+```
+
+## Headers
+
+The Web-Document object ties together the request, headers, HTML and session.
+This is why you send session-start to Web-Document.
+You can also use the Web-Document instance to redirect:
+
+```
+web goto: ['/other.html'].
+```
+
+To add a custom header:
+
+```
+web header: ( 
+	HTTP-Header new
+	key: ['Content-Length']
+	value: 400
+).
+```
+
+## Templates
+
+The default template system is very simple. You don't have to learn
+a new template syntax. Also, the template engine ensures real separation
+between presentation and business logic.
+
+To create a template from a file:
+
+```
+>> tpl := web template: ['templates/ux.tpl'].
+```
+
+The template system uses markers. 
+There are three types of markers: cut markers, paste markers and
+slot markers. The basic idea is really simple, you cut out
+areas identified by cut markers and you can paste them at
+areas identifier by paste markers. You can inject strings into
+slot markers.
+
+So for instance, given the following template, let's put the
+gem in the jewel box and add a price tag.
+
+```
+<!-- cut:gem -->
+<img src="gem.gif">
+<price>$<!-- slot:price --></price>
+<!-- /cut:gem -->
+
+<div id="box">
+<!-- paste:jewels -->
+</div>
+```
+
+You can do this as follows:
+
+```
+>> gem := tpl cut: ['gem'], copy.
+gem price: 99.
+tpl paste: gem at: ['jewels'].
+web out: tpl clean.
+```
+
+The last line simply flushes the template as a string to the client
+along with the required HTTP headers.
+
+## JSON
+
+To encode an object as JSON:
+
+```
+>> json := ( JSON jsonify: ( 
+	Dict new put: ( 
+		List new ; 1 ; 2 ; 3
+	) at: ['abc']
+)).
+Out write: json, stop.
+```
+
+To decode JSON into a xoscript object:
+
+```
+Out write: ((JSON object: json) abc ? 1), stop.
+```
+
+## Regex
+
+You can use regular expressions by creating a pattern.
+For instance to match the hrefs and targets of hyperlinks:
+
+```
+Pattern new: ['href="([^"]+)" target="([^"]+)"'].
+```
+
+Now, apply the pattern to the subject string like this:
+
+```
+pattern match: subject do: { :m :x .... }
+```
+
+Full example:
+
+```
+>> subject := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> pattern := Pattern new: ['href="([^"]+)" target="([^"]+)"'].
+>> result  := pattern match: subject do: { :m :x
+	Out write: m, stop.
+	Out write: x, stop.
+	<- ['XXX'].
+}.
+Out write: result, stop.
+```
+
+## Networking
+
+Use the Net object to perform a web request.
+The Net object always sends a POST request, unless you send None as
+data, then it will send a GET request.
+
+
+```
+Net 
+post: None 
+to: ['https://redbeanphp.com'].
+``
+
+## Encryption
+
+The server plugin comes with XChaCha20 and Argon2 based encryption.
+
+Example:
+
+```
+>> encrypted := Vault encrypt: ['hello'] key: ['world'].
+>> decrypted := Vault encrypt: encrypted key: ['world'].
+```
+
+## Tokens
+
+To generate a cryptographically secure token of a specific length:
+
+```
+>> mytok := Vault token: 40.
+```
+
+This will generate a token of 40 characters.
+
+## Formatting
+
+The Format object allows you to format data, like padding or
+adding zeroes. It uses the printf syntax.
+
+```
+>> fmt := Format new: ['%06.0f'].
+fmt apply: 56. # gives 000056
+```
+
+## Encoders/decoders
+
+Several encoders and decoders are available.
+The url encoder prepares a url for use in HTML as a link:
+
+```
+Server url-encode: ['https://example.com?a=6&b=1 2'].
+```
+
+To safely inject user input into your HTML without risking XSS
+injections, always use:
+
+```
+Server html-encode: ['<harmless>'].
+```
+
+Note that the template engine will always perform html encoding
+if you write to a slot marker. So, if you use the template system
+you don't have to use this.
+
+# gui
 
 {{messages}}
 
