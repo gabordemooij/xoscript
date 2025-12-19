@@ -1077,8 +1077,8 @@ We will see:
 List ← 0 ; 1 ; 1 ; 2 ; 3 ; 5 ; 8 ; 13
 ```
 
-This output reveals that you can use this shorter notation to declare a
-list as well:
+Instead of append you can also use ; to add elements to a list:
+
 
 ```
 >> fibonacci := List new ; 0 ; 1 ; 1 ; 2 ; 3 ; 5 ; 8 ; 13.
@@ -1125,7 +1125,7 @@ structure can be ended by sending the message **done**. In the
 example illustrated, this could be applied as follows:
 
 ```
->> x := List new ; 1 ; 2 ; 3.*
+>> x := List new ; 1 ; 2 ; 3.
 x do shift pop done.
 ```
 
@@ -1144,7 +1144,7 @@ list is a price list, such as:
 
 
 ```
->> menu := List new *
+>> menu := Dict new
 	put: ['£5'] at: ['apple pie'],
 	put: ['£6'] at: ['carrot cake'],
 	put: ['£3'] at: ['fudge'].
