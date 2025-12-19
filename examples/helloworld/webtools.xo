@@ -46,7 +46,12 @@ Web-Document on: ['init'] do: {
 	own secure := True.
 	own same-site := ['Strict'].
 	own headers-out := False.
+	own request := HTTP-Request new.
 }.
+
+Web-Document on: ['request:'] do: { :request
+	own request := request.
+}. 
 
 Web-Document on: ['secure-session-cookie:'] do: { :secure
 	self check-headers.
@@ -90,7 +95,7 @@ Web-Document on: ['check-headers'] do: {
 
 Web-Document on: ['session-start'] do: {
 	self check-headers.
-	>> request := HTTP-Request new.
+	>> request := own request.
 	>> sess-id := request cookie: ['xsid'].
 	sess-id None? true: {
 		sess-id := Vault token: 30.
@@ -123,7 +128,7 @@ Web-Document on: ['goto:'] do: { :url
 
 Web-Document on: ['session-destroy'] do: {
 	self check-headers.
-	>> request := HTTP-Request new.
+	>> request := own request.
 	>> sess-id := request cookie: ['xsid'].
 	sess-id None? false: {
 		>> session-header := HTTP-Header new.
@@ -138,6 +143,11 @@ Web-Document on: ['session-destroy'] do: {
 		own session-manager destroy.
 		own headers append: session-header.
 	}.
+}.
+
+
+Web-Document on: ['template:'] do: { :path
+	<- Template new: (File new: path, read).
 }.
 
 Web-Document on: ['out:'] do: { :output
