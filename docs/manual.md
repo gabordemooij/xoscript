@@ -1449,14 +1449,14 @@ So for instance, given the following template, let's put the
 gem in the jewel box and add a price tag.
 
 ```
-<!-- cut:gem -->
-<img src="gem.gif">
-<price>$<!-- slot:price --></price>
-<!-- /cut:gem -->
+&lt;!-- cut:gem --&gt;
+&lt;img src="gem.gif"&gt;
+&lt;price&gt;$&lt;!-- slot:price --&gt;&lt;/price&gt;
+&lt;!-- /cut:gem --&gt;
 
-<div id="box">
-<!-- paste:jewels -->
-</div>
+&lt;div id="box"&gt;
+&lt;!-- paste:jewels --&gt;
+&lt;/div&gt;
 ```
 
 You can do this as follows:
