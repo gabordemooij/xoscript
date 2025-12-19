@@ -1898,7 +1898,7 @@ the same path over and over again.
 
 {{gif}}datapack{{/gif}}
 
-## FFI
+# FFI
 
 FFI stands for Foreign Function Interface. It allows you to use functionality written by others in
 different programming languages, provided through DLL files, SO files, or Dylib files. These could
@@ -1959,9 +1959,5 @@ struct: message, passing a sequence of C types. This may be necessary when calli
 function in an external software library that expects a pointer to a struct.
 
 
-
-
-
-@api_Font_plugins/gui/gui
 
 # Localization
