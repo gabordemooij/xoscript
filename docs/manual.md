@@ -1586,7 +1586,7 @@ if you write to a slot marker. So, if you use the template system
 you don't have to use this.
 
 
-# FFI
+# ffi
 
 FFI stands for Foreign Function Interface. It allows you to use functionality written by others in
 different programming languages, provided through DLL files, SO files, or Dylib files. These could
