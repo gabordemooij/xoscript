@@ -141,7 +141,7 @@ ctr_object* ctr_array_map(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ List ] ← [ Object ]
+ * [ List ] new ; [ Object ]
  *
  *
  * @test504
