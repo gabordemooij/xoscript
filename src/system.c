@@ -464,6 +464,7 @@ ctr_object* ctr_program_num_of_args(ctr_object* myself, ctr_argument* argumentLi
 	return ctr_build_number_from_float( (ctr_number) ctr_argc );
 }
 
+//@todo just custom platform string from compilation
 ctr_object* ctr_program_platform(ctr_object* myself, ctr_argument* argumentList) {
 	char* platform_name;
 	platform_name = "lin64";
@@ -1231,6 +1232,10 @@ void ctr_clock_init( ctr_object* clock ) {
 	tzset();
 	#endif
 	clock_res->time = time(NULL);
+	if (clock_res->time == -1) {
+		//failure to set, results in 0
+		clock_res->time = 0;
+	}
 	#ifdef WIN
 	putenv("TZ=UTC");
 	tzset();
