@@ -49,21 +49,11 @@ TARGET = $(addprefix $(BUILD_OBJ_DIR)/, $(patsubst ./%, %, $(OBJS)))
 
 all: default
 
-$(BUILD_OBJ_DIR)/%.o: %.cpp
-	@mkdir -p $(dir $@)
-	@$(CXX)  $(CXXFLAGS) -c $< -o $@
-	@echo "CXX $<"
-
 $(BUILD_OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	@$(CC)  $(CFLAGS) -c $< -o $@
 	@echo "CC $<"
 
-$(BUILD_OBJ_DIR)/%.o: %.S
-	@mkdir -p $(dir $@)
-	@$(CC)  $(CFLAGS) -c $< -o $@
-	@echo "CC $<"
-	
 default: $(TARGET)
 	@mkdir -p $(dir $(BUILD_BIN_DIR)/)
 	$(CXX) -o $(BUILD_BIN_DIR)/$(BIN) $(TARGET) $(LDFLAGS)
