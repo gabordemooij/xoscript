@@ -1154,7 +1154,7 @@ ctr_object* ctr_clock_week( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * [ Moment ] format: [ String ]
  *
- * @test262
+ * @test626
  */
 ctr_object* ctr_clock_format_set( ctr_object* myself, ctr_argument* argumentList ) {
 	char* format;
