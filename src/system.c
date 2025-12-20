@@ -2,6 +2,7 @@
 
 #define CTR_OBJECT_RESOURCE_TIME 13
 
+//@todo/fix improve error handling timefuncs
 
 int ctr_gc_dust_counter;
 int ctr_gc_object_counter;
@@ -1148,6 +1149,13 @@ ctr_object* ctr_clock_week( ctr_object* myself, ctr_argument* argumentList ) {
 	return weekNumber;
 }
 
+/**
+ * @def
+ *
+ * [ Moment ] format: [ String ]
+ *
+ * @test262
+ */
 ctr_object* ctr_clock_format_set( ctr_object* myself, ctr_argument* argumentList ) {
 	char* format;
 	char* zone;
