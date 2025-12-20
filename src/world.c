@@ -971,7 +971,7 @@ void ctr_initialize_world() {
 	CtrStdCommand->info.sticky = 1;
 
 	/* Clock */
-	CtrStdClock = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
+	CtrStdClock = ctr_clock_new(CtrStdObject, NULL);
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_WAIT ), &ctr_clock_wait );
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_TIME ), &ctr_clock_time );
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_NEW_SET ), &ctr_clock_new_set );
@@ -1002,7 +1002,6 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_SYMBOL_EQUALS ), &ctr_clock_equals );
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_UNEQUALS_SYMBOL ), &ctr_clock_neq );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_MOMENT ), CtrStdClock, 0 );
-	ctr_clock_init( CtrStdClock );
 	CtrStdClock->link = CtrStdObject;
 	CtrStdFile->info.sticky = 1;
 	

@@ -1,5 +1,8 @@
 #include "citrine.h"
 
+#define CTR_OBJECT_RESOURCE_TIME 13
+
+
 int ctr_gc_dust_counter;
 int ctr_gc_object_counter;
 int ctr_gc_kept_counter;
@@ -7,7 +10,15 @@ int ctr_gc_sticky_counter;
 int ctr_gc_mode;
 double CtrVersionTime = 1753777732; // 29 july 2025;
 
+struct ctr_clock {
+	time_t time;
+} typedef ctr_clock;
 
+
+void ctr_internal_destructor_clock(ctr_resource* rs) {
+	ctr_heap_free(rs->ptr);
+	rs->ptr = NULL;
+}
 
 /**
  * @internal
@@ -705,7 +716,7 @@ ctr_object* ctr_clock_wait(ctr_object* myself, ctr_argument* argumentList) {
 ctr_object* ctr_clock_new_set( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* clock;
 	clock = ctr_clock_new( myself, argumentList );
-	ctr_internal_object_add_property( clock, ctr_build_string_from_cstring( CTR_DICT_TIME ), ctr_internal_cast2number(argumentList->object), CTR_CATEGORY_PRIVATE_PROPERTY );
+	((ctr_clock*)clock->value.rvalue->ptr)->time = ctr_tonum(argumentList->object);
 	return clock;
 }
 
@@ -717,9 +728,8 @@ ctr_object* ctr_clock_get_time( ctr_object* myself, ctr_argument* argumentList, 
 	time_t timeStamp;
 	ctr_object* answer = CtrStdNil;
 	char* zone;
-	timeStamp = (time_t) ctr_internal_cast2number(
-		ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_TIME), CTR_CATEGORY_PRIVATE_PROPERTY )
-	)->value.nvalue;
+	ctr_clock* cr = (ctr_clock*) myself->value.rvalue->ptr;
+	timeStamp = cr->time;
 	zone = ctr_heap_allocate_cstring(
 		ctr_internal_cast2string(
 			ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_ZONE), CTR_CATEGORY_PRIVATE_PROPERTY )
@@ -776,19 +786,14 @@ ctr_object* ctr_clock_get_time( ctr_object* myself, ctr_argument* argumentList, 
 ctr_object* ctr_clock_set_time( ctr_object* myself, ctr_argument* argumentList, char part ) {
 	struct tm* date;
 	time_t timeStamp;
-	ctr_object* key;
 	char* zone;
-	key = ctr_build_string_from_cstring( CTR_DICT_TIME );
-	timeStamp = (time_t) ctr_internal_cast2number(
-		ctr_internal_object_find_property( myself, key, 0 )
-	)->value.nvalue;
+	ctr_clock* cr = (ctr_clock*) myself->value.rvalue->ptr;
+	timeStamp = cr->time;
 	zone = ctr_heap_allocate_cstring(
 		ctr_internal_cast2string(
 			ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_ZONE), CTR_CATEGORY_PRIVATE_PROPERTY )
 		)
 	);
-	
-	
 	#ifdef WIN
 	char tz[100];
 	sprintf(tz, "TZ=%s", zone);
@@ -798,11 +803,7 @@ ctr_object* ctr_clock_set_time( ctr_object* myself, ctr_argument* argumentList, 
 	setenv( "TZ", zone, 1 );
 	tzset();
 	#endif
-	
 	date = localtime( &timeStamp );
-	
-	
-	
 	switch( part ) {
 		case 'Y':
 			date->tm_year = ctr_internal_cast2number(argumentList->object)->value.nvalue - 1900;
@@ -840,8 +841,7 @@ ctr_object* ctr_clock_set_time( ctr_object* myself, ctr_argument* argumentList, 
 	}
 	date->tm_isdst = -1;
 	ctr_heap_free( zone );
-	ctr_internal_object_set_property( myself, key, ctr_build_number_from_float( (double_t) mktime( date ) ), 0 );
-	
+	cr->time = mktime(date);
 	#ifdef WIN
 	putenv("TZ=UTC"); 
 	tzset();
@@ -849,7 +849,6 @@ ctr_object* ctr_clock_set_time( ctr_object* myself, ctr_argument* argumentList, 
 	setenv( "TZ", "UTC", 1 );
 	tzset();
 	#endif
-	
 	return myself;
 }
 
@@ -1033,9 +1032,8 @@ ctr_object* ctr_clock_second( ctr_object* myself, ctr_argument* argumentList ) {
 ctr_object* ctr_clock_yearday( ctr_object* myself, ctr_argument* argumentList ) {
 	struct tm* date;
 	time_t timeStamp;
-	timeStamp = (time_t) ctr_internal_cast2number(
-		ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_TIME), 0 )
-	)->value.nvalue;
+	ctr_clock* cr = (ctr_clock*) myself->value.rvalue->ptr;
+	timeStamp = cr->time;
 	date = localtime( &timeStamp );
 	return ctr_build_number_from_float( (double_t) date->tm_yday );
 }
@@ -1051,9 +1049,8 @@ ctr_object* ctr_clock_yearday( ctr_object* myself, ctr_argument* argumentList ) 
 ctr_object* ctr_clock_weekday( ctr_object* myself, ctr_argument* argumentList ) {
 	struct tm* date;
 	time_t timeStamp;
-	timeStamp = (time_t) ctr_internal_cast2number(
-		ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_TIME), 0 )
-	)->value.nvalue;
+	ctr_clock* cr = (ctr_clock*) myself->value.rvalue->ptr;
+	timeStamp = cr->time;
 	date = localtime( &timeStamp );
 	return ctr_build_number_from_float( (double_t) date->tm_wday + 1 );
 }
@@ -1068,9 +1065,8 @@ ctr_object* ctr_clock_weekday( ctr_object* myself, ctr_argument* argumentList ) 
 
 ctr_object* ctr_clock_time( ctr_object* myself, ctr_argument* argumentList ) {
 	time_t timeStamp;
-	timeStamp = (time_t) ctr_internal_cast2number(
-		ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_TIME), 0 )
-	)->value.nvalue;
+	ctr_clock* cr = (ctr_clock*) myself->value.rvalue->ptr;
+	timeStamp = cr->time;
 	return ctr_build_number_from_float( (double_t) timeStamp );
 }
 
@@ -1085,11 +1081,7 @@ ctr_object* ctr_clock_time( ctr_object* myself, ctr_argument* argumentList ) {
 ctr_object* ctr_clock_copy( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* clock;
 	clock = ctr_clock_new( myself, argumentList );
-	ctr_internal_object_add_property( clock,
-		ctr_build_string_from_cstring( CTR_DICT_TIME ),
-		ctr_clock_time( myself, NULL ),
-		CTR_CATEGORY_PRIVATE_PROPERTY
-	);
+	((ctr_clock*)clock->value.rvalue->ptr)->time = ((ctr_clock*)myself->value.rvalue->ptr)->time;
 	ctr_internal_object_add_property( clock,
 		ctr_build_string_from_cstring( CTR_DICT_ZONE ),
 		ctr_clock_get_zone( myself, NULL ),
@@ -1148,10 +1140,7 @@ ctr_object* ctr_clock_neq( ctr_object* myself, ctr_argument* argumentList ) {
 ctr_object* ctr_clock_week( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* weekNumber;
 	char*  str;
-	time_t timeStamp;
-	timeStamp = (time_t) ctr_internal_cast2number(
-		ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_TIME), 0 )
-	)->value.nvalue;
+	time_t timeStamp = ((ctr_clock*)myself->value.rvalue->ptr)->time;
 	str = ctr_heap_allocate( 4 );
 	strftime( str, 3, "%W", localtime( &timeStamp ) );
 	weekNumber = ctr_internal_cast2number( ctr_build_string_from_cstring( str ) );
@@ -1173,9 +1162,8 @@ ctr_object* ctr_clock_format_set( ctr_object* myself, ctr_argument* argumentList
 			ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_ZONE), CTR_CATEGORY_PRIVATE_PROPERTY )
 		)
 	);
-	timeStamp = (time_t) ctr_internal_cast2number(
-		ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_TIME), 0 )
-	)->value.nvalue;
+	ctr_clock* cr = (ctr_clock*) myself->value.rvalue->ptr;
+	timeStamp = cr->time;
 	description = ctr_heap_allocate( 201 );
 	setenv( "TZ", zone, 1 );
 	size_t written = strftime( description, 200, format, localtime( &timeStamp ) );
@@ -1223,7 +1211,29 @@ ctr_object* ctr_clock_to_number( ctr_object* myself, ctr_argument* argumentList 
  * @internal
  */
 void ctr_clock_init( ctr_object* clock ) {
-	ctr_internal_object_add_property( clock, ctr_build_string_from_cstring( CTR_DICT_TIME ), ctr_build_number_from_float( (double_t) time( NULL ) ), 0 );
+	ctr_resource* rs = ctr_heap_allocate(sizeof(ctr_resource));
+	ctr_clock* clock_res = ctr_heap_allocate(sizeof(ctr_clock));
+	#ifdef WIN
+	char tz[100];
+	sprintf(tz, "TZ=%s", CTR_STDTIMEZONE);
+	putenv(tz);
+	tzset();
+	#else
+	setenv( "TZ", CTR_STDTIMEZONE, 1 );
+	tzset();
+	#endif
+	clock_res->time = time(NULL);
+	#ifdef WIN
+	putenv("TZ=UTC");
+	tzset();
+	#else
+	setenv( "TZ", "UTC", 1 );
+	tzset();
+	#endif
+	rs->type = CTR_OBJECT_RESOURCE_TIME;
+	rs->ptr = (void*) clock_res;
+	rs->destructor = ctr_internal_destructor_clock;
+	clock->value.rvalue = rs;
 	ctr_internal_object_add_property( clock, ctr_build_string_from_cstring( CTR_DICT_ZONE ), ctr_build_string_from_cstring( CTR_STDTIMEZONE ), 0 );
 }
 
@@ -1235,7 +1245,6 @@ ctr_object* ctr_clock_change( ctr_object* myself, ctr_argument* argumentList, ui
 	ctr_object* numberObject;
 	ctr_object* qual;
 	char* zone;
-	ctr_object* timeObject;
 	ctr_size l;
 	time_t time;
 	char* unit;
@@ -1249,11 +1258,7 @@ ctr_object* ctr_clock_change( ctr_object* myself, ctr_argument* argumentList, ui
 	qual = ctr_internal_cast2string( qual );
 	unit = qual->value.svalue->value;
 	l    = qual->value.svalue->vlen;
-	timeObject = ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_TIME), CTR_CATEGORY_PRIVATE_PROPERTY );
-	if ( timeObject == NULL ) {
-		return myself;
-	}
-	time = (time_t) ctr_internal_cast2number( timeObject )->value.nvalue;
+	time = ((ctr_clock*)myself->value.rvalue->ptr)->time;
 	zone = ctr_heap_allocate_cstring(
 		ctr_internal_cast2string(
 			ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_ZONE), CTR_CATEGORY_PRIVATE_PROPERTY )
@@ -1276,7 +1281,7 @@ ctr_object* ctr_clock_change( ctr_object* myself, ctr_argument* argumentList, ui
 	} else if ( strncmp( unit, CTR_DICT_WEEK, l ) == 0 ) {
 		date->tm_mday += number * 7;
 	}
-	ctr_internal_object_set_property( myself, ctr_build_string_from_cstring(CTR_DICT_TIME), ctr_build_number_from_float( (ctr_number) mktime( date ) ), CTR_CATEGORY_PRIVATE_PROPERTY  );
+	((ctr_clock*)myself->value.rvalue->ptr)->time = mktime(date);
 	setenv( "TZ", "UTC", 1 );
 	ctr_heap_free( zone );
 	return myself;
@@ -1314,7 +1319,7 @@ ctr_object* ctr_clock_subtract( ctr_object* myself, ctr_argument* argumentList )
  */
 ctr_object* ctr_clock_new( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* clock;
-	clock = ctr_internal_create_object( CTR_OBJECT_TYPE_OTOBJECT );
+	clock = ctr_internal_create_object( CTR_OBJECT_TYPE_OTEX );
 	clock->link = myself;
 	ctr_clock_init( clock );
 	return clock;
