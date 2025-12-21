@@ -1412,7 +1412,7 @@ to the SQL.
 
 Obtain the inserted id like this:
 
-``
+```
 Out write: ['INSERTED: '] + query insert-id, stop. # insert id
 ```
 
