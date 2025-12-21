@@ -1624,7 +1624,7 @@ adding zeroes. It uses the printf syntax.
 fmt apply: 56. # gives 000056
 ```
 
-## Encoders/decoders
+## Encoders
 
 Several encoders and decoders are available.
 The url encoder prepares a url for use in HTML as a link:
