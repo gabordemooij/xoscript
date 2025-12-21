@@ -1567,10 +1567,10 @@ pattern match: subject do: { :m :x .... }
 Full example:
 
 ```
->> subject := ['<html>
-	<a href="http://link1" target="_blank">
-	<a href="http://link2" target="_blank">
-</html>'].
+>> subject := ['&lt;html>
+	&lt;a href="http://link1" target="_blank"&gt;
+	&lt;a href="http://link2" target="_blank"&gt;
+&lt;/html&gt;'].
 >> pattern := Pattern new: ['href="([^"]+)" target="([^"]+)"'].
 >> result  := pattern match: subject do: { :m :x
 	Out write: m, stop.
