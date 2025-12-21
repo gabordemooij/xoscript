@@ -212,29 +212,6 @@ ctr_object* ctr_request_file(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 
-
-ctr_object* ctr_request_session_start(ctr_object* myself, ctr_argument* argumentList) {
-	char* session_id = (char*) CGI_lookup(varlistCookie, "xsid");
-	const char *hex = "abcdef0123456789";
-	char buf[64];
-	int len = 63;
-	ctr_object* id;
-    if (session_id == NULL) {
-		srand(time(NULL) ^ getpid());
-		for (int i = 0; i < len; i++) {
-			buf[i] = hex[rand() % 16];
-		}
-		buf[len] = '\0';
-		printf("Set-Cookie: xsid=%s; Path=/; HttpOnly\r\n", buf);
-		id = ctr_build_string_from_cstring(buf);
-    } else {
-		id = ctr_build_string_from_cstring(session_id);
-		ctr_heap_free(session_id);
-	}
-	return id;
-}
-
-
 /**
  * Request serverOption: [string] is: [string].
  * 
@@ -347,9 +324,6 @@ void begin_http(){
 #ifdef SERVER
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_PLUGIN_REQUEST_SERVE ), &ctr_request_serve );
 #endif
-	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( "session" ), &ctr_request_session_start );
-
-
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PLUGIN_REQUEST ), requestObject, 0);
 	varlistGet = CGI_get_query(NULL);
 	varlistPost = CGI_get_post(NULL,"/tmp/_upXXXXXX");
