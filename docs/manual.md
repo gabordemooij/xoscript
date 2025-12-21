@@ -1591,7 +1591,7 @@ data, then it will send a GET request.
 Net 
 post: None 
 to: ['https://redbeanphp.com'].
-``
+```
 
 ## Encryption
 
@@ -1637,7 +1637,7 @@ To safely inject user input into your HTML without risking XSS
 injections, always use:
 
 ```
-Server html-encode: ['<harmless>'].
+Server html-encode: ['&lt;harmless&gt;'].
 ```
 
 Note that the template engine will always perform html encoding
