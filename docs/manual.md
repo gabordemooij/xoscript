@@ -333,6 +333,10 @@ execute a fragment of code three times, simply send **\*** with argument
 
 @test5
 
+In this code fragment **i** is the index. So the first time the Function
+is executed, **i** equals 0, the next time it gets executed, **i** = 1 and
+so on.
+
 Let's consider another example. When a conversion table needs to be
 printed from *kJ* (kilojoule) into *kcal* (kilocalorie) by steps of 100,
 see below for the correct notation:
@@ -355,7 +359,9 @@ result. Example:
 In the above-illustrated code fragment **1** is added to **x** as long
 as **x** is less than **5**. When this is no longer the case, the second
 function will answer with **False**, consequently, the execution of the
-first function will end.
+first function will end. Note that **x** has been defined outside the
+function and is a global variable. To learn more about scoping rules,
+consult the chapter about Functions.
 
 ## String interpolation
 
@@ -1324,6 +1330,38 @@ Program use: ['template.xo'].
 
 ```
 
+## Hello World
+
+Here is a very simple web program that you can use with a
+standard CGI server like Apache2, NGINX, OpenHTTPD or any other
+well known server.
+
+```
+#!/bin/xo
+
+Server init.
+Program use: ['webtools.xo'].
+
+>> web-document := Web-Document new.
+
+web-document out: ['
+&lt;html&gt;
+&lt;body&gt;
+&lt;b>Hello World!&lt;/b&gt;
+&lt;/body&gt;
+&lt;/html&gt;'].
+
+```
+
+If you don't want to use the Web-Document object, that's fine, but
+then you have to write the HTTP headers yourself:
+
+```
+#!/bin/xo
+Out write: ['Content-type: text/html; charset=utf-8 \n\n'], stop.
+Out write: ['hello world!'], stop.
+``` 
+
 ## Request
 
 The HTTP-Request object can be used to obtain GET/POST/COOKIE and
@@ -1393,14 +1431,32 @@ db
 ## Sessions
 
 For persistence you can store and fetch data from a session object.
+First create a new **Web-Document**. The Web-Document object ties together
+the request, headers, HTML and session. This is because, whenever you
+visit a website with your browser, you only see the HTML. But the
+entire Web-Document consists of **Headers** as well. For instance,
+most HTTP responses include a header like: Content-type:text/html to
+tell the browser that the data that follows should be rendered as HTML
+(and downloaded like a file for instance). Sessions are a way to
+store user data between requests. To keep track of this data we need
+to set a cookie, this cookie is also set through a Header. That's why
+everything comes together in the Web-Document (because it is the full
+document containing both headers and HTML or other data).
+
 
 ```
+# First we make a new Web Document instance
 >> web := Web-Document new.
+
+# Now we start a session, this will generate a Header for a cookie and
+# create a file to store your data, associated with that cookie
 >> session := web session-start.
+
+# Now we can treat session like a dict
 session userid: 123.
 ```
 
-To destroy the session:
+To destroy the session (upon logging out):
 
 ```
 web session-destroy.
@@ -1408,13 +1464,16 @@ web session-destroy.
 
 ## Headers
 
-The Web-Document object ties together the request, headers, HTML and session.
-This is why you send session-start to Web-Document.
-You can also use the Web-Document instance to redirect:
+The Web-Document also allows you to set other well known headers.
+For instance, if you want to redirect the user to another URL:
 
 ```
 web goto: ['/other.html'].
 ```
+
+Under the hood, this command also generates the HTTP header to send
+along with your other data or HTML to instruct the browser to navigate
+to the specified target address.
 
 To add a custom header:
 
