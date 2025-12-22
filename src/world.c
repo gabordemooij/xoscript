@@ -25,6 +25,7 @@ ctr_object* CtrStdBoolFalse;
 ctr_object* CtrStdSlurp;
 ctr_object* CtrStdPath;
 ctr_object* CtrStdShellCommand;
+ctr_object* CtrStdINT64;
 int ctr_message_stack_index = 0;
 ctr_object* ctr_message_stack[301];
 
@@ -789,6 +790,24 @@ void ctr_initialize_world() {
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_NUMBER ), CtrStdNumber, 0);
 	CtrStdNumber->link = CtrStdObject;
 	CtrStdNumber->info.sticky = 1;
+
+	/* INT64 */
+	CtrStdINT64 = ctr_int64_new(CtrStdObject, NULL);
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("new"), &ctr_int64_new );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("from-string:"), &ctr_int64_from_string );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("/"), &ctr_int64_divide );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("*"), &ctr_int64_multiply );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("+"), &ctr_int64_add );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("-"), &ctr_int64_minus );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("="), &ctr_int64_equal );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("!=:"), &ctr_int64_unequal );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("<=:"), &ctr_int64_lowerEqThan );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring(">=:"), &ctr_int64_higherEqThan );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring(">"), &ctr_int64_higherThan );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("<"), &ctr_int64_lowerThan );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring(CTR_DICT_TOSTRING), &ctr_int64_to_string );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Int64" ), CtrStdINT64, 0 );
+	CtrStdINT64->info.sticky = 1;
 
 	/* String */
 	CtrStdString = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);

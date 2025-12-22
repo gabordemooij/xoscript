@@ -136,6 +136,9 @@
 #define CTR_CATEGORY_PUBLIC_PROPERTY 0 /* same, all properties are PRIVATE, except those in CtrStdWorld, this is just to avoid confusion */
 #define CTR_CATEGORY_PUBLIC_METHOD 1
 
+
+#define CTR_OBJECT_RESOURCE_INT64 14
+
 /**
  * Define basic types for Citrine
  */
@@ -292,6 +295,7 @@ extern ctr_object* CtrStdExit;
 extern ctr_object* CtrStdSlurp;
 extern ctr_object* CtrStdPath;
 extern ctr_object* CtrStdShellCommand;
+extern ctr_object* CtrStdINT64;
 extern ctr_object* ctr_first_object;
 extern ctr_object* ctr_gc_watch_object; // for debug purposes
 extern int ctr_gc_clean_free; // for debug purposes
@@ -843,6 +847,21 @@ int ctr_init();
 void init_embedded_media_plugin();
 void init_embedded_gui_plugin();
 void* ctr_data_blob(unsigned int* blob_len);
+
+extern ctr_object* ctr_int64_new(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_from_string(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_to_string(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_divide(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_multiply(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_minus(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_add(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_modulo(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_equal(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_unequal(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_lowerThan(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_higherThan(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_lowerEqThan(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_higherEqThan(ctr_object* myself, ctr_argument* argumentList);
 
 /* macros */
 #define CTR_DEFINE_SETTER_CAST(funcname, propname, castfunc) \
