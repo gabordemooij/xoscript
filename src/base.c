@@ -2499,6 +2499,11 @@ ctr_object* ctr_int64_init(ctr_object* myself) {
 	return myself;
 }
 
+/**
+ * @def [ Int64 ] from-string: [ String ]
+ * 
+ * @test627
+ */
 ctr_object* ctr_int64_new(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* i64;
 	i64 = ctr_internal_create_object( CTR_OBJECT_TYPE_OTEX );
@@ -2543,19 +2548,23 @@ ctr_object* ctr_int64_to_string(ctr_object* myself, ctr_argument* argumentList) 
 	return answer;
 }
 
+#define CTR_TYPECHECK_INT64() \
+	ctr_object* other;\
+	other = argumentList->object;\
+	if (other->info.type != CTR_OBJECT_TYPE_OTEX || other->value.rvalue->type != CTR_OBJECT_RESOURCE_INT64) {\
+		ctr_error("Operation restricted to INT64.", 0);\
+		return CtrStdNil;\
+	}\
+	int64_t otherINT64 = *((int64_t*)other->value.rvalue->ptr);\
+	int64_t myINT64 = *((int64_t*)myself->value.rvalue->ptr);\
+
+
 ctr_object* ctr_int64_divide(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* other;
-	other = argumentList->object;
-	if (other->info.type != CTR_OBJECT_TYPE_OTEX || other->value.rvalue->type != CTR_OBJECT_RESOURCE_INT64) {
-		ctr_error("Operation restricted to INT64.", 0);
-		return CtrStdNil;
-	}
-	int64_t otherINT64 = *((int64_t*)other->value.rvalue->ptr);
+	CTR_TYPECHECK_INT64();
 	if (otherINT64 == 0) {
 		ctr_error("Division by zero", 0);
 		return CtrStdNil;
 	}
-	int64_t myINT64 = *((int64_t*)myself->value.rvalue->ptr);
 	int64_t resultINT64 = myINT64 / otherINT64;
 	ctr_object* result = ctr_int64_new(myself, NULL);
 	*((int64_t*)result->value.rvalue->ptr) = resultINT64;
@@ -2563,14 +2572,7 @@ ctr_object* ctr_int64_divide(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 ctr_object* ctr_int64_multiply(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* other;
-	other = argumentList->object;
-	if (other->info.type != CTR_OBJECT_TYPE_OTEX || other->value.rvalue->type != CTR_OBJECT_RESOURCE_INT64) {
-		ctr_error("Operation restricted to INT64.", 0);
-		return CtrStdNil;
-	}
-	int64_t otherINT64 = *((int64_t*)other->value.rvalue->ptr);
-	int64_t myINT64 = *((int64_t*)myself->value.rvalue->ptr);
+	CTR_TYPECHECK_INT64();
 	int64_t resultINT64 = myINT64 * otherINT64;
 	ctr_object* result = ctr_int64_new(myself, NULL);
 	*((int64_t*)result->value.rvalue->ptr) = resultINT64;
@@ -2579,14 +2581,7 @@ ctr_object* ctr_int64_multiply(ctr_object* myself, ctr_argument* argumentList) {
 
 
 ctr_object* ctr_int64_add(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* other;
-	other = argumentList->object;
-	if (other->info.type != CTR_OBJECT_TYPE_OTEX || other->value.rvalue->type != CTR_OBJECT_RESOURCE_INT64) {
-		ctr_error("Operation restricted to INT64.", 0);
-		return CtrStdNil;
-	}
-	int64_t otherINT64 = *((int64_t*)other->value.rvalue->ptr);
-	int64_t myINT64 = *((int64_t*)myself->value.rvalue->ptr);
+	CTR_TYPECHECK_INT64();
 	int64_t resultINT64 = myINT64 + otherINT64;
 	ctr_object* result = ctr_int64_new(myself, NULL);
 	*((int64_t*)result->value.rvalue->ptr) = resultINT64;
@@ -2594,14 +2589,7 @@ ctr_object* ctr_int64_add(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 ctr_object* ctr_int64_minus(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* other;
-	other = argumentList->object;
-	if (other->info.type != CTR_OBJECT_TYPE_OTEX || other->value.rvalue->type != CTR_OBJECT_RESOURCE_INT64) {
-		ctr_error("Operation restricted to INT64.", 0);
-		return CtrStdNil;
-	}
-	int64_t otherINT64 = *((int64_t*)other->value.rvalue->ptr);
-	int64_t myINT64 = *((int64_t*)myself->value.rvalue->ptr);
+	CTR_TYPECHECK_INT64();
 	int64_t resultINT64 = myINT64 - otherINT64;
 	ctr_object* result = ctr_int64_new(myself, NULL);
 	*((int64_t*)result->value.rvalue->ptr) = resultINT64;
@@ -2609,74 +2597,32 @@ ctr_object* ctr_int64_minus(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 ctr_object* ctr_int64_equal(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* other;
-	other = argumentList->object;
-	if (other->info.type != CTR_OBJECT_TYPE_OTEX || other->value.rvalue->type != CTR_OBJECT_RESOURCE_INT64) {
-		ctr_error("Operation restricted to INT64.", 0);
-		return CtrStdNil;
-	}
-	int64_t otherINT64 = *((int64_t*)other->value.rvalue->ptr);
-	int64_t myINT64 = *((int64_t*)myself->value.rvalue->ptr);
+	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(otherINT64 == myINT64);
 }
 
 ctr_object* ctr_int64_unequal(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* other;
-	other = argumentList->object;
-	if (other->info.type != CTR_OBJECT_TYPE_OTEX || other->value.rvalue->type != CTR_OBJECT_RESOURCE_INT64) {
-		ctr_error("Operation restricted to INT64.", 0);
-		return CtrStdNil;
-	}
-	int64_t otherINT64 = *((int64_t*)other->value.rvalue->ptr);
-	int64_t myINT64 = *((int64_t*)myself->value.rvalue->ptr);
+	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(otherINT64 != myINT64);
 }
 
 ctr_object* ctr_int64_lowerThan(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* other;
-	other = argumentList->object;
-	if (other->info.type != CTR_OBJECT_TYPE_OTEX || other->value.rvalue->type != CTR_OBJECT_RESOURCE_INT64) {
-		ctr_error("Operation restricted to INT64.", 0);
-		return CtrStdNil;
-	}
-	int64_t otherINT64 = *((int64_t*)other->value.rvalue->ptr);
-	int64_t myINT64 = *((int64_t*)myself->value.rvalue->ptr);
+	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(myINT64 < otherINT64);
 }
 
 ctr_object* ctr_int64_higherThan(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* other;
-	other = argumentList->object;
-	if (other->info.type != CTR_OBJECT_TYPE_OTEX || other->value.rvalue->type != CTR_OBJECT_RESOURCE_INT64) {
-		ctr_error("Operation restricted to INT64.", 0);
-		return CtrStdNil;
-	}
-	int64_t otherINT64 = *((int64_t*)other->value.rvalue->ptr);
-	int64_t myINT64 = *((int64_t*)myself->value.rvalue->ptr);
+	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(myINT64 > otherINT64);
 }
 
 
 ctr_object* ctr_int64_lowerEqThan(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* other;
-	other = argumentList->object;
-	if (other->info.type != CTR_OBJECT_TYPE_OTEX || other->value.rvalue->type != CTR_OBJECT_RESOURCE_INT64) {
-		ctr_error("Operation restricted to INT64.", 0);
-		return CtrStdNil;
-	}
-	int64_t otherINT64 = *((int64_t*)other->value.rvalue->ptr);
-	int64_t myINT64 = *((int64_t*)myself->value.rvalue->ptr);
+	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(myINT64 <= otherINT64);
 }
 
 ctr_object* ctr_int64_higherEqThan(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* other;
-	other = argumentList->object;
-	if (other->info.type != CTR_OBJECT_TYPE_OTEX || other->value.rvalue->type != CTR_OBJECT_RESOURCE_INT64) {
-		ctr_error("Operation restricted to INT64.", 0);
-		return CtrStdNil;
-	}
-	int64_t otherINT64 = *((int64_t*)other->value.rvalue->ptr);
-	int64_t myINT64 = *((int64_t*)myself->value.rvalue->ptr);
+	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(myINT64 >= otherINT64);
 }
