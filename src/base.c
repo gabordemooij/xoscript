@@ -2500,7 +2500,8 @@ ctr_object* ctr_int64_init(ctr_object* myself) {
 }
 
 /**
- * @def [ Int64 ] from-string: [ String ]
+ * @def
+ * [ Int64 ] from-string: [ String ]
  * 
  * @test627
  */
