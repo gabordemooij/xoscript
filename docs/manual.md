@@ -802,6 +802,7 @@ rate remains reasonably stable!).**
 @test305
 
 @api_Number_base
+@api_Int64_base
 
 
 # Strings
