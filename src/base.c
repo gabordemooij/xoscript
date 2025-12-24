@@ -919,6 +919,19 @@ ctr_object* ctr_number_neq(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_bool(myself->value.nvalue != otherNum->value.nvalue);
 }
 
+
+uint64_t ctr_internal_secure_random_uint64_uniform(uint64_t max) {
+    if (max == 0) return 0;
+    uint64_t x;
+    uint64_t limit = UINT64_MAX - (UINT64_MAX % max);
+    do {
+        uint64_t high = (uint64_t)arc4random();
+        uint64_t low  = (uint64_t)arc4random();
+        x = (high << 32) | low;
+    } while (x >= limit);
+    return x % max;
+}
+
 /**
  * @def
  * [ Number ] between: [ Number ] and: [ Number ]
@@ -930,7 +943,7 @@ ctr_object* ctr_number_neq(ctr_object* myself, ctr_argument* argumentList) {
 ctr_object* ctr_number_between(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_number upper_bound;
 	ctr_number lower_bound;
-	ctr_number upper_bound_from_zero;
+	uint64_t upper_bound_from_zero;
 	ctr_number swap;
 	lower_bound = ctr_internal_cast2number(
 		argumentList->object
@@ -948,14 +961,10 @@ ctr_object* ctr_number_between(ctr_object* myself, ctr_argument* argumentList) {
 	if ( lower_bound == upper_bound ) {
 		return ctr_build_number_from_float( lower_bound );
 	}
-	upper_bound_from_zero = abs( (int)upper_bound - (int)lower_bound);
-	int rolls = ceil(upper_bound_from_zero / RAND_MAX);
-	int64_t result = 0;
-	while(rolls-- > 0) {
-		result += rand();
-	}
+	upper_bound_from_zero = (uint64_t) abs( (int)upper_bound - (int)lower_bound );
+	int64_t result = ctr_internal_secure_random_uint64_uniform(upper_bound_from_zero);
 	return ctr_build_number_from_float(
-		(ctr_number) (int64_t) (result % ((int64_t) upper_bound_from_zero + 1)) + (int64_t) lower_bound
+		(ctr_number) ( result + (int64_t) lower_bound )
 	);
 }
 
