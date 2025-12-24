@@ -18,15 +18,21 @@ within minutes. This manual is somewhat extensive because it covers
 every little detail, but in essence the manual is quite short compared
 to many other programming languages.
 
-The architecture of xoscript is also very simple, yet flexible.
+The architecture of a xoscript server setup
+is also very simple, yet flexible.
 
 {{architecture.png}}
 
 To use xoscript as a server language, you need to install the
-server plugin in the mods folder. This is because we like to
+server plugin in a folder called /mods/server. 
+
+This is because we like to
 decouple the core language from server specific functionalities,
 unlike for instance PHP or Python. Otherwise we would have to ship the
 complete kitchen sink for no purpose to everyone, which is just silly.
+You can install other modules if you want as well. The system is very
+flexible.
+
 Also some functions are better implemented in the scripting language
 itself like templating and session handling, so additionally we
 ship the template.xo and webtools.xo libraries for your convenience.
@@ -48,6 +54,12 @@ For more information, see the Server chapter.
 Note that, if you don't want to use the default template engine or
 the default webtools, it goes without saying that you have to provide
 your own.
+
+If you run your webserver in a chroot, jail or other kind of sandbox,
+you also need to install the depencies of xo in that environment, you can
+see which libraries you need by using ldd (see the manpage of Linux or BSD).
+If you want to use shell commands in your xo-scripts, also copy a shell
+(like bash or ksh) to this environment.
 
 We also like to note that we take backward compatibility very serious.
 There is even a special backward compatibility feature available called
