@@ -253,7 +253,7 @@ ctr_object* ctr_object_equals(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Object ] ≠ [ Object ]
+ * [ Object ] !=: [ Object ]
  *
  *
  * @test389
@@ -572,7 +572,7 @@ ctr_object* ctr_bool_eq(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Boolean ] ≠ [ Boolean ]
+ * [ Boolean ] !=: [ Boolean ]
  *
  *
  * @test405
@@ -1085,7 +1085,7 @@ ctr_object* ctr_number_multiply(ctr_object* myself, ctr_argument* argumentList) 
 
 /**
  * @def
- * [ Code ] * [ Number ]
+ * [ Code ] × [ Number ]
  *
  *
  * @test432
@@ -2399,6 +2399,13 @@ ctr_object* ctr_block_run(ctr_object* myself, ctr_argument* argList, ctr_object*
 	}
 	return result;
 }
+
+/**
+ * @def
+ * [ Code ] apply: [ Object ]
+ *
+ * @test85 
+ */
 
 /**
  * @def

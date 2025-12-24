@@ -884,10 +884,11 @@ rate remains reasonably stable!).
 
 {{messages}}
 
-Each time a text is placed between **quotation marks** ['...'] ,
+Each time a text is placed between **blocks and quotation marks** ['...'] ,
 Xoscript will create a new stringobject for you. However, make
 sure to use the correct quotation marks. The quotation mark at the
-beginning of the text differs from the one at the end.
+beginning of the text differs from the one at the end (this allows you
+to use the single quote without needing to escape it).
 
 ## Casting
 
@@ -984,6 +985,10 @@ message *string* can be overwritten:
 # Functions
 
 {{messages}}
+
+You can group code between { and }, it then becomes a function.
+In xoscript we also use the term task sometimes or simply
+block of code.
 
 ## Exceptions
 
