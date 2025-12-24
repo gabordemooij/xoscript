@@ -990,6 +990,39 @@ You can group code between { and }, it then becomes a function.
 In xoscript we also use the term task sometimes or simply
 block of code.
 
+You can run a function by sending the message *start*.
+
+
+```
+{ Out write: 123, stop. } start.
+```
+
+If your function takes arguments, use **apply:**.
+
+```
+{ :a Out write: a, stop. } apply: a.
+```
+
+Also see the examples below.
+Because of the simplistic architecture, a function can only have
+one point of return. To avoid overhead or excessive nesting for
+conditions, you can use a procedure (which is the same as using 
+multiplication sign with argument 1):
+
+```
+{
+  (a = 1) true: { x := 1. }, break.
+  (a = 2) true: { x := 2. }, break.
+} procedure.
+```
+
+This way, (a = 2) will not be evaluated if a = 1.
+Also, you don't need nested true-messages this way.
+Whenever you find yourself nesting conditions, think
+of the procedure message. It might make your code
+easier to read.
+
+
 ## Exceptions
 
 Exceptions can be handled like this:
