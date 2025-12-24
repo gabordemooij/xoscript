@@ -38,6 +38,23 @@ currently one of the primary use cases), you might still want to
 use a different template engine or a different session handler.
 Who are we to decide that you should use ours?
 
+One of the advantages of using our own template engine is that
+you don't have to learn additional syntax to create templates though.
+The default template engine that ships with xoscript uses 100%
+separation between presentation and logic. Instead of special
+template syntax, it simply uses a very flexible slot marker system.
+For more information, see the Server chapter.
+
+Note that, if you don't want to use the default template engine or
+the default webtools, it goes without saying that you have to provide
+your own.
+
+We also like to note that we take backward compatibility very serious.
+There is even a special backward compatibility feature available called
+'version'. In general, we aim to make your code run forever. So, you will
+never have to update your code to remain compatible with newer versions
+of xoscript. Our goal is: write once, run forever.
+
 The remainer of this manual is dedicated to explaining the programming
 language xoscript in detail. Server-scripting is discussed in the chapter
 called Server. If you are an experienced software developer, you might want
