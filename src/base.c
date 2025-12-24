@@ -6,7 +6,7 @@ int ctr_in_message;
 
 /**
  * @def
- * Nil
+ * None
  *
  *
  * @test375
@@ -60,7 +60,7 @@ char* ctr_national_number(char* old_number, char* new_number) {
 
 /**
  * @def
- * Nil
+ * None
  *
  *
  * @test376
@@ -80,7 +80,7 @@ ctr_object* ctr_nil_new(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Nil ] Nil?
+ * [ None ] None?
  *
  *
  * @test377
@@ -92,7 +92,7 @@ ctr_object* ctr_nil_is_nil(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Nil ] string
+ * [ None ] string
  *
  *
  * @test378
@@ -104,7 +104,7 @@ ctr_object* ctr_nil_to_string(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Nil ] else: [ Object ]
+ * [ None ] else: [ Object ]
  *
  *
  * @test379
@@ -116,7 +116,7 @@ ctr_object* ctr_nil_else_set(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Nil ] number
+ * [ None ] number
  *
  *
  * @test380
@@ -128,7 +128,7 @@ ctr_object* ctr_nil_to_number(ctr_object* myself, ctr_argument* ctr_argumentList
 
 /**
  * @def
- * [ Nil ] boolean
+ * [ None ] boolean
  *
  *
  * @test381
@@ -498,7 +498,7 @@ ctr_object* ctr_object_respond_and_and_and(ctr_object* myself, ctr_argument* arg
 
 /**
  * @def
- * [ Object ] Nil?
+ * [ Object ] None?
  *
  *
  * @test401
