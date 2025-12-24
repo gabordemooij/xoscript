@@ -2,6 +2,53 @@
 
 {{messages}}
 
+Welcome to xoscript. xoscript is a simple scripting language (for server-side
+scripting). Simple does not mean easy. Those two concepts are often
+confused. It may still be very complex to install and setup xoscript on
+a server, but this complexity arises from the fact that most servers or
+cloud services need to be configured to use xoscript (for instance through
+CGI and a webserver). You cannot just drop xo-files on a random
+budget vps that you bought, you have to configure it yourself (or
+let somebody do that for you). That's just how things
+work, we cannot change that. That being said, xoscript *is
+actually very simple* as a language. It only has about 5 syntax rules:
+assign, message, function, return and chain (to send multiple messages).
+That's it. Any software developer should be able to learn the basics
+within minutes. This manual is somewhat extensive because it covers
+every little detail, but in essence the manual is quite short compared
+to many other programming languages.
+
+The architecture of xoscript is also very simple, yet flexible.
+
+{{architecture.png}}
+
+To use xoscript as a server language, you need to install the
+server plugin in the mods folder. This is because we like to
+decouple the core language from server specific functionalities,
+unlike for instance PHP or Python. Otherwise we would have to ship the
+complete kitchen sink for no purpose to everyone, which is just silly.
+Also some functions are better implemented in the scripting language
+itself like templating and session handling, so additionally we
+ship the template.xo and webtools.xo libraries for your convenience.
+The reason for all this is that we don't know how you want to
+use xoscript. You can use it as a server-side scripting language,
+but also for GUIs, embedded devices or just batch processing.
+Even if you use it as a server-side scripting language (which is
+currently one of the primary use cases), you might still want to
+use a different template engine or a different session handler.
+Who are we to decide that you should use ours?
+
+The remainer of this manual is dedicated to explaining the programming
+language xoscript in detail. Server-scripting is discussed in the chapter
+called Server. If you are an experienced software developer, you might want
+to skip a few chapters because some of them are a bit too detailed or
+are very similar to general programming practices. So for those of you
+who are already have experience with several other programming languages,
+you better treat this manual as a reference guide.
+
+
+## Hello world
+
 After it has been transferred to your computer, you can extract the file
 and start xo by using the following command:
 
