@@ -536,20 +536,20 @@ of objects. For example:
 >> Poodle := Dog new.
 ```
 
-**In this case, ****Dog**** inherits all the behaviour of ****Animal****
-and, in turn, the object ****Animal**** inherits all behaviour of
-****Object****, the root object of all objects.**
+In this case, **Dog** inherits all the behaviour of **Animal**
+and, in turn, the object **Animal** inherits all behaviour of
+**Object**, the root object of all objects.
 
 ## Overriding
 
 
-**In the following example a new kind of list is created:
-****Combination****, in which each element is ensured to be unique. The
-functions of the ****Sequence**** are re**used** through inheritance: **
+In the following example a new kind of list is created:
+**Combination**, in which each element is ensured to be unique. The
+functions of the **Sequence** are re**used** through inheritance:
 
 @test607
 
-**Observe how the second ****red**** is excluded from the sequence: **
+Observe how the second **red** is excluded from the sequence.
 
 Occasionally, it may be necessary to override a behaviour of an object.
 For instance, when adding numbers and units of measurements have to be
@@ -563,15 +563,15 @@ could resemble the following:
 
 ## Recursion
 
-**In the previous example, the plus **sign** is being overridden. Note
+In the previous example, the plus **sign** is being overridden. Note
 that eventually the final addition still has to be done, which, in fact,
-takes place on the following line: **
+takes place on the following line:
 
 ```
 >> answer := self + (number x factor).
 ```
 
-**Now, **how does Xoscript understand that this plus **sign** refers to
+Now, how does Xoscript understand that this plus **sign** refers to
 the original logic of addition?** For instance, another interpretation
 could be that Xoscript will repeatedly send the same message to the same
 object which, in turn, would result into an **endless loop**. Clearly,
@@ -589,19 +589,19 @@ Number:
 
 @test609
 
-**This calls for recursion. In fact, the task that is connected to the
-message ****factorial****, needs to be executed again within that function.
+This calls for recursion. In fact, the task that is connected to the
+message **factorial**, needs to be executed again within that function.
 So, it is necessary to invoke the factorial function from within the
 factorial function itself. As a rule, Xoscript will prevent this routine,
 because of the risk of ending up in an infinite loop. For this reason,
-it is vital to precede the message by the word ****recursive****. This
+it is vital to precede the message by the word **recursive**. This
 is done in order to make Xoscript aware of the fact that it is your
 intention to execute the same task, and that you did not make mistake.
 
 ## Class-like Objects
 
 **Creating an object that is set in a given initial state, presents a
-frequent issue. Suppose an object ****Rectangle**** has to be created,
+frequent issue. Suppose an object **Rectangle** has to be created,
 in order to calculate perimeter and area. A possible notation would be:
 **
 
@@ -614,7 +614,7 @@ Rectangle on: ['area'] do: {
 ```
 
 **Obviously, setting a length and width is a precondition. For that
-purpose, the messages ****length:**** and ****width:**** can be added:
+purpose, the messages **length:** and **width:** can be added:
 **
 
 ```
@@ -669,9 +669,9 @@ all of these core objects will be discussed.
 The None object
 represents emptiness, or better still, the absence of information. On
 occasion, you will receive this object as an answer to a message, in
-case of the result being ****nothing****. The most essential question
-you could ask the ****None**** object is: ****None******?****. The
-answer will always read ****True****.**
+case of the result being **nothing**. The most essential question
+you could ask the **None** object is: **None?**. The
+answer will always read **True**.
 
 ```
 Out write: None None?.
@@ -683,13 +683,13 @@ result:
 True
 ```
 
-**Any object other than ****None**** will reply with ****False****. The
+Any object other than **None** will reply with **False**. The
 above code fragment may seem a bit philosophical, yet the **None**
 object certainly has extremely practical applications. For example, you
-**will receive the None object as an answer in case you ask for a
+will receive the None object as an answer in case you ask for a
 sequence element that does not exist. You could also use the None object
 if you like to declare a variable, but do not want to specify a value
-yet. Instead, you just **assign** the special value ****None****. In
+yet. Instead, you just **assign** the special value **None**. In
 Xoscript it is not allowed to declare a variable without value, such as:
 
 
@@ -766,38 +766,38 @@ following example:
 
 @test597
 
-**In the above example, b = 4 and a = 3. With ****add: 2**** the value
-of a is raised by 2, while ****+ 3**** creates a new number that is
+In the above example, b = 4 and a = 3. With **add: 2** the value
+of a is raised by 2, while **+ 3** creates a new number that is
 equal to a + 3. The same applies to other mathematical processes, e.g.,
 multiplications. By using the multiplication symbol, you will receive a
-new object as answer. In case you use the message ****multiply by:****,
+new object as answer. In case you use the message **multiply-by:**,
 you will multiply the number itself. **
 
-**With the message ****between:and:****, for example in: ****Number
-between: X and: Y****, you will get a number between X and Y. In this
-way, any random number can be generated:**
+**With the message **between:and:**, for example in: **Number
+between: X and: Y**, you will get a number between X and Y. In this
+way, any random number can be generated:
 
 ```
 >> a := Number between: 1 and: 10.
 Out write: a, stop.
 ```
 
-**Note, that the build-in generator of random numbers in Xoscript is
-**not** suitable for** cryptographic applications.**
+Note, that the build-in generator of random numbers in Xoscript is
+not suitable for cryptographic applications.
 
 
-**You can attach a **qualifier** to a number, for instance, ****6
-apples****. Each message that does not **get** recognise**d** **by **a
+You can attach a **qualifier** to a number, for instance, **6
+apples**. Each message that does not get recognised by a
 number will be considered a qualifier. You can retrieve the qualifier of
-a number by means of the message ****qualifier****:**
+a number by means of the message qualifier:
 
-**A qualifier is basically a Text object that is stored with the Number
+A qualifier is basically a Text object that is stored with the Number
 object. The qualifier is also printed after the number on a
-****write:**** assignment. **Q**ualifiers could be used to add amounts
-in mixed currencies **for example**. On adding the amounts, you can ask
+**write:** assignment. Qualifiers could be used to add amounts
+in mixed currencies for example. On adding the amounts, you can ask
 for the qualifiers. The following program example illustrates this
 principle by using a historical currency calculator (as the exchange
-rate remains reasonably stable!).**
+rate remains reasonably stable!).
 
 @test305
 
