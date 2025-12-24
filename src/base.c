@@ -729,7 +729,7 @@ ctr_object* ctr_bool_either_or(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Boolean ] &&: [ Boolean ]
+ * [ Boolean ] and: [ Boolean ]
  * 
  *
  * @test413
@@ -756,7 +756,7 @@ ctr_object* ctr_bool_nor(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Boolean ] ||: [ Boolean ]
+ * [ Boolean ] or: [ Boolean ]
  *
  *
  * @test415
@@ -856,7 +856,7 @@ ctr_object* ctr_number_higherThan(ctr_object* myself, ctr_argument* argumentList
 
 /**
  * @def
- * [ Number ] ≥ [ Number ]
+ * [ Number ] >=: [ Number ]
  *
  *
  * @test419
@@ -882,7 +882,7 @@ ctr_object* ctr_number_lowerThan(ctr_object* myself, ctr_argument* argumentList)
 
 /**
  * @def
- * [ Number ] ≤ [ Number ]
+ * [ Number ] <=: [ Number ]
  * 
  *
  * @test421
@@ -908,7 +908,7 @@ ctr_object* ctr_number_eq(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Number ] ≠ [ Number ]
+ * [ Number ] !=: [ Number ]
  *
  *
  * @test423
@@ -1067,7 +1067,7 @@ ctr_object* ctr_number_dec(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Number ] × [ Number ]
+ * [ Number ] * [ Number ]
  * 
  *
  * @test431
@@ -1085,7 +1085,7 @@ ctr_object* ctr_number_multiply(ctr_object* myself, ctr_argument* argumentList) 
 
 /**
  * @def
- * [ Code ] × [ Number ]
+ * [ Code ] * [ Number ]
  *
  *
  * @test432
@@ -1619,7 +1619,7 @@ ctr_object* ctr_string_eq(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ String ] ≠ [ String ]
+ * [ String ] !=: [ String ]
  * 
  *
  * @test462
@@ -2245,7 +2245,7 @@ ctr_object* ctr_string_before(ctr_object* myself, ctr_argument* argumentList ) {
 
 /**
  * @def
- * [ String ] ≤ [ String ]
+ * [ String ] <=: [ String ]
  * 
  *
  * @test486
@@ -2276,7 +2276,7 @@ ctr_object* ctr_string_after(ctr_object* myself, ctr_argument* argumentList ) {
 
  /**
  * @def
- * [ String ] ≥ [ String ]
+ * [ String ] >=: [ String ]
  * 
  *
  * @test488
@@ -2330,7 +2330,7 @@ ctr_object* ctr_build_block(ctr_tnode* node) {
 
 /**
  * @def
- * [ Code ] run
+ * [ Code ] start
  * 
  *
  * @test491
