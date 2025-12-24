@@ -782,9 +782,8 @@ way, any random number can be generated:
 Out write: a, stop.
 ```
 
-Note, that the build-in generator of random numbers in Xoscript is
-not suitable for cryptographic applications.
-
+As of version 1.4, the build-in generator of random numbers in xoscript is
+crypogrpahically secure to the best of our knowledge.
 
 You can attach a **qualifier** to a number, for instance, **6
 apples**. Each message that does not get recognised by a
