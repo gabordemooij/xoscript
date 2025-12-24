@@ -834,6 +834,11 @@ messages...
 Most of these messages are self-explanatory and allow you to execute
 mathematical operations or comparisons.
 
+{{note}}
+Note that you may use ≤ ≥ ≠ × and ÷ instead their ASCII counterparts.
+This is a matter of preference.
+{{/note}}
+
 The difference between binary mathematical messages (+) and
 their keyword variations (add:) is that the former will return
 a new number, which is the result of the operation, whereas with the
