@@ -178,7 +178,7 @@ ctr_object* ctr_array_unshift(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ List ] join: [ String ]
+ * [ List ] combine: [ String ]
  *
  *
  * @test506
@@ -719,7 +719,7 @@ ctr_object* ctr_map_new(ctr_object* myclass, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Map ] type
+ * [ Dict ] type
  *
  *
  * @test525
@@ -731,7 +731,7 @@ ctr_object* ctr_map_type(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Map ] put: [ Object ] at: [ Object ]
+ * [ Dict ] put: [ Object ] at: [ Object ]
  *
  *
  * @test526
@@ -764,7 +764,7 @@ ctr_object* ctr_map_put(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Map ] [ String ]: [ Object ]
+ * [ Dict ] [ String ]: [ Object ]
  *
  *
  * @test527
@@ -784,7 +784,7 @@ ctr_object* ctr_map_key_value(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Map ] - [ Object ]
+ * [ Dict ] - [ Object ]
  *
  *
  * @test528
@@ -797,7 +797,7 @@ ctr_object* ctr_map_delete(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Map ] entries
+ * [ Dict ] entries
  * 
  *
  * @test529
@@ -821,7 +821,7 @@ ctr_object* ctr_map_keys(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Map ] values
+ * [ Dict ] values
  * 
  *
  * @test530
@@ -845,7 +845,7 @@ ctr_object* ctr_map_values(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Map ] at: [ Object ]
+ * [ Dict ] at: [ Object ]
  * 
  *
  * @test531
@@ -880,7 +880,7 @@ ctr_object* ctr_map_get(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Map ] count
+ * [ Dict ] count
  *
  *
  * @test532
@@ -910,7 +910,7 @@ ctr_object* ctr_map_copy(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Map ] each: [ Block ]
+ * [ Dict ] each: [ Block ]
  *
  *
  * @test533
@@ -955,7 +955,7 @@ ctr_object* ctr_map_each(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Map ] has: [ Object ]
+ * [ Dict ] has: [ Object ]
  *
  *
  * @test534
@@ -983,7 +983,7 @@ ctr_object* ctr_map_has(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Map ] string
+ * [ Dict ] string
  * 
  *
  * @test535
