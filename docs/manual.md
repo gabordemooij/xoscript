@@ -1314,7 +1314,7 @@ fudge, the following simplified notation can be used:
 >> price := menu fudge.
 ```
 
-@api_Map_collections
+@api_Dict_collections
 
 # File
 
