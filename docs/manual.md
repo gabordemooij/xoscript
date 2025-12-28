@@ -365,6 +365,9 @@ then **+**.
 {{note}}
 The stop message adds a newline character to the string.
 The name of this message is inspired by telegraph systems.
+Messages in telegraph systems 
+often used the word STOP to mark the end of a sentence
+(since punctuation was unreliable or costly).
 {{/note}}
 
 Moreover, **round** takes precedence over **+**, because it is a
