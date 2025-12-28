@@ -362,6 +362,11 @@ is sent to Out and is followed by the **stop** message. Within the
 argument itself, Xoscript reads from left to right, so **0.5 round**
 then **+**.
 
+{{note}}
+The message **stop** adds a newline character to the string.
+The name of this message is inspired by telegraph systems.
+{{/note}}
+
 Moreover, **round** takes precedence over **+**, because it is a
 **unary message**. Given the parentheses, **2 - 1** is calculated
 first, after which **1** is added to the result of **0.5 round** (1).
@@ -392,6 +397,23 @@ message **+** to the number **3**, with argument the number **2**. The
 result, in this case, will be **5**. In the second example (**3 +2**) ,
 the unary message **+2** is sent to number **3**. Depending on the
 context that might yield a very different result.
+
+## Non-existing methods
+
+Sending a message to an object invokes the function that has been
+attached to this object under that message name. If you send a message
+that is not understood, the receiving object will ignore your message
+and return a reference to itself instead for further communication.
+This is called tolerant message passing.
+
+Example:
+
+```
+Out write: Object blah, stop.
+```
+
+This will not give an error. It will simply print the text **Object**.
+
 
 ## Control Flow
 
