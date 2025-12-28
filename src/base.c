@@ -473,20 +473,12 @@ ctr_object* ctr_object_respond(ctr_object* myself, ctr_argument* argumentList) {
  * [ Object ] respond: [ String ] and: [ String ]
  *
  *
- * @test399
+ * @test43
  */
 
 ctr_object* ctr_object_respond_and(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
-
-/**
- * @def
- * [ Object ] respond: [ String ] and: [ String ] and: [ String ]
- *
- *
- * @test400
- */
 
 ctr_object* ctr_object_respond_and_and(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
