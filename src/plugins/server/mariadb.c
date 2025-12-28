@@ -88,10 +88,9 @@ ctr_object* ctr_mariadb_connect(ctr_object* myself, ctr_argument* argumentList) 
         myself->value.rvalue->ptr = NULL;
     } else {
 		myself->value.rvalue->ptr = conn;
-	}
-	//@fixme, conn = NULL!
-	if (mysql_autocommit(conn, 0) != 0) {
-		ctr_error("Failed to start transactional database mode (autocommit is ON)", 0);
+		if (mysql_autocommit(conn, 0) != 0) {
+			ctr_error("Failed to start transactional database mode (autocommit is ON)", 0);
+		}
 	}
 	ctr_heap_free(host);
 	ctr_heap_free(user);

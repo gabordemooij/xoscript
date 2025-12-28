@@ -1300,7 +1300,7 @@ Should the entries that you apply to store objects be without spaces
 the next notation can be also be used:
 
 ```
->> menu := List new
+>> menu := Dict new
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
