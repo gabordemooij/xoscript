@@ -808,6 +808,27 @@ object, which is the root object of both **True** and **False**, as both
 are derivatives of the root object. The Boolean object itself, however,
 does not provide any practical application.
 
+## Gotchas
+
+Be careful with using **and:** and **or:**
+
+```
+Out write: (False or: True or: True), stop.
+Out write: (False or: True, or: True), stop.
+```
+
+Yields
+
+```
+False
+True
+```
+because the message **or:** only takes 1 argument. The first message
+sends **or:or:** to False, which does not exists, so the object ignores
+the message and returns itself (False). On the other hand, the second line
+sends **or:** followed by another **or:** (using a chain symbol, i.e. a comma: ,).
+
+
 @api_Boolean_base
 
 
@@ -852,9 +873,9 @@ of a is raised by 2, while **+ 3** creates a new number that is
 equal to a + 3. The same applies to other mathematical processes, e.g.,
 multiplications. By using the multiplication symbol, you will receive a
 new object as answer. In case you use the message **multiply-by:**,
-you will multiply the number itself. **
+you will multiply the number itself.
 
-**With the message **between:and:**, for example in: **Number
+With the message **between:and:**, for example in: **Number
 between: X and: Y**, you will get a number between X and Y. In this
 way, any random number can be generated:
 
@@ -1027,6 +1048,39 @@ Whenever you find yourself nesting conditions, think
 of the procedure message. It might make your code
 easier to read.
 
+
+Here is an important gotcha:
+
+```
+{
+	False false: {
+		Out write: ['End the loop.'].
+	}, break.
+	
+	Out write: ['Dont show me.'].
+
+} procedure.
+
+```
+
+In this case, the text 'Dont show me' will be shown.
+Because **break** is send to False. If you want to execute
+a break, it needs to be send as a message to **True**.
+ 
+
+```
+{
+	False not true: {
+		Out write: ['End the loop.'].
+	}, break.
+	
+	Out write: ['Dont show me.'].
+
+} procedure.
+
+```
+
+Will work as expected.
 
 ## Exceptions
 
