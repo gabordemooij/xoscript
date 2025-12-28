@@ -363,7 +363,7 @@ argument itself, Xoscript reads from left to right, so **0.5 round**
 then **+**.
 
 {{note}}
-The message 'stop' adds a newline character to the string.
+The stop message adds a newline character to the string.
 The name of this message is inspired by telegraph systems.
 {{/note}}
 
