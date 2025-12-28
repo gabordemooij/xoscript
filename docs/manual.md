@@ -215,6 +215,12 @@ variable without an initial value is not allowed. So,
 
 is invalid and will give an error message.
 
+{{note}}
+xoscript uses dynamic scoping of variables, for
+details consult the chapter Functions.
+{{/note}}
+
+
 ## Literals
 
 Xoscript perceives everything to be an object; i.e., all numbers, texts
