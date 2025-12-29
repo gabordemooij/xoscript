@@ -647,67 +647,6 @@ In this case, **Dog** inherits all the behavior and properties
 of **Animal** and, in turn, the object **Animal** inherits all behavior of
 **Object**, the root object of all objects.
 
-## Class-like objects
-
-Although xoscript does not offer classes, mimicking class-like
-behavior is trivial. Simply override the new message.
-
-```
->> Animal := Object new.
-Animal on: ['new'] do: {
-	&lt;- self new init.
-}.
-
-Animal on: ['init'] do: {
-	own sound := ['?'].
-	own legs  := 4.
-}.
-```
-
-In the code fragment above, we create an object called Animal.
-This object serves as a *blueprint* for all kinds of animals
-like dogs and cats. The parent object Animal is written
-with a capital A to signify that this is a class-like object.
-Next we override the new message by writing our own new-method.
-In this case it sends a message new to self, followed by the message
-init. Because xoscript blocks recursion by default this won't cause
-an infinite loop. Instead, it will send the new message to the parent
-object (Object) resulting in a new instance of Animal. So we create
-a new object, based on the same object we created our new-method for.
-This is perfectly valid. Now we also send the message init, this ensures
-that the Animal object has default values for its properties. By default
-an animal has 4 legs and the sound is unknown (hence the question mark).
-To create a new instance of our Animal, we could simply say:
-
-```
->> a := Animal new.
-```
-
-Now we get a new instance of Animal with 4 legs, unknown sound and
-an init method. Just like in other OOP languages we can also
-extend our Animal:
-
-```
->> Dog := Animal new.
-Dog on: ['init'] do: {
-	self init.
-	own sound := ['barks'].
-}.
-```
-
-We can test this easily by adding a string method:
-
-```
-Animal on: ['string'] do: {
-	&lt;- own legs string + own sound.
-}.
-```
-
-Let's put it all together:
-
-@test13
-
-
 
 ## Overriding
 
@@ -769,10 +708,72 @@ intention to execute the same task, and that you did not make mistake.
 
 ## Class-like Objects
 
-**Creating an object that is set in a given initial state, presents a
+
+## Class-like objects
+
+Although xoscript does not offer classes, mimicking class-like
+behavior is trivial. Simply override the new message.
+
+```
+>> Animal := Object new.
+Animal on: ['new'] do: {
+	&lt;- self new init.
+}.
+
+Animal on: ['init'] do: {
+	own sound := ['?'].
+	own legs  := 4.
+}.
+```
+
+In the code fragment above, we create an object called Animal.
+This object serves as a *blueprint* for all kinds of animals
+like dogs and cats. The parent object Animal is written
+with a capital A to signify that this is a class-like object.
+Next we override the new message by writing our own new-method.
+In this case it sends a message new to self, followed by the message
+init. Because xoscript blocks recursion by default this won't cause
+an infinite loop. Instead, it will send the new message to the parent
+object (Object) resulting in a new instance of Animal. So we create
+a new object, based on the same object we created our new-method for.
+This is perfectly valid. Now we also send the message init, this ensures
+that the Animal object has default values for its properties. By default
+an animal has 4 legs and the sound is unknown (hence the question mark).
+To create a new instance of our Animal, we could simply say:
+
+```
+>> a := Animal new.
+```
+
+Now we get a new instance of Animal with 4 legs, unknown sound and
+an init method. Just like in other OOP languages we can also
+extend our Animal:
+
+```
+>> Dog := Animal new.
+Dog on: ['init'] do: {
+	self init.
+	own sound := ['barks'].
+}.
+```
+
+We can test this easily by adding a string method:
+
+```
+Animal on: ['string'] do: {
+	&lt;- own legs string + own sound.
+}.
+```
+
+Let's put it all together:
+
+@test13
+
+
+Creating an object that is set in a given initial state, presents a
 frequent issue. Suppose an object **Rectangle** has to be created,
 in order to calculate perimeter and area. A possible notation would be:
-**
+
 
 ```
 >> Rectangle := Object new.
@@ -782,9 +783,9 @@ Rectangle on: ['area'] do: {
 }.
 ```
 
-**Obviously, setting a length and width is a precondition. For that
+Obviously, setting a length and width is a precondition. For that
 purpose, the messages **length:** and **width:** can be added:
-**
+
 
 ```
 Rectangle on: ['length:'] do: { :length
