@@ -49,8 +49,8 @@
 /**
  * Version information
  */
-#define CTR_VERSION "1.0.3"
-#define CTR_VERSION_NUM 10003
+#define CTR_VERSION "1.3.0"
+#define CTR_VERSION_NUM 13000
 
 
 /**
