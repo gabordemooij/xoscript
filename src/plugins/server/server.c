@@ -71,9 +71,7 @@ ctr_object* ctr_server_htmlencode_set(ctr_object* myself, ctr_argument* argument
     char *o = dest;
     for (p = source; *p; p++) {
         switch (*p) {
-            case '&':
-                memcpy(o, "&amp;", 5);  o += 5;
-                break;
+           
             case '<':
                 memcpy(o, "&lt;", 4);   o += 4;
                 break;
@@ -85,6 +83,9 @@ ctr_object* ctr_server_htmlencode_set(ctr_object* myself, ctr_argument* argument
                 break;
             case '\'':
                 memcpy(o, "&#039;", 6);  o += 6;
+                break;
+                 case '&':
+                memcpy(o, "&amp;", 5);  o += 5;
                 break;
             default:
                 *o++ = *p;
