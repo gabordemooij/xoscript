@@ -687,7 +687,7 @@ Now we get a new instance of Animal with 4 legs, unknown sound and
 an init method. Just like in other OOP languages we can also
 extend our Animal:
 
-``
+```
 >> Dog := Animal new.
 Dog on: ['init'] do: {
 	self init.
@@ -699,7 +699,7 @@ We can test this easily by adding a string method:
 
 ```
 Animal on: ['string'] do: {
-	<- own legs string + own sound.
+	&lt;- own legs string + own sound.
 }.
 ```
 
