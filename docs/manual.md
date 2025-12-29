@@ -708,9 +708,6 @@ intention to execute the same task, and that you did not make mistake.
 
 ## Class-like Objects
 
-
-## Class-like objects
-
 Although xoscript does not offer classes, mimicking class-like
 behavior is trivial. Simply override the new message.
 
