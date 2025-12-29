@@ -1145,7 +1145,7 @@ ctr_object* ctr_number_mul(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Number ] ÷ [ Number ]
+ * [ Number ] / [ Number ]
  *
  *
  * @test435
