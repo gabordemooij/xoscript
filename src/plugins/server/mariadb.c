@@ -188,21 +188,21 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 	myself->value.rvalue->ptr = (void*) prepared_statement;
 	if (mysql_stmt_prepare(prepared_statement,query, query_length)) {
 		ctr_error(mysql_stmt_error(prepared_statement), 0);
-        return CtrStdNil;
+        goto free_query;
 	}
     if (mysql_stmt_bind_param(prepared_statement, parambinds)) {
         ctr_error(mysql_stmt_error(prepared_statement),0);
-        return CtrStdNil;
+        goto free_query;
 	}
 	if (mysql_stmt_execute(prepared_statement)) {
        ctr_error(mysql_stmt_error(prepared_statement),0);
-       return CtrStdNil;
+       goto free_query;
     }
 	if (fetch_mode) {
 		MYSQL_RES* rparams = mysql_stmt_result_metadata(prepared_statement);
 		if (!rparams) {
 			ctr_error(mysql_stmt_error(prepared_statement),0);
-			return CtrStdNil;
+			goto free_query;
 		} else {
 			num_fields = mysql_num_fields(rparams);
 			MYSQL_FIELD* rfields = mysql_fetch_fields(rparams);
@@ -222,7 +222,7 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 			}
 			if (mysql_stmt_bind_result(prepared_statement, rbindings)) {
 				ctr_error(mysql_stmt_error(prepared_statement),0);
-				return CtrStdNil;
+				goto free_rbuffers;
 			}
 			ctr_argument* resultArgs;
 			resultArgs = ctr_heap_allocate(sizeof(ctr_argument));
