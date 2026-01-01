@@ -96,8 +96,10 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
 	    argument2.object = matches;
         argument2.next = NULL;
         matchobj->info.sticky = 1;
-        ctr_object* result = ctr_block_run(callback, &arguments, callback);
+        ctr_object* result = ctr_block_run(callback, &arguments, NULL);
         matchobj->info.sticky = 0;
+		if (CtrStdFlow == CtrStdContinue) CtrStdFlow = NULL; /* consume continue */
+		if (CtrStdFlow) break;
         replacement = ctr_heap_allocate_cstring(result);
         size_t replen = strlen(replacement);
         if (outlen + replen >= outcap) {
@@ -109,6 +111,7 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
         ctr_heap_free(replacement);
         offset = end;
     }
+	if (CtrStdFlow == CtrStdBreak) CtrStdFlow = NULL; /* consume break */
     output[outlen] = '\0';
     pcre2_match_data_free(match);
     pcre2_code_free(re);
