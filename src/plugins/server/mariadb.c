@@ -268,7 +268,7 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 					ctr_map_put(map, map_entry_val);
 				}
 				resultArgs->object = map;
-				ctr_block_run(argumentList->object, resultArgs, argumentList->object);
+				ctr_block_run(argumentList->object, resultArgs, NULL);
 			}
 			ctr_heap_free(map_entry_val);
 			ctr_heap_free(map_entry_key);
