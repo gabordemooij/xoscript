@@ -269,7 +269,10 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 				}
 				resultArgs->object = map;
 				ctr_block_run(argumentList->object, resultArgs, NULL);
+				if (CtrStdFlow == CtrStdContinue) CtrStdFlow = NULL; /* consume continue */
+				if (CtrStdFlow) break;
 			}
+			if (CtrStdFlow == CtrStdBreak) CtrStdFlow = NULL; /* consume break */
 			ctr_heap_free(map_entry_val);
 			ctr_heap_free(map_entry_key);
 			ctr_heap_free(resultArgs);
