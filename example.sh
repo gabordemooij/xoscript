@@ -13,38 +13,42 @@ export ISO
 if [[ $OS = "Linux" ]]; then
 	if [[ $CLEAN = "clean" ]]; then
 		make clean
-		PACKAGE="gui" NAME="libctrgui.so" make plugin-clean
+		PACKAGE="server" NAME="server.so" make plugin-clean
 	fi
 	make
-	PACKAGE="gui" NAME="libctrgui.so" make plugin
+	PACKAGE="server" NAME="server.so" make plugin
 	cd examples/${EXAMPLE}
 	rm mods
 	ln -s ../../build/Linux/bin/mods mods
-	../../build/Linux/bin/xo ${EXAMPLE}.xo 
+	
+	CITRINE_MEMORY_MODE=4 \
+	REQUEST_METHOD="POST" \
+	CONTENT_TYPE="application/x-www-form-urlencoded" \
+	CONTENT_LENGTH=3 \
+	QUERY_STRING="a=2&b=4" \
+	HTTP_COOKIE="xsid=abc123" \
+	../../build/Linux/bin/xo ${EXAMPLE}.xo < <(echo -n "c=3")
 fi
 
-if [[ $OS = "Win64" ]]; then
+# On OpenBSD you need gmake and bash
+if [[ $OS = "OBSD" ]]; then
 	if [[ $CLEAN = "clean" ]]; then
-		make -f makefile.win64 clean
-		PACKAGE="gui" NAME="libctrgui.dll" make -f makefile.win64 plugin-clean
+		gmake -f makefile.obsd clean
+		PACKAGE="server" NAME="server.so" gmake -f makefile.obsd plugin-clean
 	fi
-	make -f makefile.win64
-	PACKAGE="gui" NAME="libctrgui.dll" make -f makefile.win64 plugin
+	gmake -f makefile.obsd
+	PACKAGE="server" NAME="server.so" gmake -f makefile.obsd plugin
 	cd examples/${EXAMPLE}
 	rm mods
-	ln -s ../../build/Win64/bin/mods mods
-	wine ../../build/Win64/bin/xo.exe ${EXAMPLE}.xo 
+	ln -s ../../build/OpenBSD/bin/mods mods
+	
+	CITRINE_MEMORY_MODE=4 \
+	REQUEST_METHOD="POST" \
+	CONTENT_TYPE="application/x-www-form-urlencoded" \
+	CONTENT_LENGTH=3 \
+	QUERY_STRING="a=2&b=4" \
+	HTTP_COOKIE="xsid=abc123" \
+	../../build/OpenBSD/bin/xo ${EXAMPLE}.xo < <(echo -n "c=3")
 fi
 
-if [[ $OS = "Mac" ]]; then
-	if [[ $CLEAN = "clean" ]]; then
-		make -f makefile.mac clean
-		PACKAGE="gui" NAME="libctrgui.dylib" make -f makefile.mac plugin-clean
-	fi
-	make -f makefile.mac
-	PACKAGE="gui" NAME="libctrgui.dylib" make -f makefile.mac plugin
-	cd examples/${EXAMPLE}
-	rm mods
-	ln -s ../../build/Mac/bin/mods mods
-	../../build/Mac/bin/xo ${EXAMPLE}.xo
-fi
+
