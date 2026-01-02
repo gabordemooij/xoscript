@@ -180,6 +180,56 @@ ctr_object* ctr_server_urlencode_set(ctr_object* myself, ctr_argument* argumentL
     return dest_obj;
 }
 
+/**
+ * @def [ Server ] base64-encode: [ String ]
+ * 
+ * @test621
+ */
+ctr_object* ctr_server_base64encode_set(ctr_object* myself, ctr_argument* argumentList) {
+	char* in;
+	char* out;
+	int outlen;
+	int inlen;
+	ctr_object* str;
+	ctr_object* answer;
+	str = ctr_internal_cast2string(argumentList->object);
+	inlen = str->value.svalue->vlen;
+	if (inlen==0) return ctr_build_empty_string();
+	in = ctr_heap_allocate_cstring(str);
+	outlen = BASE64_ENCODE_OUT_SIZE(inlen);
+	out = ctr_heap_allocate(outlen);
+	outlen = base64_encode(in, inlen, out);
+	answer = ctr_build_string_from_cstring(out);
+	ctr_heap_free(in);
+	ctr_heap_free(out);
+	return answer;
+}
+
+/**
+ * @def [ Server ] base64-decode: [ String ]
+ * 
+ * @test621
+ */
+ctr_object* ctr_server_base64decode_set(ctr_object* myself, ctr_argument* argumentList) {
+	char* in;
+	char* out;
+	int outlen;
+	int inlen;
+	ctr_object* str;
+	ctr_object* answer;
+	str = ctr_internal_cast2string(argumentList->object);
+	inlen = str->value.svalue->vlen;
+	if (inlen==0) return ctr_build_empty_string();
+	in = ctr_heap_allocate_cstring(str);
+	outlen = BASE64_DECODE_OUT_SIZE(inlen);
+	out = ctr_heap_allocate(outlen);
+	outlen = base64_decode(in, inlen, out);
+	answer = ctr_build_string(out, outlen);
+	ctr_heap_free(in);
+	ctr_heap_free(out);
+	return answer;
+}
+
 void begin() {
 	ctr_internal_server_init();
 	serverObject = NULL;
@@ -188,6 +238,8 @@ void begin() {
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( CTR_DICT_NEW ), &ctr_server_new );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "html-encode:" ), &ctr_server_htmlencode_set );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "url-encode:" ), &ctr_server_urlencode_set );
+	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "base64-encode:" ), &ctr_server_base64encode_set );
+	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "base64-decode:" ), &ctr_server_base64decode_set );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Server" ), serverObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	//@todo move to core
 	formatObject = NULL;

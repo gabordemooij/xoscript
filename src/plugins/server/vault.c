@@ -29,8 +29,6 @@ static void print_hex(char* name, unsigned char *data, size_t length) {
 
 /* base64 implementation written by WEI Zhicheng. */
 
-#define BASE64_ENCODE_OUT_SIZE(s) ((unsigned int)((((s) + 2) / 3) * 4 + 1))
-#define BASE64_DECODE_OUT_SIZE(s) ((unsigned int)(((s) / 4) * 3))
 
 #define BASE64_PAD '='
 #define BASE64DE_FIRST '+'
@@ -84,7 +82,7 @@ static const unsigned char base64de[] = {
 	    49,  50,  51, 255, 255, 255, 255, 255
 };
 
-static unsigned int
+unsigned int
 base64_encode(const unsigned char *in, unsigned int inlen, char *out) {
 	int s;
 	unsigned int i;
@@ -127,7 +125,7 @@ base64_encode(const unsigned char *in, unsigned int inlen, char *out) {
 	return j;
 }
 
-static unsigned int
+unsigned int
 base64_decode(const char *in, unsigned int inlen, unsigned char *out)
 {
 	unsigned int i;

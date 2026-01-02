@@ -1,2 +1,16 @@
+>> phrases := List new
+	~ ['abcd']
+	~ ['hello world']
+	~ ['']
+	~ ['@.,;"']
+	~ ['this is a much much longer string to be encoded!'].
 
-#skip
+>> message := ['Phrase: ~decoded base64: ~encoded'].
+	
+phrases each: { :_ :phrase 
+	>> e := Server base64-encode: phrase.
+	>> d := Server base64-decode: e.
+	Out write: (
+		message copy ~encoded: e, ~decoded: d
+	), stop.
+}.
