@@ -206,7 +206,8 @@ ctr_object* ctr_server_base64encode_set(ctr_object* myself, ctr_argument* argume
 }
 
 /**
- * @def [ Server ] base64-decode: [ String ]
+ * @def
+ * [ Server ] base64-decode: [ String ]
  * 
  * @test621
  */
