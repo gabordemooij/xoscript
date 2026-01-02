@@ -1970,6 +1970,60 @@ You’ll get the bytes back as a sequence. You can even create a C-struct with a
 struct: message, passing a sequence of C types. This may be necessary when calling a C
 function in an external software library that expects a pointer to a struct.
 
+# Examples
+
+In this chapter, I'll try to list some example programs to give you an idea how
+xoscript works.
+
+## FizzBuzz
+
+This is a standard fizzbuzz example:
+
+```
+{ :i
+ 
+	(i = 0) continue.
+
+	(i % 15 = 0) true: {
+		Out write: ['FizzBuzz'], stop.
+	}, continue.
+
+	(i % 3 = 0) true: {
+		Out write: ['Fizz'], stop.
+	}, continue.
+
+	(i % 5 = 0) true: {
+		Out write: ['Buzz'], stop.
+	}, continue.
+
+	Out write: i, stop.
+ 
+} * 101.
+```
+
+Output:
+
+```
+1
+2
+Fizz
+4
+Buzz
+Fizz
+7
+8
+Fizz
+Buzz
+11
+Fizz
+13
+14
+FizzBuzz
+etc...
+```
+
+More examples will follow...
+
 
 
 # Localization
