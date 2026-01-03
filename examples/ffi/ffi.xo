@@ -1,19 +1,12 @@
 
->> g := Gui new.
+Server init.
 
-# basic test ffi
+Program memory-management: 4.
 
 >> libname := ['/usr/lib/x86_64-linux-gnu/libc.so.6'].
 
-(Program platform = ['win64']) true: {
-	libname := ['msvcrt.dll'].
-}.
 
-(Program platform = ['mac64']) true: {
-	libname := ['/usr/lib/libSystem.dylib'].
-}.
-
-g link: (
+Server link: (
  List new ;
  libname ;
  ['puts'] ;
@@ -24,6 +17,7 @@ g link: (
 ).
 
 >> s := Blob utf8: ['Hello from FFI!\n'].
+
 Puts str: s.
 s free.
 
@@ -38,7 +32,7 @@ a bytes: (
 
 >> struct := Blob struct: (List <<: ['int'], ; ['int']).
 
-g link: (
+Server link: (
 	List <<: ['@structtest'], ;
 	['@structtest'] ;
 	(List <<: struct) ; 
