@@ -75,6 +75,119 @@ are very similar to general programming practices. So for those of you
 who are already have experience with several other programming languages,
 you better treat this manual as a reference guide.
 
+## Setup Linux
+
+To install xoscript, just download the package from the
+download center for your platform (Linux or OpenBSD).
+
+To install xoscript as a server module for Apache2 edit
+
+```
+/etc/apache2/sites-enabled/000-default.conf 
+```
+
+add:
+
+```
+&lt;VirtualHost *:80&gt;
+	&lt;Directory /var/www/html&gt;
+		Options +ExecCGI
+		AllowOverride All
+	&lt;/Directory&gt;
+	DocumentRoot /var/www/html
+&lt;/VirtualHost&gt;
+```
+
+## Setup OpenBSD
+
+Edit /etc/httpd.conf, add:
+
+
+```
+server "mydomain.com" {
+    listen on * port 80
+    root "/htdocs/mydomain/"
+
+    location "*.xo" {
+        fastcgi
+        fastcgi socket "/run/slowcgi.sock"   # inside chroot
+    }
+}
+```
+
+Add the xo binary and mods, as well as any dependencies in the
+chroot.
+
+## Run examples
+
+
+To run one of the example programs in the package:
+
+```
+./example.sh &lt;name&gt; &lt;Linux/Win64&gt; [clean]
+```
+
+For example, to run the FizzBuzz example on Linux:
+
+```
+./example.sh fizzbuzz Linux
+```
+
+To run the same example on OpenBSD:
+
+```
+./example.sh fizzbuzz OBSD
+```
+
+To run the example with a clean build:
+
+```
+./example.sh fizzbuzz OBSD clean
+```
+
+## Unit tests
+
+To run the unit tests:
+
+```
+./runtests.sh
+```
+
+To run the unit test without building (just testing):
+
+```
+./runtests.sh nobuild
+```
+
+## Build
+
+To build from source on Linux:
+
+```
+make clean
+ISO="en" make
+```
+
+On OpenBSD:
+
+```
+gmake -f makefile.obsd clean
+ISO="en" gmake -f makefile.obsd
+```
+
+To build the server plugin on Linux:
+
+```
+PACKAGE="server" NAME="server.so" make plugin-clean
+ISO="en" PACKAGE="server" NAME="server.so" make plugin
+```
+
+To build the server plugin on OpenBSD:
+
+```
+PACKAGE="server" NAME="server.so" gmake -f makefile.obsd plugin-clean
+ISO="en" PACKAGE="server" NAME="server.so" gmake -f makefile.obsd plugin
+```
 
 ## Hello world
 
