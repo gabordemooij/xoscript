@@ -231,6 +231,17 @@ ctr_object* ctr_server_base64decode_set(ctr_object* myself, ctr_argument* argume
 	return answer;
 }
 
+ctr_object* ctr_server_link_set(ctr_object* myself, ctr_argument* argumentList) {
+	if (argumentList->object->link == CtrStdArray) {
+		#ifdef FFI
+		ctr_internal_gui_ffi(argumentList->object);
+		#else
+		ctr_error("FFI not available.", 0);
+		#endif
+	}
+	return myself;
+}
+
 void begin() {
 	ctr_internal_server_init();
 	serverObject = NULL;
@@ -241,6 +252,7 @@ void begin() {
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "url-encode:" ), &ctr_server_urlencode_set );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "base64-encode:" ), &ctr_server_base64encode_set );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "base64-decode:" ), &ctr_server_base64decode_set );
+	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "link:" ), &ctr_server_link_set );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Server" ), serverObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	//@todo move to core
 	formatObject = NULL;
