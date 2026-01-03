@@ -3,35 +3,46 @@ xoscript
 
 Welcome to xoscript.
 
-xoscript is a __generic client-side scripting language__ to quickly
-develop connected, cross-platform apps.
+xoscript is a __simple scripting language__ to quickly
+develop (server-side) applications.
 
 Example:
 
 ```
-# Hello world in dialog
-Gui show: ['Hello world'].
+Out write: ['Hello world'], stop.
 ```
 
-To run an example program:
+To run this program:
+
+```
+xo hello.xo
+```
+
+To run one of the example programs in the package:
 
 ```
 ./example.sh <name> <Linux/Win64> [clean]
 ```
 
-For example, to run the counter example on Linux:
+For example, to run the FizzBuzz example on Linux:
 
 ```
-./example.sh counter Linux
+./example.sh fizzbuzz Linux
 ```
 
-Another example: run the helloworld example on Win64 with a clean build:
+To run the same example on OpenBSD:
 
 ```
-./example.sh helloworld Win64 clean
+./example.sh fizzbuzz OBSD
 ```
 
-To run the unit tests (Mingw-win/Lin):
+To run the example with a clean build:
+
+```
+./example.sh fizzbuzz OBSD clean
+```
+
+To run the unit tests:
 
 ```
 ./runtests.sh
@@ -43,42 +54,34 @@ To run the unit test without building (just testing):
 ./runtests.sh nobuild
 ```
 
-The tests are designed to run on Linux and test Win64 through mingw/wine.
-
-If you use the binary distribution, you don't have to use the example.sh script,
-simply do:
-
-```
-xo counter_example.xo
-```
+Binary distributions are available from the website:
+https://xoscript.com
 
 To build from source on Linux:
 
 ```
-ISO="en" make clean
+make clean
 ISO="en" make
-ISO="en" PACKAGE="gui" NAME="libctrgui.so" make plugin-clean
-ISO="en" PACKAGE="gui" NAME="libctrgui.so" make plugin
 ```
 
-for Win64/mingw32:
+On OpenBSD:
 
 ```
-ISO="en" make -f makefile.win64 clean
-ISO="en" make -f makefile.win64
-ISO="en" PACKAGE="gui" NAME="libctrgui.dll" make -f makefile.win64 plugin-clean
-ISO="en" PACKAGE="gui" NAME="libctrgui.dll" make -f makefile.win64 plugin
+gmake -f makefile.obsd clean
+ISO="en" gmake -f makefile.obsd
 ```
 
-on macos:
+To build the server plugin on Linux:
 
 ```
-ISO="en" make -f makefile.mac clean
-ISO="en" make -f makefile.mac
-ISO="en" PACKAGE="gui" NAME="libctrgui.dylib" make -f makefile.mac plugin-clean
-ISO="en" PACKAGE="gui" NAME="libctrgui.dylib" make -f makefile.mac plugin
+PACKAGE="server" NAME="server.so" make plugin-clean
+ISO="en" PACKAGE="server" NAME="server.so" make plugin
 ```
 
-Of course you may also just export the vars (ISO etc..).
-Just a matter of style.
+To build the server plugin on OpenBSD:
+
+```
+PACKAGE="server" NAME="server.so" gmake -f makefile.obsd plugin-clean
+ISO="en" PACKAGE="server" NAME="server.so" gmake -f makefile.obsd plugin
+```
 
