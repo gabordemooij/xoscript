@@ -43,6 +43,7 @@ unittest() {
 		CONTENT_LENGTH=3 \
 		QUERY_STRING="a=2&b=4" \
 		HTTP_COOKIE="xsid=abc123" \
+		FFITESTLIB="/usr/lib/x86_64-linux-gnu/libc.so.6" \
 		./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err < <(echo -n "c=3")
 	
 		cat /tmp/rs /tmp/err > /tmp/out
@@ -95,7 +96,7 @@ unittest() {
 
 # select range
 FROM=1
-TIL=630
+TIL=631
 
 # run tests for linux
 pushd build/Linux/bin
