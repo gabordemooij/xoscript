@@ -466,19 +466,10 @@ ctr_object* ctr_program_num_of_args(ctr_object* myself, ctr_argument* argumentLi
 
 //@todo just custom platform string from compilation
 ctr_object* ctr_program_platform(ctr_object* myself, ctr_argument* argumentList) {
-	char* platform_name;
+	const char* platform_name;
 	platform_name = "lin64";
-	#ifdef WIN
-	platform_name = "win64";
-	#endif
-	#ifdef MAC
-	platform_name = "mac64";
-	#endif
-	#ifdef ANDROID_EXPORT
-	platform_name = "eandr";
-	#endif
-	#ifdef IOS_EXPORT
-	platform_name = "eios";
+	#ifdef OpenBSD
+	platform_name = "obsd";
 	#endif
 	return ctr_build_string_from_cstring(platform_name);
 }
