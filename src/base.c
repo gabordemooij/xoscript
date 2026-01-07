@@ -2219,6 +2219,38 @@ ctr_object* ctr_string_compare( ctr_object* myself, ctr_argument* argumentList )
 	return ctr_build_number_from_float( c );
 }
 
+
+#pragma clang optimize off
+#pragma GCC push_options
+#pragma GCC optimize ("O0")
+int ctr_internal_string_consttime_cmp(const void* s1, const void* s2, size_t n) {
+	size_t i;
+	const unsigned char* b1 = s1;
+	const unsigned char* b2 = s2;
+	volatile unsigned char q = 0;
+	for (i = 0; i < n; i++)
+		q |= b1[i] ^ b2[i];
+	return q;
+}
+#pragma clang optimize on
+#pragma GCC pop_options
+
+ctr_object* ctr_string_tccompare(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_size maxlen;
+	int s, c, q;
+	if (myself->value.svalue->vlen < argumentList->object->value.svalue->vlen) {
+		maxlen = myself->value.svalue->vlen;
+	} else {
+		maxlen = argumentList->object->value.svalue->vlen;
+	}
+	q = ctr_internal_string_consttime_cmp(
+		myself->value.svalue->value,
+		ctr_internal_cast2string(argumentList->object)->value.svalue->value,
+		maxlen
+	);
+	return ctr_build_bool( ( q == 0 ) );
+}
+
 /**
  * @def
  * [ String ] < [ String ]

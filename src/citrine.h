@@ -576,6 +576,7 @@ extern ctr_object* ctr_string_characters( ctr_object* myself, ctr_argument* argu
 extern ctr_object* ctr_string_to_byte_array( ctr_object* myself, ctr_argument* argumentList );
 extern ctr_object* ctr_string_append_byte(ctr_object* myself, ctr_argument* argumentList );
 extern ctr_object* ctr_string_compare(ctr_object* myself, ctr_argument* argumentList );
+extern ctr_object* ctr_string_tccompare(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_string_before(ctr_object* myself, ctr_argument* argumentList );
 extern ctr_object* ctr_string_before_or_same(ctr_object* myself, ctr_argument* argumentList );
 extern ctr_object* ctr_string_after(ctr_object* myself, ctr_argument* argumentList );
