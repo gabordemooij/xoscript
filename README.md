@@ -54,6 +54,12 @@ To run the unit test without building (just testing):
 ./runtests.sh nobuild
 ```
 
+On OpenBSD:
+
+```
+./runtests_obsd.sh nobuild
+```
+
 Binary distributions are available from the website:
 https://xoscript.com
 
