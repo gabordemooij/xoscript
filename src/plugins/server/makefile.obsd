@@ -11,10 +11,6 @@ WARNINGS ?= -Wall -Wshadow -Wundef -Wno-discarded-qualifiers -Wextra -Wno-unused
 					-Wno-ignored-qualifiers -Wno-error=pedantic -Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion -Wclobbered -Wdeprecated -Wempty-body \
 					-Wshift-negative-value -Wstack-usage=2048 -Wno-unused-value -std=gnu99
 CFLAGS 			?= ${EXTRACFLAGS} -D PCRE2 -D ARC4RANDOM -D FFI -D LIBCURL -O3 -g0 -I/usr/local/include/mysql -I/usr/local/include -I ./i18n/${ISO}/ -I ../../i18n/${ISO} -I ../media/i18n/${ISO} -I$(LVGL_DIR)/ $(WARNINGS) -fPIC
-
-
-
-CXXFLAGS        ?= -fPIC
 LDFLAGS 		=  -L/usr/local/lib  -lpcre2-8 -lmariadb -lcurl -lffi -lm -shared
 
 
@@ -32,14 +28,11 @@ MAINSRC = ./server.c
 CSRCS += pattern.c net.c mariadb.c json.c vault.c http.c fficonnect.c ccgi/ccgi.c jsmn/jsmn.c monocypher/src/monocypher.c
 OBJEXT ?= .o
 
-AOBJS = $(ASRCS:.S=$(OBJEXT))
 COBJS = $(CSRCS:.c=$(OBJEXT))
-CXXOBJS = $(CXXSRCS:.cpp=$(OBJEXT))
-
 MAINOBJ = $(MAINSRC:.c=$(OBJEXT))
 
-SRCS = $(ASRCS) $(CSRCS) $(MAINSRC) $(CXXSRCS)
-OBJS = $(AOBJS) $(COBJS) $(CXXOBJS) $(MAINOBJ)
+SRCS = $(CSRCS) $(MAINSRC)
+OBJS = $(COBJS) $(MAINOBJ)
 TARGET = $(addprefix $(BUILD_OBJ_DIR)/, $(patsubst ./%, %, $(OBJS)))
 
 all: default

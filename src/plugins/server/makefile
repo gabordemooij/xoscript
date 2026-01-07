@@ -17,7 +17,6 @@ CFLAGS 			?= ${EXTRACFLAGS} -D PCRE2 -D LIBSECRET -D FFI -D LIBCURL -shared -O3 
 
 CFLAGS += `pkg-config --cflags libsecret-1`
 
-CXXFLAGS        ?= -fPIC
 LDFLAGS 		=  -lpcre2-8 -lmariadb -lcurl -lm -shared
 LDFLAGS += `pkg-config --libs libsecret-1`
 
@@ -36,15 +35,11 @@ MAINSRC = ./server.c
 
 CSRCS += pattern.c net.c mariadb.c json.c vault.c http.c fficonnect.c ccgi/ccgi.c jsmn/jsmn.c monocypher/src/monocypher.c
 OBJEXT ?= .o
-
-AOBJS = $(ASRCS:.S=$(OBJEXT))
 COBJS = $(CSRCS:.c=$(OBJEXT))
-CXXOBJS = $(CXXSRCS:.cpp=$(OBJEXT))
-
 MAINOBJ = $(MAINSRC:.c=$(OBJEXT))
 
-SRCS = $(ASRCS) $(CSRCS) $(MAINSRC) $(CXXSRCS)
-OBJS = $(AOBJS) $(COBJS) $(CXXOBJS) $(MAINOBJ)
+SRCS = $(CSRCS) $(MAINSRC)
+OBJS = $(COBJS) $(MAINOBJ)
 TARGET = $(addprefix $(BUILD_OBJ_DIR)/, $(patsubst ./%, %, $(OBJS)))
 
 all: default
