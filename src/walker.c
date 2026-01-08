@@ -1,4 +1,4 @@
-#include "citrine.h"
+#include "xo.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "citrine.h"
+#include "xo.h"
 
 #ifdef INCLUDETESTS
  

@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../../citrine.h"
+#include "../../xo.h"
 #include <server.h>
 
 #ifdef LIBCURL

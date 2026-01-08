@@ -1,4 +1,4 @@
-#include "citrine.h"
+#include "xo.h"
 
 uint64_t ctr_gc_alloc;
 uint64_t ctr_gc_memlimit;

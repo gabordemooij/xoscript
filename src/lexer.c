@@ -1,4 +1,4 @@
-#include "citrine.h"
+#include "xo.h"
 
 int ctr_clex_bflmt = 255;
 ctr_size ctr_clex_tokvlen = 0; /* length of the string value of a token */

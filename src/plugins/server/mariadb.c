@@ -3,7 +3,7 @@
 #include <string.h>
 #include "mariadb.h"
 #include <server.h>
-#include "../../citrine.h"
+#include "../../xo.h"
 
 #define CTR_OBJECT_RESOURCE_MARIADB 41
 #define CTR_OBJECT_RESOURCE_MARIADB_STM 42

@@ -3,7 +3,7 @@
 #include <string.h>
 #include "net.h"
 #include <server.h>
-#include "../../citrine.h"
+#include "../../xo.h"
 
 ctr_object* CtrCurlObject;
 

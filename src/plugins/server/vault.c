@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../citrine.h"
+#include "../../xo.h"
 #include "vault.h"
 #include "monocypher/src/monocypher.h"
 

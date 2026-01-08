@@ -5,7 +5,7 @@
 #include <stdarg.h>
 #include <math.h>
 #include <stdint.h>
-#include "citrine.h"
+#include "xo.h"
 
 char* ctr_cparse_current_program;
 ctr_source_map* ctr_source_map_head;

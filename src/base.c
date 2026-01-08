@@ -1,4 +1,4 @@
-#include "citrine.h"
+#include "xo.h"
 
 ctr_size ctr_program_length;
 uint64_t    ctr_cwlk_subprogram;

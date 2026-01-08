@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <syslog.h>
-#include "../../citrine.h"
+#include "../../xo.h"
 
 #include "i18n/en/server.h"
 

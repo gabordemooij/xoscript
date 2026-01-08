@@ -5,7 +5,7 @@
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 
-#include "../../citrine.h"
+#include "../../xo.h"
 #include "pattern.h"
 
 ctr_object* CtrServerPCRE2;

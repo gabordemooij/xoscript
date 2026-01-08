@@ -1,4 +1,4 @@
-#include "citrine.h"
+#include "xo.h"
 
 ctr_object* CtrStdWorld;
 ctr_object* CtrStdObject;
