@@ -2235,6 +2235,12 @@ int ctr_internal_string_consttime_cmp(const void* s1, const void* s2, size_t n) 
 #pragma clang optimize on
 #pragma GCC pop_options
 
+/**
+ * @def
+ * [ String ] tccompare: [ String ]
+ *
+ * @test632
+ */
 ctr_object* ctr_string_tccompare(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_size maxlen;
 	int s, c, q;
