@@ -2083,6 +2083,8 @@ You’ll get the bytes back as a sequence. You can even create a C-struct with a
 struct: message, passing a sequence of C types. This may be necessary when calling a C
 function in an external software library that expects a pointer to a struct.
 
+@api_Blob_base
+
 # Examples
 
 In this chapter, I'll try to list some example programs to give you an idea how
