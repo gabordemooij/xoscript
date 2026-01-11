@@ -1,1 +1,64 @@
-#skip
+>> libname := Program setting: ['FFITESTLIB'].
+
+
+Server
+link: (
+ List new ;
+ libname ;
+ ['fopen'] ;
+ ( List new ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+link: (
+	List new ;
+	None ;
+	['fread'] ;
+	( List new ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+	['int'] ;
+	None ;
+	['fread']
+),
+link: (
+	List new ;
+	None ;
+	['fwrite'] ;
+	( List new ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+	['int'] ;
+	None ;
+	['fwrite']
+),
+link: (
+	List new ;
+	None ;
+	['rewind'] ;
+	( List new ; ['pointer'] ) ;
+	['int'] ;
+	None ;
+	['rewind:']
+).
+
+
+>> str  := Blob utf8: ['abc123'].
+>> path := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+>> fd := Stream path: path mode: mode.
+
+>> buf := Blob new: 20.
+>> bytes-written := Stream message: ['fwrite'] arguments: (List new ; str ; 1 ; 10 ; fd ).
+Out write: bytes-written, stop.
+
+Stream rewind: fd.
+>> bytes-read := Stream message: ['fread'] arguments: (List new ; buf ; 1 ; 10 ; fd ).
+Out write: bytes-read, stop.
+
+Out write: buf, stop.
+
+str free.
+path free.
+mode free.
+buf free.
+
+

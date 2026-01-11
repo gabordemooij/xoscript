@@ -492,6 +492,33 @@ ctr_object* ctr_media_ffi_respond_to_and_and_and(ctr_object* myself, ctr_argumen
 	return result;
 }
 
+
+ctr_object* ctr_media_ffi_apply(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* result;
+	void* return_value;
+	CtrMediaFFI* ff = ctr_internal_gui_ffi_get(myself, argumentList->object);
+	if (!ff) {
+		return ctr_error("Unable to find FFI property.!", 0);
+	}
+	ctr_argument a;
+	a.object = CtrStdNil;
+	int len = (int) ctr_array_count( argumentList->next->object, &a )->value.nvalue;
+	void* values[100];
+	for(int i=0; i<len; i++) {
+		a.object = ctr_build_number_from_float((double)i);
+		ctr_object* value = ctr_array_get(argumentList->next->object, &a);
+		values[i] = ctr_internal_gui_ffi_convert_value(ff->args[i], value);
+	}
+	return_value = ctr_internal_gui_ffi_convert_value(ff->rtype, NULL);
+	ffi_call(ff->cif, ff->symbol, return_value, values);
+	result = ctr_internal_gui_ffi_convert_value_back(ff->rtype, return_value);
+	for(int i=0; i<len; i++) {
+		ctr_heap_free(values[i]);
+	}
+	ctr_heap_free(return_value);
+	return result;
+}
+
 ctr_object* ctr_media_ffi_respond_to_and_and(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	void* return_value;
@@ -775,6 +802,7 @@ void begin_ffi() {
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_FROM_LENGTH ), &ctr_blob_read);
 	CtrMediaFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
 	CtrMediaFFIObjectBase->link = CtrStdObject;
+	ctr_internal_create_func(CtrMediaFFIObjectBase, ctr_build_string_from_cstring( CTR_DICT_MESSAGEARGS ), &ctr_media_ffi_apply );
 	ctr_internal_create_func(CtrMediaFFIObjectBase, ctr_build_string_from_cstring( CTR_DICT_RESPOND_TO ), &ctr_media_ffi_respond_to );
 	ctr_internal_create_func(CtrMediaFFIObjectBase, ctr_build_string_from_cstring( CTR_DICT_RESPOND_TO_AND ), &ctr_media_ffi_respond_to_and );
 	ctr_internal_create_func(CtrMediaFFIObjectBase, ctr_build_string_from_cstring( CTR_DICT_RESPOND_TO_AND_AND ), &ctr_media_ffi_respond_to_and_and );
