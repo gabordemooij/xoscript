@@ -321,3 +321,46 @@ ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_heap_free(pathValue);
 	return fileList;
 }
+
+/**
+ * @def
+ * 
+ * [ File ] lines: [ Code ]
+ *
+ * @test547
+ */
+ctr_object* ctr_file_lines(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* path;
+	ctr_argument* lineArg;
+	ctr_object* lineObj ;
+	char* pathString;
+	FILE* f;
+	int error_code;
+	char* line = NULL;
+	size_t linesize = 0;
+	ssize_t linelen;
+	path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0);
+	if (path == NULL) return CtrStdNil;
+	pathString = ctr_heap_allocate_cstring( path );
+	f = fopen(pathString, "r");
+	error_code = errno;
+	ctr_heap_free( pathString );
+	if (!f) {
+		ctr_error( CTR_ERR_OPEN, error_code );
+		return CtrStdNil;
+	}
+	lineArg = ctr_heap_allocate(sizeof(ctr_argument));
+	while ((linelen = getline(&line, &linesize, f)) != -1) {
+		lineObj = ctr_build_string(line, (ctr_size) linelen - 1);
+		lineObj->info.sticky = 1;
+		lineArg->object = lineObj;
+		lineArg->next = NULL;
+		ctr_block_run(argumentList->object, lineArg, NULL);
+		if (CtrStdFlow == CtrStdContinue) CtrStdFlow = NULL; /* consume continue */
+		if (CtrStdFlow) break;
+	}
+	ctr_heap_free(lineArg);
+	if (line) free(line);
+	fclose(f);
+	return myself;	
+}

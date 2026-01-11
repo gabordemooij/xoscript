@@ -680,6 +680,7 @@ extern ctr_object* ctr_file_descriptor(ctr_object* myself, ctr_argument* argumen
 extern ctr_object* ctr_file_lock_generic(ctr_object* myself, ctr_argument* argumentList, int lock);
 extern ctr_object* ctr_file_lock(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_file_unlock(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_file_lines(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList);
 
 
