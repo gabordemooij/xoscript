@@ -2026,6 +2026,8 @@ you don't have to use this.
 
 # ffi
 
+{{messages}}
+
 FFI stands for Foreign Function Interface. It allows you to use functionality written by others in
 different programming languages, provided through DLL files, SO files, or Dylib files. These could
 be a variety of functions, and there's a vast range of available functionality through this method.
@@ -2083,7 +2085,7 @@ You’ll get the bytes back as a sequence. You can even create a C-struct with a
 struct: message, passing a sequence of C types. This may be necessary when calling a C
 function in an external software library that expects a pointer to a struct.
 
-@api_Blob_base
+@api_Blob_fficonnect
 
 # Examples
 
