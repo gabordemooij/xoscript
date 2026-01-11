@@ -27,16 +27,6 @@ ffi_type* ctr_internal_gui_ffi_map_type(char* description);
 void* ctr_internal_gui_ffi_convert_value(ffi_type* type, ctr_object* obj);
 
 
-/**
- * @def
- * [ Blob ] deref.
- * 
- * @example
- * blob deref.
- *
- * @result
- * @info-blob-deref
- */
 ctr_object* ctr_blob_deref(ctr_object* myself, ctr_argument* argumentList) {
 	myself->value.rvalue->ptr = (void*) *((void**)myself->value.rvalue->ptr);
 	return myself;
@@ -44,13 +34,9 @@ ctr_object* ctr_blob_deref(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Blob ] fill: [ Sequence ]
+ * [ Blob ] bytes: [ List ]
  * 
- * @example
- * blob fill: (Sequence new ; 1 ; 2 ; 3).
- *
- * @result
- * @info-blob-fill
+ * @test375
  */
 ctr_object* ctr_blob_fill(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* arr = argumentList->object;
@@ -60,16 +46,7 @@ ctr_object* ctr_blob_fill(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
-/**
- * @def
- * [ Blob ] free
- * 
- * @example
- * blob free
- *
- * @result
- * @info-blob-free
- */
+
 ctr_object* ctr_blob_free(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_heap_free(myself->value.rvalue->ptr);
 	myself->value.rvalue->ptr = NULL;
@@ -85,12 +62,8 @@ ctr_object* ctr_blob_tostring(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Blob ] new: [ Number ]
- * 
- * @example
- * >> x := Blob new: 100.
- * 
- * @result
- * @info-blob-new
+ *
+ * @test375
  */
 ctr_object* ctr_blob_new_set(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX);
@@ -106,13 +79,9 @@ ctr_object* ctr_blob_new_set(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Blob ] utf8: [ Text ]
+ * [ Blob ] utf8: [ String ]
  * 
- * @example
- * blob utf8: ['abc'].
- * 
- * @result
- * @info-blob-utf8
+ * @test569
  */
 ctr_object* ctr_blob_utf8_set(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX);
@@ -125,6 +94,12 @@ ctr_object* ctr_blob_utf8_set(ctr_object* myself, ctr_argument* argumentList) {
 	return instance;
 }
 
+/**
+ * @def
+ * [ Blob ] new: [ Number ] type: [ String ].
+ *
+ * @test548
+ */
 ffi_type* ctr_internal_gui_ffi_map_type_obj(ctr_object* obj);
 ctr_object* ctr_blob_new_set_type(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX);
@@ -146,12 +121,8 @@ ctr_object* ctr_blob_new_set_type(ctr_object* myself, ctr_argument* argumentList
 /**
  * @def
  * [ Blob ] from: [ Number ] length: [ Number ]
- * 
- * @example
- * >> data := blob from: 0 length 10.
- * 
- * @result
- * @info-blob-read
+ *
+ * @test568
  */
 ctr_object* ctr_blob_read(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument* pushArg;
@@ -176,26 +147,6 @@ ctr_object* ctr_blob_read(ctr_object* myself, ctr_argument* argumentList) {
 	return newArray;
 }
 
-/**
- * @def
- * FFI
- * 
- * @example
- * media link: (
- * 		Sequence new ; ['libc.so.6'] ;
- * 		['printf'] ;
- * 		( Sequence new ; ['pointer'] ; ['int'] ) ;
- * 		['void'] ;
- * 		['stdio'] ;
- * 		['printf:'] ;
- * 		1
- * ).
- * >> b := Blob utf8: ['I got %d appels'].
- * stdio printf: (Sequence new ; b ; 6).
- * 
- * @result
- * I got 6 apples
- */
 struct CtrMediaFFI {
 	void* handle;
 	void* symbol;
@@ -285,13 +236,9 @@ ffi_type* ctr_internal_gui_ffi_map_type_obj(ctr_object* obj) {
 
 /**
  * @def
- * [ Blob ] struct: [ Sequence ]
- * 
- * @example
- * >> ints ≔ Blob struct: (Sequence new ; ['int'] ; ['int']).
+ * [ Blob ] struct: [ List ]
  *
- * @result
- * @info-blob-struct
+ * @test549
  */
 ctr_object* ctr_blob_new_struct(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX);
@@ -317,16 +264,7 @@ ctr_object* ctr_blob_new_struct(ctr_object* myself, ctr_argument* argumentList) 
 	return instance;
 }
 
-/**
- * @def
- * [ Blob ] freestruct
- * 
- * @example
- * blob freestruct
- *
- * @result
- * @info-blob-freestruct
- */
+
 ctr_object* ctr_blob_free_struct(ctr_object* myself, ctr_argument* argumentList) {
 	if (myself->info.type == CTR_OBJECT_TYPE_OTEX) {
 		ctr_resource* buffer = (ctr_resource*) myself->value.rvalue;
@@ -775,12 +713,7 @@ void ctr_internal_gui_ffi(ctr_object* ffispec) {
 	CtrMediaPreviousFFIEntry = ff;
 }
 
-/**
- * [Blob] new
- *
- * Creates a new instance of the Blob object.
- * The Blob object allows you to manage custom memory blobs.
- */
+
 ctr_object* ctr_blob_new(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* blobInstance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
 	blobInstance->link = myself;

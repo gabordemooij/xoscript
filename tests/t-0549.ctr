@@ -1,1 +1,50 @@
-#skip
+Server init.
+
+# assumes int = 32 bit ( 4 bytes )
+>> a := Blob new: 4 * 9.
+a bytes: (
+	List new 
+	; 1    ; 0 ; 0 ; 0
+	; 10   ; 0 ; 0 ; 0
+	; 12   ; 0 ; 0 ; 0
+	; 5    ; 0 ; 0 ; 0
+	; 0    ; 0 ; 0 ; 0
+	; 81   ; 0 ; 0 ; 0
+	; 0    ; 0 ; 0 ; 0
+	; 0    ; 0 ; 0 ; 0
+	; 1    ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (
+	List new 
+		; ['int']
+		; ['int']
+		; ['int']
+		; ['int']
+		; ['int']
+		; ['int']
+		; ['int']
+		; ['int']
+).
+
+
+>> libname := Program setting: ['FFITESTLIB'].
+
+Server link: (
+ List new ;
+ libname ;
+ ['asctime'] ;
+ ( List new ; ['pointer'] ) ;
+ ['pointer'] ;
+ ['Time'] ;
+ ['asctime:']
+).
+
+Out write: (Time asctime: a), stop.
+
+a free.
+struct structfree.
+struct free.
+
+
+

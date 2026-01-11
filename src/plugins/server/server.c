@@ -231,6 +231,12 @@ ctr_object* ctr_server_base64decode_set(ctr_object* myself, ctr_argument* argume
 	return answer;
 }
 
+/**
+ * @def
+ * [ Server ] link: [ List ]
+ * 
+ * @test130
+ */
 ctr_object* ctr_server_link_set(ctr_object* myself, ctr_argument* argumentList) {
 	if (argumentList->object->link == CtrStdArray) {
 		#ifdef FFI

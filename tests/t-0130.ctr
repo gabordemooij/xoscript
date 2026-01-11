@@ -1,64 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
 >> libname := Program setting: ['FFITESTLIB'].
 
-
-Server
-link: (
- List new ;
- libname ;
- ['fopen'] ;
+# link stdio functions from c for advances file operations
+Server link: ( List new ;
+ libname ; ['fopen'] ;
  ( List new ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
-link: (
-	List new ;
-	None ;
-	['fread'] ;
-	( List new ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
-	['int'] ;
-	None ;
-	['fread']
+link: ( List new ;
+ None ; # means same lib
+ ['fread'] ;
+ ( List new ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ None ; # means same object (i.e. Stream)
+ ['fread']
 ),
 link: (
-	List new ;
-	None ;
-	['fwrite'] ;
-	( List new ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
-	['int'] ;
-	None ;
-	['fwrite']
+ List new ;
+ None ; # means same lib
+ ['fwrite'] ;
+ ( List new ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ None ; # means same lib
+ ['fwrite']
 ),
 link: (
-	List new ;
-	None ;
-	['rewind'] ;
-	( List new ; ['pointer'] ) ;
-	['int'] ;
-	None ;
-	['rewind:']
+ List new ;
+ None ; # means same lib
+ ['rewind'] ;
+ ( List new ; ['pointer'] ) ;
+ ['int'] ;
+ None ; # means same lib
+ ['rewind:']
 ).
-
 
 >> str  := Blob utf8: ['abc123'].
 >> path := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
+# open a file with fopen(path, mode)
 >> fd := Stream path: path mode: mode.
 
->> buf := Blob new: 20.
+# write bytes from buffer str to file
 >> bytes-written := Stream message: ['fwrite'] arguments: (List new ; str ; 1 ; 10 ; fd ).
 Out write: bytes-written, stop.
 
+# rewind file pointer
 Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob new: 20.
+
+# read from file
 >> bytes-read := Stream message: ['fread'] arguments: (List new ; buf ; 1 ; 10 ; fd ).
 Out write: bytes-read, stop.
-
 Out write: buf, stop.
 
-str free.
+# free memory
+str  free.
 path free.
 mode free.
-buf free.
+buf  free.
 
 
