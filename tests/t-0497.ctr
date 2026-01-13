@@ -1,1 +1,25 @@
-#skip
+Server init.
+
+# write a test file
+>> f := File new: ['/tmp/test.gif'].
+f write: ['GIF87a01234567810'].
+
+# serve the file
+Server passthru: ['test.gif'] prefix: ['/tmp/'].
+
+Out stop.
+
+Out write: ['Outside container (security):'], stop.
+{ Server passthru: ['../passwd'] prefix: ['/tmp/']. }
+except: { :e Out write: e, stop. },
+start.
+
+Out write: ['Invalid prefix:'], stop.
+{ Server passthru: ['test.gif'] prefix: ['z:\\']. }
+except: { :e Out write: e, stop. },
+start.
+
+Out write: ['Non-existant file:'], stop.
+{ Server passthru: ['xxx.xxx'] prefix: ['/tmp/']. }
+except: { :e Out write: e, stop. },
+start.
