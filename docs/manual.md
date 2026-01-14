@@ -1120,6 +1120,17 @@ sure to use the correct quotation marks. The quotation mark at the
 beginning of the text differs from the one at the end (this allows you
 to use the single quote without needing to escape it).
 
+## UTF8
+
+Strings in xoscript usually contain utf8 encoded text. Although
+it's technically possible to have binary or non-utf8 content in
+a string, it is recommended to use blobs for that. Blobs are
+provided by the server plugin (see chapter ffi).
+In general blobs/ffi are provided
+on a plugin/platform basis, since they tie into the platform
+and architecture (ffi/blobs). The core of the scripting language tries to
+remain as platform agnostic as possible.
+
 ## Casting
 
 You can create a copy of each object
@@ -1579,6 +1590,11 @@ fudge, the following simplified notation can be used:
 {{messages}}
 
 The **File** object provides basic access to the file system.
+You can use this object to read entire files into a variable at
+once, or write variables to files at once. Line by line reading
+is also supported. These are the most common file I/O operations
+in a scripting language. Advanced file operations require the
+use of FFI through the server plugin or a separate IO plugin.
 
 @api_File_file
 
@@ -2021,12 +2037,27 @@ Note that the template engine will always perform html encoding
 if you write to a slot marker. So, if you use the template system
 you don't have to use this.
 
+## Linking
+
+Using the link: message you can link an external library to
+your program using libffi. For details see the chapter about ffi.
+
+
 @api_Server_server
 
 
 # ffi
 
 {{messages}}
+
+FFI is provided on a platform/plugin basis because it
+ties into the underlying system achitecture, something the
+core is not supposed to do.
+The server plugin offers a compliant ffi/blob implementation.
+By default the core connects to the target platform
+through stdin/stdout, limited file i/o services and shell (Program os).
+Auxiliary integration is provided by ffi/blobs through application
+centered plugins like the server plugin.
 
 FFI stands for Foreign Function Interface. It allows you to use functionality written by others in
 different programming languages, provided through DLL files, SO files, or Dylib files. These could
@@ -2080,10 +2111,35 @@ with the free message.
 
 You can fill a memory blob in various ways. In our example, we fill it with text, so we use the
 utf8: message (UTF-8 is an encoding to convert text into bytes). You can also fill a blob with
-fill:, passing a sequence of byte values. To read the contents of a blob, use from:length:.
-You’ll get the bytes back as a sequence. You can even create a C-struct with a Blob using the
+bytes:, passing a list of byte values. To read the contents of a blob, use from:length:.
+You'll get the bytes back as a sequence. You can even create a C-struct with a Blob using the
 struct: message, passing a sequence of C types. This may be necessary when calling a C
 function in an external software library that expects a pointer to a struct.
+
+{warning}
+You need to free blobs yourself.
+Blobs are not cleared by the garbage collector.
+{/warning}
+
+Since blobs can be exchanged with external functions from libraries, they
+cannot be garbage collected automatically (they might remain in use by 
+external functions or these external functions might want to free them
+themselves). Therefore you need to free blobs yourself if necessary.
+
+To free a blob use:
+
+```
+myblob free.
+```
+
+To free struct use:
+
+```
+mystruct structfree free.
+```
+
+So for a struct, you need to send two messages: structfree and free to
+deallocate the memory block.
 
 @api_Blob_fficonnect
 
