@@ -2148,6 +2148,50 @@ deallocate the memory block.
 In this chapter, I'll try to list some example programs to give you an idea how
 xoscript works.
 
+## Server script
+
+This is how a typical script on server might look:
+
+```
+#!/bin/xo
+
+Server init.
+
+# I prefer a central loader that loads
+# webtools.xo and template.xo
+Program use: ['app/libs/loader.xo'].
+
+# create a new document
+&gt;&gt; web-document := Web-Document new.
+>> tpl := Template new: ( 
+	File new: ['app/templates/greeting.tpl'], read
+).
+
+# cut the message section
+&gt;&gt; message := tpl cut: ['message'].
+
+# add a message (will be encoded properly to avoid xss)
+message greeting: ['hello world!'].
+
+# paste the element at the designated slot
+tpl paste: message at: ['messages'].
+
+# output including http headers
+web-document out: tpl.
+```
+
+This would render a HTML document with a hello world message.
+As you can see, this uses a very strict separation between HTML and
+presentation logic (using the default template engine), so a
+template developer can update the template without having to
+adjust any code.
+
+You can see the result here:
+
+https://xoscript.com/test.xo
+
+
+
 ## FizzBuzz
 
 This is a standard fizzbuzz example:
