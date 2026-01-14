@@ -150,6 +150,7 @@ Web-Document on: ['template:'] do: { :path
 	<- Template new: (File new: path, read).
 }.
 
+
 Web-Document on: ['out:'] do: { :output
 	own headers-out false: {
 		own sessdata None? false: {
@@ -163,6 +164,14 @@ Web-Document on: ['out:'] do: { :output
 	}.
 	Out write: output.
 }.
+
+Web-Document on: ['not-found:'] do: { :output
+	self clear-headers header: (
+		HTTP-Header new key: ['Status'] value: ['404 Not Found']
+	).
+	self out: output.
+}.
+
 
 # Interface
 
