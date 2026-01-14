@@ -202,33 +202,35 @@ ctr_object* ctr_gui_vault_name(ctr_object* myself, ctr_argument* argumentList) {
 	);
 }
 
-
-uint8_t* ctr_gui_vault_internal_derive_key(char* password, uint8_t* hash, uint8_t* salt) {
+int ctr_gui_vault_internal_derive_key(char* password, uint8_t* hash, uint8_t* salt) {
 	crypto_argon2_config config = {
-		.algorithm = CRYPTO_ARGON2_I,            /* Argon2i         */
+		.algorithm = CRYPTO_ARGON2_ID,           /* Argon2id         */
 		.nb_blocks = 100000,                     /* 100 megabytes   */
 		.nb_passes = 3,                          /* 3 iterations    */
 		.nb_lanes  = 1                           /* Single-threaded */
 	};
+	//password MUST be UTF-8 text without NUL bytes
 	crypto_argon2_inputs inputs = {
 		.pass      = password,                   /* User password */
 		.salt      = salt,                 /* Salt for the password */
-		.pass_size = strlen(password) - 1,       /* Password length */
+		.pass_size = strlen(password),       /* Password length */
 		.salt_size = 16
 	};
 	crypto_argon2_extras extras = {0};   /* Extra parameters unused */
 	void *work_area = malloc((size_t)config.nb_blocks * 1024);
 	if (work_area == NULL) {
-		exit(1); //@todo decent error handling
+		crypto_wipe(password, strlen(password));
+		return -1;
 	} else {
 		crypto_argon2(hash, 32, work_area,
 					  config, inputs, extras);
+		crypto_wipe(password, strlen(password));
 		free(work_area);
 	}
-	return &hash;
+	return 0;
 }
 
-
+// This function is not Endiann-safe.
 ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	ctr_object* message = ctr_internal_cast2string(argumentList->object);
@@ -242,12 +244,11 @@ ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList
 		return myself;
 	}
 	int len = message->value.svalue->vlen;
-	int outlen = len + 16 + 16 + 24 + sizeof(int);
+	int outlen = len + 16 + 16 + 24 + sizeof(uint32_t);
 	int outlen64 = BASE64_ENCODE_OUT_SIZE(outlen);
 	char*    in;
 	char*    out;
 	char*    out64;
-	uint8_t* text;
 	uint8_t key[32];
 	uint8_t salt[16];
 	uint8_t mac[16];
@@ -258,11 +259,14 @@ ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList
 		ctr_error("Unable to generate secure random buffer.",0);
 		return myself;
 	}
-	text = ctr_heap_allocate_cstring( message );
 	password = ctr_heap_allocate_cstring( ctr_internal_cast2string(argumentList->next->object) );
 	encrypted = ctr_heap_allocate(len);
 	in = ctr_heap_allocate_cstring(message);
-	ctr_gui_vault_internal_derive_key(password, &key, &salt);
+	if (ctr_gui_vault_internal_derive_key(password, key, salt)==-1) {
+		ctr_error("Unable to derive key.", 0);
+		result = CtrStdNil;
+		goto clean;
+	}
 	crypto_aead_lock(encrypted, mac, key, nonce, NULL, 0, in, len);
 	out = ctr_heap_allocate( outlen );
 	memcpy(out, salt, 16);
@@ -272,13 +276,19 @@ ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList
 	memcpy(out + 16 + 24 + 16 + sizeof(uint32_t), encrypted, len);
 	crypto_wipe(key, 32);
 	out64 = ctr_heap_allocate(outlen64);
-	base64_encode(out, outlen, out64);
-	result = ctr_build_string_from_cstring(out64);
-	ctr_heap_free(in);
+	unsigned int bytes_encoded = base64_encode(out, outlen, out64);
+	if (bytes_encoded == 0) {
+		// should not be possible but then again, better safe then sorry
+		ctr_error("Invalid base64 encoding, internal error.", 0);
+		result = CtrStdNil;
+	} else {
+		result = ctr_build_string_from_cstring(out64);
+	}
 	ctr_heap_free(out);
 	ctr_heap_free(out64);
+	clean:
+	ctr_heap_free(in);
 	ctr_heap_free(encrypted);
-	ctr_heap_free(text);
 	ctr_heap_free(password);
 	return result;
 }
@@ -313,27 +323,63 @@ ctr_object* ctr_gui_vault_decrypt(ctr_object* myself, ctr_argument* argumentList
 	inlen64 = encrypted_message->value.svalue->vlen;
 	in64 = ctr_heap_allocate_cstring(encrypted_message);
 	inlen = BASE64_DECODE_OUT_SIZE(inlen64);
-	outlen = inlen - 24 - 16 - 16 - sizeof(uint32_t);
+	if (inlen < (16 + 24 + 16 + sizeof(uint32_t))) {
+		ctr_error("Encrypted message is too short.", 0);
+		ctr_heap_free(in64);
+		crypto_wipe(password, strlen(password));
+		ctr_heap_free(password);
+		return CtrStdNil;
+	}
 	in = ctr_heap_allocate(inlen);
-	base64_decode(in64, inlen64, in);
+	unsigned int bytes_decoded = base64_decode(in64, inlen64, in);
+	if (bytes_decoded == 0) {
+		ctr_error("Invalid base64 input.", 0);
+		ctr_heap_free(in);
+		ctr_heap_free(in64);
+		crypto_wipe(password, strlen(password));
+		ctr_heap_free(password);
+		return CtrStdNil;
+	}
+	inlen = bytes_decoded;
+	outlen = inlen - 24 - 16 - 16 - sizeof(uint32_t);
 	memcpy(salt, in, 16);
 	memcpy(nonce, in+16, 24);
 	memcpy(mac, in+16+24, 16);
 	memcpy(&mlen, in+16+24+16, sizeof(uint32_t));
+	if (mlen < 0 || (size_t)mlen != outlen) {
+		ctr_error("Invalid encrypted message length.", 0);
+		ctr_heap_free(in);
+		ctr_heap_free(in64);
+		crypto_wipe(password, strlen(password));
+		ctr_heap_free(password);
+		return CtrStdNil;
+	}
 	message = ctr_heap_allocate((int)mlen);
 	memcpy(message, in+16+24+16+sizeof(uint32_t), (size_t)mlen);
-	ctr_gui_vault_internal_derive_key(password, &key, &salt);
+	if (ctr_gui_vault_internal_derive_key(password, key, salt)==-1) {
+		ctr_error("Unable to derive key.", 0);
+		crypto_wipe(message, mlen);
+		result = CtrStdNil;
+		goto clean;
+	}
 	out = ctr_heap_allocate((int)mlen + 1);
+	out[(int)mlen] = '\0';
 	if (crypto_aead_unlock(out, mac, key, nonce, NULL, 0, message, (int)mlen)) {
 		ctr_error("Unable to decrypt string, invalid format, password or algorithm.", 0);
-		return myself;
+		crypto_wipe(message, mlen);
+		result = CtrStdNil;
+		goto clean;
 	}
 	crypto_wipe(key, 32);
 	result = ctr_build_string_from_cstring(out);
+	crypto_wipe(out, mlen);
+	ctr_heap_free(out);
+	clean:
 	ctr_heap_free(in64);
 	ctr_heap_free(in);
-	ctr_heap_free(out);
+	crypto_wipe(password, strlen(password));
 	ctr_heap_free(password);
+	crypto_wipe(message, mlen);
 	ctr_heap_free(message);
 	return result;
 }
