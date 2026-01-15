@@ -97,7 +97,12 @@ ctr_object* ctr_server_htmlencode_set(ctr_object* myself, ctr_argument* argument
     return dest_obj;
 }
 
-
+/**
+ * @def
+ * [ Format ] new apply: [ String ]
+ *
+ * @test536
+ */
 ctr_object* ctr_format_new(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
 	instance->link = myself;
