@@ -2045,6 +2045,7 @@ your program using libffi. For details see the chapter about ffi.
 
 @api_MariaDB_mariadb
 @api_Format_server
+@api_Pattern_pattern
 @api_Server_server
 
 
