@@ -186,7 +186,8 @@ ctr_object* ctr_server_urlencode_set(ctr_object* myself, ctr_argument* argumentL
 }
 
 /**
- * @def [ Server ] base64-encode: [ String ]
+ * @def
+ * [ Server ] base64-encode: [ String ]
  * 
  * @test621
  */
