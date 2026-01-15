@@ -680,7 +680,7 @@ ctr_object* ctr_program_err(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * Program version: [ Moment ]
+ * [ Program ] version: [ Moment ]
  *
  * @test633
  */
