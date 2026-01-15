@@ -240,7 +240,7 @@ the output.
 Out is written with an uppercase O.
 In general objects start with an uppercase letter
 unless it acts as an instance (has no methods of
-its own, just data). This mirrors class/instance
+its own, just data). This mirrors class vs instance
 conventions in other programming languages.
 {{/note}}
 
