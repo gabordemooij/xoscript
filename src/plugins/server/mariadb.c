@@ -38,6 +38,7 @@ ctr_object* ctr_mariadb_connected(ctr_object* myself, ctr_argument* argumentList
 	return ctr_build_bool( conn != NULL );
 }
 
+
 ctr_object* ctr_mariadb_connect(ctr_object* myself, ctr_argument* argumentList) {
 	MYSQL* conn;
 	conn = mysql_init(NULL);
@@ -306,6 +307,12 @@ ctr_object* ctr_mariadb_query_execute(ctr_object* myself, ctr_argument* argument
 	return ctr_internal_mariadb_execute(myself, argumentList, 0);
 }
 
+/**
+ * @def
+ * [ MariaDB ] query
+ *
+ * @test629
+ */
 ctr_object* ctr_mariadb_query_fetch(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_internal_mariadb_execute(myself, argumentList, 1);
 }

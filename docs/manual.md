@@ -2043,6 +2043,7 @@ Using the link: message you can link an external library to
 your program using libffi. For details see the chapter about ffi.
 
 
+@api_MariaDB_maria
 @api_Format_server
 @api_Server_server
 
