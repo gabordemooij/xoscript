@@ -678,6 +678,12 @@ ctr_object* ctr_program_err(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
+/**
+ * @def
+ * Program version: [ Moment ]
+ *
+ * @test633
+ */
 ctr_object* ctr_program_timemachine(ctr_object* myself, ctr_argument* argumentList) {
        time_t stamp = ctr_tonum( ctr_clock_time( argumentList->object, NULL ) );
        CtrVersionTime = stamp;
