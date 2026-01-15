@@ -336,6 +336,12 @@ int ctr_internal_server_detect_mimetype(const unsigned char *buf, size_t len) {
     return CTR_SERVER_MIMETYPE_UNKNOWN;
 }
 
+/**
+ * @def
+ * [ Server ] passthru: [ String ] prefix: [ String ]
+ *
+ * @test497
+ */
 #define MAX_ASSET_SIZE (50 * 1024 * 1024)
 ctr_object* ctr_server_passthru_set(ctr_object* myself, ctr_argument* argumentList) {
 	char* pathstr;
