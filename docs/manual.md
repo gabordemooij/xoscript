@@ -234,7 +234,16 @@ Hello world
 
 You can see the program output in the above-shown black window.
 Throughout this manual, the same visualisation will be applied to show
-the output. 
+the output.
+
+{{note}}
+Out is written with an uppercase O.
+In general objects start with an uppercase letter
+unless it acts as an instance (has no methods of
+its own, just data). This mirrors class/instance
+conventions in other programming languages.
+{{/note}}
+
 
 ## Syntax 
 
@@ -304,6 +313,14 @@ Invalid variables are for example:
 >> password.of:user := ['Classified'].
 >> ,x := 10.
 ```
+
+{{note}}
+You do not have to escape any character
+(including quotes, double quotes, string
+boundaries) in
+a string literal as long as it does not
+cause ambiguity for the lexer.
+{{/note}}
 
 After a variable has been declared, it can be used freely. This means
 that it is only necessary to use the declaration symbol the first time
