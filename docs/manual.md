@@ -1878,6 +1878,13 @@ web header: (
 ).
 ```
 
+To show a 404-page:
+
+```
+web not-found: ['OOps..'].
+```
+
+
 ## Templates
 
 The default template system is very simple. You don't have to learn
@@ -1922,6 +1929,25 @@ web out: tpl clean.
 
 The last line simply flushes the template as a string to the client
 along with the required HTTP headers.
+
+## Passthru
+
+To serve user uploaded files securely you can rely on passthru:
+
+```
+&gt;&gt; uploaded := ['smile.gif'].
+Server passthru: uploaded prefix: ['/uploads/images/'].
+Program end.
+```
+
+This will serve the user uploaded content with the appropriate
+mime type. Only white listed mime types are supported:
+GIF, JPG, PNG, WEBP, MP4, WEBM, MP3, ZIP, GZIP and PDF.
+This method prevents TOCTOU-attacks, path traversals, 
+malicious code execution (injection), symlink attacks,
+DDoS attacks (file limit = 50MB), sniffing attacks and 
+various other security issues.
+
 
 ## JSON
 
