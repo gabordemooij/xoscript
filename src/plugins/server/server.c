@@ -493,7 +493,3 @@ void begin() {
 	begin_pcre2();
 	#endif
 }
-
-void init_embedded_gui_plugin() {
-	begin();
-}

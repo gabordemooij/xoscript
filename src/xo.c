@@ -1,13 +1,5 @@
 #include "xo.h"
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#endif
-
-#ifdef EMBED
-	#include "../misc/opt/embed.h"
-#endif
-
 int ctr_argc;
 char** ctr_argv;
 
@@ -32,16 +24,6 @@ void ctr_cli_welcome() {
 	printf( CTR_MSG_COPYRIGHT );
 	printf( CTR_VERSION );
 	printf("\n");
-}
-
-void* ctr_data_blob(unsigned int* len) {
-	#ifdef EMBED
-	*len = CtrBlob_len;
-	return CtrBlob;
-	#else
-	*len = 0;
-	return NULL;
-	#endif
 }
 
 /**
@@ -93,28 +75,7 @@ int ctr_init() {
  * Bootstraps the Citrine Application.
  *
  */
-
-#ifndef EMBED
 ctr_tnode* program;
-#ifdef __EMSCRIPTEN__
-void emloop() {
-	init_embedded_gui_plugin(); //contains emloop calls so must be here
-	ctr_cwlk_run(program);
-	ctr_gc_sweep(1);
-	ctr_heap_free_rest();
-	if ( ctr_gc_alloc != 0 ) {
-		fprintf( stderr, "[WARNING] Citrine has detected an internal memory leak of: %" PRIu64 " bytes.\n", ctr_gc_alloc );
-		emscripten_force_exit(1);
-		exit(1);
-	}
-	if (CtrStdFlow && CtrStdFlow != CtrStdExit) {
-		emscripten_force_exit(1);
-		exit(1);
-	}
-	emscripten_force_exit(0);
-	exit(0);
-}
-#endif
 int main(int argc, char* argv[]) {
 	char* prg;
 	uint64_t program_text_size = 0;
@@ -135,10 +96,6 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 	ctr_initialize_world();
-#ifdef __EMSCRIPTEN__
-	chdir("/persist");
-	emscripten_set_main_loop(emloop, 0, 0);
-#else
 	ctr_cwlk_run(program);
 	ctr_gc_sweep(1);
 	ctr_heap_free( prg );
@@ -152,7 +109,5 @@ int main(int argc, char* argv[]) {
 		exit(1);
 	}
 	exit(0);
-#endif
 	return 0;
 }
-#endif

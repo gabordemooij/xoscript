@@ -848,7 +848,6 @@ int ctr_init();
 /* for exports */
 void init_embedded_media_plugin();
 void init_embedded_gui_plugin();
-void* ctr_data_blob(unsigned int* blob_len);
 
 extern ctr_object* ctr_int64_new(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_from_string(ctr_object* myself, ctr_argument* argumentList);
