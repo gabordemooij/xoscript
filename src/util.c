@@ -49,8 +49,6 @@ int fsize(char* filename) {
  * On loading, the plugin will get a chance to add its objects to the world
  * through a constructor function.
  */
-#ifdef REPLACE_PLUGIN_SYSTEM
-#else
 typedef void* (*plugin_init_func)();
 void* ctr_internal_plugin_find(ctr_object* key) {
 	ctr_object* modNameObject = ctr_internal_cast2string(key);
@@ -84,7 +82,6 @@ void* ctr_internal_plugin_find(ctr_object* key) {
 	(void) init_plugin();
 	return handle;
 }
-#endif
 
 /**
  * @internal
@@ -112,7 +109,6 @@ void* ctr_internal_plugin_find(ctr_object* key) {
  * Behavior for all the other printf() functions is the same
  * wrt excess arguments except for vprintf() (obviously).
  */
-#ifndef REPLACE_ERROR_SYSTEM
 ctr_object* ctr_error( char* message, int error_code ) {
 	char* errstr;
 	errstr = ctr_heap_allocate( sizeof(char) * 500 );
@@ -123,7 +119,6 @@ ctr_object* ctr_error( char* message, int error_code ) {
 	errstack = 0;
 	return CtrStdFlow;
 }
-#endif
 
 
 /**
