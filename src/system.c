@@ -267,6 +267,53 @@ ctr_object* ctr_gc_getmode(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 /**
+ * [ Program ] shell-escape: [ String ]
+ *
+ * @test634
+ */
+ctr_object* ctr_program_shell_escape(ctr_object* myself, ctr_argument* argumentList) {
+	// generates minimal canonical posix shell args
+	// only use for shell arguments, not commands
+	// compatible with posix compliant shells:
+	// sh,bash/dash, ksh, zsh (not cmd.exe/powershell/fish)
+	size_t n;
+	char* p;
+	char* escaped;
+	char* out;
+	ctr_object* result;
+    char* arg;
+    arg = ctr_heap_allocate_cstring(
+		ctr_internal_cast2string(argumentList->object)
+    );
+	/* +2 for surrounding single quotes */
+    n = 2;
+    for (p = arg; *p; p++) {
+        if (*p == '\'') {
+            n += 4;   // '\''
+        } else {
+            n += 1;
+		}
+    }
+    escaped = ctr_heap_allocate(n + 1);
+    out = escaped;
+    *out++ = '\'';
+    for (p = arg; *p; p++) {
+        if (*p == '\'') {
+            memcpy(out, "'\\''", 4);
+            out += 4;
+        } else {
+            *out++ = *p;
+        }
+    }
+    *(out++) = '\'';
+    *(out) = '\0';
+    result = ctr_build_string_from_cstring(escaped);
+    ctr_heap_free(escaped);
+    ctr_heap_free(arg);
+    return result;
+}
+
+/**
  * @def
  * [ Program ] os: [ String ]
  * 
