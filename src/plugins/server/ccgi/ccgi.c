@@ -37,6 +37,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <limits.h>
 #include "ccgi.h"
 
 /* CGI_val is an entry in a list of variable values */
@@ -182,7 +183,7 @@ static int
 urlcount(const char *p, const char *keep) {
     int k;
     for (k = 0; *p != 0; p++) {
-        if (isalnum(*p) || *p == ' ' ||
+        if (isalnum((unsigned char)*p) || *p == ' ' ||
             (keep != 0 && strchr(keep, *p) != 0))
         {
             k++;
@@ -204,7 +205,7 @@ urlencode(const char *in, char *out, const char *keep) {
     const char hexdigit[] = "0123456789ABCDEF";
 
     for (; *in != 0; in++) {
-        if (isalnum(*in) ||
+        if (isalnum((unsigned char)*in) ||
             (keep != 0 && strchr(keep, *in) != 0))
         {
             *out++ = *in;
@@ -294,7 +295,7 @@ scanattr(char *p, char *attr[2]) {
 
 static char *
 scanheader(char *p, char *header[2]) {
-    if (isalnum(*p) == 0) {
+    if (isalnum((unsigned char)*p) == 0) {
         return 0;
     }
     header[0] = p;
@@ -422,11 +423,10 @@ copyvalue(const char *boundary, FILE *in, const int wantfile,
  * followed by the boundary string.  If the boundary string is
  * followed by "--\r\n" then this is the last part.
  */
-
 static CGI_varlist *
 read_multipart(CGI_varlist *v, const char *template) {
     const char *ctype, *name, *filename;
-    char *p, *token[2], *boundary, *localname = 0;
+    char *p, *token[2], *boundary = 0, *localname = 0;
     strbuf *bbuf = 0, *nbuf = 0, *fbuf = 0;
     strbuf *line = 0, *value = 0;
     int len, fd;
@@ -448,9 +448,13 @@ read_multipart(CGI_varlist *v, const char *template) {
     {
         goto cleanup;
     }
-    boundary = token[1] - 4;
-    memcpy(boundary, "\r\n--", 4);
+    
 
+    size_t blen = strlen(token[1]);
+    boundary = mymalloc(blen + 5);   /* "\r\n--" + boundary + '\0' */
+    memcpy(boundary, "\r\n--", 4);
+    memcpy(boundary + 4, token[1], blen + 1);
+ 
     /*
      * first line is the boundary string, but with "\r\n"
      * at the end rather than the start.
@@ -481,7 +485,6 @@ read_multipart(CGI_varlist *v, const char *template) {
             }
 
             /* Content-Disposition: has field name and file name */
-
             while ((p = scanattr(p, token)) != 0) {
                 if (name == 0 &&
                     strcasecmp(token[0], "name") == 0)
@@ -511,26 +514,28 @@ read_multipart(CGI_varlist *v, const char *template) {
          * otherwise we read field data.  In either case the data
          * consists of everything up to, but not including the boundary.
          */
-
         if (filename != 0) {
-
             /* copy file data to newly created file */
-
             out = 0;
             if (template != 0 && *filename != 0) {
                 if (localname == 0) {
                     localname = (char *) mymalloc(strlen(template) + 1);
                 }
                 strcpy(localname, template);
-                if ((fd = mkstemp(localname)) >= 0) {
-                    out = fdopen(fd, "wb");
-                }
+                fd = mkstemp(localname);
+                if (fd >= 0) {
+					fchmod(fd, 0600);
+					out = fdopen(fd, "wb");
+					if (out == 0) {
+						close(fd);
+					}
+				}
             }
             copyvalue(boundary, stdin, 1, 0, out);
             if (out != 0) {
                 fclose(out);
-                v = CGI_add_var(v, name, localname);
                 v = CGI_add_var(v, name, filename);
+				v = CGI_add_var(v, name, localname);
             }
         }
         else {
@@ -571,6 +576,9 @@ cleanup:
     if (localname != 0) {
         free(localname);
     }
+    if (boundary != 0) {
+		free(boundary);
+	}
     return v;
 }
 
@@ -901,9 +909,14 @@ CGI_get_post(CGI_varlist *v, const char *template) {
 
     if ((env = getenv("CONTENT_TYPE")) != 0 &&
         strncasecmp(env, "application/x-www-form-urlencoded", 33) == 0 &&
-        (env = getenv("CONTENT_LENGTH")) != 0 &&
-        (len = atoi(env)) > 0)
+        (env = getenv("CONTENT_LENGTH")) != 0)
     {
+		char *end;
+		long l = strtol(env, &end, 10);
+		if (*end != '\0' || l <= 0 || l > INT_MAX) {
+			return v;
+		}
+		len = (int)l;
         buf = (char *) mymalloc(len + 1);
         if (fread(buf, 1, len, stdin) == len) {
             buf[len] = 0;
@@ -1023,303 +1036,4 @@ const char *
 CGI_next_name(CGI_varlist *v) {
     return v == 0 || v->iter == 0 || (v->iter = v->iter->next) == 0 ?
         0 : v->iter->varname;
-}
-
-/*
- * CGI_encode_entity() converts null terminated string "in" to
- * HTML entity encoding where > become &gt; and < become &lt;
- * and & becomes &amp; etc., and returns the result.  Allocates
- * memory for the result with malloc().
- */
-
-char *
-CGI_encode_entity(const char *in) {
-    char *out, *p;
-    int i, k;
-
-    if (in == 0) {
-        return 0;
-    }
-    for (i = k = 0; in[i] != 0; i++) {
-        switch(in[i]) {
-
-        case '<':
-        case '>':
-            k += 4;
-            break;
-        case '&':
-        case '\'':
-        case '\r':
-        case '\n':
-            k += 5;
-            break;
-        case '"':
-            k += 6;
-            break;
-        default:
-            k++;
-            break;
-        }
-    }
-    out = p = mymalloc(k + 1);
-
-    for (i = 0; in[i] != 0; i++) {
-        switch(in[i]) {
-
-        case '<':
-            *p++ = '&';
-            *p++ = 'l';
-            *p++ = 't';
-            *p++ = ';';
-            break;
-        case '>':
-            *p++ = '&';
-            *p++ = 'g';
-            *p++ = 't';
-            *p++ = ';';
-            break;
-        case '&':
-            *p++ = '&';
-            *p++ = 'a';
-            *p++ = 'm';
-            *p++ = 'p';
-            *p++ = ';';
-            break;
-        case '\'':
-            *p++ = '&';
-            *p++ = '#';
-            *p++ = '3';
-            *p++ = '9';
-            *p++ = ';';
-            break;
-        case '\r':
-            *p++ = '&';
-            *p++ = '#';
-            *p++ = '1';
-            *p++ = '3';
-            *p++ = ';';
-            break;
-        case '\n':
-            *p++ = '&';
-            *p++ = '#';
-            *p++ = '1';
-            *p++ = '0';
-            *p++ = ';';
-            break;
-        case '"':
-            *p++ = '&';
-            *p++ = 'q';
-            *p++ = 'u';
-            *p++ = 'o';
-            *p++ = 't';
-            *p++ = ';';
-            break;
-        default:
-            *p++ = in[i];
-            break;
-        }
-    }
-    *p = 0;
-    return out;
-}
-
-/* base64 conversion */
-
-static const char b64encode[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "abcdefghijklmnopqrstuvwxyz0123456789+/";
-
-#define BAD 100
-
-static const unsigned char b64decode[] = {
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD,  62, BAD, BAD, BAD,  63,
-     52,  53,  54,  55,  56,  57,  58,  59,
-     60,  61, BAD, BAD, BAD, BAD, BAD, BAD,
-
-    BAD,   0,   1,   2,   3,   4,   5,   6,
-      7,   8,   9,  10,  11,  12,  13,  14,
-     15,  16,  17,  18,  19,  20,  21,  22,
-     23,  24,  25, BAD, BAD, BAD, BAD, BAD,
-    BAD,  26,  27,  28,  29,  30,  31,  32,
-     33,  34,  35,  36,  37,  38,  39,  40,
-     41,  42,  43,  44,  45,  46,  47,  48,
-     49,  50,  51, BAD, BAD, BAD, BAD, BAD,
-
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD,
-    BAD, BAD, BAD, BAD, BAD, BAD, BAD, BAD
-};
-
-/*
- * CGI_decode_base64() decodes null terminated base64 encoded string p
- * and returns the result.  We store the length of the result in
- * *len and we write a null byte after the last byte of the result.
- * We allocate memory for the result with malloc();
- */
-
-void *
-CGI_decode_base64(const char *p, int *len) {
-    const unsigned char *in = (const unsigned char *) p;
-    unsigned char *out;
-    int save = 0, nbits = 0, sixbits;
-    int i, k;
-
-    if (p == 0) {
-        return 0;
-    }
-    out = mymalloc(3 + 3 * strlen(p) / 4);
-
-    /* every four base64 input characters becomes three output bytes */
-
-    for (i = k = 0; in[i] != 0; i++) {
-        if ((sixbits = b64decode[in[i]]) == BAD) {
-            continue;
-        }
-        save |= sixbits << (18 - nbits);  /* 4 x 6 bits in */
-        if ((nbits += 6) == 24) {
-            out[k++] = save >> 16;        /* 3 x 8 bits out */
-            out[k++] = save >> 8;
-            out[k++] = save;
-            nbits = 0;
-            save  = 0;
-        }
-    }
-
-    /* convert leftover bits */
-
-    for (i = 16; i >= 0 && nbits >= 8; i -= 8) {
-        out[k++] = save >> i;
-        nbits -= 8;
-    }
-    out[k] = 0;
-    if (len != 0) {
-        *len = k;
-    }
-    return out;
-}
-
-/*
- * CGI_encode_base64() base64 encodes bytes in array p of length len
- * and returns the result, which is a null terminated base64 encoded
- * string. We allocate memory for the result with malloc().
- */
-
-char *
-CGI_encode_base64(const void *p, int len) {
-    const unsigned char *in = p;
-    char *out;
-    int save = 0, nbits = 0;
-    int i, k = 0;
-
-    if (in == 0 || len <= 0) {
-        return 0;
-    }
-    out = mymalloc(4 + 4 * len / 3);
-
-    /* every three input bytes becomes 4 base64 output characters */
-
-    for (i = 0; i < len; i++) {
-        save |= in[i] << (16 - nbits);                 /* 3 x 8 bits in */
-        if ((nbits += 8) == 24) {
-            out[k++] = b64encode[(save >> 18) & 077]; /* 4 x 6 bits out */
-            out[k++] = b64encode[(save >> 12) & 077];
-            out[k++] = b64encode[(save >>  6) & 077];
-            out[k++] = b64encode[ save        & 077];
-            nbits = 0;
-            save  = 0;
-        }
-    }
-
-    /* convert leftover bits */
-
-    if (nbits > 0) {
-        for (i = 18; i >= 0; i -= 6) {
-            if (nbits > 0) {
-                out[k++] = b64encode[(save >> i) & 077];
-                nbits -= 6;
-            }
-            else {
-                out[k++] = '=';
-            }
-        }
-    }
-    out[k] = 0;
-    return out;
-}
-
-/* hex conversion */
-
-/*
- * CGI_decode_hex() decodes null terminated hex encoded string p
- * and returns the result.  We store the length of the result in
- * *len and we write a null byte after the last byte of the result.
- * We allocate memory for the result with malloc();
- */
-
-void *
-CGI_decode_hex(const char *p, int *len) {
-    unsigned char *out;
-    int i, k, n, L, R;
-
-    if (p == 0 || ((n = strlen(p)) & 1)) {
-        return 0;  /* length of input must be even */
-    }
-    out = mymalloc(n / 2 + 1);
-    for (i = k = 0; i < n; i += 2) {
-        if ((L = hex(p[i])) >= 0 && (R = hex(p[i + 1])) >= 0) {
-            out[k++] = (L << 4) + R;
-        }
-        else {
-            free(out);
-            return 0;
-        }
-    }
-    out[k] = 0;
-    if (len != 0) {
-        *len = k;
-    }
-    return out;
-}
-
-/*
- * CGI_encode_hex() hex encodes bytes in array p of length len
- * and returns the result, which is a null terminated hex encoded
- * string. We allocate memory for the result with malloc().
- */
-
-char *
-CGI_encode_hex(const void *p, int len) {
-    const unsigned char *in = p;
-    int i, k;
-    char *out;
-    const char hexdigit[] = "0123456789ABCDEF";
-
-    if (in == 0 || len <= 0) {
-        return 0;
-    }
-    out = mymalloc(len * 2 + 1);
-    for (i = k = 0; i < len; i++) {
-        out[k++] = hexdigit[in[i] >> 4];
-        out[k++] = hexdigit[in[i] & 0xf];
-    }
-    out[k] = 0;
-    return out;
 }

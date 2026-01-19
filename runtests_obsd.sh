@@ -26,13 +26,26 @@ unittest() {
 	mmode=$2
 	CITRINE_MEMORY_MODE=$mmode
 	export CITRINE_MEMORY_MODE
-	REQUEST_METHOD="POST" \
-	CONTENT_TYPE="application/x-www-form-urlencoded" \
-	CONTENT_LENGTH=3 \
-	QUERY_STRING="a=2&b=4" \
-	HTTP_COOKIE="xsid=abc123" \
-	FFITESTLIB="/usr/lib/libc.so.102.0" \
-	./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err < <(echo -n "c=3")
+	
+	
+	if [[ $i == "0635" ]]; then
+		BOUNDARY='------------------------abcdef1234567890'
+		BODY=$(printf -- '--%s\r\nContent-Disposition: form-data; name="c"\r\n\r\n2\r\n--%s\r\nContent-Disposition: form-data; name="file"; filename="hello.txt"\r\nContent-Type: text/plain\r\n\r\nhello file\r\n--%s--\r\n' "$BOUNDARY" "$BOUNDARY" "$BOUNDARY")
+		printf '%s' "$BODY" | \
+		CONTENT_TYPE="multipart/form-data; boundary=$BOUNDARY" \
+		CONTENT_LENGTH=${#BODY} \
+		REQUEST_METHOD=POST \
+		./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err
+	else
+		REQUEST_METHOD="POST" \
+		CONTENT_TYPE="application/x-www-form-urlencoded" \
+		CONTENT_LENGTH=3 \
+		QUERY_STRING="a=2&b=4" \
+		HTTP_COOKIE="xsid=abc123" \
+		FFITESTLIB="/usr/lib/libc.so.102.0" \
+		./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err < <(echo -n "c=3")
+	fi
+	
 	
 	cat /tmp/rs /tmp/err > /tmp/out
 
@@ -80,7 +93,7 @@ unittest() {
 
 # select range
 FROM=1
-TIL=634
+TIL=635
 
 # run tests for linux
 pushd build/OpenBSD/bin
