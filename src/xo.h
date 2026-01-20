@@ -886,6 +886,15 @@ ctr_object* funcname(ctr_object* myself, ctr_argument* argumentList) { \
     return myself; \
 }
 
+#define CTR_DEFINE_GETTER(funcname, propname) \
+ctr_object* funcname(ctr_object* myself, ctr_argument* argumentList) { \
+    return ctr_internal_object_property( \
+        myself, \
+        propname, \
+        NULL \
+    ); \
+}
+
 #define CTR_DEFINE_CLASS_OTEX(classname, resource_type, destructor_call) \
 ctr_object* classname(ctr_object* myself, ctr_argument* argumentList) { \
 	ctr_object* instance; \
@@ -897,6 +906,14 @@ ctr_object* classname(ctr_object* myself, ctr_argument* argumentList) { \
 	instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX); \
 	instance->link = myself; \
 	instance->value.rvalue = rs; \
+	return instance; \
+}
+
+#define CTR_DEFINE_CLASS_OTOBJECT(classname) \
+ctr_object* classname(ctr_object* myself, ctr_argument* argumentList) { \
+	ctr_object* instance; \
+	instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT); \
+	instance->link = myself; \
 	return instance; \
 }
 
