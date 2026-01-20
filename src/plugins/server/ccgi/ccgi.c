@@ -1051,7 +1051,7 @@ int CGI_parse_url(char* url, char* scheme, char* host, char* port, char* path, c
     if (hoststr == NULL) { hoststr = urlstr; } else {
         i = 0;
         while (urlstr < hoststr) {
-            unsigned char c = *urlstr;
+            c = *urlstr;
             if (c == ':') break;
             if (c == '/') break;
             if (i == (CGI_URLPARSE__SCHEME_LEN - 1)) return -1;
