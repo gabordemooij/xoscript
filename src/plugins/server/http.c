@@ -23,7 +23,8 @@ CGI_varlist *varlistGet;
 CGI_varlist *varlistPost;
 CGI_varlist *varlistCookie;
 ctr_object* CtrStdSCGICB;
-
+ctr_object* requestObject;
+ctr_object* urlObject;
 
 /**
  * @internal
@@ -212,6 +213,49 @@ ctr_object* ctr_request_file(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 
+// URL class
+CTR_DEFINE_CLASS_OTOBJECT(ctr_url_new);
+CTR_DEFINE_GETTER(ctr_url_scheme,   "scheme");
+CTR_DEFINE_GETTER(ctr_url_host,     "host");
+CTR_DEFINE_GETTER(ctr_url_port,     "port");
+CTR_DEFINE_GETTER(ctr_url_path,     "path");
+CTR_DEFINE_GETTER(ctr_url_query,    "query");
+CTR_DEFINE_GETTER(ctr_url_fragment, "fragment");
+
+ctr_object* ctr_url_from_set(ctr_object* myself, ctr_argument* argumentList) {
+	char* urlstr = ctr_heap_allocate_cstring(
+		ctr_internal_copy2string(
+			argumentList->object
+		)
+	);
+	char scheme[32 + 1];
+	char host[512 + 1];
+	char port[64 + 1];
+	char path[1024 + 1];
+	char query[1024 + 1];
+	char fragment[256 + 1];
+	memset(scheme,   0, 32 + 1);
+	memset(host,     0, 512 + 1);
+	memset(port,     0, 64 + 1);
+	memset(path,     0, 1024 + 1);
+	memset(query,    0, 1024 + 1);
+	memset(fragment, 0, 256 + 1);
+	int err = CGI_parse_url(urlstr, scheme, host, port, path, query, fragment);
+	ctr_heap_free(urlstr);
+	if (err) {
+		ctr_error("Unable to parse url", 0);
+		return CtrStdNil;
+	}
+	ctr_object* url = ctr_url_new(urlObject, argumentList);
+	ctr_internal_object_property(url, "scheme", ctr_build_string_from_cstring(scheme));
+	ctr_internal_object_property(url, "host", ctr_build_string_from_cstring(host));
+	ctr_internal_object_property(url, "port", ctr_build_number(port));
+	ctr_internal_object_property(url, "path", ctr_build_string_from_cstring(path));
+	ctr_internal_object_property(url, "query", ctr_build_string_from_cstring(query));
+	ctr_internal_object_property(url, "fragment", ctr_build_string_from_cstring(fragment));
+	return url;
+}
+
 /**
  * Request serverOption: [string] is: [string].
  * 
@@ -311,7 +355,7 @@ ctr_object* ctr_request_serve(ctr_object* myself, ctr_argument* argumentList) {
  * Adds the Request object to the World.
  */
 void begin_http(){
-	ctr_object* requestObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
+	requestObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
 	requestObject->link = CtrStdObject;
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_GET_SET ), &ctr_request_get_string );
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_GET_LIST_SET ), &ctr_request_get_array );
@@ -328,4 +372,15 @@ void begin_http(){
 	varlistGet = CGI_get_query(NULL);
 	varlistPost = CGI_get_post(NULL,"/tmp/_upXXXXXX");
 	varlistCookie = CGI_get_cookie(NULL);
+	urlObject = ctr_url_new(CtrStdObject, NULL);
+	urlObject->link = CtrStdObject;
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_NEW ), &ctr_url_new );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "from:" ), &ctr_url_from_set );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "scheme" ), &ctr_url_scheme );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "host" ), &ctr_url_host );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "port" ), &ctr_url_port );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "path" ), &ctr_url_path );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "query" ), &ctr_url_query );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "fragment" ), &ctr_url_fragment );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "URL" ), urlObject, 0);
 }

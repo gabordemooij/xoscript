@@ -56,4 +56,6 @@ void CGI_prefork_server(const char *host, int port, const char *pidfile,
     int maxproc, int minidle, int maxidle, int maxreq,
     void (*callback)(void));
 
+int CGI_parse_url(char* url, char* scheme, char* host, char* port, char* path, char* query, char* fragment);
+
 #endif

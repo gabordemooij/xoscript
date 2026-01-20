@@ -1037,3 +1037,76 @@ CGI_next_name(CGI_varlist *v) {
     return v == 0 || v->iter == 0 || (v->iter = v->iter->next) == 0 ?
         0 : v->iter->varname;
 }
+
+#define CGI_URLPARSE__SCHEME_LEN 32
+#define CGI_URLPARSE__HOST_LEN 512
+#define CGI_URLPARSE__PORT_LEN 64
+#define CGI_URLPARSE__PATH_LEN 1024
+#define CGI_URLPARSE__QUERY_LEN 1024
+#define CGI_URLPARSE__FRAGMENT_LEN 256
+int CGI_parse_url(char* url, char* scheme, char* host, char* port, char* path, char* query, char* fragment) {
+    int ipv6 = 0; int i; unsigned char c;
+    char* urlstr = url;
+    char* hoststr = strstr(urlstr, "//");
+    if (hoststr == NULL) { hoststr = urlstr; } else {
+        i = 0;
+        while (urlstr < hoststr) {
+            unsigned char c = *urlstr;
+            if (c == ':') break;
+            if (c == '/') break;
+            if (i == (CGI_URLPARSE__SCHEME_LEN - 1)) return -1;
+            scheme[i] = c; urlstr++; i++;
+        }
+        hoststr += 2; // skip slashes
+    }
+    c = *hoststr;
+    if (c == '[') { ipv6 = 1; hoststr++; }  // ipv6 bracket
+    i = 0;
+    while ((c = *hoststr) != 0)
+    {
+        if (c == ' ') { hoststr++; continue; }
+        if (c == '/') break;
+        if (c == ':') { if (!ipv6) break; } // ipv6 bracket?
+        if (c == '?') break;
+        if (c == '#') break;
+        if (ipv6) { if (c == ']') { hoststr++; break; } }
+        if (i == (CGI_URLPARSE__HOST_LEN - 1)) return -1;
+        host[i] = c;
+        hoststr++;
+        i++;
+    }
+    urlstr = hoststr;
+    if (*urlstr == ':') { urlstr++; i = 0;
+        while ((c = *urlstr) != 0) {
+            if (c == '/') break;
+            if (c == '?') break;
+            if (c == '#') break;
+            if (i == (CGI_URLPARSE__PORT_LEN - 1)) return -1;
+            port[i] = c;
+            urlstr++; i++;
+        }
+    }
+    if (*urlstr == '/') { i = 0;
+        while ((c = *urlstr) != 0) {
+            if (c == '?') break;
+            if (c == '#') break;
+            if (i == (CGI_URLPARSE__PATH_LEN - 1)) return -1;
+            path[i] = c;
+            urlstr++; i++;
+        }
+    }
+    if (*urlstr == '?') { i = 0;
+        while ((c = *urlstr) != 0) {
+            if (c == '#') break;
+            if (i == (CGI_URLPARSE__QUERY_LEN - 1)) return -1;
+            query[i] = c; urlstr++; i++;
+        }
+    }
+    if (*urlstr == '#') { i = 0;
+        while ((c = *urlstr) != 0) {
+            if (i == (CGI_URLPARSE__FRAGMENT_LEN - 1)) return -1;
+            fragment[i] = c; urlstr++; i++;
+        }
+    }
+    return 0;
+}
