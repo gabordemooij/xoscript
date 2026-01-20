@@ -1310,7 +1310,7 @@ ctr_object* ctr_number_round(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Number ] absolute
+ * [ Number ] abs
  *
  *
  * @test446
@@ -1322,7 +1322,7 @@ ctr_object* ctr_number_abs(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Number ] square root
+ * [ Number ] sqrt
  *
  *
  * @test447
