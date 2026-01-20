@@ -204,7 +204,7 @@ ctr_object* ctr_server_base64encode_set(ctr_object* myself, ctr_argument* argume
 	in = ctr_heap_allocate_cstring(str);
 	outlen = BASE64_ENCODE_OUT_SIZE(inlen);
 	out = ctr_heap_allocate(outlen);
-	outlen = base64_encode(in, inlen, out);
+	outlen = base64_encode((unsigned char*)in, inlen, out);
 	answer = ctr_build_string_from_cstring(out);
 	ctr_heap_free(in);
 	ctr_heap_free(out);
@@ -230,7 +230,7 @@ ctr_object* ctr_server_base64decode_set(ctr_object* myself, ctr_argument* argume
 	in = ctr_heap_allocate_cstring(str);
 	outlen = BASE64_DECODE_OUT_SIZE(inlen);
 	out = ctr_heap_allocate(outlen);
-	outlen = base64_decode(in, inlen, out);
+	outlen = base64_decode(in, inlen, (unsigned char*) out);
 	answer = ctr_build_string(out, outlen);
 	ctr_heap_free(in);
 	ctr_heap_free(out);
@@ -267,7 +267,7 @@ ctr_object* ctr_server_link_set(ctr_object* myself, ctr_argument* argumentList) 
 #define CTR_SERVER_MIMETYPE_WEBM    10
 
 
-int ctr_internal_server_detect_mimetype(const unsigned char *buf, size_t len) {
+int ctr_internal_server_detect_mimetype(unsigned char *buf, size_t len) {
 
     if (len < 4) return CTR_SERVER_MIMETYPE_UNKNOWN;
 
@@ -391,7 +391,7 @@ ctr_object* ctr_server_passthru_set(ctr_object* myself, ctr_argument* argumentLi
 		ctr_error("Unable to scan mimetype", 0);
 		return CtrStdNil;
 	}
-	int mimetype = ctr_internal_server_detect_mimetype(peekbuf, r);
+	int mimetype = ctr_internal_server_detect_mimetype((unsigned char*)peekbuf, r);
 	if (mimetype == CTR_SERVER_MIMETYPE_UNKNOWN) {
 		// mimetype must be in whitelist
 		close(fd);
