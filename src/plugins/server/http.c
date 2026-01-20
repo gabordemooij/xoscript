@@ -75,40 +75,6 @@ ctr_object* ctr_request_array(ctr_object* myself, ctr_argument* argumentList, CG
 }
 
 /**
- * @internal
- * 
- * Reads a server option set by user.
- */
-ctr_object* ctr_request_internal_option(ctr_object* myself, char* optName) {
-	ctr_object* key;
-	ctr_object* val;
-	key = ctr_build_string_from_cstring(optName);
-	val = ctr_internal_object_find_property(myself, key, CTR_CATEGORY_PRIVATE_PROPERTY);
-	return val;
-}
-
-/**
- * @internal
- *
- * callback for SCGI server. 
- */
-void ctr_request_serve_callback() {
-	ctr_argument* argumentList;
-	argumentList = (ctr_argument*) ctr_heap_allocate( sizeof( ctr_argument ) );
-	varlistGet = CGI_get_query(NULL);
-	varlistCookie = CGI_get_cookie(NULL);
-	varlistPost = CGI_get_post(NULL,"/tmp/_upXXXXXX");
-	ctr_block_run(CtrStdSCGICB, argumentList, CtrStdSCGICB);
-	if ( CtrStdFlow ) {
-		exit(1);
-	}
-	ctr_heap_free( argumentList );
-	CGI_free_varlist(varlistGet);
-	CGI_free_varlist(varlistPost);
-	CGI_free_varlist(varlistCookie);
-}
-
-/**
  * Request get: [string]
  * 
  * Returns the value of the specified GET parameter from the HTTP query string.
