@@ -256,98 +256,6 @@ ctr_object* ctr_url_from_set(ctr_object* myself, ctr_argument* argumentList) {
 	return url;
 }
 
-/**
- * Request serverOption: [string] is: [string].
- * 
- * Sets a server option, available server option for SCGI server include:
- * 
- * - minidle, minimum number of idle processes
- * - maxidle, maximum number of idle processes
- * - maxproc, maximum number of processes
- * - maxreq,  maximum number of concurrent requests to allow
- * 
- * Usage:
- * 
- * Request
- *  serverOption: 'minidle' is: 8,
- *  serverOption: 'maxreq'  is: 100.
- * 
- * This sets the minimum number of idle processes to 8 and the
- * maximum number of concurrent requests to 100, you can chain
- * multiple options using a comma (,).
- */
-ctr_object* ctr_request_server_option(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_internal_object_set_property(
-		myself,
-		ctr_internal_cast2string(argumentList->object),
-		ctr_internal_cast2string(argumentList->next->object),
-		CTR_CATEGORY_PRIVATE_PROPERTY
-	);
-	return myself;
-}
-
-/**
- * Request host: [string] listen: [string] pid: [string] callback: [block].
- *
- * Sets up Storm Server.
- * Storm Server is an SCGI server. Both the Request Object Plugin and Storm Server
- * are based on S. Losen's CCGI library (http://libccgi.sourceforge.net/doc.html)
- * licensed LGPL.
- *
- * To set up a Storm Server, specify host (i.e. 'localhost'),
- * a port to listen to (i.e. 9000) a pid file '/var/run/mypid.pid' and a
- * callback block.
- *
- * Usage:
- *
- * Request host:'localhost' listen:4000 pid:'/var/run/storm.pid' callback: {
- *  Pen write: 'Content-type: text/html\n\n'.
- *  var fname  := Command env: 'DOCUMENT_URI'.
- *  var script := File new: '/var/www/webapp'+fname.
- *  script include.
- * }.
- * 
- * Here we set up a server listening to port 4000. The callback prints out
- * the content type header. Then, we extract the DOCUMENT URI, i.e. '/hello.ctr'
- * and map this to a path '/var/www/webapp/hello.ctr'
- * 
- * By default there is no output buffering, either create another callback or
- * simply override the '<' or 'Pen' object to buffer instead of outputting
- * directly.
- */
- #ifdef SERVER
-ctr_object* ctr_request_serve(ctr_object* myself, ctr_argument* argumentList) {
-	char* host;
-	char* pid;
-	int   port;
-	int   minidle = 8;
-	int   maxidle = 8;
-	int   maxreq  = 1000;
-	int   maxproc = 100;
-	ctr_object* val;
-	openlog("stormserver", 0, LOG_DAEMON);
-	val = ctr_request_internal_option(myself, "minidle");
-	if (val!=NULL) minidle = (int) ctr_internal_cast2number(val)->value.nvalue;
-	val = ctr_request_internal_option(myself, "maxidle");
-	if (val!=NULL) maxidle = (int) ctr_internal_cast2number(val)->value.nvalue;
-	val = ctr_request_internal_option(myself, "maxproc");
-	if (val!=NULL) maxproc = (int) ctr_internal_cast2number(val)->value.nvalue;
-	val = ctr_request_internal_option(myself, "maxreq");
-	if (val!=NULL) maxreq = (int) ctr_internal_cast2number(val)->value.nvalue;
-	host = ctr_heap_allocate_cstring( ctr_internal_cast2string( argumentList->object ) );
-	pid = ctr_heap_allocate_cstring( ctr_internal_cast2string( argumentList->next->next->object ) );
-	port = (int) round(ctr_internal_cast2number(argumentList->next->object)->value.nvalue);
-	CtrStdSCGICB = argumentList->next->next->next->object;
-	CGI_prefork_server(host, port, pid,
-        /* maxproc */ maxproc,
-        /* minidle */ minidle,
-        /* maxidle */ maxidle,
-        /* maxreq */   maxreq, ctr_request_serve_callback);
-    ctr_heap_free( host );
-	ctr_heap_free( pid );
-	return myself;
-}
-#endif
 
 /**
  * @internal
@@ -364,10 +272,6 @@ void begin_http(){
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_POST_SET ), &ctr_request_post_string );
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_UPLOAD_SET ), &ctr_request_file );
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_POST_LIST_SET ), &ctr_request_post_array );
-	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_SET_ENVIRONMENT_VARIABLE ), &ctr_request_server_option );
-#ifdef SERVER
-	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_PLUGIN_REQUEST_SERVE ), &ctr_request_serve );
-#endif
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PLUGIN_REQUEST ), requestObject, 0);
 	varlistGet = CGI_get_query(NULL);
 	varlistPost = CGI_get_post(NULL,"/tmp/_upXXXXXX");
