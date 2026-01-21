@@ -18,33 +18,12 @@
 #include "siphash.h"
 #include <sys/stat.h>
 
-#ifdef WIN
-	#include <windows.h>
-	#include <conio.h>
-	#define realpath(N,R) _fullpath((R),(N),PATH_MAX)
-	#define CTR_DIRSEP "\\"
-	#define CTR_ERR GetLastError()
-	#define CTR_NEWLINE "\r\n"
-#else
-	#include <termios.h>
-	#include <sys/wait.h>
-	#include <dlfcn.h>
-	#define CTR_DIRSEP "/"
-	#define CTR_ERR errno
-	#define CTR_NEWLINE "\n"
-#endif
-
-
-#ifdef WINDOWS32_SETENV
-	#define setenv(name,value,o) putenv_old(name, value);
-	#define unsetenv(name) putenv_old(name, "");
-#endif
-
-#ifdef WINDOWS64_SETENV
-	#define setenv(name,value,o) _putenv_s(name, value);
-	#define unsetenv(name) _putenv_s(name, "");
-#endif
-
+#include <termios.h>
+#include <sys/wait.h>
+#include <dlfcn.h>
+#define CTR_DIRSEP "/"
+#define CTR_ERR errno
+#define CTR_NEWLINE "\n"
 
 /**
  * Version information
