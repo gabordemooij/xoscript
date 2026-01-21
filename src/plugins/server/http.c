@@ -179,7 +179,12 @@ ctr_object* ctr_request_file(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 
-// URL class
+/**
+ * @def
+ * [ URL ] from: [ String ]
+ *
+ * @test636
+ */
 CTR_DEFINE_CLASS_OTOBJECT(ctr_url_new);
 CTR_DEFINE_GETTER(ctr_url_scheme,   "scheme");
 CTR_DEFINE_GETTER(ctr_url_host,     "host");
