@@ -19,22 +19,12 @@
 #include "mariadb.h"
 #include "pattern.h"
 
-
-
 #ifdef FFI
 #include "fficonnect.h"
 #endif
 
 ctr_object* serverObject;
 ctr_object* formatObject;
-
-/**
- * Use this error handler if init or critical operation fails.
- */
-void ctr_internal_gui_fatalerror(char* msg, const char* info)	{
-	fprintf(stderr,"GUI FATAL ERROR: %s (%s) \n", msg, info);
-	exit(1);
-}
 
 void ctr_internal_server_init(void) {
 	
@@ -268,68 +258,51 @@ ctr_object* ctr_server_link_set(ctr_object* myself, ctr_argument* argumentList) 
 
 
 int ctr_internal_server_detect_mimetype(unsigned char *buf, size_t len) {
-
     if (len < 4) return CTR_SERVER_MIMETYPE_UNKNOWN;
-
-    /* JPEG / JPG */
     if (len >= 3 &&
         buf[0] == 0xFF &&
         buf[1] == 0xD8 &&
         buf[2] == 0xFF) {
         return CTR_SERVER_MIMETYPE_JPEG;
     }
-
-    /* GIF */
     if (len >= 6 &&
         (!memcmp(buf, "GIF87a", 6) ||
          !memcmp(buf, "GIF89a", 6))) {
         return CTR_SERVER_MIMETYPE_GIF;
     }
-
-    /* PNG */
     if (len >= 8 &&
         !memcmp(buf, "\x89PNG\r\n\x1A\n", 8)) {
         return CTR_SERVER_MIMETYPE_PNG;
     }
-
-    /* PDF */
     if (len >= 5 &&
         !memcmp(buf, "%PDF-", 5)) {
         return CTR_SERVER_MIMETYPE_PDF;
     }
-
-    /* ZIP */
     if (len >= 4 &&
         !memcmp(buf, "PK\x03\x04", 4)) {
         return CTR_SERVER_MIMETYPE_ZIP;
     }
-
-    /* GZIP */
     if (len >= 2 &&
         buf[0] == 0x1F &&
         buf[1] == 0x8B) {
         return CTR_SERVER_MIMETYPE_GZIP;
     }
-
     /* MP3 (ID3 tag or MPEG frame) */
     if ((len >= 3 && !memcmp(buf, "ID3", 3)) ||
         (len >= 2 && buf[0] == 0xFF && (buf[1] & 0xE0) == 0xE0)) {
         return CTR_SERVER_MIMETYPE_MP3;
     }
-
     /* MP4 (ftyp box at offset 4) */
     if (len >= 12 &&
         !memcmp(buf + 4, "ftyp", 4)) {
         return CTR_SERVER_MIMETYPE_MP4;
     }
-
     /* WEBP (RIFF + WEBP) */
     if (len >= 12 &&
         !memcmp(buf, "RIFF", 4) &&
         !memcmp(buf + 8, "WEBP", 4)) {
         return CTR_SERVER_MIMETYPE_WEBP;
     }
-
     /* WEBM (Matroska) */
     if (len >= 4 &&
         buf[0] == 0x1A &&
@@ -338,7 +311,6 @@ int ctr_internal_server_detect_mimetype(unsigned char *buf, size_t len) {
         buf[3] == 0xA3) {
         return CTR_SERVER_MIMETYPE_WEBM;
     }
-
     return CTR_SERVER_MIMETYPE_UNKNOWN;
 }
 
