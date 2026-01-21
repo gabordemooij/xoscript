@@ -11,7 +11,7 @@ WARNINGS ?= -Wall -Wshadow -Wundef -Wno-discarded-qualifiers -Wextra -Wno-unused
 					-fno-strict-aliasing -Wno-error=cpp -Wuninitialized -Wmaybe-uninitialized -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits \
 					-Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security \
 					-Wno-ignored-qualifiers -Wno-error=pedantic -Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion -Wclobbered -Wdeprecated -Wempty-body \
-					-Wshift-negative-value -Wstack-usage=2048 -Wno-unused-value -std=gnu99
+					-Wshift-negative-value -Wno-unused-value -std=gnu99
 CFLAGS 			?= ${EXTRACFLAGS} -D PCRE2 -D LIBSECRET -D FFI -D LIBCURL -shared -O3 -g0 -I/usr/include/mariadb -I ./i18n/${ISO}/ -I ../../i18n/${ISO} -I ../media/i18n/${ISO} -I$(LVGL_DIR)/ $(WARNINGS) -fPIC
 
 
