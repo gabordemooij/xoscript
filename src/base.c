@@ -2243,7 +2243,7 @@ int ctr_internal_string_consttime_cmp(const void* s1, const void* s2, size_t n) 
  */
 ctr_object* ctr_string_tccompare(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_size maxlen;
-	int s, c, q;
+	int q;
 	if (myself->value.svalue->vlen < argumentList->object->value.svalue->vlen) {
 		maxlen = myself->value.svalue->vlen;
 	} else {
