@@ -485,10 +485,6 @@ char* ctr_clex_readstr() {
 	return beginbuff;
 }
 
-void ctr_clex_set_ignore_modes( int ignore ) {
-	ctr_clex_ignore_modes = ignore;
-}
-
 void ctr_clex_move_code_pointer(int movement) {
 	ctr_code += movement;
 }
