@@ -39,11 +39,11 @@ unittest() {
 	else
 		REQUEST_METHOD="POST" \
 		CONTENT_TYPE="application/x-www-form-urlencoded" \
-		CONTENT_LENGTH=3 \
-		QUERY_STRING="a=2&b=4" \
+		CONTENT_LENGTH=20 \
+		QUERY_STRING="a=2&b=4&d[]=a&d[]=b&f[]=1&f[]=2" \
 		HTTP_COOKIE="xsid=abc123" \
 		FFITESTLIB="/usr/lib/libc.so.102.0" \
-		./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err < <(echo -n "c=3")
+		./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err < <(echo -n 'c=3&e[]=1&e[]=2&xx=1')
 	fi
 	
 	
@@ -93,7 +93,7 @@ unittest() {
 
 # select range
 FROM=1
-TIL=637
+TIL=638
 
 # run tests for linux
 pushd build/OpenBSD/bin

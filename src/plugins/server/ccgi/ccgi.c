@@ -41,6 +41,7 @@
 #include <sys/stat.h>
 
 #include "ccgi.h"
+#include "../../../xo.h"
 
 /* CGI_val is an entry in a list of variable values */
 
@@ -75,18 +76,6 @@ typedef struct {
 }
 strbuf;
 
-/* mymalloc() is a malloc() wrapper that exits on failure */
-
-static void *
-mymalloc(int size) {
-    void *ret = malloc(size);
-    if (ret == 0) {
-        fputs("C CGI Library out of memory\n", stderr);
-        exit(1);
-    }
-    return ret;
-}
-
 /*
  * sb_get() creates or extends a strbuf
  */
@@ -97,10 +86,10 @@ sb_get(strbuf *sb, int len) {
     for (size = 128; size < len; size += size)
         ;
     if (sb == 0) {
-        sb = (strbuf *) mymalloc(sizeof(*sb) + size);
+        sb = (strbuf *) ctr_heap_allocate(sizeof(*sb) + size);
     }
     else {
-        sb = (strbuf *) realloc(sb, sizeof(*sb) + size);
+        sb = (strbuf *) ctr_heap_reallocate(sb, sizeof(*sb) + size);
         if (sb == 0) {
             fputs("C CGI Library out of memory\n", stderr);
             exit(1);
@@ -337,7 +326,7 @@ readline(strbuf *line, FILE *in) {
     }
     if (i == 0) {
         if (line != 0) {
-            free(line);
+            ctr_heap_free(line);
         }
         return 0;
     }
@@ -453,7 +442,7 @@ read_multipart(CGI_varlist *v, const char *template) {
     
 
     size_t blen = strlen(token[1]);
-    boundary = mymalloc(blen + 5);   /* "\r\n--" + boundary + '\0' */
+    boundary = ctr_heap_allocate(blen + 5);   /* "\r\n--" + boundary + '\0' */
     memcpy(boundary, "\r\n--", 4);
     memcpy(boundary + 4, token[1], blen + 1);
  
@@ -521,7 +510,7 @@ read_multipart(CGI_varlist *v, const char *template) {
             out = 0;
             if (template != 0 && *filename != 0) {
                 if (localname == 0) {
-                    localname = (char *) mymalloc(strlen(template) + 1);
+                    localname = (char *) ctr_heap_allocate(strlen(template) + 1);
                 }
                 strcpy(localname, template);
                 fd = mkstemp(localname);
@@ -561,25 +550,25 @@ read_multipart(CGI_varlist *v, const char *template) {
 
 cleanup:
     if (bbuf != 0) {
-        free(bbuf);
+        ctr_heap_free(bbuf);
     }
     if (nbuf != 0) {
-        free(nbuf);
+        ctr_heap_free(nbuf);
     }
     if (fbuf != 0) {
-        free(fbuf);
+        ctr_heap_free(fbuf);
     }
     if (line != 0) {
-        free(line);
+        ctr_heap_free(line);
     }
     if (value != 0) {
-        free(value);
+        ctr_heap_free(value);
     }
     if (localname != 0) {
-        free(localname);
+        ctr_heap_free(localname);
     }
     if (boundary != 0) {
-		free(boundary);
+		ctr_heap_free(boundary);
 	}
     return v;
 }
@@ -600,7 +589,7 @@ CGI_decode_url(const char *p) {
     if (p == 0) {
         return 0;
     }
-    out = (char *) mymalloc(strlen(p) + 1);
+    out = (char *) ctr_heap_allocate(strlen(p) + 1);
     for (i = k = 0; p[i] != 0; i++) {
         switch(p[i]) {
 
@@ -636,7 +625,7 @@ CGI_encode_url(const char *p, const char *keep) {
     if (p == 0) {
         return 0;
     }
-    out = mymalloc(urlcount(p, keep) + 1);
+    out = ctr_heap_allocate(urlcount(p, keep) + 1);
     urlencode(p, out, keep);
     return out;
 }
@@ -666,7 +655,7 @@ CGI_encode_query(const char *keep, ...) {
     if (k == 0) {
         return 0;
     }
-    p = out = mymalloc(k);
+    p = out = ctr_heap_allocate(k);
 
     /* url encode each name=value pair */
 
@@ -710,7 +699,7 @@ CGI_encode_varlist(CGI_varlist *vlist, const char *keep) {
     if (k == 0) {
         return 0;
     }
-    p = out = mymalloc(k);
+    p = out = ctr_heap_allocate(k);
 
     /* URL encode each name=value pair */
 
@@ -746,7 +735,7 @@ CGI_add_var(CGI_varlist *v, const char *varname, const char *value) {
 
     /* create a new value */
 
-    val = (CGI_val *) mymalloc(sizeof(*val) + strlen(value));
+    val = (CGI_val *) ctr_heap_allocate_tracked(sizeof(*val) + strlen(value));
     strcpy((char *) val->value, value);
     val->next = 0;
 
@@ -757,7 +746,7 @@ CGI_add_var(CGI_varlist *v, const char *varname, const char *value) {
      */
 
     if ((v2 = findvar(v, varname)) == 0) {
-        v2 = (CGI_varlist *) mymalloc(sizeof(*v2) + strlen(varname));
+        v2 = (CGI_varlist *) ctr_heap_allocate_tracked(sizeof(*v2) + strlen(varname));
         strcpy((char *) v2->varname, varname);
         v2->value = val;
         v2->numvalue = 1;
@@ -777,7 +766,7 @@ CGI_add_var(CGI_varlist *v, const char *varname, const char *value) {
     }
     v2->valtail = val;
     if (v2->vector != 0) {
-        free((void *)v2->vector);
+        ctr_heap_free((void *)v2->vector);
         v2->vector = 0;
     }
     v->iter = 0;
@@ -804,7 +793,7 @@ CGI_decode_query(CGI_varlist *v, const char *query) {
     if (query == 0) {
         return v;
     }
-    buf = (char *) mymalloc(strlen(query) + 1);
+    buf = (char *) ctr_heap_allocate(strlen(query) + 1);
     name = value = 0;
     for (i = k = done = 0; done == 0; i++) {
         switch (query[i]) {
@@ -852,7 +841,7 @@ CGI_decode_query(CGI_varlist *v, const char *query) {
         }
         buf[k++] = query[i];
     }
-    free(buf);
+    ctr_heap_free(buf);
     return v;
 }
 
@@ -870,12 +859,12 @@ CGI_get_cookie(CGI_varlist *v) {
     if ((env = getenv("HTTP_COOKIE")) == 0) {
         return v;
     }
-    buf = (char *) mymalloc(strlen(env) + 1);
+    buf = (char *) ctr_heap_allocate(strlen(env) + 1);
     p = strcpy(buf, env);
     while ((p = scanattr(p, cookie)) != 0) {
         v = CGI_add_var(v, cookie[0], cookie[1]);
     }
-    free(buf);
+    ctr_heap_free(buf);
     return v;
 }
 
@@ -919,12 +908,12 @@ CGI_get_post(CGI_varlist *v, const char *template) {
 			return v;
 		}
 		len = (int)l;
-        buf = (char *) mymalloc(len + 1);
+        buf = (char *) ctr_heap_allocate(len + 1);
         if (fread(buf, 1, len, stdin) == len) {
-            buf[len] = 0;
+			buf[len] = 0;
             v = CGI_decode_query(v, buf);
         }
-        free(buf);
+        ctr_heap_free(buf);
     }
     else {
         v = read_multipart(v, template);
@@ -957,14 +946,14 @@ CGI_free_varlist(CGI_varlist *v) {
 
     if (v != 0) {
         if (v->vector != 0) {
-            free((void *)v->vector);
+            ctr_heap_free((void *)v->vector);
         }
         for (val = v->value; val != 0; val = valnext) {
             valnext = val->next;
-            free(val);
+            ctr_heap_free(val);
         }
         CGI_free_varlist(v->next);
-        free(v);
+        ctr_heap_free(v);
     }
 }
 
@@ -1003,7 +992,7 @@ CGI_lookup_all(CGI_varlist *v, const char *varname) {
     }
     if (v->vector == 0) {
         v->vector = (CGI_value *)
-            mymalloc(sizeof(CGI_value) * (v->numvalue + 1));
+            ctr_heap_allocate_tracked(sizeof(CGI_value) * (v->numvalue + 1));
         i = 0;
 
         /* to initialize v->vector we must cast away const */
