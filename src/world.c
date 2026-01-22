@@ -988,6 +988,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "platform" ), &ctr_program_platform );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_VERSION_SET ), &ctr_program_timemachine );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "shell-escape:" ), &ctr_program_shell_escape );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "alarm:" ), &ctr_program_alarm );
 	
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PROGRAM ), CtrStdCommand, 0 );
 	CtrStdCommand->link = CtrStdObject;

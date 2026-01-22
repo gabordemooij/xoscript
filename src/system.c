@@ -536,6 +536,17 @@ ctr_object* ctr_program_exit(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
+ * [ Program ] alarm: [ Number ]
+ *
+ * @test637
+ */
+ctr_object* ctr_program_alarm(ctr_object* myself, ctr_argument* argumentList) {
+	unsigned int s = (unsigned int) ctr_tonum(argumentList->object);
+	alarm(s);
+}
+
+/**
+ * @def
  * [ Program ] setting: [ String ]
  *
  *
