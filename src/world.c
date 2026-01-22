@@ -793,8 +793,8 @@ void ctr_initialize_world() {
 
 	/* INT64 */
 	CtrStdINT64 = ctr_int64_new(CtrStdObject, NULL);
-	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("new"), &ctr_int64_new );
-	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("from-string:"), &ctr_int64_from_string );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring(CTR_DICT_NEW), &ctr_int64_new );
+	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring(CTR_DICT_FROM_STRING), &ctr_int64_from_string );
 	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("/"), &ctr_int64_divide );
 	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("*"), &ctr_int64_multiply );
 	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("+"), &ctr_int64_add );
@@ -806,7 +806,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring(">"), &ctr_int64_higherThan );
 	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("<"), &ctr_int64_lowerThan );
 	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring(CTR_DICT_TOSTRING), &ctr_int64_to_string );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Int64" ), CtrStdINT64, 0 );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_INT64 ), CtrStdINT64, 0 );
 	CtrStdINT64->info.sticky = 1;
 
 	/* String */
@@ -848,8 +848,8 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_CODE ), &ctr_string_to_code );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_TOOBJECT ), &ctr_string_eval );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_MINUS ), &ctr_string_minus );
-	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "bytes" ), &ctr_string_bytes );
-	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "tccompare:" ), &ctr_string_tccompare );
+	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_BYTES ), &ctr_string_bytes );
+	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_TCCOMPARE ), &ctr_string_tccompare );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_STRING ), CtrStdString, 0 );
 	CtrStdString->link = CtrStdObject;
 	CtrStdString->info.sticky = 1;
@@ -953,7 +953,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_EXISTS ), &ctr_file_exists );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_SIZE ), &ctr_file_size );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_DELETE ), &ctr_file_delete );
-	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "lines:" ), &ctr_file_lines );
+	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_LINES_SET ), &ctr_file_lines );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_ARRAY ), &ctr_file_list );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_TOSTRING ), &ctr_file_to_string );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_FILE ), CtrStdFile, 0);
@@ -970,7 +970,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_SWEEP ), &ctr_gc_collect );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_MEMORY_LIMIT ), &ctr_gc_setmemlimit );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_GC_MODE ),  &ctr_gc_setmode );
-	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "gcmode" ),  &ctr_gc_getmode );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_GC_MODE_GET ),  &ctr_gc_getmode );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_SHELL ), &ctr_program_shell );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_INPUT ), &ctr_program_input );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_FLUSH ), &ctr_program_flush );
@@ -985,10 +985,10 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_END ), &ctr_program_exit );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_TONUMBER ), &ctr_program_tonumber );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_TOSTRING ), &ctr_program_tostring );
-	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "platform" ), &ctr_program_platform );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_PLATFORM ), &ctr_program_platform );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_VERSION_SET ), &ctr_program_timemachine );
-	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "shell-escape:" ), &ctr_program_shell_escape );
-	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "alarm:" ), &ctr_program_alarm );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_SHELLESC_SET ), &ctr_program_shell_escape );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_ALARM_SET ), &ctr_program_alarm );
 	
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PROGRAM ), CtrStdCommand, 0 );
 	CtrStdCommand->link = CtrStdObject;
@@ -1018,7 +1018,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_ZONE ), &ctr_clock_get_zone );
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_ZONE_SET ), &ctr_clock_set_zone );
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_TOSTRING ), &ctr_clock_to_string );
-	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( "format:" ), &ctr_clock_format_set );
+	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_FORMAT_SET ), &ctr_clock_format_set );
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_TONUMBER ), &ctr_clock_to_number );
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_ADD_SET ), &ctr_clock_add );
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_SUBTRACT_SET ), &ctr_clock_subtract );

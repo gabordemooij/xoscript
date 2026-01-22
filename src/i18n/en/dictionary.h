@@ -200,4 +200,15 @@
 #define CTR_DICT_MATH_ATAN                       "atan"
 #define CTR_DICT_MATH_LOG                        "log"
 #define CTR_DICT_VERSION_SET                     "version:"
+#define CTR_DICT_FROM_STRING                     "from-string:"
+#define CTR_DICT_INT64                           "Int64"
+#define CTR_DICT_BYTES                           "bytes"
+#define CTR_DICT_TCCOMPARE                       "tccompare:"
+#define CTR_DICT_LINES_SET                       "lines:"
+#define CTR_DICT_GC_MODE_GET                     "gcmode"
+#define CTR_DICT_PLATFORM                        "platform"
+#define CTR_DICT_SHELLESC_SET                    "shell-escape:"
+#define CTR_DICT_ALARM_SET                       "alarm:"
+#define CTR_DICT_FORMAT_SET                      "format:"
+
 
