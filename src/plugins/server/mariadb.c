@@ -127,7 +127,7 @@ ctr_object* ctr_mariadb_query_insert_id(ctr_object* myself, ctr_argument* argume
 	return insert_id;
 }
 
-#define CTR_CHUNK_SIZE 10
+#define CTR_CHUNK_SIZE 8192
 
 static int ctr_is_text_type(enum enum_field_types t) {
     return t == MYSQL_TYPE_BLOB ||
