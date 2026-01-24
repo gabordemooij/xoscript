@@ -127,7 +127,7 @@ ctr_object* ctr_mariadb_query_insert_id(ctr_object* myself, ctr_argument* argume
 	return insert_id;
 }
 
-#define CTR_CHUNK_SIZE 8192
+#define CTR_CHUNK_SIZE 10
 
 static int ctr_is_text_type(enum enum_field_types t) {
     return t == MYSQL_TYPE_BLOB ||
@@ -222,25 +222,22 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 			rlens = ctr_heap_allocate(num_fields * sizeof(unsigned long));
 			rnull = ctr_heap_allocate(num_fields * sizeof(my_bool));
 			for (unsigned int r = 0; r < num_fields; r++) {
-				
 				memset(&rbindings[r], 0, sizeof(MYSQL_BIND));
 				rbindings[r].buffer_type = rfields[r].type;
 				rbindings[r].length = &rlens[r];
 				rbindings[r].is_null = &rnull[r];
-				
 				if (ctr_is_text_type(rfields[r].type)) {
 						rbindings[r].buffer = NULL;
 						rbindings[r].buffer_length = 0;
 						rbuffers[r] = NULL;
 				} else {
-				
-				unsigned long max_len = rfields[r].max_length;
-				if (max_len < 128) max_len = 128;
-				rbuffers[r] = ctr_heap_allocate(max_len + 1);
-				rbindings[r].buffer = rbuffers[r];
-				rbindings[r].buffer_length = max_len + 1;
-				rbindings[r].length = &rlens[r];
-				rbindings[r].is_null = &rnull[r];
+					unsigned long max_len = rfields[r].max_length;
+					if (max_len < 128) max_len = 128;
+					rbuffers[r] = ctr_heap_allocate(max_len + 1);
+					rbindings[r].buffer = rbuffers[r];
+					rbindings[r].buffer_length = max_len + 1;
+					rbindings[r].length = &rlens[r];
+					rbindings[r].is_null = &rnull[r];
 				}
 			}
 			if (mysql_stmt_bind_result(prepared_statement, rbindings)) {
@@ -276,15 +273,14 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 						unsigned long total = rlens[i];
 						char* full = ctr_heap_allocate(total + 1);
 						unsigned long offset = 0;
-
 						while (offset < total) {
 							unsigned long to_read =
 							(total - offset > CTR_CHUNK_SIZE)
 							? CTR_CHUNK_SIZE
 							: (total - offset);
-
 							MYSQL_BIND col;
 							memset(&col, 0, sizeof(col));
+							//@todo add support for blob
 							col.buffer_type = rfields[i].type;
 							col.buffer = full + offset;
 							col.buffer_length = to_read;
@@ -294,10 +290,8 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 								i,
 								offset
 							);
-
 							offset += to_read;
 						}
-
 						full[total] = '\0';
 						map_entry_val->object = ctr_build_string(full, total);
 						ctr_heap_free(full);
