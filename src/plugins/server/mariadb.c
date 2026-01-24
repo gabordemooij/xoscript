@@ -127,6 +127,16 @@ ctr_object* ctr_mariadb_query_insert_id(ctr_object* myself, ctr_argument* argume
 	return insert_id;
 }
 
+#define CTR_CHUNK_SIZE 8192
+
+static int ctr_is_text_type(enum enum_field_types t) {
+    return t == MYSQL_TYPE_BLOB ||
+           t == MYSQL_TYPE_TINY_BLOB ||
+           t == MYSQL_TYPE_MEDIUM_BLOB ||
+           t == MYSQL_TYPE_LONG_BLOB ||
+           t == MYSQL_TYPE_STRING ||
+           t == MYSQL_TYPE_VAR_STRING;
+}
 
 ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argumentList, int fetch_mode) {
 	int            count;
@@ -212,7 +222,18 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 			rlens = ctr_heap_allocate(num_fields * sizeof(unsigned long));
 			rnull = ctr_heap_allocate(num_fields * sizeof(my_bool));
 			for (unsigned int r = 0; r < num_fields; r++) {
+				
+				memset(&rbindings[r], 0, sizeof(MYSQL_BIND));
 				rbindings[r].buffer_type = rfields[r].type;
+				rbindings[r].length = &rlens[r];
+				rbindings[r].is_null = &rnull[r];
+				
+				if (ctr_is_text_type(rfields[r].type)) {
+						rbindings[r].buffer = NULL;
+						rbindings[r].buffer_length = 0;
+						rbuffers[r] = NULL;
+				} else {
+				
 				unsigned long max_len = rfields[r].max_length;
 				if (max_len < 128) max_len = 128;
 				rbuffers[r] = ctr_heap_allocate(max_len + 1);
@@ -220,6 +241,7 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 				rbindings[r].buffer_length = max_len + 1;
 				rbindings[r].length = &rlens[r];
 				rbindings[r].is_null = &rnull[r];
+				}
 			}
 			if (mysql_stmt_bind_result(prepared_statement, rbindings)) {
 				ctr_error(mysql_stmt_error(prepared_statement),0);
@@ -250,6 +272,35 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 					map_entry_key->object = ctr_build_string_from_cstring(rfields[i].name);
 					if (rnull[i]) {
 						map_entry_val->object = CtrStdNil;
+					} else if (ctr_is_text_type(rfields[i].type)) {
+						unsigned long total = rlens[i];
+						char* full = ctr_heap_allocate(total + 1);
+						unsigned long offset = 0;
+
+						while (offset < total) {
+							unsigned long to_read =
+							(total - offset > CTR_CHUNK_SIZE)
+							? CTR_CHUNK_SIZE
+							: (total - offset);
+
+							MYSQL_BIND col;
+							memset(&col, 0, sizeof(col));
+							col.buffer_type = rfields[i].type;
+							col.buffer = full + offset;
+							col.buffer_length = to_read;
+							mysql_stmt_fetch_column(
+								prepared_statement,
+								&col,
+								i,
+								offset
+							);
+
+							offset += to_read;
+						}
+
+						full[total] = '\0';
+						map_entry_val->object = ctr_build_string(full, total);
+						ctr_heap_free(full);
 					} else {
 						switch (rfields[i].type) {
 							case MYSQL_TYPE_LONG:
@@ -281,7 +332,7 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 			
 			free_rbuffers:
 			for (unsigned int r = 0; r < num_fields; r++) {
-				ctr_heap_free(rbuffers[r]);
+				if (rbuffers[r]) ctr_heap_free(rbuffers[r]);
 			}
 			ctr_heap_free(rbuffers);
 			ctr_heap_free(rbindings);
