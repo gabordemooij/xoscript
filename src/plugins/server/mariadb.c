@@ -258,8 +258,6 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 			while (1) {
 				int s = mysql_stmt_fetch(prepared_statement);
 				if (s == MYSQL_NO_DATA) break;
-				if (s == MYSQL_DATA_TRUNCATED)
-				fprintf(stderr, "Warning: truncated data\n");
 				if (s == 1) {
 					ctr_error(mysql_stmt_error(prepared_statement),0);
 					goto free_rbuffers;
