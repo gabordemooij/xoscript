@@ -56,15 +56,50 @@ Template on: ['nl2br'] do: {
 }.
 
 Template on: ['clean'] do: {
-	own content := 
+	own content :=
 		Pattern
 		new: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
 		match: own content
 		do: { <- ['']. }.
 }.
-	
+
+Template on: ['clean-cuts'] do: {
+	>> items := List new.
+	Pattern
+	new: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	match: own content
+	do: { :_ :part
+		items append: part ? 1.
+	}.
+	items each: { :_ :id
+		own content :=
+			Pattern new: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			match: own content
+			do: { <- ['']. }.
+	 }.
+}.
+
+Template on: ['clean-space'] do: {
+	own content :=
+		Pattern
+		new: ['\\s*\\n'],
+		match: own content
+		do: { Out write: ['wash wash'], stop.
+		<- ['\n']. }.
+	own content :=
+		Pattern
+		new: ['\\n[\\s\\t]+'],
+		match: own content
+		do: { Out write: ['wash2'], stop.
+		<- ['\n']. }.
+}.
+
+Template on: ['clean-all'] do: {
+	self clean.
+	self clean-cuts.
+	self clean-space.
+}.
+
 Template on: ['string'] do: {
 		<- own content.
 }.
-
-
