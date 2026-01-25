@@ -77,26 +77,91 @@ you better treat this manual as a reference guide.
 
 ## Setup Linux
 
-To install xoscript, just download the package from the
-download center for your platform (Linux or OpenBSD).
+Download apache2 and mariadb:
 
-To install xoscript as a server module for Apache2 edit
 
 ```
-/etc/apache2/sites-enabled/000-default.conf 
+sudo apt-get install apache2 mariadb-server
+sudo a2enmod cgi
 ```
 
-add:
+Download xoscript.
+Replace X with the correct version number!
+
+```
+wget https://xoscript.com/downloads/xoserver-linux-1_5_X.tar.gz
+tar xvf xoserver*.tar.gz
+```
+
+Copy the files to the webroot and /bin:
+
+
+```
+sudo cp bin/xo /bin/xo
+sudo cp -R bin/mods /var/www/html/
+sudo cp *.xo /var/www/html/
+```
+
+Edit your apache2 config:
+
+```
+sudo nano /etc/apache2/sites-enabled/000-default.conf
+```
+
+Replace Virtualhost with:
 
 ```
 &lt;VirtualHost *:80&gt;
-	&lt;Directory /var/www/html&gt;
-		Options +ExecCGI
-		AllowOverride All
-	&lt;/Directory&gt;
-	DocumentRoot /var/www/html
+    &lt;Directory /var/www/html&gt;
+        Options +ExecCGI
+        AllowOverride All
+        AddHandler cgi-script .xo
+        Require all granted
+    &lt;/Directory&gt;
+    DocumentRoot /var/www/html
 &lt;/VirtualHost&gt;
 ```
+
+Create a test page:
+
+```
+sudo nano /var/www/html/test.xo
+```
+
+and write a little test program:
+
+```
+#!/bin/xo
+Server init.
+Program use: ['webtools.xo'].
+>> web := Web-Document new.
+web out: ['Hello World'].
+```
+
+Allow apache2 to execute your program through CGI:
+
+```
+sudo chmod uog+x /var/www/html/test.xo
+```
+
+Restart apache2:
+
+```
+sudo systemctl restart apache2
+```
+
+Go to your test page in the browser:
+
+```
+http://localhost/test.xo
+```
+
+You should see:
+
+```
+Hello World
+```
+
 
 ## Setup OpenBSD
 
@@ -116,7 +181,7 @@ server "mydomain.com" {
 ```
 
 Add the xo binary and mods, as well as any dependencies in the
-chroot.
+chroot (figure out with ldd).
 
 ## Run examples
 
