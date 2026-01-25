@@ -77,6 +77,21 @@ ctr_object* ctr_blob_new_set(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 /**
+ * @internal
+ */
+ctr_object* ctr_build_blob(void* data, size_t len) {
+	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX);
+	instance->link = CtrMediaDataBlob;
+	ctr_resource* buffer = ctr_heap_allocate(sizeof(ctr_resource));
+	buffer->ptr = ctr_heap_allocate(len);
+	memcpy(buffer->ptr, data, len);
+	buffer->destructor = &ctr_media_blob_destructor;
+	instance->value.rvalue = buffer;
+	instance->info.sticky = 1;
+	return instance;
+}
+
+/**
  * @def
  * [ Blob ] utf8: [ String ]
  * 

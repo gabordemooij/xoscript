@@ -5,6 +5,9 @@
 #include <server.h>
 #include "../../xo.h"
 
+//for blob
+#include <fficonnect.h>
+
 #define CTR_OBJECT_RESOURCE_MARIADB 41
 #define CTR_OBJECT_RESOURCE_MARIADB_STM 42
 
@@ -137,6 +140,12 @@ static int ctr_is_text_type(enum enum_field_types t) {
            t == MYSQL_TYPE_STRING ||
            t == MYSQL_TYPE_VAR_STRING;
 }
+
+
+static int ctr_is_binary(MYSQL_FIELD f) {
+    return f.charsetnr == 63;  /* binary collation */
+}
+
 
 ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argumentList, int fetch_mode) {
 	int            count;
@@ -291,7 +300,11 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 							offset += to_read;
 						}
 						full[total] = '\0';
-						map_entry_val->object = ctr_build_string(full, total);
+						if (ctr_is_binary(rfields[i])) {
+							map_entry_val->object = ctr_build_blob(full, total);
+						} else {
+							map_entry_val->object = ctr_build_string(full, total);
+						}
 						ctr_heap_free(full);
 					} else {
 						switch (rfields[i].type) {
