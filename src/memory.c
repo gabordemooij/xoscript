@@ -220,7 +220,6 @@ int ctr_heap_size( void* ptr, size_t* size ) {
  * re-allocate the memory block.
  */
 void* ctr_heap_reallocate(void* oldptr, size_t size ) {
-
 	char* nptr;
 	size_t  old_size;
 	size_t* block_width;
