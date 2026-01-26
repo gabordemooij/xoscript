@@ -243,6 +243,11 @@ void* ctr_heap_reallocate(void* oldptr, size_t size ) {
 
 	/* update the ledger */
 	ctr_gc_alloc = ( ctr_gc_alloc - old_size ) + size;
+	/* Check whether we can afford to allocate this much */
+	if (ctr_gc_memlimit < ctr_gc_alloc) {
+		printf( CTR_MERR_OOM, (unsigned long) size );
+		exit(1);
+	}
 
 	/* re-allocate memory */
 	nptr = aligned_calloc( 1, size );
