@@ -574,18 +574,10 @@ void ctr_internal_gui_ffi(ctr_object* ffispec) {
 	} else {
 		library_path = ctr_heap_allocate_cstring(ctr_internal_cast2string(arg1));
 		if (strcmp("@structtest", library_path)!=0) {
-		#ifdef WIN
-		ff->handle = LoadLibrary(library_path);
-		#else
 		ff->handle = dlopen(library_path, RTLD_NOW);
-		#endif
 		ctr_heap_free(library_path);
 		if ( !ff->handle ) {
-			#if defined WIN
-			ctr_error("Unable to open library",0);
-			#else
 			ctr_error(dlerror(),0);
-			#endif
 			return;
 		}
 		} else {
@@ -606,18 +598,10 @@ void ctr_internal_gui_ffi(ctr_object* ffispec) {
 			ff->symbol = &ctr_media_internal_structtest;
 			ctr_heap_free(symbol_name);
 		} else {
-			#ifdef WIN
-			ff->symbol = GetProcAddress( ff->handle, symbol_name ); 
-			#else
 			ff->symbol = dlsym( ff->handle, symbol_name );
-			#endif
 			ctr_heap_free(symbol_name);
 			if (!ff->symbol) {
-				#ifdef WIN
-				ctr_error("No symbol",0);
-				#else
 				ctr_error(dlerror(),0);
-				#endif
 				return;
 			}
 		}
