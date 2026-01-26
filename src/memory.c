@@ -223,7 +223,7 @@ void* ctr_heap_reallocate(void* oldptr, size_t size ) {
 	char* nptr;
 	size_t  old_size;
 	size_t* block_width;
-	if (oldptr == NULL) return;
+	if (oldptr == NULL) return NULL;
 	/* correct the required size new block to include block width */
 	size_t q = sizeof( size_t );
 	size += q;
