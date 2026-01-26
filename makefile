@@ -2,7 +2,7 @@ BUILD_DIR         = ./build
 BUILD_OBJ_DIR     = $(BUILD_DIR)/Linux/obj
 BUILD_BIN_DIR     = $(BUILD_DIR)/Linux/bin
 BIN               = xo
-CFLAGS            = -O2 -g -mtune=native -Wpedantic -Wall -I src/i18n/en -D Linux -D CTRLANG=en -D INCLUDETESTS
+CFLAGS            = -O2 -g -mtune=native -Wpedantic -Wall -I src/i18n/en -D Linux -D ALLOCALIGN=16 -D CTRLANG=en -D INCLUDETESTS
 LDFLAGS           = -g -rdynamic -lm -ldl
 CSRCS             = $(shell find ./src -maxdepth 1 -type f -name '*.c')
 COBJS             = $(patsubst ./src/%.c, $(BUILD_OBJ_DIR)/%.o, $(CSRCS))

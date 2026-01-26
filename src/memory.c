@@ -18,6 +18,22 @@ memBlock*  memBlocks = NULL;
 size_t     numberOfMemBlocks = 0;
 size_t     maxNumberOfMemBlocks = 0;
 
+/**
+ * Wrapper for calloc to allow byte-wise alignment.
+ */
+static inline void* aligned_calloc( size_t i, size_t s ) {
+	#ifndef ALLOCALIGN
+	return calloc(i, s);
+	#else
+	void* ptr;
+	size_t size = s * i;
+	if (posix_memalign(&ptr, ALLOCALIGN, size) == 0) {
+		memset(ptr, 0, size);
+		return ptr;
+	}
+	return NULL;
+	#endif
+}
 
 /**
  * Heap allocate raw memory
@@ -54,7 +70,7 @@ void* ctr_heap_allocate( size_t size ) {
 		exit(1);
 	}
 	/* Perform allocation and check result */
-	slice_of_memory = calloc( 1, size );
+	slice_of_memory = aligned_calloc( 1, size );
 	if ( slice_of_memory == NULL ) {
 		printf( CTR_MERR_MALLOC, (unsigned long) size );
 		exit(1);
@@ -214,7 +230,7 @@ void* ctr_heap_reallocate(void* oldptr, size_t size ) {
 	ctr_gc_alloc = ( ctr_gc_alloc - old_size ) + size;
 
 	/* re-allocate memory */
-	nptr = calloc( 1, size );
+	nptr = aligned_calloc( 1, size );
 	if ( nptr == NULL ) {
 		printf( CTR_MERR_MALLOC, (unsigned long) size );
 		exit(1);
