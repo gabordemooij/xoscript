@@ -197,6 +197,21 @@ void ctr_heap_free( void* ptr ) {
 }
 
 /**
+ * Obtain the size of the memory block.
+ */
+int ctr_heap_size( void* ptr, size_t* size ) {
+	if (ptr == NULL) return -1;
+	size_t* block_width;
+	size_t q = sizeof( size_t );
+	/* find the correct size of this memory block and move pointer back */
+	ptr = (void*) ((char*) ptr - q);
+	if (ptr == NULL) return -1;
+	block_width = (size_t*) ptr;
+	*size = *(block_width);
+	return 0;
+}
+
+/**
  * Memory Management Adjust Memory Block Size (re-allocation)
  * Re-allocates Memory Block.
  *

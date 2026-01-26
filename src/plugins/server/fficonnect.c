@@ -77,6 +77,20 @@ ctr_object* ctr_blob_new_set(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 /**
+ * @def
+ * [ Blob ] length
+ *
+ * @test642
+ */
+ctr_object* ctr_blob_size(ctr_object* myself, ctr_argument* argumentList) {
+	size_t size;
+	if (ctr_heap_size(myself->value.rvalue->ptr, &size) == 0) {
+		return ctr_build_number_from_float((double_t) ( size - sizeof(size_t) ) );
+	}
+	return CtrStdNil;
+}
+
+/**
  * @internal
  */
 ctr_object* ctr_build_blob(void* data, size_t len) {
@@ -708,6 +722,7 @@ void begin_ffi() {
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_STRUCT_SET ), &ctr_blob_new_struct);
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_FREE_STRUCT ), &ctr_blob_free_struct);
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_FROM_LENGTH ), &ctr_blob_read);
+	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_LENGTH ), &ctr_blob_size);
 	CtrMediaFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
 	CtrMediaFFIObjectBase->link = CtrStdObject;
 	ctr_internal_create_func(CtrMediaFFIObjectBase, ctr_build_string_from_cstring( CTR_DICT_MESSAGEARGS ), &ctr_media_ffi_apply );
