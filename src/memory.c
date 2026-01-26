@@ -61,7 +61,7 @@ static inline void* aligned_calloc( size_t i, size_t s ) {
 void* ctr_heap_allocate( size_t size ) {
 	void* slice_of_memory;
 	size_t* block_width;
-	int q = sizeof( size_t );
+	size_t q = sizeof( size_t );
 	size += q;
 	/* Check whether we can afford to allocate this much */
 	ctr_gc_alloc += size;
@@ -177,7 +177,7 @@ int ctr_gc_clean_free = 0;
 void ctr_heap_free( void* ptr ) {
 	if (ptr == NULL) return;
 	size_t* block_width;
-	int q = sizeof( size_t );
+	size_t q = sizeof( size_t );
 	size_t size;
 	/* find the correct size of this memory block and move pointer back */
 	ptr = (void*) ((char*) ptr - q);
@@ -226,7 +226,7 @@ void* ctr_heap_reallocate(void* oldptr, size_t size ) {
 	size_t* block_width;
 
 	/* correct the required size new block to include block width */
-	int q = sizeof( size_t );
+	size_t q = sizeof( size_t );
 	size += q;
 	/* move the pointer back to begin of block */
 	oldptr = (void*) ((char*) oldptr - q);
