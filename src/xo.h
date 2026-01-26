@@ -343,6 +343,7 @@ extern char* ctr_eofcode;
 extern ctr_size getBytesUtf8(char* strval, long startByte, ctr_size lenUChar);
 extern ctr_size ctr_getutf8len(char* strval, ctr_size max);
 extern int ctr_utf8size(char c);
+extern size_t ctr_utf8sanitize_fast(char *s, size_t n);
 
 /**
  * Parser functions
@@ -563,6 +564,7 @@ extern ctr_object* ctr_string_copy(ctr_object* myself, ctr_argument* argumentLis
 extern ctr_object* ctr_string_to_code(ctr_object* myself, ctr_argument* ctr_argumentList);
 extern ctr_object* ctr_string_minus(ctr_object* myself, ctr_argument* ctr_argumentList);
 extern ctr_object* ctr_string_bytes(ctr_object* myself, ctr_argument* ctr_argumentList);
+extern ctr_object* ctr_string_utf8san(ctr_object* myself, ctr_argument* ctr_argumentList);
 
 
 /**

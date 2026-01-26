@@ -1524,6 +1524,7 @@ ctr_object* ctr_build_string(char* stringValue, ctr_size size) {
 	if (size != 0) {
 		stringObject->value.svalue->value = ctr_heap_allocate( size*sizeof(char) );
 		memcpy(stringObject->value.svalue->value, stringValue, ( sizeof(char) * size ) );
+		size = ctr_utf8sanitize_fast(stringObject->value.svalue->value, size);
 	}
 	stringObject->value.svalue->vlen = size;
 	stringObject->link = CtrStdString;
@@ -1648,6 +1649,11 @@ ctr_object* ctr_string_length(ctr_object* myself, ctr_argument* argumentList) {
 
 ctr_object* ctr_string_bytes(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float(myself->value.svalue->vlen);
+}
+
+ctr_object* ctr_string_utf8san(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_utf8sanitize_fast(myself->value.svalue->value, myself->value.svalue->vlen);
+	return myself;
 }
 
 /**

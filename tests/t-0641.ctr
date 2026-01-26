@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Dict new
+	# ASCII only
+	put: ( List new ; 65 ; 65 ; 65 ; 65 ; 0 ) at: ['AAAA'],
+	# valid 2 byte sequence
+	put: ( List new ; 194 ; 162 ; 0 ) at: ['¢'],
+	# Valid 3-byte UTF-8
+    put: ( List new ; 226 ; 130 ; 172 ; 0 ) at: ['€'],
+	# Valid 4-byte UTF-8
+    put: ( List new ; 240 ; 144 ; 141 ; 136 ; 0 ) at: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    put: ( List new ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) at: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    put: ( List new ; 65 ; 193 ; 129 ; 0 ) at: ['A?'],
+	# Invalid first byte (0xFF)
+    put: ( List new ; 255 ; 0 ) at: ['?'],
+	# Incomplete multi-byte sequence at end
+    put: ( List new ; 66 ; 226 ; 0 ) at: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    put: ( List new ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) at: ['A€?𐍈B'].
+	 
+utf8cases each: { :key :value
+	>> blob := Blob new: value count, bytes: value.
+	>> str := blob string.
+	(str = key) true: {
+		Out write: ['OK'], stop.
+	}, else: {
+		Out write: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, stop.
+	}.
+	blob free.
+}.
