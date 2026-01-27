@@ -569,6 +569,36 @@ ctr_object* ctr_program_pledge(ctr_object* myself, ctr_argument* argumentList) {
 	return  myself;
 }
 
+/**
+ * @def
+ * [ Program ] unveil: [ String ] permissions: [ String ]
+ *
+ * @test644
+ */
+ctr_object* ctr_program_unveil(ctr_object* myself, ctr_argument* argumentList) {
+	#ifdef UNVEIL
+	if (argumentList->object == CtrStdNil && argumentList->next->object == CtrStdNil) {
+		unveil(NULL, NULL); // lock
+		return myself;
+	}
+	char* path = ctr_heap_allocate_cstring(
+		ctr_internal_copy2string(argumentList->object)
+	);
+	char* permissions = ctr_heap_allocate_cstring(
+		ctr_internal_copy2string(argumentList->next->object)
+	);
+	//child process is always limited to the permissions of the host
+	int err = unveil(path, permissions);
+	if (err) {
+		ctr_error("Unveil failed.", err);
+	}
+	ctr_heap_free(path);
+	ctr_heap_free(permissions);
+	#else
+	ctr_error("Unveil not available.", 0);
+	#endif
+	return  myself;
+}
 
 /**
  * @def

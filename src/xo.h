@@ -693,6 +693,7 @@ extern ctr_object* ctr_program_platform(ctr_object* myself, ctr_argument* argume
 extern ctr_object* ctr_program_timemachine(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_program_alarm(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_program_pledge(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_program_unveil(ctr_object* myself, ctr_argument* argumentList);
 extern double ctr_internal_versiontime(void);
 
 /**
