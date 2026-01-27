@@ -28,8 +28,8 @@
 /**
  * Version information
  */
-#define CTR_VERSION "1.5.2"
-#define CTR_VERSION_NUM 105002
+#define CTR_VERSION "1.5.3"
+#define CTR_VERSION_NUM 105003
 
 
 /**
