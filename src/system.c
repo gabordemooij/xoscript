@@ -546,6 +546,24 @@ ctr_object* ctr_program_alarm(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
+ctr_object* ctr_program_pledge(ctr_object* myself, ctr_argument* argumentList) {
+	#ifdef PLEDGE
+	char* str = ctr_heap_allocate_cstring(
+		ctr_internal_copy2string(argumentList->object)
+	);
+	//child process is always limited to the permissions of the host
+	int err = pledge(str, NULL);
+	if (err) {
+		ctr_error("Pledge failed.", err);
+	}
+	ctr_heap_free(str);
+	#else
+	ctr_error("Pledge not available.", 0);
+	#endif
+	return  myself;
+}
+
+
 /**
  * @def
  * [ Program ] setting: [ String ]
