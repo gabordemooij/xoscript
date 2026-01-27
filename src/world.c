@@ -830,7 +830,6 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_APPEND ), &ctr_string_append );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_ADD_SET ), &ctr_string_append );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_TONUMBER ), &ctr_string_to_number );
-	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_ITONUMBER ), &ctr_string_in_to_number );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_TOBOOL ), &ctr_string_to_boolean );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_HASH_WITH_KEY ), &ctr_string_hash_with_key );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_TOSTRING), &ctr_object_myself );

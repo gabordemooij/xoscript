@@ -537,7 +537,6 @@ extern ctr_object* ctr_string_last_index_of(ctr_object* myself, ctr_argument* ar
 extern ctr_object* ctr_string_replace_with(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_string_split(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_string_to_number(ctr_object* myself, ctr_argument* argumentList);
-extern ctr_object* ctr_string_in_to_number(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_string_to_boolean(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_string_to_lower(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_string_to_upper(ctr_object* myself, ctr_argument* argumentList);
@@ -780,7 +779,7 @@ extern ctr_object* ctr_build_empty_string();
 extern ctr_object* ctr_build_string(char* object, ctr_size vlen);
 extern ctr_object* ctr_build_block(ctr_tnode* node);
 extern ctr_object* ctr_build_number(char* object);
-extern ctr_object* ctr_build_number_from_string(char* fixedStr, ctr_size strLength, char international);
+extern ctr_object* ctr_build_number_from_string(char* fixedStr, ctr_size strLength);
 extern ctr_object* ctr_build_number_from_float(ctr_number floatNumber);
 extern ctr_object* ctr_build_bool(int truth);
 extern ctr_object* ctr_build_nil();

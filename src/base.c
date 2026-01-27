@@ -796,24 +796,15 @@ ctr_object* ctr_number_new(ctr_object* myself, ctr_argument* argumentList) {
  * @internal
  * BuildNumberFromString
  */
-ctr_object* ctr_build_number_from_string(char* str, ctr_size length, char international) {
+ctr_object* ctr_build_number_from_string(char* str, ctr_size length) {
 	char* old_number;
-	char* new_number;
 	ctr_object* numberObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTNUMBER);
 	/* turn string into a C-string before feeding it to atof */
 	int stringNumberLength = ( length <= 40 ) ? length : 40;
 	/* max length is 40 (and that's probably even too long... ) */
 	old_number = (char*) ctr_heap_allocate( 41 * sizeof( char ) );
 	memcpy( old_number, str, stringNumberLength );
-	/* convert national number to international number */
-	if (international) {
-		new_number = (char*) ctr_heap_allocate( 41 * sizeof( char ) );
-		ctr_national_number( old_number, new_number );
-		numberObject->value.nvalue = atof(new_number);
-		ctr_heap_free( new_number );
-	} else {
-		numberObject->value.nvalue = atof(old_number);
-	}
+	numberObject->value.nvalue = atof(old_number);
 	numberObject->link = CtrStdNumber;
 	ctr_heap_free( old_number );
 	return numberObject;
@@ -2104,11 +2095,7 @@ ctr_object* ctr_string_trim(ctr_object* myself, ctr_argument* argumentList) {
  */
 
 ctr_object* ctr_string_to_number(ctr_object* myself, ctr_argument* argumentList) {
-	return ctr_build_number_from_string(myself->value.svalue->value, myself->value.svalue->vlen, 1);
-}
-
-ctr_object* ctr_string_in_to_number(ctr_object* myself, ctr_argument* argumentList) {
-	return ctr_build_number_from_string(myself->value.svalue->value, myself->value.svalue->vlen, 0);
+	return ctr_build_number_from_string(myself->value.svalue->value, myself->value.svalue->vlen);
 }
 
 /**

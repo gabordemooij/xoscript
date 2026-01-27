@@ -83,7 +83,7 @@ ctr_object* ctr_cwlk_message(ctr_tnode* paramNode) {
 			r = ctr_build_string(receiverNode->value, receiverNode->vlen);
 			break;
 		case CTR_AST_NODE_LTRNUM:
-			r = ctr_build_number_from_string(receiverNode->value, receiverNode->vlen, 0);
+			r = ctr_build_number_from_string(receiverNode->value, receiverNode->vlen);
 			break;
 		case CTR_AST_NODE_NESTED:
 			r = ctr_cwlk_expr(receiverNode, &wasReturn);
@@ -238,7 +238,7 @@ ctr_object* ctr_cwlk_expr(ctr_tnode* node, char* wasReturn) {
 			result = ctr_build_nil();
 			break;
 		case CTR_AST_NODE_LTRNUM:
-			result = ctr_build_number_from_string(node->value, node->vlen, 0);
+			result = ctr_build_number_from_string(node->value, node->vlen);
 			break;
 		case CTR_AST_NODE_CODEBLOCK:
 			result = ctr_build_block(node);
