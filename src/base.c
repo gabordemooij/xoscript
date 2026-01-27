@@ -2499,7 +2499,7 @@ ctr_object* ctr_block_error(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Code ] catch: [ Code ]
+ * [ Code ] except: [ Code ]
  *
  *
  * @test495
