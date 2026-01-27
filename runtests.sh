@@ -66,8 +66,8 @@ unittest() {
 		return
 	fi
 	
-	if [[ "$skipcode" == "#Windows" && "$os" != "win" ]]; then
-		echo "SKIP Windows-only test"
+	if [[ "$skipcode" == "#OBSD" ]]; then
+		echo "SKIP OBSD-only test"
 		return
 	fi
 
@@ -101,7 +101,7 @@ unittest() {
 
 # select range
 FROM=1
-TIL=642
+TIL=643
 
 # run tests for linux
 pushd build/Linux/bin
