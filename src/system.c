@@ -546,6 +546,12 @@ ctr_object* ctr_program_alarm(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
+/**
+ * @def
+ * [ Program ] pledge: [ String ]
+ *
+ * @test643
+ */
 ctr_object* ctr_program_pledge(ctr_object* myself, ctr_argument* argumentList) {
 	#ifdef PLEDGE
 	char* str = ctr_heap_allocate_cstring(
