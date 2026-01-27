@@ -1443,19 +1443,19 @@ ctr_object* ctr_internal_number_to_string(ctr_object* myself, ctr_argument* argu
 	ctr_object* qname;
 	ctr_object* qual;
 	ctr_object* stringObject;
+	bufSize = snprintf(NULL, 0, "%.10f", o->value.nvalue) + 1; // measure required buffer size
 	if (!flat) {
 		qname = ctr_build_string_from_cstring( CTR_DICT_QUALIFIER );
 		qual = ctr_internal_object_find_property( myself, qname, CTR_CATEGORY_PRIVATE_PROPERTY );
 		if (qual) {
 			qual = ctr_internal_cast2string( qual );
-			q = ctr_heap_allocate( (100 + qual->value.svalue->vlen) * sizeof( char ) );
+			q = ctr_heap_allocate( (bufSize + qual->value.svalue->vlen) * sizeof( char ) );
 		} else {
-			q = ctr_heap_allocate( 100 * sizeof( char ) );
+			q = ctr_heap_allocate( bufSize * sizeof( char ) );
 		}
 	}
-	bufSize = snprintf(NULL, 0, "%.10f", o->value.nvalue); // measure required buffer size
-	buf = ctr_heap_allocate( bufSize + 1 );
-	snprintf( buf, bufSize + 1, "%.10f", o->value.nvalue );
+	buf = ctr_heap_allocate( bufSize );
+	snprintf( buf, bufSize, "%.10f", o->value.nvalue );
 	p = buf + strlen(buf) - 1;
 	//this loop only works with snprintf %0.10f, '0' would cause buffer underflow
 	while ( *p == '0' && *p-- != '.' );
