@@ -1453,10 +1453,11 @@ ctr_object* ctr_internal_number_to_string(ctr_object* myself, ctr_argument* argu
 			q = ctr_heap_allocate( 100 * sizeof( char ) );
 		}
 	}
-	bufSize = 100 * sizeof( char );
-	buf = ctr_heap_allocate( bufSize );
-	snprintf( buf, 99, "%.10f", o->value.nvalue );
+	bufSize = snprintf(NULL, 0, "%.10f", o->value.nvalue); // measure required buffer size
+	buf = ctr_heap_allocate( bufSize + 1 );
+	snprintf( buf, bufSize + 1, "%.10f", o->value.nvalue );
 	p = buf + strlen(buf) - 1;
+	//this loop only works with snprintf %0.10f, '0' would cause buffer underflow
 	while ( *p == '0' && *p-- != '.' );
 	*( p + 1 ) = '\0';
 	if ( *p == '.' ) *p = '\0';
