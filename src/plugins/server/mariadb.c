@@ -307,7 +307,49 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 						}
 						ctr_heap_free(full);
 					} else {
+						size_t req_bufsize;
+						size_t oksize;
+						char* req_buf;
+						MYSQL_TIME* t;
+						map_entry_val->object = CtrStdNil;
 						switch (rfields[i].type) {
+							case MYSQL_TYPE_DATE:
+								t = rbuffers[i];
+								req_bufsize = snprintf(NULL, 0, "%04d-%02d-%02d", t->year, t->month, t->day);
+								if (req_bufsize > 0) {
+									req_buf = ctr_heap_allocate(req_bufsize + 1);
+									oksize = snprintf(req_buf, req_bufsize + 1, "%04d-%02d-%02d", t->year, t->month, t->day);
+									if (oksize == req_bufsize) {
+										map_entry_val->object = ctr_build_string_from_cstring(req_buf);
+									} 
+									ctr_heap_free(req_buf);
+								}
+								break;
+							case MYSQL_TYPE_DATETIME:
+							case MYSQL_TYPE_TIMESTAMP:
+								t = rbuffers[i];
+								req_bufsize = snprintf(NULL, 0, "%04d-%02d-%02d %02d:%02d:%02d", t->year, t->month, t->day, t->hour, t->minute, t->second);
+								if (req_bufsize > 0) {
+									req_buf = ctr_heap_allocate(req_bufsize + 1);
+									oksize = snprintf(req_buf, req_bufsize + 1, "%04d-%02d-%02d %02d:%02d:%02d", t->year, t->month, t->day, t->hour, t->minute, t->second);
+									if (oksize == req_bufsize) {
+										map_entry_val->object = ctr_build_string_from_cstring(req_buf);
+									}
+									ctr_heap_free(req_buf);
+								}
+								break;
+							case MYSQL_TYPE_TIME:
+								t = rbuffers[i];
+								req_bufsize = snprintf(NULL, 0, "%02d:%02d:%02d", t->hour, t->minute, t->second);
+								if (req_bufsize > 0) {
+									req_buf = ctr_heap_allocate(req_bufsize + 1);
+									oksize = snprintf(req_buf, req_bufsize + 1, "%02d:%02d:%02d", t->hour, t->minute, t->second);
+									if (oksize == req_bufsize) {
+										map_entry_val->object = ctr_build_string_from_cstring(req_buf);
+									}
+									ctr_heap_free(req_buf);
+								}
+								break;
 							case MYSQL_TYPE_LONG:
 							case MYSQL_TYPE_LONGLONG:
 							case MYSQL_TYPE_TINY:
@@ -319,7 +361,7 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 								map_entry_val->object = ctr_build_number_from_float(*(double*)rbuffers[i]);
 								break;
 							default: {
-								map_entry_val->object = ctr_build_string((char*) rbuffers[i], rlens[i]);
+								// data type not supported
 								break;
 							}
 						}
