@@ -149,7 +149,7 @@ ctr_object* ctr_request_cookie_array(ctr_object* myself, ctr_argument* argumentL
 }
 
 /**
- * Request file: [string].
+ * Request upload: [string].
  * 
  * Returns array containing the path to the uploaded temporay file (0) and
  * the desired name of the uploaded file (1).
