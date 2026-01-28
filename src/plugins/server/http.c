@@ -16,9 +16,6 @@
 
 #include "ccgi/ccgi.h"
 
-
-/* gcc -c request.c -Wall -Werror -fpic -o request.o ; gcc -shared -o libctrrequest.so request.o */
-
 CGI_varlist *varlistGet;
 CGI_varlist *varlistPost;
 CGI_varlist *varlistCookie;
@@ -75,84 +72,56 @@ ctr_object* ctr_request_array(ctr_object* myself, ctr_argument* argumentList, CG
 }
 
 /**
- * Request get: [string]
- * 
- * Returns the value of the specified GET parameter from the HTTP query string.
- * For example if the query string of an url is: ?search=glasses
- * then the value of:
- * 
- * item := Request get: 'search'.
- * 
- * would be 'glasses'.
+ * @def
+ * [ Request ] get: [ String ]
  */
 ctr_object* ctr_request_get_string(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_request_string(myself, argumentList, varlistGet);
 }
 
 /**
- * Request getArray: [string].
- * 
- * Returns an array of strings extracted from the query string.
- * For example if the query string contains: ?option=a&option=b
- * 
- * Request getArray: 'option'.
- * 
- * will contain two elements: 'a' and 'b'. Note that
- * this also works with array-like notation: ?option[]='a'&option[]=b:
- * 
- * Request getArray: 'option[]'.
- * 
- * will return the same array.
+ * @def
+ * [ Request ] get-list: [ String ]
  */
 ctr_object* ctr_request_get_array(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_request_array(myself, argumentList, varlistGet);
 }
 
 /**
- * Request post: [string].
- * 
- * Obtains a string from the HTTP POST payload. Just like 'get:' but for
- * POST variables. See 'Request get:' for details.
+ * @def
+ * [ Request ] post: [ String ]
  */
 ctr_object* ctr_request_post_string(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_request_string(myself, argumentList, varlistPost);
 }
 
 /**
- * Request postArray: [string].
- * 
- * Obtains an array from the HTTP POST payload. Just like 'getArray:' but for
- * POST variables. See 'Request getArray:' for details.
+ * @def
+ * [ Request ] post-list: [ String ]
  */
 ctr_object* ctr_request_post_array(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_request_array(myself, argumentList, varlistPost);
 }
 
 /**
- * Request cookie: [string].
- * 
- * Obtains a string from the HTTP COOKIE payload. Just like 'get:' but for
- * COOKIE variables. See 'Request get:' for details.
+ * @def
+ * [ Request ] cookie: [ String ]
  */
 ctr_object* ctr_request_cookie_string(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_request_string(myself, argumentList, varlistCookie);
 }
 
 /**
- * Request cookieArray: [string].
- * 
- * Obtains an array from the HTTP COOKIE payload. Just like 'getArray:' but for
- * COOKIE variables. See 'Request getArray:' for details.
+ * @def
+ * [ Request ] cookie-list: [ String ]
  */
 ctr_object* ctr_request_cookie_array(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_request_array(myself, argumentList, varlistCookie);
 }
 
 /**
- * Request upload: [string].
- * 
- * Returns array containing the path to the uploaded temporay file (0) and
- * the desired name of the uploaded file (1).
+ * @def
+ * [ Request ] upload: [ String ]
  */
 ctr_object* ctr_request_file(ctr_object* myself, ctr_argument* argumentList) {
 	CGI_value* value;
