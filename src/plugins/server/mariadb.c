@@ -310,6 +310,8 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 						switch (rfields[i].type) {
 							case MYSQL_TYPE_LONG:
 							case MYSQL_TYPE_LONGLONG:
+							case MYSQL_TYPE_TINY:
+							case MYSQL_TYPE_SHORT:
 								map_entry_val->object = ctr_build_number_from_float((double)*(int*)rbuffers[i]);
 								break;
 							case MYSQL_TYPE_DOUBLE:
