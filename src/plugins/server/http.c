@@ -203,6 +203,20 @@ ctr_object* ctr_url_from_set(ctr_object* myself, ctr_argument* argumentList) {
  * Adds the Request object to the World.
  */
 void begin_http(){
+	char* maxpostfields_str = getenv("max-postfields");
+	size_t maxpostfields = 0;
+	if (maxpostfields_str == NULL) {
+		maxpostfields_str = "40";
+	}
+	maxpostfields = (size_t) atoi(maxpostfields_str);
+	CGI_set_max_postfields(maxpostfields);
+	char* maxcontentlength_str = getenv("max-contentlength");
+	size_t maxcontentlength = 0;
+	if (maxcontentlength_str == NULL) {
+		maxcontentlength_str = "1000";
+	}
+	maxcontentlength = (size_t) atoi(maxcontentlength_str);
+	CGI_set_max_contentlength(maxcontentlength);
 	requestObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
 	requestObject->link = CtrStdObject;
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_GET_SET ), &ctr_request_get_string );

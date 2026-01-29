@@ -93,7 +93,7 @@ unittest() {
 
 # select range
 FROM=1
-TIL=647
+TIL=649
 
 # run tests for linux
 pushd build/OpenBSD/bin

@@ -43,6 +43,21 @@
 #include "ccgi.h"
 #include "../../../xo.h"
 
+size_t CCGI_MAX_POSTFIELDS = 0;
+size_t CCGI_MAX_CONTENTLENGTH = 0;
+
+static size_t postfieldcount = 0;
+static size_t contentlengthcount = 0;
+
+void CGI_set_max_postfields(size_t n) {
+	CCGI_MAX_POSTFIELDS = n;
+}
+
+void CGI_set_max_contentlength(size_t n) {
+	CCGI_MAX_CONTENTLENGTH = n;
+}
+
+
 /* CGI_val is an entry in a list of variable values */
 
 typedef struct CGI_val CGI_val;
@@ -319,6 +334,13 @@ readline(strbuf *line, FILE *in) {
     int c, i = 0;
 
     while ((c = getc(in)) != EOF) {
+		
+		contentlengthcount++;
+		if (contentlengthcount >= CCGI_MAX_CONTENTLENGTH) {
+			// if we hit max content length, kill process
+			exit(-1);
+		}
+		
         line = savechar(line, i++, c);
         if (c == '\n') {
             break;
@@ -546,6 +568,9 @@ read_multipart(CGI_varlist *v, const char *template) {
         {
             break;
         }
+
+        // if we hit max postfields stop
+        if (postfieldcount++ >= CCGI_MAX_POSTFIELDS) break;
     }
 
 cleanup:
@@ -785,7 +810,7 @@ CGI_add_var(CGI_varlist *v, const char *varname, const char *value) {
  */
 
 CGI_varlist *
-CGI_decode_query(CGI_varlist *v, const char *query) {
+CGI_decode_query(CGI_varlist *v, const char *query, int ispost) {
     char *buf;
     const char *name, *value;
     int i, k, L, R, done;
@@ -819,7 +844,9 @@ CGI_decode_query(CGI_varlist *v, const char *query) {
                 value = buf + k;
             }
             if (name != 0) {
-                v = CGI_add_var(v, name, value);
+				if (!ispost || (ispost && postfieldcount++ < CCGI_MAX_POSTFIELDS)) {
+					v = CGI_add_var(v, name, value);
+				}
             }
             k = 0;
             name = value = 0;
@@ -876,7 +903,7 @@ CGI_get_cookie(CGI_varlist *v) {
 
 CGI_varlist *
 CGI_get_query(CGI_varlist *v) {
-    return CGI_decode_query(v, getenv("QUERY_STRING"));
+    return CGI_decode_query(v, getenv("QUERY_STRING"), 0);
 }
 
 /*
@@ -908,10 +935,16 @@ CGI_get_post(CGI_varlist *v, const char *template) {
 			return v;
 		}
 		len = (int)l;
+
+		if (len >= CCGI_MAX_CONTENTLENGTH) {
+			// if we hit max content length, kill process
+			exit(-1);
+		}
+		
         buf = (char *) ctr_heap_allocate(len + 1);
         if (fread(buf, 1, len, stdin) == len) {
 			buf[len] = 0;
-            v = CGI_decode_query(v, buf);
+            v = CGI_decode_query(v, buf, 1);
         }
         ctr_heap_free(buf);
     }

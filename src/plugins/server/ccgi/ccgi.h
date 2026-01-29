@@ -8,6 +8,9 @@
 #ifndef _CCGI_H
 #define _CCGI_H
 
+void CGI_set_max_postfields(size_t n);
+void CGI_set_max_contentlength(size_t n);
+
 typedef struct CGI_varlist CGI_varlist;
 
 typedef const char * const CGI_value;
@@ -17,7 +20,7 @@ char *CGI_encode_hex(const void *p, int len);
 void *CGI_decode_hex(const char *p, int *len);
 char *CGI_encode_query(const char *keep, ...);
 char *CGI_encode_varlist(CGI_varlist *v, const char *keep);
-CGI_varlist *CGI_decode_query(CGI_varlist *v, const char *query);
+CGI_varlist *CGI_decode_query(CGI_varlist *v, const char *query, int ispost);
 CGI_varlist *CGI_get_cookie(CGI_varlist *v);
 CGI_varlist *CGI_get_query(CGI_varlist *v);
 CGI_varlist *CGI_get_post(CGI_varlist *v, const char *template);
