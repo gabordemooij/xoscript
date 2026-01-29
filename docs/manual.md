@@ -1854,6 +1854,25 @@ UPLOAD data:
 >> filename := upload ? 1.
 ```
 
+## Maxpost/length
+
+The default max post fields is 40 and the default max content
+length is 1000. To configure differently on a per script basis:
+
+```
+Program setting: ['max-contentlength'] value: 1. 
+Program setting: ['max-postfields'] value: 1. 
+```
+
+{{note}}
+If content length exceeds the maximum, the
+process is killed because we cannot be sure
+the payload is safe anymore.
+{{/note}}
+
+
+
+
 ## Database
 
 The Database object can be used to query MariaDB/MySQL.
