@@ -685,6 +685,7 @@ ctr_object* ctr_program_waitforinput(ctr_object* myself, ctr_argument* argumentL
 	ctr_object* userInput;
 	buff = ctr_heap_allocate(page * sizeof(char));
 	while ((c = getchar()) != '\n') {
+		if (c == EOF) break;
 		buff[bytes] = c;
 		bytes++;
 		if (bytes >= page) {
