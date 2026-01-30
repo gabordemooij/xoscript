@@ -28,7 +28,6 @@ CGI_varlist *CGI_get_all(const char *template);
 CGI_varlist *CGI_add_var(CGI_varlist *v, const char *varname,
     const char *value);
 
-void CGI_free_varlist(CGI_varlist *v);
 CGI_value *CGI_lookup_all(CGI_varlist *v, const char *varname);
 const char *CGI_lookup(CGI_varlist *v, const char *varname);
 const char *CGI_first_name(CGI_varlist *v);

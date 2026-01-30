@@ -856,26 +856,6 @@ CGI_get_all(const char *template) {
     return v;
 }
 
-/* CGI_free_varlist() frees all memory used by variable list "v" */
-
-void
-CGI_free_varlist(CGI_varlist *v) {
-    CGI_val *val, *valnext;
-
-    if (v != 0) {
-        if (v->vector != 0) {
-            ctr_heap_free((void *)v->vector);
-        }
-        for (val = v->value; val != 0; val = valnext) {
-            valnext = val->next;
-            ctr_heap_free(val);
-        }
-        CGI_free_varlist(v->next); //@todo fix recursion
-        ctr_heap_free(v);
-    }
-}
-
-
 /*
  * CGI_lookup() searches variable list "v" for an entry named
  * "varname" and returns null if not found.  Otherwise we return the
