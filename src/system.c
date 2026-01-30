@@ -543,15 +543,23 @@ ctr_object* ctr_program_exit(ctr_object* myself, ctr_argument* argumentList) {
 ctr_object* ctr_program_alarm(ctr_object* myself, ctr_argument* argumentList) {
 	unsigned int s = (unsigned int) ctr_tonum(argumentList->object);
 	pid_t pid = fork();
-    if (pid < 0) {
+	if (pid < 0) {
         ctr_error("Unable to set alarm", 0);
         return CtrStdNil;
     }
-    if (pid == 0) {
-        sleep(s);
-        kill(getppid(), SIGKILL);
-        exit(0);
-    }
+    if (pid > 0) { // parent
+		double elapsed = 0.0;
+		while (elapsed < s) {
+			if (waitpid(pid, NULL, WNOHANG) > 0) {
+				exit(0); // early
+			}
+			usleep(100000);
+			elapsed += 0.1;
+		}
+		kill(pid, SIGKILL);
+		waitpid(pid, NULL, 0); // reap (no zombie) even if kill fails
+		exit(0);
+	}
     return myself;
 }
 
