@@ -21,6 +21,8 @@
 #include <termios.h>
 #include <sys/wait.h>
 #include <dlfcn.h>
+#include <signal.h>
+
 #define CTR_DIRSEP "/"
 #define CTR_ERR errno
 #define CTR_NEWLINE "\n"
