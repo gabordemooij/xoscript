@@ -231,7 +231,7 @@ void* ctr_heap_reallocate(void* oldptr, size_t size ) {
 	oldptr = (void*) ((char*) oldptr - q);
 	/* read memory size at beginning of old block */
 	block_width = (size_t*) oldptr;
-	old_size = *(block_width);
+	old_size = *(block_width); //includes the header
 
 	/* if somehow the requested size is less than the old size */
 	/* otherwise upon copying memory contents we will cross    */
@@ -239,7 +239,6 @@ void* ctr_heap_reallocate(void* oldptr, size_t size ) {
 	if (size <= old_size) {
 		return (void*) ((char*) oldptr + q);
 	}
-
 	/* update the ledger */
 	ctr_gc_alloc = ( ctr_gc_alloc - old_size ) + size;
 	/* Check whether we can afford to allocate this much */
