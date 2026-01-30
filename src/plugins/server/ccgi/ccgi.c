@@ -186,24 +186,6 @@ hex(int digit) {
     }
 }
 
-/* urlcount() returns the number of bytes needed to URL encode a string */
-
-static int
-urlcount(const char *p, const char *keep) {
-    int k;
-    for (k = 0; *p != 0; p++) {
-        if (isalnum((unsigned char)*p) || *p == ' ' ||
-            (keep != 0 && strchr(keep, *p) != 0))
-        {
-            k++;
-        }
-        else {
-            k += 3;
-        }
-    }
-    return k;
-}
-
 /*
  * urlencode() URL encodes string "in" into string "out" and
  * returns a pointer to the null byte at the end of "out"
@@ -491,7 +473,9 @@ read_multipart(CGI_varlist *v, const char *template) {
     /* read all the parts */
 
     for (;;) {
-
+		// if we hit max postfields stop
+        if (postfieldcount >= CCGI_MAX_POSTFIELDS) goto cleanup;
+		postfieldcount++;
         /* Scan header lines for the Content-Disposition: header */
 
         name = filename = 0;
@@ -575,9 +559,6 @@ read_multipart(CGI_varlist *v, const char *template) {
         {
             break;
         }
-
-        // if we hit max postfields stop
-        if (postfieldcount++ >= CCGI_MAX_POSTFIELDS) break;
     }
 
 cleanup:
@@ -645,109 +626,6 @@ CGI_decode_url(const char *p) {
     return out;
 }
 
-/*
- * CGI_encode_url() URL encodes a string and returns the result
- * in memory from malloc().
- */
-
-char *
-CGI_encode_url(const char *p, const char *keep) {
-    char *out;
-
-    if (p == 0) {
-        return 0;
-    }
-    out = ctr_heap_allocate(urlcount(p, keep) + 1);
-    urlencode(p, out, keep);
-    return out;
-}
-
-/*
- * CGI_encode_query() takes a variable arg list of strings
- * and encodes them into a URL query string of the form
- * name1=value1&name2=value2 ... where each name and value
- * is URL encoded.
- */
-
-char *
-CGI_encode_query(const char *keep, ...) {
-    char *out, *p;
-    va_list ap;
-    const char *name, *value;
-    int k;
-
-    /* calculate the size of the output string */
-
-    va_start(ap, keep);
-    k = 0;
-    while ((value = va_arg(ap, const char *)) != 0) {
-        k += urlcount(value, keep) + 1;
-    }
-    va_end(ap);
-    if (k == 0) {
-        return 0;
-    }
-    p = out = ctr_heap_allocate(k);
-
-    /* url encode each name=value pair */
-
-    va_start(ap, keep);
-    while ((name = va_arg(ap, const char *)) != 0 &&
-        (value = va_arg(ap, const char *)) != 0)
-    {
-        if (p != out) {
-            *p++ = '&';
-        }
-        p = urlencode(name, p, keep);
-        *p++ = '=';
-        p = urlencode(value, p, keep);
-    }
-    va_end(ap);
-    *p = 0;
-    return out;
-}
-
-/*
- * CGI_encode_varlist() encodes a CGI_varlist into a query
- * string of the form name1=value1&name2=value2 ... where
- * each name and value is URL encoded.
- */
-
-char *
-CGI_encode_varlist(CGI_varlist *vlist, const char *keep) {
-    char *out, *p;
-    CGI_varlist *v;
-    CGI_val *value;
-    int k = 0;
-
-    /* calculate size of the output string */
-
-    for (v = vlist; v != 0; v = v->next) {
-        for (value = v->value; value != 0; value = value->next) {
-            k += 2 + urlcount(v->varname, keep) +
-                urlcount(value->value, keep);
-        }
-    }
-    if (k == 0) {
-        return 0;
-    }
-    p = out = ctr_heap_allocate(k);
-
-    /* URL encode each name=value pair */
-
-    for (v = vlist; v != 0; v = v->next) {
-        for (value = v->value; value != 0; value = value->next) {
-            if (p != out) {
-                *p++ = '&';
-            }
-            p = urlencode(v->varname, p, keep);
-            *p++ = '=';
-            p = urlencode(value->value, p, keep);
-        }
-    }
-    *p = 0;
-    return out;
-}
 
 /*
  * CGI_add_var() adds a new variable name and value to variable list
@@ -992,7 +870,7 @@ CGI_free_varlist(CGI_varlist *v) {
             valnext = val->next;
             ctr_heap_free(val);
         }
-        CGI_free_varlist(v->next);
+        CGI_free_varlist(v->next); //@todo fix recursion
         ctr_heap_free(v);
     }
 }
