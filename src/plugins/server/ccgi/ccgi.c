@@ -467,6 +467,7 @@ read_multipart(CGI_varlist *v, const char *template) {
     
 
     size_t blen = strlen(token[1]);
+    if (blen == 0 || blen > 70) goto cleanup; //per rfc2046
     for (const char *p = token[1]; *p; p++) {
 		if (strchr(RFC_SAFE_BOUNDARY_CHARS, *p)==NULL) goto cleanup;
     }
