@@ -542,8 +542,17 @@ ctr_object* ctr_program_exit(ctr_object* myself, ctr_argument* argumentList) {
  */
 ctr_object* ctr_program_alarm(ctr_object* myself, ctr_argument* argumentList) {
 	unsigned int s = (unsigned int) ctr_tonum(argumentList->object);
-	alarm(s);
-	return myself;
+	pid_t pid = fork();
+    if (pid < 0) {
+        ctr_error("Unable to set alarm", 0);
+        return CtrStdNil;
+    }
+    if (pid == 0) {
+        sleep(s);
+        kill(getppid(), SIGKILL);
+        exit(0);
+    }
+    return myself;
 }
 
 /**
