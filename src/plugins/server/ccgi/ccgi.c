@@ -43,6 +43,9 @@
 #include "ccgi.h"
 #include "../../../xo.h"
 
+#define RFC_SAFE_BOUNDARY_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'()+_,-./:=?"
+
+
 size_t CCGI_MAX_POSTFIELDS = 0;
 size_t CCGI_MAX_CONTENTLENGTH = 0;
 
@@ -464,6 +467,9 @@ read_multipart(CGI_varlist *v, const char *template) {
     
 
     size_t blen = strlen(token[1]);
+    for (const char *p = token[1]; *p; p++) {
+		if (strchr(RFC_SAFE_BOUNDARY_CHARS, *p)==NULL) goto cleanup;
+    }
     boundary = ctr_heap_allocate(blen + 5);   /* "\r\n--" + boundary + '\0' */
     memcpy(boundary, "\r\n--", 4);
     memcpy(boundary + 4, token[1], blen + 1);
