@@ -2011,7 +2011,7 @@ gem in the jewel box and add a price tag.
 ```
 &lt;!-- cut:gem --&gt;
 &lt;img src="gem.gif"&gt;
-&lt;price&gt;$&lt;!-- slot:price --&gt;&lt;/price&gt;
+&lt;b&gt;$&lt;!-- slot:price --&gt;&lt;/b&gt;
 &lt;!-- /cut:gem --&gt;
 
 &lt;div id="box"&gt;
@@ -2030,6 +2030,16 @@ web out: tpl clean.
 
 The last line simply flushes the template as a string to the client
 along with the required HTTP headers.
+
+Result:
+
+```
+&lt;div id="box"&gt;
+&lt;img src="gem.gif"&gt;
+&lt;b&gt;$99&lt;/b&gt;
+&lt;/div&gt;
+```
+
 
 ## Passthru
 
