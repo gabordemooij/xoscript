@@ -541,6 +541,10 @@ ctr_object* ctr_program_exit(ctr_object* myself, ctr_argument* argumentList) {
  * @test637
  */
 ctr_object* ctr_program_alarm(ctr_object* myself, ctr_argument* argumentList) {
+	static int locked = 0;
+	// setting alarm is irreversible, attacker cannot disable it
+	if (locked != 0) return myself;
+	locked = 1;
 	unsigned int s = (unsigned int) ctr_tonum(argumentList->object);
 	pid_t pid = fork();
 	if (pid < 0) {
