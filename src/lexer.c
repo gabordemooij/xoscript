@@ -14,7 +14,6 @@ char* ctr_clex_oldptr;
 char* ctr_clex_olderptr;
 int ctr_clex_old_line_number = 0;
 int ctr_clex_older_line_number = 0;
-int ctr_clex_ignore_modes = 0;
 int ctr_clex_number_of_lines = 0;
 char ctr_clex_param_prefix_char;
 
@@ -369,11 +368,6 @@ char* ctr_clex_readstr() {
 		if ( c == '\n' ) ctr_clex_line_number ++;
 		if ( c == '\\' && !escape) {
 			escape = 1;
-			if (ctr_clex_ignore_modes) {
-				*(strbuff) = '\\';
-				ctr_clex_tokvlen += 1;
-				strbuff++;
-			}
 			ctr_code ++;
 			continue;
 		}
@@ -435,27 +429,27 @@ char* ctr_clex_readstr() {
 					break;
 			}
 		}
-		else if (!ctr_clex_ignore_modes && !escape && strncmp(ctr_code, "↵", 3)==0) {
+		else if (!escape && strncmp(ctr_code, "↵", 3)==0) {
 			ctr_code += 3;
 			ctr_clex_tokvlen += 1;
 			*(strbuff) = '\n';
 			strbuff++;
 		}
-		else if (!ctr_clex_ignore_modes && !escape && strncmp(ctr_code, "⇿", 3)==0) {
+		else if (!escape && strncmp(ctr_code, "⇿", 3)==0) {
 			ctr_code += 3;
 			ctr_clex_tokvlen += 1;
 			*(strbuff) = '\t';
 			strbuff++;
 		}
 		else if (strncmp(ctr_code, CTR_DICT_QUOT_CLOSE, ctr_clex_keyword_qc_len)==0) {
-			if (!escape && !ctr_clex_ignore_modes) nesting--;
+			if (!escape) nesting--;
 			strncpy(strbuff, CTR_DICT_QUOT_CLOSE, ctr_clex_keyword_qc_len);
 			ctr_code += ctr_clex_keyword_qc_len;
 			ctr_clex_tokvlen += ctr_clex_keyword_qc_len;
 			strbuff += ctr_clex_keyword_qc_len;
 		}
 		else if (strncmp(ctr_code, CTR_DICT_QUOT_OPEN, ctr_clex_keyword_qo_len)==0) {
-			if (!escape && !ctr_clex_ignore_modes) nesting++;
+			if (!escape) nesting++;
 			strncpy(strbuff, CTR_DICT_QUOT_OPEN, ctr_clex_keyword_qo_len);
 			ctr_code += ctr_clex_keyword_qo_len;
 			ctr_clex_tokvlen += ctr_clex_keyword_qo_len;
