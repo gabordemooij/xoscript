@@ -359,7 +359,6 @@ char* ctr_clex_readstr() {
 	strbuff = (char*) ctr_heap_allocate(memblock);
 	beginbuff = strbuff;
 	escape = 0;
-	/* ignore_modes is used for translator, then you dont want to interpret escape sequence but copy -verbatim- */
 	while(
 		(ctr_code<ctr_eofcode-ctr_clex_keyword_qc_len) &&
 		(strncmp(ctr_code, CTR_DICT_QUOT_CLOSE, ctr_clex_keyword_qc_len)!=0 || nesting>0 || escape)
