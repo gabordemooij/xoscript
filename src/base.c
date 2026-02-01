@@ -1440,7 +1440,7 @@ ctr_object* ctr_internal_number_to_string(ctr_object* myself, ctr_argument* argu
 		qual = ctr_internal_object_find_property( myself, qname, CTR_CATEGORY_PRIVATE_PROPERTY );
 		if (qual) {
 			qual = ctr_internal_cast2string( qual );
-			q = ctr_heap_allocate( (bufSize + qual->value.svalue->vlen) * sizeof( char ) );
+			q = ctr_heap_allocate( (bufSize + qual->value.svalue->vlen + 1) * sizeof( char ) ); //+1 for extra space between
 		} else {
 			q = ctr_heap_allocate( bufSize * sizeof( char ) );
 		}
