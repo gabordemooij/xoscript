@@ -1430,10 +1430,11 @@ ctr_object* ctr_internal_number_to_string(ctr_object* myself, ctr_argument* argu
 	char* q;
 	char* p;
 	char* buf;
+	const char* fmt = "%.10f";
 	int bufSize;
 	ctr_object* qual;
 	ctr_object* stringObject;
-	bufSize = snprintf(NULL, 0, "%.10f", o->value.nvalue) + 1; // measure required buffer size
+	bufSize = snprintf(NULL, 0, fmt, o->value.nvalue) + 1; // measure required buffer size
 	if (!flat) {
 		qual = ctr_internal_object_property( myself, CTR_DICT_QUALIFIER, NULL);
 		if (qual == CtrStdNil) qual = NULL;
@@ -1445,7 +1446,7 @@ ctr_object* ctr_internal_number_to_string(ctr_object* myself, ctr_argument* argu
 		}
 	}
 	buf = ctr_heap_allocate( bufSize );
-	snprintf( buf, bufSize, "%.10f", o->value.nvalue );
+	snprintf( buf, bufSize, fmt, o->value.nvalue );
 	p = buf + strlen(buf) - 1;
 	//this loop only works with snprintf %0.10f, '0' would cause buffer underflow
 	while ( *p == '0' && *p-- != '.' );
