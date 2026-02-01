@@ -1717,39 +1717,35 @@ ctr_object* ctr_string_new(ctr_object* myself, ctr_argument* argumentList) {
  * @test467
  */
 
+
+// turns a string into executable code, by surrounding
+// it with literal str boundaries
 ctr_object* ctr_string_to_code(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* answer;
-	ctr_size i;
-	ctr_size j;
-	ctr_size q;
-	char* str;
-	char* quotes = (char*) ctr_heap_allocate( myself->value.svalue->vlen );
-	ctr_size len = myself->value.svalue->vlen;
-	j = 0;
-	for(i = 0; i < myself->value.svalue->vlen; i++ ) {
-		if (
-			strncmp((myself->value.svalue->value + i),  CTR_DICT_QUOT_OPEN,  ctr_clex_keyword_qo_len)==0 ||
-			strncmp((myself->value.svalue->value + i),  CTR_DICT_QUOT_CLOSE, ctr_clex_keyword_qc_len)==0
-		) {
-			len++;
-			quotes[j++] = i;
+	char* q1 = CTR_DICT_QUOT_OPEN; //quotes can be asymetric and differ in length
+	char* q2 = CTR_DICT_QUOT_CLOSE; //because the scripting syntax may be localized
+	int l1 = ctr_clex_keyword_qo_len;
+	int l2 = ctr_clex_keyword_qc_len;
+	char* v = myself->value.svalue->value;
+	size_t vlen = myself->value.svalue->vlen;
+	// calculate the maximum str length, worst case 1 escape for every char (=*2)
+	size_t s = (vlen * 2 + l1 + l2 + 1);
+	char* r = ctr_heap_allocate(s); //zeroed so ends with NUL already
+	char* d = r;
+	memcpy(d, q1,l1); d += l1;
+	//q1 and q2 cannot be equal and may not overlap
+	for(size_t i = 0; i < vlen; i++ ) {
+		if ((i <= vlen - l1) && strncmp(v + i, q1, l1)==0) {
+			*d++ = '\\'; //prefix the next sequence with escape char
 		}
-	}
-	str = (char*) ctr_heap_allocate( len + ctr_clex_keyword_qo_len + ctr_clex_keyword_qc_len + 1 );
-	q = j; j = 0;
-	strcpy(str, CTR_DICT_QUOT_OPEN);
-	for(i = 0; i < myself->value.svalue->vlen; i++ ) {
-		if (j < q && i == quotes[j]) {
-			str[ctr_clex_keyword_qo_len + i + j] = '\\';
-			j++;
+		if ((i <= vlen - l2) && strncmp(v + i, q2, l2)==0) {
+			*d++ = '\\'; //prefix the next sequence with escape char
 		}
-		str[ctr_clex_keyword_qo_len + i + j] = myself->value.svalue->value[i];
+		*d++ = v[i]; //just copy from here
 	}
-	strcpy((str + ctr_clex_keyword_qo_len + i + j), CTR_DICT_QUOT_CLOSE);
-	answer = ctr_build_string_from_cstring( str );
-	ctr_heap_free(quotes);
-	ctr_heap_free(str);
-	return answer;
+	memcpy(d, q2, l2);
+	ctr_object* result = ctr_build_string_from_cstring(r);
+	ctr_heap_free(r);
+	return result;
 }
 
 /**
