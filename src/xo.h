@@ -23,6 +23,10 @@
 #include <dlfcn.h>
 #include <signal.h>
 
+#ifdef LIBBSD 
+#include <bsd/string.h>
+#endif
+
 #define CTR_DIRSEP "/"
 #define CTR_ERR errno
 #define CTR_NEWLINE "\n"
