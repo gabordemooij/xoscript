@@ -1431,13 +1431,12 @@ ctr_object* ctr_internal_number_to_string(ctr_object* myself, ctr_argument* argu
 	char* p;
 	char* buf;
 	int bufSize;
-	ctr_object* qname;
 	ctr_object* qual;
 	ctr_object* stringObject;
 	bufSize = snprintf(NULL, 0, "%.10f", o->value.nvalue) + 1; // measure required buffer size
 	if (!flat) {
-		qname = ctr_build_string_from_cstring( CTR_DICT_QUALIFIER );
-		qual = ctr_internal_object_find_property( myself, qname, CTR_CATEGORY_PRIVATE_PROPERTY );
+		qual = ctr_internal_object_property( myself, CTR_DICT_QUALIFIER, NULL);
+		if (qual == CtrStdNil) qual = NULL;
 		if (qual) {
 			qual = ctr_internal_cast2string( qual );
 			q = ctr_heap_allocate( (bufSize + qual->value.svalue->vlen + 1) * sizeof( char ) ); //+1 for extra space between
