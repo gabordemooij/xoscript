@@ -389,6 +389,14 @@ ctr_object* ctr_program_tostring(ctr_object* myself, ctr_argument* argumentList)
 	return ctr_build_string_from_cstring(CTR_MSG_WELCOME);
 }
 
+ctr_object* ctr_program_getcwd(ctr_object* myself, ctr_argument* argumentList) {
+	char* buf = ctr_heap_allocate(PATH_MAX + 1);
+	getcwd(buf, PATH_MAX);
+	ctr_object* path = ctr_build_string_from_cstring(buf);
+	ctr_heap_free(buf);
+	return path;
+}
+
 
 /**
  * @def

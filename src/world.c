@@ -991,6 +991,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_ALARM_SET ), &ctr_program_alarm );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "pledge:" ), &ctr_program_pledge );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "unveil:permissions:" ), &ctr_program_unveil );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "path" ), &ctr_program_getcwd );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PROGRAM ), CtrStdCommand, 0 );
 	CtrStdCommand->link = CtrStdObject;
 	CtrStdCommand->info.sticky = 1;
