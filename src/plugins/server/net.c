@@ -71,11 +71,23 @@ ctr_object* ctr_network_basic_text_send(ctr_object* myself, ctr_argument* argume
     return result;
 }
 
+ctr_object* ctr_network_get(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_argument a;
+	ctr_argument u;
+	a.object = CtrStdNil;
+	u.object = argumentList->object;
+	a.next = &u;
+	u.next = NULL;
+	return ctr_network_basic_text_send(myself, &a);
+}
+
+
 void begin_net() {
 	CtrCurlObject = ctr_network_new(CtrStdObject, NULL);
 	CtrCurlObject->link = CtrStdObject;
 	ctr_internal_create_func(CtrCurlObject, ctr_build_string_from_cstring( "new" ), &ctr_network_new );
 	ctr_internal_create_func(CtrCurlObject, ctr_build_string_from_cstring( "post:to:" ), &ctr_network_basic_text_send );
+	ctr_internal_create_func(CtrCurlObject, ctr_build_string_from_cstring( "get:" ), &ctr_network_get );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Net" ), CtrCurlObject, CTR_CATEGORY_PUBLIC_PROPERTY);	
 }
 
