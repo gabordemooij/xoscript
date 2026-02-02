@@ -4,58 +4,6 @@ ctr_size ctr_program_length;
 uint64_t    ctr_cwlk_subprogram;
 int ctr_in_message;
 
-/**
- * @def
- * None
- *
- *
- * @test375
- */
-
-char* ctr_international_number(char* old_number, char* new_number) {
-	char i, j, k, old_length;
-	j = 0;
-	k = 0;
-	old_length = strlen( old_number );
-	for( i = 0; i < old_length; i ++ ) {
-		if ( *(old_number + i) == '.' ) {
-			strncpy( new_number + j , CTR_DICT_NUM_DEC_SEP, ctr_clex_keyword_num_sep_dec_len);
-			j += ctr_clex_keyword_num_sep_dec_len;
-			continue;
-		}
-		if (isdigit(*(old_number + i))) {
-			k++;
-		}
-		*(new_number + j) = *(old_number + i);
-		j++;
-	}
-	return new_number;
-}
-
-/**
- * Format a national number to international notation.
- */
-char* ctr_national_number(char* old_number, char* new_number) {
-	char i, j, old_length;
-	j = 0;
-	old_length = strlen( old_number );
-	for( i = 0; i < old_length; i ++ ) {
-		if ( strncmp(old_number+i, CTR_DICT_NUM_THO_SEP, ctr_clex_keyword_num_sep_tho_len) == 0 ) {
-			i += (ctr_clex_keyword_num_sep_tho_len - 1);
-			continue;
-		}
-		if ( strncmp(old_number+i, CTR_DICT_NUM_DEC_SEP, ctr_clex_keyword_num_sep_dec_len) == 0 ) {
-			i += (ctr_clex_keyword_num_sep_tho_len - 1);
-			*(new_number + j) = '.';
-			j++;
-			continue;
-		}
-		*(new_number + j) = *(old_number + i);
-		j++;
-	}
-	return new_number;
-}
-
 
 
 /**
@@ -1426,45 +1374,31 @@ ctr_object* ctr_number_bit_xor(ctr_object* myself, ctr_argument* argumentList) {
  * - ctr_number_to_string_flat
  */
 ctr_object* ctr_internal_number_to_string(ctr_object* myself, ctr_argument* argumentList, char flat) {
-	ctr_object* o = myself;
-	char* q;
-	char* p;
-	char* buf;
 	const char* fmt = "%.10f";
-	int bufSize;
-	ctr_object* qual;
-	ctr_object* stringObject;
-	bufSize = snprintf(NULL, 0, fmt, o->value.nvalue) + 1; // measure required buffer size
+	char* buf;
+	size_t s;
+	size_t i;
+	s = snprintf(NULL, 0, fmt, myself->value.nvalue);
+	buf = ctr_heap_allocate(s + 1);
+	snprintf(buf, s + 1, fmt, myself->value.nvalue);
+	char* p = buf + (strlen(buf) - 1);
+	while(p > buf && *p == '0') p--;
+	if (p > buf && *p == '.') p--;
 	if (!flat) {
-		qual = ctr_internal_object_property( myself, CTR_DICT_QUALIFIER, NULL);
-		if (qual == CtrStdNil) qual = NULL;
-		if (qual) {
-			qual = ctr_internal_cast2string( qual );
-			q = ctr_heap_allocate( (bufSize + qual->value.svalue->vlen + 1) * sizeof( char ) ); //+1 for extra space between
-		} else {
-			q = ctr_heap_allocate( bufSize * sizeof( char ) );
+		ctr_object* qual = ctr_internal_object_property( myself, CTR_DICT_QUALIFIER, NULL);
+		if (qual != CtrStdNil) {
+			qual = ctr_internal_cast2string(qual);
+			i = p - buf;
+			buf = ctr_heap_reallocate(buf, i + 1 + qual->value.svalue->vlen);
+			p = buf + i;
+			*(p + 1) = ' ';
+			memcpy(p + 2,  qual->value.svalue->value, qual->value.svalue->vlen);
+			p += 1 + qual->value.svalue->vlen;
 		}
 	}
-	buf = ctr_heap_allocate( bufSize );
-	snprintf( buf, bufSize, fmt, o->value.nvalue );
-	p = buf + strlen(buf) - 1;
-	//this loop only works with snprintf %0.10f, '0' would cause buffer underflow
-	while ( *p == '0' && *p-- != '.' );
-	*( p + 1 ) = '\0';
-	if ( *p == '.' ) *p = '\0';
-	if (!flat) {
-		q = ctr_international_number( buf, q );
-		if (qual) {
-			strcat(q, " ");
-			strncat(q, qual->value.svalue->value, qual->value.svalue->vlen);
-		}
-		stringObject = ctr_build_string_from_cstring(q);
-		ctr_heap_free( q );
-	} else {
-		stringObject = ctr_build_string_from_cstring(buf);
-	}
-	ctr_heap_free( buf );
-	return stringObject;
+	ctr_object* r = ctr_build_string(buf, ((p+1) - buf));
+	ctr_heap_free(buf);
+	return r;
 }
 
 /**
