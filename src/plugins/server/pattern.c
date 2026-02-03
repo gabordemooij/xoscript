@@ -140,7 +140,7 @@ ctr_object* ctr_server_pcre2_new(ctr_object* myself, ctr_argument* argumentList)
  */
 ctr_object* ctr_server_pcre2_match_do(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* prop = ctr_internal_object_property(myself, "_pattern",NULL);
-	if (!prop) return CtrStdNil;
+	if (prop == CtrStdNil) return CtrStdNil;
 	ctr_object* answer = CtrStdNil;
 	char* pattern_str = ctr_heap_allocate_cstring(prop);
 	char* subject_str = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
