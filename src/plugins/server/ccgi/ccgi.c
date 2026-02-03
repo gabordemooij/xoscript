@@ -358,6 +358,11 @@ copyvalue(const char *boundary, FILE *in, const int wantfile,
     matched = k = 0;
 
     while ((c = getc(in)) != EOF) {
+		contentlengthcount++;
+		if (contentlengthcount >= CCGI_MAX_CONTENTLENGTH) {
+			// if we hit max content length, kill process
+			exit(-1);
+		}
 
         /*
          * If we partially match the boundary, then we copy the
