@@ -115,6 +115,7 @@ ctr_object* ctr_format_new_set(ctr_object* myself, ctr_argument* argumentList) {
 
 ctr_object* ctr_format_apply_to(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* format = ctr_internal_object_property(myself, "_format", NULL);
+	if (format == CtrStdNil) return CtrStdNil;
 	char* format_str = ctr_heap_allocate_cstring(format);
 	ctr_object* value = argumentList->object;
 	char* result = "";
