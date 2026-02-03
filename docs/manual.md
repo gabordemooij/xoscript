@@ -2330,7 +2330,46 @@ You can see the result here:
 
 https://xoscript.com/test.xo
 
+## Sophisticated Templates
 
+This is an example of how you make a select in a form:
+
+```
+&gt;&gt; htmlstr := ['
+&lt;html&gt;
+&lt;body&gt;
+&lt;form&gt;
+&lt;!-- cut:products --&gt;
+&lt;select name="products"&gt;
+	&lt;!-- cut:product --&gt;
+	&lt;option value="&lt;!-- slot:value -->"&gt;
+		&lt;!-- slot:name --&gt;
+	&lt;/option&gt;
+	&lt;!-- /cut:product --&gt;
+	&lt;!-- paste:product --&gt;
+&lt;/select&gt;
+&lt;!-- /cut:products --&gt;
+&lt;!-- paste:products --&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+'].
+
+&gt;&gt; tpl := Template new: htmlstr.
+&gt;&gt; menu := List new ; ['pizza'] ; ['pasta'].
+&gt;&gt; products := tpl cut: ['products'], copy.
+&gt;&gt; product := products cut: ['product'], copy.
+
+menu each: { :n :item
+	products paste: (
+		product copy
+		value: n,
+		name: item
+	) at: ['product'].
+}.
+
+tpl paste: products at: ['products'].
+```
 
 ## FizzBuzz
 
