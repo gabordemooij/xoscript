@@ -213,7 +213,7 @@ void begin_http(){
 	char* maxcontentlength_str = getenv("max-contentlength");
 	size_t maxcontentlength = 0;
 	if (maxcontentlength_str == NULL) {
-		maxcontentlength_str = "1000";
+		maxcontentlength_str = "2000000"; //2 MB
 	}
 	maxcontentlength = (size_t) atoi(maxcontentlength_str);
 	CGI_set_max_contentlength(maxcontentlength);
