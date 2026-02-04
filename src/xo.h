@@ -857,6 +857,9 @@ extern ctr_object* ctr_hexhelper_new(ctr_object* myself, ctr_argument* argumentL
 extern ctr_object* ctr_hexhelper_parse(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_octhelper_new(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_octhelper_parse(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_binhelper_new(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_binhelper_parse(ctr_object* myself, ctr_argument* argumentList);
+
 
 
 /* macros */
