@@ -812,10 +812,6 @@ extern int ctr_heap_size( void* ptr, size_t* size );
 extern ctr_object* ctr_error( char* error_string, int error_code );
 #endif
 
-#ifdef WINDOWS_ERROR_SYSTEM
-extern ctr_object* ctr_error( char* error_string, uint16_t error_code );
-#endif
-
 extern ctr_object* ctr_error_text( char* error_string );
 
 extern char ctr_deserialize_mode;

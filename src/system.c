@@ -880,27 +880,11 @@ ctr_object* ctr_clock_get_time( ctr_object* myself, ctr_argument* argumentList, 
 			ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_ZONE), CTR_CATEGORY_PRIVATE_PROPERTY )
 		)
 	);
-	
-	#ifdef WIN
-	char tz[100];
-	sprintf(tz, "TZ=%s", zone);
-	putenv(tz);
-	tzset();
-	#else
 	setenv( "TZ", zone, 1 );
 	tzset();
-	#endif
-	
-	date = localtime( &timeStamp );
-	
-	#ifdef WIN
-	putenv("TZ=UTC"); 
-	tzset();
-	#else
+	date = localtime( &timeStamp );	
 	setenv( "TZ", "UTC", 1 );
 	tzset();
-	#endif
-	
 	switch( part ) {
 		case 'Y':
 			answer = ctr_build_number_from_float( (ctr_number) date->tm_year + 1900 );
@@ -939,15 +923,8 @@ ctr_object* ctr_clock_set_time( ctr_object* myself, ctr_argument* argumentList, 
 			ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_ZONE), CTR_CATEGORY_PRIVATE_PROPERTY )
 		)
 	);
-	#ifdef WIN
-	char tz[100];
-	sprintf(tz, "TZ=%s", zone);
-	putenv(tz);
-	tzset();
-	#else
 	setenv( "TZ", zone, 1 );
 	tzset();
-	#endif
 	date = localtime( &timeStamp );
 	switch( part ) {
 		case 'Y':
@@ -987,13 +964,8 @@ ctr_object* ctr_clock_set_time( ctr_object* myself, ctr_argument* argumentList, 
 	date->tm_isdst = -1;
 	ctr_heap_free( zone );
 	cr->time = mktime(date);
-	#ifdef WIN
-	putenv("TZ=UTC"); 
-	tzset();
-	#else
 	setenv( "TZ", "UTC", 1 );
 	tzset();
-	#endif
 	return myself;
 }
 
@@ -1365,27 +1337,15 @@ ctr_object* ctr_clock_to_number( ctr_object* myself, ctr_argument* argumentList 
 void ctr_clock_init( ctr_object* clock ) {
 	ctr_resource* rs = ctr_heap_allocate(sizeof(ctr_resource));
 	ctr_clock* clock_res = ctr_heap_allocate(sizeof(ctr_clock));
-	#ifdef WIN
-	char tz[100];
-	sprintf(tz, "TZ=%s", CTR_STDTIMEZONE);
-	putenv(tz);
-	tzset();
-	#else
 	setenv( "TZ", CTR_STDTIMEZONE, 1 );
 	tzset();
-	#endif
 	clock_res->time = time(NULL);
 	if (clock_res->time == -1) {
 		//failure to set, results in 0
 		clock_res->time = 0;
 	}
-	#ifdef WIN
-	putenv("TZ=UTC");
-	tzset();
-	#else
 	setenv( "TZ", "UTC", 1 );
 	tzset();
-	#endif
 	rs->type = CTR_OBJECT_RESOURCE_TIME;
 	rs->ptr = (void*) clock_res;
 	rs->destructor = ctr_internal_destructor_clock;

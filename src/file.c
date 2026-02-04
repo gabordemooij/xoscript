@@ -288,9 +288,6 @@ ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList) {
 		strcat( fullPath, entry->d_name);
 		if (realpath( fullPath, pathBuf )) {
 		/* lstat is slow, but we have no choice, there is no other way to keep this portable */
-		#ifdef WIN
-			putArgumentList->object = ctr_build_string_from_cstring( CTR_MSG_DSC_FILE );
-		#else
 		lstat(pathBuf, &st);
 		if (S_ISREG(st.st_mode))
 			putArgumentList->object = ctr_build_string_from_cstring( CTR_MSG_DSC_FILE );
@@ -308,7 +305,6 @@ ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList) {
 			putArgumentList->object = ctr_build_string_from_cstring( CTR_MSG_DSC_NPIP );
 		else
 			putArgumentList->object = ctr_build_string_from_cstring( CTR_MSG_DSC_OTHR );
-		#endif
 		ctr_map_put(fileListItem, putArgumentList);
 		addArgumentList->object = fileListItem;
 		ctr_array_push(fileList, addArgumentList);
