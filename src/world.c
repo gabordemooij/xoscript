@@ -27,6 +27,8 @@ ctr_object* CtrStdPath;
 ctr_object* CtrStdShellCommand;
 ctr_object* CtrStdINT64;
 ctr_object* CtrStdHexHelper;
+ctr_object* CtrStdOctHelper;
+
 int ctr_message_stack_index = 0;
 ctr_object* ctr_message_stack[301];
 
@@ -817,6 +819,14 @@ void ctr_initialize_world() {
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Hx" ), CtrStdHexHelper, 0 );
 	CtrStdHexHelper->link = CtrStdObject;
 	CtrStdHexHelper->info.sticky = 1;
+	
+	/* Oct Helper */
+	ctr_object* CtrStdOctHelper = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
+	ctr_internal_create_func(CtrStdOctHelper, ctr_build_string_from_cstring(CTR_DICT_NEW), &ctr_octhelper_new );
+	ctr_internal_create_func(CtrStdOctHelper, ctr_build_string_from_cstring(CTR_DICT_RESPOND_TO), &ctr_octhelper_parse );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Oct" ), CtrStdOctHelper, 0 );
+	CtrStdOctHelper->link = CtrStdObject;
+	CtrStdOctHelper->info.sticky = 1;
 
 	/* String */
 	CtrStdString = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);

@@ -855,6 +855,9 @@ extern ctr_object* ctr_int64_higherEqThan(ctr_object* myself, ctr_argument* argu
 
 extern ctr_object* ctr_hexhelper_new(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_hexhelper_parse(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_octhelper_new(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_octhelper_parse(ctr_object* myself, ctr_argument* argumentList);
+
 
 /* macros */
 #define CTR_DEFINE_SETTER_CAST(funcname, propname, castfunc) \

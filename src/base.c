@@ -2690,3 +2690,8 @@ CTR_DEFINE_CLASS_OTOBJECT(ctr_hexhelper_new)
 ctr_object* ctr_hexhelper_parse(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_num_parse(myself, argumentList, 16);
 }
+
+CTR_DEFINE_CLASS_OTOBJECT(ctr_octhelper_new)
+ctr_object* ctr_octhelper_parse(ctr_object* myself, ctr_argument* argumentList) {
+	return ctr_num_parse(myself, argumentList, 8);
+}
