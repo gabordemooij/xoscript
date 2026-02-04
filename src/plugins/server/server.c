@@ -430,6 +430,60 @@ ctr_object* ctr_server_passthru_set(ctr_object* myself, ctr_argument* argumentLi
 	return myself;
 }
 
+ctr_object* ctr_server_mimetype(ctr_object* myself, ctr_argument* argumentList) {
+	char* pathstr;
+	char peekbuf[12];
+	ctr_object* mimetype = CtrStdNil;
+	pathstr = ctr_heap_allocate_cstring(
+		ctr_internal_cast2string(argumentList->object)
+	);
+	FILE* f = fopen(pathstr,"rb");
+	ctr_heap_free(pathstr);
+	if (f == NULL) {
+		ctr_error("Unable to open file", 0);
+		return CtrStdNil;
+	}
+	int bytes_read = fread(peekbuf, 1, 12, f);
+	fclose(f);
+	int m = ctr_internal_server_detect_mimetype((unsigned char*)peekbuf, bytes_read);
+	switch(m) {
+		case CTR_SERVER_MIMETYPE_UNKNOWN:
+			mimetype = ctr_build_string_from_cstring("unknown");
+			break;
+		case CTR_SERVER_MIMETYPE_JPEG:
+			mimetype = ctr_build_string_from_cstring("jpg");
+			break;
+		case CTR_SERVER_MIMETYPE_PNG:
+			mimetype = ctr_build_string_from_cstring("png");
+			break;
+		case CTR_SERVER_MIMETYPE_GIF:
+			mimetype = ctr_build_string_from_cstring("gif");
+			break;
+		case CTR_SERVER_MIMETYPE_WEBP:
+			mimetype = ctr_build_string_from_cstring("webp");
+			break;
+		case CTR_SERVER_MIMETYPE_MP3:
+			mimetype = ctr_build_string_from_cstring("mp3");
+			break;
+		case CTR_SERVER_MIMETYPE_MP4:
+			mimetype = ctr_build_string_from_cstring("mp4");
+			break;
+		case CTR_SERVER_MIMETYPE_WEBM:
+			mimetype = ctr_build_string_from_cstring("webm");
+			break;
+		case CTR_SERVER_MIMETYPE_ZIP:
+			mimetype = ctr_build_string_from_cstring("zip");
+			break;
+		case CTR_SERVER_MIMETYPE_GZIP:
+			mimetype = ctr_build_string_from_cstring("gzip");
+			break;
+		case CTR_SERVER_MIMETYPE_PDF:
+			mimetype = ctr_build_string_from_cstring("pdf");
+			break;
+	}
+	return mimetype;
+}
+
 void begin() {
 	ctr_internal_server_init();
 	serverObject = NULL;
@@ -442,6 +496,7 @@ void begin() {
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "base64-decode:" ), &ctr_server_base64decode_set );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "link:" ), &ctr_server_link_set );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "passthru:prefix:" ), &ctr_server_passthru_set );
+	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "mimetype:" ), &ctr_server_mimetype );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Server" ), serverObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	//@todo move to core
 	formatObject = NULL;
