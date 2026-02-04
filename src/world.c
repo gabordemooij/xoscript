@@ -26,6 +26,7 @@ ctr_object* CtrStdSlurp;
 ctr_object* CtrStdPath;
 ctr_object* CtrStdShellCommand;
 ctr_object* CtrStdINT64;
+ctr_object* CtrStdHexHelper;
 int ctr_message_stack_index = 0;
 ctr_object* ctr_message_stack[301];
 
@@ -808,6 +809,14 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring(CTR_DICT_TOSTRING), &ctr_int64_to_string );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_INT64 ), CtrStdINT64, 0 );
 	CtrStdINT64->info.sticky = 1;
+
+	/* Hex Helper */
+	ctr_object* CtrStdHexHelper = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
+	ctr_internal_create_func(CtrStdHexHelper, ctr_build_string_from_cstring(CTR_DICT_NEW), &ctr_hexhelper_new );
+	ctr_internal_create_func(CtrStdHexHelper, ctr_build_string_from_cstring(CTR_DICT_RESPOND_TO), &ctr_hexhelper_parse );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Hx" ), CtrStdHexHelper, 0 );
+	CtrStdHexHelper->link = CtrStdObject;
+	CtrStdHexHelper->info.sticky = 1;
 
 	/* String */
 	CtrStdString = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);

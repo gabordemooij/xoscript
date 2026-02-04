@@ -2597,3 +2597,96 @@ ctr_object* ctr_int64_higherEqThan(ctr_object* myself, ctr_argument* argumentLis
 	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(myINT64 >= otherINT64);
 }
+
+int ctr_internal_parsenum(char *str, int base, double_t* ret) {
+	if (!str || !ret || base < 2 || base > 36) {
+        return -1;
+    }
+    while (isspace((unsigned char)*str)) {
+        str++;
+    }
+    int sign = 1;
+    if (*str == '-') {
+        sign = -1;
+        str++;
+    } else if (*str == '+') {
+        str++;
+    }
+    double_t result = 0.0;
+    while (*str) {
+        int digit;
+        if (isdigit((unsigned char)*str)) {
+            digit = *str - '0';
+        } else if (isalpha((unsigned char)*str)) {
+            digit = tolower(*str) - 'a' + 10;
+        } else {
+            break;
+        }
+        if (digit >= base) break;
+        result = result * base + digit;
+        str++;
+    }
+    // Fractional part
+    if (*str == '.') {
+        str++;
+        double_t frac = 1.0 / base;
+
+        while (*str) {
+            int digit;
+            if (isdigit((unsigned char)*str)) {
+                digit = *str - '0';
+            } else if (isalpha((unsigned char)*str)) {
+                digit = tolower(*str) - 'a' + 10;
+            } else {
+                break;
+            }
+
+            if (digit >= base) break;
+
+            result += digit * frac;
+            frac /= base;
+            str++;
+        }
+    }
+
+    *ret = sign * result;
+    return 0;
+}
+
+
+ctr_object* ctr_num_parse(ctr_object* myself, ctr_argument* argumentList, int checkbase) {
+	char* str = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	ctr_object* answer = CtrStdNil;
+	double_t n = 0;
+	int err = -1;
+	char prefix;
+	int base = 10;
+	size_t len = strlen(str);
+	if (len > 1) {
+		prefix = *str;
+		if (len > 2 && prefix == '-') { //-x2
+			prefix = *(str + 1);
+			*(str + 1) = '-'; // copy the sign
+		}
+		else if (len > 2 && prefix == '+') { //+x2
+			prefix = *(str + 1);
+			*(str + 1) = '+'; // copy the sign
+		}
+		if (prefix == 'b')      base = 2;
+		else if (prefix == 'x') base = 16;
+		else if (prefix == 'o') base = 8;
+		if (base == checkbase) err = ctr_internal_parsenum(str + 1, base, &n);
+	}
+	ctr_heap_free(str);
+	if (err) {
+		ctr_error("Conversion failed", 0);
+	} else {
+		answer = ctr_build_number_from_float(n);
+	}
+	return answer;
+}
+
+CTR_DEFINE_CLASS_OTOBJECT(ctr_hexhelper_new)
+ctr_object* ctr_hexhelper_parse(ctr_object* myself, ctr_argument* argumentList) {
+	return ctr_num_parse(myself, argumentList, 16);
+}
