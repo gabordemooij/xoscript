@@ -6,6 +6,9 @@ ulimit -S -c unlimited
 CITRINE_MEMORY_LIMIT_MB=10
 export CITRINE_MEMORY_LIMIT_MB
 
+PLATFORMCODE="obsd"
+export PLATFORMCODE
+
 BUILD="${1:-build}"
 
 if [[ $BUILD == "build" ]]; then
@@ -93,7 +96,7 @@ unittest() {
 
 # select range
 FROM=1
-TIL=654
+TIL=655
 
 # run tests for linux
 pushd build/OpenBSD/bin

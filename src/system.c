@@ -519,14 +519,17 @@ ctr_object* ctr_program_num_of_args(ctr_object* myself, ctr_argument* argumentLi
 	return ctr_build_number_from_float( (ctr_number) ctr_argc );
 }
 
-//@todo just custom platform string from compilation
 ctr_object* ctr_program_platform(ctr_object* myself, ctr_argument* argumentList) {
-	const char* platform_name;
-	platform_name = "lin64";
-	#ifdef OpenBSD
-	platform_name = "obsd";
+
+	#ifdef Linux
+	#define PLATFORM_NAME "lin64"
 	#endif
-	return ctr_build_string_from_cstring(platform_name);
+
+	#ifdef OpenBSD
+	#define PLATFORM_NAME "obsd"
+	#endif
+
+	return ctr_build_string_from_cstring(PLATFORM_NAME);
 }
 
 /**

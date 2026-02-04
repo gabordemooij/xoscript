@@ -6,6 +6,9 @@ ulimit -S -c unlimited
 CITRINE_MEMORY_LIMIT_MB=10
 export CITRINE_MEMORY_LIMIT_MB
 
+PLATFORMCODE="lin64"
+export PLATFORMCODE
+
 BUILD="${1:-build}"
 
 if [[ $BUILD == "build" ]]; then
@@ -19,7 +22,6 @@ EXTRACFLAGS="-D TEST"
 PACKAGE="server"
 export EXTRACFLAGS
 export PACKAGE
-
 make plugin-clean
 NAME="libctrserver.so" make plugin
 
@@ -101,7 +103,7 @@ unittest() {
 
 # select range
 FROM=1
-TIL=654
+TIL=655
 
 # run tests for linux
 pushd build/Linux/bin
