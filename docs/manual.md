@@ -2288,6 +2288,8 @@ deallocate the memory block.
 
 # Examples
 
+{{messages}}
+
 In this chapter, I'll try to list some example programs to give you an idea how
 xoscript works.
 
