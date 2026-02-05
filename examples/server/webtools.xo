@@ -36,10 +36,6 @@ Web-Document on: ['new'] do: {
 
 Web-Document on: ['init'] do: {
 	own headers := List new.
-	own headers append: ( 
-		HTTP-Header new 
-		key: ['Content-type'] value: ['text/html; charset=utf-8']
-	).
 	own sess-id := None.
 	own session-manager := Tempfile-Session new.
 	own sessdata := None.
@@ -150,12 +146,15 @@ Web-Document on: ['template:'] do: { :path
 	<- Template new: (File new: path, read).
 }.
 
-
-Web-Document on: ['out:'] do: { :output
+Web-Document on: ['out:type:'] do: { :output :type
 	own headers-out false: {
 		own sessdata None? false: {
 			own session-manager save: own sessdata.
 		}.
+		own headers append: (
+			HTTP-Header new
+			key: ['Content-type'] value: type
+		).
 		own headers each: { :_ :header
 			Out write: header.
 		}.
@@ -163,6 +162,16 @@ Web-Document on: ['out:'] do: { :output
 		Out write: ['\r\n'].
 	}.
 	Out write: output.
+}.
+
+
+
+Web-Document on: ['out:'] do: { :output
+	self out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document on: ['json:'] do: { :output
+	self out: ( JSON jsonify: output ) output type: ['Content-Type: application/json'].
 }.
 
 Web-Document on: ['not-found:'] do: { :output
