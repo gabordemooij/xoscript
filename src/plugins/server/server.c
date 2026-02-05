@@ -430,6 +430,12 @@ ctr_object* ctr_server_passthru_set(ctr_object* myself, ctr_argument* argumentLi
 	return myself;
 }
 
+/**
+ * @def
+ * [ Server ] mimetype: [ String ]
+ *
+ * @test657
+ */
 ctr_object* ctr_server_mimetype(ctr_object* myself, ctr_argument* argumentList) {
 	char* pathstr;
 	char peekbuf[12];
