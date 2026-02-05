@@ -1860,7 +1860,7 @@ UPLOAD data:
 ## Maxpost/length
 
 The default max post fields is 40 and the default max content
-length is 1000. To configure differently on a per script basis:
+length is 2MB. To configure differently on a per script basis:
 
 ```
 Program setting: ['max-contentlength'] value: 1. 
