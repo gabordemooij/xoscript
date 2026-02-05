@@ -1190,6 +1190,9 @@ rate remains reasonably stable!).
 
 @api_Number_base
 @api_Int64_base
+@api_Hx_base
+@api_Oct_base
+@api_Bin_base
 
 
 # Strings

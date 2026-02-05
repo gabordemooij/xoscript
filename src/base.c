@@ -2686,16 +2686,34 @@ ctr_object* ctr_num_parse(ctr_object* myself, ctr_argument* argumentList, int ch
 	return answer;
 }
 
+/**
+ * @def
+ * [ Hx ] [ String ]
+ *
+ * @test658
+ */
 CTR_DEFINE_CLASS_OTOBJECT(ctr_hexhelper_new)
 ctr_object* ctr_hexhelper_parse(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_num_parse(myself, argumentList, 16);
 }
 
+/**
+ * @def
+ * [ Oct ] [ String ]
+ *
+ * @test659
+ */
 CTR_DEFINE_CLASS_OTOBJECT(ctr_octhelper_new)
 ctr_object* ctr_octhelper_parse(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_num_parse(myself, argumentList, 8);
 }
 
+/**
+ * @def
+ * [ Bin ] [ String ]
+ *
+ * @test660
+ */
 CTR_DEFINE_CLASS_OTOBJECT(ctr_binhelper_new)
 ctr_object* ctr_binhelper_parse(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_num_parse(myself, argumentList, 2);
