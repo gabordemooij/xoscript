@@ -22,7 +22,7 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
         NULL
     );
     if (!re) {
-        char* err[120];
+        char err[120];
         sprintf(err, "Failed to compile PCRE2 pattern at offset: %zu.", (size_t)erroroffset);
         ctr_error(err,0);
         return NULL;
@@ -80,11 +80,12 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
         for (int j = 0; j<=cnt; j++) {
 			PCRE2_SIZE l;
 			int q = pcre2_substring_length_bynumber(match, j, &l);
+			if (q != 0) l=0;
 			size_t room = (l * 4 * sizeof(PCRE2_UCHAR)) + 1;
 			PCRE2_UCHAR* pbuf = ctr_heap_allocate(room);
 			int qq = pcre2_substring_copy_bynumber(match, j, pbuf, &room);
 			if (qq) continue;
-			ctr_object* subgroup = ctr_build_string_from_cstring(pbuf);
+			ctr_object* subgroup = ctr_build_string_from_cstring((char*)pbuf);
 			subgroup->info.sticky = 1;
 			ctr_argument pusharg;
 			pusharg.object = subgroup;

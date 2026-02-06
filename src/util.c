@@ -109,7 +109,7 @@ void* ctr_internal_plugin_find(ctr_object* key) {
  * Behavior for all the other printf() functions is the same
  * wrt excess arguments except for vprintf() (obviously).
  */
-ctr_object* ctr_error( char* message, int error_code ) {
+ctr_object* ctr_error( const char* message, int error_code ) {
 	char* errstr;
 	errstr = ctr_heap_allocate( sizeof(char) * 500 );
 	snprintf( errstr, 500, message, strerror( error_code ) );

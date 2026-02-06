@@ -206,7 +206,7 @@ typedef struct ctr_object ctr_object;
 struct ctr_resource {
 	unsigned int type;
 	void* ptr;
-	void (*destructor)();
+	void (*destructor)(struct ctr_resource* rs);
 };
 typedef struct ctr_resource ctr_resource;
 
@@ -785,7 +785,7 @@ extern uint64_t ctr_gc_memlimit;
  * Literal Constructors (internal only)
  */
 extern ctr_object* ctr_build_empty_string();
-extern ctr_object* ctr_build_string(char* object, ctr_size vlen);
+extern ctr_object* ctr_build_string(const char* object, ctr_size vlen);
 extern ctr_object* ctr_build_block(ctr_tnode* node);
 extern ctr_object* ctr_build_number(char* object);
 extern ctr_object* ctr_build_number_from_string(char* fixedStr, ctr_size strLength);
@@ -809,7 +809,7 @@ extern char* ctr_heap_allocate_cstring( ctr_object* o );
 extern int ctr_heap_size( void* ptr, size_t* size );
 
 #ifndef REPLACE_ERROR_SYSTEM
-extern ctr_object* ctr_error( char* error_string, int error_code );
+extern ctr_object* ctr_error( const char* error_string, int error_code );
 #endif
 
 extern ctr_object* ctr_error_text( char* error_string );

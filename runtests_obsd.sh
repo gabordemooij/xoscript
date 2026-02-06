@@ -15,7 +15,7 @@ if [[ $BUILD == "build" ]]; then
 LDFLAGS='-shared'
 ISO="en" 
 export ISO
-gmake clean ; gmake
+gmake clean
 EXTRACFLAGS="-D TEST"
 gmake -f makefile.obsd clean
 PACKAGE="server" NAME="server.so" gmake -f makefile.obsd plugin-clean
