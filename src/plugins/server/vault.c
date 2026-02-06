@@ -202,7 +202,7 @@ ctr_object* ctr_gui_vault_name(ctr_object* myself, ctr_argument* argumentList) {
 	);
 }
 
-int ctr_gui_vault_internal_derive_key(char* password, uint8_t* hash, uint8_t* salt) {
+int ctr_gui_vault_internal_derive_key(unsigned char* password, uint8_t* hash, uint8_t* salt) {
 	crypto_argon2_config config = {
 		.algorithm = CRYPTO_ARGON2_ID,           /* Argon2id         */
 		.nb_blocks = 100000,                     /* 100 megabytes   */
@@ -213,18 +213,18 @@ int ctr_gui_vault_internal_derive_key(char* password, uint8_t* hash, uint8_t* sa
 	crypto_argon2_inputs inputs = {
 		.pass      = password,                   /* User password */
 		.salt      = salt,                 /* Salt for the password */
-		.pass_size = strlen(password),       /* Password length */
+		.pass_size = strlen((char*)password),       /* Password length */
 		.salt_size = 16
 	};
 	crypto_argon2_extras extras = {0};   /* Extra parameters unused */
 	void *work_area = malloc((size_t)config.nb_blocks * 1024);
 	if (work_area == NULL) {
-		crypto_wipe(password, strlen(password));
+		crypto_wipe(password, strlen((char*)password));
 		return -1;
 	} else {
 		crypto_argon2(hash, 32, work_area,
 					  config, inputs, extras);
-		crypto_wipe(password, strlen(password));
+		crypto_wipe(password, strlen((char*)password));
 		free(work_area);
 	}
 	return 0;
@@ -259,7 +259,7 @@ ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList
 		ctr_error("Unable to generate secure random buffer.",0);
 		return myself;
 	}
-	password = ctr_heap_allocate_cstring( ctr_internal_cast2string(argumentList->next->object) );
+	password = (unsigned char*) ctr_heap_allocate_cstring( ctr_internal_cast2string(argumentList->next->object) );
 	encrypted = ctr_heap_allocate(len);
 	in = ctr_heap_allocate_cstring(message);
 	if (ctr_gui_vault_internal_derive_key(password, key, salt)==-1) {
@@ -267,7 +267,7 @@ ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList
 		result = CtrStdNil;
 		goto clean;
 	}
-	crypto_aead_lock(encrypted, mac, key, nonce, NULL, 0, in, len);
+	crypto_aead_lock((unsigned char*)encrypted, mac, key, nonce, NULL, 0, (unsigned char*)in, len);
 	out = ctr_heap_allocate( outlen );
 	memcpy(out, salt, 16);
 	memcpy(out + 16, nonce, 24);
@@ -276,7 +276,7 @@ ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList
 	memcpy(out + 16 + 24 + 16 + sizeof(uint32_t), encrypted, len);
 	crypto_wipe(key, 32);
 	out64 = ctr_heap_allocate(outlen64);
-	unsigned int bytes_encoded = base64_encode(out, outlen, out64);
+	unsigned int bytes_encoded = base64_encode((unsigned char*)out, outlen, out64);
 	if (bytes_encoded == 0) {
 		// should not be possible but then again, better safe then sorry
 		ctr_error("Invalid base64 encoding, internal error.", 0);
@@ -296,7 +296,7 @@ ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList
 ctr_object* ctr_gui_vault_decrypt(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	ctr_object* encrypted_message;
-	uint8_t* password;
+	char* password;
 	char* in64;
 	char* in;
 	char* out;
@@ -326,17 +326,17 @@ ctr_object* ctr_gui_vault_decrypt(ctr_object* myself, ctr_argument* argumentList
 	if (inlen < (16 + 24 + 16 + sizeof(uint32_t))) {
 		ctr_error("Encrypted message is too short.", 0);
 		ctr_heap_free(in64);
-		crypto_wipe(password, strlen(password));
+		crypto_wipe((unsigned char*)password, strlen(password));
 		ctr_heap_free(password);
 		return CtrStdNil;
 	}
 	in = ctr_heap_allocate(inlen);
-	unsigned int bytes_decoded = base64_decode(in64, inlen64, in);
+	unsigned int bytes_decoded = base64_decode(in64, inlen64, (unsigned char*)in);
 	if (bytes_decoded == 0) {
 		ctr_error("Invalid base64 input.", 0);
 		ctr_heap_free(in);
 		ctr_heap_free(in64);
-		crypto_wipe(password, strlen(password));
+		crypto_wipe((unsigned char*)password, strlen(password));
 		ctr_heap_free(password);
 		return CtrStdNil;
 	}
@@ -350,13 +350,13 @@ ctr_object* ctr_gui_vault_decrypt(ctr_object* myself, ctr_argument* argumentList
 		ctr_error("Invalid encrypted message length.", 0);
 		ctr_heap_free(in);
 		ctr_heap_free(in64);
-		crypto_wipe(password, strlen(password));
+		crypto_wipe((unsigned char*)password, strlen(password));
 		ctr_heap_free(password);
 		return CtrStdNil;
 	}
 	message = ctr_heap_allocate((int)mlen);
 	memcpy(message, in+16+24+16+sizeof(uint32_t), (size_t)mlen);
-	if (ctr_gui_vault_internal_derive_key(password, key, salt)==-1) {
+	if (ctr_gui_vault_internal_derive_key((unsigned char*)password, key, salt)==-1) {
 		ctr_error("Unable to derive key.", 0);
 		crypto_wipe(message, mlen);
 		result = CtrStdNil;
@@ -364,20 +364,20 @@ ctr_object* ctr_gui_vault_decrypt(ctr_object* myself, ctr_argument* argumentList
 	}
 	out = ctr_heap_allocate((int)mlen + 1);
 	out[(int)mlen] = '\0';
-	if (crypto_aead_unlock(out, mac, key, nonce, NULL, 0, message, (int)mlen)) {
+	if (crypto_aead_unlock((unsigned char*)out, mac, key, nonce, NULL, 0, (unsigned char*) message, (int)mlen)) {
 		ctr_error("Unable to decrypt string, invalid format, password or algorithm.", 0);
 		crypto_wipe(message, mlen);
 		result = CtrStdNil;
 		goto clean;
 	}
 	crypto_wipe(key, 32);
-	result = ctr_build_string_from_cstring(out);
+	result = ctr_build_string_from_cstring((char*)out);
 	crypto_wipe(out, mlen);
 	ctr_heap_free(out);
 	clean:
 	ctr_heap_free(in64);
 	ctr_heap_free(in);
-	crypto_wipe(password, strlen(password));
+	crypto_wipe((unsigned char*)password, strlen(password)); // cast away unsignedness for strlen
 	ctr_heap_free(password);
 	crypto_wipe(message, mlen);
 	ctr_heap_free(message);
