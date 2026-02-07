@@ -30,6 +30,12 @@ size_t ctr_curl_write_callback(char* ptr, size_t size, size_t nmemb, void *userd
 	return len;
 }
 
+/**
+ * @def
+ * [ Net ] post: [ String ] to: [ String ]
+ *
+ * @test661
+ */
 ctr_object* ctr_network_basic_text_send(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	char* message_str = NULL;
