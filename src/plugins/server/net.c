@@ -71,6 +71,12 @@ ctr_object* ctr_network_basic_text_send(ctr_object* myself, ctr_argument* argume
     return result;
 }
 
+/**
+ * @def
+ * [ Net ] get: [ String ]
+ *
+ * @test653
+ */
 ctr_object* ctr_network_get(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument a;
 	ctr_argument u;
