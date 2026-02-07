@@ -807,10 +807,7 @@ extern size_t ctr_heap_get_latest_tracking_id();
 extern void* ctr_heap_reallocate_tracked(size_t tracking_id, size_t size );
 extern char* ctr_heap_allocate_cstring( ctr_object* o );
 extern int ctr_heap_size( void* ptr, size_t* size );
-
-#ifndef REPLACE_ERROR_SYSTEM
 extern ctr_object* ctr_error( const char* error_string, int error_code );
-#endif
 
 extern ctr_object* ctr_error_text( char* error_string );
 

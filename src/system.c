@@ -731,8 +731,6 @@ ctr_object* ctr_program_waitforinput(ctr_object* myself, ctr_argument* argumentL
  * @test564
  */
 
-#ifdef REPLACE_PROGRAM_PASSWORD
-#else
 ctr_object* ctr_program_waitforpassword(ctr_object* myself, ctr_argument* argumentList) {
 	static struct termios oldt, newt;
 	int c;
@@ -762,7 +760,6 @@ ctr_object* ctr_program_waitforpassword(ctr_object* myself, ctr_argument* argume
 	tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
 	return userInput;
 }
-#endif
 
 /**
  * @def
@@ -854,15 +851,12 @@ double ctr_internal_versiontime() {
  * @test568
  */
 
-#ifdef REPLACE_CLOCK_WAIT
-#else
 ctr_object* ctr_clock_wait(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* arg = ctr_internal_cast2number(argumentList->object);
 	int n = (int) arg->value.nvalue;
 	sleep(n);
 	return myself;
 }
-#endif
 
 ctr_object* ctr_clock_new_set( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* clock;
