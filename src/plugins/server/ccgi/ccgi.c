@@ -1,3 +1,77 @@
+/**
+ * C CGI Library version 1.2b
+ *
+ * Original Author: Stephen C. Losen
+ * Patched and integrated by: Gabor de Mooij
+ *
+ * Copyright 2015 Stephen C. Losen.  Distributed under the terms
+ * of the GNU Lesser General Public License (LGPL 2.1)
+ *
+ * This is a modified version of CCGIlib, with
+ * additional security patches and integrated as xoscript
+ * plugin (part of the server plugin) through the http object.
+ *
+ * This library is not exposed to the user directly but
+ * is to be indirectly accessed through the HTTP-Request object.
+ *
+ * Only CGI is supported. This patched version is intended
+ * to be used in a CGI environment where each requests spawns its
+ * own process, independent of other requests/processes and
+ * isolated from other requests/processes as well as the webserver
+ * process. Upon security violations, this patched version may
+ * therefore exit directly, causing a HTTP 500 error.
+ *
+ * List of patches:
+ *
+ * - Upload paths templates are set by the calling library and
+ * cannot be set by the user or uploader, thus mitigating any
+ * user input related security issues through upload paths in
+ * the file upload code.
+ *
+ * - Custom malloc (mymalloc) is implemented as
+ * ctr_heap_allocate which honors memory limits of the script
+ * environment. Note that ctr_heap_allocate exits automatically
+ * if memory allocation fails and zeroes the returned memory
+ * block (like calloc).
+ *
+ * - Content length is enforced through CGI_set_max_contentlength
+ * which is set by the calling code and not directly exposed to the
+ * xoscript developer. This is a global, per process variable by design.
+ * Content length value is checked not be \0, > INT_MAX or less than 0.
+ *
+ * - Max post fields is enforced through CGI_set_max_postfields
+ * which is set by the calling code and not directly exposed to the
+ * xoscript developer. This is a global, per process variable by design.
+ *
+ * - Time limits are set through the CGI webserver and/or through
+ * the alarm-system of xoscript which will create a child process,
+ * watch it and kill it after the specified time has elapsed. The
+ * IO operations in this code may therefore remain blocking, since
+ * even blocking IO requests will be stopped after receiving a KILL
+ * signal (in case of an attack designed to exhaust all server
+ * resources).
+ *
+ * - CGI_free_varlist has been removed since the request data
+ * will remain for the entire lifespan of the process.
+ *
+ * - Non-CGI server version has been removed.
+ *
+ * - Multipart boundary limits of 70 are enforced (RFC 2046).
+ *
+ * - Only valid boundary chars are accepted as part of a
+ * boundary (RFC 2046)
+ *
+ * - CGI_parse_url: URL parser with fixed length return parameters has been
+ * added.
+ *
+ * - Chars in scanner have been cast to unsigned char
+ * before passing them to isalnum() to avoid undefined behavior
+ * with negative values.
+ *
+ * - Returnvalues of mkstemp, fdopen etc are now checked, also
+ * upload is chmodded 0600.
+ */
+
 /*
  * C CGI Library version 1.2
  *
