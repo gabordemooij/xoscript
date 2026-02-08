@@ -178,14 +178,9 @@ sb_get(strbuf *sb, int len) {
     for (size = 128; size < len; size += size)
         ;
     if (sb == 0) {
-        sb = (strbuf *) ctr_heap_allocate(sizeof(*sb) + size);
-    }
-    else {
-        sb = (strbuf *) ctr_heap_reallocate(sb, sizeof(*sb) + size);
-        if (sb == 0) {
-            fputs("C CGI Library out of memory\n", stderr);
-            exit(1);
-        }
+		sb = (strbuf *) ctr_heap_allocate(sizeof(*sb) + size);
+    } else {
+		sb = (strbuf *) ctr_heap_reallocate(sb, sizeof(*sb) + size);
     }
     sb->size = size;
     return sb;
