@@ -2429,3 +2429,20 @@ More examples will follow...
 
 
 # Localization
+
+You can use xoscript in your native language if you wish.
+To so, build xoscript like this:
+
+```
+make clean
+PACKAGE="server" make plugin-clean
+iso="xx" LDFLAGS='-shared' make
+iso="xx" PACKAGE="server" NAME="libctrserver.so" make plugin
+```
+
+Replace xx with the language iso code of your choice and
+add the dictionary for your language if it is not provided yet.
+
+
+
+
