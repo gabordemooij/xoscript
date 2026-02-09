@@ -2444,5 +2444,31 @@ Replace xx with the language iso code of your choice and
 add the dictionary for your language if it is not provided yet.
 
 
+# Credits
 
+Original developer of xoscript: Gabor de Mooij
+Original English manual translation and editing: Bernadette Peeters
+New manual (English): Gabor de Mooij and the xoscript community
+
+Xoscript makes use of the following open source projects
+and I would like to express my gratitude towards these projects
+by listing them here:
+
+CSiphash by Majek (https://github.com/majek/csiphash/) 
+MIT Licensed
+
+JSMN by ZSerge (ttps://github.com/zserge/jsmn)
+MIT Licensed
+
+Monocypher by LoupVaillant (https://github.com/LoupVaillant/Monocypher)
+BSD2 Licensed
+
+libCCGI by Stephen C. Losen,  University of Virginia
+LGPL Licensed
+
+UTF8Encoder by Bjoern Hoehrmann
+Custom permissive license (included in 3rdparty_licenses.txt)
+
+Base64Encoder by WEI Zhicheng
+Public Domain
 
