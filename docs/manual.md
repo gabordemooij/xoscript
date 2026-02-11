@@ -2068,19 +2068,25 @@ various other security issues.
 To encode an object as JSON:
 
 ```
->> json := ( JSON jsonify: ( 
+&gt;&gt; json := ( JSON jsonify: ( 
 	Dict new put: ( 
 		List new ; 1 ; 2 ; 3
 	) at: ['abc']
 )).
-Out write: json, stop.
 ```
 
 To decode JSON into a xoscript object:
 
 ```
-Out write: ((JSON object: json) abc ? 1), stop.
+&gt;&gt; dict := ((JSON object: json) abc ? 1).
 ```
+
+To directly output a Dict as json with the correct headers:
+
+```
+web json: dict.
+```
+
 
 ## Regex
 
