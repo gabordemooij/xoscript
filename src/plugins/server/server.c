@@ -256,7 +256,7 @@ ctr_object* ctr_server_link_set(ctr_object* myself, ctr_argument* argumentList) 
 #define CTR_SERVER_MIMETYPE_MP4     8
 #define CTR_SERVER_MIMETYPE_WEBP    9
 #define CTR_SERVER_MIMETYPE_WEBM    10
-
+#define CTR_SERVER_MIMETYPE_SVG     11
 
 int ctr_internal_server_detect_mimetype(unsigned char *buf, size_t len) {
     if (len < 4) return CTR_SERVER_MIMETYPE_UNKNOWN;
@@ -265,6 +265,9 @@ int ctr_internal_server_detect_mimetype(unsigned char *buf, size_t len) {
         buf[1] == 0xD8 &&
         buf[2] == 0xFF) {
         return CTR_SERVER_MIMETYPE_JPEG;
+    }
+    if (len >= 5 && memcmp(buf, "<svg ", 5)==0) {
+        return CTR_SERVER_MIMETYPE_SVG;
     }
     if (len >= 6 &&
         (!memcmp(buf, "GIF87a", 6) ||
@@ -404,6 +407,9 @@ ctr_object* ctr_server_passthru_set(ctr_object* myself, ctr_argument* argumentLi
 		case CTR_SERVER_MIMETYPE_PDF:
 			printf("Content-Type: application/pdf\r\n");
 			break;
+		case CTR_SERVER_MIMETYPE_SVG:
+			printf("Content-Type: image/svg+xml\r\n");
+			break;
 	}
 	printf("Content-Length: %lld\r\n", (long long)st.st_size);
 	printf("X-Content-Type-Options: nosniff\r\n\r\n");
@@ -485,6 +491,9 @@ ctr_object* ctr_server_mimetype(ctr_object* myself, ctr_argument* argumentList) 
 			break;
 		case CTR_SERVER_MIMETYPE_PDF:
 			mimetype = ctr_build_string_from_cstring("pdf");
+			break;
+		case CTR_SERVER_MIMETYPE_SVG:
+			mimetype = ctr_build_string_from_cstring("svg");
 			break;
 	}
 	return mimetype;
