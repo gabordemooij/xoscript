@@ -1056,7 +1056,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_SYMBOL_EQUALS ), &ctr_clock_equals );
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_UNEQUALS_SYMBOL ), &ctr_clock_neq );
     ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( "from:" ), &ctr_clock_from_iso );
-
+    ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( "iso-datetime" ), &ctr_clock_to_iso_string );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_MOMENT ), CtrStdClock, 0 );
 	CtrStdClock->link = CtrStdObject;
 	CtrStdFile->info.sticky = 1;

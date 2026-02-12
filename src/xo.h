@@ -740,6 +740,7 @@ extern ctr_object* ctr_clock_copy( ctr_object* myself, ctr_argument* argumentLis
 extern ctr_object* ctr_clock_equals( ctr_object* myself, ctr_argument* argumentList );
 extern ctr_object* ctr_clock_neq( ctr_object* myself, ctr_argument* argumentList );
 extern ctr_object* ctr_clock_from_iso( ctr_object* myself, ctr_argument* argumentList );
+extern ctr_object* ctr_clock_to_iso_string( ctr_object* myself, ctr_argument* argumentList );
 extern void ctr_clock_init( ctr_object* clock );
 
 /**

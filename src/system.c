@@ -1319,6 +1319,21 @@ ctr_object* ctr_clock_to_string( ctr_object* myself, ctr_argument* argumentList 
 	return ctr_clock_format_set(myself, &a);
 }
 
+
+/**
+ * @def
+ * [ Moment ] iso-datetime
+ *
+ *
+ * @test663
+ */
+ctr_object* ctr_clock_to_iso_string( ctr_object* myself, ctr_argument* argumentList ) {
+	ctr_argument a;
+	a.object = ctr_build_string_from_cstring("%Y-%m-%d %H:%M:%S");
+	a.next = NULL;
+	return ctr_clock_format_set(myself, &a);
+}
+
 /**
  * @def
  * [ Moment ] number
