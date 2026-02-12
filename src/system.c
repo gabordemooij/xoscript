@@ -1442,6 +1442,57 @@ ctr_object* ctr_clock_new( ctr_object* myself, ctr_argument* argumentList ) {
 }
 
 /**
+ * [ Moment ] from: [ String ]
+ *
+ * @test662
+ */
+ctr_object* ctr_clock_from_iso( ctr_object* myself, ctr_argument* argumentList ) {
+	char* iso = ctr_heap_allocate_cstring(
+		ctr_internal_cast2string(
+			argumentList->object
+		)
+	);
+	char* zone = ctr_heap_allocate_cstring(
+		ctr_internal_cast2string(
+			ctr_internal_object_find_property( myself,
+			ctr_build_string_from_cstring(CTR_DICT_ZONE),
+			CTR_CATEGORY_PRIVATE_PROPERTY )
+		)
+	);
+	ctr_object* result = CtrStdNil;
+	struct tm tm;
+	memset(&tm, 0, sizeof(tm));
+	int n = 0;
+	// strptime not part of standard c
+	n = sscanf(iso, "%d-%d-%d %d:%d:%d",
+		&tm.tm_year,
+		&tm.tm_mon,
+		&tm.tm_mday,
+		&tm.tm_hour,
+		&tm.tm_min,
+		&tm.tm_sec
+	);
+	if (n != 6) {
+		ctr_error("Cannot parse date/time format", 0);
+		goto cleanup;
+	}
+	// correct tm values year since 1900 and january = 0
+	tm.tm_year -= 1900;
+	tm.tm_mon -= 1;
+	result = ctr_clock_new(myself, argumentList);
+	ctr_clock* cr = (ctr_clock*) result->value.rvalue->ptr;
+	setenv( "TZ", zone, 1 );
+	tzset();
+	cr->time = mktime(&tm);
+	setenv( "TZ", "UTC", 1 );
+	tzset();
+	cleanup:
+	ctr_heap_free(zone);
+	ctr_heap_free(iso);
+	return result;
+}
+
+/**
  * @def
  * [ Out ] write: [ String ]
  *
