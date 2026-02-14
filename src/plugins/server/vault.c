@@ -233,19 +233,6 @@ int ctr_gui_vault_internal_derive_key(unsigned char* password, uint8_t* hash, ui
 // This function is not Endiann-safe.
 ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
-	ctr_object* message = ctr_internal_cast2string(argumentList->object);
-	ctr_object* password_obj = ctr_internal_cast2string(argumentList->next->object);
-	if (message->value.svalue->vlen < 1) {
-		ctr_error("Empty message string.", 0);
-		return myself;
-	}
-	if (password_obj->value.svalue->vlen < 1) {
-		ctr_error("Empty password string.", 0);
-		return myself;
-	}
-	int len = message->value.svalue->vlen;
-	int outlen = len + 16 + 16 + 24 + sizeof(uint32_t);
-	int outlen64 = BASE64_ENCODE_OUT_SIZE(outlen);
 	char*    in;
 	char*    out;
 	char*    out64;
@@ -255,13 +242,30 @@ ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList
 	uint8_t nonce[24];
 	uint8_t* password;
 	uint8_t* encrypted;
-	if (random_buf(salt, 16) == -1 || random_buf(nonce, 24) == -1) {
-		ctr_error("Unable to generate secure random buffer.",0);
+	password = (unsigned char*) ctr_heap_allocate_cstring( ctr_internal_cast2string(argumentList->next->object) );
+	in = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	int len = strlen(in);
+	if (len < 1) {
+		ctr_error("Empty message string.", 0);
+		ctr_heap_free(in);
+		ctr_heap_free(password);
 		return myself;
 	}
-	password = (unsigned char*) ctr_heap_allocate_cstring( ctr_internal_cast2string(argumentList->next->object) );
+	if (strlen((char*)password) < 1) {
+		ctr_error("Empty password string.", 0);
+		ctr_heap_free(in);
+		ctr_heap_free(password);
+		return myself;
+	}
+	int outlen = len + 16 + 16 + 24 + sizeof(uint32_t);
+	int outlen64 = BASE64_ENCODE_OUT_SIZE(outlen);
+	if (random_buf(salt, 16) == -1 || random_buf(nonce, 24) == -1) {
+		ctr_error("Unable to generate secure random buffer.",0);
+		ctr_heap_free(in);
+		ctr_heap_free(password);
+		return myself;
+	}
 	encrypted = ctr_heap_allocate(len);
-	in = ctr_heap_allocate_cstring(message);
 	if (ctr_gui_vault_internal_derive_key(password, key, salt)==-1) {
 		ctr_error("Unable to derive key.", 0);
 		result = CtrStdNil;
@@ -311,17 +315,21 @@ ctr_object* ctr_gui_vault_decrypt(ctr_object* myself, ctr_argument* argumentList
 	uint8_t nonce[24];
 	encrypted_message = ctr_internal_cast2string( argumentList->object );
 	ctr_object* password_obj = ctr_internal_cast2string(argumentList->next->object);
+	password = ctr_heap_allocate_cstring( ctr_internal_cast2string(argumentList->next->object) );
+	in64 = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	inlen64 = strlen(in64);
 	if (encrypted_message->value.svalue->vlen < 1) {
 		ctr_error("Empty message string.", 0);
+		ctr_heap_free(password);
+		ctr_heap_free(in64);
 		return myself;
 	}
 	if (password_obj->value.svalue->vlen < 1) {
 		ctr_error("Empty password string.", 0);
+		ctr_heap_free(password);
+		ctr_heap_free(in64);
 		return myself;
 	}
-	password = ctr_heap_allocate_cstring( ctr_internal_cast2string(argumentList->next->object) );
-	inlen64 = encrypted_message->value.svalue->vlen;
-	in64 = ctr_heap_allocate_cstring(encrypted_message);
 	inlen = BASE64_DECODE_OUT_SIZE(inlen64);
 	if (inlen < (16 + 24 + 16 + sizeof(uint32_t))) {
 		ctr_error("Encrypted message is too short.", 0);

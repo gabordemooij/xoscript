@@ -193,6 +193,8 @@ ctr_object* ctr_array_join(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* str;
 	ctr_object* resultStr;
 	ctr_object* glue = ctr_internal_cast2string(argumentList->object);
+	int sticky = glue->info.sticky;
+	glue->info.sticky = 1;
 	ctr_size glen = glue->value.svalue->vlen;
 	for(i=myself->value.avalue->tail; i<myself->value.avalue->head; i++) {
 		o = *( myself->value.avalue->elements + i );
@@ -211,6 +213,7 @@ ctr_object* ctr_array_join(ctr_object* myself, ctr_argument* argumentList) {
 	}
 	resultStr = ctr_build_string(result, len);
 	if (i > myself->value.avalue->tail) ctr_heap_free( result );
+	glue->info.sticky = sticky;
 	return resultStr;
 }
 
@@ -397,8 +400,9 @@ ctr_object* ctr_array_from_length(ctr_object* myself, ctr_argument* argumentList
 	ctr_argument* elnumArg;
 	ctr_object* elnum;
 	ctr_object* startElement = ctr_internal_cast2number(argumentList->object);
-	ctr_object* count = ctr_internal_cast2number(argumentList->next->object);
+	//order is important, cast2number may trigger gc, so convert early!
 	int start = (int) startElement->value.nvalue;
+	ctr_object* count = ctr_internal_cast2number(argumentList->next->object);
 	int len = (int) count->value.nvalue;
 	int i = 0;
 	ctr_object* newArray = ctr_array_new(CtrStdArray, NULL);
@@ -425,12 +429,12 @@ ctr_object* ctr_array_from_length(ctr_object* myself, ctr_argument* argumentList
 
 ctr_object* ctr_array_splice(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* newArray = ctr_array_new(CtrStdArray, NULL);
-	
+	//order is important, cast2number may trigger gc, so convert early!
 	ctr_object* fromObject        = ctr_internal_cast2number(argumentList->object);
-	ctr_object* lengthObject      = ctr_internal_cast2number(argumentList->next->object);
-	ctr_object* replacement       = argumentList->next->next->object;
 	ctr_number from   = fromObject->value.nvalue;
+	ctr_object* lengthObject      = ctr_internal_cast2number(argumentList->next->object);
 	ctr_number length = lengthObject->value.nvalue;
+	ctr_object* replacement       = argumentList->next->next->object;
 	ctr_object* remainder; 
 	ctr_argument* sliceFromArg;
 	ctr_argument* sliceLengthArg;
@@ -685,6 +689,8 @@ ctr_object* ctr_array_index_of( ctr_object* myself, ctr_argument* argumentList )
 	ctr_size i = 0;
 	ctr_object* needle = ctr_internal_cast2string(argumentList->object);
 	ctr_object* element;
+	int sticky = needle->info.sticky;
+	needle->info.sticky = 1;
 	for(i = myself->value.avalue->tail; i < myself->value.avalue->head; i++) {
 		element = ctr_internal_cast2string( (ctr_object*) *(myself->value.avalue->elements + i) );
 		if (
@@ -694,6 +700,7 @@ ctr_object* ctr_array_index_of( ctr_object* myself, ctr_argument* argumentList )
 			break;
 		}
 	}
+	needle->info.sticky = sticky;
 	if (found == -1) return ctr_build_nil();
 	return ctr_build_number_from_float(found);
 }
@@ -966,6 +973,8 @@ ctr_object* ctr_map_has(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_mapitem* m;
 	ctr_object* candidate;
 	ctr_object* needle = ctr_internal_cast2string(argumentList->object);
+	int sticky = needle->info.sticky;
+	needle->info.sticky = 1;
 	m = myself->properties->head;
 	while(m) {
 		candidate = ctr_internal_cast2string(m->value);
@@ -978,6 +987,7 @@ ctr_object* ctr_map_has(ctr_object* myself, ctr_argument* argumentList) {
 		}
 		m = m->next;
 	}
+	needle->info.sticky = sticky;
 	return ctr_build_bool(found);
 }
 

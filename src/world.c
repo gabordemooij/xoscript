@@ -1160,7 +1160,12 @@ ctr_object* ctr_send_message(ctr_object* receiverObject, char* message, long vle
 			argCount ++;
 		}
 		mesgArgument = (ctr_argument*) ctr_heap_allocate( sizeof( ctr_argument ) );
-		mesgArgument->object = ctr_build_string(message, vlen);
+		ctr_object* mobj = ctr_build_string(message, vlen);
+		//important: mobj MUST be sticky, otherwise GC'ed in callee before use
+		//(for instance, after cast2string, causing send msg = GC! ) see: test624
+		//BUT, don't put it on mesgArgument->object->info.sticky = 1; --> might be changed! see: test214
+		mobj->info.sticky = 1;
+		mesgArgument->object = mobj;
 		mesgArgument->next = argumentList;
 		//@important! static argument signatures because this is direct 1-to-1 map on actual methods! Don't be tempted to change to list!
 		if (argCount == 0 || argCount > 3) {
@@ -1172,6 +1177,7 @@ ctr_object* ctr_send_message(ctr_object* receiverObject, char* message, long vle
 		} else if (argCount == 3) {
 			returnValue = ctr_send_message(receiverObject, CTR_DICT_RESPOND_TO_AND_AND_AND, strlen(CTR_DICT_RESPOND_TO_AND_AND_AND),  mesgArgument);
 		}
+		mobj->info.sticky = 0;
 		ctr_heap_free( mesgArgument );
 		if (receiverObject->info.chainMode == 1) return receiverObject;
 		return returnValue;

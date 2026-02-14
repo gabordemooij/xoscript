@@ -156,9 +156,10 @@ ctr_object* ctr_blob_read(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument* pushArg;
 	ctr_argument* elnumArg;
 	ctr_object* elnum;
+	//order is important, cast2number may trigger gc, so convert early!
 	ctr_object* startElement = ctr_internal_cast2number(argumentList->object);
-	ctr_object* count = ctr_internal_cast2number(argumentList->next->object);
 	int start = (int) startElement->value.nvalue;
+	ctr_object* count = ctr_internal_cast2number(argumentList->next->object);
 	int len = (int) count->value.nvalue;
 	int i = 0;
 	ctr_object* newArray = ctr_array_new(CtrStdArray, NULL);

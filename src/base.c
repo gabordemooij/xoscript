@@ -342,6 +342,8 @@ ctr_object* ctr_object_message( ctr_object* myself, ctr_argument* argumentList )
 		ctr_error( CTR_ERR_EXP_ARR, 0 );
 		return CtrStdNil;
 	}
+	int sticky = message->info.sticky;
+	message->info.sticky = 1;
 	ctr_size length = (int) ctr_array_count( arr,  NULL )->value.nvalue;
 	ctr_size i = 0;
 	ctr_argument* args = ctr_heap_allocate( sizeof( ctr_argument ) );
@@ -373,6 +375,7 @@ ctr_object* ctr_object_message( ctr_object* myself, ctr_argument* argumentList )
 			ctr_heap_free( a );
 		}
 	}
+	message->info.sticky = sticky;
 	ctr_heap_free( flatMessage );
 	return answer;
 }
@@ -462,6 +465,8 @@ ctr_object* ctr_object_learn_meaning(ctr_object* myself, ctr_argument* ctr_argum
        ctr_size     i                      = 0;
        ctr_mapitem* current_method         = myself->methods->head;
        ctr_object*  target_method_name     = ctr_internal_cast2string( ctr_argumentList->next->object );
+       int sticky = target_method_name->info.sticky;
+       target_method_name->info.sticky = 1;
        char*        target_method_name_str = target_method_name->value.svalue->value;
        ctr_size     target_method_name_len = target_method_name->value.svalue->vlen;
        ctr_object*  alias                  = ctr_internal_cast2string( ctr_argumentList->object );
@@ -477,6 +482,7 @@ ctr_object* ctr_object_learn_meaning(ctr_object* myself, ctr_argument* ctr_argum
                current_method = current_method->next;
                i ++;
        }
+       target_method_name->info.sticky = sticky;
        return myself;
 }
 
@@ -940,9 +946,12 @@ ctr_object* ctr_number_add(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* strObject;
 	if (otherNum->info.type == CTR_OBJECT_TYPE_OTSTRING) {
 		strObject = ctr_internal_cast2string(myself);
+		int sticky = strObject->info.sticky;
+		strObject->info.sticky = 1;
 		newArg = (ctr_argument*) ctr_heap_allocate( sizeof( ctr_argument ) );
 		newArg->object = otherNum;
 		result = ctr_string_concat(strObject, newArg);
+		strObject->info.sticky = sticky;
 		ctr_heap_free( newArg );
 		return result;
 	} else {
@@ -2123,7 +2132,10 @@ ctr_object* ctr_string_characters( ctr_object* myself, ctr_argument* argumentLis
  */
 
 ctr_object* ctr_string_compare( ctr_object* myself, ctr_argument* argumentList ) {
+	//@todo simplify with cstrs
 	argumentList->object = ctr_internal_cast2string(argumentList->object);
+	int sticky = argumentList->object->info.sticky;
+	argumentList->object->info.sticky = 1;
 	ctr_size maxlen;
 	int s, c;
 	if (myself->value.svalue->vlen < argumentList->object->value.svalue->vlen) {
@@ -2136,6 +2148,7 @@ ctr_object* ctr_string_compare( ctr_object* myself, ctr_argument* argumentList )
 		ctr_internal_cast2string(argumentList->object)->value.svalue->value,
 		maxlen
 	);
+	argumentList->object->info.sticky = sticky;
 	//implementations can differ, only the sign matters -1 0 +1.
 	c = 0;
 	if (s < 0) c = -1;
@@ -2168,16 +2181,20 @@ int ctr_internal_string_consttime_cmp(const void* s1, const void* s2, size_t n) 
 ctr_object* ctr_string_tccompare(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_size maxlen;
 	int q;
-	if (myself->value.svalue->vlen < argumentList->object->value.svalue->vlen) {
+	ctr_object* other = ctr_internal_cast2string(argumentList->object);
+	int sticky = other->info.sticky;
+	other->info.sticky = 1;
+	if (myself->value.svalue->vlen < other->value.svalue->vlen) {
 		maxlen = myself->value.svalue->vlen;
 	} else {
-		maxlen = argumentList->object->value.svalue->vlen;
+		maxlen = other->value.svalue->vlen;
 	}
 	q = ctr_internal_string_consttime_cmp(
 		myself->value.svalue->value,
-		ctr_internal_cast2string(argumentList->object)->value.svalue->value,
+		other->value.svalue->value,
 		maxlen
 	);
+	other->info.sticky = sticky;
 	return ctr_build_bool( ( q == 0 ) );
 }
 
