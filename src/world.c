@@ -418,8 +418,14 @@ void ctr_internal_create_func(ctr_object* o, ctr_object* key, ctr_object* (*func
  * InternalNumberCast
  *
  * Same as cast but always returns a copy.
+ *
+ * Warning: casting may involve message sending
+ * and therefore code block execution, which may
+ * trigger GC. So, any temporary ctr_object for
+ * internal use should be made sticky.
  */
-ctr_object* ctr_internal_copy2number(ctr_object* o) {
+ctr_object* ctr_internal_copy2number(ctr_object* obj2convert_triggers_GC ) {
+	ctr_object* o = obj2convert_triggers_GC;
 	ctr_argument* a = ctr_heap_allocate( sizeof( ctr_argument ) );
 	a->object = CtrStdNil;
 	ctr_object* numObject = ctr_send_message( o, CTR_DICT_TONUMBER, strlen(CTR_DICT_TONUMBER), a );
@@ -437,8 +443,14 @@ ctr_object* ctr_internal_copy2number(ctr_object* o) {
  * InternalNumberCast
  *
  * Casts an object to a number object.
+ *
+ * Warning: casting may involve message sending
+ * and therefore code block execution, which may
+ * trigger GC. So, any temporary ctr_object for
+ * internal use should be made sticky.
  */
-ctr_object* ctr_internal_cast2number(ctr_object* o) {
+ctr_object* ctr_internal_cast2number(ctr_object* obj2convert_triggers_GC) {
+	ctr_object* o = obj2convert_triggers_GC;
 	if ( o->info.type == CTR_OBJECT_TYPE_OTNUMBER ) return o;
 	return ctr_internal_copy2number(o);
 }
@@ -449,8 +461,14 @@ ctr_object* ctr_internal_cast2number(ctr_object* o) {
  * InternalStringCast
  *
  * Casts an object to a string object.
+ *
+ * Warning: casting may involve message sending
+ * and therefore code block execution, which may
+ * trigger GC. So, any temporary ctr_object for
+ * internal use should be made sticky.
  */
-ctr_object* ctr_internal_cast2string( ctr_object* o ) {
+ctr_object* ctr_internal_cast2string( ctr_object* obj2convert_triggers_GC ) {
+	ctr_object* o = obj2convert_triggers_GC;
 	if ( o->info.type == CTR_OBJECT_TYPE_OTSTRING ) return o;
 	return ctr_internal_copy2string(o);
 }
@@ -461,8 +479,14 @@ ctr_object* ctr_internal_cast2string( ctr_object* o ) {
  * CopyToString
  *
  * Same as cast but always returns a copy.
+ *
+ * Warning: casting may involve message sending
+ * and therefore code block execution, which may
+ * trigger GC. So, any temporary ctr_object for
+ * internal use should be made sticky.
  */
-ctr_object* ctr_internal_copy2string( ctr_object* o ) {
+ctr_object* ctr_internal_copy2string( ctr_object* obj2convert_triggers_GC ) {
+	ctr_object* o = obj2convert_triggers_GC;
 	ctr_argument* a = ctr_heap_allocate( sizeof( ctr_argument ) );
 	a->object = CtrStdNil;
 	ctr_object* stringObject = ctr_send_message( o, CTR_DICT_TOSTRING, strlen(CTR_DICT_TOSTRING), a );
@@ -480,8 +504,14 @@ ctr_object* ctr_internal_copy2string( ctr_object* o ) {
  * InternalBooleanCast
  *
  * Casts an object to a boolean.
+ *
+ * Warning: casting may involve message sending
+ * and therefore code block execution, which may
+ * trigger GC. So, any temporary ctr_object for
+ * internal use should be made sticky.
  */
-ctr_object* ctr_internal_cast2bool( ctr_object* o ) {
+ctr_object* ctr_internal_cast2bool( ctr_object* obj2convert_triggers_GC ) {
+	ctr_object* o = obj2convert_triggers_GC;
 	if (o->info.type == CTR_OBJECT_TYPE_OTBOOL) return o;
 	ctr_argument* a = ctr_heap_allocate( sizeof( ctr_argument ) );
 	a->object = CtrStdNil;
