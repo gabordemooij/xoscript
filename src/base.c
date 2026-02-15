@@ -1879,6 +1879,17 @@ ctr_object* ctr_string_last_index_of(ctr_object* myself, ctr_argument* argumentL
 	return ctr_build_number_from_float((float) uchar_index);
 }
 
+static ctr_object* ctr_internal_build_string_nonutf8(const char* stringValue, ctr_size size) {
+	ctr_object* stringObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
+	if (size != 0) {
+		stringObject->value.svalue->value = ctr_heap_allocate( size*sizeof(char) );
+		memcpy(stringObject->value.svalue->value, stringValue, ( sizeof(char) * size ) );
+	}
+	stringObject->value.svalue->vlen = size;
+	stringObject->link = CtrStdString;
+	return stringObject;
+}
+
 /**
  * @def
  * [ String ] [ String ]: [ String ]
@@ -1886,21 +1897,75 @@ ctr_object* ctr_string_last_index_of(ctr_object* myself, ctr_argument* argumentL
  *
  * @test475
  */
-
 ctr_object* ctr_string_fill_in(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* message = ctr_internal_cast2string( argumentList->object );
+	//@todo performance
+	unsigned char MASK_BYTE = 255;
+	ctr_object* needle = ctr_internal_cast2string( argumentList->object ); //needle is sticky because arg
+	ctr_object* repl = ctr_internal_cast2string( argumentList->next->object );
+	int sticky_repl = repl->info.sticky;
+	repl->info.sticky = 1;
 	ctr_object* slot;
-
-	if ( message->value.svalue->value[message->value.svalue->vlen - 1] == ctr_clex_param_prefix_char ) {
-		slot = ctr_build_string( message->value.svalue->value, message->value.svalue->vlen - 1);
-		slot->info.sticky = 1;
+	// Clean the slot if needed
+	if ( needle->value.svalue->value[needle->value.svalue->vlen - 1] == ctr_clex_param_prefix_char ) {
+		slot = ctr_build_string( needle->value.svalue->value, needle->value.svalue->vlen - 1);
 	} else {
-		slot = message;
+		slot = needle;  // needle is already sticky
 	}
-	argumentList->object = slot;
-	ctr_object* result = ctr_string_replace_with( myself, argumentList );
-	slot->info.sticky = 0;
-	return result;
+	int sticky_slot = slot->info.sticky;
+	slot->info.sticky = 1;
+	// make a copy of the string
+	char* mbuf = ctr_heap_allocate(myself->value.svalue->vlen);
+	// create a mask if it does not exist, this is the old mask
+	ctr_object* mask = ctr_internal_object_property( myself, "_mask", NULL );
+	if (mask == CtrStdNil) {
+		mask = ctr_internal_build_string_nonutf8(
+			myself->value.svalue->value,
+			myself->value.svalue->vlen
+		);
+		ctr_internal_object_property(myself, "_mask", NULL);
+	}
+	// apply the mask to the string to avoid recusive replacement
+	size_t j = 0;
+	for(size_t i = 0; i<myself->value.svalue->vlen; i++) {
+		if ((unsigned char)mask->value.svalue->value[i]==MASK_BYTE) {
+			mbuf[j++] = myself->value.svalue->value[i]; //copy the byte because it can be displaced
+			myself->value.svalue->value[i] = MASK_BYTE;
+		}
+	}
+	ctr_argument a;
+	ctr_argument n;
+	a.object = slot;
+	a.next = &n;
+	n.object = repl;
+	n.next = NULL;
+	ctr_string_replace_with( myself, &a );
+	// unmask the string
+	j = 0;
+	for(size_t i = 0; i<myself->value.svalue->vlen; i++) {
+		if ((unsigned char)myself->value.svalue->value[i]==MASK_BYTE) {
+			myself->value.svalue->value[i] = mbuf[j++];
+		}
+	}
+	// create a fillerstr
+	char* fillerstr;
+	fillerstr = ctr_heap_allocate(repl->value.svalue->vlen);
+	memset(fillerstr, MASK_BYTE, repl->value.svalue->vlen);
+	ctr_object* filler = ctr_internal_build_string_nonutf8(fillerstr, repl->value.svalue->vlen);
+	filler->info.sticky = 1;
+	// apply the filler to the mask
+	a.object = slot;
+	a.next = &n;
+	n.object = filler;
+	n.next = NULL;
+	mask = ctr_string_replace_with( mask, &a );
+	// update the mask
+	ctr_internal_object_property( myself, "_mask", mask );
+	slot->info.sticky = sticky_slot;
+	filler->info.sticky = 0;
+	repl->info.sticky = sticky_repl;
+	ctr_heap_free(fillerstr);
+	ctr_heap_free(mbuf);
+	return myself;
 }
 
 /**
