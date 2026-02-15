@@ -1,9 +1,5 @@
 #include "xo.h"
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#endif
-
 ctr_tnode* ctr_callstack[301];
 uint8_t ctr_callstack_index;
 
