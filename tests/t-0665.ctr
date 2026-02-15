@@ -1,0 +1,23 @@
+# sticky (GC) test, @todo make more
+>> a := Object new.
+
+a on: ['string'] do: {
+	>> q:= 1 + 1. # causes GC
+	
+	<- ['1'].
+}.
+
+>> b := Object new.
+
+b on: ['string'] do: { 
+	<- ['2'].
+}.
+
+
+>> l := List new ; 0 ; a ; b.
+
+
+
+Out write: (l find: (1 + 1)  ), stop. #2
+
+Out write: (l combine: (1 + 1)  ), stop. #02122
