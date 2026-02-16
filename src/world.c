@@ -669,12 +669,10 @@ void ctr_set(ctr_object* key, ctr_object* object) {
 }
 
 static void ctr_internal_set_feature_flags() {
-	char* flag;
-	int flag_int;
-	flag = getenv("FEATURE_RECURSIVE_STRINTPOL");
-	flag_int = 0;
-	if (flag) flag_int = atoi(flag);
-	CtrFeatureFlagRecursiveStrIntPol = flag_int;
+	// Set feature flag defaults
+	// Don't read env vars, too slow (CGI context)
+	// (and harder to test)
+	CtrFeatureFlagRecursiveStrIntPol = 0;
 }
 
 /**
