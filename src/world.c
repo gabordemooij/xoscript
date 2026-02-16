@@ -30,6 +30,11 @@ ctr_object* CtrStdHexHelper;
 ctr_object* CtrStdOctHelper;
 ctr_object* CtrStdBinHelper;
 
+/**
+ * Feature flags
+ */
+int CtrFeatureFlagRecursiveStrIntPol = 0;
+
 int ctr_message_stack_index = 0;
 ctr_object* ctr_message_stack[301];
 
@@ -663,6 +668,15 @@ void ctr_set(ctr_object* key, ctr_object* object) {
 	ctr_internal_object_set_property(context, key, object, 0);
 }
 
+static void ctr_internal_set_feature_flags() {
+	char* flag;
+	int flag_int;
+	flag = getenv("FEATURE_RECURSIVE_STRINTPOL");
+	flag_int = 0;
+	if (flag) flag_int = atoi(flag);
+	CtrFeatureFlagRecursiveStrIntPol = flag_int;
+}
+
 /**
  * ?internal
  *
@@ -684,6 +698,7 @@ void ctr_initialize_world() {
 	ctr_contexts[0] = CtrStdWorld;
 	ctr_message_stack_index = 0;
 	ctr_message_stack[ctr_message_stack_index] = CtrStdWorld;
+	ctr_internal_set_feature_flags();
 
 	/* Object */
 	CtrStdObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
@@ -1050,6 +1065,8 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "pledge:" ), &ctr_program_pledge );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "unveil:permissions:" ), &ctr_program_unveil );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "path" ), &ctr_program_getcwd );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "feature:enable:" ), &ctr_program_feature_set );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "feature:" ), &ctr_program_feature );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PROGRAM ), CtrStdCommand, 0 );
 	CtrStdCommand->link = CtrStdObject;
 	CtrStdCommand->info.sticky = 1;

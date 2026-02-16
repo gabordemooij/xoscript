@@ -839,6 +839,47 @@ ctr_object* ctr_program_timemachine(ctr_object* myself, ctr_argument* argumentLi
        return myself;
 }
 
+/**
+ * @def
+ * [ Program ] feature: [ String ] enable: [ Boolean ]
+ *
+ * @test666
+ */
+ctr_object* ctr_program_feature_set(ctr_object* myself, ctr_argument* argumentList) {
+	int sticky;
+	ctr_object* feature = ctr_internal_cast2string(argumentList->object);
+	sticky = feature->info.sticky;
+	feature->info.sticky = 1;
+	ctr_object* enabled = ctr_internal_cast2bool(argumentList->next->object);
+	feature->info.sticky = sticky;
+	char* value = feature->value.svalue->value;
+	size_t vlen = feature->value.svalue->vlen;
+	if (memcmp("RECURSIVE_STRINTPOL", value, vlen)==0) {
+		CtrFeatureFlagRecursiveStrIntPol = (enabled == CtrStdBoolTrue);
+		return myself;
+	}
+	ctr_error("Unknown feature.", 0);
+	return CtrStdNil;
+}
+
+/**
+ * @def
+ * [ Program ] feature: [ String ]
+ *
+ * @test666
+ */
+ctr_object* ctr_program_feature(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* feature = ctr_internal_cast2string(argumentList->object);
+	char* value = feature->value.svalue->value;
+	size_t vlen = feature->value.svalue->vlen;
+	if (memcmp("RECURSIVE_STRINTPOL", value, vlen)==0) {
+		return ctr_build_bool(CtrFeatureFlagRecursiveStrIntPol);
+	}
+	ctr_error("Unknown feature.", 0);
+	return CtrStdNil;
+}
+
+
 double ctr_internal_versiontime() {
        return CtrVersionTime;
 }

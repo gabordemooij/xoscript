@@ -37,7 +37,6 @@
 #define CTR_VERSION "1.5.5"
 #define CTR_VERSION_NUM 105005
 
-
 /**
  * Define the Citrine tokens 
  */
@@ -701,6 +700,8 @@ extern ctr_object* ctr_program_alarm(ctr_object* myself, ctr_argument* argumentL
 extern ctr_object* ctr_program_pledge(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_program_unveil(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_program_getcwd(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_program_feature_set(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_program_feature(ctr_object* myself, ctr_argument* argumentList);
 extern double ctr_internal_versiontime(void);
 
 /**
@@ -855,7 +856,10 @@ extern ctr_object* ctr_octhelper_parse(ctr_object* myself, ctr_argument* argumen
 extern ctr_object* ctr_binhelper_new(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_binhelper_parse(ctr_object* myself, ctr_argument* argumentList);
 
-
+/**
+ * Feature flags
+ */
+extern int CtrFeatureFlagRecursiveStrIntPol;
 
 /* macros */
 #define CTR_DEFINE_SETTER_CAST(funcname, propname, castfunc) \
