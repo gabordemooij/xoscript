@@ -9,7 +9,7 @@ int ctr_gc_object_counter;
 int ctr_gc_kept_counter;
 int ctr_gc_sticky_counter;
 int ctr_gc_mode;
-double CtrVersionTime = 1753777732; // 29 july 2025;
+double CtrVersionTime = CTR_VERSION_20260216;
 
 struct ctr_clock {
 	time_t time;
@@ -834,9 +834,13 @@ ctr_object* ctr_program_err(ctr_object* myself, ctr_argument* argumentList) {
  * @test633
  */
 ctr_object* ctr_program_timemachine(ctr_object* myself, ctr_argument* argumentList) {
-       time_t stamp = ctr_tonum( ctr_clock_time( argumentList->object, NULL ) );
-       CtrVersionTime = stamp;
-       return myself;
+	time_t stamp = ctr_tonum( ctr_clock_time( argumentList->object, NULL ) );
+	CtrVersionTime = stamp;
+	// Select features based upon timestamp
+	if (CtrVersionTime < CTR_VERSION_20260216) {
+		CtrFeatureFlagRecursiveStrIntPol = 1;
+	}
+    return myself;
 }
 
 /**

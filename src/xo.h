@@ -38,6 +38,12 @@
 #define CTR_VERSION_NUM 105005
 
 /**
+ * Backward compatibility table
+ */
+#define CTR_VERSION_20250729 1753777732
+#define CTR_VERSION_20260216 1771282716
+
+/**
  * Define the Citrine tokens 
  */
 #define CTR_TOKEN_REF 1
