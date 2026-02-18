@@ -112,7 +112,11 @@ void* ctr_internal_plugin_find(ctr_object* key) {
 ctr_object* ctr_error( const char* message, int error_code ) {
 	char* errstr;
 	errstr = ctr_heap_allocate( sizeof(char) * 500 );
-	snprintf( errstr, 500, message, strerror( error_code ) );
+	int bytes = snprintf( errstr, 500, message, strerror( error_code ) );
+	if (bytes == -1) {
+		//encoding error, emit error but continue
+		ctr_print_error("Unable to print error message.", 0);
+	}
 	CtrStdFlow = ctr_build_string_from_cstring( errstr );
 	ctr_heap_free( errstr );
 	CtrStdFlow->info.sticky = 1;
@@ -124,12 +128,13 @@ ctr_object* ctr_error( const char* message, int error_code ) {
 /**
  * @internal
  *
- * Prints a message to the error stream.
+ * Prints a message to the error stream
+ * and exits with error code if code != 0.
  */
 void ctr_print_error( char* error, int code ) {
 	fwrite( error, sizeof(char), strlen(error), stderr );
 	fwrite( "\n", sizeof(char), 1, stderr );
-	if ( code > -1 ) {
+	if ( code != 0 ) {
 		exit(code);
 	}
 }

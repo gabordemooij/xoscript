@@ -189,7 +189,8 @@ void ctr_heap_free( void* ptr ) {
 	}
 	if (ptr != NULL) free(ptr);
 	if (size > ctr_gc_alloc) {
-		ctr_print_error("[WARNING] Freeing more memory than allocated.", -1);
+		//emit error but continue
+		ctr_print_error("[WARNING] Freeing more memory than allocated.", 0);
 		ctr_gc_alloc = 0;
 	} else {
 		ctr_gc_alloc -= size;
