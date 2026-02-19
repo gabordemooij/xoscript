@@ -1895,6 +1895,7 @@ static ctr_object* ctr_internal_build_string_nonutf8(const char* stringValue, ct
  * Recursive string interpolation (deprecated).
  * Use feature RECUSIVE_STRINTPOL to enable.
  */
+ #ifndef NOBC
 ctr_object* ctr_feature_string_fill_in(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* message = ctr_internal_cast2string( argumentList->object );
 	ctr_object* slot;
@@ -1910,6 +1911,7 @@ ctr_object* ctr_feature_string_fill_in(ctr_object* myself, ctr_argument* argumen
 	slot->info.sticky = 0;
 	return result;
 }
+#endif
 
 /**
  * @def
@@ -1920,9 +1922,11 @@ ctr_object* ctr_feature_string_fill_in(ctr_object* myself, ctr_argument* argumen
  */
 ctr_object* ctr_string_fill_in(ctr_object* myself, ctr_argument* argumentList) {
 	//@bc backward compatibility
+	#ifndef NOBC
 	if (CtrFeatureFlagRecursiveStrIntPol) {
 		return ctr_feature_string_fill_in(myself, argumentList);
 	}
+	#endif
 	//@todo performance
 	unsigned char MASK_BYTE = 255;
 	ctr_object* needle = ctr_internal_cast2string( argumentList->object ); //needle is sticky because arg
