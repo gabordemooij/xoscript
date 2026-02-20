@@ -90,6 +90,128 @@ ctr_object* ctr_blob_size(ctr_object* myself, ctr_argument* argumentList) {
 	return CtrStdNil;
 }
 
+/* Decodings UTF16/32 */
+
+static uint16_t ctr_internal_utf8_eswap16(uint16_t w) {
+    return (w >> 8) | (w << 8);
+}
+
+static uint32_t ctr_internal_utf8_eswap32(uint32_t w) {
+    return ((w >> 24) & 0x000000FF) |
+           ((w >> 8)  & 0x0000FF00) |
+           ((w << 8)  & 0x00FF0000) |
+           ((w << 24) & 0xFF000000);
+}
+
+static int ctr_internal_utf8_encode_cp(uint32_t cp, char* out) {
+    if (cp <= 0x7F) {
+        out[0] = cp;
+        return 1;
+    } else if (cp <= 0x7FF) {
+        out[0] = 0xC0 | (cp >> 6);
+        out[1] = 0x80 | (cp & 0x3F);
+        return 2;
+    } else if (cp <= 0xFFFF) {
+        out[0] = 0xE0 | (cp >> 12);
+        out[1] = 0x80 | ((cp >> 6) & 0x3F);
+        out[2] = 0x80 | (cp & 0x3F);
+        return 3;
+    } else {
+        out[0] = 0xF0 | (cp >> 18);
+        out[1] = 0x80 | ((cp >> 12) & 0x3F);
+        out[2] = 0x80 | ((cp >> 6) & 0x3F);
+        out[3] = 0x80 | (cp & 0x3F);
+        return 4;
+    }
+}
+
+static int ctr_internal_utf8_decode_utf16(const char* s, char* d, int le) {
+    const uint16_t* src = (const uint16_t*)s;
+    char* dst = d;
+    while (*src) {
+        uint16_t w1 = *src++;
+        if (!le) w1 = ctr_internal_utf8_eswap16(w1);
+        uint32_t cp;
+        if (w1 >= 0xD800 && w1 <= 0xDBFF) { // high
+            uint16_t w2 = *src++;
+            if (!le) w2 = ctr_internal_utf8_eswap16(w2);
+            if (w2 >= 0xDC00 && w2 <= 0xDFFF) { // low
+                cp = 0x10000 + (((w1 - 0xD800) << 10) | (w2 - 0xDC00));
+            } else {
+                cp = 0xFFFD;
+                --src; // invalid surrogate,rollback
+            }
+        } else if (w1 >= 0xDC00 && w1 <= 0xDFFF) {
+            cp = 0xFFFD; // unexpected low surrogate
+        } else {
+            cp = w1;
+        }
+        dst += ctr_internal_utf8_encode_cp(cp, dst);
+    }
+    *dst = '\0';
+    return dst - d;
+}
+
+static int ctr_internal_utf8_decode_utf32(const char* s, char* d, int le) {
+    const uint32_t* src = (const uint32_t*)s;
+    char* dst = d;
+    while (*src) {
+        uint32_t cp = *src++;
+        if (!le) cp = ctr_internal_utf8_eswap32(cp);
+        if (cp > 0x10FFFF || (cp >= 0xD800 && cp <= 0xDFFF))
+            cp = 0xFFFD;
+        dst += ctr_internal_utf8_encode_cp(cp, dst);
+    }
+    *dst = '\0';
+    return dst - d;
+}
+
+int ctr_internal_utf8_decode(const char* s, char* d, char* enc, size_t* n) {
+	*n = 0;
+	int r = 0;
+	if (strcmp(enc, "utf16le")==0) {
+		*n = ctr_internal_utf8_decode_utf16(s,d,1);
+	} else if (strcmp(enc, "utf16be")==0) {
+		*n = ctr_internal_utf8_decode_utf16(s,d,0);
+	} else if (strcmp(enc, "utf32le")==0) {
+		*n = ctr_internal_utf8_decode_utf32(s,d,1);
+	} else if (strcmp(enc, "utf32be")==0) {
+		*n = ctr_internal_utf8_decode_utf32(s,d,0);
+	} else {
+		*n = 0; r = -1;
+	}
+	return r;
+}
+
+/**
+ * @def
+ * [ Blob ] decode: [ String ]
+ *
+ * @test668
+ */
+ctr_object* ctr_blob_decode( ctr_object* myself, ctr_argument* argumentList ) {
+	char* src = myself->value.rvalue->ptr;
+	char* encoding = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	size_t bufsize = strlen(src);
+	int utf32 = 0;
+	utf32 = (strlen(encoding)>4 && encoding[3]=='3');
+	if (!utf32) {
+		bufsize *= 2; //utf16 needs factor 12, utf32 needs factor 1
+	}
+	char* dest = ctr_heap_allocate(bufsize);
+	size_t n = 0;
+	int err = ctr_internal_utf8_decode(src, dest, encoding, &n);
+	ctr_heap_free(encoding);
+	if (err == -1) {
+		ctr_heap_free(dest);
+		ctr_error("Invalid source encoding, use: utf16le, utf16be, utf32le or utf32be.", 0);
+		return CtrStdNil;
+	}
+	ctr_object* result = ctr_build_string_from_cstring(dest);
+	ctr_heap_free(dest);
+	return result;
+}
+
 /**
  * @internal
  */
@@ -724,6 +846,7 @@ void begin_ffi() {
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_FREE_STRUCT ), &ctr_blob_free_struct);
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_FROM_LENGTH ), &ctr_blob_read);
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_LENGTH ), &ctr_blob_size);
+	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( "decode:" ), &ctr_blob_decode);
 	CtrMediaFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
 	CtrMediaFFIObjectBase->link = CtrStdObject;
 	ctr_internal_create_func(CtrMediaFFIObjectBase, ctr_build_string_from_cstring( CTR_DICT_MESSAGEARGS ), &ctr_media_ffi_apply );
