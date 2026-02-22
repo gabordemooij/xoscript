@@ -2453,7 +2453,9 @@ add the dictionary for your language if it is not provided yet.
 # Credits
 
 Original developer of xoscript: Gabor de Mooij
+
 Original English manual translation and editing: Bernadette Peeters
+
 New manual (English): Gabor de Mooij and the xoscript community
 
 Xoscript makes use of the following open source projects

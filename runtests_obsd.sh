@@ -52,9 +52,9 @@ unittest() {
 	export CITRINE_MEMORY_MODE
 	
 	if [[ $i == "0635" ]]; then
-		setup1 $i
-	else
 		setup2 $i
+	else
+		setup1 $i
 	fi
 	
 	cat /tmp/rs /tmp/err > /tmp/out
