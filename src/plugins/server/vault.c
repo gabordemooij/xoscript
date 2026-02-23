@@ -482,6 +482,99 @@ ctr_object* ctr_server_vault_password_verify(ctr_object* myself, ctr_argument* a
 	return result;
 }
 
+ctr_object* ctr_server_vault_pki_create(ctr_object* myself, ctr_argument* argumentList) {
+	uint8_t seed[32];
+	uint8_t sk  [64];
+	uint8_t pk  [32];
+	char* sk64;
+	char* pk64;
+	ctr_object* karr = CtrStdNil;
+	arc4random_buf(seed, 32);
+	crypto_eddsa_key_pair(sk, pk, seed);
+	size_t sk64len = BASE64_ENCODE_OUT_SIZE(64);
+	sk64 = ctr_heap_allocate(sk64len + 1);
+	size_t pk64len = BASE64_ENCODE_OUT_SIZE(32);
+	pk64 = ctr_heap_allocate(pk64len + 1);
+	if (base64_encode((unsigned char*)sk, 64, sk64)!=sk64len-1 ||
+	base64_encode((unsigned char*)pk, 32, pk64)!=pk64len-1) {
+		ctr_error("base64 encoding failed", 0);
+		goto cleanup;
+	}
+	ctr_argument a;
+	a.object = CtrStdNil;
+	a.next = NULL;
+	karr = ctr_array_new(CtrStdArray, &a);
+	ctr_object* sko = ctr_build_string_from_cstring(sk64);
+	a.object = sko;
+	ctr_array_push(karr,&a);
+	ctr_object* pko = ctr_build_string_from_cstring(pk64);
+	a.object = pko;
+	ctr_array_push(karr,&a);
+	cleanup:
+		crypto_wipe(sk,64);
+		crypto_wipe(pk,32);
+		crypto_wipe(sk64,sk64len);
+		crypto_wipe(pk64,pk64len);
+		ctr_heap_free(sk64);
+		ctr_heap_free(pk64);
+	return karr;
+}
+
+ctr_object* ctr_server_vault_pki_sign(ctr_object* myself, ctr_argument* argumentList) {
+	uint8_t       signature[65];
+	char* sig64 = NULL;
+	ctr_object* sig = CtrStdNil;
+	char* sk64  = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->next->object));
+	uint8_t* msg = (uint8_t*) ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	uint8_t sk[64];
+	if (base64_decode(sk64, strlen(sk64), &sk)!=64) {
+		ctr_error("base64 decoding failed", 0);
+		goto cleanup;
+	}
+	crypto_eddsa_sign(signature, sk, msg, strlen(msg));
+	signature[64] = 0;
+	size_t sig64len = BASE64_ENCODE_OUT_SIZE(64);
+	sig64 = ctr_heap_allocate(sig64len + 1);
+	if (base64_encode(signature, 64, sig64)!=sig64len-1) {
+		ctr_error("base64 encoding failed", 0);
+		goto cleanup;
+	}
+	sig = ctr_build_string_from_cstring(sig64);
+	cleanup:
+		crypto_wipe(sk, 64);
+		ctr_heap_free(sk64);
+		ctr_heap_free(msg);
+		if (sig64) ctr_heap_free(sig64);
+	return sig;
+}
+
+ctr_object* ctr_server_vault_pki_check(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* check = CtrStdBoolFalse;
+	char* msg   = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	char* sig64  = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->next->object));
+	char* pk64 = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->next->next->object));
+	uint8_t pk       [32];
+	uint8_t signature[64];
+	if (base64_decode(pk64, strlen(pk64), pk)!=32) {
+		ctr_error("base64 decoding failed", 0);
+		goto cleanup;
+	}
+	if (base64_decode(sig64, strlen(sig64), signature)!=64) {
+		ctr_error("base64 decoding failed", 0);
+		goto cleanup;
+	}
+	check = ctr_build_bool(
+		!crypto_eddsa_check(signature, pk, (uint8_t*)msg, strlen(msg))
+	);
+	cleanup:
+		ctr_heap_free(msg);
+		ctr_heap_free(pk64);
+		ctr_heap_free(sig64);
+
+	return check;
+}
+
+
 /*
  * cryptographically secure random token
  */
@@ -536,5 +629,8 @@ void begin_vault() {
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "token:" ), &ctr_server_vault_token_set );
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "password-hash:" ), &ctr_server_vault_password_hash );
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "password-hash:verify:" ), &ctr_server_vault_password_verify );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "edkeys" ), &ctr_server_vault_pki_create );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "sign:with:" ), &ctr_server_vault_pki_sign );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "check:signature:with:" ), &ctr_server_vault_pki_check );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Vault" ), vaultObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 }
