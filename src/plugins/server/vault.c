@@ -14,6 +14,9 @@
 #define SERVER_VAULT_TOKENCHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 #define SERVER_VAULT_TOKENCHARS_NUM 62
 
+/* Set crypto version = Argon2i 100mb 3lanes 16byte salt */
+#define SERVER_VAULT_CRYPTO_ID_20262 "C20262$"
+
 // either provided by libsecret or bsd
 int random_buf(void *buf, size_t n) {
     arc4random_buf(buf, n);
@@ -392,6 +395,92 @@ ctr_object* ctr_gui_vault_decrypt(ctr_object* myself, ctr_argument* argumentList
 	return result;
 }
 
+/**
+ * @def
+ * [ Vault ] password-hash: [ String ]
+ *
+ * @test669
+ */
+ctr_object* ctr_server_vault_password_hash(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* result = CtrStdNil;
+	uint8_t hash[32];
+	uint8_t salt[16];
+	uint8_t* password;
+	char* out64 = NULL;
+	password = (unsigned char*) ctr_heap_allocate_cstring( ctr_internal_cast2string(argumentList->object) );
+	if (strlen((char*)password) < 1) {
+		ctr_error("Empty password string.", 0);
+		goto cleanup;
+	}
+	if (random_buf(salt, 16) == -1) {
+		ctr_error("Unable to generate secure random buffer.",0);
+		goto cleanup;
+	}
+	if (ctr_gui_vault_internal_derive_key(password, hash, salt)==-1) {
+		ctr_error("Unable to hash password.", 0);
+		goto cleanup;
+	}
+	uint8_t buf[48];
+	memcpy(buf, hash, 32);
+	memcpy(buf+32, salt, 16);
+	size_t outlen64 = BASE64_ENCODE_OUT_SIZE(48);
+	out64 = ctr_heap_allocate(outlen64 + 7 + 1);
+	unsigned int bytes_encoded;
+	bytes_encoded = base64_encode((unsigned char*)buf, 48, out64+7);
+	if (bytes_encoded == 0) {
+		ctr_error("base64 encoding failed", 0);
+		goto cleanup;
+	}
+	out64[outlen64+7] = 0;
+	memcpy(out64, SERVER_VAULT_CRYPTO_ID_20262, 7); //prefix
+	result = ctr_build_string_from_cstring(out64);
+	cleanup:
+		if (out64) ctr_heap_free(out64);
+		crypto_wipe((unsigned char*)password, strlen((char*)password));
+		ctr_heap_free(password);
+	
+	return result;
+}
+
+/**
+ * @def
+ * [ Vault ] password-hash: [ String ] verify: [ String ]
+ *
+ * @test669
+ */
+ctr_object* ctr_server_vault_password_verify(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* result = CtrStdBoolFalse;
+	uint8_t* salt;
+	uint8_t* hash;
+	uint8_t  hash2[32];
+	uint8_t* phash64;
+	char* pxphash64 = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	char* verify = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->next->object));
+	uint8_t* phash = ctr_heap_allocate(48);
+	if (strncmp(pxphash64,SERVER_VAULT_CRYPTO_ID_20262,7)!=0){
+		ctr_error("Unknown password type", 0);
+		goto cleanup;
+	}
+	phash64 = (uint8_t*) pxphash64 + 7;
+	if (base64_decode((char*)phash64, strlen((char*)phash64), (unsigned char*)phash)!=48) {
+		ctr_error("Decoding error",0);
+		goto cleanup;
+	}
+	hash = phash;
+	salt = phash + 32;
+	if (ctr_gui_vault_internal_derive_key((unsigned char*)verify, hash2, salt)!=0) {
+		ctr_error("Unable to derive key",0);
+		goto cleanup;
+	}
+	result = ctr_build_bool( !crypto_verify32(hash, hash2) );
+	cleanup:
+	
+	ctr_heap_free(pxphash64);
+	crypto_wipe(verify, strlen((char*)verify));
+	ctr_heap_free(verify);
+	ctr_heap_free(phash);
+	return result;
+}
 
 /*
  * cryptographically secure random token
@@ -445,5 +534,7 @@ void begin_vault() {
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "encrypt:key:" ), &ctr_gui_vault_encrypt );
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "decrypt:key:" ), &ctr_gui_vault_decrypt );
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "token:" ), &ctr_server_vault_token_set );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "password-hash:" ), &ctr_server_vault_password_hash );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "password-hash:verify:" ), &ctr_server_vault_password_verify );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Vault" ), vaultObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 }
