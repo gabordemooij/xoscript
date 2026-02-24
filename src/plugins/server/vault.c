@@ -24,146 +24,78 @@ int random_buf(void *buf, size_t n) {
 }
 
 static void print_hex(char* name, unsigned char *data, size_t length) {
+    printf("=> %s ", name);
     for (size_t i = 0; i < length; ++i) {
         printf("%02x", data[i]);
     }
     printf("\n");
 }
 
-/* base64 implementation written by WEI Zhicheng. */
-
-
+//rfc4648
 #define BASE64_PAD '='
-#define BASE64DE_FIRST '+'
-#define BASE64DE_LAST 'z'
-
-/* BASE 64 encode table */
-static const char base64en[] = {
-	'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
-	'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-	'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-	'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
-	'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-	'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-	'w', 'x', 'y', 'z', '0', '1', '2', '3',
-	'4', '5', '6', '7', '8', '9', '+', '/',
+static const char base64en[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static const unsigned char base64de[256] = {
+    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+    255,255,255,255,255,255,255,255,255,255,255,62,255,255,255,63, // '+'=43, '/'=47
+    52,53,54,55,56,57,58,59,60,61,255,255,255,255,255,255,             // '0'-'9'=48-57
+    255,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,                               // 'A'-'O'=65-79
+    15,16,17,18,19,20,21,22,23,24,25,255,255,255,255,255,               // 'P'-'Z'=80-90
+    255,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,                   // 'a'-'o'=97-111
+    41,42,43,44,45,46,47,48,49,50,51,255,255,255,255,255,               // 'p'-'z'=112-122
+    // rest are 255
+    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
 };
 
-/* ASCII order for BASE 64 decode, 255 in unused character */
-static const unsigned char base64de[] = {
-	/* nul, soh, stx, etx, eot, enq, ack, bel, */
-	   255, 255, 255, 255, 255, 255, 255, 255,
-	/*  bs,  ht,  nl,  vt,  np,  cr,  so,  si, */
-	   255, 255, 255, 255, 255, 255, 255, 255,
-	/* dle, dc1, dc2, dc3, dc4, nak, syn, etb, */
-	   255, 255, 255, 255, 255, 255, 255, 255,
-	/* can,  em, sub, esc,  fs,  gs,  rs,  us, */
-	   255, 255, 255, 255, 255, 255, 255, 255,
-	/*  sp, '!', '"', '#', '$', '%', '&', ''', */
-	   255, 255, 255, 255, 255, 255, 255, 255,
-	/* '(', ')', '*', '+', ',', '-', '.', '/', */
-	   255, 255, 255,  62, 255, 255, 255,  63,
-	/* '0', '1', '2', '3', '4', '5', '6', '7', */
-	    52,  53,  54,  55,  56,  57,  58,  59,
-	/* '8', '9', ':', ';', '<', '=', '>', '?', */
-	    60,  61, 255, 255, 255, 255, 255, 255,
-	/* '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', */
-	   255,   0,   1,  2,   3,   4,   5,    6,
-	/* 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', */
-	     7,   8,   9,  10,  11,  12,  13,  14,
-	/* 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', */
-	    15,  16,  17,  18,  19,  20,  21,  22,
-	/* 'X', 'Y', 'Z', '[', '\', ']', '^', '_', */
-	    23,  24,  25, 255, 255, 255, 255, 255,
-	/* '`', 'a', 'b', 'c', 'd', 'e', 'f', 'g', */
-	   255,  26,  27,  28,  29,  30,  31,  32,
-	/* 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', */
-	    33,  34,  35,  36,  37,  38,  39,  40,
-	/* 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', */
-	    41,  42,  43,  44,  45,  46,  47,  48,
-	/* 'x', 'y', 'z', '{', '|', '}', '~', del, */
-	    49,  50,  51, 255, 255, 255, 255, 255
-};
-
-unsigned int
-base64_encode(const unsigned char *in, unsigned int inlen, char *out) {
-	int s;
-	unsigned int i;
-	unsigned int j;
-	unsigned char c;
-	unsigned char l;
-	s = 0;
-	l = 0;
-	for (i = j = 0; i < inlen; i++) {
-		c = in[i];
-		switch (s) {
-		case 0:
-			s = 1;
-			out[j++] = base64en[(c >> 2) & 0x3F];
-			break;
-		case 1:
-			s = 2;
-			out[j++] = base64en[((l & 0x3) << 4) | ((c >> 4) & 0xF)];
-			break;
-		case 2:
-			s = 0;
-			out[j++] = base64en[((l & 0xF) << 2) | ((c >> 6) & 0x3)];
-			out[j++] = base64en[c & 0x3F];
-			break;
-		}
-		l = c;
-	}
-	switch (s) {
-	case 1:
-		out[j++] = base64en[(l & 0x3) << 4];
-		out[j++] = BASE64_PAD;
-		out[j++] = BASE64_PAD;
-		break;
-	case 2:
-		out[j++] = base64en[(l & 0xF) << 2];
-		out[j++] = BASE64_PAD;
-		break;
-	}
-	out[j] = 0;
-	return j;
+/* Base64 encode */
+unsigned int base64_encode(const unsigned char *in, unsigned int inlen, char *out) {
+    unsigned int i, j = 0;
+    for (i = 0; i < inlen; i += 3) {
+        uint32_t octet_a = i < inlen ? in[i] : 0;
+        uint32_t octet_b = (i + 1) < inlen ? in[i + 1] : 0;
+        uint32_t octet_c = (i + 2) < inlen ? in[i + 2] : 0;
+        uint32_t triple = (octet_a << 16) | (octet_b << 8) | octet_c;
+        out[j++] = base64en[(triple >> 18) & 0x3F];
+        out[j++] = base64en[(triple >> 12) & 0x3F];
+        out[j++] = (i + 1) < inlen ? base64en[(triple >> 6) & 0x3F] : BASE64_PAD;
+        out[j++] = (i + 2) < inlen ? base64en[triple & 0x3F] : BASE64_PAD;
+    }
+    out[j] = 0;
+    return j;
 }
 
-unsigned int
-base64_decode(const char *in, unsigned int inlen, unsigned char *out)
-{
-	unsigned int i;
-	unsigned int j;
-	unsigned char c;
-	if (inlen & 0x3) { return 0; }
-	for (i = j = 0; i < inlen; i++) {
-		if (in[i] == BASE64_PAD) { break; }
-		if (in[i] < BASE64DE_FIRST || in[i] > BASE64DE_LAST) return 0;
-		c = base64de[(unsigned char)in[i]];
-		if (c == 255) return 0;
-		switch (i & 0x3) {
-		case 0:
-			out[j] = (c << 2) & 0xFF;
-			break;
-		case 1:
-			out[j++] |= (c >> 4) & 0x3;
-			out[j] = (c & 0xF) << 4; 
-			break;
-		case 2:
-			out[j++] |= (c >> 2) & 0xF;
-			out[j] = (c & 0x3) << 6;
-			break;
-		case 3:
-			out[j++] |= c;
-			break;
-		}
-	}
-	return j;
+/* Base64 decode */
+unsigned int base64_decode(const char *in, unsigned int inlen, unsigned char *out) {
+    if (inlen % 4 != 0) return 0; // must be multiple of 4
+    unsigned int i, j = 0;
+    for (i = 0; i < inlen; i += 4) {
+        unsigned char sextet[4];
+        for (int k = 0; k < 4; ++k) {
+            if (in[i + k] == BASE64_PAD) {
+                sextet[k] = 0;
+            } else {
+                unsigned char v = base64de[(unsigned char)in[i + k]];
+                if (v == 255) return 0; // invalid character
+                sextet[k] = v;
+            }
+        }
+        out[j++] = (sextet[0] << 2) | (sextet[1] >> 4);
+        if (in[i + 2] != BASE64_PAD) {
+            out[j++] = ((sextet[1] & 0xF) << 4) | (sextet[2] >> 2);
+        }
+        if (in[i + 3] != BASE64_PAD) {
+            out[j++] = ((sextet[2] & 0x3) << 6) | sextet[3];
+        }
+    }
+    return j;
 }
-
-/* End of base64 code */
-
-
-
 
 //@todo protect against using Vault itself, always make instance, need name
 
@@ -521,18 +453,17 @@ ctr_object* ctr_server_vault_pki_create(ctr_object* myself, ctr_argument* argume
 }
 
 ctr_object* ctr_server_vault_pki_sign(ctr_object* myself, ctr_argument* argumentList) {
-	uint8_t       signature[65];
+	uint8_t       signature[64];
 	char* sig64 = NULL;
 	ctr_object* sig = CtrStdNil;
 	char* sk64  = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->next->object));
 	uint8_t* msg = (uint8_t*) ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
 	uint8_t sk[64];
-	if (base64_decode(sk64, strlen(sk64), &sk)!=64) {
+	if (base64_decode(sk64, strlen(sk64), sk)!=64) {
 		ctr_error("base64 decoding failed", 0);
 		goto cleanup;
 	}
-	crypto_eddsa_sign(signature, sk, msg, strlen(msg));
-	signature[64] = 0;
+	crypto_eddsa_sign(signature, sk, msg, strlen((char*)msg));
 	size_t sig64len = BASE64_ENCODE_OUT_SIZE(64);
 	sig64 = ctr_heap_allocate(sig64len + 1);
 	if (base64_encode(signature, 64, sig64)!=sig64len-1) {

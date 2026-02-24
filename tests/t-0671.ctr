@@ -1,0 +1,30 @@
+# public key (to secure APIs etc)
+Server init.
+
+# generate keys
+>> keys := Vault edkeys.
+
+# private (secret) key
+>> sk := keys first.
+
+# public key
+>> pk := keys last.
+
+# sign a message
+>> sig := Vault sign: ['abc'] with: sk.
+
+# check message (ok)
+Out write: ( 
+	Vault
+		check: ['abc'] 
+		signature: sig 
+		with: pk 
+), stop.
+
+# check message (fail)
+Out write: ( 
+	Vault 
+		check: ['abd'] 
+		signature: sig 
+		with: pk 
+), stop.
