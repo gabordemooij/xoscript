@@ -2477,6 +2477,4 @@ LGPL Licensed
 UTF8Encoder by Bjoern Hoehrmann
 Custom permissive license (included in 3rdparty_licenses.txt)
 
-Base64Encoder by WEI Zhicheng
-Public Domain
 
