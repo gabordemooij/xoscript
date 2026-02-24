@@ -574,6 +574,37 @@ ctr_object* ctr_server_vault_pki_check(ctr_object* myself, ctr_argument* argumen
 	return check;
 }
 
+/**
+ * @def
+ * [ Vault ] hash: [ String ] type: [ String ]
+ *
+ * @test670
+ */
+ctr_object* ctr_server_vault_hash(ctr_object* myself, ctr_argument* argumentList) {
+	uint8_t hash[64];
+	size_t hash64len;
+	ctr_object* result = CtrStdNil;
+	char* message  = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	char* hashtype = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->next->object));
+	char* hash64   = NULL;
+	if (strcmp("blake2b", hashtype)!=0) {
+		ctr_error("Unsupported hash type, use: blake2b", 0);
+		goto cleanup;
+	}
+	crypto_blake2b(hash, 64, (uint8_t*)message, strlen(message));
+	hash64len = BASE64_ENCODE_OUT_SIZE(64);
+	hash64 = ctr_heap_allocate(hash64len + 1);
+	if (base64_encode(hash, 64, hash64)!=hash64len-1) {
+		ctr_error("base64 encoding failed", 0);
+		goto cleanup;
+	}
+	result = ctr_build_string_from_cstring(hash64);
+	cleanup:
+		if (hash64) ctr_heap_free(hash64);
+		ctr_heap_free(hashtype);
+		ctr_heap_free(message);
+	return result;
+}
 
 /*
  * cryptographically secure random token
@@ -632,5 +663,6 @@ void begin_vault() {
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "edkeys" ), &ctr_server_vault_pki_create );
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "sign:with:" ), &ctr_server_vault_pki_sign );
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "check:signature:with:" ), &ctr_server_vault_pki_check );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "hash:type:" ), &ctr_server_vault_hash );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Vault" ), vaultObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 }
