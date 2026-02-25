@@ -5,6 +5,9 @@
 #include "../../xo.h"
 #include <ffi.h>
 
+#include "monocypher/src/monocypher.h"
+
+
 ctr_object* CtrMediaFFIObjectBase;
 ctr_object* CtrMediaDataBlob;
 
@@ -45,6 +48,16 @@ ctr_object* ctr_blob_fill(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
+ctr_object* ctr_blob_wipe(ctr_object* myself, ctr_argument* argumentList) {
+	size_t s = 0;
+	int err = ctr_heap_size(myself->value.rvalue->ptr, &s);
+	if (err) {
+		ctr_error("Unable to wipe memory block.", 0);
+		return CtrStdNil;
+	}
+	crypto_wipe(myself->value.rvalue->ptr, s - sizeof(size_t));
+	return myself;
+}
 
 ctr_object* ctr_blob_free(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_heap_free(myself->value.rvalue->ptr);
@@ -868,6 +881,7 @@ void begin_ffi() {
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_FREE_STRUCT ), &ctr_blob_free_struct);
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_FROM_LENGTH ), &ctr_blob_read);
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_LENGTH ), &ctr_blob_size);
+	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( "wipe" ), &ctr_blob_wipe);
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( "decode:" ), &ctr_blob_decode);
 	CtrMediaFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
 	CtrMediaFFIObjectBase->link = CtrStdObject;
