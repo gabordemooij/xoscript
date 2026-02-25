@@ -48,6 +48,12 @@ ctr_object* ctr_blob_fill(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
+/**
+ * @def
+ * [ Blob ] wipe
+ *
+ * @test672
+ */
 ctr_object* ctr_blob_wipe(ctr_object* myself, ctr_argument* argumentList) {
 	size_t s = 0;
 	int err = ctr_heap_size(myself->value.rvalue->ptr, &s);
