@@ -138,9 +138,8 @@ ctr_object* ctr_format_apply_to(ctr_object* myself, ctr_argument* argumentList) 
 	return answer;
 }
 
-
-ctr_object* ctr_server_urlencode_set(ctr_object* myself, ctr_argument* argumentList) {
-    char* source = ctr_heap_allocate_cstring(
+static ctr_object* ctr_server_urlformencode(ctr_object* myself, ctr_argument* argumentList, int is_form) {
+	char* source = ctr_heap_allocate_cstring(
 		ctr_internal_cast2string(argumentList->object)
 	);
     size_t len = 0;
@@ -160,7 +159,7 @@ ctr_object* ctr_server_urlencode_set(ctr_object* myself, ctr_argument* argumentL
 	}
     char *o = dest;
     for (p = source; *p; p++) {
-        if (*p == ' ') {
+        if (*p == ' ' && is_form) {
             *o++ = '+';
         } else if (*p == '-' || *p == '_' || *p == '.' || *p == '~' || isalnum((unsigned char)*p)) {
 			*o++ = *p;
@@ -174,6 +173,15 @@ ctr_object* ctr_server_urlencode_set(ctr_object* myself, ctr_argument* argumentL
     ctr_heap_free(dest);
     ctr_heap_free(source);
     return dest_obj;
+}
+
+
+ctr_object* ctr_server_urlencode_set(ctr_object* myself, ctr_argument* argumentList) {
+    return ctr_server_urlformencode(myself, argumentList, 0);
+}
+
+ctr_object* ctr_server_formencode_set(ctr_object* myself, ctr_argument* argumentList) {
+    return ctr_server_urlformencode(myself, argumentList, 1);
 }
 
 /**
@@ -507,6 +515,7 @@ void begin() {
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( CTR_DICT_NEW ), &ctr_server_new );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "html-encode:" ), &ctr_server_htmlencode_set );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "url-encode:" ), &ctr_server_urlencode_set );
+	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "form-encode:" ), &ctr_server_formencode_set );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "base64-encode:" ), &ctr_server_base64encode_set );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "base64-decode:" ), &ctr_server_base64decode_set );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "link:" ), &ctr_server_link_set );

@@ -112,7 +112,7 @@ unittest() {
 
 # select range
 FROM=1
-TIL=672
+TIL=673
 
 # run tests for linux
 pushd build/Linux/bin
