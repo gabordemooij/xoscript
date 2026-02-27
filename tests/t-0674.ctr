@@ -1,0 +1,32 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> path := ['/tmp/dat.csv'].
+>> csv := File new: path.
+csv write: s.
+
+# accepts CRLF LF CR, varying row length
+csv delimiter: [';'] quote: ['"'] lines: { :line
+	Out write: line, stop.
+}.
+
+# unequal lines
+s append: ['\njustone'].
+csv write: s.
+{
+	csv delimiter: [';'] quote: ['"'] lines: { :line
+		Out write: line, stop.
+	}.
+} except: { :e 
+	Out write: e, stop.
+}, start.
+
+# invalid format
+s := ['"he"llo";world'].
+csv write: s.
+{
+	csv delimiter: [';'] quote: ['"'] lines: { :line
+		Out write: line, stop.
+	}.
+} except: { :e 
+	Out write: e, stop.
+}, start.

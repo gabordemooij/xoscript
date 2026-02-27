@@ -360,3 +360,139 @@ ctr_object* ctr_file_lines(ctr_object* myself, ctr_argument* argumentList) {
 	fclose(f);
 	return myself;	
 }
+
+/**
+ * @def
+ * [ File ] delimiter: [ String ] quote: [ String ] lines: [ Function ]
+ *
+ * @test675
+ */
+ctr_object* ctr_file_csvlines( ctr_object* myself, ctr_argument* argumentList ) {
+	ctr_object* path;
+	ctr_object* result;
+	ctr_argument a;
+	ctr_argument cba;
+	size_t bufsize;
+	char* pathstr;
+	FILE* f;
+	char  error_message[200];
+	char* delim;
+	char* quote;
+	char* buf;
+	char q;
+	char d;
+	char c;
+	int error_code;
+	size_t row;
+	size_t col;
+	int eof;
+	int st;
+	int o;
+	int p;
+	size_t headers;
+	size_t columns;
+	size_t line;
+	path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0);
+	if (path == NULL) return CtrStdNil;
+	pathstr = ctr_heap_allocate_cstring( path );
+	f = fopen(pathstr, "r");
+	error_code = errno;
+	ctr_heap_free( pathstr );
+	if (!f) {
+		ctr_error( CTR_ERR_OPEN, error_code );
+		return CtrStdNil;
+	}
+	delim = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	quote = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->next->object));
+	buf = NULL;
+	if (strlen(quote)!=1 || strlen(delim)!=1) {
+		ctr_error("Invalid delimiter or quote.", 0);
+		goto cleanup;
+	}
+	bufsize = 10;
+	buf = ctr_heap_allocate(bufsize);
+	eof = 0;
+	st = 0;
+	q = quote[0];
+	d = delim[0];
+	o = 0;
+	p = 0;
+	row = 0;
+	col = 0;
+	headers = 0;
+	columns = 0;
+	line = 0;
+	result = ctr_array_new(CtrStdArray, argumentList);
+	for(;;) {
+		o = fgetc(f);
+		col++;
+		if (o == EOF) eof = 1;
+		c = (char) o;
+		if (c == '\n') { col = 0; line++; }
+		if (st == 3) {
+			st = 0;
+			if (c == '\n') {
+				continue;
+			}
+		}
+		if (st == 0 && c == q) {
+			st = 1;
+			continue;
+		}
+		if (st == 1 && c == q) {
+			st = 2;
+			continue;
+		}
+		if (st == 2 && c == q) {
+			st = 1;
+		}
+		if (st != 1 && (c == d || c == '\r' || c == '\n' || eof)) {
+			buf[p] = 0;
+			a.object = ctr_build_string_from_cstring(buf);
+			a.next = NULL;
+			ctr_array_push(result, &a);
+			p = 0;
+			st = 0;
+			columns++;
+			if (c == '\r' || c == '\n' || eof) {
+				if (row == 0) {
+					headers = columns;
+				} else if (headers != columns) {
+					snprintf(error_message, 200, "Invalid column number on line %ld (expected: %ld got: %ld) \n", row, headers,columns);
+					ctr_error(error_message, 0);
+					goto cleanup;
+				}
+				row++;
+				columns = 0;
+				col = 0;
+				cba.object = result;
+				cba.next = NULL;
+				ctr_internal_object_property(myself, "csvline", result); // prevent GC for whole line (array + elements)
+				ctr_block_run(argumentList->next->next->object, &cba, NULL);
+				if (CtrStdFlow == CtrStdContinue) CtrStdFlow = NULL; // consume continue
+				if (CtrStdFlow) break;
+				if (c == '\r') st = 3;
+				if (eof) break;
+				result = ctr_array_new(CtrStdArray, argumentList);
+			}
+			continue;
+		}
+		if (st == 2) {
+			snprintf(error_message, 200, "Unexpected 0x0%x at line: %ld character: %ld", c, line, col);
+			ctr_error(error_message, 0);
+			goto cleanup;
+		}
+		buf[p++] = c;
+		if (p >= bufsize) {
+			bufsize *= 2;
+			buf = ctr_heap_reallocate( buf, bufsize );
+		}
+	}
+	cleanup:
+		fclose(f);
+		ctr_heap_free(delim);
+		ctr_heap_free(quote);
+		if (buf) ctr_heap_free(buf);
+	return myself;
+}
+
