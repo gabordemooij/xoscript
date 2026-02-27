@@ -175,11 +175,22 @@ static ctr_object* ctr_server_urlformencode(ctr_object* myself, ctr_argument* ar
     return dest_obj;
 }
 
-
+/**
+ * @def
+ * [ Server ] url-encode: [ String ]
+ *
+ * @test673
+ */
 ctr_object* ctr_server_urlencode_set(ctr_object* myself, ctr_argument* argumentList) {
     return ctr_server_urlformencode(myself, argumentList, 0);
 }
 
+/**
+ * @def
+ * [ Server ] form-encode: [ String ]
+ *
+ * @test673
+ */
 ctr_object* ctr_server_formencode_set(ctr_object* myself, ctr_argument* argumentList) {
     return ctr_server_urlformencode(myself, argumentList, 1);
 }
