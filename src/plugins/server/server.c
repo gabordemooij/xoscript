@@ -138,6 +138,10 @@ ctr_object* ctr_format_apply_to(ctr_object* myself, ctr_argument* argumentList) 
 	return answer;
 }
 
+/**
+ * Encodes RFC 3986 or application/form.
+ * RFC 3986 encodes space as %20 while form encoding uses +.
+ */
 static ctr_object* ctr_server_urlformencode(ctr_object* myself, ctr_argument* argumentList, int is_form) {
 	char* source = ctr_heap_allocate_cstring(
 		ctr_internal_cast2string(argumentList->object)
