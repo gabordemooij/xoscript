@@ -25,9 +25,7 @@ export PACKAGE
 make plugin-clean
 NAME="libctrserver.so" make plugin
 
-
 fi
-
 
 setup1() {
 	i=$1
@@ -64,7 +62,6 @@ unittest() {
 	fi
 	cat /tmp/rs /tmp/err > /tmp/out
 
-
 	if ! test -f ../../../tests/exp/en/test${i}en.exp; then
 		if ! touch ../../../tests/exp/en/test${i}en.exp; then
 			exit 1
@@ -72,11 +69,7 @@ unittest() {
 	fi
 
 	skipcode=$(head -n1 ../../../tests/t-$1.ctr)
-	if [[ "$skipcode" == "#Linux" && "$os" != "lin" ]]; then
-		echo "SKIP Linux-only test"
-		return
-	fi
-	
+
 	if [[ "$skipcode" == "#OBSD" ]]; then
 		echo "SKIP OBSD-only test"
 		return
@@ -107,7 +100,6 @@ unittest() {
 	else
 		echo "✓ test $i | $mmode"
 	fi
-
 }
 
 # select range
@@ -118,9 +110,9 @@ TIL=675
 pushd build/Linux/bin
 for i in $(seq -f "%04g" $FROM $TIL);
 do
-    unittest $i 1 lin
-    unittest $i 4 lin
-    unittest $i 0 lin
+    unittest $i 1
+    unittest $i 4
+    unittest $i 0
 done
 popd
 
