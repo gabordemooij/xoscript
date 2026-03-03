@@ -83,6 +83,10 @@ Web-Document on: ['session-manager:'] do: { :manager
 	own session-manager := manager.
 }.
 
+Web-Document on: ['session-manager'] do: {
+	<- own session-manager.
+}.
+
 Web-Document on: ['check-headers'] do: {
 	own headers-out true: {
 		this-task error: ['Headers already sent to client.'].
@@ -187,7 +191,7 @@ Web-Document on: ['not-found:'] do: { :output
 >> Session := Object new.
 
 Session on: ['new'] do: {
-	<- self new for: None.
+	<- self new init for: None.
 }.
 
 Session on: ['for:'] do: { :id
@@ -210,8 +214,16 @@ Session on: ['destroy'] do: {
 
 >> Tempfile-Session := Session new.
 
+Tempfile-Session on: ['init'] do: {
+	own pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session on: ['path-prefix:'] do: { :str
+	own pathprefix := str.
+}.
+
 Tempfile-Session on: ['file'] do: {
-	<- ( File new: ( ['/tmp/sess-'] + own id + ['.txt'] ) ).
+	<- ( File new: ( own pathprefix + own id + ['.txt'] ) ).
 }.
 
 Tempfile-Session on: ['load'] do: {
