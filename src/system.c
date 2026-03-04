@@ -893,7 +893,7 @@ double ctr_internal_versiontime() {
  * [ Moment ] wait: [ Number ]
  *
  *
- * @test568
+ * @test79
  */
 
 ctr_object* ctr_clock_wait(ctr_object* myself, ctr_argument* argumentList) {
