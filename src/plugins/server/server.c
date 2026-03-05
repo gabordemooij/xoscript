@@ -113,7 +113,7 @@ ctr_object* ctr_format_new_set(ctr_object* myself, ctr_argument* argumentList) {
 	return instance;
 }
 
-ctr_object* ctr_format_apply_to(ctr_object* myself, ctr_argument* argumentList) {
+ctr_object* ctr_format_apply_to_general(ctr_object* myself, ctr_argument* argumentList, int cast) {
 	ctr_object* format = ctr_internal_object_property(myself, "_format", NULL);
 	if (format == CtrStdNil) return CtrStdNil;
 	char* format_str = ctr_heap_allocate_cstring(format);
@@ -128,7 +128,12 @@ ctr_object* ctr_format_apply_to(ctr_object* myself, ctr_argument* argumentList) 
 		answer = ctr_build_string_from_cstring(result);
 		free(result);
 	} else if (value->info.type == CTR_OBJECT_TYPE_OTNUMBER)  {
-		asprintf(&result, format_str, (double) value->value.nvalue);
+		if (cast == 1) {
+			// cast to int (to print octals or decimals for instance %o/%d etc..)
+			asprintf(&result, format_str, (int) value->value.nvalue);
+		} else {
+			asprintf(&result, format_str, (double) value->value.nvalue);
+		}
 		answer = ctr_build_string_from_cstring(result);
 		free(result);
 	} else {
@@ -136,6 +141,16 @@ ctr_object* ctr_format_apply_to(ctr_object* myself, ctr_argument* argumentList) 
 	}
 	ctr_heap_free(format_str);
 	return answer;
+}
+
+ctr_object* ctr_format_apply_to(ctr_object* myself, ctr_argument* argumentList) {
+	return ctr_format_apply_to_general(myself, argumentList, 0);
+}
+
+// because xoscript only works with floats, cast to int and set format cast = 1
+// yes, this is not ideal, but in a scripting context it's good enough
+ctr_object* ctr_format_apply_int_to(ctr_object* myself, ctr_argument* argumentList) {
+	return ctr_format_apply_to_general(myself, argumentList, 1);
 }
 
 /**
@@ -545,6 +560,7 @@ void begin() {
 	ctr_internal_create_func(formatObject, ctr_build_string_from_cstring( CTR_DICT_NEW_SET ), &ctr_format_new_set );
 	ctr_internal_create_func(formatObject, ctr_build_string_from_cstring( "format:" ), &ctr_format_format_set );
 	ctr_internal_create_func(formatObject, ctr_build_string_from_cstring( "apply:" ), &ctr_format_apply_to );
+	ctr_internal_create_func(formatObject, ctr_build_string_from_cstring( "apply-int:" ), &ctr_format_apply_int_to );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Format" ), formatObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	#ifdef LIBCURL
 	begin_net();
