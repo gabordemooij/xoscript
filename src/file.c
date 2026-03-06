@@ -496,3 +496,63 @@ ctr_object* ctr_file_csvlines( ctr_object* myself, ctr_argument* argumentList ) 
 	return myself;
 }
 
+/**
+ * @def
+ * [ File ] chmod: [ Number ]
+ *
+ * @test677
+ */
+ctr_object* ctr_file_chmod(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0);
+	int mask = (int) ctr_tonum(argumentList->object);
+	char* pathstr;
+	if (path == NULL) return myself;
+	pathstr = ctr_heap_allocate_cstring( path );
+	int err = chmod(pathstr, mask);
+	int errcode = errno;
+	ctr_heap_free( pathstr );
+	if (err) {
+		CtrStdFlow = ctr_error( "chmod failed", errcode );
+		return CtrStdNil;
+	}
+	return myself;
+}
+
+/**
+ * @def
+ * [ File ] stat
+ *
+ * @test677
+ */
+ctr_object* ctr_file_stat(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0);
+	char* pathstr;
+	if (path == NULL) return myself;
+	pathstr = ctr_heap_allocate_cstring( path );
+	struct stat st;
+	int err = stat(pathstr, &st);
+	int errcode = errno;
+	ctr_heap_free( pathstr );
+	if (err) {
+		CtrStdFlow = ctr_error( "stat failed", errcode );
+		return CtrStdNil;
+	}
+	ctr_argument a;
+	a.next = NULL;
+	a.object = NULL;
+	ctr_object* info = ctr_map_new(CtrStdMap, &a);
+	ctr_argument arg_val;
+	ctr_argument arg_key;
+	ctr_object* mode = ctr_build_number_from_float( (double) st.st_mode );
+	mode->info.sticky = 1; //gc
+	arg_val.object = mode;
+	arg_val.next = &arg_key;
+	ctr_object* mode_key = ctr_build_string_from_cstring("mode");
+	mode_key->info.sticky = 1;
+	arg_key.object = mode_key;
+	arg_key.next = NULL;
+	ctr_map_put(info, &arg_val);
+	mode->info.sticky = 0;
+	mode_key->info.sticky = 0;
+	return info;
+}

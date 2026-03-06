@@ -672,8 +672,8 @@ extern ctr_object* ctr_file_unlock(ctr_object* myself, ctr_argument* argumentLis
 extern ctr_object* ctr_file_lines(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_file_csvlines( ctr_object* myself, ctr_argument* argumentList );
 extern ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList);
-
-
+extern ctr_object* ctr_file_chmod(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_file_stat(ctr_object* myself, ctr_argument* argumentList);
 
 /**
  * Command Object Interface
