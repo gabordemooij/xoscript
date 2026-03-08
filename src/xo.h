@@ -17,7 +17,8 @@
 #include <locale.h>
 #include "siphash.h"
 #include <sys/stat.h>
-
+#include <pwd.h>
+#include <grp.h>
 #include <termios.h>
 #include <sys/wait.h>
 #include <dlfcn.h>
@@ -673,6 +674,7 @@ extern ctr_object* ctr_file_csvlines( ctr_object* myself, ctr_argument* argument
 extern ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_file_chmod(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_file_stat(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_file_chown(ctr_object* myself, ctr_argument* argumentList);
 
 /**
  * Command Object Interface

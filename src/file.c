@@ -519,6 +519,47 @@ ctr_object* ctr_file_chmod(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 /**
+ * @def
+ * [ File ] owner: [ String ] group: [ String ]
+ *
+ * @test679
+ */
+ctr_object* ctr_file_chown(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0);
+	int mask = (int) ctr_tonum(argumentList->object);
+	char* pathstr;
+	if (path == NULL) return myself;
+	pathstr = ctr_heap_allocate_cstring( path );
+	char* owner = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	char* group = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->next->object));
+	struct passwd *pw;
+	struct group *gr;
+	uid_t uid;
+	gid_t gid;
+	pw = getpwnam(owner);
+	if (!pw) {
+		ctr_error("Unknown user id", 0);
+		goto cleanup;
+	}
+	uid = pw->pw_uid;
+	gr = getgrnam(group);
+	if (!gr) {
+		ctr_error("Unknown group id", 0);
+		goto cleanup;
+	}
+	gid = gr->gr_gid;
+	if (chown(pathstr, uid, gid) != 0) {
+		ctr_error("Chown failed", 0);
+		goto cleanup;
+	}
+	cleanup:
+	ctr_heap_free( pathstr );
+	ctr_heap_free( owner );
+	ctr_heap_free( group );
+	return myself;
+}
+
+/**
  * @internal
  *
  * Locks a file or unlocks a file.
