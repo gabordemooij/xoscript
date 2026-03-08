@@ -711,6 +711,7 @@ extern ctr_object* ctr_program_getcwd(ctr_object* myself, ctr_argument* argument
 extern ctr_object* ctr_program_feature_set(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_program_feature(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_program_chdir(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_program_mkdir(ctr_object* myself, ctr_argument* argumentList);
 extern double ctr_internal_versiontime(void);
 
 /**

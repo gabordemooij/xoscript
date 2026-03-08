@@ -368,6 +368,26 @@ ctr_object* ctr_program_chdir(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
+
+/**
+ * @def
+ * [ Program ] mkdir: [ String ] mode: [ Number ]
+ *
+ * @test681
+ */
+ctr_object* ctr_program_mkdir(ctr_object* myself, ctr_argument* argumentList) {
+	char* pathstr = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	int mask = (int) ctr_tonum(argumentList->next->object);
+	int err = mkdir(pathstr, mask);
+	int errcode = errno;
+	ctr_heap_free( pathstr );
+	if (err) {
+		CtrStdFlow = ctr_error( "mkdir failed", errcode );
+		return CtrStdNil;
+	}
+	return myself;
+}
+
 /**
  * @def
  * [ Program ] argument: [ Number ]

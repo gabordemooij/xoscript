@@ -1072,6 +1072,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "feature:enable:" ), &ctr_program_feature_set );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "feature:" ), &ctr_program_feature );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "chdir:" ), &ctr_program_chdir );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "mkdir:mode:" ), &ctr_program_mkdir );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PROGRAM ), CtrStdCommand, 0 );
 	CtrStdCommand->link = CtrStdObject;
 	CtrStdCommand->info.sticky = 1;
