@@ -675,6 +675,8 @@ extern ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList)
 extern ctr_object* ctr_file_chmod(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_file_stat(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_file_chown(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_file_tempwrite(ctr_object* myself, ctr_argument* argumentList);
+
 
 /**
  * Command Object Interface

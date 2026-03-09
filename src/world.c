@@ -1030,6 +1030,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "stat" ), &ctr_file_stat );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "lock" ), &ctr_file_lock );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "unlock" ), &ctr_file_unlock );
+	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "tempwrite:" ), &ctr_file_tempwrite );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "owner:group:" ), &ctr_file_chown );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_ARRAY ), &ctr_file_list );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_TOSTRING ), &ctr_file_to_string );

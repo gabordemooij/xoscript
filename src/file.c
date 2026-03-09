@@ -130,6 +130,27 @@ ctr_object* ctr_file_write(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
+ * [ File ] tempwrite: [ String ]
+ *
+ *
+ * @test682
+ */
+
+ctr_object* ctr_file_tempwrite(ctr_object* myself, ctr_argument* argumentList) {
+	char path[] = "/tmp/xotempXXXXXX";
+	int f = mkstemp(path);
+	if (f == -1) {
+		ctr_error("Unable to create temporary file", 0);
+		return CtrStdNil;
+	}
+	ctr_object* str = ctr_internal_cast2string(argumentList->object);
+	write(f,str->value.svalue->value, str->value.svalue->vlen);
+	close(f);
+	return ctr_build_string_from_cstring(path);
+}
+
+/**
+ * @def
  * [ File ] append: [ String ]
  *
  *
