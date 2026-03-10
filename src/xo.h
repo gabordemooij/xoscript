@@ -35,8 +35,8 @@
 /**
  * Version information
  */
-#define CTR_VERSION "1.5.8"
-#define CTR_VERSION_NUM 105008
+#define CTR_VERSION "1.5.9"
+#define CTR_VERSION_NUM 105009
 
 /**
  * Backward compatibility table
