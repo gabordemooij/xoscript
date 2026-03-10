@@ -537,6 +537,114 @@ ctr_object* ctr_server_mimetype(ctr_object* myself, ctr_argument* argumentList) 
 	return mimetype;
 }
 
+static int is_valid_ipv4(const char *ip) {
+    if (ip == NULL) return 0;
+    int num, dots = 0;
+    const char *ptr = ip;
+    while (*ptr) {
+        if (!isdigit(*ptr)) return 0;
+		num = 0;
+        int digits = 0;
+        while (*ptr && isdigit(*ptr)) {
+            num = num * 10 + (*ptr - '0');
+            digits++;
+			if (digits > 3) return 0;
+            if (num > 255) return 0;
+            ptr++;
+        }
+        if (digits > 1 && *(ptr - digits) == '0') return 0;
+        if (*ptr == '.') {
+            dots++;
+            if (dots > 3) return 0;
+            ptr++;
+            if (*ptr == '\0') return 0;
+        } else if (*ptr != '\0') {
+            return 0;
+        }
+    }
+    return dots == 3;
+}
+
+static int is_valid_ipv6(const char *ip) {
+	if (!ip || *ip == '\0') return 0;
+	int blocks = 0;
+	int digits = 0;
+	int double_colon_seen = 0;
+	while (*ip) {
+		if (isxdigit((unsigned char)*ip)) {
+		digits++;
+		if (digits > 4) return 0;
+		} else if (*ip == ':') {
+			if (*(ip + 1) == ':' && !double_colon_seen) {
+				double_colon_seen = 1;
+				ip++;
+			} else if (digits == 0) {
+				return 0;
+			}
+			blocks++;
+			digits = 0;
+			} else {
+			return 0;
+		}
+		ip++;
+	}
+	if (digits > 0) blocks++;
+	if (double_colon_seen) return blocks <= 8;
+	return blocks == 8;
+}
+
+static int is_valid_mac(const char* mac) {
+    int i;
+    if (!mac) return 0;
+    for (i = 0; i < 17; i++) {
+        if ((i + 1) % 3 == 0) {
+            if (mac[i] != ':') return 0;
+        } else {
+            if (!isxdigit(mac[i])) return 0;
+        }
+    }
+    return mac[17] == '\0';
+}
+
+/**
+ * @def
+ * [ String ] ipv4?
+ *
+ * @test684
+ */
+ctr_object* ctr_string_ipv4(ctr_object* myself, ctr_argument* argumentList) {
+	char* str = ctr_heap_allocate_cstring(myself);
+	ctr_object* bool = ctr_build_bool(is_valid_ipv4(str));
+	ctr_heap_free(str);
+	return bool;
+}
+
+/**
+ * @def
+ * [ String ] ipv6?
+ *
+ * @test685
+ */
+ctr_object* ctr_string_ipv6(ctr_object* myself, ctr_argument* argumentList) {
+	char* str = ctr_heap_allocate_cstring(myself);
+	ctr_object* bool = ctr_build_bool(is_valid_ipv6(str));
+	ctr_heap_free(str);
+	return bool;
+}
+
+/**
+ * @def
+ * [ String ] mac?
+ *
+ * @test686
+ */
+ctr_object* ctr_string_mac(ctr_object* myself, ctr_argument* argumentList) {
+	char* str = ctr_heap_allocate_cstring(myself);
+	ctr_object* bool = ctr_build_bool(is_valid_mac(str));
+	ctr_heap_free(str);
+	return bool;
+}
+
 void begin() {
 	ctr_internal_server_init();
 	serverObject = NULL;
@@ -562,6 +670,9 @@ void begin() {
 	ctr_internal_create_func(formatObject, ctr_build_string_from_cstring( "apply:" ), &ctr_format_apply_to );
 	ctr_internal_create_func(formatObject, ctr_build_string_from_cstring( "apply-int:" ), &ctr_format_apply_int_to );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Format" ), formatObject, CTR_CATEGORY_PUBLIC_PROPERTY);
+	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "ipv4?" ), &ctr_string_ipv4 );
+	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "ipv6?" ), &ctr_string_ipv6 );
+	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "mac?" ), &ctr_string_mac );
 	#ifdef LIBCURL
 	begin_net();
 	#endif
