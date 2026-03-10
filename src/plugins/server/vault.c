@@ -578,6 +578,52 @@ ctr_object* ctr_server_vault_token_set(ctr_object* myself, ctr_argument* argumen
     return answer;
 }
 
+/**
+ * @def
+ * [ File ] checksum
+ *
+ * @test683 
+ */
+ctr_object* ctr_file_checksum(ctr_object* myself, ctr_argument* argumentList) {
+    ctr_object* path = ctr_internal_object_property(myself, "path", NULL);
+    uint8_t hash[32];
+    if (path == NULL) return CtrStdNil;
+	char* pathstr = ctr_heap_allocate_cstring( path );
+	FILE* f = fopen(pathstr, "rb");
+	int error_code = errno;
+	ctr_heap_free( pathstr );
+	if (!f) {
+		ctr_error( CTR_ERR_OPEN, error_code );
+		return CtrStdNil;
+	}
+    crypto_blake2b_ctx ctx;
+    crypto_blake2b_init(&ctx, 32); // 32 bytes = 256-bit fingerprint
+	uint8_t buf[4096];
+    size_t n;
+    while ((n = fread(buf, 1, sizeof(buf), f)) > 0) {
+        crypto_blake2b_update(&ctx, buf, n);
+    }
+    if (ferror(f)) {
+		error_code = errno;
+        fclose(f);
+        ctr_error( CTR_ERR_OPEN, error_code );
+		return CtrStdNil;
+    }
+	fclose(f);
+    crypto_blake2b_final(&ctx, (uint8_t*) &hash);
+    size_t hash64len = BASE64_ENCODE_OUT_SIZE(32);
+	char* hash64 = ctr_heap_allocate(hash64len + 1);
+	if (base64_encode(hash, 32, hash64)!=hash64len-1) {
+		ctr_heap_free(hash64);
+		ctr_error("base64 encoding failed", 0);
+		return CtrStdNil;
+	}
+	ctr_object* result = ctr_build_string_from_cstring(hash64);
+	ctr_heap_free(hash64);
+    return result;
+}
+
+
 ctr_object* vaultObject;
 void begin_vault() {
 	//ctr_gui_internal_vault_init();
@@ -596,4 +642,5 @@ void begin_vault() {
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "check:signature:with:" ), &ctr_server_vault_pki_check );
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "hash:type:" ), &ctr_server_vault_hash );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Vault" ), vaultObject, CTR_CATEGORY_PUBLIC_PROPERTY);
+	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "checksum" ), &ctr_file_checksum );
 }
