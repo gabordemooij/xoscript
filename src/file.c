@@ -146,7 +146,10 @@ ctr_object* ctr_file_tempwrite(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* str = ctr_internal_cast2string(argumentList->object);
 	write(f,str->value.svalue->value, str->value.svalue->vlen);
 	close(f);
-	return ctr_build_string_from_cstring(path);
+	ctr_argument a;
+	a.object = ctr_build_string_from_cstring(path);
+	a.next = NULL;
+	return ctr_file_new(CtrStdFile, &a);
 }
 
 /**
