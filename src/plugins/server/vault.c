@@ -626,7 +626,6 @@ ctr_object* ctr_file_checksum(ctr_object* myself, ctr_argument* argumentList) {
 
 ctr_object* vaultObject;
 void begin_vault() {
-	//ctr_gui_internal_vault_init();
 	vaultObject = ctr_gui_vault_new(CtrStdObject, NULL);
 	vaultObject->link = CtrStdObject;
 	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "new" ), &ctr_gui_vault_new );
