@@ -691,7 +691,6 @@ ctr_object* ctr_file_stat(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_map_put(info, &arg_val);
 	size->info.sticky = 0;
 	size_key->info.sticky = 0;
-	
 	ctr_object* atime_key = ctr_build_string_from_cstring("last-access");
 	ctr_object* atime = ctr_build_number_from_float((double) st.st_atime);
 	atime->info.sticky = 1;
@@ -701,7 +700,6 @@ ctr_object* ctr_file_stat(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_map_put(info, &arg_val);
 	atime->info.sticky = 0;
 	atime_key->info.sticky = 0;
-	
 	ctr_object* mtime_key = ctr_build_string_from_cstring("last-modified");
 	ctr_object* mtime = ctr_build_number_from_float((double) st.st_mtime);
 	mtime->info.sticky = 1;
