@@ -308,7 +308,6 @@ ctr_object* ctr_gui_vault_decrypt(ctr_object* myself, ctr_argument* argumentList
 	out = ctr_heap_allocate((int)mlen + 1);
 	out[(int)mlen] = '\0';
 	if (crypto_aead_unlock((unsigned char*)out, mac, key, nonce, NULL, 0, (unsigned char*) message, (int)mlen)) {
-		//@todo fix memleak
 		ctr_error("Unable to decrypt string, invalid format, password or algorithm.", 0);
 		ctr_heap_free(out);
 		result = CtrStdNil;
