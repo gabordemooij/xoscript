@@ -746,25 +746,14 @@ ctr_object* ctr_map_type(ctr_object* myself, ctr_argument* argumentList) {
 
 ctr_object* ctr_map_put(ctr_object* myself, ctr_argument* argumentList) {
 	char* key;
-	long keyLen;
-	ctr_object* putKey;
+	size_t keyLen;
+	ctr_object* putKey = ctr_internal_cast2string(argumentList->next->object);
 	ctr_object* putValue = argumentList->object;
-	ctr_argument* nextArgument = argumentList->next;
-	ctr_argument* emptyArgumentList = ctr_heap_allocate(sizeof(ctr_argument));
-	emptyArgumentList->next = NULL;
-	emptyArgumentList->object = NULL;
-	/* Use tostring and not tocode here because tocode will escape quotes, but tostring not, this will preserve the orig key */
-	putKey = ctr_send_message(nextArgument->object, CTR_DICT_TOSTRING, strlen(CTR_DICT_TOSTRING), emptyArgumentList);
-	/* If developer returns something other than string (ouch, toString), then cast anyway */
-	if (putKey->info.type != CTR_OBJECT_TYPE_OTSTRING) {
-		putKey = ctr_internal_cast2string(putKey);
-	}
 	key = ctr_heap_allocate( putKey->value.svalue->vlen * sizeof( char ) );
 	keyLen = putKey->value.svalue->vlen;
 	memcpy(key, putKey->value.svalue->value, keyLen);
 	ctr_internal_object_delete_property(myself, ctr_build_string(key, keyLen), 0);
 	ctr_internal_object_add_property(myself, ctr_build_string(key, keyLen), putValue, 0);
-	ctr_heap_free( emptyArgumentList );
 	ctr_heap_free( key );
 	return myself;
 }
