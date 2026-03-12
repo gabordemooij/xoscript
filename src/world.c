@@ -471,6 +471,9 @@ ctr_object* ctr_internal_cast2number(ctr_object* obj2convert_triggers_GC) {
  * and therefore code block execution, which may
  * trigger GC. So, any temporary ctr_object for
  * internal use should be made sticky.
+ *
+ * This function must ALWAYS BE
+ * GC SAFE IF argument IS A string (type).
  */
 ctr_object* ctr_internal_cast2string( ctr_object* obj2convert_triggers_GC ) {
 	ctr_object* o = obj2convert_triggers_GC;
