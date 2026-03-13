@@ -645,6 +645,51 @@ ctr_object* ctr_string_mac(ctr_object* myself, ctr_argument* argumentList) {
 	return bool;
 }
 
+/**
+ * @def
+ * [ String ] html
+ *
+ * @test687
+ */
+ctr_object* ctr_string_tohtml(ctr_object* myself, ctr_argument* argumentList ) {
+	size_t len = 0;
+	char* html; char* dst;
+	int r,b,it,i;
+	r = 0; i = 0; b = 0; it = 0;
+	size_t vlen;
+	vlen = myself->value.svalue->vlen;
+	char* value;
+	value = myself->value.svalue->value;
+	for(i=0; i<vlen; i++) {
+		char c = value[i];
+		if (c == '*' && !b)  { len += 3; b=1;  continue; }
+		if (c == '*' &&  b)  { len += 4; b=0;  continue; }
+		if (c == '|' && !it) { len += 3; it=1; continue; }
+		if (c == '|' && it)  { len += 4; it=0; continue; }
+		if (c == '\r')       { len += 5; r=1;  continue; } 
+		if (!r && c == '\n') { len += 5;       continue; }
+		if (r && c == '\n')  { r = 0; }
+		len += 1;
+	}
+	html = ctr_heap_allocate(len + 1);
+	dst = html;
+	r = 0; i = 0; b = 0; it = 0;
+	for(i=0; i<vlen; i++) {
+		char c = value[i];
+		if (c == '*' && !b)  { memcpy(dst,"<b>",3);    dst += 3; b=1;  continue; }
+		if (c == '*' &&  b)  { memcpy(dst,"</b>",4);   dst += 4; b=0;  continue; }
+		if (c == '|' && !it) { memcpy(dst,"<i>",3);    dst += 3; it=1; continue; }
+		if (c == '|' && it)  { memcpy(dst,"</i>",4);   dst += 4; it=0; continue; }
+		if (c == '\r')       { memcpy(dst,"<br>\r",5); dst += 5; r=1;  continue; } 
+		if (!r && c == '\n') { memcpy(dst,"<br>\n",5); dst += 5;       continue; }
+		if (r && c == '\n')  { r = 0; }
+		*dst++ = c;
+	}
+	ctr_object* result = ctr_build_string_from_cstring(html);
+	ctr_heap_free(html);
+	return result;
+}
+
 void begin() {
 	ctr_internal_server_init();
 	serverObject = NULL;
@@ -673,6 +718,8 @@ void begin() {
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "ipv4?" ), &ctr_string_ipv4 );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "ipv6?" ), &ctr_string_ipv6 );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "mac?" ), &ctr_string_mac );
+	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "html" ), &ctr_string_tohtml );
+	
 	#ifdef LIBCURL
 	begin_net();
 	#endif
