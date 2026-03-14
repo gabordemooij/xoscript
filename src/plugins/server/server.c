@@ -664,8 +664,8 @@ ctr_object* ctr_string_tohtml(ctr_object* myself, ctr_argument* argumentList ) {
 		char c = value[i];
 		if (c == '*' && !b)  { len += 3; b=1;  continue; }
 		if (c == '*' &&  b)  { len += 4; b=0;  continue; }
-		if (c == '|' && !it) { len += 3; it=1; continue; }
-		if (c == '|' && it)  { len += 4; it=0; continue; }
+		if (c == '_' && !it) { len += 3; it=1; continue; }
+		if (c == '_' && it)  { len += 4; it=0; continue; }
 		if (c == '\r')       { len += 5; r=1;  continue; } 
 		if (!r && c == '\n') { len += 5;       continue; }
 		if (r && c == '\n')  { r = 0; }
@@ -678,8 +678,8 @@ ctr_object* ctr_string_tohtml(ctr_object* myself, ctr_argument* argumentList ) {
 		char c = value[i];
 		if (c == '*' && !b)  { memcpy(dst,"<b>",3);    dst += 3; b=1;  continue; }
 		if (c == '*' &&  b)  { memcpy(dst,"</b>",4);   dst += 4; b=0;  continue; }
-		if (c == '|' && !it) { memcpy(dst,"<i>",3);    dst += 3; it=1; continue; }
-		if (c == '|' && it)  { memcpy(dst,"</i>",4);   dst += 4; it=0; continue; }
+		if (c == '_' && !it) { memcpy(dst,"<i>",3);    dst += 3; it=1; continue; }
+		if (c == '_' && it)  { memcpy(dst,"</i>",4);   dst += 4; it=0; continue; }
 		if (c == '\r')       { memcpy(dst,"<br>\r",5); dst += 5; r=1;  continue; } 
 		if (!r && c == '\n') { memcpy(dst,"<br>\n",5); dst += 5;       continue; }
 		if (r && c == '\n')  { r = 0; }
