@@ -35,8 +35,8 @@ void ctr_cli_read_args(int argc, char* argv[]) {
 		ctr_cli_welcome();
 		exit(0);
 	} else {
-		ctr_mode_input_file = (char*) ctr_heap_allocate_tracked( sizeof( char ) * 255 );
-		strncpy(ctr_mode_input_file, argv[1], 254);
+		ctr_mode_input_file = (char*) ctr_heap_allocate_tracked( strlen(argv[1]) + 1 );
+		strcpy(ctr_mode_input_file, argv[1]);
 	}
 }
 

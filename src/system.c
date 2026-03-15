@@ -689,8 +689,8 @@ ctr_object* ctr_program_get_env(ctr_object* myself, ctr_argument* argumentList) 
 	char*       envVarNameStr;
 	char*       envVal;
 	envVarNameObj = ctr_internal_cast2string(argumentList->object);
-	envVarNameStr = ctr_heap_allocate((envVarNameObj->value.svalue->vlen+1)*sizeof(char));
-	strncpy(envVarNameStr, envVarNameObj->value.svalue->value, envVarNameObj->value.svalue->vlen);
+	envVarNameStr = ctr_heap_allocate((envVarNameObj->value.svalue->vlen)*sizeof(char));
+	memcpy(envVarNameStr, envVarNameObj->value.svalue->value, envVarNameObj->value.svalue->vlen);
 	*(envVarNameStr + (envVarNameObj->value.svalue->vlen)) = '\0';
 	envVal = getenv(envVarNameStr);
 	ctr_heap_free(envVarNameStr );

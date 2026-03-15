@@ -442,14 +442,14 @@ char* ctr_clex_readstr() {
 		}
 		else if (strncmp(ctr_code, CTR_DICT_QUOT_CLOSE, ctr_clex_keyword_qc_len)==0) {
 			if (!escape) nesting--;
-			strncpy(strbuff, CTR_DICT_QUOT_CLOSE, ctr_clex_keyword_qc_len);
+			memcpy(strbuff, CTR_DICT_QUOT_CLOSE, ctr_clex_keyword_qc_len);
 			ctr_code += ctr_clex_keyword_qc_len;
 			ctr_clex_tokvlen += ctr_clex_keyword_qc_len;
 			strbuff += ctr_clex_keyword_qc_len;
 		}
 		else if (strncmp(ctr_code, CTR_DICT_QUOT_OPEN, ctr_clex_keyword_qo_len)==0) {
 			if (!escape) nesting++;
-			strncpy(strbuff, CTR_DICT_QUOT_OPEN, ctr_clex_keyword_qo_len);
+			memcpy(strbuff, CTR_DICT_QUOT_OPEN, ctr_clex_keyword_qo_len);
 			ctr_code += ctr_clex_keyword_qo_len;
 			ctr_clex_tokvlen += ctr_clex_keyword_qo_len;
 			strbuff += ctr_clex_keyword_qo_len;
