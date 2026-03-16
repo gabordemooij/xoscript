@@ -164,7 +164,7 @@ static ctr_object* ctr_server_urlformencode(ctr_object* myself, ctr_argument* ar
     size_t len = 0;
 	char *p;
     for (p = source; *p; p++) {
-        if (*p == ' ' || *p == '-' || *p == '_' || *p == '.' || *p == '~' || isalnum((unsigned char)*p)) { //RFC 3986 unreserved characters
+        if ((*p == ' ' && is_form) || *p == '-' || *p == '_' || *p == '.' || *p == '~' || isalnum((unsigned char)*p)) { //RFC 3986 unreserved characters
             len += 1;
         } else {
             len += 3; // %HH
