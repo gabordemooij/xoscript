@@ -576,7 +576,7 @@ extern ctr_object* ctr_string_to_code(ctr_object* myself, ctr_argument* ctr_argu
 extern ctr_object* ctr_string_minus(ctr_object* myself, ctr_argument* ctr_argumentList);
 extern ctr_object* ctr_string_bytes(ctr_object* myself, ctr_argument* ctr_argumentList);
 extern ctr_object* ctr_string_utf8san(ctr_object* myself, ctr_argument* ctr_argumentList);
-
+extern ctr_object* ctr_string_ord(ctr_object* myself, ctr_argument* ctr_argumentList);
 
 /**
  * Block Interface

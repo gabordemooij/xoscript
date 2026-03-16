@@ -2219,6 +2219,19 @@ ctr_object* ctr_string_characters( ctr_object* myself, ctr_argument* argumentLis
 
 /**
  * @def
+ * [ String ] byte
+ *
+ * @test688
+ */
+ctr_object* ctr_string_ord( ctr_object* myself, ctr_argument* argumentList ) {
+	size_t len = myself->value.svalue->vlen;
+	char*  str = myself->value.svalue->value;
+	if (len < 1) return CtrStdNil;
+	return ctr_build_number_from_float( (double) str[0] );
+}
+
+/**
+ * @def
  * [ String ] compare: [ String ]
  *
  *
