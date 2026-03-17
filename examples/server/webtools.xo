@@ -248,3 +248,60 @@ Tempfile-Session on: ['destroy'] do: {
 	}.
 }.
 
+
+String on: ['urlencode'] do: {
+	<- Server url-encode: self.
+}.
+
+>> URL := Object new.
+
+URL on: ['init'] do: {
+	own protocol := ['https://'].
+	own host     := ['localhost'].
+	own path     := [''].
+	own params   := [''].
+	own hash     := [''].
+}.
+
+URL on: ['new'] do: {
+	<- self new init.
+}.
+
+URL on: ['string'] do: {
+	<- (
+	own protocol +
+	own host +
+	own path +
+	own params +
+	own hash ).
+}.
+
+URL on: ['protocol:'] do: { :protocol
+	((List new: ['http'] ; ['https']) contains: protocol) true: {
+		own protocol := protocol + ['://'].
+	}, false: {
+		this-task error: ['Invalid protocol'].
+	}.
+}.
+
+URL on: ['host:'] do: { :host
+	#todo validate according to rfc
+	own host := host.
+}.
+
+URL on: ['path:'] do: { :path
+	own path := ['/'] + path urlencode.
+}.
+
+URL on: ['params:'] do: { :map
+	>> params := List new.
+	map each: { :key :value
+		params append: key string urlencode + ['='] + value string urlencode.
+	}.
+	own params := ['?'] + ( params combine: ['&'] ).
+}.
+
+URL on: ['hash:'] do: { :hash
+	own hash := ['#'] + hash urlencode.
+}.
+
