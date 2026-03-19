@@ -275,7 +275,7 @@ int ctr_clex_tok() {
 	}
 	if (c == ctr_clex_param_prefix_char) { ctr_code++; return CTR_TOKEN_COLON; }
 	if (strncmp(ctr_code, CTR_DICT_RETURN, ctr_clex_keyword_return_len)==0
-	&& *(ctr_code+ctr_clex_keyword_return_len)==' '
+	&& ( isspace(*(ctr_code+ctr_clex_keyword_return_len)) )
 	) {
 		ctr_code += ctr_clex_keyword_return_len;
 		return CTR_TOKEN_RET;
