@@ -50,7 +50,6 @@ ctr_object* ctr_network_basic_text_send(ctr_object* myself, ctr_argument* argume
 	}
 	curl = curl_easy_init();
 	curl_easy_setopt(curl, CURLOPT_URL, destination);
-	curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0L);
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 	if (argumentList->object != CtrStdNil) {
 		message_str = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
