@@ -4,13 +4,14 @@
 
 Welcome to xoscript. xoscript is a simple scripting language (for server-side
 scripting). Simple does not mean easy. Those two concepts are often
-confused. It may still be very complex to install and setup xoscript on
-a server, but this complexity arises from the fact that most servers or
-cloud services need to be configured to use xoscript (for instance through
-CGI and a webserver). You cannot just drop xo-files on a random
-budget vps that you bought, you have to configure it yourself (or
-let somebody do that for you). That's just how things
-work, we cannot change that. That being said, xoscript *is
+confused.
+
+For instance, although with xoscript you can just drop an .xo
+file on your server and execute it with your browser, you still
+have to configure your server to handle these files (or let
+somebody else do this for you). 
+
+That being said, xoscript *is
 actually very simple* as a language. It only has about 5 syntax rules:
 assign, message, function, return and chain (to send multiple messages).
 That's it. Any software developer should be able to learn the basics
