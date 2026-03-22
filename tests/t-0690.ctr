@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Out write: ['Database test'], stop.
+
+>> db := Maria-DB new host: ['localhost'],
+	username: ['xo'], password: ['pass123'], dbname: ['xobase'], connect.
+
+Out write: ['Can we connect? '] + db connected?, stop.
+
+>> query := db query: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameters: ( List new ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  query execute. db commit. } except: { :e db rollback.  }, start.
+
+Out write: ['Can we insert? '] + ( query insert-id > 0 ), stop.
+
+>> x := 0.
+>> query :=
+db query: ['SELECT * FROM book order by id desc limit 2'], 
+fetch: { :row 
+	x add: 1.
+	True break. # must clean up, no 'Commands out of sync'
+}.
+
+>> query :=
+db query: ['SELECT * FROM book order by id desc limit 2'], 
+fetch: { :row
+	x add: 1.
+	True break.
+}.
+
+(x > 0) true: {
+	Out write: ['Can we break in the middle of a fetch? '].
+}.
+
+Out write: True, stop.
