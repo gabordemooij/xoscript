@@ -99,6 +99,9 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
         matchobj->info.sticky = 1;
         ctr_object* result = ctr_block_run(callback, &arguments, NULL);
         matchobj->info.sticky = 0;
+        if (result->info.type != CTR_OBJECT_TYPE_OTSTRING) {
+			result = ctr_build_empty_string();
+		}
 		if (CtrStdFlow == CtrStdContinue) CtrStdFlow = NULL; /* consume continue */
 		if (CtrStdFlow) break;
         replacement = ctr_heap_allocate_cstring(result);
