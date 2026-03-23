@@ -1,0 +1,41 @@
+Server init.
+
+Out write: (
+	Pattern new: ['^\\w+$'],
+	match: ['test@example.com'] 
+), stop. # 0 match, fails on @ and .
+
+Out write: (
+	Pattern new: ['^[^@]+@[^\.]+\.\\w+$'],
+	match: ['test@example.com'] 
+), stop. # 1 match
+
+Out write: (
+	Pattern new: ['[^@]+@[^\.]+\.\\w+'],
+	match: ['test@example.com'] 
+), stop. # 1 match
+
+Out write: (
+	Pattern new: ['([^@]+)@([^\.]+)\.\\w+'],
+	match: ['test@example.com'] 
+), stop. # 1 match, groups dont matter
+
+Out write: (
+	Pattern new: ['[a-z]'],
+	match: ['test@example.com'] 
+), stop. # 14 matches
+
+Out write: (
+	Pattern new: ['.*'],
+	match: ['test@example.com'] 
+), stop. # 1 match (all)
+
+Out write: (
+	Pattern new: ['(.*)'],
+	match: ['test@example.com'] 
+), stop. # 1 match (all)
+
+Out write: (
+	Pattern new: ['\\s*[^@]+@[^\.]+\.\\w+'],
+	match: ['test@example.com'] 
+), stop. # 1 match, prefix space optional, gets ignored

@@ -10,8 +10,9 @@
 
 ctr_object* CtrServerPCRE2;
 
-char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char *subject, ctr_object* callback) {
+char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char *subject, ctr_object* callback, size_t* match_count) {
     int errorcode;
+    size_t num_matches = 0;
     PCRE2_SIZE erroroffset;
     pcre2_code *re = pcre2_compile(
         (PCRE2_SPTR)pattern,
@@ -56,7 +57,7 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
 		PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match);
         size_t start = ovector[0];
         size_t end   = ovector[1];
-		if (start > offset) {
+        if (start > offset) {
             size_t chunk = start - offset;
             if (outlen + chunk >= outcap) {
                 outcap = outlen + chunk + 128;
@@ -65,6 +66,7 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
             memcpy(output + outlen, subject + offset, chunk);
             outlen += chunk;
         }
+        if (start == end) break; // otherwise infinite loop with things like (.*)
         const char *mstr = subject + start;
         size_t mlen = end - start;
         char *replacement;
@@ -97,7 +99,11 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
 	    argument2.object = matches;
         argument2.next = NULL;
         matchobj->info.sticky = 1;
-        ctr_object* result = ctr_block_run(callback, &arguments, NULL);
+        ctr_object* result = CtrStdNil;
+        if (callback) {
+			result = ctr_block_run(callback, &arguments, NULL);
+		}
+		num_matches ++;
         matchobj->info.sticky = 0;
         if (result->info.type != CTR_OBJECT_TYPE_OTSTRING) {
 			result = ctr_build_empty_string();
@@ -119,6 +125,7 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
     output[outlen] = '\0';
     pcre2_match_data_free(match);
     pcre2_code_free(re);
+    *match_count = num_matches;
     return output;
 }
 
@@ -144,11 +151,12 @@ ctr_object* ctr_server_pcre2_new(ctr_object* myself, ctr_argument* argumentList)
  */
 ctr_object* ctr_server_pcre2_match_do(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* prop = ctr_internal_object_property(myself, "_pattern",NULL);
+	size_t match_count = 0;
 	if (prop == CtrStdNil) return CtrStdNil;
 	ctr_object* answer = CtrStdNil;
 	char* pattern_str = ctr_heap_allocate_cstring(prop);
 	char* subject_str = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
-	char* result = ctr_internal_server_pcre2_replace_callback(pattern_str, subject_str, argumentList->next->object);
+	char* result = ctr_internal_server_pcre2_replace_callback(pattern_str, subject_str, argumentList->next->object, &match_count);
 	if (result) {
 		answer = ctr_build_string_from_cstring(result);
 		ctr_heap_free(result);
@@ -158,9 +166,32 @@ ctr_object* ctr_server_pcre2_match_do(ctr_object* myself, ctr_argument* argument
 	return answer;
 }
 
+/**
+ * @def
+ * [ Pattern ] match: [ String ]
+ *
+ * @test692
+ */
+ctr_object* ctr_server_pcre2_match_count(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* prop = ctr_internal_object_property(myself, "_pattern",NULL);
+	size_t match_count = 0;
+	if (prop == CtrStdNil) return CtrStdNil;
+	ctr_object* answer = CtrStdNil;
+	char* pattern_str = ctr_heap_allocate_cstring(prop);
+	char* subject_str = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	char* result = ctr_internal_server_pcre2_replace_callback(pattern_str, subject_str, NULL, &match_count);
+	if (result) {
+		ctr_heap_free(result);
+	}
+	ctr_heap_free(subject_str);
+	ctr_heap_free(pattern_str);
+	return ctr_build_number_from_float((double) (int) match_count);
+}
+
 void begin_pcre2() {
 	CtrServerPCRE2 = ctr_server_pcre2_new(CtrStdString, NULL);
 	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( CTR_DICT_NEW_SET ), &ctr_server_pcre2_new_set );
 	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( "match:do:" ), &ctr_server_pcre2_match_do );
+	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( "match:" ), &ctr_server_pcre2_match_count );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Pattern" ), CtrServerPCRE2, CTR_CATEGORY_PUBLIC_PROPERTY);
 }
