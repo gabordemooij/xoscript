@@ -1307,6 +1307,7 @@ message *string* can be overwritten:
 @test620
 
 @api_String_base
+@api_String_server
 
 
 # Functions
