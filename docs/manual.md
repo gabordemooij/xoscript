@@ -1307,6 +1307,12 @@ message *string* can be overwritten:
 @test620
 
 @api_String_base
+
+## Server strings
+
+The following String features are added by the
+Server plugin.
+
 @api_String_server
 
 
