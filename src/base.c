@@ -1424,7 +1424,7 @@ ctr_object* ctr_number_to_string(ctr_object* myself, ctr_argument* argumentList)
 
 /**
  * @def
- * [ Number ] raw
+ * [ Number ] plain
  *
  *
  * @test457
