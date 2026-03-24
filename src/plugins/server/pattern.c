@@ -11,75 +11,75 @@
 ctr_object* CtrServerPCRE2;
 
 char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char *subject, ctr_object* callback, size_t* match_count) {
-    int errorcode;
-    size_t num_matches = 0;
-    PCRE2_SIZE erroroffset;
-    pcre2_code *re = pcre2_compile(
-        (PCRE2_SPTR)pattern,
-        PCRE2_ZERO_TERMINATED,
-        0,
-        &errorcode,
-        &erroroffset,
-        NULL
-    );
-    if (!re) {
-        char err[120];
-        sprintf(err, "Failed to compile PCRE2 pattern at offset: %zu.", (size_t)erroroffset);
-        ctr_error(err,0);
-        return NULL;
-    }
+	int errorcode;
+	size_t num_matches = 0;
+	PCRE2_SIZE erroroffset;
+	pcre2_code *re = pcre2_compile(
+		(PCRE2_SPTR)pattern,
+		PCRE2_ZERO_TERMINATED,
+		0,
+		&errorcode,
+		&erroroffset,
+		NULL
+	);
+	if (!re) {
+		char err[120];
+		sprintf(err, "Failed to compile PCRE2 pattern at offset: %zu.", (size_t)erroroffset);
+		ctr_error(err,0);
+		return NULL;
+	}
 	pcre2_match_data *match = pcre2_match_data_create_from_pattern(re, NULL);
 	size_t subject_len = strlen(subject);
-    size_t outcap = subject_len * 2 + 128;
-    char *output = ctr_heap_allocate(outcap);
-    size_t outlen = 0;
-    size_t offset = 0;
-    while (1) {
-        int rc = pcre2_match(
-            re,
-            (PCRE2_SPTR8)subject,
-            subject_len,
-            offset,
-            0,
-            match,
-            NULL
-        );
+	size_t outcap = subject_len * 2 + 128;
+	char *output = ctr_heap_allocate(outcap);
+	size_t outlen = 0;
+	size_t offset = 0;
+	while (1) {
+		int rc = pcre2_match(
+			re,
+			(PCRE2_SPTR8)subject,
+			subject_len,
+			offset,
+			0,
+			match,
+			NULL
+		);
 		if (rc < 0) {
-            size_t rest = subject_len - offset;
-            if (outlen + rest + 1 > outcap) {
-                outcap = outlen + rest + 1;
-                output = ctr_heap_reallocate(output, outcap);
-            }
-            memcpy(output + outlen, subject + offset, rest);
-            outlen += rest;
-            break;
-        }
+			size_t rest = subject_len - offset;
+			if (outlen + rest + 1 > outcap) {
+				outcap = outlen + rest + 1;
+				output = ctr_heap_reallocate(output, outcap);
+			}
+			memcpy(output + outlen, subject + offset, rest);
+			outlen += rest;
+			break;
+		}
 		PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match);
-        size_t start = ovector[0];
-        size_t end   = ovector[1];
-        if (start > offset) {
-            size_t chunk = start - offset;
-            if (outlen + chunk >= outcap) {
-                outcap = outlen + chunk + 128;
-                output = ctr_heap_reallocate(output, outcap);
-            }
-            memcpy(output + outlen, subject + offset, chunk);
-            outlen += chunk;
-        }
-        if (start == end) break; // otherwise infinite loop with things like (.*)
-        const char *mstr = subject + start;
-        size_t mlen = end - start;
-        char *replacement;
-        ctr_object* matchobj = ctr_build_string(mstr, mlen);
-        ctr_argument arguments;
-        ctr_argument argument2;
-        arguments.object = matchobj;
-        arguments.next = &argument2;
-        ctr_object* matches = ctr_array_new(CtrStdArray, &arguments);
-        uint32_t cnt;
-        pcre2_pattern_info(re, PCRE2_INFO_CAPTURECOUNT, (void*) &cnt);
-        //@todo fix memory usage
-        for (int j = 0; j<=cnt; j++) {
+		size_t start = ovector[0];
+		size_t end   = ovector[1];
+		if (start > offset) {
+			size_t chunk = start - offset;
+			if (outlen + chunk >= outcap) {
+				outcap = outlen + chunk + 128;
+				output = ctr_heap_reallocate(output, outcap);
+			}
+			memcpy(output + outlen, subject + offset, chunk);
+			outlen += chunk;
+		}
+		if (start == end) break; // otherwise infinite loop with things like (.*)
+		const char *mstr = subject + start;
+		size_t mlen = end - start;
+		char *replacement;
+		ctr_object* matchobj = ctr_build_string(mstr, mlen);
+		ctr_argument arguments;
+		ctr_argument argument2;
+		arguments.object = matchobj;
+		arguments.next = &argument2;
+		ctr_object* matches = ctr_array_new(CtrStdArray, &arguments);
+		uint32_t cnt;
+		pcre2_pattern_info(re, PCRE2_INFO_CAPTURECOUNT, (void*) &cnt);
+		//@todo fix memory usage
+		for (int j = 0; j<=cnt; j++) {
 			PCRE2_SIZE l;
 			int q = pcre2_substring_length_bynumber(match, j, &l);
 			if (q != 0) l=0;
@@ -95,38 +95,38 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
 			ctr_array_push(matches, &pusharg);
 			ctr_heap_free(pbuf);
 		}
-        matches->info.sticky = 1;
-	    argument2.object = matches;
-        argument2.next = NULL;
-        matchobj->info.sticky = 1;
-        ctr_object* result = CtrStdNil;
-        if (callback) {
+		matches->info.sticky = 1;
+		argument2.object = matches;
+		argument2.next = NULL;
+		matchobj->info.sticky = 1;
+		ctr_object* result = CtrStdNil;
+		if (callback) {
 			result = ctr_block_run(callback, &arguments, NULL);
 		}
 		num_matches ++;
-        matchobj->info.sticky = 0;
-        if (result->info.type != CTR_OBJECT_TYPE_OTSTRING) {
+		matchobj->info.sticky = 0;
+		if (result->info.type != CTR_OBJECT_TYPE_OTSTRING) {
 			result = ctr_build_empty_string();
 		}
 		if (CtrStdFlow == CtrStdContinue) CtrStdFlow = NULL; /* consume continue */
 		if (CtrStdFlow) break;
-        replacement = ctr_heap_allocate_cstring(result);
-        size_t replen = strlen(replacement);
-        if (outlen + replen >= outcap) {
-            outcap = outlen + replen + 128;
-            output = ctr_heap_reallocate(output, outcap);
-        }
-        memcpy(output + outlen, replacement, replen);
-        outlen += replen;
-        ctr_heap_free(replacement);
-        offset = end;
-    }
+		replacement = ctr_heap_allocate_cstring(result);
+		size_t replen = strlen(replacement);
+		if (outlen + replen >= outcap) {
+			outcap = outlen + replen + 128;
+			output = ctr_heap_reallocate(output, outcap);
+		}
+		memcpy(output + outlen, replacement, replen);
+		outlen += replen;
+		ctr_heap_free(replacement);
+		offset = end;
+	}
 	if (CtrStdFlow == CtrStdBreak) CtrStdFlow = NULL; /* consume break */
-    output[outlen] = '\0';
-    pcre2_match_data_free(match);
-    pcre2_code_free(re);
-    *match_count = num_matches;
-    return output;
+	output[outlen] = '\0';
+	pcre2_match_data_free(match);
+	pcre2_code_free(re);
+	*match_count = num_matches;
+	return output;
 }
 
 ctr_object* ctr_server_pcre2_new_set(ctr_object* myself, ctr_argument* argumentList) {
