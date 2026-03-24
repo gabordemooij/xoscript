@@ -419,7 +419,7 @@ details consult the chapter Functions.
 
 ## Literals
 
-Xoscript perceives everything to be an object; i.e., all numbers, texts
+Xoscript perceives everything to be an object; i.e., all numbers, strings
 and code fragments. Numbers, such as 1, 2, 100, -999 and 1,234 are
 Number objects. All texts between single quotation marks are String
 objects. All code fragments grouped between curly brackets {...} are
@@ -530,7 +530,7 @@ Out write:
 HELLO
 ```
 
-Here, two messages are sent to the **Text** object: **trim**, followed
+Here, two messages are sent to the **String** object: **trim**, followed
 by **upper**.
 
 In the following fragment, the use of a comma is necessary to indicate
@@ -1224,9 +1224,9 @@ with a different type by using the following messages:
 
 Message | Result
 ------- | ------
-number  | Converts an object into a number
-text    | Converts an object into text
-bool    | Converts an object into a boolean object (True or False)
+number  | Converts to a number
+string  | Converts to a string
+bool    | Converts to a boolean
   
 The following rules **apply**:
 
