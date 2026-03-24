@@ -1509,7 +1509,6 @@ respond:and:         | 1
 respond:and:and:     | 2
 respond:and:and:and: | 3
 
-Example:
 
 @test619
 
