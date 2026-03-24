@@ -176,7 +176,6 @@ ctr_object* ctr_server_pcre2_match_count(ctr_object* myself, ctr_argument* argum
 	ctr_object* prop = ctr_internal_object_property(myself, "_pattern",NULL);
 	size_t match_count = 0;
 	if (prop == CtrStdNil) return CtrStdNil;
-	ctr_object* answer = CtrStdNil;
 	char* pattern_str = ctr_heap_allocate_cstring(prop);
 	char* subject_str = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
 	char* result = ctr_internal_server_pcre2_replace_callback(pattern_str, subject_str, NULL, &match_count);
