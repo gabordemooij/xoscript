@@ -690,6 +690,65 @@ ctr_object* ctr_string_tohtml(ctr_object* myself, ctr_argument* argumentList ) {
 	return result;
 }
 
+/**
+ * String wrappers
+ * This is no extra functionality, it's just wrappers to use
+ * Server features from the String object.
+ */
+
+ /**
+  * @def
+  * [ String ] url-encode
+  *
+  * @test694
+  */
+ctr_object* ctr_string_urlencode(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_argument a;
+	a.object = myself;
+	a.next = NULL;
+	return ctr_server_urlencode_set(myself, &a);
+}
+
+/**
+  * @def
+  * [ String ] form-encode
+  *
+  * @test695
+  */
+ctr_object* ctr_string_formencode(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_argument a;
+	a.object = myself;
+	a.next = NULL;
+	return ctr_server_formencode_set(myself, &a);
+}
+
+/**
+  * @def
+  * [ String ] base64-encode
+  *
+  * @test696
+  */
+ctr_object* ctr_string_b64encode(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_argument a;
+	a.object = myself;
+	a.next = NULL;
+	return ctr_server_base64encode_set(myself, &a);
+}
+
+/**
+  * @def
+  * [ String ] base64-decode
+  *
+  * @test697
+  */
+ctr_object* ctr_string_b64decode(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_argument a;
+	a.object = myself;
+	a.next = NULL;
+	return ctr_server_base64decode_set(myself, &a);
+}
+
+
 void begin() {
 	ctr_internal_server_init();
 	serverObject = NULL;
@@ -705,7 +764,6 @@ void begin() {
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "passthru:prefix:" ), &ctr_server_passthru_set );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( "mimetype:" ), &ctr_server_mimetype );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Server" ), serverObject, CTR_CATEGORY_PUBLIC_PROPERTY);
-	//@todo move to core
 	formatObject = NULL;
 	formatObject = ctr_format_new(CtrStdObject, NULL);
 	formatObject->link = CtrStdObject;
@@ -719,7 +777,10 @@ void begin() {
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "ipv6?" ), &ctr_string_ipv6 );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "mac?" ), &ctr_string_mac );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "html" ), &ctr_string_tohtml );
-	
+	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "url-encode" ), &ctr_string_urlencode );
+	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "form-encode" ), &ctr_string_formencode );
+	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "base64-encode" ), &ctr_string_b64encode );
+	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "base64-decode" ), &ctr_string_b64decode );
 	#ifdef LIBCURL
 	begin_net();
 	#endif
