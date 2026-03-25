@@ -170,7 +170,7 @@ ctr_object* ctr_server_pcre2_match_do(ctr_object* myself, ctr_argument* argument
  * @def
  * [ Pattern ] match: [ String ]
  *
- * @test692
+ * @test698
  */
 ctr_object* ctr_server_pcre2_match_count(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* prop = ctr_internal_object_property(myself, "_pattern",NULL);
@@ -187,10 +187,19 @@ ctr_object* ctr_server_pcre2_match_count(ctr_object* myself, ctr_argument* argum
 	return ctr_build_number_from_float((double) (int) match_count);
 }
 
+/**
+ * @def
+ * [ Pattern ] match: [ String ] capture: [ String ]
+ *
+ * @test693
+ */
+
 void begin_pcre2() {
 	CtrServerPCRE2 = ctr_server_pcre2_new(CtrStdString, NULL);
 	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( CTR_DICT_NEW_SET ), &ctr_server_pcre2_new_set );
 	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( "match:do:" ), &ctr_server_pcre2_match_do );
+	// alias for match/do but intended for capturing matches only
+	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( "match:capture:" ), &ctr_server_pcre2_match_do );
 	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( "match:" ), &ctr_server_pcre2_match_count );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Pattern" ), CtrServerPCRE2, CTR_CATEGORY_PUBLIC_PROPERTY);
 }
