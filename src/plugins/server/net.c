@@ -22,7 +22,7 @@ size_t ctr_curl_write_callback(char* ptr, size_t size, size_t nmemb, void *userd
 	size_t len = (size * nmemb);
 	size_t required_size = len + CtrMediaCurlBytesRead;
 	if (required_size > CtrMediaCurlBufferSize) {
-		CtrMediaCurlBuffer = ctr_heap_reallocate(CtrMediaCurlBuffer, required_size);
+		CtrMediaCurlBuffer = ctr_heap_reallocate(CtrMediaCurlBuffer, required_size + 1); //extra room for NUL-byte
 		CtrMediaCurlBufferSize = required_size;
 	}
 	memcpy(CtrMediaCurlBuffer+CtrMediaCurlBytesRead, ptr, len);
