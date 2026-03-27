@@ -38,7 +38,18 @@ Out write: ['INSERTED: '] + query insert-id, stop. # insert id
 
 >> query :=
 db query: ['SELECT * FROM book order by id desc limit 2'], 
-fetch: { :row Out write: row id + [' '] + row description + [': '] + row price, stop. }. # fetching rows
+fetch: { :row 
+	Out write: row id + [' '] + row description + [': '] + row price, stop.
+	#True break.
+}. # fetching rows
+
+>> query :=
+db query: ['SELECT * FROM book order by id desc limit 2'], 
+fetch: { :row 
+	Out write: row id + [' '] + row description + [': '] + row price, stop.
+	#True break.
+}. # fetching rows
+
 
 # ~ CURL ~
 Out write: ( Net post: None to: ['https://redbeanphp.com'] ) length, stop. # post none = GET
@@ -122,7 +133,7 @@ Out write: (Server base64-decode: a), stop.
 >> u := URL new.
 u protocol: ['http'], host: ['example.com'], path: ['path'], params: (
 	Dict new
-	a: 1,
+	a: ['1+'],
 	b: 2
 ).
 Out write: u, stop.
