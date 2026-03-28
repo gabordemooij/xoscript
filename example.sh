@@ -20,7 +20,7 @@ if [[ $OS = "Linux" ]]; then
 	cd examples/${EXAMPLE}
 	rm mods
 	ln -s ../../build/Linux/bin/mods mods
-	
+	ln -s ../../src/xo/* .
 	CITRINE_MEMORY_MODE=4 \
 	REQUEST_METHOD="POST" \
 	CONTENT_TYPE="application/x-www-form-urlencoded" \
@@ -41,7 +41,7 @@ if [[ $OS = "OBSD" ]]; then
 	cd examples/${EXAMPLE}
 	rm mods
 	ln -s ../../build/OpenBSD/bin/mods mods
-	
+	ln -s ../../src/xo/* .
 	CITRINE_MEMORY_MODE=4 \
 	REQUEST_METHOD="POST" \
 	CONTENT_TYPE="application/x-www-form-urlencoded" \

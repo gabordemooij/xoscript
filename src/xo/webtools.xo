@@ -249,10 +249,6 @@ Tempfile-Session on: ['destroy'] do: {
 }.
 
 
-String on: ['urlencode'] do: {
-	<- Server url-encode: self.
-}.
-
 >> URL := Object new.
 
 URL on: ['init'] do: {
@@ -290,18 +286,18 @@ URL on: ['host:'] do: { :host
 }.
 
 URL on: ['path:'] do: { :path
-	own path := ['/'] + path urlencode.
+	own path := ['/'] + path url-encode.
 }.
 
 URL on: ['params:'] do: { :map
 	>> params := List new.
 	map each: { :key :value
-		params append: key string urlencode + ['='] + value string urlencode.
+		params append: key string url-encode + ['='] + value string url-encode.
 	}.
 	own params := ['?'] + ( params combine: ['&'] ).
 }.
 
 URL on: ['hash:'] do: { :hash
-	own hash := ['#'] + hash urlencode.
+	own hash := ['#'] + hash url-encode.
 }.
 
