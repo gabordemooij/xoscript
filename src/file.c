@@ -550,7 +550,6 @@ ctr_object* ctr_file_chmod(ctr_object* myself, ctr_argument* argumentList) {
  */
 ctr_object* ctr_file_chown(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0);
-	int mask = (int) ctr_tonum(argumentList->object);
 	char* pathstr;
 	if (path == NULL) return myself;
 	pathstr = ctr_heap_allocate_cstring( path );
