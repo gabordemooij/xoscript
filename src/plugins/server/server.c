@@ -748,6 +748,19 @@ ctr_object* ctr_string_b64decode(ctr_object* myself, ctr_argument* argumentList)
 	return ctr_server_base64decode_set(myself, &a);
 }
 
+/**
+  * @def
+  * [ String ] html-encode
+  *
+  * @test699
+  */
+ctr_object* ctr_string_htmlencode(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_argument a;
+	a.object = myself;
+	a.next = NULL;
+	return ctr_server_htmlencode_set(myself, &a);
+}
+
 
 void begin() {
 	ctr_internal_server_init();
@@ -777,6 +790,7 @@ void begin() {
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "ipv6?" ), &ctr_string_ipv6 );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "mac?" ), &ctr_string_mac );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "html" ), &ctr_string_tohtml );
+	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "html-encode" ), &ctr_string_htmlencode );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "url-encode" ), &ctr_string_urlencode );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "form-encode" ), &ctr_string_formencode );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "base64-encode" ), &ctr_string_b64encode );
