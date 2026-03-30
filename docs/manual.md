@@ -112,15 +112,15 @@ sudo nano /etc/apache2/sites-enabled/000-default.conf
 Replace Virtualhost with:
 
 ```
-&lt;VirtualHost *:80&gt;
-    &lt;Directory /var/www/html&gt;
+<VirtualHost *:80>
+    <Directory /var/www/html>
         Options +ExecCGI
         AllowOverride All
         AddHandler cgi-script .xo
         Require all granted
-    &lt;/Directory&gt;
+    </Directory>
     DocumentRoot /var/www/html
-&lt;/VirtualHost&gt;
+</VirtualHost>
 ```
 
 Create a test page:
@@ -190,7 +190,7 @@ chroot (figure out with ldd).
 To run one of the example programs in the package:
 
 ```
-./example.sh &lt;name&gt; &lt;Linux/Win64&gt; [clean]
+./example.sh <name> <Linux/OBSD> [clean]
 ```
 
 For example, to run the FizzBuzz example on Linux:
@@ -446,7 +446,7 @@ sending messages to objects. The general notation to send a message to
 an object is as follows:
 
 ```
-&lt;object&gt; &lt;message&gt;
+<object> <message>
 ```
 
 To find out if the number **2**, for example, is an even number, the
@@ -910,7 +910,7 @@ behavior is trivial. Simply override the new message.
 ```
 >> Animal := Object new.
 Animal on: ['new'] do: {
-	&lt;- self new init.
+	<- self new init.
 }.
 
 Animal on: ['init'] do: {
@@ -954,7 +954,7 @@ We can test this easily by adding a string method:
 
 ```
 Animal on: ['string'] do: {
-	&lt;- own legs string + own sound.
+	<- own legs string + own sound.
 }.
 ```
 
@@ -1830,11 +1830,11 @@ Program use: ['webtools.xo'].
 >> web-document := Web-Document new.
 
 web-document out: ['
-&lt;html&gt;
-&lt;body&gt;
-&lt;b>Hello World!&lt;/b&gt;
-&lt;/body&gt;
-&lt;/html&gt;'].
+<html>
+<body>
+<b>Hello World!</b>
+</body>
+</html>'].
 
 ```
 
@@ -2019,14 +2019,14 @@ So for instance, given the following template, let's put the
 gem in the jewel box and add a price tag.
 
 ```
-&lt;!-- cut:gem --&gt;
-&lt;img src="gem.gif"&gt;
-&lt;b&gt;$&lt;!-- slot:price --&gt;&lt;/b&gt;
-&lt;!-- /cut:gem --&gt;
+<!-- cut:gem -->
+<img src="gem.gif">
+<b>$<!-- slot:price --></b>
+<!-- /cut:gem -->
 
-&lt;div id="box"&gt;
-&lt;!-- paste:jewels --&gt;
-&lt;/div&gt;
+<div id="box">
+<!-- paste:jewels -->
+</div>
 ```
 
 You can do this as follows:
@@ -2044,10 +2044,10 @@ along with the required HTTP headers.
 Result:
 
 ```
-&lt;div id="box"&gt;
-&lt;img src="gem.gif"&gt;
-&lt;b&gt;$99&lt;/b&gt;
-&lt;/div&gt;
+<div id="box">
+<img src="gem.gif">
+<b>$99</b>
+</div>
 ```
 
 
@@ -2056,7 +2056,7 @@ Result:
 To serve user uploaded files securely you can rely on passthru:
 
 ```
-&gt;&gt; uploaded := ['smile.gif'].
+>> uploaded := ['smile.gif'].
 Server passthru: uploaded prefix: ['/uploads/images/'].
 Program end.
 ```
@@ -2075,7 +2075,7 @@ various other security issues.
 To encode an object as JSON:
 
 ```
-&gt;&gt; json := ( JSON jsonify: ( 
+>> json := ( JSON jsonify: ( 
 	Dict new put: ( 
 		List new ; 1 ; 2 ; 3
 	) at: ['abc']
@@ -2085,7 +2085,7 @@ To encode an object as JSON:
 To decode JSON into a xoscript object:
 
 ```
-&gt;&gt; dict := ((JSON object: json) abc ? 1).
+>> dict := ((JSON object: json) abc ? 1).
 ```
 
 To directly output a Dict as json with the correct headers:
@@ -2113,10 +2113,10 @@ pattern match: subject do: { :m :x .... }
 Full example:
 
 ```
->> subject := ['&lt;html>
-	&lt;a href="http://link1" target="_blank"&gt;
-	&lt;a href="http://link2" target="_blank"&gt;
-&lt;/html&gt;'].
+>> subject := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
 >> pattern := Pattern new: ['href="([^"]+)" target="([^"]+)"'].
 >> result  := pattern match: subject do: { :m :x
 	Out write: m, stop.
@@ -2322,13 +2322,13 @@ Server init.
 Program use: ['app/libs/loader.xo'].
 
 # create a new document
-&gt;&gt; web-document := Web-Document new.
+>> web-document := Web-Document new.
 >> tpl := Template new: ( 
 	File new: ['app/templates/greeting.tpl'], read
 ).
 
 # cut the message section
-&gt;&gt; message := tpl cut: ['message'].
+>> message := tpl cut: ['message'].
 
 # add a message (will be encoded properly to avoid xss)
 message greeting: ['hello world!'].
@@ -2355,30 +2355,30 @@ https://xoscript.com/test.xo
 This is an example of how you make a select in a form:
 
 ```
-&gt;&gt; htmlstr := ['
-&lt;html&gt;
-&lt;body&gt;
-&lt;form&gt;
-&lt;!-- cut:products --&gt;
-&lt;select name="products"&gt;
-	&lt;!-- cut:product --&gt;
-	&lt;option value="&lt;!-- slot:value -->"&gt;
-		&lt;!-- slot:name --&gt;
-	&lt;/option&gt;
-	&lt;!-- /cut:product --&gt;
-	&lt;!-- paste:product --&gt;
-&lt;/select&gt;
-&lt;!-- /cut:products --&gt;
-&lt;!-- paste:products --&gt;
-&lt;/form&gt;
-&lt;/body&gt;
-&lt;/html&gt;
+>> htmlstr := ['
+<html>
+<body>
+<form>
+<!-- cut:products -->
+<select name="products">
+	<!-- cut:product -->
+	<option value="<!-- slot:value -->">
+		<!-- slot:name -->
+	</option>
+	<!-- /cut:product -->
+	<!-- paste:product -->
+</select>
+<!-- /cut:products -->
+<!-- paste:products -->
+</form>
+</body>
+</html>
 '].
 
-&gt;&gt; tpl := Template new: htmlstr.
-&gt;&gt; menu := List new ; ['pizza'] ; ['pasta'].
-&gt;&gt; products := tpl cut: ['products'], copy.
-&gt;&gt; product := products cut: ['product'], copy.
+>> tpl := Template new: htmlstr.
+>> menu := List new ; ['pizza'] ; ['pasta'].
+>> products := tpl cut: ['products'], copy.
+>> product := products cut: ['product'], copy.
 
 menu each: { :n :item
 	products paste: (
