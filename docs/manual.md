@@ -849,11 +849,11 @@ of **Animal** and, in turn, the object **Animal** inherits all behavior of
 
 In the following example a new kind of list is created:
 **Combination**, in which each element is ensured to be unique. The
-functions of the **Sequence** are re**used** through inheritance:
+functions of the list are reused through inheritance:
 
 @test607
 
-Observe how the second **red** is excluded from the sequence.
+Observe how the second **red** is excluded from the list.
 
 Occasionally, it may be necessary to override a behaviour of an object.
 For instance, when adding numbers and units of measurements have to be
@@ -1050,7 +1050,7 @@ Any object other than **None** will reply with **False**. The
 above code fragment may seem a bit philosophical, yet the **None**
 object certainly has extremely practical applications. For example, you
 will receive the None object as an answer in case you ask for a
-sequence element that does not exist. You could also use the None object
+list element that does not exist. You could also use the None object
 if you like to declare a variable, but do not want to specify a value
 yet. Instead, you just **assign** the special value **None**. In
 Xoscript it is not allowed to declare a variable without value, such as:
@@ -1253,7 +1253,7 @@ object. When working with a loop, something similar occurs:
 
 In fact, Xoscript **always** uses references, so on **:quantity**
 the above-illustrated loop also indicates the reference to the element
-in the sequence.
+in the list.
 
 In order to copy an object, you have to specify this action
 **explicitly**:
@@ -1272,13 +1272,13 @@ new list with the same elements.
 @test614
 
 In this case, 4 is added only to the copy.
-However, because the copy is shallow, the objects in both sequences
+However, because the copy is shallow, the objects in both lists
 are the same.
 
 @test615
 
 So if we append 2 to each name in the copy, the original
-sequence is affected as well.
+list is affected as well.
 
 To remedy this we need to make a **deep copy**. Such a copy action
 for a list could be composed as follows:
@@ -1301,7 +1301,7 @@ following example:
 Xoscript uses **implicit conversion** to convert objects. To print a
 list on screen, Xoscript will, for example, send the message
 *string* internally to the list. This can proof very useful, in
-case you would like to print a sequence as a comma-separated list. The
+case you would like to print a list as a comma-separated list. The
 message *string* can be overwritten: 
 
 @test620
@@ -1538,7 +1538,7 @@ a new List write:
 >> fibonacci := List new.
 ```
 
-This empty sequence can be filled using **append:** :
+This empty lists can be filled using **append:** :
 
 ```
 fibonacci append: 0.
@@ -1551,7 +1551,7 @@ fibonacci append: 8.
 fibonacci append: 13.
 ```
 
-If we write the sequence to screen:
+If we write the list to screen:
 
 ```
 Out write: fibonacci, stop.
@@ -1571,7 +1571,7 @@ Instead of append you can also use ; to add elements to a list:
 ```
 
 The semicolons (;) are all binary messages which put a
-value into the sequence.
+value into the list.
 
 ## Chaining
 
@@ -1589,7 +1589,7 @@ x shift pop.
 ```
 
 Unfortunately, the previous notation will not function correctly. The
-message **shift** returns the first element of the sequence, which,
+message **shift** returns the first element of the list, which,
 in turn, will become the receiver of the message **pop**. So, the
 message **pop** is not sent to **x**, but instead to 2. A
 possible solution to this problem would be to create two separate
@@ -2249,7 +2249,7 @@ The arguments for link method:
 
 - Argument #1: The DLL or SO file you want to use.
 - Argument #2: The function in that file you want to link.
-- Argument #3: A sequence with the names of the data types of the function’s arguments.
+- Argument #3: A list with the names of the data types of the function’s arguments.
 - Argument #4: The name of the function's return type.
 - Argument #5: The name of the object you want to link this function to (if it doesn’t exist, it will be created
 automatically).
@@ -2270,7 +2270,7 @@ with the free message.
 You can fill a memory blob in various ways. In our example, we fill it with text, so we use the
 utf8: message (UTF-8 is an encoding to convert text into bytes). You can also fill a blob with
 bytes:, passing a list of byte values. To read the contents of a blob, use from:length:.
-You'll get the bytes back as a sequence. You can even create a C-struct with a Blob using the
+You'll get the bytes back as a list. You can even create a C-struct with a Blob using the
 struct: message, passing a sequence of C types. This may be necessary when calling a C
 function in an external software library that expects a pointer to a struct.
 
