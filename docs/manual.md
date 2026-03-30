@@ -2183,7 +2183,7 @@ To safely inject user input into your HTML without risking XSS
 injections, always use:
 
 ```
-Server html-encode: ['&lt;harmless&gt;'].
+Server html-encode: ['<harmless>'].
 ```
 
 Note that the template engine will always perform html encoding
