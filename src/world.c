@@ -863,7 +863,7 @@ void ctr_initialize_world() {
 	ctr_object* CtrStdHexHelper = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
 	ctr_internal_create_func(CtrStdHexHelper, ctr_build_string_from_cstring(CTR_DICT_NEW), &ctr_hexhelper_new );
 	ctr_internal_create_func(CtrStdHexHelper, ctr_build_string_from_cstring(CTR_DICT_RESPOND_TO), &ctr_hexhelper_parse );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Hx" ), CtrStdHexHelper, 0 );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_HEXADECIMAL ), CtrStdHexHelper, 0 );
 	CtrStdHexHelper->link = CtrStdObject;
 	CtrStdHexHelper->info.sticky = 1;
 
@@ -871,7 +871,7 @@ void ctr_initialize_world() {
 	ctr_object* CtrStdOctHelper = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
 	ctr_internal_create_func(CtrStdOctHelper, ctr_build_string_from_cstring(CTR_DICT_NEW), &ctr_octhelper_new );
 	ctr_internal_create_func(CtrStdOctHelper, ctr_build_string_from_cstring(CTR_DICT_RESPOND_TO), &ctr_octhelper_parse );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Oct" ), CtrStdOctHelper, 0 );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_OCTAL ), CtrStdOctHelper, 0 );
 	CtrStdOctHelper->link = CtrStdObject;
 	CtrStdOctHelper->info.sticky = 1;
 
@@ -879,7 +879,7 @@ void ctr_initialize_world() {
 	ctr_object* CtrStdBinHelper = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
 	ctr_internal_create_func(CtrStdBinHelper, ctr_build_string_from_cstring(CTR_DICT_NEW), &ctr_binhelper_new );
 	ctr_internal_create_func(CtrStdBinHelper, ctr_build_string_from_cstring(CTR_DICT_RESPOND_TO), &ctr_binhelper_parse );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Bin" ), CtrStdBinHelper, 0 );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_BINARY ), CtrStdBinHelper, 0 );
 	CtrStdBinHelper->link = CtrStdObject;
 	CtrStdBinHelper->info.sticky = 1;
 
@@ -923,8 +923,8 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_MINUS ), &ctr_string_minus );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_BYTES ), &ctr_string_bytes );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_TCCOMPARE ), &ctr_string_tccompare );
-	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "utf8" ), &ctr_string_utf8san );
-	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( "byte" ), &ctr_string_ord );
+	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_UTF8 ), &ctr_string_utf8san );
+	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_BYTE ), &ctr_string_ord );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_STRING ), CtrStdString, 0 );
 	CtrStdString->link = CtrStdObject;
 	CtrStdString->info.sticky = 1;
@@ -1029,13 +1029,13 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_SIZE ), &ctr_file_size );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_DELETE ), &ctr_file_delete );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_LINES_SET ), &ctr_file_lines );
-	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "delimiter:quote:lines:" ), &ctr_file_csvlines );
-	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "chmod:" ), &ctr_file_chmod );
-	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "stat" ), &ctr_file_stat );
-	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "lock" ), &ctr_file_lock );
-	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "unlock" ), &ctr_file_unlock );
-	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "tempwrite:" ), &ctr_file_tempwrite );
-	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "owner:group:" ), &ctr_file_chown );
+	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_DELIM_QUOTE_LINES ), &ctr_file_csvlines );
+	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_UNIX_CHMOD_SET ), &ctr_file_chmod );
+	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_UNIX_STAT ), &ctr_file_stat );
+	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_LOCK ), &ctr_file_lock );
+	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_UNLOCK ), &ctr_file_unlock );
+	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_TEMPORARY_WRITE_SET ), &ctr_file_tempwrite );
+	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_OWNER_GROUP_SET ), &ctr_file_chown );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_ARRAY ), &ctr_file_list );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_TOSTRING ), &ctr_file_to_string );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_FILE ), CtrStdFile, 0);
@@ -1060,7 +1060,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_MEMORY ), &ctr_gc_memory );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_USE_SET ), &ctr_program_include );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_WAIT_FOR_PASSW ), &ctr_program_waitforpassword );
-	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "test" ), &ctr_program_test );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_TEST ), &ctr_program_test );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_RESPOND_TO_AND ), &ctr_program_object_message_exists );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_RESPOND_TO ), &ctr_program_object_exists );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_INDEX_OF ), &ctr_program_object_exists );
@@ -1071,13 +1071,13 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_VERSION_SET ), &ctr_program_timemachine );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_SHELLESC_SET ), &ctr_program_shell_escape );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_ALARM_SET ), &ctr_program_alarm );
-	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "pledge:" ), &ctr_program_pledge );
-	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "unveil:permissions:" ), &ctr_program_unveil );
-	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "path" ), &ctr_program_getcwd );
-	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "feature:enable:" ), &ctr_program_feature_set );
-	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "feature:" ), &ctr_program_feature );
-	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "chdir:" ), &ctr_program_chdir );
-	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( "mkdir:mode:" ), &ctr_program_mkdir );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_OBSD_PLEDGE_SET ), &ctr_program_pledge );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_OBSD_UNVEIL_SET ), &ctr_program_unveil );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_PATH ), &ctr_program_getcwd );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_FEATURE_ENABLE_SET ), &ctr_program_feature_set );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_FEATURE_SET ), &ctr_program_feature );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_UNIX_CHDIR_SET ), &ctr_program_chdir );
+	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_UNIX_MKDIR_SET ), &ctr_program_mkdir );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PROGRAM ), CtrStdCommand, 0 );
 	CtrStdCommand->link = CtrStdObject;
 	CtrStdCommand->info.sticky = 1;
@@ -1113,8 +1113,8 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_COPY ), &ctr_clock_copy );
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_SYMBOL_EQUALS ), &ctr_clock_equals );
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_UNEQUALS_SYMBOL ), &ctr_clock_neq );
-    ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( "from:" ), &ctr_clock_from_iso );
-    ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( "iso-datetime" ), &ctr_clock_to_iso_string );
+    ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_FROM_SET ), &ctr_clock_from_iso );
+    ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_ISODATETIME ), &ctr_clock_to_iso_string );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_MOMENT ), CtrStdClock, 0 );
 	CtrStdClock->link = CtrStdObject;
 	CtrStdFile->info.sticky = 1;
