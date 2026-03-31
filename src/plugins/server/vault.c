@@ -8,6 +8,7 @@
 
 #include "../../xo.h"
 #include "vault.h"
+#include <server.h>
 #include "monocypher/src/monocypher.h"
 
 
@@ -628,18 +629,18 @@ ctr_object* vaultObject;
 void begin_vault() {
 	vaultObject = ctr_gui_vault_new(CtrStdObject, NULL);
 	vaultObject->link = CtrStdObject;
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "new" ), &ctr_gui_vault_new );
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "new:" ), &ctr_gui_vault_new_set );
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "name" ), &ctr_gui_vault_name );
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "encrypt:key:" ), &ctr_gui_vault_encrypt );
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "decrypt:key:" ), &ctr_gui_vault_decrypt );
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "token:" ), &ctr_server_vault_token_set );
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "password-hash:" ), &ctr_server_vault_password_hash );
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "password-hash:verify:" ), &ctr_server_vault_password_verify );
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "edkeys" ), &ctr_server_vault_pki_create );
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "sign:with:" ), &ctr_server_vault_pki_sign );
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "check:signature:with:" ), &ctr_server_vault_pki_check );
-	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( "hash:type:" ), &ctr_server_vault_hash );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Vault" ), vaultObject, CTR_CATEGORY_PUBLIC_PROPERTY);
-	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( "checksum" ), &ctr_file_checksum );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( CTR_DICT_NEW ), &ctr_gui_vault_new );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( CTR_DICT_NEW_SET ), &ctr_gui_vault_new_set );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( CTR_DICT_NAME ), &ctr_gui_vault_name );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( CTR_DICT_ENCRYPT_KEY_SET ), &ctr_gui_vault_encrypt );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( CTR_DICT_DECRYPT_KEY_SET ), &ctr_gui_vault_decrypt );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( CTR_DICT_TOKEN_SET ), &ctr_server_vault_token_set );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( CTR_DICT_PASSWORD_HASH_SET ), &ctr_server_vault_password_hash );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( CTR_DICT_PASSWORD_HASH_VERIFY_SET ), &ctr_server_vault_password_verify );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( CTR_DICT_EDKEYS ), &ctr_server_vault_pki_create );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( CTR_DICT_SIGN_WITH_SET ), &ctr_server_vault_pki_sign );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( CTR_DICT_CHECK_SIGNATURE_SET ), &ctr_server_vault_pki_check );
+	ctr_internal_create_func(vaultObject, ctr_build_string_from_cstring( CTR_DICT_HASH_TYPE_SET ), &ctr_server_vault_hash );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_VAULT_OBJECT ), vaultObject, CTR_CATEGORY_PUBLIC_PROPERTY);
+	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_CHECKSUM ), &ctr_file_checksum );
 }
