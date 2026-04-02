@@ -7,6 +7,8 @@
 
 #include "../../xo.h"
 #include "pattern.h"
+#include <server.h>
+
 
 ctr_object* CtrServerPCRE2;
 
@@ -197,9 +199,9 @@ ctr_object* ctr_server_pcre2_match_count(ctr_object* myself, ctr_argument* argum
 void begin_pcre2() {
 	CtrServerPCRE2 = ctr_server_pcre2_new(CtrStdString, NULL);
 	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( CTR_DICT_NEW_SET ), &ctr_server_pcre2_new_set );
-	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( "match:do:" ), &ctr_server_pcre2_match_do );
+	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( CTR_DICT_MATCH_DO_SET ), &ctr_server_pcre2_match_do );
 	// alias for match/do but intended for capturing matches only
-	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( "match:capture:" ), &ctr_server_pcre2_match_do );
-	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( "match:" ), &ctr_server_pcre2_match_count );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Pattern" ), CtrServerPCRE2, CTR_CATEGORY_PUBLIC_PROPERTY);
+	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( CTR_DICT_MATCH_CAPTURE_SET ), &ctr_server_pcre2_match_do );
+	ctr_internal_create_func(CtrServerPCRE2, ctr_build_string_from_cstring( CTR_DICT_MATCH_SET ), &ctr_server_pcre2_match_count );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PATTERN_OBJECT ), CtrServerPCRE2, CTR_CATEGORY_PUBLIC_PROPERTY);
 }

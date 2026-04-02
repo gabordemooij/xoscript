@@ -101,3 +101,7 @@
 #define CTR_DICT_FORM_ENCODE "form-encode"
 #define CTR_DICT_BASE64_ENCODE "base64-encode"
 #define CTR_DICT_BASE64_DECODE "base64-decode"
+#define CTR_DICT_MATCH_DO_SET "match:do:"
+#define CTR_DICT_MATCH_CAPTURE_SET "match:capture:"
+#define CTR_DICT_MATCH_SET "match:"
+#define CTR_DICT_PATTERN_OBJECT "Pattern"
