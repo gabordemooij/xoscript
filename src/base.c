@@ -1383,7 +1383,7 @@ ctr_object* ctr_number_bit_xor(ctr_object* myself, ctr_argument* argumentList) {
  * - ctr_number_to_string_flat
  */
 ctr_object* ctr_internal_number_to_string(ctr_object* myself, ctr_argument* argumentList, char flat) {
-	const char* fmt = "%.10f";
+	const char* fmt = "%.10f"; //10 digits hides most common float inexactness for display
 	char* buf;
 	size_t s;
 	size_t i;
