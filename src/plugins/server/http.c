@@ -233,12 +233,12 @@ void begin_http(){
 	urlObject = ctr_url_new(CtrStdObject, NULL);
 	urlObject->link = CtrStdObject;
 	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_NEW ), &ctr_url_new );
-	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "from:" ), &ctr_url_from_set );
-	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "scheme" ), &ctr_url_scheme );
-	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "host" ), &ctr_url_host );
-	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "port" ), &ctr_url_port );
-	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "path" ), &ctr_url_path );
-	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "query" ), &ctr_url_query );
-	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( "fragment" ), &ctr_url_fragment );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "URL" ), urlObject, 0);
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_FROM_SET ), &ctr_url_from_set );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_URL_SCHEME ), &ctr_url_scheme );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_URL_HOST ), &ctr_url_host );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_URL_PORT ), &ctr_url_port );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_URL_PATH ), &ctr_url_path );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_URL_QUERY ), &ctr_url_query );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_URL_FRAGMENT ), &ctr_url_fragment );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_URL_OBJECT ), urlObject, 0);
 }
