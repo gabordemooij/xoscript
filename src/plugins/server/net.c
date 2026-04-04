@@ -96,9 +96,9 @@ ctr_object* ctr_network_get(ctr_object* myself, ctr_argument* argumentList) {
 void begin_net() {
 	CtrCurlObject = ctr_network_new(CtrStdObject, NULL);
 	CtrCurlObject->link = CtrStdObject;
-	ctr_internal_create_func(CtrCurlObject, ctr_build_string_from_cstring( "new" ), &ctr_network_new );
-	ctr_internal_create_func(CtrCurlObject, ctr_build_string_from_cstring( "post:to:" ), &ctr_network_basic_text_send );
-	ctr_internal_create_func(CtrCurlObject, ctr_build_string_from_cstring( "get:" ), &ctr_network_get );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( "Net" ), CtrCurlObject, CTR_CATEGORY_PUBLIC_PROPERTY);	
+	ctr_internal_create_func(CtrCurlObject, ctr_build_string_from_cstring( CTR_DICT_NEW ), &ctr_network_new );
+	ctr_internal_create_func(CtrCurlObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_POST_TO_SET ), &ctr_network_basic_text_send );
+	ctr_internal_create_func(CtrCurlObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_GET_SET ), &ctr_network_get );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_NETWORK_OBJECT ), CtrCurlObject, CTR_CATEGORY_PUBLIC_PROPERTY);	
 }
 
