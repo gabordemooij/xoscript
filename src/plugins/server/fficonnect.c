@@ -887,8 +887,8 @@ void begin_ffi() {
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_FREE_STRUCT ), &ctr_blob_free_struct);
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_FROM_LENGTH ), &ctr_blob_read);
 	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_LENGTH ), &ctr_blob_size);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( "wipe" ), &ctr_blob_wipe);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( "decode:" ), &ctr_blob_decode);
+	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_WIPE ), &ctr_blob_wipe);
+	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_DECODE_SET ), &ctr_blob_decode);
 	CtrMediaFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
 	CtrMediaFFIObjectBase->link = CtrStdObject;
 	ctr_internal_create_func(CtrMediaFFIObjectBase, ctr_build_string_from_cstring( CTR_DICT_MESSAGEARGS ), &ctr_media_ffi_apply );

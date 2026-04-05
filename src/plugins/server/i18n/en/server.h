@@ -113,3 +113,5 @@
 #define CTR_DICT_URL_QUERY "query"
 #define CTR_DICT_URL_FRAGMENT "fragment"
 #define CTR_DICT_URL_OBJECT "URL"
+#define CTR_DICT_WIPE "wipe"
+#define CTR_DICT_DECODE_SET "decode:"
