@@ -108,6 +108,8 @@
 #define CTR_DICT_PATTERN_OBJECT "Pattern"
 #define CTR_DICT_URL_SCHEME "scheme"
 #define CTR_DICT_URL_HOST "host"
+#define CTR_DICT_URL_HOST_SET "host:"
+#define CTR_DICT_URL_USERNAME_SET "username:"
 #define CTR_DICT_URL_PORT "port"
 #define CTR_DICT_URL_PATH "path"
 #define CTR_DICT_URL_QUERY "query"
@@ -115,3 +117,22 @@
 #define CTR_DICT_URL_OBJECT "URL"
 #define CTR_DICT_WIPE "wipe"
 #define CTR_DICT_DECODE_SET "decode:"
+#define CTR_DICT_PASSWORD_SET "password:"
+#define CTR_DICT_DATABASENAME_SET "dbname:"
+#define CTR_DICT_DATABASE_SET "database:"
+#define CTR_DICT_CLOSE "close"
+#define CTR_DICT_CONNECT "connect"
+#define CTR_DICT_CONNECTED "connected?"
+#define CTR_DICT_COMMIT "commit"
+#define CTR_DICT_ROLLBACK "rollback"
+#define CTR_DICT_EXECUTE "execute"
+#define CTR_DICT_DATABASE_QUERY_SET "query:"
+#define CTR_DICT_DATABASE_QUERYPARAMS_SET "parameters:"
+#define CTR_DICT_FETCH_SET "fetch:"
+#define CTR_DICT_DATABASE_INSERTID "insert-id"
+#define CTR_DICT_DATABASE_MARIADB_OBJECT "Maria-DB"
+#define CTR_DICT_DATABASE_MARIADB_QUERY_OBJECT "Maria-Query"
+
+
+
+
