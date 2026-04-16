@@ -23,7 +23,6 @@
 #define CTR_DICT_NEW                             "new"                       // Word or symbol for unary message to create a new object (unary message, no colon allowed)
 #define CTR_DICT_NEW_SET                         "new:"                      // Word to create a new object based on the recipient with an additional argument for initialisation
 #define CTR_DICT_NEW_TYPE_SET                    "new:type:"                 // Phrase to create a new object, passing a size or initial argument and a type argument
-
 #define CTR_DICT_EQUALS                          "equals:"                   // Compares the identify (memory location) of two objects (must keyword message with exactly 1 colon at the end)
 #define CTR_DICT_AND                             "and:"                      // Word for and as in (A and B), must contain only 1 colon at the end
 #define CTR_DICT_OR                              "or:"                       // Word for or as in (A or B), must contain only 1 colon at the end
