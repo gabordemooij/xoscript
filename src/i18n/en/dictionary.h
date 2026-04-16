@@ -21,6 +21,9 @@
 #define CTR_DICT_ME_ICON                         "self"                      // Word or symbol to refer to the object itself from within a method to call another method
 #define CTR_DICT_MY_ICON                         "own"                       // Word or symbol to refer to the object itself from within a method to access a property
 #define CTR_DICT_NEW                             "new"                       // Word or symbol for unary message to create a new object (unary message, no colon allowed)
+#define CTR_DICT_NEW_SET                         "new:"                      // Word to create a new object based on the recipient with an additional argument for initialisation
+#define CTR_DICT_NEW_TYPE_SET                    "new:type:"                 // Phrase to create a new object, passing a size or initial argument and a type argument
+
 #define CTR_DICT_EQUALS                          "equals:"                   // Compares the identify (memory location) of two objects (must keyword message with exactly 1 colon at the end)
 #define CTR_DICT_AND                             "and:"                      // Word for and as in (A and B), must contain only 1 colon at the end
 #define CTR_DICT_OR                              "or:"                       // Word for or as in (A or B), must contain only 1 colon at the end
@@ -116,7 +119,6 @@
 #define CTR_DICT_CHARACTERS                      "characters"                // Word to refer to characters or letters in a string, resulting in a list
 #define CTR_DICT_QUALIFIER_SET                   "qualify:"                  // Word to add a description or unit of measurement string to a number
 #define CTR_DICT_QUALIFIER                       "qualifier"                 // Word to obtain the description or unit of measurement string associated with a number
-#define CTR_DICT_NEW_SET                         "new:"                      // Word to create a new object based on the recipient with an additional argument for initialisation
 #define CTR_DICT_HOUR                            "hour"                      // Word to obtain the hour of the day from an object respresenting a point in time
 #define CTR_DICT_HOUR_SET                        "hour:"                     // Word to change the hour of the day in an object representing a point in time
 #define CTR_DICT_MINUTE_SET                      "minute:"                   // Word to change the minute of the hour in an object representing a point in time
@@ -176,6 +178,8 @@
 #define CTR_DICT_TEST                            "test"                      // Word to perform a test on the recipient object without arguments
 #define CTR_DICT_FROM_SET                        "from:"                     // Word to obtain an object resulting from transforming another object specified by argument 1 (from).
 #define CTR_DICT_ISODATETIME                     "iso-datetime"              // Word to obtain an standard iso datetime formatted representation of the recipient object
+#define CTR_DICT_NAME                            "name"                      // Word to inquire about the name of an object or an entity respresented by an object
+#define CTR_DICT_PASSWORD_SET                    "password:"                 // Word to associate the password in argument 1 with the recipient object
 
 /* Section B: Code generation, must match Dict/List messages! */
 #define CTR_DICT_CODEGEN_MAP_NEW                 "(Dict new) "               // Code generation for dict, new part
@@ -195,7 +199,9 @@
 #define CTR_DICT_OCTAL                           "Oct"                       // Word or abbreviation indicating an octal number
 #define CTR_DICT_BINARY                          "Bin"                       // Word or abbreviation indicating a binary number
 #define CTR_DICT_UTF8                            "utf8"                      // Word or abbreviation to request a UTF-8 encoded string from the recipient object
+#define CTR_DICT_UTF8_SET                        "utf8:"                     // Word to set utf8 encoded data
 #define CTR_DICT_BYTES                           "bytes"                     // Word to obtain byte values from recipient object
+#define CTR_DICT_BYTES_SET                       "bytes:"                    // Word to change or set the bytes of an object (most likely Blob)
 #define CTR_DICT_BYTE                            "byte"                      // Word to obtain a single byte value from a recipient object
 #define CTR_DICT_TCCOMPARE                       "tccompare:"                // Word to compare the recipient object to the object specified by the argument using a constant time comparison
 #define CTR_DICT_TEMPORARY_WRITE_SET             "tempwrite:"                // Word, abbreviation or term to describe writing a string to a temporary file (path will be returned)

@@ -9,17 +9,13 @@
 #define CTR_DICT_DATABASE_MARIADB_QUERY_OBJECT   "Maria-Query"               // Word for object representing a MariaDB database query
 #define CTR_DICT_PATTERN_OBJECT                  "Pattern"                   // Word for object representing a PCRE2-style regular expression
 #define CTR_DICT_FORMAT_OBJECT                   "Format"                    // Word for object that represents a specific formatting for a string
-#define CTR_DICT_NAME                            "name"                      // Word to inquire about the name of an object or an entity respresented by an object
 #define CTR_DICT_JSONIFY                         "jsonify:"                  // Term to turn objects into a string with JSON encoding
 #define CTR_DICT_OBJECT_FROM_SET                 "object:"                   // Term to turn serialized string back into an object
 #define CTR_DICT_LINK_SET                        "link:"                     // Word to connect or link something to something else
-#define CTR_DICT_BYTES_SET                       "bytes:"                    // Word to change or set the bytes of an object (most likely Blob)
 #define CTR_DICT_FREE                            "free"                      // Word to free allocated computer memory
 #define CTR_DICT_FREE_STRUCT                     "structfree"                // Term to free allocated c-structure in computer memory
 #define CTR_DICT_STRUCT_SET                      "struct:"                   // Term to describe a c-structure in computer memory
 #define CTR_DICT_DEREF                           "deref"                     // Term for dereferencing a c pointer
-#define CTR_DICT_UTF8_SET                        "utf8:"                     // Word to set utf8 encoded data
-#define CTR_DICT_NEW_TYPE_SET                    "new:type:"                 // Phrase to create a new object, passing a size or initial argument and a type argument
 #define CTR_DICT_HTTP_REQUEST_GET_SET            "get:"                      // Term to obtain the value of an http search parameter (from a HTTP GET request)
 #define CTR_DICT_HTTP_REQUEST_GET_LIST_SET       "get-list:"                 // Term to obtain a list of similary named search parameters (from a HTTP GET request)
 #define CTR_DICT_HTTP_REQUEST_COOKIE_SET         "cookie:"                   // Term to obtain the value of an http cookie header
@@ -68,7 +64,6 @@
 #define CTR_DICT_URL_FRAGMENT                    "fragment"                  // Word to obtain the fragment part of an URL
 #define CTR_DICT_WIPE                            "wipe"                      // Word to delete the contents of an object
 #define CTR_DICT_DECODE_SET                      "decode:"                   // Word to decode the recipient object according to the decoding protocol specified in argument 1
-#define CTR_DICT_PASSWORD_SET                    "password:"                 // Word to associate the password in argument 1 with the recipient object
 #define CTR_DICT_DATABASENAME_SET                "dbname:"                   // Word to associate the database name in argument 1 with the recipient object
 #define CTR_DICT_DATABASE_SET                    "database:"                 // Word to associate the database object in argument 1 with the recipient object
 #define CTR_DICT_CLOSE                           "close"                     // Word to invoke a closing operation on the recipient object
@@ -81,7 +76,3 @@
 #define CTR_DICT_DATABASE_QUERYPARAMS_SET        "parameters:"               // Word to associate database query parameters in argument with the current state of the recipient object
 #define CTR_DICT_FETCH_SET                       "fetch:"                    // Word to fetch something from the recipient object and associate a callback function using the argument
 #define CTR_DICT_DATABASE_INSERTID               "insert-id"                 // Word to return a database insertion id resulting from an insert operation on a database
-
-
-
-
