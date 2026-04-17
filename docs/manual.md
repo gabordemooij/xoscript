@@ -1689,6 +1689,7 @@ in a scripting language. Advanced file operations require the
 use of FFI through the server plugin or a separate IO plugin.
 
 @api_File_file
+@api_File_vault
 
 # Date/Time
 
