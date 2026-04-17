@@ -53,12 +53,7 @@ ctr_object* ctr_server_htmlencode_set(ctr_object* myself, ctr_argument* argument
         }
     }
     char* dest = ctr_heap_allocate(len + 1);
-	if (!dest) {
-		ctr_error("Out of memory while creating html output buffer.", 0);
-		ctr_heap_free(source);
-		return CtrStdNil;
-	}
-    char *o = dest;
+	char *o = dest;
     for (p = source; *p; p++) {
         switch (*p) {
             case '&':
