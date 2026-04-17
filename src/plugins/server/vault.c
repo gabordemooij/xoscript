@@ -415,6 +415,12 @@ ctr_object* ctr_server_vault_password_verify(ctr_object* myself, ctr_argument* a
 	return result;
 }
 
+/**
+ * @def
+ * [ Vault ] edkeys
+ * 
+ * @test700
+ */
 ctr_object* ctr_server_vault_pki_create(ctr_object* myself, ctr_argument* argumentList) {
 	uint8_t seed[32];
 	uint8_t sk  [64];
@@ -453,6 +459,12 @@ ctr_object* ctr_server_vault_pki_create(ctr_object* myself, ctr_argument* argume
 	return karr;
 }
 
+/**
+ * @def
+ * [ Vault ] sign: [ String ] with: [ String ]
+ * 
+ * @test701
+ */
 ctr_object* ctr_server_vault_pki_sign(ctr_object* myself, ctr_argument* argumentList) {
 	uint8_t       signature[64];
 	char* sig64 = NULL;
@@ -480,6 +492,12 @@ ctr_object* ctr_server_vault_pki_sign(ctr_object* myself, ctr_argument* argument
 	return sig;
 }
 
+/**
+ * @def
+ * [ Vault ] check: [ String ] signature: [ String ] with: [ String ]
+ * 
+ * @test671
+ */
 ctr_object* ctr_server_vault_pki_check(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* check = CtrStdBoolFalse;
 	char* msg   = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
