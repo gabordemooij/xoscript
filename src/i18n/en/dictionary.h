@@ -17,9 +17,9 @@
 #define CTR_DICT_INT64                           "Int64"                     // 64-bit Integer Number class-like object
 #define CTR_DICT_PATH_OBJECT                     "Path"                      // Path object, root of all path objects, file locations, can be used to turn messages into strings separated by OS-dependent path separator
 #define CTR_DICT_CMD_OBJECT                      "Command"                   // Command object, root all command objects, can be used to turn messages into strings separated by spaces
-#define CTR_DICT_PEN_ICON                        "Out"                       // Word or symbol for standard output object (stdout)
-#define CTR_DICT_ME_ICON                         "self"                      // Word or symbol to refer to the object itself from within a method to call another method
-#define CTR_DICT_MY_ICON                         "own"                       // Word or symbol to refer to the object itself from within a method to access a property
+#define CTR_DICT_STDOUT_OBJECT                   "Out"                       // Word or symbol for standard output object (stdout)
+#define CTR_DICT_SELF                            "self"                      // Word or symbol to refer to the object itself from within a method to call another method
+#define CTR_DICT_OWN                             "own"                       // Word or symbol to refer to the object itself from within a method to access a property
 #define CTR_DICT_NEW                             "new"                       // Word or symbol for unary message to create a new object (unary message, no colon allowed)
 #define CTR_DICT_NEW_SET                         "new:"                      // Word to create a new object based on the recipient with an additional argument for initialisation
 #define CTR_DICT_NEW_TYPE_SET                    "new:type:"                 // Phrase to create a new object, passing a size or initial argument and a type argument
@@ -216,7 +216,7 @@
 #define CTR_DICT_MATH_LOG                        "log"                       // Word or abbreviation for logarithm
 
 /* Section D: Symbols (recommended to not translate) */
-#define CTR_DICT_VAR_ICON                        ">>"                        // Word or symbol to declare a variable
+#define CTR_DICT_VAR                             ">>"                        // Word or symbol to declare a variable
 #define CTR_DICT_BULLET                          "~"                         // Adds a value to a list (binary message, must be exactly 1 UTF8-codepoint)
 #define CTR_DICT_SYMBOL_EQUALS                   "="                         // Compares the value of two objects (binary message, must be exactly 1 UTF8-codepoint)
 #define CTR_DICT_PLUS                            "+"                         // Symbol for addition (binary message, must be exactly 1 UTF8-codepoint)

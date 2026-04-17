@@ -51,9 +51,9 @@ int ctr_init() {
 	CtrStdFlow = NULL;
 	ctr_source_mapping = 1;
 	ctr_deserialize_mode = 0;
-	ctr_clex_keyword_me_icon = CTR_DICT_ME_ICON;
-	ctr_clex_keyword_my_icon = CTR_DICT_MY_ICON;
-	ctr_clex_keyword_var_icon = CTR_DICT_VAR_ICON;
+	ctr_clex_keyword_me_icon = CTR_DICT_SELF;
+	ctr_clex_keyword_my_icon = CTR_DICT_OWN;
+	ctr_clex_keyword_var_icon = CTR_DICT_VAR;
 	ctr_clex_keyword_my_icon_len = strlen( ctr_clex_keyword_my_icon );
 	ctr_clex_keyword_var_icon_len = strlen( ctr_clex_keyword_var_icon );
 	ctr_clex_keyword_eol_len = strlen( CTR_DICT_END_OF_LINE );
