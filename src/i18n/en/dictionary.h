@@ -7,7 +7,7 @@
 #define CTR_DICT_FALSE_OBJECT                    "False"                     // False object (extends Bool)
 #define CTR_DICT_NUMBER_OBJECT                   "Number"                    // Number object (root object of all numbers)
 #define CTR_DICT_STRING_OBJECT                   "String"                    // String object (root object of all strings)
-#define CTR_DICT_TASK_OBJECT                     "Function"                  // Function object (root object of all functions)
+#define CTR_DICT_FUNCTION_OBJECT                 "Function"                  // Function object (root object of all functions)
 #define CTR_DICT_OBJECT_OBJECT                   "Object"                    // Root object (root object of all objects)
 #define CTR_DICT_ARRAY_OBJECT                    "List"                      // List object (root object of all lists)
 #define CTR_DICT_MAP_OBJECT                      "Dict"                      // Dict object (root object of all dictionaries/maps)

@@ -943,7 +943,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdBlock, ctr_build_string_from_cstring( CTR_DICT_PROCEDURE ), &ctr_block_procedure );
 	ctr_internal_create_func(CtrStdBlock, ctr_build_string_from_cstring( CTR_DICT_WHILE ), &ctr_block_while_true );
 	ctr_internal_create_func(CtrStdBlock, ctr_build_string_from_cstring( CTR_DICT_TOSTRING ), &ctr_block_to_string );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_TASK_OBJECT ), CtrStdBlock, 0 );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_FUNCTION_OBJECT ), CtrStdBlock, 0 );
 	CtrStdBlock->link = CtrStdObject;
 	CtrStdBlock->info.sticky = 1;
 

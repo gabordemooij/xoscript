@@ -121,7 +121,7 @@ ctr_object* ctr_object_type(ctr_object* myself, ctr_argument* argumentList) {
 			return ctr_build_string_from_cstring( CTR_DICT_STRING_OBJECT );
 		case CTR_OBJECT_TYPE_OTBLOCK:
 		case CTR_OBJECT_TYPE_OTNATFUNC:
-			return ctr_build_string_from_cstring( CTR_DICT_TASK_OBJECT );
+			return ctr_build_string_from_cstring( CTR_DICT_FUNCTION_OBJECT );
 		default:
 			return ctr_build_string_from_cstring( CTR_DICT_OBJECT_OBJECT );
 	}
@@ -2575,7 +2575,7 @@ ctr_object* ctr_block_catch(ctr_object* myself, ctr_argument* argumentList) {
  */
 
 ctr_object* ctr_block_to_string(ctr_object* myself, ctr_argument* argumentList) {
-	return ctr_build_string_from_cstring( CTR_DICT_TASK_OBJECT );
+	return ctr_build_string_from_cstring( CTR_DICT_FUNCTION_OBJECT );
 }
 
 void ctr_internal_destructor_int64(ctr_resource* rs) {
