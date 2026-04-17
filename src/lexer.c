@@ -114,9 +114,9 @@ void ctr_clex_emit_error( char* message ) {
  * Loads program into memory.
  */
 void ctr_clex_load(char* prg) {
-	ctr_clex_true_len = strlen(CTR_DICT_TRUE);
-	ctr_clex_false_len = strlen(CTR_DICT_FALSE);
-	ctr_clex_nil_len = strlen(CTR_DICT_NIL);
+	ctr_clex_true_len = strlen(CTR_DICT_TRUE_OBJECT);
+	ctr_clex_false_len = strlen(CTR_DICT_FALSE_OBJECT);
+	ctr_clex_nil_len = strlen(CTR_DICT_NIL_OBJECT);
 	ctr_code = prg;
 	ctr_code_start = prg;
 	ctr_clex_buffer = ctr_heap_allocate_tracked(ctr_clex_bflmt);

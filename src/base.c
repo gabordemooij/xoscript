@@ -47,7 +47,7 @@ ctr_object* ctr_nil_is_nil(ctr_object* myself, ctr_argument* argumentList) {
  */
 
 ctr_object* ctr_nil_to_string(ctr_object* myself, ctr_argument* argumentList) {
-	return ctr_build_string_from_cstring( CTR_DICT_NIL );
+	return ctr_build_string_from_cstring( CTR_DICT_NIL_OBJECT );
 }
 
 /**
@@ -112,18 +112,18 @@ ctr_object* ctr_object_make(ctr_object* myself, ctr_argument* argumentList) {
 ctr_object* ctr_object_type(ctr_object* myself, ctr_argument* argumentList) {
 	switch(myself->info.type){
 		case CTR_OBJECT_TYPE_OTNIL:
-			return ctr_build_string_from_cstring( CTR_DICT_NIL );
+			return ctr_build_string_from_cstring( CTR_DICT_NIL_OBJECT );
 		case CTR_OBJECT_TYPE_OTBOOL:
-			return ctr_build_string_from_cstring( CTR_DICT_BOOLEAN );
+			return ctr_build_string_from_cstring( CTR_DICT_BOOLEAN_OBJECT );
 		case CTR_OBJECT_TYPE_OTNUMBER:
-			return ctr_build_string_from_cstring( CTR_DICT_NUMBER );
+			return ctr_build_string_from_cstring( CTR_DICT_NUMBER_OBJECT );
 		case CTR_OBJECT_TYPE_OTSTRING:
-			return ctr_build_string_from_cstring( CTR_DICT_STRING );
+			return ctr_build_string_from_cstring( CTR_DICT_STRING_OBJECT );
 		case CTR_OBJECT_TYPE_OTBLOCK:
 		case CTR_OBJECT_TYPE_OTNATFUNC:
-			return ctr_build_string_from_cstring( CTR_DICT_TASK );
+			return ctr_build_string_from_cstring( CTR_DICT_TASK_OBJECT );
 		default:
-			return ctr_build_string_from_cstring( CTR_DICT_OBJECT );
+			return ctr_build_string_from_cstring( CTR_DICT_OBJECT_OBJECT );
 	}
 }
 
@@ -158,7 +158,7 @@ ctr_object* ctr_object_to_code(ctr_object* myself, ctr_argument* argumentList) {
  */
 
 ctr_object* ctr_object_to_string( ctr_object* myself, ctr_argument* argumentList ) {
-	return ctr_build_string_from_cstring( CTR_DICT_OBJECT );
+	return ctr_build_string_from_cstring( CTR_DICT_OBJECT_OBJECT );
 }
 
 /**
@@ -538,9 +538,9 @@ ctr_object* ctr_bool_neq(ctr_object* myself, ctr_argument* argumentList) {
 
 ctr_object* ctr_bool_to_string(ctr_object* myself, ctr_argument* argumentList) {
 	if (myself->value.bvalue == 1) {
-		return ctr_build_string_from_cstring( CTR_DICT_TRUE );
+		return ctr_build_string_from_cstring( CTR_DICT_TRUE_OBJECT );
 	} else {
-		return ctr_build_string_from_cstring( CTR_DICT_FALSE );
+		return ctr_build_string_from_cstring( CTR_DICT_FALSE_OBJECT );
 	}
 }
 
@@ -2575,7 +2575,7 @@ ctr_object* ctr_block_catch(ctr_object* myself, ctr_argument* argumentList) {
  */
 
 ctr_object* ctr_block_to_string(ctr_object* myself, ctr_argument* argumentList) {
-	return ctr_build_string_from_cstring( CTR_DICT_TASK );
+	return ctr_build_string_from_cstring( CTR_DICT_TASK_OBJECT );
 }
 
 void ctr_internal_destructor_int64(ctr_resource* rs) {

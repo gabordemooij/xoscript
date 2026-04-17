@@ -1,20 +1,20 @@
 /* English Language File for XOScript Core Module */
 
 /* Section A: Objects, Keywords & Messages (translation recommended) */
-#define CTR_DICT_NIL                             "None"                      // None object (null)
-#define CTR_DICT_BOOLEAN                         "Bool"                      // Bool object (boolean, parent of True and False, equals False)
-#define CTR_DICT_TRUE                            "True"                      // True object (extends Bool)
-#define CTR_DICT_FALSE                           "False"                     // False object (extends Bool)
-#define CTR_DICT_NUMBER                          "Number"                    // Number object (root object of all numbers)
-#define CTR_DICT_STRING                          "String"                    // String object (root object of all strings)
-#define CTR_DICT_TASK                            "Function"                  // Function object (root object of all functions)
-#define CTR_DICT_OBJECT                          "Object"                    // Root object (root object of all objects)
+#define CTR_DICT_NIL_OBJECT                      "None"                      // None object (null)
+#define CTR_DICT_BOOLEAN_OBJECT                  "Bool"                      // Bool object (boolean, parent of True and False, equals False)
+#define CTR_DICT_TRUE_OBJECT                     "True"                      // True object (extends Bool)
+#define CTR_DICT_FALSE_OBJECT                    "False"                     // False object (extends Bool)
+#define CTR_DICT_NUMBER_OBJECT                   "Number"                    // Number object (root object of all numbers)
+#define CTR_DICT_STRING_OBJECT                   "String"                    // String object (root object of all strings)
+#define CTR_DICT_TASK_OBJECT                     "Function"                  // Function object (root object of all functions)
+#define CTR_DICT_OBJECT_OBJECT                   "Object"                    // Root object (root object of all objects)
 #define CTR_DICT_ARRAY_OBJECT                    "List"                      // List object (root object of all lists)
 #define CTR_DICT_MAP_OBJECT                      "Dict"                      // Dict object (root object of all dictionaries/maps)
-#define CTR_DICT_PROGRAM                         "Program"                   // Program object (to communicate with process)
-#define CTR_DICT_FILE                            "File"                      // File object (root object of all files)
-#define CTR_DICT_MOMENT                          "Moment"                    // Moment object (root object of all time/moment objects)
-#define CTR_DICT_INT64                           "Int64"                     // 64-bit Integer Number class-like object
+#define CTR_DICT_PROGRAM_OBJECT                  "Program"                   // Program object (to communicate with process)
+#define CTR_DICT_FILE_OBJECT                     "File"                      // File object (root object of all files)
+#define CTR_DICT_MOMENT_OBJECT                   "Moment"                    // Moment object (root object of all time/moment objects)
+#define CTR_DICT_INT64_OBJECT                    "Int64"                     // 64-bit Integer Number class-like object
 #define CTR_DICT_PATH_OBJECT                     "Path"                      // Path object, root of all path objects, file locations, can be used to turn messages into strings separated by OS-dependent path separator
 #define CTR_DICT_CMD_OBJECT                      "Command"                   // Command object, root all command objects, can be used to turn messages into strings separated by spaces
 #define CTR_DICT_STDOUT_OBJECT                   "Out"                       // Word or symbol for standard output object (stdout)

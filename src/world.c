@@ -728,13 +728,13 @@ void ctr_initialize_world() {
 	ctr_internal_create_func( CtrStdObject, ctr_build_string_from_cstring( CTR_DICT_LEARN ), &ctr_object_learn_meaning );
 	ctr_internal_create_func( CtrStdObject, ctr_build_string_from_cstring( CTR_DICT_CODE ), &ctr_object_to_code );
 	ctr_internal_create_func( CtrStdObject, ctr_build_string_from_cstring( CTR_DICT_RECURSIVE ), &ctr_object_recursion );
-	ctr_internal_object_add_property( CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_OBJECT ), CtrStdObject, 0 );
+	ctr_internal_object_add_property( CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_OBJECT_OBJECT ), CtrStdObject, 0 );
 	CtrStdObject->link = NULL;
 	CtrStdObject->info.sticky = 1;
 
 	/* Nil */
 	CtrStdNil = ctr_internal_create_object(CTR_OBJECT_TYPE_OTNIL);
-	ctr_internal_object_add_property( CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_NIL ), CtrStdNil, 0 );
+	ctr_internal_object_add_property( CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_NIL_OBJECT ), CtrStdNil, 0 );
 	ctr_internal_create_func( CtrStdNil, ctr_build_string_from_cstring( CTR_DICT_ISNIL ), &ctr_nil_is_nil );
 	ctr_internal_create_func( CtrStdNil, ctr_build_string_from_cstring( CTR_DICT_TOSTRING ), &ctr_nil_to_string );
 	ctr_internal_create_func( CtrStdNil, ctr_build_string_from_cstring( CTR_DICT_TONUMBER ), &ctr_nil_to_number );
@@ -766,7 +766,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func( CtrStdBool, ctr_build_string_from_cstring( CTR_DICT_COPY ), &ctr_bool_copy );
 	ctr_internal_create_func( CtrStdBool, ctr_build_string_from_cstring( CTR_DICT_CODE ), &ctr_bool_to_string );
 
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_BOOLEAN ), CtrStdBool, 0 );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_BOOLEAN_OBJECT ), CtrStdBool, 0 );
 	CtrStdBool->link = CtrStdObject;
 	CtrStdBool->info.sticky = 1;
 	
@@ -775,14 +775,14 @@ void ctr_initialize_world() {
 	CtrStdBoolTrue->info.type = CTR_OBJECT_TYPE_OTBOOL;
 	CtrStdBoolTrue->link = CtrStdBool;
 	CtrStdBoolTrue->info.sticky = 1;
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_TRUE ), CtrStdBoolTrue, 0 );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_TRUE_OBJECT ), CtrStdBoolTrue, 0 );
 
 	CtrStdBoolFalse = ctr_internal_create_object(CTR_OBJECT_TYPE_OTBOOL);
 	CtrStdBoolFalse->value.bvalue = 0;
 	CtrStdBoolFalse->info.type = CTR_OBJECT_TYPE_OTBOOL;
 	CtrStdBoolFalse->link = CtrStdBool;
 	CtrStdBoolFalse->info.sticky = 1;
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_FALSE ), CtrStdBoolFalse, 0 );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_FALSE_OBJECT ), CtrStdBoolFalse, 0 );
 
 
 	/* Number */
@@ -837,7 +837,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdNumber, ctr_build_string_from_cstring( "&" ), &ctr_number_bit_and );
 	ctr_internal_create_func(CtrStdNumber, ctr_build_string_from_cstring( "|" ), &ctr_number_bit_or );
 	ctr_internal_create_func(CtrStdNumber, ctr_build_string_from_cstring( "^" ), &ctr_number_bit_xor );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_NUMBER ), CtrStdNumber, 0);
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_NUMBER_OBJECT ), CtrStdNumber, 0);
 	CtrStdNumber->link = CtrStdObject;
 	CtrStdNumber->info.sticky = 1;
 
@@ -856,7 +856,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring(">"), &ctr_int64_higherThan );
 	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring("<"), &ctr_int64_lowerThan );
 	ctr_internal_create_func(CtrStdINT64, ctr_build_string_from_cstring(CTR_DICT_TOSTRING), &ctr_int64_to_string );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_INT64 ), CtrStdINT64, 0 );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_INT64_OBJECT ), CtrStdINT64, 0 );
 	CtrStdINT64->info.sticky = 1;
 
 	/* Hex Helper */
@@ -925,7 +925,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_TCCOMPARE ), &ctr_string_tccompare );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_UTF8 ), &ctr_string_utf8san );
 	ctr_internal_create_func(CtrStdString, ctr_build_string_from_cstring( CTR_DICT_BYTE ), &ctr_string_ord );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_STRING ), CtrStdString, 0 );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_STRING_OBJECT ), CtrStdString, 0 );
 	CtrStdString->link = CtrStdObject;
 	CtrStdString->info.sticky = 1;
 
@@ -943,7 +943,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdBlock, ctr_build_string_from_cstring( CTR_DICT_PROCEDURE ), &ctr_block_procedure );
 	ctr_internal_create_func(CtrStdBlock, ctr_build_string_from_cstring( CTR_DICT_WHILE ), &ctr_block_while_true );
 	ctr_internal_create_func(CtrStdBlock, ctr_build_string_from_cstring( CTR_DICT_TOSTRING ), &ctr_block_to_string );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_TASK ), CtrStdBlock, 0 );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_TASK_OBJECT ), CtrStdBlock, 0 );
 	CtrStdBlock->link = CtrStdObject;
 	CtrStdBlock->info.sticky = 1;
 
@@ -1038,7 +1038,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_OWNER_GROUP_SET ), &ctr_file_chown );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_ARRAY ), &ctr_file_list );
 	ctr_internal_create_func(CtrStdFile, ctr_build_string_from_cstring( CTR_DICT_TOSTRING ), &ctr_file_to_string );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_FILE ), CtrStdFile, 0);
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_FILE_OBJECT ), CtrStdFile, 0);
 	CtrStdFile->link = CtrStdObject;
 	CtrStdFile->info.sticky = 1;
 
@@ -1078,7 +1078,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_FEATURE_SET ), &ctr_program_feature );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_UNIX_CHDIR_SET ), &ctr_program_chdir );
 	ctr_internal_create_func(CtrStdCommand, ctr_build_string_from_cstring( CTR_DICT_UNIX_MKDIR_SET ), &ctr_program_mkdir );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PROGRAM ), CtrStdCommand, 0 );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PROGRAM_OBJECT ), CtrStdCommand, 0 );
 	CtrStdCommand->link = CtrStdObject;
 	CtrStdCommand->info.sticky = 1;
 
@@ -1115,7 +1115,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_UNEQUALS_SYMBOL ), &ctr_clock_neq );
     ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_FROM_SET ), &ctr_clock_from_iso );
     ctr_internal_create_func(CtrStdClock, ctr_build_string_from_cstring( CTR_DICT_ISODATETIME ), &ctr_clock_to_iso_string );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_MOMENT ), CtrStdClock, 0 );
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_MOMENT_OBJECT ), CtrStdClock, 0 );
 	CtrStdClock->link = CtrStdObject;
 	CtrStdFile->info.sticky = 1;
 	
