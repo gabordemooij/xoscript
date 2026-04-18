@@ -88,7 +88,6 @@ ctr_object* ctr_string_escape(ctr_object* myself, ctr_argument* argumentList)  {
 			tstr[k++] = str[i];
 		}
 	}
-	//printf("tlen = %ld \n",tlen);
 	newString = ctr_build_string(tstr, tlen);
 	ctr_heap_free( tstr );
 	return newString;
@@ -205,14 +204,6 @@ ctr_object* ctr_string_unescape(ctr_object* myself, ctr_argument* argumentList) 
 	return newString;
 }
 
-
-/**
- * [Json] new
- *
- * Creates a new instance of the Json object.
- * The Json object allows you to use the Json protocol to communicate with
- * other applications.
- */
 ctr_object* ctr_json_new(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* jsonInstance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
 	jsonInstance->link = myself;
@@ -302,17 +293,10 @@ ctr_object* ctr_jsmn_dump( char* data, jsmntok_t** tt ) {
 }
 
 /**
- * [Json] parse: [String].
- * 
- * Parses a string containing Json encoded data into native Citrine objects.
- * The Json structure must begin with an object (notation: {}). Therefore,
- * the answer to this message from the Json object will always be a Map.
+ * @def
+ * [ JSON ] object: [ String ]
  *
- * Usage:
- *
- * ☞ tasks := '{"todo":7,"finished":3}'.
- * ✎ write: tasks todo. #7
- *
+ * @test703
  */
 ctr_object* ctr_json_parse(ctr_object* myself, ctr_argument* argumentList) {
 	char* jsonString = ctr_heap_allocate_cstring(
@@ -350,11 +334,12 @@ ctr_object* ctr_json_parse(ctr_object* myself, ctr_argument* argumentList) {
 	return answer;
 }
 
+
 /**
- * [Json] jsonify: [Map].
+ * @def
+ * [ JSON ] jsonify: [ Object ]
  *
- * Given a map, the jsonify: message will make the Json object return a
- * String object representing the Map.
+ * @test702
  */
 ctr_object* ctr_json_jsonify(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object*  string;
@@ -478,15 +463,6 @@ ctr_object* ctr_json_jsonify(ctr_object* myself, ctr_argument* argumentList) {
 	return string;
 }
 
-/**
- * C-constructor function.
- *
- * This function gets called when the plugin is loaded into memory.
- * Here we have a chance to add the new object(s) to the World.
- *
- * In this case, we are going to add the Json object to the
- * world.
- */
 void begin_json(){
 	ctr_object* jsonObject = ctr_json_new(CtrStdObject, NULL);
 	ctr_internal_create_func(jsonObject, ctr_build_string_from_cstring( CTR_DICT_OBJECT_FROM_SET ), &ctr_json_parse );
