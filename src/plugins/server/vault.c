@@ -167,6 +167,12 @@ int ctr_gui_vault_internal_derive_key(unsigned char* password, uint8_t* hash, ui
 }
 
 // This function is not Endiann-safe.
+/**
+ * @def
+ * [ Vault ] encrypt: [ String ] key: [ String ]
+ *
+ * @test565
+ */
 ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	char*    in;
@@ -233,6 +239,12 @@ ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList
 	return result;
 }
 
+/**
+ * @def
+ * [ Vault ] decrypt: [ String ] key: [ String ]
+ *
+ * @test565
+ */
 ctr_object* ctr_gui_vault_decrypt(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	ctr_object* encrypted_message;
