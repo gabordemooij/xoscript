@@ -1,3 +1,5 @@
+/* English Language File for XOScript Server Plugin */
+
 #define CTR_DICT_VAULT_OBJECT                    "Vault"                     // Word for object providing cryptography features
 #define CTR_DICT_JSON_OBJECT                     "JSON"                      // Word for object that handles JSON protocol
 #define CTR_DICT_PLUGIN_REQUEST                  "HTTP-Request"              // Word for object representing the current HTTP-Request
