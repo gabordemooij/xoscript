@@ -373,7 +373,6 @@ ctr_tnode* ctr_cparse_ref() {
 		r->vlen = ctr_clex_tok_value_length();
 	}
 	if (
-	(strncmp(">>", tmp, 2)==0 && r->vlen == 2) ||
 	(strncmp(ctr_clex_keyword_var_icon, tmp, ctr_clex_keyword_var_icon_len)==0 && r->vlen == ctr_clex_keyword_var_icon_len)
 	) {
 		int t = ctr_clex_tok();
