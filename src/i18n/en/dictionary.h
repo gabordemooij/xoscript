@@ -44,8 +44,8 @@
 #define CTR_DICT_CONTINUE                        "continue"                  // Word for: continue the loop, skip the rest of this iteration and continue with next iteration
 #define CTR_DICT_ELSE                            "else:"                     // Alias for: 'false:'
 #define CTR_DICT_NOT                             "not"                       // Word for inversion, like green is not red
-#define CTR_DICT_TONUMBER                        "number"                    // Word for casting to a Number
-#define CTR_DICT_TOSTRING                        "string"                    // Word for casting to a String
+#define CTR_DICT_NUMBER                          "number"                    // Word for casting to a Number
+#define CTR_DICT_STRING                          "string"                    // Word for casting to a String
 #define CTR_DICT_CHAR_AT_SET                     "character:"                // Word to access an UTF-8 characters (1 code point) as a String from the specified position
 #define CTR_DICT_EITHEROR                        "either:or:"                // Word to select 1 of 2 objects, either A or B
 #define CTR_DICT_BY_SET                          "by:"                       // Word to combine 2 lists into 1 dict, recipient list will provide the values while the argument list provides the keys
@@ -59,9 +59,11 @@
 #define CTR_DICT_EVEN                            "even?"                     // Word to ask whether a number is an even number (2, 4, 6...)
 #define CTR_DICT_POS                             "positive?"                 // Word to ask whether a number is > 0
 #define CTR_DICT_NEG                             "negative?"                 // Word to ask whether a number is < 0
-#define CTR_DICT_TOBOOL                          "bool"                      // Word for casting to True or False
+#define CTR_DICT_BOOL                            "bool"                      // Word for casting to True or False
 #define CTR_DICT_RANDOM_NUM_BETWEEN              "between:and:"              // Phrase with 2 colons for asking a random number between argument 1 and argument 2
 #define CTR_DICT_LENGTH                          "length"                    // Word for asking for the length of something
+#define CTR_DICT_FROM_SET                        "from:"                     // Word to obtain an object manifactured from the object in argument 1, using it as a source
+#define CTR_DICT_FROM_STRING_SET                 "from-string:"              // Phrase to obtain an object manificatured from a string object in argument 1, using it as a source
 #define CTR_DICT_FROM_LENGTH                     "from:length:"              // Phrase for requesting a part of something specifying the start with argument 1 and the length / amount with argument 2
 #define CTR_DICT_TRIM                            "trim"                      // Word to remove surrounding spaces from a string
 #define CTR_DICT_AT                              "at:"                       // Word to request an element in a collection located using the argument
@@ -164,21 +166,19 @@
 #define CTR_DICT_TOOBJECT                        "object"                    // Word to use to cast a string to an object by parsing/evaluating the code within
 #define CTR_DICT_RECURSIVE                       "recursive"                 // Word to enable calling the same method from a method
 #define CTR_DICT_VERSION_SET                     "version:"                  // Word to set the version of recipient to the specified value in the argument
-#define CTR_DICT_FROM_STRING                     "from-string:"              // Word to obtain an object from a string
-#define CTR_DICT_LINES_SET                       "lines:"                    // Word to call a function for each line read from an object
-#define CTR_DICT_PLATFORM                        "platform"                  // Word to obtain a string identifying the current platform
+#define CTR_DICT_PASSWORD_SET                    "password:"                 // Word to associate the password in argument 1 with the recipient object
+#define CTR_DICT_NAME                            "name"                      // Word to obtain the name associated with the recipient object
 #define CTR_DICT_ALARM_SET                       "alarm:"                    // Word or phrase to limit the execution of the program to the number of seconds specified by the argument
-#define CTR_DICT_FORMAT_SET                      "format:"                   // Word or phrase to obtain a string representation of the recipient object in the specified format in the argument
+#define CTR_DICT_LINES_SET                       "lines:"                    // Word to call a function for each line read from an object
 #define CTR_DICT_DELIM_QUOTE_LINES               "delimiter:quote:lines:"    // Phrase to apply a function to a CSV line from a readable object, argument 1 must be the delimiter, argument 2 must be the quote style, argument 3 is the function
 #define CTR_DICT_LOCK                            "lock"                      // Word for locking the resource respresented by the recipient object
 #define CTR_DICT_UNLOCK                          "unlock"                    // Word for unlocking the resource represented by the recipient object
+#define CTR_DICT_PLATFORM                        "platform"                  // Word to obtain a string identifying the current platform
+#define CTR_DICT_TEST                            "test"                      // Word to perform a test on the recipient object without arguments
 #define CTR_DICT_FEATURE_SET                     "feature:"                  // Word to obtain the current activation status of the feature identified by argument 1
 #define CTR_DICT_FEATURE_ENABLE_SET              "feature:enable:"           // Word to select feature identified by argument 1 and enable it or disable it as specified by argument 2
-#define CTR_DICT_TEST                            "test"                      // Word to perform a test on the recipient object without arguments
-#define CTR_DICT_FROM_SET                        "from:"                     // Word to obtain an object resulting from transforming another object specified by argument 1 (from).
+#define CTR_DICT_FORMAT_SET                      "format:"                   // Word or phrase to obtain a string representation of the recipient object in the specified format in the argument
 #define CTR_DICT_ISODATETIME                     "iso-datetime"              // Word to obtain an standard iso datetime formatted representation of the recipient object
-#define CTR_DICT_NAME                            "name"                      // Word to inquire about the name of an object or an entity respresented by an object
-#define CTR_DICT_PASSWORD_SET                    "password:"                 // Word to associate the password in argument 1 with the recipient object
 
 /* Section B: Code generation, must match Dict/List messages! */
 #define CTR_DICT_CODEGEN_MAP_NEW                 "(Dict new) "               // Code generation for dict, new part
