@@ -496,7 +496,7 @@ void begin_mariadb(){
 	ctr_internal_create_func(CtrMariaDBQuery, ctr_build_string_from_cstring( CTR_DICT_NEW_SET ), &ctr_mariadb_query_new_set );
 	ctr_internal_create_func(CtrMariaDBQuery, ctr_build_string_from_cstring( CTR_DICT_DATABASE_SET ), &ctr_mariadb_query_database_set );
 	ctr_internal_create_func(CtrMariaDBQuery, ctr_build_string_from_cstring( CTR_DICT_DATABASE_QUERY_SET ), &ctr_mariadb_query_query_set );
-	ctr_internal_create_func(CtrMariaDBQuery, ctr_build_string_from_cstring( CTR_DICT_TOSTRING ), &ctr_mariadb_query_tostring );
+	ctr_internal_create_func(CtrMariaDBQuery, ctr_build_string_from_cstring( CTR_DICT_STRING ), &ctr_mariadb_query_tostring );
 	ctr_internal_create_func(CtrMariaDBQuery, ctr_build_string_from_cstring( CTR_DICT_DATABASE_QUERYPARAMS_SET ), &ctr_mariadb_query_param_set );
 	ctr_internal_create_func(CtrMariaDBQuery, ctr_build_string_from_cstring( CTR_DICT_EXECUTE ), &ctr_mariadb_query_execute );
 	ctr_internal_create_func(CtrMariaDBQuery, ctr_build_string_from_cstring( CTR_DICT_FETCH_SET ), &ctr_mariadb_query_fetch );

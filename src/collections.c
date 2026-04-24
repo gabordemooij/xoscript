@@ -860,7 +860,7 @@ ctr_object* ctr_map_get(ctr_object* myself, ctr_argument* argumentList) {
 	searchKey = argumentList->object;
 
 	/* Give developer a chance to define a key for array */
-	searchKey = ctr_send_message(searchKey, CTR_DICT_TOSTRING, strlen(CTR_DICT_TOSTRING), emptyArgumentList);
+	searchKey = ctr_send_message(searchKey, CTR_DICT_STRING, strlen(CTR_DICT_STRING), emptyArgumentList);
 	ctr_heap_free( emptyArgumentList );
 
 	/* If developer returns something other than string (ouch, toString), then cast anyway */

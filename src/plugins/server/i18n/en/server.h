@@ -11,6 +11,7 @@
 #define CTR_DICT_DATABASE_MARIADB_QUERY_OBJECT   "Maria-Query"               // Word for object representing a MariaDB database query
 #define CTR_DICT_PATTERN_OBJECT                  "Pattern"                   // Word for object representing a PCRE2-style regular expression
 #define CTR_DICT_FORMAT_OBJECT                   "Format"                    // Word for object that represents a specific formatting for a string
+#define CTR_DICT_FORMAT_SET                      "format:"                   // Term to produce an object implementing the format as specified by argument 1
 #define CTR_DICT_JSONIFY                         "jsonify:"                  // Term to turn objects into a string with JSON encoding
 #define CTR_DICT_OBJECT_FROM_SET                 "object:"                   // Term to turn serialized string back into an object
 #define CTR_DICT_LINK_SET                        "link:"                     // Word to connect or link something to something else
