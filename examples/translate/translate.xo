@@ -1,0 +1,78 @@
+# Creates a translation table for several languages
+Server init.
+Program use: ['template.xo'], chdir: ['../..'].
+
+# define the languages
+>> langs := List new ; ['en'] ; ['nl'].
+
+# define the language files to use for the translation table
+>> files := List new
+~ ( Path src i18n lang: ['dictionary.h'] ) string
+~ ( Path src plugins server i18n lang: ['server.h'] ) string.
+
+>> section-b := 182. # limit to section a in core
+
+# define an HTML template for the translation table
+>> html := Template new: ['
+<table>
+	<thead>
+		<tr>
+			<!-- cut:column -->
+			<th><!-- slot:header --></th>
+			<!-- /cut:column -->
+			<!-- paste:columns -->
+		</tr>
+	</thead>
+	<tbody>
+	<!-- cut:row -->
+	<tr>
+		<!-- cut:cell -->
+		<td><!-- slot:word --></td>
+		<!-- /cut:cell -->
+		<!-- paste:cells -->
+	</tr>
+	<!-- /cut:row -->
+	<!-- paste:rows -->
+	</tbody>
+</table>'].
+
+# cut the relevant section (in order!)
+>> col    := html cut: ['column'].
+>> cell   := html cut: ['cell'].
+>> row    := html cut: ['row'].
+
+# create a vocabulary dict containing all translations
+>> voca   := Dict new.
+>> rx     := Pattern new: ['"([^"]+)"'].
+langs each: { :_ :langcode
+	>> words := List new.
+	files each: { :n :path
+		File new: (path copy lang: langcode),
+		read split: ['\n'],
+		each: { :lineno :line
+			(n = 0 and: lineno > section-b) break.
+			rx match: line capture: { :_ :captured
+				words append: (captured position: 1).
+			}.
+		}.
+	}.
+	voca put: words at: langcode.
+}.
+
+# create headers for table
+voca each: { :lang
+	html paste: (col copy header: lang) at: ['columns'].
+}.
+
+# populate table with vocabulary dict
+{ :i
+	>> word-row := row copy.
+	voca each: { :_ :words
+		>> word := words position: i.
+		>> word-cell := cell copy word: word.
+		word-row paste: word-cell at: ['cells'].
+	}.
+	html paste: word-row at: ['rows'].
+} * (voca at: ['en'], count). # use English as reference
+
+Out write: html clean-all, stop.
