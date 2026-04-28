@@ -237,7 +237,7 @@ void begin_http(){
 	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_URL_SCHEME ), &ctr_url_scheme );
 	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_URL_HOST ), &ctr_url_host );
 	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_URL_PORT ), &ctr_url_port );
-	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_URL_PATH ), &ctr_url_path );
+	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_PATH ), &ctr_url_path );
 	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_URL_QUERY ), &ctr_url_query );
 	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_URL_FRAGMENT ), &ctr_url_fragment );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_URL_OBJECT ), urlObject, 0);

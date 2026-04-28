@@ -11,7 +11,6 @@
 #define CTR_DICT_DATABASE_MARIADB_QUERY_OBJECT   "Maria-Query"               // Word for object representing a MariaDB database query
 #define CTR_DICT_PATTERN_OBJECT                  "Pattern"                   // Word for object representing a PCRE2-style regular expression
 #define CTR_DICT_FORMAT_OBJECT                   "Format"                    // Word for object that represents a specific formatting for a string
-#define CTR_DICT_FORMAT_SET                      "format:"                   // Term to produce an object implementing the format as specified by argument 1
 #define CTR_DICT_JSONIFY                         "jsonify:"                  // Term to turn objects into a string with JSON encoding
 #define CTR_DICT_OBJECT_FROM_SET                 "object:"                   // Term to turn serialized string back into an object
 #define CTR_DICT_LINK_SET                        "link:"                     // Word to connect or link something to something else
@@ -62,7 +61,6 @@
 #define CTR_DICT_URL_HOST_SET                    "host:"                     // Word to change the host of an URL
 #define CTR_DICT_URL_USERNAME_SET                "username:"                 // Word to change the username in an URL
 #define CTR_DICT_URL_PORT                        "port"                      // Word to obtain the port part in an URL
-#define CTR_DICT_URL_PATH                        "path"                      // Word to obtain the path part in an URL
 #define CTR_DICT_URL_QUERY                       "query"                     // Word to obtain the query part of an URL
 #define CTR_DICT_URL_FRAGMENT                    "fragment"                  // Word to obtain the fragment part of an URL
 #define CTR_DICT_WIPE                            "wipe"                      // Word to delete the contents of an object

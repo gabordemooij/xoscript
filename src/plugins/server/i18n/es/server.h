@@ -61,7 +61,6 @@
 #define CTR_DICT_URL_HOST_SET                    "host:"
 #define CTR_DICT_URL_USERNAME_SET                "nombre-usuario:"
 #define CTR_DICT_URL_PORT                        "puerto"
-#define CTR_DICT_URL_PATH                        "url-ruta"
 #define CTR_DICT_URL_QUERY                       "params-búsqueda"
 #define CTR_DICT_URL_FRAGMENT                    "url-hash"
 #define CTR_DICT_WIPE                            "limpieza"
