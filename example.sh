@@ -3,11 +3,20 @@ ulimit -S -c unlimited
 EXAMPLE="${1:-passwordapp}"
 OS="${2:-Linux}"
 CLEAN="${3:-no}"
+ISO="${4:-en}"
 
+echo "Running example: "
 echo $EXAMPLE
+
+echo "On platform: "
 echo $OS
 
-ISO="en"
+echo "with language edition code: "
+echo $ISO
+
+echo "With build option: "
+echo $CLEAN
+
 export ISO
 
 if [[ $OS = "Linux" ]]; then
