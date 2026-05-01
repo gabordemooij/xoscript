@@ -3,7 +3,7 @@ Server init.
 Program use: ['template.xo'], chdir: ['../..'].
 
 # define the languages
->> langs := List new ; ['en'] ; ['nl'].
+>> langs := List new ; ['en'] ; ['es'] ; ['nl'].
 
 # define the language files to use for the translation table
 >> files := List new
@@ -44,15 +44,31 @@ Program use: ['template.xo'], chdir: ['../..'].
 # create a vocabulary dict containing all translations
 >> voca   := Dict new.
 >> rx     := Pattern new: ['"([^"]+)"'].
+
 langs each: { :_ :langcode
 	>> words := List new.
+	>> index := 0.
 	files each: { :n :path
 		File new: (path copy lang: langcode),
 		read split: ['\n'],
 		each: { :lineno :line
 			(n = 0 and: lineno > section-b) break.
 			rx match: line capture: { :_ :captured
-				words append: (captured position: 1).
+				>> word := captured position: 1.
+				words find: word, true: { #check for dups
+					this-task
+					error: ['duplicate: '] + langcode + ['/'] + word.
+				}.
+				(langcode !=: ['en']) true: {
+					>> other := voca en position: index.
+					( (other split: [':'], count) # check for mismatch
+					!=: (word split: [':'], count) ) true: { #check colon match
+						this-task
+						error: ['colons differ:'] + other + langcode + ['/'] + word.
+					}.
+				}.
+				words append: word.
+				index add: 1.
 			}.
 		}.
 	}.
