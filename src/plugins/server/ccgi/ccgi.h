@@ -30,8 +30,6 @@ CGI_varlist *CGI_add_var(CGI_varlist *v, const char *varname,
 
 CGI_value *CGI_lookup_all(CGI_varlist *v, const char *varname);
 const char *CGI_lookup(CGI_varlist *v, const char *varname);
-const char *CGI_first_name(CGI_varlist *v);
-const char *CGI_next_name(CGI_varlist *v);
 int CGI_parse_url(char* url, char* scheme, char* host, char* port, char* path, char* query, char* fragment);
 
 #endif
