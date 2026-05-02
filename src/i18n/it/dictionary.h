@@ -44,7 +44,6 @@
 #define CTR_DICT_CONTINUE                        "continua"
 #define CTR_DICT_ELSE                            "altro:"
 #define CTR_DICT_NOT                             "non"
-
 #define CTR_DICT_NUMBER                          "numero"
 #define CTR_DICT_STRING                          "testo"
 #define CTR_DICT_CHAR_AT_SET                     "carattere:"
@@ -75,7 +74,6 @@
 #define CTR_DICT_SPLIT                           "diviso:"
 #define CTR_DICT_SKIP                            "compensare:"
 #define CTR_DICT_RUN                             "correre"
-
 #define CTR_DICT_APPLY_TO                        "applica:"
 #define CTR_DICT_APPLY_TO_AND                    "applica:e:"
 #define CTR_DICT_APPLY_TO_AND_AND                "applica:e:e:"
@@ -141,7 +139,6 @@
 #define CTR_DICT_YEAR_DAY                        "giorno-dell-anno"
 #define CTR_DICT_ZONE                            "zona"
 #define CTR_DICT_ZONE_SET                        "zona:"
-
 #define CTR_DICT_ADD_SET                         "inserisci:"
 #define CTR_DICT_SUBTRACT_SET                    "sottrarre:"
 #define CTR_DICT_MULTIPLIER_SET                  "moltiplicato-per:"

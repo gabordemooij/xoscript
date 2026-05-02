@@ -72,7 +72,7 @@
 #define CTR_DICT_CONNECTED                       "подключено?"
 #define CTR_DICT_COMMIT                          "commit"
 #define CTR_DICT_ROLLBACK                        "rollback"
-#define CTR_DICT_EXECUTE                         "выполнить"
+#define CTR_DICT_EXECUTE                         "мутация"
 #define CTR_DICT_DATABASE_QUERY_SET              "запрос:"
 #define CTR_DICT_DATABASE_QUERYPARAMS_SET        "параметры:"
 #define CTR_DICT_FETCH_SET                       "получить:"

@@ -46,7 +46,7 @@
 #define CTR_DICT_NOT                             "не"
 #define CTR_DICT_NUMBER                          "к-числу"
 #define CTR_DICT_STRING                          "к-тексту"
-#define CTR_DICT_CHAR_AT_SET                     "набор-символов::"
+#define CTR_DICT_CHAR_AT_SET                     "набор-символов:"
 #define CTR_DICT_EITHEROR                        "либо:или:"
 #define CTR_DICT_BY_SET                          "на:"
 #define CTR_DICT_FLOOR                           "меньше"
@@ -74,7 +74,6 @@
 #define CTR_DICT_SPLIT                           "разделить:"
 #define CTR_DICT_SKIP                            "сместить:"
 #define CTR_DICT_RUN                             "запуск"
-
 #define CTR_DICT_APPLY_TO                        "применить:"
 #define CTR_DICT_APPLY_TO_AND                    "применить:и:"
 #define CTR_DICT_APPLY_TO_AND_AND                "применить:и:и:"
@@ -113,7 +112,7 @@
 #define CTR_DICT_RESPOND_TO_AND                  "ответить:и:"
 #define CTR_DICT_RESPOND_TO_AND_AND              "ответить:и:и:"
 #define CTR_DICT_RESPOND_TO_AND_AND_AND          "ответить:и:и:и:"
-#define CTR_DICT_SHELL                           "Сістэмная-каманда::"
+#define CTR_DICT_SHELL                           "Сістэмная-каманда:"
 #define CTR_DICT_SWEEP                           "мести"
 #define CTR_DICT_MEMORY_LIMIT                    "лимит:"
 #define CTR_DICT_MEMORY                          "лимит"
@@ -122,7 +121,6 @@
 #define CTR_DICT_CHARACTERS                      "символы"
 #define CTR_DICT_QUALIFIER_SET                   "квалифицировать:"
 #define CTR_DICT_QUALIFIER                       "квалифицировать"
-
 #define CTR_DICT_HOUR                            "час"
 #define CTR_DICT_HOUR_SET                        "час:"
 #define CTR_DICT_MINUTE_SET                      "минут:"
@@ -142,7 +140,6 @@
 #define CTR_DICT_YEAR_DAY                        "день-в-году"
 #define CTR_DICT_ZONE                            "часовая-зона"
 #define CTR_DICT_ZONE_SET                        "часовая-зона:"
-
 #define CTR_DICT_ADD_SET                         "добавить:"
 #define CTR_DICT_SUBTRACT_SET                    "вычесть:"
 #define CTR_DICT_MULTIPLIER_SET                  "умножить-на:"
