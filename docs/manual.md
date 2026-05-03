@@ -2458,6 +2458,7 @@ iso="xx" PACKAGE="server" NAME="libctrserver.so" make plugin
 Replace xx with the language iso code of your choice and
 add the dictionary for your language if it is not provided yet.
 
+{{translations}}
 
 # Credits
 
