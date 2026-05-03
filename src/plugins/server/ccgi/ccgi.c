@@ -70,6 +70,11 @@
  *
  * - Returnvalues of mkstemp, fdopen etc are now checked, also
  * upload is chmodded 0600.
+ *
+ * - CCGI_MAX_FIELD_SIZE to cap field size
+ *
+ * - sb_get protected against integer overflow
+ *
  */
 
 /*
@@ -122,6 +127,7 @@
 
 size_t CCGI_MAX_POSTFIELDS = 0;
 size_t CCGI_MAX_CONTENTLENGTH = 0;
+size_t CCGI_MAX_FIELD_SIZE = 65536;
 
 static size_t postfieldcount = 0;
 static size_t contentlengthcount = 0;
@@ -132,6 +138,10 @@ void CGI_set_max_postfields(size_t n) {
 
 void CGI_set_max_contentlength(size_t n) {
 	CCGI_MAX_CONTENTLENGTH = n;
+}
+
+void CGI_set_max_fieldsize(size_t n) {
+	CCGI_MAX_FIELD_SIZE = n;
 }
 
 
@@ -173,15 +183,16 @@ strbuf;
  */
 
 static strbuf* sb_get(strbuf *sb, int len) {
-	int size;
-	for (size = 128; size < len; size += size)
-		;
+	size_t size = (len < 128) ? 128 : (size_t)len;
+	if (size > INT_MAX - (int)sizeof(*sb)) {
+		exit(-1);
+	}
 	if (sb == 0) {
 		sb = (strbuf *) ctr_heap_allocate(sizeof(*sb) + size);
 	} else {
 		sb = (strbuf *) ctr_heap_reallocate(sb, sizeof(*sb) + size);
 	}
-	sb->size = size;
+	sb->size = (int) size;
 	return sb;
 }
 
@@ -405,7 +416,9 @@ static strbuf* copyvalue(const char *boundary, FILE *in, const int wantfile, str
 			// if we hit max content length, kill process
 			exit(-1);
 		}
-
+		if (wantfile == 0 && k >= CCGI_MAX_FIELD_SIZE) {
+			exit(-1);
+		}
 		/*
 		 * If we partially match the boundary, then we copy the
 		 * entire matching prefix to the output.  We do not need to

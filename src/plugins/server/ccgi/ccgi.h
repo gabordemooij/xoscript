@@ -10,6 +10,8 @@
 
 void CGI_set_max_postfields(size_t n);
 void CGI_set_max_contentlength(size_t n);
+void CGI_set_max_fieldsize(size_t n);
+
 
 typedef struct CGI_varlist CGI_varlist;
 
