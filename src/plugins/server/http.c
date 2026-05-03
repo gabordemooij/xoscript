@@ -16,12 +16,24 @@
 
 #include "ccgi/ccgi.h"
 
-CGI_varlist *varlistGet;
-CGI_varlist *varlistPost;
-CGI_varlist *varlistCookie;
+CGI_varlist* varlistGet = NULL;
+CGI_varlist* varlistPost = NULL;
+CGI_varlist* varlistCookie = NULL;
 ctr_object* CtrStdSCGICB;
 ctr_object* requestObject;
 ctr_object* urlObject;
+
+static void initGet() {
+	varlistGet = CGI_get_query(NULL);
+}
+
+static void initPost() {
+	varlistPost = CGI_get_post(NULL,"/tmp/_upXXXXXX");
+}
+
+static void initCookie() {
+	varlistCookie = CGI_get_cookie(NULL);
+}
 
 /**
  * @internal
@@ -76,6 +88,7 @@ ctr_object* ctr_request_array(ctr_object* myself, ctr_argument* argumentList, CG
  * [ Request ] get: [ String ]
  */
 ctr_object* ctr_request_get_string(ctr_object* myself, ctr_argument* argumentList) {
+	if (!varlistGet) initGet();
 	return ctr_request_string(myself, argumentList, varlistGet);
 }
 
@@ -84,6 +97,7 @@ ctr_object* ctr_request_get_string(ctr_object* myself, ctr_argument* argumentLis
  * [ Request ] get-list: [ String ]
  */
 ctr_object* ctr_request_get_array(ctr_object* myself, ctr_argument* argumentList) {
+	if (!varlistGet) initGet();
 	return ctr_request_array(myself, argumentList, varlistGet);
 }
 
@@ -92,6 +106,7 @@ ctr_object* ctr_request_get_array(ctr_object* myself, ctr_argument* argumentList
  * [ Request ] post: [ String ]
  */
 ctr_object* ctr_request_post_string(ctr_object* myself, ctr_argument* argumentList) {
+	if (!varlistPost) initPost();
 	return ctr_request_string(myself, argumentList, varlistPost);
 }
 
@@ -100,6 +115,7 @@ ctr_object* ctr_request_post_string(ctr_object* myself, ctr_argument* argumentLi
  * [ Request ] post-list: [ String ]
  */
 ctr_object* ctr_request_post_array(ctr_object* myself, ctr_argument* argumentList) {
+	if (!varlistPost) initPost();
 	return ctr_request_array(myself, argumentList, varlistPost);
 }
 
@@ -108,6 +124,7 @@ ctr_object* ctr_request_post_array(ctr_object* myself, ctr_argument* argumentLis
  * [ Request ] cookie: [ String ]
  */
 ctr_object* ctr_request_cookie_string(ctr_object* myself, ctr_argument* argumentList) {
+	if (!varlistCookie) initCookie();
 	return ctr_request_string(myself, argumentList, varlistCookie);
 }
 
@@ -116,6 +133,9 @@ ctr_object* ctr_request_cookie_string(ctr_object* myself, ctr_argument* argument
  * [ Request ] cookie-list: [ String ]
  */
 ctr_object* ctr_request_cookie_array(ctr_object* myself, ctr_argument* argumentList) {
+	if (!varlistGet) initGet();
+	if (!varlistPost) initPost();
+	if (!varlistCookie) initCookie();
 	return ctr_request_array(myself, argumentList, varlistCookie);
 }
 
@@ -124,6 +144,7 @@ ctr_object* ctr_request_cookie_array(ctr_object* myself, ctr_argument* argumentL
  * [ Request ] upload: [ String ]
  */
 ctr_object* ctr_request_file(ctr_object* myself, ctr_argument* argumentList) {
+	if (!varlistPost) initPost();
 	CGI_value* value;
 	ctr_object* list;
 	ctr_object* cgiVarObject;
@@ -228,9 +249,6 @@ void begin_http(){
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_UPLOAD_SET ), &ctr_request_file );
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_POST_LIST_SET ), &ctr_request_post_array );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PLUGIN_REQUEST ), requestObject, 0);
-	varlistGet = CGI_get_query(NULL);
-	varlistPost = CGI_get_post(NULL,"/tmp/_upXXXXXX");
-	varlistCookie = CGI_get_cookie(NULL);
 	urlObject = ctr_url_new(CtrStdObject, NULL);
 	urlObject->link = CtrStdObject;
 	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_NEW ), &ctr_url_new );
