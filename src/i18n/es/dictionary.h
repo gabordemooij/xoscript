@@ -180,14 +180,7 @@
 #define CTR_DICT_FORMAT_SET                      "formato:"
 #define CTR_DICT_ISODATETIME                     "iso-fecha-hora"
 
-/* Section B: Code generation, must match Dict/List messages! */
-#define CTR_DICT_CODEGEN_MAP_NEW                 "(Lista crear) "
-#define CTR_DICT_CODEGEN_MAP_PUT                 "poner:"
-#define CTR_DICT_CODEGEN_MAP_PUT_AT              " en:"
-#define CTR_DICT_CODEGEN_ARRAY_NEW               "Serie crear"
-#define CTR_DICT_CODEGEN_ARRAY_NEW_PUSH          "Serie ← "
-
-/* Section C: System terms & Math (hard to translate) */
+/* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "promesa:"
 #define CTR_DICT_OBSD_UNVEIL_SET                 "revelar:permisos:"
 #define CTR_DICT_UNIX_CHMOD_SET                  "chmod:"
@@ -214,6 +207,13 @@
 #define CTR_DICT_MATH_TAN                        "tangente"
 #define CTR_DICT_MATH_ATAN                       "arcotangente"
 #define CTR_DICT_MATH_LOG                        "logaritmo"
+
+/* Section C: Code generation, must match Dict/List messages! */
+#define CTR_DICT_CODEGEN_MAP_NEW                 "(Lista crear) "
+#define CTR_DICT_CODEGEN_MAP_PUT                 "poner:"
+#define CTR_DICT_CODEGEN_MAP_PUT_AT              " en:"
+#define CTR_DICT_CODEGEN_ARRAY_NEW               "Serie crear"
+#define CTR_DICT_CODEGEN_ARRAY_NEW_PUSH          "Serie ← "
 
 /* Section D: Symbols (recommended to not translate) */
 #define CTR_DICT_VAR                             ">>"

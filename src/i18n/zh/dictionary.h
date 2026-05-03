@@ -180,14 +180,7 @@
 #define CTR_DICT_FORMAT_SET                      "格式:"
 #define CTR_DICT_ISODATETIME                     "iso时间"
 
-/* Section B: Code generation */
-#define CTR_DICT_CODEGEN_MAP_NEW                 "(映射 新建) "
-#define CTR_DICT_CODEGEN_MAP_PUT                 "放:"
-#define CTR_DICT_CODEGEN_MAP_PUT_AT              " 在:"
-#define CTR_DICT_CODEGEN_ARRAY_NEW               "数组 新建 "
-#define CTR_DICT_CODEGEN_ARRAY_NEW_PUSH          "数组 ← "
-
-/* Section C: System & Math */
+/* Section B: System & Math */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"
 #define CTR_DICT_OBSD_UNVEIL_SET                 "unveil:权限:"
 #define CTR_DICT_UNIX_CHMOD_SET                  "chmod:"
@@ -199,7 +192,7 @@
 #define CTR_DICT_BINARY                          "二进制"
 #define CTR_DICT_UTF8                            "utf8"
 #define CTR_DICT_UTF8_SET                        "utf8:"
-#define CTR_DICT_BYTES                           "字节"
+#define CTR_DICT_BYTES                           "字节范围"
 #define CTR_DICT_BYTES_SET                       "字节:"
 #define CTR_DICT_BYTE                            "字节"
 #define CTR_DICT_TCCOMPARE                       "tc比较:"
@@ -215,7 +208,14 @@
 #define CTR_DICT_MATH_ATAN                       "atan"
 #define CTR_DICT_MATH_LOG                        "log"
 
-/* Section D & E unchanged */
+/* Section C: Code generation */
+#define CTR_DICT_CODEGEN_MAP_NEW                 "(映射 新建) "
+#define CTR_DICT_CODEGEN_MAP_PUT                 "放:"
+#define CTR_DICT_CODEGEN_MAP_PUT_AT              " 在:"
+#define CTR_DICT_CODEGEN_ARRAY_NEW               "数组 新建 "
+#define CTR_DICT_CODEGEN_ARRAY_NEW_PUSH          "数组 ← "
+
+/* Section D: Symbols (recommended to not translate) */
 #define CTR_DICT_VAR                             ">>"
 #define CTR_DICT_BULLET                          "~"
 #define CTR_DICT_SYMBOL_EQUALS                   "="

@@ -93,7 +93,6 @@
 #define CTR_DICT_READ                            "прочитать"
 #define CTR_DICT_APPEND                          "добавить-в-конец:"
 #define CTR_DICT_PREPEND                         "добавить-в-начало:"
-
 #define CTR_DICT_EXISTS                          "существует"
 #define CTR_DICT_SIZE                            "размер"
 #define CTR_DICT_DELETE                          "удалить"
@@ -182,14 +181,7 @@
 #define CTR_DICT_FORMAT_SET                      "формат:"
 #define CTR_DICT_ISODATETIME                     "iso-датавремя"
 
-/* Section B: Code generation, must match Dict/List messages! */
-#define CTR_DICT_CODEGEN_MAP_NEW                 "(Карта новый) "
-#define CTR_DICT_CODEGEN_MAP_PUT                 "разместить:"
-#define CTR_DICT_CODEGEN_MAP_PUT_AT              " в:"
-#define CTR_DICT_CODEGEN_ARRAY_NEW               "Список новый "
-#define CTR_DICT_CODEGEN_ARRAY_NEW_PUSH          "Список ← "
-
-/* Section C: System terms & Math (hard to translate) */
+/* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"
 #define CTR_DICT_OBSD_UNVEIL_SET                 "unveil:permissions:"
 #define CTR_DICT_UNIX_CHMOD_SET                  "chmod:"
@@ -216,6 +208,13 @@
 #define CTR_DICT_MATH_TAN                        "tan"
 #define CTR_DICT_MATH_ATAN                       "atan"
 #define CTR_DICT_MATH_LOG                        "log"
+
+/* Section C: Code generation, must match Dict/List messages! */
+#define CTR_DICT_CODEGEN_MAP_NEW                 "(Карта новый) "
+#define CTR_DICT_CODEGEN_MAP_PUT                 "разместить:"
+#define CTR_DICT_CODEGEN_MAP_PUT_AT              " в:"
+#define CTR_DICT_CODEGEN_ARRAY_NEW               "Список новый "
+#define CTR_DICT_CODEGEN_ARRAY_NEW_PUSH          "Список ← "
 
 /* Section D: Symbols (recommended to not translate) */
 #define CTR_DICT_VAR                             ">>"

@@ -180,14 +180,7 @@
 #define CTR_DICT_FORMAT_SET                      "format:"                   // Word or phrase to obtain a string representation of the recipient object in the specified format in the argument
 #define CTR_DICT_ISODATETIME                     "iso-datetime"              // Word to obtain an standard iso datetime formatted representation of the recipient object
 
-/* Section B: Code generation, must match Dict/List messages! */
-#define CTR_DICT_CODEGEN_MAP_NEW                 "(Dict new) "               // Code generation for dict, new part
-#define CTR_DICT_CODEGEN_MAP_PUT                 "put:"                      // Code generation for dict, value part
-#define CTR_DICT_CODEGEN_MAP_PUT_AT              " at:"                      // Code generation for dict, key part
-#define CTR_DICT_CODEGEN_ARRAY_NEW               "List new "                 // Code generation for list, new part (empty)
-#define CTR_DICT_CODEGEN_ARRAY_NEW_PUSH          "List ← "                   // Code generation for list, new and add part
-
-/* Section C: System terms & Math (hard to translate) */
+/* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"                   // Term to invoke pledge command on OpenBSD with argument
 #define CTR_DICT_OBSD_UNVEIL_SET                 "unveil:permissions:"       // Term to invoke unveil command on OpenBSD with arguments
 #define CTR_DICT_UNIX_CHMOD_SET                  "chmod:"                    // Word or abbreviation to apply a POSIX-style chmod command to the recipient object
@@ -214,6 +207,13 @@
 #define CTR_DICT_MATH_TAN                        "tan"                       // Word or abbreviation for tangus
 #define CTR_DICT_MATH_ATAN                       "atan"                      // Word or abbreviation for atangus
 #define CTR_DICT_MATH_LOG                        "log"                       // Word or abbreviation for logarithm
+
+/* Section C: Code generation, must match Dict/List messages! */
+#define CTR_DICT_CODEGEN_MAP_NEW                 "(Dict new) "               // Code generation for dict, new part
+#define CTR_DICT_CODEGEN_MAP_PUT                 "put:"                      // Code generation for dict, value part
+#define CTR_DICT_CODEGEN_MAP_PUT_AT              " at:"                      // Code generation for dict, key part
+#define CTR_DICT_CODEGEN_ARRAY_NEW               "List new "                 // Code generation for list, new part (empty)
+#define CTR_DICT_CODEGEN_ARRAY_NEW_PUSH          "List ← "                   // Code generation for list, new and add part
 
 /* Section D: Symbols (recommended to not translate) */
 #define CTR_DICT_VAR                             ">>"                        // Word or symbol to declare a variable
