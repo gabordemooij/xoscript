@@ -133,8 +133,6 @@ ctr_object* ctr_request_cookie_string(ctr_object* myself, ctr_argument* argument
  * [ Request ] cookie-list: [ String ]
  */
 ctr_object* ctr_request_cookie_array(ctr_object* myself, ctr_argument* argumentList) {
-	if (!varlistGet) initGet();
-	if (!varlistPost) initPost();
 	if (!varlistCookie) initCookie();
 	return ctr_request_array(myself, argumentList, varlistCookie);
 }
