@@ -932,6 +932,7 @@ void ctr_initialize_world() {
 	/* Block */
 	CtrStdBlock = ctr_internal_create_object(CTR_OBJECT_TYPE_OTBLOCK);
 	ctr_internal_create_func(CtrStdBlock, ctr_build_string_from_cstring( CTR_DICT_RUN ), &ctr_block_runIt );
+	ctr_internal_create_func(CtrStdBlock, ctr_build_string_from_cstring( CTR_DICT_TRY ), &ctr_block_try );
 	ctr_internal_create_func(CtrStdBlock, ctr_build_string_from_cstring( CTR_DICT_APPLY_TO ), &ctr_block_runIt );
 	ctr_internal_create_func(CtrStdBlock, ctr_build_string_from_cstring( CTR_DICT_APPLY_TO_AND ), &ctr_block_runIt );
 	ctr_internal_create_func(CtrStdBlock, ctr_build_string_from_cstring( CTR_DICT_APPLY_TO_AND_AND ), &ctr_block_runIt );

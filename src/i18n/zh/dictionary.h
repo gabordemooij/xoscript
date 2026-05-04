@@ -179,6 +179,7 @@
 #define CTR_DICT_FEATURE_ENABLE_SET              "功能:启用:"
 #define CTR_DICT_FORMAT_SET                      "格式:"
 #define CTR_DICT_ISODATETIME                     "iso时间"
+#define CTR_DICT_TRY                             "尝试"
 
 /* Section B: System & Math */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"

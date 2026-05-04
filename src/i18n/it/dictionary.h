@@ -179,6 +179,7 @@
 #define CTR_DICT_FEATURE_ENABLE_SET              "funzionalità:attivo:"
 #define CTR_DICT_FORMAT_SET                      "format:"
 #define CTR_DICT_ISODATETIME                     "iso-datetime"
+#define CTR_DICT_TRY                             "prova"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"

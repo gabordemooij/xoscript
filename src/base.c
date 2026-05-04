@@ -2522,6 +2522,13 @@ ctr_object* ctr_block_runIt(ctr_object* myself, ctr_argument* argumentList) {
 	return result;
 }
 
+ctr_object* ctr_block_try(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* result;
+	result = ctr_block_run(myself, argumentList, NULL);
+	if (CtrStdFlow == CtrStdBreak || CtrStdFlow == CtrStdContinue) CtrStdFlow = NULL; /* consume break */
+	return result;
+}
+
 /**
  * @def
  * [ Code ] set: [ String ] value: [ Object ]

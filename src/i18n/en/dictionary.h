@@ -179,6 +179,7 @@
 #define CTR_DICT_FEATURE_ENABLE_SET              "feature:enable:"           // Word to select feature identified by argument 1 and enable it or disable it as specified by argument 2
 #define CTR_DICT_FORMAT_SET                      "format:"                   // Word or phrase to obtain a string representation of the recipient object in the specified format in the argument
 #define CTR_DICT_ISODATETIME                     "iso-datetime"              // Word to obtain an standard iso datetime formatted representation of the recipient object
+#define CTR_DICT_TRY                             "try"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"                   // Term to invoke pledge command on OpenBSD with argument

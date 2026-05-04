@@ -180,6 +180,7 @@
 #define CTR_DICT_FEATURE_ENABLE_SET              "функциональность:активирован:"
 #define CTR_DICT_FORMAT_SET                      "формат:"
 #define CTR_DICT_ISODATETIME                     "iso-датавремя"
+#define CTR_DICT_TRY                             "попробуй"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"

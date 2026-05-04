@@ -583,6 +583,7 @@ extern ctr_object* ctr_string_ord(ctr_object* myself, ctr_argument* ctr_argument
  */
 extern ctr_object* ctr_block_new(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_block_runIt(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_block_try(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_block_set(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_block_error(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_block_catch(ctr_object* myself, ctr_argument* argumentList);
