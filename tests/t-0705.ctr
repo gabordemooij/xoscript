@@ -1,0 +1,24 @@
+
+
+>> obj := Object new.
+
+obj on: ['greet'] do: {
+	<- ['hi'].
+}.
+
+# needs to output hi123hi123ok
+obj on: ['task'] do: {
+	own property := 123.
+	{
+		# try binds self/own to object instead of block
+		Out write: self greet.
+		Out write: own property.
+		1 / 0.
+	} except: {
+		Out write: self greet.
+		Out write: own property.
+		Out write: ['ok'].
+	}, try.
+}.
+
+obj task.
