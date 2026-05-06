@@ -65,7 +65,7 @@
 #define CTR_DICT_URL_FRAGMENT                    "fragmento"
 #define CTR_DICT_WIPE                            "borrado-seguro"
 #define CTR_DICT_DECODE_SET                      "decodificar:"
-#define CTR_DICT_DATABASENAME_SET                "nombre-bd:"
+#define CTR_DICT_DATABASENAME_SET                "nombre-base-datos:"
 #define CTR_DICT_DATABASE_SET                    "base-de-datos:"
 #define CTR_DICT_CLOSE                           "cerrar"
 #define CTR_DICT_CONNECT                         "conectar"
