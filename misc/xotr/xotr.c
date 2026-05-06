@@ -1,0 +1,881 @@
+#include "xo.h"
+
+/**
+ * Tiny XOScript translation tool to translate
+ * xoscripts from one language to another.
+ */
+ 
+int ctr_argc;
+char** ctr_argv;
+size_t ctr_program_length;
+
+char* ctr_mode_input_file;
+char* ctr_mode_dict_file;
+char* ctr_mode_hfile1;
+char* ctr_mode_hfile2;
+ctr_size ctr_clex_keyword_eol_len;
+ctr_size ctr_clex_keyword_num_sep_dec_len;
+ctr_size ctr_clex_keyword_num_sep_tho_len;
+ctr_size ctr_clex_keyword_assignment_len;
+ctr_size ctr_clex_keyword_return_len;
+ctr_size ctr_clex_keyword_chain_len;
+extern char* ctr_code_start;
+int ctr_clex_ignore_modes = 0;
+
+void* ctr_heap_allocate_tracked(size_t size) {
+	return calloc(size, 1);
+}
+
+void* ctr_heap_allocate(size_t size) {
+	return calloc(size, 1);
+}
+
+void* ctr_heap_reallocate(void* old, size_t size) {
+	void* nw = realloc(old, size);
+	memset(nw, 0, size);
+	return nw;
+}
+
+/**
+ * ?internal
+ *
+ * ReadFile
+ *
+ * Reads in an entire file.
+ */
+char* ctr_internal_readf(char* file_name, uint64_t* total_size) {
+	char* prg;
+	int ch;
+	int prev;
+	uint64_t size;
+	uint64_t real_size;
+	FILE* fp;
+	fp = fopen(file_name,"r");
+	if( fp == NULL ) {
+	  fprintf(stderr, CTR_ERR_FOPEN );
+	  exit(1);
+	}
+	prev = ftell(fp);
+	fseek(fp,0L,SEEK_END);
+	size = ftell(fp);
+	fseek(fp,prev,SEEK_SET);
+	real_size = (size+4)*sizeof(char);
+	prg = ctr_heap_allocate(real_size); /* add 4 bytes, 3 for optional closing sequence verbatim mode and one lucky byte! */
+	ctr_program_length=0;
+	while( ( ch = fgetc(fp) ) != EOF ) prg[ctr_program_length++]=ch;
+	/* because we just want to use strncmp() for simple tokens in lexer and not check the length/eof on every step */
+	/* should be 0 already because calloc() and lucky byte but just for clarity */
+	prg[ctr_program_length] = '\0';
+	fclose(fp);
+	*total_size = (uint64_t) real_size;
+	return prg;
+}
+
+
+void ctr_clex_set_ignore_modes( int ignore ) {
+	ctr_clex_ignore_modes = ignore;
+}
+
+
+/**
+ * ?internal
+ *
+ * InternalMemMem
+ *
+ * memmem implementation because this not available on every system.
+ */
+char* ctr_internal_memmem(char* haystack, long hlen, char* needle, long nlen, int reverse ) {
+	char* cur;
+	char* last;
+	char* begin;
+	int step = (1 - reverse * 2); /* 1 if reverse = 0, -1 if reverse = 1 */
+	if (nlen == 0) return NULL;
+	if (hlen == 0) return NULL;
+	if (hlen < nlen) return NULL;
+	if (!reverse) {
+		begin = haystack;
+		last = haystack + hlen - nlen + 1;
+	} else {
+		begin = haystack + hlen - nlen;
+		last = haystack - 1;
+	}
+	for(cur = begin; cur!=last; cur += step) {
+		if (memcmp(cur,needle,nlen) == 0) return cur;
+	}
+	return NULL;
+}
+
+
+/**
+ * @internal
+ *
+ * Prints a message to the error stream.
+ */
+void ctr_print_error( char* error, int code ) {
+	fwrite( error, sizeof(char), strlen(error), stderr );
+	fwrite( "\n", sizeof(char), 1, stderr );
+	if ( code > -1 ) {
+		exit(code);
+	}
+}
+
+
+int ctr_clex_forward_scan(char* e, ctr_size* newCodePointer) {
+	ctr_size i = *(newCodePointer);
+	int nesting = 0;
+	int blocks = 0;
+	int quote = 0;
+	int escape = 0;
+	int found = 0;
+	int number = 0;
+	while( (e+i) < ctr_eofcode ) {
+		//Are we still inside a part of a number?
+		if (number && !isdigit(*(e+i)) &&
+			!(
+			(e+i+ctr_clex_keyword_num_sep_dec_len+1)<ctr_eofcode &&
+			strncmp((e+i),CTR_DICT_NUM_DEC_SEP, ctr_clex_keyword_num_sep_dec_len)==0 &&
+			isdigit(*(e+i+ctr_clex_keyword_num_sep_dec_len+1))
+			)
+			&&
+			!(
+			(e+i+ctr_clex_keyword_num_sep_tho_len+1)<ctr_eofcode &&
+			strncmp((e+i),CTR_DICT_NUM_THO_SEP, ctr_clex_keyword_num_sep_tho_len)==0 &&
+			isdigit(*(e+i+ctr_clex_keyword_num_sep_tho_len+1))
+			)
+		) { 
+			number = 0;
+		}
+		if (escape) escape = 0;
+		if (!quote && *(e+i) == '(') nesting++;
+		else if (!quote && nesting && *(e+i) == ')') nesting--;
+		else if (!quote && *(e+i) == '{') blocks++;
+		else if (!quote && blocks && *(e+i) == '}') blocks--;
+		else if (!escape && !quote && strncmp((e+i),CTR_DICT_QUOT_OPEN, ctr_clex_keyword_qo_len) == 0) quote++;
+		else if (!escape && quote && strncmp((e+i),CTR_DICT_QUOT_CLOSE, ctr_clex_keyword_qc_len) == 0) quote--;
+		else if (quote && *(e+i) == '\\' && !escape) { escape = 1;  }
+		else if (!number && isdigit(*(e+i))) { number = 1; }
+		else if (!nesting && !quote && !blocks && !number) {
+			//found a chain
+			if (strncmp((e+i),CTR_DICT_MESSAGE_CHAIN,ctr_clex_keyword_chain_len)==0) {
+				*(newCodePointer) = i;
+				found = 1;
+				break;
+			}
+			//found eol symbol
+			if (strncmp((e+i),CTR_DICT_END_OF_LINE,ctr_clex_keyword_eol_len)==0) {
+				*(newCodePointer) = i;
+				found = 1;
+				break;
+			}
+			//found )
+			if (strncmp((e+i),CTR_DICT_PAREN_CLOSE,strlen(CTR_DICT_PAREN_CLOSE))==0) {
+				*(newCodePointer) = i;
+				found = 1;
+				break;
+			}
+			//found parameter or argument prefix
+			if (strncmp((e+i),CTR_DICT_PARAMETER_PREFIX,strlen(CTR_DICT_PARAMETER_PREFIX))==0) {
+				*(newCodePointer) = i;
+				found = 1;
+				break;
+			}
+		}
+		i++;
+	}
+	return found;
+}
+
+int ctr_clex_backward_scan( char* codePointer, char* bytes, ctr_size* offset, ctr_size limit ) {
+	ctr_size q = *(offset);
+	for(q=0; q<limit; q++) {
+		if ((codePointer-q)<ctr_code_start) return 0;
+		char backScanChar = *(codePointer-q);
+		if (
+			backScanChar == '\n'||
+			backScanChar == '\t'||
+			backScanChar == ' ' ||
+			backScanChar == ')' ||
+			backScanChar == '}'
+		) {
+			*(offset) = q;
+			return 1;
+		}
+	}
+	return 0;
+}
+
+/**
+ * CommandLine Read Arguments
+ * Parses command line arguments and sets global settings accordingly.
+ */
+int ctr_cli_read_args(int argc, char* argv[]) {
+	int mode = 0;
+	if (argc < 3) {
+		exit(0);
+	}
+	ctr_mode_dict_file = (char*) calloc( sizeof( char ) * 255,1 );
+	strncpy(ctr_mode_dict_file, argv[1], 254);
+	ctr_mode_input_file = (char*) calloc( sizeof( char ) * 255,1 );
+	strncpy(ctr_mode_input_file, argv[2], 254);
+	mode = 1;
+	return mode;
+}
+
+/**
+ * Inits the Citrine environment.
+ */
+int ctr_init() {
+	
+	ctr_clex_keyword_me_icon = CTR_DICT_SELF;
+	ctr_clex_keyword_my_icon = CTR_DICT_OWN;
+	ctr_clex_keyword_var_icon = CTR_DICT_VAR;
+	ctr_clex_keyword_my_icon_len = strlen( ctr_clex_keyword_my_icon );
+	ctr_clex_keyword_var_icon_len = strlen( ctr_clex_keyword_var_icon );
+	ctr_clex_keyword_eol_len = strlen( CTR_DICT_END_OF_LINE );
+	ctr_clex_keyword_chain_len = strlen( CTR_DICT_MESSAGE_CHAIN );
+	ctr_clex_keyword_num_sep_dec_len = strlen( CTR_DICT_NUM_DEC_SEP );
+	ctr_clex_keyword_num_sep_tho_len = strlen( CTR_DICT_NUM_THO_SEP );
+	ctr_clex_keyword_qo_len = strlen( CTR_DICT_QUOT_OPEN );
+	ctr_clex_keyword_qc_len = strlen( CTR_DICT_QUOT_CLOSE );
+	ctr_clex_keyword_assignment_len = strlen( CTR_DICT_ASSIGN );
+	ctr_clex_keyword_return_len = strlen( CTR_DICT_RETURN );
+	ctr_clex_param_prefix_char = ':';
+	
+	return 0;
+}
+
+ctr_tnode* program;
+const int CTR_TRANSLATE_MAX_WORD_LEN = 180;
+char ctr_clex_param_prefix_char_translation;
+
+/**
+ * Dictionary Structure
+ * A dictionary is used to translate citrine code from
+ * one human language to another. The structure consists of
+ * a type (i.e. s for string and t for token), word, translation
+ * and lengths. It's a linked list.
+ */
+struct ctr_dict {
+	char type;
+	char* word;
+	ctr_size wordLength;
+	char* translation;
+	ctr_size translationLength;
+	struct ctr_dict* next;
+};
+
+/**
+ * A Note structure is used by the translation system to make notes.
+ * Notes form a linked list known as the notebook and can have markers
+ * (integers) and attachments (string buffers) and are attached to
+ * certain positions in the Citrine code (code pointers).
+ * The notebook is used to associate parts of messages with the message
+ * signature like 'and:' in 'respond:and:'. String buffers containing
+ * message parts ('and:') are stored in the notebook and associated with
+ * code pointers. This way messages can be translated 'as a whole'.
+ */
+typedef struct ctr_dict ctr_dict;
+struct ctr_note {
+	char* attachment;
+	char* attachedTo;
+	int mark;
+	struct ctr_note* next;
+};
+
+typedef struct ctr_note ctr_note;
+ctr_note* previousNote = NULL;
+ctr_note* firstNote = NULL;
+
+ctr_dict* ctr_trans_d;
+ctr_dict* ctr_trans_x;
+
+/**
+ * Creates a note and attached it to the specified pointer.
+ * The notebook is used to associate parts of messages with the message
+ * signature like 'and:' in 'respond:and:'. String buffers containing
+ * message parts ('and:') are stored in the notebook and associated with
+ * code pointers. This way messages can be translated 'as a whole'.
+ */
+ctr_note* ctr_note_create( char* pointer ) {
+	ctr_note* note = (ctr_note*) calloc(sizeof(ctr_note), 1);
+	note->attachedTo = pointer;
+	note->attachment = calloc(CTR_TRANSLATE_MAX_WORD_LEN, 1);
+	note->next = NULL;
+	note->mark = -1;
+	return note;
+}
+
+/**
+ * Adds the specified note to the notebook and
+ * marks the note using the specified code.
+ * The notebook is used to associate parts of messages with the message
+ * signature like 'and:' in 'respond:and:'. String buffers containing
+ * message parts ('and:') are stored in the notebook and associated with
+ * code pointers. This way messages can be translated 'as a whole'.
+ */
+void ctr_notebook_add( ctr_note* note, int mark ) {
+	if (previousNote == NULL) {
+		firstNote = note;
+	} else {
+		previousNote->next = note;
+	}
+	note->mark = mark;
+	previousNote = note;
+}
+
+/**
+ * Removes the entire notebook.
+ * The notebook is used to associate parts of messages with the message
+ * signature like 'and:' in 'respond:and:'. String buffers containing
+ * message parts ('and:') are stored in the notebook and associated with
+ * code pointers. This way messages can be translated 'as a whole'.
+ */
+void ctr_notebook_remove() {
+	ctr_note* note = firstNote;
+	while(note) {
+		if (note->mark > -1) {
+			 note->mark = -1;
+			 note->attachedTo = NULL;
+		 }
+		note = note->next;
+	}
+}
+
+/**
+ * Clear all marks in the notebook.
+ * The notebook is used to associate parts of messages with the message
+ * signature like 'and:' in 'respond:and:'. String buffers containing
+ * message parts ('and:') are stored in the notebook and associated with
+ * code pointers. This way messages can be translated 'as a whole'.
+ */
+void ctr_notebook_clear_marks() {
+	ctr_note* note = firstNote;
+	while(note) {
+		note->mark = -1;
+		note = note->next;
+	}
+}
+
+/**
+ * Attaches a buffer to the note.
+ * The notebook is used to associate parts of messages with the message
+ * signature like 'and:' in 'respond:and:'. String buffers containing
+ * message parts ('and:') are stored in the notebook and associated with
+ * code pointers. This way messages can be translated 'as a whole'.
+ */
+void ctr_note_attach( ctr_note* note, char* buffer ) {
+	if (!note) {
+		printf("Invalid");
+		exit(1);
+	}
+	memcpy(note->attachment,buffer,strlen(buffer));
+}
+
+/**
+ * Searches the notebook for a note associated with the
+ * specified code pointer.
+ * The notebook is used to associate parts of messages with the message
+ * signature like 'and:' in 'respond:and:'. String buffers containing
+ * message parts ('and:') are stored in the notebook and associated with
+ * code pointers. This way messages can be translated 'as a whole'.
+ */
+ctr_note* ctr_notebook_search( char* codePoint ) {
+	ctr_note* found = NULL;
+	ctr_note* note = firstNote;
+	while(note) {
+		if ( note->attachedTo == codePoint ) { found = note;  break; }
+		note = note->next;
+	}
+	return found;
+}
+
+/**
+ * Returns the note object associated with the specified
+ * marker.
+ * The notebook is used to associate parts of messages with the message
+ * signature like 'and:' in 'respond:and:'. String buffers containing
+ * message parts ('and:') are stored in the notebook and associated with
+ * code pointers. This way messages can be translated 'as a whole'.
+ */
+ctr_note* ctr_note_grab( int mark ) {
+	ctr_note* found = NULL;
+	ctr_note* note = firstNote;
+	while(note != NULL) {
+		if (note->mark == mark) {
+			note->mark = -1;
+			found = note;
+			break;
+		}
+		note = note->next;
+	}
+	return found;
+}
+
+/**
+ * Attaches string buffers of message parts to all
+ * marked notes in the notebook. Given the remainder of a message
+ * (i.e. everything after the first ':') this function will
+ * find the marked notes (and their code pointers) and attach
+ * the string buffers associated with the remaining message parts.
+ * The notebook is used to associate parts of messages with the message
+ * signature like 'and:' in 'respond:and:'. String buffers containing
+ * message parts ('and:') are stored in the notebook and associated with
+ * code pointers. This way messages can be translated 'as a whole'.
+ */
+void ctr_note_collect( char* remainder ) {
+	int qq;
+	int jj;
+	ctr_size k;
+	char* buff;
+	if (strlen(remainder)>CTR_TRANSLATE_MAX_WORD_LEN) {
+		ctr_print_error(CTR_TERR_LONG,1);
+	}
+	buff = calloc(CTR_TRANSLATE_MAX_WORD_LEN, 1);
+	qq = 0;
+	jj = 0;
+	for(k=0; k<strlen(remainder); k++) {
+		*(buff+(jj++))=*(remainder+k);
+		if (*(remainder + k) == ctr_clex_param_prefix_char_translation) {
+			ctr_note_attach( ctr_note_grab( qq++ ), buff );
+			memset(buff, 0, CTR_TRANSLATE_MAX_WORD_LEN);
+			jj=0;
+		}
+	}
+	free(buff);
+}
+
+
+/**
+ * Loads a dictionary into memory.
+ * A dictionary file has the following format:
+ *
+ * <t> "<word>" "<translation>"
+ *
+ * Where <t> is 't' for token (i.e. a programming language word)
+ * or 's' for string (a literal series of bytes declared in the Citrine program).
+ * This allows the dictionary to specify both translations for
+ * objects, variables and messages as well as for user interface strings
+ * and text snippets. There is no need to translate comments because
+ * Citrine does not support them. This is always the reason why.
+ */
+ctr_dict* ctr_translate_load_dictionary() {
+	FILE* file = fopen(ctr_mode_dict_file,"r");
+	if (file == NULL) {
+		ctr_print_error(CTR_TERR_DICT, 1);
+	}
+	char  translationType;
+	char* word = calloc(5000, 1);
+	char* translation = calloc(5000, 1);
+	char* buffer;
+	char* format;
+	ctr_trans_d = NULL;
+	ctr_trans_x = NULL;
+	ctr_dict* startdict = NULL;
+	ctr_dict* entry = NULL;
+	ctr_dict* previousEntry = NULL;
+	ctr_dict* e;
+	int qq = 0;
+	char* modifier;
+	while( fscanf( file, "%c \"%4999[^\"]\" \"%4999[^\"]\"\n", &translationType, word, translation) > 0 ) {
+		if (translationType != 't' && translationType != 's' && translationType != 'd' && translationType != 'x') {
+			printf("Invalid translation line: %d \n",qq);
+			exit(1);
+		}
+		entry = (ctr_dict*) calloc( sizeof(ctr_dict), 1 );
+		if (startdict == NULL) startdict = entry;
+		entry->type = translationType;
+		qq++;
+		entry->wordLength = strlen(word);
+		// if a word contains a modifier (i.e. same word is used twice, don't continue)
+		// translation stops, because it's a one-way dictionary.
+		modifier = strchr(word, '#');
+		if (modifier) {
+			// modifiers are used to use the same translation
+			// for different words, however this makes the translation
+			// one-way, because translating back you cannot know what the
+			// word means anymore - this is a feature, translation is not
+			// a requirement, some code just runs locally only
+			format = CTR_TERR_AMWORD;
+			buffer = calloc(600 * sizeof(char),1);
+			snprintf( buffer, 600 * sizeof(char), format, modifier+1);
+			ctr_print_error( buffer, 1 );
+		}
+		modifier = strchr(translation, '#');
+		if (modifier) translation = modifier + 1;
+		entry->translationLength = strlen(translation);
+		if (entry->type != 's' && (entry->wordLength > CTR_TRANSLATE_MAX_WORD_LEN || entry->translationLength > CTR_TRANSLATE_MAX_WORD_LEN)) {
+			ctr_print_error(CTR_TERR_ELONG, 1);
+		} 
+		entry->word = calloc( entry->wordLength, 1 );
+		entry->translation = calloc( entry->translationLength, 1 );
+		memcpy(entry->word, word, entry->wordLength);
+		memcpy(entry->translation, translation, entry->translationLength);
+		if (translationType == 'd') {
+			ctr_trans_d = entry;
+			continue;
+		}
+		if (translationType == 'x') {
+			ctr_trans_x = entry;
+			continue;
+		}
+		if (strncmp(entry->word, CTR_DICT_PARAMETER_PREFIX,1)==0) {
+			ctr_clex_param_prefix_char_translation = entry->translation[0];
+		}
+		if (previousEntry) {
+			entry->next = previousEntry;
+		} else {
+			entry->next = NULL;
+		}
+		previousEntry = entry;
+		e = entry;
+		while(e->next != NULL) {
+			e = e->next;
+			if (e->type == entry->type) {
+				if ( e->wordLength == entry->wordLength ) {
+					if ( strncmp( e->word, entry->word, entry->wordLength ) == 0 ) {
+						format = CTR_TERR_AMWORD;
+						buffer = calloc( 600 * sizeof(char) ,1);
+						snprintf( buffer, 600 * sizeof(char), format, word );
+						ctr_print_error( buffer, 1 );
+					}
+				}
+				if ( e->translationLength == entry->translationLength ) {
+					if ( strncmp( e->translation, entry->translation, entry->translationLength ) == 0 && !modifier ) {
+						format = CTR_TERR_AMTRANS;
+						buffer = calloc(600 * sizeof(char),1);
+						snprintf( buffer, 600 * sizeof(char), format, translation);
+						ctr_print_error( buffer, 1 );
+					}
+				}
+			}
+		}
+	}
+	fclose(file);
+	if (ctr_trans_d == NULL) {
+		printf("No decimal separator found in dictionary, please add entry for type d.\n");
+		exit(1);
+	}
+	if (ctr_trans_x == NULL) {
+		printf("No thousands separator found in dictionary, please add entry for type x.\n");
+		exit(1);
+	}
+	return previousEntry;
+}
+
+
+/**
+ * Translates a word in the program using a dictionary and a context flag.
+ * If the word is a keyword message and there is translation available, the remainder
+ * gets filled for the next parts of the message to come.
+ */
+int ctr_translate_translate(char* v, ctr_size l, ctr_dict* dictionary, char context, char* remainder) {
+	int found = 0;
+	ctr_size i, p, q;
+	ctr_dict* entry;
+	char* buffer;
+	char* warning;
+	entry = dictionary;
+	while( entry ) {
+		ctr_size ml;
+		ml = entry->wordLength;
+		if ( l == entry->wordLength && context == entry->type && strncmp( entry->word, v, ml ) == 0 ) {
+			if (context == 't') {
+				p = 0; q = 0;
+				for (i = 1; i<entry->wordLength; i++) {
+					if (*(entry->word + i)==ctr_clex_param_prefix_char) p++;
+				}
+				for (i = 1; i<entry->translationLength; i++) {
+					if (*(entry->translation + i)==ctr_clex_param_prefix_char_translation) q++;
+				}
+				if ( p != q ) {
+					ctr_print_error(CTR_TERR_COLONS, 1);
+				}
+				for (i = 0; i<entry->translationLength; i++) {
+					fwrite(entry->translation + i,1,1,stdout);
+					if (i>0 && *(entry->translation + i)==ctr_clex_param_prefix_char_translation && entry->translationLength > (i+1)) {
+						if ((entry->translationLength-i)>CTR_TRANSLATE_MAX_WORD_LEN) {
+							ctr_print_error(CTR_TERR_BUFF, 1);
+						}
+						memcpy(remainder,entry->translation+i+1,(entry->translationLength-i-1));
+						break;
+					}
+				}
+			} else {
+				fwrite(entry->translation, entry->translationLength, 1,stdout);
+			}
+			found = 1;
+			break;
+		}
+		entry = entry->next;
+		//printf("next = %p \n", entry);
+	}
+	if (context == 't' && !found && ctr_internal_memmem(v,l,CTR_DICT_PARAMETER_PREFIX,1,0)>((char*)NULL)) {
+		for (i = 0; i<l; i++) {
+				fwrite(v+i,1,1,stdout);
+				if (*(v + i)==ctr_clex_param_prefix_char) {
+					memcpy(remainder,v+i+1,(l-i));
+					found = 1;
+					break;
+				}
+			}
+	}
+	if (!found) {
+		buffer = calloc( 600,1 );
+		warning = CTR_TERR_WARN;
+		memcpy(buffer, warning, strlen(warning));
+		memcpy(buffer + (strlen(warning)), v, l);
+		ctr_print_error( buffer, -1 );
+		free(buffer);
+	}
+	return found;
+}
+
+/**
+ * Prints translatable strings in the program.
+ */
+char* ctr_translate_string(char* codePointer, ctr_dict* dictionary) {
+	char* s;
+	ctr_size l;
+	char* e;
+	char* p;
+	p = codePointer;
+	e = ctr_clex_code_pointer();
+	fwrite(p, ((e - ctr_clex_keyword_qo_len) - p),1, stdout);
+	s = ctr_clex_readstr();
+	l = ctr_clex_tok_value_length(s);
+	e = ctr_clex_code_pointer();
+	ctr_translate_translate(CTR_DICT_QUOT_OPEN,ctr_clex_keyword_qo_len,dictionary,'t',NULL);
+	/* Strings larger than 100 bytes cannot be translated */
+	if (l>100 || !ctr_translate_translate(s,l,dictionary,'s',NULL)) {
+		fwrite(s,l,1,stdout);
+	}
+	ctr_translate_translate(CTR_DICT_QUOT_CLOSE,ctr_clex_keyword_qc_len,dictionary,'t',NULL);
+	e = ctr_clex_code_pointer();
+	return e;
+}
+
+/**
+ * Prints a translatable reference in the program.
+ */
+char* ctr_translate_ref(char* codePointer, ctr_dict* dictionary) {
+	char* message;
+	int noteCount;
+	char skipColon;
+	char* remainder;
+	char* p = codePointer;
+	char* e;
+	ctr_size l;
+	ctr_size ol;
+	ctr_note* foundNote;
+	skipColon = 0;
+	e = ctr_clex_code_pointer();
+	l = ctr_clex_tok_value_length();
+	ol = l;
+	message = ctr_clex_tok_value();
+	fwrite(p, ((e - l ) - p),1, stdout);
+	noteCount = 0;
+	/* is this part of a keyword message (end with colon?) */
+	if (*(e)==ctr_clex_param_prefix_char) {
+		ctr_notebook_clear_marks();
+		skipColon = 1;
+		ctr_size q;
+		message = calloc(CTR_TRANSLATE_MAX_WORD_LEN,1);
+		if (l+1 > CTR_TRANSLATE_MAX_WORD_LEN) {
+			ctr_print_error(CTR_TERR_TOK, 1);
+		}
+		memcpy(message, e-l,l);
+		//add colon to message-part
+		memcpy(message+l, CTR_DICT_PARAMETER_PREFIX, strlen(CTR_DICT_PARAMETER_PREFIX));
+		ctr_size i = 1;
+		while(ctr_clex_forward_scan(e, &i)) {
+			if (
+			   (e+i+ctr_clex_keyword_eol_len<ctr_eofcode && strncmp(e+i,CTR_DICT_END_OF_LINE,ctr_clex_keyword_eol_len)==0)
+		    || (e+i+ctr_clex_keyword_chain_len<ctr_eofcode && strncmp(e+i,CTR_DICT_MESSAGE_CHAIN,ctr_clex_keyword_chain_len)==0)
+			|| *(e+i)==')'
+			) break;
+			if (*(e+i)==ctr_clex_param_prefix_char) {
+				ctr_notebook_add( ctr_note_create(e+i), noteCount );
+				noteCount++;
+				q = 0;
+				if (ctr_clex_backward_scan(e+i, "\n\t )}", &q, CTR_TRANSLATE_MAX_WORD_LEN)) {
+					if ((l+1)+((e+i+1)-(e+i-q+1))>CTR_TRANSLATE_MAX_WORD_LEN) {
+						ctr_print_error(CTR_TERR_PART, 1);
+					}
+					memcpy(message+l+1,e+i-q+1, (e+i+1)-(e+i-q+1));
+					l += ((e+i+1)-(e+i-q+1));
+				} else {
+					ctr_print_error(CTR_MSG_ERROR,1);
+				}
+			}
+			i++;
+		}
+		l++;
+	}
+	foundNote = ctr_notebook_search( e );
+	if (foundNote) {
+		fwrite(foundNote->attachment, strlen(foundNote->attachment),1,stdout);
+	} else {
+		remainder = calloc(CTR_TRANSLATE_MAX_WORD_LEN,1);
+		//printf("======> %s %d \n", message, l);
+		if (!ctr_translate_translate( message, l, dictionary, 't', remainder )) {
+			skipColon = 0;
+			fwrite(e-ol, ol, 1, stdout);
+			ctr_notebook_remove();
+		} else {
+			if (noteCount>0) ctr_note_collect(remainder);
+		}
+		free(remainder);
+	}
+	return (e + skipColon);
+}
+
+/**
+ * Prints a part of the program that does not contain
+ * translatable items.
+ */
+char* ctr_translate_rest(char* codePointer) {
+	char* p;
+	char* e;
+	p = codePointer;
+	e = ctr_clex_code_pointer();
+	fwrite(p, e-p,1,stdout);
+	return e;
+}
+
+/**
+ * Prints a language specific line terminator.
+ * For instance, Indian languages end a line with danda instead of
+ * a dot.
+ */
+char* ctr_translate_dot(char* codePointer, ctr_dict* dictionary) {
+	ctr_translate_translate(CTR_DICT_END_OF_LINE,ctr_clex_keyword_eol_len,dictionary,'t',(char*)NULL);
+	return ctr_clex_code_pointer();
+}
+
+char* ctr_translate_assign(char* codePointer, ctr_dict* dictionary) {
+	ctr_translate_translate(CTR_DICT_ASSIGN,ctr_clex_keyword_assignment_len,dictionary,'t',(char*)NULL);
+	return ctr_clex_code_pointer();
+}
+
+char* ctr_translate_chain(char* codePointer, ctr_dict* dictionary) {
+	ctr_translate_translate(CTR_DICT_MESSAGE_CHAIN,ctr_clex_keyword_chain_len,dictionary,'t',(char*)NULL);
+	return ctr_clex_code_pointer();
+}
+
+char* ctr_translate_colon(char* codePointer, ctr_dict* dictionary) {
+	ctr_translate_translate(CTR_DICT_PARAMETER_PREFIX,strlen(CTR_DICT_PARAMETER_PREFIX),dictionary,'t',(char*)NULL);
+	return ctr_clex_code_pointer();
+}
+
+char* ctr_translate_ret(char* codePointer, ctr_dict* dictionary) {
+	ctr_translate_translate(CTR_DICT_RETURN,strlen(CTR_DICT_RETURN),dictionary,'t',(char*)NULL);
+	return ctr_clex_code_pointer();
+}
+
+/**
+ * Translates a number from one language into another taking into
+ * account numeric writing systems like decimal separators and thousand
+ * separators.
+ */
+char* ctr_translate_number(char* codePointer) {
+	char* p;
+	char* e;
+	p = codePointer;
+	e = ctr_clex_code_pointer();
+	while( p < e ) {
+		if ( ctr_trans_d->wordLength <= (ctr_size) ( e - p ) ) {
+			if ( strncmp( ctr_trans_d->word, p, ctr_trans_d->wordLength ) == 0 ) {
+				fwrite(ctr_trans_d->translation, ctr_trans_d->translationLength,1,stdout);
+				p += ctr_trans_d->wordLength;
+				continue;
+			}
+		}
+		if ( ctr_trans_x->wordLength <= (ctr_size) ( e - p ) ) {
+			if ( strncmp( ctr_trans_x->word, p, ctr_trans_x->wordLength ) == 0 ) {
+				fwrite(ctr_trans_x->translation, ctr_trans_x->translationLength,1,stdout);
+				p += ctr_trans_x->wordLength;
+				continue;
+			}
+		}
+		fwrite(p, 1,1,stdout);
+		p += 1;
+	}
+	return e;
+}
+
+/**
+ * Prints the remaining part of the program.
+ */
+void ctr_translate_fin(char* codePointer) {
+	char* e;
+	char* p;
+	p = codePointer;
+	ctr_size l;
+	e = ctr_clex_code_pointer();
+	l = ctr_clex_tok_value_length();
+	fwrite(p, ((e - l) - p),1, stdout);
+	fwrite(e-l, l, 1, stdout);
+}
+
+/**
+ * Translates a program from one human language to another.
+ */
+void ctr_translate_program(char* prg, char* programPath) {
+	ctr_dict* dictionary;
+	int t;
+	char* p;
+	dictionary = ctr_translate_load_dictionary();
+	ctr_clex_set_ignore_modes(1);
+	ctr_clex_load(prg);
+	t = ctr_clex_tok();
+	p = prg;
+	while ( 1 ) {
+		if ( t == CTR_TOKEN_FIN ) {
+			ctr_translate_fin(p);
+			break;
+		}
+		else if ( t == CTR_TOKEN_RET ) {
+			fwrite(" ", 1, 1, stdout);
+			p = ctr_translate_ret(p, dictionary);
+		}
+		else if ( t == CTR_TOKEN_QUOTE ) {
+			p = ctr_translate_string(p, dictionary);
+		} 
+		else if ( t == CTR_TOKEN_REF || t == CTR_TOKEN_BOOLEANYES || t == CTR_TOKEN_BOOLEANNO || t == CTR_TOKEN_NIL ) {
+			p = ctr_translate_ref(p,dictionary);
+		}
+		else if ( t == CTR_TOKEN_DOT ) {
+			p = ctr_translate_dot(p,dictionary);
+		}
+		else if ( t == CTR_TOKEN_ASSIGNMENT ) {
+			fwrite(" ", 1, 1, stdout);
+			p = ctr_translate_assign(p,dictionary);
+		}
+		else if ( t == CTR_TOKEN_CHAIN ) {
+			p = ctr_translate_chain(p,dictionary);
+		}
+		
+		else if ( t == CTR_TOKEN_NUMBER ) {
+			p = ctr_translate_number(p);
+		}
+		else {
+			p = ctr_translate_rest(p);
+		}
+		t = ctr_clex_tok();
+	}
+}
+
+
+int main(int argc, char* argv[]) {
+	char* prg;
+	uint64_t program_text_size = 0;
+	ctr_init();
+	int mode = ctr_cli_read_args(argc,argv);
+	if (mode == 1) {
+		ctr_code_start = prg;
+		prg = ctr_internal_readf(ctr_mode_input_file, &program_text_size);
+		ctr_translate_program(prg, ctr_mode_input_file);
+		exit(0);
+	}
+	return 0;
+}
