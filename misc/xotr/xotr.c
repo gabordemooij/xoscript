@@ -8,7 +8,6 @@
 int ctr_argc;
 char** ctr_argv;
 size_t ctr_program_length;
-
 char* ctr_mode_input_file;
 char* ctr_mode_dict_file;
 char* ctr_mode_hfile1;
@@ -71,10 +70,6 @@ char* ctr_internal_readf(char* file_name, uint64_t* total_size) {
 	return prg;
 }
 
-
-void ctr_clex_set_ignore_modes( int ignore ) {
-	ctr_clex_ignore_modes = ignore;
-}
 
 
 /**
@@ -204,28 +199,11 @@ int ctr_clex_backward_scan( char* codePointer, char* bytes, ctr_size* offset, ct
 	return 0;
 }
 
-/**
- * CommandLine Read Arguments
- * Parses command line arguments and sets global settings accordingly.
- */
-int ctr_cli_read_args(int argc, char* argv[]) {
-	int mode = 0;
-	if (argc < 3) {
-		exit(0);
-	}
-	ctr_mode_dict_file = (char*) calloc( sizeof( char ) * 255,1 );
-	strncpy(ctr_mode_dict_file, argv[1], 254);
-	ctr_mode_input_file = (char*) calloc( sizeof( char ) * 255,1 );
-	strncpy(ctr_mode_input_file, argv[2], 254);
-	mode = 1;
-	return mode;
-}
 
 /**
  * Inits the Citrine environment.
  */
 int ctr_init() {
-	
 	ctr_clex_keyword_me_icon = CTR_DICT_SELF;
 	ctr_clex_keyword_my_icon = CTR_DICT_OWN;
 	ctr_clex_keyword_var_icon = CTR_DICT_VAR;
@@ -444,7 +422,6 @@ void ctr_note_collect( char* remainder ) {
 	free(buff);
 }
 
-
 /**
  * Loads a dictionary into memory.
  * A dictionary file has the following format:
@@ -562,7 +539,6 @@ ctr_dict* ctr_translate_load_dictionary() {
 	return previousEntry;
 }
 
-
 /**
  * Translates a word in the program using a dictionary and a context flag.
  * If the word is a keyword message and there is translation available, the remainder
@@ -607,7 +583,6 @@ int ctr_translate_translate(char* v, ctr_size l, ctr_dict* dictionary, char cont
 			break;
 		}
 		entry = entry->next;
-		//printf("next = %p \n", entry);
 	}
 	if (context == 't' && !found && ctr_internal_memmem(v,l,CTR_DICT_PARAMETER_PREFIX,1,0)>((char*)NULL)) {
 		for (i = 0; i<l; i++) {
@@ -825,7 +800,6 @@ void ctr_translate_program(char* prg, char* programPath) {
 	int t;
 	char* p;
 	dictionary = ctr_translate_load_dictionary();
-	ctr_clex_set_ignore_modes(1);
 	ctr_clex_load(prg);
 	t = ctr_clex_tok();
 	p = prg;
@@ -870,12 +844,16 @@ int main(int argc, char* argv[]) {
 	char* prg;
 	uint64_t program_text_size = 0;
 	ctr_init();
-	int mode = ctr_cli_read_args(argc,argv);
-	if (mode == 1) {
-		ctr_code_start = prg;
-		prg = ctr_internal_readf(ctr_mode_input_file, &program_text_size);
-		ctr_translate_program(prg, ctr_mode_input_file);
+	if (argc < 3) {
+		printf("Usage: xotr <dict> <programfile>\n");
 		exit(0);
 	}
-	return 0;
+	ctr_mode_dict_file = (char*) calloc( sizeof( char ) * 255,1 );
+	strncpy(ctr_mode_dict_file, argv[1], 254);
+	ctr_mode_input_file = (char*) calloc( sizeof( char ) * 255,1 );
+	strncpy(ctr_mode_input_file, argv[2], 254);
+	ctr_code_start = prg;
+	prg = ctr_internal_readf(ctr_mode_input_file, &program_text_size);
+	ctr_translate_program(prg, ctr_mode_input_file);
+	exit(0);
 }
