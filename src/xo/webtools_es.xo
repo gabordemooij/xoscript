@@ -1,0 +1,292 @@
+>> HTTP-Header := Objeto crear.
+
+HTTP-Header al: ['new'] hacer: { <- yo crear init.
+}.
+
+HTTP-Header al: ['init'] hacer: {
+	mi key := Nulo.
+	mi value := Nulo.
+}.
+
+HTTP-Header al: ['key:value:'] hacer: { :key :value
+	mi key := key.
+	mi value := value.
+}.
+
+HTTP-Header al: ['key'] hacer: { <- mi key.
+}.
+
+HTTP-Header al: ['value'] hacer: { <- mi value.
+}.
+
+HTTP-Header al: ['string'] hacer: { <- mi key + [': '] + mi value + [' 
+'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Objeto crear.
+
+Web-Document al: ['new'] hacer: { <- yo crear init.
+}.
+
+Web-Document al: ['init'] hacer: {
+	mi headers := Lista crear.
+	mi sess-id := Nulo.
+	mi session-manager := Tempfile-Session crear.
+	mi sessdata := Nulo.
+	mi secure := Verdadero.
+	mi same-site := ['Strict'].
+	mi headers-out := Falso.
+	mi request := HTTP-Request crear.
+}.
+
+Web-Document al: ['request:'] hacer: { :request
+	mi request := request.
+}. 
+
+Web-Document al: ['secure-session-cookie:'] hacer: { :secure
+	yo check-headers.
+	mi secure := secure.
+}.
+
+Web-Document al: ['same-site-session-cookie:'] hacer: { :value
+	yo check-headers.
+	>> options := Lista crear 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options contiene: value, falso: {
+		la-tarea-actual error: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	mi same-site := value.
+}.
+
+Web-Document al: ['header:'] hacer: { :header
+	yo check-headers.
+	mi headers adjuntar: header.
+}.
+
+Web-Document al: ['clear-headers'] hacer: {
+	yo check-headers.
+	mi headers := Lista crear.
+}.
+
+Web-Document al: ['session-manager:'] hacer: { :manager
+	yo check-headers.
+	mi session-manager := manager.
+}.
+
+Web-Document al: ['session-manager'] hacer: { <- mi session-manager.
+}.
+
+Web-Document al: ['check-headers'] hacer: {
+	mi headers-out verdadero: {
+		la-tarea-actual error: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document al: ['session-start'] hacer: {
+	yo check-headers.
+	>> request := mi request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ¿nulo? verdadero: {
+		sess-id := Vault token: 30.
+		>> session-header := HTTP-Header crear
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (mi secure o: ['Secure'] o: ['']),
+		SSITE: (mi same-site),
+		XSID: sess-id
+		).
+		mi headers adjuntar: session-header.
+	}.
+	mi sessdata := mi session-manager for: sess-id, load. <- mi sessdata. # reference
+}.
+
+Web-Document al: ['goto:'] hacer: { :url
+	yo check-headers.
+	yo clear-headers.
+	mi headers
+	adjuntar: (
+		HTTP-Header crear
+		key: ['Status'] value: ['303 See Other']
+	),
+	adjuntar: (
+		HTTP-Header crear
+		key: ['Location'] value: url
+	).
+	yo out: ['Redirect'].
+}.
+
+Web-Document al: ['session-destroy'] hacer: {
+	yo check-headers.
+	>> request := mi request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ¿nulo? falso: {
+		>> session-header := HTTP-Header crear.
+		>> when := Momento crear año: 1970, formato: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (mi secure o: ['Secure'] o: ['']),
+			SSITE: (mi same-site),
+			XSID: sess-id
+		).
+		mi session-manager destroy.
+		mi headers adjuntar: session-header.
+	}.
+}.
+
+
+Web-Document al: ['template:'] hacer: { :ruta <- Template crear: (Archivo crear: ruta, leer).
+}.
+
+Web-Document al: ['out:type:'] hacer: { :output :tipo
+	mi headers-out falso: {
+		mi sessdata ¿nulo? falso: {
+			mi session-manager save: mi sessdata.
+		}.
+		mi headers adjuntar: (
+			HTTP-Header crear
+			key: ['Content-type'] value: tipo
+		).
+		mi headers cada: { :_ :header
+			Salida escribir: header.
+		}.
+		mi headers-out := Verdadero.
+		Salida escribir: ['
+'].
+	}.
+	Salida escribir: output.
+}.
+
+
+
+Web-Document al: ['out:'] hacer: { :output
+	yo out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document al: ['json:'] hacer: { :output
+	yo out: ( JSON jsonify: output ) output type: ['Content-Type: application/json'].
+}.
+
+Web-Document al: ['not-found:'] hacer: { :output
+	yo clear-headers header: (
+		HTTP-Header crear key: ['Status'] value: ['404 Not Found']
+	).
+	yo out: output.
+}.
+
+
+# Interface
+
+>> Session := Objeto crear.
+
+Session al: ['new'] hacer: { <- yo crear init for: Nulo.
+}.
+
+Session al: ['for:'] hacer: { :id
+	mi id := id.
+}.
+
+Session al: ['load'] hacer: {
+	la-tarea-actual error: ['Not implemented.'].
+}.
+
+Session al: ['save:'] hacer: {
+	la-tarea-actual error: ['Not implemented.'].
+}.
+
+Session al: ['destroy'] hacer: {
+	la-tarea-actual error: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session crear.
+
+Tempfile-Session al: ['init'] hacer: {
+	mi pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session al: ['path-prefix:'] hacer: { :str
+	mi pathprefix := str.
+}.
+
+Tempfile-Session al: ['file'] hacer: { <- ( Archivo crear: ( mi pathprefix + mi id + ['.txt'] ) ).
+}.
+
+Tempfile-Session al: ['load'] hacer: {
+	>> file := yo file.
+	file existe falso: {
+		file escribir: (Diccionario crear código).
+	}. <- file leer objeto.
+}.
+
+Tempfile-Session al: ['save:'] hacer: { :data
+	>> file := yo file.
+	file existe verdadero: {
+		file escribir: data código.
+	}.
+}.
+
+Tempfile-Session al: ['destroy'] hacer: {
+	>> file := yo file.
+	file existe verdadero: {
+		file eliminar.
+	}.
+}.
+
+
+>> URL := Objeto crear.
+
+URL al: ['init'] hacer: {
+	mi protocol := ['https://'].
+	mi host := ['localhost'].
+	mi ruta := [''].
+	mi params := [''].
+	mi hash := [''].
+}.
+
+URL al: ['new'] hacer: { <- yo crear init.
+}.
+
+URL al: ['string'] hacer: { <- (
+	mi protocol +
+	mi host +
+	mi ruta +
+	mi params +
+	mi hash ).
+}.
+
+URL al: ['protocol:'] hacer: { :protocol
+	((Lista crear: ['http'] ; ['https']) contiene: protocol) verdadero: {
+		mi protocol := protocol + ['://'].
+	}, falso: {
+		la-tarea-actual error: ['Invalid protocol'].
+	}.
+}.
+
+URL al: ['host:'] hacer: { :host
+	#todo validate according to rfc
+	mi host := host.
+}.
+
+URL al: ['path:'] hacer: { :ruta
+	mi ruta := ['/'] + ruta url-encode.
+}.
+
+URL al: ['params:'] hacer: { :map
+	>> params := Lista crear.
+	map cada: { :key :value
+		params adjuntar: key texto url-encode + ['='] + value texto url-encode.
+	}.
+	mi params := ['?'] + ( params unir: ['&'] ).
+}.
+
+URL al: ['hash:'] hacer: { :hash
+	mi hash := ['#'] + hash url-encode.
+}.
+

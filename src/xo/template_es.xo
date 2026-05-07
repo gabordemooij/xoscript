@@ -1,0 +1,100 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objeto crear.
+
+Template al: ['new'] hacer: { <- yo crear content: [''].
+}.
+
+Template al: ['content:'] hacer: { :content
+	mi content := content. 
+}.
+
+Template al: ['new:'] hacer: { :content <- yo crear content: content.
+}.
+
+Template al: ['cut:'] hacer: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := mi content partir: startmarker.
+	>> prefix := parts primero.
+	>> parts2 := parts último partir: endmarker.
+	>> suffix := parts2 último.
+	>> part := parts2 primero.
+	>> rest := prefix + suffix.
+	mi content := rest. <- Template crear: part.
+	
+}.
+
+Template al: ['copy'] hacer: { <- yo crear: yo texto copiar.
+}.
+	
+Template al: ['paste:at:'] hacer: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	mi content reemplazar: pastemarker con: ( snippet texto + pastemarker ).
+}.
+
+Template al: ['set:value:'] hacer: { :slot :value
+	mi content reemplazar: ['<!-- slot:'] + slot + [' -->'] con: ( Server html-encode: value ).
+}.
+
+Template al: ['set:html:'] hacer: { :slot :html
+	mi content reemplazar: ['<!-- slot:'] + slot + [' -->'] con: html.
+}.
+
+Template al: ['respond:and:'] hacer: { :slot :value
+	yo valor: (slot desde: 0 longitud: (slot longitud - 1)) asignar: value.
+}.
+
+Template al: ['nl2br'] hacer: {
+	mi content reemplazar: ['
+'] con: ['<br>'].
+}.
+
+Template al: ['clean'] hacer: {
+	mi content :=
+		Pattern
+		crear: ['\<\!\-\- (paste|slot)\:\S+ \-\-\>'],
+		match: mi content
+		do: { <- ['']. }.
+}.
+
+Template al: ['clean-cuts'] hacer: {
+	>> items := Lista crear.
+	Pattern
+	crear: ['\<\!\-\- cut\:(\S+) \-\-\>'],
+	match: mi content
+	do: { :_ :part
+		items adjuntar: part ? 1.
+	}.
+	items cada: { :_ :id
+		mi content :=
+			Pattern crear: ( ['(?s)\<\!\-\- cut\:'] + id + [' \-\-\>.*\<\!\-\- \/cut\:'] + id + [' \-\-\>']),
+			match: mi content
+			do: { <- ['']. }.
+	 }.
+}.
+
+Template al: ['clean-space'] hacer: {
+	mi content :=
+		Pattern
+		crear: ['\s*\n'],
+		match: mi content
+		do: { <- ['
+']. }.
+	mi content :=
+		Pattern
+		crear: ['\n[\s\t]+'],
+		match: mi content
+		do: { <- ['
+']. }.
+}.
+
+Template al: ['clean-all'] hacer: {
+	yo clean.
+	yo clean-cuts.
+	yo clean-space.
+}.
+
+Template al: ['string'] hacer: { <- mi content.
+}.
