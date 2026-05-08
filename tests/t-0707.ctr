@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Program memory-management: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB new host: ['localhost'],
+	username: ['xo'], password: ['pass123'], dbname: ['xobase'], connect.
+
+>> TwoDigitFormat := Format new: ['%02d'].
+
+# Datetime
+{
+	>> year     := Number between: 1995 and: 2050, string.
+	>> month    := TwoDigitFormat apply-int: (Number between: 1 and: 12), string.
+	>> day      := TwoDigitFormat apply-int: (Number between: 1 and: 28), string.
+	>> hour     := TwoDigitFormat apply-int: (Number between: 1 and: 23), string.
+	>> minute   := TwoDigitFormat apply-int: (Number between: 1 and: 59), string.
+	>> second   := TwoDigitFormat apply-int: (Number between: 1 and: 59), string.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: year,
+		MM: month,
+		DD: day,
+		HH: hour,
+		II: minute,
+		SS: second.
+	>> query :=
+	db query: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	fetch: { :row
+		(row mydatetime = datetime) false: {
+			this-task error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter add: 1.
+} * 100.
+
+# Date
+{
+	>> year     := Number between: 1995 and: 2050, string.
+	>> month    := TwoDigitFormat apply-int: (Number between: 1 and: 12), string.
+	>> day      := TwoDigitFormat apply-int: (Number between: 1 and: 28), string.
+	>> date     := ['YYYY-MM-DD'].
+	date
+		YYYY: year,
+		MM: month,
+		DD: day.
+	>> query :=
+	db query: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	fetch: { :row
+		(row mydate = date) false: {
+			this-task error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter add: 1.
+} * 100.
+
+
+# Time
+{
+	>> hour     := TwoDigitFormat apply-int: (Number between: 1 and: 23), string.
+	>> minute   := TwoDigitFormat apply-int: (Number between: 1 and: 59), string.
+	>> second   := TwoDigitFormat apply-int: (Number between: 1 and: 59), string.
+	>> time := ['HH:II:SS'].
+	time
+		HH: hour,
+		II: minute,
+		SS: second.
+	>> query :=
+	db query: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: time),
+	fetch: { :row
+		(row mytime = time) false: {
+			this-task error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter add: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := List new fill: 100000 with: ['x'], combine: [''].
+{
+	>> str2 := Vault token: 40.
+	>> query :=
+	db query: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	fetch: { :row
+		(row str1 = str1 and: row str2 = str2) false: {
+			this-task error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter add: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1  := Number between: 1 and: 99999.
+	>> n2  := n1 / 1000.
+	>> big := (
+		( Int64 from-string: ['9223372036854775807'] ) -
+		( Int64 from-string: ['99999'] ) +
+		( Int64 from-string: n1 string )
+	).
+	>> query :=
+	db query: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	fetch: { :row
+		(row n1 = n1) false: {
+			this-task error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) false: {
+			this-task error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 round) false: {
+			this-task error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) false: {
+			this-task error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter add: 1.
+} * 100.
+
+
+Out write: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), stop.

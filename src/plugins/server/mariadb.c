@@ -181,6 +181,7 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 	char* query = ctr_heap_allocate_cstring(ctr_internal_copy2string(queryobj));
 	unsigned long query_length = (unsigned long) queryobj->value.svalue->vlen;
 	ctr_object* params = ctr_internal_object_property(myself,"parameters",NULL);
+	count = 0;
 	if (params->info.type == CTR_OBJECT_TYPE_OTARRAY) {
 		count = ctr_tonum( ctr_array_count(params, argumentList) );
 		parambinds = ctr_heap_allocate((count) * sizeof(MYSQL_BIND));
@@ -210,7 +211,7 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 		ctr_error(mysql_stmt_error(prepared_statement), 0);
         goto free_query;
 	}
-    if (mysql_stmt_bind_param(prepared_statement, parambinds)) {
+    if (count && mysql_stmt_bind_param(prepared_statement, parambinds)) {
         ctr_error(mysql_stmt_error(prepared_statement),0);
         goto free_query;
 	}
@@ -287,7 +288,6 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 							: (total - offset);
 							MYSQL_BIND col;
 							memset(&col, 0, sizeof(col));
-							//@todo add support for blob
 							col.buffer_type = rfields[i].type;
 							col.buffer = full + offset;
 							col.buffer_length = to_read;
@@ -351,14 +351,28 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 								}
 								break;
 							case MYSQL_TYPE_LONG:
-							case MYSQL_TYPE_LONGLONG:
 							case MYSQL_TYPE_TINY:
 							case MYSQL_TYPE_SHORT:
 								map_entry_val->object = ctr_build_number_from_float((double)*(int*)rbuffers[i]);
 								break;
+							case MYSQL_TYPE_LONGLONG:
+								char* tmpbuf = ctr_heap_allocate(40);
+								sprintf(tmpbuf, "%lld", *((unsigned long long*)rbuffers[i]));
+								ctr_argument a;
+								a.object = ctr_build_string_from_cstring(tmpbuf);
+								a.next = NULL;
+								map_entry_val->object = ctr_int64_from_string(CtrStdINT64, &a);
+								ctr_heap_free(tmpbuf);
+								break;
 							case MYSQL_TYPE_DOUBLE:
 							case MYSQL_TYPE_FLOAT:
 								map_entry_val->object = ctr_build_number_from_float(*(double*)rbuffers[i]);
+								break;
+							case MYSQL_TYPE_DECIMAL:
+							case MYSQL_TYPE_NEWDECIMAL:
+								char* dec = (char*)rbuffers[i];
+								if (rlens[i] < rbindings[i].buffer_length) dec[rlens[i]] = '\0';
+								map_entry_val->object = ctr_build_string_from_cstring(dec);
 								break;
 							default: {
 								// data type not supported
