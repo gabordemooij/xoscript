@@ -5,7 +5,7 @@
 #define CTR_DICT_PLUGIN_REQUEST                  "Petición-HTTP"
 #define CTR_DICT_NETWORK_OBJECT                  "Red"
 #define CTR_DICT_BLOB_OBJECT                     "Blob"
-#define CTR_DICT_SERVER_OBJECT                   "Servidor"
+#define CTR_DICT_SERVER_OBJECT                   "Server" //Servidor, but for loading we need Server now
 #define CTR_DICT_URL_OBJECT                      "URL"
 #define CTR_DICT_DATABASE_MARIADB_OBJECT         "Maria-DB"
 #define CTR_DICT_DATABASE_MARIADB_QUERY_OBJECT   "Maria-Consulta"
