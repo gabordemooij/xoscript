@@ -2594,6 +2594,7 @@ ctr_object* ctr_int64_init(ctr_object* myself) {
 	ctr_resource* rs = ctr_heap_allocate(sizeof(ctr_resource));
 	rs->type = CTR_OBJECT_RESOURCE_INT64;
 	int64_t* i64_val = ctr_heap_allocate(sizeof(int64_t));
+	*(i64_val) = (int64_t) 0;
 	rs->ptr = (void*) i64_val;
 	rs->destructor = ctr_internal_destructor_int64;
 	myself->value.rvalue = rs;
@@ -2606,10 +2607,10 @@ ctr_object* ctr_int64_init(ctr_object* myself) {
  * 
  * @test627
  */
-ctr_object* ctr_int64_new(ctr_object* myself, ctr_argument* argumentList) {
+ctr_object* ctr_int64_new(ctr_object* myclass, ctr_argument* argumentList) {
 	ctr_object* i64;
 	i64 = ctr_internal_create_object( CTR_OBJECT_TYPE_OTEX );
-	i64->link = myself;
+	i64->link = myclass;
 	ctr_int64_init( i64 );
 	return i64;
 }
@@ -2617,7 +2618,7 @@ ctr_object* ctr_int64_new(ctr_object* myself, ctr_argument* argumentList) {
 ctr_object* ctr_int64_from_string(ctr_object* myself, ctr_argument* argumentList) {
 	char *endptr;
     errno = 0;
-    ctr_object* i64 = ctr_int64_new(myself, NULL);
+    ctr_object* i64 = ctr_int64_new(CtrStdINT64, NULL);
     if (argumentList->object->info.type != CTR_OBJECT_TYPE_OTSTRING) {
 		ctr_error("Conversion from object other than string to int64 is not allowed due to possible inaccuracy.", 0);
 		return CtrStdNil;
@@ -2668,7 +2669,7 @@ ctr_object* ctr_int64_divide(ctr_object* myself, ctr_argument* argumentList) {
 		return CtrStdNil;
 	}
 	int64_t resultINT64 = myINT64 / otherINT64;
-	ctr_object* result = ctr_int64_new(myself, NULL);
+	ctr_object* result = ctr_int64_new(CtrStdINT64, NULL);
 	*((int64_t*)result->value.rvalue->ptr) = resultINT64;
 	return result;
 }
@@ -2676,7 +2677,7 @@ ctr_object* ctr_int64_divide(ctr_object* myself, ctr_argument* argumentList) {
 ctr_object* ctr_int64_multiply(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	int64_t resultINT64 = myINT64 * otherINT64;
-	ctr_object* result = ctr_int64_new(myself, NULL);
+	ctr_object* result = ctr_int64_new(CtrStdINT64, NULL);
 	*((int64_t*)result->value.rvalue->ptr) = resultINT64;
 	return result;
 }
@@ -2685,7 +2686,7 @@ ctr_object* ctr_int64_multiply(ctr_object* myself, ctr_argument* argumentList) {
 ctr_object* ctr_int64_add(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	int64_t resultINT64 = myINT64 + otherINT64;
-	ctr_object* result = ctr_int64_new(myself, NULL);
+	ctr_object* result = ctr_int64_new(CtrStdINT64, NULL);
 	*((int64_t*)result->value.rvalue->ptr) = resultINT64;
 	return result;
 }
@@ -2693,7 +2694,7 @@ ctr_object* ctr_int64_add(ctr_object* myself, ctr_argument* argumentList) {
 ctr_object* ctr_int64_minus(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	int64_t resultINT64 = myINT64 - otherINT64;
-	ctr_object* result = ctr_int64_new(myself, NULL);
+	ctr_object* result = ctr_int64_new(CtrStdINT64, NULL);
 	*((int64_t*)result->value.rvalue->ptr) = resultINT64;
 	return result;
 }
