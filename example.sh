@@ -1,6 +1,11 @@
 ulimit -S -c unlimited
 
-EXAMPLE="${1:-passwordapp}"
+if [ "$#" -eq 0 ]; then
+    echo "Usage: example.sh <example> [Linux|OBSD] [clean] [en]"
+    exit 0
+fi
+
+EXAMPLE="${1:-none}"
 OS="${2:-Linux}"
 CLEAN="${3:-no}"
 ISO="${4:-en}"
