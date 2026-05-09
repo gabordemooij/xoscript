@@ -334,6 +334,55 @@ ctr_object* ctr_json_parse(ctr_object* myself, ctr_argument* argumentList) {
 	return answer;
 }
 
+ctr_object* ctr_json_jsonify(ctr_object* myself, ctr_argument* argumentList);
+
+void ctr_json_jsonify_array(ctr_object* myself, ctr_object* array, ctr_object*  string, ctr_argument* newArgumentList) {
+	int i;
+	ctr_object* arrayElement;
+	newArgumentList->object = ctr_build_string_from_cstring( "[" );
+	ctr_string_append( string, newArgumentList );
+	for(i=array->value.avalue->tail; i<array->value.avalue->head; i++) {
+		if ( i > array->value.avalue->tail ) {
+			newArgumentList->object = ctr_build_string_from_cstring( "," );
+			ctr_string_append( string, newArgumentList );
+		}
+		arrayElement = *( array->value.avalue->elements + i );
+		if ( arrayElement->info.type == CTR_OBJECT_TYPE_OTBOOL && arrayElement->value.bvalue == 1) {
+			newArgumentList->object = ctr_build_string_from_cstring( "true" );
+			ctr_string_append( string, newArgumentList );
+		}
+		else if ( arrayElement->info.type == CTR_OBJECT_TYPE_OTBOOL && arrayElement->value.bvalue == 0) {
+			newArgumentList->object = ctr_build_string_from_cstring( "false" );
+			ctr_string_append( string, newArgumentList );
+		}
+		else if ( arrayElement->info.type == CTR_OBJECT_TYPE_OTNIL ) {
+			newArgumentList->object = ctr_build_string_from_cstring( "null" );
+			ctr_string_append( string, newArgumentList );
+		}
+		else if ( arrayElement->info.type == CTR_OBJECT_TYPE_OTNUMBER ) {
+			newArgumentList->object = arrayElement;
+			ctr_string_append( string, newArgumentList );
+		}
+		else if ( arrayElement->info.type == CTR_OBJECT_TYPE_OTSTRING ) {
+			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
+			ctr_string_append( string, newArgumentList );
+			newArgumentList->object = ctr_string_escape( arrayElement, newArgumentList );
+			ctr_string_append( string, newArgumentList );
+			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
+			ctr_string_append( string, newArgumentList );
+		}
+		else if ( arrayElement->info.type == CTR_OBJECT_TYPE_OTARRAY ) {
+			ctr_json_jsonify_array(myself, arrayElement, string, newArgumentList);
+		} 
+		else {
+			newArgumentList->object = arrayElement;
+			newArgumentList->object = ctr_json_jsonify( myself, newArgumentList );
+			ctr_string_append( string, newArgumentList );
+		}
+	}
+	newArgumentList->object = ctr_build_string_from_cstring( "]" );
+	ctr_string_append( string, newArgumentList );
+}
 
 /**
  * @def
@@ -402,49 +451,7 @@ ctr_object* ctr_json_jsonify(ctr_object* myself, ctr_argument* argumentList) {
 			ctr_string_append( string, newArgumentList );
 		}
 		else if ( mapItem->value->info.type == CTR_OBJECT_TYPE_OTARRAY ) {
-			int i;
-			ctr_object* array = mapItem->value;
-			ctr_object* arrayElement;
-			newArgumentList->object = ctr_build_string_from_cstring( "[" );
-			ctr_string_append( string, newArgumentList );
-			for(i=array->value.avalue->tail; i<array->value.avalue->head; i++) {
-				if ( i > array->value.avalue->tail ) {
-					newArgumentList->object = ctr_build_string_from_cstring( "," );
-					ctr_string_append( string, newArgumentList );
-				}
-				arrayElement = *( array->value.avalue->elements + i );
-				if ( arrayElement->info.type == CTR_OBJECT_TYPE_OTBOOL && arrayElement->value.bvalue == 1) {
-					newArgumentList->object = ctr_build_string_from_cstring( "true" );
-					ctr_string_append( string, newArgumentList );
-				}
-				else if ( arrayElement->info.type == CTR_OBJECT_TYPE_OTBOOL && arrayElement->value.bvalue == 0) {
-					newArgumentList->object = ctr_build_string_from_cstring( "false" );
-					ctr_string_append( string, newArgumentList );
-				}
-				else if ( arrayElement->info.type == CTR_OBJECT_TYPE_OTNIL ) {
-					newArgumentList->object = ctr_build_string_from_cstring( "null" );
-					ctr_string_append( string, newArgumentList );
-				}
-				else if ( arrayElement->info.type == CTR_OBJECT_TYPE_OTNUMBER ) {
-					newArgumentList->object = arrayElement;
-					ctr_string_append( string, newArgumentList );
-				}
-				else if ( arrayElement->info.type == CTR_OBJECT_TYPE_OTSTRING ) {
-					newArgumentList->object = ctr_build_string_from_cstring( "\"" );
-					ctr_string_append( string, newArgumentList );
-					newArgumentList->object = ctr_string_escape( arrayElement, newArgumentList );
-					ctr_string_append( string, newArgumentList );
-					newArgumentList->object = ctr_build_string_from_cstring( "\"" );
-					ctr_string_append( string, newArgumentList );
-				}
-				else {
-					newArgumentList->object = arrayElement;
-					newArgumentList->object = ctr_json_jsonify( myself, newArgumentList );
-					ctr_string_append( string, newArgumentList );
-				}
-			}
-			newArgumentList->object = ctr_build_string_from_cstring( "]" );
-			ctr_string_append( string, newArgumentList );
+			ctr_json_jsonify_array(myself, mapItem->value, string, newArgumentList);
 		}
 		else {
 			newArgumentList->object = mapItem->value;
