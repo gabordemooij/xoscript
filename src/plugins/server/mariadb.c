@@ -157,6 +157,8 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 	ctr_object*    queryobj;
 	unsigned int   num_fields;
 	unsigned long* plens;
+	char* tmpbuf;
+	char* dec;
 	MYSQL_BIND* rbindings;
 	void **rbuffers;
 	unsigned long *rlens;
@@ -356,7 +358,7 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 								map_entry_val->object = ctr_build_number_from_float((double)*(int*)rbuffers[i]);
 								break;
 							case MYSQL_TYPE_LONGLONG:
-								char* tmpbuf = ctr_heap_allocate(40);
+								tmpbuf = ctr_heap_allocate(40);
 								sprintf(tmpbuf, "%lld", *((unsigned long long*)rbuffers[i]));
 								ctr_argument a;
 								a.object = ctr_build_string_from_cstring(tmpbuf);
@@ -370,7 +372,7 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 								break;
 							case MYSQL_TYPE_DECIMAL:
 							case MYSQL_TYPE_NEWDECIMAL:
-								char* dec = (char*)rbuffers[i];
+								dec = (char*)rbuffers[i];
 								if (rlens[i] < rbindings[i].buffer_length) dec[rlens[i]] = '\0';
 								map_entry_val->object = ctr_build_string_from_cstring(dec);
 								break;
