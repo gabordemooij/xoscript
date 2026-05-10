@@ -1,0 +1,160 @@
+# Quick demo for Spanish version
+
+# Run like: ./example.sh spanish Linux clean es
+
+Server init.
+
+# ~ Solicitudes HTTP ~
+>> rq := HTTP-Request crear.
+Salida escribir: ['HTTP-GET a='] + ( rq get: ['a'] ), detener. # GET
+Salida escribir: ['HTTP-POST c='] + ( rq post: ['c'] ), detener. # POST
+
+
+# ~ Database ~
+>> base-de-datos := Maria-DB crear host: ['localhost'],
+		usuario: ['xo'],
+		contraseña: ['pass123'],
+		nombre-base-datos: ['xobase'],
+		conectar.
+
+>> query := 
+	base-de-datos 
+	consultar: ['
+		INSERT INTO book (id, description, price, rating) 
+		VALUES (NULL, ?, ?, ?)
+	'], 
+	parámetros: ( Lista crear ; ['abc'] ; 12.35 ; 6 ).
+
+{
+	query ejecutar. 
+	base-de-datos confirmar.
+} capturar: { :e 
+	base-de-datos revertir.
+}, empezar.
+
+Salida escribir: ['ID: '] + query id-insertado, detener.
+
+>> query :=
+	base-de-datos
+	consultar: ['
+		SELECT * FROM book 
+		ORDER BY id DESC LIMIT 2
+	'], 
+	extraer: { :row 
+		Salida escribir:
+		row id + [' '] + 
+		row description + [': '] + 
+		row price,
+		detener.
+}.
+
+>> query :=
+base-de-datos
+	query: ['SELECT * FROM book order by id desc limit 2'], 
+	fetch: { :row 
+		Salida escribir: row id + [' '] + row description + [': '] + row price, detener.
+	}.
+
+
+# ~ CURL ~
+Salida escribir: ( Red 
+	obtener: ['https://xoscript.com'] )
+	longitud, 
+	detener.
+
+# ~ JSON ~
+>> json := (
+	JSON jsonificar: (
+		Diccionario crear
+		poner: (
+			Lista crear ; 1 ; 2 ; 3
+		) en: ['abc']
+	)).
+
+Salida escribir: 
+	json,
+	detener.
+
+Salida escribir: (
+	(JSON objeto: json) abc ? 1
+), detener.
+
+# ~ Encryption ~
+>> cs := Contenedor-seguro crear: ['Contenedor Seguro'].
+Salida escribir: ['cifrar:'], detener.
+>> clave := ['world'].
+>> a := cs cifrar: ['hello'] clave: clave.
+>> b := cs descifrar: a clave: clave.
+Salida escribir: (
+	['cifrar: <a> descifrar: <b>']
+	<a>: a,
+	<b>: b
+), detener.
+
+# ~ Session handler (by default stored in /tmp) ~
+Programa utilizar: ['webtools_es.xo'].
+>> web := Web-Document crear.
+>> x := web session-start.
+Salida escribir: x, detener.
+x user: 123.
+web session-destroy.
+web goto: ['/'].
+
+
+# ~ Template ~
+Programa utilizar: ['template_es.xo'].
+>> html := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	<p>
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+	</p>
+	<!-- cut:unused -->
+	<span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+	<!-- /cut:unused -->
+'].
+
+>> tpl := Template crear content: html.
+>> greeting := tpl cut: ['greeting'], copiar greeting: ['Hello World!'].
+tpl paste: greeting at: ['greetings'].
+web out: tpl clean-all.
+
+# ~ Regex ~
+>> subject := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> pattern := Patrón crear: ['href="([^"]+)" target="([^"]+)"'].
+>> result := pattern coincidir: subject ejecutar: { :m :x
+	Salida escribir: m, detener.
+	Salida escribir: x, detener.
+	<- ['XXX'].
+}.
+Salida escribir: result, detener.
+
+# ~ Utilities ~
+Salida escribir: (Server codificar-html: ['<&"' hello '"&>']), detener.
+Salida escribir: (Server codificar-url: ['https://example.com?a=6&b=1 2']), detener.
+Salida escribir: (Formato crear: ['Number format: %06.0f'], aplicar: 56), detener.
+Salida escribir: (Contenedor-seguro token: 20), detener.
+Salida escribir: (Momento crear formato: ['%a, %d %b %Y %H:%M:%S']), detener.
+>> a := Server codificar-base64: ['abc123'].
+Salida escribir: a, detener.
+Salida escribir: (Server decodificar-base64: a), detener.
+
+>> u := URL crear.
+u protocol: ['http'], host: ['example.com'], path: ['path'], params: (
+	Diccionario crear
+	a: ['1+'],
+	b: 2
+).
+Salida escribir: u, detener.
+
+

@@ -1,6 +1,6 @@
 >> HTTP-Header := Objeto crear.
 
-HTTP-Header al: ['new'] hacer: { <- yo crear init.
+HTTP-Header al: ['crear'] hacer: { <- yo crear init.
 }.
 
 HTTP-Header al: ['init'] hacer: {
@@ -19,7 +19,7 @@ HTTP-Header al: ['key'] hacer: { <- mi key.
 HTTP-Header al: ['value'] hacer: { <- mi value.
 }.
 
-HTTP-Header al: ['string'] hacer: { <- mi key + [': '] + mi value + [' 
+HTTP-Header al: ['texto'] hacer: { <- mi key + [': '] + mi value + [' 
 '].
 }.
 
@@ -27,7 +27,7 @@ HTTP-Header al: ['string'] hacer: { <- mi key + [': '] + mi value + ['
 
 >> Web-Document := Objeto crear.
 
-Web-Document al: ['new'] hacer: { <- yo crear init.
+Web-Document al: ['crear'] hacer: { <- yo crear init.
 }.
 
 Web-Document al: ['init'] hacer: {
@@ -92,8 +92,10 @@ Web-Document al: ['session-start'] hacer: {
 	yo check-headers.
 	>> request := mi request.
 	>> sess-id := request cookie: ['xsid'].
+
+
 	sess-id ¿nulo? verdadero: {
-		sess-id := Vault token: 30.
+		sess-id := Contenedor-seguro token: 30.
 		>> session-header := HTTP-Header crear
 		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
 		SEC: (mi secure o: ['Secure'] o: ['']),
@@ -102,7 +104,8 @@ Web-Document al: ['session-start'] hacer: {
 		).
 		mi headers adjuntar: session-header.
 	}.
-	mi sessdata := mi session-manager for: sess-id, load. <- mi sessdata. # reference
+	mi sessdata := mi session-manager for: sess-id, load.
+	<- mi sessdata. # reference
 }.
 
 Web-Document al: ['goto:'] hacer: { :url
@@ -140,7 +143,8 @@ Web-Document al: ['session-destroy'] hacer: {
 }.
 
 
-Web-Document al: ['template:'] hacer: { :ruta <- Template crear: (Archivo crear: ruta, leer).
+Web-Document al: ['template:'] hacer: { :ruta 
+	<- Template crear: (Archivo crear: ruta, leer).
 }.
 
 Web-Document al: ['out:type:'] hacer: { :output :tipo
@@ -156,8 +160,7 @@ Web-Document al: ['out:type:'] hacer: { :output :tipo
 			Salida escribir: header.
 		}.
 		mi headers-out := Verdadero.
-		Salida escribir: ['
-'].
+		Salida escribir: ['\n'].
 	}.
 	Salida escribir: output.
 }.
@@ -184,7 +187,7 @@ Web-Document al: ['not-found:'] hacer: { :output
 
 >> Session := Objeto crear.
 
-Session al: ['new'] hacer: { <- yo crear init for: Nulo.
+Session al: ['crear'] hacer: { <- yo crear init for: Nulo.
 }.
 
 Session al: ['for:'] hacer: { :id
@@ -215,7 +218,8 @@ Tempfile-Session al: ['path-prefix:'] hacer: { :str
 	mi pathprefix := str.
 }.
 
-Tempfile-Session al: ['file'] hacer: { <- ( Archivo crear: ( mi pathprefix + mi id + ['.txt'] ) ).
+Tempfile-Session al: ['file'] hacer: {
+	<- ( Archivo crear: ( mi pathprefix + mi id + ['.txt'] ) ).
 }.
 
 Tempfile-Session al: ['load'] hacer: {
@@ -250,10 +254,10 @@ URL al: ['init'] hacer: {
 	mi hash := [''].
 }.
 
-URL al: ['new'] hacer: { <- yo crear init.
+URL al: ['crear'] hacer: { <- yo crear init.
 }.
 
-URL al: ['string'] hacer: { <- (
+URL al: ['texto'] hacer: { <- (
 	mi protocol +
 	mi host +
 	mi ruta +

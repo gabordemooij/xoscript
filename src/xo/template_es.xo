@@ -3,14 +3,14 @@
 
 >> Template := Objeto crear.
 
-Template al: ['new'] hacer: { <- yo crear content: [''].
+Template al: ['crear'] hacer: { <- yo crear content: [''].
 }.
 
 Template al: ['content:'] hacer: { :content
 	mi content := content. 
 }.
 
-Template al: ['new:'] hacer: { :content <- yo crear content: content.
+Template al: ['crear:'] hacer: { :content <- yo crear content: content.
 }.
 
 Template al: ['cut:'] hacer: { :marker
@@ -34,60 +34,57 @@ Template al: ['paste:at:'] hacer: { :snippet :id
 	mi content reemplazar: pastemarker con: ( snippet texto + pastemarker ).
 }.
 
-Template al: ['set:value:'] hacer: { :slot :value
-	mi content reemplazar: ['<!-- slot:'] + slot + [' -->'] con: ( Server html-encode: value ).
+Template al: ['valor:asignar:'] hacer: { :slot :value
+	mi content reemplazar: ['<!-- slot:'] + slot + [' -->'] con: ( Server codificar-html: value ).
 }.
 
 Template al: ['set:html:'] hacer: { :slot :html
 	mi content reemplazar: ['<!-- slot:'] + slot + [' -->'] con: html.
 }.
 
-Template al: ['respond:and:'] hacer: { :slot :value
+Template al: ['responder:y:'] hacer: { :slot :value
 	yo valor: (slot desde: 0 longitud: (slot longitud - 1)) asignar: value.
 }.
 
 Template al: ['nl2br'] hacer: {
-	mi content reemplazar: ['
-'] con: ['<br>'].
+	mi content reemplazar: [''] con: ['<br>'].
 }.
 
 Template al: ['clean'] hacer: {
 	mi content :=
-		Pattern
-		crear: ['\<\!\-\- (paste|slot)\:\S+ \-\-\>'],
-		match: mi content
-		do: { <- ['']. }.
+		Patrón
+		crear: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		coincidir: mi content
+		ejecutar: { <- ['']. }.
 }.
 
 Template al: ['clean-cuts'] hacer: {
 	>> items := Lista crear.
-	Pattern
-	crear: ['\<\!\-\- cut\:(\S+) \-\-\>'],
-	match: mi content
-	do: { :_ :part
+	Patrón
+	crear: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	coincidir: mi content
+	ejecutar: { :_ :part
 		items adjuntar: part ? 1.
 	}.
 	items cada: { :_ :id
 		mi content :=
-			Pattern crear: ( ['(?s)\<\!\-\- cut\:'] + id + [' \-\-\>.*\<\!\-\- \/cut\:'] + id + [' \-\-\>']),
-			match: mi content
-			do: { <- ['']. }.
+			Patrón crear: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			coincidir: mi content
+			ejecutar: { <- ['']. }.
 	 }.
 }.
 
 Template al: ['clean-space'] hacer: {
 	mi content :=
-		Pattern
-		crear: ['\s*\n'],
-		match: mi content
-		do: { <- ['
-']. }.
+		Patrón
+		crear: ['\\s*\\n'],
+		coincidir: mi content
+		ejecutar: { <- ['']. }.
 	mi content :=
-		Pattern
+		Patrón
 		crear: ['\n[\s\t]+'],
-		match: mi content
-		do: { <- ['
-']. }.
+		coincidir: mi content
+		ejecutar: { <- ['']. }.
 }.
 
 Template al: ['clean-all'] hacer: {
@@ -96,5 +93,6 @@ Template al: ['clean-all'] hacer: {
 	yo clean-space.
 }.
 
-Template al: ['string'] hacer: { <- mi content.
+Template al: ['texto'] hacer: {
+	<- mi content.
 }.
