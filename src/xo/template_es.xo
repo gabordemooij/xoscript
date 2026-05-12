@@ -3,26 +3,26 @@
 
 >> Plantilla := Objeto crear.
 
-Plantilla al: ['crear'] hacer: { <- yo crear content: [''].
+Plantilla al: ['crear'] hacer: { <- yo crear contenido: [''].
 }.
 
-Plantilla al: ['content:'] hacer: { :content
-	mi content := content. 
+Plantilla al: ['contenido:'] hacer: { :contenido
+	mi contenido := contenido. 
 }.
 
-Plantilla al: ['crear:'] hacer: { :content <- yo crear content: content.
+Plantilla al: ['crear:'] hacer: { :contenido <- yo crear contenido: contenido.
 }.
 
 Plantilla al: ['cut:'] hacer: { :marker
 	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
 	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := mi content partir: startmarker.
+	>> parts := mi contenido partir: startmarker.
 	>> prefix := parts primero.
 	>> parts2 := parts último partir: endmarker.
 	>> suffix := parts2 último.
 	>> part := parts2 primero.
 	>> rest := prefix + suffix.
-	mi content := rest. <- Plantilla crear: part.
+	mi contenido := rest. <- Plantilla crear: part.
 	
 }.
 
@@ -31,15 +31,15 @@ Plantilla al: ['copy'] hacer: { <- yo crear: yo texto copiar.
 	
 Plantilla al: ['paste:at:'] hacer: { :snippet :id
 	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	mi content reemplazar: pastemarker con: ( snippet texto + pastemarker ).
+	mi contenido reemplazar: pastemarker con: ( snippet texto + pastemarker ).
 }.
 
 Plantilla al: ['valor:asignar:'] hacer: { :slot :value
-	mi content reemplazar: ['<!-- slot:'] + slot + [' -->'] con: ( Server codificar-html: value ).
+	mi contenido reemplazar: ['<!-- slot:'] + slot + [' -->'] con: ( Server codificar-html: value ).
 }.
 
 Plantilla al: ['set:html:'] hacer: { :slot :html
-	mi content reemplazar: ['<!-- slot:'] + slot + [' -->'] con: html.
+	mi contenido reemplazar: ['<!-- slot:'] + slot + [' -->'] con: html.
 }.
 
 Plantilla al: ['responder:y:'] hacer: { :slot :value
@@ -47,14 +47,14 @@ Plantilla al: ['responder:y:'] hacer: { :slot :value
 }.
 
 Plantilla al: ['nl2br'] hacer: {
-	mi content reemplazar: [''] con: ['<br>'].
+	mi contenido reemplazar: [''] con: ['<br>'].
 }.
 
 Plantilla al: ['clean'] hacer: {
-	mi content :=
+	mi contenido :=
 		Patrón
 		crear: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		coincidir: mi content
+		coincidir: mi contenido
 		ejecutar: { <- ['']. }.
 }.
 
@@ -62,28 +62,28 @@ Plantilla al: ['clean-cuts'] hacer: {
 	>> items := Lista crear.
 	Patrón
 	crear: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	coincidir: mi content
+	coincidir: mi contenido
 	ejecutar: { :_ :part
 		items adjuntar: part ? 1.
 	}.
 	items cada: { :_ :id
-		mi content :=
+		mi contenido :=
 			Patrón crear: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			coincidir: mi content
+			coincidir: mi contenido
 			ejecutar: { <- ['']. }.
 	 }.
 }.
 
 Plantilla al: ['clean-space'] hacer: {
-	mi content :=
+	mi contenido :=
 		Patrón
 		crear: ['\\s*\\n'],
-		coincidir: mi content
+		coincidir: mi contenido
 		ejecutar: { <- ['']. }.
-	mi content :=
+	mi contenido :=
 		Patrón
 		crear: ['\n[\s\t]+'],
-		coincidir: mi content
+		coincidir: mi contenido
 		ejecutar: { <- ['']. }.
 }.
 
@@ -94,5 +94,5 @@ Plantilla al: ['clean-all'] hacer: {
 }.
 
 Plantilla al: ['texto'] hacer: {
-	<- mi content.
+	<- mi contenido.
 }.
