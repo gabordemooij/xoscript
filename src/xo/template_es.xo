@@ -1,19 +1,19 @@
 
 # ~ Simple template engine ~
 
->> Template := Objeto crear.
+>> Plantilla := Objeto crear.
 
-Template al: ['crear'] hacer: { <- yo crear content: [''].
+Plantilla al: ['crear'] hacer: { <- yo crear content: [''].
 }.
 
-Template al: ['content:'] hacer: { :content
+Plantilla al: ['content:'] hacer: { :content
 	mi content := content. 
 }.
 
-Template al: ['crear:'] hacer: { :content <- yo crear content: content.
+Plantilla al: ['crear:'] hacer: { :content <- yo crear content: content.
 }.
 
-Template al: ['cut:'] hacer: { :marker
+Plantilla al: ['cut:'] hacer: { :marker
 	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
 	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
 	>> parts := mi content partir: startmarker.
@@ -22,35 +22,35 @@ Template al: ['cut:'] hacer: { :marker
 	>> suffix := parts2 último.
 	>> part := parts2 primero.
 	>> rest := prefix + suffix.
-	mi content := rest. <- Template crear: part.
+	mi content := rest. <- Plantilla crear: part.
 	
 }.
 
-Template al: ['copy'] hacer: { <- yo crear: yo texto copiar.
+Plantilla al: ['copy'] hacer: { <- yo crear: yo texto copiar.
 }.
 	
-Template al: ['paste:at:'] hacer: { :snippet :id
+Plantilla al: ['paste:at:'] hacer: { :snippet :id
 	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
 	mi content reemplazar: pastemarker con: ( snippet texto + pastemarker ).
 }.
 
-Template al: ['valor:asignar:'] hacer: { :slot :value
+Plantilla al: ['valor:asignar:'] hacer: { :slot :value
 	mi content reemplazar: ['<!-- slot:'] + slot + [' -->'] con: ( Server codificar-html: value ).
 }.
 
-Template al: ['set:html:'] hacer: { :slot :html
+Plantilla al: ['set:html:'] hacer: { :slot :html
 	mi content reemplazar: ['<!-- slot:'] + slot + [' -->'] con: html.
 }.
 
-Template al: ['responder:y:'] hacer: { :slot :value
+Plantilla al: ['responder:y:'] hacer: { :slot :value
 	yo valor: (slot desde: 0 longitud: (slot longitud - 1)) asignar: value.
 }.
 
-Template al: ['nl2br'] hacer: {
+Plantilla al: ['nl2br'] hacer: {
 	mi content reemplazar: [''] con: ['<br>'].
 }.
 
-Template al: ['clean'] hacer: {
+Plantilla al: ['clean'] hacer: {
 	mi content :=
 		Patrón
 		crear: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
@@ -58,7 +58,7 @@ Template al: ['clean'] hacer: {
 		ejecutar: { <- ['']. }.
 }.
 
-Template al: ['clean-cuts'] hacer: {
+Plantilla al: ['clean-cuts'] hacer: {
 	>> items := Lista crear.
 	Patrón
 	crear: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
@@ -74,7 +74,7 @@ Template al: ['clean-cuts'] hacer: {
 	 }.
 }.
 
-Template al: ['clean-space'] hacer: {
+Plantilla al: ['clean-space'] hacer: {
 	mi content :=
 		Patrón
 		crear: ['\\s*\\n'],
@@ -87,12 +87,12 @@ Template al: ['clean-space'] hacer: {
 		ejecutar: { <- ['']. }.
 }.
 
-Template al: ['clean-all'] hacer: {
+Plantilla al: ['clean-all'] hacer: {
 	yo clean.
 	yo clean-cuts.
 	yo clean-space.
 }.
 
-Template al: ['texto'] hacer: {
+Plantilla al: ['texto'] hacer: {
 	<- mi content.
 }.
