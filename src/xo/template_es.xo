@@ -13,37 +13,37 @@ Plantilla al: ['contenido:'] hacer: { :contenido
 Plantilla al: ['crear:'] hacer: { :contenido <- yo crear contenido: contenido.
 }.
 
-Plantilla al: ['cortar:'] hacer: { :marker
-	>> startmarker := (['<!-- cortar:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cortar:%id% -->'] %id%: marker).
-	>> parts := mi contenido partir: startmarker.
-	>> prefix := parts primero.
-	>> parts2 := parts último partir: endmarker.
-	>> suffix := parts2 último.
-	>> part := parts2 primero.
-	>> rest := prefix + suffix.
-	mi contenido := rest. <- Plantilla crear: part.
-	
+Plantilla al: ['cortar:'] hacer: { :marcador
+	>> empiece-de-marcador := (['<!-- cortar:%id% -->'] %id%: marcador).
+	>> fin-de-marcador := (['<!-- /cortar:%id% -->'] %id%: marcador).
+	>> partes := mi contenido partir: empiece-de-marcador.
+	>> prefijo := partes primero.
+	>> partes2 := partes último partir: fin-de-marcador.
+	>> sufijo := partes2 último.
+	>> parte := partes2 primero.
+	>> resto := prefijo + sufijo.
+	mi contenido := resto. 
+	<- Plantilla crear: parte.
 }.
 
 Plantilla al: ['copy'] hacer: { <- yo crear: yo texto copiar.
 }.
 	
-Plantilla al: ['pegar:en:'] hacer: { :snippet :id
-	>> pastemarker := (['<!-- pegar:%id% -->'] %id%: id).
-	mi contenido reemplazar: pastemarker con: ( snippet texto + pastemarker ).
+Plantilla al: ['pegar:en:'] hacer: { :fragmento :id
+	>> pegador := (['<!-- pegar:%id% -->'] %id%: id).
+	mi contenido reemplazar: pegador con: ( fragmento texto + pegador ).
 }.
 
-Plantilla al: ['valor:asignar:'] hacer: { :ranura :value
-	mi contenido reemplazar: ['<!-- ranura:'] + ranura + [' -->'] con: ( Server codificar-html: value ).
+Plantilla al: ['valor:asignar:'] hacer: { :ranura :valor
+	mi contenido reemplazar: ['<!-- ranura:'] + ranura + [' -->'] con: ( Server codificar-html: valor ).
 }.
 
-Plantilla al: ['set:html:'] hacer: { :ranura :html
+Plantilla al: ['establecer:html:'] hacer: { :ranura :html
 	mi contenido reemplazar: ['<!-- ranura:'] + ranura + [' -->'] con: html.
 }.
 
-Plantilla al: ['responder:y:'] hacer: { :ranura :value
-	yo valor: (ranura desde: 0 longitud: (ranura longitud - 1)) asignar: value.
+Plantilla al: ['responder:y:'] hacer: { :ranura :valor
+	yo valor: (ranura desde: 0 longitud: (ranura longitud - 1)) asignar: valor.
 }.
 
 Plantilla al: ['nl2br'] hacer: {
@@ -59,14 +59,14 @@ Plantilla al: ['limpiar'] hacer: {
 }.
 
 Plantilla al: ['limpiar-cortadores'] hacer: {
-	>> items := Lista crear.
+	>> elementos := Lista crear.
 	Patrón
 	crear: ['\\<\\!\\-\\- cortar\\:(\\S+) \\-\\-\\>'],
 	coincidir: mi contenido
 	ejecutar: { :_ :part
-		items adjuntar: part ? 1.
+		elementos adjuntar: part ? 1.
 	}.
-	items cada: { :_ :id
+	elementos cada: { :_ :id
 		mi contenido :=
 			Patrón crear: ( ['(?s)\\<\\!\\-\\- cortar\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cortar\\:'] + id + [' \\-\\-\\>']),
 			coincidir: mi contenido
