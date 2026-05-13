@@ -1,27 +1,25 @@
->> HTTP-Header := Objeto crear.
+>> Cabezera-HTTP := Objeto crear.
 
-HTTP-Header al: ['crear'] hacer: { <- yo crear init.
+Cabezera-HTTP al: ['crear'] hacer: { <- yo crear init.
 }.
 
-HTTP-Header al: ['init'] hacer: {
+Cabezera-HTTP al: ['init'] hacer: {
 	mi key := Nulo.
 	mi value := Nulo.
 }.
 
-HTTP-Header al: ['key:value:'] hacer: { :key :value
+Cabezera-HTTP al: ['key:value:'] hacer: { :key :value
 	mi key := key.
 	mi value := value.
 }.
 
-HTTP-Header al: ['key'] hacer: { <- mi key.
+Cabezera-HTTP al: ['key'] hacer: { <- mi key.
 }.
 
-HTTP-Header al: ['value'] hacer: { <- mi value.
+Cabezera-HTTP al: ['value'] hacer: { <- mi value.
 }.
 
-HTTP-Header al: ['texto'] hacer: { <- mi key + [': '] + mi value + [' 
-'].
-}.
+Cabezera-HTTP al: ['texto'] hacer: { <- mi key + [': '] + mi value + [' \r\n']. }.
 
 # Web document, ties together headers, HTML and session
 
@@ -96,7 +94,7 @@ Documento-Web al: ['session-start'] hacer: {
 
 	sess-id ¿nulo? verdadero: {
 		sess-id := Contenedor-seguro token: 30.
-		>> session-header := HTTP-Header crear
+		>> session-header := Cabezera-HTTP crear
 		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
 		SEC: (mi secure o: ['Secure'] o: ['']),
 		SSITE: (mi same-site),
@@ -113,11 +111,11 @@ Documento-Web al: ['goto:'] hacer: { :url
 	yo clear-headers.
 	mi headers
 	adjuntar: (
-		HTTP-Header crear
+		Cabezera-HTTP crear
 		key: ['Status'] value: ['303 See Other']
 	),
 	adjuntar: (
-		HTTP-Header crear
+		Cabezera-HTTP crear
 		key: ['Location'] value: url
 	).
 	yo out: ['Redirect'].
@@ -128,7 +126,7 @@ Documento-Web al: ['session-destroy'] hacer: {
 	>> request := mi request.
 	>> sess-id := request cookie: ['xsid'].
 	sess-id ¿nulo? falso: {
-		>> session-header := HTTP-Header crear.
+		>> session-header := Cabezera-HTTP crear.
 		>> when := Momento crear año: 1970, formato: ['%a, %d %b %Y %H:%M:%S GMT'].
 		session-header key: ['Set-Cookie'] value: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
@@ -153,7 +151,7 @@ Documento-Web al: ['out:type:'] hacer: { :output :tipo
 			mi session-manager save: mi sessdata.
 		}.
 		mi headers adjuntar: (
-			HTTP-Header crear
+			Cabezera-HTTP crear
 			key: ['Content-type'] value: tipo
 		).
 		mi headers cada: { :_ :header
@@ -177,7 +175,7 @@ Documento-Web al: ['json:'] hacer: { :output
 
 Documento-Web al: ['not-found:'] hacer: { :output
 	yo clear-headers header: (
-		HTTP-Header crear key: ['Status'] value: ['404 Not Found']
+		Cabezera-HTTP crear key: ['Status'] value: ['404 Not Found']
 	).
 	yo out: output.
 }.
