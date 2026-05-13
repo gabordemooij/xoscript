@@ -12,7 +12,7 @@
 #include <syslog.h>
 #include "../../xo.h"
 
-#include "i18n/en/server.h"
+#include <server.h>
 
 #include "ccgi/ccgi.h"
 
