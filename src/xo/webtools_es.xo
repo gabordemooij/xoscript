@@ -25,12 +25,12 @@ HTTP-Header al: ['texto'] hacer: { <- mi key + [': '] + mi value + ['
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Objeto crear.
+>> Documento-Web := Objeto crear.
 
-Web-Document al: ['crear'] hacer: { <- yo crear init.
+Documento-Web al: ['crear'] hacer: { <- yo crear init.
 }.
 
-Web-Document al: ['init'] hacer: {
+Documento-Web al: ['init'] hacer: {
 	mi headers := Lista crear.
 	mi sess-id := Nulo.
 	mi session-manager := Tempfile-Session crear.
@@ -41,16 +41,16 @@ Web-Document al: ['init'] hacer: {
 	mi request := HTTP-Request crear.
 }.
 
-Web-Document al: ['request:'] hacer: { :request
+Documento-Web al: ['request:'] hacer: { :request
 	mi request := request.
 }. 
 
-Web-Document al: ['secure-session-cookie:'] hacer: { :secure
+Documento-Web al: ['secure-session-cookie:'] hacer: { :secure
 	yo check-headers.
 	mi secure := secure.
 }.
 
-Web-Document al: ['same-site-session-cookie:'] hacer: { :value
+Documento-Web al: ['same-site-session-cookie:'] hacer: { :value
 	yo check-headers.
 	>> options := Lista crear 
 		~ ['Strict']
@@ -64,31 +64,31 @@ Web-Document al: ['same-site-session-cookie:'] hacer: { :value
 	mi same-site := value.
 }.
 
-Web-Document al: ['header:'] hacer: { :header
+Documento-Web al: ['header:'] hacer: { :header
 	yo check-headers.
 	mi headers adjuntar: header.
 }.
 
-Web-Document al: ['clear-headers'] hacer: {
+Documento-Web al: ['clear-headers'] hacer: {
 	yo check-headers.
 	mi headers := Lista crear.
 }.
 
-Web-Document al: ['session-manager:'] hacer: { :manager
+Documento-Web al: ['session-manager:'] hacer: { :manager
 	yo check-headers.
 	mi session-manager := manager.
 }.
 
-Web-Document al: ['session-manager'] hacer: { <- mi session-manager.
+Documento-Web al: ['session-manager'] hacer: { <- mi session-manager.
 }.
 
-Web-Document al: ['check-headers'] hacer: {
+Documento-Web al: ['check-headers'] hacer: {
 	mi headers-out verdadero: {
 		la-tarea-actual error: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document al: ['session-start'] hacer: {
+Documento-Web al: ['session-start'] hacer: {
 	yo check-headers.
 	>> request := mi request.
 	>> sess-id := request cookie: ['xsid'].
@@ -108,7 +108,7 @@ Web-Document al: ['session-start'] hacer: {
 	<- mi sessdata. # reference
 }.
 
-Web-Document al: ['goto:'] hacer: { :url
+Documento-Web al: ['goto:'] hacer: { :url
 	yo check-headers.
 	yo clear-headers.
 	mi headers
@@ -123,7 +123,7 @@ Web-Document al: ['goto:'] hacer: { :url
 	yo out: ['Redirect'].
 }.
 
-Web-Document al: ['session-destroy'] hacer: {
+Documento-Web al: ['session-destroy'] hacer: {
 	yo check-headers.
 	>> request := mi request.
 	>> sess-id := request cookie: ['xsid'].
@@ -143,11 +143,11 @@ Web-Document al: ['session-destroy'] hacer: {
 }.
 
 
-Web-Document al: ['template:'] hacer: { :ruta 
+Documento-Web al: ['template:'] hacer: { :ruta 
 	<- Template crear: (Archivo crear: ruta, leer).
 }.
 
-Web-Document al: ['out:type:'] hacer: { :output :tipo
+Documento-Web al: ['out:type:'] hacer: { :output :tipo
 	mi headers-out falso: {
 		mi sessdata ¿nulo? falso: {
 			mi session-manager save: mi sessdata.
@@ -167,15 +167,15 @@ Web-Document al: ['out:type:'] hacer: { :output :tipo
 
 
 
-Web-Document al: ['out:'] hacer: { :output
+Documento-Web al: ['out:'] hacer: { :output
 	yo out: output type: ['text/html; charset=utf-8'].
 }.
 
-Web-Document al: ['json:'] hacer: { :output
+Documento-Web al: ['json:'] hacer: { :output
 	yo out: ( JSON jsonify: output ) output type: ['Content-Type: application/json'].
 }.
 
-Web-Document al: ['not-found:'] hacer: { :output
+Documento-Web al: ['not-found:'] hacer: { :output
 	yo clear-headers header: (
 		HTTP-Header crear key: ['Status'] value: ['404 Not Found']
 	).
