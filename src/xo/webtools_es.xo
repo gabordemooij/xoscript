@@ -1,37 +1,37 @@
 >> Cabezera-HTTP := Objeto crear.
 
-Cabezera-HTTP al: ['crear'] hacer: { <- yo crear init.
+Cabezera-HTTP al: ['crear'] hacer: { <- yo crear iniciar.
 }.
 
-Cabezera-HTTP al: ['init'] hacer: {
-	mi key := Nulo.
-	mi value := Nulo.
+Cabezera-HTTP al: ['iniciar'] hacer: {
+	mi clave := Nulo.
+	mi valor := Nulo.
 }.
 
-Cabezera-HTTP al: ['key:value:'] hacer: { :key :value
-	mi key := key.
-	mi value := value.
+Cabezera-HTTP al: ['clave:valor:'] hacer: { :clave :valor
+	mi clave := clave.
+	mi valor := valor.
 }.
 
-Cabezera-HTTP al: ['key'] hacer: { <- mi key.
+Cabezera-HTTP al: ['clave'] hacer: { <- mi clave.
 }.
 
-Cabezera-HTTP al: ['value'] hacer: { <- mi value.
+Cabezera-HTTP al: ['valor'] hacer: { <- mi valor.
 }.
 
-Cabezera-HTTP al: ['texto'] hacer: { <- mi key + [': '] + mi value + [' \r\n']. }.
+Cabezera-HTTP al: ['texto'] hacer: { <- mi clave + [': '] + mi valor + [' \r\n']. }.
 
 # Web document, ties together headers, HTML and session
 
 >> Documento-Web := Objeto crear.
 
-Documento-Web al: ['crear'] hacer: { <- yo crear init.
+Documento-Web al: ['crear'] hacer: { <- yo crear iniciar.
 }.
 
-Documento-Web al: ['init'] hacer: {
+Documento-Web al: ['iniciar'] hacer: {
 	mi headers := Lista crear.
 	mi sess-id := Nulo.
-	mi session-manager := Tempfile-Session crear.
+	mi controlador-sesión := Ficherotemporal-sesión crear.
 	mi sessdata := Nulo.
 	mi secure := Verdadero.
 	mi same-site := ['Strict'].
@@ -48,18 +48,18 @@ Documento-Web al: ['secure-session-cookie:'] hacer: { :secure
 	mi secure := secure.
 }.
 
-Documento-Web al: ['same-site-session-cookie:'] hacer: { :value
+Documento-Web al: ['mismo-sitio-sesión-cookie:'] hacer: { :valor
 	yo check-headers.
 	>> options := Lista crear 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options contiene: value, falso: {
+	options contiene: valor, falso: {
 		la-tarea-actual error: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	mi same-site := value.
+	mi same-site := valor.
 }.
 
 Documento-Web al: ['header:'] hacer: { :header
@@ -72,12 +72,12 @@ Documento-Web al: ['clear-headers'] hacer: {
 	mi headers := Lista crear.
 }.
 
-Documento-Web al: ['session-manager:'] hacer: { :manager
+Documento-Web al: ['controlador-sesión:'] hacer: { :manager
 	yo check-headers.
-	mi session-manager := manager.
+	mi controlador-sesión := manager.
 }.
 
-Documento-Web al: ['session-manager'] hacer: { <- mi session-manager.
+Documento-Web al: ['controlador-sesión'] hacer: { <- mi controlador-sesión.
 }.
 
 Documento-Web al: ['check-headers'] hacer: {
@@ -86,7 +86,7 @@ Documento-Web al: ['check-headers'] hacer: {
 	}.
 }.
 
-Documento-Web al: ['session-start'] hacer: {
+Documento-Web al: ['empezar-sesión'] hacer: {
 	yo check-headers.
 	>> request := mi request.
 	>> sess-id := request cookie: ['xsid'].
@@ -95,14 +95,14 @@ Documento-Web al: ['session-start'] hacer: {
 	sess-id ¿nulo? verdadero: {
 		sess-id := Contenedor-seguro token: 30.
 		>> session-header := Cabezera-HTTP crear
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		clave: ['Set-Cookie'] valor: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
 		SEC: (mi secure o: ['Secure'] o: ['']),
 		SSITE: (mi same-site),
 		XSID: sess-id
 		).
 		mi headers adjuntar: session-header.
 	}.
-	mi sessdata := mi session-manager for: sess-id, load.
+	mi sessdata := mi controlador-sesión for: sess-id, load.
 	<- mi sessdata. # reference
 }.
 
@@ -112,47 +112,47 @@ Documento-Web al: ['goto:'] hacer: { :url
 	mi headers
 	adjuntar: (
 		Cabezera-HTTP crear
-		key: ['Status'] value: ['303 See Other']
+		clave: ['Status'] valor: ['303 See Other']
 	),
 	adjuntar: (
 		Cabezera-HTTP crear
-		key: ['Location'] value: url
+		clave: ['Location'] valor: url
 	).
 	yo out: ['Redirect'].
 }.
 
-Documento-Web al: ['session-destroy'] hacer: {
+Documento-Web al: ['borrar-sesión'] hacer: {
 	yo check-headers.
 	>> request := mi request.
 	>> sess-id := request cookie: ['xsid'].
 	sess-id ¿nulo? falso: {
 		>> session-header := Cabezera-HTTP crear.
 		>> when := Momento crear año: 1970, formato: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+		session-header clave: ['Set-Cookie'] valor: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
 			EXP: when,
 			SEC: (mi secure o: ['Secure'] o: ['']),
 			SSITE: (mi same-site),
 			XSID: sess-id
 		).
-		mi session-manager destroy.
+		mi controlador-sesión destroy.
 		mi headers adjuntar: session-header.
 	}.
 }.
 
 
-Documento-Web al: ['template:'] hacer: { :ruta 
-	<- Template crear: (Archivo crear: ruta, leer).
+Documento-Web al: ['plantilla:'] hacer: { :ruta 
+	<- Plantilla crear: (Archivo crear: ruta, leer).
 }.
 
 Documento-Web al: ['out:type:'] hacer: { :output :tipo
 	mi headers-out falso: {
 		mi sessdata ¿nulo? falso: {
-			mi session-manager save: mi sessdata.
+			mi controlador-sesión save: mi sessdata.
 		}.
 		mi headers adjuntar: (
 			Cabezera-HTTP crear
-			key: ['Content-type'] value: tipo
+			clave: ['Content-type'] valor: tipo
 		).
 		mi headers cada: { :_ :header
 			Salida escribir: header.
@@ -175,7 +175,7 @@ Documento-Web al: ['json:'] hacer: { :output
 
 Documento-Web al: ['not-found:'] hacer: { :output
 	yo clear-headers header: (
-		Cabezera-HTTP crear key: ['Status'] value: ['404 Not Found']
+		Cabezera-HTTP crear clave: ['Status'] valor: ['404 Not Found']
 	).
 	yo out: output.
 }.
@@ -185,7 +185,7 @@ Documento-Web al: ['not-found:'] hacer: { :output
 
 >> Session := Objeto crear.
 
-Session al: ['crear'] hacer: { <- yo crear init for: Nulo.
+Session al: ['crear'] hacer: { <- yo crear iniciar for: Nulo.
 }.
 
 Session al: ['for:'] hacer: { :id
@@ -206,35 +206,35 @@ Session al: ['destroy'] hacer: {
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session crear.
+>> Ficherotemporal-sesión := Session crear.
 
-Tempfile-Session al: ['init'] hacer: {
+Ficherotemporal-sesión al: ['iniciar'] hacer: {
 	mi pathprefix := ['/tmp/sess-'].
 }.
 
-Tempfile-Session al: ['path-prefix:'] hacer: { :str
+Ficherotemporal-sesión al: ['path-prefix:'] hacer: { :str
 	mi pathprefix := str.
 }.
 
-Tempfile-Session al: ['file'] hacer: {
+Ficherotemporal-sesión al: ['file'] hacer: {
 	<- ( Archivo crear: ( mi pathprefix + mi id + ['.txt'] ) ).
 }.
 
-Tempfile-Session al: ['load'] hacer: {
+Ficherotemporal-sesión al: ['load'] hacer: {
 	>> file := yo file.
 	file existe falso: {
 		file escribir: (Diccionario crear código).
 	}. <- file leer objeto.
 }.
 
-Tempfile-Session al: ['save:'] hacer: { :data
+Ficherotemporal-sesión al: ['save:'] hacer: { :data
 	>> file := yo file.
 	file existe verdadero: {
 		file escribir: data código.
 	}.
 }.
 
-Tempfile-Session al: ['destroy'] hacer: {
+Ficherotemporal-sesión al: ['destroy'] hacer: {
 	>> file := yo file.
 	file existe verdadero: {
 		file eliminar.
@@ -244,7 +244,7 @@ Tempfile-Session al: ['destroy'] hacer: {
 
 >> URL := Objeto crear.
 
-URL al: ['init'] hacer: {
+URL al: ['iniciar'] hacer: {
 	mi protocol := ['https://'].
 	mi host := ['localhost'].
 	mi ruta := [''].
@@ -252,7 +252,7 @@ URL al: ['init'] hacer: {
 	mi hash := [''].
 }.
 
-URL al: ['crear'] hacer: { <- yo crear init.
+URL al: ['crear'] hacer: { <- yo crear iniciar.
 }.
 
 URL al: ['texto'] hacer: { <- (
@@ -282,8 +282,8 @@ URL al: ['path:'] hacer: { :ruta
 
 URL al: ['params:'] hacer: { :map
 	>> params := Lista crear.
-	map cada: { :key :value
-		params adjuntar: key texto url-encode + ['='] + value texto url-encode.
+	map cada: { :clave :valor
+		params adjuntar: clave texto url-encode + ['='] + valor texto url-encode.
 	}.
 	mi params := ['?'] + ( params unir: ['&'] ).
 }.
