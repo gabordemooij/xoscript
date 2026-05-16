@@ -216,6 +216,18 @@ int ccgi_tgetc(FILE* unused) {
 	return ccgi_tgetc_buf[0];
 }
 
+size_t ccgi_tfread(void *ptr, size_t size, size_t nmemb, FILE* f) {
+	unsigned char *dst = ptr;
+	size_t total = size * nmemb;
+	size_t read_bytes = 0;
+	while (read_bytes < total) {
+		int c = ccgi_tgetc(f);
+		if (c == EOF) break;
+		dst[read_bytes++] = (unsigned char)c;
+	}
+	return read_bytes / size;
+}
+
 /* CGI_val is an entry in a list of variable values */
 
 typedef struct CGI_val CGI_val;
@@ -902,7 +914,7 @@ CGI_varlist* CGI_get_post(CGI_varlist *v, const char *template) {
 		}
 		
 		buf = (char *) ctr_heap_allocate(len + 1);
-		if (fread(buf, 1, len, stdin) == len) {
+		if (ccgi_tfread(buf, 1, len, stdin) == len) {
 			buf[len] = 0;
 			v = CGI_decode_query(v, buf, 1);
 		}

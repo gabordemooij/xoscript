@@ -242,7 +242,7 @@ void begin_http(){
 	if (maxtime_str == NULL) {
 		maxtime_str = "5000"; //5sec
 	}
-	maxtime = (size_t) atoi(maxtime_str);
+	maxtime = (int) atoi(maxtime_str);
 	CGI_set_max_time(maxtime);
 	ccgi_tgetc_setup(STDIN_FILENO);
 	requestObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
