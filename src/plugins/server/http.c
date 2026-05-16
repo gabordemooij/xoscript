@@ -237,6 +237,14 @@ void begin_http(){
 	maxcontentlength = (size_t) atoi(maxcontentlength_str);
 	CGI_set_max_contentlength(maxcontentlength);
 	CGI_set_max_fieldsize(65536);
+	char* maxtime_str = getenv("max-time");
+	int maxtime = 0;
+	if (maxtime_str == NULL) {
+		maxtime_str = "5000"; //5sec
+	}
+	maxtime = (size_t) atoi(maxtime_str);
+	CGI_set_max_time(maxtime);
+	ccgi_tgetc_setup(STDIN_FILENO);
 	requestObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
 	requestObject->link = CtrStdObject;
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_GET_SET ), &ctr_request_get_string );

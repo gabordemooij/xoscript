@@ -118,6 +118,8 @@
 #include <stdio.h>
 #include <limits.h>
 #include <sys/stat.h>
+#include <fcntl.h>
+#include <poll.h>
 
 #include "ccgi.h"
 #include "../../../xo.h"
@@ -128,6 +130,7 @@
 size_t CCGI_MAX_POSTFIELDS = 0;
 size_t CCGI_MAX_CONTENTLENGTH = 0;
 size_t CCGI_MAX_FIELD_SIZE = 65536;
+int CCGI_MAX_TIME = 5000;
 
 static size_t postfieldcount = 0;
 static size_t contentlengthcount = 0;
@@ -144,6 +147,74 @@ void CGI_set_max_fieldsize(size_t n) {
 	CCGI_MAX_FIELD_SIZE = n;
 }
 
+void CGI_set_max_time(int n) {
+	CCGI_MAX_TIME = n;
+}
+
+size_t  ccgi_tgetc_pos = 0;
+size_t  ccgi_tgetc_len = 0;
+int64_t ccgi_tgetc_lim = 0;
+unsigned char ccgi_tgetc_buf[4096];
+int ccgi_tgetc_fd = -1;
+
+/**
+ * CCGI TGETC
+ * drop-in replacement for getc() to allow hard deadlines for
+ * stdin reading.
+ */
+int64_t ccgi_now_ms() {
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	int64_t now_ms = (int64_t)ts.tv_sec * 1000 + ts.tv_nsec / 1000000;
+	return now_ms;
+}
+
+void ccgi_tgetc_setup(int fd) {
+	int flags = fcntl(fd, F_GETFL, 0);
+	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+	ccgi_tgetc_lim = ccgi_now_ms() + CCGI_MAX_TIME;
+	ccgi_tgetc_fd = fd;
+}
+
+int ccgi_tgetc(FILE* unused) {
+	ssize_t n = 0;
+	if (ccgi_tgetc_pos < ccgi_tgetc_len) {
+		return ccgi_tgetc_buf[ccgi_tgetc_pos++];
+	}
+	int64_t remain;
+	remain = ccgi_tgetc_lim - ccgi_now_ms();
+	if (remain <= 0) return EOF;
+	struct pollfd pfd = {
+		.fd = ccgi_tgetc_fd,
+		.events = POLLIN
+	};
+	while(1) {
+		int r = poll(&pfd, 1, (int)remain);
+		if (r == 0) return EOF;
+		if (r < 0) {
+			if (errno == EINTR) {
+				remain = ccgi_tgetc_lim - ccgi_now_ms();
+				if (remain <= 0) return EOF;
+				continue;
+			}
+			return EOF;
+		}
+		n = read(ccgi_tgetc_fd, ccgi_tgetc_buf, sizeof(ccgi_tgetc_buf));
+		if (n == 0) return EOF;
+		if (n < 0) {
+			if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) {
+				remain = ccgi_tgetc_lim - ccgi_now_ms();
+				if (remain <= 0) return EOF;
+				continue;
+			}
+			return EOF;
+		}
+		break;
+	}
+	ccgi_tgetc_pos = 1;
+	ccgi_tgetc_len = n;
+	return ccgi_tgetc_buf[0];
+}
 
 /* CGI_val is an entry in a list of variable values */
 
@@ -376,7 +447,7 @@ static char* scanheader(char *p, char *header[2]) {
  */
 static strbuf* readline(strbuf *line, FILE *in) {
 	int c, i = 0;
-	while ((c = getc(in)) != EOF) {
+	while ((c = ccgi_tgetc(in)) != EOF) {
 		contentlengthcount++;
 		if (contentlengthcount >= CCGI_MAX_CONTENTLENGTH) {
 			// if we hit max content length, kill process
@@ -410,7 +481,7 @@ static strbuf* copyvalue(const char *boundary, FILE *in, const int wantfile, str
 
 	matched = k = 0;
 
-	while ((c = getc(in)) != EOF) {
+	while ((c = ccgi_tgetc(in)) != EOF) {
 		contentlengthcount++;
 		if (contentlengthcount >= CCGI_MAX_CONTENTLENGTH) {
 			// if we hit max content length, kill process

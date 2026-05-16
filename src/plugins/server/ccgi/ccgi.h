@@ -11,7 +11,8 @@
 void CGI_set_max_postfields(size_t n);
 void CGI_set_max_contentlength(size_t n);
 void CGI_set_max_fieldsize(size_t n);
-
+void CGI_set_max_time(int n);
+void ccgi_tgetc_setup(int fd);
 
 typedef struct CGI_varlist CGI_varlist;
 
