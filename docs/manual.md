@@ -1816,6 +1816,29 @@ Program use: ['template.xo'].
 
 ```
 
+## Server Settings
+
+You can set the following server settings:
+
+```
+	# default values are given
+	# so if you do not set anything these
+	# values are used...
+
+	Program 
+	setting: ['max-postfields']
+	value: 40.
+
+	Program 
+	setting: ['max-contentlength']
+	value: 2000000. # 2MB
+
+	Program 
+	setting: ['max-time']
+	value: 5000. # 5sec
+
+```
+
 ## Hello World
 
 Here is a very simple web program that you can use with a
