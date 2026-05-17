@@ -21,7 +21,7 @@ Cabezera-HTTP al: ['valor'] hacer: { <- mi valor.
 
 Cabezera-HTTP al: ['texto'] hacer: { <- mi clave + [': '] + mi valor + [' \r\n']. }.
 
-# Web document, ties together headers, HTML and session
+# Documento web, une los encabezados , HTML and sesión
 
 >> Documento-Web := Objeto crear.
 
@@ -56,7 +56,7 @@ Documento-Web al: ['mismo-sitio-sesión-cookie:'] hacer: { :valor
 		~ ['None'].
 	
 	opciones contiene: valor, falso: {
-		la-tarea-actual error: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+		la-tarea-actual error: ['Invalido mismo-sitio-sesión-cookie valor (Elige entre Strict, Lax or None).'].
 	}.
 
 	mi mismo-sitio := valor.
@@ -82,7 +82,7 @@ Documento-Web al: ['controlador-sesión'] hacer: { <- mi controlador-sesión.
 
 Documento-Web al: ['comprobar-cabezeras'] hacer: {
 	mi cabezeras-salida verdadero: {
-		la-tarea-actual error: ['Headers already sent to client.'].
+		la-tarea-actual error: ['Cabezeras ya enviadas al cliente.'].
 	}.
 }.
 
@@ -103,7 +103,7 @@ Documento-Web al: ['empezar-sesión'] hacer: {
 		mi cabezeras adjuntar: cabezera-sesión.
 	}.
 	mi datos-sesión := mi controlador-sesión para: id-sesión, cargar.
-	<- mi datos-sesión. # reference
+	<- mi datos-sesión. # referencia
 }.
 
 Documento-Web al: ['ir-a:'] hacer: { :url
@@ -118,7 +118,7 @@ Documento-Web al: ['ir-a:'] hacer: { :url
 		Cabezera-HTTP crear
 		clave: ['Location'] valor: url
 	).
-	yo salir: ['Redirect'].
+	yo salida: ['Redirect'].
 }.
 
 Documento-Web al: ['borrar-sesión'] hacer: {
@@ -145,7 +145,7 @@ Documento-Web al: ['plantilla:'] hacer: { :ruta
 	<- Plantilla crear: (Archivo crear: ruta, leer).
 }.
 
-Documento-Web al: ['salir:tipo:'] hacer: { :salida :tipo
+Documento-Web al: ['salida:tipo:'] hacer: { :salida :tipo
 	mi cabezeras-salida falso: {
 		mi datos-sesión ¿nulo? falso: {
 			mi controlador-sesión salvar: mi datos-sesión.
@@ -165,19 +165,19 @@ Documento-Web al: ['salir:tipo:'] hacer: { :salida :tipo
 
 
 
-Documento-Web al: ['salir:'] hacer: { :salida
-	yo salir: salida tipo: ['text/html; charset=utf-8'].
+Documento-Web al: ['salida:'] hacer: { :salida
+	yo salida: salida tipo: ['text/html; charset=utf-8'].
 }.
 
 Documento-Web al: ['json:'] hacer: { :salida
-	yo salir: ( JSON jsonify: salida ) tipo: ['Content-Type: application/json'].
+	yo salida: ( JSON jsonify: salida ) tipo: ['Content-Type: application/json'].
 }.
 
 Documento-Web al: ['no-encontrado:'] hacer: { :salida
 	yo limpiar-cabezeras cabezera: (
 		Cabezera-HTTP crear clave: ['Status'] valor: ['404 Not Found']
 	).
-	yo salir: salida.
+	yo salida: salida.
 }.
 
 
@@ -193,18 +193,18 @@ Sesión al: ['para:'] hacer: { :id
 }.
 
 Sesión al: ['cargar'] hacer: {
-	la-tarea-actual error: ['Not implemented.'].
+	la-tarea-actual error: ['No implementado.'].
 }.
 
 Sesión al: ['salvar:'] hacer: {
-	la-tarea-actual error: ['Not implemented.'].
+	la-tarea-actual error: ['No implementado.'].
 }.
 
 Sesión al: ['destrozar'] hacer: {
-	la-tarea-actual error: ['Not implemented.'].
+	la-tarea-actual error: ['No implementado.'].
 }.
 
-# Default Session implementation, uses tempfile
+# La implementación por defecto usa archivos temporales
 
 >> Ficherotemporal-sesión := Sesión crear.
 
@@ -267,28 +267,28 @@ URL al: ['protocolo:'] hacer: { :protocolo
 	((Lista crear: ['http'] ; ['https']) contiene: protocolo) verdadero: {
 		mi protocolo := protocolo + ['://'].
 	}, falso: {
-		la-tarea-actual error: ['Invalid protocol'].
+		la-tarea-actual error: ['Protocolo inválido'].
 	}.
 }.
 
 URL al: ['host:'] hacer: { :host
-	#todo validate according to rfc
+	#todo validar según RFC
 	mi host := host.
 }.
 
 URL al: ['path:'] hacer: { :ruta
-	mi ruta := ['/'] + ruta url-encode.
+	mi ruta := ['/'] + ruta codificar-url.
 }.
 
 URL al: ['parámetros:'] hacer: { :mapa
 	>> parámetros := Lista crear.
 	mapa cada: { :clave :valor
-		parámetros adjuntar: clave texto url-encode + ['='] + valor texto url-encode.
+		parámetros adjuntar: clave texto codificar-url + ['='] + valor texto codificar-url.
 	}.
 	mi parámetros := ['?'] + ( parámetros unir: ['&'] ).
 }.
 
 URL al: ['hash:'] hacer: { :hash
-	mi hash := ['#'] + hash url-encode.
+	mi hash := ['#'] + hash codificar-url.
 }.
 
