@@ -1904,8 +1904,16 @@ process is killed because we cannot be sure
 the payload is safe anymore.
 {{/note}}
 
+The maxtime limit determines the maximum time in ms
+to read stdin/postdata.
 
+```
+Program setting: ['max-time'] value: 5000. # 5sec
+```
 
+This only applies to I/O reading of the post, preventing
+slowloris-like attacks. If you really want to cap the
+execution time of any operation use Program alarm.
 
 ## Database
 
