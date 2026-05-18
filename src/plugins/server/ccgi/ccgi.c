@@ -894,6 +894,7 @@ CGI_varlist* CGI_get_query(CGI_varlist *v) {
  * name (as specified by the user) can be obtained with
  * CGI_lookup_all(v, fieldname).
  */
+ char* postbuf = NULL;
 CGI_varlist* CGI_get_post(CGI_varlist *v, const char *template) {
 	const char *env;
 	char *buf;
@@ -918,12 +919,18 @@ CGI_varlist* CGI_get_post(CGI_varlist *v, const char *template) {
 			buf[len] = 0;
 			v = CGI_decode_query(v, buf, 1);
 		}
+		postbuf = calloc(1, len+1);
+		memcpy(postbuf,buf,len);
 		ctr_heap_free(buf);
 	}
 	else {
 		v = read_multipart(v, template);
 	}
 	return v;
+}
+
+char* ccgi_debug() {
+	return postbuf;
 }
 
 /*

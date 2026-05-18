@@ -52,6 +52,12 @@ ctr_object* ctr_request_string(ctr_object* myself, ctr_argument* argumentList, C
 	return ctr_build_string_from_cstring(value);
 }
 
+ctr_object* ctr_request_rawpost(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* postbufobj = ctr_build_string_from_cstring(ccgi_debug());
+	postbufobj->info.sticky = 1;
+	return postbufobj;
+}
+
 /**
  * @internal
  * 
@@ -254,6 +260,7 @@ void begin_http(){
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_POST_SET ), &ctr_request_post_string );
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_UPLOAD_SET ), &ctr_request_file );
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_POST_LIST_SET ), &ctr_request_post_array );
+	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( "rawpost" ), &ctr_request_rawpost );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PLUGIN_REQUEST ), requestObject, 0);
 	urlObject = ctr_url_new(CtrStdObject, NULL);
 	urlObject->link = CtrStdObject;
