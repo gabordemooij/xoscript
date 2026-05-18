@@ -125,6 +125,7 @@
 #include "../../../xo.h"
 
 #define RFC_SAFE_BOUNDARY_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'()+_,-./:=?"
+ char* postbuf = NULL;
 
 
 size_t CCGI_MAX_POSTFIELDS = 0;
@@ -896,7 +897,6 @@ CGI_varlist* CGI_get_query(CGI_varlist *v) {
  * name (as specified by the user) can be obtained with
  * CGI_lookup_all(v, fieldname).
  */
- char* postbuf = NULL;
 CGI_varlist* CGI_get_post(CGI_varlist *v, const char *template) {
 	const char *env;
 	char *buf;
