@@ -125,7 +125,7 @@
 #include "../../../xo.h"
 
 #define RFC_SAFE_BOUNDARY_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'()+_,-./:=?"
- char* postbuf = NULL;
+char* postbuf = NULL;
 
 
 size_t CCGI_MAX_POSTFIELDS = 0;
@@ -932,6 +932,7 @@ CGI_varlist* CGI_get_post(CGI_varlist *v, const char *template) {
 }
 
 char* ccgi_debug() {
+	if (postbuf == NULL) return ctr_build_empty_string();
 	return postbuf;
 }
 
