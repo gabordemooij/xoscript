@@ -932,7 +932,6 @@ CGI_varlist* CGI_get_post(CGI_varlist *v, const char *template) {
 }
 
 char* ccgi_debug() {
-	if (postbuf == NULL) return ctr_build_empty_string();
 	return postbuf;
 }
 

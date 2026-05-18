@@ -53,7 +53,13 @@ ctr_object* ctr_request_string(ctr_object* myself, ctr_argument* argumentList, C
 }
 
 ctr_object* ctr_request_rawpost(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* postbufobj = ctr_build_string_from_cstring(ccgi_debug());
+	char* pb = ccgi_debug();
+	ctr_object* postbufobj;
+	if (pb == NULL) {
+		postbufobj = ctr_build_empty_string();
+	} else {
+		postbufobj = ctr_build_string_from_cstring(pb);
+	}
 	postbufobj->info.sticky = 1;
 	return postbufobj;
 }
