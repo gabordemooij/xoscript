@@ -211,6 +211,8 @@ int ccgi_tgetc(FILE* unused) {
 		}
 		break;
 	}
+	postbuf = calloc(1, sizeof(ccgi_tgetc_buf) + 1);
+	memcpy(postbuf, ccgi_tgetc_buf, sizeof(ccgi_tgetc_buf));
 	ccgi_tgetc_pos = 1;
 	ccgi_tgetc_len = n;
 	return ccgi_tgetc_buf[0];
