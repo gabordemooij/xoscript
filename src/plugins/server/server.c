@@ -772,6 +772,7 @@ void begin() {
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( CTR_DICT_PASSTHRU_PREFIX_SET ), &ctr_server_passthru_set );
 	ctr_internal_create_func(serverObject, ctr_build_string_from_cstring( CTR_DICT_MIMETYPE_SET ), &ctr_server_mimetype );
 	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_SERVER_OBJECT ), serverObject, CTR_CATEGORY_PUBLIC_PROPERTY);
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_SERVER_OBJECT_INTERNATIONAL ), serverObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	formatObject = NULL;
 	formatObject = ctr_format_new(CtrStdObject, NULL);
 	formatObject->link = CtrStdObject;

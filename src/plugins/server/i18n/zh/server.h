@@ -5,6 +5,7 @@
 #define CTR_DICT_PLUGIN_REQUEST                  "HTTP请求"
 #define CTR_DICT_NETWORK_OBJECT                  "网络"
 #define CTR_DICT_BLOB_OBJECT                     "Blob"
+#define CTR_DICT_SERVER_OBJECT_INTERNATIONAL     "Server"
 #define CTR_DICT_SERVER_OBJECT                   "服务器"
 #define CTR_DICT_URL_OBJECT                      "URL"
 #define CTR_DICT_DATABASE_MARIADB_OBJECT         "MariaDB"

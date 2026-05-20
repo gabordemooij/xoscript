@@ -5,7 +5,8 @@
 #define CTR_DICT_PLUGIN_REQUEST                  "HTTP-Request"              // Word for object representing the current HTTP-Request
 #define CTR_DICT_NETWORK_OBJECT                  "Net"                       // Word for object providing network functionality
 #define CTR_DICT_BLOB_OBJECT                     "Blob"                      // Word for object representing a computer memory block
-#define CTR_DICT_SERVER_OBJECT                   "Server"                    // Word for object providing server functionality
+#define CTR_DICT_SERVER_OBJECT_INTERNATIONAL     "Server"                    // Word for object providing server functionality, international
+#define CTR_DICT_SERVER_OBJECT                   "_Server"                   // Word for object providing server functionality
 #define CTR_DICT_URL_OBJECT                      "URL"                       // Word for object representing internet address or URL
 #define CTR_DICT_DATABASE_MARIADB_OBJECT         "Maria-DB"                  // Word for object representing MariaDB database system
 #define CTR_DICT_DATABASE_MARIADB_QUERY_OBJECT   "Maria-Query"               // Word for object representing a MariaDB database query
