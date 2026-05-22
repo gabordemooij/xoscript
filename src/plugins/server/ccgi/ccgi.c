@@ -170,9 +170,22 @@ int64_t ccgi_now_ms() {
 	return now_ms;
 }
 
+void ccgi_log_stderr(const char *msg) {
+	fwrite(msg, 1, strlen(msg), stderr);
+	fwrite("\n", 1, 1, stderr);
+	fflush(stderr);
+}
+
 void ccgi_tgetc_setup(int fd) {
 	int flags = fcntl(fd, F_GETFL, 0);
-	fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+	if (flags < 0) {
+		ccgi_log_stderr("fcntl F_GETFL failed");
+		exit(-1);
+	}
+	if (fcntl(fd, F_SETFL, flags | O_NONBLOCK) < 0) {
+		ccgi_log_stderr("fcntl F_SETFL failed");
+		exit(-1);
+	}
 	ccgi_tgetc_lim = ccgi_now_ms() + CCGI_MAX_TIME;
 	ccgi_tgetc_fd = fd;
 }
