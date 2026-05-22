@@ -78,3 +78,6 @@
 #define CTR_DICT_DATABASE_QUERYPARAMS_SET        "параметры:"
 #define CTR_DICT_FETCH_SET                       "получить:"
 #define CTR_DICT_DATABASE_INSERTID               "insert-id"
+#define CTR_DICT_SRVCNF_MAXPOSTFIELDS            "max-polya" 
+#define CTR_DICT_SRVCNF_MAXCONTENTLNGTH          "max-soderzhimoe"
+#define CTR_DICT_SRVCNF_MAXPOSTTIME              "max-procvremya"

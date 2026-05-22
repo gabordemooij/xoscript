@@ -78,3 +78,6 @@
 #define CTR_DICT_DATABASE_QUERYPARAMS_SET        "parámetros:"
 #define CTR_DICT_FETCH_SET                       "extraer:"
 #define CTR_DICT_DATABASE_INSERTID               "id-insertado"
+#define CTR_DICT_SRVCNF_MAXPOSTFIELDS            "max-campos" 
+#define CTR_DICT_SRVCNF_MAXCONTENTLNGTH          "max-contenido"
+#define CTR_DICT_SRVCNF_MAXPOSTTIME              "max-proctiempo"

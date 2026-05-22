@@ -78,3 +78,6 @@
 #define CTR_DICT_DATABASE_QUERYPARAMS_SET        "parameters:"               // Word to associate database query parameters in argument with the current state of the recipient object
 #define CTR_DICT_FETCH_SET                       "fetch:"                    // Word to fetch something from the recipient object and associate a callback function using the argument
 #define CTR_DICT_DATABASE_INSERTID               "insert-id"                 // Word to return a database insertion id resulting from an insert operation on a database
+#define CTR_DICT_SRVCNF_MAXPOSTFIELDS            "max-postfields"            // Word for program setting to configure maximum fields to be processed in http post payload
+#define CTR_DICT_SRVCNF_MAXCONTENTLNGTH          "max-contentlength"         // Word for program setting to configure the maximum content length allowed to process
+#define CTR_DICT_SRVCNF_MAXPOSTTIME              "max-posttime"              // Word for program setting to configure the time limit to enforce upon reading stdin in CGI to read raw post data

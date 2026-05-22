@@ -78,3 +78,6 @@
 #define CTR_DICT_DATABASE_QUERYPARAMS_SET        "参数:"
 #define CTR_DICT_FETCH_SET                       "获取:"
 #define CTR_DICT_DATABASE_INSERTID               "插入ID"
+#define CTR_DICT_SRVCNF_MAXPOSTFIELDS            "最大发送字段" 
+#define CTR_DICT_SRVCNF_MAXCONTENTLNGTH          "最大内容"
+#define CTR_DICT_SRVCNF_MAXPOSTTIME              "最大处理时间"

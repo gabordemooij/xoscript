@@ -222,14 +222,14 @@ ctr_object* ctr_url_from_set(ctr_object* myself, ctr_argument* argumentList) {
  * Adds the Request object to the World.
  */
 void begin_http(){
-	char* maxpostfields_str = getenv("max-postfields");
+	char* maxpostfields_str = getenv(CTR_DICT_SRVCNF_MAXPOSTFIELDS);
 	size_t maxpostfields = 0;
 	if (maxpostfields_str == NULL) {
 		maxpostfields_str = "40";
 	}
 	maxpostfields = (size_t) atoi(maxpostfields_str);
 	CGI_set_max_postfields(maxpostfields);
-	char* maxcontentlength_str = getenv("max-contentlength");
+	char* maxcontentlength_str = getenv(CTR_DICT_SRVCNF_MAXCONTENTLNGTH);
 	size_t maxcontentlength = 0;
 	if (maxcontentlength_str == NULL) {
 		maxcontentlength_str = "2000000"; //2 MB
@@ -237,7 +237,7 @@ void begin_http(){
 	maxcontentlength = (size_t) atoi(maxcontentlength_str);
 	CGI_set_max_contentlength(maxcontentlength);
 	CGI_set_max_fieldsize(65536);
-	char* maxtime_str = getenv("max-time");
+	char* maxtime_str = getenv(CTR_DICT_SRVCNF_MAXPOSTTIME);
 	int maxtime = 0;
 	if (maxtime_str == NULL) {
 		maxtime_str = "5000"; //5sec
