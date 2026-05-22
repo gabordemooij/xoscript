@@ -22,10 +22,10 @@ LDFLAGS += `pkg-config --libs libsecret-1`
 
 
 
-BIN 			= libctrserver.so
+BIN 			= libctr$(NAME).so
 BUILD_DIR 		= ../../../build/Linux
-BUILD_OBJ_DIR 	= $(BUILD_DIR)/obj/mods/server
-BUILD_BIN_DIR 	= $(BUILD_DIR)/bin/mods/server
+BUILD_OBJ_DIR 	= $(BUILD_DIR)/obj/mods/$(NAME)
+BUILD_BIN_DIR 	= $(BUILD_DIR)/bin/mods/$(NAME)
 
 prefix ?= /usr
 bindir ?= $(prefix)/bin

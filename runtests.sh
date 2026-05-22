@@ -23,7 +23,7 @@ PACKAGE="server"
 export EXTRACFLAGS
 export PACKAGE
 make plugin-clean
-NAME="libctrserver.so" make plugin
+NAME="server" make plugin
 
 fi
 

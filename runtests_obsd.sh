@@ -18,9 +18,9 @@ export ISO
 gmake clean
 EXTRACFLAGS="-D TEST"
 gmake -f makefile.obsd clean
-PACKAGE="server" NAME="server.so" gmake -f makefile.obsd plugin-clean
+PACKAGE="server" NAME="server" gmake -f makefile.obsd plugin-clean
 gmake -f makefile.obsd
-PACKAGE="server" NAME="server.so" gmake -f makefile.obsd plugin
+PACKAGE="server" NAME="server" gmake -f makefile.obsd plugin
 fi
 
 setup1() {
