@@ -125,8 +125,6 @@
 #include "../../../xo.h"
 
 #define RFC_SAFE_BOUNDARY_CHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'()+_,-./:=?"
-char* postbuf = NULL;
-
 
 size_t CCGI_MAX_POSTFIELDS = 0;
 size_t CCGI_MAX_CONTENTLENGTH = 0;
@@ -225,8 +223,6 @@ int ccgi_tgetc(FILE* unused) {
 		}
 		break;
 	}
-	postbuf = calloc(1, sizeof(ccgi_tgetc_buf) + 1);
-	memcpy(postbuf, ccgi_tgetc_buf, sizeof(ccgi_tgetc_buf));
 	ccgi_tgetc_pos = 1;
 	ccgi_tgetc_len = n;
 	return ccgi_tgetc_buf[0];
@@ -934,18 +930,12 @@ CGI_varlist* CGI_get_post(CGI_varlist *v, const char *template) {
 			buf[len] = 0;
 			v = CGI_decode_query(v, buf, 1);
 		}
-		postbuf = calloc(1, len+1);
-		memcpy(postbuf,buf,len);
 		ctr_heap_free(buf);
 	}
 	else {
 		v = read_multipart(v, template);
 	}
 	return v;
-}
-
-char* ccgi_debug() {
-	return postbuf;
 }
 
 /*
