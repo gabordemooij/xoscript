@@ -2,7 +2,7 @@
 
 #define CTR_DICT_VAULT_OBJECT                    "Cofre"
 #define CTR_DICT_JSON_OBJECT                     "JSON"
-#define CTR_DICT_PLUGIN_REQUEST                  "Requisição-HTTP"
+#define CTR_DICT_REQUEST_OBJECT                  "Requisição-HTTP"
 #define CTR_DICT_NETWORK_OBJECT                  "Rede"
 #define CTR_DICT_BLOB_OBJECT                     "Blob"
 #define CTR_DICT_SERVER_OBJECT_INTERNATIONAL     "Server"

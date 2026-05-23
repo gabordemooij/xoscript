@@ -2,7 +2,7 @@
 
 #define CTR_DICT_VAULT_OBJECT                    "Хранилище"
 #define CTR_DICT_JSON_OBJECT                     "JSON"
-#define CTR_DICT_PLUGIN_REQUEST                  "HTTP-запрос"
+#define CTR_DICT_REQUEST_OBJECT                  "HTTP-запрос"
 #define CTR_DICT_NETWORK_OBJECT                  "Сеть"
 #define CTR_DICT_BLOB_OBJECT                     "Blob"
 #define CTR_DICT_SERVER_OBJECT_INTERNATIONAL     "Server"

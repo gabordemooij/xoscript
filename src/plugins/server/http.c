@@ -254,7 +254,7 @@ void begin_http(){
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_POST_SET ), &ctr_request_post_string );
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_UPLOAD_SET ), &ctr_request_file );
 	ctr_internal_create_func(requestObject, ctr_build_string_from_cstring( CTR_DICT_HTTP_REQUEST_POST_LIST_SET ), &ctr_request_post_array );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_PLUGIN_REQUEST ), requestObject, 0);
+	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring( CTR_DICT_REQUEST_OBJECT ), requestObject, 0);
 	urlObject = ctr_url_new(CtrStdObject, NULL);
 	urlObject->link = CtrStdObject;
 	ctr_internal_create_func(urlObject, ctr_build_string_from_cstring( CTR_DICT_NEW ), &ctr_url_new );

@@ -2,7 +2,7 @@
 
 #define CTR_DICT_VAULT_OBJECT                    "保险库"
 #define CTR_DICT_JSON_OBJECT                     "JSON"
-#define CTR_DICT_PLUGIN_REQUEST                  "HTTP请求"
+#define CTR_DICT_REQUEST_OBJECT                  "HTTP请求"
 #define CTR_DICT_NETWORK_OBJECT                  "网络"
 #define CTR_DICT_BLOB_OBJECT                     "Blob"
 #define CTR_DICT_SERVER_OBJECT_INTERNATIONAL     "Server"

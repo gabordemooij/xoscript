@@ -2,7 +2,7 @@
 
 #define CTR_DICT_VAULT_OBJECT                    "Contenedor-seguro"
 #define CTR_DICT_JSON_OBJECT                     "JSON"
-#define CTR_DICT_PLUGIN_REQUEST                  "Petición-HTTP"
+#define CTR_DICT_REQUEST_OBJECT                  "Petición-HTTP"
 #define CTR_DICT_NETWORK_OBJECT                  "Red"
 #define CTR_DICT_BLOB_OBJECT                     "Blob"
 #define CTR_DICT_SERVER_OBJECT_INTERNATIONAL     "Server"

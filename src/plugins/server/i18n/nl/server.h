@@ -2,7 +2,7 @@
 
 #define CTR_DICT_VAULT_OBJECT                    "Kluis"
 #define CTR_DICT_JSON_OBJECT                     "JSON"
-#define CTR_DICT_PLUGIN_REQUEST                  "HTTP-Request"
+#define CTR_DICT_REQUEST_OBJECT                  "HTTP-Request"
 #define CTR_DICT_NETWORK_OBJECT                  "Net"
 #define CTR_DICT_BLOB_OBJECT                     "Blob"
 #define CTR_DICT_SERVER_OBJECT_INTERNATIONAL     "Server"
