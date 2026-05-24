@@ -154,9 +154,9 @@ ctr_object* ctr_request_file(ctr_object* myself, ctr_argument* argumentList) {
 	cgiVar = ctr_heap_allocate_cstring( cgiVarObject );
 	value = CGI_lookup_all(varlistPost, (const char*)cgiVar);
 	ctr_heap_free( cgiVar );
-    list = ctr_array_new(CtrStdArray, NULL);
+	list = ctr_array_new(CtrStdArray, NULL);
 	if (value == 0 || value[1] == 0) return list;
-    for (i = 0; value[i] != 0; i++) {
+	for (i = 0; value[i] != 0; i++) {
 		arg = (ctr_argument*) ctr_heap_allocate( sizeof( ctr_argument ) );
 		val = (char*) value[i];
 		arg->object = ctr_build_string_from_cstring(val);
