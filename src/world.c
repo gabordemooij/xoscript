@@ -1228,13 +1228,13 @@ ctr_object* ctr_send_message(ctr_object* receiverObject, char* message, long vle
 		mesgArgument->next = argumentList;
 		//@important! static argument signatures because this is direct 1-to-1 map on actual methods! Don't be tempted to change to list!
 		if (argCount == 0 || argCount > 3) {
-			returnValue = ctr_send_message(receiverObject, CTR_DICT_RESPOND_TO, strlen(CTR_DICT_RESPOND_TO),  mesgArgument);
+			returnValue = ctr_send_message(receiverObject, CTR_DICT_RESPOND_TO, ctr_clex_keyword_respond_to_len,  mesgArgument);
 		} else if (argCount == 1) {
-			returnValue = ctr_send_message(receiverObject, CTR_DICT_RESPOND_TO_AND, strlen(CTR_DICT_RESPOND_TO_AND),  mesgArgument);
+			returnValue = ctr_send_message(receiverObject, CTR_DICT_RESPOND_TO_AND, ctr_clex_keyword_respond_to_and_len,  mesgArgument);
 		} else if (argCount == 2) {
-			returnValue = ctr_send_message(receiverObject, CTR_DICT_RESPOND_TO_AND_AND, strlen(CTR_DICT_RESPOND_TO_AND_AND),  mesgArgument);
+			returnValue = ctr_send_message(receiverObject, CTR_DICT_RESPOND_TO_AND_AND, ctr_clex_keyword_respond_to_and_and_len,  mesgArgument);
 		} else if (argCount == 3) {
-			returnValue = ctr_send_message(receiverObject, CTR_DICT_RESPOND_TO_AND_AND_AND, strlen(CTR_DICT_RESPOND_TO_AND_AND_AND),  mesgArgument);
+			returnValue = ctr_send_message(receiverObject, CTR_DICT_RESPOND_TO_AND_AND_AND, ctr_clex_keyword_respond_to_and_and_and_len,  mesgArgument);
 		}
 		mobj->info.sticky = 0;
 		ctr_heap_free( mesgArgument );

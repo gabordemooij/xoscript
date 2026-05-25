@@ -13,6 +13,10 @@ ctr_size ctr_clex_keyword_num_sep_tho_len;
 ctr_size ctr_clex_keyword_assignment_len;
 ctr_size ctr_clex_keyword_return_len;
 ctr_size ctr_clex_keyword_chain_len;
+ctr_size ctr_clex_keyword_respond_to_len;
+ctr_size ctr_clex_keyword_respond_to_and_len;
+ctr_size ctr_clex_keyword_respond_to_and_and_len;
+ctr_size ctr_clex_keyword_respond_to_and_and_and_len;
 
 /**
  * CommandLine Display Welcome Message
@@ -64,6 +68,10 @@ int ctr_init() {
 	ctr_clex_keyword_qc_len = strlen( CTR_DICT_QUOT_CLOSE );
 	ctr_clex_keyword_assignment_len = strlen( CTR_DICT_ASSIGN );
 	ctr_clex_keyword_return_len = strlen( CTR_DICT_RETURN );
+	ctr_clex_keyword_respond_to_len = strlen(CTR_DICT_RESPOND_TO);
+	ctr_clex_keyword_respond_to_and_len = strlen(CTR_DICT_RESPOND_TO_AND);
+	ctr_clex_keyword_respond_to_and_and_len = strlen(CTR_DICT_RESPOND_TO_AND_AND);
+	ctr_clex_keyword_respond_to_and_and_and_len = strlen(CTR_DICT_RESPOND_TO_AND_AND_AND);
 	ctr_clex_param_prefix_char = CTR_DICT_PARAMETER_PREFIX[0];
 	ctr_gc_memlimit = 64 * 1000000; /* Default memory limit: 64MB */
 	ctr_gc_mode = 1;                /* Default GC mode: regular GC. */
