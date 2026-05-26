@@ -49,13 +49,25 @@ setup2() {
 	./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err
 }
 
+setup3() {
+	i=$1
+	CITRINE_MEMORY_PROFILE=1 \
+	./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err
+}
+
 unittest() {
 	i=$1
 	mmode=$2
 	os=$3
 	CITRINE_MEMORY_MODE=$mmode
 	export CITRINE_MEMORY_MODE
-	if [[ $i == "0635" ]]; then
+	if ((
+	( 10#$i >= 132 && 10#$i <= 218 ) ||
+	( 10#$i >= 310 && 10#$i <= 311 ) ||
+	( 10#$i >= 351 && 10#$i <= 351 )
+	)); then
+		setup3 $i
+	elif [[ $i == "0635" ]]; then
 		setup2 $i
 	else
 		setup1 $i

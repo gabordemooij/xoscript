@@ -236,6 +236,7 @@ struct ctr_tnode {
 	char modifier;
 	char* value;
 	ctr_size vlen;
+	ctr_object* cached_name;
 	struct ctr_tlistitem* nodes;
 };
 typedef struct ctr_tnode ctr_tnode;
@@ -311,6 +312,7 @@ extern char* ctr_mode_input_file;
 extern char* ctr_mode_dict_file;
 extern char* ctr_mode_hfile1;
 extern char* ctr_mode_hfile2;
+extern int ctr_mode_memory_profiler;
 
 extern void ctr_cli_welcome();
 

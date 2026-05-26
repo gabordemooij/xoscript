@@ -54,8 +54,18 @@ ctr_object* ctr_cwlk_message(ctr_tnode* paramNode) {
 		case CTR_AST_NODE_REFERENCE:
 			literal = 0;
 			if (CtrStdFlow == NULL || CtrStdFlow == CtrStdContinue || CtrStdFlow == CtrStdBreak) {
-				recipientName = ctr_build_string(receiverNode->value, receiverNode->vlen);
-				recipientName->info.sticky = 1;
+				if (receiverNode->cached_name) {
+					recipientName = receiverNode->cached_name;
+				} else {
+					recipientName = ctr_build_string(receiverNode->value, receiverNode->vlen);
+					recipientName->info.sticky = 1;
+					if (!ctr_mode_memory_profiler) {
+						//if we are profiling memory don't cache the recipient name
+						//because this makes measuring memory consumption in tests more
+						//complex.
+						receiverNode->cached_name = recipientName;
+					}
+				}
 				ctr_callstack[ctr_callstack_index++] = receiverNode;
 				if (receiverNode->modifier == 1) {
 					r = ctr_find_in_my(recipientName);
@@ -66,7 +76,7 @@ ctr_object* ctr_cwlk_message(ctr_tnode* paramNode) {
 					ctr_callstack_index--;
 				} else {
 					errstack++;
-					recipientName->info.sticky = 0;
+					if (ctr_mode_memory_profiler) recipientName->info.sticky = 0;
 					return CtrStdNil;
 				}
 				if (!r) {
@@ -171,7 +181,7 @@ ctr_object* ctr_cwlk_message(ctr_tnode* paramNode) {
 		printf( CTR_ERR_ANOMALY );
 		exit(1);
 	}
-	if (recipientName) recipientName->info.sticky = 0;
+	if (recipientName && ctr_mode_memory_profiler) recipientName->info.sticky = 0;
 	return result;
 }	
 

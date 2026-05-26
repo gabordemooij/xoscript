@@ -17,6 +17,7 @@ ctr_size ctr_clex_keyword_respond_to_len;
 ctr_size ctr_clex_keyword_respond_to_and_len;
 ctr_size ctr_clex_keyword_respond_to_and_and_len;
 ctr_size ctr_clex_keyword_respond_to_and_and_and_len;
+int ctr_mode_memory_profiler;
 
 /**
  * CommandLine Display Welcome Message
@@ -96,6 +97,8 @@ int main(int argc, char* argv[]) {
 	//Advanced parameters - environment
 	char* env_param_citrine_memory_limit_mb   = getenv("CITRINE_MEMORY_LIMIT_MB");   // - memory limit in MB
 	char* env_param_citrine_memory_mode       = getenv("CITRINE_MEMORY_MODE");       // - GC mode
+	char* env_param_citrine_memory_profile    = getenv("CITRINE_MEMORY_PROFILE");    // - for memtesting
+	if (env_param_citrine_memory_profile) ctr_mode_memory_profiler = atoi(env_param_citrine_memory_profile);
 	if (env_param_citrine_memory_limit_mb)   ctr_gc_memlimit = atoi(env_param_citrine_memory_limit_mb) * 1000000;
 	if (env_param_citrine_memory_mode)       ctr_gc_mode = atoi(env_param_citrine_memory_mode);
 	program = ctr_cparse_parse(prg, ctr_mode_input_file);

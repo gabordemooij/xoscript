@@ -45,6 +45,7 @@ void ctr_cparse_emit_error_unexpected( int t, char* hint )
  */
 ctr_tnode* ctr_cparse_create_node( int type ){
 	ctr_tnode* node = (ctr_tnode*) ctr_heap_allocate_tracked( sizeof( ctr_tnode ) );
+	node->cached_name = NULL;
 	if (ctr_source_mapping) {
 		ctr_source_map* m = (ctr_source_map*) ctr_heap_allocate_tracked( sizeof( ctr_source_map ) );
 		m->line = ctr_clex_line_number;
