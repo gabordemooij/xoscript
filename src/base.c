@@ -866,27 +866,18 @@ ctr_object* ctr_number_neq(ctr_object* myself, ctr_argument* argumentList) {
  * max = UINT64_MAX -> full 64-bit range
  */
 uint64_t ctr_internal_secure_random_uint64_uniform(uint64_t max) {
-	uint64_t threshold;
-	uint64_t high;
-	uint64_t low;
-	uint64_t x;
-	if (max == 0) return 0;
-	// full uint64_t range
 	if (max == UINT64_MAX) {
-		high = (uint64_t)arc4random();
-		low  = (uint64_t)arc4random();
-		return (high << 32) | low;
+		uint64_t x;
+		arc4random_buf(&x, sizeof(x));
+		return x;
 	}
-	// inclusive upper bound
-	max += 1;
-	// exact unbiased rejection threshold
-	threshold = (-max) % max;
+	uint64_t bound = max + 1;
+	uint64_t limit = UINT64_MAX - (UINT64_MAX % bound);
+	uint64_t x;
 	do {
-		high = (uint64_t)arc4random();
-		low  = (uint64_t)arc4random();
-		x = (high << 32) | low;
-	} while (x < threshold);
-	return x % max;
+		arc4random_buf(&x, sizeof(x));
+	} while (x >= limit);
+	return x % bound;
 }
 
 /**
