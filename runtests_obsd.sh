@@ -98,7 +98,7 @@ unittest() {
 		diff -bw ../../../tests/exp/en/test${i}en.exp /tmp/out
 		echo "code:"
 		echo $code
-		read -p "save new test result? (y/n)" answer
+		read -p "save new test result? (y/n)" answer </dev/tty
 		if [[ $answer == "y" ]]; then
 			cat /tmp/out > ../../../tests/exp/en/test${i}en.exp
 			echo "recorded."
