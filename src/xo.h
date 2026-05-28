@@ -409,6 +409,10 @@ extern char*       ctr_internal_readf(char* file_name, uint64_t* size_allocated)
 extern ctr_object* ctr_send_message(ctr_object* receiver, char* message, long len, ctr_argument* argumentList);
 extern void ctr_internal_create_func(ctr_object* o, ctr_object* key, ctr_object* (*func)( ctr_object*, ctr_argument* ) );
 
+extern void ctr_heap_init(void);
+extern int ctr_heap_recycle_object(ctr_object* old);
+extern ctr_object* ctr_heap_recycled_object();
+
 /**
  * Scoping functions
  */

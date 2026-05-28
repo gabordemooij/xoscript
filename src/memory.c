@@ -83,6 +83,39 @@ void* ctr_heap_allocate( size_t size ) {
 	return slice_of_memory;
 }
 
+#define MAX_RECYCLE_OBJS 2000
+ctr_object* ctr_recycled_objects[MAX_RECYCLE_OBJS];
+size_t ctr_recycled_object_index = 0;
+size_t ctr_recycled_object_max = MAX_RECYCLE_OBJS;
+
+void ctr_heap_init(void) {
+	if (ctr_mode_memory_profiler) {
+		ctr_recycled_object_max = 0; //disables object recycling
+	}
+}
+
+int ctr_heap_recycle_object(ctr_object* old) {
+	if (ctr_recycled_object_index < ctr_recycled_object_max) {
+		ctr_recycled_objects[ctr_recycled_object_index++] = old;
+		return 0;
+	}
+	return 1;
+}
+
+ctr_object* ctr_heap_recycled_object() {
+	if (ctr_recycled_object_index > 0) {
+		ctr_object* r = ctr_recycled_objects[--ctr_recycled_object_index];
+		r->properties->head = NULL;
+		r->methods->head = NULL;
+		r->properties->size = 0;
+		r->methods->size = 0;
+		memset(&r->value, 0, sizeof(r->value));
+		memset(&r->info, 0, sizeof(r->info));
+		return r;
+	}
+	return NULL;
+}
+
 /**
  * Returns the current memory block number so you can rewind
  * the tracked memory allocator back to this point later on.
@@ -160,6 +193,11 @@ void ctr_heap_free_rest() {
 	memBlocks = NULL;
 	numberOfMemBlocks = 0;
 	maxNumberOfMemBlocks = 0;
+	for(int i=0; i<ctr_recycled_object_index; i++) {
+		ctr_heap_free(ctr_recycled_objects[i]->methods);
+		ctr_heap_free(ctr_recycled_objects[i]->properties);
+		ctr_heap_free(ctr_recycled_objects[i]);
+	}
 }
 
 

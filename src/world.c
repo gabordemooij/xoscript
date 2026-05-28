@@ -373,9 +373,12 @@ char* ctr_internal_memmem(char* haystack, long hlen, char* needle, long nlen, in
  */
 ctr_object* ctr_internal_create_object(int type) {
 	ctr_object* o;
-	o = ctr_heap_allocate(sizeof(ctr_object));
-	o->properties = ctr_heap_allocate(sizeof(ctr_map));
-	o->methods = ctr_heap_allocate(sizeof(ctr_map));
+	o = ctr_heap_recycled_object();
+	if (!o) {
+		o = ctr_heap_allocate(sizeof(ctr_object));
+		o->properties = ctr_heap_allocate(sizeof(ctr_map));
+		o->methods = ctr_heap_allocate(sizeof(ctr_map));
+	}
 	o->properties->size = 0;
 	o->methods->size = 0;
 	o->properties->head = NULL;

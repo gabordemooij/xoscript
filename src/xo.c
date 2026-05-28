@@ -101,6 +101,7 @@ int main(int argc, char* argv[]) {
 	if (env_param_citrine_memory_profile) ctr_mode_memory_profiler = atoi(env_param_citrine_memory_profile);
 	if (env_param_citrine_memory_limit_mb)   ctr_gc_memlimit = atoi(env_param_citrine_memory_limit_mb) * 1000000;
 	if (env_param_citrine_memory_mode)       ctr_gc_mode = atoi(env_param_citrine_memory_mode);
+	ctr_heap_init();
 	program = ctr_cparse_parse(prg, ctr_mode_input_file);
 	if (program == NULL) {
 		fwrite(CtrStdFlow->value.svalue->value, CtrStdFlow->value.svalue->vlen, 1, stderr);

@@ -118,8 +118,14 @@ void ctr_gc_sweep( int all ) {
 					mapItem = tmp;
 				}
 			}
-			ctr_heap_free( currentObject->methods );
-			ctr_heap_free( currentObject->properties );
+			int recycle = -1;
+			if (!all) {
+				recycle = ctr_heap_recycle_object(currentObject);
+			}
+			if (recycle != 0) {
+				ctr_heap_free( currentObject->methods );
+				ctr_heap_free( currentObject->properties );
+			}
 			switch (currentObject->info.type) {
 				case CTR_OBJECT_TYPE_OTSTRING:
 					if (currentObject->value.svalue != NULL) {
@@ -140,7 +146,9 @@ void ctr_gc_sweep( int all ) {
 					}
 				break;
 			}
-			ctr_heap_free( currentObject );
+			if (all || recycle != 0) {
+				ctr_heap_free( currentObject );
+			}
 			currentObject = nextObject;
 		} else {
 			ctr_gc_kept_counter ++;
