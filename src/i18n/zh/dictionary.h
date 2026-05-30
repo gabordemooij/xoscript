@@ -180,6 +180,7 @@
 #define CTR_DICT_FORMAT_SET                      "格式:"
 #define CTR_DICT_ISODATETIME                     "iso时间"
 #define CTR_DICT_TRY                             "尝试"
+#define CTR_DICT_LOG                             "日志条目:"
 
 /* Section B: System & Math */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"

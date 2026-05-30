@@ -180,6 +180,7 @@
 #define CTR_DICT_FORMAT_SET                      "format:"                   // Word or phrase to obtain a string representation of the recipient object in the specified format in the argument
 #define CTR_DICT_ISODATETIME                     "iso-datetime"              // Word to obtain an standard iso datetime formatted representation of the recipient object
 #define CTR_DICT_TRY                             "try"
+#define CTR_DICT_LOG                             "log:"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"                   // Term to invoke pledge command on OpenBSD with argument

@@ -180,6 +180,7 @@
 #define CTR_DICT_FORMAT_SET                      "formato:"
 #define CTR_DICT_ISODATETIME                     "iso-fecha-hora"
 #define CTR_DICT_TRY                             "intentar"
+#define CTR_DICT_LOG                             "registrar:"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "promesa:"

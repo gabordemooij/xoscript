@@ -158,6 +158,7 @@
 #define CTR_DICT_ASCII_UPPER_CASE                "верхний-регистр"
 #define CTR_DICT_ASCII_LOWER_CASE                "нижний-регистр"
 #define CTR_DICT_CONTAINS                        "содержит:"
+#define CTR_DICT_LOG                             "записать:"
 
 #define CTR_DICT_ENVIRONMENT_VARIABLE            "конфигурация:"
 #define CTR_DICT_SET_ENVIRONMENT_VARIABLE        "конфигурация:параметр:"
