@@ -27,10 +27,10 @@ export ISO
 if [[ $OS = "Linux" ]]; then
 	if [[ $CLEAN = "clean" ]]; then
 		make clean
-		PACKAGE="server" NAME="server.so" make plugin-clean
+		PACKAGE="server" NAME="server" make plugin-clean
 	fi
 	make
-	PACKAGE="server" NAME="server.so" make plugin
+	PACKAGE="server" NAME="server" make plugin
 	cd examples/${EXAMPLE}
 	rm mods
 	ln -s ../../build/Linux/bin/mods mods
@@ -48,10 +48,10 @@ fi
 if [[ $OS = "OBSD" ]]; then
 	if [[ $CLEAN = "clean" ]]; then
 		gmake -f makefile.obsd clean
-		PACKAGE="server" NAME="server.so" gmake -f makefile.obsd plugin-clean
+		PACKAGE="server" NAME="server" gmake -f makefile.obsd plugin-clean
 	fi
 	gmake -f makefile.obsd
-	PACKAGE="server" NAME="server.so" gmake -f makefile.obsd plugin
+	PACKAGE="server" NAME="server" gmake -f makefile.obsd plugin
 	cd examples/${EXAMPLE}
 	rm mods
 	ln -s ../../build/OpenBSD/bin/mods mods
