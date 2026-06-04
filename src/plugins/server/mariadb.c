@@ -81,16 +81,16 @@ ctr_object* ctr_mariadb_connect(ctr_object* myself, ctr_argument* argumentList) 
 		return CtrStdNil;
 	}
 	name = ctr_heap_allocate_cstring(prop);
-    if (mysql_real_connect(conn,
-                           host,
-                           user,
-                           pass,
-                           name,
-                           0, NULL, 0) == NULL) {
-        ctr_error(mysql_error(conn), 0);
-        mysql_close(conn);
-        myself->value.rvalue->ptr = NULL;
-    } else {
+	if (mysql_real_connect(conn,
+						   host,
+						   user,
+						   pass,
+						   name,
+						   0, NULL, 0) == NULL) {
+		ctr_error(mysql_error(conn), 0);
+		mysql_close(conn);
+		myself->value.rvalue->ptr = NULL;
+	} else {
 		myself->value.rvalue->ptr = conn;
 		if (mysql_autocommit(conn, 0) != 0) {
 			ctr_error("Failed to start transactional database mode (autocommit is ON)", 0);
@@ -133,17 +133,17 @@ ctr_object* ctr_mariadb_query_insert_id(ctr_object* myself, ctr_argument* argume
 #define CTR_CHUNK_SIZE 8192
 
 static int ctr_is_text_type(enum enum_field_types t) {
-    return t == MYSQL_TYPE_BLOB ||
-           t == MYSQL_TYPE_TINY_BLOB ||
-           t == MYSQL_TYPE_MEDIUM_BLOB ||
-           t == MYSQL_TYPE_LONG_BLOB ||
-           t == MYSQL_TYPE_STRING ||
-           t == MYSQL_TYPE_VAR_STRING;
+	return t == MYSQL_TYPE_BLOB ||
+	t == MYSQL_TYPE_TINY_BLOB ||
+	t == MYSQL_TYPE_MEDIUM_BLOB ||
+	t == MYSQL_TYPE_LONG_BLOB ||
+	t == MYSQL_TYPE_STRING ||
+	t == MYSQL_TYPE_VAR_STRING;
 }
 
 
 static int ctr_is_binary(MYSQL_FIELD f) {
-    return f.charsetnr == 63;  /* binary collation */
+	return f.charsetnr == 63;  /* binary collation */
 }
 
 
@@ -211,16 +211,16 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 	myself->value.rvalue->ptr = (void*) prepared_statement;
 	if (mysql_stmt_prepare(prepared_statement,query, query_length)) {
 		ctr_error(mysql_stmt_error(prepared_statement), 0);
-        goto free_query;
+		goto free_query;
 	}
-    if (count && mysql_stmt_bind_param(prepared_statement, parambinds)) {
-        ctr_error(mysql_stmt_error(prepared_statement),0);
-        goto free_query;
+	if (count && mysql_stmt_bind_param(prepared_statement, parambinds)) {
+		ctr_error(mysql_stmt_error(prepared_statement),0);
+		goto free_query;
 	}
 	if (mysql_stmt_execute(prepared_statement)) {
-       ctr_error(mysql_stmt_error(prepared_statement),0);
-       goto free_query;
-    }
+		ctr_error(mysql_stmt_error(prepared_statement),0);
+		goto free_query;
+	}
 	if (fetch_mode) {
 		MYSQL_RES* rparams = mysql_stmt_result_metadata(prepared_statement);
 		if (!rparams) {

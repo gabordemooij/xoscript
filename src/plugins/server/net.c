@@ -73,7 +73,7 @@ ctr_object* ctr_network_basic_text_send(ctr_object* myself, ctr_argument* argume
 	if (message_str) {
 		ctr_heap_free(message_str);
 	}
-    return result;
+	return result;
 }
 
 /**

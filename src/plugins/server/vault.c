@@ -36,66 +36,66 @@ static void print_hex(char* name, unsigned char *data, size_t length) {
 #define BASE64_PAD '='
 static const char base64en[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static const unsigned char base64de[256] = {
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,62,255,255,255,63, // '+'=43, '/'=47
-    52,53,54,55,56,57,58,59,60,61,255,255,255,255,255,255,             // '0'-'9'=48-57
-    255,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,                               // 'A'-'O'=65-79
-    15,16,17,18,19,20,21,22,23,24,25,255,255,255,255,255,               // 'P'-'Z'=80-90
-    255,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,                   // 'a'-'o'=97-111
-    41,42,43,44,45,46,47,48,49,50,51,255,255,255,255,255,               // 'p'-'z'=112-122
-    // rest are 255
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
+	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+	255,255,255,255,255,255,255,255,255,255,255,62,255,255,255,63, // '+'=43, '/'=47
+	52,53,54,55,56,57,58,59,60,61,255,255,255,255,255,255,             // '0'-'9'=48-57
+	255,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,                               // 'A'-'O'=65-79
+	15,16,17,18,19,20,21,22,23,24,25,255,255,255,255,255,               // 'P'-'Z'=80-90
+	255,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,                   // 'a'-'o'=97-111
+	41,42,43,44,45,46,47,48,49,50,51,255,255,255,255,255,               // 'p'-'z'=112-122
+	// rest are 255
+	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255
 };
 
 /* Base64 encode */
 unsigned int base64_encode(const unsigned char *in, unsigned int inlen, char *out) {
-    unsigned int i, j = 0;
-    for (i = 0; i < inlen; i += 3) {
-        uint32_t octet_a = i < inlen ? in[i] : 0;
-        uint32_t octet_b = (i + 1) < inlen ? in[i + 1] : 0;
-        uint32_t octet_c = (i + 2) < inlen ? in[i + 2] : 0;
-        uint32_t triple = (octet_a << 16) | (octet_b << 8) | octet_c;
-        out[j++] = base64en[(triple >> 18) & 0x3F];
-        out[j++] = base64en[(triple >> 12) & 0x3F];
-        out[j++] = (i + 1) < inlen ? base64en[(triple >> 6) & 0x3F] : BASE64_PAD;
-        out[j++] = (i + 2) < inlen ? base64en[triple & 0x3F] : BASE64_PAD;
-    }
-    out[j] = 0;
-    return j;
+	unsigned int i, j = 0;
+	for (i = 0; i < inlen; i += 3) {
+		uint32_t octet_a = i < inlen ? in[i] : 0;
+		uint32_t octet_b = (i + 1) < inlen ? in[i + 1] : 0;
+		uint32_t octet_c = (i + 2) < inlen ? in[i + 2] : 0;
+		uint32_t triple = (octet_a << 16) | (octet_b << 8) | octet_c;
+		out[j++] = base64en[(triple >> 18) & 0x3F];
+		out[j++] = base64en[(triple >> 12) & 0x3F];
+		out[j++] = (i + 1) < inlen ? base64en[(triple >> 6) & 0x3F] : BASE64_PAD;
+		out[j++] = (i + 2) < inlen ? base64en[triple & 0x3F] : BASE64_PAD;
+	}
+	out[j] = 0;
+	return j;
 }
 
 /* Base64 decode */
 unsigned int base64_decode(const char *in, unsigned int inlen, unsigned char *out) {
-    if (inlen % 4 != 0) return 0; // must be multiple of 4
-    unsigned int i, j = 0;
-    for (i = 0; i < inlen; i += 4) {
-        unsigned char sextet[4];
-        for (int k = 0; k < 4; ++k) {
-            if (in[i + k] == BASE64_PAD) {
-                sextet[k] = 0;
-            } else {
-                unsigned char v = base64de[(unsigned char)in[i + k]];
-                if (v == 255) return 0; // invalid character
-                sextet[k] = v;
-            }
-        }
-        out[j++] = (sextet[0] << 2) | (sextet[1] >> 4);
-        if (in[i + 2] != BASE64_PAD) {
-            out[j++] = ((sextet[1] & 0xF) << 4) | (sextet[2] >> 2);
-        }
-        if (in[i + 3] != BASE64_PAD) {
-            out[j++] = ((sextet[2] & 0x3) << 6) | sextet[3];
-        }
-    }
-    return j;
+	if (inlen % 4 != 0) return 0; // must be multiple of 4
+	unsigned int i, j = 0;
+	for (i = 0; i < inlen; i += 4) {
+		unsigned char sextet[4];
+		for (int k = 0; k < 4; ++k) {
+			if (in[i + k] == BASE64_PAD) {
+				sextet[k] = 0;
+			} else {
+				unsigned char v = base64de[(unsigned char)in[i + k]];
+				if (v == 255) return 0; // invalid character
+				sextet[k] = v;
+			}
+		}
+		out[j++] = (sextet[0] << 2) | (sextet[1] >> 4);
+		if (in[i + 2] != BASE64_PAD) {
+			out[j++] = ((sextet[1] & 0xF) << 4) | (sextet[2] >> 2);
+		}
+		if (in[i + 3] != BASE64_PAD) {
+			out[j++] = ((sextet[2] & 0x3) << 6) | sextet[3];
+		}
+	}
+	return j;
 }
 
 //@todo protect against using Vault itself, always make instance, need name
@@ -579,34 +579,34 @@ ctr_object* ctr_server_vault_token_set(ctr_object* myself, ctr_argument* argumen
 	}
 	size_t rnd_len = length + (length / 4) + 1;
 	uint8_t* rnd = ctr_heap_allocate(rnd_len);
-    char* out = ctr_heap_allocate(length + 1);
-    if (random_buf(rnd, rnd_len) != 0) {
+	char* out = ctr_heap_allocate(length + 1);
+	if (random_buf(rnd, rnd_len) != 0) {
 		ctr_error("Unable to generate random token", 0);
 		ctr_heap_free(rnd);
 		ctr_heap_free(out);
 		return CtrStdNil;
 	}
 	size_t out_i = 0;
-    size_t rnd_i = 0;
-    while (out_i < length) {
-        if (rnd_i >= rnd_len) {
-            if (random_buf(rnd, rnd_len) != 0) { // extremely unlikely, but refill if needed
+	size_t rnd_i = 0;
+	while (out_i < length) {
+		if (rnd_i >= rnd_len) {
+			if (random_buf(rnd, rnd_len) != 0) { // extremely unlikely, but refill if needed
 				ctr_error("Unable to generate random token", 0);
 				ctr_heap_free(rnd);
 				ctr_heap_free(out);
 				return CtrStdNil;
 			}
-            rnd_i = 0;
-        }
-        uint8_t v = rnd[rnd_i++];
-        if (v >= 248)  continue; // avoid modulo bias (256 % 62 = 8)
-        out[out_i++] = SERVER_VAULT_TOKENCHARS[v % SERVER_VAULT_TOKENCHARS_NUM];
-    }
-    out[length] = '\0';
-    ctr_object* answer = ctr_build_string_from_cstring(out);
-    ctr_heap_free(rnd);
+			rnd_i = 0;
+		}
+		uint8_t v = rnd[rnd_i++];
+		if (v >= 248)  continue; // avoid modulo bias (256 % 62 = 8)
+		out[out_i++] = SERVER_VAULT_TOKENCHARS[v % SERVER_VAULT_TOKENCHARS_NUM];
+	}
+	out[length] = '\0';
+	ctr_object* answer = ctr_build_string_from_cstring(out);
+	ctr_heap_free(rnd);
 	ctr_heap_free(out);
-    return answer;
+	return answer;
 }
 
 /**
@@ -616,9 +616,9 @@ ctr_object* ctr_server_vault_token_set(ctr_object* myself, ctr_argument* argumen
  * @test683 
  */
 ctr_object* ctr_file_checksum(ctr_object* myself, ctr_argument* argumentList) {
-    ctr_object* path = ctr_internal_object_property(myself, "path", NULL);
-    uint8_t hash[32];
-    if (path == NULL) return CtrStdNil;
+	ctr_object* path = ctr_internal_object_property(myself, "path", NULL);
+	uint8_t hash[32];
+	if (path == NULL) return CtrStdNil;
 	char* pathstr = ctr_heap_allocate_cstring( path );
 	FILE* f = fopen(pathstr, "rb");
 	int error_code = errno;
@@ -627,22 +627,22 @@ ctr_object* ctr_file_checksum(ctr_object* myself, ctr_argument* argumentList) {
 		ctr_error( CTR_ERR_OPEN, error_code );
 		return CtrStdNil;
 	}
-    crypto_blake2b_ctx ctx;
-    crypto_blake2b_init(&ctx, 32); // 32 bytes = 256-bit fingerprint
+	crypto_blake2b_ctx ctx;
+	crypto_blake2b_init(&ctx, 32); // 32 bytes = 256-bit fingerprint
 	uint8_t buf[4096];
-    size_t n;
-    while ((n = fread(buf, 1, sizeof(buf), f)) > 0) {
-        crypto_blake2b_update(&ctx, buf, n);
-    }
-    if (ferror(f)) {
+	size_t n;
+	while ((n = fread(buf, 1, sizeof(buf), f)) > 0) {
+		crypto_blake2b_update(&ctx, buf, n);
+	}
+	if (ferror(f)) {
 		error_code = errno;
-        fclose(f);
-        ctr_error( CTR_ERR_OPEN, error_code );
+		fclose(f);
+		ctr_error( CTR_ERR_OPEN, error_code );
 		return CtrStdNil;
-    }
+	}
 	fclose(f);
-    crypto_blake2b_final(&ctx, (uint8_t*) &hash);
-    size_t hash64len = BASE64_ENCODE_OUT_SIZE(32);
+	crypto_blake2b_final(&ctx, (uint8_t*) &hash);
+	size_t hash64len = BASE64_ENCODE_OUT_SIZE(32);
 	char* hash64 = ctr_heap_allocate(hash64len + 1);
 	if (base64_encode(hash, 32, hash64)!=hash64len-1) {
 		ctr_heap_free(hash64);
@@ -651,7 +651,7 @@ ctr_object* ctr_file_checksum(ctr_object* myself, ctr_argument* argumentList) {
 	}
 	ctr_object* result = ctr_build_string_from_cstring(hash64);
 	ctr_heap_free(hash64);
-    return result;
+	return result;
 }
 
 

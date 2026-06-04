@@ -589,16 +589,16 @@ static int is_valid_ipv6(const char *ip) {
 }
 
 static int is_valid_mac(const char* mac) {
-    int i;
-    if (!mac) return 0;
-    for (i = 0; i < 17; i++) {
-        if ((i + 1) % 3 == 0) {
-            if (mac[i] != ':') return 0;
-        } else {
-            if (!isxdigit(mac[i])) return 0;
-        }
-    }
-    return mac[17] == '\0';
+	int i;
+	if (!mac) return 0;
+	for (i = 0; i < 17; i++) {
+		if ((i + 1) % 3 == 0) {
+			if (mac[i] != ':') return 0;
+		} else {
+			if (!isxdigit(mac[i])) return 0;
+		}
+	}
+	return mac[17] == '\0';
 }
 
 /**

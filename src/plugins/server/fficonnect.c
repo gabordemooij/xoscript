@@ -110,99 +110,99 @@ ctr_object* ctr_blob_size(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 static uint16_t ctr_internal_utf8_eswap16(uint16_t w) {
-    return (w >> 8) | (w << 8);
+	return (w >> 8) | (w << 8);
 }
 
 static uint32_t ctr_internal_utf8_eswap32(uint32_t w) {
-    return ((w >> 24) & 0x000000FF) |
-           ((w >> 8)  & 0x0000FF00) |
-           ((w << 8)  & 0x00FF0000) |
-           ((w << 24) & 0xFF000000);
+	return ((w >> 24) & 0x000000FF) |
+		   ((w >> 8)  & 0x0000FF00) |
+		   ((w << 8)  & 0x00FF0000) |
+		   ((w << 24) & 0xFF000000);
 }
 
 static int ctr_internal_utf8_encode_cp(uint32_t cp, uint8_t* out, size_t remaining) {
-    if (cp <= 0x7F) {
-        if (remaining < 1) return -1;
-        out[0] = (uint8_t)cp;
-        return 1;
-    } else if (cp <= 0x7FF) {
-        if (remaining < 2) return -1;
-        out[0] = 0xC0 | (cp >> 6);
-        out[1] = 0x80 | (cp & 0x3F);
-        return 2;
-    } else if (cp <= 0xFFFF) {
-        if (remaining < 3) return -1;
-        out[0] = 0xE0 | (cp >> 12);
-        out[1] = 0x80 | ((cp >> 6) & 0x3F);
-        out[2] = 0x80 | (cp & 0x3F);
-        return 3;
-    } else {
-        if (remaining < 4) return -1;
-        out[0] = 0xF0 | (cp >> 18);
-        out[1] = 0x80 | ((cp >> 12) & 0x3F);
-        out[2] = 0x80 | ((cp >> 6) & 0x3F);
-        out[3] = 0x80 | (cp & 0x3F);
-        return 4;
-    }
+	if (cp <= 0x7F) {
+		if (remaining < 1) return -1;
+		out[0] = (uint8_t)cp;
+		return 1;
+	} else if (cp <= 0x7FF) {
+		if (remaining < 2) return -1;
+		out[0] = 0xC0 | (cp >> 6);
+		out[1] = 0x80 | (cp & 0x3F);
+		return 2;
+	} else if (cp <= 0xFFFF) {
+		if (remaining < 3) return -1;
+		out[0] = 0xE0 | (cp >> 12);
+		out[1] = 0x80 | ((cp >> 6) & 0x3F);
+		out[2] = 0x80 | (cp & 0x3F);
+		return 3;
+	} else {
+		if (remaining < 4) return -1;
+		out[0] = 0xF0 | (cp >> 18);
+		out[1] = 0x80 | ((cp >> 12) & 0x3F);
+		out[2] = 0x80 | ((cp >> 6) & 0x3F);
+		out[3] = 0x80 | (cp & 0x3F);
+		return 4;
+	}
 }
 
 static int ctr_internal_utf8_decode_utf16(const uint16_t* in, size_t in_len, uint8_t* out, size_t out_len, size_t* written, int little_endian) {
-    size_t i = 0, o = 0;
-    while (i < in_len) {
-        uint32_t cp;
-        uint16_t w1 = in[i++];
-        if (!little_endian) w1 = ctr_internal_utf8_eswap16(w1);
-        if ((w1 & 0xF800) == 0xD800) {
-            // low surrogate first = invalid
-            if (w1 >= 0xDC00) {
-                cp = 0xFFFD;
-            } else {
-                if (i >= in_len) {
-                    *written = o;
-                    return -2; // truncated
-                }
-                uint16_t w2 = in[i++];
-                if (!little_endian) w2 = ctr_internal_utf8_eswap16(w2);
-                if ((w2 & 0xFC00) == 0xDC00) {
-                    cp = 0x10000 + (((w1 & 0x3FF) << 10) | (w2 & 0x3FF));
-                } else {
-                    cp = 0xFFFD;
-                }
-            }
-        } else {
-            cp = w1;
-        }
-        size_t remaining = out_len - o;
-        int n = ctr_internal_utf8_encode_cp(cp, out + o, remaining);
-        if (n < 0) {
-            *written = o;
-            return -1; // overflow
-        }
-        o += n;
-    }
-    *written = o;
-    return 0;
+	size_t i = 0, o = 0;
+	while (i < in_len) {
+		uint32_t cp;
+		uint16_t w1 = in[i++];
+		if (!little_endian) w1 = ctr_internal_utf8_eswap16(w1);
+		if ((w1 & 0xF800) == 0xD800) {
+			// low surrogate first = invalid
+			if (w1 >= 0xDC00) {
+				cp = 0xFFFD;
+			} else {
+				if (i >= in_len) {
+					*written = o;
+					return -2; // truncated
+				}
+				uint16_t w2 = in[i++];
+				if (!little_endian) w2 = ctr_internal_utf8_eswap16(w2);
+				if ((w2 & 0xFC00) == 0xDC00) {
+					cp = 0x10000 + (((w1 & 0x3FF) << 10) | (w2 & 0x3FF));
+				} else {
+					cp = 0xFFFD;
+				}
+			}
+		} else {
+			cp = w1;
+		}
+		size_t remaining = out_len - o;
+		int n = ctr_internal_utf8_encode_cp(cp, out + o, remaining);
+		if (n < 0) {
+			*written = o;
+			return -1; // overflow
+		}
+		o += n;
+	}
+	*written = o;
+	return 0;
 }
 
 /* UTF-32 decoder with endian flag */
 static int ctr_internal_utf32_to_utf8(const uint32_t* in, size_t in_len, uint8_t* out, size_t out_len, size_t* written, int little_endian) {
-    size_t i = 0, o = 0;
-    while (i < in_len) {
-        uint32_t cp = in[i++];
-        if (!little_endian) cp = ctr_internal_utf8_eswap32(cp);
-        // Invalid codepoints: > 0x10FFFF or surrogate range 0xD800–0xDFFF
-        if (cp > 0x10FFFF || (cp >= 0xD800 && cp <= 0xDFFF))
-            cp = 0xFFFD;
-        size_t remaining = out_len - o;
-        int n = ctr_internal_utf8_encode_cp(cp, out + o, remaining);
-        if (n < 0) {
-            *written = o;
-            return -1; // overflow
-        }
-        o += n;
-    }
-    *written = o;
-    return 0;
+	size_t i = 0, o = 0;
+	while (i < in_len) {
+		uint32_t cp = in[i++];
+		if (!little_endian) cp = ctr_internal_utf8_eswap32(cp);
+		// Invalid codepoints: > 0x10FFFF or surrogate range 0xD800–0xDFFF
+		if (cp > 0x10FFFF || (cp >= 0xD800 && cp <= 0xDFFF))
+			cp = 0xFFFD;
+		size_t remaining = out_len - o;
+		int n = ctr_internal_utf8_encode_cp(cp, out + o, remaining);
+		if (n < 0) {
+			*written = o;
+			return -1; // overflow
+		}
+		o += n;
+	}
+	*written = o;
+	return 0;
 }
 
 /**
