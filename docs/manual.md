@@ -2347,6 +2347,13 @@ This is how a typical script on server might look:
 ```
 #!/bin/xo
 
+# keep backward compat.
+Program version: (
+	Moment 
+	zone: ['CEST'],
+	from: ['2026-06-15 10:00:00']
+).
+
 Server init.
 
 # I prefer a central loader that loads
