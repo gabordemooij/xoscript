@@ -1,0 +1,63 @@
+# Voorbeeld in het Nederlands
+# Run als: ./example.sh nl Linux clean nl
+Server init.
+
+>> rq := HTTP-Request nieuw.
+Uit schrijf: ['HTTP-GET a='] + ( rq get: ['a'] ), stop. # GET
+Uit schrijf: ['HTTP-POST c='] + ( rq post: ['c'] ), stop. # POST
+
+# ~ Databank ~
+# stel dit in met je eigen instellingen!
+>> DB := Maria-DB nieuw host: ['localhost'],
+	gebruikersnaam: ['xo'],
+	wachtwoord: ['pass123'],
+	databanknaam: ['xobase'],
+	verbinden.
+
+DB  query: ['SELECT "hallo wereld!"'], 
+	ophalen: { :rij
+		Uit schrijf: rij, stop.
+}.
+
+# ~ JSON ~
+>> json := (
+	JSON jsonify: (
+		Lijst nieuw zet: (
+			Reeks nieuw ; 1 ; 2 ; 3
+		) bij: ['abc']
+	)).
+Uit schrijf: json, stop.
+Uit schrijf: ((JSON object: json) abc ? 1), stop.
+
+# ~ Encryptie ~
+>> kluis := Kluis nieuw: ['Bank'].
+Uit schrijf: ['versleuteld:'], stop.
+>> x := kluis versleutel: ['hallo'] sleutel: ['wereld'].
+Uit schrijf: x, stop.
+Uit schrijf: ['ontsleutel:'], stop.
+Uit schrijf: (kluis ontsleutel: x sleutel: ['wereld']), stop.
+
+# ~ Regex ~
+>> fragment := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> patroon := Patroon nieuw: ['href="([^"]+)" target="([^"]+)"'].
+>> result  := patroon overeenkomst: fragment doen: { :m :x
+	Uit schrijf: m, stop.
+	Uit schrijf: x, stop.
+	<- ['XXX'].
+}.
+Uit schrijf: result, stop.
+
+# ~ Formatting ~
+Uit schrijf: (Moment nieuw format: ['%a, %d %b %Y %H:%M:%S']), stop.
+
+# ~ Diversen ~
+Uit schrijf: (Server html-coderen: ['<&"' hello '"&>']), stop.
+Uit schrijf: (Server url-coderen: ['https://example.com?a=6&b=1 2']), stop.
+Uit schrijf: (Format new: ['Number format: %06.0f \n'], apply: 56), stop.
+Uit schrijf: (Kluis token: 20), stop.
+>> a := Server base64-coderen: ['abc123'].
+Uit schrijf: a, stop.
+Uit schrijf: (Server base64-decoderen: a), stop.
