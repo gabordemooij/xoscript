@@ -477,7 +477,3 @@ char* ctr_clex_readstr() {
 	}
 	return beginbuff;
 }
-
-void ctr_clex_move_code_pointer(int movement) {
-	ctr_code += movement;
-}

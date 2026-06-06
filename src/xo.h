@@ -841,7 +841,6 @@ extern char ctr_deserialize_mode;
 
 
 extern char ctr_program_log_type;
-extern void ctr_clex_move_code_pointer(int movement);
 extern void ctr_print_error(char* error, int code);
 
 size_t ctr_heap_tracker_memoryblocknumber();
