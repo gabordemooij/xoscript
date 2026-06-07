@@ -935,3 +935,4 @@ ctr_object* classname(ctr_object* myself, ctr_argument* argumentList) { \
 	return instance; \
 }
 
+#define CTR_STRINGOBJ(x) ctr_build_string(x, sizeof(x) - 1)

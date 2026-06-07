@@ -876,27 +876,27 @@ ctr_object* ctr_blob_new(ctr_object* myself, ctr_argument* argumentList) {
 void begin_ffi() {
 	CtrMediaDataBlob = ctr_blob_new(CtrStdObject, NULL);
 	CtrMediaDataBlob->link = CtrStdObject;
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_NEW_SET ), &ctr_blob_new_set);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_STRING ), &ctr_blob_tostring);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_BYTES_SET ), &ctr_blob_fill);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_UTF8_SET ), &ctr_blob_utf8_set);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_NEW_TYPE_SET ), &ctr_blob_new_set_type);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_DEREF ), &ctr_blob_deref);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_FREE ), &ctr_blob_free);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_STRUCT_SET ), &ctr_blob_new_struct);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_FREE_STRUCT ), &ctr_blob_free_struct);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_FROM_LENGTH ), &ctr_blob_read);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_LENGTH ), &ctr_blob_size);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_WIPE ), &ctr_blob_wipe);
-	ctr_internal_create_func(CtrMediaDataBlob, ctr_build_string_from_cstring( CTR_DICT_DECODE_SET ), &ctr_blob_decode);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_NEW_SET ), &ctr_blob_new_set);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_STRING ), &ctr_blob_tostring);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_BYTES_SET ), &ctr_blob_fill);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_UTF8_SET ), &ctr_blob_utf8_set);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_NEW_TYPE_SET ), &ctr_blob_new_set_type);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_DEREF ), &ctr_blob_deref);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_FREE ), &ctr_blob_free);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_STRUCT_SET ), &ctr_blob_new_struct);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_FREE_STRUCT ), &ctr_blob_free_struct);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_FROM_LENGTH ), &ctr_blob_read);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_LENGTH ), &ctr_blob_size);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_WIPE ), &ctr_blob_wipe);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_DECODE_SET ), &ctr_blob_decode);
 	CtrMediaFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
 	CtrMediaFFIObjectBase->link = CtrStdObject;
-	ctr_internal_create_func(CtrMediaFFIObjectBase, ctr_build_string_from_cstring( CTR_DICT_MESSAGEARGS ), &ctr_media_ffi_apply );
-	ctr_internal_create_func(CtrMediaFFIObjectBase, ctr_build_string_from_cstring( CTR_DICT_RESPOND_TO ), &ctr_media_ffi_respond_to );
-	ctr_internal_create_func(CtrMediaFFIObjectBase, ctr_build_string_from_cstring( CTR_DICT_RESPOND_TO_AND ), &ctr_media_ffi_respond_to_and );
-	ctr_internal_create_func(CtrMediaFFIObjectBase, ctr_build_string_from_cstring( CTR_DICT_RESPOND_TO_AND_AND ), &ctr_media_ffi_respond_to_and_and );
-	ctr_internal_create_func(CtrMediaFFIObjectBase, ctr_build_string_from_cstring( CTR_DICT_RESPOND_TO_AND_AND_AND ), &ctr_media_ffi_respond_to_and_and_and );
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring(CTR_DICT_BLOB_OBJECT), CtrMediaDataBlob, CTR_CATEGORY_PUBLIC_PROPERTY);
+	ctr_internal_create_func(CtrMediaFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_MESSAGEARGS ), &ctr_media_ffi_apply );
+	ctr_internal_create_func(CtrMediaFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO ), &ctr_media_ffi_respond_to );
+	ctr_internal_create_func(CtrMediaFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND ), &ctr_media_ffi_respond_to_and );
+	ctr_internal_create_func(CtrMediaFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND_AND ), &ctr_media_ffi_respond_to_and_and );
+	ctr_internal_create_func(CtrMediaFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND_AND_AND ), &ctr_media_ffi_respond_to_and_and_and );
+	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ(CTR_DICT_BLOB_OBJECT), CtrMediaDataBlob, CTR_CATEGORY_PUBLIC_PROPERTY);
 	//prevent from gc'ed
-	ctr_internal_object_add_property(CtrStdWorld, ctr_build_string_from_cstring("_FFI"), CtrMediaFFIObjectBase, CTR_CATEGORY_PUBLIC_PROPERTY);
+	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ("_FFI"), CtrMediaFFIObjectBase, CTR_CATEGORY_PUBLIC_PROPERTY);
 }
