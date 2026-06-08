@@ -1134,7 +1134,6 @@ void ctr_initialize_world() {
 	CtrStdSlurp->link = CtrStdObject;
 	CtrStdSlurp->info.sticky = 1;
 	
-	
 	CtrStdShellCommand = ctr_internal_create_object( CTR_OBJECT_TYPE_OTOBJECT );
 	ctr_internal_create_func(CtrStdShellCommand, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO ), &ctr_shellcommand_respond_to );
 	ctr_internal_create_func(CtrStdShellCommand, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND ), &ctr_shellcommand_respond_to_and );
