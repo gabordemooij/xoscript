@@ -62,8 +62,8 @@ char* ctr_internal_readf(char* file_name, uint64_t* total_size) {
 	FILE* fp;
 	fp = fopen(file_name,"r");
 	if( fp == NULL ) {
-	  fprintf(stderr, CTR_ERR_FOPEN );
-	  exit(1);
+		fprintf(stderr, CTR_ERR_FOPEN );
+		exit(1);
 	}
 	prev = ftell(fp);
 	fseek(fp,0L,SEEK_END);
@@ -1118,8 +1118,8 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdClock, CTR_STRINGOBJ( CTR_DICT_COPY ), &ctr_clock_copy );
 	ctr_internal_create_func(CtrStdClock, CTR_STRINGOBJ( CTR_DICT_SYMBOL_EQUALS ), &ctr_clock_equals );
 	ctr_internal_create_func(CtrStdClock, CTR_STRINGOBJ( CTR_DICT_UNEQUALS_SYMBOL ), &ctr_clock_neq );
-    ctr_internal_create_func(CtrStdClock, CTR_STRINGOBJ( CTR_DICT_FROM_SET ), &ctr_clock_from_iso );
-    ctr_internal_create_func(CtrStdClock, CTR_STRINGOBJ( CTR_DICT_ISODATETIME ), &ctr_clock_to_iso_string );
+	ctr_internal_create_func(CtrStdClock, CTR_STRINGOBJ( CTR_DICT_FROM_SET ), &ctr_clock_from_iso );
+	ctr_internal_create_func(CtrStdClock, CTR_STRINGOBJ( CTR_DICT_ISODATETIME ), &ctr_clock_to_iso_string );
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ( CTR_DICT_MOMENT_OBJECT ), CtrStdClock, 0 );
 	CtrStdClock->link = CtrStdObject;
 	CtrStdFile->info.sticky = 1;
