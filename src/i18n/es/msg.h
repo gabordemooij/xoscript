@@ -1,5 +1,5 @@
 #define CTR_MSG_LANG_CODE "es"
-#define CTR_MSG_WELCOME   "Citrine/ES\n"
+#define CTR_MSG_WELCOME   "XOScript/ES\n"
 #define CTR_MSG_COPYRIGHT "Gabor de Mooij ©, Licensed BSD\n"
 #define CTR_MSG_USAGE_G   "No hay suficientes argumentos , Usa:: ctr -g file1.h file2.h"
 #define CTR_MSG_USAGE_T   "No hay suficientes argumentos , Usa:: ctr -t d.dict program.ctr"

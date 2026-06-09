@@ -1,5 +1,5 @@
 #define CTR_MSG_LANG_CODE "zh1"
-#define CTR_MSG_WELCOME   "Citrine/ZH1\n"
+#define CTR_MSG_WELCOME   "XOScript/ZH2\n"
 #define CTR_MSG_COPYRIGHT "Gabor de Mooij ©, Licensed BSD\n"
 #define CTR_MSG_USAGE_G   "參數不足。用法：: ctr -g file1.h file2.h"
 #define CTR_MSG_USAGE_T   "參數不足。用法：: ctr -t d.dict program.ctr"
