@@ -158,8 +158,6 @@
 #define CTR_DICT_ASCII_UPPER_CASE                "верхний-регистр"
 #define CTR_DICT_ASCII_LOWER_CASE                "нижний-регистр"
 #define CTR_DICT_CONTAINS                        "содержит:"
-#define CTR_DICT_LOG                             "записать:"
-
 #define CTR_DICT_ENVIRONMENT_VARIABLE            "конфигурация:"
 #define CTR_DICT_SET_ENVIRONMENT_VARIABLE        "конфигурация:параметр:"
 #define CTR_DICT_CURRENT_TASK                    "этот-блок-кода"
@@ -182,6 +180,7 @@
 #define CTR_DICT_FORMAT_SET                      "формат:"
 #define CTR_DICT_ISODATETIME                     "iso-датавремя"
 #define CTR_DICT_TRY                             "попробуй"
+#define CTR_DICT_LOG                             "записать:"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"
