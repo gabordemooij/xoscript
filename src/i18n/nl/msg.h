@@ -57,7 +57,6 @@
 #define CTR_MSG_DSC_NPIP  "benoemde pijp"
 #define CTR_MSG_DSC_OTHR  "anders"
 #define CTR_MSG_DSC_TYPE  "type"
-#define CTR_TERR_LMISMAT  "Taal komt niet overeen."
 #define CTR_TERR_LONG     "Vertaalfout, bericht te lang."
 #define CTR_TERR_DICT     "Fout bij openen woordenboek."
 #define CTR_TERR_KMISMAT  "Fout: sleutel komt niet overeen %s %s op regel %d\n"

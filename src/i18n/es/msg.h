@@ -57,7 +57,6 @@
 #define CTR_MSG_DSC_NPIP  "canal de comunicación"
 #define CTR_MSG_DSC_OTHR  "otro"
 #define CTR_MSG_DSC_TYPE  "tipo"
-#define CTR_TERR_LMISMAT  "Desajuste lingüístico."
 #define CTR_TERR_LONG     "Error de traducción, mensaje demasiado largo."
 #define CTR_TERR_DICT     "Error abriendo el diccionario."
 #define CTR_TERR_KMISMAT  "Error: error de clave %s %s en la línea %d\n"

@@ -57,7 +57,6 @@
 #define CTR_MSG_DSC_NPIP  "named pipe"
 #define CTR_MSG_DSC_OTHR  "other"
 #define CTR_MSG_DSC_TYPE  "type"
-#define CTR_TERR_LMISMAT  "Language mismatch."
 #define CTR_TERR_LONG     "Translation error, message too long."
 #define CTR_TERR_DICT     "Error opening dictionary."
 #define CTR_TERR_KMISMAT  "Error: key mismatch %s %s on line %d\n"

@@ -57,7 +57,6 @@
 #define CTR_MSG_DSC_NPIP  "именованный канал"
 #define CTR_MSG_DSC_OTHR  "прочее"
 #define CTR_MSG_DSC_TYPE  "тип"
-#define CTR_TERR_LMISMAT  "Несоответствие языков."
 #define CTR_TERR_LONG     "Ошибка перевода, сообщение слишком длинное."
 #define CTR_TERR_DICT     "Ошибка при открытии словаря."
 #define CTR_TERR_KMISMAT  "Ошибка: несоответствие ключей %s %s в строке %d\n"
