@@ -7,19 +7,19 @@ int errstack;
  * Determines the size of the specified file.
  */
 int fsize(char* filename) {
-  int size;
-  FILE* fh;
-  fh = fopen(filename, "rb");
-  if(fh != NULL){
-    if( fseek(fh, 0, SEEK_END) ){
-      fclose(fh);
-      return -1;
-    }
-    size = ftell(fh);
-    fclose(fh);
-    return size;
-  }
-  return -1;
+	int size;
+	FILE* fh;
+	fh = fopen(filename, "rb");
+	if(fh != NULL){
+	if( fseek(fh, 0, SEEK_END) ){
+		fclose(fh);
+		return -1;
+	}
+	size = ftell(fh);
+	fclose(fh);
+	return size;
+	}
+	return -1;
 }
 
 /**
