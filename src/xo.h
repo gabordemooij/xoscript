@@ -670,14 +670,6 @@ extern ctr_object* ctr_file_exists(ctr_object* myself, ctr_argument* argumentLis
 extern ctr_object* ctr_file_size(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_file_delete(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_file_include(ctr_object* myself, ctr_argument* argumentList);
-extern ctr_object* ctr_file_open(ctr_object* myself, ctr_argument* argumentList);
-extern ctr_object* ctr_file_close(ctr_object* myself, ctr_argument* argumentList);
-extern ctr_object* ctr_file_read_bytes(ctr_object* myself, ctr_argument* argumentList);
-extern ctr_object* ctr_file_write_bytes(ctr_object* myself, ctr_argument* argumentList);
-extern ctr_object* ctr_file_seek(ctr_object* myself, ctr_argument* argumentList);
-extern ctr_object* ctr_file_seek_rewind(ctr_object* myself, ctr_argument* argumentList);
-extern ctr_object* ctr_file_seek_end(ctr_object* myself, ctr_argument* argumentList);
-extern ctr_object* ctr_file_descriptor(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_file_lock(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_file_unlock(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_file_lines(ctr_object* myself, ctr_argument* argumentList);
