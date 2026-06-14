@@ -691,11 +691,7 @@ static void ctr_internal_set_feature_flags() {
 ctr_object* currentMethod;
 void ctr_initialize_world() {
 	ctr_internal_recursion = 0;
-	int i;
-	srand((unsigned)time(NULL));
-	for(i=0; i<16; i++) {
-		CtrHashKey[i] = (int) (rand() % 256);
-	}
+	arc4random_buf(CtrHashKey, 16);
 	ctr_first_object = NULL;
 	CtrStdWorld = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
 	CtrStdWorld->info.sticky = 1;
