@@ -20,16 +20,16 @@
 
 // either provided by libsecret or bsd
 int random_buf(void *buf, size_t n) {
-    arc4random_buf(buf, n);
-    return 0;
+	arc4random_buf(buf, n);
+	return 0;
 }
 
 static void print_hex(char* name, unsigned char *data, size_t length) {
-    printf("=> %s ", name);
-    for (size_t i = 0; i < length; ++i) {
-        printf("%02x", data[i]);
-    }
-    printf("\n");
+	printf("=> %s ", name);
+	for (size_t i = 0; i < length; ++i) {
+		printf("%02x", data[i]);
+	}
+	printf("\n");
 }
 
 //rfc4648
