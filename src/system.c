@@ -1,4 +1,5 @@
 #include "xo.h"
+#include <stddef.h>
 
 #define CTR_OBJECT_RESOURCE_TIME 13
 
@@ -1789,3 +1790,676 @@ ctr_object* ctr_slurp_to_string( ctr_object* myself, ctr_argument* argumentList 
 	}
 	return commandObj;
 }
+
+#ifdef EXPERIMENTS
+
+#define CTR_WIREABLE_TYPE_STR 1
+#define CTR_WIREABLE_TYPE_TNODE 2
+#define CTR_WIREABLE_TYPE_TNODELIST 3
+#define CTR_WIREABLE_TYPE_MAP 4
+#define CTR_WIREABLE_TYPE_MAPITEM 5
+#define CTR_WIREABLE_TYPE_OBJ 6
+#define CTR_WIREABLE_TYPE_CSTR 7
+
+#define CTR_WIREABLE_KNOWN_BLOCK 1
+#define CTR_WIREABLE_KNOWN_ROOT 2
+#define CTR_WIREABLE_KNOWN_STRING 3
+#define CTR_WIREABLE_KNOWN_CONSOLE 4
+
+
+
+
+
+
+struct ctr_wireable {
+	struct ctr_wireable* next;
+	int type;
+	size_t id;
+	size_t memsize;
+	uintptr_t address;
+	int numofpointers;
+	int pointers[10];
+	void* memblock;
+};
+
+typedef struct ctr_wireable ctr_wireable;
+ctr_wireable* __debug = 0;
+
+
+struct ctr_wireables {
+	ctr_wireable* wireable;
+	struct ctr_wireables* next;
+};
+
+typedef struct ctr_wireables ctr_wireables;
+
+
+ctr_wireable* wirelist_head;
+ctr_wireable* wirelist_current;
+
+
+void ctr_dumper_dump_object(ctr_object* obj);
+void ctr_dumper_dump_codeblock(ctr_tnode* codeblock);
+
+size_t CtrWireableID;
+
+void ctr_wireable_add(ctr_wireable* w) {
+	ctr_wireable* addition = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
+	memset(addition,0,sizeof(ctr_wireable));
+	w->next = addition;
+	wirelist_current = w->next;
+	addition->type = 0;
+}
+
+void ctr_dumper_dump_cstr(char* str, size_t vlen) {
+	ctr_wireable* w = wirelist_current;
+	w->next = NULL;
+	char* memstr = ctr_heap_allocate_tracked(vlen);
+	w->memblock = memstr - sizeof(size_t);// (void*) (((char*) str) - sizeof(size_t));
+	w->memsize = *((size_t*)w->memblock);
+	memcpy(memstr, str, vlen); 
+	w->type = CTR_WIREABLE_TYPE_CSTR;
+	w->id = CtrWireableID;
+	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
+	w->address = (uintptr_t) str;
+	w->numofpointers = 0;
+	w->next = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
+	wirelist_current = w->next;
+	ctr_wireable_add(w);
+	
+}
+
+void ctr_dumper_dump_str(ctr_string* str) {
+	//printf("str! %s \n", str);
+	
+	ctr_wireable* w = wirelist_current;
+	//printf("current = %p \n", (void*)w);
+	
+	w->next = NULL;
+	
+	w->memblock = (void*) (((char*) str) - sizeof(size_t));
+	w->memsize = *((size_t*)w->memblock);
+	w->type = CTR_WIREABLE_TYPE_STR;
+	
+	
+	
+	w->id = CtrWireableID;
+	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
+	
+	w->address = (uintptr_t) str;
+	w->numofpointers = 1;	
+	w->pointers[0] = offsetof(ctr_string, value);
+	
+	w->next = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
+	wirelist_current = w->next;
+	
+	ctr_wireable_add(w);
+	
+	if (str->value) {
+		ctr_dumper_dump_cstr(str->value, str->vlen);
+	}
+	
+	//printf("DEBUG pointers[0] = %d @ w/%p\n", __debug->pointers[0], (void*)__debug);
+}
+
+
+void ctr_dumper_dump_codeblock_nodes(ctr_tlistitem* nodes) {
+	//printf("codelistitem!\n");
+	
+	ctr_wireable* w = wirelist_current;
+	//printf("current = %p \n", (void*)w);
+	w->next = NULL;
+	w->type = CTR_WIREABLE_TYPE_TNODELIST;
+	
+	
+	w->memblock = (void*) (((char*) nodes) - sizeof(size_t));
+	w->memsize = *((size_t*)w->memblock);
+	
+	w->id = CtrWireableID;
+	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
+	
+	w->address = (uintptr_t) nodes;
+	w->pointers[0] = (int) ((uintptr_t) &nodes->node - w->address);
+	w->pointers[1] = (int) ((uintptr_t) &nodes->next - w->address);
+	w->numofpointers = 2;
+	
+	ctr_wireable_add(w);
+	
+	if (nodes->node) {
+		ctr_dumper_dump_codeblock(nodes->node);
+		
+	}
+	
+	if (nodes->next) {
+		ctr_dumper_dump_codeblock_nodes(nodes->next);
+		
+	}
+	
+	//printf("DEBUG pointers[0] = %d \n", __debug->pointers[0]);
+	
+}
+
+void ctr_dumper_dump_codeblock(ctr_tnode* codeblock) {
+	//printf("codeblock!\n");
+	
+	ctr_wireable* w = wirelist_current;
+	//printf("current = %p \n", (void*)w);
+	w->next = NULL;
+	w->type = CTR_WIREABLE_TYPE_TNODE;
+	
+	
+	w->memblock = (void*) (((char*) codeblock) - sizeof(size_t));
+	w->memsize = *((size_t*)w->memblock);
+	
+	w->id = CtrWireableID;
+	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
+	
+	w->address = (uintptr_t) codeblock;
+	w->pointers[0] = (int) ((uintptr_t) &codeblock->cached_name - w->address);
+	w->pointers[1] = (int) ((uintptr_t) &codeblock->nodes - w->address);
+	w->pointers[2] = (int) ((uintptr_t) &codeblock->value - w->address);
+	w->numofpointers = 3;
+	
+	
+	ctr_wireable_add(w);
+
+	if (codeblock->cached_name) {
+		ctr_dumper_dump_object(codeblock->cached_name);
+	}
+	
+	if (codeblock->nodes) {
+		ctr_dumper_dump_codeblock_nodes(codeblock->nodes);
+	}
+	
+	if (codeblock->value) {
+		ctr_dumper_dump_cstr(codeblock->value, codeblock->vlen);
+	}
+	//printf("DEBUG pointers[0] = %d \n", __debug->pointers[0]);
+	
+}
+
+void ctr_dumper_dump_mapitem(ctr_mapitem* mapitem) {
+	//printf("mapitem!\n");
+	ctr_wireable* w = wirelist_current;
+	//printf("current = %p \n", (void*)w);
+	w->next = NULL;
+	w->type = CTR_WIREABLE_TYPE_MAPITEM;
+	
+	
+	w->memblock = (void*) (((char*) mapitem) - sizeof(size_t));
+	w->memsize = *((size_t*)w->memblock);
+	
+	w->id = CtrWireableID;
+	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
+	
+	w->address = (uintptr_t) mapitem;
+	w->pointers[0] = (int) offsetof(ctr_mapitem, key);
+	w->pointers[1] = (int) offsetof(ctr_mapitem, value);
+	w->pointers[2] = (int) offsetof(ctr_mapitem, prev);
+	w->pointers[3] = (int) offsetof(ctr_mapitem, next);
+	w->numofpointers = 4;
+	
+	ctr_wireable_add(w);
+	
+	if (mapitem->key) {
+		ctr_dumper_dump_object(mapitem->key);
+	}
+	if (mapitem->value) {
+		ctr_dumper_dump_object(mapitem->value);
+	}
+	
+}
+
+void ctr_dumper_dump_map(ctr_map* map) {
+	//printf("map!\n");
+	
+	ctr_wireable* w = wirelist_current;
+	//printf("current = %p \n", (void*)w);
+	w->next = NULL;
+	w->type = CTR_WIREABLE_TYPE_MAP;
+	
+	
+	w->memblock = (void*) (((char*) map) - sizeof(size_t));
+	w->memsize = *((size_t*)w->memblock);
+	
+	w->id = CtrWireableID;
+	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
+	
+	w->address = (uintptr_t) map;
+	w->pointers[0] = (int) offsetof(ctr_map, head);
+	w->numofpointers = 1;
+	
+	ctr_wireable_add(w);
+	
+	
+	
+	ctr_mapitem* mapitem = map->head;
+	
+	while(mapitem) {
+		ctr_dumper_dump_mapitem(mapitem);
+		mapitem = mapitem->next;
+	}
+}
+
+void ctr_dumper_dump_object(ctr_object* obj) {
+	//printf("dump object!\n");
+	
+	ctr_wireable* w = wirelist_current;
+	//printf("current = %p \n", (void*)w);
+	
+	w->next = NULL;
+	w->type = CTR_WIREABLE_TYPE_OBJ;
+	
+	
+	w->memblock = (void*) (((char*) obj) - sizeof(size_t));
+	w->memsize = *((size_t*)w->memblock);
+	
+	w->id = CtrWireableID;
+	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
+	
+	w->address = (uintptr_t) obj;
+	if (obj->info.type == CTR_OBJECT_TYPE_OTBOOL || obj->info.type == CTR_OBJECT_TYPE_OTNUMBER) {
+		w->numofpointers = 3;
+		w->pointers[0] = (int) offsetof(ctr_object, properties);
+		w->pointers[1] = (int) offsetof(ctr_object, methods);
+		w->pointers[2] = (int) offsetof(ctr_object, link);
+	} else {
+		w->numofpointers = 4;
+		w->pointers[0] = (int) offsetof(ctr_object, properties);
+		w->pointers[1] = (int) offsetof(ctr_object, methods);
+		w->pointers[2] = (int) offsetof(ctr_object, link);
+		w->pointers[3] = (int) offsetof(ctr_object, value);
+	
+	}
+	
+	
+	if (!__debug) {
+		__debug = w;
+	}
+	
+	//printf("DEBUG pointers[0] = %d \n", __debug->pointers[0]);
+	
+	//printf("--> wireable: address = %lu mempointer = %p size = %lu objsize = %lu \n", w->address, w->memblock, memblock_size, sizeof(ctr_object) + sizeof(size_t));
+	//printf("--> wireable: pointer 0 = %d \n", w->pointers[0]);
+	//printf("--> wireable: pointer 0 to --> %p | %p \n",   (void*)(w->address + w->pointers[0]),  (void*)&obj->properties);
+	//printf("--> wireable: pointer 1 = %d \n", w->pointers[1]);
+	//printf("--> wireable: pointer 1 to --> %p | %p \n", (void*)(w->address + w->pointers[1]),  &obj->methods);
+	//printf("--> wireable: properties @ %p \n", (void*) obj->properties);
+	//printf("--> wireable: methods @ %p \n", (void*) obj->methods);
+	
+	
+	
+	
+	ctr_wireable_add(w);
+	
+	
+	if (obj->link) {
+		//printf("--> link\n");
+		if (
+			obj->link != CtrStdBlock
+			&& obj->link != CtrStdString
+			&& obj->link != CtrStdObject
+			&& obj->link != CtrStdConsole
+		
+		) {
+			ctr_dumper_dump_codeblock(obj->link);
+		} else {
+			/*
+			printf(" ==> %p \n", obj->link );
+
+			
+			void* xpointer = (void*) ((char*)w->memblock + sizeof(size_t) + w->pointers[2]);
+			memset(xpointer, (uintptr_t) obj->link, sizeof(uintptr_t));
+			printf("found a link to well known object!\n");
+			
+			void* pointer = *((void**) ((char*)w->memblock + sizeof(size_t) + w->pointers[2]));
+			
+			printf(" %p -> %p -> %p \n", (void*)CtrStdBlock, (void*)obj->link, (void*) pointer);
+			exit(0);
+			* */
+			
+		}
+		
+	
+		
+	}
+	
+	ctr_dumper_dump_map(obj->properties);
+	ctr_dumper_dump_map(obj->methods);
+	
+	
+	
+	if (obj->info.type == CTR_OBJECT_TYPE_OTBLOCK) {
+		//printf("--> otblock\n");
+		ctr_dumper_dump_codeblock(obj->value.block);
+	}
+	else if (obj->info.type == CTR_OBJECT_TYPE_OTSTRING) {
+		//printf("--> otstr\n");
+		ctr_dumper_dump_str(obj->value.svalue);
+	} else {
+		//printf("undefined object type %d \n", obj->info.type);
+	}
+	
+	
+	
+	//printf(
+	//"align=%zu sizeof=%zu w=%p mod=%zu\n",
+	//alignment,
+	//sizeof(ctr_wireable),
+	//(void*)w,
+	//((uintptr_t)w) % alignment
+	//);
+	//return w;
+}
+
+void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
+	
+	//printf("=====> DEBUG pointers[0] = %d @ w/%p :%d \n", __debug->pointers[0], (void*)__debug, __debug->numofpointers);
+
+
+	
+	
+
+	int n = w->numofpointers;
+	
+	char* memblock_copy = ctr_heap_allocate_tracked(w->memsize);
+	memcpy(memblock_copy, w->memblock, w->memsize);
+	w->memblock = memblock_copy;
+
+	for(int i = 0; i < n; i++) {
+		int offset_pointer = w->pointers[i];
+		char* memblock = w->memblock;
+		
+		
+		void* pointer = *((void**) (memblock + sizeof(size_t) + offset_pointer));
+		void* xpointer = (void*) (memblock + sizeof(size_t) + offset_pointer);
+		
+		
+		
+		//*(xpointer) = 0x999;
+		ctr_wireable* needle = wl;
+		
+		if (pointer == NULL) {
+			memset(xpointer, 0, sizeof(uintptr_t));
+			continue;
+		}
+		
+		if (pointer == CtrStdBlock) {
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_BLOCK;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			uintptr_t* pointer2 = *((uintptr_t**) (memblock + sizeof(size_t) + offset_pointer));
+			//printf("found a link to CtrStdBlock! %p -> %p -> %p \n", pointer, CtrStdBlock, pointer2);
+			if (pointer2 == (uintptr_t) CTR_WIREABLE_KNOWN_BLOCK) {
+				//printf("recognized as block\n");
+			}
+			continue;
+		} else if (pointer == CtrStdString) {
+			
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_STRING;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			
+			//printf("found a link to CtrStdString!");
+			continue;
+		} else if (pointer == CtrStdObject) {
+			
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_ROOT;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			
+			//printf("found a link to CtrStdObject!");
+			continue;
+		} else if (pointer == CtrStdConsole) {
+			
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_CONSOLE;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			
+			//printf("found a link to CtrStdConsole!");
+			continue;
+		}
+		
+		//replace pointer with id
+		int found_address = 0;
+		while(needle) {
+			//printf("search for needle: %p = %p ?\n", (void*)needle->address, (void*)pointer);
+			if (needle->address == (uintptr_t) pointer) {
+				//printf("search for needle: %p = %p ?\n", (void*)needle->address, (void*)pointer);
+				
+				//*(xpointer) = (void *)(uintptr_t)needle->id;
+				
+				memcpy(xpointer, (void *)(uintptr_t*) &needle->id, sizeof(uintptr_t));
+				//printf("Rewired: %p -> %p \n", pointer, *((void**)xpointer));
+				found_address = 1;
+				break;
+			}
+			needle = needle->next;
+		}
+		
+		if (!found_address) {
+			//printf("Failed mapping: --> %p \n", (void*)pointer);
+			exit(1);
+		}
+		
+		
+	
+	}
+	//exit(0);
+	return;
+}
+
+ctr_object* ctr_object_dump( ctr_object* myself, ctr_argument* argumentList ) {
+	
+	CtrWireableID = 0x1000;
+	FILE* f = fopen("/tmp/dump.bin", "wb");
+	fwrite("xdmp0.2/", strlen("xdmp0.2/"), 1, f);
+
+	wirelist_head = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
+	wirelist_current = wirelist_head;
+	ctr_dumper_dump_object(myself);
+	
+		
+	ctr_wireable* w = wirelist_head;
+	
+	
+	int i = 0;
+	while(w) {
+		//printf("==> %p \n",(void*)w);
+		//printf("--> %lx \n", w->id);
+		if (!w->id) {
+			//printf("okidoki\n");
+			break;
+		}
+		//printf("Writing block #%d | ID=%lx Type=%d", i,w->id,w->type);
+		
+		ctr_internal_unwire(w, wirelist_head);
+		//printf("Writing block #%d | #%lx @%p to disk: |%lu| \n", i++, w->id, (void*)w, w->memsize);
+		fwrite(w, sizeof(ctr_wireable), 1, f);
+		fwrite(w->memblock, w->memsize, 1, f);
+		//printf("---\n");
+		
+		w = w->next;
+	}
+	
+	fclose(f);
+	//if (myself->methods->head) {
+	//	mapItem = myself->methods->head;
+	//	printf("found method %p \n", (void*) mapItem);
+		//ptr = mapItem->key;
+		
+	//}
+		//			tmp = mapItem->next;
+	//			mapItem = currentObject->properties->head;
+	//printf("closing\n");
+	return myself;
+}
+
+
+
+ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
+	//printf("load object\n");
+	char* magic = ctr_heap_allocate_tracked(100);
+	int items_read = 0;
+	int blocks_read = 0;
+	FILE* f = fopen("/tmp/dump.bin", "rb");
+	fread(magic, 8, 1, f);
+	//printf("======\n");
+	//printf("|%s|\n", magic);
+	fseek(f, 0, SEEK_END);
+	size_t filesize = ftell(f);
+	fseek(f, 8, SEEK_SET);
+	
+	//printf("file size: %lu \n", filesize);
+	char* blob = (char*)ctr_heap_allocate_tracked(filesize);
+	size_t max_rehash_space = filesize / sizeof(ctr_mapitem);
+	//printf("max rehash space = %lu \n",max_rehash_space );
+	ctr_mapitem** rehashes = ctr_heap_allocate(max_rehash_space);
+	size_t rehash_index = 0;
+	
+	
+	size_t offset = 0;
+	size_t len = 0;
+	char* data;
+	ctr_wireable* w;
+	ctr_object* entry = NULL;
+	
+	for(;;) {
+		//printf("\n");
+		len = sizeof(ctr_wireable);
+
+		w = (ctr_wireable*) (blob + offset);
+		items_read = fread(w, len, 1 , f);
+
+		
+		if (items_read == 0) break;
+		offset += sizeof(ctr_wireable);
+		
+		/*
+		printf("O:");
+		if (w->type == 0) printf("Nil ");
+		if (w->type == CTR_WIREABLE_TYPE_MAP) printf("Map ");
+		if (w->type == CTR_WIREABLE_TYPE_MAPITEM) printf("MIt ");
+		if (w->type == CTR_WIREABLE_TYPE_TNODE) printf("Nde ");
+		if (w->type == CTR_WIREABLE_TYPE_TNODELIST) printf("TLs ");
+		if (w->type == CTR_WIREABLE_TYPE_OBJ) printf("Obj ");
+		if (w->type == CTR_WIREABLE_TYPE_STR) printf("Str ");
+		if (w->type == CTR_WIREABLE_TYPE_CSTR) printf("Val ");
+		* */
+		
+
+		//printf("#%lx --> %p + %lu => %p: ", w->id, (void*)w, len, (void*)blob + offset);
+		//printf("%d OK ", items_read);
+		
+		char* data = (char*) ((char*)blob + offset);
+		memset(data, 0, w->memsize);
+		//printf("& %lu bytes --> %p: ", w->memsize, data);
+		
+		blocks_read = fread(data, w->memsize, 1, f);
+		
+
+		
+		offset += w->memsize;
+		//printf("%d OK ==> %p %lu ", blocks_read, (void*)blob + offset, offset);
+		if (blocks_read == 0) break;
+		
+		//rewire
+		//printf("rew. %d ", w->numofpointers);
+		//printf("\n");
+		
+		for(int i = 0; i < w->numofpointers; i++) {
+			int offset_pointer = w->pointers[i];
+			char* memblock = (char*) data + sizeof(size_t); //w->memblock; read the memblock that has been serialized
+			
+			//printf("w = %p \n", (void*) w);
+			//printf("memblock = %p \n", (void*) w->memblock);
+			//printf("offset = %d \n", offset_pointer);
+			
+			//void* pointer = *((void**) (memblock + sizeof(size_t) + offset_pointer));
+			uintptr_t* xpointer = (uintptr_t*) (memblock + offset_pointer);
+			uintptr_t old = *xpointer;
+			
+			//printf("%lx \n",old);
+			
+			// under 0x1000 is well known object
+			if (old < 0x1000) {
+				if (old == 0x0) {
+					
+					
+					
+					// NULL pointer
+					
+					
+					
+					*xpointer = 0;
+					//printf(" [ %lx -> Nil %p ] ", old, (void*) *xpointer );
+					
+					
+					
+				} else if (old == CTR_WIREABLE_KNOWN_BLOCK) {
+					*xpointer = CtrStdBlock;
+					//printf(" [ %lx -> Blk %p ] ", old, (void*) *xpointer );
+				} else if (old == CTR_WIREABLE_KNOWN_STRING) {
+					*xpointer = CtrStdString;
+					//printf(" [ %lx -> Str %p ] ", old, (void*) *xpointer );
+				} else if (old == CTR_WIREABLE_KNOWN_CONSOLE) {
+					*xpointer = CtrStdConsole;
+					//printf(" [ %lx -> Out %p ] ", old, (void*) *xpointer );
+				} else if (old == CTR_WIREABLE_KNOWN_ROOT) {
+					*xpointer = CtrStdObject;
+					//printf(" [ %lx -> Obj %p ] ", old, (void*) *xpointer );
+				}
+			} else {
+				*xpointer = old - 0x1000 + blob + sizeof(ctr_wireable) + sizeof(size_t);
+				
+				
+				
+				
+				
+				//printf(" [ %lx -> Ref %p ] ", old, (void*) *xpointer );
+				
+				
+			}
+			
+			
+		}
+		
+		char* memblock = (char*) data + sizeof(size_t);
+		if (w->type == CTR_WIREABLE_TYPE_OBJ) {
+			ctr_object* tmp = (ctr_object*) memblock;
+			if (tmp->info.type == CTR_OBJECT_TYPE_OTSTRING) {
+				//printf("str=%p|%d", tmp->value,tmp->value.svalue->vlen);
+	
+			}
+		}
+		
+		// correct the hashkey, otherwise lookup fails
+		if (w->type == CTR_WIREABLE_TYPE_MAPITEM) {
+			ctr_mapitem* item = (ctr_mapitem*) memblock;
+			*(rehashes + (rehash_index++)) = item;
+			//item->hashKey = ctr_internal_index_hash(item->key);
+		}
+		
+		if (!entry) {
+			entry = (ctr_object*) ((char*)data + sizeof(size_t));
+		}
+		
+		
+	}
+	
+	for(int i = 0; i<rehash_index; i++) {
+		ctr_mapitem* it = *(rehashes + i);
+		it->hashKey = ctr_internal_index_hash(it->key);
+	}
+	
+	//printf("\n");
+	fclose(f);
+	ctr_heap_free((void*)rehashes);
+	if (entry) {
+		//printf("======= FOUND ENTRY ====== %p \n", entry);
+		//printf("info: %d \n", entry->info.sticky);
+		//printf(" method : %p  \n", (void*)entry->methods);
+		//printf(" method head: %p  \n", (void*)entry->methods->head);
+	
+		return entry;
+	}
+	
+	return CtrStdNil;
+}
+#endif

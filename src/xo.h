@@ -465,7 +465,10 @@ extern ctr_object* ctr_object_respond_and_and_and(ctr_object* myself, ctr_argume
 extern ctr_object* ctr_object_case_do(ctr_object* myself, ctr_argument* ctr_argumentList);
 extern ctr_object* ctr_object_to_code(ctr_object* myself, ctr_argument* ctr_argumentList);
 extern ctr_object* ctr_object_recursion(ctr_object* myself, ctr_argument* argumentList);
-
+#ifdef EXPERIMENTS
+extern ctr_object* ctr_object_dump(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_object_load(ctr_object* myself, ctr_argument* argumentList);
+#endif
 
 /**
  * Boolean Interface
