@@ -16,7 +16,8 @@ LDFLAGS='-shared'
 ISO="en" 
 export ISO
 gmake clean
-EXTRACFLAGS="-D TEST"
+EXTRACFLAGS="-D TEST -D EXPERIMENTS"
+export EXTRACFLAGS
 gmake -f makefile.obsd clean
 PACKAGE="server" NAME="server" gmake -f makefile.obsd plugin-clean
 gmake -f makefile.obsd

@@ -17,10 +17,10 @@ LDFLAGS='-shared'
 ISO="en" 
 export ISO
 
-make clean ; make
-EXTRACFLAGS="-D TEST"
-PACKAGE="server"
+EXTRACFLAGS="-D TEST -D EXPERIMENTS"
 export EXTRACFLAGS
+make clean ; make
+PACKAGE="server"
 export PACKAGE
 make plugin-clean
 NAME="server" make plugin
