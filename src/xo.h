@@ -130,6 +130,26 @@
 
 #define CTR_OBJECT_RESOURCE_INT64 14
 
+
+#ifdef EXPERIMENTS
+
+#define CTR_WIREABLE_TYPE_STR 1
+#define CTR_WIREABLE_TYPE_TNODE 2
+#define CTR_WIREABLE_TYPE_TNODELIST 3
+#define CTR_WIREABLE_TYPE_MAP 4
+#define CTR_WIREABLE_TYPE_MAPITEM 5
+#define CTR_WIREABLE_TYPE_OBJ 6
+#define CTR_WIREABLE_TYPE_CSTR 7
+
+#define CTR_WIREABLE_KNOWN_BLOCK 1
+#define CTR_WIREABLE_KNOWN_ROOT 2
+#define CTR_WIREABLE_KNOWN_STRING 3
+#define CTR_WIREABLE_KNOWN_CONSOLE 4
+
+#endif
+
+
+
 /**
  * Define basic types for Citrine
  */
@@ -259,6 +279,29 @@ typedef struct ctr_source_map ctr_source_map;
 
 extern ctr_source_map* ctr_source_map_head;
 extern int ctr_source_mapping;
+
+#ifdef EXPERIMENTS
+struct ctr_wireable {
+	struct ctr_wireable* next;
+	int type;
+	size_t id;
+	size_t memsize;
+	uintptr_t address;
+	int numofpointers;
+	int pointers[10];
+	void* memblock;
+};
+
+typedef struct ctr_wireable ctr_wireable;
+
+struct ctr_wireables {
+	ctr_wireable* wireable;
+	struct ctr_wireables* next;
+};
+
+typedef struct ctr_wireables ctr_wireables;
+
+#endif
 
 /**
  * Core Objects
