@@ -1025,6 +1025,34 @@ The world of Xoscript is filled with a diversity of objects, which are
 available to your program right from the start. In the next chapters,
 all of these core objects will be discussed.
 
+## Snapshots
+
+You can save an object (along with its current state) to disk with:
+
+```
+myobject save-as: ['saved.bin'].
+```
+
+To reload the object from disk:
+
+```
+>> myobject := Object load-from: ['saved.bin'].
+```
+
+Snapshots can be used to save a certain state or to improve performance.
+Loading a snapshot avoids lexing, parsing and application setup.
+Also, in the future, additional performance benefits may be introduced
+with snapshots, like optimization of certain patterns or detection and
+optimization of hot paths.
+
+{{warning}}
+Snapshots are an experimental feature, do not use it in production.
+To activate experimental features compile with -D EXPERIMENTS.
+{{/warning}}
+
+
+@test712
+
 # None Object
 
 {{messages}}
