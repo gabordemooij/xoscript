@@ -1837,7 +1837,7 @@ void ctr_dumper_dump_str(ctr_string* str) {
 	w->id = CtrWireableID;
 	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
 	w->address = (uintptr_t) str;
-	w->numofpointers = 1;	
+	w->numofpointers = 1;
 	w->pointers[0] = offsetof(ctr_string, value);
 	w->next = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
 	wirelist_current = w->next;
@@ -1846,6 +1846,39 @@ void ctr_dumper_dump_str(ctr_string* str) {
 		ctr_dumper_dump_cstr(str->value, str->vlen);
 	}
 }
+
+void ctr_dumper_dump_array(ctr_collection* arr) {
+	ctr_wireable* w = wirelist_current;
+	w->next = NULL;
+	w->memblock = (void*) (((char*) arr) - sizeof(size_t));
+	w->memsize = *((size_t*)w->memblock);
+	w->type = CTR_WIREABLE_TYPE_ARR;
+	w->id = CtrWireableID;
+	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
+	w->address = (uintptr_t) arr;
+	w->numofpointers = 1;
+	w->pointers[0] = offsetof(ctr_collection, elements);
+	w->next = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
+	wirelist_current = w->next;
+	ctr_wireable_add(w);
+	//elements
+	w = wirelist_current;
+	w->next = NULL;
+	w->memblock = (void*) (((char*) arr->elements) - sizeof(size_t));
+	w->memsize = *((size_t*)w->memblock);
+	w->type = CTR_WIREABLE_TYPE_ELEMS;
+	w->id = CtrWireableID;
+	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
+	w->address = (uintptr_t) arr->elements;
+	w->numofpointers = 0;
+	w->next = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
+	wirelist_current = w->next;
+	ctr_wireable_add(w);
+	for(size_t i = arr->tail; i < arr->head; i++) {
+		ctr_dumper_dump_object( *( arr->elements + i ) );
+	}
+}
+
 
 void ctr_dumper_dump_codeblock_nodes(ctr_tlistitem* nodes) {
 	ctr_wireable* w = wirelist_current;
@@ -1963,6 +1996,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 			&& obj->link != CtrStdString
 			&& obj->link != CtrStdObject
 			&& obj->link != CtrStdConsole
+			&& obj->link != CtrStdArray
 		) {
 			ctr_dumper_dump_object(obj->link);
 		} else {
@@ -1973,6 +2007,9 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 	ctr_dumper_dump_map(obj->methods);
 	if (obj->info.type == CTR_OBJECT_TYPE_OTBLOCK) {
 		ctr_dumper_dump_codeblock(obj->value.block);
+	}
+	else if (obj->info.type == CTR_OBJECT_TYPE_OTARRAY) {
+		ctr_dumper_dump_array(obj->value.avalue);
 	}
 	else if (obj->info.type == CTR_OBJECT_TYPE_OTSTRING) {
 		ctr_dumper_dump_str(obj->value.svalue);
@@ -1986,6 +2023,30 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 	char* memblock_copy = ctr_heap_allocate_tracked(w->memsize);
 	memcpy(memblock_copy, w->memblock, w->memsize);
 	w->memblock = memblock_copy;
+	if (w->type == CTR_WIREABLE_TYPE_ELEMS) {
+		char* memblock = w->memblock;
+		ctr_object** elems = (ctr_object**) (memblock + sizeof(size_t));
+		size_t length = ( w->memsize - sizeof(size_t) ) / sizeof(ctr_object*);
+		for(size_t j = 0; j<length; j++) {
+			ctr_wireable* needle = wl;
+			void* pointer = *((void**) (elems + j));
+			void* xpointer = (void*) (elems + j);
+			int found_address = 0;
+			while(needle) {
+				if (needle->address == (uintptr_t) pointer) {
+					memcpy(xpointer, (void *)(uintptr_t*) &needle->id, sizeof(uintptr_t));
+					found_address = 1;
+					break;
+				}
+				needle = needle->next;
+			}
+			if (!found_address) {
+				printf("el not found: %p \n", pointer);
+				exit(1); //@todo error handling
+			}
+		}
+		return;
+	}
 	for(int i = 0; i < n; i++) {
 		int offset_pointer = w->pointers[i];
 		char* memblock = w->memblock;
@@ -1996,7 +2057,11 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			memset(xpointer, 0, sizeof(uintptr_t));
 			continue;
 		}
-		if (pointer == CtrStdBlock) {
+		if (pointer == CtrStdArray) {
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_LIST;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			continue;
+		} else if (pointer == CtrStdBlock) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_BLOCK;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
@@ -2024,6 +2089,7 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			needle = needle->next;
 		}
 		if (!found_address) {
+			printf("not found: %p \n", pointer);
 			exit(1); //@todo error handling
 		}
 	}
@@ -2083,6 +2149,32 @@ ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 		blocks_read = fread(data, w->memsize, 1, f);
 		offset += w->memsize;
 		if (blocks_read == 0) break;
+		if (w->type == CTR_WIREABLE_TYPE_ELEMS) {
+			char* memblock = (char*) data + sizeof(size_t);
+			ctr_object** elems = (ctr_object**) (memblock);
+			size_t length = ( w->memsize - sizeof(size_t) ) / sizeof(ctr_object*);
+			for(size_t j=0; j<length; j++) {
+				uintptr_t* xpointer = (uintptr_t*) (void*) (elems + j);
+				uintptr_t old = *xpointer;
+				if (old < 0x1000) {
+					if (old == 0x0) {
+						*xpointer = 0;
+					} else if (old == CTR_WIREABLE_KNOWN_BLOCK) {
+						*xpointer = (uintptr_t) CtrStdBlock;
+					} else if (old == CTR_WIREABLE_KNOWN_STRING) {
+						*xpointer = (uintptr_t) CtrStdString;
+					} else if (old == CTR_WIREABLE_KNOWN_CONSOLE) {
+						*xpointer = (uintptr_t) CtrStdConsole;
+					} else if (old == CTR_WIREABLE_KNOWN_ROOT) {
+						*xpointer = (uintptr_t) CtrStdObject;
+					} else if (old == CTR_WIREABLE_KNOWN_LIST) {
+						*xpointer = (uintptr_t) CtrStdArray;
+					}
+				} else {
+					*xpointer = (uintptr_t) (char*) ( old - 0x1000 + blob + sizeof(ctr_wireable) + sizeof(size_t) );
+				}
+			}
+		} else {
 		for(int i = 0; i < w->numofpointers; i++) {
 			int offset_pointer = w->pointers[i];
 			char* memblock = (char*) data + sizeof(size_t); //w->memblock; read the memblock that has been serialized
@@ -2099,10 +2191,13 @@ ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 					*xpointer = (uintptr_t) CtrStdConsole;
 				} else if (old == CTR_WIREABLE_KNOWN_ROOT) {
 					*xpointer = (uintptr_t) CtrStdObject;
+				} else if (old == CTR_WIREABLE_KNOWN_LIST) {
+					*xpointer = (uintptr_t) CtrStdArray;
 				}
 			} else {
 				*xpointer = (uintptr_t) (char*) ( old - 0x1000 + blob + sizeof(ctr_wireable) + sizeof(size_t) );
 			}
+		}
 		}
 		char* memblock = (char*) data + sizeof(size_t);
 		// correct the hashkey, otherwise lookup fails
