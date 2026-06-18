@@ -91,7 +91,7 @@ unittest() {
 	observed="$(< /tmp/out)"
 	expected="$(< ../../../tests/exp/en/test${i}en.exp)"
 	diff="$(diff -bBZ /tmp/out ../../../tests/exp/en/test${i}en.exp)"
-    if [[  $diff != "" ]]; then
+	if [[  $diff != "" ]]; then
 		echo "𐄂 test $i"
 		echo $skipcode
 		echo "expected:"
@@ -122,9 +122,9 @@ TIL=717
 pushd build/Linux/bin
 for i in $(seq -f "%04g" $FROM $TIL);
 do
-    unittest $i 1
-    unittest $i 4
-    unittest $i 0
+	unittest $i 1
+	unittest $i 4
+	unittest $i 0
 done
 popd
 

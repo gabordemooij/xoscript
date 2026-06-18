@@ -88,7 +88,7 @@ unittest() {
 	sed '$ { /^$/d; }' /tmp/out > /tmp/out3
 	
 	diff="$(diff -bw /tmp/out3 /tmp/out2)"
-    if [[  $diff != "" ]]; then
+	if [[  $diff != "" ]]; then
 		echo "𐄂 test $i"
 		echo $skipcode
 		echo "expected:"
@@ -119,9 +119,9 @@ TIL=717
 pushd build/OpenBSD/bin
 for i in $(seq -f "%04g" $FROM $TIL);
 do
-    unittest $i 1
-    unittest $i 4
-    unittest $i 0
+	unittest $i 1
+	unittest $i 4
+	unittest $i 0
 done
 popd
 
