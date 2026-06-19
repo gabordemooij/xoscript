@@ -290,36 +290,36 @@ ctr_object* ctr_program_shell_escape(ctr_object* myself, ctr_argument* argumentL
 	char* escaped;
 	char* out;
 	ctr_object* result;
-    char* arg;
-    arg = ctr_heap_allocate_cstring(
+	char* arg;
+	arg = ctr_heap_allocate_cstring(
 		ctr_internal_cast2string(argumentList->object)
-    );
+	);
 	/* +2 for surrounding single quotes */
-    n = 2;
-    for (p = arg; *p; p++) {
-        if (*p == '\'') {
-            n += 4;   // '\''
-        } else {
-            n += 1;
+	n = 2;
+	for (p = arg; *p; p++) {
+		if (*p == '\'') {
+			n += 4;   // '\''
+		} else {
+			n += 1;
 		}
-    }
-    escaped = ctr_heap_allocate(n + 1);
-    out = escaped;
-    *out++ = '\'';
-    for (p = arg; *p; p++) {
-        if (*p == '\'') {
-            memcpy(out, "'\\''", 4);
-            out += 4;
-        } else {
-            *out++ = *p;
-        }
-    }
-    *(out++) = '\'';
-    *(out) = '\0';
-    result = ctr_build_string_from_cstring(escaped);
-    ctr_heap_free(escaped);
-    ctr_heap_free(arg);
-    return result;
+	}
+	escaped = ctr_heap_allocate(n + 1);
+	out = escaped;
+	*out++ = '\'';
+	for (p = arg; *p; p++) {
+		if (*p == '\'') {
+			memcpy(out, "'\\''", 4);
+			out += 4;
+		} else {
+			*out++ = *p;
+		}
+	}
+	*(out++) = '\'';
+	*(out) = '\0';
+	result = ctr_build_string_from_cstring(escaped);
+	ctr_heap_free(escaped);
+	ctr_heap_free(arg);
+	return result;
 }
 
 /**
@@ -612,10 +612,10 @@ ctr_object* ctr_program_alarm(ctr_object* myself, ctr_argument* argumentList) {
 	unsigned int s = (unsigned int) ctr_tonum(argumentList->object);
 	pid_t pid = fork();
 	if (pid < 0) {
-        ctr_error("Unable to set alarm", 0);
-        return CtrStdNil;
-    }
-    if (pid > 0) { // parent
+		ctr_error("Unable to set alarm", 0);
+		return CtrStdNil;
+	}
+	if (pid > 0) { // parent
 		double elapsed = 0.0;
 		while (elapsed < s) {
 			if (waitpid(pid, NULL, WNOHANG) > 0) {
@@ -628,7 +628,7 @@ ctr_object* ctr_program_alarm(ctr_object* myself, ctr_argument* argumentList) {
 		waitpid(pid, NULL, 0); // reap (no zombie) even if kill fails
 		exit(0);
 	}
-    return myself;
+	return myself;
 }
 
 /**
@@ -887,7 +887,7 @@ ctr_object* ctr_program_timemachine(ctr_object* myself, ctr_argument* argumentLi
 	if (CtrVersionTime < CTR_VERSION_20260216) {
 		CtrFeatureFlagRecursiveStrIntPol = 1;
 	}
-    return myself;
+	return myself;
 }
 
 /**
@@ -932,7 +932,7 @@ ctr_object* ctr_program_feature(ctr_object* myself, ctr_argument* argumentList) 
 
 
 double ctr_internal_versiontime() {
-       return CtrVersionTime;
+	   return CtrVersionTime;
 }
 
 /**
