@@ -2369,6 +2369,14 @@ deallocate the memory block.
 In this chapter, I'll try to list some example programs to give you an idea how
 xoscript works.
 
+## First impression
+
+A traditional hello to the world:
+
+```
+Out write: ['Hello World!'], stop.
+```
+
 ## Server script
 
 This is how a typical script on server might look:
