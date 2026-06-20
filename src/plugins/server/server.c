@@ -624,12 +624,12 @@ ctr_object* ctr_string_tohtml(ctr_object* myself, ctr_argument* argumentList ) {
  * Server features from the String object.
  */
 
- /**
-  * @def
-  * [ String ] url-encode
-  *
-  * @test694
-  */
+/**
+ * @def
+ * [ String ] url-encode
+ *
+ * @test694
+ */
 ctr_object* ctr_string_urlencode(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument a;
 	a.object = myself;
@@ -638,11 +638,11 @@ ctr_object* ctr_string_urlencode(ctr_object* myself, ctr_argument* argumentList)
 }
 
 /**
-  * @def
-  * [ String ] form-encode
-  *
-  * @test695
-  */
+ * @def
+ * [ String ] form-encode
+ *
+ * @test695
+ */
 ctr_object* ctr_string_formencode(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument a;
 	a.object = myself;
@@ -651,11 +651,11 @@ ctr_object* ctr_string_formencode(ctr_object* myself, ctr_argument* argumentList
 }
 
 /**
-  * @def
-  * [ String ] base64-encode
-  *
-  * @test696
-  */
+ * @def
+ * [ String ] base64-encode
+ *
+ * @test696
+ */
 ctr_object* ctr_string_b64encode(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument a;
 	a.object = myself;
@@ -664,11 +664,11 @@ ctr_object* ctr_string_b64encode(ctr_object* myself, ctr_argument* argumentList)
 }
 
 /**
-  * @def
-  * [ String ] base64-decode
-  *
-  * @test697
-  */
+ * @def
+ * [ String ] base64-decode
+ *
+ * @test697
+ */
 ctr_object* ctr_string_b64decode(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument a;
 	a.object = myself;
@@ -677,11 +677,11 @@ ctr_object* ctr_string_b64decode(ctr_object* myself, ctr_argument* argumentList)
 }
 
 /**
-  * @def
-  * [ String ] html-encode
-  *
-  * @test699
-  */
+ * @def
+ * [ String ] html-encode
+ *
+ * @test699
+ */
 ctr_object* ctr_string_htmlencode(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument a;
 	a.object = myself;
