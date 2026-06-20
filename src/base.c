@@ -2925,6 +2925,13 @@ ctr_object* ctr_format_apply_to(ctr_object* myself, ctr_argument* argumentList) 
 
 // because xoscript only works with floats, cast to int and set format cast = 1
 // yes, this is not ideal, but in a scripting context it's good enough
+
+/**
+ * @def
+ * [ Format ] apply-int: [ Number ]
+ *
+ * @test718
+ */
 ctr_object* ctr_format_apply_int_to(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_format_apply_to_general(myself, argumentList, 1);
 }
