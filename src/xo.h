@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include "dictionary.h"
 #include "msg.h"
 #include <inttypes.h>
@@ -808,6 +810,13 @@ extern ctr_object* ctr_clock_neq( ctr_object* myself, ctr_argument* argumentList
 extern ctr_object* ctr_clock_from_iso( ctr_object* myself, ctr_argument* argumentList );
 extern ctr_object* ctr_clock_to_iso_string( ctr_object* myself, ctr_argument* argumentList );
 extern void ctr_clock_init( ctr_object* clock );
+
+extern ctr_object* ctr_format_new(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_format_format_set(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_format_new_set(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_format_apply_to_general(ctr_object* myself, ctr_argument* argumentList, int cast);
+extern ctr_object* ctr_format_apply_to(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_format_apply_int_to(ctr_object* myself, ctr_argument* argumentList);
 
 /**
  * Garbage Collector Object Interface

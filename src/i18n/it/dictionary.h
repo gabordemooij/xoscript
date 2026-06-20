@@ -18,6 +18,7 @@
 #define CTR_DICT_PATH_OBJECT                     "Sentiero"
 #define CTR_DICT_CMD_OBJECT                      "Istruzioni"
 #define CTR_DICT_STDOUT_OBJECT                   "Uscita"
+#define CTR_DICT_FORMAT_OBJECT                   "Formato"
 #define CTR_DICT_SELF                            "io"
 #define CTR_DICT_OWN                             "mio"
 #define CTR_DICT_NEW                             "nuovo"
@@ -181,6 +182,7 @@
 #define CTR_DICT_ISODATETIME                     "iso-datetime"
 #define CTR_DICT_TRY                             "prova"
 #define CTR_DICT_LOG                             "registrare:"
+#define CTR_DICT_APPLY_TO_INT_SET                "applica-int:"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"

@@ -11,7 +11,6 @@
 #define CTR_DICT_DATABASE_MARIADB_OBJECT         "Maria-DB"                  // Word for object representing MariaDB database system
 #define CTR_DICT_DATABASE_MARIADB_QUERY_OBJECT   "Maria-Query"               // Word for object representing a MariaDB database query
 #define CTR_DICT_PATTERN_OBJECT                  "Pattern"                   // Word for object representing a PCRE2-style regular expression
-#define CTR_DICT_FORMAT_OBJECT                   "Format"                    // Word for object that represents a specific formatting for a string
 #define CTR_DICT_JSONIFY                         "jsonify:"                  // Term to turn objects into a string with JSON encoding
 #define CTR_DICT_OBJECT_FROM_SET                 "object:"                   // Term to turn serialized string back into an object
 #define CTR_DICT_LINK_SET                        "link:"                     // Word to connect or link something to something else
@@ -44,7 +43,6 @@
 #define CTR_DICT_BASE64_DECODE_SET               "base64-decode:"            // Word to BASE64-decode the object in argument 1
 #define CTR_DICT_PASSTHRU_PREFIX_SET             "passthru:prefix:"          // Phrase to serve the asset specified in argument 1 and in container directory specified by argument 2
 #define CTR_DICT_MIMETYPE_SET                    "mimetype:"                 // Word or phrase to inquire about the MIME-type of object specified in argument
-#define CTR_DICT_APPLY_TO_INT_SET                "apply-int:"                // Word or phrase to apply a function to an object that is of type Int64
 #define CTR_DICT_IPV4                            "ipv4?"                     // Word or phrase to inquire whether the recipient object can be classified as an IPv4 address
 #define CTR_DICT_IPV6                            "ipv6?"                     // Word or phrase to inquire whether the recipient object can be classified as an IPv6 address
 #define CTR_DICT_MAC                             "mac?"                      // Word or phrase to inquire whether the recipient object can be classified as an mac address

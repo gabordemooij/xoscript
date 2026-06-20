@@ -18,6 +18,7 @@
 #define CTR_DICT_PATH_OBJECT                     "Путь"
 #define CTR_DICT_CMD_OBJECT                      "Командование"
 #define CTR_DICT_STDOUT_OBJECT                   "Выход"
+#define CTR_DICT_FORMAT_OBJECT                   "Формат"
 #define CTR_DICT_SELF                            "сам"
 #define CTR_DICT_OWN                             "мой"
 #define CTR_DICT_NEW                             "новый"
@@ -181,6 +182,7 @@
 #define CTR_DICT_ISODATETIME                     "iso-датавремя"
 #define CTR_DICT_TRY                             "попробуй"
 #define CTR_DICT_LOG                             "записать:"
+#define CTR_DICT_APPLY_TO_INT_SET                "применить-int:"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"

@@ -18,6 +18,7 @@
 #define CTR_DICT_PATH_OBJECT                     "Ruta"
 #define CTR_DICT_CMD_OBJECT                      "Comando"
 #define CTR_DICT_STDOUT_OBJECT                   "Salida"
+#define CTR_DICT_FORMAT_OBJECT                   "Formato"
 #define CTR_DICT_SELF                            "yo"
 #define CTR_DICT_OWN                             "mi"
 #define CTR_DICT_NEW                             "crear"
@@ -181,6 +182,7 @@
 #define CTR_DICT_ISODATETIME                     "iso-fecha-hora"
 #define CTR_DICT_TRY                             "intentar"
 #define CTR_DICT_LOG                             "registrar:"
+#define CTR_DICT_APPLY_TO_INT_SET                "aplicar-a-entero:"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "promesa:"

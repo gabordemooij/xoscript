@@ -2861,3 +2861,70 @@ CTR_DEFINE_CLASS_OTOBJECT(ctr_binhelper_new)
 ctr_object* ctr_binhelper_parse(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_num_parse(myself, argumentList, 2);
 }
+
+
+/**
+ * @def
+ * [ Format ] new apply: [ String ]
+ *
+ * @test536
+ */
+ctr_object* ctr_format_new(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
+	instance->link = myself;
+	return instance;
+}
+
+ctr_object* ctr_format_format_set(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_internal_object_property(myself,
+		"_format",
+		ctr_internal_cast2string(argumentList->object)
+	);
+	return myself;
+}
+
+ctr_object* ctr_format_new_set(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* instance = ctr_format_new(myself, argumentList);
+	ctr_format_format_set(instance, argumentList);
+	return instance;
+}
+
+ctr_object* ctr_format_apply_to_general(ctr_object* myself, ctr_argument* argumentList, int cast) {
+	ctr_object* format = ctr_internal_object_property(myself, "_format", NULL);
+	if (format == CtrStdNil) return CtrStdNil;
+	char* format_str = ctr_heap_allocate_cstring(format);
+	ctr_object* value = argumentList->object;
+	char* result = "";
+	char* s;
+	ctr_object* answer;
+	if (value->info.type == CTR_OBJECT_TYPE_OTSTRING) {
+		s = ctr_heap_allocate_cstring(value);
+		asprintf(&result, format_str, s);
+		ctr_heap_free(s);
+		answer = ctr_build_string_from_cstring(result);
+		free(result);
+	} else if (value->info.type == CTR_OBJECT_TYPE_OTNUMBER)  {
+		if (cast == 1) {
+			// cast to int (to print octals or decimals for instance %o/%d etc..)
+			asprintf(&result, format_str, (int) value->value.nvalue);
+		} else {
+			asprintf(&result, format_str, (double) value->value.nvalue);
+		}
+		answer = ctr_build_string_from_cstring(result);
+		free(result);
+	} else {
+		answer = ctr_build_string_from_cstring(format_str);
+	}
+	ctr_heap_free(format_str);
+	return answer;
+}
+
+ctr_object* ctr_format_apply_to(ctr_object* myself, ctr_argument* argumentList) {
+	return ctr_format_apply_to_general(myself, argumentList, 0);
+}
+
+// because xoscript only works with floats, cast to int and set format cast = 1
+// yes, this is not ideal, but in a scripting context it's good enough
+ctr_object* ctr_format_apply_int_to(ctr_object* myself, ctr_argument* argumentList) {
+	return ctr_format_apply_to_general(myself, argumentList, 1);
+}

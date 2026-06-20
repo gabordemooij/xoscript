@@ -18,6 +18,7 @@
 #define CTR_DICT_PATH_OBJECT                     "Path"                      // Path object, root of all path objects, file locations, can be used to turn messages into strings separated by OS-dependent path separator
 #define CTR_DICT_CMD_OBJECT                      "Command"                   // Command object, root all command objects, can be used to turn messages into strings separated by spaces
 #define CTR_DICT_STDOUT_OBJECT                   "Out"                       // Word or symbol for standard output object (stdout)
+#define CTR_DICT_FORMAT_OBJECT                   "Format"                    // Word for object that represents a specific formatting for a string
 #define CTR_DICT_SELF                            "self"                      // Word or symbol to refer to the object itself from within a method to call another method
 #define CTR_DICT_OWN                             "own"                       // Word or symbol to refer to the object itself from within a method to access a property
 #define CTR_DICT_NEW                             "new"                       // Word or symbol for unary message to create a new object (unary message, no colon allowed)
@@ -181,6 +182,7 @@
 #define CTR_DICT_ISODATETIME                     "iso-datetime"              // Word to obtain an standard iso datetime formatted representation of the recipient object
 #define CTR_DICT_TRY                             "try"
 #define CTR_DICT_LOG                             "log:"
+#define CTR_DICT_APPLY_TO_INT_SET                "apply-int:"                // Word or phrase to apply a function to an object that is of type Int64
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"                   // Term to invoke pledge command on OpenBSD with argument

@@ -18,6 +18,7 @@
 #define CTR_DICT_PATH_OBJECT                     "Bestandslocatie"
 #define CTR_DICT_CMD_OBJECT                      "Instructie"
 #define CTR_DICT_STDOUT_OBJECT                   "Uit"
+#define CTR_DICT_FORMAT_OBJECT                   "Format"
 #define CTR_DICT_SELF                            "zelf"
 #define CTR_DICT_OWN                             "eigen"
 #define CTR_DICT_NEW                             "nieuw"
@@ -181,6 +182,7 @@
 #define CTR_DICT_ISODATETIME                     "iso-datetime"
 #define CTR_DICT_TRY                             "probeer"
 #define CTR_DICT_LOG                             "log:"
+#define CTR_DICT_APPLY_TO_INT_SET                "toepassen-int:"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"

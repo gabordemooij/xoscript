@@ -18,6 +18,7 @@
 #define CTR_DICT_PATH_OBJECT                     "路径对象"
 #define CTR_DICT_CMD_OBJECT                      "命令对象"
 #define CTR_DICT_STDOUT_OBJECT                   "输出"
+#define CTR_DICT_FORMAT_OBJECT                   "格式"
 #define CTR_DICT_SELF                            "自身"
 #define CTR_DICT_OWN                             "拥有"
 #define CTR_DICT_NEW                             "新建"
@@ -181,6 +182,7 @@
 #define CTR_DICT_ISODATETIME                     "iso时间"
 #define CTR_DICT_TRY                             "尝试"
 #define CTR_DICT_LOG                             "日志条目:"
+#define CTR_DICT_APPLY_TO_INT_SET                "应用-int:"
 
 /* Section B: System & Math */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"

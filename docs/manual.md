@@ -1335,6 +1335,8 @@ message *string* can be overwritten:
 @test620
 
 @api_String_base
+@api_Format_base
+
 
 ## Server strings
 
@@ -2257,7 +2259,6 @@ your program using libffi. For details see the chapter about ffi.
 
 
 @api_MariaDB_mariadb
-@api_Format_server
 @api_Net_net
 @api_Vault_vault
 @api_Server_server

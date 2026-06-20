@@ -18,6 +18,7 @@
 #define CTR_DICT_PATH_OBJECT                     "Caminho"
 #define CTR_DICT_CMD_OBJECT                      "Comando"
 #define CTR_DICT_STDOUT_OBJECT                   "Saída"
+#define CTR_DICT_FORMAT_OBJECT                   "Formato"
 #define CTR_DICT_SELF                            "isto"
 #define CTR_DICT_OWN                             "prop"
 #define CTR_DICT_NEW                             "novo"
@@ -181,6 +182,7 @@
 #define CTR_DICT_ISODATETIME                     "iso-datetime"
 #define CTR_DICT_TRY                             "tentar"
 #define CTR_DICT_LOG                             "registar:"
+#define CTR_DICT_APPLY_TO_INT_SET                "aplicar-int:"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"
