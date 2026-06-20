@@ -102,37 +102,37 @@ static ctr_object* ctr_server_urlformencode(ctr_object* myself, ctr_argument* ar
 	char* source = ctr_heap_allocate_cstring(
 		ctr_internal_cast2string(argumentList->object)
 	);
-    size_t len = 0;
+	size_t len = 0;
 	char *p;
-    for (p = source; *p; p++) {
-        if ((*p == ' ' && is_form) || *p == '-' || *p == '_' || *p == '.' || *p == '~' || isalnum((unsigned char)*p)) { //RFC 3986 unreserved characters
-            len += 1;
-        } else {
-            len += 3; // %HH
-        }
-    }
+	for (p = source; *p; p++) {
+		if ((*p == ' ' && is_form) || *p == '-' || *p == '_' || *p == '.' || *p == '~' || isalnum((unsigned char)*p)) { //RFC 3986 unreserved characters
+			len += 1;
+		} else {
+			len += 3; // %HH
+		}
+	}
 	char* dest = ctr_heap_allocate(len + 1);
 	if (!dest) {
 		ctr_error("Out of memory while creating urlencoded output buffer.", 0);
 		ctr_heap_free(source);
 		return CtrStdNil;
 	}
-    char *o = dest;
-    for (p = source; *p; p++) {
-        if (*p == ' ' && is_form) {
-            *o++ = '+';
-        } else if (*p == '-' || *p == '_' || *p == '.' || *p == '~' || isalnum((unsigned char)*p)) {
+	char *o = dest;
+	for (p = source; *p; p++) {
+		if (*p == ' ' && is_form) {
+			*o++ = '+';
+		} else if (*p == '-' || *p == '_' || *p == '.' || *p == '~' || isalnum((unsigned char)*p)) {
 			*o++ = *p;
-        } else {
-            sprintf(o, "%%%02X", (unsigned char)*p);
-            o += 3;
-        }
-    }
-    *o = '\0';
-    ctr_object* dest_obj = ctr_build_string_from_cstring(dest);
-    ctr_heap_free(dest);
-    ctr_heap_free(source);
-    return dest_obj;
+		} else {
+			sprintf(o, "%%%02X", (unsigned char)*p);
+			o += 3;
+		}
+	}
+	*o = '\0';
+	ctr_object* dest_obj = ctr_build_string_from_cstring(dest);
+	ctr_heap_free(dest);
+	ctr_heap_free(source);
+	return dest_obj;
 }
 
 /**
@@ -142,7 +142,7 @@ static ctr_object* ctr_server_urlformencode(ctr_object* myself, ctr_argument* ar
  * @test673
  */
 ctr_object* ctr_server_urlencode_set(ctr_object* myself, ctr_argument* argumentList) {
-    return ctr_server_urlformencode(myself, argumentList, 0);
+	return ctr_server_urlformencode(myself, argumentList, 0);
 }
 
 /**
@@ -152,7 +152,7 @@ ctr_object* ctr_server_urlencode_set(ctr_object* myself, ctr_argument* argumentL
  * @test673
  */
 ctr_object* ctr_server_formencode_set(ctr_object* myself, ctr_argument* argumentList) {
-    return ctr_server_urlformencode(myself, argumentList, 1);
+	return ctr_server_urlformencode(myself, argumentList, 1);
 }
 
 /**
@@ -466,31 +466,31 @@ ctr_object* ctr_server_mimetype(ctr_object* myself, ctr_argument* argumentList) 
 }
 
 static int is_valid_ipv4(const char *ip) {
-    if (ip == NULL) return 0;
-    int num, dots = 0;
-    const char *ptr = ip;
-    while (*ptr) {
-        if (!isdigit(*ptr)) return 0;
+	if (ip == NULL) return 0;
+	int num, dots = 0;
+	const char *ptr = ip;
+	while (*ptr) {
+		if (!isdigit(*ptr)) return 0;
 		num = 0;
-        int digits = 0;
-        while (*ptr && isdigit(*ptr)) {
-            num = num * 10 + (*ptr - '0');
-            digits++;
+		int digits = 0;
+		while (*ptr && isdigit(*ptr)) {
+			num = num * 10 + (*ptr - '0');
+			digits++;
 			if (digits > 3) return 0;
-            if (num > 255) return 0;
-            ptr++;
-        }
-        if (digits > 1 && *(ptr - digits) == '0') return 0;
-        if (*ptr == '.') {
-            dots++;
-            if (dots > 3) return 0;
-            ptr++;
-            if (*ptr == '\0') return 0;
-        } else if (*ptr != '\0') {
-            return 0;
-        }
-    }
-    return dots == 3;
+			if (num > 255) return 0;
+			ptr++;
+		}
+		if (digits > 1 && *(ptr - digits) == '0') return 0;
+		if (*ptr == '.') {
+			dots++;
+			if (dots > 3) return 0;
+			ptr++;
+			if (*ptr == '\0') return 0;
+		} else if (*ptr != '\0') {
+			return 0;
+		}
+	}
+	return dots == 3;
 }
 
 static int is_valid_ipv6(const char *ip) {
