@@ -460,30 +460,30 @@ ctr_object* ctr_object_is_nil(ctr_object* myself, ctr_argument* argumentList) {
  */
 
 ctr_object* ctr_object_learn_meaning(ctr_object* myself, ctr_argument* ctr_argumentList) {
-       char*  current_method_name_str;
-       ctr_size     current_method_name_len;
-       ctr_size     i                      = 0;
-       ctr_mapitem* current_method         = myself->methods->head;
-       ctr_object*  target_method_name     = ctr_internal_cast2string( ctr_argumentList->next->object );
-       int sticky = target_method_name->info.sticky;
-       target_method_name->info.sticky = 1;
-       char*        target_method_name_str = target_method_name->value.svalue->value;
-       ctr_size     target_method_name_len = target_method_name->value.svalue->vlen;
-       ctr_object*  alias                  = ctr_internal_cast2string( ctr_argumentList->object );
-       while( i < myself->methods->size ) {
-               current_method_name_str = current_method->key->value.svalue->value;
-               current_method_name_len = current_method->key->value.svalue->vlen;
-               if (  current_method_name_len == target_method_name_len ) {
+		char*  current_method_name_str;
+		ctr_size     current_method_name_len;
+		ctr_size     i                      = 0;
+		ctr_mapitem* current_method         = myself->methods->head;
+		ctr_object*  target_method_name     = ctr_internal_cast2string( ctr_argumentList->next->object );
+		int sticky = target_method_name->info.sticky;
+		target_method_name->info.sticky = 1;
+		char*        target_method_name_str = target_method_name->value.svalue->value;
+		ctr_size     target_method_name_len = target_method_name->value.svalue->vlen;
+		ctr_object*  alias                  = ctr_internal_cast2string( ctr_argumentList->object );
+		while( i < myself->methods->size ) {
+				current_method_name_str = current_method->key->value.svalue->value;
+				current_method_name_len = current_method->key->value.svalue->vlen;
+				if (  current_method_name_len == target_method_name_len ) {
 					if ( strncmp( current_method_name_str, target_method_name_str, current_method_name_len ) == 0 ) {
-                       ctr_internal_object_add_property( myself, alias, current_method->value, 1);
-                       break;
+					   ctr_internal_object_add_property( myself, alias, current_method->value, 1);
+					   break;
 					}
 				}
-               current_method = current_method->next;
-               i ++;
-       }
-       target_method_name->info.sticky = sticky;
-       return myself;
+				current_method = current_method->next;
+				i ++;
+		}
+		target_method_name->info.sticky = sticky;
+		return myself;
 }
 
 /**
@@ -1749,7 +1749,7 @@ ctr_object* ctr_string_from_length(ctr_object* myself, ctr_argument* argumentLis
 	ctr_heap_free( myself->value.svalue->value );
 	myself->value.svalue->value = dest;
 	myself->value.svalue->vlen  = ub;
-    return myself;
+	return myself;
 }
 
 /**
@@ -2628,30 +2628,30 @@ ctr_object* ctr_int64_new(ctr_object* myclass, ctr_argument* argumentList) {
 
 ctr_object* ctr_int64_from_string(ctr_object* myself, ctr_argument* argumentList) {
 	char *endptr;
-    errno = 0;
-    ctr_object* i64 = ctr_int64_new(CtrStdINT64, NULL);
-    if (argumentList->object->info.type != CTR_OBJECT_TYPE_OTSTRING) {
+	errno = 0;
+	ctr_object* i64 = ctr_int64_new(CtrStdINT64, NULL);
+	if (argumentList->object->info.type != CTR_OBJECT_TYPE_OTSTRING) {
 		ctr_error("Conversion from object other than string to int64 is not allowed due to possible inaccuracy.", 0);
 		return CtrStdNil;
 	}
 	char* str = ctr_heap_allocate_cstring(argumentList->object);
-    int64_t value = strtoll(str,&endptr,10);
-    if (errno == ERANGE) {
-        ctr_error("Number out of range", 0);
-        ctr_heap_free(str);
-        return CtrStdNil;
-    } else if (endptr == str) {
-        ctr_error("Unable to parse string to number", 0);
-        ctr_heap_free(str);
-        return CtrStdNil;
-    } else if (*endptr != '\0') {
+	int64_t value = strtoll(str,&endptr,10);
+	if (errno == ERANGE) {
+		ctr_error("Number out of range", 0);
+		ctr_heap_free(str);
+		return CtrStdNil;
+	} else if (endptr == str) {
+		ctr_error("Unable to parse string to number", 0);
+		ctr_heap_free(str);
+		return CtrStdNil;
+	} else if (*endptr != '\0') {
 		ctr_error("Additional chars found after number string", 0);
 		ctr_heap_free(str);
 		return CtrStdNil;
-    }
-    ctr_heap_free(str);
+	}
+	ctr_heap_free(str);
 	*((int64_t*)i64->value.rvalue->ptr) = value;
-    return i64;
+	return i64;
 }
 
 ctr_object* ctr_int64_to_string(ctr_object* myself, ctr_argument* argumentList) {
@@ -2743,57 +2743,57 @@ ctr_object* ctr_int64_higherEqThan(ctr_object* myself, ctr_argument* argumentLis
 
 int ctr_internal_parsenum(char *str, int base, double_t* ret) {
 	if (!str || !ret || base < 2 || base > 36) {
-        return -1;
-    }
-    while (isspace((unsigned char)*str)) {
-        str++;
-    }
-    int sign = 1;
-    if (*str == '-') {
-        sign = -1;
-        str++;
-    } else if (*str == '+') {
-        str++;
-    }
-    double_t result = 0.0;
-    while (*str) {
-        int digit;
-        if (isdigit((unsigned char)*str)) {
-            digit = *str - '0';
-        } else if (isalpha((unsigned char)*str)) {
-            digit = tolower(*str) - 'a' + 10;
-        } else {
-            break;
-        }
-        if (digit >= base) break;
-        result = result * base + digit;
-        str++;
-    }
-    // Fractional part
-    if (*str == '.') {
-        str++;
-        double_t frac = 1.0 / base;
+		return -1;
+	}
+	while (isspace((unsigned char)*str)) {
+		str++;
+	}
+	int sign = 1;
+	if (*str == '-') {
+		sign = -1;
+		str++;
+	} else if (*str == '+') {
+		str++;
+	}
+	double_t result = 0.0;
+	while (*str) {
+		int digit;
+		if (isdigit((unsigned char)*str)) {
+			digit = *str - '0';
+		} else if (isalpha((unsigned char)*str)) {
+			digit = tolower(*str) - 'a' + 10;
+		} else {
+			break;
+		}
+		if (digit >= base) break;
+		result = result * base + digit;
+		str++;
+	}
+	// Fractional part
+	if (*str == '.') {
+		str++;
+		double_t frac = 1.0 / base;
 
-        while (*str) {
-            int digit;
-            if (isdigit((unsigned char)*str)) {
-                digit = *str - '0';
-            } else if (isalpha((unsigned char)*str)) {
-                digit = tolower(*str) - 'a' + 10;
-            } else {
-                break;
-            }
+		while (*str) {
+			int digit;
+			if (isdigit((unsigned char)*str)) {
+				digit = *str - '0';
+			} else if (isalpha((unsigned char)*str)) {
+				digit = tolower(*str) - 'a' + 10;
+			} else {
+				break;
+			}
 
-            if (digit >= base) break;
+			if (digit >= base) break;
 
-            result += digit * frac;
-            frac /= base;
-            str++;
-        }
-    }
+			result += digit * frac;
+			frac /= base;
+			str++;
+		}
+	}
 
-    *ret = sign * result;
-    return 0;
+	*ret = sign * result;
+	return 0;
 }
 
 
