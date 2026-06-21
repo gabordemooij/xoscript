@@ -479,7 +479,7 @@ for example:
 >> x := Number between: 1 and: 10.
 ```
 
-In this case the message **between:and: ** is sent to **Number**, which
+In this case the message **between:and:** is sent to **Number**, which
 is the root object of all numbers. The result will be a random number
 between 1 and 10. Finally, there are **binary messages**, which have
 only one character and one argument:
@@ -880,13 +880,13 @@ the original logic of addition?** For instance, another interpretation
 could be that Xoscript will repeatedly send the same message to the same
 object which, in turn, would result into an **endless loop**. Clearly,
 this is not the intention. As soon as you send a message to an object,
-which would **execute** the **exact** **same code, Xoscript will realise,
+which would execute the exact same code, Xoscript will realise,
 in this case, that the underlying, overridden message is meant. So, your
 program will automatically be safeguarded against this form of endless
 loops. However, when it is indeed your aim to run the same function from the
 current function, it will be necessary to first send the message
 **recursive**. In this case, the result will be an infinite
-loop. **However there are useful applications for recursive tasks, f**or
+loop. However there are useful applications for recursive tasks, for
 instance, suppose that you want to calculate the factorial of a given
 number. In that case, simply add the message **factorial** to
 Number:
