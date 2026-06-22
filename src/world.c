@@ -29,7 +29,7 @@ ctr_object* CtrStdINT64;
 ctr_object* CtrStdHexHelper;
 ctr_object* CtrStdOctHelper;
 ctr_object* CtrStdBinHelper;
-ctr_object* formatObject;
+ctr_object* CtrStdFormat;
 
 
 /**
@@ -1126,15 +1126,15 @@ void ctr_initialize_world() {
 	CtrStdClock->link = CtrStdObject;
 	CtrStdFile->info.sticky = 1;
 	
-	formatObject = NULL;
-	formatObject = ctr_format_new(CtrStdObject, NULL);
-	formatObject->link = CtrStdObject;
-	ctr_internal_create_func(formatObject, CTR_STRINGOBJ( CTR_DICT_NEW ), &ctr_format_new );
-	ctr_internal_create_func(formatObject, CTR_STRINGOBJ( CTR_DICT_NEW_SET ), &ctr_format_new_set );
-	ctr_internal_create_func(formatObject, CTR_STRINGOBJ( CTR_DICT_FORMAT_SET ), &ctr_format_format_set );
-	ctr_internal_create_func(formatObject, CTR_STRINGOBJ( CTR_DICT_APPLY_TO ), &ctr_format_apply_to );
-	ctr_internal_create_func(formatObject, CTR_STRINGOBJ( CTR_DICT_APPLY_TO_INT_SET ), &ctr_format_apply_int_to );
-	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ( CTR_DICT_FORMAT_OBJECT ), formatObject, CTR_CATEGORY_PUBLIC_PROPERTY);
+	CtrStdFormat = NULL;
+	CtrStdFormat = ctr_format_new(CtrStdObject, NULL);
+	CtrStdFormat->link = CtrStdObject;
+	ctr_internal_create_func(CtrStdFormat, CTR_STRINGOBJ( CTR_DICT_NEW ), &ctr_format_new );
+	ctr_internal_create_func(CtrStdFormat, CTR_STRINGOBJ( CTR_DICT_NEW_SET ), &ctr_format_new_set );
+	ctr_internal_create_func(CtrStdFormat, CTR_STRINGOBJ( CTR_DICT_FORMAT_SET ), &ctr_format_format_set );
+	ctr_internal_create_func(CtrStdFormat, CTR_STRINGOBJ( CTR_DICT_APPLY_TO ), &ctr_format_apply_to );
+	ctr_internal_create_func(CtrStdFormat, CTR_STRINGOBJ( CTR_DICT_APPLY_TO_INT_SET ), &ctr_format_apply_int_to );
+	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ( CTR_DICT_FORMAT_OBJECT ), CtrStdFormat, CTR_CATEGORY_PUBLIC_PROPERTY);
 
 	/* Other objects */
 	CtrStdSlurp = ctr_internal_create_object( CTR_OBJECT_TYPE_OTOBJECT );
