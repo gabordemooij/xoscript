@@ -419,7 +419,6 @@ ctr_object* ctr_server_vault_password_verify(ctr_object* myself, ctr_argument* a
 	}
 	result = ctr_build_bool( !crypto_verify32(hash, hash2) );
 	cleanup:
-	
 	ctr_heap_free(pxphash64);
 	crypto_wipe(verify, strlen((char*)verify));
 	ctr_heap_free(verify);
