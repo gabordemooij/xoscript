@@ -100,7 +100,7 @@ unsigned int base64_decode(const char *in, unsigned int inlen, unsigned char *ou
 
 //@todo protect against using Vault itself, always make instance, need name
 
-char* ctr_internal_gui_vault_name(ctr_object* myself) {
+char* ctr_internal_vault_name(ctr_object* myself) {
 	return ctr_heap_allocate_cstring(
 		ctr_internal_cast2string(
 			ctr_internal_object_property(
@@ -112,7 +112,7 @@ char* ctr_internal_gui_vault_name(ctr_object* myself) {
 	);
 }
 
-ctr_object* ctr_gui_vault_new_set(ctr_object* myself, ctr_argument* argumentList) {
+ctr_object* ctr_vault_new_set(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* inst = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
 	ctr_internal_object_property(
 		inst,
@@ -123,14 +123,14 @@ ctr_object* ctr_gui_vault_new_set(ctr_object* myself, ctr_argument* argumentList
 	return inst;
 }
 
-ctr_object* ctr_gui_vault_new(ctr_object* myself, ctr_argument* argumentList) {
+ctr_object* ctr_vault_new(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument a;
 	a.object = ctr_build_string_from_cstring("default");
 	a.next = NULL;
-	return ctr_gui_vault_new_set(myself, &a);
+	return ctr_vault_new_set(myself, &a);
 }
 
-ctr_object* ctr_gui_vault_name(ctr_object* myself, ctr_argument* argumentList) {
+ctr_object* ctr_vault_name(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_internal_object_property(
 		myself,
 		"name",
@@ -138,7 +138,7 @@ ctr_object* ctr_gui_vault_name(ctr_object* myself, ctr_argument* argumentList) {
 	);
 }
 
-int ctr_gui_vault_internal_derive_key(unsigned char* password, uint8_t* hash, uint8_t* salt) {
+int ctr_vault_internal_derive_key(unsigned char* password, uint8_t* hash, uint8_t* salt) {
 	crypto_argon2_config config = {
 		.algorithm = CRYPTO_ARGON2_ID,           /* Argon2id         */
 		.nb_blocks = 100000,                     /* 100 megabytes   */
@@ -173,7 +173,7 @@ int ctr_gui_vault_internal_derive_key(unsigned char* password, uint8_t* hash, ui
  *
  * @test565
  */
-ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList) {
+ctr_object* ctr_vault_encrypt(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	char*    in;
 	char*    out;
@@ -208,7 +208,7 @@ ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList
 		return myself;
 	}
 	encrypted = ctr_heap_allocate(len);
-	if (ctr_gui_vault_internal_derive_key(password, key, salt)==-1) {
+	if (ctr_vault_internal_derive_key(password, key, salt)==-1) {
 		ctr_error("Unable to derive key.", 0);
 		result = CtrStdNil;
 		goto clean;
@@ -245,7 +245,7 @@ ctr_object* ctr_gui_vault_encrypt(ctr_object* myself, ctr_argument* argumentList
  *
  * @test565
  */
-ctr_object* ctr_gui_vault_decrypt(ctr_object* myself, ctr_argument* argumentList) {
+ctr_object* ctr_vault_decrypt(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	ctr_object* encrypted_message;
 	char* password;
@@ -312,7 +312,7 @@ ctr_object* ctr_gui_vault_decrypt(ctr_object* myself, ctr_argument* argumentList
 	}
 	message = ctr_heap_allocate((int)mlen);
 	memcpy(message, in+16+24+16+sizeof(uint32_t), (size_t)mlen);
-	if (ctr_gui_vault_internal_derive_key((unsigned char*)password, key, salt)==-1) {
+	if (ctr_vault_internal_derive_key((unsigned char*)password, key, salt)==-1) {
 		ctr_error("Unable to derive key.", 0);
 		crypto_wipe(message, mlen);
 		result = CtrStdNil;
@@ -361,7 +361,7 @@ ctr_object* ctr_server_vault_password_hash(ctr_object* myself, ctr_argument* arg
 		ctr_error("Unable to generate secure random buffer.",0);
 		goto cleanup;
 	}
-	if (ctr_gui_vault_internal_derive_key(password, hash, salt)==-1) {
+	if (ctr_vault_internal_derive_key(password, hash, salt)==-1) {
 		ctr_error("Unable to hash password.", 0);
 		goto cleanup;
 	}
@@ -413,7 +413,7 @@ ctr_object* ctr_server_vault_password_verify(ctr_object* myself, ctr_argument* a
 	}
 	hash = phash;
 	salt = phash + 32;
-	if (ctr_gui_vault_internal_derive_key((unsigned char*)verify, hash2, salt)!=0) {
+	if (ctr_vault_internal_derive_key((unsigned char*)verify, hash2, salt)!=0) {
 		ctr_error("Unable to derive key",0);
 		goto cleanup;
 	}
@@ -657,13 +657,13 @@ ctr_object* ctr_file_checksum(ctr_object* myself, ctr_argument* argumentList) {
 
 ctr_object* vaultObject;
 void begin_vault() {
-	vaultObject = ctr_gui_vault_new(CtrStdObject, NULL);
+	vaultObject = ctr_vault_new(CtrStdObject, NULL);
 	vaultObject->link = CtrStdObject;
-	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_NEW ), &ctr_gui_vault_new );
-	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_NEW_SET ), &ctr_gui_vault_new_set );
-	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_NAME ), &ctr_gui_vault_name );
-	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_ENCRYPT_KEY_SET ), &ctr_gui_vault_encrypt );
-	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_DECRYPT_KEY_SET ), &ctr_gui_vault_decrypt );
+	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_NEW ), &ctr_vault_new );
+	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_NEW_SET ), &ctr_vault_new_set );
+	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_NAME ), &ctr_vault_name );
+	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_ENCRYPT_KEY_SET ), &ctr_vault_encrypt );
+	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_DECRYPT_KEY_SET ), &ctr_vault_decrypt );
 	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_TOKEN_SET ), &ctr_server_vault_token_set );
 	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_PASSWORD_HASH_SET ), &ctr_server_vault_password_hash );
 	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_PASSWORD_HASH_VERIFY_SET ), &ctr_server_vault_password_verify );
