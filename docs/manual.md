@@ -2254,6 +2254,36 @@ Note that the template engine will always perform html encoding
 if you write to a slot marker. So, if you use the template system
 you don't have to use this.
 
+## Mailing
+
+To send a mail use the mailtools.xo library.
+
+Example:
+
+```
+Server init.
+Program use: ['mailtools.xo'].
+
+>> e-mail := HTML-Email new.
+>> img := e-mail attach: ( File new: ['myimage.png'] ).
+
+e-mail
+from: ['xo@xoscript.com'] name: ['xo'],
+to: ( List new ; ['xo2@xoscipt.com'] ),
+subject: ['xoxo'],
+body: (['
+<html>
+<body>
+<h1>hello!</h1>
+<img src="<cid>">
+</body>
+</html>	
+'] <cid>: img), send.
+
+```
+
+
+
 ## Linking
 
 Using the link: message you can link an external library to
