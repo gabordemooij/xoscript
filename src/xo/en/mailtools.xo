@@ -40,7 +40,8 @@ Email on: ['body:'] do: { :body
 }.
 
 Email on: ['send'] do: {
-	Out write: ['sendmail -t '] + ( File tempwrite: self generate, path ), stop.
+	>> f := File tempwrite: self generate.
+	Program os: ['sendmail -t < '] + f path, stop.
 }.
 
 >> HTML-Email := Email new.
@@ -88,16 +89,21 @@ HTML-Email on: ['generate'] do: {
 	own attachments each: { :id :info
 		>> blob := info data.
 		str append: ['--'] + own boundary + brk.
-		str append: ['Content-Type:'] + info mime + brk.
+		str append: ['Content-Type: '] + info mime + brk.
 		str append: ['Content-Transfer-Encoding: base64'] + brk.
 		str append: ['Content-ID: <attachment'] + id + ['>'] + brk.
 		str append: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
 		str append: brk.
-		str append: blob.
+		>> max := 76.
+		>> len := blob length.
+		>> chunks := (len / max) ceil.
+		{ :i
+			>> chunk := blob copy from: i * max length: max.
+			str append: chunk + brk.
+		} * chunks.
 		str append: brk.
 		str append: brk.
 	}.
 	str append: ['--'] + own boundary + ['--'] + brk.
 	<- str.
 }.
-
