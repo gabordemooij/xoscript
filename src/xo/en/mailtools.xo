@@ -1,0 +1,103 @@
+>> Email := Object new.
+
+Email on: ['init'] do: {
+	own recipients := List new.
+	own cc := List new.
+	own bcc := List new.
+	own from := None.
+	own from-name := None.
+	own subject := None.
+	own body := None.
+}.
+
+Email on: ['new'] do: {
+	<- self new init.
+}.
+
+Email on: ['to:'] do: { :list
+	own recipients := list.
+}.
+ 
+Email on: ['cc:'] do: { :list
+	own cc := list.
+}.
+
+Email on: ['bcc:'] do: { :list
+	own bcc := list.
+}.
+
+Email on: ['subject:'] do: { :subject
+	own subject := subject.
+}.
+
+Email on: ['from:name:'] do: { :from :name
+	own from := from.
+	own from-name := name.
+}.
+
+Email on: ['body:'] do: { :body
+	own body := body.
+}.
+
+Email on: ['send'] do: {
+	Out write: ['sendmail -t '] + ( File tempwrite: self generate, path ), stop.
+}.
+
+>> HTML-Email := Email new.
+
+HTML-Email on: ['init'] do: {
+	self init.
+	own attachments := List new.
+	own boundary := Vault token: 40.
+}.
+
+HTML-Email on: ['attach:'] do: { :file
+	>> id := own attachments count.
+	>> blob := file blob.
+	own attachments append: (
+		Dict new
+			file: file path,
+			mime: ['image/'] + (Server mimetype: file path),
+			data: blob base64-encode
+	).
+	blob free.
+	<- ['cid:attachment'] + id.
+}.
+
+HTML-Email on: ['generate'] do: {
+	>> brk  := ['\r\n'].
+	>> str := [''].
+	str append: ['From: '] + own from-name + [' <'] + ( own from ) + ['>'] + brk.
+	str append: ['To: '] + ( own recipients combine: [','] ) + brk.
+	own cc count true: { 
+		str append: ['Cc: '] + ( own cc combine: [','] ) + brk.
+	}.
+	own bcc count true: {
+		str append: ['Bcc: '] + ( own bcc combine: [','] ) + brk.
+	}.
+	str append: ['Subject: '] + own subject + brk.
+	str append: ['MIME-Version: 1.0'] + brk.
+	str append: ['Content-Type: multipart/related; boundary="'] + own boundary + ['"; type=text/html'] + brk.
+	str append: brk.
+	str append: ['--'] + own boundary + brk.
+	str append: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str append: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str append: brk.	
+	str append: own body.
+	str append: brk.
+	own attachments each: { :id :info
+		>> blob := info data.
+		str append: ['--'] + own boundary + brk.
+		str append: ['Content-Type:'] + info mime + brk.
+		str append: ['Content-Transfer-Encoding: base64'] + brk.
+		str append: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str append: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str append: brk.
+		str append: blob.
+		str append: brk.
+		str append: brk.
+	}.
+	str append: ['--'] + own boundary + ['--'] + brk.
+	<- str.
+}.
+
