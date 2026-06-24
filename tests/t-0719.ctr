@@ -1,0 +1,22 @@
+Server init.
+>> fmt := Format new: ['%#3x'].
+
+>> blob := Blob new: 4.
+blob bytes: ( 
+	List new ; 0 ; 1 ; 2 ; 3
+).
+
+>> file := File new: ['/tmp/blob'].
+file blob: blob.
+blob free.
+
+>> read := file blob.
+read 
+from: 0 
+length: 4, 
+do each: { :i :b 
+	Out
+	write: (fmt apply-int: b),
+	stop.
+}.
+read free.

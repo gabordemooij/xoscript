@@ -4,6 +4,7 @@
 #include <server.h>
 #include "../../xo.h"
 #include <ffi.h>
+#include <vault.h>
 
 #include "monocypher/src/monocypher.h"
 
@@ -873,6 +874,105 @@ ctr_object* ctr_blob_new(ctr_object* myself, ctr_argument* argumentList) {
 	return blobInstance;
 }
 
+/**
+ * @def
+ * [ File ] blob
+ *
+ * @test721
+ */
+ctr_object* ctr_file_blob(ctr_object* myself, ctr_argument* argumentList) {
+	//@todo share code with core/file
+	ctr_object* path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0);
+	ctr_size fileLen;
+	char* pathString;
+	char *buffer;
+	size_t bytesRead;
+	FILE* f;
+	int error_code;
+	if (path == NULL) return CtrStdNil;
+	pathString = ctr_heap_allocate_cstring( path );
+	f = fopen(pathString, "rb");
+	error_code = errno;
+	ctr_heap_free( pathString );
+	if (!f) {
+		ctr_error( CTR_ERR_OPEN, error_code );
+		return CtrStdNil;
+	}
+	fseek(f, 0, SEEK_END);
+	fileLen=ftell(f);
+	fseek(f, 0, SEEK_SET);
+	buffer=(char *)ctr_heap_allocate(fileLen+1);
+	if (!buffer){
+		fprintf(stderr, CTR_ERR_OOM );
+		fclose(f);exit(1);
+	}
+	bytesRead = fread(buffer, 1, fileLen, f);
+	fclose(f);
+	if (bytesRead != fileLen) {
+		ctr_error( CTR_ERR_OPEN, error_code );
+		ctr_heap_free( buffer );
+		return CtrStdNil;
+	}
+	ctr_object* blob = ctr_blob_new(CtrMediaDataBlob, NULL);
+	ctr_resource* rbuffer = ctr_heap_allocate(sizeof(ctr_resource));
+	rbuffer->ptr = buffer;
+	rbuffer->destructor = &ctr_media_blob_destructor;
+	blob->value.rvalue = rbuffer;
+	blob->info.sticky = 1; //@todo check if this is really needed
+	return blob;
+}
+
+/**
+ * @def
+ * [ File ] blob: [ Blob ]
+ *
+ * @test720
+ */
+ctr_object* ctr_file_blob_write(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* blob = argumentList->object;
+	ctr_object* path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0 );
+	FILE* f;
+	ctr_size vlen;
+	char* pathString;
+	int error_code;
+	if (path == NULL) return CtrStdNil;
+	vlen = path->value.svalue->vlen;
+	pathString = ctr_heap_allocate(vlen + 1);
+	memcpy(pathString, path->value.svalue->value, vlen);
+	memcpy(pathString+vlen,"\0",1);
+	f = fopen(pathString, "wb+");
+	error_code = errno;
+	ctr_heap_free( pathString );
+	if (!f) {
+		CtrStdFlow = ctr_error( CTR_ERR_OPEN, error_code );
+		return CtrStdNil;
+	}
+	size_t s;
+	ctr_heap_size(blob->value.rvalue->ptr, &s);
+	fwrite(blob->value.rvalue->ptr, sizeof(char), s, f);
+	fclose(f);
+	return myself;
+}
+
+/**
+ * @def
+ * [ Blob ] base64-encode
+ *
+ * @test722
+ */
+ctr_object* ctr_blob_base64(ctr_object* myself, ctr_argument* argumentList) {
+	size_t s;
+	ctr_object* answer;
+	char* buf = myself->value.rvalue->ptr;
+	ctr_heap_size(buf, &s);
+	size_t outlen = BASE64_ENCODE_OUT_SIZE(s);
+	char* out = (char*) ctr_heap_allocate(outlen);
+	outlen = base64_encode((unsigned char*)buf, s, out);
+	answer = ctr_build_string_from_cstring(out);
+	ctr_heap_free(out);
+	return answer;
+}
+
 void begin_ffi() {
 	CtrMediaDataBlob = ctr_blob_new(CtrStdObject, NULL);
 	CtrMediaDataBlob->link = CtrStdObject;
@@ -889,6 +989,7 @@ void begin_ffi() {
 	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_LENGTH ), &ctr_blob_size);
 	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_WIPE ), &ctr_blob_wipe);
 	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_DECODE_SET ), &ctr_blob_decode);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_ENCODE ), &ctr_blob_base64);
 	CtrMediaFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
 	CtrMediaFFIObjectBase->link = CtrStdObject;
 	ctr_internal_create_func(CtrMediaFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_MESSAGEARGS ), &ctr_media_ffi_apply );
@@ -899,4 +1000,6 @@ void begin_ffi() {
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ(CTR_DICT_BLOB_OBJECT), CtrMediaDataBlob, CTR_CATEGORY_PUBLIC_PROPERTY);
 	//prevent from gc'ed
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ("_FFI"), CtrMediaFFIObjectBase, CTR_CATEGORY_PUBLIC_PROPERTY);
+	ctr_internal_create_func(CtrStdFile, CTR_STRINGOBJ( "blob" ), &ctr_file_blob );
+	ctr_internal_create_func(CtrStdFile, CTR_STRINGOBJ( "blob:" ), &ctr_file_blob_write );
 }
