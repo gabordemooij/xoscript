@@ -44,6 +44,24 @@ Email on: ['send'] do: {
 	Program os: ['sendmail -t < '] + f path, stop.
 }.
 
+Email on: ['generate'] do: {
+	>> brk  := ['\r\n'].
+	>> str := [''].
+	str append: ['From: '] + own from-name + [' <'] + ( own from ) + ['>'] + brk.
+	str append: ['To: '] + ( own recipients combine: [','] ) + brk.
+	own cc count true: {
+		str append: ['Cc: '] + ( own cc combine: [','] ) + brk.
+	}.
+	own bcc count true: {
+		str append: ['Bcc: '] + ( own bcc combine: [','] ) + brk.
+	}.
+	str append: ['Subject: '] + own subject + brk.
+	str append: brk.
+	str append: own body.
+	str append: brk.
+	<- str.
+}.
+
 >> HTML-Email := Email new.
 
 HTML-Email on: ['init'] do: {
@@ -70,7 +88,7 @@ HTML-Email on: ['generate'] do: {
 	>> str := [''].
 	str append: ['From: '] + own from-name + [' <'] + ( own from ) + ['>'] + brk.
 	str append: ['To: '] + ( own recipients combine: [','] ) + brk.
-	own cc count true: { 
+	own cc count true: {
 		str append: ['Cc: '] + ( own cc combine: [','] ) + brk.
 	}.
 	own bcc count true: {
@@ -83,7 +101,7 @@ HTML-Email on: ['generate'] do: {
 	str append: ['--'] + own boundary + brk.
 	str append: ['Content-Type: text/html; charset=UTF-8'] + brk.
 	str append: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str append: brk.	
+	str append: brk.
 	str append: own body.
 	str append: brk.
 	own attachments each: { :id :info
