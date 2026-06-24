@@ -1720,6 +1720,8 @@ use of FFI through the server plugin or a separate IO plugin.
 
 @api_File_file
 @api_File_vault
+@api_File_fficonnect
+
 
 # Date/Time
 
