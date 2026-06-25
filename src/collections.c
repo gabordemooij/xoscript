@@ -570,6 +570,7 @@ ctr_object* ctr_array_copy(ctr_object* myself, ctr_argument* argumentList) {
 ctr_object* temp_sorter;
 ctr_object* temp_self;
 int ctr_sort_cmp(const void * a, const void * b) {
+	//@todo check this function
 	ctr_argument* arg1 = (ctr_argument*) ctr_heap_allocate( sizeof( ctr_argument ) );
 	ctr_argument* arg2 = (ctr_argument*) ctr_heap_allocate( sizeof( ctr_argument ) );
 	ctr_object* result;
@@ -577,6 +578,7 @@ int ctr_sort_cmp(const void * a, const void * b) {
 	arg1->next = arg2;
 	arg1->object = *((ctr_object**) a);
 	arg2->object = *((ctr_object**) b);
+	//@todo these are set every step and overwrite, not really needed?
 	ctr_gc_internal_pin(temp_sorter);
 	ctr_gc_internal_pin(temp_self);
 	ctr_gc_internal_pin(arg1->object);
