@@ -79,3 +79,5 @@
 #define CTR_DICT_SRVCNF_MAXPOSTFIELDS            "max-postfields"            // Word for program setting to configure maximum fields to be processed in http post payload
 #define CTR_DICT_SRVCNF_MAXCONTENTLNGTH          "max-contentlength"         // Word for program setting to configure the maximum content length allowed to process
 #define CTR_DICT_SRVCNF_MAXPOSTTIME              "max-posttime"              // Word for program setting to configure the time limit to enforce upon reading stdin in CGI to read raw post data
+#define CTR_DICT_BLOB                            "blob"                      // Word to cast something to a blob object / get a blob
+#define CTR_DICT_BLOB_SET                        "blob:"                     // Word to set a blob

@@ -79,3 +79,5 @@
 #define CTR_DICT_SRVCNF_MAXPOSTFIELDS            "max-campos" 
 #define CTR_DICT_SRVCNF_MAXCONTENTLNGTH          "max-conteudo"
 #define CTR_DICT_SRVCNF_MAXPOSTTIME              "max-proctempo"
+#define CTR_DICT_BLOB                            "blob"
+#define CTR_DICT_BLOB_SET                        "blob:"

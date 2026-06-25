@@ -79,3 +79,5 @@
 #define CTR_DICT_SRVCNF_MAXPOSTFIELDS            "最大发送字段" 
 #define CTR_DICT_SRVCNF_MAXCONTENTLNGTH          "最大内容"
 #define CTR_DICT_SRVCNF_MAXPOSTTIME              "最大处理时间"
+#define CTR_DICT_BLOB                            "blob"
+#define CTR_DICT_BLOB_SET                        "blob:"

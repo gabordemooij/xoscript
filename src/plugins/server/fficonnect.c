@@ -1033,6 +1033,6 @@ void begin_ffi() {
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ(CTR_DICT_BLOB_OBJECT), CtrMediaDataBlob, CTR_CATEGORY_PUBLIC_PROPERTY);
 	//prevent from gc'ed
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ("_FFI"), CtrMediaFFIObjectBase, CTR_CATEGORY_PUBLIC_PROPERTY);
-	ctr_internal_create_func(CtrStdFile, CTR_STRINGOBJ( "blob" ), &ctr_file_blob );
-	ctr_internal_create_func(CtrStdFile, CTR_STRINGOBJ( "blob:" ), &ctr_file_blob_write );
+	ctr_internal_create_func(CtrStdFile, CTR_STRINGOBJ( CTR_DICT_BLOB ), &ctr_file_blob );
+	ctr_internal_create_func(CtrStdFile, CTR_STRINGOBJ( CTR_DICT_BLOB_SET ), &ctr_file_blob_write );
 }

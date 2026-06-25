@@ -79,3 +79,5 @@
 #define CTR_DICT_SRVCNF_MAXPOSTFIELDS            "max-polya" 
 #define CTR_DICT_SRVCNF_MAXCONTENTLNGTH          "max-soderzhimoe"
 #define CTR_DICT_SRVCNF_MAXPOSTTIME              "max-procvremya"
+#define CTR_DICT_BLOB                            "blob"
+#define CTR_DICT_BLOB_SET                        "blob:"
