@@ -876,6 +876,37 @@ ctr_object* ctr_blob_new(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
+ * [ Blob ] decode-base64: [ String ]
+ *
+ * @test723
+ */
+ctr_object* ctr_blob_frombase64_set(ctr_object* myself, ctr_argument* argumentList) {
+	char* in;
+	char* out;
+	int outlen;
+	int inlen;
+	ctr_object* str;
+	ctr_object* answer;
+	ctr_resource* rbuffer;
+	str = ctr_internal_cast2string(argumentList->object);
+	inlen = str->value.svalue->vlen;
+	if (inlen==0) return ctr_build_empty_string();
+	in = ctr_heap_allocate_cstring(str);
+	outlen = BASE64_DECODE_OUT_SIZE(inlen);
+	out = ctr_heap_allocate(outlen);
+	outlen = base64_decode(in, inlen, (unsigned char*) out);
+	answer = ctr_blob_new(CtrMediaDataBlob, NULL); //@todo DRY
+	rbuffer = ctr_heap_allocate(sizeof(ctr_resource));
+	rbuffer->ptr = out;
+	rbuffer->destructor = &ctr_media_blob_destructor;
+	answer->value.rvalue = rbuffer;
+	answer->info.sticky = 1; //@todo check if this is really needed
+	ctr_heap_free(in);
+	return answer;
+}
+
+/**
+ * @def
  * [ File ] blob
  *
  * @test721
@@ -990,6 +1021,7 @@ void begin_ffi() {
 	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_WIPE ), &ctr_blob_wipe);
 	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_DECODE_SET ), &ctr_blob_decode);
 	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_ENCODE ), &ctr_blob_base64);
+	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_DECODE_SET ), &ctr_blob_frombase64_set);
 	CtrMediaFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
 	CtrMediaFFIObjectBase->link = CtrStdObject;
 	ctr_internal_create_func(CtrMediaFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_MESSAGEARGS ), &ctr_media_ffi_apply );
