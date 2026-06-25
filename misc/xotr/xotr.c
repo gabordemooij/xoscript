@@ -31,7 +31,6 @@ void* ctr_heap_allocate(size_t size) {
 
 void* ctr_heap_reallocate(void* old, size_t size) {
 	void* nw = realloc(old, size);
-	memset(nw, 0, size);
 	return nw;
 }
 
