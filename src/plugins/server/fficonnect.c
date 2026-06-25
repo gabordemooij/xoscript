@@ -996,6 +996,7 @@ ctr_object* ctr_blob_base64(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* answer;
 	char* buf = myself->value.rvalue->ptr;
 	ctr_heap_size(buf, &s);
+	s -= sizeof(size_t);
 	size_t outlen = BASE64_ENCODE_OUT_SIZE(s);
 	char* out = (char*) ctr_heap_allocate(outlen);
 	outlen = base64_encode((unsigned char*)buf, s, out);
