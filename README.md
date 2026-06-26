@@ -36,10 +36,10 @@ To run the same example on OpenBSD:
 ./example.sh fizzbuzz OBSD
 ```
 
-To run the example with a clean build:
+To run the example with a clean build in English:
 
 ```
-./example.sh fizzbuzz OBSD clean
+./example.sh fizzbuzz OBSD clean en
 ```
 
 To run the unit tests:
@@ -80,14 +80,21 @@ ISO="en" gmake -f makefile.obsd
 To build the server plugin on Linux:
 
 ```
-PACKAGE="server" NAME="server.so" make plugin-clean
-ISO="en" PACKAGE="server" NAME="server.so" make plugin
+PACKAGE="server" NAME="server" make plugin-clean
+ISO="en" PACKAGE="server" NAME="server" make plugin
+```
+
+For Spanish:
+
+```
+PACKAGE="server" NAME="servidor" make plugin-clean
+ISO="en" PACKAGE="server" NAME="servidor" make plugin
 ```
 
 To build the server plugin on OpenBSD:
 
 ```
-PACKAGE="server" NAME="server.so" gmake -f makefile.obsd plugin-clean
-ISO="en" PACKAGE="server" NAME="server.so" gmake -f makefile.obsd plugin
+PACKAGE="server" NAME="server" gmake -f makefile.obsd plugin-clean
+ISO="en" PACKAGE="server" NAME="server" gmake -f makefile.obsd plugin
 ```
 
