@@ -9,8 +9,8 @@
 #include "monocypher/src/monocypher.h"
 
 
-ctr_object* CtrMediaFFIObjectBase;
-ctr_object* CtrMediaDataBlob;
+ctr_object* CtrFFIObjectBase;
+ctr_object* CtrDataBlob;
 
 ctr_object* ctr_ffi_object_new(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
@@ -259,7 +259,7 @@ ctr_object* ctr_blob_decode(ctr_object* myself, ctr_argument* argumentList) {
  */
 ctr_object* ctr_build_blob(void* data, size_t len) {
 	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX);
-	instance->link = CtrMediaDataBlob;
+	instance->link = CtrDataBlob;
 	ctr_resource* buffer = ctr_heap_allocate(sizeof(ctr_resource));
 	buffer->ptr = ctr_heap_allocate(len);
 	memcpy(buffer->ptr, data, len);
@@ -340,7 +340,7 @@ ctr_object* ctr_blob_read(ctr_object* myself, ctr_argument* argumentList) {
 	return newArray;
 }
 
-struct CtrMediaFFI {
+struct CtrFFI {
 	void* handle;
 	void* symbol;
 	ffi_type* args[20];
@@ -349,7 +349,7 @@ struct CtrMediaFFI {
 	ffi_cif* cif;
 	ctr_object* owner;
 };
-typedef struct CtrMediaFFI CtrMediaFFI;
+typedef struct CtrFFI CtrFFI;
 
 struct ctr_media_test_struct {
 	int a;
@@ -363,7 +363,7 @@ int ctr_media_internal_structtest(ctr_media_test_struct sum) {
 }
 
 void ctr_media_ffi_destructor(ctr_resource* resource_value) {
-	CtrMediaFFI* ff = (CtrMediaFFI*) resource_value->ptr;
+	CtrFFI* ff = (CtrFFI*) resource_value->ptr;
 	ctr_heap_free(ff->cif);
 	ff->cif = NULL;
 	ctr_heap_free(ff);	
@@ -519,7 +519,7 @@ void* ctr_internal_gui_ffi_convert_value(ffi_type* type, ctr_object* obj) {
 			if (obj == CtrStdNil) {
 				*((void**)ptr) = NULL;
 			}
-			else if (obj->link == CtrMediaDataBlob) {
+			else if (obj->link == CtrDataBlob) {
 				*((void**)ptr) = (void*) obj->value.rvalue->ptr;
 			}
 			else {
@@ -574,7 +574,7 @@ ctr_object* ctr_internal_gui_ffi_convert_value_back(ffi_type* type, void* ptr) {
 		result = ctr_build_number_from_float( (ctr_number) *((long*) ptr) );
 	} else if (type == &ffi_type_pointer) {
 		ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX);
-		instance->link = CtrMediaDataBlob;
+		instance->link = CtrDataBlob;
 		ctr_resource* buffer = ctr_heap_allocate(sizeof(ctr_resource));
 		buffer->ptr = *((void**)ptr);
 		buffer->destructor = &ctr_media_blob_destructor;
@@ -585,7 +585,7 @@ ctr_object* ctr_internal_gui_ffi_convert_value_back(ffi_type* type, void* ptr) {
 	return result;
 }
 
-CtrMediaFFI* ctr_internal_gui_ffi_get(ctr_object* obj, ctr_object* property) {
+CtrFFI* ctr_internal_gui_ffi_get(ctr_object* obj, ctr_object* property) {
 	ctr_object* resource_holder = ctr_internal_object_find_property(
 		obj,
 		ctr_internal_cast2string( property ),
@@ -598,14 +598,14 @@ CtrMediaFFI* ctr_internal_gui_ffi_get(ctr_object* obj, ctr_object* property) {
 	if (!resource) {
 		return NULL;
 	}
-	CtrMediaFFI* ff = (CtrMediaFFI*) resource->ptr;
+	CtrFFI* ff = (CtrFFI*) resource->ptr;
 	return ff;
 }
 
 ctr_object* ctr_media_ffi_respond_to_and_and_and(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	void* return_value;
-	CtrMediaFFI* ff = ctr_internal_gui_ffi_get(myself, argumentList->object);
+	CtrFFI* ff = ctr_internal_gui_ffi_get(myself, argumentList->object);
 	if (!ff) {
 		return ctr_error("Unable to find FFI property.", 0);
 	}
@@ -626,7 +626,7 @@ ctr_object* ctr_media_ffi_respond_to_and_and_and(ctr_object* myself, ctr_argumen
 ctr_object* ctr_media_ffi_respond_to_and_and(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	void* return_value;
-	CtrMediaFFI* ff = ctr_internal_gui_ffi_get(myself, argumentList->object);
+	CtrFFI* ff = ctr_internal_gui_ffi_get(myself, argumentList->object);
 	if (!ff) {
 		return ctr_error("Unable to find FFI property.", 0);
 	}
@@ -646,7 +646,7 @@ ctr_object* ctr_media_ffi_respond_to_and(ctr_object* myself, ctr_argument* argum
 	ctr_object* result;
 	ctr_object* arr;
 	void* return_value;
-	CtrMediaFFI* ff = ctr_internal_gui_ffi_get(myself, argumentList->object);
+	CtrFFI* ff = ctr_internal_gui_ffi_get(myself, argumentList->object);
 	if (!ff) {
 		return ctr_error("Unable to find FFI property.", 0);
 	}
@@ -686,7 +686,7 @@ ctr_object* ctr_media_ffi_apply(ctr_object* myself, ctr_argument* argumentList) 
 ctr_object* ctr_media_ffi_respond_to(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	void* return_value;
-	CtrMediaFFI* ff = ctr_internal_gui_ffi_get(myself, argumentList->object);
+	CtrFFI* ff = ctr_internal_gui_ffi_get(myself, argumentList->object);
 	if (!ff) {
 		return ctr_error("Unable to find FFI property.", 0);
 	}
@@ -703,13 +703,13 @@ ctr_object* ctr_media_ffi_respond_to(ctr_object* myself, ctr_argument* argumentL
  * The generic methods are then used to map those properties
  * to messages.
  */
-CtrMediaFFI* CtrMediaPreviousFFIEntry = NULL;
+CtrFFI* CtrPreviousFFIEntry = NULL;
 void ctr_internal_gui_ffi(ctr_object* ffispec) {
 	char* library_path;
 	char* symbol_name;
 	char* ffi_property_name;
 	char* rtype_desc;
-	CtrMediaFFI* ff;
+	CtrFFI* ff;
 	ctr_object* arg1;
 	ctr_object* arg2;
 	ctr_object* arg3;
@@ -735,7 +735,7 @@ void ctr_internal_gui_ffi(ctr_object* ffispec) {
 		arg7 = *(ffispec->value.avalue->elements + 6);	
 	}
 	// Create FFI entry
-	ff = ctr_heap_allocate(sizeof(CtrMediaFFI));
+	ff = ctr_heap_allocate(sizeof(CtrFFI));
 	if (!ff) {
 		ctr_error("Unable to allocate FFI handle.", 0);
 		return;
@@ -744,8 +744,8 @@ void ctr_internal_gui_ffi(ctr_object* ffispec) {
 	ff->handle = NULL;
 	// Load dynamic library
 	if (arg1 == CtrStdNil) {
-		if (CtrMediaPreviousFFIEntry) {
-			ff->handle = CtrMediaPreviousFFIEntry->handle;
+		if (CtrPreviousFFIEntry) {
+			ff->handle = CtrPreviousFFIEntry->handle;
 		} else {
 			ctr_error("No FFI handle", 0);
 			return;
@@ -765,8 +765,8 @@ void ctr_internal_gui_ffi(ctr_object* ffispec) {
 	}
 	// Obtain symbol reference
 	if (arg2 == CtrStdNil) {
-		if (CtrMediaPreviousFFIEntry) {
-			ff->symbol = CtrMediaPreviousFFIEntry->symbol;
+		if (CtrPreviousFFIEntry) {
+			ff->symbol = CtrPreviousFFIEntry->symbol;
 		} else {
 			ctr_error("No FFI symbol", 0);
 			return;
@@ -827,15 +827,15 @@ void ctr_internal_gui_ffi(ctr_object* ffispec) {
 	}
 	// Create the owner object in the world
 	if (arg5 == CtrStdNil) {
-		if (CtrMediaPreviousFFIEntry) {
-			ff->owner = CtrMediaPreviousFFIEntry->owner;
+		if (CtrPreviousFFIEntry) {
+			ff->owner = CtrPreviousFFIEntry->owner;
 		} else {
 			ctr_error("No FFI bridge object",0);
 			return;
 		}
 	} else {
 		ff->owner = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
-		ff->owner->link = CtrMediaFFIObjectBase;
+		ff->owner->link = CtrFFIObjectBase;
 		ctr_internal_object_add_property(
 			CtrStdWorld,
 			ctr_internal_cast2string(arg5),
@@ -864,7 +864,7 @@ void ctr_internal_gui_ffi(ctr_object* ffispec) {
 	);
 	ctr_heap_free(ffi_property_name);
 	// Succesfully created FFI bridge, store this bridge in cache
-	CtrMediaPreviousFFIEntry = ff;
+	CtrPreviousFFIEntry = ff;
 }
 
 
@@ -895,7 +895,7 @@ ctr_object* ctr_blob_frombase64_set(ctr_object* myself, ctr_argument* argumentLi
 	outlen = BASE64_DECODE_OUT_SIZE(inlen);
 	out = ctr_heap_allocate(outlen);
 	outlen = base64_decode(in, inlen, (unsigned char*) out);
-	answer = ctr_blob_new(CtrMediaDataBlob, NULL); //@todo DRY
+	answer = ctr_blob_new(CtrDataBlob, NULL); //@todo DRY
 	rbuffer = ctr_heap_allocate(sizeof(ctr_resource));
 	rbuffer->ptr = out;
 	rbuffer->destructor = &ctr_media_blob_destructor;
@@ -944,7 +944,7 @@ ctr_object* ctr_file_blob(ctr_object* myself, ctr_argument* argumentList) {
 		ctr_heap_free( buffer );
 		return CtrStdNil;
 	}
-	ctr_object* blob = ctr_blob_new(CtrMediaDataBlob, NULL);
+	ctr_object* blob = ctr_blob_new(CtrDataBlob, NULL);
 	ctr_resource* rbuffer = ctr_heap_allocate(sizeof(ctr_resource));
 	rbuffer->ptr = buffer;
 	rbuffer->destructor = &ctr_media_blob_destructor;
@@ -1006,33 +1006,33 @@ ctr_object* ctr_blob_base64(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 void begin_ffi() {
-	CtrMediaDataBlob = ctr_blob_new(CtrStdObject, NULL);
-	CtrMediaDataBlob->link = CtrStdObject;
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_NEW_SET ), &ctr_blob_new_set);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_STRING ), &ctr_blob_tostring);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_BYTES_SET ), &ctr_blob_fill);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_UTF8_SET ), &ctr_blob_utf8_set);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_NEW_TYPE_SET ), &ctr_blob_new_set_type);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_DEREF ), &ctr_blob_deref);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_FREE ), &ctr_blob_free);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_STRUCT_SET ), &ctr_blob_new_struct);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_FREE_STRUCT ), &ctr_blob_free_struct);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_FROM_LENGTH ), &ctr_blob_read);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_LENGTH ), &ctr_blob_size);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_WIPE ), &ctr_blob_wipe);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_DECODE_SET ), &ctr_blob_decode);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_ENCODE ), &ctr_blob_base64);
-	ctr_internal_create_func(CtrMediaDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_DECODE_SET ), &ctr_blob_frombase64_set);
-	CtrMediaFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
-	CtrMediaFFIObjectBase->link = CtrStdObject;
-	ctr_internal_create_func(CtrMediaFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_MESSAGEARGS ), &ctr_media_ffi_apply );
-	ctr_internal_create_func(CtrMediaFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO ), &ctr_media_ffi_respond_to );
-	ctr_internal_create_func(CtrMediaFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND ), &ctr_media_ffi_respond_to_and );
-	ctr_internal_create_func(CtrMediaFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND_AND ), &ctr_media_ffi_respond_to_and_and );
-	ctr_internal_create_func(CtrMediaFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND_AND_AND ), &ctr_media_ffi_respond_to_and_and_and );
-	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ(CTR_DICT_BLOB_OBJECT), CtrMediaDataBlob, CTR_CATEGORY_PUBLIC_PROPERTY);
+	CtrDataBlob = ctr_blob_new(CtrStdObject, NULL);
+	CtrDataBlob->link = CtrStdObject;
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_NEW_SET ), &ctr_blob_new_set);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_STRING ), &ctr_blob_tostring);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BYTES_SET ), &ctr_blob_fill);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_UTF8_SET ), &ctr_blob_utf8_set);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_NEW_TYPE_SET ), &ctr_blob_new_set_type);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_DEREF ), &ctr_blob_deref);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_FREE ), &ctr_blob_free);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_STRUCT_SET ), &ctr_blob_new_struct);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_FREE_STRUCT ), &ctr_blob_free_struct);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_FROM_LENGTH ), &ctr_blob_read);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_LENGTH ), &ctr_blob_size);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_WIPE ), &ctr_blob_wipe);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_DECODE_SET ), &ctr_blob_decode);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_ENCODE ), &ctr_blob_base64);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_DECODE_SET ), &ctr_blob_frombase64_set);
+	CtrFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
+	CtrFFIObjectBase->link = CtrStdObject;
+	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_MESSAGEARGS ), &ctr_media_ffi_apply );
+	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO ), &ctr_media_ffi_respond_to );
+	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND ), &ctr_media_ffi_respond_to_and );
+	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND_AND ), &ctr_media_ffi_respond_to_and_and );
+	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND_AND_AND ), &ctr_media_ffi_respond_to_and_and_and );
+	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ(CTR_DICT_BLOB_OBJECT), CtrDataBlob, CTR_CATEGORY_PUBLIC_PROPERTY);
 	//prevent from gc'ed
-	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ("_FFI"), CtrMediaFFIObjectBase, CTR_CATEGORY_PUBLIC_PROPERTY);
+	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ("_FFI"), CtrFFIObjectBase, CTR_CATEGORY_PUBLIC_PROPERTY);
 	ctr_internal_create_func(CtrStdFile, CTR_STRINGOBJ( CTR_DICT_BLOB ), &ctr_file_blob );
 	ctr_internal_create_func(CtrStdFile, CTR_STRINGOBJ( CTR_DICT_BLOB_SET ), &ctr_file_blob_write );
 }

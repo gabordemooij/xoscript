@@ -15,18 +15,18 @@ ctr_object* ctr_network_new(ctr_object* myself, ctr_argument* argumentList) {
 	return instance;
 }
 
-char* CtrMediaCurlBuffer;
-size_t CtrMediaCurlBufferSize;
-size_t CtrMediaCurlBytesRead;
+char* CtrCurlBuffer;
+size_t CtrCurlBufferSize;
+size_t CtrCurlBytesRead;
 size_t ctr_curl_write_callback(char* ptr, size_t size, size_t nmemb, void *userdata) {
 	size_t len = (size * nmemb);
-	size_t required_size = len + CtrMediaCurlBytesRead;
-	if (required_size > CtrMediaCurlBufferSize) {
-		CtrMediaCurlBuffer = ctr_heap_reallocate(CtrMediaCurlBuffer, required_size + 1); //extra room for NUL-byte
-		CtrMediaCurlBufferSize = required_size;
+	size_t required_size = len + CtrCurlBytesRead;
+	if (required_size > CtrCurlBufferSize) {
+		CtrCurlBuffer = ctr_heap_reallocate(CtrCurlBuffer, required_size + 1); //extra room for NUL-byte
+		CtrCurlBufferSize = required_size;
 	}
-	memcpy(CtrMediaCurlBuffer+CtrMediaCurlBytesRead, ptr, len);
-	CtrMediaCurlBytesRead += len;
+	memcpy(CtrCurlBuffer+CtrCurlBytesRead, ptr, len);
+	CtrCurlBytesRead += len;
 	return len;
 }
 
@@ -42,9 +42,9 @@ ctr_object* ctr_network_basic_text_send(ctr_object* myself, ctr_argument* argume
 	char* destination = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->next->object));
 	CURL* curl;
 	CURLcode res;
-	CtrMediaCurlBuffer = ctr_heap_allocate(10);
-	CtrMediaCurlBufferSize = 10;
-	CtrMediaCurlBytesRead = 0;
+	CtrCurlBuffer = ctr_heap_allocate(10);
+	CtrCurlBufferSize = 10;
+	CtrCurlBytesRead = 0;
 	if (!CtrNetworkConnectedFlag) {
 		curl_global_init(CURL_GLOBAL_DEFAULT);
 	}
@@ -61,13 +61,13 @@ ctr_object* ctr_network_basic_text_send(ctr_object* myself, ctr_argument* argume
 		result = ctr_error((char*)curl_easy_strerror(res), 0);
 	} else {
 		curl_easy_cleanup(curl);
-		result = ctr_build_string_from_cstring(CtrMediaCurlBuffer);
+		result = ctr_build_string_from_cstring(CtrCurlBuffer);
 	}
-	CtrMediaCurlBytesRead = 0;
-	if (CtrMediaCurlBufferSize) {
-		ctr_heap_free(CtrMediaCurlBuffer);
-		CtrMediaCurlBuffer = NULL;
-		CtrMediaCurlBufferSize = 0;
+	CtrCurlBytesRead = 0;
+	if (CtrCurlBufferSize) {
+		ctr_heap_free(CtrCurlBuffer);
+		CtrCurlBuffer = NULL;
+		CtrCurlBufferSize = 0;
 	}
 	ctr_heap_free(destination);
 	if (message_str) {
