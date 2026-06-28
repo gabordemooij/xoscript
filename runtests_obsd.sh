@@ -24,6 +24,8 @@ gmake -f makefile.obsd
 PACKAGE="server" NAME="server" gmake -f makefile.obsd plugin
 fi
 
+# Change FFITESTLIB to the correct value
+
 setup1() {
 	i=$1
 	REQUEST_METHOD="POST" \
@@ -31,7 +33,7 @@ setup1() {
 	CONTENT_LENGTH=20 \
 	QUERY_STRING="a=2&b=4&d[]=a&d[]=b&f[]=1&f[]=2" \
 	HTTP_COOKIE="xsid=abc123" \
-	FFITESTLIB="/usr/lib/libc.so.102.0" \
+	FFITESTLIB="/usr/lib/libc.so.103.0" \
 	./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err < <(echo -n 'c=3&e[]=1&e[]=2&xx=1')
 }
 
@@ -114,7 +116,7 @@ unittest() {
 
 # select range
 FROM=1
-TIL=723
+TIL=724
 
 pushd build/OpenBSD/bin
 for i in $(seq -f "%04g" $FROM $TIL);

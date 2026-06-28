@@ -1997,6 +1997,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 			&& obj->link != CtrStdObject
 			&& obj->link != CtrStdConsole
 			&& obj->link != CtrStdArray
+			&& obj->link != CtrStdFile
 		) {
 			ctr_dumper_dump_object(obj->link);
 		} else {
@@ -2013,6 +2014,10 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 	}
 	else if (obj->info.type == CTR_OBJECT_TYPE_OTSTRING) {
 		ctr_dumper_dump_str(obj->value.svalue);
+	}
+	else if (obj->info.type == CTR_OBJECT_TYPE_OTEX) {
+		//@todo check if rvalue is null -> if not throw error
+		//i.e. cant snapshot active resources like DB connections etc.
 	} else {
 		//@nothing
 	}
@@ -2075,6 +2080,10 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			continue;
 		} else if (pointer == CtrStdConsole) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_CONSOLE;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			continue;
+		} else if (pointer == CtrStdFile) {
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_FILE;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
 		}
@@ -2169,6 +2178,8 @@ ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 						*xpointer = (uintptr_t) CtrStdObject;
 					} else if (old == CTR_WIREABLE_KNOWN_LIST) {
 						*xpointer = (uintptr_t) CtrStdArray;
+					} else if (old == CTR_WIREABLE_KNOWN_FILE) {
+						*xpointer = (uintptr_t) CtrStdFile;
 					}
 				} else {
 					*xpointer = (uintptr_t) (char*) ( old - 0x1000 + blob + sizeof(ctr_wireable) + sizeof(size_t) );
@@ -2193,6 +2204,8 @@ ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 					*xpointer = (uintptr_t) CtrStdObject;
 				} else if (old == CTR_WIREABLE_KNOWN_LIST) {
 					*xpointer = (uintptr_t) CtrStdArray;
+				} else if (old == CTR_WIREABLE_KNOWN_FILE) {
+					*xpointer = (uintptr_t) CtrStdFile;
 				}
 			} else {
 				*xpointer = (uintptr_t) (char*) ( old - 0x1000 + blob + sizeof(ctr_wireable) + sizeof(size_t) );
