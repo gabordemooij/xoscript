@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/ksh
 #set -x
 #set -v
-ulimit -S -c unlimited
+ulimit -c 0 # avoid core dumps bc pledge/unveil
 
 CITRINE_MEMORY_LIMIT_MB=10
 export CITRINE_MEMORY_LIMIT_MB
@@ -24,7 +24,7 @@ gmake -f makefile.obsd
 PACKAGE="server" NAME="server" gmake -f makefile.obsd plugin
 fi
 
-# Change FFITESTLIB to the correct value
+printf '%s' 'c=3&e[]=1&e[]=2&xx=1' > /tmp/xotest.txt
 
 setup1() {
 	i=$1
@@ -33,8 +33,8 @@ setup1() {
 	CONTENT_LENGTH=20 \
 	QUERY_STRING="a=2&b=4&d[]=a&d[]=b&f[]=1&f[]=2" \
 	HTTP_COOKIE="xsid=abc123" \
-	FFITESTLIB="/usr/lib/libc.so.103.0" \
-	./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err < <(echo -n 'c=3&e[]=1&e[]=2&xx=1')
+	FFITESTLIB=$(ldconfig -r | awk '$3 ~ /libc\.so/ {print $3}') \
+	./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err < /tmp/xotest.txt
 }
 
 setup2() {
@@ -101,7 +101,8 @@ unittest() {
 		diff -bw ../../../tests/exp/en/test${i}en.exp /tmp/out
 		echo "code:"
 		echo $code
-		read -p "save new test result? (y/n)" answer </dev/tty
+		printf "save new test result? (y/n)"
+		read answer
 		if [[ $answer == "y" ]]; then
 			cat /tmp/out > ../../../tests/exp/en/test${i}en.exp
 			echo "recorded."
@@ -118,13 +119,13 @@ unittest() {
 FROM=1
 TIL=724
 
-pushd build/OpenBSD/bin
+cd build/OpenBSD/bin
 for i in $(seq -f "%04g" $FROM $TIL);
 do
 	unittest $i 1
 	unittest $i 4
 	unittest $i 0
 done
-popd
+cd ../../..
 
 
