@@ -42,16 +42,16 @@ if [[ $OS = "Linux" ]]; then
 	rm mods
 	ln -s ../../build/Linux/bin/mods mods
 	ln -s ../../src/xo/* .
+	echo 'c=3' > /tmp/xo_fxt_stdin
 	CITRINE_MEMORY_MODE=4 \
 	REQUEST_METHOD="POST" \
 	CONTENT_TYPE="application/x-www-form-urlencoded" \
 	CONTENT_LENGTH=3 \
 	QUERY_STRING="a=2&b=4" \
 	HTTP_COOKIE="xsid=abc123" \
-	../../build/Linux/bin/xo ${EXAMPLE}.xo < <(echo -n "c=3")
+	../../build/Linux/bin/xo ${EXAMPLE}.xo < /tmp/xo_fxt_stdin
 fi
 
-# On OpenBSD you need gmake and bash
 if [[ $OS = "OBSD" ]]; then
 	if [[ $CLEAN = "clean" ]]; then
 		make -f makefile.obsd clean
@@ -63,13 +63,14 @@ if [[ $OS = "OBSD" ]]; then
 	rm mods
 	ln -s ../../build/OpenBSD/bin/mods mods
 	ln -s ../../src/xo/* .
+	printf 'c=3' > /tmp/xo_fxt_stdin
 	CITRINE_MEMORY_MODE=4 \
 	REQUEST_METHOD="POST" \
 	CONTENT_TYPE="application/x-www-form-urlencoded" \
 	CONTENT_LENGTH=3 \
 	QUERY_STRING="a=2&b=4" \
 	HTTP_COOKIE="xsid=abc123" \
-	../../build/OpenBSD/bin/xo ${EXAMPLE}.xo < <(echo -n "c=3")
+	../../build/OpenBSD/bin/xo ${EXAMPLE}.xo < /tmp/xo_fxt_stdin
 fi
 
 
