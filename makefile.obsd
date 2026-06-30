@@ -1,29 +1,32 @@
 BUILD_DIR         = ./build
-BUILD_OBJ_DIR     = $(BUILD_DIR)/OpenBSD/obj
-BUILD_BIN_DIR     = $(BUILD_DIR)/OpenBSD/bin
+BUILD_OBJ_DIR     = ${BUILD_DIR}/OpenBSD/obj
+BUILD_BIN_DIR     = ${BUILD_DIR}/OpenBSD/bin
 BIN               = xo
 CFLAGS            = -O2 -std=c99 -g -mtune=native -Wno-unknown-pragmas -D CTRLANG=${ISO} -D OpenBSD -D PLEDGE -D UNVEIL -D ALLOCALIGN=16 -D PATH_MAX=1024 -I src/i18n/${ISO}  -D INCLUDETESTS
 LDFLAGS           = -g -rdynamic -lm
-CSRCS             = $(shell find ./src -maxdepth 1 -type f -name '*.c')
-COBJS             = $(patsubst ./src/%.c, $(BUILD_OBJ_DIR)/%.o, $(CSRCS))
-TARGET            = $(COBJS)
+CSRCS             != find ./src -maxdepth 1 -type f -name '*.c'
+COBJS             = ${CSRCS:S,^./src/,${BUILD_OBJ_DIR}/,:S,.c$,.o,}
+TARGET            = ${COBJS}
 
 all: xo
 
-xo: $(TARGET)
-	@mkdir -p $(BUILD_BIN_DIR)
-	$(CC) $(TARGET) $(LDFLAGS) -o $(BUILD_BIN_DIR)/$(BIN)
+xo: ${TARGET}
+	@mkdir -p ${BUILD_BIN_DIR}
+	${CC} ${TARGET} ${LDFLAGS} -o ${BUILD_BIN_DIR}/${BIN}
 
-$(BUILD_OBJ_DIR)/%.o: ./src/%.c
-	@mkdir -p $(BUILD_OBJ_DIR)
-	$(CC) $(CFLAGS) $(EXTRACFLAGS) -c $< -o $@
+.for s in ${CSRCS}
+o = ${s:S,^./src/,${BUILD_OBJ_DIR}/,:S,.c$,.o,}
+${o}: ${s}
+	@mkdir -p ${.TARGET:H}
+	${CC} ${CFLAGS} ${EXTRACFLAGS} -c ${s} -o ${.TARGET}
+.endfor
 
 clean:
 	rm  $(BUILD_OBJ_DIR)/* $(BUILD_BIN_DIR)/$(BIN)
 
 plugin:
-	cd src/plugins/${PACKAGE} ; gmake -f makefile.obsd all
+	cd src/plugins/${PACKAGE} ; make -f makefile.obsd all
 
 plugin-clean:
-	cd src/plugins/${PACKAGE} ; gmake -f makefile.obsd clean
+	cd src/plugins/${PACKAGE} ; make -f makefile.obsd clean
 
