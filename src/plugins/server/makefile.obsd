@@ -1,50 +1,41 @@
-#
-# Makefile
-#
 CC ?= gcc
 PLUGIN_DIR ?= .
-
 WARNINGS ?= -Wall -Wshadow -Wundef -Wextra -Wno-unused-function -Wno-error=strict-prototypes -Wpointer-arith \
 					-fno-strict-aliasing -Wno-error=cpp -Wuninitialized -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits \
 					-Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security \
 					 -Wno-error=pedantic -Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion  -Wdeprecated -Wempty-body \
 					-Wshift-negative-value -Wno-unused-value -std=gnu99
-CFLAGS 			?= ${EXTRACFLAGS} -D PCRE2 -D ARC4RANDOM -D FFI -D LIBCURL -O3 -g0 -I/usr/local/include/mysql -I/usr/local/include -I ./i18n/${ISO}/ -I ../../i18n/${ISO} -I$(PLUGIN_DIR)/ $(WARNINGS) -fPIC
-LDFLAGS 		=  -L/usr/local/lib  -lpcre2-8 -lmariadb -lcurl -lffi -lm -shared
-
-
-BIN 			= libctr$(NAME).so
-BUILD_DIR 		= ../../../build/OpenBSD
-BUILD_OBJ_DIR 	= $(BUILD_DIR)/obj/mods/$(NAME)
-BUILD_BIN_DIR 	= $(BUILD_DIR)/bin/mods/$(NAME)
+CFLAGS2 			?= ${EXTRACFLAGS} -D PCRE2 -D ARC4RANDOM -D FFI -D LIBCURL -O3 -g0 -I/usr/local/include/mysql -I/usr/local/include -I ./i18n/${ISO}/ -I ../../i18n/${ISO} -I$(PLUGIN_DIR)/ $(WARNINGS) -fPIC
+LDFLAGS2 		=  -L/usr/local/lib  -lpcre2-8 -lmariadb -lcurl -lffi -lm -shared
+BIN 			= libctr${NAME}.so
+BUILD_DIR2 		= ../../../build/OpenBSD
+BUILD_OBJ_DIR2 	= $(BUILD_DIR2)/obj/mods/${NAME}
+BUILD_BIN_DIR2 	= $(BUILD_DIR2)/bin/mods/${NAME}
 
 prefix ?= /usr
 bindir ?= $(prefix)/bin
-
-#Collect the files to compile
 MAINSRC = ./server.c
 
-CSRCS += pattern.c net.c mariadb.c json.c vault.c http.c fficonnect.c ccgi/ccgi.c jsmn/jsmn.c monocypher/src/monocypher.c
+CSRCS += pattern.c net.c mariadb.c json.c vault.c http.c fficonnect.c ccgi/ccgi.c jsmn/jsmn.c monocypher/src/monocypher.c server.c
 OBJEXT ?= .o
 
-COBJS = $(CSRCS:.c=$(OBJEXT))
-MAINOBJ = $(MAINSRC:.c=$(OBJEXT))
+COBJS = ${CSRCS:S,^,${BUILD_OBJ_DIR2}/,:S,.c$,.o,}
 
-SRCS = $(CSRCS) $(MAINSRC)
-OBJS = $(COBJS) $(MAINOBJ)
-TARGET = $(addprefix $(BUILD_OBJ_DIR)/, $(patsubst ./%, %, $(OBJS)))
+TARGET = ${COBJS}
 
 all: default
 
-$(BUILD_OBJ_DIR)/%.o: %.c
-	@mkdir -p $(dir $@)
-	@$(CC)  $(CFLAGS) -c $< -o $@
-	@echo "CC $<"
-	
+.for s in ${CSRCS}
+o = ${s:S,^,${BUILD_OBJ_DIR2}/,:S,.c$,.o,}
+${o}: ${s}
+	@mkdir -p ${BUILD_OBJ_DIR2}/${.TARGET:H}
+	${CC} ${CFLAGS2} ${EXTRACFLAGS} -c ${s} -o ${.TARGET}
+.endfor
+
 default: $(TARGET)
-	@mkdir -p $(dir $(BUILD_BIN_DIR)/)
-	$(CXX) -o $(BUILD_BIN_DIR)/$(BIN) $(TARGET) $(LDFLAGS)
+	@mkdir -p ${BUILD_BIN_DIR2}
+	$(CC) -o ${BUILD_BIN_DIR2}/${BIN} ${TARGET} ${LDFLAGS2}
 
 clean: 
-	rm -rf $(BUILD_OBJ_DIR)/*
-	rm -rf $(BUILD_BIN_DIR)/*
+	rm ${BUILD_OBJ_DIR2}/*
+	rm ${BUILD_BIN_DIR2}/*

@@ -54,11 +54,11 @@ fi
 # On OpenBSD you need gmake and bash
 if [[ $OS = "OBSD" ]]; then
 	if [[ $CLEAN = "clean" ]]; then
-		gmake -f makefile.obsd clean
-		PACKAGE="server" NAME="${server_plugin_name[$ISO]}" gmake -f makefile.obsd plugin-clean
+		make -f makefile.obsd clean
+		PACKAGE="server" NAME="${server_plugin_name[$ISO]}" make -f makefile.obsd plugin-clean
 	fi
-	gmake -f makefile.obsd
-	PACKAGE="server" NAME="${server_plugin_name[$ISO]}" gmake -f makefile.obsd plugin
+	make -f makefile.obsd
+	PACKAGE="server" NAME="${server_plugin_name[$ISO]}" make -f makefile.obsd plugin
 	cd examples/${EXAMPLE}
 	rm mods
 	ln -s ../../build/OpenBSD/bin/mods mods
