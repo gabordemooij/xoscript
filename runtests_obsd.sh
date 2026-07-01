@@ -15,7 +15,7 @@ if [[ $BUILD == "build" ]]; then
 LDFLAGS='-shared'
 ISO="en" 
 export ISO
-gmake clean
+make clean
 EXTRACFLAGS="-D TEST -D EXPERIMENTS"
 export EXTRACFLAGS
 make -f makefile.obsd clean
