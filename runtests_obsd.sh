@@ -19,9 +19,9 @@ gmake clean
 EXTRACFLAGS="-D TEST -D EXPERIMENTS"
 export EXTRACFLAGS
 make -f makefile.obsd clean
-PACKAGE="server" NAME="server" gmake -f makefile.obsd plugin-clean
+PACKAGE="server" NAME="server" make -f makefile.obsd plugin-clean
 make -f makefile.obsd
-PACKAGE="server" NAME="server" gmake -f makefile.obsd plugin
+PACKAGE="server" NAME="server" make -f makefile.obsd plugin
 fi
 
 printf '%s' 'c=3&e[]=1&e[]=2&xx=1' > /tmp/xotest.txt
@@ -117,7 +117,7 @@ unittest() {
 
 # select range
 FROM=1
-TIL=724
+TIL=726
 
 cd build/OpenBSD/bin
 for i in $(seq -f "%04g" $FROM $TIL);

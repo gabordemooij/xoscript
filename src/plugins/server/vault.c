@@ -399,9 +399,11 @@ ctr_object* ctr_server_vault_password_verify(ctr_object* myself, ctr_argument* a
 	uint8_t* hash;
 	uint8_t  hash2[32];
 	uint8_t* phash64;
-	char* pxphash64 = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
+	ctr_object* hashObject = ctr_internal_cast2string(argumentList->object);
+	char* pxphash64 = ctr_heap_allocate_cstring(hashObject);
 	char* verify = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->next->object));
 	uint8_t* phash = ctr_heap_allocate(48);
+	if (BASE64_DECODE_OUT_SIZE(hashObject->value.svalue->vlen - 7) > BASE64_DECODE_OUT_SIZE(BASE64_ENCODE_OUT_SIZE(48))) goto cleanup;
 	if (strncmp(pxphash64,SERVER_VAULT_CRYPTO_ID_20262,7)!=0){
 		ctr_error("Unknown password type", 0);
 		goto cleanup;
@@ -480,9 +482,14 @@ ctr_object* ctr_server_vault_pki_sign(ctr_object* myself, ctr_argument* argument
 	uint8_t       signature[64];
 	char* sig64 = NULL;
 	ctr_object* sig = CtrStdNil;
-	char* sk64  = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->next->object));
+	ctr_object* signKey;
+	signKey = ctr_internal_cast2string(argumentList->next->object);
+	char* sk64  = ctr_heap_allocate_cstring(signKey);
 	uint8_t* msg = (uint8_t*) ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
 	uint8_t sk[64];
+	if (BASE64_DECODE_OUT_SIZE(signKey->value.svalue->vlen) > BASE64_DECODE_OUT_SIZE(BASE64_ENCODE_OUT_SIZE(64))) {
+		 goto cleanup;
+	}
 	if (base64_decode(sk64, strlen(sk64), sk)!=64) {
 		ctr_error("base64 decoding failed", 0);
 		goto cleanup;
@@ -510,12 +517,17 @@ ctr_object* ctr_server_vault_pki_sign(ctr_object* myself, ctr_argument* argument
  * @test671
  */
 ctr_object* ctr_server_vault_pki_check(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* sig64Object;
+	ctr_object* pk64Object;
 	ctr_object* check = CtrStdBoolFalse;
+	sig64Object = ctr_internal_cast2string(argumentList->next->object);
+	pk64Object = ctr_internal_cast2string(argumentList->next->next->object);
 	char* msg   = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
-	char* sig64  = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->next->object));
-	char* pk64 = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->next->next->object));
-	uint8_t pk       [32];
+	char* sig64  = ctr_heap_allocate_cstring(sig64Object);
+	char* pk64 = ctr_heap_allocate_cstring(pk64Object);
+	uint8_t pk[32];
 	uint8_t signature[64];
+	if ( BASE64_DECODE_OUT_SIZE(pk64Object->value.svalue->vlen) > BASE64_DECODE_OUT_SIZE(BASE64_ENCODE_OUT_SIZE(32)) ||  BASE64_DECODE_OUT_SIZE(sig64Object->value.svalue->vlen) > BASE64_DECODE_OUT_SIZE(BASE64_ENCODE_OUT_SIZE(64))) goto cleanup;
 	if (base64_decode(pk64, strlen(pk64), pk)!=32) {
 		ctr_error("base64 decoding failed", 0);
 		goto cleanup;
