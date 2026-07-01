@@ -289,6 +289,9 @@ int ctr_clex_tok() {
 		if (c == '-') {
 			ctr_clex_buffer[i] = c; ctr_clex_tokvlen++;
 			i++;
+			if (i >= ctr_clex_bflmt) {
+				ctr_clex_emit_error( CTR_ERR_TOKBUFF );
+			}
 			ctr_code++;
 			c = *ctr_code;
 		}
@@ -297,6 +300,9 @@ int ctr_clex_tok() {
 			ctr_clex_tokvlen++;
 			ctr_code++;
 			c = *ctr_code;
+			if (i >= ctr_clex_bflmt) {
+				ctr_clex_emit_error( CTR_ERR_TOKBUFF );
+			}
 		}
 		eol = ( strncmp(ctr_code,CTR_DICT_END_OF_LINE,ctr_clex_keyword_eol_len)==0 );
 		if (eol && (ctr_code+ctr_clex_keyword_eol_len <= ctr_eofcode) && !isdigit(*(ctr_code+ctr_clex_keyword_eol_len))) {
@@ -309,6 +315,9 @@ int ctr_clex_tok() {
 		strncmp(ctr_code,CTR_DICT_NUM_DEC_SEP,ctr_clex_keyword_num_sep_dec_len)==0) {
 			ctr_clex_buffer[i] = '.'; ctr_clex_tokvlen++;
 			i++;
+			if (i >= ctr_clex_bflmt) {
+				ctr_clex_emit_error( CTR_ERR_TOKBUFF );
+			}
 			ctr_code++;
 			c = *ctr_code;
 		}
@@ -316,6 +325,9 @@ int ctr_clex_tok() {
 		while((isdigit(c))) {
 			ctr_clex_buffer[i] = c; ctr_clex_tokvlen++;
 			i++;
+			if (i >= ctr_clex_bflmt) {
+				ctr_clex_emit_error( CTR_ERR_TOKBUFF );
+			}
 			ctr_code++;
 			c = *ctr_code;
 		}
@@ -329,7 +341,7 @@ int ctr_clex_tok() {
 		}
 		ctr_clex_tokvlen++;
 		i++;
-		if (i > ctr_clex_bflmt) {
+		if (i >= ctr_clex_bflmt) {
 			ctr_clex_emit_error( CTR_ERR_TOKBUFF );
 		}
 		ctr_code++;
