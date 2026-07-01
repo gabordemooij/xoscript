@@ -73,8 +73,8 @@ ISO="en" make
 On OpenBSD:
 
 ```
-gmake -f makefile.obsd clean
-ISO="en" gmake -f makefile.obsd
+make -f makefile.obsd clean
+ISO="en" make -f makefile.obsd
 ```
 
 To build the server plugin on Linux:
@@ -94,7 +94,7 @@ ISO="en" PACKAGE="server" NAME="servidor" make plugin
 To build the server plugin on OpenBSD:
 
 ```
-PACKAGE="server" NAME="server" gmake -f makefile.obsd plugin-clean
-ISO="en" PACKAGE="server" NAME="server" gmake -f makefile.obsd plugin
+PACKAGE="server" NAME="server" make -f makefile.obsd plugin-clean
+ISO="en" PACKAGE="server" NAME="server" make -f makefile.obsd plugin
 ```
 
