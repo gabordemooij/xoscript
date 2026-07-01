@@ -2128,6 +2128,17 @@ ctr_object* ctr_object_dump( ctr_object* myself, ctr_argument* argumentList ) {
 	return myself;
 }
 
+/* Lookup table for ID -> pointer */
+static void* ctr_dumper_map_id2ptr[10] = {
+	[0] = 0,
+	[CTR_WIREABLE_KNOWN_BLOCK] = &CtrStdBlock,
+	[CTR_WIREABLE_KNOWN_STRING] = &CtrStdString,
+	[CTR_WIREABLE_KNOWN_CONSOLE] = &CtrStdConsole,
+	[CTR_WIREABLE_KNOWN_ROOT] = &CtrStdObject,
+	[CTR_WIREABLE_KNOWN_LIST] = &CtrStdArray,
+	[CTR_WIREABLE_KNOWN_FILE] = &CtrStdFile
+};
+
 ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 	char* magic = ctr_heap_allocate_tracked(100);
 	int items_read = 0;
@@ -2165,22 +2176,10 @@ ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 			for(size_t j=0; j<length; j++) {
 				uintptr_t* xpointer = (uintptr_t*) (void*) (elems + j);
 				uintptr_t old = *xpointer;
-				if (old < 0x1000) {
-					if (old == 0x0) {
-						*xpointer = 0;
-					} else if (old == CTR_WIREABLE_KNOWN_BLOCK) {
-						*xpointer = (uintptr_t) CtrStdBlock;
-					} else if (old == CTR_WIREABLE_KNOWN_STRING) {
-						*xpointer = (uintptr_t) CtrStdString;
-					} else if (old == CTR_WIREABLE_KNOWN_CONSOLE) {
-						*xpointer = (uintptr_t) CtrStdConsole;
-					} else if (old == CTR_WIREABLE_KNOWN_ROOT) {
-						*xpointer = (uintptr_t) CtrStdObject;
-					} else if (old == CTR_WIREABLE_KNOWN_LIST) {
-						*xpointer = (uintptr_t) CtrStdArray;
-					} else if (old == CTR_WIREABLE_KNOWN_FILE) {
-						*xpointer = (uintptr_t) CtrStdFile;
-					}
+				if (old == 0x0) {
+					*xpointer = 0;
+				} else if (old < 0x1000) {
+					*xpointer = (uintptr_t) *( (ctr_object**) ctr_dumper_map_id2ptr[old] );
 				} else {
 					*xpointer = (uintptr_t) (char*) ( old - 0x1000 + blob + sizeof(ctr_wireable) + sizeof(size_t) );
 				}
@@ -2191,22 +2190,10 @@ ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 			char* memblock = (char*) data + sizeof(size_t); //w->memblock; read the memblock that has been serialized
 			uintptr_t* xpointer = (uintptr_t*) (memblock + offset_pointer);
 			uintptr_t old = *xpointer;
-			if (old < 0x1000) {
-				if (old == 0x0) {
-					*xpointer = 0;
-				} else if (old == CTR_WIREABLE_KNOWN_BLOCK) {
-					*xpointer = (uintptr_t) CtrStdBlock;
-				} else if (old == CTR_WIREABLE_KNOWN_STRING) {
-					*xpointer = (uintptr_t) CtrStdString;
-				} else if (old == CTR_WIREABLE_KNOWN_CONSOLE) {
-					*xpointer = (uintptr_t) CtrStdConsole;
-				} else if (old == CTR_WIREABLE_KNOWN_ROOT) {
-					*xpointer = (uintptr_t) CtrStdObject;
-				} else if (old == CTR_WIREABLE_KNOWN_LIST) {
-					*xpointer = (uintptr_t) CtrStdArray;
-				} else if (old == CTR_WIREABLE_KNOWN_FILE) {
-					*xpointer = (uintptr_t) CtrStdFile;
-				}
+			if (old == 0x0) {
+				*xpointer = 0;
+			} else if (old < 0x1000) {
+				*xpointer = (uintptr_t) *( (ctr_object**) ctr_dumper_map_id2ptr[old] );
 			} else {
 				*xpointer = (uintptr_t) (char*) ( old - 0x1000 + blob + sizeof(ctr_wireable) + sizeof(size_t) );
 			}
