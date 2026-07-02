@@ -2110,7 +2110,7 @@ ctr_object* ctr_object_dump( ctr_object* myself, ctr_argument* argumentList ) {
 	char* pathstr = ctr_heap_allocate_cstring(argumentList->object);
 	FILE* f = fopen(pathstr, "wb");
 	ctr_heap_free(pathstr);
-	fwrite("xdmp0.2/", strlen("xdmp0.2/"), 1, f);
+	fwrite(CTR_WIREABLE_MAGIC_V2, sizeof(CTR_WIREABLE_MAGIC_V2)-1, 1, f);
 	wirelist_head = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
 	wirelist_current = wirelist_head;
 	ctr_dumper_dump_object(myself);
@@ -2140,13 +2140,13 @@ static void* ctr_dumper_map_id2ptr[10] = {
 };
 
 ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
-	char* magic = ctr_heap_allocate_tracked(100);
+	char* magic = ctr_heap_allocate_tracked(sizeof(CTR_WIREABLE_MAGIC_V2)-1);
 	int items_read = 0;
 	int blocks_read = 0;
 	char* pathstr = ctr_heap_allocate_cstring(argumentList->object);
 	FILE* f = fopen(pathstr, "rb");
 	ctr_heap_free(pathstr);
-	fread(magic, 8, 1, f);
+	fread(magic, sizeof(CTR_WIREABLE_MAGIC_V2)-1, 1, f);
 	fseek(f, 0, SEEK_END);
 	size_t filesize = ftell(f);
 	fseek(f, 8, SEEK_SET);
