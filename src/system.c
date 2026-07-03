@@ -1815,7 +1815,7 @@ void ctr_dumper_dump_cstr(char* str, size_t vlen) {
 	ctr_wireable* w = wirelist_current;
 	w->next = NULL;
 	char* memstr = ctr_heap_allocate_tracked(vlen);
-	w->memblock = memstr - sizeof(size_t);// (void*) (((char*) str) - sizeof(size_t));
+	w->memblock = memstr - sizeof(size_t);
 	w->memsize = *((size_t*)w->memblock);
 	memcpy(memstr, str, vlen); 
 	w->type = CTR_WIREABLE_TYPE_CSTR;
@@ -1861,7 +1861,6 @@ void ctr_dumper_dump_array(ctr_collection* arr) {
 	w->next = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
 	wirelist_current = w->next;
 	ctr_wireable_add(w);
-	//elements
 	w = wirelist_current;
 	w->next = NULL;
 	w->memblock = (void*) (((char*) arr->elements) - sizeof(size_t));
@@ -1878,7 +1877,6 @@ void ctr_dumper_dump_array(ctr_collection* arr) {
 		ctr_dumper_dump_object( *( arr->elements + i ) );
 	}
 }
-
 
 void ctr_dumper_dump_codeblock_nodes(ctr_tlistitem* nodes) {
 	ctr_wireable* w = wirelist_current;
@@ -2185,19 +2183,19 @@ ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 				}
 			}
 		} else {
-		for(int i = 0; i < w->numofpointers; i++) {
-			int offset_pointer = w->pointers[i];
-			char* memblock = (char*) data + sizeof(size_t); //w->memblock; read the memblock that has been serialized
-			uintptr_t* xpointer = (uintptr_t*) (memblock + offset_pointer);
-			uintptr_t old = *xpointer;
-			if (old == 0x0) {
-				*xpointer = 0;
-			} else if (old < 0x1000) {
-				*xpointer = (uintptr_t) *( (ctr_object**) ctr_dumper_map_id2ptr[old] );
-			} else {
-				*xpointer = (uintptr_t) (char*) ( old - 0x1000 + blob + sizeof(ctr_wireable) + sizeof(size_t) );
+			for(int i = 0; i < w->numofpointers; i++) {
+				int offset_pointer = w->pointers[i];
+				char* memblock = (char*) data + sizeof(size_t); //w->memblock; read the memblock that has been serialized
+				uintptr_t* xpointer = (uintptr_t*) (memblock + offset_pointer);
+				uintptr_t old = *xpointer;
+				if (old == 0x0) {
+					*xpointer = 0;
+				} else if (old < 0x1000) {
+					*xpointer = (uintptr_t) *( (ctr_object**) ctr_dumper_map_id2ptr[old] );
+				} else {
+					*xpointer = (uintptr_t) (char*) ( old - 0x1000 + blob + sizeof(ctr_wireable) + sizeof(size_t) );
+				}
 			}
-		}
 		}
 		char* memblock = (char*) data + sizeof(size_t);
 		// correct the hashkey, otherwise lookup fails
