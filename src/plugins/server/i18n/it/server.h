@@ -81,3 +81,4 @@
 #define CTR_DICT_SRVCNF_MAXPOSTTIME              "max-proctempo"
 #define CTR_DICT_BLOB                            "blob"
 #define CTR_DICT_BLOB_SET                        "blob:"
+#define CTR_DICT_XOR_AND_SET                     "xor:e:"

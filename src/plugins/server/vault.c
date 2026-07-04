@@ -18,6 +18,8 @@
 /* Set crypto version = Argon2i 100mb 3lanes 16byte salt */
 #define SERVER_VAULT_CRYPTO_ID_20262 "C20262$"
 
+
+
 // either provided by libsecret or bsd
 int random_buf(void *buf, size_t n) {
 	arc4random_buf(buf, n);
@@ -31,6 +33,56 @@ static void print_hex(char* name, unsigned char *data, size_t length) {
 	}
 	printf("\n");
 }
+
+#ifdef EXPERIMENTS
+size_t ctr_internal_vault_xor(char* buffer1, char* buffer2, size_t len) {
+	size_t i;
+	i = 0;
+	//@todo optimize asm
+	asm volatile ("loop%=: \
+	cmp %[len], %[i];  \
+	jae done%=; \
+	movb (%[buf2], %[i]), %%al;\
+	xorb %%al, (%[buf1], %[i]);\
+	inc %[i]; \
+	jmp loop%=; \
+	done%=: \
+	"
+     :[i]"+r"(i)
+     :[len]"r"(len), [buf1]"r"(buffer1), [buf2]"r"(buffer2)
+     :"%rax", "memory" , "cc"
+     );
+     return i;
+}
+
+/**
+ * @def
+ * [ Vault ] xor: [ Blob ] and: [ Blob ]
+ *
+ * @test727
+ */
+ctr_object* ctr_server_vault_xor(ctr_object* myself, ctr_argument* argumentList) {
+	char* buffer1;
+	char* buffer2;
+	size_t n;
+	size_t i;
+	n = 0;
+	ctr_object* bufferObject1 = argumentList->object;
+	ctr_object* bufferObject2 = argumentList->next->object;
+	if (
+	bufferObject1->info.type != CTR_OBJECT_TYPE_OTEX ||
+	bufferObject2->info.type != CTR_OBJECT_TYPE_OTEX) {
+		ctr_error("Only Blobs allowed", 0); //@todo localize error message
+		return CtrStdNil;
+	}
+	//@todo add type-check Blob
+	buffer1 = (char*) bufferObject1->value.rvalue->ptr;
+	buffer2 = (char*) bufferObject2->value.rvalue->ptr;
+	ctr_heap_size(buffer1, &n);
+	i = ctr_internal_vault_xor(buffer1, buffer2, n - sizeof(size_t));
+	return ctr_build_number_from_float( (double_t) i );
+}
+#endif
 
 //rfc4648
 #define BASE64_PAD '='
@@ -682,6 +734,7 @@ void begin_vault() {
 	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_SIGN_WITH_SET ), &ctr_server_vault_pki_sign );
 	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_CHECK_SIGNATURE_SET ), &ctr_server_vault_pki_check );
 	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_HASH_TYPE_SET ), &ctr_server_vault_hash );
+	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( "xor:and:" ), &ctr_server_vault_xor );
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ( CTR_DICT_VAULT_OBJECT ), vaultObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	ctr_internal_create_func(CtrStdFile, CTR_STRINGOBJ( CTR_DICT_CHECKSUM ), &ctr_file_checksum );
 }
