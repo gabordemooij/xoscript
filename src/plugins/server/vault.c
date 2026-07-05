@@ -717,7 +717,6 @@ ctr_object* ctr_file_checksum(ctr_object* myself, ctr_argument* argumentList) {
 	return result;
 }
 
-
 ctr_object* vaultObject;
 void begin_vault() {
 	vaultObject = ctr_vault_new(CtrStdObject, NULL);
@@ -734,7 +733,9 @@ void begin_vault() {
 	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_SIGN_WITH_SET ), &ctr_server_vault_pki_sign );
 	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_CHECK_SIGNATURE_SET ), &ctr_server_vault_pki_check );
 	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_HASH_TYPE_SET ), &ctr_server_vault_hash );
-	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( "xor:and:" ), &ctr_server_vault_xor );
+	#ifdef EXPERIMENTS
+	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_XOR_AND_SET ), &ctr_server_vault_xor );
+	#endif
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ( CTR_DICT_VAULT_OBJECT ), vaultObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	ctr_internal_create_func(CtrStdFile, CTR_STRINGOBJ( CTR_DICT_CHECKSUM ), &ctr_file_checksum );
 }
