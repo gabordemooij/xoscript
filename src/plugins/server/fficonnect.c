@@ -19,15 +19,15 @@ ctr_object* ctr_ffi_object_new(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 
-void ctr_media_blob_destructor(ctr_resource* resource_value) {
+void ctr_blob_destructor(ctr_resource* resource_value) {
 	// the destructor cant remove the memory automatically
 	// because upon returning from a c-function it is not known
 	// whether the memory belongs to us or to the called function
 	// you have to call free / freestruct.
 }
 
-ffi_type* ctr_internal_gui_ffi_map_type(char* description);
-void* ctr_internal_gui_ffi_convert_value(ffi_type* type, ctr_object* obj);
+ffi_type* ctr_internal_ffi_map_type(char* description);
+void* ctr_internal_ffi_convert_value(ffi_type* type, ctr_object* obj);
 
 
 ctr_object* ctr_blob_deref(ctr_object* myself, ctr_argument* argumentList) {
@@ -90,7 +90,7 @@ ctr_object* ctr_blob_new_set(ctr_object* myself, ctr_argument* argumentList) {
 	size_t size = (size_t) ctr_tonum(argumentList->object);
 	ctr_resource* buffer = ctr_heap_allocate(sizeof(ctr_resource));
 	buffer->ptr = ctr_heap_allocate(size);
-	buffer->destructor = &ctr_media_blob_destructor;
+	buffer->destructor = &ctr_blob_destructor;
 	instance->value.rvalue = buffer;
 	instance->info.sticky = 1;
 	return instance;
@@ -263,7 +263,7 @@ ctr_object* ctr_build_blob(void* data, size_t len) {
 	ctr_resource* buffer = ctr_heap_allocate(sizeof(ctr_resource));
 	buffer->ptr = ctr_heap_allocate(len);
 	memcpy(buffer->ptr, data, len);
-	buffer->destructor = &ctr_media_blob_destructor;
+	buffer->destructor = &ctr_blob_destructor;
 	instance->value.rvalue = buffer;
 	instance->info.sticky = 1;
 	return instance;
@@ -280,7 +280,7 @@ ctr_object* ctr_blob_utf8_set(ctr_object* myself, ctr_argument* argumentList) {
 	instance->link = myself;
 	ctr_resource* buffer = ctr_heap_allocate(sizeof(ctr_resource));
 	buffer->ptr = ctr_heap_allocate_cstring(argumentList->object);
-	buffer->destructor = &ctr_media_blob_destructor;
+	buffer->destructor = &ctr_blob_destructor;
 	instance->value.rvalue = buffer;
 	instance->info.sticky = 1;
 	return instance;
@@ -292,16 +292,16 @@ ctr_object* ctr_blob_utf8_set(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test548
  */
-ffi_type* ctr_internal_gui_ffi_map_type_obj(ctr_object* obj);
+ffi_type* ctr_internal_ffi_map_type_obj(ctr_object* obj);
 ctr_object* ctr_blob_new_set_type(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX);
 	instance->link = myself;
 	ctr_resource* buffer;
-	ffi_type* type = ctr_internal_gui_ffi_map_type_obj(argumentList->next->object);
+	ffi_type* type = ctr_internal_ffi_map_type_obj(argumentList->next->object);
 	if (type) {
 		buffer = ctr_heap_allocate(sizeof(ctr_resource));
-		buffer->destructor = &ctr_media_blob_destructor;
-		buffer->ptr = ctr_internal_gui_ffi_convert_value(type, argumentList->object);
+		buffer->destructor = &ctr_blob_destructor;
+		buffer->ptr = ctr_internal_ffi_convert_value(type, argumentList->object);
 	} else {
 		buffer = NULL;
 	}
@@ -351,18 +351,18 @@ struct CtrFFI {
 };
 typedef struct CtrFFI CtrFFI;
 
-struct ctr_media_test_struct {
+struct ctr_test_struct {
 	int a;
 	int b;
 };
-typedef struct ctr_media_test_struct ctr_media_test_struct;
+typedef struct ctr_test_struct ctr_test_struct;
 
-int ctr_media_internal_structtest(ctr_media_test_struct sum) {
+int ctr_internal_structtest(ctr_test_struct sum) {
 	// printf("sum of %d and %d is: %d \n", sum.a, sum.b, sum.a + sum.b); -- for debugging
 	return sum.a + sum.b;
 }
 
-void ctr_media_ffi_destructor(ctr_resource* resource_value) {
+void ctr_ffi_destructor(ctr_resource* resource_value) {
 	CtrFFI* ff = (CtrFFI*) resource_value->ptr;
 	ctr_heap_free(ff->cif);
 	ff->cif = NULL;
@@ -370,7 +370,7 @@ void ctr_media_ffi_destructor(ctr_resource* resource_value) {
 }
 
 
-ffi_type* ctr_internal_gui_ffi_map_type(char* description) {
+ffi_type* ctr_internal_ffi_map_type(char* description) {
 	if (strcmp(description, "void")==0) {
 		return &ffi_type_void;
 	} else if (strcmp(description, "uint")==0) {
@@ -415,11 +415,11 @@ ffi_type* ctr_internal_gui_ffi_map_type(char* description) {
 	return NULL;
 }
 
-ffi_type* ctr_internal_gui_ffi_map_type_obj(ctr_object* obj) {
+ffi_type* ctr_internal_ffi_map_type_obj(ctr_object* obj) {
 	ffi_type* result;
 	if (obj->info.type == CTR_OBJECT_TYPE_OTSTRING) {
 		char* description = ctr_heap_allocate_cstring(obj);
-		result = ctr_internal_gui_ffi_map_type(description);
+		result = ctr_internal_ffi_map_type(description);
 		ctr_heap_free(description);
 	} else {
 		result = obj->value.rvalue->ptr;
@@ -437,7 +437,7 @@ ctr_object* ctr_blob_new_struct(ctr_object* myself, ctr_argument* argumentList) 
 	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX);
 	instance->link = myself;
 	ctr_resource* buffer = ctr_heap_allocate(sizeof(ctr_resource));
-	buffer->destructor = &ctr_media_blob_destructor;
+	buffer->destructor = &ctr_blob_destructor;
 	ffi_type* cstruct = ctr_heap_allocate(sizeof(ffi_type));
 	cstruct->type = FFI_TYPE_STRUCT;
 	cstruct->alignment = 0;
@@ -448,7 +448,7 @@ ctr_object* ctr_blob_new_struct(ctr_object* myself, ctr_argument* argumentList) 
 		cstruct->elements = (ffi_type**) ctr_heap_allocate(sizeof(ffi_type*) * (nargs+1));
 		int i;
 		for (i = 0; i < nargs; i++) {
-			cstruct->elements[i] = ctr_internal_gui_ffi_map_type_obj(*(arr->value.avalue->elements + i));
+			cstruct->elements[i] = ctr_internal_ffi_map_type_obj(*(arr->value.avalue->elements + i));
 		}
 		cstruct->elements[i] = NULL;
 	}
@@ -469,7 +469,7 @@ ctr_object* ctr_blob_free_struct(ctr_object* myself, ctr_argument* argumentList)
 	return CtrStdNil;
 }
 
-void* ctr_internal_gui_ffi_convert_value(ffi_type* type, ctr_object* obj) {
+void* ctr_internal_ffi_convert_value(ffi_type* type, ctr_object* obj) {
 	//allocate for return type, must be at least ffi_arg
 	ctr_size size = type->size;
 	if (obj == NULL) {
@@ -532,7 +532,7 @@ void* ctr_internal_gui_ffi_convert_value(ffi_type* type, ctr_object* obj) {
 	return ptr;
 }
 
-ctr_object* ctr_internal_gui_ffi_convert_value_back(ffi_type* type, void* ptr) {
+ctr_object* ctr_internal_ffi_convert_value_back(ffi_type* type, void* ptr) {
 	ctr_object* result = CtrStdNil;
 	if (type == &ffi_type_void) {
 		result = CtrStdNil;
@@ -577,7 +577,7 @@ ctr_object* ctr_internal_gui_ffi_convert_value_back(ffi_type* type, void* ptr) {
 		instance->link = CtrDataBlob;
 		ctr_resource* buffer = ctr_heap_allocate(sizeof(ctr_resource));
 		buffer->ptr = *((void**)ptr);
-		buffer->destructor = &ctr_media_blob_destructor;
+		buffer->destructor = &ctr_blob_destructor;
 		instance->value.rvalue = buffer;
 		instance->info.sticky = 1;
 		result = instance;
@@ -585,7 +585,7 @@ ctr_object* ctr_internal_gui_ffi_convert_value_back(ffi_type* type, void* ptr) {
 	return result;
 }
 
-CtrFFI* ctr_internal_gui_ffi_get(ctr_object* obj, ctr_object* property) {
+CtrFFI* ctr_internal_ffi_get(ctr_object* obj, ctr_object* property) {
 	ctr_object* resource_holder = ctr_internal_object_find_property(
 		obj,
 		ctr_internal_cast2string( property ),
@@ -602,20 +602,20 @@ CtrFFI* ctr_internal_gui_ffi_get(ctr_object* obj, ctr_object* property) {
 	return ff;
 }
 
-ctr_object* ctr_media_ffi_respond_to_and_and_and(ctr_object* myself, ctr_argument* argumentList) {
+ctr_object* ctr_ffi_respond_to_and_and_and(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	void* return_value;
-	CtrFFI* ff = ctr_internal_gui_ffi_get(myself, argumentList->object);
+	CtrFFI* ff = ctr_internal_ffi_get(myself, argumentList->object);
 	if (!ff) {
 		return ctr_error("Unable to find FFI property.", 0);
 	}
 	void* values[3];
-	values[0] = ctr_internal_gui_ffi_convert_value(ff->args[0], argumentList->next->object);
-	values[1] = ctr_internal_gui_ffi_convert_value(ff->args[1], argumentList->next->next->object);
-	values[2] = ctr_internal_gui_ffi_convert_value(ff->args[2], argumentList->next->next->next->object);
-	return_value = ctr_internal_gui_ffi_convert_value(ff->rtype, NULL);
+	values[0] = ctr_internal_ffi_convert_value(ff->args[0], argumentList->next->object);
+	values[1] = ctr_internal_ffi_convert_value(ff->args[1], argumentList->next->next->object);
+	values[2] = ctr_internal_ffi_convert_value(ff->args[2], argumentList->next->next->next->object);
+	return_value = ctr_internal_ffi_convert_value(ff->rtype, NULL);
 	ffi_call(ff->cif, ff->symbol, return_value, values);
-	result = ctr_internal_gui_ffi_convert_value_back(ff->rtype, return_value);
+	result = ctr_internal_ffi_convert_value_back(ff->rtype, return_value);
 	ctr_heap_free(values[0]);
 	ctr_heap_free(values[1]);
 	ctr_heap_free(values[2]);
@@ -623,30 +623,30 @@ ctr_object* ctr_media_ffi_respond_to_and_and_and(ctr_object* myself, ctr_argumen
 	return result;
 }
 
-ctr_object* ctr_media_ffi_respond_to_and_and(ctr_object* myself, ctr_argument* argumentList) {
+ctr_object* ctr_ffi_respond_to_and_and(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	void* return_value;
-	CtrFFI* ff = ctr_internal_gui_ffi_get(myself, argumentList->object);
+	CtrFFI* ff = ctr_internal_ffi_get(myself, argumentList->object);
 	if (!ff) {
 		return ctr_error("Unable to find FFI property.", 0);
 	}
 	void* values[20];
-	values[0] = ctr_internal_gui_ffi_convert_value(ff->args[0], argumentList->next->object);
-	values[1] = ctr_internal_gui_ffi_convert_value(ff->args[1], argumentList->next->next->object);
-	return_value = ctr_internal_gui_ffi_convert_value(ff->rtype, NULL);
+	values[0] = ctr_internal_ffi_convert_value(ff->args[0], argumentList->next->object);
+	values[1] = ctr_internal_ffi_convert_value(ff->args[1], argumentList->next->next->object);
+	return_value = ctr_internal_ffi_convert_value(ff->rtype, NULL);
 	ffi_call(ff->cif, ff->symbol, return_value, values);
-	result = ctr_internal_gui_ffi_convert_value_back(ff->rtype, return_value);
+	result = ctr_internal_ffi_convert_value_back(ff->rtype, return_value);
 	ctr_heap_free(values[0]);
 	ctr_heap_free(values[1]);
 	ctr_heap_free(return_value);
 	return result;
 }
 
-ctr_object* ctr_media_ffi_respond_to_and(ctr_object* myself, ctr_argument* argumentList) {
+ctr_object* ctr_ffi_respond_to_and(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	ctr_object* arr;
 	void* return_value;
-	CtrFFI* ff = ctr_internal_gui_ffi_get(myself, argumentList->object);
+	CtrFFI* ff = ctr_internal_ffi_get(myself, argumentList->object);
 	if (!ff) {
 		return ctr_error("Unable to find FFI property.", 0);
 	}
@@ -658,14 +658,14 @@ ctr_object* ctr_media_ffi_respond_to_and(ctr_object* myself, ctr_argument* argum
 		}
 		for(int i = 0; i<arr->value.avalue->head; i++) {
 			if (i > ff->nargs) break;
-			values[i] = ctr_internal_gui_ffi_convert_value(ff->args[i], *(arr->value.avalue->elements+i));
+			values[i] = ctr_internal_ffi_convert_value(ff->args[i], *(arr->value.avalue->elements+i));
 		}
 	} else {
-		values[0] = ctr_internal_gui_ffi_convert_value(ff->args[0], argumentList->next->object);
+		values[0] = ctr_internal_ffi_convert_value(ff->args[0], argumentList->next->object);
 	}
-	return_value = ctr_internal_gui_ffi_convert_value(ff->rtype, NULL);
+	return_value = ctr_internal_ffi_convert_value(ff->rtype, NULL);
 	ffi_call(ff->cif, ff->symbol, return_value, values);
-	result = ctr_internal_gui_ffi_convert_value_back(ff->rtype, return_value);
+	result = ctr_internal_ffi_convert_value_back(ff->rtype, return_value);
 	if (argumentList->next->object->info.type == CTR_OBJECT_TYPE_OTARRAY) {
 		arr = argumentList->next->object;
 		for(int i = 0; i<arr->value.avalue->head; i++) {
@@ -679,20 +679,20 @@ ctr_object* ctr_media_ffi_respond_to_and(ctr_object* myself, ctr_argument* argum
 	return result;
 }
 
-ctr_object* ctr_media_ffi_apply(ctr_object* myself, ctr_argument* argumentList) {
-	return ctr_media_ffi_respond_to_and(myself, argumentList);
+ctr_object* ctr_ffi_apply(ctr_object* myself, ctr_argument* argumentList) {
+	return ctr_ffi_respond_to_and(myself, argumentList);
 }
 
-ctr_object* ctr_media_ffi_respond_to(ctr_object* myself, ctr_argument* argumentList) {
+ctr_object* ctr_ffi_respond_to(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* result;
 	void* return_value;
-	CtrFFI* ff = ctr_internal_gui_ffi_get(myself, argumentList->object);
+	CtrFFI* ff = ctr_internal_ffi_get(myself, argumentList->object);
 	if (!ff) {
 		return ctr_error("Unable to find FFI property.", 0);
 	}
-	return_value = ctr_internal_gui_ffi_convert_value(ff->rtype, NULL);
+	return_value = ctr_internal_ffi_convert_value(ff->rtype, NULL);
 	ffi_call(ff->cif, ff->symbol, return_value, NULL);
-	result = ctr_internal_gui_ffi_convert_value_back(ff->rtype, return_value);
+	result = ctr_internal_ffi_convert_value_back(ff->rtype, return_value);
 	ctr_heap_free(return_value);
 	return result;
 }
@@ -704,7 +704,7 @@ ctr_object* ctr_media_ffi_respond_to(ctr_object* myself, ctr_argument* argumentL
  * to messages.
  */
 CtrFFI* CtrPreviousFFIEntry = NULL;
-void ctr_internal_gui_ffi(ctr_object* ffispec) {
+void ctr_internal_ffi(ctr_object* ffispec) {
 	char* library_path;
 	char* symbol_name;
 	char* ffi_property_name;
@@ -774,7 +774,7 @@ void ctr_internal_gui_ffi(ctr_object* ffispec) {
 	} else {
 		symbol_name = ctr_heap_allocate_cstring(ctr_internal_cast2string(arg2));
 		if (strcmp("@structtest", symbol_name)==0) {
-			ff->symbol = &ctr_media_internal_structtest;
+			ff->symbol = &ctr_internal_structtest;
 			ctr_heap_free(symbol_name);
 		} else {
 			ff->symbol = dlsym( ff->handle, symbol_name );
@@ -798,7 +798,7 @@ void ctr_internal_gui_ffi(ctr_object* ffispec) {
 		return;
 	}
 	for(int i = 0; i<ff->nargs; i++) {
-		ff->args[i] = ctr_internal_gui_ffi_map_type_obj(*(arg3->value.avalue->elements + i));
+		ff->args[i] = ctr_internal_ffi_map_type_obj(*(arg3->value.avalue->elements + i));
 		if (!ff->args[i]) {
 			ctr_error("Unable to map argument type.", 0);
 			return;
@@ -808,7 +808,7 @@ void ctr_internal_gui_ffi(ctr_object* ffispec) {
 	// Build the return type
 	rtype_desc = ctr_heap_allocate_cstring(ctr_internal_cast2string(arg4));
 	ff->rtype = NULL;
-	ff->rtype = ctr_internal_gui_ffi_map_type(rtype_desc);
+	ff->rtype = ctr_internal_ffi_map_type(rtype_desc);
 	ctr_heap_free(rtype_desc);
 	
 	if (!ff->rtype) {
@@ -851,7 +851,7 @@ void ctr_internal_gui_ffi(ctr_object* ffispec) {
 	resource = ctr_heap_allocate(sizeof(ctr_resource));
 	resource->ptr = ff;
 	resource->type = 2;
-	resource->destructor = &ctr_media_ffi_destructor;
+	resource->destructor = &ctr_ffi_destructor;
 	cif_resource_holder = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX);
 	cif_resource_holder->value.rvalue = resource;
 	ffi_property_name = ctr_heap_allocate_cstring(
@@ -898,7 +898,7 @@ ctr_object* ctr_blob_frombase64_set(ctr_object* myself, ctr_argument* argumentLi
 	answer = ctr_blob_new(CtrDataBlob, NULL); //@todo DRY
 	rbuffer = ctr_heap_allocate(sizeof(ctr_resource));
 	rbuffer->ptr = out;
-	rbuffer->destructor = &ctr_media_blob_destructor;
+	rbuffer->destructor = &ctr_blob_destructor;
 	answer->value.rvalue = rbuffer;
 	answer->info.sticky = 1; //@todo check if this is really needed
 	ctr_heap_free(in);
@@ -947,7 +947,7 @@ ctr_object* ctr_file_blob(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* blob = ctr_blob_new(CtrDataBlob, NULL);
 	ctr_resource* rbuffer = ctr_heap_allocate(sizeof(ctr_resource));
 	rbuffer->ptr = buffer;
-	rbuffer->destructor = &ctr_media_blob_destructor;
+	rbuffer->destructor = &ctr_blob_destructor;
 	blob->value.rvalue = rbuffer;
 	blob->info.sticky = 1; //@todo check if this is really needed
 	return blob;
@@ -1025,11 +1025,11 @@ void begin_ffi() {
 	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_DECODE_SET ), &ctr_blob_frombase64_set);
 	CtrFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
 	CtrFFIObjectBase->link = CtrStdObject;
-	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_MESSAGEARGS ), &ctr_media_ffi_apply );
-	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO ), &ctr_media_ffi_respond_to );
-	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND ), &ctr_media_ffi_respond_to_and );
-	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND_AND ), &ctr_media_ffi_respond_to_and_and );
-	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND_AND_AND ), &ctr_media_ffi_respond_to_and_and_and );
+	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_MESSAGEARGS ), &ctr_ffi_apply );
+	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO ), &ctr_ffi_respond_to );
+	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND ), &ctr_ffi_respond_to_and );
+	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND_AND ), &ctr_ffi_respond_to_and_and );
+	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_RESPOND_TO_AND_AND_AND ), &ctr_ffi_respond_to_and_and_and );
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ(CTR_DICT_BLOB_OBJECT), CtrDataBlob, CTR_CATEGORY_PUBLIC_PROPERTY);
 	//prevent from gc'ed
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ("_FFI"), CtrFFIObjectBase, CTR_CATEGORY_PUBLIC_PROPERTY);

@@ -905,10 +905,6 @@ extern int putenv_old(const char* name, const char* value);
 /* for inclusion of citrine as lib (i.e. export) */
 int ctr_init();
 
-/* for exports */
-void init_embedded_media_plugin();
-void init_embedded_gui_plugin();
-
 extern ctr_object* ctr_int64_new(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_from_string(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_to_string(ctr_object* myself, ctr_argument* argumentList);

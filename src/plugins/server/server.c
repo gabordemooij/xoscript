@@ -216,7 +216,7 @@ ctr_object* ctr_server_base64decode_set(ctr_object* myself, ctr_argument* argume
 ctr_object* ctr_server_link_set(ctr_object* myself, ctr_argument* argumentList) {
 	if (argumentList->object->link == CtrStdArray) {
 		#ifdef FFI
-		ctr_internal_gui_ffi(argumentList->object);
+		ctr_internal_ffi(argumentList->object);
 		#else
 		ctr_error("FFI not available.", 0);
 		#endif
