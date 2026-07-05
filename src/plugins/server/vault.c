@@ -48,11 +48,11 @@ size_t ctr_internal_vault_xor(char* buffer1, char* buffer2, size_t len) {
 	jmp loop%=; \
 	done%=: \
 	"
-     :[i]"+r"(i)
-     :[len]"r"(len), [buf1]"r"(buffer1), [buf2]"r"(buffer2)
-     :"%rax", "memory" , "cc"
-     );
-     return i;
+	:[i]"+r"(i)
+	:[len]"r"(len), [buf1]"r"(buffer1), [buf2]"r"(buffer2)
+	:"%rax", "memory" , "cc"
+	);
+	return i;
 }
 
 /**
