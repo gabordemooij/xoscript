@@ -57,12 +57,8 @@ ctr_object* ctr_blob_fill(ctr_object* myself, ctr_argument* argumentList) {
  */
 ctr_object* ctr_blob_wipe(ctr_object* myself, ctr_argument* argumentList) {
 	size_t s = 0;
-	int err = ctr_heap_size(myself->value.rvalue->ptr, &s);
-	if (err) {
-		ctr_error("Unable to wipe memory block.", 0);
-		return CtrStdNil;
-	}
-	crypto_wipe(myself->value.rvalue->ptr, s - sizeof(size_t));
+	s = ctr_heap_size(myself->value.rvalue->ptr);
+	crypto_wipe(myself->value.rvalue->ptr, s);
 	return myself;
 }
 
@@ -104,10 +100,8 @@ ctr_object* ctr_blob_new_set(ctr_object* myself, ctr_argument* argumentList) {
  */
 ctr_object* ctr_blob_size(ctr_object* myself, ctr_argument* argumentList) {
 	size_t size;
-	if (ctr_heap_size(myself->value.rvalue->ptr, &size) == 0) {
-		return ctr_build_number_from_float((double_t) ( size - sizeof(size_t) ) );
-	}
-	return CtrStdNil;
+	size = ctr_heap_size(myself->value.rvalue->ptr);
+	return ctr_build_number_from_float((double_t) size);
 }
 
 static uint16_t ctr_internal_utf8_eswap16(uint16_t w) {
@@ -230,8 +224,7 @@ ctr_object* ctr_blob_decode(ctr_object* myself, ctr_argument* argumentList) {
 		ctr_error("Invalid source encoding, use: utf16le, utf16be, utf32le or utf32be.", 0);
 		return CtrStdNil;
 	}
-	ctr_heap_size(in, &inlen);
-	inlen -= sizeof(size_t); // subtract header
+	inlen = ctr_heap_size(in);
 	if (is_utf16) {
 		outlen = inlen / 2 * 3 + 1; // max 3 bytes per UTF-16 code unit
 	} else {
@@ -979,7 +972,7 @@ ctr_object* ctr_file_blob_write(ctr_object* myself, ctr_argument* argumentList) 
 		return CtrStdNil;
 	}
 	size_t s;
-	ctr_heap_size(blob->value.rvalue->ptr, &s);
+	s = ctr_heap_size(blob->value.rvalue->ptr);
 	fwrite(blob->value.rvalue->ptr, sizeof(char), s, f);
 	fclose(f);
 	return myself;
@@ -995,8 +988,7 @@ ctr_object* ctr_blob_base64(ctr_object* myself, ctr_argument* argumentList) {
 	size_t s;
 	ctr_object* answer;
 	char* buf = myself->value.rvalue->ptr;
-	ctr_heap_size(buf, &s);
-	s -= sizeof(size_t); //@todo put in function (i.e. ctr_heap_size_neat())
+	s = ctr_heap_size(buf);
 	size_t outlen = BASE64_ENCODE_OUT_SIZE(s);
 	char* out = (char*) ctr_heap_allocate(outlen);
 	outlen = base64_encode((unsigned char*)buf, s, out);

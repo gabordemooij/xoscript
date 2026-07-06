@@ -78,8 +78,8 @@ ctr_object* ctr_server_vault_xor(ctr_object* myself, ctr_argument* argumentList)
 	//@todo add type-check Blob
 	buffer1 = (char*) bufferObject1->value.rvalue->ptr;
 	buffer2 = (char*) bufferObject2->value.rvalue->ptr;
-	ctr_heap_size(buffer1, &n);
-	i = ctr_internal_vault_xor(buffer1, buffer2, n - sizeof(size_t));
+	n = ctr_heap_size(buffer1);
+	i = ctr_internal_vault_xor(buffer1, buffer2, n);
 	return ctr_build_number_from_float( (double_t) i );
 }
 #endif

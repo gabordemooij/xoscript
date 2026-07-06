@@ -238,16 +238,19 @@ void ctr_heap_free( void* ptr ) {
 /**
  * Obtain the size of the memory block.
  */
-int ctr_heap_size( void* ptr, size_t* size ) {
-	if (ptr == NULL) return -1;
+size_t ctr_heap_size( void* ptr ) {
+	if (ptr == NULL) {
+		ctr_print_error("[Error] Invalid memory pointer.", 1);
+	}
 	size_t* block_width;
 	size_t q = sizeof( size_t );
 	/* find the correct size of this memory block and move pointer back */
 	ptr = (void*) ((char*) ptr - q);
-	if (ptr == NULL) return -1;
+	if (ptr == NULL) {
+		ctr_print_error("[Error] Unable to access memory block.", 1);
+	}
 	block_width = (size_t*) ptr;
-	*size = *(block_width);
-	return 0;
+	return *(block_width) - sizeof(size_t);
 }
 
 /**
