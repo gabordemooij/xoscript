@@ -130,6 +130,7 @@ void ctr_coretest_memory() {
 	size = (size_t) *((size_t*) ((char*)chunk - sizeof(size_t)));
 	expected_size = (ctr_gc_mode & 8) ? 64 : (32 + sizeof(size_t));
 	ctr_test(size == expected_size);
+	ctr_test(size == ctr_heap_size(chunk) + sizeof(size_t));
 }
 
 /**
