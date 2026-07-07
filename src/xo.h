@@ -421,6 +421,8 @@ extern size_t ctr_utf8sanitize_fast(char *s, size_t n);
 extern ctr_tnode* ctr_cparse_parse(char* prg, char* pathString);
 extern ctr_tnode* ctr_cparse_expr(int mode);
 extern ctr_tnode* ctr_cparse_ret();
+extern ctr_tnode* ctr_cparse_block();
+extern ctr_tnode* ctr_cparse_create_node( int type );
 
 /**
  * Abstract Tree Walker functions
@@ -428,8 +430,6 @@ extern ctr_tnode* ctr_cparse_ret();
 extern uint64_t    ctr_cwlk_subprogram;
 extern ctr_object* ctr_cwlk_run(ctr_tnode* program);
 extern ctr_object* ctr_cwlk_expr(ctr_tnode* node, char* wasReturn);
-extern ctr_tnode* ctr_cparse_block();
-extern ctr_tnode* ctr_cparse_create_node( int type );
 
 /**
  * Internal World functions
@@ -899,10 +899,6 @@ extern void ctr_print_error(char* error, int code);
 
 size_t ctr_heap_tracker_memoryblocknumber();
 size_t ctr_heap_tracker_rewind( size_t memoryBlockNumber );
-
-extern int putenv_old(const char* name, const char* value);
-
-/* for inclusion of citrine as lib (i.e. export) */
 int ctr_init();
 
 extern ctr_object* ctr_int64_new(ctr_object* myself, ctr_argument* argumentList);
