@@ -157,6 +157,10 @@ ctr_object* ctr_internal_object_find_property(ctr_object* owner, ctr_object* key
 		}
 		head = owner->properties->head;
 	}
+	// @note: we use O(n) lookup here because most objects are tiny and hash comparison is really fast
+	// hashmaps for every object would cause OOM, creating conditional hashmaps would significantly
+	// impact complexity, we favor simplicity/auditability here. Note that && ...equal() is only
+	// executed if key matches.
 	while(head) {
 		if ((hashKey == head->hashKey) && ctr_internal_object_is_equal(head->key, key)) {
 			return head->value;
