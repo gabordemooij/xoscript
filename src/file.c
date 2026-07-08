@@ -78,6 +78,10 @@ ctr_object* ctr_file_read(ctr_object* myself, ctr_argument* argumentList) {
 	}
 	fseek(f, 0, SEEK_END);
 	fileLen=ftell(f);
+	if (fileLen == -1) {
+		ctr_error( CTR_ERR_OPEN, error_code );
+		return CtrStdNil;
+	}
 	fseek(f, 0, SEEK_SET);
 	buffer=(char *)ctr_heap_allocate(fileLen+1);
 	if (!buffer){
@@ -248,6 +252,7 @@ ctr_object* ctr_file_size(ctr_object* myself, ctr_argument* argumentList) {
 	prev = ftell(f);
 	fseek(f, 0L, SEEK_END);
 	sz=ftell(f);
+	if (sz == -1) return CtrStdNil;
 	fseek(f,prev,SEEK_SET);
 	if (f) {
 		fclose(f);
