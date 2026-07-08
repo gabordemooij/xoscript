@@ -31,7 +31,7 @@
 #define CTR_DICT_TOKEN_SET                       "令牌:"
 #define CTR_DICT_PASSWORD_HASH_SET               "密码哈希:"
 #define CTR_DICT_PASSWORD_HASH_VERIFY_SET        "密码哈希:验证:"
-#define CTR_DICT_EDKEYS                          "edkeys"
+#define CTR_DICT_EDKEYS                          "生成加密密钥"
 #define CTR_DICT_SIGN_WITH_SET                   "签名:用:"
 #define CTR_DICT_CHECK_SIGNATURE_SET             "验证:签名:用:"
 #define CTR_DICT_HASH_TYPE_SET                   "哈希:类型:"

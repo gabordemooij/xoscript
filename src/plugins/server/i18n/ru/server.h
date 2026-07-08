@@ -31,7 +31,7 @@
 #define CTR_DICT_TOKEN_SET                       "токен:"
 #define CTR_DICT_PASSWORD_HASH_SET               "хэш-пароля:"
 #define CTR_DICT_PASSWORD_HASH_VERIFY_SET        "хэш-пароля:проверить:"
-#define CTR_DICT_EDKEYS                          "edkeys"
+#define CTR_DICT_EDKEYS                          "криптографические-ключи"
 #define CTR_DICT_SIGN_WITH_SET                   "подписать:с:"
 #define CTR_DICT_CHECK_SIGNATURE_SET             "проверить:подпись:с:"
 #define CTR_DICT_HASH_TYPE_SET                   "хэш:тип:"

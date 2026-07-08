@@ -31,7 +31,7 @@
 #define CTR_DICT_TOKEN_SET                       "token:"                    // Word to generate a secure token of the specified length in the argument
 #define CTR_DICT_PASSWORD_HASH_SET               "password-hash:"            // Word or phrase to generate a secure hash for a password or secret
 #define CTR_DICT_PASSWORD_HASH_VERIFY_SET        "password-hash:verify:"     // Word or phrase to verify if the hash in argument 1 is associated with the secret in argument 2
-#define CTR_DICT_EDKEYS                          "edkeys"                    // Term to generate a Ed25519 key pair
+#define CTR_DICT_EDKEYS                          "generate-keys"             // Term to generate a key pair (Ed25519)
 #define CTR_DICT_SIGN_WITH_SET                   "sign:with:"                // Phrase to sign the string in argument 1 with the edkey in argument 2
 #define CTR_DICT_CHECK_SIGNATURE_SET             "check:signature:with:"     // Phrase to check the signed string in argument 1 with the signature in argument 2 and the private key in argument 3
 #define CTR_DICT_HASH_TYPE_SET                   "hash:type:"                // Phrase to generate a hash of the string in argument 1 with the hashing function identified by the string in argument 2

@@ -31,7 +31,7 @@
 #define CTR_DICT_TOKEN_SET                       "token:"
 #define CTR_DICT_PASSWORD_HASH_SET               "hash-senha:"
 #define CTR_DICT_PASSWORD_HASH_VERIFY_SET        "hash-senha:verificar:"
-#define CTR_DICT_EDKEYS                          "edkeys"
+#define CTR_DICT_EDKEYS                          "chaves-criptográficas"
 #define CTR_DICT_SIGN_WITH_SET                   "assinar:com:"
 #define CTR_DICT_CHECK_SIGNATURE_SET             "verificar:assinatura:com:"
 #define CTR_DICT_HASH_TYPE_SET                   "hash:tipo:"
