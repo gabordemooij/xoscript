@@ -37,21 +37,9 @@ static void print_hex(char* name, unsigned char *data, size_t length) {
 #ifdef EXPERIMENTS
 size_t ctr_internal_vault_xor(char* buffer1, char* buffer2, size_t len) {
 	size_t i;
-	i = 0;
-	//@todo optimize asm
-	asm volatile ("loop%=: \
-	cmp %[len], %[i];  \
-	jae done%=; \
-	movb (%[buf2], %[i]), %%al;\
-	xorb %%al, (%[buf1], %[i]);\
-	inc %[i]; \
-	jmp loop%=; \
-	done%=: \
-	"
-	:[i]"+r"(i)
-	:[len]"r"(len), [buf1]"r"(buffer1), [buf2]"r"(buffer2)
-	:"%rax", "memory" , "cc"
-	);
+	for(i = 0; i<len; i++) {
+		buffer1[i] ^= buffer2[i];
+	}
 	return i;
 }
 
