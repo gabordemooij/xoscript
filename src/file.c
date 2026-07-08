@@ -309,7 +309,7 @@ ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList) {
 		putArgumentList->object = ctr_build_string_from_cstring(entry->d_name);
 		ctr_map_put(fileListItem, putArgumentList);
 		putArgumentList->next->object = ctr_build_string_from_cstring( CTR_MSG_DSC_TYPE );
-		if ((strlen(CTR_DIRSEP) + strlen(CTR_DIRSEP) + strlen(entry->d_name)) > PATH_MAX) {
+		if ((strlen(CTR_DIRSEP) + strlen(CTR_DIRSEP) + strlen(entry->d_name)) >= PATH_MAX) {
 			continue;
 		}
 		strcpy( fullPath, pathValue );
