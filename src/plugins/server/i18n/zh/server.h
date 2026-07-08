@@ -82,3 +82,4 @@
 #define CTR_DICT_BLOB                            "blob"
 #define CTR_DICT_BLOB_SET                        "blob:"
 #define CTR_DICT_XOR_AND_SET                     "xor:and:"
+#define CTR_DICT_BLOB_RANDOM                     "random:"

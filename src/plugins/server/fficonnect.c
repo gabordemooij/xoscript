@@ -264,6 +264,24 @@ ctr_object* ctr_build_blob(void* data, size_t len) {
 
 /**
  * @def
+ * [ Blob ] random: [ Number ]
+ *
+ * @test728
+ */
+ctr_object* ctr_blob_randombuf(ctr_object* myself, ctr_argument* argumentList) {
+	size_t len;
+	char* buf;
+	ctr_object* randomBlob;
+	len = (int) ctr_tonum(argumentList->object);
+	buf = ctr_heap_allocate(len);
+	random_buf(buf, len);
+	randomBlob = ctr_build_blob(buf,len); //bit slow due to overhead, but simpler
+	ctr_heap_free(buf);
+	return randomBlob;
+}
+
+/**
+ * @def
  * [ Blob ] utf8: [ String ]
  * 
  * @test569
@@ -1015,6 +1033,7 @@ void begin_ffi() {
 	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_DECODE_SET ), &ctr_blob_decode);
 	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_ENCODE ), &ctr_blob_base64);
 	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_DECODE_SET ), &ctr_blob_frombase64_set);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BLOB_RANDOM ), &ctr_blob_randombuf);
 	CtrFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
 	CtrFFIObjectBase->link = CtrStdObject;
 	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_MESSAGEARGS ), &ctr_ffi_apply );
