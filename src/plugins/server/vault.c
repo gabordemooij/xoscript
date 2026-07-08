@@ -34,7 +34,6 @@ static void print_hex(char* name, unsigned char *data, size_t length) {
 	printf("\n");
 }
 
-#ifdef EXPERIMENTS
 size_t ctr_internal_vault_xor(char* buffer1, char* buffer2, size_t len) {
 	size_t i;
 	for(i = 0; i<len; i++) {
@@ -70,7 +69,6 @@ ctr_object* ctr_server_vault_xor(ctr_object* myself, ctr_argument* argumentList)
 	i = ctr_internal_vault_xor(buffer1, buffer2, n);
 	return ctr_build_number_from_float( (double_t) i );
 }
-#endif
 
 //rfc4648
 #define BASE64_PAD '='
