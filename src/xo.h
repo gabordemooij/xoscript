@@ -924,6 +924,8 @@ extern ctr_object* ctr_octhelper_parse(ctr_object* myself, ctr_argument* argumen
 extern ctr_object* ctr_binhelper_new(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_binhelper_parse(ctr_object* myself, ctr_argument* argumentList);
 
+extern int ctr_accept(ctr_object* obj, ctr_object* x);
+
 /**
  * Feature flags
  */
