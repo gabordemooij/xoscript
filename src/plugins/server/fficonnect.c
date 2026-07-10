@@ -5,7 +5,7 @@
 #include "../../xo.h"
 #include <ffi.h>
 #include <vault.h>
-
+#include "fficonnect.h"
 #include "monocypher/src/monocypher.h"
 
 

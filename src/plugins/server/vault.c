@@ -8,6 +8,7 @@
 
 #include "../../xo.h"
 #include "vault.h"
+#include "fficonnect.h"
 #include <server.h>
 #include "monocypher/src/monocypher.h"
 
@@ -42,6 +43,7 @@ size_t ctr_internal_vault_xor(char* buffer1, char* buffer2, size_t len) {
 	return i;
 }
 
+#ifdef FFI
 /**
  * @def
  * [ Vault ] xor: [ Blob ] and: [ Blob ]
@@ -62,6 +64,11 @@ ctr_object* ctr_server_vault_xor(ctr_object* myself, ctr_argument* argumentList)
 		ctr_error("Only Blobs allowed", 0); //@todo localize error message
 		return CtrStdNil;
 	}
+	//check type blob
+	if (!ctr_accept(bufferObject1, CtrDataBlob) || !ctr_accept(bufferObject2, CtrDataBlob)) {
+		ctr_error("Only Blobs allowed", 0); //@todo localize error message
+		return CtrStdNil;
+	} 
 	//@todo add type-check Blob
 	buffer1 = (char*) bufferObject1->value.rvalue->ptr;
 	buffer2 = (char*) bufferObject2->value.rvalue->ptr;
@@ -69,6 +76,7 @@ ctr_object* ctr_server_vault_xor(ctr_object* myself, ctr_argument* argumentList)
 	i = ctr_internal_vault_xor(buffer1, buffer2, n);
 	return ctr_build_number_from_float( (double_t) i );
 }
+#endif
 
 //rfc4648
 #define BASE64_PAD '='

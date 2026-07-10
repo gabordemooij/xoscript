@@ -1,0 +1,15 @@
+Server init.
+>> a := Blob new: 4.
+a bytes: ( List new ; Bin b00000101 ; Hx x0A ; Bin b10000001 ; 0).
+>> b := Blob new: 4.
+b bytes: ( List new ; Bin b00000110 ; Hx x0A ; Bin b10000000 ; 0).
+Vault xor: a and: b.
+# >> c := a new. @todo fix memory leak, Blob new should not be allowed.
+# Vault xor: a and: c. # should not be possible
+{
+	Vault
+		xor: ( File new: ['noblob???'] ) 
+		and: ( File new: ['noblob???'] ).
+} except: { :e Out write: e, stop. }, start.
+a free.
+b free.
