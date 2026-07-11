@@ -1,6 +1,7 @@
 #include "xo.h"
 #include <stddef.h>
 
+//@todo move to xo.h
 #define CTR_OBJECT_RESOURCE_TIME 13
 
 //@todo/fix improve error handling timefuncs
@@ -12,6 +13,7 @@ int ctr_gc_sticky_counter;
 int ctr_gc_mode;
 double CtrVersionTime = CTR_VERSION_20260216;
 
+//@todo move to xo.h
 struct ctr_clock {
 	time_t time;
 } typedef ctr_clock;
@@ -1828,6 +1830,21 @@ void ctr_dumper_dump_cstr(char* str, size_t vlen) {
 	ctr_wireable_add(w);
 }
 
+void ctr_dump_dump_clock(ctr_clock* clock) {
+	ctr_wireable* w = wirelist_current;
+	w->next = NULL;
+	w->memblock = (void*) (((char*) clock) - sizeof(size_t));
+	w->memsize = *((size_t*)w->memblock);
+	w->type = CTR_WIREABLE_TYPE_TIME;
+	w->id = CtrWireableID;
+	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
+	w->address = (uintptr_t) clock;
+	w->numofpointers = 0;
+	w->next = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
+	wirelist_current = w->next;
+	ctr_wireable_add(w);
+}
+
 void ctr_dumper_dump_str(ctr_string* str) {
 	ctr_wireable* w = wirelist_current;
 	w->next = NULL;
@@ -1996,6 +2013,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 			&& obj->link != CtrStdConsole
 			&& obj->link != CtrStdArray
 			&& obj->link != CtrStdFile
+			&& obj->link != CtrStdClock
 		) {
 			ctr_dumper_dump_object(obj->link);
 		} else {
@@ -2014,6 +2032,9 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 		ctr_dumper_dump_str(obj->value.svalue);
 	}
 	else if (obj->info.type == CTR_OBJECT_TYPE_OTEX) {
+		if (obj->value.rvalue && obj->value.rvalue->type == CTR_OBJECT_RESOURCE_TIME) {
+			ctr_dump_dump_clock((ctr_clock*)obj->value.rvalue);
+		}
 		//@todo check if rvalue is null -> if not throw error
 		//i.e. cant snapshot active resources like DB connections etc.
 	} else {
@@ -2084,6 +2105,10 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_FILE;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
+		} else if (pointer == CtrStdClock) {
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_MOMENT;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			continue;
 		}
 		//replace pointer with id
 		int found_address = 0;
@@ -2134,7 +2159,8 @@ static void* ctr_dumper_map_id2ptr[10] = {
 	[CTR_WIREABLE_KNOWN_CONSOLE] = &CtrStdConsole,
 	[CTR_WIREABLE_KNOWN_ROOT] = &CtrStdObject,
 	[CTR_WIREABLE_KNOWN_LIST] = &CtrStdArray,
-	[CTR_WIREABLE_KNOWN_FILE] = &CtrStdFile
+	[CTR_WIREABLE_KNOWN_FILE] = &CtrStdFile,
+	[CTR_WIREABLE_KNOWN_MOMENT] = &CtrStdClock,
 };
 
 ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
