@@ -8,9 +8,6 @@
 //for blob
 #include <fficonnect.h>
 
-#define CTR_OBJECT_RESOURCE_MARIADB 41
-#define CTR_OBJECT_RESOURCE_MARIADB_STM 42
-
 ctr_object* CtrMariaDB;
 ctr_object* CtrMariaDBQuery;
 

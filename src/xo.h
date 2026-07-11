@@ -47,6 +47,14 @@
 #define CTR_VERSION_20260216 1771282716
 
 /**
+ * Resource types
+ */
+#define CTR_OBJECT_RESOURCE_TIME 13
+#define CTR_OBJECT_RESOURCE_INT64 14
+#define CTR_OBJECT_RESOURCE_MARIADB 41
+#define CTR_OBJECT_RESOURCE_MARIADB_STM 42
+
+/**
  * Define the Citrine tokens 
  */
 #define CTR_TOKEN_REF 1
@@ -128,10 +136,6 @@
 #define CTR_CATEGORY_PRIVATE_PROPERTY 0
 #define CTR_CATEGORY_PUBLIC_PROPERTY 0 /* same, all properties are PRIVATE, except those in CtrStdWorld, this is just to avoid confusion */
 #define CTR_CATEGORY_PUBLIC_METHOD 1
-
-
-#define CTR_OBJECT_RESOURCE_INT64 14
-
 
 #ifdef EXPERIMENTS
 

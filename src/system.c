@@ -1,9 +1,6 @@
 #include "xo.h"
 #include <stddef.h>
 
-//@todo move to xo.h
-#define CTR_OBJECT_RESOURCE_TIME 13
-
 //@todo/fix improve error handling timefuncs
 
 int ctr_gc_dust_counter;
