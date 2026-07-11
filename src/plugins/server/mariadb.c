@@ -43,6 +43,7 @@ CTR_DEFINE_SETTER(ctr_mariadb_query_param_set,      "parameters");
  */
 ctr_object* ctr_mariadb_connected(ctr_object* myself, ctr_argument* argumentList) {
 	MYSQL* conn;
+	if (!myself->value.rvalue) return CtrStdBoolFalse;
 	conn = (MYSQL*) myself->value.rvalue->ptr;
 	return ctr_build_bool( conn != NULL );
 }
