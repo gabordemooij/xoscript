@@ -35,13 +35,24 @@ CTR_DEFINE_SETTER_CAST(ctr_mariadb_query_query_set, "query", ctr_internal_copy2s
 CTR_DEFINE_SETTER(ctr_mariadb_query_database_set,   "database");
 CTR_DEFINE_SETTER(ctr_mariadb_query_param_set,      "parameters");
 
+/**
+ * @def
+ * [ Maria-DB ] connected?
+ *
+ * @test732
+ */
 ctr_object* ctr_mariadb_connected(ctr_object* myself, ctr_argument* argumentList) {
 	MYSQL* conn;
 	conn = (MYSQL*) myself->value.rvalue->ptr;
 	return ctr_build_bool( conn != NULL );
 }
 
-
+/**
+ * @def
+ * [ Maria-DB ] connect
+ *
+ * @test731
+ */
 ctr_object* ctr_mariadb_connect(ctr_object* myself, ctr_argument* argumentList) {
 	MYSQL* conn;
 	conn = mysql_init(NULL);
