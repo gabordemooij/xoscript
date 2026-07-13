@@ -21,6 +21,8 @@ ctr_size ctr_clex_keyword_chain_len;
 extern char* ctr_code_start;
 int ctr_clex_ignore_modes = 0;
 
+extern int ctr_clex_tok_value_length();
+
 void* ctr_heap_allocate_tracked(size_t size) {
 	return calloc(size, 1);
 }
