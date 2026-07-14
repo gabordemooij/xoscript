@@ -35,49 +35,6 @@ static void print_hex(char* name, unsigned char *data, size_t length) {
 	printf("\n");
 }
 
-size_t ctr_internal_vault_xor(char* buffer1, char* buffer2, size_t len) {
-	size_t i;
-	for(i = 0; i<len; i++) {
-		buffer1[i] ^= buffer2[i];
-	}
-	return i;
-}
-
-#ifdef FFI
-/**
- * @def
- * [ Vault ] xor: [ Blob ] and: [ Blob ]
- *
- * @test727
- */
-ctr_object* ctr_server_vault_xor(ctr_object* myself, ctr_argument* argumentList) {
-	char* buffer1;
-	char* buffer2;
-	size_t n;
-	size_t i;
-	n = 0;
-	ctr_object* bufferObject1 = argumentList->object;
-	ctr_object* bufferObject2 = argumentList->next->object;
-	if (
-	bufferObject1->info.type != CTR_OBJECT_TYPE_OTEX ||
-	bufferObject2->info.type != CTR_OBJECT_TYPE_OTEX) {
-		ctr_error("Only Blobs allowed", 0); //@todo localize error message
-		return CtrStdNil;
-	}
-	//check type blob
-	if (!ctr_accept(bufferObject1, CtrDataBlob) || !ctr_accept(bufferObject2, CtrDataBlob)) {
-		ctr_error("Only Blobs allowed", 0); //@todo localize error message
-		return CtrStdNil;
-	} 
-	//@todo add type-check Blob
-	buffer1 = (char*) bufferObject1->value.rvalue->ptr;
-	buffer2 = (char*) bufferObject2->value.rvalue->ptr;
-	n = ctr_heap_size(buffer1);
-	i = ctr_internal_vault_xor(buffer1, buffer2, n);
-	return ctr_build_number_from_float( (double_t) i );
-}
-#endif
-
 //rfc4648
 #define BASE64_PAD '='
 static const char base64en[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -727,9 +684,6 @@ void begin_vault() {
 	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_SIGN_WITH_SET ), &ctr_server_vault_pki_sign );
 	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_CHECK_SIGNATURE_SET ), &ctr_server_vault_pki_check );
 	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_HASH_TYPE_SET ), &ctr_server_vault_hash );
-	#ifdef EXPERIMENTS
-	ctr_internal_create_func(vaultObject, CTR_STRINGOBJ( CTR_DICT_XOR_AND_SET ), &ctr_server_vault_xor );
-	#endif
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ( CTR_DICT_VAULT_OBJECT ), vaultObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 	ctr_internal_create_func(CtrStdFile, CTR_STRINGOBJ( CTR_DICT_CHECKSUM ), &ctr_file_checksum );
 }

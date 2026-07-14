@@ -51,7 +51,7 @@ ctr_object* ctr_internal_recursion;
 int ctr_accept(ctr_object* obj, ctr_object* x) {
 	ctr_object* link;
 	ctr_object* old;
-	link = obj->link;
+	link = obj;
 	old = NULL;
 	while(link && link != old && link != x) {
 		old = link;

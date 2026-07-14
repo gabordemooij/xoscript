@@ -1015,6 +1015,41 @@ ctr_object* ctr_blob_base64(ctr_object* myself, ctr_argument* argumentList) {
 	return answer;
 }
 
+size_t ctr_internal_blob_xor(char* buffer1, char* buffer2, size_t len) {
+	size_t i;
+	for(i = 0; i<len; i++) {
+		buffer1[i] ^= buffer2[i];
+	}
+	return i;
+}
+
+/**
+ * @def
+ * [ Blob ] xor: [ Blob ]
+ *
+ * @test727
+ */
+ctr_object* ctr_blob_xor(ctr_object* myself, ctr_argument* argumentList) {
+	char* buffer1;
+	char* buffer2;
+	size_t n;
+	size_t i;
+	n = 0;
+	ctr_object* bufferObject1 = myself;
+	ctr_object* bufferObject2 = argumentList->object;
+	//check type blob
+	if (bufferObject2->link != CtrDataBlob) {
+		ctr_error("Only Blobs allowed", 0); //@todo localize error message
+		return CtrStdNil;
+	} 
+	//@todo add type-check Blob
+	buffer1 = (char*) bufferObject1->value.rvalue->ptr;
+	buffer2 = (char*) bufferObject2->value.rvalue->ptr;
+	n = ctr_heap_size(buffer1);
+	i = ctr_internal_blob_xor(buffer1, buffer2, n);
+	return ctr_build_number_from_float( (double_t) i );
+}
+
 void begin_ffi() {
 	CtrDataBlob = ctr_blob_new(CtrStdObject, NULL);
 	CtrDataBlob->link = CtrStdObject;
@@ -1034,6 +1069,7 @@ void begin_ffi() {
 	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_ENCODE ), &ctr_blob_base64);
 	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_DECODE_SET ), &ctr_blob_frombase64_set);
 	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BLOB_RANDOM ), &ctr_blob_randombuf);
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( "xor:" ), &ctr_blob_xor );
 	CtrFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
 	CtrFFIObjectBase->link = CtrStdObject;
 	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_MESSAGEARGS ), &ctr_ffi_apply );
