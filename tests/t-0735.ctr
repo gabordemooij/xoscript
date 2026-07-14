@@ -3,9 +3,13 @@ Server init.
 a bytes: ( List new ; Bin b00000101 ; Hx x0A ; Bin b10000001 ; 0).
 >> b := Blob new: 4.
 b bytes: ( List new ; Bin b00000110 ; Hx x0A ; Bin b10000000 ; 0).
->> c := a new.
 # inherited blob does not get the buffer, so it's useless
-# it will pass ctr_accept() but since buffer ptr == null, it will return 0
-{ Out write: ( a xor: c ), stop. } except: { :e Out write: e, stop. }, start.
+# it will pass ctr_accept() but since buffer ptr == null, it will retur
+>> c := a new.
+{ 
+>> n := a xor: c.
+Out write: ['xorred:'], stop. 
+Out write: n, stop. 
+} except: { :e Out write: e, stop. }, start.
 a free.
 b free.

@@ -8,6 +8,7 @@
 #include "fficonnect.h"
 #include "monocypher/src/monocypher.h"
 
+//@todo although ffi is always flaky, at least add null checks ptrs
 
 ctr_object* CtrFFIObjectBase;
 ctr_object* CtrDataBlob;
@@ -1032,27 +1033,31 @@ size_t ctr_internal_blob_xor(char* buffer1, char* buffer2, size_t len) {
 ctr_object* ctr_blob_xor(ctr_object* myself, ctr_argument* argumentList) {
 	char* buffer1;
 	char* buffer2;
-	size_t n;
+	size_t n1, n2, n;
 	size_t i;
-	n = 0;
+	i = 0;
 	ctr_object* bufferObject1 = myself;
 	ctr_object* bufferObject2 = argumentList->object;
-	//check type blob
-	if (bufferObject2->link != CtrDataBlob) {
+	if (!ctr_accept(bufferObject2, CtrDataBlob)) {
 		ctr_error("Only Blobs allowed", 0); //@todo localize error message
 		return CtrStdNil;
-	} 
-	//@todo add type-check Blob
-	buffer1 = (char*) bufferObject1->value.rvalue->ptr;
-	buffer2 = (char*) bufferObject2->value.rvalue->ptr;
-	n = ctr_heap_size(buffer1);
-	i = ctr_internal_blob_xor(buffer1, buffer2, n);
+	}
+	fflush(stdout);
+	if (bufferObject1->value.rvalue && bufferObject2->value.rvalue) {
+		buffer1 = (char*) bufferObject1->value.rvalue->ptr;
+		buffer2 = (char*) bufferObject2->value.rvalue->ptr;
+		n1 = ctr_heap_size(buffer1);
+		n2 = ctr_heap_size(buffer2);
+		n = (n1 < n2) ? n1 : n2;
+		i = ctr_internal_blob_xor(buffer1, buffer2, n);
+	}
 	return ctr_build_number_from_float( (double_t) i );
 }
 
 void begin_ffi() {
 	CtrDataBlob = ctr_blob_new(CtrStdObject, NULL);
 	CtrDataBlob->link = CtrStdObject;
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_NEW ), &ctr_blob_new);
 	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_NEW_SET ), &ctr_blob_new_set);
 	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_STRING ), &ctr_blob_tostring);
 	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BYTES_SET ), &ctr_blob_fill);
