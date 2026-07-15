@@ -13,12 +13,12 @@
 ctr_object* CtrFFIObjectBase;
 ctr_object* CtrDataBlob;
 
+
 ctr_object* ctr_ffi_object_new(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
 	instance->link = myself;
 	return instance;
 }
-
 
 void ctr_blob_destructor(ctr_resource* resource_value) {
 	// the destructor cant remove the memory automatically
@@ -26,6 +26,7 @@ void ctr_blob_destructor(ctr_resource* resource_value) {
 	// whether the memory belongs to us or to the called function
 	// you have to call free / freestruct.
 }
+
 
 ffi_type* ctr_internal_ffi_map_type(char* description);
 void* ctr_internal_ffi_convert_value(ffi_type* type, ctr_object* obj);
@@ -74,6 +75,8 @@ ctr_object* ctr_blob_tostring(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_string_from_cstring(myself->value.rvalue->ptr);
 }
 
+CTR_DEFINE_CLASS_OTEX(ctr_blob_new, CTR_OBJECT_RESOURCE_BLOB, ctr_blob_destructor)
+
 
 /**
  * @def
@@ -82,13 +85,10 @@ ctr_object* ctr_blob_tostring(ctr_object* myself, ctr_argument* argumentList) {
  * @test375
  */
 ctr_object* ctr_blob_new_set(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX);
-	instance->link = myself;
+	ctr_object* instance = ctr_blob_new(myself, argumentList);
 	size_t size = (size_t) ctr_tonum(argumentList->object);
-	ctr_resource* buffer = ctr_heap_allocate(sizeof(ctr_resource));
-	buffer->ptr = ctr_heap_allocate(size);
-	buffer->destructor = &ctr_blob_destructor;
-	instance->value.rvalue = buffer;
+	instance->value.rvalue->ptr = ctr_heap_allocate(size);
+	instance->value.rvalue->destructor = &ctr_blob_destructor;
 	instance->info.sticky = 1;
 	return instance;
 }
@@ -879,13 +879,6 @@ void ctr_internal_ffi(ctr_object* ffispec) {
 	CtrPreviousFFIEntry = ff;
 }
 
-
-ctr_object* ctr_blob_new(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* blobInstance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTEX);
-	blobInstance->link = myself;
-	return blobInstance;
-}
-
 /**
  * @def
  * [ Blob ] decode-base64: [ String ]
@@ -908,10 +901,9 @@ ctr_object* ctr_blob_frombase64_set(ctr_object* myself, ctr_argument* argumentLi
 	out = ctr_heap_allocate(outlen);
 	outlen = base64_decode(in, inlen, (unsigned char*) out);
 	answer = ctr_blob_new(CtrDataBlob, NULL); //@todo DRY
-	rbuffer = ctr_heap_allocate(sizeof(ctr_resource));
+	rbuffer = answer->value.rvalue;
 	rbuffer->ptr = out;
 	rbuffer->destructor = &ctr_blob_destructor;
-	answer->value.rvalue = rbuffer;
 	answer->info.sticky = 1; //@todo check if this is really needed
 	ctr_heap_free(in);
 	return answer;
@@ -957,10 +949,9 @@ ctr_object* ctr_file_blob(ctr_object* myself, ctr_argument* argumentList) {
 		return CtrStdNil;
 	}
 	ctr_object* blob = ctr_blob_new(CtrDataBlob, NULL);
-	ctr_resource* rbuffer = ctr_heap_allocate(sizeof(ctr_resource));
+	ctr_resource* rbuffer = blob->value.rvalue;
 	rbuffer->ptr = buffer;
 	rbuffer->destructor = &ctr_blob_destructor;
-	blob->value.rvalue = rbuffer;
 	blob->info.sticky = 1; //@todo check if this is really needed
 	return blob;
 }
@@ -1026,7 +1017,7 @@ size_t ctr_internal_blob_xor(char* buffer1, char* buffer2, size_t len) {
 
 /**
  * @def
- * [ Blob ] xor: [ Blob ]
+ * [ Blob ] ^ [ Blob ]
  *
  * @test727
  */
@@ -1042,8 +1033,7 @@ ctr_object* ctr_blob_xor(ctr_object* myself, ctr_argument* argumentList) {
 		ctr_error("Only Blobs allowed", 0); //@todo localize error message
 		return CtrStdNil;
 	}
-	fflush(stdout);
-	if (bufferObject1->value.rvalue && bufferObject2->value.rvalue) {
+	if (bufferObject1->value.rvalue->ptr && bufferObject2->value.rvalue->ptr) {
 		buffer1 = (char*) bufferObject1->value.rvalue->ptr;
 		buffer2 = (char*) bufferObject2->value.rvalue->ptr;
 		n1 = ctr_heap_size(buffer1);
@@ -1074,7 +1064,7 @@ void begin_ffi() {
 	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_ENCODE ), &ctr_blob_base64);
 	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BASE64_DECODE_SET ), &ctr_blob_frombase64_set);
 	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( CTR_DICT_BLOB_RANDOM ), &ctr_blob_randombuf);
-	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( "xor:" ), &ctr_blob_xor );
+	ctr_internal_create_func(CtrDataBlob, CTR_STRINGOBJ( "^" ), &ctr_blob_xor );
 	CtrFFIObjectBase = ctr_ffi_object_new(CtrStdObject, NULL);
 	CtrFFIObjectBase->link = CtrStdObject;
 	ctr_internal_create_func(CtrFFIObjectBase, CTR_STRINGOBJ( CTR_DICT_MESSAGEARGS ), &ctr_ffi_apply );

@@ -81,5 +81,4 @@
 #define CTR_DICT_SRVCNF_MAXPOSTTIME              "max-posttime"              // Word for program setting to configure the time limit to enforce upon reading stdin in CGI to read raw post data
 #define CTR_DICT_BLOB                            "blob"                      // Word to cast something to a blob object / get a blob
 #define CTR_DICT_BLOB_SET                        "blob:"                     // Word to set a blob
-#define CTR_DICT_XOR_AND_SET                     "xor:and:"                  // Word to describe XOR'ing blob1 with blob2
 #define CTR_DICT_BLOB_RANDOM                     "random:"                   // Word to describe filling a blob buffer with cryptographically secure random data 

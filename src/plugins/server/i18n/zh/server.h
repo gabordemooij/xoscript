@@ -81,5 +81,4 @@
 #define CTR_DICT_SRVCNF_MAXPOSTTIME              "最大处理时间"
 #define CTR_DICT_BLOB                            "blob"
 #define CTR_DICT_BLOB_SET                        "blob:"
-#define CTR_DICT_XOR_AND_SET                     "xor:and:"
 #define CTR_DICT_BLOB_RANDOM                     "random:"

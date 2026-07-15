@@ -53,6 +53,7 @@
 #define CTR_OBJECT_RESOURCE_INT64 14
 #define CTR_OBJECT_RESOURCE_MARIADB 41
 #define CTR_OBJECT_RESOURCE_MARIADB_STM 42
+#define CTR_OBJECT_RESOURCE_BLOB 45
 
 /**
  * Define the Citrine tokens 
@@ -960,11 +961,11 @@ ctr_object* funcname(ctr_object* myself, ctr_argument* argumentList) { \
 
 #define CTR_DEFINE_GETTER(funcname, propname) \
 ctr_object* funcname(ctr_object* myself, ctr_argument* argumentList) { \
-    return ctr_internal_object_property( \
-        myself, \
-        propname, \
-        NULL \
-    ); \
+	return ctr_internal_object_property( \
+		myself, \
+		propname, \
+		NULL \
+	); \
 }
 
 #define CTR_DEFINE_CLASS_OTEX(classname, resource_type, destructor_call) \
