@@ -257,7 +257,7 @@ ctr_object* ctr_gc_setmemlimit(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [Program] memory-management: [Number]
+ * [ Program ] memory-management: [ Number ]
  *
  * @test736
  */
@@ -268,7 +268,7 @@ ctr_object* ctr_gc_setmode(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [Program] gcmode
+ * [ Program ] gcmode
  *
  * @test736
  */
