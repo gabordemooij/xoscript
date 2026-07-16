@@ -256,20 +256,22 @@ ctr_object* ctr_gc_setmemlimit(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 /**
- * [Program] tidiness: [Number]
+ * @def
+ * [Program] memory-management: [Number]
  *
- * Selects mode of operation for GC.
- *
- * Available Modes:
- * 0 - No Garbage Collection
- * 1 - Activate Garbage Collector (default)
- * 4 - Activate Garbage Collector for every single step (testing only)
+ * @test736
  */
 ctr_object* ctr_gc_setmode(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_gc_mode = (int) ctr_internal_cast2number( argumentList->object )->value.nvalue;
 	return myself;
 }
 
+/**
+ * @def
+ * [Program] gcmode
+ *
+ * @test736
+ */
 ctr_object* ctr_gc_getmode(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float((double) ctr_gc_mode);
 }
