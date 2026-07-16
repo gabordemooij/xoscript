@@ -900,7 +900,7 @@ ctr_object* ctr_blob_frombase64_set(ctr_object* myself, ctr_argument* argumentLi
 	outlen = BASE64_DECODE_OUT_SIZE(inlen);
 	out = ctr_heap_allocate(outlen);
 	outlen = base64_decode(in, inlen, (unsigned char*) out);
-	answer = ctr_blob_new(CtrDataBlob, NULL); //@todo DRY
+	answer = ctr_blob_new(CtrDataBlob, NULL);
 	rbuffer = answer->value.rvalue;
 	rbuffer->ptr = out;
 	rbuffer->destructor = &ctr_blob_destructor;
