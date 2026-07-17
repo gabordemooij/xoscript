@@ -10,12 +10,6 @@ int ctr_gc_sticky_counter;
 int ctr_gc_mode;
 double CtrVersionTime = CTR_VERSION_20260216;
 
-//@todo move to xo.h
-struct ctr_clock {
-	time_t time;
-} typedef ctr_clock;
-
-
 void ctr_internal_destructor_clock(ctr_resource* rs) {
 	ctr_heap_free(rs->ptr);
 	rs->ptr = NULL;

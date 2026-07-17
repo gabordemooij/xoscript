@@ -216,6 +216,14 @@ struct ctr_argument {
 typedef struct ctr_argument ctr_argument;
 
 /**
+ * time_t wrapper
+ */
+struct ctr_clock {
+	time_t time;
+};
+typedef struct ctr_clock ctr_clock;
+
+/**
  * Root Object
  */
 struct ctr_object {
