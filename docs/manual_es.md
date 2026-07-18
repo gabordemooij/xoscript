@@ -58,10 +58,10 @@ Nulo en el capítulo 3).
 
 ## Acciones
 
-Citrine percibe todo como un objeto, por lo tanto, no hay otros tipos de datos.
-Básicamente, hay tres acciones rutinarias básicas en un programa escrito en Citrine:
+XOScript percibe todo como un objeto, por lo tanto, no hay otros tipos de datos.
+Básicamente, hay tres acciones rutinarias básicas en un programa escrito en XOScript:
 asignar, mensajes programming y responder.
-El intercambio de mensajes entre objetos latypes parte clave un programa Citrine. Las
+El intercambio de mensajes entre objetos latypes parte clave un programa XOScript. Las
 tres acciones: Asignar, Mensajes, Respuesta.
 
 ## Objetos y mensajes
@@ -117,7 +117,7 @@ binarios sin dos puntos. Los mensajes binarios se pueden encadenar:
 En este fragmento, + 2 se envía primero al objeto Número 3, lo que da como resultado
 el objeto Número 5, después de lo cual se envía -1 a este número. Los lectores
 observadores tienen razón al notar la discrepancia que muestra este protocolo con
-respecto a las secuencias matemáticas convencionales de operadores. Citrine ignora la
+respecto a las secuencias matemáticas convencionales de operadores. XOScript ignora la
 secuencia matemática a favor de la coherencia en su sistema de mensajes. Como
 resultado, la suma:
 
@@ -142,14 +142,14 @@ Salida escribir:
 
 Aquí, se envían dos mensajes al objeto Texto : recortar , seguido de mayúsculas.
 En el siguiente fragmento, es necesario el uso de una coma para indicar que se está
-entrando un nuevo mensaje. De lo contrario, Citrine se confundirá.
+entrando un nuevo mensaje. De lo contrario, XOScript se confundirá.
 
 ```
 Salida escribir: ['Hola!'], detener .
 ```
 
 Primero, se envía el mensaje escribir: al objeto Salida , seguido del mensaje detener .
-Sin la coma, Citrine pensaría que desea enviar el mensaje detener al objeto de
+Sin la coma, XOScript pensaría que desea enviar el mensaje detener al objeto de
 Texto Hola , lo cual resultaría un resultado incorrecto.
 La secuencia de proceso de mensajes es la siguiente: de izquierda a derecha; comience
 con los mensajes entre paréntesis seguidos de los mensajes unitarios. A continuación,
@@ -160,9 +160,9 @@ siguiente ejemplo:
 Salida escribir: 0.5 redondear + (2 – 1), detener .
 ```
 
-Citrine siempre lee de izquierda a derecha: primero, se envía el mensaje escribir: a
+XOScript siempre lee de izquierda a derecha: primero, se envía el mensaje escribir: a
 Salida y es seguido por el mensaje detener .Dentro del argumento en sí,(el
-argumento de un mensaje es aquello que va despues de los 2 puntos :) Citrine lee de
+argumento de un mensaje es aquello que va despues de los 2 puntos :) XOScript lee de
 izquierda a derecha, por lo que 0,5 redondear y luego el +.
 
 Además, redondear tiene prioridad sobre +, porque es un mensaje unitario.
@@ -171,8 +171,8 @@ resultado de 0,5 redondear (1). Todo el proceso dará como resultado 2,
 que también es la respuesta a escribir. Después
 de la coma sigue el mensaje de parada, que mueve el cursor a una nueva línea. Por
 supuesto, la mejor manera de comprender completamente el orden de secuencia de los
-programas de Citrine es con la práctica.
-Es importante señalar que en Citrine, al contrario de muchos otros lenguajes de
+programas de XOScript es con la práctica.
+Es importante señalar que en XOScript, al contrario de muchos otros lenguajes de
 programación, los espacios en blanco son una parte fundamental de su sintaxis. En
 particular, cuando se trata de mensajes binarios, los espacios en blanco pueden causar
 cierta confusión.
@@ -183,9 +183,9 @@ número 2. El resultado, en este caso, será 5. En el segundo ejemplo (3 +2), el
 unario +2 se envía al número 3. Dependiendo del contexto eso podría producir un
 resultado muy diferente.
 
-# El flujo del programa
+## El flujo del programa
 
-En Citrine no hay necesidad de reglas gramaticales separadas para bucles y condicionales.
+En XOScript no hay necesidad de reglas gramaticales separadas para bucles y condicionales.
 Una declaración condicional es simplemente un simple mensaje verdadero: o falso: a un
 objeto Verdadero o a un objeto Falso .
 
@@ -198,7 +198,7 @@ objeto Verdadero o a un objeto Falso .
 Los objetos Verdadero y Falso también se conocen como objetos de toma de decisiones.
 Esta denominación a veces es más precisa, porque especiﬁca que estos objetos se utilizan
 para hacer que el programa maneje ciertas decisiones. Al igual que otros lenguajes de
-programación, un programa escrito en Citrine sigue un curso especíﬁco y conlleva varios
+programación, un programa escrito en XOScript sigue un curso especíﬁco y conlleva varios
 patrones de ramiﬁcación. Las formas seleccionadas dentro de un programa dependen en
 gran medida de estos objetos de toma de decisiones.
 En el ejemplo anterior, el mensaje verdadero: se envía a Verdadero (la respuesta a la
@@ -264,8 +264,8 @@ número1 kJ ➞ número2 kcal
 ```
 
 Esto signiﬁca que número1 representa el valor de kJ y número2 el valor de kcal. Así es
-como funciona la interpolación de cadenas en Citrine. No se necesitan reglas gramaticales
-diferentes para hacer esto en Citrine. Simplemente envíe la palabra que necesita ser
+como funciona la interpolación de cadenas en XOScript. No se necesitan reglas gramaticales
+diferentes para hacer esto en XOScript. Simplemente envíe la palabra que necesita ser
 reemplazada al texto con el texto sustituto como argumento:
 
 ```
@@ -351,7 +351,7 @@ Naturalmente el resultado mostrado será:
 
 # Objetos
 
-El mundo de Citrine está lleno de una diversidad de objetos, que están disponibles para
+El mundo de XOScript está lleno de una diversidad de objetos, que están disponibles para
 su programa desde el principio. 
 
 Además de ajustar y expandir objetos existentes, también puede crear nuevos objetos
@@ -410,7 +410,7 @@ Salida escribir: factura-anual numero, detener.
 
 No es necesario volver a escribir la implementación del mensaje número, ya que se
 hereda del objeto factura escrito anteriormente; en consecuencia, se puede reutilizar
-el código antiguo. Citrine carece de conceptos como clases y otros conceptos
+el código antiguo. XOScript carece de conceptos como clases y otros conceptos
 relacionados. Esto signiﬁca que los objetos solo pueden heredar de otros objetos, también
 conocido como herencia prototípica.
 Ahora, volvamos a las propiedades. Las propiedades de los objetos solo se pueden
@@ -494,11 +494,11 @@ todavía se debe realizar la suma ﬁnal, que, de hecho, tiene lugar en la sigui
 >> respuesta := yo + (número x factor).
 ```
 
-Ahora bien, ¿cómo entiende Citrine que este signo más se reﬁere a la lógica original
-de la suma? Por ejemplo, otra interpretación podría ser que Citrine enviará
+Ahora bien, ¿cómo entiende XOScript que este signo más se reﬁere a la lógica original
+de la suma? Por ejemplo, otra interpretación podría ser que XOScript enviará
 repetidamente el mismo mensaje al mismo objeto, lo que, a su vez, daría como resultado
 un bucle inﬁnito. Claramente, esta no es la intención. Tan pronto como envíe un
-mensaje a un objeto, que ejecutaría exactamente el mismo código, Citrine se dará
+mensaje a un objeto, que ejecutaría exactamente el mismo código, XOScript se dará
 cuenta, en este caso, de que se trata del mensaje subyacente anulado.
 Por lo tanto, su programa estará automáticamente protegido contra esta forma de
 bucles inﬁnitos. 
@@ -526,9 +526,9 @@ respuesta := anterior * siguiente recursivo factorial.
 
 Esto requiere recursión. De hecho, la tarea que está conectada al mensaje factorial
 debe ser ejecutada nuevamente dentro de esa tarea. Por lo tanto, es necesario invocar
-la tarea factorial desde dentro de la tarea factorial misma. Como regla, Citrine evitará
+la tarea factorial desde dentro de la tarea factorial misma. Como regla, XOScript evitará
 esta rutina, debido al riesgo de terminar en un bucle inﬁnito. Por esta razón, es vital
-preceder el mensaje con la palabra recursivo. Esto se hace para que Citrine sepa
+preceder el mensaje con la palabra recursivo. Esto se hace para que XOScript sepa
 que es tu intención ejecutar la misma tarea y que no cometiste ningún error.
 El siguiente bucle muestra los factoriales de los números del 1 al 10:
 
@@ -594,7 +594,7 @@ rectángulo ancho: 0.
 ```
 
 Observe que en la segunda línea se vuelve a invocar el primer nuevo inicial. Sin
-embargo, esto no resultará en un bucle inﬁnito, ya que Citrine lo evitará. 
+embargo, esto no resultará en un bucle inﬁnito, ya que XOScript lo evitará. 
 Cuando se crea un
 nuevo rectángulo, ahora medirá automáticamente 0 por 0, desde el principio. De esta
 manera, no se producirá ningún error al calcular el área:
@@ -605,6 +605,290 @@ Salida escribir: rectángulo area.
 
 >> rectángulo := Rectángulo nuevo longitud: 2, ancho: 3.
 Salida escribir: rectángulo area.
+```
+
+# Nulo
+
+Objeto muy básico es el objeto Nulo. Este objeto representa el vacío, o mejor aún, la
+ausencia de información. En ocasiones, recibirás este objeto como respuesta a un
+mensaje, en caso de que el resultado sea nada. La pregunta más esencial que puedes
+hacerle al objeto Nulo es: ¿nulo?.
+La respuesta siempre será Verdadero
+
+```
+Salida escribir: Nulo ¿nulo? .
+```
+
+Cualquier objeto que no sea Nulo responderá con Falso. El fragmento de código anterior
+puede parecer un poco ﬁlosóﬁco, pero el objeto Nulo ciertamente tiene aplicaciones
+extremadamente prácticas. Por ejemplo, recibirá el objeto Nulo como respuesta en caso de
+que solicite un elemento de una serie
+que no existe.
+También puede usar el objeto Nulo si desea declarar una variable, pero no desea
+especiﬁcar un valor aún. En su lugar, simplemente asigne el valor especial Nulo. En
+XOScript no está permitido declarar una variable sin valor, como:
+
+```
+>> valor.
+```
+
+En su lugar, debe escribir lo siguiente:
+
+```
+>> valor := Nulo.
+```
+
+# Booleano
+
+En los capítulos anteriores se han analizado en profundidad los objetos Verdadero o
+Falso. Hemos utilizado estos objetos, por ejemplo, para ejecutar tareas en función de
+ciertas condiciones. Verdadero y Falso se basan en el álgebra de Boole.
+A diferencia de la mayoría de los lenguajes de programación más populares en el
+momento de escribir este artículo, XOScript proporciona solo un único objeto Verdadero y un
+único objeto Falso. Para aclarar, cada vez que escribe Verdadero no implica que se haya
+creado un nuevo objeto. En cambio, siempre utiliza una referencia. Esto signiﬁca que
+cuando escribe lo siguiente:
+
+```
+>> x := Verdadero.
+```
+
+La x se reﬁere al objeto Verdadero. El código condicional y los bucles también veriﬁcan
+esta referencia. En XOScript, el signiﬁcado de Verdadero y Falso no es ﬁjo. De hecho, un
+programa XOScript se confunde bastante con una declaración como esta:
+
+```
+Verdadero := Falso.
+```
+
+El resultado de tales acciones no está deﬁnido, pero sigue siendo una acción válida y, por
+lo tanto, está permitida formalmente. Además, hay un objeto Decision, que es el objeto
+raíz de Verdadero y Falso, ya que ambos son derivados del objeto raíz. Sin embargo, el
+objeto Decision en sí no proporciona ninguna
+aplicación práctica.
+Por medio de los objetos Verdadero y Falso, puede ejecutar partes de su programa bajo
+condiciones especíﬁcas:
+
+```
+>> precio := Número entre: 0 y: 20.
+>> presupuesto := 10.
+precio > presupuesto verdadero: {
+Salida escribir: ['demasiado caro'].
+}, falso: {
+Salida escribir: ['¡vendido!'].
+}.
+```
+
+
+Para facilitar la lectura, en lugar de falso: también puede utilizar el mensaje otro:. Esto es
+básicamente lo mismo , porque el mensaje otro: es un sinónimo de falso:. (otro , hace
+referencia a - otro caso - ) Por lo tanto, el siguiente fragmento muestra exactamente el
+mismo procedimiento:
+
+```
+>> precio := Número entre: 0 y: 20.
+>> presupuesto := 10.
+precio > presupuesto verdadero: {
+Salida escribir: ['demasiado caro'].
+}, otro: {
+Salida escribir: ['¡vendido!'].
+}.
+```
+
+Depende totalmente de usted cuál de las dos variaciones preﬁere utilizar para facilitar la
+lectura.
+Los objetos de decisión también se pueden utilizar para combinar diferentes condiciones.
+Por ejemplo, una tarea se puede ejecutar cuando dos cosas producen un objeto
+Verdadero. O bien, si se cumple una de dos o incluso más condiciones, como se ilustra
+en el siguiente ejemplo:
+
+```
+>> azúcar := Verdadero.
+>> leche := Falso.
+>> x := azúcar y: leche.
+```
+
+En el fragmento anterior se crean dos nuevos objetos, que son azúcar y leche. El objeto
+azúcar es un objeto Verdadero mientras que leche es un objeto Falso. Ahora, cuando
+quieres saber si alguien preﬁere tanto leche como azúcar en su café o té, envías el
+mensaje y: a un objeto y envías el otro objeto junto con él como argumento. La respuesta
+a y: será Falso, porque y: solo responde con Verdadero cuando el objeto en sí es
+aﬁrmativo, así como el argumento. En cualquier otro caso, devolverá Falso. Entonces,
+en este caso x es igual a Falso. Además del mensaje y:, también puedes usar o: ,
+de la siguiente manera:
+
+```
+>> azúcar := Verdadero.
+>> leche := Falso.
+>> x := azúcar o: leche.
+```
+
+En este caso, el azúcar, coincidentemente el primer objeto indicado, responderá
+Verdadero. El objeto Verdadero al que se reﬁere la variable azúcar, en realidad siempre
+responde a la pregunta o: con Verdadero si efectivamente el objeto en sí es aﬁrmativo
+o efectivamente el objeto en el argumento es aﬁrmativo, o si ambos son Verdadero.
+En caso de que ninguno de los objetos sea Verdadero, entonces la respuesta será Falso.
+Al usar el mensaje o: puede esperar Verdadero si está rodeado por dos objetos Falso.
+
+```
+>> azúcar := Falso.
+>> leche := Falso.
+>> x := azúcar o: leche.
+```
+
+Con el mensaje no se invierte un objeto de decisión, es decir, un Verdadero se convierte
+en Falso
+
+```
+>> azúcar := Falso no.
+>> leche := Falso no.
+>> x := azúcar y: leche.
+```
+
+Entonces, en este caso x es Verdadero, porque tanto azúcar como leche son Falso no,
+es decir, no no, por lo tanto Verdadero.
+Con entonces:caso-contrario: puedes seleccionar, por medio de un objeto Verdadero o
+Falso, un objeto diferente de un par de objetos. De la siguiente manera:
+
+```
+>> azúcar := Verdadero.
+>> x :=
+azúcar
+entonces: 1 cuchara caso-contrario: Nulo.
+```
+
+En el fragmento anterior x será igual a 1 cuchara. Cuando el mensaje de recepción es
+Verdadero, se seleccionará el primer objeto y si no, se seleccionará el segundo.
+También puedes convertir un Verdadero o un Falso en un número enviando el número
+del mensaje. El objeto Verdadero responderá con 1 y Falso responderá con 0.
+Obviamente, también puedes comparar objetos Verdadero y Falso entre sí:
+
+```
+>> x := (Verdadero !=: Falso).
+>> y := (Verdadero = Falso).
+```
+
+En este caso x es igual a Verdadero e y es igual a Falso.
+Los mensajes continuar y salir se pueden utilizar dentro de un bucle. Por lo tanto,
+cuando envía salir dentro de un bucle a un objeto Verdadero, el bucle ﬁnalizará desde
+ese punto. El programa continuará en la primera instrucción después del bucle.
+El mensaje continuar está relacionado con salir, sin embargo, en lugar de ﬁnalizar todo
+el bucle, solo ﬁnalizará la iteración actual. La parte restante de la ronda actual se omite y
+se inicia la siguiente ronda del bucle.
+A continuación, se muestran algunos ejemplos:
+
+
+```
+{ :i
+Salida escribir: i, detener.
+(i > 9) salir.
+} * 20.
+````
+
+Este fragmento de código en particular ilustra el efecto de la interrupción del mensaje.
+Muestra una pequeña lista de los números del 1 al 10; sin embargo, tan pronto como el
+número en i supera diez, el bucle se interrumpe en ese punto.
+
+```
+{ :i
+(i > 10 and: i < 15) continuar.
+Salida escribir: i, detener.
+} * 20.
+```
+
+
+Este fragmento de código produce una pequeña lista de 1 a 10 seguida de 15 a 20. Los
+números entre 10 y 15 se omiten. Esto se debe a que para este intervalo la condición
+( i > 10 y: i < 15 ) da como resultado Verdadero, por lo que el mensaje continuar se
+envía a este objeto Verdadero. Esto signiﬁca que se omite la parte restante del bucle y
+comienza la siguiente iteración. Los mensajes continuar y salir son ignorados por el
+objeto Falso.
+Finalmente, el mensaje texto le permite crear una representación textual de un objeto
+Verdadero o Falso.
+
+# Número
+
+Cada vez que escriba un número, por ejemplo 9, -10 o 3,12, detrás de la pantalla,XOScript
+convertirá estos números en un objeto Número. Puede enviar mensajes a este objeto
+Número, o puede asignar el número a una variable y enviar mensajes después:
+
+```
+10 ¿par?
+```
+
+```
+>> diez := 10.
+diez ¿par?
+```
+
+Ambas notaciones son válidas. El objeto Número responde a los siguientes mensajes
+como: >, ≥( >=:), <, ≤ (<=:), =, ≠ (!=:), +, –, *, /, entre:y: , ¿impar? , ¿par?, añadir: ,
+restar:, multiplicar-por: , dividir-por:, módulo:, elevar-a:, ¿positivo?, ¿negativo?,
+redondear, redondear-al-alza , redondear-a-la-baja , raíz-cuadrada , absoluto , texto ,
+bruto , caliﬁcación , booleano y caliﬁcar:
+La mayoría de estos mensajes se explican por sí solos y permiten ejecutar operaciones
+matemáticas (+) o comparaciones (>). La diferencia entre los mensajes matemáticos
+binarios (+) y sus variaciones de palabras clave (añadir:) es que los primeros devolverán
+un nuevo número, que es el resultado de la operación, mientras que con los últimos
+se modiﬁcará el objeto en sí. Esto se ilustra en el siguiente ejemplo:
+
+```
+>> a := 1.
+>> b := a + 3.
+a añadir: 2.
+Salida escribir: a, detener.
+Salida escribir: b, detener.
+```
+
+En el ejemplo anterior, b = 4 y a = 3. Con añadir: 2 el valor de a se aumenta en 2,
+mientras que + 3 crea un nuevo número que es igual a a + 3. Lo mismo se aplica a otros
+procesos matemáticos, por ejemplo, las multiplicaciones. Al utilizar el símbolo de
+multiplicación, recibirá un nuevo objeto como respuesta. En caso de que utilice el mensaje
+multiplicar-por:, multiplicará el número en sí.
+Con el mensaje entre: y:, por ejemplo en: Número entre: X y: Y, obtendrá un número
+entre X e Y. De esta manera, se puede generar cualquier número aleatorio:
+
+```
+>> a := Número entre: 1 y: 10 .
+```
+
+Tenga en cuenta que el generador integrado de números aleatorios en XOScript no es
+adecuado para aplicaciones criptográﬁcas.
+Puedes adjuntar un caliﬁcador a un número, por ejemplo, 6 manzanas. Cada mensaje
+que no sea reconocido por un número será considerado un caliﬁcador. Puedes recuperar
+el caliﬁcador de un número por medio del caliﬁcador de mensaje:
+
+```
+>> cantidad := 6 monedas.
+Salida escribir: cantidad.
+Salida escribir: cantidad calificador.
+```
+
+Un caliﬁcador es básicamente un objeto de texto que se almacena con el objeto de
+número. El caliﬁcador también se imprime después del número en una asignación de
+escritura (escribir:) . Los caliﬁcadores se pueden utilizar para sumar cantidades en
+monedas mixtas, por ejemplo. Al sumar las cantidades, puede solicitar los caliﬁcadores.
+El siguiente ejemplo de programa ilustra este principio utilizando una calculadora de
+moneda histórica (¡ya que el tipo de cambio se mantiene razonablemente estable!).
+
+```
+Número en: ['+'] hacer: { :cantidad
+	(cantidad calificador = ['ducados']) verdadero: {
+		cantidad multiplicar-por: 5.
+	}.
+	yo añadir: cantidad.
+}.
+Salida escribir: (7 florines + 3 ducados), detener.
+```
+
+En el fragmento de código anterior, el mensaje + se adapta de tal manera que se tiene
+en cuenta la moneda. En este ejemplo, 1 ducado equivale a 5 ﬂorines. La palabra clave
+yo indica el objeto en sí: yo se utiliza para enviar un mensaje al objeto en sí. Además,
+también se puede establecer un caliﬁcador de forma explícita utilizando el caliﬁcador de
+mensaje:
+
+```
+>> x := 7 calificador: ['ducatos'].
 ```
 
 # Texto
@@ -648,7 +932,7 @@ puntos cada: { :número :cantidad cantidad añadir: 1. }.
 Salida escribir: puntos, detener.
 ```
 
-De hecho, Citrine siempre usa referencias, por lo que en :cantidad el bucle ilustrado
+De hecho, XOScript siempre usa referencias, por lo que en :cantidad el bucle ilustrado
 anteriormente también indica la
 referencia al elemento en la secuencia:
 
@@ -764,8 +1048,8 @@ computadora, puede aplicar el mensaje es-igual-a:
 
 ## Conversión implícita
 
-Citrine utiliza la conversión implícita para convertir objetos. Para imprimir una
-secuencia en la pantalla, Citrine, por ejemplo, enviará el texto del mensaje i
+XOScript utiliza la conversión implícita para convertir objetos. Para imprimir una
+secuencia en la pantalla, XOScript, por ejemplo, enviará el texto del mensaje i
 nternamente a la secuencia. Esto puede resultar muy útil, en caso de que
 quiera imprimir una secuencia como una lista separada por comas. El texto del
 mensaje se puede sobrescribir:
@@ -796,7 +1080,237 @@ total añadir: elemento.
 Salida escribir: 1 + suma, detener.
 ```
 
-# Functions
+# Funciones
+
+El objeto de tarea responde a mensajes como: empezar, *, mientras:, error:, capturar:
+y proceder:. El capítulo 2 ilustró cómo un fragmento de código determinado se puede ejecutar varias
+veces; es decir, enviando el mensaje * a una tarea, seguido de la cantidad de iteraciones
+requeridas. Para un recordatorio rápido, aquí hay dos nuevos ejemplos de ese tipo de
+mensajes. Primero, el bucle simple:
+
+```
+{ :grados
+	Salida escribir:
+	grados * 1.8 + 32, detener.
+} * 30.
+```
+
+Este ejemplo devuelve una pequeña lista de temperaturas que van desde 1 a 30 grados
+Fahrenheit
+
+Esta secuencia se crea cuando la tarea entre corchetes {} se multiplica por el número 30.
+
+```
+>> grados := 0.
+{
+	Salida escribir:
+	grados * 1.8 + 32, detener.
+	grados añadir: 1.
+} mientras: { <- grados <=: 0. }.
+```
+
+El fragmento ilustrado anteriormente devuelve el mismo resultado, sin embargo, utiliza
+un bucle while. En este caso, el mensaje mientras: se envía a la tarea con el argumento
+una segunda tarea. La primera tarea se ejecutará repetidamente, hasta que la segunda
+tarea devuelva un Falso. Para aclarar, mientras la respuesta a la primera tarea siga
+siendo Verdadera, la primera tarea continúa ejecutándose. Debido a que cada vez que
+se agrega 1 a la cantidad de grados durante la ejecución de la primera tarea, la segunda
+tarea devolverá Falso tan pronto como cuente 31
+grados Fahrenheit.
+
+Una forma diferente de manipular el ﬂujo del programa informático es deﬁnir un fragmento
+de código con controladores en caso de error. Por ejemplo, digamos que una aplicación
+de presupuesto tiene que determinar el presupuesto mensual en función de la entrada de
+un usuario sobre los ingresos y la cantidad de meses.
+
+```
+>> presupuesto := ingresos / meses.
+```
+
+¿Puedes adivinar qué sucede cuando la cantidad de meses resulta ser 0? Lo que sucede
+es un mensaje de error:
+
+La primera línea del mensaje muestra que se ha producido un error que no ha sido
+gestionado por el programa. La segunda línea de la salida indica el problema real, que es,
+en este caso, que no se permite la división por 0. La primera línea también revela que
+se puede gestionar un error. Este también es un caso de ejecución de código
+condicional; sin embargo, en esta situación se escribirá y ejecutará un fragmento de
+código en caso de que se produzca un error provocado por un fragmento de código
+diferente. Por ejemplo, vea cómo modiﬁcar este
+mensaje de error:
+
+```
+{
+>> presupuesto := ingresos / meses.
+} capturar: { :error
+	Salida escribir: ['¡No permitido!'], detener.
+}, empezar.
+```
+
+En este caso la salida será (en 0 meses)
+
+En este caso, ha gestionado su propio manejo de errores. Tenga en cuenta que falta la
+sentencia de -error no manejado - ; después de todo, usted manejó bien el error y,
+según XOScript, ese es el ﬁnal.
+Sin embargo, ¿cómo funciona exactamente el manejo de errores en el ejemplo anterior?
+En primer lugar, hay dos tareas: la tarea original y la tarea de manejo. Estas tareas
+están vinculadas por el mensaje capturar: Al recibir el mensaje capturar: una tarea con
+la captura, el objeto Tarea receptor cambiará, en caso de que ocurra un error, al código
+dentro del objeto Tarea que se ha asignado para realizar el manejador de errores.
+Después de que los dos bloques estén vinculados, es obvio qué hacer en caso de que
+ocurra un error. 
+
+En realidad, no se está iniciando nada. Esto introduce el mensaje ﬁnal en el fragmento de
+código: empezar. Esto inicia la ejecución del primer objeto Tarea, porque el mensaje
+capturar: produce el propio objeto Tarea como respuesta. Además, dado que se trata de
+un mensaje de palabra clave, se necesitará una coma para encadenar el nuevo mensaje
+unario. Formalmente, la estructura se puede observar de la siguiente manera:
+
+```
+{ Tarea 1 } capturar: { Tarea 2 }, empezar.
+```
+
+También puede provocar que se produzca un error en su programa de forma intencionada
+y, al hacerlo, activar el bloque manejador. Esto se hace enviando el mensaje error: a la
+tarea actual, como se muestra en la siguiente
+ilustración:
+
+```
+{
+	esta-tarea error: ['Whoops!'].
+} capturar: { :mistake
+	Salida escribir: mistake.
+}, empezar.
+```
+
+Tenga en cuenta que el objeto de error incluido en el mensaje error:, se devuelve en la
+rutina del controlador. De esta manera, se pueden pasar diversos objetos de error
+autoinducidos a su tarea de controlador. Además, muestra cómo puede comunicarse con
+la tarea actual enviando un mensaje a esta-tarea.
+
+En lugar de enviar el mensaje empezar, se puede utilizar el mensaje * 1 para ejecutar la
+tarea una vez. Ambos mensajes terminan teniendo el mismo resultado. Un mensaje que
+es muy similar a empezar (o * 1, dependiendo de cómo lo mire) es el mensaje proceder.
+Este mensaje se utiliza a menudo para mejorar la legibilidad. En el siguiente ejemplo se analizarán los diversos aspectos de cómo se utiliza
+el objeto Tarea en la práctica. Este próximo programa de demostración tiene como
+objetivo convertir un número en números romanos. Este
+ejemplo en particular se limita a números inferiores a 40.
+
+```
+>> numero := 17.
+{
+	{
+		numero >=: 10 verdadero: {
+			Salida escribir: ['X'].
+			numero restar: 10.
+		}, salir.
+		numero >=:≥9 verdadero: {
+			Salida escribir: ['IX'].
+			numero restar: 9.
+		}, salir.
+		numero >=: 5 verdadero: {
+			Salida escribir: ['V'].
+			numero restar: 5.
+		}, salir.
+		numero >=:≥4 verdadero: {
+			Salida escribir: ['IV'].
+			numero restar: 4.
+		}, salir.
+		numero >=: 1 verdadero: {
+			Salida escribir: ['I'].
+			numero restar: 1.
+		}, salir.
+	} proceder.
+} mientras: { <- numero > 0. }.
+```
+
+El programa en su forma actual devuelve el número romano correspondiente al número
+17. Al modiﬁcar el valor del número 17 en la parte superior del programa por algo
+diferente, por ejemplo 20, el resultado cambiará igualmente (XX). Ahora, observe más de
+cerca el programa. Los corchetes más externos pertenecen al mensaje while:. En este
+punto, vincula dos tareas. La primera tarea continúa ejecutándose mientras la segunda
+tarea siga devolviendo Verdadero como respuesta. Esa segunda tarea es bastante
+simple:
+
+```
+{ <- numero > 0. }
+```
+
+Esto signiﬁca que, mientras numero sea mayor que 0, se ejecutará la primera tarea.
+La primera tarea es un poco más larga, sin embargo, es básicamente un conjunto de
+tareas condicionales. Eche un vistazo al primer fragmento:
+
+
+```
+numero >=: 10 verdadero: {
+	Salida escribir: ['X'].
+	numero restar: 10.
+}, salir.
+```
+
+En este caso, se pregunta si el número es mayor o igual a 10. Si la respuesta a esta
+pregunta es Verdadero, se escribe el símbolo romano del número 10, que es X. Para
+continuar, se restan 10 al número y se termina esta ronda. En consecuencia, el mensaje
+salir salta del bucle y comprueba si el número sigue siendo mayor que 0. Si es así, se
+inicia otra ronda. En el caso de que el número sea 20, se llega de nuevo a esta primera
+parte. En el caso de 17, la respuesta a la pregunta si el número ≥ 10 debe leerse
+claramente Falso, ya que 17 - 10 = 7, y 7 es menor que 10. En este caso, se desciende
+al siguiente bloque (número ≥ 9). Nuevamente, la respuesta será Falso, ya que 7 es
+menor que 9. Luego, se llega a (número ≥ 5), lo que da como resultado V. De esta
+manera, se va cortando el número romano más grande posible de su número hasta que
+no quede nada.
+Sin embargo, hay un pequeño tecnicismo oculto en este programa. Tenga en cuenta que
+también se envía el mensaje salir, en caso de que exista la posibilidad de mostrar un
+número romano en la pantalla. Esto es para evitar la visualización de un número romano
+más pequeño demasiado pronto. En el caso de 20 (XX), no es deseable mostrar un IX
+después de la X; básicamente, el objetivo es reiniciar el proceso. De hecho, es por eso
+que los comparadores de números están dentro de una tarea y el mensaje proceder se
+envía a la tarea externa. Este procedimiento garantiza la posibilidad de abortar la tarea
+después de que se haya realizado una comparación exitosa.
+XOScript proporciona a las tareas la opción de inyectar valores. Ahora, observe la tarea a
+continuación:
+
+```
+>> enviando := {
+	Boletin hacia: mi recipiente.
+}.
+enviando asignar: ['recipiente']
+valor: ['info@citrine-lang.org'].
+enviando empezar.
+```
+
+Esta ilustración presenta una tarea imaginaria que envía un boletín informativo a una
+dirección de correo electrónico o destinatario. Este destinatario se puede inyectar en la
+tarea, de forma externa y antes de que se inicie la tarea, enviando el mensaje
+asignar:valor: a la tarea. Al hacerlo, el valor del destinatario se preestablece en la
+tarea. Este valor también se puede modiﬁcar y la tarea se puede volver a ejecutar. Este
+es un método útil cuando se utilizan objetos de tarea
+
+No se permiten tareas vacías. En teoría, una tarea vacía se vería así: {}, sin embargo,
+XOScript percibe esto como un error de lenguaje. Si desea declarar una tarea vacía, puede
+utilizar el objeto Nulo:
+
+```
+>> tarea := Nulo.
+```
+
+Aunque no se trata de una tarea real, sino de un objeto Nulo, se puede enviar un
+mensaje de inicio:
+
+```
+>> respuesta := tarea empezar.
+```
+
+De hecho, es lo mismo que:
+
+```
+>> respuesta := Nulo empezar.
+```
+
+Debido a que el objeto Nulo no reconoce el mensaje empezar, se devolverá a sí mismo
+como respuesta, dejando la respuesta nuevamente como Nulo. Por lo tanto, no es
+necesario tener una tarea vacía. Debido al elegante diseño del lenguaje de programación
+XOScript, puede simplemente utilizar el objeto Nulo para esto.
 
 ## Visibilidad
 
@@ -912,13 +1426,137 @@ Malaga
 
 Tan pronto como la heladería recibe el mensaje helado, el sabor se ajusta a Málaga.
 Para las personas que nunca han trabajado con otro lenguaje de programación que no
-sea Citrine, esto no sería muy sorprendente. Después de todo, esto tiene todo el sentido
-según los procedimientos generales de Citrine. Sin embargo, en la mayoría de los otros
+sea XOScript, esto no sería muy sorprendente. Después de todo, esto tiene todo el sentido
+según los procedimientos generales de XOScript. Sin embargo, en la mayoría de los otros
 lenguajes de programación, la salida sería Pistachio, o incluso devolverían un mensaje
 de error, dependiendo de las reglas de visibilidad.
 
+# El objeto raíz
 
-# Root Object
+El objeto llamado Objeto es el objeto raíz de todos los objetos en XOScript. Este objeto
+raíz responde a mensajes como: hacer, hecho, en-caso-de:hacer: , en:hacer: ,
+mensaje:argumentos: , responder:y: … , aprender:signiﬁca: , y recursivo. Todos
+los demás objetos se derivan de este objeto, incluido el objeto Nulo. El mensaje que se
+envía con más frecuencia es en:hacer: , que amplía las funcionalidades de un objeto.
+Este mensaje es recibido por el objeto raíz, que en consecuencia vincula la tarea
+especiﬁcada al mensaje y, al hacerlo, expande el objeto derivado. Este método ya se
+mencionó en el capítulo 2, sin embargo, para completar, observe otro ejemplo.
+En la siguiente ilustración, se deﬁne un objeto circular con la intención de calcular su
+área en función de
+su radio:
+
+```
+>> circulo := Objeto nuevo.
+	circulo en: ['radio:'] hacer: { :r
+	mi radio := r.
+}.
+círculo en: ['área'] hacer: {
+	<- mi radio * 2 * 3,14.
+}.
+```
+
+Se añaden dos mensajes: radio:, que se utiliza para establecer el radio del círculo, y
+area, que se utiliza para calcular su area. Este objeto se puede utilizar de la siguiente
+manera:
+
+```
+circulo radio: 4, área.
+```
+
+El resultado será 25,12 (tenga en cuenta que se utiliza una aproximación muy
+aproximada de Pi, es decir, 3,14, por lo tanto, el resultado no es muy preciso). Este
+objeto también puede basarse en otro objeto, lo que signiﬁca que un objeto deﬁnido
+previamente se expande enviando mensajes en:hacer:. De esta manera, por ejemplo,
+un objeto Usuario puede basarse en un objeto Persona al que se le puede agregar un
+nombre de inicio de sesión:
+
+```
+>> Usuario := Persona nuevo.
+Usuario en: ['login:'] hacer: { :nombre
+	mi login := nombre.
+}.
+```
+
+
+Además, los objetos del sistema pueden expandirse, como el objeto Texto con un cifrado
+ROT-13. Esta es una manera fácil de cifrar textos, basada en la técnica de cifrado
+Cifrado César (que es muy débil para propósitos más serios). El principio detrás de
+ROT-13 es bastante simple. Cada carácter se desplaza 13 posiciones en el alfabeto.
+En caso de que un carácter pase el carácter z, el conteo continúa desde a en adelante.
+Por lo tanto, a se convierte en n, b se convierte en o y x se convierte en k. Por ejemplo,
+cuando el texto Londres se cifra con ROT-13, mostrará Lbaqba.
+Si se necesita agregar una funcionalidad de este tipo a cada texto, la manera más fácil de
+hacerlo es expandir el objeto Texto en sí (ya que cada texto deriva de este mismo objeto)
+utilizando el mensaje en:hacer:
+
+```
+Texto en: ['rot13'] hacer: {
+	>> alfabeto :=
+	['abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'].
+	>> código := [''].
+	yo caracteres cada: { :i :carácter
+		>> índice := alfabeto encontrar: carácter.
+		>> rot13 := índice + 13.
+		>> codificado := alfabeto carácter: rot13.
+		código añadir: codificado.
+	}.
+	<- código.
+}.
+```
+
+A partir de ahora, cada texto se puede cifrar de la siguiente manera:
+
+```
+Salida escribir: ['hola'] rot13, detener.
+```
+
+Un detalle curioso de ROT-13 es que cuando se implementa el cifrado por segunda vez,
+el texto original vuelve a aparecer. De esta manera, el texto cifrado vuelve a ser
+descifrado:
+
+```
+Salida escribir: ['hello'] rot13 rot13, detener.
+```
+
+Esto demuestra que el mensaje en:hacer: es uno de los principios más fundamentales
+del lenguaje de programación XOScript. Nótese que sin este mensaje, que es parte del
+objeto raíz Objeto , no sería posible ampliar las funcionalidades de los objetos.
+Un segundo mensaje esencial es es-igual-a:, que devuelve Verdadero en el caso de
+dos variables que apuntan hacia el mismo objeto, como:
+
+```
+>> x := 1.
+>> y := x.
+Salida escribir : (x es-igual-a: y), detener.
+```
+
+Observe la sutil diferencia entre = y es-igual-a: . El primero mencionado compara el
+valor del contenido de dos objetos, mientras que el segundo mencionado examina la
+memoria de la computadora para ver si son, de hecho, el mismo objeto.
+El mensaje en-caso-de:hacer: permite ejecutar una tarea condicional, al igual que los
+mensajes verdadero: y falso: . La diferencia es que puede adjuntar una tarea por valor.
+El siguiente ejemplo, por ejemplo, muestra el valor en la variable x. Si el valor de x es
+igual a 1, se ejecuta el primer bloque de código. Si x=2, se ejecutará la segunda tarea,
+y así sucesivamente. De esta manera, selecciona el código correcto para el valor x:
+
+```
+>> x := 2.
+
+x
+en-caso-de: 1 hacer: {
+	Salida escribir: ['Status: denegado'].
+},
+en-caso-de: 2 hacer: {
+	Salida escribir: ['Status: pendiente'].
+},
+
+en-caso-de: 3 hacer: {
+	Salida escribir: ['Status: aprovado'].
+}.
+Salida detener.
+
+```
+
 
 ## Manejo de mensajes desconocidos
 
@@ -938,7 +1576,7 @@ Salida en: ['responder:'] hacer: { :texto
 ```
 
 La tarea que está conectada a responder: se ejecuta en cada mensaje desconocido.
-Dado que el mensaje Humpty es desconocido, Citrine ejecutará internamente el
+Dado que el mensaje Humpty es desconocido, XOScript ejecutará internamente el
 siguiente mensaje:
 
 ```
@@ -947,7 +1585,7 @@ Salida responder: ['Humpty'].
 
 Existen varias aplicaciones concebibles para los mensajes generales. Una de sus
 principales aplicaciones es en combinación con el principio de uniformidad; es decir,
-la traducción del software de Citrine a otros lenguajes técnicos. 
+la traducción del software de XOScript a otros lenguajes técnicos. 
 
 ## Mensajes enviados mediante programación
 
@@ -976,7 +1614,7 @@ Salida escribir: ( Número mensaje: b argumentos: a ), detener.
 
 # Series
 
-Citrine conoce dos tipos de colecciones: series y listas. Las series son enumeraciones
+XOScript conoce dos tipos de colecciones: series y listas. Las series son enumeraciones
 de objetos en un orden ﬁjo. Las listas no tienen orden, sino que se parecen a una
 leyenda que incluye una clave (o término) y su valor correspondiente. Las series son
 comparables a las matrices o arreglos (PHP, Java, C) y las listas (Python). Las listas
@@ -1249,7 +1887,7 @@ x toma-el-último
 
 Sin embargo, esto es poco práctico, en particular cuando necesita eliminar más de dos
 elementos.
-Por lo tanto, Citrine ofrece una estructura de mensaje alternativa para este tipo de
+Por lo tanto, XOScript ofrece una estructura de mensaje alternativa para este tipo de
 situaciones. En las estructuras de mensajes alternativas, las respuestas de los objetos
 se ignoran y obtendrá el objeto receptor como respuesta, una y otra vez. Una
 estructura de mensaje alternativa se inicia enviando el mensaje hacer a un objeto y la
@@ -1275,7 +1913,7 @@ El código anterior generará el mensaje de error: Debe responder con texto. La 
 de esto es que el mensaje de escribir: desea crear un texto de x; por lo tanto, envía
 internamente el texto del mensaje. Como regla, se devuelve un objeto de texto como
 respuesta, sin embargo, como la estructura de mensaje alternativa aún está activa,
-se devuelve la serie en sí. Esto hace que el procesamiento posterior falle y Citrine
+se devuelve la serie en sí. Esto hace que el procesamiento posterior falle y XOScript
 mostrará un mensaje de error.
 
 # Listas
@@ -1331,4 +1969,380 @@ utilizar la siguiente notación simpliﬁcada:
 ```
 >> precio := menu dulce.
 ```
+
+# Archivos
+
+El objeto Archivo responde a mensajes como: ruta, leer, escribir: , existe, eliminar,
+tamaño y serie:.
+XOScript permite la edición esencial de archivos. Para ello, utilice el objeto de sistema
+Archivo.
+En este ejemplo, un archivo de texto que contiene ['verduras olvidadas'] debe ordenarse
+alfabéticamente:
+Contenido del archivo verduras en la carpeta documentos:
+Chirivía
+Alcachofa de Jerusalén
+Rábano de invierno
+Nabo
+Para imprimir el contenido de este archivo en la pantalla, escriba lo siguiente:
+
+```
+>> fichero := Archivo nuevo: Ubicación-del-archivo documentos verduras.
+Salida escribir: fichero leer , detener.
+```
+
+
+Para ordenar el contenido y luego guardar la serie ordenada, escriba:
+
+```
+>> verduras :=
+Archivo nuevo:
+Ubicación-del-archivo documentos verduras ,
+leer
+dividir: ['↵'] ,
+ordenar: { :a :b <- a > b. }.
+Archivo nuevo:
+Ubicación-del-archivo documentos nuevoficheroordenado ,
+escribir: (verduras combinar: [’↵']).
+```
+
+
+Así, también en este ejemplo, se lee crea un archivo con (nuevo) despues se lee el
+contenido, y se divide en líneas mediante el mensaje dividir: , como argumento
+usamos el signo de nueva línea ( ↵ ). o tambien podemos usar el salto de linea
+tradiccional en otros lenguajes de programación que es ( \n ) Para continuar, se ordena
+según el método mencionado en capítulo 3. Finalmente, se guarda en el disco, después
+de haber combinado las líneas en un solo texto.
+Además de leer y escribir:, también se pueden manejar otros asuntos. Mediante el
+mensaje adjuntar: , se puede agregar texto a un archivo, como en el siguiente ejemplo
+Archivo nuevo: Ubicación-del-archivo documentos nuevoficheroordenado ,
+adjuntar : ['Zucchini'].
+La ubicación del archivo se puede recuperar con el mensaje ruta .
+
+```
+>> location := fichero ruta.
+```
+
+Para saber si un archivo existe o no, se puede enviar el mensaje existe después de lo
+cual se devuelve un objeto Verdadero o Falso.
+
+```
+>> x := Archivo nuevo: Ubicación-del-archivo desconocido.
+Salida escribir: x existe, detener.
+```
+
+Los archivos se pueden eliminar enviando el mensaje eliminar .
+
+```
+fichero borrar.
+```
+
+También se puede obtener el tamaño (en bytes):
+
+```
+fichero tamaño.
+```
+
+Para solicitar el contenido de una carpeta, se puede enviar el mensaje serie al objeto
+Archivo como argumento la ubicación de la carpeta. Por ejemplo, si se solicita el
+contenido de la carpeta documentos, se debe hacer:
+
+```
+ficheros := Archivo serie: Ubicación-del-Archivo documentos.
+```
+
+Como resultado, se devuelve una serie que contiene en cada posición una lista con las
+entradas ﬁcheros y tipo que contienen el nombre del archivo y su tipo, en ese orden.
+
+# Momentos
+
+Para una representación estructurada de fecha y hora, XOScript utiliza el objeto Momento.
+En caso de que se imprima un nuevo objeto Momento en pantalla, se muestran la fecha y
+hora actuales:
+
+```
+Salida escribir: Momento nuevo, detener.
+```
+
+También es fácil leer los componentes de tiempo individuales. Así, por ejemplo, si solo es
+necesario conocer el año actual, se puede enviar el mensaje año al momento y, a su vez,
+la respuesta será un
+objeto Número que contiene únicamente el año:
+
+```
+>> m := Momento nuevo.
+Salida escribir: m año bruto, stop.
+```
+
+Tenga en cuenta que el mensaje bruto debe enviarse al objeto Número resultante. Esto
+es para evitar la salida de 2,020 , que es, por supuesto, una notación correcta para
+números, sin embargo, no se usa normalmente en el contexto de notaciones de años.
+También es posible solicitar cuestiones que podrían ser menos obvias de determinar
+al principio, por ejemplo, el día de la semana (usando el mensaje día-semanal ):
+
+```
+>> m := Momento nuevo.
+Salida escribir: m día-semanal, detener.
+```
+
+Aquí, el número 3 representa el martes. Un día laborable siempre comienza el 1
+(domingo), el lunes representa el segundo día, el martes el tercer día, y así
+sucesivamente. El sábado es siempre el último día de la semana, según XOScript.
+De la misma manera, se puede recuperar el número de la semana (semana), así como
+los meses, días, horas, minutos y segundos. El siguiente ejemplo muestra cómo se
+crea un nuevo objeto Momento y cómo se pueden recuperar todos los componentes
+individuales de fecha y hora: el segundo, el minuto, la hora, el día,
+el mes, el día del año (dia-del-año), el día de la semana (día-semanal) y la zona
+horaria (zona).
+
+```
+>> ahora := Momento nuevo.
+Salida escribir: ahora, detener.
+Salida escribir: ahora segundo, detener.
+Salida escribir: ahora minuto, detener.
+Salida escribir: ahora hora, detener.
+Salida escribir: ahora día, detener.
+Salida escribir: ahora dia-del-año, detener.
+Salida escribir: ahora día-semanal, detener.
+Salida escribir: ahora mes, detener.
+Salida escribir: ahora zona, detener.
+```
+
+Para cambiar uno de los componentes de tiempo, se envía un objeto Número. Por lo
+tanto, para modiﬁcar el segundero a 13, se hace:
+
+```
+>> m := Momento nuevo.
+m segundo: 13.
+Salida escribir: m, detener.
+```
+
+También es posible conﬁgurar otros componentes de tiempo usando año: , mes: , día:
+, hora: , minuto: , y segundo:
+
+```
+>> cuando := Momento nuevo
+año: 2020,
+mes: 12,
+día: 31,
+hora: 23,
+minuto: 59,
+segundo: 59.
+Salida escribir: cuando, detener.
+```
+
+No es posible conﬁgurar ni cambiar el día de la semana ni el día del año.
+Tenga en cuenta que los ajustes deben ser de mayor a menor; de hecho, conﬁgurar un
+componente mayor borra los componentes menores. El siguiente ejemplo ilustra este
+principio:
+
+```
+>> cuando := Momento nuevo
+año: 2020,
+mes: 12,
+día: 31,
+hora: 23,
+minuto: 59,
+segundo: 59,
+año: 2021.
+Salida escribir: cuando, detener.
+Esto mostrará:
+```
+
+En este caso, los componentes de tiempo más pequeños vuelven a sus valores iniciales,
+porque en el último momento se establece el año.
+Si selecciona un número demasiado alto para un componente de tiempo, el reloj seguirá
+contando de la manera habitual:
+
+```
+>> entonces := Momento nuevo
+año: 2020,
+mes: 2,
+día: 30.
+Salida escribir: entonces, detener.
+El resultado será::
+01/03/2020 00:00
+```
+
+En febrero nunca hay más de 29 días, por lo que el calendario cuenta desde el 1 de
+marzo. En este caso,2020 fue un año bisiesto.
+Si desea utilizar una notación diferente para la visualización del tiempo, simplemente
+combine los componentes del tiempo libremente:
+
+```
+>> pantalla := ['día mes año'].
+>> fecha := Momento nuevo.
+pantalla
+año: fecha año bruto,
+mes: fecha mes,
+día: fecha día.
+Salida escribir: display, detener.
+```
+
+No olvides tener en cuenta las distintas zonas horarias para evitar sorpresas. La zona
+horaria ( zona: ) en la variante británica de XOScript se mostrará como:
+
+```
+>> m := Momento nuevo.
+Salida escribir: m zona, detener.
+```
+
+
+Al enviar el mensaje tiempo obtendrás la cantidad de segundos que han pasado desde
+el 1 de enero de 1970. Este es un punto de referencia en el tiempo a partir del cual la
+mayoría de las computadoras calculan la hora del sistema.
+
+```
+>> ahora := Momento nuevo tiempo.
+Salida escribir: ahora, detener.
+```
+
+También puedes crear un nuevo Momento basado en una marca de tiempo como esta:
+
+```
+>> ahora := Momento nuevo: 0.
+Salida escribir: ahora año bruto, detener.
+```
+
+Estas marcas de tiempo pueden ser útiles para compartir datos de tiempo con otros
+sistemas. También se pueden utilizar para crear una descripción elegante del tiempo,
+algo que se desea comúnmente en varios programas:
+
+```
+Momento en: ['describe'] hacer: {
+>> ahora := Momento nuevo.
+>> descripción := ['-'].
+>> diferencia := ahora tiempo - yo tiempo.
+{
+(diferencia < 60) verdadero: {
+descripción := ['ahora mismo'].
+}, salir.
+(diferencia < 3600) verdadero: {
+>> minutos := (diferencia / 60) redondo.
+descripción := ['hace algunos minutos'] algunos: minutos.
+}, salir.
+descripción := (
+['día-mes-año']
+día: (ahora día),
+mes: (ahora mes),
+año: (ahora año bruto)
+).
+} proceder.
+<- descripción.
+}.
+>> m := Momento nuevo.
+Salida escribir: m describe, detener.
+>> m := Momento nuevo: (Momento nuevo tiempo - 1,500).
+Salida escribir: m describe, detener.
+>> m := Momento nuevo: (Momento nuevo tiempo - 5,000).
+Salida escribir: m describe, detener.
+```
+
+Tenga en cuenta que en el ejemplo anterior, todo se coloca entre corchetes {},
+seguido del mensaje proceder. Esta es una optimización para acelerar el programa.
+Al colocar todo en un bloque de proceso, se habilita el uso del mensaje salir
+después de cada condicional, para evitar que también se procesen condicionales
+excesivos.
+Para calcular los tiempos, simplemente sume cada componente de tiempo por
+separado. Por ejemplo, en caso de que desee saber qué hora será dentro de una
+hora:
+
+```
+>> m := Momento nuevo.
+Salida escribir: m, detener.
+m añadir: 1 hora.
+Salida escribir: m, detener.
+```
+
+Vea cómo se aplica aquí un truco para mejorar la legibilidad: añadir: 1 hora. De
+hecho, el mensaje hora se envía a 1, que es un caliﬁcador (explicado en el capítulo
+3).
+De la misma manera, puede agregar, por ejemplo, 100 segundos. No es necesario
+concentrarse en la conversión a las unidades correctas, ya que el objeto Momento
+lo hará por usted (usando el caliﬁcador).
+
+Ahora, observemos un ejemplo más complicado sobre el uso de add: y subtract::
+
+```
+>> entonces := Momento nuevo
+año: 2020,
+mes: 2,
+día: 29,
+hora: 23,
+minuto: 59,
+segundo: 59,
+restar: 1 segundo,
+añadir: 2 segundo,
+restar: 9000 hora.
+Salida escribir: entonces, detener.
+```
+
+Para crear una copia de un momento, haga lo siguiente:
+
+```
+>> entonces := Momento nuevo.
+>> ahora := entonces copiar.
+Salida escribir: entonces = ahora, detener.
+Salida escribir: (entonces es-igual-a: ahora), detener.
+```
+
+En el ejemplo anterior, se crea una copia del momento entonces. Ambos momentos
+describen el mismo punto en el tiempo, por lo que = da como resultado Verdadero.
+Sin embargo, tenga en cuenta que sigue siendo solo una copia, no el original. Debido
+a que físicamente es, de hecho, un objeto diferente, en una ubicación diferente en la
+memoria de la computadora, el mensaje es-igual-a: solo puede dar como resultado la
+respuesta Falso.
+Una característica adicional del objeto Momento es detener momentáneamente el
+proceso. Puede pausar la ejecución del programa utilizando el mensaje esperar:
+seguido del número de segundos. Eche un vistazo al siguiente ejemplo para ver una
+breve ilustración de este principio:
+
+```
+>> antes := Momento nuevo.
+Momento esperar: 2.
+>> después := Momento nuevo.
+Salida escribir: antes, detener.
+Salida escribir: despúes, detener.
+```
+
+Después de 2 segundos, el fragmento de programa anterior mostrará el resultado
+de dos momentos: el momento grabado antes de la pausa y el momento grabado
+después de esa pausa. Como resultado, las descripciones de tiempo en su
+pantalla deberían mostrar una diferencia de 2 segundos.
+
+# Programa
+
+En este capítulo se describe el objeto Programa, y este es el último objeto que se
+revisará en la serie de objetos básicos del sistema. La función básica del objeto
+Programa es comunicarse con el mundo exterior, de manera similar al objeto Archivo
+y al objeto Salida. Estos tres representan la puerta de entrada al mundo exterior.
+Además, este objeto contiene una serie de funciones que beneﬁcian la administración
+avanzada de la memoria. También puede cargar otros programas de XOScript utilizando el
+objeto Programa. Para combinar varios programas de XOScript, puede enviar el mensaje
+utilizar: . En este ejemplo, hay dos archivos de XOScript, que se denominan herramientas
+y programa:
+Contenido de herramientas:
+
+```
+>> Herramienta := Objeto nuevo.
+```
+
+Contenido del programa:
+
+```
+Programa utilizar: Ubicación-del-Archivo heramientas.
+Salida escribir: Heramienta tipo, detener.
+```
+
+Al ejecutar el programa XOScript titulado programa, se cargará el código del archivo
+heramientas gracias al mensaje utilizar:
+
+De esta manera, puede incluir el trabajo de otras personas en su propio programa y
+hacer uso de la funcionalidad proporcionada por bibliotecas externas.
+Durante la ejecución del código incluido, el directorio de trabajo se cambiará a su carpeta
+principal.
+Puede ejecutar comandos del sistema desde XOScript, enviando el mensaje sistema: a
+Programa. Esto le permite, por ejemplo, copiar archivos, reubicarlos o invocar otro s
+oftware para ejecutar tareas especíﬁcas. En un sistema Linux, por ejemplo, puede
+aplicar el siguiente paso para mostrar los archivos en la
+carpeta actual:
 

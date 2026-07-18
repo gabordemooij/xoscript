@@ -1311,10 +1311,8 @@ gebruikmaken van deze vereenvoudigde notatie:
 U kunt bestanden lezen en schrijven met het Bestand-object. Hier volgt een voorbeeld:
 
 ```
-# lezen
 >> inlezen := Bestand nieuw: ['adressen.txt'], lezen.
 
-# schrijven
 Bestand nieuw: ['sensordata.dat'], 
 schrijf: data.
 ```
