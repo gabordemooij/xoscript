@@ -2344,5 +2344,153 @@ Puede ejecutar comandos del sistema desde XOScript, enviando el mensaje sistema:
 Programa. Esto le permite, por ejemplo, copiar archivos, reubicarlos o invocar otro s
 oftware para ejecutar tareas especíﬁcas. En un sistema Linux, por ejemplo, puede
 aplicar el siguiente paso para mostrar los archivos en la
-carpeta actual:
+carpeta actual.
 
+
+## Módulos
+
+El mundo de Citrine se puede ampliar con nuevos objetos de sistema, instalando
+módulos. Se puede agregar un nuevo objeto de sistema al mundo de Citrine colocando
+el archivo del módulo (normalmente un archivo con el suﬁjo .so o .dll) en la carpeta
+mods. Supongamos que desea convertir una secuencia dada al protocolo JSON;
+para ello, se puede utilizar el módulo de complemento JSON. Para instalarlo, haga lo
+siguiente:
+
+El suﬁjo exacto del archivo varía según el sistema. El ejemplo anterior se basa en un
+sistema Linux.
+Sin embargo, la ubicación del archivo de un archivo de expansión siempre se verá
+similar a lo siguiente:
+mods / <object name> / libctr <object name> . extension (so/dll/dylib)
+Cuando envías un mensaje al objeto que está disponible a través del módulo de
+complemento, Citrine lo cargará automáticamente:
+
+```
+>> cartas := Serie nuevo
+	~ ['poker']
+	~ ['belote'].
+>> tableros := Serie nuevo
+	~ ['chutes and ladders']
+	~ ['ludo'].
+>> juegos := Lista nuevo
+	cartas: cartas,
+	tableros: tableros.
+>> texto := Json jsonify: juegos.
+Salida escribir: texto.
+```
+
+En el ejemplo anterior se ha aplicado el módulo JSON. La lista de juegos se convierte
+en un objeto Texto, que representa los datos según el protocolo JSON: Para ello se
+envía el mensaje jsonify: con la lista como argumento. La salida se muestra en el
+ejemplo anterior
+
+Tan pronto como se invoca Json, Citrine buscará si hay un módulo en la carpeta mods
+que haga que este objeto esté disponible. Para esta acción, Citrine implementa una
+comparación de texto. Citrine busca el archivo libctrjson, para ubicar el objeto Json.
+En caso de que se trate de un objeto llamado Xml, Citrine veriﬁcará si el archivo
+libctrxml está presente o no. Este análisis solo se ejecuta cuando se envía un mensaje
+a un objeto que no está presente en el programa actual. Como regla, no afectará el
+rendimiento del programa informático en sí. El análisis solo se ejecuta en caso de que
+sea probable que ocurra un error de programa de todos modos. Tan pronto como se
+identiﬁca, se carga y el programa seguirá manejando el mensaje.
+Si envía un mensaje a un módulo inexistente, aparecerá un mensaje de error. Este es
+el mismo mensaje de error que un mensaje que se envía a un objeto inexistente. Por lo
+tanto, en ambos casos el mensaje de error es el mismo. En consecuencia, Citrine
+iniciará una búsqueda de cada objeto desconocido para ver si el objeto aún puede
+cargarse como una expansión. Si este no es el caso, el proceso falla. El siguiente
+ejemplo prueba si un módulo de expansión está realmente presente:
+
+```
+{ Tetera infusionar . } capturar: {
+	Salida escribir: ['¡No hay té para ti!'], detener.
+}, empezar.
+```
+
+# Detección
+
+El capítulo anterior mostró cómo averiguar si un módulo de expansión está presente
+o no.
+Sin embargo, existen varias formas de explorar el sistema durante la ejecución del
+programa. Citrine tiene un par de métodos para detectar qué objetos están presentes y
+a qué mensajes responden estos objetos.
+En primer lugar, se puede preguntar a cada objeto qué tipo es:
+
+```
+>> cosa := Objeto.
+Salida escribir: cosa tipo , detener.
+Salida escribir: 12345 tipo , detener.
+Salida escribir: ['word salad'] tipo , detener.
+Salida escribir: Verdadero tipo , detener.
+```
+
+A diferencia de muchos lenguajes de programación comunes, los tipos son maleables.
+El tipo estándar de un objeto es, por ejemplo, objeto, pero puedes modiﬁcarlo:
+
+```
+>> Persona := Objeto nuevo.
+Persona en: ['tipo'] hacer: { <- ['humano']. }.
+Salida escribir: Persona tipo.
+```
+
+Observe cómo esto no inﬂuye en el objeto Persona, ya que solo se ha modiﬁcado la
+respuesta al tipo de mensaje, nada más.
+Los tipos pueden ser útiles para veriﬁcar si el mensaje está recibiendo los argumentos
+correctos. Por ejemplo, permiten veriﬁcar durante una adición si los argumentos son, de
+hecho, números. Sin embargo, son formas más pragmáticas de recuperar las
+propiedades de los objetos. Debido a que
+los objetos Citrine no generan errores en mensajes no válidos, puede tratar los objetos
+que espera que sean numéricos como tales y ver qué sucede. Si el objeto que obtiene
+resulta ser otro, no se verá afectado por sus
+mensajes.
+El objeto Programa se presentó en el capítulo 3.12. Con este objeto y utilizando el
+mensaje utilizar:, es posible incluir programas de otros en su propio programa. Los
+objetos que están disponibles en archivos de programa externos, también se pueden
+utilizar en su propio programa. También es posible preguntar al objeto Programa si un
+objeto dado ya está presente en el programa:
+
+```
+Programa Herramienta verdadero: { … }.
+```
+
+El código en el lugar de la línea de puntos se ejecutará, en este caso, si el objeto
+Herramienta realmente existe. En el caso de un nombre de objeto que consta de un solo
+símbolo, es mejor aplicar la siguiente notación para evitar confusiones:
+
+```
+Programa encontrar: ['X'], verdadero: { … }.
+```
+
+```
+Programa X
+```
+
+no es un mensaje válido.
+Además de preguntar por objetos, es igualmente posible preguntar al objeto Programa
+por mensajes. Por ejemplo, se puede preguntar si el objeto Número conoce el mensaje
+entre:y:, de la manera que se ilustra a continuación:
+
+```
+Salida escribir: ( Programa Número: ['entre:y:'] ), detener.
+Salida escribir: ( Programa Número: ['reemplazar:con:'] ), detener.
+```
+
+Tenga en cuenta la notación del mensaje: el mensaje que debe ser reconocido por el
+objeto relevante debe escribirse junto y sin argumentos. Cuando, por ejemplo, desea
+averiguar si se le puede pedir al objeto Conejo de Pascua que salte: 5 metros a:
+izquierda, se podría enviar el siguiente mensaje a Programa:
+
+```
+Programa Conejo de Pascua: ['saltar:a:'].
+```
+
+En resumen, el mensaje relevante que debe ser respondido por el Conejo de Pascua,
+se escribe básicamente como saltar:a:.
+El objeto Programa también puede proporcionar información sobre la versión de Citrine
+que se está utilizando en un momento determinado. Como respuesta al texto del
+mensaje, el objeto Programa muestra El lenguaje de programación Citrine/UK. Como
+respuesta al número del mensaje, se mostrará el número de versión, por
+ejemplo:
+
+```
+Salida escribir: Programa, detener.
+Salida escribir: Programa número, detener.
+```
