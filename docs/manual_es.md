@@ -1,5 +1,7 @@
 # Base
 
+{{messages}}
+
 XOScript es un lenguaje de programación puramente orientado a objetos.
 Esto significa que en XOScript todo es un objeto; no existen otros tipos de datos.
 Un programa informático escrito en XOScript puede constar, a grandes rasgos,
