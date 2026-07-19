@@ -783,7 +783,7 @@ A continuación, se muestran algunos ejemplos:
 Salida escribir: i, detener.
 (i > 9) salir.
 } * 20.
-````
+```
 
 Este fragmento de código en particular ilustra el efecto de la interrupción del mensaje.
 Muestra una pequeña lista de los números del 1 al 10; sin embargo, tan pronto como el
