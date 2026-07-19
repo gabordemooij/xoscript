@@ -353,6 +353,8 @@ Naturalmente el resultado mostrado será:
 
 # Objetos
 
+{{messages}}
+
 El mundo de XOScript está lleno de una diversidad de objetos, que están disponibles para
 su programa desde el principio. 
 
@@ -895,6 +897,8 @@ mensaje:
 
 # Texto
 
+{{messages}}
+
 Cada vez que se coloca un texto entre bloques y comillas [‘…’],
 Xoscript crea un nuevo objeto de cadena. Sin embargo, asegúrese de usar
 las comillas correctas. La comilla al principio del texto es diferente de la
@@ -1083,6 +1087,8 @@ Salida escribir: 1 + suma, detener.
 ```
 
 # Funciones
+
+{{messages}}
 
 El objeto de tarea responde a mensajes como: empezar, *, mientras:, error:, capturar:
 y proceder:. El capítulo 2 ilustró cómo un fragmento de código determinado se puede ejecutar varias
@@ -1435,6 +1441,8 @@ de error, dependiendo de las reglas de visibilidad.
 
 # El objeto raíz
 
+{{messages}}
+
 El objeto llamado Objeto es el objeto raíz de todos los objetos en XOScript. Este objeto
 raíz responde a mensajes como: hacer, hecho, en-caso-de:hacer: , en:hacer: ,
 mensaje:argumentos: , responder:y: … , aprender:signiﬁca: , y recursivo. Todos
@@ -1615,6 +1623,8 @@ Salida escribir: ( Número mensaje: b argumentos: a ), detener.
 
 
 # Series
+
+{{messages}}
 
 XOScript conoce dos tipos de colecciones: series y listas. Las series son enumeraciones
 de objetos en un orden ﬁjo. Las listas no tienen orden, sino que se parecen a una
@@ -2313,6 +2323,8 @@ pantalla deberían mostrar una diferencia de 2 segundos.
 
 # Programa
 
+{{messages}}
+
 En este capítulo se describe el objeto Programa, y este es el último objeto que se
 revisará en la serie de objetos básicos del sistema. La función básica del objeto
 Programa es comunicarse con el mundo exterior, de manera similar al objeto Archivo
@@ -2407,7 +2419,7 @@ ejemplo prueba si un módulo de expansión está realmente presente:
 }, empezar.
 ```
 
-# Detección
+## Detección
 
 El capítulo anterior mostró cómo averiguar si un módulo de expansión está presente
 o no.
