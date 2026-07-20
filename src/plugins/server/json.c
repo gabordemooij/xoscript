@@ -3,6 +3,7 @@
 #include <string.h>
 #include "jsmn/jsmn.h"
 #include <server.h>
+#include <srvmsg.h>
 #include "../../xo.h"
 
 
@@ -227,11 +228,11 @@ ctr_object* ctr_jsmn_dump( char* data, jsmntok_t** tt ) {
 		return CtrStdNil;
 	}
 	if (t == NULL) {
-		CtrStdFlow = ctr_error("Invalid JSON.", 0);
+		CtrStdFlow = ctr_error(CTR_SRV_JSON_ERR_INVALID, 0);
 		return CtrStdNil;
 	}
 	if (t->start < 0 || t->end < 0 || t->start >= len || ((t->end - t->start) < 0) || (( t->end - t->start ) > len) ) {
-		CtrStdFlow = ctr_error("Invalid JSON.", 0);
+		CtrStdFlow = ctr_error(CTR_SRV_JSON_ERR_INVALID, 0);
 		return CtrStdNil;
 	}
 	if (t->type == JSMN_STRING) {
@@ -286,7 +287,7 @@ ctr_object* ctr_jsmn_dump( char* data, jsmntok_t** tt ) {
 		ctr_heap_free(b);
 	}
 	else {
-		CtrStdFlow = ctr_error("Invalid JSON.", 0);
+		CtrStdFlow = ctr_error(CTR_SRV_JSON_ERR_INVALID, 0);
 		answer = CtrStdNil;
 	}
 	return answer;
@@ -314,7 +315,7 @@ ctr_object* ctr_json_parse(ctr_object* myself, ctr_argument* argumentList) {
 	s = jsmn_parse(&jsmn, jsonString, strlen(jsonString), NULL, 0);
 	if ( s <= 0 ) {
 		ctr_heap_free( jsonString );
-		CtrStdFlow = ctr_error("Invalid JSON.", 0);
+		CtrStdFlow = ctr_error(CTR_SRV_JSON_ERR_INVALID, 0);
 		return CtrStdNil;
 	}
 	size = (ctr_size) s;
@@ -325,7 +326,7 @@ ctr_object* ctr_json_parse(ctr_object* myself, ctr_argument* argumentList) {
 	if (r < size || t[0].type != JSMN_OBJECT) {
 		ctr_heap_free( t );
 		ctr_heap_free( jsonString );
-		CtrStdFlow = ctr_error("Invalid JSON.", 0);
+		CtrStdFlow = ctr_error(CTR_SRV_JSON_ERR_INVALID, 0);
 		return CtrStdNil;
 	}
 	answer = ctr_jsmn_dump(jsonString, &t);
