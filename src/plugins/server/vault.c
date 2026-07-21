@@ -12,27 +12,16 @@
 #include <server.h>
 #include "monocypher/src/monocypher.h"
 
-
 #define SERVER_VAULT_TOKENCHARS "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 #define SERVER_VAULT_TOKENCHARS_NUM 62
 
-/* Set crypto version = Argon2i 100mb 3lanes 16byte salt */
+// Set crypto version = Argon2i 100mb 3lanes 16byte salt
 #define SERVER_VAULT_CRYPTO_ID_20262 "C20262$"
-
-
 
 // either provided by libsecret or bsd
 int random_buf(void *buf, size_t n) {
 	arc4random_buf(buf, n);
 	return 0;
-}
-
-static void print_hex(char* name, unsigned char *data, size_t length) {
-	printf("=> %s ", name);
-	for (size_t i = 0; i < length; ++i) {
-		printf("%02x", data[i]);
-	}
-	printf("\n");
 }
 
 //rfc4648
@@ -143,19 +132,19 @@ ctr_object* ctr_vault_name(ctr_object* myself, ctr_argument* argumentList) {
 
 int ctr_vault_internal_derive_key(unsigned char* password, uint8_t* hash, uint8_t* salt) {
 	crypto_argon2_config config = {
-		.algorithm = CRYPTO_ARGON2_ID,           /* Argon2id         */
-		.nb_blocks = 100000,                     /* 100 megabytes   */
-		.nb_passes = 3,                          /* 3 iterations    */
-		.nb_lanes  = 1                           /* Single-threaded */
+		.algorithm = CRYPTO_ARGON2_ID, //Argon2id
+		.nb_blocks = 100000, //100 megabytes
+		.nb_passes = 3, //3 iterations
+		.nb_lanes  = 1 //Single-threaded
 	};
 	//password MUST be UTF-8 text without NUL bytes
 	crypto_argon2_inputs inputs = {
-		.pass      = password,                   /* User password */
-		.salt      = salt,                 /* Salt for the password */
-		.pass_size = strlen((char*)password),       /* Password length */
+		.pass      = password,
+		.salt      = salt,
+		.pass_size = strlen((char*)password),
 		.salt_size = 16
 	};
-	crypto_argon2_extras extras = {0};   /* Extra parameters unused */
+	crypto_argon2_extras extras = {0}; // Extra parameters unused
 	void *work_area = malloc((size_t)config.nb_blocks * 1024);
 	if (work_area == NULL) {
 		crypto_wipe(password, strlen((char*)password));
