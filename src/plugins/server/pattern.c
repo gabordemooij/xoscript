@@ -88,7 +88,10 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
 			size_t room = (l * 4 * sizeof(PCRE2_UCHAR)) + 1;
 			PCRE2_UCHAR* pbuf = ctr_heap_allocate(room);
 			int qq = pcre2_substring_copy_bynumber(match, j, pbuf, &room);
-			if (qq) continue;
+			if (qq) {
+				ctr_heap_free(pbuf);
+				continue;
+			}
 			ctr_object* subgroup = ctr_build_string_from_cstring((char*)pbuf);
 			subgroup->info.sticky = 1;
 			ctr_argument pusharg;
