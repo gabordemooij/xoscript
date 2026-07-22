@@ -75,3 +75,4 @@
 #define CTR_MERR_POOL     "No se puede asignar el grupo de memoria.\n"
 #define CTR_STDDATEFRMT   "%Y-%m-%d %H:%M:%S"
 #define CTR_STDTIMEZONE   "UTC"
+#define CTR_ERR_RECIPIENT "Objeto no encontrado.\n"

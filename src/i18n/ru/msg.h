@@ -75,3 +75,5 @@
 #define CTR_MERR_POOL     "Невозможно выделить пул памяти.\n"
 #define CTR_STDDATEFRMT   "%H:%M:%S %d.%m.%Y"
 #define CTR_STDTIMEZONE   "Europe/Moscow"
+#define CTR_ERR_RECIPIENT "Объект не найден.\n"
+

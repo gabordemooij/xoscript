@@ -75,6 +75,7 @@
 #define CTR_MERR_POOL     "Kon geen geheugenbank aanleggen.\n"
 #define CTR_STDDATEFRMT   "%d-%m-%Y %H.%M:%S"
 #define CTR_STDTIMEZONE   "Europe/Amsterdam"
+#define CTR_ERR_RECIPIENT "Object niet gevonden.\n"
 
 
 

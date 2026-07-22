@@ -80,7 +80,7 @@ ctr_object* ctr_cwlk_message(ctr_tnode* paramNode) {
 					return CtrStdNil;
 				}
 				if (!r) {
-					fprintf(stderr, "Invalid state"); //@todo improve error message
+					fprintf(stderr, CTR_ERR_RECIPIENT); //@todo improve error message
 					exit(1);
 				}
 			}
