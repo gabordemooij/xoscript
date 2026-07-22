@@ -15,17 +15,26 @@ export PLATFORMCODE
 
 BUILD="${1:-build}"
 
+
+declare -A server_plugin_name
+server_plugin_name[es]="servidor"
+server_plugin_name[en]="server"
+server_plugin_name[nl]="server"
+
 if [[ $BUILD == "build" ]]; then
 LDFLAGS='-shared'
-ISO="en" 
+for ISO in "nl" "es" "en"; #en last (=base)
+do
 export ISO
 make clean
 EXTRACFLAGS="-D TEST -D EXPERIMENTS"
 export EXTRACFLAGS
 make -f makefile.obsd clean
-PACKAGE="server" NAME="server" make -f makefile.obsd plugin-clean
+PACKAGE="server" NAME=${server_plugin_name[$ISO]} make -f makefile.obsd plugin-clean
 make -f makefile.obsd
-PACKAGE="server" NAME="server" make -f makefile.obsd plugin
+PACKAGE="server" NAME=${server_plugin_name[$ISO]} make -f makefile.obsd plugin
+cp build/OpenBSD/bin/xo build/OpenBSD/bin/xo$ISO #copy lang edition
+done
 fi
 
 printf '%s' 'c=3&e[]=1&e[]=2&xx=1' > /tmp/xotest.txt
