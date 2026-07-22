@@ -3,7 +3,7 @@
 #include <string.h>
 #include "jsmn/jsmn.h"
 #include <server.h>
-#include <srvmsg.h>
+#include <srv_msg.h>
 #include "../../xo.h"
 
 
