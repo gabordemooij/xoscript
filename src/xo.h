@@ -167,7 +167,7 @@
 
 
 /**
- * Define basic types for Citrine
+ * Define basic types for XOScript
  */
 typedef  unsigned int ctr_bool;
 typedef  double       ctr_number;
@@ -176,7 +176,7 @@ typedef  char*        ctr_raw_string;
 typedef  size_t ctr_size;
 
 /**
- * Internal Citrine String
+ * Internal XOScript String
  */
 struct ctr_string {
 	char* value;
