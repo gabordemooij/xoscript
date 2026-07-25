@@ -271,6 +271,7 @@ ctr_object* ctr_gc_getmode(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 /**
+ * @def
  * [ Program ] shell-escape: [ String ]
  *
  * @test634
