@@ -422,7 +422,7 @@ ctr_object* ctr_server_vault_password_verify(ctr_object* myself, ctr_argument* a
 
 /**
  * @def
- * [ Vault ] edkeys
+ * [ Vault ] generate-keys
  * 
  * @test700
  */
