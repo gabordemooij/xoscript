@@ -12,6 +12,10 @@
 
 ctr_object* CtrServerPCRE2;
 
+/**
+ * Not fully PCRE2-compliant, stops on first nomatch.
+ * Probably good enough for most purposes.
+ */
 char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char *subject, ctr_object* callback, size_t* match_count) {
 	int errorcode;
 	size_t num_matches = 0;
@@ -80,7 +84,8 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
 		ctr_object* matches = ctr_array_new(CtrStdArray, &arguments);
 		uint32_t cnt;
 		pcre2_pattern_info(re, PCRE2_INFO_CAPTURECOUNT, (void*) &cnt);
-		//@todo fix memory usage
+		ctr_object** subgroups_to_clean;
+		subgroups_to_clean = ctr_heap_allocate((cnt + 1) * sizeof(ctr_object));
 		for (int j = 0; j<=cnt; j++) {
 			PCRE2_SIZE l;
 			int q = pcre2_substring_length_bynumber(match, j, &l);
@@ -94,6 +99,7 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
 			}
 			ctr_object* subgroup = ctr_build_string_from_cstring((char*)pbuf);
 			subgroup->info.sticky = 1;
+			subgroups_to_clean[j] = subgroup;
 			ctr_argument pusharg;
 			pusharg.object = subgroup;
 			pusharg.next = NULL;
@@ -109,6 +115,10 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
 			result = ctr_block_run(callback, &arguments, NULL);
 		}
 		num_matches ++;
+		for(size_t j = 0; j<=cnt; j++) {
+			subgroups_to_clean[j]->info.sticky = 0;
+		}
+		ctr_heap_free(subgroups_to_clean);
 		matchobj->info.sticky = 0;
 		if (result->info.type != CTR_OBJECT_TYPE_OTSTRING) {
 			result = ctr_build_empty_string();
