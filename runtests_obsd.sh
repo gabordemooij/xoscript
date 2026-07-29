@@ -23,7 +23,7 @@ server_plugin_name[nl]="server"
 
 if [[ $BUILD == "build" ]]; then
 LDFLAGS='-shared'
-for ISO in "nl" "es" "en"; #en last (=base)
+for ISO in "en"; #en last (=base)
 do
 export ISO
 make clean
@@ -130,7 +130,7 @@ unittest() {
 
 # select range
 FROM=1
-TIL=736
+TIL=737
 
 cd build/OpenBSD/bin
 for i in $(seq -f "%04g" $FROM $TIL);
