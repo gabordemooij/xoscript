@@ -59,6 +59,8 @@ int ctr_init() {
 	ctr_clex_keyword_me_icon = CTR_DICT_SELF;
 	ctr_clex_keyword_my_icon = CTR_DICT_OWN;
 	ctr_clex_keyword_var_icon = CTR_DICT_VAR;
+	// we use strlen instead of sizeof - 1 to reduce accidental complexity and
+	// to avoid compiler warnings (some compilers find it suspicious in strncmp etc).
 	ctr_clex_keyword_my_icon_len = strlen( ctr_clex_keyword_my_icon );
 	ctr_clex_keyword_var_icon_len = strlen( ctr_clex_keyword_var_icon );
 	ctr_clex_keyword_eol_len = strlen( CTR_DICT_END_OF_LINE );
