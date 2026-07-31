@@ -363,7 +363,7 @@ ctr_tnode* ctr_cparse_ref() {
 	r->type = CTR_AST_NODE_REFERENCE;
 	r->vlen = ctr_clex_tok_value_length();
 	tmp = ctr_clex_tok_value();
-	if (strncmp(ctr_clex_keyword_my_icon, tmp, ctr_clex_keyword_my_icon_len)==0 && r->vlen == ctr_clex_keyword_my_icon_len) {
+	if (r->vlen == ctr_clex_keyword_my_icon_len && memcmp(ctr_clex_keyword_my_icon, tmp, ctr_clex_keyword_my_icon_len)==0) {
 		int t = ctr_clex_tok();
 		if (t != CTR_TOKEN_REF) {
 			ctr_cparse_emit_error_unexpected( t, CTR_ERR_EXP_KEY );
@@ -374,7 +374,7 @@ ctr_tnode* ctr_cparse_ref() {
 		r->vlen = ctr_clex_tok_value_length();
 	}
 	if (
-	(strncmp(ctr_clex_keyword_var_icon, tmp, ctr_clex_keyword_var_icon_len)==0 && r->vlen == ctr_clex_keyword_var_icon_len)
+	(r->vlen == ctr_clex_keyword_var_icon_len && memcmp(ctr_clex_keyword_var_icon, tmp, ctr_clex_keyword_var_icon_len)==0)
 	) {
 		int t = ctr_clex_tok();
 		if (t != CTR_TOKEN_REF) {

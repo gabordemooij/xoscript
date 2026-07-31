@@ -695,9 +695,7 @@ ctr_object* ctr_array_index_of( ctr_object* myself, ctr_argument* argumentList )
 	needle->info.sticky = 1;
 	for(i = myself->value.avalue->tail; i < myself->value.avalue->head; i++) {
 		element = ctr_internal_cast2string( (ctr_object*) *(myself->value.avalue->elements + i) );
-		if (
-		element->value.svalue->vlen == needle->value.svalue->vlen &&
-		strncmp(element->value.svalue->value,needle->value.svalue->value,needle->value.svalue->vlen)==0) {
+		if (CTR_STRINGOBJ_EQUAL(element, needle)) {
 			found = i;
 			break;
 		}
@@ -969,13 +967,8 @@ ctr_object* ctr_map_has(ctr_object* myself, ctr_argument* argumentList) {
 	m = myself->properties->head;
 	while(m) {
 		candidate = ctr_internal_cast2string(m->value);
-		if ( needle->value.svalue->vlen == candidate->value.svalue->vlen ) {
-			if ( strncmp(
-			candidate->value.svalue->value,
-			needle->value.svalue->value, needle->value.svalue->vlen) == 0) {
-				found = 1;
-			}
-		}
+		found = CTR_STRINGOBJ_EQUAL(needle, candidate);
+		if (found) break;
 		m = m->next;
 	}
 	needle->info.sticky = sticky;

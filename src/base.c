@@ -460,24 +460,16 @@ ctr_object* ctr_object_is_nil(ctr_object* myself, ctr_argument* argumentList) {
  */
 
 ctr_object* ctr_object_learn_meaning(ctr_object* myself, ctr_argument* ctr_argumentList) {
-		char*  current_method_name_str;
-		ctr_size     current_method_name_len;
 		ctr_size     i                      = 0;
 		ctr_mapitem* current_method         = myself->methods->head;
 		ctr_object*  target_method_name     = ctr_internal_cast2string( ctr_argumentList->next->object );
 		int sticky = target_method_name->info.sticky;
 		target_method_name->info.sticky = 1;
-		char*        target_method_name_str = target_method_name->value.svalue->value;
-		ctr_size     target_method_name_len = target_method_name->value.svalue->vlen;
 		ctr_object*  alias                  = ctr_internal_cast2string( ctr_argumentList->object );
 		while( i < myself->methods->size ) {
-				current_method_name_str = current_method->key->value.svalue->value;
-				current_method_name_len = current_method->key->value.svalue->vlen;
-				if (  current_method_name_len == target_method_name_len ) {
-					if ( strncmp( current_method_name_str, target_method_name_str, current_method_name_len ) == 0 ) {
-					   ctr_internal_object_add_property( myself, alias, current_method->value, 1);
-					   break;
-					}
+				if (CTR_STRINGOBJ_EQUAL(current_method->key, target_method_name)) {
+					ctr_internal_object_add_property( myself, alias, current_method->value, 1);
+					break;
 				}
 				current_method = current_method->next;
 				i ++;
@@ -1550,10 +1542,7 @@ ctr_object* ctr_string_eval(ctr_object* myself, ctr_argument* argumentList) {
 
 ctr_object* ctr_string_eq(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* other = ctr_internal_cast2string( argumentList->object );
-	if (other->value.svalue->vlen != myself->value.svalue->vlen) {
-		return CtrStdBoolFalse;
-	}
-	return ctr_build_bool((strncmp(other->value.svalue->value, myself->value.svalue->value, myself->value.svalue->vlen)==0));
+	return ctr_build_bool(CTR_STRINGOBJ_EQUAL(myself, other));
 }
 
 /**
@@ -1566,10 +1555,7 @@ ctr_object* ctr_string_eq(ctr_object* myself, ctr_argument* argumentList) {
 
 ctr_object* ctr_string_neq(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* other = ctr_internal_cast2string( argumentList->object );
-	if (other->value.svalue->vlen != myself->value.svalue->vlen) {
-		return CtrStdBoolTrue;
-	}
-	return ctr_build_bool(!(strncmp(other->value.svalue->value, myself->value.svalue->value, myself->value.svalue->vlen)==0));
+	return ctr_build_bool(!CTR_STRINGOBJ_EQUAL(myself, other));
 }
 
 /**
@@ -1688,10 +1674,10 @@ ctr_object* ctr_string_to_code(ctr_object* myself, ctr_argument* argumentList) {
 	memcpy(d, q1,l1); d += l1;
 	//q1 and q2 cannot be equal and may not overlap
 	for(size_t i = 0; i < vlen; i++ ) {
-		if ((i <= vlen - l1) && strncmp(v + i, q1, l1)==0) {
+		if ((i <= vlen - l1) && memcmp(v + i, q1, l1)==0) {
 			*d++ = '\\'; //prefix the next sequence with escape char
 		}
-		if ((i <= vlen - l2) && strncmp(v + i, q2, l2)==0) {
+		if ((i <= vlen - l2) && memcmp(v + i, q2, l2)==0) {
 			*d++ = '\\'; //prefix the next sequence with escape char
 		}
 		*d++ = v[i]; //just copy from here

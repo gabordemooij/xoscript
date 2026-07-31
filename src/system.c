@@ -238,10 +238,10 @@ ctr_object* ctr_gc_setmemlimit(ctr_object* myself, ctr_argument* argumentList) {
 	);
 	uint64_t memlimit = (uint64_t) ctr_internal_cast2number( argumentList->object )->value.nvalue;
 	if (unit && unit->value.svalue->vlen == 2) {
-		if (strncmp("KB", unit->value.svalue->value, 2)==0) {
+		if (CTR_STRINGOBJ_CSTRING_EQUAL(unit, "KB")) {
 			memlimit *= 1000;
 		}
-		else if (strncmp("MB", unit->value.svalue->value, 2)==0) {
+		else if (CTR_STRINGOBJ_CSTRING_EQUAL(unit, "MB")) {
 			memlimit *= 1000000;
 		}
 	}
@@ -1312,7 +1312,7 @@ ctr_object* ctr_clock_equals( ctr_object* myself, ctr_argument* argumentList ) {
 	mytime->value.nvalue == othertime->value.nvalue &&
 	myzone != NULL &&
 	otherzone != NULL &&
-	strncmp(myzone->value.svalue->value,otherzone->value.svalue->value,myzone->value.svalue->vlen)==0
+	CTR_STRINGOBJ_EQUAL(myzone, otherzone)
 	) {
 		return CtrStdBoolTrue;
 	}
@@ -1485,19 +1485,19 @@ ctr_object* ctr_clock_change( ctr_object* myself, ctr_argument* argumentList, ui
 	);
 	setenv( "TZ", zone, 1 );
 	date = localtime( &time );
-	if ( strncmp( unit, CTR_DICT_HOUR, l ) == 0 ) {
+	if ( CTR_STRINGOBJ_CSTRING_EQUAL( qual, CTR_DICT_HOUR )) {
 		date->tm_hour += number;
-	} else if ( strncmp( unit, CTR_DICT_MINUTE, l ) == 0 ) {
+	} else if ( CTR_STRINGOBJ_CSTRING_EQUAL( qual, CTR_DICT_MINUTE )) {
 		date->tm_min += number;
-	} else if ( strncmp( unit, CTR_DICT_SECOND, l ) == 0 ) {
+	} else if ( CTR_STRINGOBJ_CSTRING_EQUAL( qual, CTR_DICT_SECOND )) {
 		date->tm_sec += number;
-	} else if ( strncmp( unit, CTR_DICT_DAY, l ) == 0 ) {
+	} else if ( CTR_STRINGOBJ_CSTRING_EQUAL( qual, CTR_DICT_DAY )) {
 		date->tm_mday += number;
-	} else if ( strncmp( unit, CTR_DICT_MONTH, l ) == 0 ) {
+	} else if ( CTR_STRINGOBJ_CSTRING_EQUAL( qual, CTR_DICT_MONTH )) {
 		date->tm_mon += number;
-	} else if ( strncmp( unit, CTR_DICT_YEAR, l ) == 0 ) {
+	} else if ( CTR_STRINGOBJ_CSTRING_EQUAL( qual, CTR_DICT_YEAR )) {
 		date->tm_year += number;
-	} else if ( strncmp( unit, CTR_DICT_WEEK, l ) == 0 ) {
+	} else if ( CTR_STRINGOBJ_CSTRING_EQUAL( qual, CTR_DICT_WEEK )) {
 		date->tm_mday += number * 7;
 	}
 	((ctr_clock*)myself->value.rvalue->ptr)->time = mktime(date);
