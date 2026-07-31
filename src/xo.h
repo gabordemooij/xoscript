@@ -999,3 +999,9 @@ ctr_object* classname(ctr_object* myself, ctr_argument* argumentList) { \
 }
 
 #define CTR_STRINGOBJ(x) ctr_build_string(x, sizeof(x) - 1)
+
+#define CTR_STRINGOBJ_EQUAL(a,b) ( a->value.svalue->vlen == b->value.svalue->vlen && \
+	( !memcmp( a->value.svalue->value, b->value.svalue->value, b->value.svalue->vlen)))
+
+#define CTR_STRINGOBJ_CSTRING_EQUAL(a,b) ( a->value.svalue->vlen == strlen(b) && \
+	( !memcmp( a->value.svalue->value, b, a->value.svalue->vlen)))
