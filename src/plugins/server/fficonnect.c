@@ -40,7 +40,7 @@ ctr_object* ctr_blob_deref(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Blob ] bytes: [ List ]
- * 
+ *
  * @test375
  */
 ctr_object* ctr_blob_fill(ctr_object* myself, ctr_argument* argumentList) {

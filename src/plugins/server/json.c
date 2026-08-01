@@ -197,9 +197,6 @@ ctr_object* ctr_string_unescape(ctr_object* myself, ctr_argument* argumentList) 
 			tstr[k++] = str[i];
 		}
 	}
-	
-	
-	
 	newString = ctr_build_string(tstr, tlen);
 	ctr_heap_free( tstr );
 	return newString;

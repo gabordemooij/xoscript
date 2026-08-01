@@ -460,22 +460,22 @@ ctr_object* ctr_object_is_nil(ctr_object* myself, ctr_argument* argumentList) {
  */
 
 ctr_object* ctr_object_learn_meaning(ctr_object* myself, ctr_argument* ctr_argumentList) {
-		ctr_size     i                      = 0;
-		ctr_mapitem* current_method         = myself->methods->head;
-		ctr_object*  target_method_name     = ctr_internal_cast2string( ctr_argumentList->next->object );
-		int sticky = target_method_name->info.sticky;
-		target_method_name->info.sticky = 1;
-		ctr_object*  alias                  = ctr_internal_cast2string( ctr_argumentList->object );
-		while( i < myself->methods->size ) {
-				if (CTR_STRINGOBJ_EQUAL(current_method->key, target_method_name)) {
-					ctr_internal_object_add_property( myself, alias, current_method->value, 1);
-					break;
-				}
-				current_method = current_method->next;
-				i ++;
+	ctr_size i = 0;
+	ctr_mapitem* current_method = myself->methods->head;
+	ctr_object* target_method_name = ctr_internal_cast2string( ctr_argumentList->next->object );
+	int sticky = target_method_name->info.sticky;
+	target_method_name->info.sticky = 1;
+	ctr_object* alias = ctr_internal_cast2string( ctr_argumentList->object );
+	while( i < myself->methods->size ) {
+		if (CTR_STRINGOBJ_EQUAL(current_method->key, target_method_name)) {
+			ctr_internal_object_add_property( myself, alias, current_method->value, 1);
+			break;
 		}
-		target_method_name->info.sticky = sticky;
-		return myself;
+		current_method = current_method->next;
+		i ++;
+	}
+	target_method_name->info.sticky = sticky;
+	return myself;
 }
 
 /**
@@ -1530,8 +1530,6 @@ ctr_object* ctr_string_eval(ctr_object* myself, ctr_argument* argumentList) {
 	return result;
 }
 
-
-
 /**
  * @def
  * [ String ] = [ String ]
@@ -1814,7 +1812,6 @@ ctr_object* ctr_string_index_of(ctr_object* myself, ctr_argument* argumentList) 
  * @def
  * [ String ] uppercase
  *
- *
  * @test472
  */
 
@@ -1832,11 +1829,9 @@ ctr_object* ctr_string_to_upper(ctr_object* myself, ctr_argument* argumentList) 
 	return myself;
 }
 
-
 /**
  * @def
  * [ String ] lowercase
- *
  *
  * @test473
  */
@@ -1858,7 +1853,6 @@ ctr_object* ctr_string_to_lower(ctr_object* myself, ctr_argument* argumentList) 
 /**
  * @def
  * [ String ] last: [ String ]
- *
  *
  * @test474
  */
@@ -1913,7 +1907,6 @@ ctr_object* ctr_feature_string_fill_in(ctr_object* myself, ctr_argument* argumen
 /**
  * @def
  * [ String ] [ String ]: [ String ]
- *
  *
  * @test476
  */
@@ -2054,10 +2047,8 @@ ctr_object* ctr_string_replace_with(ctr_object* myself, ctr_argument* argumentLi
  * @def
  * [ String ] - [ String ]
  *
- *
  * @test477
  */
-
 ctr_object* ctr_string_minus(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* needle = ctr_internal_cast2string(argumentList->object);
 	long nlen = needle->value.svalue->vlen;
@@ -2192,7 +2183,6 @@ ctr_object* ctr_string_split(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ String ] characters
  *
- *
  * @test483
  */
 
@@ -2230,7 +2220,6 @@ ctr_object* ctr_string_ord( ctr_object* myself, ctr_argument* argumentList ) {
 /**
  * @def
  * [ String ] compare: [ String ]
- *
  *
  * @test484
  */
@@ -2306,7 +2295,6 @@ ctr_object* ctr_string_tccompare(ctr_object* myself, ctr_argument* argumentList)
  * @def
  * [ String ] < [ String ]
  * 
- *
  * @test485
  */
 
@@ -2322,7 +2310,6 @@ ctr_object* ctr_string_before(ctr_object* myself, ctr_argument* argumentList ) {
  * @def
  * [ String ] <=: [ String ]
  * 
- *
  * @test486
  */
 
@@ -2337,7 +2324,6 @@ ctr_object* ctr_string_before_or_same(ctr_object* myself, ctr_argument* argument
  * @def
  * [ String ] > [ String ]
  * 
- *
  * @test487
  */
 
@@ -2353,7 +2339,6 @@ ctr_object* ctr_string_after(ctr_object* myself, ctr_argument* argumentList ) {
  * @def
  * [ String ] >=: [ String ]
  * 
- *
  * @test488
  */
 
@@ -2367,7 +2352,6 @@ ctr_object* ctr_string_after_or_same(ctr_object* myself, ctr_argument* argumentL
 /**
  * @def
  * [ String ] hash: [ String ]
- *
  *
  * @test489
  */
@@ -2392,7 +2376,6 @@ ctr_object* ctr_string_hash_with_key( ctr_object* myself, ctr_argument* argument
  * @def
  * Code
  *
- *
  * @test490
  */
 
@@ -2407,7 +2390,6 @@ ctr_object* ctr_build_block(ctr_tnode* node) {
  * @def
  * [ Code ] start
  * 
- *
  * @test491
  */
 
@@ -2486,7 +2468,6 @@ ctr_object* ctr_block_run(ctr_object* myself, ctr_argument* argList, ctr_object*
  * @def
  * [ Code ] while: [ Code ]
  *
- *
  * @test492
  */
 
@@ -2530,7 +2511,6 @@ ctr_object* ctr_block_try(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Code ] set: [ String ] value: [ Object ]
  *
- *
  * @test493
  */
 
@@ -2545,7 +2525,6 @@ ctr_object* ctr_block_set(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Code ] error: [ Object ]
  *
- *
  * @test494
  */
 
@@ -2558,7 +2537,6 @@ ctr_object* ctr_block_error(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Code ] except: [ Code ]
- *
  *
  * @test495
  */
@@ -2573,7 +2551,6 @@ ctr_object* ctr_block_catch(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Code ] string
- *
  *
  * @test496
  */

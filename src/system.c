@@ -226,7 +226,6 @@ ctr_object* ctr_gc_memory(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Program ] memory: [Number]
  *
- *
  * @test550
  */
 
@@ -321,7 +320,6 @@ ctr_object* ctr_program_shell_escape(ctr_object* myself, ctr_argument* argumentL
 /**
  * @def
  * [ Program ] os: [ String ]
- * 
  *
  * @test551
  */
@@ -397,7 +395,6 @@ ctr_object* ctr_program_mkdir(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Program ] argument: [ Number ]
  *
- *
  * @test552
  */
 
@@ -412,7 +409,6 @@ ctr_object* ctr_program_argument(ctr_object* myself, ctr_argument* argumentList)
  * @def
  * [ Program ] number.
  *
- *
  * @test553
  */
 
@@ -423,7 +419,6 @@ ctr_object* ctr_program_tonumber(ctr_object* myself, ctr_argument* argumentList)
 /**
  * @def
  * [ Program ] string
- *
  *
  * @test554
  */
@@ -450,7 +445,6 @@ ctr_object* ctr_program_getcwd(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Program ] use: [ String ]
- *
  *
  * @test555
  */
@@ -504,7 +498,6 @@ ctr_object* ctr_program_include(ctr_object* myself, ctr_argument* argumentList) 
 /**
  * @def
  * [ Program ] [ String ]
- * 
  *
  * @test556
  */
@@ -513,7 +506,6 @@ ctr_object* ctr_program_include(ctr_object* myself, ctr_argument* argumentList) 
 /**
  * @def
  * [ Program ] find: [ String ]
- * 
  *
  * @test557
  */
@@ -528,7 +520,6 @@ ctr_object* ctr_program_object_exists( ctr_object* myself, ctr_argument* argumen
 /**
  * @def
  * [ Program ] [ String ]: [ String ]
- * 
  *
  * @test558
  */
@@ -560,7 +551,6 @@ ctr_object* ctr_program_object_message_exists( ctr_object* myself, ctr_argument*
  * @def
  * [ Program ] arguments
  *
- *
  * @test559
  */
 
@@ -584,7 +574,6 @@ ctr_object* ctr_program_platform(ctr_object* myself, ctr_argument* argumentList)
 /**
  * @def
  * [ Program ] end
- *
  *
  * @test560
  */
@@ -685,7 +674,6 @@ ctr_object* ctr_program_unveil(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Program ] setting: [ String ]
  *
- *
  * @test561
  */
 
@@ -708,7 +696,6 @@ ctr_object* ctr_program_get_env(ctr_object* myself, ctr_argument* argumentList) 
 /**
  * @def
  * [ Program ] setting: [ String ] value: [ String ]
- *
  *
  * @test562
  */
@@ -736,7 +723,6 @@ ctr_object* ctr_program_set_env(ctr_object* myself, ctr_argument* argumentList) 
 /**
  * @def
  * [ Program ] ask
- *
  *
  * @test563
  */
@@ -769,7 +755,6 @@ ctr_object* ctr_program_waitforinput(ctr_object* myself, ctr_argument* argumentL
 /**
  * @def
  * [ Program ] ask password
- *
  *
  * @test564
  */
@@ -808,7 +793,6 @@ ctr_object* ctr_program_waitforpassword(ctr_object* myself, ctr_argument* argume
  * @def
  * [ Program ] input
  *
- *
  * @test565
  */
 
@@ -839,7 +823,6 @@ ctr_object* ctr_program_input(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Program ] flush
- *
  *
  * @test566
  */
@@ -934,7 +917,6 @@ double ctr_internal_versiontime() {
 /**
  * @def
  * [ Moment ] wait: [ Number ]
- *
  *
  * @test79
  */
@@ -1061,7 +1043,6 @@ ctr_object* ctr_clock_set_time( ctr_object* myself, ctr_argument* argumentList, 
  * @def
  * [ Moment ] zone: [ String ]
  *
- *
  * @test570
  */
 
@@ -1074,7 +1055,6 @@ ctr_object* ctr_clock_set_zone( ctr_object* myself, ctr_argument* argumentList )
  * @def
  * [ Moment ] zone
  *
- *
  * @test571
  */
 
@@ -1085,7 +1065,6 @@ ctr_object* ctr_clock_get_zone( ctr_object* myself, ctr_argument* argumentList )
 /**
  * @def
  * [ Moment ] year: [ Number ]
- *
  *
  * @test572
  */
@@ -1098,7 +1077,6 @@ ctr_object* ctr_clock_set_year( ctr_object* myself, ctr_argument* argumentList )
  * @def
  * [ Moment ] month: [ Number ]
  *
- *
  * @test573
  */
 
@@ -1109,7 +1087,6 @@ ctr_object* ctr_clock_set_month( ctr_object* myself, ctr_argument* argumentList 
 /**
  * @def
  * [ Moment ] day: [ Number ]
- *
  *
  * @test574
  */
@@ -1122,7 +1099,6 @@ ctr_object* ctr_clock_set_day( ctr_object* myself, ctr_argument* argumentList ) 
  * @def
  * [ Moment ] hour: [ Number ]
  *
- *
  * @test575
  */
 
@@ -1133,7 +1109,6 @@ ctr_object* ctr_clock_set_hour( ctr_object* myself, ctr_argument* argumentList )
 /**
  * @def
  * [ Moment ] minute: [ Number ]
- *
  *
  * @test576
  */
@@ -1146,7 +1121,6 @@ ctr_object* ctr_clock_set_minute( ctr_object* myself, ctr_argument* argumentList
  * @def
  * [ Moment ] second: [ Number ]
  *
- *
  * @test577
  */
 
@@ -1157,7 +1131,6 @@ ctr_object* ctr_clock_set_second( ctr_object* myself, ctr_argument* argumentList
 /**
  * @def
  * [ Moment ] year
- *
  *
  * @test578
  */
@@ -1170,7 +1143,6 @@ ctr_object* ctr_clock_year( ctr_object* myself, ctr_argument* argumentList ) {
  * @def
  * [ Moment ] month
  *
- *
  * @test579
  */
 
@@ -1181,7 +1153,6 @@ ctr_object* ctr_clock_month( ctr_object* myself, ctr_argument* argumentList ) {
 /**
  * @def
  * [ Moment ] day
- *
  *
  * @test580
  */
@@ -1194,7 +1165,6 @@ ctr_object* ctr_clock_day( ctr_object* myself, ctr_argument* argumentList ) {
  * @def
  * [ Moment ] hour
  *
- *
  * @test581
  */
 
@@ -1205,7 +1175,6 @@ ctr_object* ctr_clock_hour( ctr_object* myself, ctr_argument* argumentList ) {
 /**
  * @def
  * [ Moment ] minute
- *
  *
  * @test582
  */
@@ -1218,7 +1187,6 @@ ctr_object* ctr_clock_minute( ctr_object* myself, ctr_argument* argumentList ) {
  * @def
  * [ Moment ] second
  *
- *
  * @test583
  */
 
@@ -1229,7 +1197,6 @@ ctr_object* ctr_clock_second( ctr_object* myself, ctr_argument* argumentList ) {
 /**
  * @def
  * [ Moment ] yearday
- *
  *
  * @test584
  */
@@ -1247,7 +1214,6 @@ ctr_object* ctr_clock_yearday( ctr_object* myself, ctr_argument* argumentList ) 
  * @def
  * [ Moment ] weekday
  *
- *
  * @test585
  */
 
@@ -1264,7 +1230,6 @@ ctr_object* ctr_clock_weekday( ctr_object* myself, ctr_argument* argumentList ) 
  * @def
  * [ Moment ] time
  *
- *
  * @test586
  */
 
@@ -1278,7 +1243,6 @@ ctr_object* ctr_clock_time( ctr_object* myself, ctr_argument* argumentList ) {
 /**
  * @def
  * [ Moment ] copy
- *
  *
  * @test587
  */
@@ -1298,7 +1262,6 @@ ctr_object* ctr_clock_copy( ctr_object* myself, ctr_argument* argumentList ) {
 /**
  * @def
  * [ Moment ] = [ Moment ]
- *
  *
  * @test588
  */
@@ -1323,7 +1286,6 @@ ctr_object* ctr_clock_equals( ctr_object* myself, ctr_argument* argumentList ) {
  * @def
  * [ Moment ] ≠ [ Moment ]
  *
- *
  * @test589
  */
 
@@ -1337,7 +1299,6 @@ ctr_object* ctr_clock_neq( ctr_object* myself, ctr_argument* argumentList ) {
 /**
  * @def
  * [ Moment ] week
- *
  *
  * @test590
  */
@@ -1355,7 +1316,6 @@ ctr_object* ctr_clock_week( ctr_object* myself, ctr_argument* argumentList ) {
 
 /**
  * @def
- *
  * [ Moment ] format: [ String ]
  *
  * @test626
@@ -1396,7 +1356,6 @@ ctr_object* ctr_clock_format_set( ctr_object* myself, ctr_argument* argumentList
  * @def
  * [ Moment ] string
  *
- *
  * @test591
  */
 
@@ -1412,7 +1371,6 @@ ctr_object* ctr_clock_to_string( ctr_object* myself, ctr_argument* argumentList 
  * @def
  * [ Moment ] iso-datetime
  *
- *
  * @test663
  */
 ctr_object* ctr_clock_to_iso_string( ctr_object* myself, ctr_argument* argumentList ) {
@@ -1425,7 +1383,6 @@ ctr_object* ctr_clock_to_iso_string( ctr_object* myself, ctr_argument* argumentL
 /**
  * @def
  * [ Moment ] number
- *
  *
  * @test592
  */
@@ -1509,7 +1466,6 @@ ctr_object* ctr_clock_change( ctr_object* myself, ctr_argument* argumentList, ui
 /**
  * @def
  * [ Moment ] add: [ Number ]
- * 
  *
  * @test593
  */
@@ -1521,7 +1477,6 @@ ctr_object* ctr_clock_add( ctr_object* myself, ctr_argument* argumentList ) {
 /**
  * @def
  * [ Moment ] subtract: [ Number ]
- * 
  *
  * @test594
  */
@@ -1599,7 +1554,6 @@ ctr_object* ctr_clock_from_iso( ctr_object* myself, ctr_argument* argumentList )
  * @def
  * [ Out ] write: [ String ]
  *
- *
  * @test595
  */
 
@@ -1613,7 +1567,6 @@ ctr_object* ctr_console_write(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Out ] stop
- *
  *
  * @test596
  */

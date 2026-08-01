@@ -4,7 +4,6 @@
  * @def
  * File
  *
- *
  * @test536
  */
 
@@ -24,7 +23,6 @@ ctr_object* ctr_file_new(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ File ] path
  *
- *
  * @test538
  */
 
@@ -37,7 +35,6 @@ ctr_object* ctr_file_path(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ File ] string
- * 
  *
  * @test539
  */
@@ -53,7 +50,6 @@ ctr_object* ctr_file_to_string(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ File ] read
- *
  *
  * @test540
  */
@@ -104,7 +100,6 @@ ctr_object* ctr_file_read(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ File ] write: [ String ]
  *
- *
  * @test541
  */
 
@@ -136,7 +131,6 @@ ctr_object* ctr_file_write(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ File ] tempwrite: [ String ]
  *
- *
  * @test682
  */
 
@@ -159,7 +153,6 @@ ctr_object* ctr_file_tempwrite(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ File ] append: [ String ]
- *
  *
  * @test542
  */
@@ -188,7 +181,6 @@ ctr_object* ctr_file_append(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ File ] exists
  *
- *
  * @test543
  */
 
@@ -211,7 +203,6 @@ ctr_object* ctr_file_exists(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ File ] delete
- * 
  *
  * @test544
  */
@@ -234,7 +225,6 @@ ctr_object* ctr_file_delete(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ File ] size
- * 
  *
  * @test545
  */
@@ -263,7 +253,6 @@ ctr_object* ctr_file_size(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ File ] list: [ String ]
- * 
  *
  * @test546
  */
@@ -349,7 +338,6 @@ ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * 
  * [ File ] lines: [ Code ]
  *
  * @test547

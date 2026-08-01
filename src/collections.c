@@ -3,7 +3,6 @@
 /**
  * @def
  * List
- * 
  *
  * @test497
  */
@@ -22,7 +21,6 @@ ctr_object* ctr_array_new(ctr_object* myclass, ctr_argument* argumentList) {
  * @def
  * [ List ] type
  *
- *
  * @test499
  */
 
@@ -33,7 +31,6 @@ ctr_object* ctr_array_type(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ List ] append: [ String ]
- * 
  *
  * @test500
  */
@@ -55,7 +52,6 @@ ctr_object* ctr_array_push(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ List ] minimum
- *
  *
  * @test501
  */
@@ -79,7 +75,6 @@ ctr_object* ctr_array_min(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ List ] maximum
  *
- *
  * @test502
  */
 
@@ -101,7 +96,6 @@ ctr_object* ctr_array_max(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ List ] each: [ Block ]
- *
  *
  * @test503
  */
@@ -143,7 +137,6 @@ ctr_object* ctr_array_map(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ List ] new ; [ Object ]
  *
- *
  * @test504
  */
 
@@ -155,7 +148,6 @@ ctr_object* ctr_array_new_and_push(ctr_object* myclass, ctr_argument* argumentLi
 /**
  * @def
  * [ List ] prepend: [ String ]
- * 
  *
  * @test505
  */
@@ -179,7 +171,6 @@ ctr_object* ctr_array_unshift(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ List ] combine: [ String ]
- *
  *
  * @test506
  */
@@ -221,7 +212,6 @@ ctr_object* ctr_array_join(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ List ] position: [ Number ]
  *
- *
  * @test507
  */
 
@@ -244,7 +234,6 @@ ctr_object* ctr_array_get(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ List ] first
  *
- *
  * @test508
  */
 
@@ -261,7 +250,6 @@ ctr_object* ctr_array_first(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ List ] last
  *
- *
  * @test509
  */
 
@@ -277,7 +265,6 @@ ctr_object* ctr_array_last(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ List ] second last
- *
  *
  * @test510
  */
@@ -296,12 +283,10 @@ ctr_object* ctr_array_second_last(ctr_object* myself, ctr_argument* argumentList
  * @def
  * [ List ] put: [ Object ] at: [ Number ]
  *
- *
  * @test511
  */
 
 ctr_object* ctr_array_put(ctr_object* myself, ctr_argument* argumentList) {
-
 	ctr_object* putValue = argumentList->object;
 	ctr_object* putIndex = ctr_internal_cast2number(argumentList->next->object);
 	ctr_size putIndexNumber;
@@ -343,7 +328,6 @@ ctr_object* ctr_array_put(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ List ] pop
  *
- *
  * @test512
  */
 
@@ -358,7 +342,6 @@ ctr_object* ctr_array_pop(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ List ] shift
- *
  *
  * @test513
  */
@@ -376,7 +359,6 @@ ctr_object* ctr_array_shift(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ List ] count
- * 
  *
  * @test514
  */
@@ -390,7 +372,6 @@ ctr_object* ctr_array_count(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ List ] from: [ Number ] length: [ Number ]
- * 
  *
  * @test515
  */
@@ -422,7 +403,6 @@ ctr_object* ctr_array_from_length(ctr_object* myself, ctr_argument* argumentList
 /**
  * @def
  * [ List ] replace: [ Number ] length: [ Number ] with: [ List ]
- * 
  *
  * @test516
  */
@@ -474,7 +454,6 @@ ctr_object* ctr_array_splice(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ List ] + [ List ]
  *
- *
  * @test517
  */
 
@@ -511,7 +490,6 @@ ctr_object* ctr_array_add(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ List ] by: [ List ]
  *
- *
  * @test518
  */
 
@@ -541,7 +519,6 @@ ctr_object* ctr_array_combine(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ List ] copy
- *
  *
  * @test519
  */
@@ -594,7 +571,6 @@ int ctr_sort_cmp(const void * a, const void * b) {
  * @def
  * [ List ] sort: [ Block ]
  *
- *
  * @test520
  */
 
@@ -614,7 +590,6 @@ ctr_object* ctr_array_sort(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ List ] string
  * 
- *
  * @test521
  */
 
@@ -657,7 +632,6 @@ ctr_object* ctr_array_to_string( ctr_object* myself, ctr_argument* argumentList 
  * @def
  * [ List ] fill: [ Number ] with: [ Object ]
  *
- *
  * @test522
  */
 
@@ -681,7 +655,6 @@ ctr_object* ctr_array_fill( ctr_object* myself, ctr_argument* argumentList ) {
 /**
  * @def
  * [ List ] find: [ Object ]
- *
  *
  * @test523
  */
@@ -714,7 +687,6 @@ ctr_object* ctr_array_has( ctr_object* myself, ctr_argument* argumentList ) {
  * @def
  * Map
  * 
- *
  * @test524
  */
 
@@ -728,7 +700,6 @@ ctr_object* ctr_map_new(ctr_object* myclass, ctr_argument* argumentList) {
  * @def
  * [ Dict ] type
  *
- *
  * @test525
  */
 
@@ -739,7 +710,6 @@ ctr_object* ctr_map_type(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Dict ] put: [ Object ] at: [ Object ]
- *
  *
  * @test526
  */
@@ -762,7 +732,6 @@ ctr_object* ctr_map_put(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Dict ] [ String ]: [ Object ]
  *
- *
  * @test527
  */
 
@@ -782,7 +751,6 @@ ctr_object* ctr_map_key_value(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Dict ] - [ Object ]
  *
- *
  * @test528
  */
 
@@ -795,7 +763,6 @@ ctr_object* ctr_map_delete(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Dict ] entries
  * 
- *
  * @test529
  */
 
@@ -819,7 +786,6 @@ ctr_object* ctr_map_keys(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Dict ] values
  * 
- *
  * @test530
  */
 
@@ -843,7 +809,6 @@ ctr_object* ctr_map_values(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Dict ] at: [ Object ]
  * 
- *
  * @test531
  */
 
@@ -878,7 +843,6 @@ ctr_object* ctr_map_get(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Dict ] count
  *
- *
  * @test532
  */
 
@@ -907,7 +871,6 @@ ctr_object* ctr_map_copy(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Dict ] each: [ Block ]
- *
  *
  * @test533
  */
@@ -953,7 +916,6 @@ ctr_object* ctr_map_each(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Dict ] has: [ Object ]
  *
- *
  * @test534
  */
 
@@ -979,7 +941,6 @@ ctr_object* ctr_map_has(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Dict ] string
  * 
- *
  * @test535
  */
 
