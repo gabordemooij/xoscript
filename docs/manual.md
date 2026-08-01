@@ -2293,7 +2293,6 @@ your program using libffi. For details see the chapter about ffi.
 @api_Request_server
 @api_URL_server
 @api_Pattern_pattern
-@api_Format_format
 @api_MariaDB_mariadb
 @api_Net_net
 @api_Vault_vault
