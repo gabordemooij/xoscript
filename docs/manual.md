@@ -2290,8 +2290,8 @@ Using the link: message you can link an external library to
 your program using libffi. For details see the chapter about ffi.
 
 
-@api_Request_server
-@api_URL_server
+@api_Request_http
+@api_URL_http
 @api_Pattern_pattern
 @api_MariaDB_mariadb
 @api_Net_net
