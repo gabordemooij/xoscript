@@ -19,5 +19,8 @@ void begin() {
 	exampleObject = NULL;
 	exampleObject = ctr_example_new(CtrStdObject, NULL);
 	exampleObject->link = CtrStdObject;
+	//create a constructor
 	ctr_internal_create_func(exampleObject, CTR_STRINGOBJ( CTR_DICT_NEW ), &ctr_example_new );
+	//add the Example plugin to the world
+	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ( "Example" ), exampleObject, CTR_CATEGORY_PUBLIC_PROPERTY);
 }
