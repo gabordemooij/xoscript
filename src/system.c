@@ -1421,9 +1421,7 @@ ctr_object* ctr_clock_change( ctr_object* myself, ctr_argument* argumentList, ui
 	ctr_object* numberObject;
 	ctr_object* qual;
 	char* zone;
-	ctr_size l;
 	time_t time;
-	char* unit;
 	struct tm* date;
 	numberObject = ctr_internal_cast2number( argumentList->object );
 	number = numberObject->value.nvalue * (forward ? 1 : -1);
@@ -1432,8 +1430,6 @@ ctr_object* ctr_clock_change( ctr_object* myself, ctr_argument* argumentList, ui
 		return myself;
 	}
 	qual = ctr_internal_cast2string( qual );
-	unit = qual->value.svalue->value;
-	l    = qual->value.svalue->vlen;
 	time = ((ctr_clock*)myself->value.rvalue->ptr)->time;
 	zone = ctr_heap_allocate_cstring(
 		ctr_internal_cast2string(
