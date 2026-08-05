@@ -745,6 +745,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( CTR_DICT_LEARN ), &ctr_object_learn_meaning );
 	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( CTR_DICT_CODE ), &ctr_object_to_code );
 	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( CTR_DICT_RECURSIVE ), &ctr_object_recursion );
+	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( CTR_DICT_MEMORY_ADDRESS ), &ctr_object_address );
 	#ifdef EXPERIMENTS
 	ctr_internal_create_func( CtrStdObject, ctr_build_string_from_cstring( "save-as:" ), &ctr_object_dump );
 	ctr_internal_create_func( CtrStdObject, ctr_build_string_from_cstring( "load-from:" ), &ctr_object_load );

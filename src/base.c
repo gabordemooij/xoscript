@@ -129,6 +129,18 @@ ctr_object* ctr_object_type(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
+ * [ Object ] address
+ *
+ * @test738
+ */
+ctr_object* ctr_object_address(ctr_object* myself, ctr_argument* argumentList) {
+	char buf[40];
+	snprintf(buf, 40, "%p", myself);
+	return ctr_build_string_from_cstring(buf);
+}
+
+/**
+ * @def
  * [ Object ] code.
  * 
  *

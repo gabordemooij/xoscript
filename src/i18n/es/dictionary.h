@@ -183,6 +183,7 @@
 #define CTR_DICT_TRY                             "intentar"
 #define CTR_DICT_LOG                             "registrar:"
 #define CTR_DICT_APPLY_TO_INT_SET                "aplicar-a-entero:"
+#define CTR_DICT_MEMORY_ADDRESS                  "dirección-de-memoria"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "promesa:"

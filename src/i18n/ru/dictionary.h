@@ -183,6 +183,7 @@
 #define CTR_DICT_TRY                             "попробуй"
 #define CTR_DICT_LOG                             "записать:"
 #define CTR_DICT_APPLY_TO_INT_SET                "применить-int:"
+#define CTR_DICT_MEMORY_ADDRESS                  "адрес-памяти"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"
