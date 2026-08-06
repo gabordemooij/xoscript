@@ -4,7 +4,7 @@
 ulimit -c 0 # avoid core dumps bc pledge/unveil
 
 # set malloc in security audit mode
-MALLOC_OPTIONS=S
+MALLOC_OPTIONS=SCFGJ
 export MALLOC_OPTIONS
 
 CITRINE_MEMORY_LIMIT_MB=10
