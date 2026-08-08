@@ -598,7 +598,7 @@ ctr_object* ctr_file_lock_generic(ctr_object* myself, ctr_argument* argumentList
 		CTR_CATEGORY_PRIVATE_PROPERTY
 	);
 	if (fdObj == NULL) {
-		fd = open( path, O_CREAT );
+		fd = open( path, O_CREAT, 0600 );
 		fdObj = ctr_build_number_from_float( (ctr_size) fd );
 		ctr_internal_object_set_property(
 			myself, fdObjKey, fdObj, CTR_CATEGORY_PRIVATE_PROPERTY
