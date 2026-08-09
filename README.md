@@ -32,7 +32,7 @@ xo hello.xo
 ```
 
 To run it on the server, just install the XOScript interpreter
-on your server and the Server plugin in the /mods folder next to it.
+on your server, along with the Server plugin.
 Then, with a CGI webserver, point your script file to
 XOScript with something like:
 
