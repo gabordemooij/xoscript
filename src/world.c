@@ -69,24 +69,40 @@ int ctr_accept(ctr_object* obj, ctr_object* x) {
  */
 char* ctr_internal_readf(char* file_name, uint64_t* total_size) {
 	char* prg;
-	int ch;
-	int prev;
-	uint64_t size;
+	long size;
 	uint64_t real_size;
+	size_t bytes = 0;
 	FILE* fp;
-	fp = fopen(file_name,"r");
+	fp = fopen(file_name,"rb");
 	if( fp == NULL ) {
 		fprintf(stderr, CTR_ERR_FOPEN );
 		exit(1);
 	}
-	prev = ftell(fp);
-	fseek(fp,0L,SEEK_END);
+	if (fseek(fp,0L,SEEK_END) != 0) {
+		fprintf(stderr, "IO Error" );
+		exit(1);
+	}
 	size = ftell(fp);
-	fseek(fp,prev,SEEK_SET);
-	real_size = (size+4)*sizeof(char);
+	if (size < 0) {
+		fprintf(stderr, "IO Error" );
+		exit(1);
+	}
+	if (fseek(fp,0L,SEEK_SET) != 0) {
+		fprintf(stderr, "IO Error" );
+		exit(1);
+	}
+	real_size = (uint64_t) (size+4)*sizeof(char);
 	prg = ctr_heap_allocate(real_size); /* add 4 bytes, 3 for optional closing sequence verbatim mode and one lucky byte! */
 	ctr_program_length=0;
-	while( ( ch = fgetc(fp) ) != EOF ) prg[ctr_program_length++]=ch;
+	while (ctr_program_length < size) {
+		bytes = fread(prg + ctr_program_length, 1, size - ctr_program_length, fp);
+		if (bytes == 0) break;
+		ctr_program_length += bytes;
+	}
+	if (ferror(fp) || ctr_program_length != size) {
+		fprintf(stderr, "IO Error" );
+		exit(1);
+	}
 	/* because we just want to use strncmp() for simple tokens in lexer and not check the length/eof on every step */
 	/* should be 0 already because calloc() and lucky byte but just for clarity */
 	prg[ctr_program_length] = '\0';
