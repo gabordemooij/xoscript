@@ -859,7 +859,7 @@ ctr_object* ctr_program_err(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test633
  */
-ctr_object* ctr_program_timemachine(ctr_object* myself, ctr_argument* argumentList) {
+ctr_object* ctr_program_version_set(ctr_object* myself, ctr_argument* argumentList) {
 	time_t stamp = ctr_tonum( ctr_clock_time( argumentList->object, NULL ) );
 	CtrVersionTime = stamp;
 	// Select features based upon timestamp
@@ -911,7 +911,7 @@ ctr_object* ctr_program_feature(ctr_object* myself, ctr_argument* argumentList) 
 
 
 double ctr_internal_versiontime() {
-	   return CtrVersionTime;
+	return CtrVersionTime;
 }
 
 /**
