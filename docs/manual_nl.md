@@ -1,5 +1,7 @@
 # Basis
 
+{{messages}}
+
 XOScript is een pure objectgeoriënteerde programmeertaal. Dat wil zeggen dat alles in XOScript een
 object is. Er zijn verder geen andere datatypen. Een computerprogramma dat geschreven is in
 XOScript kan grofweg uit drie soorten handelingen bestaan: toewijzen, berichten sturen en
@@ -405,6 +407,8 @@ Het resultaat van deze operatie is natuurlijk 7.
 
 # Objecten
 
+{{messages}}
+
 Naast het aanpassen en uitbreiden van bestaande objecten, kunnen we ook zelf nieuwe objecten
 maken, dat doen we door het bericht nieuw te sturen. Stel dat we bijvoorbeeld voor een
 facturatiesysteem een factuurobject willen hebben dat een opeenvolgende factuurnummering
@@ -733,6 +737,8 @@ is dus niet toegestaan. In plaats daarvan schrijft u:
 
 # Beslissingsobject
 
+{{messages}}
+
 In tegenstelling tot de meeste populaire programmeertalen op het moment van schrijven,
 biedt Xoscript slechts één enkel True-object en één enkel False-object.
 Om dit te verduidelijken: elke keer dat je **Ja** schrijft, betekent dit niet dat er een nieuw object wordt aangemaakt. In plaats daarvan gebruik je altijd een referentie. Dit betekent dat wanneer je het volgende schrijft:
@@ -768,6 +774,8 @@ Zonder de komma zou het bericht **en:of:** verstuurd zijn, en
 dat bestaat niet.
 
 # Getallen
+
+{{messages}}
 
 Telkens als u een getal opschrijft, zoals 9, -10 of 3,12, maakt XOScript daar achter de schermen een
 Getal-object van. U kunt dan berichten sturen naar het Getal-object of u kunt het getal toewijzen
@@ -861,6 +869,8 @@ U kunt een kwalificering trouwens ook expliciet instellen met het bericht kwalif
 
 # Teksten
 
+{{messages}}
+
 Telkens als u een tekst tussen aanhalingstekens ['...'] zet, maakt XOScript voor u een nieuw Tekstobject.
 U kunt berichten naar dit Tekst-object sturen, net zoals u berichten naar andere objecten kunt sturen.
 Dat kan nadat u de tekst heeft toegewezen aan een variabele maar ook al direct daarvoor:
@@ -948,6 +958,8 @@ som bij: ['getal'] doen: {
 ```
 
 # Functies
+
+{{messages}}
 
 U maakt een Functie door een reeks instructies tussen { en } te zetten.
 
@@ -1154,6 +1166,8 @@ Dynamic Scoping genoemd.
 
 # Moederobject
 
+{{messages}}
+
 Het object met de naam Object is de moeder van alle objecten in XOScript. Het moederobject
 antwoordt op de volgende berichten: bool, getal, tekst, gelijk:, doen, klaar, geval:doen:,
 bericht:argumenten:, bij:doen:, reageer:en…, leer:betekent: en recursief. Elk ander object is
@@ -1199,6 +1213,8 @@ Uitvoer:
 ```
 
 # Reeksen
+
+{{messages}}
 
 XOScript kent twee soorten verzamelingen: reeksen en lijsten. Reeksen zijn opsommingen van
 objecten met een vaste volgorde. Lijsten hebben geen volgorde, maar lijken meer op een
@@ -1271,6 +1287,8 @@ Let er wel op dat u afsluit met klaar anders komt u voor verrassingen te staan.
 
 # Lijsten
 
+{{messages}}
+
 Net als Reeks is Lijst ook een verzameling. Om een lijst te maken gebruikt u het Lijst-object. In
 tegenstelling tot een reeks is een lijst ongeordend. Een ander verschil met een reeks is dat een lijst
 bestaat uit objectparen, hierbij fungeert het ene object als ingang (of trefwoord) waarmee het andere
@@ -1308,6 +1326,8 @@ gebruikmaken van deze vereenvoudigde notatie:
 
 # Bestanden
 
+{{messages}}
+
 U kunt bestanden lezen en schrijven met het Bestand-object. Hier volgt een voorbeeld:
 
 ```
@@ -1318,6 +1338,8 @@ schrijf: data.
 ```
 
 # Datum en Tijd
+
+{{messages}}
 
 We kunnen een moment in de tijd beschrijven met een Tekst-object: 28-07-2020 15.14:39 maar dat
 rekent wel lastig. Hoe tellen we hier bijvoorbeeld 5.30 bij op? We zouden de tekst kunnen
@@ -1335,8 +1357,9 @@ Geeft ons het jaar...
 2020
 ```
 
-
 # Programma/Uitvoer
+
+{{messages}}
 
 U kunt verschillende
 XOScript-programma’s combineren door het bericht gebruik: te sturen.
