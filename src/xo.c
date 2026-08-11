@@ -4,9 +4,6 @@ int ctr_argc;
 char** ctr_argv;
 
 char* ctr_mode_input_file;
-char* ctr_mode_dict_file;
-char* ctr_mode_hfile1;
-char* ctr_mode_hfile2;
 ctr_size ctr_clex_keyword_eol_len;
 ctr_size ctr_clex_keyword_num_sep_dec_len;
 ctr_size ctr_clex_keyword_num_sep_tho_len;
@@ -107,7 +104,7 @@ int main(int argc, char* argv[]) {
 	program = ctr_cparse_parse(prg, ctr_mode_input_file);
 	if (program == NULL) {
 		fwrite(CtrStdFlow->value.svalue->value, CtrStdFlow->value.svalue->vlen, 1, stderr);
-		exit(1);
+		return 1;
 	}
 	ctr_initialize_world();
 	ctr_cwlk_run(program);
@@ -117,11 +114,10 @@ int main(int argc, char* argv[]) {
 	//For memory profiling
 	if ( ctr_gc_alloc != 0 ) {
 		fprintf( stderr, "[WARNING] xoscript has detected an internal memory leak of: %" PRIu64 " bytes.\n", ctr_gc_alloc );
-		exit(1);
+		return 1;
 	}
 	if (CtrStdFlow && CtrStdFlow != CtrStdExit) {
-		exit(1);
+		return 1;
 	}
-	exit(0);
 	return 0;
 }
