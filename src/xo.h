@@ -160,6 +160,7 @@
 #define CTR_WIREABLE_KNOWN_LIST 5
 #define CTR_WIREABLE_KNOWN_FILE 6
 #define CTR_WIREABLE_KNOWN_MOMENT 7
+#define CTR_WIREABLE_KNOWN_BINHELPER 8
 
 
 #endif
@@ -355,6 +356,9 @@ extern ctr_object* CtrStdSlurp;
 extern ctr_object* CtrStdPath;
 extern ctr_object* CtrStdShellCommand;
 extern ctr_object* CtrStdINT64;
+extern ctr_object* CtrStdBinHelper;
+extern ctr_object* CtrStdOctHelper;
+extern ctr_object* CtrStdHexHelper;
 extern ctr_object* ctr_first_object;
 extern ctr_object* ctr_gc_watch_object; // for debug purposes
 extern int ctr_gc_clean_free; // for debug purposes
@@ -533,6 +537,7 @@ extern ctr_object* ctr_object_case_do(ctr_object* myself, ctr_argument* ctr_argu
 extern ctr_object* ctr_object_to_code(ctr_object* myself, ctr_argument* ctr_argumentList);
 extern ctr_object* ctr_object_recursion(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_object_address(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_object_parent(ctr_object* myself, ctr_argument* argumentList);
 #ifdef EXPERIMENTS
 extern ctr_object* ctr_object_dump(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_object_load(ctr_object* myself, ctr_argument* argumentList);

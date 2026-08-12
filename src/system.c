@@ -1957,6 +1957,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 			&& obj->link != CtrStdArray
 			&& obj->link != CtrStdFile
 			&& obj->link != CtrStdClock
+			&& obj->link != CtrStdBinHelper
 		) {
 			ctr_dumper_dump_object(obj->link);
 		} else {
@@ -2052,6 +2053,10 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_MOMENT;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
+		} else if (pointer == CtrStdBinHelper) {
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_BINHELPER;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			continue;
 		}
 		//replace pointer with id
 		int found_address = 0;
@@ -2095,7 +2100,7 @@ ctr_object* ctr_object_dump( ctr_object* myself, ctr_argument* argumentList ) {
 }
 
 /* Lookup table for ID -> pointer */
-static void* ctr_dumper_map_id2ptr[10] = {
+static void* ctr_dumper_map_id2ptr[11] = {
 	[0] = 0,
 	[CTR_WIREABLE_KNOWN_BLOCK] = &CtrStdBlock,
 	[CTR_WIREABLE_KNOWN_STRING] = &CtrStdString,
@@ -2104,6 +2109,7 @@ static void* ctr_dumper_map_id2ptr[10] = {
 	[CTR_WIREABLE_KNOWN_LIST] = &CtrStdArray,
 	[CTR_WIREABLE_KNOWN_FILE] = &CtrStdFile,
 	[CTR_WIREABLE_KNOWN_MOMENT] = &CtrStdClock,
+	[CTR_WIREABLE_KNOWN_BINHELPER] = &CtrStdBinHelper,
 };
 
 ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {

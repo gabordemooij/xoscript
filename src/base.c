@@ -237,6 +237,10 @@ ctr_object* ctr_object_myself(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
+ctr_object* ctr_object_parent(ctr_object* myself, ctr_argument* argumentList) {
+	return myself->link;
+}
+
 /**
  * @def
  * [ Object ] recursive

@@ -130,7 +130,7 @@ unittest() {
 
 # select range
 FROM=1
-TIL=738
+TIL=739
 
 cd build/OpenBSD/bin
 for i in $(seq -f "%04g" $FROM $TIL);

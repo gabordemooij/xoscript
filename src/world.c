@@ -737,6 +737,7 @@ void ctr_initialize_world() {
 	/* Object */
 	CtrStdObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
 	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( CTR_DICT_NEW ), &ctr_object_make );
+	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( "parent" ), &ctr_object_parent );
 	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( CTR_DICT_EQUALS ), &ctr_object_equals );
 	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( CTR_DICT_SYMBOL_EQUALS ), &ctr_object_equals );
 	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( CTR_DICT_UNEQUALS_SYMBOL ), &ctr_object_unequals );
@@ -898,7 +899,7 @@ void ctr_initialize_world() {
 	CtrStdINT64->info.sticky = 1;
 
 	/* Hex Helper */
-	ctr_object* CtrStdHexHelper = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
+	CtrStdHexHelper = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
 	ctr_internal_create_func(CtrStdHexHelper, CTR_STRINGOBJ(CTR_DICT_NEW), &ctr_hexhelper_new );
 	ctr_internal_create_func(CtrStdHexHelper, CTR_STRINGOBJ(CTR_DICT_RESPOND_TO), &ctr_hexhelper_parse );
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ( CTR_DICT_HEXADECIMAL ), CtrStdHexHelper, 0 );
@@ -906,7 +907,7 @@ void ctr_initialize_world() {
 	CtrStdHexHelper->info.sticky = 1;
 
 	/* Oct Helper */
-	ctr_object* CtrStdOctHelper = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
+	CtrStdOctHelper = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
 	ctr_internal_create_func(CtrStdOctHelper, CTR_STRINGOBJ(CTR_DICT_NEW), &ctr_octhelper_new );
 	ctr_internal_create_func(CtrStdOctHelper, CTR_STRINGOBJ(CTR_DICT_RESPOND_TO), &ctr_octhelper_parse );
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ( CTR_DICT_OCTAL ), CtrStdOctHelper, 0 );
@@ -914,7 +915,7 @@ void ctr_initialize_world() {
 	CtrStdOctHelper->info.sticky = 1;
 
 	/* Bin Helper */
-	ctr_object* CtrStdBinHelper = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
+	CtrStdBinHelper = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
 	ctr_internal_create_func(CtrStdBinHelper, CTR_STRINGOBJ(CTR_DICT_NEW), &ctr_binhelper_new );
 	ctr_internal_create_func(CtrStdBinHelper, CTR_STRINGOBJ(CTR_DICT_RESPOND_TO), &ctr_binhelper_parse );
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ( CTR_DICT_BINARY ), CtrStdBinHelper, 0 );

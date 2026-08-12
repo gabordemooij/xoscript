@@ -1,0 +1,24 @@
+Out write: ['Test object'], stop.
+>> a := Object new. 
+
+a on: ['item:'] do: { :binhelper
+	own binhelper := binhelper. 
+}.
+
+a on: ['item'] do: {
+	<- own binhelper.
+}.
+
+a item: Bin new.
+
+>> old-binhelper-address := a item parent memory-address.
+a save-as: ['/tmp/a.bin'].
+Out write: ['========== RELOADING SNAP:'], stop.
+
+>> b := Object load-from: ['/tmp/a.bin'].
+
+(b item parent memory-address = old-binhelper-address) true: {
+	Out write: ['Object link re-attached.'], stop.
+}.
+
+
