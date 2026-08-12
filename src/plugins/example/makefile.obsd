@@ -1,0 +1,30 @@
+CC ?= gcc
+PLUGIN_DIR ?= .
+CFLAGS2 		?= -I ../../i18n/en -I$(PLUGIN_DIR)/  -fPIC
+LDFLAGS2 		= -shared
+BIN 			= libctr${NAME}.so
+BUILD_DIR2 		= ../../../build/OpenBSD
+BUILD_OBJ_DIR2 	= $(BUILD_DIR2)/obj/mods/${NAME}
+BUILD_BIN_DIR2 	= $(BUILD_DIR2)/bin/mods/${NAME}
+
+CSRCS += example.c
+COBJS = ${CSRCS:S,^,${BUILD_OBJ_DIR2}/,:S,.c$,.o,}
+
+TARGET = ${COBJS}
+
+all: default
+
+.for s in ${CSRCS}
+o = ${s:S,^,${BUILD_OBJ_DIR2}/,:S,.c$,.o,}
+${o}: ${s}
+	@mkdir -p ${.TARGET:H}
+	${CC} ${CFLAGS2} ${EXTRACFLAGS} -c ${s} -o ${.TARGET}
+.endfor
+
+default: $(TARGET)
+	@mkdir -p ${BUILD_BIN_DIR2}
+	$(CC) -o ${BUILD_BIN_DIR2}/${BIN} ${TARGET} ${LDFLAGS2}
+
+clean: 
+	rm ${BUILD_OBJ_DIR2}/*
+	rm ${BUILD_BIN_DIR2}/*
