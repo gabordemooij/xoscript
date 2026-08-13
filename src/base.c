@@ -237,7 +237,14 @@ ctr_object* ctr_object_myself(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
+/**
+ * @def
+ * [ Object ] parent
+ *
+ * @test740
+ */
 ctr_object* ctr_object_parent(ctr_object* myself, ctr_argument* argumentList) {
+	if (!myself->link) return CtrStdObject; //only root has link NULL
 	return myself->link;
 }
 
