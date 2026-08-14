@@ -239,7 +239,7 @@ ctr_object* ctr_object_myself(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Object ] parent
+ * [ Object ] prototype
  *
  * @test740
  */

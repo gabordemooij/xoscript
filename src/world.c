@@ -737,7 +737,7 @@ void ctr_initialize_world() {
 	/* Object */
 	CtrStdObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
 	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( CTR_DICT_NEW ), &ctr_object_make );
-	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( "parent" ), &ctr_object_parent );
+	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( CTR_DICT_OBJECT_PROTOTYPE ), &ctr_object_parent );
 	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( CTR_DICT_EQUALS ), &ctr_object_equals );
 	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( CTR_DICT_SYMBOL_EQUALS ), &ctr_object_equals );
 	ctr_internal_create_func( CtrStdObject, CTR_STRINGOBJ( CTR_DICT_UNEQUALS_SYMBOL ), &ctr_object_unequals );

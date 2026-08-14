@@ -184,6 +184,7 @@
 #define CTR_DICT_LOG                             "日志条目:"
 #define CTR_DICT_APPLY_TO_INT_SET                "应用-int:"
 #define CTR_DICT_MEMORY_ADDRESS                  "内存地址"
+#define CTR_DICT_OBJECT_PROTOTYPE                "原型"
 
 /* Section B: System & Math */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"

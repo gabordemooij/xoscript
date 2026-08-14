@@ -184,6 +184,7 @@
 #define CTR_DICT_LOG                             "registrare:"
 #define CTR_DICT_APPLY_TO_INT_SET                "applica-int:"
 #define CTR_DICT_MEMORY_ADDRESS                  "indirizzo-di-memoria"
+#define CTR_DICT_OBJECT_PROTOTYPE                "prototipo"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"
