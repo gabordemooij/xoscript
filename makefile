@@ -11,7 +11,6 @@ TARGET            = $(COBJS)
 all: xo
 
 xo: $(TARGET)
-	@mkdir -p $(BUILD_BIN_DIR)
 	$(CC) $(TARGET) $(LDFLAGS) -o $(BUILD_BIN_DIR)/$(BIN)
 
 $(BUILD_OBJ_DIR)/%.o: ./src/%.c
