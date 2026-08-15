@@ -1,0 +1,22 @@
+Out write: ['Test object'], stop.
+>> a := Object new. 
+
+a on: ['item:'] do: { :octhelper
+	own octhelper := octhelper. 
+}.
+
+a on: ['item'] do: {
+	<- own octhelper.
+}.
+
+a item: Oct new.
+
+>> old-octhelper-address := a item prototype memory-address.
+a save-as: ['/tmp/a.bin'].
+Out write: ['========== RELOADING SNAP:'], stop.
+
+>> b := Object load-from: ['/tmp/a.bin'].
+
+(b item prototype memory-address = old-octhelper-address) true: {
+	Out write: ['Object link re-attached.'], stop.
+}.
