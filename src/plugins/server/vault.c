@@ -2,6 +2,13 @@
 #include <libsecret/secret.h>
 #endif
 
+// Only needed for GLIBC 3.25 or older (EOL 2027)
+#ifdef GLIBC325
+#ifdef LIBBSD
+#include <bsd/bsd.h>
+#endif
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
