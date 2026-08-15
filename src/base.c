@@ -1,15 +1,12 @@
 #include "xo.h"
 
 ctr_size ctr_program_length;
-uint64_t    ctr_cwlk_subprogram;
+uint64_t ctr_cwlk_subprogram;
 int ctr_in_message;
-
-
 
 /**
  * @def
  * None
- *
  *
  * @test376
  */
@@ -18,22 +15,18 @@ ctr_object* ctr_build_nil() {
 	return CtrStdNil;
 }
 
-
 ctr_object* ctr_nil_new(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* nilObject = ctr_build_nil();
 	nilObject->link = myself;
 	return nilObject;
 }
 
-
 /**
  * @def
  * [ None ] None?
  *
- *
  * @test377
  */
-
 ctr_object* ctr_nil_is_nil(ctr_object* myself, ctr_argument* argumentList) {
 	return CtrStdBoolTrue;
 }
@@ -42,10 +35,8 @@ ctr_object* ctr_nil_is_nil(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ None ] string
  *
- *
  * @test378
  */
-
 ctr_object* ctr_nil_to_string(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_string_from_cstring( CTR_DICT_NIL_OBJECT );
 }
@@ -54,10 +45,8 @@ ctr_object* ctr_nil_to_string(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ None ] else: [ Object ]
  *
- *
  * @test379
  */
-
 ctr_object* ctr_nil_else_set(ctr_object* myself, ctr_argument* argumentList) {
 	return argumentList->object;
 }
@@ -66,10 +55,8 @@ ctr_object* ctr_nil_else_set(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ None ] number
  *
- *
  * @test380
  */
-
 ctr_object* ctr_nil_to_number(ctr_object* myself, ctr_argument* ctr_argumentList) {
 	return ctr_build_number_from_float(0);
 }
@@ -78,10 +65,8 @@ ctr_object* ctr_nil_to_number(ctr_object* myself, ctr_argument* ctr_argumentList
  * @def
  * [ None ] boolean
  *
- *
  * @test381
  */
-
 ctr_object* ctr_nil_to_boolean(ctr_object* myself, ctr_argument* ctr_argumentList) {
 	return CtrStdBoolFalse;
 }
@@ -90,10 +75,8 @@ ctr_object* ctr_nil_to_boolean(ctr_object* myself, ctr_argument* ctr_argumentLis
  * @def
  * Object
  *
- *
  * @test382
  */
-
 ctr_object* ctr_object_make(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* objectInstance = NULL;
 	objectInstance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
@@ -105,10 +88,8 @@ ctr_object* ctr_object_make(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Object ] type
  *
- *
  * @test383
  */
-
 ctr_object* ctr_object_type(ctr_object* myself, ctr_argument* argumentList) {
 	switch(myself->info.type){
 		case CTR_OBJECT_TYPE_OTNIL:
@@ -142,11 +123,9 @@ ctr_object* ctr_object_address(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Object ] code.
- * 
  *
  * @test384
  */
-
 ctr_object* ctr_object_to_code(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument* newArgumentList;
 	ctr_object* string = ctr_build_empty_string();
@@ -165,10 +144,8 @@ ctr_object* ctr_object_to_code(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Object ] string
  *
- *
  * @test385
  */
-
 ctr_object* ctr_object_to_string( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_build_string_from_cstring( CTR_DICT_OBJECT_OBJECT );
 }
@@ -177,10 +154,8 @@ ctr_object* ctr_object_to_string( ctr_object* myself, ctr_argument* argumentList
  * @def
  * [ Object ] number
  *
- *
  * @test386
  */
-
 ctr_object* ctr_object_to_number(ctr_object* myself, ctr_argument* ctr_argumentList) {
 	return ctr_build_number_from_float(1);
 }
@@ -189,10 +164,8 @@ ctr_object* ctr_object_to_number(ctr_object* myself, ctr_argument* ctr_argumentL
  * @def
  * [ Object ] boolean
  *
- *
  * @test387
  */
-
 ctr_object* ctr_object_to_boolean(ctr_object* myself, ctr_argument* ctr_argumentList) {
 	return CtrStdBoolTrue;
 }
@@ -201,10 +174,8 @@ ctr_object* ctr_object_to_boolean(ctr_object* myself, ctr_argument* ctr_argument
  * @def
  * [ Object ] equals: [ Object ]
  *
- *
  * @test388
  */
-
 ctr_object* ctr_object_equals(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherObject = argumentList->object;
 	if (otherObject == myself) return CtrStdBoolTrue;
@@ -215,10 +186,8 @@ ctr_object* ctr_object_equals(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Object ] !=: [ Object ]
  *
- *
  * @test389
  */
-
 ctr_object* ctr_object_unequals(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherObject = argumentList->object;
 	if (otherObject != myself) return CtrStdBoolTrue;
@@ -229,10 +198,8 @@ ctr_object* ctr_object_unequals(ctr_object* myself, ctr_argument* argumentList) 
  * @def
  * [ Object ] myself
  *
- *
  * @test390
  */
-
 ctr_object* ctr_object_myself(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
@@ -252,10 +219,8 @@ ctr_object* ctr_object_parent(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Object ] recursive
  *
- *
  * @test391
  */
-
 ctr_object* ctr_object_recursion(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_internal_recursion = myself;
 	return myself;
@@ -265,10 +230,8 @@ ctr_object* ctr_object_recursion(ctr_object* myself, ctr_argument* argumentList)
  * @def
  * [ Object ] do
  *
- *
  * @test392
  */
-
 ctr_object* ctr_object_do( ctr_object* myself, ctr_argument* argumentList ) {
 	myself->info.chainMode = 1;
 	return myself;
@@ -278,10 +241,8 @@ ctr_object* ctr_object_do( ctr_object* myself, ctr_argument* argumentList ) {
  * @def
  * [ Object ] done
  *
- *
  * @test393
  */
-
 ctr_object* ctr_object_done( ctr_object* myself, ctr_argument* argumentList ) {
 	myself->info.chainMode = 0;
 	return myself;
@@ -291,10 +252,8 @@ ctr_object* ctr_object_done( ctr_object* myself, ctr_argument* argumentList ) {
  * @def
  * [ Object ] copy
  *
- *
  * @test394
  */
-
 ctr_object* ctr_bool_copy( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_build_bool(myself->value.bvalue);
 }
@@ -313,14 +272,11 @@ ctr_object* ctr_string_copy( ctr_object* myself, ctr_argument* argumentList ) {
 }
 
 /**
- * 
  * @def
  * [ Object ] case: [ Object ] do: [ Code ]
  *
- *
  * @test395
  */
-
 ctr_object* ctr_object_case_do( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* block = argumentList->next->object;
 	ctr_argument* compareArguments;
@@ -353,10 +309,8 @@ ctr_object* ctr_object_case_do( ctr_object* myself, ctr_argument* argumentList )
  * @def
  * [ Object ] message: [ String ] arguments: [ List ]
  *
- *
  * @test396
  */
-
 ctr_object* ctr_object_message( ctr_object* myself, ctr_argument* argumentList ) {
 	//@important! we use a List because message+arguments would exceed argument limit!
 	ctr_object* message = ctr_internal_cast2string( argumentList->object );
@@ -407,10 +361,8 @@ ctr_object* ctr_object_message( ctr_object* myself, ctr_argument* argumentList )
  * @def
  * [ Object ] on: [ String ] do: [ Code ]
  *
- *
  * @test397
  */
-
 ctr_object* ctr_object_on_do(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument* nextArgument;
 	ctr_object* methodBlock;
@@ -434,10 +386,8 @@ ctr_object* ctr_object_on_do(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Object ] respond: [ String ]
  *
- *
  * @test398
  */
-
 ctr_object* ctr_object_respond(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
@@ -446,10 +396,8 @@ ctr_object* ctr_object_respond(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Object ] respond: [ String ] and: [ String ]
  *
- *
  * @test43
  */
-
 ctr_object* ctr_object_respond_and(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
@@ -466,10 +414,8 @@ ctr_object* ctr_object_respond_and_and_and(ctr_object* myself, ctr_argument* arg
  * @def
  * [ Object ] None?
  *
- *
  * @test401
  */
-
 ctr_object* ctr_object_is_nil(ctr_object* myself, ctr_argument* argumentList) {
 	return CtrStdBoolFalse;
 }
@@ -478,10 +424,8 @@ ctr_object* ctr_object_is_nil(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Object ] learn: [ String ] means: [ String ]
  *
- *
  * @test402
  */
-
 ctr_object* ctr_object_learn_meaning(ctr_object* myself, ctr_argument* ctr_argumentList) {
 	ctr_size i = 0;
 	ctr_mapitem* current_method = myself->methods->head;
@@ -505,10 +449,8 @@ ctr_object* ctr_object_learn_meaning(ctr_object* myself, ctr_argument* ctr_argum
  * @def
  * Boolean
  *
- *
  * @test403
  */
-
 ctr_object* ctr_build_bool(int truth) {
 	if (truth) return CtrStdBoolTrue;
 	return CtrStdBoolFalse;
@@ -522,10 +464,8 @@ ctr_object* ctr_bool_new(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Boolean ] = [ Boolean ]
  *
- *
  * @test404
  */
-
 ctr_object* ctr_bool_eq(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_bool(ctr_internal_cast2bool(argumentList->object)->value.bvalue == myself->value.bvalue);
 }
@@ -535,10 +475,8 @@ ctr_object* ctr_bool_eq(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Boolean ] !=: [ Boolean ]
  *
- *
  * @test405
  */
-
 ctr_object* ctr_bool_neq(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_bool(ctr_internal_cast2bool(argumentList->object)->value.bvalue != myself->value.bvalue);
 }
@@ -547,10 +485,8 @@ ctr_object* ctr_bool_neq(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Boolean ] string
  *
- *
  * @test406
  */
-
 ctr_object* ctr_bool_to_string(ctr_object* myself, ctr_argument* argumentList) {
 	if (myself->value.bvalue == 1) {
 		return ctr_build_string_from_cstring( CTR_DICT_TRUE_OBJECT );
@@ -563,10 +499,8 @@ ctr_object* ctr_bool_to_string(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Boolean ] break
  *
- *
  * @test407
  */
-
 ctr_object* ctr_bool_break(ctr_object* myself, ctr_argument* argumentList) {
 	if (myself->value.bvalue) {
 		CtrStdFlow = CtrStdBreak; /* If error = Break it's a break, there is no real error. */
@@ -578,10 +512,8 @@ ctr_object* ctr_bool_break(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Boolean ] continue
  *
- *
  * @test408
  */
-
 ctr_object* ctr_bool_continue(ctr_object* myself, ctr_argument* argumentList) {
 	if (myself->value.bvalue) {
 		CtrStdFlow = CtrStdContinue; /* If error = Continue, then it breaks only one iteration (return). */
@@ -593,10 +525,8 @@ ctr_object* ctr_bool_continue(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Boolean ] true: [ Code ]
  *
- *
  * @test409
  */
-
 ctr_object* ctr_bool_if_true(ctr_object* myself, ctr_argument* argumentList) {
 	if (myself->value.bvalue) {
 		ctr_object* codeBlock = argumentList->object;
@@ -621,10 +551,8 @@ ctr_object* ctr_bool_if_true(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Boolean ] false: [ Code ]
  *
- *
  * @test410
  */
-
 ctr_object* ctr_bool_if_false(ctr_object* myself, ctr_argument* argumentList) {
 	if (!myself->value.bvalue) {
 		ctr_object* codeBlock = argumentList->object;
@@ -663,10 +591,8 @@ ctr_object* ctr_object_if_true( ctr_object* myself, ctr_argument* argumentList )
  * @def
  * [ Boolean ] not
  *
- *
  * @test411
  */
-
 ctr_object* ctr_bool_not(ctr_object* myself, ctr_argument* argumentList) {
 	if (!myself->value.bvalue) return CtrStdBoolTrue;
 	return CtrStdBoolFalse;
@@ -676,10 +602,8 @@ ctr_object* ctr_bool_not(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Boolean ] either: [ Object ] or: [ Object ]
  *
- *
  * @test412
  */
-
 ctr_object* ctr_bool_either_or(ctr_object* myself, ctr_argument* argumentList) {
 	if (myself->value.bvalue) {
 		return argumentList->object;
@@ -691,11 +615,9 @@ ctr_object* ctr_bool_either_or(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Boolean ] and: [ Boolean ]
- * 
  *
  * @test413
  */
-
 ctr_object* ctr_bool_and(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* other = ctr_internal_cast2bool(argumentList->object);
 	if ((myself->value.bvalue && other->value.bvalue)) return CtrStdBoolTrue;
@@ -706,10 +628,8 @@ ctr_object* ctr_bool_and(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Boolean ] nor: [ Boolean ]
  *
- *
  * @test414
  */
-
 ctr_object* ctr_bool_nor(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* other = ctr_internal_cast2bool(argumentList->object);
 	return ctr_build_bool((!myself->value.bvalue && !other->value.bvalue));
@@ -719,10 +639,8 @@ ctr_object* ctr_bool_nor(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Boolean ] or: [ Boolean ]
  *
- *
  * @test415
  */
-
 ctr_object* ctr_bool_or(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* other = ctr_internal_cast2bool(argumentList->object);
 	return ctr_build_bool((myself->value.bvalue || other->value.bvalue));
@@ -732,10 +650,8 @@ ctr_object* ctr_bool_or(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Boolean ] number
  *
- *
  * @test416
  */
-
 ctr_object* ctr_bool_to_number(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float( (ctr_number) myself->value.bvalue );
 }
@@ -744,10 +660,8 @@ ctr_object* ctr_bool_to_number(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * Number
  *
- *
  * @test417
  */
-
 ctr_object* ctr_build_number(char* n) {
 	ctr_object* numberObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTNUMBER);
 	numberObject->value.nvalue = atof(n);
@@ -797,10 +711,8 @@ ctr_object* ctr_build_number_from_float(ctr_number f) {
  * @def
  * [ Number ] > [ Number ]
  *
- *
  * @test418
  */
-
 ctr_object* ctr_number_higherThan(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	return ctr_build_bool((myself->value.nvalue > otherNum->value.nvalue));
@@ -810,10 +722,8 @@ ctr_object* ctr_number_higherThan(ctr_object* myself, ctr_argument* argumentList
  * @def
  * [ Number ] >=: [ Number ]
  *
- *
  * @test419
  */
-
 ctr_object* ctr_number_higherEqThan(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	return ctr_build_bool((myself->value.nvalue >= otherNum->value.nvalue));
@@ -822,11 +732,9 @@ ctr_object* ctr_number_higherEqThan(ctr_object* myself, ctr_argument* argumentLi
 /**
  * @def
  * [ Number ] < [ Number ]
- * 
  *
  * @test420
  */
-
 ctr_object* ctr_number_lowerThan(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	return ctr_build_bool((myself->value.nvalue < otherNum->value.nvalue));
@@ -836,10 +744,8 @@ ctr_object* ctr_number_lowerThan(ctr_object* myself, ctr_argument* argumentList)
  * @def
  * [ Number ] <=: [ Number ]
  * 
- *
  * @test421
  */
-
 ctr_object* ctr_number_lowerEqThan(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	return ctr_build_bool((myself->value.nvalue <= otherNum->value.nvalue));
@@ -849,10 +755,8 @@ ctr_object* ctr_number_lowerEqThan(ctr_object* myself, ctr_argument* argumentLis
  * @def
  * [ Number ] = [ Number ]
  *
- *
  * @test422
  */
-
 ctr_object* ctr_number_eq(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	return ctr_build_bool(myself->value.nvalue == otherNum->value.nvalue);
@@ -862,10 +766,8 @@ ctr_object* ctr_number_eq(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] !=: [ Number ]
  *
- *
  * @test423
  */
-
 ctr_object* ctr_number_neq(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	return ctr_build_bool(myself->value.nvalue != otherNum->value.nvalue);
@@ -898,11 +800,9 @@ uint64_t ctr_internal_secure_random_uint64_uniform(uint64_t max) {
 /**
  * @def
  * [ Number ] between: [ Number ] and: [ Number ]
- * 
  *
  * @test424
  */
-
 ctr_object* ctr_number_between(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_number upper_bound;
 	ctr_number lower_bound;
@@ -935,10 +835,8 @@ ctr_object* ctr_number_between(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] odd?
  *
- *
  * @test425
  */
-
 ctr_object* ctr_number_odd(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_bool((int)myself->value.nvalue % 2);
 }
@@ -947,10 +845,8 @@ ctr_object* ctr_number_odd(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] even?
  *
- *
  * @test426
  */
-
 ctr_object* ctr_number_even(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_bool(!((int)myself->value.nvalue % 2));
 }
@@ -959,10 +855,8 @@ ctr_object* ctr_number_even(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] + [ Number ]
  *
- *
  * @test427
  */
-
 ctr_object* ctr_number_add(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument* newArg;
 	ctr_object* otherNum = argumentList->object;
@@ -992,10 +886,8 @@ ctr_object* ctr_number_add(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] add: [ Number ]
  *
- *
  * @test428
  */
-
 ctr_object* ctr_number_inc(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	myself->value.nvalue += otherNum->value.nvalue;
@@ -1006,10 +898,8 @@ ctr_object* ctr_number_inc(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] - [ Number ]
  *
- *
  * @test429
  */
-
 ctr_object* ctr_number_minus(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	ctr_number a = myself->value.nvalue;
@@ -1021,10 +911,8 @@ ctr_object* ctr_number_minus(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] subtract: [ Number ]
  *
- *
  * @test430
  */
-
 ctr_object* ctr_number_dec(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	myself->value.nvalue -= otherNum->value.nvalue;
@@ -1034,11 +922,9 @@ ctr_object* ctr_number_dec(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Number ] * [ Number ]
- * 
  *
  * @test431
  */
-
 ctr_object* ctr_number_multiply(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum;
 	ctr_number a;
@@ -1053,10 +939,8 @@ ctr_object* ctr_number_multiply(ctr_object* myself, ctr_argument* argumentList) 
  * @def
  * [ Code ] × [ Number ]
  *
- *
  * @test432
  */
-
 ctr_object* ctr_block_times(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* indexNumber;
 	ctr_object* block = myself;
@@ -1084,10 +968,8 @@ ctr_object* ctr_block_times(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Code ] procedure
  *
- *
  * @test433
  */
-
 ctr_object* ctr_block_procedure(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* block = myself;
 	ctr_argument* arguments;
@@ -1106,11 +988,9 @@ ctr_object* ctr_block_procedure(ctr_object* myself, ctr_argument* argumentList) 
 /**
  * @def
  * [ Number ] multiply by: [ Number ]
- * 
  *
  * @test434
  */
-
 ctr_object* ctr_number_mul(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	myself->value.nvalue *= otherNum->value.nvalue;
@@ -1121,10 +1001,8 @@ ctr_object* ctr_number_mul(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] / [ Number ]
  *
- *
  * @test435
  */
-
 ctr_object* ctr_number_divide(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	ctr_number a = myself->value.nvalue;
@@ -1140,10 +1018,8 @@ ctr_object* ctr_number_divide(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] divide by: [ Number ]
  *
- *
  * @test436
  */
-
 ctr_object* ctr_number_div(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	if (otherNum->value.nvalue == 0) {
@@ -1158,10 +1034,8 @@ ctr_object* ctr_number_div(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] modulo: [ modulo ]
  *
- *
  * @test437
  */
-
 ctr_object* ctr_number_modulo(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	ctr_number a = myself->value.nvalue;
@@ -1176,11 +1050,9 @@ ctr_object* ctr_number_modulo(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Number ] power: [ Number ]
- * 
  *
  * @test438
  */
-
 ctr_object* ctr_number_pow(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherNum = ctr_internal_cast2number(argumentList->object);
 	ctr_number a = myself->value.nvalue;
@@ -1192,10 +1064,8 @@ ctr_object* ctr_number_pow(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] positive?
  *
- *
  * @test439
  */
-
 ctr_object* ctr_number_positive(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_bool( ( myself->value.nvalue > 0) );
 }
@@ -1203,11 +1073,9 @@ ctr_object* ctr_number_positive(ctr_object* myself, ctr_argument* argumentList) 
 /**
  * @def
  * [ Number ] negative?
- * 
  *
  * @test440
  */
-
 ctr_object* ctr_number_negative(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_bool( ( myself->value.nvalue < 0) );
 }
@@ -1216,10 +1084,8 @@ ctr_object* ctr_number_negative(ctr_object* myself, ctr_argument* argumentList) 
  * @def
  * [ Number ] floor
  *
- *
  * @test441
  */
-
 ctr_object* ctr_number_floor(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float(floor(myself->value.nvalue));
 }
@@ -1228,10 +1094,8 @@ ctr_object* ctr_number_floor(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] [ String ]
  *
- *
  * @test442
  */
-
 ctr_object* ctr_number_qualify(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_internal_object_set_property( myself, ctr_build_string_from_cstring( CTR_DICT_QUALIFIER ), ctr_internal_cast2string( argumentList->object ), CTR_CATEGORY_PRIVATE_PROPERTY );
 	return myself;
@@ -1239,12 +1103,10 @@ ctr_object* ctr_number_qualify(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Number ] qualifier.
- *
+ * [ Number ] qualifier
  *
  * @test443
  */
-
 ctr_object* ctr_number_qualification(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* answer = ctr_internal_object_find_property( myself, ctr_build_string_from_cstring( CTR_DICT_QUALIFIER ), CTR_CATEGORY_PRIVATE_PROPERTY );
 	if ( answer == NULL ) return CtrStdNil;
@@ -1261,11 +1123,9 @@ ctr_object* ctr_number_respond_to(ctr_object* myself, ctr_argument* argumentList
 /**
  * @def
  * [ Number ] ceil
- * 
  *
  * @test444
  */
-
 ctr_object* ctr_number_ceil(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float(ceil(myself->value.nvalue));
 }
@@ -1273,11 +1133,9 @@ ctr_object* ctr_number_ceil(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Number ] round
- * 
  *
  * @test445
  */
-
 ctr_object* ctr_number_round(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float(round(myself->value.nvalue));
 }
@@ -1286,10 +1144,8 @@ ctr_object* ctr_number_round(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] abs
  *
- *
  * @test446
  */
-
 ctr_object* ctr_number_abs(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float(fabs(myself->value.nvalue));
 }
@@ -1298,10 +1154,8 @@ ctr_object* ctr_number_abs(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] sqrt
  *
- *
  * @test447
  */
-
 ctr_object* ctr_number_sqrt(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float(sqrt(myself->value.nvalue));
 }
@@ -1310,10 +1164,8 @@ ctr_object* ctr_number_sqrt(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] sin
  *
- *
  * @test448
  */
-
 ctr_object* ctr_number_sin(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float(sin(myself->value.nvalue));
 }
@@ -1322,10 +1174,8 @@ ctr_object* ctr_number_sin(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] cos
  *
- *
  * @test449
  */
-
 ctr_object* ctr_number_cos(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float(cos(myself->value.nvalue));
 }
@@ -1334,10 +1184,8 @@ ctr_object* ctr_number_cos(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] tan
  *
- *
  * @test450
  */
-
 ctr_object* ctr_number_tan(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float(tan(myself->value.nvalue));
 }
@@ -1346,10 +1194,8 @@ ctr_object* ctr_number_tan(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] atan
  *
- *
  * @test451
  */
-
 ctr_object* ctr_number_atan(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float(atan(myself->value.nvalue));
 }
@@ -1358,10 +1204,8 @@ ctr_object* ctr_number_atan(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] log
  *
- *
  * @test452
  */
-
 ctr_object* ctr_number_log(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float(log(myself->value.nvalue));
 }
@@ -1370,10 +1214,8 @@ ctr_object* ctr_number_log(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] & [ Number ]
  *
- *
  * @test453
  */
-
 ctr_object* ctr_number_bit_and(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float((int)myself->value.nvalue & (int)ctr_tonum(argumentList->object));
 }
@@ -1382,10 +1224,8 @@ ctr_object* ctr_number_bit_and(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] | [ Number ]
  *
- *
  * @test454
  */
-
 ctr_object* ctr_number_bit_or(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float((int)myself->value.nvalue | (int)ctr_tonum(argumentList->object));
 }
@@ -1394,10 +1234,8 @@ ctr_object* ctr_number_bit_or(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ Number ] ^ [ Number ]
  *
- *
  * @test455
  */
-
 ctr_object* ctr_number_bit_xor(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float((int)myself->value.nvalue ^ (int)ctr_tonum(argumentList->object));
 }
@@ -1440,10 +1278,8 @@ ctr_object* ctr_internal_number_to_string(ctr_object* myself, ctr_argument* argu
  * @def
  * [ Number ] string
  *
- *
  * @test456
  */
-
 ctr_object* ctr_number_to_string(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_internal_number_to_string(myself, argumentList, 0);
 }
@@ -1452,10 +1288,8 @@ ctr_object* ctr_number_to_string(ctr_object* myself, ctr_argument* argumentList)
  * @def
  * [ Number ] plain
  *
- *
  * @test457
  */
-
 ctr_object* ctr_number_to_string_flat(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_internal_number_to_string(myself, argumentList, 1);
 }
@@ -1464,10 +1298,8 @@ ctr_object* ctr_number_to_string_flat(ctr_object* myself, ctr_argument* argument
  * @def
  * [ Number ] boolean
  *
- *
  * @test458
  */
-
 ctr_object* ctr_number_to_boolean(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_bool( myself->value.nvalue );
 }
@@ -1476,10 +1308,8 @@ ctr_object* ctr_number_to_boolean(ctr_object* myself, ctr_argument* argumentList
  * @def
  * String
  *
- *
  * @test459
  */
-
 ctr_object* ctr_build_string(const char* stringValue, ctr_size size) {
 	ctr_object* stringObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
 	if (size != 0) {
@@ -1518,10 +1348,8 @@ ctr_object* ctr_build_empty_string() {
  * @def
  * [ String ] object
  *
- *
  * @test460
  */
-
 ctr_object* ctr_string_eval(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_tnode* parsedCode;
 	ctr_object* result;
@@ -1556,11 +1384,9 @@ ctr_object* ctr_string_eval(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ String ] = [ String ]
- * 
  *
  * @test461
  */
-
 ctr_object* ctr_string_eq(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* other = ctr_internal_cast2string( argumentList->object );
 	return ctr_build_bool(CTR_STRINGOBJ_EQUAL(myself, other));
@@ -1569,11 +1395,9 @@ ctr_object* ctr_string_eq(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ String ] !=: [ String ]
- * 
  *
  * @test462
  */
-
 ctr_object* ctr_string_neq(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* other = ctr_internal_cast2string( argumentList->object );
 	return ctr_build_bool(!CTR_STRINGOBJ_EQUAL(myself, other));
@@ -1583,10 +1407,8 @@ ctr_object* ctr_string_neq(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ String ] length
  *
- *
  * @test463
  */
-
 ctr_object* ctr_string_length(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_size n = ctr_getutf8len(myself->value.svalue->value, (ctr_size) myself->value.svalue->vlen);
 	return ctr_build_number_from_float((ctr_number) n);
@@ -1596,10 +1418,8 @@ ctr_object* ctr_string_length(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ String ] bytes
  *
- *
  * @test464
  */
-
 ctr_object* ctr_string_bytes(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float(myself->value.svalue->vlen);
 }
@@ -1613,10 +1433,8 @@ ctr_object* ctr_string_utf8san(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ String ] + [ String ]
  *
- *
  * @test465
  */
-
 ctr_object* ctr_string_concat(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* strObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTSTRING);
 	ctr_size n1;
@@ -1638,10 +1456,8 @@ ctr_object* ctr_string_concat(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ String ] append: [ String ]
  *
- *
  * @test466
  */
-
 ctr_object* ctr_string_append(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* strObject;
 	ctr_size n1;
@@ -1663,7 +1479,6 @@ ctr_object* ctr_string_append(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
-
 ctr_object* ctr_string_new(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* stringObject = ctr_build_empty_string();
 	stringObject->link = myself;
@@ -1674,11 +1489,8 @@ ctr_object* ctr_string_new(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ String ] code
  *
- *
  * @test467
  */
-
-
 // turns a string into executable code, by surrounding
 // it with literal str boundaries
 ctr_object* ctr_string_to_code(ctr_object* myself, ctr_argument* argumentList) {
@@ -1713,10 +1525,8 @@ ctr_object* ctr_string_to_code(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ String ] from: [ Number ] length: [ Number ]
  *
- *
  * @test468
  */
-
 ctr_object* ctr_string_from_length(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* fromPos = ctr_internal_cast2number(argumentList->object);
 	ctr_object* length = ctr_internal_cast2number(argumentList->next->object);
@@ -1763,10 +1573,8 @@ ctr_object* ctr_string_from_length(ctr_object* myself, ctr_argument* argumentLis
  * @def
  * [ String ] offset: [ Number ]
  *
- *
  * @test469
  */
-
 ctr_object* ctr_string_skip(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument* argument1;
 	ctr_argument* argument2;
@@ -1790,10 +1598,8 @@ ctr_object* ctr_string_skip(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ String ] character: [ Number ]
  *
- *
  * @test470
  */
-
 ctr_object* ctr_string_at(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* fromPos = ctr_internal_cast2number(argumentList->object);
 	ctr_size a = (ctr_size) (fromPos->value.nvalue);
@@ -1814,10 +1620,8 @@ ctr_object* ctr_string_at(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ String ] find: [ String ]
  *
- *
  * @test471
  */
-
 ctr_object* ctr_string_index_of(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* sub = ctr_internal_cast2string(argumentList->object);
 	long hlen = myself->value.svalue->vlen;
@@ -1837,7 +1641,6 @@ ctr_object* ctr_string_index_of(ctr_object* myself, ctr_argument* argumentList) 
  *
  * @test472
  */
-
 ctr_object* ctr_string_to_upper(ctr_object* myself, ctr_argument* argumentList) {
 	char* str = myself->value.svalue->value;
 	size_t  len = myself->value.svalue->vlen;
@@ -1858,7 +1661,6 @@ ctr_object* ctr_string_to_upper(ctr_object* myself, ctr_argument* argumentList) 
  *
  * @test473
  */
-
 ctr_object* ctr_string_to_lower(ctr_object* myself, ctr_argument* argumentList) {
 	char* str = myself->value.svalue->value;
 	size_t len = myself->value.svalue->vlen;
@@ -1879,7 +1681,6 @@ ctr_object* ctr_string_to_lower(ctr_object* myself, ctr_argument* argumentList) 
  *
  * @test474
  */
-
 ctr_object* ctr_string_last_index_of(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* sub = ctr_internal_cast2string(argumentList->object);
 	ctr_size hlen = myself->value.svalue->vlen;
@@ -1903,7 +1704,6 @@ static ctr_object* ctr_internal_build_string_nonutf8(const char* stringValue, ct
 	stringObject->link = CtrStdString;
 	return stringObject;
 }
-
 
 /**
  * Recursive string interpolation (deprecated).
@@ -2014,10 +1814,8 @@ ctr_object* ctr_string_fill_in(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ String ] replace: [ String ] with: [ String ]
  *
- *
  * @test476
  */
-
 ctr_object* ctr_string_replace_with(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* needle = ctr_internal_cast2string(argumentList->object);
 	ctr_object* replacement = ctr_internal_cast2string(argumentList->next->object);
@@ -2085,15 +1883,12 @@ ctr_object* ctr_string_minus(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
-
 /**
  * @def
  * [ String ] contains: [ String ]
  *
- *
  * @test478
  */
-
 ctr_object* ctr_string_contains( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_build_bool(
 		ctr_string_index_of( myself, argumentList ) != CtrStdNil
@@ -2104,10 +1899,8 @@ ctr_object* ctr_string_contains( ctr_object* myself, ctr_argument* argumentList 
  * @def
  * [ String ] trim
  *
- *
  * @test479
  */
-
 ctr_object* ctr_string_trim(ctr_object* myself, ctr_argument* argumentList) {
 	char* str = myself->value.svalue->value;
 	long  len = myself->value.svalue->vlen;
@@ -2134,10 +1927,8 @@ ctr_object* ctr_string_trim(ctr_object* myself, ctr_argument* argumentList) {
  * @def
  * [ String ] number
  *
- *
  * @test480
  */
-
 ctr_object* ctr_string_to_number(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_string(myself->value.svalue->value, myself->value.svalue->vlen);
 }
@@ -2146,10 +1937,8 @@ ctr_object* ctr_string_to_number(ctr_object* myself, ctr_argument* argumentList)
  * @def
  * [ String ] boolean
  *
- *
  * @test481
  */
-
 ctr_object* ctr_string_to_boolean(ctr_object* myself, ctr_argument* argumentList) {
 	if ( myself->value.svalue->vlen == 0 ) return CtrStdBoolFalse;
 	return ctr_build_bool( 1 );
@@ -2159,10 +1948,8 @@ ctr_object* ctr_string_to_boolean(ctr_object* myself, ctr_argument* argumentList
  * @def
  * [ String ] split: [ String ]
  *
- *
  * @test482
  */
-
 ctr_object* ctr_string_split(ctr_object* myself, ctr_argument* argumentList) {
 	char* str = myself->value.svalue->value;
 	long len = myself->value.svalue->vlen;
@@ -2208,7 +1995,6 @@ ctr_object* ctr_string_split(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test483
  */
-
 ctr_object* ctr_string_characters( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_size i;
 	int charSize;
@@ -2246,7 +2032,6 @@ ctr_object* ctr_string_ord( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * @test484
  */
-
 ctr_object* ctr_string_compare( ctr_object* myself, ctr_argument* argumentList ) {
 	//@todo simplify with cstrs
 	argumentList->object = ctr_internal_cast2string(argumentList->object);
@@ -2271,7 +2056,6 @@ ctr_object* ctr_string_compare( ctr_object* myself, ctr_argument* argumentList )
 	if (s > 0) c = 1;
 	return ctr_build_number_from_float( c );
 }
-
 
 #pragma clang optimize off
 #pragma GCC push_options
@@ -2317,10 +2101,9 @@ ctr_object* ctr_string_tccompare(ctr_object* myself, ctr_argument* argumentList)
 /**
  * @def
  * [ String ] < [ String ]
- * 
+ *
  * @test485
  */
-
 ctr_object* ctr_string_before(ctr_object* myself, ctr_argument* argumentList ) {
 	if ( ctr_string_compare( myself, argumentList )->value.nvalue < 0 ) {
 		return ctr_build_bool( 1 );
@@ -2328,14 +2111,12 @@ ctr_object* ctr_string_before(ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_build_bool( 0 );
 }
 
-
 /**
  * @def
  * [ String ] <=: [ String ]
- * 
+ *
  * @test486
  */
-
 ctr_object* ctr_string_before_or_same(ctr_object* myself, ctr_argument* argumentList ) {
 	if ( ctr_string_compare( myself, argumentList )->value.nvalue <= 0 ) {
 		return ctr_build_bool( 1 );
@@ -2346,10 +2127,9 @@ ctr_object* ctr_string_before_or_same(ctr_object* myself, ctr_argument* argument
 /**
  * @def
  * [ String ] > [ String ]
- * 
+ *
  * @test487
  */
-
 ctr_object* ctr_string_after(ctr_object* myself, ctr_argument* argumentList ) {
 	if ( ctr_string_compare( myself, argumentList )->value.nvalue > 0 ) {
 		return ctr_build_bool( 1 );
@@ -2357,14 +2137,12 @@ ctr_object* ctr_string_after(ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_build_bool( 0 );
 }
 
-
- /**
+/**
  * @def
  * [ String ] >=: [ String ]
- * 
+ *
  * @test488
  */
-
 ctr_object* ctr_string_after_or_same(ctr_object* myself, ctr_argument* argumentList ) {
 	if ( ctr_string_compare( myself, argumentList )->value.nvalue >= 0 ) {
 		return ctr_build_bool( 1 );
@@ -2378,7 +2156,6 @@ ctr_object* ctr_string_after_or_same(ctr_object* myself, ctr_argument* argumentL
  *
  * @test489
  */
-
 ctr_object* ctr_string_hash_with_key( ctr_object* myself, ctr_argument* argumentList ) {
 	char* keyString = ctr_heap_allocate_cstring( ctr_internal_cast2string( argumentList->object ) );
 	if ( strlen( keyString ) < 16 ) {
@@ -2401,7 +2178,6 @@ ctr_object* ctr_string_hash_with_key( ctr_object* myself, ctr_argument* argument
  *
  * @test490
  */
-
 ctr_object* ctr_build_block(ctr_tnode* node) {
 	ctr_object* codeBlockObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTBLOCK);
 	codeBlockObject->value.block = node;
@@ -2412,10 +2188,9 @@ ctr_object* ctr_build_block(ctr_tnode* node) {
 /**
  * @def
  * [ Code ] start
- * 
+ *
  * @test491
  */
-
 ctr_object* ctr_block_run(ctr_object* myself, ctr_argument* argList, ctr_object* my) {
 	ctr_object* result;
 	ctr_tnode* node = myself->value.block;
@@ -2493,7 +2268,6 @@ ctr_object* ctr_block_run(ctr_object* myself, ctr_argument* argList, ctr_object*
  *
  * @test492
  */
-
 ctr_object* ctr_block_while_true(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* block = argumentList->object;
 	if (block->info.type != CTR_OBJECT_TYPE_OTBLOCK) {
@@ -2536,7 +2310,6 @@ ctr_object* ctr_block_try(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test493
  */
-
 ctr_object* ctr_block_set(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* key = ctr_internal_cast2string(argumentList->object);
 	ctr_object* value = argumentList->next->object;
@@ -2550,7 +2323,6 @@ ctr_object* ctr_block_set(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test494
  */
-
 ctr_object* ctr_block_error(ctr_object* myself, ctr_argument* argumentList) {
 	CtrStdFlow = argumentList->object;
 	CtrStdFlow->info.sticky = 1;
@@ -2563,7 +2335,6 @@ ctr_object* ctr_block_error(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test495
  */
-
 ctr_object* ctr_block_catch(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* catchBlock = argumentList->object;
 	ctr_internal_object_delete_property(myself, ctr_build_string_from_cstring( "catch" ), 0 );
@@ -2577,7 +2348,6 @@ ctr_object* ctr_block_catch(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test496
  */
-
 ctr_object* ctr_block_to_string(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_string_from_cstring( CTR_DICT_FUNCTION_OBJECT );
 }
@@ -2601,7 +2371,7 @@ ctr_object* ctr_int64_init(ctr_object* myself) {
 /**
  * @def
  * [ Int64 ] from-string: [ String ]
- * 
+ *
  * @test627
  */
 ctr_object* ctr_int64_new(ctr_object* myclass, ctr_argument* argumentList) {
@@ -2679,7 +2449,6 @@ ctr_object* ctr_int64_multiply(ctr_object* myself, ctr_argument* argumentList) {
 	return result;
 }
 
-
 ctr_object* ctr_int64_add(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	int64_t resultINT64 = myINT64 + otherINT64;
@@ -2715,7 +2484,6 @@ ctr_object* ctr_int64_higherThan(ctr_object* myself, ctr_argument* argumentList)
 	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(myINT64 > otherINT64);
 }
-
 
 ctr_object* ctr_int64_lowerEqThan(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
@@ -2759,7 +2527,6 @@ int ctr_internal_parsenum(char *str, int base, double_t* ret) {
 	if (*str == '.') {
 		str++;
 		double_t frac = 1.0 / base;
-
 		while (*str) {
 			int digit;
 			if (isdigit((unsigned char)*str)) {
@@ -2769,19 +2536,15 @@ int ctr_internal_parsenum(char *str, int base, double_t* ret) {
 			} else {
 				break;
 			}
-
 			if (digit >= base) break;
-
 			result += digit * frac;
 			frac /= base;
 			str++;
 		}
 	}
-
 	*ret = sign * result;
 	return 0;
 }
-
 
 ctr_object* ctr_num_parse(ctr_object* myself, ctr_argument* argumentList, int checkbase) {
 	char* str = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));

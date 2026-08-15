@@ -23,7 +23,6 @@ ctr_object* ctr_array_new(ctr_object* myclass, ctr_argument* argumentList) {
  *
  * @test499
  */
-
 ctr_object* ctr_array_type(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_string_from_cstring( CTR_DICT_ARRAY_OBJECT );
 }
@@ -34,7 +33,6 @@ ctr_object* ctr_array_type(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test500
  */
-
 ctr_object* ctr_array_push(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* pushValue;
 	if (myself->value.avalue->length <= (myself->value.avalue->head + 1)) {
@@ -55,7 +53,6 @@ ctr_object* ctr_array_push(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test501
  */
-
 ctr_object* ctr_array_min(ctr_object* myself, ctr_argument* argumentList) {
 	double min = 0;
 	double v = 0;
@@ -77,7 +74,6 @@ ctr_object* ctr_array_min(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test502
  */
-
 ctr_object* ctr_array_max(ctr_object* myself, ctr_argument* argumentList) {
 	double max = 0;
 	double v = 0;
@@ -99,7 +95,6 @@ ctr_object* ctr_array_max(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test503
  */
-
 ctr_object* ctr_array_map(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* block = argumentList->object;
 	ctr_size i = 0;
@@ -139,7 +134,6 @@ ctr_object* ctr_array_map(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test504
  */
-
 ctr_object* ctr_array_new_and_push(ctr_object* myclass, ctr_argument* argumentList) {
 	ctr_object* s = ctr_array_new(myclass, NULL);
 	return ctr_array_push(s, argumentList);
@@ -151,7 +145,6 @@ ctr_object* ctr_array_new_and_push(ctr_object* myclass, ctr_argument* argumentLi
  *
  * @test505
  */
-
 ctr_object* ctr_array_unshift(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* pushValue = argumentList->object;
 	if (myself->value.avalue->tail > 0) {
@@ -174,7 +167,6 @@ ctr_object* ctr_array_unshift(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test506
  */
-
 ctr_object* ctr_array_join(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_size i;
 	char* result = NULL;
@@ -214,7 +206,6 @@ ctr_object* ctr_array_join(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test507
  */
-
 ctr_object* ctr_array_get(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* getIndex = argumentList->object;
 	int i;
@@ -236,7 +227,6 @@ ctr_object* ctr_array_get(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test508
  */
-
 ctr_object* ctr_array_first(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_size length = 0;
 	length = (ctr_size) myself->value.avalue->head - myself->value.avalue->tail;
@@ -252,7 +242,6 @@ ctr_object* ctr_array_first(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test509
  */
-
 ctr_object* ctr_array_last(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_size length = 0;
 	length = (ctr_size) myself->value.avalue->head - myself->value.avalue->tail;
@@ -264,11 +253,10 @@ ctr_object* ctr_array_last(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ List ] second last
+ * [ List ] penultimate
  *
  * @test510
  */
-
 ctr_object* ctr_array_second_last(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_size length = 0;
 	length = (ctr_size) myself->value.avalue->head - myself->value.avalue->tail;
@@ -278,29 +266,24 @@ ctr_object* ctr_array_second_last(ctr_object* myself, ctr_argument* argumentList
 	return *(myself->value.avalue->elements + myself->value.avalue->tail + (length - 2));
 }
 
-
 /**
  * @def
  * [ List ] put: [ Object ] at: [ Number ]
  *
  * @test511
  */
-
 ctr_object* ctr_array_put(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* putValue = argumentList->object;
 	ctr_object* putIndex = ctr_internal_cast2number(argumentList->next->object);
 	ctr_size putIndexNumber;
 	ctr_size head;
 	ctr_size tail;
-
 	if (putIndex->value.nvalue < 0) {
 		CtrStdFlow = ctr_error( CTR_ERR_BOUNDS, 0 );
 		return myself;
 	}
-
 	head = (ctr_size) myself->value.avalue->head;
 	tail = (ctr_size) myself->value.avalue->tail;
-
 	putIndexNumber = (ctr_size) putIndex->value.nvalue;
 	if (head <= putIndexNumber) {
 		ctr_size j;
@@ -330,7 +313,6 @@ ctr_object* ctr_array_put(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test512
  */
-
 ctr_object* ctr_array_pop(ctr_object* myself, ctr_argument* argumentList) {
 	if (myself->value.avalue->tail >= myself->value.avalue->head) {
 		return CtrStdNil;
@@ -345,7 +327,6 @@ ctr_object* ctr_array_pop(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test513
  */
-
 ctr_object* ctr_array_shift(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* shiftedOff;
 	if (myself->value.avalue->tail >= myself->value.avalue->head) {
@@ -362,7 +343,6 @@ ctr_object* ctr_array_shift(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test514
  */
-
 ctr_object* ctr_array_count(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_number d = 0;
 	d = (ctr_number) myself->value.avalue->head - myself->value.avalue->tail;
@@ -375,7 +355,6 @@ ctr_object* ctr_array_count(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test515
  */
-
 ctr_object* ctr_array_from_length(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_argument* pushArg;
 	ctr_argument* elnumArg;
@@ -406,7 +385,6 @@ ctr_object* ctr_array_from_length(ctr_object* myself, ctr_argument* argumentList
  *
  * @test516
  */
-
 ctr_object* ctr_array_splice(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* newArray = ctr_array_new(CtrStdArray, NULL);
 	//order is important, cast2number may trigger gc, so convert early!
@@ -456,7 +434,6 @@ ctr_object* ctr_array_splice(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test517
  */
-
 ctr_object* ctr_array_add(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* otherArray = argumentList->object;
 	ctr_object* newArray = ctr_array_new(CtrStdArray, NULL);
@@ -492,7 +469,6 @@ ctr_object* ctr_array_add(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test518
  */
-
 ctr_object* ctr_array_combine(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_size i;
 	ctr_object* map = ctr_map_new( CtrStdMap, argumentList );
@@ -522,7 +498,6 @@ ctr_object* ctr_array_combine(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test519
  */
-
 ctr_object* ctr_array_copy(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_size i = 0;
 	ctr_object* copy = ctr_array_new( CtrStdArray, argumentList );
@@ -573,7 +548,6 @@ int ctr_sort_cmp(const void * a, const void * b) {
  *
  * @test520
  */
-
 ctr_object* ctr_array_sort(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* sorter = argumentList->object;
 	if (sorter->info.type != CTR_OBJECT_TYPE_OTBLOCK) {
@@ -589,10 +563,9 @@ ctr_object* ctr_array_sort(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ List ] string
- * 
+ *
  * @test521
  */
-
 ctr_object* ctr_array_to_string( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_size i;
 	ctr_object* arrayElement;
@@ -634,7 +607,6 @@ ctr_object* ctr_array_to_string( ctr_object* myself, ctr_argument* argumentList 
  *
  * @test522
  */
-
 ctr_object* ctr_array_fill( ctr_object* myself, ctr_argument* argumentList ) {
 	size_t n;
 	ctr_number fill_times;
@@ -658,7 +630,6 @@ ctr_object* ctr_array_fill( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * @test523
  */
-
 ctr_object* ctr_array_index_of( ctr_object* myself, ctr_argument* argumentList ) {
 	int found = -1;
 	ctr_size i = 0;
@@ -686,10 +657,9 @@ ctr_object* ctr_array_has( ctr_object* myself, ctr_argument* argumentList ) {
 /**
  * @def
  * Map
- * 
+ *
  * @test524
  */
-
 ctr_object* ctr_map_new(ctr_object* myclass, ctr_argument* argumentList) {
 	ctr_object* s = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
 	s->link = myclass;
@@ -702,7 +672,6 @@ ctr_object* ctr_map_new(ctr_object* myclass, ctr_argument* argumentList) {
  *
  * @test525
  */
-
 ctr_object* ctr_map_type(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_string_from_cstring( CTR_DICT_MAP_OBJECT );
 }
@@ -713,7 +682,6 @@ ctr_object* ctr_map_type(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test526
  */
-
 ctr_object* ctr_map_put(ctr_object* myself, ctr_argument* argumentList) {
 	char* key;
 	size_t keyLen;
@@ -734,7 +702,6 @@ ctr_object* ctr_map_put(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test527
  */
-
 ctr_object* ctr_map_key_value(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* newKey;
 	ctr_object* key = ctr_internal_cast2string(argumentList->object);
@@ -753,7 +720,6 @@ ctr_object* ctr_map_key_value(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test528
  */
-
 ctr_object* ctr_map_delete(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_internal_object_delete_property(myself, ctr_internal_cast2string(argumentList->object), 0);
 	return myself;
@@ -762,10 +728,9 @@ ctr_object* ctr_map_delete(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Dict ] entries
- * 
+ *
  * @test529
  */
-
 ctr_object* ctr_map_keys(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* list;
 	ctr_mapitem* m;
@@ -785,10 +750,9 @@ ctr_object* ctr_map_keys(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Dict ] values
- * 
+ *
  * @test530
  */
-
 ctr_object* ctr_map_values(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* list;
 	ctr_mapitem* m;
@@ -808,31 +772,24 @@ ctr_object* ctr_map_values(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Dict ] at: [ Object ]
- * 
+ *
  * @test531
  */
-
 ctr_object* ctr_map_get(ctr_object* myself, ctr_argument* argumentList) {
-
 	ctr_argument* emptyArgumentList;
 	ctr_object*   searchKey;
 	ctr_object*   foundObject;
-
 	emptyArgumentList = ctr_heap_allocate(sizeof(ctr_argument));
 	emptyArgumentList->next = NULL;
 	emptyArgumentList->object = NULL;
-
 	searchKey = argumentList->object;
-
 	/* Give developer a chance to define a key for array */
 	searchKey = ctr_send_message(searchKey, CTR_DICT_STRING, strlen(CTR_DICT_STRING), emptyArgumentList);
 	ctr_heap_free( emptyArgumentList );
-
 	/* If developer returns something other than string (ouch, toString), then cast anyway */
 	if (searchKey->info.type != CTR_OBJECT_TYPE_OTSTRING) {
 		searchKey = ctr_internal_cast2string(searchKey);
 	}
-
 	foundObject = ctr_internal_object_find_property(myself, searchKey, 0);
 	if (foundObject == NULL) foundObject = ctr_build_nil();
 	return foundObject;
@@ -845,7 +802,6 @@ ctr_object* ctr_map_get(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test532
  */
-
 ctr_object* ctr_map_count(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float( myself->properties->size );
 }
@@ -874,7 +830,6 @@ ctr_object* ctr_map_copy(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test533
  */
-
 ctr_object* ctr_map_each(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* block = argumentList->object;
 	ctr_mapitem* m;
@@ -911,14 +866,12 @@ ctr_object* ctr_map_each(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
-
 /**
  * @def
  * [ Dict ] has: [ Object ]
  *
  * @test534
  */
-
 ctr_object* ctr_map_has(ctr_object* myself, ctr_argument* argumentList) {
 	int found = 0;
 	ctr_mapitem* m;
@@ -940,10 +893,9 @@ ctr_object* ctr_map_has(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @def
  * [ Dict ] string
- * 
+ *
  * @test535
  */
-
 ctr_object* ctr_map_to_string( ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object*  string;
 	ctr_mapitem* mapItem;

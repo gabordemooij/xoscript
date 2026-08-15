@@ -6,8 +6,6 @@
  *
  * @test536
  */
-
-
 ctr_object* ctr_file_new(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* s = ctr_object_make(myself, argumentList);
 	ctr_object* pathObject;
@@ -25,7 +23,6 @@ ctr_object* ctr_file_new(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test538
  */
-
 ctr_object* ctr_file_path(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0);
 	if (path == NULL) return CtrStdNil;
@@ -38,7 +35,6 @@ ctr_object* ctr_file_path(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test539
  */
-
 ctr_object* ctr_file_to_string(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* path = ctr_file_path(myself,argumentList);
 	if ( path == CtrStdNil) {
@@ -53,7 +49,6 @@ ctr_object* ctr_file_to_string(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test540
  */
-
 ctr_object* ctr_file_read(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0);
 	ctr_object* str;
@@ -102,7 +97,6 @@ ctr_object* ctr_file_read(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test541
  */
-
 ctr_object* ctr_file_write(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* str = ctr_internal_cast2string(argumentList->object);
 	ctr_object* path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0 );
@@ -133,7 +127,6 @@ ctr_object* ctr_file_write(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test682
  */
-
 ctr_object* ctr_file_tempwrite(ctr_object* myself, ctr_argument* argumentList) {
 	char path[] = "/tmp/xotempXXXXXX";
 	int f = mkstemp(path);
@@ -156,7 +149,6 @@ ctr_object* ctr_file_tempwrite(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test542
  */
-
 ctr_object* ctr_file_append(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* str = ctr_internal_cast2string(argumentList->object);
 	ctr_object* path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0);
@@ -183,7 +175,6 @@ ctr_object* ctr_file_append(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test543
  */
-
 ctr_object* ctr_file_exists(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0);
 	char* pathString;
@@ -206,7 +197,6 @@ ctr_object* ctr_file_exists(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test544
  */
-
 ctr_object* ctr_file_delete(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0);
 	char* pathString;
@@ -228,7 +218,6 @@ ctr_object* ctr_file_delete(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test545
  */
-
 ctr_object* ctr_file_size(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* path = ctr_internal_object_find_property(myself, ctr_build_string_from_cstring( "path" ), 0);
 	char* pathString;
@@ -256,7 +245,6 @@ ctr_object* ctr_file_size(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test546
  */
-
 ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList) {
 	/**
 	 * Returns a list with strings, not file objects, because

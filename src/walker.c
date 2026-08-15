@@ -3,7 +3,6 @@
 ctr_tnode* ctr_callstack[301];
 uint8_t ctr_callstack_index;
 
-
 /**
  * CTRWalkerReturn
  *
@@ -23,7 +22,6 @@ ctr_object* ctr_cwlk_return(ctr_tnode* node) {
 		exit(1);
 	}
 	e = ctr_cwlk_expr(li->node, &wasReturn);
-
 	return e;
 }
 

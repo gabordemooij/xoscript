@@ -228,7 +228,6 @@ ctr_object* ctr_gc_memory(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test550
  */
-
 ctr_object* ctr_gc_setmemlimit(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* unit = ctr_internal_object_find_property(
 		argumentList->object,
@@ -323,7 +322,6 @@ ctr_object* ctr_program_shell_escape(ctr_object* myself, ctr_argument* argumentL
  *
  * @test551
  */
-
 ctr_object* ctr_program_shell(ctr_object* myself, ctr_argument* argumentList) {
 	FILE* stream;
 	char* outputBuffer;
@@ -371,7 +369,6 @@ ctr_object* ctr_program_chdir(ctr_object* myself, ctr_argument* argumentList) {
 	return myself;
 }
 
-
 /**
  * @def
  * [ Program ] mkdir: [ String ] mode: [ Number ]
@@ -397,7 +394,6 @@ ctr_object* ctr_program_mkdir(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test552
  */
-
 ctr_object* ctr_program_argument(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* numberObject = ctr_internal_cast2number(argumentList->object);
 	int n = (int) numberObject->value.nvalue;
@@ -411,7 +407,6 @@ ctr_object* ctr_program_argument(ctr_object* myself, ctr_argument* argumentList)
  *
  * @test553
  */
-
 ctr_object* ctr_program_tonumber(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float(CTR_VERSION_NUM);
 }
@@ -422,7 +417,6 @@ ctr_object* ctr_program_tonumber(ctr_object* myself, ctr_argument* argumentList)
  *
  * @test554
  */
-
 ctr_object* ctr_program_tostring(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_string_from_cstring(CTR_MSG_WELCOME);
 }
@@ -441,14 +435,12 @@ ctr_object* ctr_program_getcwd(ctr_object* myself, ctr_argument* argumentList) {
 	return path;
 }
 
-
 /**
  * @def
  * [ Program ] use: [ String ]
  *
  * @test555
  */
-
 ctr_object* ctr_program_include(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_size vlen;
 	char* pathString;
@@ -509,7 +501,6 @@ ctr_object* ctr_program_include(ctr_object* myself, ctr_argument* argumentList) 
  *
  * @test557
  */
-
 ctr_object* ctr_program_object_exists( ctr_object* myself, ctr_argument* argumentList ) {
 	if ( ctr_internal_object_find_property(CtrStdWorld, argumentList->object, CTR_CATEGORY_PUBLIC_PROPERTY) ) {
 		return CtrStdBoolTrue;
@@ -523,7 +514,6 @@ ctr_object* ctr_program_object_exists( ctr_object* myself, ctr_argument* argumen
  *
  * @test558
  */
-
 ctr_object* ctr_program_object_message_exists( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* foundObject;
 	ctr_object* objectName;
@@ -545,7 +535,6 @@ ctr_object* ctr_program_object_message_exists( ctr_object* myself, ctr_argument*
 	}
 	return CtrStdBoolFalse;
 }
-
 
 /**
  * @def
@@ -577,7 +566,6 @@ ctr_object* ctr_program_platform(ctr_object* myself, ctr_argument* argumentList)
  *
  * @test560
  */
-
 ctr_object* ctr_program_exit(ctr_object* myself, ctr_argument* argumentList) {
 	CtrStdFlow = CtrStdExit;
 	return CtrStdNil;
@@ -676,7 +664,6 @@ ctr_object* ctr_program_unveil(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test561
  */
-
 ctr_object* ctr_program_get_env(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* envVarNameObj;
 	char*       envVarNameStr;
@@ -699,7 +686,6 @@ ctr_object* ctr_program_get_env(ctr_object* myself, ctr_argument* argumentList) 
  *
  * @test562
  */
-
 ctr_object* ctr_program_set_env(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* envVarNameObj;
 	ctr_object* envValObj;
@@ -726,7 +712,6 @@ ctr_object* ctr_program_set_env(ctr_object* myself, ctr_argument* argumentList) 
  *
  * @test563
  */
-
 ctr_object* ctr_program_waitforinput(ctr_object* myself, ctr_argument* argumentList) {
 	int c;
 	ctr_size bytes = 0;
@@ -758,7 +743,6 @@ ctr_object* ctr_program_waitforinput(ctr_object* myself, ctr_argument* argumentL
  *
  * @test564
  */
-
 ctr_object* ctr_program_waitforpassword(ctr_object* myself, ctr_argument* argumentList) {
 	static struct termios oldt, newt;
 	int c;
@@ -795,7 +779,6 @@ ctr_object* ctr_program_waitforpassword(ctr_object* myself, ctr_argument* argume
  *
  * @test565
  */
-
 ctr_object* ctr_program_input(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_size bytes = 0;
 	ctr_size page = 64;
@@ -826,7 +809,6 @@ ctr_object* ctr_program_input(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test566
  */
-
 ctr_object* ctr_program_flush(ctr_object* myself, ctr_argument* ctr_argumentList) {
 	 fflush(stdout);
 	 return myself;
@@ -836,10 +818,8 @@ ctr_object* ctr_program_flush(ctr_object* myself, ctr_argument* ctr_argumentList
  * @def
  * [ Program ] error: [ String ]
  *
- *
  * @test567
  */
-
 ctr_object* ctr_program_err(ctr_object* myself, ctr_argument* argumentList) {
 	char* message;
 	message = ctr_heap_allocate_cstring(
@@ -920,7 +900,6 @@ double ctr_internal_versiontime() {
  *
  * @test79
  */
-
 ctr_object* ctr_clock_wait(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* arg = ctr_internal_cast2number(argumentList->object);
 	int n = (int) arg->value.nvalue;
@@ -1045,7 +1024,6 @@ ctr_object* ctr_clock_set_time( ctr_object* myself, ctr_argument* argumentList, 
  *
  * @test570
  */
-
 ctr_object* ctr_clock_set_zone( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_internal_object_set_property( myself, ctr_build_string_from_cstring(CTR_DICT_ZONE), ctr_internal_cast2string( argumentList->object ), CTR_CATEGORY_PRIVATE_PROPERTY );
 	return myself;
@@ -1057,7 +1035,6 @@ ctr_object* ctr_clock_set_zone( ctr_object* myself, ctr_argument* argumentList )
  *
  * @test571
  */
-
 ctr_object* ctr_clock_get_zone( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_internal_object_find_property( myself, ctr_build_string_from_cstring(CTR_DICT_ZONE), CTR_CATEGORY_PRIVATE_PROPERTY );
 }
@@ -1068,7 +1045,6 @@ ctr_object* ctr_clock_get_zone( ctr_object* myself, ctr_argument* argumentList )
  *
  * @test572
  */
-
 ctr_object* ctr_clock_set_year( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_set_time( myself, argumentList, 'Y' );
 }
@@ -1079,7 +1055,6 @@ ctr_object* ctr_clock_set_year( ctr_object* myself, ctr_argument* argumentList )
  *
  * @test573
  */
-
 ctr_object* ctr_clock_set_month( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_set_time( myself, argumentList, 'm' );
 }
@@ -1090,7 +1065,6 @@ ctr_object* ctr_clock_set_month( ctr_object* myself, ctr_argument* argumentList 
  *
  * @test574
  */
-
 ctr_object* ctr_clock_set_day( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_set_time( myself, argumentList, 'd' );
 }
@@ -1101,7 +1075,6 @@ ctr_object* ctr_clock_set_day( ctr_object* myself, ctr_argument* argumentList ) 
  *
  * @test575
  */
-
 ctr_object* ctr_clock_set_hour( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_set_time( myself, argumentList, 'H' );
 }
@@ -1112,7 +1085,6 @@ ctr_object* ctr_clock_set_hour( ctr_object* myself, ctr_argument* argumentList )
  *
  * @test576
  */
-
 ctr_object* ctr_clock_set_minute( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_set_time( myself, argumentList, 'i' );
 }
@@ -1123,7 +1095,6 @@ ctr_object* ctr_clock_set_minute( ctr_object* myself, ctr_argument* argumentList
  *
  * @test577
  */
-
 ctr_object* ctr_clock_set_second( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_set_time( myself, argumentList, 's' );
 }
@@ -1134,7 +1105,6 @@ ctr_object* ctr_clock_set_second( ctr_object* myself, ctr_argument* argumentList
  *
  * @test578
  */
-
 ctr_object* ctr_clock_year( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_get_time( myself, argumentList, 'Y' );
 }
@@ -1145,7 +1115,6 @@ ctr_object* ctr_clock_year( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * @test579
  */
-
 ctr_object* ctr_clock_month( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_get_time( myself, argumentList, 'm' );
 }
@@ -1156,7 +1125,6 @@ ctr_object* ctr_clock_month( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * @test580
  */
-
 ctr_object* ctr_clock_day( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_get_time( myself, argumentList, 'd' );
 }
@@ -1167,7 +1135,6 @@ ctr_object* ctr_clock_day( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * @test581
  */
-
 ctr_object* ctr_clock_hour( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_get_time( myself, argumentList, 'H' );
 }
@@ -1178,7 +1145,6 @@ ctr_object* ctr_clock_hour( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * @test582
  */
-
 ctr_object* ctr_clock_minute( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_get_time( myself, argumentList, 'i' );
 }
@@ -1189,7 +1155,6 @@ ctr_object* ctr_clock_minute( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * @test583
  */
-
 ctr_object* ctr_clock_second( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_get_time( myself, argumentList, 's' );
 }
@@ -1200,7 +1165,6 @@ ctr_object* ctr_clock_second( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * @test584
  */
-
 ctr_object* ctr_clock_yearday( ctr_object* myself, ctr_argument* argumentList ) {
 	struct tm* date;
 	time_t timeStamp;
@@ -1216,7 +1180,6 @@ ctr_object* ctr_clock_yearday( ctr_object* myself, ctr_argument* argumentList ) 
  *
  * @test585
  */
-
 ctr_object* ctr_clock_weekday( ctr_object* myself, ctr_argument* argumentList ) {
 	struct tm* date;
 	time_t timeStamp;
@@ -1232,7 +1195,6 @@ ctr_object* ctr_clock_weekday( ctr_object* myself, ctr_argument* argumentList ) 
  *
  * @test586
  */
-
 ctr_object* ctr_clock_time( ctr_object* myself, ctr_argument* argumentList ) {
 	time_t timeStamp;
 	ctr_clock* cr = (ctr_clock*) myself->value.rvalue->ptr;
@@ -1246,7 +1208,6 @@ ctr_object* ctr_clock_time( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * @test587
  */
-
 ctr_object* ctr_clock_copy( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* clock;
 	clock = ctr_clock_new( myself, argumentList );
@@ -1265,7 +1226,6 @@ ctr_object* ctr_clock_copy( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * @test588
  */
-
 ctr_object* ctr_clock_equals( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* mytime = ctr_clock_time( myself, NULL );
 	ctr_object* myzone = ctr_clock_get_zone( myself, NULL );
@@ -1288,7 +1248,6 @@ ctr_object* ctr_clock_equals( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * @test589
  */
-
 ctr_object* ctr_clock_neq( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* boolean = ctr_clock_equals(myself, argumentList);
 	if (boolean == CtrStdBoolTrue) return CtrStdBoolFalse;
@@ -1302,7 +1261,6 @@ ctr_object* ctr_clock_neq( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * @test590
  */
-
 ctr_object* ctr_clock_week( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* weekNumber;
 	char*  str;
@@ -1351,14 +1309,12 @@ ctr_object* ctr_clock_format_set( ctr_object* myself, ctr_argument* argumentList
 	return answer;
 }
 
-
 /**
  * @def
  * [ Moment ] string
  *
  * @test591
  */
-
 ctr_object* ctr_clock_to_string( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_argument a;
 	a.object = ctr_build_string_from_cstring(CTR_STDDATEFRMT);
@@ -1386,7 +1342,6 @@ ctr_object* ctr_clock_to_iso_string( ctr_object* myself, ctr_argument* argumentL
  *
  * @test592
  */
-
 ctr_object* ctr_clock_to_number( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_send_message( myself, "time", strlen("time"), argumentList );
 }
@@ -1465,7 +1420,6 @@ ctr_object* ctr_clock_change( ctr_object* myself, ctr_argument* argumentList, ui
  *
  * @test593
  */
-
 ctr_object* ctr_clock_add( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_change( myself, argumentList, 1 );
 }
@@ -1476,12 +1430,12 @@ ctr_object* ctr_clock_add( ctr_object* myself, ctr_argument* argumentList ) {
  *
  * @test594
  */
-
 ctr_object* ctr_clock_subtract( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_clock_change( myself, argumentList, 0 );
 }
 
 /**
+ * @todo add def and test
  * [ Moment ] new
  *
  * Creates a new clock, by default a clock will be set to
@@ -1496,6 +1450,7 @@ ctr_object* ctr_clock_new( ctr_object* myself, ctr_argument* argumentList ) {
 }
 
 /**
+ * @def
  * [ Moment ] from: [ String ]
  *
  * @test662
@@ -1552,7 +1507,6 @@ ctr_object* ctr_clock_from_iso( ctr_object* myself, ctr_argument* argumentList )
  *
  * @test595
  */
-
 ctr_object* ctr_console_write(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* argument1 = argumentList->object;
 	ctr_object* strObject = ctr_internal_cast2string(argument1);
@@ -1566,7 +1520,6 @@ ctr_object* ctr_console_write(ctr_object* myself, ctr_argument* argumentList) {
  *
  * @test596
  */
-
 ctr_object* ctr_console_brk(ctr_object* myself, ctr_argument* argumentList) {
 	fwrite("\n", sizeof(char), 1, stdout);
 	fflush(stdout);
@@ -1666,45 +1619,6 @@ ctr_object* ctr_slurp_respond_to_and(ctr_object* myself, ctr_argument* argumentL
  * The message ‘obtain‘ can be used to acquire the generated string.
  * The Slurp object is a separate object with minimal messages to avoid
  * ‘message collision‘.
- */
-
-/**
- * [Slurp] obtain
- * 
- * Obtains the string generated using the Slurp object.
- * A Slurp object collects all messages send to it and flushes its buffer while
- * returning the resulting string after an ‘obtain‘ message has been received.
- * 
- * Usage:
- * 
- * Slurp hello world.
- * Pen write: (Slurp obtain).
- * 
- * This will output: ‘hello world‘.
- * Use the Slurp object to integrate verbose shell commands, other programming languages
- * (like SQL) etc into your main program without overusing strings.
- *
- * Note that we can‘t use the = and * unfortunately right now
- * because = is also a method in the main object. While * can be used
- * theoretically, it expects an identifier, and ‘from‘ is not a real
- * identifier, it‘s just another unary message, so instead of using a binary
- * * we simply use a keyword message select: with argument ‘*‘ and then
- * proceed our SQL query with a comma (,) to chain the rest.
- * This is an artifact of the fact that the DSL has to be embedded within
- * the language of Citrine. However even with these restrictions (some of which might be
- * alleviated in future versions) it‘s quite comfortable and readable to interweave
- * an external language in your Citrine script code.
- *
- * Usage:
- *
- * ☞ query ≔ Slurp
- *	select: ‘*‘,
- *	from
- *		users
- *	where
- *		user_id=: 1.
- *
- * #result: select * from users where user_id= 1
  */
 ctr_object* ctr_slurp_obtain( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* commandObj;

@@ -198,7 +198,6 @@ ctr_object* ctr_internal_object_find_property(ctr_object* owner, ctr_object* key
 	return NULL;
 }
 
-
 /**
  * ?internal
  *
@@ -309,7 +308,6 @@ void ctr_internal_object_set_property(ctr_object* owner, ctr_object* key, ctr_ob
 	ctr_internal_object_delete_property(owner, key, is_method);
 	ctr_internal_object_add_property(owner, key, value, is_method);
 }
-
 
 /**
  * ?internal
@@ -1320,7 +1318,6 @@ ctr_object* ctr_send_message(ctr_object* receiverObject, char* message, long vle
 	return result;
 }
 
-
 /**
  * ?internal
  *
@@ -1336,7 +1333,6 @@ ctr_object* ctr_assign_value(ctr_object* key, ctr_object* o) {
 	ctr_set(key, object);
 	return object;
 }
-
 
 /**
  * ?internal
