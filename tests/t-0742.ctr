@@ -1,0 +1,22 @@
+Out write: ['Test object'], stop.
+>> a := Object new. 
+
+a on: ['item:'] do: { :hexhelper
+	own hexhelper := hexhelper. 
+}.
+
+a on: ['item'] do: {
+	<- own hexhelper.
+}.
+
+a item: Hx new.
+
+>> old-hexhelper-address := a item prototype memory-address.
+a save-as: ['/tmp/a.bin'].
+Out write: ['========== RELOADING SNAP:'], stop.
+
+>> b := Object load-from: ['/tmp/a.bin'].
+
+(b item prototype memory-address = old-hexhelper-address) true: {
+	Out write: ['Object link re-attached.'], stop.
+}.
