@@ -166,15 +166,12 @@
 
 #endif
 
-
-
 /**
  * Define basic types for XOScript
  */
 typedef  unsigned int ctr_bool;
-typedef  double       ctr_number;
-typedef  char*        ctr_raw_string;
-
+typedef  double ctr_number;
+typedef  char* ctr_raw_string;
 typedef  size_t ctr_size;
 
 /**
@@ -185,7 +182,6 @@ struct ctr_string {
 	ctr_size vlen;
 };
 typedef struct ctr_string ctr_string;
-
 
 /**
  * Map 
@@ -391,14 +387,14 @@ extern void ctr_cli_welcome();
 /**
  * Lexer functions
  */
-extern void 	ctr_clex_load(char* prg);
-extern int 	ctr_clex_tok();
-extern char*  ctr_clex_code_pointer();
-extern char* 	ctr_clex_tok_value();
-extern long    ctr_clex_tok_value_length();
-extern void 	ctr_clex_putback();
-extern char*	ctr_clex_readstr();
-extern char*   ctr_clex_tok_describe( int token );
+extern void ctr_clex_load(char* prg);
+extern int ctr_clex_tok();
+extern char* ctr_clex_code_pointer();
+extern char* ctr_clex_tok_value();
+extern long ctr_clex_tok_value_length();
+extern void ctr_clex_putback();
+extern char* ctr_clex_readstr();
+extern char* ctr_clex_tok_describe( int token );
 extern char* ctr_clex_keyword_me_icon;
 extern char* ctr_clex_keyword_my_icon;
 extern char* ctr_clex_keyword_var_icon;
@@ -447,7 +443,7 @@ extern ctr_tnode* ctr_cparse_create_node( int type );
 /**
  * Abstract Tree Walker functions
  */
-extern uint64_t    ctr_cwlk_subprogram;
+extern uint64_t ctr_cwlk_subprogram;
 extern ctr_object* ctr_cwlk_run(ctr_tnode* program);
 extern ctr_object* ctr_cwlk_expr(ctr_tnode* node, char* wasReturn);
 
@@ -455,29 +451,29 @@ extern ctr_object* ctr_cwlk_expr(ctr_tnode* node, char* wasReturn);
  * Internal World functions
  */
 extern int ctr_in_message;
-extern void        ctr_initialize_world();
-extern char*       ctr_internal_memmem(char* haystack, long hlen, char* needle, long nlen, int reverse );
-extern void        ctr_internal_object_add_property(ctr_object* owner, ctr_object* key, ctr_object* value, int m);
-extern void        ctr_internal_object_set_property(ctr_object* owner, ctr_object* key, ctr_object* value, int is_method);
-extern void        ctr_internal_object_delete_property(ctr_object* owner, ctr_object* key, int is_method);
+extern void ctr_initialize_world();
+extern char* ctr_internal_memmem(char* haystack, long hlen, char* needle, long nlen, int reverse );
+extern void ctr_internal_object_add_property(ctr_object* owner, ctr_object* key, ctr_object* value, int m);
+extern void ctr_internal_object_set_property(ctr_object* owner, ctr_object* key, ctr_object* value, int is_method);
+extern void ctr_internal_object_delete_property(ctr_object* owner, ctr_object* key, int is_method);
 extern ctr_object* ctr_internal_object_find_property(ctr_object* owner, ctr_object* key, int is_method);
 extern ctr_object* ctr_internal_object_property(ctr_object* owner, char* keystr, ctr_object* value);
 extern double ctr_tonum(ctr_object* o);
 extern char ctr_tobool(ctr_object* o);
-extern uint64_t    ctr_internal_index_hash(ctr_object* key);
-extern void        ctr_internal_object_add_property(ctr_object* owner, ctr_object* key, ctr_object* value, int m);
+extern uint64_t ctr_internal_index_hash(ctr_object* key);
+extern void ctr_internal_object_add_property(ctr_object* owner, ctr_object* key, ctr_object* value, int m);
 extern ctr_object* ctr_internal_cast2bool( ctr_object* o );
 extern ctr_object* ctr_internal_cast2number(ctr_object* o);
 extern ctr_object* ctr_internal_create_object(int type);
 extern ctr_object* ctr_internal_cast2string( ctr_object* o );
 extern ctr_object* ctr_internal_copy2string( ctr_object* o );
-extern void*       ctr_internal_plugin_find( ctr_object* key );
+extern void* ctr_internal_plugin_find( ctr_object* key );
 extern ctr_object* ctr_find(ctr_object* key);
 extern ctr_object* ctr_find_in_my(ctr_object* key);
 extern ctr_object* ctr_assign_value(ctr_object* key, ctr_object* val);
 extern ctr_object* ctr_assign_value_to_my(ctr_object* key, ctr_object* val);
 extern ctr_object* ctr_assign_value_to_local(ctr_object* key, ctr_object* val);
-extern char*       ctr_internal_readf(char* file_name, uint64_t* size_allocated);
+extern char* ctr_internal_readf(char* file_name, uint64_t* size_allocated);
 extern ctr_object* ctr_send_message(ctr_object* receiver, char* message, long len, ctr_argument* argumentList);
 extern void ctr_internal_create_func(ctr_object* o, ctr_object* key, ctr_object* (*func)( ctr_object*, ctr_argument* ) );
 
@@ -899,7 +895,6 @@ extern void ctr_gc_internal_collect();
 extern ctr_object* ctr_gc_internal_pin( ctr_object* object );
 extern ctr_object* ctr_gc_memory(ctr_object* myself, ctr_argument* argumentList);
 
-
 extern void* ctr_heap_allocate( size_t size );
 extern void* ctr_heap_allocate_tracked( size_t size );
 extern void  ctr_heap_free( void* ptr );
@@ -914,7 +909,6 @@ extern ctr_object* ctr_error( const char* error_string, int error_code );
 extern ctr_object* ctr_error_text( char* error_string );
 
 extern char ctr_deserialize_mode;
-
 
 extern char ctr_program_log_type;
 extern void ctr_print_error(char* error, int code);
@@ -937,7 +931,6 @@ extern ctr_object* ctr_int64_lowerThan(ctr_object* myself, ctr_argument* argumen
 extern ctr_object* ctr_int64_higherThan(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_lowerEqThan(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_higherEqThan(ctr_object* myself, ctr_argument* argumentList);
-
 
 extern ctr_object* ctr_hexhelper_new(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_hexhelper_parse(ctr_object* myself, ctr_argument* argumentList);
