@@ -665,18 +665,14 @@ ctr_object* ctr_program_unveil(ctr_object* myself, ctr_argument* argumentList) {
  * @test561
  */
 ctr_object* ctr_program_get_env(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* envVarNameObj;
-	char*       envVarNameStr;
-	char*       envVal;
-	envVarNameObj = ctr_internal_cast2string(argumentList->object);
-	envVarNameStr = ctr_heap_allocate((envVarNameObj->value.svalue->vlen)*sizeof(char));
-	memcpy(envVarNameStr, envVarNameObj->value.svalue->value, envVarNameObj->value.svalue->vlen);
-	*(envVarNameStr + (envVarNameObj->value.svalue->vlen)) = '\0';
+	char* envVarNameStr;
+	char* envVal;
+	envVarNameStr = ctr_heap_allocate_cstring(
+		ctr_internal_cast2string(argumentList->object)
+	);
 	envVal = getenv(envVarNameStr);
-	ctr_heap_free(envVarNameStr );
-	if (envVal == NULL) {
-		return CtrStdNil;
-	}
+	ctr_heap_free(envVarNameStr);
+	if (envVal == NULL) return CtrStdNil;
 	return ctr_build_string_from_cstring(envVal);
 }
 
@@ -687,18 +683,17 @@ ctr_object* ctr_program_get_env(ctr_object* myself, ctr_argument* argumentList) 
  * @test562
  */
 ctr_object* ctr_program_set_env(ctr_object* myself, ctr_argument* argumentList) {
-	ctr_object* envVarNameObj;
-	ctr_object* envValObj;
-	char*       envVarNameStr;
-	char*       envValStr;
-	envVarNameObj = ctr_internal_cast2string(argumentList->object);
-	envValObj = argumentList->next->object;
-	envVarNameStr = ctr_heap_allocate_cstring( envVarNameObj );
-	if (envValObj == CtrStdNil) {
+	char* envVarNameStr;
+	char* envValStr;
+	envVarNameStr = ctr_heap_allocate_cstring(
+		ctr_internal_cast2string(argumentList->object)
+	);
+	if (argumentList->next->object == CtrStdNil) {
 		unsetenv(envVarNameStr);
 	} else {
-		envValObj = ctr_internal_cast2string(envValObj);
-		envValStr = ctr_heap_allocate_cstring( envValObj );
+		envValStr = ctr_heap_allocate_cstring(
+			ctr_internal_cast2string(argumentList->next->object)
+		);
 		setenv(envVarNameStr, envValStr, 1);
 		ctr_heap_free( envValStr );
 	}
