@@ -185,6 +185,7 @@
 #define CTR_DICT_APPLY_TO_INT_SET                "toepassen-int:"
 #define CTR_DICT_MEMORY_ADDRESS                  "geheugenadres"
 #define CTR_DICT_OBJECT_PROTOTYPE                "prototype"
+#define CTR_DICT_VERSION                         "versie"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"

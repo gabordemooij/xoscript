@@ -185,6 +185,7 @@
 #define CTR_DICT_APPLY_TO_INT_SET                "apply-int:"                // Word or phrase to apply a function to an object that is of type Int64
 #define CTR_DICT_MEMORY_ADDRESS                  "memory-address"            // Word or phrase to obtain the address of an object in computer memory
 #define CTR_DICT_OBJECT_PROTOTYPE                "prototype"                 // Word or phrase to obtain the prototype (or parent) object of the current object
+#define CTR_DICT_VERSION                         "version"                   // Word to get the version of recipient
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"                   // Term to invoke pledge command on OpenBSD with argument

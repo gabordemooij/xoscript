@@ -185,6 +185,7 @@
 #define CTR_DICT_APPLY_TO_INT_SET                "применить-int:"
 #define CTR_DICT_MEMORY_ADDRESS                  "адрес-памяти"
 #define CTR_DICT_OBJECT_PROTOTYPE                "прототип"
+#define CTR_DICT_VERSION                         "версия"
 
 /* Section B: System terms & Math (hard to translate) */
 #define CTR_DICT_OBSD_PLEDGE_SET                 "pledge:"
