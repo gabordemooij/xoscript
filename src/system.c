@@ -846,6 +846,18 @@ ctr_object* ctr_program_version_set(ctr_object* myself, ctr_argument* argumentLi
 
 /**
  * @def
+ * [ Program ] version
+ *
+ * @test744
+ */
+ctr_object* ctr_program_version(ctr_object* myself, ctr_argument* argumentList) {
+	ctr_object* clock = ctr_clock_new( CtrStdClock, NULL );
+	((ctr_clock*)clock->value.rvalue->ptr)->time = CtrVersionTime;
+	return clock;
+}
+
+/**
+ * @def
  * [ Program ] feature: [ String ] enable: [ Boolean ]
  *
  * @test666

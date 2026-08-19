@@ -1108,6 +1108,7 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdCommand, CTR_STRINGOBJ( CTR_DICT_STRING ), &ctr_program_tostring );
 	ctr_internal_create_func(CtrStdCommand, CTR_STRINGOBJ( CTR_DICT_PLATFORM ), &ctr_program_platform );
 	ctr_internal_create_func(CtrStdCommand, CTR_STRINGOBJ( CTR_DICT_VERSION_SET ), &ctr_program_version_set);
+	ctr_internal_create_func(CtrStdCommand, CTR_STRINGOBJ( CTR_DICT_VERSION ), &ctr_program_version );
 	ctr_internal_create_func(CtrStdCommand, CTR_STRINGOBJ( CTR_DICT_SHELLESC_SET ), &ctr_program_shell_escape );
 	ctr_internal_create_func(CtrStdCommand, CTR_STRINGOBJ( CTR_DICT_ALARM_SET ), &ctr_program_alarm );
 	ctr_internal_create_func(CtrStdCommand, CTR_STRINGOBJ( CTR_DICT_OBSD_PLEDGE_SET ), &ctr_program_pledge );

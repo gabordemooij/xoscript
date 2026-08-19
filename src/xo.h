@@ -781,6 +781,7 @@ extern ctr_object* ctr_program_test(ctr_object* myself, ctr_argument* argumentLi
 extern ctr_object* ctr_program_object_exists(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_program_object_message_exists(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_program_platform(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_program_version(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_program_version_set(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_program_alarm(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_program_pledge(ctr_object* myself, ctr_argument* argumentList);
