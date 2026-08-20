@@ -984,7 +984,7 @@ ctr_object* ctr_clock_set_time( ctr_object* myself, ctr_argument* argumentList, 
 	date = localtime( &timeStamp );
 	switch( part ) {
 		case 'Y':
-			date->tm_year = ctr_internal_cast2number(argumentList->object)->value.nvalue - 1900;
+			date->tm_year = ctr_tonum(argumentList->object) - 1900;
 			date->tm_mon = 0;
 			date->tm_mday = 1;
 			date->tm_hour = 0;
@@ -992,29 +992,29 @@ ctr_object* ctr_clock_set_time( ctr_object* myself, ctr_argument* argumentList, 
 			date->tm_sec = 0;
 			break;
 		case 'm':
-			date->tm_mon = ctr_internal_cast2number(argumentList->object)->value.nvalue - 1;
+			date->tm_mon = ctr_tonum(argumentList->object) - 1;
 			date->tm_mday = 1;
 			date->tm_hour = 0;
 			date->tm_min = 0;
 			date->tm_sec = 0;
 			break;
 		case 'd':
-			date->tm_mday = ctr_internal_cast2number(argumentList->object)->value.nvalue;
+			date->tm_mday = ctr_tonum(argumentList->object);
 			date->tm_hour = 0;
 			date->tm_min = 0;
 			date->tm_sec = 0;
 			break;
 		case 'H':
-			date->tm_hour = ctr_internal_cast2number(argumentList->object)->value.nvalue;
+			date->tm_hour = ctr_tonum(argumentList->object);
 			date->tm_min = 0;
 			date->tm_sec = 0;
 			break;
 		case 'i':
-			date->tm_min = ctr_internal_cast2number(argumentList->object)->value.nvalue;
+			date->tm_min = ctr_tonum(argumentList->object);
 			date->tm_sec = 0;
 			break;
 		case 's':
-			date->tm_sec = ctr_internal_cast2number(argumentList->object)->value.nvalue;
+			date->tm_sec = ctr_tonum(argumentList->object);
 			break;
 	}
 	date->tm_isdst = -1;
