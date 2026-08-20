@@ -54,7 +54,7 @@ static inline void* aligned_calloc( size_t i, size_t s ) {
  * This function will track the allocated bytes to monitor memory
  * management.
  *
- * @param uintptr_t size memory size
+ * @param size_t size memory size
  *
  * @return void*
  */
@@ -88,12 +88,24 @@ ctr_object* ctr_recycled_objects[MAX_RECYCLE_OBJS];
 size_t ctr_recycled_object_index = 0;
 size_t ctr_recycled_object_max = MAX_RECYCLE_OBJS;
 
+/**
+ * Inits the heap.
+ */
 void ctr_heap_init(void) {
 	if (ctr_mode_memory_profiler) {
 		ctr_recycled_object_max = 0; //disables object recycling
 	}
 }
 
+/**
+ * Recycle an object for use later.
+ * Returns 0 if the object has been registered as recyclable.
+ * Returns 1 if the limit for recyclable objects has been reached.
+ *
+ * @param ctr_object* old
+ *
+ * @return int
+ */
 int ctr_heap_recycle_object(ctr_object* old) {
 	if (ctr_recycled_object_index < ctr_recycled_object_max) {
 		ctr_recycled_objects[ctr_recycled_object_index++] = old;
@@ -102,6 +114,11 @@ int ctr_heap_recycle_object(ctr_object* old) {
 	return 1;
 }
 
+/**
+ * Returns a cleansed, recycled object.
+ *
+ * @return ctr_object*
+ */
 ctr_object* ctr_heap_recycled_object() {
 	if (ctr_recycled_object_index > 0) {
 		ctr_object* r = ctr_recycled_objects[--ctr_recycled_object_index];
@@ -128,6 +145,10 @@ size_t ctr_heap_tracker_memoryblocknumber() {
 /**
  * Rewinds memory block number to a previously stored
  * position, i.e. sequence number.
+ *
+ * @param size_r memory_block_number
+ *
+ * @return size_t
  */
 size_t ctr_heap_tracker_rewind( size_t memoryBlockNumber ) {
 	size_t i;
@@ -142,6 +163,10 @@ size_t ctr_heap_tracker_rewind( size_t memoryBlockNumber ) {
 /**
  * Allocates memory on heap and tracks it for clean-up when
  * the program ends.
+ *
+ * @param size_t size requested size of tracked memory block
+ *
+ * @return void*
  */
 void* ctr_heap_allocate_tracked( size_t size ) {
 	void* space;
@@ -164,6 +189,11 @@ void* ctr_heap_allocate_tracked( size_t size ) {
 /**
  * Reallocates tracked memory on heap.
  * You need to provide a tracking ID.
+ *
+ * @param size_t tracking_id id of memory block
+ * @param size_t size requested size
+ *
+ * @return void*
  */
 void* ctr_heap_reallocate_tracked( size_t tracking_id, size_t size ) {
 	void* space;
@@ -176,6 +206,8 @@ void* ctr_heap_reallocate_tracked( size_t tracking_id, size_t size ) {
 
 /**
  * Returns the latest tracking ID after tracking allocation.
+ *
+ * @return size_t
  */
 size_t ctr_heap_get_latest_tracking_id() {
 	return numberOfMemBlocks - 1;
@@ -207,7 +239,7 @@ void ctr_heap_free_rest() {
  * Frees the memory pointed to by the specified pointer and deducts
  * the specified size from the allocation bookkeepting variable.
  *
- * @param void*     ptr  pointer to memory to be freed
+ * @param void* ptr pointer to memory to be freed
  *
  * @return void
  */
@@ -237,6 +269,10 @@ void ctr_heap_free( void* ptr ) {
 
 /**
  * Obtain the size of the memory block.
+ *
+ * @param void* ptr pointer to memory block to measure
+ *
+ * @return size_t
  */
 size_t ctr_heap_size( void* ptr ) {
 	if (ptr == NULL) {
@@ -260,6 +296,11 @@ size_t ctr_heap_size( void* ptr ) {
  * Given the old pointer, the desired size, the original size and
  * the purpose for allocation, this function will attempt to
  * re-allocate the memory block.
+ *
+ * @param void* oldptr old pointer
+ * @param size_t size requested size
+ *
+ * @return void*
  */
 void* ctr_heap_reallocate(void* oldptr, size_t size ) {
 	char* nptr;
@@ -320,7 +361,7 @@ void* ctr_heap_reallocate(void* oldptr, size_t size ) {
  * Warning: this function 'leaks' memory, you have to ctr_heap_free() it.
  * It will allocate the necessary resources to store the string.
  * To free this memory you'll need to call ctr_heap_free
- * passing the pointer and the number of bytes ( value.svalue->vlen ).
+ * passing the pointer.
  *
  * @note
  * This function removes NULL-bytes from the resulting C-string
