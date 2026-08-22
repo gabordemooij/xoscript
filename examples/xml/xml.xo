@@ -1,0 +1,52 @@
+# Experimental FFI example with LIBXML2
+
+
+>> FFILIB := ['/usr/local/lib/libxml2.so.22.1'].
+
+Out
+write: ['This is an advanced example.'], stop
+write: ['You might need to configure this example first.'], stop
+write: ['Open the xml.xo file and edit FFILIB before testing!'], stop
+write: ( ['Current value is: ~lib '] ~lib: FFILIB ), stop stop.
+
+# write some xml
+File 
+new: ['/tmp/xmltest.xml'],
+write: ['<doc>hello from xml!</doc>'].
+
+# link up the libxml2 (you may need to change the path)
+Server
+link: ( List new ;
+	FFILIB ;
+	['xmlParseFile'] ;
+	( List new ; ['pointer'] ) ; # params
+	['pointer'] ; # returns
+	['XML'] ; # obj
+	['from:'] # msg
+),
+link: ( List new ;
+	None ; # same
+	['xmlDocGetRootElement'] ;
+	( List new ; ['pointer'] ) ; # params
+	['pointer'] ; # returns
+	None ; # same
+	['root-node:'] # msg
+),
+link: ( List new ;
+	None ; # same
+	['xmlNodeGetContent'] ;
+	( List new ; ['pointer'] ) ; # params
+	['pointer'] ; # returns
+	None ; # same
+	['content:'] # msg
+).
+
+>> fname := Blob utf8: ['/tmp/xmltest.xml'].
+>> xmldoc := XML from: fname.
+fname free.
+>> node := XML root-node: xmldoc.
+>> ct := XML content: node.
+# extract from node
+Out write: ct string, stop.
+
+
