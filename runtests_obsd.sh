@@ -104,7 +104,7 @@ unittest() {
 	
 	diff="$(diff -bw /tmp/out3 /tmp/out2)"
 	if [[  $diff != "" ]]; then
-		print "𐄂 test $i"
+		print "[fail] test $i"
 		print $skipcode
 		print "expected:"
 		print "|$expected|"
@@ -123,7 +123,7 @@ unittest() {
 			exit 1
 		fi
 	else
-		print "✓ test $i | $mmode"
+		print "[pass] test $i | $mmode"
 	fi
 
 }

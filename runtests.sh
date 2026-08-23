@@ -92,7 +92,7 @@ unittest() {
 	expected="$(< ../../../tests/exp/en/test${i}en.exp)"
 	diff="$(diff -bBZ /tmp/out ../../../tests/exp/en/test${i}en.exp)"
 	if [[  $diff != "" ]]; then
-		echo "𐄂 test $i"
+		echo "[fail] test $i"
 		echo $skipcode
 		echo "expected:"
 		echo "|$expected|"
@@ -110,7 +110,7 @@ unittest() {
 			exit 1
 		fi
 	else
-		echo "✓ test $i | $mmode"
+		echo "[pass] test $i | $mmode"
 	fi
 }
 
