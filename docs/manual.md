@@ -264,15 +264,15 @@ and start xo by using the following command:
 xo
 ```
 
-To run a Xoscript, store the program as a file by adding -xo
+To run a XOScript, store the program as a file by adding -xo
 suffix (optional). In addition, insert the file name of your program
-after the Xoscript command:
+after the XOScript command:
 
 ```
 xo myprogram.xo
 ```
 
-When you run a Xoscript command while using your program file as a
+When you run a XOScript command while using your program file as a
 parameter, xo will read and execute your program file.
 
 {{note}}
@@ -285,7 +285,7 @@ libraries beforehand.
 {{/warning}}
 
 Tradition dictates that the first program in any new programming
-language should be a kind of salute to the world. In Xoscript, such a
+language should be a kind of salute to the world. In XOScript, such a
 **Hello world** program looks like this:
 
 @test598
@@ -313,12 +313,12 @@ conventions in other programming languages.
 
 ## Syntax 
 
-Xoscript is a *pure* *object-oriented* programming language. This means
+XOScript is a *pure* *object-oriented* programming language. This means
 that xoscript perceives everything to be an object, therefore there are
 no other *data types*. There are essentially three basic routine actions
-in a program that is written in Xoscript: *assigning*, *sending messages*
+in a program that is written in XOScript: *assigning*, *sending messages*
 and *responding*. Exchanging messages between objects is the key part of
-a Xoscript program. The three individual routine actions are illustrated
+a XOScript program. The three individual routine actions are illustrated
 below:
 
 
@@ -331,8 +331,8 @@ keyword message | x from: 0 length: 10.
 answer          | <- answer.  
 
 
-This chapter will give you a general impression of the language Xoscript
-and describes its basic principles. Xoscript is a small language and
+This chapter will give you a general impression of the language XOScript
+and describes its basic principles. XOScript is a small language and
 founded on three actions (see illustration) which translate into
 approximately six grammar rules. That is all it takes to master the
 language.
@@ -344,7 +344,7 @@ introduction to the language. The basic principles will be briefly
 explained and illustrated by several relevant examples. Any missing
 details will be outlined at a later moment.
 
-Comments in Xoscript are prefixed with a \# symbol. So the following line
+Comments in XOScript are prefixed with a \# symbol. So the following line
 will be ignored:
 
 ```
@@ -419,7 +419,7 @@ details consult the chapter Functions.
 
 ## Literals
 
-Xoscript perceives everything to be an object; i.e., all numbers, strings
+XOScript perceives everything to be an object; i.e., all numbers, strings
 and code fragments. Numbers, such as 1, 2, 100, -999 and 1,234 are
 Number objects. All texts between single quotation marks are String
 objects. All code fragments grouped between curly brackets {...} are
@@ -441,7 +441,7 @@ root object of all objects.
 
 ## Messages
 
-Programming in Xoscript basically means
+Programming in XOScript basically means
 sending messages to objects. The general notation to send a message to
 an object is as follows:
 
@@ -502,7 +502,7 @@ In this fragment **+ 2** is first sent to **Number** object **3**, which
 results in Number object **5**, after which **-1** is sent to this
 number. Observant readers are correct to notice the discrepancy which
 this protocol shows regarding the conventional mathematical sequences of
-operators. Xoscript ignores the mathematical sequence in favour of
+operators. XOScript ignores the mathematical sequence in favour of
 consistency in its message system. As a result, the sum:
 
 ```
@@ -534,14 +534,14 @@ Here, two messages are sent to the **String** object: **trim**, followed
 by **upper**.
 
 In the following fragment, the use of a comma is necessary to indicate
-that a new message is incoming. If not, Xoscript will get confused.
+that a new message is incoming. If not, XOScript will get confused.
 
 ```
 Out write: ['Hello!'], stop.
 ```
 
 First, the message **write:** is sent to the pencil symbol followed by
-**stop**. Without the comma, Xoscript would think that you wish to send
+**stop**. Without the comma, XOScript would think that you wish to send
 **stop** to **string** **Hello!**, a futile exercise.
 
 The process sequence of messages is as follows: from left to right;
@@ -553,9 +553,9 @@ below:
 Out write: 0.5 round + (2 - 1), stop.
 ```
 
-Xoscript always reads from left to right: first, the message **write:**
+XOScript always reads from left to right: first, the message **write:**
 is sent to Out and is followed by the **stop** message. Within the
-argument itself, Xoscript reads from left to right, so **0.5 round**
+argument itself, XOScript reads from left to right, so **0.5 round**
 then **+**.
 
 {{note}}
@@ -573,9 +573,9 @@ first, after which **1** is added to the result of **0.5 round** (1).
 The whole process will give the result **2**, which is also the written
 answer. After the comma follows the stop message, which moves the cursor
 to a new line. Of course, the best way to fully comprehend the sequence
-order of Xoscript programs is with practise.
+order of XOScript programs is with practise.
 
-It is worthy to note that in Xoscript, contrary to many other programming
+It is worthy to note that in XOScript, contrary to many other programming
 languages, whitespaces are a fundamental part of its syntax. In
 particular when it comes to binary messages, whitespaces may cause some
 confusion. Always use a whitespace after a binary message. You cannot
@@ -616,7 +616,7 @@ This will not give an error. It will simply print the text **Object**.
 
 ## Control Flow
 
-In Xoscript there is no need for separate grammar rules for *loops* and
+In XOScript there is no need for separate grammar rules for *loops* and
 *ifs*. An if-statement is just a simple **true:** or **false:** message
 to either a **True** object or a **False** object:
 
@@ -685,8 +685,8 @@ number1 kJ ➞ number2 kcal
 ```
 
 This means that **number1** stands for kJ-value and **number2** for
-kcal-value. This is how string interpolation operates in Xoscript. There
-are no separate grammar rules needed for this in Xoscript. Simply send
+kcal-value. This is how string interpolation operates in XOScript. There
+are no separate grammar rules needed for this in XOScript. Simply send
 the word that needs to be replaced to the text with the substitute text
 as argument:
 
@@ -789,7 +789,7 @@ enter a specified year:
 
 There is no need to write the implementation for the message **number**
 again, as it is inherited from the previously written **invoice
-object**; consequently, old code can be reused. Xoscript lacks concepts
+object**; consequently, old code can be reused. XOScript lacks concepts
 such as classes and other related concepts. This means that objects can
 solely inherit from other objects, also known as *prototypical
 inheritance*.
@@ -875,12 +875,12 @@ takes place on the following line:
 >> answer := self + (number x factor).
 ```
 
-Now, how does Xoscript understand that this plus **sign** refers to
+Now, how does XOScript understand that this plus **sign** refers to
 the original logic of addition?** For instance, another interpretation
-could be that Xoscript will repeatedly send the same message to the same
+could be that XOScript will repeatedly send the same message to the same
 object which, in turn, would result into an **endless loop**. Clearly,
 this is not the intention. As soon as you send a message to an object,
-which would execute the exact same code, Xoscript will realise,
+which would execute the exact same code, XOScript will realise,
 in this case, that the underlying, overridden message is meant. So, your
 program will automatically be safeguarded against this form of endless
 loops. However, when it is indeed your aim to run the same function from the
@@ -896,10 +896,10 @@ Number:
 This calls for recursion. In fact, the task that is connected to the
 message **factorial**, needs to be executed again within that function.
 So, it is necessary to invoke the factorial function from within the
-factorial function itself. As a rule, Xoscript will prevent this routine,
+factorial function itself. As a rule, XOScript will prevent this routine,
 because of the risk of ending up in an infinite loop. For this reason,
 it is vital to precede the message by the word **recursive**. This
-is done in order to make Xoscript aware of the fact that it is your
+is done in order to make XOScript aware of the fact that it is your
 intention to execute the same task, and that you did not make mistake.
 
 ## Class-like Objects
@@ -1021,7 +1021,7 @@ case, it is necessary to **override** the message **new**.
 
 If we override the new-message we are basically mimicking a **class**.
 
-The world of Xoscript is filled with a diversity of objects, which are
+The world of XOScript is filled with a diversity of objects, which are
 available to your program right from the start. In the next chapters,
 all of these core objects will be discussed.
 
@@ -1081,7 +1081,7 @@ will receive the None object as an answer in case you ask for a
 list element that does not exist. You could also use the None object
 if you like to declare a variable, but do not want to specify a value
 yet. Instead, you just **assign** the special value **None**. In
-Xoscript it is not allowed to declare a variable without value, such as:
+XOScript it is not allowed to declare a variable without value, such as:
 
 
 ```
@@ -1103,7 +1103,7 @@ Instead, you have to write the following:
 {{messages}}
 
 Contrary to most popular programming languages at the moment of writing,
-Xoscript provides for only one single True object and one single False
+XOScript provides for only one single True object and one single False
 object. To clarify, each time you write, **True** it does not imply that
 a new object has been created. Instead, you always use a reference. This
 means that when you write the following:
@@ -1111,8 +1111,8 @@ means that when you write the following:
 \>\> x := True.
 
 The **x** refers to the **True** object. Conditional code and loops also
-verify this reference. In Xoscript, the meaning of **True** and **False**
-is not fixed. In fact, a Xoscript program gets pretty shaken up over a
+verify this reference. In XOScript, the meaning of **True** and **False**
+is not fixed. In fact, a XOScript program gets pretty shaken up over a
 statement like this:
 
 True := False.
@@ -1152,7 +1152,7 @@ sends **or:** followed by another **or:** (using a chain symbol, i.e. a comma: ,
 {{messages}}
 
 Each time you write a number, for example 9, -10, or 3,12, behind the
-screen, Xoscript will convert these numbers into a **Number** object. You
+screen, XOScript will convert these numbers into a **Number** object. You
 can send messages to this Number object, or you could assign the number
 to a variable and send messages afterwards:
 
@@ -1229,7 +1229,7 @@ rate remains reasonably stable!).
 {{messages}}
 
 Each time a text is placed between **blocks and quotation marks** ['...'] ,
-Xoscript will create a new stringobject for you. However, make
+XOScript will create a new stringobject for you. However, make
 sure to use the correct quotation marks. The quotation mark at the
 beginning of the text differs from the one at the end (this allows you
 to use the single quote without needing to escape it).
@@ -1266,9 +1266,9 @@ string   | ['None']  | ['False']/['True'] | ['n']                 | n/a       | 
 
 ## Copying
 
-Values in Xoscript are always passed **by reference**. In other languages
-it depends on the type of value, in Xoscript there is only one way,
-by reference. Xoscript never makes a copy of a value. To copy an object,
+Values in XOScript are always passed **by reference**. In other languages
+it depends on the type of value, in XOScript there is only one way,
+by reference. XOScript never makes a copy of a value. To copy an object,
 you need to send the message **copy**. 
 
 @test611
@@ -1279,7 +1279,7 @@ object. When working with a loop, something similar occurs:
 
 @test612
 
-In fact, Xoscript **always** uses references, so on **:quantity**
+In fact, XOScript **always** uses references, so on **:quantity**
 the above-illustrated loop also indicates the reference to the element
 in the list.
 
@@ -1326,8 +1326,8 @@ following example:
 
 ## Implicit Conversion
 
-Xoscript uses **implicit conversion** to convert objects. To print a
-list on screen, Xoscript will, for example, send the message
+XOScript uses **implicit conversion** to convert objects. To print a
+list on screen, XOScript will, for example, send the message
 *string* internally to the list. This can proof very useful, in
 case you would like to print a list as a comma-separated list. The
 message *string* can be overwritten: 
@@ -1443,7 +1443,7 @@ Out write: mistake.
 
 ## Injecting values
 
-Xoscript provides for tasks the option to inject values. Now, have a look
+XOScript provides for tasks the option to inject values. Now, have a look
 at the task below:
 
 ```
@@ -1467,7 +1467,7 @@ Task objects.
 ## Empty Functions
 
 Empty tasks are not allowed. In theory an empty task would look like
-this: **{}**, however Xoscript perceives this as a language error. If you
+this: **{}**, however XOScript perceives this as a language error. If you
 like to declare an empty task, you can use the None object:
 
 ```
@@ -1490,7 +1490,7 @@ In fact this is the same as:
 Because the object **None** does not recognise the message **start**, it
 will return itself as answer, leaving the answer once again **None**.
 So, there is no necessity to have an empty task. Due to the elegant
-design of the programming language Xoscript, you can simply use the None
+design of the programming language XOScript, you can simply use the None
 object for this.
 
 ## Dynamic Scoping
@@ -1514,7 +1514,7 @@ To illustrate this principle:
 {{messages}}
 
 The object named **Object** is the root object of all objects in
-Xoscript and provides core language features. 
+XOScript and provides core language features. 
 
 The most frequently sent message
 is **on:do:**, which expands the functionalities of an object. This
@@ -1556,7 +1556,7 @@ sent via a variable. To do so, you use the message
 
 {{messages}}
 
-Xoscript knows two types of collections: *lists* and *dicts*.
+XOScript knows two types of collections: *lists* and *dicts*.
 **Lists** are enumerations of objects in a *fixed order*. Dicts have
 no order, instead, resemble a legenda involving a key (or term) and its
 corresponding value. Lists are comparable to arrays (PHP, Java, C)
@@ -1631,7 +1631,7 @@ x pop.
 ```
 
 However, this is rather unpractical, in particular when you need to
-delete more than two elements. Therefore, Xoscript offers an
+delete more than two elements. Therefore, XOScript offers an
 alternative message structure for these kinds of situations. In
 **alternative** message structures, the answers of objects are ignored
 and you will get the receiving object back as answer, time and again.
@@ -1727,7 +1727,7 @@ use of FFI through the server plugin or a separate IO plugin.
 
 {{messages}}
 
-For a structured representation of time and date, Xoscript uses the
+For a structured representation of time and date, XOScript uses the
 **Moment** object. In case a new Moment object is printed on screen, the
 current date and time are shown:
 
@@ -1799,10 +1799,10 @@ code package under src/plugins/example.
 ## Reflection
 
 There are various ways for system
-exploring during program execution. Xoscript holds a couple of methods to
+exploring during program execution. XOScript holds a couple of methods to
 detect which objects are present and to which messages these objects
 respond. Firstly, each object can be asked what **type** it is,
-however types in Xoscript are malleable and therefore unreliable.
+however types in XOScript are malleable and therefore unreliable.
 
 It is also possible to ask the Program object if a
 given object is already present in the program:
@@ -2362,7 +2362,7 @@ where X can be 8, 16, 32, or 64.
 
 These types refer to the number of bytes required to store the data. For printf, we are linking to a
 new object called Printf and the message template:number:. You translate the external
-function into the Xoscript dialect before using it. The message template:number: expects a
+function into the XOScript dialect before using it. The message template:number: expects a
 buffer with the template text as its first parameter. We create this buffer using a Blob object, which
 allows you to manually allocate memory. You are responsible for freeing this memory afterward
 with the free message.
@@ -2582,7 +2582,7 @@ Original English manual translation and editing: Bernadette Peeters
 
 New manual (English): Gabor de Mooij and the xoscript community
 
-Xoscript makes use of the following open source projects
+XOScript makes use of the following open source projects
 and I would like to express my gratitude towards these projects
 by listing them here:
 
