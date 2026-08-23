@@ -93,7 +93,7 @@ unittest() {
 
 	skipcode=$(head -n1 ../../../tests/t-$1.ctr)
 	if [[ "$skipcode" == "#Linux" ]]; then
-		echo "SKIP Linux-only test"
+		print "SKIP Linux-only test"
 		return
 	fi
 	code="$(< ../../../tests/t-$i.ctr)"
@@ -104,26 +104,26 @@ unittest() {
 	
 	diff="$(diff -bw /tmp/out3 /tmp/out2)"
 	if [[  $diff != "" ]]; then
-		echo "𐄂 test $i"
-		echo $skipcode
-		echo "expected:"
-		echo "|$expected|"
-		echo "observed:"
-		echo "|$observed|"
-		echo "diff:"
+		print "𐄂 test $i"
+		print $skipcode
+		print "expected:"
+		print "|$expected|"
+		print "observed:"
+		print "|$observed|"
+		print "diff:"
 		diff -bw ../../../tests/exp/en/test${i}en.exp /tmp/out
-		echo "code:"
-		echo $code
+		print "code:"
+		print $code
 		printf "save new test result? (y/n)"
 		read answer
 		if [[ $answer == "y" ]]; then
 			cat /tmp/out > ../../../tests/exp/en/test${i}en.exp
-			echo "recorded."
+			print "recorded."
 		else
 			exit 1
 		fi
 	else
-		echo "✓ test $i | $mmode"
+		print "✓ test $i | $mmode"
 	fi
 
 }
