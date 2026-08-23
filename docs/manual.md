@@ -1783,13 +1783,17 @@ Hello World
 
 ## Modules/Plugins
 
-The world of Xoscript can be expanded with new system objects, by
+The world of XOScript can be expanded with new system objects, by
 installing modules . A new system object can be added to the world of
-Xoscript by placing the module file (usually a file with the suffix .so
-or .dll) into the mods folder. 
+XOScript by placing the module file (usually a file with the suffix .so
+) into the mods folder. 
 
 When you send a message to the object that is made available through the
-plugin module, it will be automatically loaded by Xoscript.
+plugin module, it will be automatically loaded by XOScript.
+
+You can also write plugins yourself. Plugins are written in the
+C Programming Language. You can find an example plugin in the source
+code package under src/plugins/example.
 
 
 ## Reflection
