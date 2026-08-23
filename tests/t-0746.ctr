@@ -1,0 +1,29 @@
+Out write: ['Test object'], stop.
+>> a := Object new. 
+
+a on: ['item:'] do: { :dict
+	own dict := dict. 
+}.
+
+a on: ['item'] do: {
+	<- own dict.
+}.
+
+a item: (
+Dict new
+	hello: ['world'],
+	world: (Dict new put: ['a'] at: ['b'])).
+
+Out write: a item, stop.
+
+>> old-dict-address := a item prototype memory-address.
+a save-as: ['/tmp/a.bin'].
+Out write: ['========== RELOADING SNAP:'], stop.
+
+>> b := Object load-from: ['/tmp/a.bin'].
+
+(b item prototype memory-address = old-dict-address) true: {
+	Out write: ['Object link re-attached.'], stop.
+}.
+
+Out write: b item, stop.

@@ -1882,6 +1882,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 			&& obj->link != CtrStdOctHelper
 			&& obj->link != CtrStdHexHelper
 			&& obj->link != CtrStdMap
+			&& obj->link != CtrStdNumber
 		) {
 			ctr_dumper_dump_object(obj->link);
 		} else {
@@ -1993,7 +1994,11 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_DICT;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
-		}
+		} else if (pointer == CtrStdNumber) {
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_NUM;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			continue;
+		}		
 		//replace pointer with id
 		int found_address = 0;
 		while(needle) {
@@ -2036,7 +2041,7 @@ ctr_object* ctr_object_dump( ctr_object* myself, ctr_argument* argumentList ) {
 }
 
 /* Lookup table for ID -> pointer */
-static void* ctr_dumper_map_id2ptr[14] = {
+static void* ctr_dumper_map_id2ptr[15] = {
 	[0] = 0,
 	[CTR_WIREABLE_KNOWN_BLOCK] = &CtrStdBlock,
 	[CTR_WIREABLE_KNOWN_STRING] = &CtrStdString,
@@ -2049,6 +2054,7 @@ static void* ctr_dumper_map_id2ptr[14] = {
 	[CTR_WIREABLE_KNOWN_OCTHELPER] = &CtrStdOctHelper,
 	[CTR_WIREABLE_KNOWN_HEXHELPER] = &CtrStdHexHelper,
 	[CTR_WIREABLE_KNOWN_DICT] = &CtrStdMap,
+	[CTR_WIREABLE_KNOWN_NUM] = &CtrStdNumber,
 };
 
 ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
