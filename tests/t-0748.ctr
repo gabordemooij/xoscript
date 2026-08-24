@@ -1,0 +1,26 @@
+Out write: ['Test object'], stop.
+>> a := Object new. 
+
+a on: ['item:'] do: { :bool
+	own bool := bool. 
+}.
+
+a on: ['item'] do: {
+	<- own bool.
+}.
+
+a item: True.
+
+Out write: a item, stop.
+
+>> old-bool-address := a item prototype memory-address.
+a save-as: ['/tmp/a.bin'].
+Out write: ['========== RELOADING SNAP:'], stop.
+
+>> b := Object load-from: ['/tmp/a.bin'].
+
+(b item prototype memory-address = old-bool-address) true: {
+	Out write: ['Object link re-attached.'], stop.
+}.
+
+Out write: b item, stop.
