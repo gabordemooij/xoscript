@@ -54,13 +54,6 @@ int ctr_clex_nil_len = 0;
 char* ivarname;
 int ivarlen;
 
-// Windows XP and maybe some other OSes cannot handle UTF-8 with issspace
-// they report certain chars like × to be white space, which is incorrect
-// and will result in parsing errors.
-int _isspace(char c) {
-	return (c == ' ' || c == '\t' || c == '\r' || c == '\n');
-}
-
 /**
  * Lexer - is Symbol Delimiter ?
  * Determines whether the specified symbol is a delimiter.
@@ -238,7 +231,7 @@ int ctr_clex_tok() {
 	i = 0;
 	c = *ctr_code;
 	for(;;) {
-		while(ctr_code != ctr_eofcode && (_isspace(c))) {
+		while(ctr_code != ctr_eofcode && (isspace(c))) {
 			if (c == '\n') ctr_clex_line_number++;
 			ctr_code ++;
 			c = *ctr_code;
