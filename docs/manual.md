@@ -2,25 +2,50 @@
 
 {{messages}}
 
-Welcome to xoscript. xoscript is a simple scripting language (for server-side
-scripting). Simple does not mean easy. Those two concepts are often
-confused.
 
-For instance, although with xoscript you can just drop an .xo
-file on your server and execute it with your browser, you still
-have to configure your server to handle these files (or let
-somebody else do this for you). 
+Welcome to XOScript
+The XOScript project aims to create a scripting language that is simple and auditable.
+Simple does not necessarily mean easy.
+A familiar programming language may be easier to use than XOScript.
+Here, simplicity means something different:
+being able to form a complete mental model of the language and its behavior.
 
-That being said, xoscript *is
-actually very simple* as a language. It only has about 5 syntax rules:
-assign, message, function, return and chain (to send multiple messages).
-That's it. Any software developer should be able to learn the basics
-within minutes. This manual is somewhat extensive because it covers
-every little detail, but in essence the manual is quite short compared
-to many other programming languages.
+XOScript is designed to fit in your head.
+Its grammar and number of concepts are deliberately small.
+There are no classes; objects can be extended directly.
+Objects are passed by reference, copying is explicit,
+and functions have a single exit point.
+
+Some of these choices differ significantly from mainstream languages.
+XOScript has no type system, for example, and uses dynamic scoping.
+Messages that cannot be handled are ignored rather than producing an exception.
+These choices have consequences and are not intended to eliminate errors.
+They are intended to keep the language's underlying model small and consistent.
+
+XOScript can also be localized, making it possible to express business
+rules in a natural language and potentially share them with non-technical stakeholders.
+
+Auditability means applying the same philosophy to the implementation.
+The runtime is written in C, with a small handwritten lexer, parser, and tree walker.
+The standard library and runtime largely mirror the structure of the language,
+making the relationship between XOScript code and its implementation relatively direct.
+
+Tests are also closely connected to the documentation.
+Each method should have an associated test that can be incorporated into the manual,
+helping keep the documentation in sync with the implementation.
+
+XOScript is not intended to compete with mainstream languages on
+features or familiarity. It explores a different goal:
+a programming environment that a developer can understand as a whole.
+
+The hope is that a small language and a small
+implementation make it practical to understand software
+from byte to object, from syntax to runtime, and to write code with
+confidence because you understand both what happens in
+the script and what happens under the hood.
 
 The architecture of a xoscript server setup
-is also very simple, yet flexible.
+is simple, yet flexible.
 
 {{architecture.png}}
 
