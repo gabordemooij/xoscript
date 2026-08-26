@@ -43,6 +43,7 @@
 /**
  * Backward compatibility table
  */
+#define CTR_VERSION_19930101 725846400
 #define CTR_VERSION_20250729 1753777732
 #define CTR_VERSION_20260216 1771282716
 

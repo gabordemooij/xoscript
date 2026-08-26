@@ -838,6 +838,10 @@ ctr_object* ctr_program_version_set(ctr_object* myself, ctr_argument* argumentLi
 	time_t stamp = ctr_tonum( ctr_clock_time( argumentList->object, NULL ) );
 	CtrVersionTime = stamp;
 	// Select features based upon timestamp
+	if (CtrVersionTime < CTR_VERSION_19930101) {
+		ctr_error("That would require a time machine!", 0);
+		return CtrStdNil;
+	}
 	if (CtrVersionTime < CTR_VERSION_20260216) {
 		CtrFeatureFlagRecursiveStrIntPol = 1;
 	}
