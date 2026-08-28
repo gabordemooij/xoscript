@@ -770,10 +770,6 @@ extern ctr_object* ctr_program_get_env(ctr_object* myself, ctr_argument* argumen
 extern ctr_object* ctr_program_set_env(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_program_exit(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_program_flush(ctr_object* myself, ctr_argument* ctr_argumentList);
-extern ctr_object* ctr_program_forbid_shell(ctr_object* myself, ctr_argument* ctr_argumentList);
-extern ctr_object* ctr_program_forbid_file_write(ctr_object* myself, ctr_argument* ctr_argumentList);
-extern ctr_object* ctr_program_forbid_file_read(ctr_object* myself, ctr_argument* ctr_argumentList);
-extern ctr_object* ctr_program_forbid_include(ctr_object* myself, ctr_argument* ctr_argumentList);
 extern ctr_object* ctr_program_shell_escape(ctr_object* myself, ctr_argument* ctr_argumentList);
 extern ctr_object* ctr_program_countdown(ctr_object* myself, ctr_argument* ctr_argumentList);
 extern ctr_object* ctr_program_err(ctr_object* myself, ctr_argument* argumentList );
