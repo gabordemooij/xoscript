@@ -1,7 +1,5 @@
 #!/bin/bash
-#set -x
-#set -v
-ulimit -S -c unlimited
+ulimit -S -c unlimited # allow core dumps (unlike on obsd!)
 
 CITRINE_MEMORY_LIMIT_MB=10
 export CITRINE_MEMORY_LIMIT_MB

@@ -1,6 +1,4 @@
 #!/bin/ksh
-#set -x
-#set -v
 ulimit -c 0 # avoid core dumps bc pledge/unveil
 
 # set malloc in security audit mode
