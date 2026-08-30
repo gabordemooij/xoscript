@@ -56,7 +56,6 @@ setup3() {
 unittest() {
 	i=$1
 	mmode=$2
-	os=$3
 	CITRINE_MEMORY_MODE=$mmode
 	export CITRINE_MEMORY_MODE
 	if ((

@@ -12,7 +12,13 @@ PLATFORMCODE="obsd"
 export PLATFORMCODE
 
 BUILD="${1:-build}"
+MULTILANG="${2:-single}"
 
+if [[ $MULTILANG == "multi" ]]; then
+set -A LANGS es nl en
+else
+set -A LANGS en
+fi
 
 declare -A server_plugin_name
 server_plugin_name[es]="servidor"
@@ -21,7 +27,7 @@ server_plugin_name[nl]="server"
 
 if [[ $BUILD == "build" ]]; then
 LDFLAGS='-shared'
-for ISO in "en"; #en last (=base)
+for ISO in ${LANGS[@]}; 
 do
 export ISO
 make clean
@@ -123,7 +129,6 @@ unittest() {
 	else
 		print "[pass] test $i | $mmode"
 	fi
-
 }
 
 # select range

@@ -6,8 +6,8 @@
 OS=$(uname)
 if [ "$OS" = "OpenBSD" ]; then
 	# Run tests on OpenBSD
-	./misc/xotest/runtests_obsd.sh
+	./misc/xotest/runtests_obsd.sh "$@"
 else
 	# Run tests on Linux
-	./misc/xotest/runtests.sh
+	./misc/xotest/runtests.sh $1 "$@"
 fi
