@@ -73,9 +73,6 @@ uint8_t ctr_clex_is_delimiter( char* code ) {
 	if (strncmp(code, CTR_DICT_ASSIGN, ctr_clex_keyword_assignment_len) == 0) {
 		return 1;
 	}
-	if (strncmp(code, ":=", ctr_clex_keyword_assignment_len) == 0) {
-		return 1;
-	}
 	if (strncmp(code, CTR_DICT_MESSAGE_CHAIN, ctr_clex_keyword_chain_len) == 0 ) {
 		return 1;
 	}
