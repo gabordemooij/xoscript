@@ -76,14 +76,14 @@ void ctr_coretest_tokens() {
 	
 	ctr_test(token == CTR_TOKEN_RET);
 	ctr_test(strlen(ctr_clex_tok_value())==0);
-	ctr_test(strcmp(ctr_clex_tok_describe(token),"↲")==0);
+	ctr_test(strcmp(ctr_clex_tok_describe(token),CTR_DICT_RETURN)==0);
 	sprintf( buffer, "%s", CTR_DICT_ASSIGN );
 	ctr_clex_load( buffer );
 	
 	token = ctr_clex_tok();
 	ctr_test(token == CTR_TOKEN_ASSIGNMENT);
 	ctr_test(strlen(ctr_clex_tok_value())==0);
-	ctr_test(strcmp(ctr_clex_tok_describe(token),"≔")==0);
+	ctr_test(strcmp(ctr_clex_tok_describe(token),CTR_DICT_ASSIGN)==0);
 	ctr_program_length = 0;
 	ctr_clex_load( buffer );
 	token = ctr_clex_tok();

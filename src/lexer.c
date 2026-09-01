@@ -17,25 +17,6 @@ int ctr_clex_older_line_number = 0;
 int ctr_clex_number_of_lines = 0;
 char ctr_clex_param_prefix_char;
 
-char* ctr_clex_desc_tok_ref = "reference";
-char* ctr_clex_desc_tok_quote = "'";
-char* ctr_clex_desc_tok_number = "number";
-char* ctr_clex_desc_tok_paropen = "(";
-char* ctr_clex_desc_tok_parclose = ")";
-char* ctr_clex_desc_tok_blockopen = "{";
-char* ctr_clex_desc_tok_blockclose = "}";
-char* ctr_clex_desc_tok_colon = ":";
-char* ctr_clex_desc_tok_dot = ".";
-char* ctr_clex_desc_tok_chain = ",";
-char* ctr_clex_desc_tok_booleanyes = "True";
-char* ctr_clex_desc_tok_booleanno = "False";
-char* ctr_clex_desc_tok_nil = "Nil";
-char* ctr_clex_desc_tok_assignment = "≔";
-
-char* ctr_clex_desc_tok_ret_unicode = "↲";
-char* ctr_clex_desc_tok_fin = "end of program";
-char* ctr_clex_desc_tok_unknown = "(unknown token)";
-
 char* ctr_clex_keyword_me_icon;
 char* ctr_clex_keyword_my_icon;
 char* ctr_clex_keyword_var_icon;
@@ -126,65 +107,33 @@ char* ctr_clex_tok_value() {
 	return ctr_clex_buffer;
 }
 
+char* ctr_token_descriptions[] = {
+	[CTR_TOKEN_RET] = CTR_DICT_RETURN,
+	[CTR_TOKEN_ASSIGNMENT] = CTR_DICT_ASSIGN,
+	[CTR_TOKEN_BLOCKCLOSE] = CTR_DICT_BLOCK_END,
+	[CTR_TOKEN_BLOCKOPEN] = CTR_DICT_BLOCK_START,
+	[CTR_TOKEN_BOOLEANNO] = CTR_DICT_FALSE_OBJECT,
+	[CTR_TOKEN_BOOLEANYES] = CTR_DICT_TRUE_OBJECT,
+	[CTR_TOKEN_CHAIN] = CTR_DICT_MESSAGE_CHAIN,
+	[CTR_TOKEN_COLON] = CTR_DICT_PARAMETER_PREFIX,
+	[CTR_TOKEN_DOT] = CTR_DICT_END_OF_LINE,
+	[CTR_TOKEN_FIN] = "end of program",
+	[CTR_TOKEN_NIL] = CTR_DICT_NIL_OBJECT,
+	[CTR_TOKEN_NUMBER] = CTR_DICT_NUMBER_OBJECT,
+	[CTR_TOKEN_PARCLOSE] = CTR_DICT_PAREN_CLOSE,
+	[CTR_TOKEN_PAROPEN] = CTR_DICT_PAREN_OPEN,
+	[CTR_TOKEN_QUOTE] = CTR_DICT_QUOT_OPEN,
+	[CTR_TOKEN_REF] = "reference",
+};
+
 /**
  * CTRLexerTokenDescribe
  *
  * Returns a pointer to a string describing the token.
  */
 char* ctr_clex_tok_describe(int token) {
-	char* description;
-	switch(token) {
-		case CTR_TOKEN_RET:
-			description = ctr_clex_desc_tok_ret_unicode;
-			break;
-		case CTR_TOKEN_ASSIGNMENT:
-			description = ctr_clex_desc_tok_assignment;
-			break;
-		case CTR_TOKEN_BLOCKCLOSE:
-			description = ctr_clex_desc_tok_blockclose;
-			break;
-		case CTR_TOKEN_BLOCKOPEN:
-			description = ctr_clex_desc_tok_blockopen;
-			break;
-		case CTR_TOKEN_BOOLEANNO:
-			description = ctr_clex_desc_tok_booleanno;
-			break;
-		case CTR_TOKEN_BOOLEANYES:
-			description = ctr_clex_desc_tok_booleanyes;
-			break;
-		case CTR_TOKEN_CHAIN:
-			description = ctr_clex_desc_tok_chain;
-			break;
-		case CTR_TOKEN_COLON:
-			description = ctr_clex_desc_tok_colon;
-			break;
-		case CTR_TOKEN_DOT:
-			description = ctr_clex_desc_tok_dot;
-			break;
-		case CTR_TOKEN_FIN:
-			description = ctr_clex_desc_tok_fin;
-			break;
-		case CTR_TOKEN_NIL:
-			description = ctr_clex_desc_tok_nil;
-			break;
-		case CTR_TOKEN_NUMBER:
-			description = ctr_clex_desc_tok_number;
-			break;
-		case CTR_TOKEN_PARCLOSE:
-			description = ctr_clex_desc_tok_parclose;
-			break;
-		case CTR_TOKEN_PAROPEN:
-			description = ctr_clex_desc_tok_paropen;
-			break;
-		case CTR_TOKEN_QUOTE:
-			description = ctr_clex_desc_tok_quote;
-			break;
-		case CTR_TOKEN_REF:
-			description = ctr_clex_desc_tok_ref;
-			break;
-		default:
-			description = ctr_clex_desc_tok_unknown;
-	}
+	char* description = ctr_token_descriptions[token];
+	if (description==NULL) return "unknown token";
 	return description;
 }
 
