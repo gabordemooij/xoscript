@@ -238,8 +238,6 @@
 #define CTR_DICT_LESS_OR_EQUAL_SYMBOL            "≤"
 #define CTR_DICT_UNEQUALS_SYMBOL                 "≠"
 #define CTR_DICT_END_OF_LINE                     "."
-#define CTR_DICT_NUM_DEC_SEP                     "."
-#define CTR_DICT_NUM_THO_SEP                     ","
 #define CTR_DICT_QUOT_OPEN                       "['"
 #define CTR_DICT_QUOT_CLOSE                      "']"
 #define CTR_DICT_MESSAGE_CHAIN                   ","

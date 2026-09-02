@@ -251,7 +251,7 @@ int ctr_clex_tok() {
 		if (
 		((ctr_code+ctr_clex_keyword_num_sep_dec_len+1) <= ctr_eofcode) &&
 		isdigit(*(ctr_code+ctr_clex_keyword_num_sep_dec_len)) &&
-		strncmp(ctr_code,CTR_DICT_NUM_DEC_SEP,ctr_clex_keyword_num_sep_dec_len)==0) {
+		*ctr_code=='.') {
 			ctr_clex_buffer[i] = '.'; ctr_clex_tokvlen++;
 			i++;
 			if (i >= ctr_clex_bflmt) {

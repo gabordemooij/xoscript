@@ -238,8 +238,6 @@
 #define CTR_DICT_LESS_OR_EQUAL_SYMBOL            "≤"                         // Non-ASCII symbol for less or equal comparisons (ASCII equivalent is provided by default) (binary message, must be exactly 1 UTF8-codepoint)
 #define CTR_DICT_UNEQUALS_SYMBOL                 "≠"                         // Non-ASCII symbol for unequality in comparisons (ASCII equivalent is provided by default) (binary message, must be exactly 1 UTF8-codepoint)
 #define CTR_DICT_END_OF_LINE                     "."                         // End of line marker
-#define CTR_DICT_NUM_DEC_SEP                     "."                         // Symbol to use as decimal separator
-#define CTR_DICT_NUM_THO_SEP                     ","                         // Symbol to use as thousands separator
 #define CTR_DICT_QUOT_OPEN                       "['"                        // Start of literal string
 #define CTR_DICT_QUOT_CLOSE                      "']"                        // End of a literal string
 #define CTR_DICT_MESSAGE_CHAIN                   ","                         // Symbol to use for chaining multiple keyword messages, must be exactly 1 byte
