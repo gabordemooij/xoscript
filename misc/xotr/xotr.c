@@ -21,7 +21,7 @@ ctr_size ctr_clex_keyword_chain_len;
 extern char* ctr_code_start;
 int ctr_clex_ignore_modes = 0;
 
-extern int ctr_clex_tok_value_length();
+extern long ctr_clex_tok_value_length(void);
 
 void* ctr_heap_allocate_tracked(size_t size) {
 	return calloc(size, 1);
@@ -618,7 +618,7 @@ char* ctr_translate_string(char* codePointer, ctr_dict* dictionary) {
 	e = ctr_clex_code_pointer();
 	fwrite(p, ((e - ctr_clex_keyword_qo_len) - p),1, stdout);
 	s = ctr_clex_readstr();
-	l = ctr_clex_tok_value_length(s);
+	l = ctr_clex_tok_value_length();
 	e = ctr_clex_code_pointer();
 	ctr_translate_translate(CTR_DICT_QUOT_OPEN,ctr_clex_keyword_qo_len,dictionary,'t',NULL);
 	/* Strings larger than 100 bytes cannot be translated */
