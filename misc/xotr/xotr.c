@@ -13,8 +13,6 @@ char* ctr_mode_dict_file;
 char* ctr_mode_hfile1;
 char* ctr_mode_hfile2;
 ctr_size ctr_clex_keyword_eol_len;
-ctr_size ctr_clex_keyword_num_sep_dec_len;
-ctr_size ctr_clex_keyword_num_sep_tho_len;
 ctr_size ctr_clex_keyword_assignment_len;
 ctr_size ctr_clex_keyword_return_len;
 ctr_size ctr_clex_keyword_chain_len;
@@ -128,15 +126,15 @@ int ctr_clex_forward_scan(char* e, ctr_size* newCodePointer) {
 		//Are we still inside a part of a number?
 		if (number && !isdigit(*(e+i)) &&
 			!(
-			(e+i+ctr_clex_keyword_num_sep_dec_len+1)<ctr_eofcode &&
-			strncmp((e+i),CTR_DICT_NUM_DEC_SEP, ctr_clex_keyword_num_sep_dec_len)==0 &&
-			isdigit(*(e+i+ctr_clex_keyword_num_sep_dec_len+1))
+			(e+i+1+1)<ctr_eofcode &&
+			strncmp((e+i),".", 1)==0 &&
+			isdigit(*(e+i+1+1))
 			)
 			&&
 			!(
-			(e+i+ctr_clex_keyword_num_sep_tho_len+1)<ctr_eofcode &&
-			strncmp((e+i),CTR_DICT_NUM_THO_SEP, ctr_clex_keyword_num_sep_tho_len)==0 &&
-			isdigit(*(e+i+ctr_clex_keyword_num_sep_tho_len+1))
+			(e+i+1+1)<ctr_eofcode &&
+			strncmp((e+i),",", 1)==0 &&
+			isdigit(*(e+i+1+1))
 			)
 		) { 
 			number = 0;
@@ -212,8 +210,6 @@ int ctr_init() {
 	ctr_clex_keyword_var_icon_len = strlen( ctr_clex_keyword_var_icon );
 	ctr_clex_keyword_eol_len = strlen( CTR_DICT_END_OF_LINE );
 	ctr_clex_keyword_chain_len = strlen( CTR_DICT_MESSAGE_CHAIN );
-	ctr_clex_keyword_num_sep_dec_len = strlen( CTR_DICT_NUM_DEC_SEP );
-	ctr_clex_keyword_num_sep_tho_len = strlen( CTR_DICT_NUM_THO_SEP );
 	ctr_clex_keyword_qo_len = strlen( CTR_DICT_QUOT_OPEN );
 	ctr_clex_keyword_qc_len = strlen( CTR_DICT_QUOT_CLOSE );
 	ctr_clex_keyword_assignment_len = strlen( CTR_DICT_ASSIGN );
@@ -264,9 +260,6 @@ struct ctr_note {
 typedef struct ctr_note ctr_note;
 ctr_note* previousNote = NULL;
 ctr_note* firstNote = NULL;
-
-ctr_dict* ctr_trans_d;
-ctr_dict* ctr_trans_x;
 
 /**
  * Creates a note and attached it to the specified pointer.
@@ -446,8 +439,6 @@ ctr_dict* ctr_translate_load_dictionary() {
 	char* translation = calloc(5000, 1);
 	char* buffer;
 	char* format;
-	ctr_trans_d = NULL;
-	ctr_trans_x = NULL;
 	ctr_dict* startdict = NULL;
 	ctr_dict* entry = NULL;
 	ctr_dict* previousEntry = NULL;
@@ -488,14 +479,6 @@ ctr_dict* ctr_translate_load_dictionary() {
 		entry->translation = calloc( entry->translationLength, 1 );
 		memcpy(entry->word, word, entry->wordLength);
 		memcpy(entry->translation, translation, entry->translationLength);
-		if (translationType == 'd') {
-			ctr_trans_d = entry;
-			continue;
-		}
-		if (translationType == 'x') {
-			ctr_trans_x = entry;
-			continue;
-		}
 		if (strncmp(entry->word, CTR_DICT_PARAMETER_PREFIX,1)==0) {
 			ctr_clex_param_prefix_char_translation = entry->translation[0];
 		}
@@ -529,14 +512,6 @@ ctr_dict* ctr_translate_load_dictionary() {
 		}
 	}
 	fclose(file);
-	if (ctr_trans_d == NULL) {
-		printf("No decimal separator found in dictionary, please add entry for type d.\n");
-		exit(1);
-	}
-	if (ctr_trans_x == NULL) {
-		printf("No thousands separator found in dictionary, please add entry for type x.\n");
-		exit(1);
-	}
 	return previousEntry;
 }
 
@@ -759,17 +734,17 @@ char* ctr_translate_number(char* codePointer) {
 	p = codePointer;
 	e = ctr_clex_code_pointer();
 	while( p < e ) {
-		if ( ctr_trans_d->wordLength <= (ctr_size) ( e - p ) ) {
-			if ( strncmp( ctr_trans_d->word, p, ctr_trans_d->wordLength ) == 0 ) {
-				fwrite(ctr_trans_d->translation, ctr_trans_d->translationLength,1,stdout);
-				p += ctr_trans_d->wordLength;
+		if ( 1 <= (ctr_size) ( e - p ) ) {
+			if ( strncmp( ".", p, 1 ) == 0 ) {
+				fwrite(".", 1,1,stdout);
+				p += 1;
 				continue;
 			}
 		}
-		if ( ctr_trans_x->wordLength <= (ctr_size) ( e - p ) ) {
-			if ( strncmp( ctr_trans_x->word, p, ctr_trans_x->wordLength ) == 0 ) {
-				fwrite(ctr_trans_x->translation, ctr_trans_x->translationLength,1,stdout);
-				p += ctr_trans_x->wordLength;
+		if ( 1 <= (ctr_size) ( e - p ) ) {
+			if ( strncmp( ",", p, 1 ) == 0 ) {
+				fwrite(",", 1,1,stdout);
+				p += 1;
 				continue;
 			}
 		}

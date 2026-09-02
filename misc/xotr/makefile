@@ -12,7 +12,6 @@ all: xotr
 
 xotr:
 	cc  ../../src/lexer.c xotr.c -I ../../src/i18n/en -I ../../src -o xotr
-	
 
 clean:
 	rm  xotr
