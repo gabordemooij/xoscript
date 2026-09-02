@@ -5,7 +5,6 @@ char** ctr_argv;
 
 char* ctr_mode_input_file;
 ctr_size ctr_clex_keyword_eol_len;
-ctr_size ctr_clex_keyword_num_sep_dec_len;
 ctr_size ctr_clex_keyword_assignment_len;
 ctr_size ctr_clex_keyword_return_len;
 ctr_size ctr_clex_keyword_chain_len;
@@ -61,7 +60,6 @@ int ctr_init() {
 	ctr_clex_keyword_var_icon_len = strlen( ctr_clex_keyword_var_icon );
 	ctr_clex_keyword_eol_len = strlen( CTR_DICT_END_OF_LINE );
 	ctr_clex_keyword_chain_len = strlen( CTR_DICT_MESSAGE_CHAIN );
-	ctr_clex_keyword_num_sep_dec_len = strlen( "." );
 	ctr_clex_keyword_qo_len = strlen( CTR_DICT_QUOT_OPEN );
 	ctr_clex_keyword_qc_len = strlen( CTR_DICT_QUOT_CLOSE );
 	ctr_clex_keyword_assignment_len = strlen( CTR_DICT_ASSIGN );

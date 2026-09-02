@@ -249,8 +249,8 @@ int ctr_clex_tok() {
 		}
 		//Parse decimal separator (turn into international symbol .)
 		if (
-		((ctr_code+ctr_clex_keyword_num_sep_dec_len+1) <= ctr_eofcode) &&
-		isdigit(*(ctr_code+ctr_clex_keyword_num_sep_dec_len)) &&
+		((ctr_code+1+1) <= ctr_eofcode) &&
+		isdigit(*(ctr_code+1)) &&
 		*ctr_code=='.') {
 			ctr_clex_buffer[i] = '.'; ctr_clex_tokvlen++;
 			i++;
