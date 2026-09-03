@@ -104,6 +104,12 @@
 				<property name="label">
 					<xsl:value-of select="@text"/>
 				</property>
+				<property name="active">
+					<xsl:choose>
+						<xsl:when test="@checked">true</xsl:when>
+						<xsl:otherwise>false</xsl:otherwise>
+					</xsl:choose>
+				</property>
 			</object>
 		</child>
 	</xsl:template>
