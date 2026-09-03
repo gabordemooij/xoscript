@@ -1855,7 +1855,9 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 	if (
 	obj == CtrStdBoolTrue 
 	|| obj == CtrStdBoolFalse
-	|| obj == CtrStdNil) return;
+	|| obj == CtrStdNil
+	|| obj == CtrStdBool
+	) return;
 	ctr_wireable* w = wirelist_current;
 	w->next = NULL;
 	w->type = CTR_WIREABLE_TYPE_OBJ;
@@ -1894,6 +1896,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 			&& obj->link != CtrStdBoolTrue
 			&& obj->link != CtrStdBoolFalse
 			&& obj->link != CtrStdNil
+			&& obj->link != CtrStdBool
 		) {
 			ctr_dumper_dump_object(obj->link);
 		} else {
@@ -2021,6 +2024,10 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_NONE;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
+		} else if (pointer == CtrStdBool) {
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_BOOL;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			continue;
 		}
 		//replace pointer with id
 		int found_address = 0;
@@ -2064,7 +2071,7 @@ ctr_object* ctr_object_dump( ctr_object* myself, ctr_argument* argumentList ) {
 }
 
 /* Lookup table for ID -> pointer */
-static void* ctr_dumper_map_id2ptr[18] = {
+static void* ctr_dumper_map_id2ptr[19] = {
 	[0] = 0,
 	[CTR_WIREABLE_KNOWN_BLOCK] = &CtrStdBlock,
 	[CTR_WIREABLE_KNOWN_STRING] = &CtrStdString,
@@ -2081,6 +2088,7 @@ static void* ctr_dumper_map_id2ptr[18] = {
 	[CTR_WIREABLE_KNOWN_TRUE] = &CtrStdBoolTrue,
 	[CTR_WIREABLE_KNOWN_FALSE] = &CtrStdBoolFalse,
 	[CTR_WIREABLE_KNOWN_NONE] = &CtrStdNil,
+	[CTR_WIREABLE_KNOWN_BOOL] = & CtrStdBool,
 };
 
 ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
