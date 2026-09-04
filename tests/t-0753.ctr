@@ -1,0 +1,26 @@
+Out write: ['Test object'], stop.
+>> a := Object new. 
+
+a on: ['item:'] do: { :fmt
+	own fmt := fmt. 
+}.
+
+a on: ['item'] do: {
+	<- own fmt.
+}.
+
+a item: ( Format new: ['|%s|'] ).
+
+Out write: a item, stop.
+
+>> old-fmt-address := a item prototype memory-address.
+a save-as: ['/tmp/a.bin'].
+Out write: ['========== RELOADING SNAP:'], stop.
+
+>> b := Object load-from: ['/tmp/a.bin'].
+
+(b item prototype memory-address = old-fmt-address) true: {
+	Out write: ['Object link re-attached.'], stop.
+}.
+
+Out write: ( b item apply: ['hello'] ), stop.

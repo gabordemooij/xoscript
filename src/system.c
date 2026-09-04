@@ -1897,6 +1897,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 			&& obj->link != CtrStdBoolFalse
 			&& obj->link != CtrStdNil
 			&& obj->link != CtrStdBool
+			&& obj->link != CtrStdFormat
 		) {
 			ctr_dumper_dump_object(obj->link);
 		} else {
@@ -2028,6 +2029,10 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_BOOL;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
+		} else if (pointer == CtrStdFormat) {
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_FORMAT;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			continue;
 		}
 		//replace pointer with id
 		int found_address = 0;
@@ -2088,7 +2093,8 @@ static void* ctr_dumper_map_id2ptr[19] = {
 	[CTR_WIREABLE_KNOWN_TRUE] = &CtrStdBoolTrue,
 	[CTR_WIREABLE_KNOWN_FALSE] = &CtrStdBoolFalse,
 	[CTR_WIREABLE_KNOWN_NONE] = &CtrStdNil,
-	[CTR_WIREABLE_KNOWN_BOOL] = & CtrStdBool,
+	[CTR_WIREABLE_KNOWN_BOOL] = &CtrStdBool,
+	[CTR_WIREABLE_KNOWN_FORMAT] = &CtrStdFormat
 };
 
 ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {

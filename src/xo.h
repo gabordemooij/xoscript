@@ -170,6 +170,7 @@
 #define CTR_WIREABLE_KNOWN_FALSE 14
 #define CTR_WIREABLE_KNOWN_NONE 15
 #define CTR_WIREABLE_KNOWN_BOOL 16
+#define CTR_WIREABLE_KNOWN_FORMAT 17
 
 #endif
 
@@ -361,6 +362,7 @@ extern ctr_object* CtrStdINT64;
 extern ctr_object* CtrStdBinHelper;
 extern ctr_object* CtrStdOctHelper;
 extern ctr_object* CtrStdHexHelper;
+extern ctr_object* CtrStdFormat;
 extern ctr_object* ctr_first_object;
 extern ctr_object* ctr_gc_watch_object; // for debug purposes
 extern int ctr_gc_clean_free; // for debug purposes
