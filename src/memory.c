@@ -36,6 +36,22 @@ static inline void* aligned_calloc( size_t i, size_t s ) {
 }
 
 /**
+ * Toggle Tracked Objects Mode
+ *
+ * Sets the tracked objects flag to 0 or 1.
+ * If tracked objects is set to 0, heap_free
+ * checks if the address is in tracked space before
+ * freeing. Otherwise this leads to double frees() because
+ * tracked space is not managed by GC, but by the memory tracker.
+ *
+ * @param int toggle
+ */
+static int tracked_objects = 0;
+void ctr_heap_set_tracked_objects(int toggle) {
+	tracked_objects = toggle;
+}
+
+/**
  * Heap allocate raw memory
  * Allocates a slice of memory having the specified size in bytes.
  * The memory will be zeroed (calloc is used).
@@ -107,7 +123,7 @@ void ctr_heap_init(void) {
  * @return int
  */
 int ctr_heap_recycle_object(ctr_object* old) {
-	if (ctr_recycled_object_index < ctr_recycled_object_max) {
+	if (!ctr_heap_is_tracked((void*)old) && ctr_recycled_object_index < ctr_recycled_object_max) {
 		ctr_recycled_objects[ctr_recycled_object_index++] = old;
 		return 0;
 	}
@@ -218,6 +234,7 @@ size_t ctr_heap_get_latest_tracking_id() {
  */
 void ctr_heap_free_rest() {
 	size_t i;
+	ctr_heap_set_tracked_objects(0);
 	for ( i = 0; i < numberOfMemBlocks; i ++) {
 		ctr_heap_free( memBlocks[i].space );
 	}
@@ -232,6 +249,28 @@ void ctr_heap_free_rest() {
 	}
 }
 
+/**
+ * Heap pointer is tracked?
+ *
+ * Returns 0 if heap pointer is NULL,
+ * there are no objects in tracked memory space 
+ * or the heap pointer is not in tracked space.
+ * Returns 1 otherwise.
+ *
+ * @param void* ptr
+ *
+ * @return int
+ */
+int ctr_heap_is_tracked(void* ptr) {
+	if (ptr == NULL) return 0;
+	if (!tracked_objects) return 0;
+	for ( int i = 0; i < numberOfMemBlocks; i ++) {
+		if (ptr >= memBlocks[i].space && ptr <= memBlocks[i].space + memBlocks[i].size ) {
+			return 1;
+		}
+	}
+	return 0;
+}
 
 /**
  * Heap free memory
@@ -246,6 +285,7 @@ void ctr_heap_free_rest() {
 int ctr_gc_clean_free = 0;
 void ctr_heap_free( void* ptr ) {
 	if (ptr == NULL) return;
+	if (ctr_heap_is_tracked(ptr)) return;
 	size_t* block_width;
 	size_t q = sizeof( size_t );
 	size_t size;
