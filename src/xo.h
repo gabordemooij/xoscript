@@ -153,6 +153,7 @@
 #define CTR_WIREABLE_TYPE_ARR 8
 #define CTR_WIREABLE_TYPE_ELEMS 9
 #define CTR_WIREABLE_TYPE_TIME 10
+#define CTR_WIREABLE_TYPE_TIMERESOURCE 11
 
 #define CTR_WIREABLE_KNOWN_BLOCK 1
 #define CTR_WIREABLE_KNOWN_ROOT 2
@@ -171,6 +172,7 @@
 #define CTR_WIREABLE_KNOWN_NONE 15
 #define CTR_WIREABLE_KNOWN_BOOL 16
 #define CTR_WIREABLE_KNOWN_FORMAT 17
+#define CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR 18
 
 #endif
 
@@ -483,6 +485,8 @@ extern ctr_object* ctr_send_message(ctr_object* receiver, char* message, long le
 extern void ctr_internal_create_func(ctr_object* o, ctr_object* key, ctr_object* (*func)( ctr_object*, ctr_argument* ) );
 
 extern void ctr_heap_init(void);
+extern int ctr_heap_is_tracked(void* ptr);
+extern void ctr_heap_set_tracked_objects(int toggle);
 extern int ctr_heap_recycle_object(ctr_object* old);
 extern ctr_object* ctr_heap_recycled_object();
 

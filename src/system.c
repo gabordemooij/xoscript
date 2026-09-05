@@ -1713,6 +1713,26 @@ void ctr_dump_dump_clock(ctr_clock* clock) {
 	ctr_wireable_add(w);
 }
 
+void ctr_dump_dump_clock_resource(ctr_resource* resource) {
+	ctr_wireable* w = wirelist_current;
+	w->next = NULL;
+	w->memblock = (void*) (((char*) resource) - sizeof(size_t));
+	w->memsize = *((size_t*)w->memblock);
+	w->type = CTR_WIREABLE_TYPE_TIMERESOURCE;
+	w->id = CtrWireableID;
+	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
+	w->address = (uintptr_t) resource;
+	w->numofpointers = 2;
+	w->pointers[0] = offsetof(ctr_resource, ptr);
+	w->pointers[1] = offsetof(ctr_resource, destructor);
+	w->next = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
+	wirelist_current = w->next;
+	ctr_wireable_add(w);
+	if (resource->ptr) {
+		ctr_dump_dump_clock(resource->ptr);
+	}
+}
+
 void ctr_dumper_dump_str(ctr_string* str) {
 	ctr_wireable* w = wirelist_current;
 	w->next = NULL;
@@ -1918,7 +1938,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 	}
 	else if (obj->info.type == CTR_OBJECT_TYPE_OTEX) {
 		if (obj->value.rvalue && obj->value.rvalue->type == CTR_OBJECT_RESOURCE_TIME) {
-			ctr_dump_dump_clock((ctr_clock*)obj->value.rvalue);
+			ctr_dump_dump_clock_resource((ctr_resource*)obj->value.rvalue);
 		}
 		//@todo check if rvalue is null -> if not throw error
 		//i.e. cant snapshot active resources like DB connections etc.
@@ -2034,6 +2054,10 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_FORMAT;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
+		} else if (pointer == ctr_internal_destructor_clock) {
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			continue;
 		}
 		//replace pointer with id
 		int found_address = 0;
@@ -2077,7 +2101,7 @@ ctr_object* ctr_object_dump( ctr_object* myself, ctr_argument* argumentList ) {
 }
 
 /* Lookup table for ID -> pointer */
-static void* ctr_dumper_map_id2ptr[19] = {
+static void* ctr_dumper_map_id2ptr[20] = {
 	[0] = 0,
 	[CTR_WIREABLE_KNOWN_BLOCK] = &CtrStdBlock,
 	[CTR_WIREABLE_KNOWN_STRING] = &CtrStdString,
@@ -2095,7 +2119,8 @@ static void* ctr_dumper_map_id2ptr[19] = {
 	[CTR_WIREABLE_KNOWN_FALSE] = &CtrStdBoolFalse,
 	[CTR_WIREABLE_KNOWN_NONE] = &CtrStdNil,
 	[CTR_WIREABLE_KNOWN_BOOL] = &CtrStdBool,
-	[CTR_WIREABLE_KNOWN_FORMAT] = &CtrStdFormat
+	[CTR_WIREABLE_KNOWN_FORMAT] = &CtrStdFormat,
+	[CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR] = &ctr_internal_destructor_clock
 };
 
 ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
@@ -2152,6 +2177,10 @@ ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 				if (old == 0x0) {
 					*xpointer = 0;
 				} else if (old < 0x1000) {
+					if (old == CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR) {
+						*xpointer = (uintptr_t) ctr_internal_destructor_clock;
+						continue;
+					}
 					*xpointer = (uintptr_t) *( (ctr_object**) ctr_dumper_map_id2ptr[old] );
 				} else {
 					*xpointer = (uintptr_t) (char*) ( old - 0x1000 + blob + sizeof(ctr_wireable) + sizeof(size_t) );
@@ -2164,6 +2193,11 @@ ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 			ctr_mapitem* item = (ctr_mapitem*) memblock;
 			*(rehashes + (rehash_index++)) = item;
 		}
+		if (w->type == CTR_WIREABLE_TYPE_OBJ) {
+			ctr_object* o = (ctr_object*) memblock;
+			o->gnext = ctr_first_object;
+			ctr_first_object = o;
+		}
 		if (!entry) {
 			entry = (ctr_object*) ((char*)data + sizeof(size_t));
 		}
@@ -2175,8 +2209,9 @@ ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 	fclose(f);
 	ctr_heap_free((void*)rehashes);
 	if (entry) {
+		ctr_heap_set_tracked_objects(1);
 		return entry;
-	}	
+	}
 	return CtrStdNil;
 }
 #endif
