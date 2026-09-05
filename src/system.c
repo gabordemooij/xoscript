@@ -1857,6 +1857,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 	|| obj == CtrStdBoolFalse
 	|| obj == CtrStdNil
 	|| obj == CtrStdBool
+	|| obj == CtrStdConsole
 	) return;
 	ctr_wireable* w = wirelist_current;
 	w->next = NULL;

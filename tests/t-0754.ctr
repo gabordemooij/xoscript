@@ -1,0 +1,31 @@
+Out write: ['Test object'], stop.
+>> a := Object new. 
+
+a on: ['item:'] do: { :out
+	own out := out. 
+}.
+
+a on: ['item'] do: {
+	<- own out.
+}.
+
+a on: ['greet'] do: {
+	Out write: ['hi from original out!'], stop.
+}.
+
+a item: Out.
+
+Out write: a item, stop.
+
+>> old-out-address := a item prototype memory-address.
+a save-as: ['/tmp/a.bin'].
+Out write: ['========== RELOADING SNAP:'], stop.
+
+>> b := Object load-from: ['/tmp/a.bin'].
+
+(b item prototype memory-address = old-out-address) true: {
+	Out write: ['Object link re-attached.'], stop.
+}.
+
+b item write: ['hello from loaded out!'], stop.
+b greet.
