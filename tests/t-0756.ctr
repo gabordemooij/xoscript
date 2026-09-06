@@ -1,0 +1,17 @@
+Out write: ['Test object'], stop.
+>> greeter := Object new.
+greeter on: ['name:'] do: { :name
+	own xname := name. 
+}.
+greeter on: ['greet'] do: {
+	Out write: ['Hello '] + own xname, stop.
+}.
+greeter name: ['Sherlock'].
+greeter save-as: ['/tmp/a.bin'].
+greeter save-as: ['/tmp/b.bin'].
+Out write: ['========== RELOADING SNAP:'], stop.
+>> b := Object load-from: ['/tmp/a.bin'].
+>> c := Object load-from: ['/tmp/b.bin'].
+b greet.
+b name: ['Watson'], greet.
+c name: ['Moriarty'], greet.
