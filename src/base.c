@@ -2370,9 +2370,9 @@ ctr_object* ctr_int64_init(ctr_object* myself) {
 
 /**
  * @def
- * [ Int64 ] from-string: [ String ]
+ * [ Int64 ] new
  *
- * @test627
+ * @test757
  */
 ctr_object* ctr_int64_new(ctr_object* myclass, ctr_argument* argumentList) {
 	ctr_object* i64;
@@ -2382,6 +2382,12 @@ ctr_object* ctr_int64_new(ctr_object* myclass, ctr_argument* argumentList) {
 	return i64;
 }
 
+/**
+ * @def
+ * [ Int64 ] from-string: [ String ]
+ *
+ * @test627
+ */
 ctr_object* ctr_int64_from_string(ctr_object* myself, ctr_argument* argumentList) {
 	char *endptr;
 	errno = 0;
