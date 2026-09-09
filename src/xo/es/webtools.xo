@@ -158,6 +158,24 @@ Documento-Web al: ['salida:tipo:'] hacer: { :salida :tipo
 			Cabezera-HTTP crear
 			clave: ['Content-type'] valor: tipo
 		).
+		mi cabezeras cada: { :_ :cabezera
+			Salida escribir: cabezera.
+		}.
+		mi cabezeras-salida := Verdadero.
+		Salida escribir: ['\n'].
+	}.
+	Salida escribir: salida.
+}.
+
+Documento-Web al: ['finalizar:tipo:'] hacer: { :salida :tipo
+	mi cabezeras-salida falso: {
+		mi datos-sesión ¿nulo? falso: {
+			mi controlador-sesión salvar: mi datos-sesión.
+		}.
+		mi cabezeras adjuntar: (
+			Cabezera-HTTP crear
+			clave: ['Content-type'] valor: tipo
+		).
 		mi cabezeras adjuntar: (
 			Cabezera-HTTP crear
 			clave: ['Content-Length'] valor: salida texto bytes
@@ -171,10 +189,12 @@ Documento-Web al: ['salida:tipo:'] hacer: { :salida :tipo
 	Salida escribir: salida.
 }.
 
-
-
 Documento-Web al: ['salida:'] hacer: { :salida
 	yo salida: salida tipo: ['text/html; charset=utf-8'].
+}.
+
+Documento-Web al: ['finalizar:'] hacer: { :salida
+	yo finalizar: salida tipo: ['text/html; charset=utf-8'].
 }.
 
 Documento-Web al: ['json:'] hacer: { :salida

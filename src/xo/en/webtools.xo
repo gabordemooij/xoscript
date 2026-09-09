@@ -163,6 +163,24 @@ Web-Document on: ['out:type:'] do: { :output :type
 			HTTP-Header new
 			key: ['Content-type'] value: type
 		).
+		own headers each: { :_ :header
+			Out write: header.
+		}.
+		own headers-out := True.
+		Out write: ['\r\n'].
+	}.
+	Out write: output.
+}.
+
+Web-Document on: ['finish:type:'] do: { :output :type
+	own headers-out false: {
+		own sessdata None? false: {
+			own session-manager save: own sessdata.
+		}.
+		own headers append: (
+			HTTP-Header new
+			key: ['Content-type'] value: type
+		).
 		own headers append: (
 			HTTP-Header new
 			key: ['Content-Length'] value: output string bytes
@@ -176,10 +194,12 @@ Web-Document on: ['out:type:'] do: { :output :type
 	Out write: output.
 }.
 
-
-
 Web-Document on: ['out:'] do: { :output
 	self out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document on: ['finish:'] do: { :output
+	self finish: output type: ['text/html; charset=utf-8'].
 }.
 
 Web-Document on: ['json:'] do: { :output
