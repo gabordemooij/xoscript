@@ -13,7 +13,7 @@
 				<property name="default-width">
 					<xsl:value-of select="html/body/@width"/>
 				</property>
-				  <property name="default-height">
+				<property name="default-height">
 					<xsl:value-of select="html/body/@height"/>
 				</property>
 				<child>
@@ -33,16 +33,31 @@
 			</style>
 		</xsl:if>
 	</xsl:template>
+	<xsl:template name="gtk-id">
+		<xsl:attribute name="id">
+			<xsl:choose>
+				<xsl:when test="@id">
+					<xsl:value-of select="@id"/>
+				</xsl:when>
+				<xsl:when test="@name = 'submit' and @value">
+					<xsl:value-of select="@value"/>
+				</xsl:when>
+				<xsl:when test="@name">
+					<xsl:value-of select="@name"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>item_</xsl:text>
+					<xsl:number count="*" level="any"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:attribute>
+	</xsl:template>
 	<!-- FORM -->
 	<xsl:template match="form">
 		<xsl:call-template name="gtk-style"/>
 		<child>
 			<object class="GtkBox">
-				<xsl:if test="@id">
-					<xsl:attribute name="id">
-						<xsl:value-of select="@id"/>
-					</xsl:attribute>
-				</xsl:if>
+				<xsl:call-template name="gtk-id"/>
 				<property name="orientation">vertical</property>
 				<property name="spacing">6</property>
 				<xsl:apply-templates/>
@@ -53,6 +68,7 @@
 	<xsl:template match="div">
 		<child>
 			<object class="GtkBox">
+				<xsl:call-template name="gtk-id"/>
 				<property name="orientation">horizontal</property>
 				<property name="spacing">4</property>
 				<xsl:apply-templates/>
@@ -63,6 +79,7 @@
 	<xsl:template match="label">
 		<child>
 			<object class="GtkLabel">
+				<xsl:call-template name="gtk-id"/>
 				<property name="label">
 					<xsl:value-of select="@text"/>
 				</property>
@@ -75,9 +92,10 @@
 		<xsl:call-template name="gtk-style"/>
 		<child>
 			<object class="GtkEntry">
-				<xsl:attribute name="id">
-					<xsl:value-of select="@id"/>
-				</xsl:attribute>
+				<xsl:call-template name="gtk-id"/>
+				<property name="text">
+					<xsl:value-of select="@value"/>
+				</property>
 			</object>
 		</child>
 	</xsl:template>
@@ -86,9 +104,7 @@
 		<xsl:call-template name="gtk-style"/>
 		<child>
 			<object class="GtkEntry">
-				<xsl:attribute name="id">
-					<xsl:value-of select="@id"/>
-				</xsl:attribute>
+				<xsl:call-template name="gtk-id"/>
 				<property name="visibility">False</property>
 			</object>
 		</child>
@@ -98,9 +114,7 @@
 		<xsl:call-template name="gtk-style"/>
 		<child>
 			<object class="GtkCheckButton">
-				<xsl:attribute name="id">
-					<xsl:value-of select="@id"/>
-				</xsl:attribute>
+				<xsl:call-template name="gtk-id"/>
 				<property name="label">
 					<xsl:value-of select="@text"/>
 				</property>
@@ -118,9 +132,7 @@
 		<xsl:call-template name="gtk-style"/>
 		<child>
 			<object class="GtkCheckButton">
-				<xsl:attribute name="id">
-					<xsl:value-of select="@id"/>
-				</xsl:attribute>
+				<xsl:call-template name="gtk-id"/>
 				<property name="label">
 					<xsl:value-of select="@text"/>
 				</property>
@@ -138,15 +150,15 @@
 		<xsl:call-template name="gtk-style"/>
 		<child>
 			<object class="GtkButton">
-				<xsl:attribute name="id">
-					<xsl:value-of select="@id"/>
-				</xsl:attribute>
+				<xsl:call-template name="gtk-id"/>
 				<property name="label">
-					<xsl:value-of select="@text"/>
+					<xsl:value-of select="."/>
 				</property>
-				<property name="name">
-					<xsl:value-of select="@name"/>
-				</property>
+				<xsl:if test="@name">
+					<property name="name">
+						<xsl:value-of select="@value"/>
+					</property>
+				</xsl:if>
 				<xsl:if test="@width">
 				<property name="halign">start</property>
 				<property name="width-request">100</property>
@@ -159,6 +171,7 @@
 		<xsl:call-template name="gtk-style"/>
 		<child>
 			<object class="GtkImage">
+				<xsl:call-template name="gtk-id"/>
 				<property name="file">
 					<xsl:value-of select="@src"/>
 				</property>
@@ -170,11 +183,7 @@
 		<xsl:call-template name="gtk-style"/>
 		<child>
 			<object class="GtkGrid">
-				<xsl:if test="@id">
-					<xsl:attribute name="id">
-						<xsl:value-of select="@id"/>
-					</xsl:attribute>
-				</xsl:if>
+				<xsl:call-template name="gtk-id"/>
 				<property name="row-spacing">4</property>
 				<property name="column-spacing">8</property>
 				<xsl:apply-templates select="tr"/>
@@ -238,7 +247,8 @@
 	<xsl:template match="text()[normalize-space()]">
 	<child>
 		<object class="GtkLabel">
-		<property name="label">
+			<xsl:call-template name="gtk-id"/>
+			<property name="label">
 				<xsl:value-of select="normalize-space(.)"/>
 			</property>
 			<property name="xalign">0</property>
