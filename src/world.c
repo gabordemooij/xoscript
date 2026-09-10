@@ -880,9 +880,13 @@ void ctr_initialize_world() {
 	CtrStdINT64 = ctr_int64_new(CtrStdObject, NULL);
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ(CTR_DICT_NEW), &ctr_int64_new );
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ(CTR_DICT_FROM_STRING_SET), &ctr_int64_from_string );
+	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ( CTR_DICT_DIVIDER_SET ), &ctr_int64_div );
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ("/"), &ctr_int64_divide );
+	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ( CTR_DICT_MULTIPLIER_SET ), &ctr_int64_mul );
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ("*"), &ctr_int64_multiply );
+	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ( CTR_DICT_ADD_SET ), &ctr_int64_inc );
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ("+"), &ctr_int64_add );
+	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ( CTR_DICT_SUBTRACT_SET ), &ctr_int64_dec );
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ("-"), &ctr_int64_minus );
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ("="), &ctr_int64_equal );
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ("!=:"), &ctr_int64_unequal );

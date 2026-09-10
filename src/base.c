@@ -1016,7 +1016,7 @@ ctr_object* ctr_number_divide(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
- * [ Number ] divide by: [ Number ]
+ * [ Number ] divide-by: [ Number ]
  *
  * @test436
  */
@@ -2372,7 +2372,7 @@ ctr_object* ctr_int64_init(ctr_object* myself) {
  * @def
  * [ Int64 ] new
  *
- * @test757
+ * @test761
  */
 ctr_object* ctr_int64_new(ctr_object* myclass, ctr_argument* argumentList) {
 	ctr_object* i64;
@@ -2434,7 +2434,12 @@ ctr_object* ctr_int64_to_string(ctr_object* myself, ctr_argument* argumentList) 
 	int64_t otherINT64 = *((int64_t*)other->value.rvalue->ptr);\
 	int64_t myINT64 = *((int64_t*)myself->value.rvalue->ptr);\
 
-
+/**
+ * @def
+ * [ Int64 ] / [ Int64 ]
+ *
+ * @test765
+ */
 ctr_object* ctr_int64_divide(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	if (otherINT64 == 0) {
@@ -2447,6 +2452,28 @@ ctr_object* ctr_int64_divide(ctr_object* myself, ctr_argument* argumentList) {
 	return result;
 }
 
+/**
+ * @def
+ * [ Int64 ] divide-by: [ Int64 ]
+ *
+ * @test760
+ */
+ctr_object* ctr_int64_div(ctr_object* myself, ctr_argument* argumentList) {
+	CTR_TYPECHECK_INT64();
+	if (otherINT64 == 0) {
+		ctr_error("Division by zero", 0);
+		return CtrStdNil;
+	}
+	*((int64_t*)myself->value.rvalue->ptr) /= otherINT64;
+	return myself;
+}
+
+/**
+ * @def
+ * [ Int64 ] * [ Int64 ]
+ *
+ * @test764
+ */
 ctr_object* ctr_int64_multiply(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	int64_t resultINT64 = myINT64 * otherINT64;
@@ -2455,6 +2482,24 @@ ctr_object* ctr_int64_multiply(ctr_object* myself, ctr_argument* argumentList) {
 	return result;
 }
 
+/**
+ * @def
+ * [ Int64 ] multiply-by: [ Int64 ]
+ *
+ * @test759
+ */
+ctr_object* ctr_int64_mul(ctr_object* myself, ctr_argument* argumentList) {
+	CTR_TYPECHECK_INT64();
+	*((int64_t*)myself->value.rvalue->ptr) *= otherINT64;
+	return myself;
+}
+
+/**
+ * @def
+ * [ Int64 ] + [ Int64 ]
+ *
+ * @test762
+ */
 ctr_object* ctr_int64_add(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	int64_t resultINT64 = myINT64 + otherINT64;
@@ -2463,6 +2508,24 @@ ctr_object* ctr_int64_add(ctr_object* myself, ctr_argument* argumentList) {
 	return result;
 }
 
+/**
+ * @def
+ * [ Int64 ] add: [ Int64 ]
+ *
+ * @test757
+ */
+ctr_object* ctr_int64_inc(ctr_object* myself, ctr_argument* argumentList) {
+	CTR_TYPECHECK_INT64();
+	*((int64_t*)myself->value.rvalue->ptr) += otherINT64;
+	return myself;
+}
+
+/**
+ * @def
+ * [ Int64 ] - [ Int64 ]
+ *
+ * @test763
+ */
 ctr_object* ctr_int64_minus(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	int64_t resultINT64 = myINT64 - otherINT64;
@@ -2471,31 +2534,79 @@ ctr_object* ctr_int64_minus(ctr_object* myself, ctr_argument* argumentList) {
 	return result;
 }
 
+/**
+ * @def
+ * [ Int64 ] subtract: [ Int64 ]
+ *
+ * @test758
+ */
+ctr_object* ctr_int64_dec(ctr_object* myself, ctr_argument* argumentList) {
+	CTR_TYPECHECK_INT64();
+	*((int64_t*)myself->value.rvalue->ptr) -= otherINT64;
+	return myself;
+}
+
+/**
+ * @def
+ * [ Int64 ] = [ Int64 ]
+ *
+ * @test771
+ */
 ctr_object* ctr_int64_equal(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(otherINT64 == myINT64);
 }
 
+/**
+ * @def
+ * [ Int64 ] !=: [ Int64 ]
+ *
+ * @test770
+ */
 ctr_object* ctr_int64_unequal(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(otherINT64 != myINT64);
 }
 
+/**
+ * @def
+ * [ Int64 ] < [ Int64 ]
+ *
+ * @test769
+ */
 ctr_object* ctr_int64_lowerThan(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(myINT64 < otherINT64);
 }
 
+/**
+ * @def
+ * [ Int64 ] > [ Int64 ]
+ *
+ * @test768
+ */
 ctr_object* ctr_int64_higherThan(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(myINT64 > otherINT64);
 }
 
+/**
+ * @def
+ * [ Int64 ] <=: [ Int64 ]
+ *
+ * @test767
+ */
 ctr_object* ctr_int64_lowerEqThan(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(myINT64 <= otherINT64);
 }
 
+/**
+ * @def
+ * [ Int64 ] >=: [ Int64 ]
+ *
+ * @test766
+ */
 ctr_object* ctr_int64_higherEqThan(ctr_object* myself, ctr_argument* argumentList) {
 	CTR_TYPECHECK_INT64();
 	return ctr_build_bool(myINT64 >= otherINT64);

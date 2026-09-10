@@ -927,9 +927,13 @@ extern ctr_object* ctr_int64_new(ctr_object* myself, ctr_argument* argumentList)
 extern ctr_object* ctr_int64_from_string(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_to_string(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_divide(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_div(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_multiply(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_mul(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_minus(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_dec(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_add(ctr_object* myself, ctr_argument* argumentList);
+extern ctr_object* ctr_int64_inc(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_modulo(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_equal(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_unequal(ctr_object* myself, ctr_argument* argumentList);
