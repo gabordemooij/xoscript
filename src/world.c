@@ -882,6 +882,8 @@ void ctr_initialize_world() {
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ(CTR_DICT_FROM_STRING_SET), &ctr_int64_from_string );
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ( CTR_DICT_DIVIDER_SET ), &ctr_int64_div );
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ("/"), &ctr_int64_divide );
+	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ( CTR_DICT_MODULO ), &ctr_int64_modulo );
+	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ( "%" ), &ctr_int64_modulo );
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ( CTR_DICT_MULTIPLIER_SET ), &ctr_int64_mul );
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ("*"), &ctr_int64_multiply );
 	ctr_internal_create_func(CtrStdINT64, CTR_STRINGOBJ( CTR_DICT_ADD_SET ), &ctr_int64_inc );

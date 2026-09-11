@@ -2454,6 +2454,24 @@ ctr_object* ctr_int64_divide(ctr_object* myself, ctr_argument* argumentList) {
 
 /**
  * @def
+ * [ Int64 ] modulo: [ Int64 ]
+ *
+ * @test772
+ */
+ctr_object* ctr_int64_modulo(ctr_object* myself, ctr_argument* argumentList) {
+	CTR_TYPECHECK_INT64();
+	if (otherINT64 == 0) {
+		ctr_error("Division by zero", 0);
+		return CtrStdNil;
+	}
+	int64_t resultINT64 = myINT64 % otherINT64;
+	ctr_object* result = ctr_int64_new(CtrStdINT64, NULL);
+	*((int64_t*)result->value.rvalue->ptr) = resultINT64;
+	return result;
+}
+
+/**
+ * @def
  * [ Int64 ] divide-by: [ Int64 ]
  *
  * @test760
