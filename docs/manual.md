@@ -206,6 +206,27 @@ server "mydomain.com" {
 }
 ```
 
+If you want to use SSL:
+
+```
+listen on * tls port 443
+tls {
+	certificate "/etc/ssl/mycert.crt"
+	key "/etc/ssl/private/mykey.key"
+}
+```
+
+To protect the key exchange against quantum,
+select the mlkem cipher:
+
+```
+tls {
+ ... 
+ ecdhe "X25519MLKEM768"
+ ...
+}
+```
+
 Add the xo binary and mods, as well as any dependencies in the
 chroot (figure out with ldd).
 
