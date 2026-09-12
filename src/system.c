@@ -1698,7 +1698,7 @@ void ctr_dumper_dump_cstr(char* str, size_t vlen) {
 	ctr_wireable_add(w);
 }
 
-void ctr_dump_dump_clock(ctr_clock* clock) {
+void ctr_dumper_dump_clock(ctr_clock* clock) {
 	ctr_wireable* w = wirelist_current;
 	w->next = NULL;
 	w->memblock = (void*) (((char*) clock) - sizeof(size_t));
@@ -1713,7 +1713,7 @@ void ctr_dump_dump_clock(ctr_clock* clock) {
 	ctr_wireable_add(w);
 }
 
-void ctr_dump_dump_clock_resource(ctr_resource* resource) {
+void ctr_dumper_dump_clock_resource(ctr_resource* resource) {
 	ctr_wireable* w = wirelist_current;
 	w->next = NULL;
 	w->memblock = (void*) (((char*) resource) - sizeof(size_t));
@@ -1729,7 +1729,7 @@ void ctr_dump_dump_clock_resource(ctr_resource* resource) {
 	wirelist_current = w->next;
 	ctr_wireable_add(w);
 	if (resource->ptr) {
-		ctr_dump_dump_clock(resource->ptr);
+		ctr_dumper_dump_clock(resource->ptr);
 	}
 }
 
@@ -1974,7 +1974,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 	}
 	else if (obj->info.type == CTR_OBJECT_TYPE_OTEX) {
 		if (obj->value.rvalue && obj->value.rvalue->type == CTR_OBJECT_RESOURCE_TIME) {
-			ctr_dump_dump_clock_resource((ctr_resource*)obj->value.rvalue);
+			ctr_dumper_dump_clock_resource((ctr_resource*)obj->value.rvalue);
 		} else if (obj->value.rvalue && obj->value.rvalue->type == CTR_OBJECT_RESOURCE_INT64) {
 			ctr_dumper_dump_int64_resource((ctr_resource*)obj->value.rvalue);
 		}
