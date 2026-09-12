@@ -1733,6 +1733,41 @@ void ctr_dump_dump_clock_resource(ctr_resource* resource) {
 	}
 }
 
+void ctr_dumper_dump_int64(int64_t* i64_val) {
+	ctr_wireable* w = wirelist_current;
+	w->next = NULL;
+	w->memblock = (void*) (((char*) i64_val) - sizeof(size_t));
+	w->memsize = *((size_t*)w->memblock);
+	w->type = CTR_WIREABLE_TYPE_INT64;
+	w->id = CtrWireableID;
+	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
+	w->address = (uintptr_t) i64_val;
+	w->numofpointers = 0;
+	w->next = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
+	wirelist_current = w->next;
+	ctr_wireable_add(w);
+}
+
+void ctr_dumper_dump_int64_resource(ctr_resource* resource) {
+	ctr_wireable* w = wirelist_current;
+	w->next = NULL;
+	w->memblock = (void*) (((char*) resource) - sizeof(size_t));
+	w->memsize = *((size_t*)w->memblock);
+	w->type = CTR_WIREABLE_TYPE_INT64RESOURCE;
+	w->id = CtrWireableID;
+	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
+	w->address = (uintptr_t) resource;
+	w->numofpointers = 2;
+	w->pointers[0] = offsetof(ctr_resource, ptr);
+	w->pointers[1] = offsetof(ctr_resource, destructor);
+	w->next = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
+	wirelist_current = w->next;
+	ctr_wireable_add(w);
+	if (resource->ptr) {
+		ctr_dumper_dump_int64(resource->ptr);
+	}
+}
+
 void ctr_dumper_dump_str(ctr_string* str) {
 	ctr_wireable* w = wirelist_current;
 	w->next = NULL;
@@ -1919,6 +1954,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 			&& obj->link != CtrStdNil
 			&& obj->link != CtrStdBool
 			&& obj->link != CtrStdFormat
+			&& obj->link != CtrStdINT64
 		) {
 			ctr_dumper_dump_object(obj->link);
 		} else {
@@ -1939,6 +1975,8 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 	else if (obj->info.type == CTR_OBJECT_TYPE_OTEX) {
 		if (obj->value.rvalue && obj->value.rvalue->type == CTR_OBJECT_RESOURCE_TIME) {
 			ctr_dump_dump_clock_resource((ctr_resource*)obj->value.rvalue);
+		} else if (obj->value.rvalue && obj->value.rvalue->type == CTR_OBJECT_RESOURCE_INT64) {
+			ctr_dumper_dump_int64_resource((ctr_resource*)obj->value.rvalue);
 		}
 		//@todo check if rvalue is null -> if not throw error
 		//i.e. cant snapshot active resources like DB connections etc.
@@ -2058,6 +2096,14 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
+		} else if (pointer == CtrStdINT64) {
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_INT64;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			continue;
+		}  else if (pointer == ctr_internal_destructor_int64) {
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_INT64DESTRUCTOR;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			continue;
 		}
 		//replace pointer with id
 		int found_address = 0;
@@ -2101,7 +2147,7 @@ ctr_object* ctr_object_dump( ctr_object* myself, ctr_argument* argumentList ) {
 }
 
 /* Lookup table for ID -> pointer */
-static void* ctr_dumper_map_id2ptr[20] = {
+static void* ctr_dumper_map_id2ptr[22] = {
 	[0] = 0,
 	[CTR_WIREABLE_KNOWN_BLOCK] = &CtrStdBlock,
 	[CTR_WIREABLE_KNOWN_STRING] = &CtrStdString,
@@ -2120,7 +2166,9 @@ static void* ctr_dumper_map_id2ptr[20] = {
 	[CTR_WIREABLE_KNOWN_NONE] = &CtrStdNil,
 	[CTR_WIREABLE_KNOWN_BOOL] = &CtrStdBool,
 	[CTR_WIREABLE_KNOWN_FORMAT] = &CtrStdFormat,
-	[CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR] = &ctr_internal_destructor_clock
+	[CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR] = &ctr_internal_destructor_clock,
+	[CTR_WIREABLE_KNOWN_INT64] = &CtrStdINT64,
+	[CTR_WIREABLE_KNOWN_INT64DESTRUCTOR] = &ctr_internal_destructor_int64
 };
 
 ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
@@ -2163,6 +2211,14 @@ ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 				if (old == 0x0) {
 					*xpointer = 0;
 				} else if (old < 0x1000) {
+					if (old == CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR) {
+						*xpointer = (uintptr_t) ctr_internal_destructor_clock;
+						continue;
+					}
+					if (old == CTR_WIREABLE_KNOWN_INT64DESTRUCTOR) {
+						*xpointer = (uintptr_t) ctr_internal_destructor_int64;
+						continue;
+					}
 					*xpointer = (uintptr_t) *( (ctr_object**) ctr_dumper_map_id2ptr[old] );
 				} else {
 					*xpointer = (uintptr_t) (char*) ( old - 0x1000 + blob + sizeof(ctr_wireable) + sizeof(size_t) );
@@ -2179,6 +2235,10 @@ ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 				} else if (old < 0x1000) {
 					if (old == CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR) {
 						*xpointer = (uintptr_t) ctr_internal_destructor_clock;
+						continue;
+					}
+					if (old == CTR_WIREABLE_KNOWN_INT64DESTRUCTOR) {
+						*xpointer = (uintptr_t) ctr_internal_destructor_int64;
 						continue;
 					}
 					*xpointer = (uintptr_t) *( (ctr_object**) ctr_dumper_map_id2ptr[old] );

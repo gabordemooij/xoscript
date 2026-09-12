@@ -154,6 +154,8 @@
 #define CTR_WIREABLE_TYPE_ELEMS 9
 #define CTR_WIREABLE_TYPE_TIME 10
 #define CTR_WIREABLE_TYPE_TIMERESOURCE 11
+#define CTR_WIREABLE_TYPE_INT64 12
+#define CTR_WIREABLE_TYPE_INT64RESOURCE 13
 
 #define CTR_WIREABLE_KNOWN_BLOCK 1
 #define CTR_WIREABLE_KNOWN_ROOT 2
@@ -173,6 +175,8 @@
 #define CTR_WIREABLE_KNOWN_BOOL 16
 #define CTR_WIREABLE_KNOWN_FORMAT 17
 #define CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR 18
+#define CTR_WIREABLE_KNOWN_INT64 19
+#define CTR_WIREABLE_KNOWN_INT64DESTRUCTOR 20
 
 #endif
 
@@ -942,6 +946,7 @@ extern ctr_object* ctr_int64_lowerThan(ctr_object* myself, ctr_argument* argumen
 extern ctr_object* ctr_int64_higherThan(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_lowerEqThan(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_higherEqThan(ctr_object* myself, ctr_argument* argumentList);
+extern void ctr_internal_destructor_int64(ctr_resource* rs);
 
 extern ctr_object* ctr_hexhelper_new(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_hexhelper_parse(ctr_object* myself, ctr_argument* argumentList);

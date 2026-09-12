@@ -1,0 +1,24 @@
+Out write: ['Test object'], stop.
+>> a := Object new. 
+a on: ['item:'] do: { :lst
+	own lst := lst. 
+}.
+a on: ['item'] do: {
+	<- own lst.
+}.
+a item: (
+	List new ; 1 ; (
+		List new ; ['a'] ; (
+			List new ; ( Moment new: 1 )
+		) ; ( Int64 from-string: ['321'] )
+	)
+).
+Out write: a item, stop.
+>> old-lst-address := a item prototype memory-address.
+a save-as: ['/tmp/a.bin'].
+Out write: ['========== RELOADING SNAP:'], stop.
+>> b := Object load-from: ['/tmp/a.bin'].
+(b item prototype memory-address = old-lst-address) true: {
+	Out write: ['Object link re-attached.'], stop.
+}.
+Out write: ( b item ), stop.
