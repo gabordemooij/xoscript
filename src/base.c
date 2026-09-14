@@ -2747,12 +2747,7 @@ ctr_object* ctr_binhelper_parse(ctr_object* myself, ctr_argument* argumentList) 
 }
 
 
-/**
- * @def
- * [ Format ] new apply: [ String ]
- *
- * @test536
- */
+
 ctr_object* ctr_format_new(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* instance = ctr_internal_create_object(CTR_OBJECT_TYPE_OTOBJECT);
 	instance->link = myself;
@@ -2767,12 +2762,28 @@ ctr_object* ctr_format_format_set(ctr_object* myself, ctr_argument* argumentList
 	return myself;
 }
 
+/**
+ * @def
+ * [ Format ] format: [ String ]
+ *
+ * @test776
+ */
 ctr_object* ctr_format_new_set(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* instance = ctr_format_new(myself, argumentList);
 	ctr_format_format_set(instance, argumentList);
 	return instance;
 }
 
+/**
+ * @internal
+ *
+ * Applies format with cast.
+ *
+ * @param ctr_object* myself
+ * @param ctr_argument* argumentList
+ * @param int cast
+ * @return ctr_object* result
+ */
 ctr_object* ctr_format_apply_to_general(ctr_object* myself, ctr_argument* argumentList, int cast) {
 	ctr_object* format = ctr_internal_object_property(myself, "_format", NULL);
 	if (format == CtrStdNil) return CtrStdNil;
@@ -2803,6 +2814,12 @@ ctr_object* ctr_format_apply_to_general(ctr_object* myself, ctr_argument* argume
 	return answer;
 }
 
+/**
+ * @def
+ * [ Format ] new apply: [ String ]
+ *
+ * @test536
+ */
 ctr_object* ctr_format_apply_to(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_format_apply_to_general(myself, argumentList, 0);
 }
