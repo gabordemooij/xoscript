@@ -260,7 +260,7 @@ ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList) {
 	struct dirent* entry;
 	char* pathValue;
 	char  pathBuf[PATH_MAX + 1];
-	char  fullPath[PATH_MAX + 1];
+	char* fullPath;
 	ctr_object* fileList;
 	ctr_object* fileListItem;
 	ctr_object* path;
@@ -269,6 +269,7 @@ ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList) {
 	path = ctr_internal_cast2string( argumentList->object );
 	fileList = ctr_array_new(CtrStdArray, NULL);
 	pathValue = ctr_heap_allocate_cstring( path );
+	size_t pathBufSize = 40;
 	struct stat st;
 	d = opendir( pathValue );
 	if (d == 0) {
@@ -280,14 +281,17 @@ ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList) {
 	putArgumentList = ctr_heap_allocate( sizeof( ctr_argument ) );
 	addArgumentList = ctr_heap_allocate( sizeof( ctr_argument ) );
 	putArgumentList->next = ctr_heap_allocate( sizeof( ctr_argument ) );
+	fullPath = ctr_heap_allocate(pathBufSize + 1);
 	while((entry = readdir(d))) {
 		fileListItem = ctr_map_new(CtrStdMap, NULL);
 		putArgumentList->next->object = ctr_build_string_from_cstring( CTR_MSG_DSC_FILE );
 		putArgumentList->object = ctr_build_string_from_cstring(entry->d_name);
 		ctr_map_put(fileListItem, putArgumentList);
 		putArgumentList->next->object = ctr_build_string_from_cstring( CTR_MSG_DSC_TYPE );
-		if ((strlen(CTR_DIRSEP) + strlen(CTR_DIRSEP) + strlen(entry->d_name)) >= PATH_MAX) {
-			continue;
+		size_t pathSizeNeeded = strlen(pathValue) + strlen(CTR_DIRSEP) + strlen(entry->d_name);
+		if (pathSizeNeeded > pathBufSize) {
+			pathBufSize = pathSizeNeeded;
+			fullPath = ctr_heap_reallocate(fullPath, pathBufSize + 1);
 		}
 		strcpy( fullPath, pathValue );
 		strcat( fullPath, CTR_DIRSEP );
@@ -321,6 +325,7 @@ ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_heap_free(putArgumentList);
 	ctr_heap_free(addArgumentList);
 	ctr_heap_free(pathValue);
+	ctr_heap_free(fullPath);
 	return fileList;
 }
 
