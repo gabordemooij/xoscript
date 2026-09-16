@@ -2798,6 +2798,10 @@ ctr_object* ctr_format_apply_to_general(ctr_object* myself, ctr_argument* argume
 		ctr_heap_free(s);
 		answer = ctr_build_string_from_cstring(result);
 		free(result);
+	} else if (value->info.type == CTR_OBJECT_TYPE_OTEX && value->value.rvalue->type == CTR_OBJECT_RESOURCE_INT64) { 
+		asprintf(&result, format_str, (uint64_t) *((uint64_t*)value->value.rvalue->ptr));
+		answer = ctr_build_string_from_cstring(result);
+		free(result);
 	} else if (value->info.type == CTR_OBJECT_TYPE_OTNUMBER)  {
 		if (cast == 1) {
 			// cast to int (to print octals or decimals for instance %o/%d etc..)
