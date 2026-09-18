@@ -1,0 +1,30 @@
+Server init.
+>> FFILIB := ['/usr/lib/libc.so.103.0'].
+Out
+write: ['This is an advanced example.'], stop
+write: ['You might need to configure this example first.'], stop
+write: ['Open the catgets.xo file and edit FFILIB, before testing!'], stop
+write: ( ['Current value is: ~lib '] ~lib: FFILIB ), stop stop.
+Server link: ( List new ;
+	FFILIB ;
+	['catopen'] ;
+	( List new ; ['pointer'] ; ['int'] ) ; # params
+	['pointer'] ; # returns
+	['Translations'] ; # obj
+	['open:flag:'] # msg
+),
+link: ( List new ;
+	FFILIB ;
+	['catgets'] ;
+	( List new ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ; # params
+	['pointer'] ; # returns
+	None ; # obj
+	['get:'] # msg
+).
+>> fname := Blob utf8: ( ['path/hello.cat'] path: Program path ).
+>> t := Translations open: fname flag: 0.
+>> default := Blob utf8: ['Unable to find message catalogue.'].
+>> msg := Translations get: (List new ; t ; 1 ; 1 ; default).
+Out write: msg string, stop.
+fname free.
+default free.
