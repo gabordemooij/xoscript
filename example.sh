@@ -22,22 +22,30 @@ echo $ISO
 echo "With build option: "
 echo $CLEAN
 
+if [[ $ISO = "nl" ]]; then
+	ISOKEY=2
+elif [[ $ISO = "en" ]]; then
+	ISOKEY=1
+elif [[ $ISO = "es" ]]; then
+	ISOKEY=0
+else
+	echo "Example for this language not supported yet."
+fi
 
-declare -A server_plugin_name
-server_plugin_name[es]="servidor"
-server_plugin_name[en]="server"
-server_plugin_name[nl]="server"
-echo ${server_plugin_name[$ISO]}
+server_plugin_name[0]="servidor"
+server_plugin_name[1]="server"
+server_plugin_name[2]="server"
+echo ${server_plugin_name[$ISOKEY]}
 
 export ISO
 
 if [[ $OS = "Linux" ]]; then
 	if [[ $CLEAN = "clean" ]]; then
 		make clean
-		PACKAGE="server" NAME="${server_plugin_name[$ISO]}" make plugin-clean
+		PACKAGE="server" NAME="${server_plugin_name[$ISOKEY]}" make plugin-clean
 	fi
 	make
-	PACKAGE="server" NAME="${server_plugin_name[$ISO]}" make plugin
+	PACKAGE="server" NAME="${server_plugin_name[$ISOKEY]}" make plugin
 	cd examples/${EXAMPLE}
 	rm mods
 	ln -s ../../build/Linux/bin/mods mods
@@ -55,10 +63,10 @@ fi
 if [[ $OS = "OBSD" ]]; then
 	if [[ $CLEAN = "clean" ]]; then
 		make -f makefile.obsd clean
-		PACKAGE="server" NAME="${server_plugin_name[$ISO]}" make -f makefile.obsd plugin-clean
+		PACKAGE="server" NAME="${server_plugin_name[$ISOKEY]}" make -f makefile.obsd plugin-clean
 	fi
 	make -f makefile.obsd
-	PACKAGE="server" NAME="${server_plugin_name[$ISO]}" make -f makefile.obsd plugin
+	PACKAGE="server" NAME="${server_plugin_name[$ISOKEY]}" make -f makefile.obsd plugin
 	cd examples/${EXAMPLE}
 	rm mods
 	ln -s ../../build/OpenBSD/bin/mods mods
