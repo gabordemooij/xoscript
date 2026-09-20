@@ -11,10 +11,20 @@
 					<xsl:value-of select="html/head/title"/>
 				</property>
 				<property name="default-width">
-					<xsl:value-of select="html/body/@width"/>
+					<xsl:choose>
+						<xsl:when test="html/body/width">
+							<xsl:value-of select="html/body/@width"/>
+						</xsl:when>
+						<xsl:otherwise>800</xsl:otherwise>
+					</xsl:choose>
 				</property>
 				<property name="default-height">
-					<xsl:value-of select="html/body/@height"/>
+					<xsl:choose>
+						<xsl:when test="html/body/height">
+							<xsl:value-of select="html/body/@height"/>
+						</xsl:when>
+						<xsl:otherwise>600</xsl:otherwise>
+					</xsl:choose>
 				</property>
 				<child>
 					<object class="GtkBox" id="main_box">
@@ -129,17 +139,29 @@
 	</xsl:template>
 	<!-- RADIO -->
 	<xsl:template match="input[@type='radio']">
-		<xsl:call-template name="gtk-style"/>
 		<child>
 			<object class="GtkCheckButton">
-				<xsl:call-template name="gtk-id"/>
+				<!-- todo: style always within widget, like this -->
+				<xsl:call-template name="gtk-style"/>
+				<!-- first radio gets name as id -->
+				<xsl:choose>
+					<xsl:when test="not(preceding::input[@type='radio' and @name=current()/@name])">
+						<xsl:attribute name="id">
+							<xsl:value-of select="@name"/>
+						</xsl:attribute>
+					</xsl:when>
+					<!-- subsequent radios get regular id -->
+					<xsl:otherwise>
+						<xsl:call-template name="gtk-id"/>
+					</xsl:otherwise>
+				</xsl:choose>
 				<property name="label">
 					<xsl:value-of select="@text"/>
 				</property>
 				<xsl:if test="preceding::input[@type='radio' and @name=current()/@name]">
 					<property name="group">
 						<xsl:value-of
-							select="preceding::input[@type='radio' and @name=current()/@name][1]/@id"/>
+							select="preceding::input[@type='radio' and @name=current()/@name][1]/@name"/>
 					</property>
 				</xsl:if>
 			</object>
@@ -161,7 +183,7 @@
 				</xsl:if>
 				<xsl:if test="@width">
 				<property name="halign">start</property>
-				<property name="width-request">100</property>
+				<property name="width-request"><xsl:value-of select="@width"/></property>
 				</xsl:if>
 			</object>
 		</child>
@@ -247,7 +269,6 @@
 	<xsl:template match="text()[normalize-space()]">
 	<child>
 		<object class="GtkLabel">
-			<xsl:call-template name="gtk-id"/>
 			<property name="label">
 				<xsl:value-of select="normalize-space(.)"/>
 			</property>
