@@ -109,6 +109,29 @@
 			</object>
 		</child>
 	</xsl:template>
+	<!-- TEXTAREA -->
+	<xsl:template match="textarea">
+		<xsl:call-template name="gtk-style"/>
+		<child>
+			<object class="GtkScrolledWindow">
+				<property name="vexpand">true</property>
+				<property name="hexpand">true</property>
+				<child>
+					<object class="GtkTextView" id="text_view">
+						<xsl:call-template name="gtk-id"/>
+						<property name="wrap-mode">word</property>
+						<property name="buffer">
+							<object class="GtkTextBuffer">
+								<property name="text">
+									<xsl:value-of select="."/>
+								</property>
+							</object>
+						</property>
+					</object>
+				</child>
+			</object>
+		</child>
+	</xsl:template>
 	<!-- PASSWORD -->
 	<xsl:template match="input[@type='password']">
 		<xsl:call-template name="gtk-style"/>
@@ -143,27 +166,16 @@
 			<object class="GtkCheckButton">
 				<!-- todo: style always within widget, like this -->
 				<xsl:call-template name="gtk-style"/>
-				<!-- first radio gets name as id -->
-				<xsl:choose>
-					<xsl:when test="not(preceding::input[@type='radio' and @name=current()/@name])">
-						<xsl:attribute name="id">
-							<xsl:value-of select="@name"/>
-						</xsl:attribute>
-					</xsl:when>
-					<!-- subsequent radios get regular id -->
-					<xsl:otherwise>
-						<xsl:call-template name="gtk-id"/>
-					</xsl:otherwise>
-				</xsl:choose>
-				<property name="label">
-					<xsl:value-of select="@text"/>
-				</property>
-				<xsl:if test="preceding::input[@type='radio' and @name=current()/@name]">
+					<xsl:attribute name="id">
+						<!-- encode radio name as _RG<group>_<value> -->
+						<xsl:value-of select="concat('_RG', @name, '_', @value)"/>
+					</xsl:attribute>
 					<property name="group">
-						<xsl:value-of
-							select="preceding::input[@type='radio' and @name=current()/@name][1]/@name"/>
+						<xsl:value-of select="concat('_RG', @name, '_',(//input[@type='radio' and @name = current()/@name])[1]/@value)"/>
 					</property>
-				</xsl:if>
+					<property name="label">
+						<xsl:value-of select="@text"/>
+					</property>
 			</object>
 		</child>
 	</xsl:template>
