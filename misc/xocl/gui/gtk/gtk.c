@@ -16,9 +16,30 @@ static void on_submit(GtkButton *button,  gpointer user_data) {
 				json_key(gtk_buildable_get_buildable_id(GTK_BUILDABLE(obj)));
 				json_string(gtk_editable_get_text(GTK_EDITABLE(obj)));
 			}
-			if (GTK_IS_CHECK_BUTTON(obj)) {
+			if (GTK_IS_TEXT_VIEW(obj)) {
 				json_key(gtk_buildable_get_buildable_id(GTK_BUILDABLE(obj)));
-				if (gtk_check_button_get_active(GTK_CHECK_BUTTON(obj))) {
+				GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(obj));
+				GtkTextIter start, end;
+				gtk_text_buffer_get_bounds(buffer, &start, &end);
+				char *text = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
+				json_string(text);
+				g_free(text);
+			}
+			if (GTK_IS_CHECK_BUTTON(obj)) {
+				char* key = gtk_buildable_get_buildable_id(GTK_BUILDABLE(obj));
+				gboolean checked = gtk_check_button_get_active(GTK_CHECK_BUTTON(obj));
+				if (strncmp("_RG", key, 3)==0) {
+					if (checked) {
+						char* keycopy  = strdup(key);
+						char* tok = strtok(keycopy, "_");
+						json_key(tok+2);
+						tok=strtok(NULL,"_");
+						json_string(tok);
+					}
+					continue;
+				}
+				json_key(key);
+				if (checked) {
 					json_string("on");
 				} else {
 					json_string("off");
