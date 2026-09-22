@@ -109,6 +109,19 @@
 			</object>
 		</child>
 	</xsl:template>
+	<!-- HIDDEN INPUT -->
+	<xsl:template match="input[@type='hidden']">
+		<xsl:call-template name="gtk-style"/>
+		<child>
+			<object class="GtkEntry">
+				<xsl:call-template name="gtk-id"/>
+				<property name="text">
+					<xsl:value-of select="@value"/>
+				</property>
+				<property name="visible">False</property>
+			</object>
+		</child>
+	</xsl:template>
 	<!-- TEXTAREA -->
 	<xsl:template match="textarea">
 		<xsl:call-template name="gtk-style"/>
