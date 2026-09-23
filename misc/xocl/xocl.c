@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <strings.h>
+#include <string.h>
 #include <stdlib.h>
 
 #ifdef GUI_GTK
@@ -124,18 +125,25 @@ void json_key(const char* s) {
 void json_close(void) {
 	json_state = 0;
 	fputc('}', fout);
+	fputc('\n', fout);
+	fflush(fout);
 }
 
-int readxml(char** xmlbuffer) {
+int readxml(char** xmlbuffer, char* eoi) {
 	size_t cap;
-	int chunk = 10;
+	int chunk = 1;
 	int bytes = 0;
 	size_t pos = 0;
 	cap = chunk + 1;
 	char* xmlui = malloc(cap);
+	if (feof(fin)) return 2;
 	while( ( bytes = fread(xmlui + pos, 1, chunk, fin) ) ) {
 		pos += bytes;
 		cap = cap + chunk - (chunk - bytes);
+		*(xmlui + pos) = 0;
+		if (strstr(xmlui, eoi)) {
+			break;
+		}
 		xmlui = realloc(xmlui, cap);
 		if (xmlui == NULL) {
 			return 1;

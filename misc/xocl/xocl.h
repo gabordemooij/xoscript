@@ -1,5 +1,5 @@
 /* Input function */
-int readxml(char** xmlui);
+int readxml(char** xmlui, char* eoi);
 
 /* Output functions */
 void json_start(void);
