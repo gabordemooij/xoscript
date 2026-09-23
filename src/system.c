@@ -1913,6 +1913,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 	|| obj == CtrStdNil
 	|| obj == CtrStdBool
 	|| obj == CtrStdConsole
+	|| obj == CtrStdSlurp
 	) return;
 	ctr_wireable* w = wirelist_current;
 	w->next = NULL;
@@ -1955,6 +1956,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 			&& obj->link != CtrStdBool
 			&& obj->link != CtrStdFormat
 			&& obj->link != CtrStdINT64
+			&& obj->link != CtrStdSlurp
 		) {
 			ctr_dumper_dump_object(obj->link);
 		} else {
@@ -2092,6 +2094,10 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_FORMAT;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
+		} else if (pointer == CtrStdSlurp) {
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_PATH;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			continue;
 		} else if (pointer == ctr_internal_destructor_clock) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
@@ -2147,7 +2153,7 @@ ctr_object* ctr_object_dump( ctr_object* myself, ctr_argument* argumentList ) {
 }
 
 /* Lookup table for ID -> pointer */
-static void* ctr_dumper_map_id2ptr[22] = {
+static void* ctr_dumper_map_id2ptr[23] = {
 	[0] = 0,
 	[CTR_WIREABLE_KNOWN_BLOCK] = &CtrStdBlock,
 	[CTR_WIREABLE_KNOWN_STRING] = &CtrStdString,
@@ -2168,7 +2174,8 @@ static void* ctr_dumper_map_id2ptr[22] = {
 	[CTR_WIREABLE_KNOWN_FORMAT] = &CtrStdFormat,
 	[CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR] = &ctr_internal_destructor_clock,
 	[CTR_WIREABLE_KNOWN_INT64] = &CtrStdINT64,
-	[CTR_WIREABLE_KNOWN_INT64DESTRUCTOR] = &ctr_internal_destructor_int64
+	[CTR_WIREABLE_KNOWN_INT64DESTRUCTOR] = &ctr_internal_destructor_int64,
+	[CTR_WIREABLE_KNOWN_PATH] = &CtrStdSlurp
 };
 
 ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
