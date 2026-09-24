@@ -136,12 +136,13 @@ int readxml(char** xmlbuffer, char* eoi) {
 	size_t pos = 0;
 	cap = chunk + 1;
 	char* xmlui = malloc(cap);
-	if (feof(fin)) return 2;
+	int eoi_found = 0;
 	while( ( bytes = fread(xmlui + pos, 1, chunk, fin) ) ) {
 		pos += bytes;
 		cap = cap + chunk - (chunk - bytes);
 		*(xmlui + pos) = 0;
 		if (strstr(xmlui, eoi)) {
+			eoi_found = 1;
 			break;
 		}
 		xmlui = realloc(xmlui, cap);
@@ -149,6 +150,7 @@ int readxml(char** xmlbuffer, char* eoi) {
 			return 1;
 		}
 	}
+	if (!eoi_found) return 2;
 	*(xmlui + pos) = 0;
 	*xmlbuffer = xmlui;
 	return 0;

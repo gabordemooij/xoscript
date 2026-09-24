@@ -50,13 +50,12 @@ static void on_submit(GtkButton *button,  gpointer user_data) {
 			}
 		}
 	}
-	
 	json_close();
 	g_object_unref(builder);
 	builder = gtk_builder_new();
 	int r = readxml(&xmlui, "</interface>");
 	if (r != 0) {
-		g_printerr("Unable to read xml file: %d \n", r);
+		if (r == 1) g_printerr("Unable to read xml file: %d \n", r);
 		exit(0);
 		return;
 	}
@@ -85,8 +84,9 @@ static void on_submit(GtkButton *button,  gpointer user_data) {
 static void activate(GtkApplication *gtk_app, gpointer user_data) {
 	char* xmlui;
 	builder = gtk_builder_new();
-	if (readxml(&xmlui, "</interface>") != 0) {
-		g_printerr("Unable to read xml file.\n");
+	int r = readxml(&xmlui, "</interface>");
+	if (r != 0) {
+		if (r == 1) g_printerr("Unable to read xml file.\n");
 		exit(0);
 		return;
 	}
