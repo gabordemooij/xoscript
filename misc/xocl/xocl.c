@@ -129,6 +129,30 @@ void json_close(void) {
 	fflush(fout);
 }
 
+void output_start(void) {
+	if (output_format == JSON) {
+		json_start();
+	}
+}
+
+void output_string(const char *s) {
+	if (output_format == JSON) {
+		json_string(s);
+	}
+}
+
+void output_key(const char* s) {
+	if (output_format == JSON) {
+		json_key(s);
+	}
+}
+
+void output_close(void) {
+	if (output_format == JSON) {
+		json_close();
+	}
+}
+
 int readxml(char** xmlbuffer, char* eoi) {
 	size_t cap;
 	int chunk = 1;

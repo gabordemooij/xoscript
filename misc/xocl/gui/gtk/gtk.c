@@ -38,23 +38,23 @@ static void clickhandlers(GtkApplication *gtk_app) {
 
 static void on_submit(GtkButton *button,  gpointer user_data) {
 	GSList *objects = gtk_builder_get_objects(builder);
-	json_start();
-	json_key("submit");
-	json_string(gtk_widget_get_name(GTK_WIDGET(button)));
+	output_start();
+	output_key("submit");
+	output_string(gtk_widget_get_name(GTK_WIDGET(button)));
 	for (GSList *l = objects; l; l = l->next) {
 		GObject *obj = l->data;
 		if (GTK_IS_WIDGET(obj)) {
 			if (GTK_IS_ENTRY(obj)) {
-				json_key(gtk_buildable_get_buildable_id(GTK_BUILDABLE(obj)));
-				json_string(gtk_editable_get_text(GTK_EDITABLE(obj)));
+				output_key(gtk_buildable_get_buildable_id(GTK_BUILDABLE(obj)));
+				output_string(gtk_editable_get_text(GTK_EDITABLE(obj)));
 			}
 			if (GTK_IS_TEXT_VIEW(obj)) {
-				json_key(gtk_buildable_get_buildable_id(GTK_BUILDABLE(obj)));
+				output_key(gtk_buildable_get_buildable_id(GTK_BUILDABLE(obj)));
 				GtkTextBuffer* buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(obj));
 				GtkTextIter start, end;
 				gtk_text_buffer_get_bounds(buffer, &start, &end);
 				char *text = gtk_text_buffer_get_text(buffer, &start, &end, FALSE);
-				json_string(text);
+				output_string(text);
 				g_free(text);
 			}
 			if (GTK_IS_CHECK_BUTTON(obj)) {
@@ -64,22 +64,22 @@ static void on_submit(GtkButton *button,  gpointer user_data) {
 					if (checked) {
 						char* keycopy  = strdup(key);
 						char* tok = strtok(keycopy, "_");
-						json_key(tok+2);
+						output_key(tok+2);
 						tok=strtok(NULL,"_");
-						json_string(tok);
+						output_string(tok);
 					}
 					continue;
 				}
-				json_key(key);
+				output_key(key);
 				if (checked) {
-					json_string("on");
+					output_string("on");
 				} else {
-					json_string("off");
+					output_string("off");
 				}
 			}
 		}
 	}
-	json_close();
+	output_close();
 	buildxml();
 	GtkWidget* nwindow = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
 	GtkWidget* new_content = gtk_widget_get_first_child(nwindow);

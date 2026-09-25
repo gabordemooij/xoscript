@@ -2,7 +2,7 @@
 int readxml(char** xmlui, char* eoi);
 
 /* Output functions */
-void json_start(void);
-void json_string(const char *s);
-void json_key(const char* s);
-void json_close(void);
+void output_start(void);
+void output_string(const char *s);
+void output_key(const char* s);
+void output_close(void);
