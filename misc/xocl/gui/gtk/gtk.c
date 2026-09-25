@@ -6,8 +6,37 @@ GtkBuilder* builder;
 GtkWidget *window;
 GtkApplication *app;
 
-static void on_submit(GtkButton *button,  gpointer user_data) {
+static void buildxml() {
 	char* xmlui;
+	if (builder) g_object_unref(builder);
+	builder = gtk_builder_new();
+	int r = readxml(&xmlui, "</interface>");
+	if (r != 0) {
+		if (r == 1) g_printerr("Unable to read xml file: %d \n", r);
+		exit(0);
+	}
+	GError *error = NULL;
+	gtk_builder_add_from_string(builder,xmlui,-1,&error);
+	if (error){
+		g_printerr("XML Error: %s\n", error->message);
+		g_error_free(error);
+		return;
+	}
+}
+static void on_submit(GtkButton *button,  gpointer user_data);
+
+static void clickhandlers(GtkApplication *gtk_app) {
+	GSList *objects = gtk_builder_get_objects(builder);
+	for (GSList *l = objects; l != NULL; l = l->next) {
+		GObject *obj = G_OBJECT(l->data);
+		if (GTK_IS_BUTTON(obj)) {
+			GtkButton *button = GTK_BUTTON(obj);
+			g_signal_connect(obj, "clicked", G_CALLBACK(on_submit), gtk_app);
+		}
+	}
+}
+
+static void on_submit(GtkButton *button,  gpointer user_data) {
 	GSList *objects = gtk_builder_get_objects(builder);
 	json_start();
 	json_key("submit");
@@ -51,45 +80,18 @@ static void on_submit(GtkButton *button,  gpointer user_data) {
 		}
 	}
 	json_close();
-	g_object_unref(builder);
-	builder = gtk_builder_new();
-	int r = readxml(&xmlui, "</interface>");
-	if (r != 0) {
-		if (r == 1) g_printerr("Unable to read xml file: %d \n", r);
-		exit(0);
-		return;
-	}
-	GError *error = NULL;
-	gtk_builder_add_from_string(builder,xmlui,-1,&error);
-	if (error){
-		g_printerr("XML Error: %s\n", error->message);
-		g_error_free(error);
-		return;
-	}
+	buildxml();
 	GtkWidget* nwindow = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
 	GtkWidget* new_content = gtk_widget_get_first_child(nwindow);
 	g_object_ref(new_content);
 	gtk_window_set_child(GTK_WINDOW(nwindow), NULL);
 	g_object_unref(new_content);
 	gtk_window_set_child(GTK_WINDOW(window), new_content);
-	GSList* nobjects = gtk_builder_get_objects(builder);
-	for (GSList *l = nobjects; l != NULL; l = l->next) {
-		GObject *obj = G_OBJECT(l->data);
-		if (GTK_IS_BUTTON(obj)) {
-			g_signal_connect(obj, "clicked", G_CALLBACK(on_submit), app);
-		}
-	}
+	clickhandlers(app);
 }
 
 static void activate(GtkApplication *gtk_app, gpointer user_data) {
-	char* xmlui;
-	builder = gtk_builder_new();
-	int r = readxml(&xmlui, "</interface>");
-	if (r != 0) {
-		if (r == 1) g_printerr("Unable to read xml file.\n");
-		exit(0);
-		return;
-	}
+	buildxml();
 	GtkCssProvider *provider = gtk_css_provider_new();
 	gtk_css_provider_load_from_file(
 		provider,
@@ -100,24 +102,10 @@ static void activate(GtkApplication *gtk_app, gpointer user_data) {
 		GTK_STYLE_PROVIDER(provider),
 		GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
 	);
-	GError *error = NULL;
-	gtk_builder_add_from_string(builder,xmlui,-1,&error);
-	if (error){
-		g_printerr("XML Error: %s\n", error->message);
-		g_error_free(error);
-		return;
-	}
 	window = GTK_WIDGET(gtk_builder_get_object(builder, "window"));
 	GtkWidget *button = GTK_WIDGET(gtk_builder_get_object(builder, "submit"));
 	gtk_window_set_application(GTK_WINDOW(window), gtk_app);
-	GSList *objects = gtk_builder_get_objects(builder);
-	for (GSList *l = objects; l != NULL; l = l->next) {
-		GObject *obj = G_OBJECT(l->data);
-		if (GTK_IS_BUTTON(obj)) {
-			GtkButton *button = GTK_BUTTON(obj);
-			g_signal_connect(obj, "clicked", G_CALLBACK(on_submit), gtk_app);
-		}
-	}
+	clickhandlers(gtk_app);
 	gtk_window_present(GTK_WINDOW(window));
 }
 
@@ -126,6 +114,5 @@ int gui_gtk_start(void) {
 	app = gtk_application_new(getenv("XOCL_APPLICATION_ID"), G_APPLICATION_DEFAULT_FLAGS);
 	g_signal_connect(app, "activate", G_CALLBACK(activate), NULL);
 	status = g_application_run(G_APPLICATION(app), 0, NULL);
-	
 	return status;
 }
