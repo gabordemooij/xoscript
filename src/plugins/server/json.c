@@ -15,8 +15,7 @@
  * If the character is a control character, the well known
  * C-based character substitute will be used.
  */
-ctr_object* ctr_string_escape(ctr_object* myself, ctr_argument* argumentList)  {
-	ctr_object* escape = argumentList->object;
+ctr_object* ctr_string_escape(ctr_object* myself, char* characters)  {
 	ctr_object* newString = NULL;
 	char* str = myself->value.svalue->value;
 	long  len = myself->value.svalue->vlen;
@@ -26,14 +25,12 @@ ctr_object* ctr_string_escape(ctr_object* myself, ctr_argument* argumentList)  {
 	ctr_size q = 0;
 	ctr_size numOfCharacters = 0;
 	long tlen = 0;
-	char* characters;
 	char character;
 	char characterDescription;
 	char isControlChar = 0;
 	char escaped;
 	long tag_len = 0;
-	characters = escape->value.svalue->value;
-	numOfCharacters = escape->value.svalue->vlen;
+	numOfCharacters =strlen(characters);
 	if (numOfCharacters < 1) {
 		return myself;
 	}
@@ -108,8 +105,7 @@ ctr_object* ctr_string_escape(ctr_object* myself, ctr_argument* argumentList)  {
  *
  * 'UnEscapes' the specified ASCII character in a string.
  */
-ctr_object* ctr_string_unescape(ctr_object* myself, ctr_argument* argumentList)  {
-	ctr_object* escape = argumentList->object;
+ctr_object* ctr_string_unescape(ctr_object* myself, char* characters)  {
 	ctr_object* newString = NULL;
 	char character;
 	char characterDescription;
@@ -117,7 +113,6 @@ ctr_object* ctr_string_unescape(ctr_object* myself, ctr_argument* argumentList) 
 	long  len = myself->value.svalue->vlen;
 	char* tstr;
 	char isControlChar = 0;
-	char* characters;
 	ctr_size numOfCharacters;
 	char unescaped;
 	ctr_size q;
@@ -125,8 +120,7 @@ ctr_object* ctr_string_unescape(ctr_object* myself, ctr_argument* argumentList) 
 	long k=0;
 	long tlen = 0;
 	long tag_len = 0;
-	characters = escape->value.svalue->value;
-	numOfCharacters = escape->value.svalue->vlen;
+	numOfCharacters = strlen(characters);
 	if (numOfCharacters < 1) {
 		return myself;
 	}
@@ -257,10 +251,7 @@ ctr_object* ctr_jsmn_dump( char* data, jsmntok_t** tt ) {
 	}
 	if (t->type == JSMN_STRING) {
 		answer = ctr_build_string( (data + t->start), (t->end - t->start) );
-		a = ctr_heap_allocate( sizeof(ctr_argument) );
-		a->object = ctr_build_string_from_cstring("\"\t\b\n\r\f\\");
-		answer = ctr_string_unescape( answer, a );
-		ctr_heap_free(a);
+		answer = ctr_string_unescape( answer, "\"\t\b\n\r\f\\" );
 		*(tt)+=1;
 	}
 	else if (t->type == JSMN_PRIMITIVE ) {
@@ -387,7 +378,7 @@ void ctr_json_jsonify_array(ctr_object* myself, ctr_object* array, ctr_object*  
 		else if ( arrayElement->info.type == CTR_OBJECT_TYPE_OTSTRING ) {
 			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
 			ctr_string_append( string, newArgumentList );
-			newArgumentList->object = ctr_string_escape( arrayElement, newArgumentList );
+			newArgumentList->object = ctr_string_escape( arrayElement, "\"\n\b\r\t\f\\" );
 			ctr_string_append( string, newArgumentList );
 			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
 			ctr_string_append( string, newArgumentList );
@@ -415,9 +406,15 @@ ctr_object* ctr_json_jsonify(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object*  string;
 	ctr_mapitem* mapItem;
 	ctr_argument* newArgumentList;
+	newArgumentList = ctr_heap_allocate( sizeof( ctr_argument ) );
+	if ( argumentList->object->info.type == CTR_OBJECT_TYPE_OTARRAY ) {
+		string = ctr_build_string_from_cstring( "" );
+		ctr_json_jsonify_array(myself, argumentList->object, string, newArgumentList);
+		ctr_heap_free( newArgumentList );
+		return string;
+	}
 	string  = ctr_build_string_from_cstring( "{" );
 	mapItem = argumentList->object->properties->head;
-	newArgumentList = ctr_heap_allocate( sizeof( ctr_argument ) );
 	while( mapItem ) {
 		if ( mapItem->key->info.type == CTR_OBJECT_TYPE_OTBOOL && mapItem->key->value.bvalue == 1) {
 			newArgumentList->object = ctr_build_string_from_cstring( "true" );
@@ -438,8 +435,7 @@ ctr_object* ctr_json_jsonify(ctr_object* myself, ctr_argument* argumentList) {
 		else if ( mapItem->key->info.type == CTR_OBJECT_TYPE_OTSTRING ) {
 			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
 			ctr_string_append( string, newArgumentList );
-			newArgumentList->object = ctr_build_string_from_cstring("\"\n\b\r\t\f\\");
-			newArgumentList->object = ctr_string_escape( mapItem->key, newArgumentList );
+			newArgumentList->object = ctr_string_escape( mapItem->key, "\"\n\b\r\t\f\\" );
 			ctr_string_append( string, newArgumentList );
 			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
 			ctr_string_append( string, newArgumentList );
@@ -465,8 +461,7 @@ ctr_object* ctr_json_jsonify(ctr_object* myself, ctr_argument* argumentList) {
 		else if ( mapItem->value->info.type == CTR_OBJECT_TYPE_OTSTRING ) {
 			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
 			ctr_string_append( string, newArgumentList );
-			newArgumentList->object = ctr_build_string_from_cstring("\"\n\b\r\t\f\\");
-			newArgumentList->object = ctr_string_escape( mapItem->value, newArgumentList );
+			newArgumentList->object = ctr_string_escape( mapItem->value, "\"\n\b\r\t\f\\" );
 			ctr_string_append( string, newArgumentList );
 			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
 			ctr_string_append( string, newArgumentList );
