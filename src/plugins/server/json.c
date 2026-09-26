@@ -16,7 +16,7 @@
  * C-based character substitute will be used.
  */
 ctr_object* ctr_string_escape(ctr_object* myself, ctr_argument* argumentList)  {
-	ctr_object* escape = ctr_internal_cast2string( argumentList->object );
+	ctr_object* escape = argumentList->object;
 	ctr_object* newString = NULL;
 	char* str = myself->value.svalue->value;
 	long  len = myself->value.svalue->vlen;
@@ -109,7 +109,7 @@ ctr_object* ctr_string_escape(ctr_object* myself, ctr_argument* argumentList)  {
  * 'UnEscapes' the specified ASCII character in a string.
  */
 ctr_object* ctr_string_unescape(ctr_object* myself, ctr_argument* argumentList)  {
-	ctr_object* escape = ctr_internal_cast2string( argumentList->object );
+	ctr_object* escape = argumentList->object;
 	ctr_object* newString = NULL;
 	char character;
 	char characterDescription;
