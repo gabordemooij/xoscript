@@ -53,6 +53,10 @@ ctr_object* ctr_string_escape(ctr_object* myself, ctr_argument* argumentList)  {
 	tlen = len + tag_len;
 	tstr = ctr_heap_allocate( tlen * sizeof( char ) );
 	for(i = 0; i < len; i++) {
+		if (str[i] == 0) {
+			tstr[k++] = '?'; // filter 0 bytes
+			continue;
+		}
 		char c = str[i];
 		escaped = 0;
 		for (q = 0; q < numOfCharacters; q ++) {
@@ -72,6 +76,10 @@ ctr_object* ctr_string_escape(ctr_object* myself, ctr_argument* argumentList)  {
 			}
 			if (character == '\b') {
 				characterDescription = 'b';
+				isControlChar = 1;
+			}
+			if (character == '\f') {
+				characterDescription = 'f';
 				isControlChar = 1;
 			}
 			if (c == character) {
@@ -142,6 +150,10 @@ ctr_object* ctr_string_unescape(ctr_object* myself, ctr_argument* argumentList) 
 			characterDescription = 'b';
 			isControlChar = 1;
 		}
+		if (character == '\f') {
+				characterDescription = 'f';
+				isControlChar = 1;
+		}
 		for(i = 0; i < len; i++) {
 			if (i<len-1 && str[i] == '\\' && str[i+1] == characterDescription) {
 				tag_len -= 1;
@@ -151,6 +163,10 @@ ctr_object* ctr_string_unescape(ctr_object* myself, ctr_argument* argumentList) 
 	tlen = len + tag_len;
 	tstr = ctr_heap_allocate( tlen * sizeof( char ) );
 	for(i = 0; i < len; i++) {
+		if (str[i] == 0) {
+			tstr[k++] = '?'; // filter 0 bytes
+			continue;
+		}
 		unescaped = 0;
 		for (q = 0; q < numOfCharacters; q ++) {
 			character = characters[q];
@@ -172,6 +188,10 @@ ctr_object* ctr_string_unescape(ctr_object* myself, ctr_argument* argumentList) 
 				characterDescription = 'b';
 				isControlChar = 1;
 			}
+			if (character == '\f') {
+				characterDescription = 'f';
+				isControlChar = 1;
+			}
 			if (i<len-1 && str[i] == '\\' && str[i+1] == characterDescription) {
 				if (isControlChar) {
 					if ( characterDescription == 'n' ) {
@@ -185,6 +205,9 @@ ctr_object* ctr_string_unescape(ctr_object* myself, ctr_argument* argumentList) 
 					}
 					if ( characterDescription == 'b' ) {
 						tstr[k++] = '\b';
+					}
+					if ( characterDescription == 'f' ) {
+						tstr[k++] = '\f';
 					}
 				} else {
 					tstr[k++] = str[i+1];

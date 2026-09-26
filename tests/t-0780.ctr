@@ -1,0 +1,86 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := List new ;
+	# {"key":"normal"} normal ASCII
+	( Dict new put: ['normal'] at: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Dict new put: ['hello world'] at: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Dict new put: ['"'] at: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Dict new put: ['backslash: \\'] at: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Dict new put: ['slash: /'] at: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Dict new put: ['backspace: \b'] at: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Dict new put: ['formfeed: \f'] at: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Dict new put: ['newline: \n'] at: ['key'] ) ;
+	( Dict new put: ['newline: ↵'] at: ['key'] ) ;
+	( Dict new put: ['newline: 
+	'] at: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Dict new put: ['carriage return: \r'] at: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Dict new put: ['tab \t'] at: ['key'] ) ;
+	( Dict new put: ['tab ⇿'] at: ['key'] ) ;
+	( Dict new put: ['tab  '] at: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Dict new put: ['NUL \u0000'] at: ['key'] ) ;
+	( Dict new put: ['NUL \0'] at: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Dict new put: ['control: \u0001'] at: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Dict new put: ['control: \u001F'] at: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Dict new put: ['unicode: é'] at: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Dict new put: ['unicode: €'] at: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Dict new put: ['unicode: 日本語'] at: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Dict new put: ['unicode: 😀'] at: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Dict new put: ['unicode: 🧑‍💻'] at: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Dict new put: ['combining: e\u0301'] at: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Dict new put: ['escaped unicode: \u00e9'] at: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Dict new put: ['escaped unicode: \u20ac'] at: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Dict new put: ['escaped unicode: \ud83d\ude00'] at: ['key'] ) ;
+	# {"key":""} empty value
+	( Dict new put: [''] at: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Dict new put: ['@ < > & = % + ? #'] at: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Dict new put: ['''] at: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Dict new put: ['multiple: \" \\ \n \r \t'] at: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Dict new put: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] at: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Dict new put: [' value'] at: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Dict new put: ['value '] at: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Dict new put: [' \t\n\r '] at: ['key'] )
+	.
+
+dicts each: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Dict new put: d key at: ['key']).
+	>> b := JSON jsonify: (Dict new put: ['value'] at: d key).
+	>> e := JSON object: a.
+	>> f := JSON object: b.
+	((e key = d key and: (f ? d key = ['value'])) or: (e key = ['NUL ?'])) true: {
+		Out write: ['OK'], stop.
+	}, else: {
+		Out write: ['Unable to properly encode/decode: '] + d + j, stop.
+		Program end.
+	}.
+}.
