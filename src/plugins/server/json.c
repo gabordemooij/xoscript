@@ -15,7 +15,8 @@
  * If the character is a control character, the well known
  * C-based character substitute will be used.
  */
-ctr_object* ctr_string_escape(ctr_object* myself, char* characters)  {
+ctr_object* ctr_string_escape(ctr_object* myself)  {
+	char* characters = "\"\n\b\r\t\f\\";
 	ctr_object* newString = NULL;
 	char* str = myself->value.svalue->value;
 	long  len = myself->value.svalue->vlen;
@@ -45,8 +46,6 @@ ctr_object* ctr_string_escape(ctr_object* myself, char* characters)  {
 			}
 		}
 	}
-	//printf("tlen = %ld, tag_len = %ld \n",tlen, tag_len);
-	
 	tlen = len + tag_len;
 	tstr = ctr_heap_allocate( tlen * sizeof( char ) );
 	for(i = 0; i < len; i++) {
@@ -105,9 +104,10 @@ ctr_object* ctr_string_escape(ctr_object* myself, char* characters)  {
  *
  * 'UnEscapes' the specified ASCII character in a string.
  */
-ctr_object* ctr_string_unescape(ctr_object* myself, char* characters)  {
+ctr_object* ctr_string_unescape(ctr_object* myself )  {
 	ctr_object* newString = NULL;
 	char character;
+	char* characters = "\"\n\b\r\t\f\\";
 	char characterDescription;
 	char* str = myself->value.svalue->value;
 	long  len = myself->value.svalue->vlen;
@@ -251,7 +251,7 @@ ctr_object* ctr_jsmn_dump( char* data, jsmntok_t** tt ) {
 	}
 	if (t->type == JSMN_STRING) {
 		answer = ctr_build_string( (data + t->start), (t->end - t->start) );
-		answer = ctr_string_unescape( answer, "\"\t\b\n\r\f\\" );
+		answer = ctr_string_unescape( answer );
 		*(tt)+=1;
 	}
 	else if (t->type == JSMN_PRIMITIVE ) {
@@ -378,7 +378,7 @@ void ctr_json_jsonify_array(ctr_object* myself, ctr_object* array, ctr_object*  
 		else if ( arrayElement->info.type == CTR_OBJECT_TYPE_OTSTRING ) {
 			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
 			ctr_string_append( string, newArgumentList );
-			newArgumentList->object = ctr_string_escape( arrayElement, "\"\n\b\r\t\f\\" );
+			newArgumentList->object = ctr_string_escape( arrayElement );
 			ctr_string_append( string, newArgumentList );
 			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
 			ctr_string_append( string, newArgumentList );
@@ -435,7 +435,7 @@ ctr_object* ctr_json_jsonify(ctr_object* myself, ctr_argument* argumentList) {
 		else if ( mapItem->key->info.type == CTR_OBJECT_TYPE_OTSTRING ) {
 			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
 			ctr_string_append( string, newArgumentList );
-			newArgumentList->object = ctr_string_escape( mapItem->key, "\"\n\b\r\t\f\\" );
+			newArgumentList->object = ctr_string_escape( mapItem->key );
 			ctr_string_append( string, newArgumentList );
 			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
 			ctr_string_append( string, newArgumentList );
@@ -461,7 +461,7 @@ ctr_object* ctr_json_jsonify(ctr_object* myself, ctr_argument* argumentList) {
 		else if ( mapItem->value->info.type == CTR_OBJECT_TYPE_OTSTRING ) {
 			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
 			ctr_string_append( string, newArgumentList );
-			newArgumentList->object = ctr_string_escape( mapItem->value, "\"\n\b\r\t\f\\" );
+			newArgumentList->object = ctr_string_escape( mapItem->value );
 			ctr_string_append( string, newArgumentList );
 			newArgumentList->object = ctr_build_string_from_cstring( "\"" );
 			ctr_string_append( string, newArgumentList );
