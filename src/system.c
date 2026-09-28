@@ -1957,6 +1957,7 @@ void ctr_dumper_dump_object(ctr_object* obj) {
 			&& obj->link != CtrStdFormat
 			&& obj->link != CtrStdINT64
 			&& obj->link != CtrStdSlurp
+			&& obj->link != CtrStdShellCommand
 		) {
 			ctr_dumper_dump_object(obj->link);
 		} else {
@@ -2110,6 +2111,10 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_INT64DESTRUCTOR;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
+		}  else if (pointer == CtrStdShellCommand) {
+			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_CMD;
+			memcpy(xpointer, &u, sizeof(uintptr_t));
+			continue;
 		}
 		//replace pointer with id
 		int found_address = 0;
@@ -2175,7 +2180,8 @@ static void* ctr_dumper_map_id2ptr[23] = {
 	[CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR] = &ctr_internal_destructor_clock,
 	[CTR_WIREABLE_KNOWN_INT64] = &CtrStdINT64,
 	[CTR_WIREABLE_KNOWN_INT64DESTRUCTOR] = &ctr_internal_destructor_int64,
-	[CTR_WIREABLE_KNOWN_PATH] = &CtrStdSlurp
+	[CTR_WIREABLE_KNOWN_PATH] = &CtrStdSlurp,
+	[CTR_WIREABLE_KNOWN_CMD] = &CtrStdShellCommand
 };
 
 ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
