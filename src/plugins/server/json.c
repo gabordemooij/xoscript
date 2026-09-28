@@ -17,6 +17,7 @@
  */
 ctr_object* ctr_string_escape(ctr_object* myself)  {
 	char* characters = "\"\n\b\r\t\f\\";
+	char* descriptions = "\"nbrtf\\";
 	ctr_object* newString = NULL;
 	char* str = myself->value.svalue->value;
 	long  len = myself->value.svalue->vlen;
@@ -27,8 +28,6 @@ ctr_object* ctr_string_escape(ctr_object* myself)  {
 	ctr_size numOfCharacters = 0;
 	long tlen = 0;
 	char character;
-	char characterDescription;
-	char isControlChar = 0;
 	char escaped;
 	long tag_len = 0;
 	numOfCharacters =strlen(characters);
@@ -37,8 +36,6 @@ ctr_object* ctr_string_escape(ctr_object* myself)  {
 	}
 	for (q = 0; q < numOfCharacters; q ++) {
 		character = characters[q];
-		isControlChar = 0;
-		characterDescription = character;
 		for(i =0; i < len; i++) {
 			char c = str[i];
 			if (c == character) {
@@ -57,34 +54,9 @@ ctr_object* ctr_string_escape(ctr_object* myself)  {
 		escaped = 0;
 		for (q = 0; q < numOfCharacters; q ++) {
 			character = characters[q];
-			isControlChar = 0;
-			if (character == '\t') {
-				characterDescription = 't';
-				isControlChar = 1;
-			}
-			if (character == '\r') {
-				characterDescription = 'r';
-				isControlChar = 1;
-			}
-			if (character == '\n') {
-				characterDescription = 'n';
-				isControlChar = 1;
-			}
-			if (character == '\b') {
-				characterDescription = 'b';
-				isControlChar = 1;
-			}
-			if (character == '\f') {
-				characterDescription = 'f';
-				isControlChar = 1;
-			}
 			if (c == character) {
 				tstr[k++] = '\\';
-				if (isControlChar) {
-					tstr[k++] = characterDescription;
-				} else {
-					tstr[k++] = str[i];
-				}
+				tstr[k++] = descriptions[q];
 				escaped = 1;
 				break;
 			}
@@ -106,56 +78,26 @@ ctr_object* ctr_string_escape(ctr_object* myself)  {
  */
 ctr_object* ctr_string_unescape(ctr_object* myself )  {
 	ctr_object* newString = NULL;
-	char character;
 	char* characters = "\"\n\b\r\t\f\\";
-	char characterDescription;
+	char* descriptions = "\"nbrtf\\";
 	char* str = myself->value.svalue->value;
 	long  len = myself->value.svalue->vlen;
 	char* tstr;
-	char isControlChar = 0;
 	ctr_size numOfCharacters;
 	char unescaped;
 	ctr_size q;
 	long i=0;
 	long k=0;
-	long tlen = 0;
-	long tag_len = 0;
+	ctr_size tlen = len;
 	numOfCharacters = strlen(characters);
-	if (numOfCharacters < 1) {
-		return myself;
-	}
 	for (q = 0; q < numOfCharacters; q ++) {
-		character = characters[q];
-		isControlChar = 0;
-		characterDescription = character;
-		if (character == '\t') {
-			characterDescription = 't';
-			isControlChar = 1;
-		}
-		if (character == '\r') {
-			characterDescription = 'r';
-			isControlChar = 1;
-		}
-		if (character == '\n') {
-			characterDescription = 'n';
-			isControlChar = 1;
-		}
-		if (character == '\b') {
-			characterDescription = 'b';
-			isControlChar = 1;
-		}
-		if (character == '\f') {
-				characterDescription = 'f';
-				isControlChar = 1;
-		}
 		for(i = 0; i < len; i++) {
-			if (i<len-1 && str[i] == '\\' && str[i+1] == characterDescription) {
-				tag_len -= 1;
+			if (i<len-1 && str[i] == '\\' && str[i+1] == descriptions[q]) {
+				tlen -= 1;
 			}
 		}
 	}
-	tlen = len + tag_len;
-	tstr = ctr_heap_allocate( tlen * sizeof( char ) );
+	tstr = ctr_heap_allocate( tlen );
 	for(i = 0; i < len; i++) {
 		if (str[i] == 0) {
 			tstr[k++] = '?'; // filter 0 bytes
@@ -163,51 +105,11 @@ ctr_object* ctr_string_unescape(ctr_object* myself )  {
 		}
 		unescaped = 0;
 		for (q = 0; q < numOfCharacters; q ++) {
-			character = characters[q];
-			characterDescription = character;
-			isControlChar = 0;
-			if (character == '\t') {
-				characterDescription = 't';
-				isControlChar = 1;
-			}
-			if (character == '\r') {
-				characterDescription = 'r';
-				isControlChar = 1;
-			}
-			if (character == '\n') {
-				characterDescription = 'n';
-				isControlChar = 1;
-			}
-			if (character == '\b') {
-				characterDescription = 'b';
-				isControlChar = 1;
-			}
-			if (character == '\f') {
-				characterDescription = 'f';
-				isControlChar = 1;
-			}
-			if (i<len-1 && str[i] == '\\' && str[i+1] == characterDescription) {
-				if (isControlChar) {
-					if ( characterDescription == 'n' ) {
-						tstr[k++] = '\n';
-					}
-					if ( characterDescription == 'r' ) {
-						tstr[k++] = '\r';
-					}
-					if ( characterDescription == 't' ) {
-						tstr[k++] = '\t';
-					}
-					if ( characterDescription == 'b' ) {
-						tstr[k++] = '\b';
-					}
-					if ( characterDescription == 'f' ) {
-						tstr[k++] = '\f';
-					}
-				} else {
-					tstr[k++] = str[i+1];
-				}
+			if (i<len-1 && str[i] == '\\' && str[i+1] == descriptions[q]) {
+				tstr[k++]=characters[q];
 				i++;
 				unescaped = 1;
+				break;
 			}
 		}
 		if (unescaped == 0) {
