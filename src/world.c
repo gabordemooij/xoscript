@@ -572,7 +572,7 @@ ctr_object* ctr_internal_cast2bool( ctr_object* obj2convert_triggers_GC ) {
  *
  * Opens a new context to keep track of variables.
  */
-void ctr_open_context() {
+void ctr_open_context(void) {
 	ctr_object* context;
 	if (ctr_context_id >= 299) {
 		CtrStdFlow = ctr_error( CTR_ERR_NESTING, 0 );
@@ -589,7 +589,7 @@ void ctr_open_context() {
  *
  * Closes a context.
  */
-void ctr_close_context() {
+void ctr_close_context(void) {
 	ctr_contexts[ctr_context_id]->info.sticky = 0;
 	if (ctr_context_id == 0) return;
 	ctr_context_id--;
@@ -704,7 +704,7 @@ void ctr_set(ctr_object* key, ctr_object* object) {
 	ctr_internal_object_set_property(context, key, object, 0);
 }
 
-static void ctr_internal_set_feature_flags() {
+static void ctr_internal_set_feature_flags(void) {
 	// Set feature flag defaults
 	// Don't read env vars, too slow (CGI context)
 	// (and harder to test)
@@ -719,7 +719,7 @@ static void ctr_internal_set_feature_flags() {
  * Populate the World of Citrine.
  */
 ctr_object* currentMethod;
-void ctr_initialize_world() {
+void ctr_initialize_world(void) {
 	ctr_internal_recursion = 0;
 	arc4random_buf(CtrHashKey, 16);
 	ctr_first_object = NULL;

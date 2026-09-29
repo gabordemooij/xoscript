@@ -160,7 +160,7 @@ void ctr_gc_sweep( int all ) {
  * @internal
  * Garbage Collector sweep.
  */
-void  ctr_gc_internal_collect() {
+void  ctr_gc_internal_collect(void) {
 	ctr_object* context;
 	int oldcid;
 	ctr_gc_dust_counter = 0;
@@ -178,7 +178,7 @@ void  ctr_gc_internal_collect() {
 	ctr_context_id = oldcid;
 }
 
-void ctr_gc_cycle() {
+void ctr_gc_cycle(void) {
 	if ( ( ( ctr_gc_mode & 1 ) && ctr_gc_alloc > ( ctr_gc_memlimit * 0.8 ) ) || ctr_gc_mode & 4 ) {
 		ctr_gc_internal_collect();
 	}
@@ -901,7 +901,7 @@ ctr_object* ctr_program_feature(ctr_object* myself, ctr_argument* argumentList) 
 }
 
 
-double ctr_internal_versiontime() {
+double ctr_internal_versiontime(void) {
 	return CtrVersionTime;
 }
 

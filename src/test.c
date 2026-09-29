@@ -23,7 +23,7 @@ void ctr_test( int t ) {
 /**
  * Perform token test
  */
-void ctr_coretest_tokens() {
+void ctr_coretest_tokens(void) {
 	char* buffer;
 	int token;
 	ctr_program_length = 40;
@@ -96,7 +96,7 @@ void ctr_coretest_tokens() {
 /**
  * Perform parser test
  */
-void ctr_coretest_parser() {
+void ctr_coretest_parser(void) {
 	char* buffer;
 	ctr_program_length = 40;
 	buffer = calloc(40,1);
@@ -114,7 +114,7 @@ void ctr_coretest_parser() {
 /**
  * Test memory functions.
  */
-void ctr_coretest_memory() {
+void ctr_coretest_memory(void) {
 	char* chunk;
 	size_t size;
 	size_t expected_size;
@@ -136,7 +136,7 @@ void ctr_coretest_memory() {
 /**
  * Run Core tests.
  */
-void ctr_coretest() {
+void ctr_coretest(void) {
 	printf("Running Internal Tests\n");
 	ctr_coretest_tokens();
 	ctr_coretest_parser();

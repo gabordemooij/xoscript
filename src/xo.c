@@ -19,7 +19,7 @@ int ctr_mode_memory_profiler;
  * Displays a Welcome message, copyright information,
  * version information and usage.
  */
-void ctr_cli_welcome() {
+void ctr_cli_welcome(void) {
 	printf( CTR_MSG_WELCOME );
 	printf( CTR_MSG_COPYRIGHT );
 	printf( CTR_VERSION );
@@ -43,7 +43,7 @@ void ctr_cli_read_args(int argc, char* argv[]) {
 /**
  * Inits the Citrine environment.
  */
-int ctr_init() {
+int ctr_init(void) {
 	ctr_in_message = 0;
 	ctr_callstack_index = 0;
 	ctr_source_map_head = NULL;

@@ -228,7 +228,7 @@ ctr_tlistitem* ctr_cparse_messages(ctr_tnode* r, int mode) {
  *
  * Generates a set of nested nodes.
  */
-ctr_tnode* ctr_cparse_popen() {
+ctr_tnode* ctr_cparse_popen(void) {
 	ctr_tnode* r;
 	ctr_tlistitem* li;
 	int t;
@@ -252,7 +252,7 @@ ctr_tnode* ctr_cparse_popen() {
  *
  * Generates a set of AST nodes to represent a block of code.
  */
-ctr_tnode* ctr_cparse_block() {
+ctr_tnode* ctr_cparse_block(void) {
 	ctr_tnode* r;
 	ctr_tlistitem* codeBlockPart1;
 	ctr_tlistitem* codeBlockPart2;
@@ -355,7 +355,7 @@ ctr_tnode* ctr_cparse_block() {
  *
  * Generates the nodes to respresent a variable or property.
  */
-ctr_tnode* ctr_cparse_ref() {
+ctr_tnode* ctr_cparse_ref(void) {
 	ctr_tnode* r;
 	char* tmp;
 	ctr_clex_tok();
@@ -395,7 +395,7 @@ ctr_tnode* ctr_cparse_ref() {
  *
  * Generates a node to represent a string.
  */
-ctr_tnode* ctr_cparse_string() {
+ctr_tnode* ctr_cparse_string(void) {
 	ctr_tnode* r;
 	char* n;
 	ctr_size vlen;
@@ -416,7 +416,7 @@ ctr_tnode* ctr_cparse_string() {
  *
  * Generates a node to represent a number.
  */
-ctr_tnode* ctr_cparse_number() {
+ctr_tnode* ctr_cparse_number(void) {
 	char* n;
 	ctr_tnode* r;
 	long l;
@@ -436,7 +436,7 @@ ctr_tnode* ctr_cparse_number() {
  *
  * Generates a node to represent a receiver (of a message).
  */
-ctr_tnode* ctr_cparse_receiver() {
+ctr_tnode* ctr_cparse_receiver(void) {
 	int t;
 	t = ctr_clex_tok();
 	ctr_clex_putback();
@@ -549,7 +549,7 @@ ctr_tnode* ctr_cparse_expr(int mode) {
  *
  * Generates a node to represent a return from a block of code.
  */
-ctr_tnode* ctr_cparse_ret() {
+ctr_tnode* ctr_cparse_ret(void) {
 	ctr_tlistitem* li;
 	ctr_tnode* r;
 	ctr_clex_tok();
@@ -567,7 +567,7 @@ ctr_tnode* ctr_cparse_ret() {
  *
  * Generates a node to represent the end of a program.
  */
-ctr_tnode* ctr_cparse_fin() {
+ctr_tnode* ctr_cparse_fin(void) {
 	ctr_tnode* f;
 	ctr_clex_tok();
 	f = ctr_cparse_create_node( CTR_AST_NODE );
@@ -580,7 +580,7 @@ ctr_tnode* ctr_cparse_fin() {
  *
  * Generates a set of nodes representing a statement.
  */
-ctr_tlistitem* ctr_cparse_statement() {
+ctr_tlistitem* ctr_cparse_statement(void) {
 	ctr_tlistitem* li = (ctr_tlistitem*) ctr_heap_allocate_tracked( sizeof(ctr_tlistitem) );
 	int t = ctr_clex_tok();
 	ctr_clex_putback();
@@ -608,7 +608,7 @@ ctr_tlistitem* ctr_cparse_statement() {
  * Generates the nodes to represent the entire program
  * as an Abstract Syntax Tree (AST).
  */
-ctr_tnode* ctr_cparse_program() {
+ctr_tnode* ctr_cparse_program(void) {
 	ctr_tnode* program = ctr_cparse_create_node( CTR_AST_PROGRAM );
 	ctr_tlistitem* pli;
 	int first = 1;

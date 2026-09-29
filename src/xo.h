@@ -397,18 +397,16 @@ extern char* ctr_mode_hfile1;
 extern char* ctr_mode_hfile2;
 extern int ctr_mode_memory_profiler;
 
-extern void ctr_cli_welcome();
-
 /**
  * Lexer functions
  */
 extern void ctr_clex_load(char* prg);
-extern int ctr_clex_tok();
-extern char* ctr_clex_code_pointer();
-extern char* ctr_clex_tok_value();
-extern long ctr_clex_tok_value_length();
-extern void ctr_clex_putback();
-extern char* ctr_clex_readstr();
+extern int ctr_clex_tok(void);
+extern char* ctr_clex_code_pointer(void);
+extern char* ctr_clex_tok_value(void);
+extern long ctr_clex_tok_value_length(void);
+extern void ctr_clex_putback(void);
+extern char* ctr_clex_readstr(void);
 extern char* ctr_clex_tok_describe( int token );
 extern char* ctr_clex_keyword_me_icon;
 extern char* ctr_clex_keyword_my_icon;
@@ -449,8 +447,8 @@ extern size_t ctr_utf8sanitize_fast(char *s, size_t n);
  */
 extern ctr_tnode* ctr_cparse_parse(char* prg, char* pathString);
 extern ctr_tnode* ctr_cparse_expr(int mode);
-extern ctr_tnode* ctr_cparse_ret();
-extern ctr_tnode* ctr_cparse_block();
+extern ctr_tnode* ctr_cparse_ret(void);
+extern ctr_tnode* ctr_cparse_block(void);
 extern ctr_tnode* ctr_cparse_create_node( int type );
 
 /**
@@ -464,7 +462,7 @@ extern ctr_object* ctr_cwlk_expr(ctr_tnode* node, char* wasReturn);
  * Internal World functions
  */
 extern int ctr_in_message;
-extern void ctr_initialize_world();
+extern void ctr_initialize_world(void);
 extern char* ctr_internal_memmem(char* haystack, long hlen, char* needle, long nlen, int reverse );
 extern void ctr_internal_object_add_property(ctr_object* owner, ctr_object* key, ctr_object* value, int m);
 extern void ctr_internal_object_set_property(ctr_object* owner, ctr_object* key, ctr_object* value, int is_method);
@@ -494,13 +492,13 @@ extern void ctr_heap_init(void);
 extern int ctr_heap_is_tracked(void* ptr);
 extern void ctr_heap_set_tracked_objects(int toggle);
 extern int ctr_heap_recycle_object(ctr_object* old);
-extern ctr_object* ctr_heap_recycled_object();
+extern ctr_object* ctr_heap_recycled_object(void);
 
 /**
  * Scoping functions
  */
-extern void ctr_open_context();
-extern void ctr_close_context();
+extern void ctr_open_context(void);
+extern void ctr_close_context(void);
 
 /**
  * Global Scoping variables
@@ -858,7 +856,7 @@ extern ctr_object* ctr_gc_collect(ctr_object* myself, ctr_argument* argumentList
 extern ctr_object* ctr_gc_setmode(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_gc_setmemlimit(ctr_object* myself, ctr_argument* argumentList);
 extern void ctr_gc_sweep( int all );
-extern void ctr_gc_cycle();
+extern void ctr_gc_cycle(void);
 
 /**
  * Slurp Object Interface
@@ -894,25 +892,25 @@ extern uint64_t ctr_gc_memlimit;
 /**
  * Literal Constructors (internal only)
  */
-extern ctr_object* ctr_build_empty_string();
+extern ctr_object* ctr_build_empty_string(void);
 extern ctr_object* ctr_build_string(const char* object, ctr_size vlen);
 extern ctr_object* ctr_build_block(ctr_tnode* node);
 extern ctr_object* ctr_build_number(char* object);
 extern ctr_object* ctr_build_number_from_string(char* fixedStr, ctr_size strLength);
 extern ctr_object* ctr_build_number_from_float(ctr_number floatNumber);
 extern ctr_object* ctr_build_bool(int truth);
-extern ctr_object* ctr_build_nil();
+extern ctr_object* ctr_build_nil(void);
 extern ctr_object* ctr_build_string_from_cstring( char* str );
-extern void ctr_gc_internal_collect();
+extern void ctr_gc_internal_collect(void);
 extern ctr_object* ctr_gc_internal_pin( ctr_object* object );
 extern ctr_object* ctr_gc_memory(ctr_object* myself, ctr_argument* argumentList);
 
 extern void* ctr_heap_allocate( size_t size );
 extern void* ctr_heap_allocate_tracked( size_t size );
 extern void  ctr_heap_free( void* ptr );
-extern void  ctr_heap_free_rest();
+extern void  ctr_heap_free_rest(void);
 extern void* ctr_heap_reallocate(void* oldptr, size_t size );
-extern size_t ctr_heap_get_latest_tracking_id();
+extern size_t ctr_heap_get_latest_tracking_id(void);
 extern void* ctr_heap_reallocate_tracked(size_t tracking_id, size_t size );
 extern char* ctr_heap_allocate_cstring( ctr_object* o );
 extern size_t ctr_heap_size( void* ptr );
@@ -925,9 +923,9 @@ extern char ctr_deserialize_mode;
 extern char ctr_program_log_type;
 extern void ctr_print_error(char* error, int code);
 
-size_t ctr_heap_tracker_memoryblocknumber();
+size_t ctr_heap_tracker_memoryblocknumber(void);
 size_t ctr_heap_tracker_rewind( size_t memoryBlockNumber );
-int ctr_init();
+int ctr_init(void);
 
 extern ctr_object* ctr_int64_new(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_int64_from_string(ctr_object* myself, ctr_argument* argumentList);

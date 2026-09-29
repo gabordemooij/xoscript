@@ -49,7 +49,7 @@ int fsize(char* filename) {
  * On loading, the plugin will get a chance to add its objects to the world
  * through a constructor function.
  */
-typedef void* (*plugin_init_func)();
+typedef void* (*plugin_init_func)(void);
 void* ctr_internal_plugin_find(ctr_object* key) {
 	ctr_object* modNameObject = ctr_internal_cast2string(key);
 	void* handle;

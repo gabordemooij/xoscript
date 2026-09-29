@@ -135,7 +135,7 @@ int ctr_heap_recycle_object(ctr_object* old) {
  *
  * @return ctr_object*
  */
-ctr_object* ctr_heap_recycled_object() {
+ctr_object* ctr_heap_recycled_object(void) {
 	if (ctr_recycled_object_index > 0) {
 		ctr_object* r = ctr_recycled_objects[--ctr_recycled_object_index];
 		r->properties->head = NULL;
@@ -154,7 +154,7 @@ ctr_object* ctr_heap_recycled_object() {
  * the tracked memory allocator back to this point later on.
  * Used for deserializing.
  */
-size_t ctr_heap_tracker_memoryblocknumber() {
+size_t ctr_heap_tracker_memoryblocknumber(void) {
 	return numberOfMemBlocks;
 }
 
@@ -225,14 +225,14 @@ void* ctr_heap_reallocate_tracked( size_t tracking_id, size_t size ) {
  *
  * @return size_t
  */
-size_t ctr_heap_get_latest_tracking_id() {
+size_t ctr_heap_get_latest_tracking_id(void) {
 	return numberOfMemBlocks - 1;
 }
 
 /**
  * Frees all tracked memory blocks.
  */
-void ctr_heap_free_rest() {
+void ctr_heap_free_rest(void) {
 	size_t i;
 	ctr_heap_set_tracked_objects(0);
 	for ( i = 0; i < numberOfMemBlocks; i ++) {

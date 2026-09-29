@@ -11,7 +11,7 @@ int ctr_in_message;
  * @test376
  */
 
-ctr_object* ctr_build_nil() {
+ctr_object* ctr_build_nil(void) {
 	return CtrStdNil;
 }
 
@@ -1340,7 +1340,7 @@ ctr_object* ctr_build_string_from_cstring(char* cstring) {
  * the 'magic' number 0 when building a string, it is more
  * readable this way and your intention is clearer.
  */
-ctr_object* ctr_build_empty_string() {
+ctr_object* ctr_build_empty_string(void) {
 	return ctr_build_string( "", 0 );
 }
 

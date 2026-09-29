@@ -103,7 +103,7 @@ void ctr_clex_load(char* prg) {
  * Returns the string of characters representing the value
  * of the currently selected token.
  */
-char* ctr_clex_tok_value() {
+char* ctr_clex_tok_value(void) {
 	return ctr_clex_buffer;
 }
 
@@ -143,7 +143,7 @@ char* ctr_clex_tok_describe(int token) {
  *
  * Returns the length of the value of the currently selected token.
  */
-long ctr_clex_tok_value_length() {
+long ctr_clex_tok_value_length(void) {
 	return ctr_clex_tokvlen;
 }
 
@@ -152,7 +152,7 @@ long ctr_clex_tok_value_length() {
  *
  * Puts back a token and resets the pointer to the previous one.
  */
-void ctr_clex_putback() {
+void ctr_clex_putback(void) {
 	ctr_code = ctr_clex_oldptr;
 	ctr_clex_oldptr = ctr_clex_olderptr;
 	ctr_clex_line_number = ctr_clex_old_line_number;
@@ -165,7 +165,7 @@ void ctr_clex_putback() {
  * Reads the next token from the program buffer and selects this
  * token.
  */
-int ctr_clex_tok() {
+int ctr_clex_tok(void) {
 	char c;
 	int i;
 	char eol;
@@ -289,7 +289,7 @@ int ctr_clex_tok() {
 	return CTR_TOKEN_REF;
 }
 
-char* ctr_clex_code_pointer() {
+char* ctr_clex_code_pointer(void) {
 	return ctr_code;
 }
 
@@ -298,7 +298,7 @@ char* ctr_clex_code_pointer() {
  *
  * Reads an entire string between a pair of quotes.
  */
-char* ctr_clex_readstr() {
+char* ctr_clex_readstr(void) {
 	ctr_size nesting = 0;
 	char* strbuff;
 	char c;
