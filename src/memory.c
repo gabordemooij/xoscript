@@ -265,7 +265,7 @@ int ctr_heap_is_tracked(void* ptr) {
 	if (ptr == NULL) return 0;
 	if (!tracked_objects) return 0;
 	for ( int i = 0; i < numberOfMemBlocks; i ++) {
-		if (ptr >= memBlocks[i].space && ptr <= memBlocks[i].space + memBlocks[i].size ) {
+		if (ptr >= memBlocks[i].space && (char*) ptr <= (char*) memBlocks[i].space + memBlocks[i].size ) {
 			return 1;
 		}
 	}
