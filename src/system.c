@@ -2099,7 +2099,7 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_PATH;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
-		} else if (pointer == ctr_internal_destructor_clock) {
+		} else if (memcmp((uintptr_t*)pointer, (uintptr_t*) &ctr_internal_destructor_clock, sizeof(uintptr_t))==0) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
@@ -2107,7 +2107,7 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_INT64;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
-		}  else if (pointer == ctr_internal_destructor_int64) {
+		} else if (memcmp((uintptr_t*)pointer, (uintptr_t*) &ctr_internal_destructor_int64, sizeof(uintptr_t))==0) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_INT64DESTRUCTOR;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
@@ -2177,9 +2177,7 @@ static void* ctr_dumper_map_id2ptr[23] = {
 	[CTR_WIREABLE_KNOWN_NONE] = &CtrStdNil,
 	[CTR_WIREABLE_KNOWN_BOOL] = &CtrStdBool,
 	[CTR_WIREABLE_KNOWN_FORMAT] = &CtrStdFormat,
-	[CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR] = &ctr_internal_destructor_clock,
 	[CTR_WIREABLE_KNOWN_INT64] = &CtrStdINT64,
-	[CTR_WIREABLE_KNOWN_INT64DESTRUCTOR] = &ctr_internal_destructor_int64,
 	[CTR_WIREABLE_KNOWN_PATH] = &CtrStdSlurp,
 	[CTR_WIREABLE_KNOWN_CMD] = &CtrStdShellCommand
 };
