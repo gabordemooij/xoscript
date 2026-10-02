@@ -293,9 +293,9 @@ ctr_object* ctr_file_list(ctr_object* myself, ctr_argument* argumentList) {
 			pathBufSize = pathSizeNeeded;
 			fullPath = ctr_heap_reallocate(fullPath, pathBufSize + 1);
 		}
-		strcpy( fullPath, pathValue );
-		strcat( fullPath, CTR_DIRSEP );
-		strcat( fullPath, entry->d_name);
+		if (snprintf(fullPath, pathSizeNeeded + 1, "%s%s%s", pathValue, CTR_DIRSEP, entry->d_name) != pathSizeNeeded ) {
+			ctr_print_error("Assert failed: fullPath has invalid length.", 1);
+		}
 		if (realpath( fullPath, pathBuf )) {
 		/* lstat is slow, but we have no choice, there is no other way to keep this portable */
 		lstat(pathBuf, &st);

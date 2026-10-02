@@ -2418,7 +2418,9 @@ ctr_object* ctr_int64_from_string(ctr_object* myself, ctr_argument* argumentList
 
 ctr_object* ctr_int64_to_string(ctr_object* myself, ctr_argument* argumentList) {
 	char* buf = ctr_heap_allocate(21);
-	sprintf(buf, "%lld", *((long long*)myself->value.rvalue->ptr));
+	if (snprintf(buf, 20, "%lld", *((long long*)myself->value.rvalue->ptr)) > 20) {
+		ctr_error("snprintf failed", 1);
+	}
 	ctr_object* answer = ctr_build_string_from_cstring(buf);
 	ctr_heap_free(buf);
 	return answer;
