@@ -1722,9 +1722,8 @@ void ctr_dumper_dump_clock_resource(ctr_resource* resource) {
 	w->id = CtrWireableID;
 	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
 	w->address = (uintptr_t) resource;
-	w->numofpointers = 2;
+	w->numofpointers = 1;
 	w->pointers[0] = offsetof(ctr_resource, ptr);
-	w->pointers[1] = offsetof(ctr_resource, destructor);
 	w->next = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
 	wirelist_current = w->next;
 	ctr_wireable_add(w);
@@ -1757,9 +1756,8 @@ void ctr_dumper_dump_int64_resource(ctr_resource* resource) {
 	w->id = CtrWireableID;
 	CtrWireableID += ( sizeof(ctr_wireable) + w->memsize );
 	w->address = (uintptr_t) resource;
-	w->numofpointers = 2;
+	w->numofpointers = 1;
 	w->pointers[0] = offsetof(ctr_resource, ptr);
-	w->pointers[1] = offsetof(ctr_resource, destructor);
 	w->next = ctr_heap_allocate_tracked(sizeof(ctr_wireable));
 	wirelist_current = w->next;
 	ctr_wireable_add(w);
@@ -2099,19 +2097,11 @@ void ctr_internal_unwire(ctr_wireable* w, ctr_wireable* wl) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_PATH;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
-		} else if (memcmp((uintptr_t*)pointer, (uintptr_t*) &ctr_internal_destructor_clock, sizeof(uintptr_t))==0) {
-			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR;
-			memcpy(xpointer, &u, sizeof(uintptr_t));
-			continue;
 		} else if (pointer == CtrStdINT64) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_INT64;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
-		} else if (memcmp((uintptr_t*)pointer, (uintptr_t*) &ctr_internal_destructor_int64, sizeof(uintptr_t))==0) {
-			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_INT64DESTRUCTOR;
-			memcpy(xpointer, &u, sizeof(uintptr_t));
-			continue;
-		}  else if (pointer == CtrStdShellCommand) {
+		} else if (pointer == CtrStdShellCommand) {
 			uintptr_t u = (uintptr_t) CTR_WIREABLE_KNOWN_CMD;
 			memcpy(xpointer, &u, sizeof(uintptr_t));
 			continue;
@@ -2222,36 +2212,28 @@ ctr_object* ctr_object_load( ctr_object* myself, ctr_argument* argumentList ) {
 				if (old == 0x0) {
 					*xpointer = 0;
 				} else if (old < 0x1000) {
-					if (old == CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR) {
-						*xpointer = (uintptr_t) ctr_internal_destructor_clock;
-						continue;
-					}
-					if (old == CTR_WIREABLE_KNOWN_INT64DESTRUCTOR) {
-						*xpointer = (uintptr_t) ctr_internal_destructor_int64;
-						continue;
-					}
 					*xpointer = (uintptr_t) *( (ctr_object**) ctr_dumper_map_id2ptr[old] );
 				} else {
 					*xpointer = (uintptr_t) (char*) ( old - 0x1000 + blob + sizeof(ctr_wireable) + sizeof(size_t) );
 				}
 			}
 		} else {
+			char* memblock = (char*) data + sizeof(size_t); //w->memblock; read the memblock that has been serialized
+			if (w->type == CTR_WIREABLE_TYPE_INT64RESOURCE) {
+				ctr_resource* rs = (ctr_resource*) memblock;
+				rs->destructor = ctr_internal_destructor_int64;
+			}
+			if (w->type == CTR_WIREABLE_TYPE_TIMERESOURCE) {
+				ctr_resource* rs = (ctr_resource*) memblock;
+				rs->destructor = ctr_internal_destructor_clock;
+			}
 			for(int i = 0; i < w->numofpointers; i++) {
 				int offset_pointer = w->pointers[i];
-				char* memblock = (char*) data + sizeof(size_t); //w->memblock; read the memblock that has been serialized
 				uintptr_t* xpointer = (uintptr_t*) (memblock + offset_pointer);
 				uintptr_t old = *xpointer;
 				if (old == 0x0) {
 					*xpointer = 0;
 				} else if (old < 0x1000) {
-					if (old == CTR_WIREABLE_KNOWN_TIMEDESTRUCTOR) {
-						*xpointer = (uintptr_t) ctr_internal_destructor_clock;
-						continue;
-					}
-					if (old == CTR_WIREABLE_KNOWN_INT64DESTRUCTOR) {
-						*xpointer = (uintptr_t) ctr_internal_destructor_int64;
-						continue;
-					}
 					*xpointer = (uintptr_t) *( (ctr_object**) ctr_dumper_map_id2ptr[old] );
 				} else {
 					*xpointer = (uintptr_t) (char*) ( old - 0x1000 + blob + sizeof(ctr_wireable) + sizeof(size_t) );
