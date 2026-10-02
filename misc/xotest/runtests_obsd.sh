@@ -20,23 +20,24 @@ else
 set -A LANGS en
 fi
 
-declare -A server_plugin_name
-server_plugin_name[es]="servidor"
-server_plugin_name[en]="server"
-server_plugin_name[nl]="server"
-
 if [[ $BUILD == "build" ]]; then
 LDFLAGS='-shared'
 for ISO in ${LANGS[@]}; 
 do
 export ISO
+
+SERVER="server"
+if [[ $ISO == "es" ]]; then
+	SERVER="servidor"
+fi
+
 make clean
 EXTRACFLAGS="-D TEST -D EXPERIMENTS"
 export EXTRACFLAGS
 make -f makefile.obsd clean
-PACKAGE="server" NAME=${server_plugin_name[$ISO]} make -f makefile.obsd plugin-clean
+PACKAGE="server" NAME=${SERVER} make -f makefile.obsd plugin-clean
 make -f makefile.obsd
-PACKAGE="server" NAME=${server_plugin_name[$ISO]} make -f makefile.obsd plugin
+PACKAGE="server" NAME=${SERVER} make -f makefile.obsd plugin
 cp build/OpenBSD/bin/xo build/OpenBSD/bin/xo$ISO #copy lang edition
 done
 fi
