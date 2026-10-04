@@ -58,7 +58,7 @@ static void on_submit(GtkButton *button,  gpointer user_data) {
 				g_free(text);
 			}
 			if (GTK_IS_CHECK_BUTTON(obj)) {
-				char* key = gtk_buildable_get_buildable_id(GTK_BUILDABLE(obj));
+				const char* key = gtk_buildable_get_buildable_id(GTK_BUILDABLE(obj));
 				gboolean checked = gtk_check_button_get_active(GTK_CHECK_BUTTON(obj));
 				if (strncmp("_RG", key, 3)==0) {
 					if (checked) {
