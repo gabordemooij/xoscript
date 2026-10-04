@@ -1021,3 +1021,4 @@ ctr_object* classname(ctr_object* myself, ctr_argument* argumentList) { \
 
 #define CTR_STRINGOBJ_CSTRING_EQUAL(a,b) ( a->value.svalue->vlen == strlen(b) && \
 	( !memcmp( a->value.svalue->value, b, a->value.svalue->vlen)))
+
