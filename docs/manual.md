@@ -2620,6 +2620,52 @@ add the dictionary for your language if it is not provided yet.
 
 {{translations}}
 
+# Tools
+
+This chapters discusses additional tools that work together with
+XOScript.
+
+## XOCL
+
+XOCL (XO Client) can be used to turn a webapp into a desktop
+application to reduce client-side attack surface (including XSS).
+
+Basic usage:
+
+```
+xsltproc gtk.xsl screen.html | ./xocl
+```
+
+XOCL reads XML from stdin and writes form field values to stdout.
+The current version supports GTK4 XML as input and JSON as output.
+To convert HTML to the target XML format, XSLT can be used, a
+default GTK4-XSLT is provided as well as an example HTML-file and
+an xocl_example1.sh script that ties it all together.
+
+The xocl_wrapper.sh template illustrates how to use XOCL in a
+persistent way, acting as a kind of application specific browser.
+The general idea is:
+
+```
+  curl URL
+     |
+ apply XSLT
+     |
+ stdin XOCL
+     |
+  jq result
+     |
+  curl post
+     |
+   repeat
+```
+
+The current version only supports GTK4, support for
+other GUI toolkits will be added (or you can add it yourself).
+This assumes the target GUI toolkit can already process XML, if not
+(like Motif), an additional XML adapter is needed.
+
+
 # Credits
 
 Original developer of xoscript: Gabor de Mooij
