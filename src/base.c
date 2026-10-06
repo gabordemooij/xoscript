@@ -319,6 +319,9 @@ ctr_object* ctr_object_message( ctr_object* myself, ctr_argument* argumentList )
 		ctr_error( CTR_ERR_EXP_ARR, 0 );
 		return CtrStdNil;
 	}
+	if ( !message->value.svalue->vlen ) {
+		return CtrStdNil;
+	}
 	int sticky = message->info.sticky;
 	message->info.sticky = 1;
 	ctr_size length = (int) ctr_array_count( arr,  NULL )->value.nvalue;
