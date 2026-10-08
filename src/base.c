@@ -667,7 +667,7 @@ ctr_object* ctr_bool_to_number(ctr_object* myself, ctr_argument* argumentList) {
  */
 ctr_object* ctr_build_number(char* n) {
 	ctr_object* numberObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTNUMBER);
-	numberObject->value.nvalue = atof(n);
+	numberObject->value.nvalue = strtod(n, NULL);
 	numberObject->link = CtrStdNumber;
 	return numberObject;
 }
