@@ -28,7 +28,6 @@ void ctr_coretest_tokens(void) {
 	int token;
 	ctr_program_length = 40;
 	buffer = calloc(40,1);
-	int bytes = 0;
 	if (snprintf( buffer, 39, "%s", CTR_DICT_PAREN_OPEN ) > 39) ctr_print_error("snprintf failed", 1);
 	ctr_clex_load( buffer );
 	token = ctr_clex_tok();
