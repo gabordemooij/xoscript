@@ -2437,7 +2437,7 @@ ctr_object* ctr_int64_to_string(ctr_object* myself, ctr_argument* argumentList) 
 		return CtrStdNil;\
 	}\
 	int64_t otherINT64 = *((int64_t*)other->value.rvalue->ptr);\
-	int64_t myINT64 = *((int64_t*)myself->value.rvalue->ptr);\
+	int64_t myINT64 __attribute__((unused)) = *((int64_t*)myself->value.rvalue->ptr);\
 
 /**
  * @def
