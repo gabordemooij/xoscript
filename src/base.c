@@ -1955,15 +1955,15 @@ ctr_object* ctr_string_to_boolean(ctr_object* myself, ctr_argument* argumentList
  */
 ctr_object* ctr_string_split(ctr_object* myself, ctr_argument* argumentList) {
 	char* str = myself->value.svalue->value;
-	long len = myself->value.svalue->vlen;
+	size_t len = myself->value.svalue->vlen;
 	ctr_object* delimObject  = ctr_internal_cast2string(argumentList->object);
 	char* dstr = delimObject->value.svalue->value;
-	long dlen = delimObject->value.svalue->vlen;
+	size_t dlen = delimObject->value.svalue->vlen;
 	ctr_argument* arg;
 	ctr_object* arr = ctr_array_new(CtrStdArray, NULL);
-	long i;
-	long j = 0;
-	long k = 0;
+	size_t i;
+	size_t j = 0;
+	size_t k = 0;
 	char* buffer = ctr_heap_allocate( sizeof(char)*len );
 	for(i=0; i<len; i++) {
 		buffer[j] = str[i];
