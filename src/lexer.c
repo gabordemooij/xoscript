@@ -36,15 +36,14 @@ char* ivarname;
 int ivarlen;
 
 /**
- * Lexer - is Symbol Delimiter ?
  * Determines whether the specified symbol is a delimiter.
  * Returns 1 if the symbol is a delimiter and 0 otherwise.
  *
  * @param char* code code to be inspected
  *
- * @return uint8_t
+ * @return int
  */
-uint8_t ctr_clex_is_delimiter( char* code ) {
+static int ctr_clex_is_delimiter( char* code ) {
 	if (strncmp(code, CTR_DICT_END_OF_LINE, ctr_clex_keyword_eol_len) == 0) {
 		return 1;
 	}
