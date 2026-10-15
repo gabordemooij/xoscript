@@ -250,14 +250,10 @@ ctr_object* ctr_object_done( ctr_object* myself, ctr_argument* argumentList ) {
 
 /**
  * @def
- * [ Object ] copy
+ * [ Number ] copy
  *
  * @test394
  */
-ctr_object* ctr_bool_copy( ctr_object* myself, ctr_argument* argumentList ) {
-	return ctr_build_bool(myself->value.bvalue);
-}
-
 ctr_object* ctr_number_copy( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* qual = ctr_internal_object_find_property( myself, ctr_build_string_from_cstring( CTR_DICT_QUALIFIER ), CTR_CATEGORY_PRIVATE_PROPERTY );
 	ctr_object* copy = ctr_build_number_from_float(myself->value.nvalue);
@@ -267,6 +263,12 @@ ctr_object* ctr_number_copy( ctr_object* myself, ctr_argument* argumentList ) {
 	return copy;
 }
 
+/**
+ * @def
+ * [ String ] copy
+ *
+ * @test790
+ */
 ctr_object* ctr_string_copy( ctr_object* myself, ctr_argument* argumentList ) {
 	return ctr_build_string(myself->value.svalue->value, myself->value.svalue->vlen);
 }

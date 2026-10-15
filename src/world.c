@@ -798,7 +798,6 @@ void ctr_initialize_world(void) {
 	ctr_internal_create_func( CtrStdBool, CTR_STRINGOBJ( CTR_DICT_STRING ), &ctr_bool_to_string );
 	ctr_internal_create_func( CtrStdBool, CTR_STRINGOBJ( CTR_DICT_BOOL ), &ctr_object_myself );
 	ctr_internal_create_func( CtrStdBool, CTR_STRINGOBJ( CTR_DICT_EITHEROR ), &ctr_bool_either_or );
-	ctr_internal_create_func( CtrStdBool, CTR_STRINGOBJ( CTR_DICT_COPY ), &ctr_bool_copy );
 	ctr_internal_create_func( CtrStdBool, CTR_STRINGOBJ( CTR_DICT_CODE ), &ctr_bool_to_string );
 
 	ctr_internal_object_add_property(CtrStdWorld, CTR_STRINGOBJ( CTR_DICT_BOOLEAN_OBJECT ), CtrStdBool, 0 );

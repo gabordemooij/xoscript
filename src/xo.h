@@ -570,7 +570,6 @@ extern ctr_object* ctr_bool_not(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_bool_either_or(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_bool_break(ctr_object* myself, ctr_argument* argumentList);
 extern ctr_object* ctr_bool_continue(ctr_object* myself, ctr_argument* argumentList);
-extern ctr_object* ctr_bool_copy(ctr_object* myself, ctr_argument* argumentList);
 
 /**
  * Number Interface
