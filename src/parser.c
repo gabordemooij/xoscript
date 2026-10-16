@@ -39,8 +39,6 @@ void ctr_cparse_emit_error_unexpected( int t, char* hint )
 }
 
 /**
- * CTRParserCreateNode
- *
  * Creates a parser node and adds it to the source map.
  */
 ctr_tnode* ctr_cparse_create_node( int type ){
@@ -61,8 +59,6 @@ ctr_tnode* ctr_cparse_create_node( int type ){
 }
 
 /**
- * CTRParserMessage
- *
  * Creates the AST nodes for sending a message.
  *
  * - precedence mode 0: no argument (allows processing of unary message, binary message and keyword message)
@@ -224,8 +220,6 @@ ctr_tlistitem* ctr_cparse_messages(ctr_tnode* r, int mode) {
 
 
 /**
- * CTRParserPOpen
- *
  * Generates a set of nested nodes.
  */
 ctr_tnode* ctr_cparse_popen(void) {
@@ -248,8 +242,6 @@ ctr_tnode* ctr_cparse_popen(void) {
 }
 
 /**
- * CTRParserBlock
- *
  * Generates a set of AST nodes to represent a block of code.
  */
 ctr_tnode* ctr_cparse_block(void) {
@@ -351,8 +343,6 @@ ctr_tnode* ctr_cparse_block(void) {
 }
 
 /**
- * CTRParserReference
- *
  * Generates the nodes to respresent a variable or property.
  */
 ctr_tnode* ctr_cparse_ref(void) {
@@ -391,8 +381,6 @@ ctr_tnode* ctr_cparse_ref(void) {
 }
 
 /**
- * CTRParserString
- *
  * Generates a node to represent a string.
  */
 ctr_tnode* ctr_cparse_string(void) {
@@ -412,8 +400,6 @@ ctr_tnode* ctr_cparse_string(void) {
 }
 
 /**
- * CTRParserNumber
- *
  * Generates a node to represent a number.
  */
 ctr_tnode* ctr_cparse_number(void) {
@@ -432,8 +418,6 @@ ctr_tnode* ctr_cparse_number(void) {
 }
 
 /**
- * CTRParserReceiver
- *
  * Generates a node to represent a receiver (of a message).
  */
 ctr_tnode* ctr_cparse_receiver(void) {
@@ -459,8 +443,6 @@ ctr_tnode* ctr_cparse_receiver(void) {
 }
 
 /**
- * CTRParserAssignment
- *
  * Generates a node to represent an assignment.
  */
 ctr_tnode* ctr_cparse_assignment(ctr_tnode* r) {
@@ -481,8 +463,6 @@ ctr_tnode* ctr_cparse_assignment(ctr_tnode* r) {
 }
 
 /**
- * CTRParserExpression
- *
  * Generates a set of nodes to represent an expression.
  */
 ctr_tnode* ctr_cparse_expr(int mode) {
@@ -545,8 +525,6 @@ ctr_tnode* ctr_cparse_expr(int mode) {
 }
 
 /**
- * CTRParserReturn
- *
  * Generates a node to represent a return from a block of code.
  */
 ctr_tnode* ctr_cparse_ret(void) {
@@ -563,8 +541,6 @@ ctr_tnode* ctr_cparse_ret(void) {
 }
 
 /**
- * CTRParserFin
- *
  * Generates a node to represent the end of a program.
  */
 ctr_tnode* ctr_cparse_fin(void) {
@@ -576,8 +552,6 @@ ctr_tnode* ctr_cparse_fin(void) {
 }
 
 /**
- * CTRParserStatement
- *
  * Generates a set of nodes representing a statement.
  */
 ctr_tlistitem* ctr_cparse_statement(void) {
@@ -603,8 +577,6 @@ ctr_tlistitem* ctr_cparse_statement(void) {
 }
 
 /**
- * CTRParserProgram
- *
  * Generates the nodes to represent the entire program
  * as an Abstract Syntax Tree (AST).
  */
@@ -630,8 +602,6 @@ ctr_tnode* ctr_cparse_program(void) {
 }
 
 /**
- * CTRParserStart
- *
  * Begins the parsing stage of a program.
  */
 ctr_tnode*  ctr_cparse_parse(char* prg, char* pathString) {

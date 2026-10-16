@@ -1,8 +1,6 @@
 #include "xo.h"
 
 /**
- * UTF8Size
- *
  * measures the size of character
  */
 int ctr_utf8size(char c) {
@@ -13,8 +11,6 @@ int ctr_utf8size(char c) {
 }
 
 /**
- * GetUTF8Length
- *
  * measures the length of an utf8 string in utf8 chars
  */
 ctr_size ctr_getutf8len(char* strval, ctr_size max) {
@@ -28,9 +24,6 @@ ctr_size ctr_getutf8len(char* strval, ctr_size max) {
 	return (i-j);
 }
 
-/**
- * GetBytesForUTF8String
- */
 ctr_size getBytesUtf8(char* strval, long startByte, ctr_size lenUChar) {
 	long i = 0;
 	long bytes = 0;

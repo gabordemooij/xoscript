@@ -38,10 +38,6 @@ int ivarlen;
 /**
  * Determines whether the specified symbol is a delimiter.
  * Returns 1 if the symbol is a delimiter and 0 otherwise.
- *
- * @param char* code code to be inspected
- *
- * @return int
  */
 static int ctr_clex_is_delimiter( char* code ) {
 	if (strncmp(code, CTR_DICT_END_OF_LINE, ctr_clex_keyword_eol_len) == 0) {
@@ -60,7 +56,7 @@ static int ctr_clex_is_delimiter( char* code ) {
 	return (
 	   symbol == '('
 	|| symbol == ')'
-	|| symbol == ctr_clex_param_prefix_char
+	|| symbol == ctr_clex_param_prefix_char // ':'
 	|| symbol == ' '
 	|| symbol == '\n'
 	|| symbol == '\t'
@@ -69,8 +65,6 @@ static int ctr_clex_is_delimiter( char* code ) {
 }
 
 /**
- * CTRLexerEmitError
- *
  * Displays an error message for the lexer.
  */
 void ctr_clex_emit_error( char* message ) {
@@ -79,8 +73,6 @@ void ctr_clex_emit_error( char* message ) {
 }
 
 /**
- * CTRLexerLoad
- *
  * Loads program into memory.
  */
 void ctr_clex_load(char* prg) {
@@ -97,8 +89,6 @@ void ctr_clex_load(char* prg) {
 }
 
 /**
- * CTRLexerTokenValue
- *
  * Returns the string of characters representing the value
  * of the currently selected token.
  */
@@ -126,8 +116,6 @@ char* ctr_token_descriptions[] = {
 };
 
 /**
- * CTRLexerTokenDescribe
- *
  * Returns a pointer to a string describing the token.
  */
 char* ctr_clex_tok_describe(int token) {
@@ -138,8 +126,6 @@ char* ctr_clex_tok_describe(int token) {
 
 
 /**
- * CTRLexerTokenValueLength
- *
  * Returns the length of the value of the currently selected token.
  */
 long ctr_clex_tok_value_length(void) {
@@ -147,8 +133,6 @@ long ctr_clex_tok_value_length(void) {
 }
 
 /**
- * CTRLexerPutBackToken
- *
  * Puts back a token and resets the pointer to the previous one.
  */
 void ctr_clex_putback(void) {
@@ -159,8 +143,6 @@ void ctr_clex_putback(void) {
 }
 
 /**
- * CTRLexerReadToken
- *
  * Reads the next token from the program buffer and selects this
  * token.
  */
@@ -293,8 +275,6 @@ char* ctr_clex_code_pointer(void) {
 }
 
 /**
- * CTRLexerStringReader
- *
  * Reads an entire string between a pair of quotes.
  */
 char* ctr_clex_readstr(void) {

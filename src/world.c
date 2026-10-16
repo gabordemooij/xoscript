@@ -59,10 +59,6 @@ int ctr_accept(ctr_object* obj, ctr_object* x) {
 }
 
 /**
- * ?internal
- *
- * ReadFile
- *
  * Reads in an entire file.
  */
 char* ctr_internal_readf(char* file_name, uint64_t* total_size) {
@@ -110,10 +106,6 @@ char* ctr_internal_readf(char* file_name, uint64_t* total_size) {
 }
 
 /**
- * ?internal
- *
- * InternalObjectIsEqual
- *
  * Detemines whether two objects are identical.
  */
 int ctr_internal_object_is_equal(ctr_object* object1, ctr_object* object2) {
@@ -149,10 +141,6 @@ int ctr_internal_object_is_equal(ctr_object* object1, ctr_object* object2) {
 }
 
 /**
- * ?internal
- *
- * InternalObjectIndexHash
- *
  * Given an object, this function will calculate a hash to speed-up
  * lookup.
  */
@@ -162,10 +150,6 @@ uint64_t ctr_internal_index_hash(ctr_object* key) {
 }
 
 /**
- * ?internal
- *
- * InternalObjectFindProperty
- *
  * Finds property in object.
  */
 ctr_object* ctr_internal_object_find_property(ctr_object* owner, ctr_object* key, int is_method) {
@@ -197,10 +181,6 @@ ctr_object* ctr_internal_object_find_property(ctr_object* owner, ctr_object* key
 }
 
 /**
- * ?internal
- *
- * InternalObjectDeleteProperty
- *
  * Deletes the specified property from the object.
  */
 void ctr_internal_object_delete_property(ctr_object* owner, ctr_object* key, int is_method) {
@@ -258,10 +238,6 @@ void ctr_internal_object_delete_property(ctr_object* owner, ctr_object* key, int
 }
 
 /**
- * ?internal
- *
- * InternalObjectAddProperty
- *
  * Adds a property to an object.
  */
 void ctr_internal_object_add_property(ctr_object* owner, ctr_object* key, ctr_object* value, int m) {
@@ -296,10 +272,6 @@ void ctr_internal_object_add_property(ctr_object* owner, ctr_object* key, ctr_ob
 }
 
 /**
- * ?internal
- *
- * InternalObjectSetProperty
- *
  * Sets a property on an object.
  */
 void ctr_internal_object_set_property(ctr_object* owner, ctr_object* key, ctr_object* value, int is_method) {
@@ -308,10 +280,6 @@ void ctr_internal_object_set_property(ctr_object* owner, ctr_object* key, ctr_ob
 }
 
 /**
- * ?internal
- *
- * InternalObjectProperty
- *
  * Convenience function to get or set a property of an object.
  * If value == NULL, this function returns the value of the property of the object.
  * Otherwise the value is set. If the property does not exist, CtrStdNil is returned.
@@ -343,10 +311,6 @@ ctr_object* ctr_internal_object_property(ctr_object* owner, char* keystr, ctr_ob
 }
 
 /**
- * ?internal
- *
- * toNum()
- * Convenience function.
  * Casts an object to a number object and extracts the numeric
  * value from the object as a double.
  */
@@ -355,10 +319,6 @@ double ctr_tonum(ctr_object* o) {
 }
 
 /**
- * ?internal
- *
- * toBool()
- * Convenience function.
  * Casts an object to a boolean object and extracts the boolean
  * value from the object as a char (i.e. 1 or 0).
  */
@@ -367,10 +327,6 @@ char ctr_tobool(ctr_object* o) {
 }
 
 /**
- * ?internal
- *
- * InternalMemMem
- *
  * memmem implementation because this not available on every system.
  */
 char* ctr_internal_memmem(char* haystack, long hlen, char* needle, long nlen, int reverse ) {
@@ -394,13 +350,6 @@ char* ctr_internal_memmem(char* haystack, long hlen, char* needle, long nlen, in
 	return NULL;
 }
 
-/**
- * ?internal
- *
- * InternalObjectCreate
- *
- * Creates an object.
- */
 ctr_object* ctr_internal_create_object(int type) {
 	ctr_object* o;
 	o = ctr_heap_recycled_object();
@@ -438,10 +387,6 @@ ctr_object* ctr_internal_create_object(int type) {
 }
 
 /**
- * ?internal
- *
- * InternalFunctionCreate
- *
  * Create a function and add this to the object as a method.
  */
 void ctr_internal_create_func(ctr_object* o, ctr_object* key, ctr_object* (*func)( ctr_object*, ctr_argument* ) ) {
@@ -451,10 +396,6 @@ void ctr_internal_create_func(ctr_object* o, ctr_object* key, ctr_object* (*func
 }
 
 /**
- * ?internal
- *
- * InternalNumberCast
- *
  * Same as cast but always returns a copy.
  *
  * Warning: casting may involve message sending
@@ -476,10 +417,6 @@ ctr_object* ctr_internal_copy2number(ctr_object* obj2convert_triggers_GC ) {
 }
 
 /**
- * ?internal
- *
- * InternalNumberCast
- *
  * Casts an object to a number object.
  *
  * Warning: casting may involve message sending
@@ -494,10 +431,6 @@ ctr_object* ctr_internal_cast2number(ctr_object* obj2convert_triggers_GC) {
 }
 
 /**
- * ?internal
- *
- * InternalStringCast
- *
  * Casts an object to a string object.
  *
  * Warning: casting may involve message sending
@@ -515,10 +448,6 @@ ctr_object* ctr_internal_cast2string( ctr_object* obj2convert_triggers_GC ) {
 }
 
 /**
- * ?internal
- *
- * CopyToString
- *
  * Same as cast but always returns a copy.
  *
  * Warning: casting may involve message sending
@@ -540,10 +469,6 @@ ctr_object* ctr_internal_copy2string( ctr_object* obj2convert_triggers_GC ) {
 }
 
 /**
- * ?internal
- *
- * InternalBooleanCast
- *
  * Casts an object to a boolean.
  *
  * Warning: casting may involve message sending
@@ -566,10 +491,6 @@ ctr_object* ctr_internal_cast2bool( ctr_object* obj2convert_triggers_GC ) {
 }
 
 /**
- * ?internal
- *
- * ContextOpen
- *
  * Opens a new context to keep track of variables.
  */
 void ctr_open_context(void) {
@@ -583,10 +504,6 @@ void ctr_open_context(void) {
 }
 
 /**
- * ?internal
- *
- * ContextClose
- *
  * Closes a context.
  */
 void ctr_close_context(void) {
@@ -596,10 +513,6 @@ void ctr_close_context(void) {
 }
 
 /**
- * ?internal
- *
- * CTRFind
- *
  * Tries to locate a variable in the current context or one
  * of the contexts beneath.
  */
@@ -637,10 +550,6 @@ ctr_object* ctr_find(ctr_object* key) {
 }
 
 /**
- * ?internal
- *
- * CTRFindInMy
- *
  * Tries to locate a property of an object.
  */
 ctr_object* ctr_find_in_my(ctr_object* key) {
@@ -668,10 +577,6 @@ ctr_object* ctr_find_in_my(ctr_object* key) {
 }
 
 /**
- * ?internal
- *
- * CTRSetBasic
- *
  * Sets a proeprty in an object (context).
  */
 void ctr_set(ctr_object* key, ctr_object* object) {
@@ -712,10 +617,6 @@ static void ctr_internal_set_feature_flags(void) {
 }
 
 /**
- * ?internal
- *
- * WorldInitialize
- *
  * Populate the World of Citrine.
  */
 ctr_object* currentMethod;
@@ -1323,10 +1224,6 @@ ctr_object* ctr_send_message(ctr_object* receiverObject, char* message, long vle
 }
 
 /**
- * ?internal
- *
- * CTRValueAssignment
- *
  * Assigns a value to a variable in the current context.
  */
 ctr_object* ctr_assign_value(ctr_object* key, ctr_object* o) {
@@ -1339,10 +1236,6 @@ ctr_object* ctr_assign_value(ctr_object* key, ctr_object* o) {
 }
 
 /**
- * ?internal
- *
- * CTRAssignValueObject
- *
  * Assigns a value to a property of an object.
  */
 ctr_object* ctr_assign_value_to_my(ctr_object* key, ctr_object* o) {
@@ -1356,10 +1249,6 @@ ctr_object* ctr_assign_value_to_my(ctr_object* key, ctr_object* o) {
 }
 
 /**
- * ?internal
- *
- * CTRAssignValueObjectLocal
- *
  * Assigns a value to a local of an object.
  */
 ctr_object* ctr_assign_value_to_local(ctr_object* key, ctr_object* o) {

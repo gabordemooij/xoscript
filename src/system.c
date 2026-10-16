@@ -16,7 +16,6 @@ void ctr_internal_destructor_clock(ctr_resource* rs) {
 }
 
 /**
- * @internal
  * GarbageCollector Marker
  */
 void ctr_gc_mark(ctr_object* object) {
@@ -59,7 +58,6 @@ void ctr_gc_mark(ctr_object* object) {
 }
 
 /**
- * @internal
  * GarbageCollector Sweeper
  */
 ctr_object* ctr_gc_watch_object = NULL;
@@ -157,7 +155,6 @@ void ctr_gc_sweep( int all ) {
 }
 
 /**
- * @internal
  * Garbage Collector sweep.
  */
 void  ctr_gc_internal_collect(void) {
@@ -969,9 +966,6 @@ ctr_object* ctr_clock_get_time( ctr_object* myself, ctr_argument* argumentList, 
 	return answer;
 }
 
-/**
- * @internal
- */
 ctr_object* ctr_clock_set_time( ctr_object* myself, ctr_argument* argumentList, char part ) {
 	struct tm* date;
 	time_t timeStamp;

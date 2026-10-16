@@ -8,8 +8,6 @@ int ctr_internal_testcounter = 1;
 
 /**
  * Displays test no, or aborts testing because of failed assumption.
- * 
- * @param integer t
  */
 void ctr_test( int t ) {
 	if (t) {

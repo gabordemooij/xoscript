@@ -569,8 +569,6 @@ ctr_object* ctr_file_chown(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 /**
- * @internal
- *
  * Locks a file or unlocks a file.
  * All locking functions use this function under the hood.
  */

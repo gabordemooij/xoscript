@@ -680,10 +680,6 @@ ctr_object* ctr_number_new(ctr_object* myself, ctr_argument* argumentList) {
 	return numberObject;
 }
 
-/**
- * @internal
- * BuildNumberFromString
- */
 ctr_object* ctr_build_number_from_string(char* str, ctr_size length) {
 	char* old_number;
 	ctr_object* numberObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTNUMBER);
@@ -699,11 +695,7 @@ ctr_object* ctr_build_number_from_string(char* str, ctr_size length) {
 }
 
 /**
- * @internal
- * BuildNumberFromFloat
- *
  * Creates a number object from a float.
- * Internal use only.
  */
 ctr_object* ctr_build_number_from_float(ctr_number f) {
 	ctr_object* numberObject = ctr_internal_create_object(CTR_OBJECT_TYPE_OTNUMBER);
@@ -1245,12 +1237,6 @@ ctr_object* ctr_number_bit_xor(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_build_number_from_float((int)myself->value.nvalue ^ (int)ctr_tonum(argumentList->object));
 }
 
-/**
- * @internal
- * Generic method, used by:
- * - ctr_number_to_string
- * - ctr_number_to_string_flat
- */
 ctr_object* ctr_internal_number_to_string(ctr_object* myself, ctr_argument* argumentList, char flat) {
 	const char* fmt = "%.10f"; //10 digits hides most common float inexactness for display
 	char* buf;
@@ -1328,19 +1314,13 @@ ctr_object* ctr_build_string(const char* stringValue, ctr_size size) {
 }
 
 /**
- * @internal
- * BuildStringFromCString
- *
- * Creates a Citrine String from a 0 terminated C String.
+ * Creates a string object from a NUL terminated C string.
  */
 ctr_object* ctr_build_string_from_cstring(char* cstring) {
 	return ctr_build_string(cstring, strlen(cstring));
 }
 
 /**
- * @internal
- * BuildEmptyString
- *
  * Creates an empty string object, use this to avoid using
  * the 'magic' number 0 when building a string, it is more
  * readable this way and your intention is clearer.
@@ -2782,14 +2762,7 @@ ctr_object* ctr_format_new_set(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 /**
- * @internal
- *
  * Applies format with cast.
- *
- * @param ctr_object* myself
- * @param ctr_argument* argumentList
- * @param int cast
- * @return ctr_object* result
  */
 ctr_object* ctr_format_apply_to_general(ctr_object* myself, ctr_argument* argumentList, int cast) {
 	ctr_object* format = ctr_internal_object_property(myself, "_format", NULL);

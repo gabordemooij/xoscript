@@ -4,8 +4,6 @@ ctr_tnode* ctr_callstack[301];
 uint8_t ctr_callstack_index;
 
 /**
- * CTRWalkerReturn
- *
  * Returns from a block of code.
  */
 ctr_object* ctr_cwlk_return(ctr_tnode* node) {
@@ -26,8 +24,6 @@ ctr_object* ctr_cwlk_return(ctr_tnode* node) {
 }
 
 /**
- * CTRWalkerMessage
- *
  * Processes a message sending operation.
  */
 ctr_object* ctr_cwlk_message(ctr_tnode* paramNode) {
@@ -184,8 +180,6 @@ ctr_object* ctr_cwlk_message(ctr_tnode* paramNode) {
 }	
 
 /**
- * CTRWalkerAssignment
- *
  * Processes an assignment operation.
  */
 ctr_object* ctr_cwlk_assignment(ctr_tnode* node) {
@@ -216,8 +210,6 @@ ctr_object* ctr_cwlk_assignment(ctr_tnode* node) {
 }	
 
 /**
- * CTRWalkerExpression
- *
  * Processes an expression.
  */
 ctr_object* ctr_cwlk_expr(ctr_tnode* node, char* wasReturn) {
@@ -314,8 +306,6 @@ ctr_object* ctr_cwlk_expr(ctr_tnode* node, char* wasReturn) {
 }
 
 /**
- * CTRWalkerRunBlock
- *
  * Processes the execution of a block of code.
  */
 ctr_object* ctr_cwlk_run(ctr_tnode* program) {
