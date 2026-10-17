@@ -91,7 +91,7 @@
 			<object class="GtkLabel">
 				<xsl:call-template name="gtk-id"/>
 				<property name="label">
-					<xsl:value-of select="@text"/>
+					<xsl:value-of select="."/>
 				</property>
 				<property name="xalign">0</property>
 			</object>
