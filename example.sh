@@ -6,12 +6,25 @@ if [ "$#" -eq 0 ]; then
 fi
 
 EXAMPLE="${1:-none}"
-OS="${2:-Linux}"
+OS="${2:-Uname}"
 CLEAN="${3:-no}"
 ISO="${4:-en}"
 
 echo "Running example: "
 echo $EXAMPLE
+
+# if no OS specified try uname
+if [[ $OS = "Uname" ]]; then
+	UNAME=$(uname)
+	if [[ $UNAME = "Linux" ]]; then
+		OS="Linux"
+	elif [[ $UNAME = "OpenBSD" ]]; then
+		OS="OBSD"
+	else
+		echo "OS not supported yet."
+		exit 1
+	fi
+fi
 
 echo "On platform: "
 echo $OS
