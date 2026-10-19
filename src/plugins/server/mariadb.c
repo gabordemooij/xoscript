@@ -29,7 +29,14 @@ CTR_DEFINE_SETTER_CAST(ctr_mariadb_username_set,    "username", ctr_internal_cop
 CTR_DEFINE_SETTER_CAST(ctr_mariadb_password_set,    "password", ctr_internal_copy2string);
 CTR_DEFINE_SETTER_CAST(ctr_mariadb_dbname_set,      "dbname", ctr_internal_copy2string);
 CTR_DEFINE_SETTER_CAST(ctr_mariadb_query_query_set, "query", ctr_internal_copy2string);
+
+/**
+ * [ Maria-Query ] database: [ String ]
+ *
+ * @test791
+ */
 CTR_DEFINE_SETTER(ctr_mariadb_query_database_set,   "database");
+
 CTR_DEFINE_SETTER(ctr_mariadb_query_param_set,      "parameters");
 
 /**
@@ -112,6 +119,11 @@ ctr_object* ctr_mariadb_connect(ctr_object* myself, ctr_argument* argumentList) 
 	return myself;
 }
 
+/**
+ * [ Maria-Query ] new: [ String ]
+ *
+ * @test791
+ */
 ctr_object* ctr_mariadb_query_new_set(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* query = ctr_mariadb_query_new(myself, argumentList);
 	ctr_mariadb_query_query_set(query, argumentList);
@@ -437,7 +449,7 @@ ctr_object* ctr_mariadb_query_execute(ctr_object* myself, ctr_argument* argument
 
 /**
  * @def
- * [ MariaDB ] query
+ * [ Maria-DB ] query
  *
  * @test639
  */
@@ -458,6 +470,11 @@ ctr_object* ctr_mariadb_query_close(ctr_object* myself, ctr_argument* argumentLi
 	return ok;
 }
 
+/**
+ * [ Maria-DB ] query: [ String ]
+ *
+ * @test792
+ */
 ctr_object* ctr_mariadb_query_set(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* query = ctr_mariadb_query_new_set(CtrMariaDBQuery, argumentList);
 	ctr_argument a;

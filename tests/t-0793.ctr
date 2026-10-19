@@ -1,0 +1,27 @@
+Server init.
+
+>> DB := Maria-DB new host: ['localhost'],
+	username: ['xo'],
+	password: ['pass123'],
+	dbname: ['xobase'],
+	connect.
+
+{
+	DB query:
+	['DROP TABLE movies'],
+	execute.
+} except: { None. }, start.
+
+DB query:
+['CREATE TABLE movies (id INT PRIMARY KEY, title VARCHAR(64))'],
+execute.
+
+DB query: ['INSERT INTO movies (id,title) VALUES(1, ?)'],
+parameters: ( List new ; ['Halloween'] ),
+execute.
+
+DB query: ['SELECT * FROM movies'],
+fetch: { :movie
+	Out write: movie title, stop.
+}.
+
