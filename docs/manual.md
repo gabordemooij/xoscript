@@ -2647,6 +2647,7 @@ persistent way, acting as a kind of application specific browser.
 The general idea is:
 
 ```
+
   curl URL
      |
  apply XSLT
@@ -2658,6 +2659,7 @@ The general idea is:
   curl post
      |
    repeat
+
 ```
 
 The current version only supports GTK4, support for
