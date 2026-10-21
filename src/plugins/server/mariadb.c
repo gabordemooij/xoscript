@@ -23,11 +23,33 @@ void ctr_mariadb_stm_destructor(ctr_resource* rs) {
 CTR_DEFINE_CLASS_OTEX(ctr_mariadb_new, CTR_OBJECT_RESOURCE_MARIADB, ctr_mariadb_destructor);
 CTR_DEFINE_CLASS_OTEX(ctr_mariadb_query_new, CTR_OBJECT_RESOURCE_MARIADB_STM, ctr_mariadb_stm_destructor);
 
-// Define setters
-CTR_DEFINE_SETTER_CAST(ctr_mariadb_host_set,        "host", ctr_internal_copy2string);
-CTR_DEFINE_SETTER_CAST(ctr_mariadb_username_set,    "username", ctr_internal_copy2string);
-CTR_DEFINE_SETTER_CAST(ctr_mariadb_password_set,    "password", ctr_internal_copy2string);
-CTR_DEFINE_SETTER_CAST(ctr_mariadb_dbname_set,      "dbname", ctr_internal_copy2string);
+/**
+ * [ Maria-DB ] host: [ String ]
+ *
+ * @test795
+ */
+CTR_DEFINE_SETTER_CAST(ctr_mariadb_host_set, "host", ctr_internal_copy2string);
+
+/**
+ * [ Maria-DB ] username: [ String ]
+ *
+ * @test794
+ */
+CTR_DEFINE_SETTER_CAST(ctr_mariadb_username_set, "username", ctr_internal_copy2string);
+
+/**
+ * [ Maria-DB ] password: [ String ]
+ *
+ * @test797
+ */
+CTR_DEFINE_SETTER_CAST(ctr_mariadb_password_set, "password", ctr_internal_copy2string);
+
+/**
+ * [ Maria-DB ] dbname: [ String ]
+ *
+ * @test796
+ */
+CTR_DEFINE_SETTER_CAST(ctr_mariadb_dbname_set, "dbname", ctr_internal_copy2string);
 CTR_DEFINE_SETTER_CAST(ctr_mariadb_query_query_set, "query", ctr_internal_copy2string);
 
 /**
@@ -38,6 +60,39 @@ CTR_DEFINE_SETTER_CAST(ctr_mariadb_query_query_set, "query", ctr_internal_copy2s
 CTR_DEFINE_SETTER(ctr_mariadb_query_database_set,   "database");
 
 CTR_DEFINE_SETTER(ctr_mariadb_query_param_set,      "parameters");
+
+/**
+ * [ Maria-DB ] string
+ *
+ * @test798
+ */
+ctr_object* ctr_mariadb_tostring(ctr_object* myself, ctr_argument* argumentList) {
+	char* props[] = {"username","password","host","dbname"};
+	char* strs[4];
+	size_t maxsize = 20;
+	for(int i=0; i<4; i++) {
+		ctr_internal_object_property(myself, props[i], NULL);
+		ctr_object* prop = ctr_internal_object_property(myself, props[i], NULL);
+		if (prop == CtrStdNil) {
+			strs[i] = ctr_heap_allocate_cstring(CTR_STRINGOBJ("?"));
+		} else {
+			if (i == 1) {
+				strs[i] = ctr_heap_allocate_cstring(CTR_STRINGOBJ("****"));
+			} else {
+				strs[i] = ctr_heap_allocate_cstring(prop);
+			}
+		}
+		maxsize += strlen(strs[i]);
+	}
+	char* dsn = ctr_heap_allocate(maxsize);
+	snprintf(dsn,maxsize,"%s:%s@%s DB=%s", strs[0],strs[1],strs[2],strs[3]);
+	for(int i=0; i<4; i++) ctr_heap_free(strs[i]);
+	ctr_object* dsno = ctr_build_string_from_cstring(dsn);
+	ctr_heap_free(dsn);
+	return dsno;
+	return CtrStdNil;
+}
+
 
 /**
  * @def
@@ -534,6 +589,7 @@ void begin_mariadb(){
 	ctr_internal_create_func(CtrMariaDB, CTR_STRINGOBJ( CTR_DICT_COMMIT ), &ctr_mariadb_commit );
 	ctr_internal_create_func(CtrMariaDB, CTR_STRINGOBJ( CTR_DICT_ROLLBACK ), &ctr_mariadb_rollback );
 	ctr_internal_create_func(CtrMariaDB, CTR_STRINGOBJ( CTR_DICT_CLOSE ), &ctr_mariadb_close );
+	ctr_internal_create_func(CtrMariaDB, CTR_STRINGOBJ( CTR_DICT_STRING ), &ctr_mariadb_tostring );
 	ctr_internal_create_func(CtrMariaDBQuery, CTR_STRINGOBJ( CTR_DICT_NEW ), &ctr_mariadb_query_new );
 	ctr_internal_create_func(CtrMariaDBQuery, CTR_STRINGOBJ( CTR_DICT_NEW_SET ), &ctr_mariadb_query_new_set );
 	ctr_internal_create_func(CtrMariaDBQuery, CTR_STRINGOBJ( CTR_DICT_DATABASE_SET ), &ctr_mariadb_query_database_set );
