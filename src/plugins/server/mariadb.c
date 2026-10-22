@@ -50,6 +50,14 @@ CTR_DEFINE_SETTER_CAST(ctr_mariadb_password_set, "password", ctr_internal_copy2s
  * @test796
  */
 CTR_DEFINE_SETTER_CAST(ctr_mariadb_dbname_set, "dbname", ctr_internal_copy2string);
+
+/**
+ * [ Maria-Query ] port: [ String ]
+ *
+ * @test799
+ */
+CTR_DEFINE_SETTER_CAST(ctr_mariadb_port_set, "port", ctr_internal_copy2string);
+
 CTR_DEFINE_SETTER_CAST(ctr_mariadb_query_query_set, "query", ctr_internal_copy2string);
 
 /**
@@ -57,9 +65,9 @@ CTR_DEFINE_SETTER_CAST(ctr_mariadb_query_query_set, "query", ctr_internal_copy2s
  *
  * @test791
  */
-CTR_DEFINE_SETTER(ctr_mariadb_query_database_set,   "database");
+CTR_DEFINE_SETTER(ctr_mariadb_query_database_set, "database");
 
-CTR_DEFINE_SETTER(ctr_mariadb_query_param_set,      "parameters");
+CTR_DEFINE_SETTER(ctr_mariadb_query_param_set, "parameters");
 
 /**
  * [ Maria-DB ] string
@@ -67,10 +75,10 @@ CTR_DEFINE_SETTER(ctr_mariadb_query_param_set,      "parameters");
  * @test798
  */
 ctr_object* ctr_mariadb_tostring(ctr_object* myself, ctr_argument* argumentList) {
-	char* props[] = {"username","password","host","dbname"};
-	char* strs[4];
+	char* props[] = {"username","password","host","dbname","port"};
+	char* strs[5];
 	size_t maxsize = 20;
-	for(int i=0; i<4; i++) {
+	for(int i=0; i<5; i++) {
 		ctr_internal_object_property(myself, props[i], NULL);
 		ctr_object* prop = ctr_internal_object_property(myself, props[i], NULL);
 		if (prop == CtrStdNil) {
@@ -85,8 +93,8 @@ ctr_object* ctr_mariadb_tostring(ctr_object* myself, ctr_argument* argumentList)
 		maxsize += strlen(strs[i]);
 	}
 	char* dsn = ctr_heap_allocate(maxsize);
-	snprintf(dsn,maxsize,"%s:%s@%s DB=%s", strs[0],strs[1],strs[2],strs[3]);
-	for(int i=0; i<4; i++) ctr_heap_free(strs[i]);
+	snprintf(dsn,maxsize,"%s:%s@%s:%s DB=%s", strs[0],strs[1],strs[2],strs[4],strs[3]);
+	for(int i=0; i<5; i++) ctr_heap_free(strs[i]);
 	ctr_object* dsno = ctr_build_string_from_cstring(dsn);
 	ctr_heap_free(dsn);
 	return dsno;
@@ -152,12 +160,13 @@ ctr_object* ctr_mariadb_connect(ctr_object* myself, ctr_argument* argumentList) 
 		return CtrStdNil;
 	}
 	name = ctr_heap_allocate_cstring(prop);
+	unsigned int port = ctr_tonum(ctr_internal_object_property(myself, "port", NULL));
 	if (mysql_real_connect(conn,
 						   host,
 						   user,
 						   pass,
 						   name,
-						   0, NULL, 0) == NULL) {
+						   port, NULL, 0) == NULL) {
 		ctr_error(mysql_error(conn), 0);
 		mysql_close(conn);
 		myself->value.rvalue->ptr = NULL;
@@ -583,6 +592,7 @@ void begin_mariadb(){
 	ctr_internal_create_func(CtrMariaDB, CTR_STRINGOBJ( CTR_DICT_URL_USERNAME_SET ), &ctr_mariadb_username_set );
 	ctr_internal_create_func(CtrMariaDB, CTR_STRINGOBJ( CTR_DICT_PASSWORD_SET ), &ctr_mariadb_password_set );
 	ctr_internal_create_func(CtrMariaDB, CTR_STRINGOBJ( CTR_DICT_DATABASENAME_SET ), &ctr_mariadb_dbname_set );
+	ctr_internal_create_func(CtrMariaDB, CTR_STRINGOBJ( "port:" ), &ctr_mariadb_port_set );
 	ctr_internal_create_func(CtrMariaDB, CTR_STRINGOBJ( CTR_DICT_CONNECT ), &ctr_mariadb_connect );
 	ctr_internal_create_func(CtrMariaDB, CTR_STRINGOBJ( CTR_DICT_DATABASE_QUERY_SET ), &ctr_mariadb_query_set );
 	ctr_internal_create_func(CtrMariaDB, CTR_STRINGOBJ( CTR_DICT_CONNECTED ), &ctr_mariadb_connected );
