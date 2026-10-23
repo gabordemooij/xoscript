@@ -67,6 +67,11 @@ CTR_DEFINE_SETTER_CAST(ctr_mariadb_query_query_set, "query", ctr_internal_copy2s
  */
 CTR_DEFINE_SETTER(ctr_mariadb_query_database_set, "database");
 
+/**
+ * [ Maria-Query ] parameters: [ List ]
+ *
+ * @test800
+ */
 CTR_DEFINE_SETTER(ctr_mariadb_query_param_set, "parameters");
 
 /**
@@ -198,6 +203,11 @@ ctr_object* ctr_mariadb_query_tostring(ctr_object* myself, ctr_argument* argumen
 	return ctr_internal_object_property(myself, "query", NULL);
 }
 
+/**
+ * [ Maria-Query ] insert-id
+ *
+ * @test800
+ */
 ctr_object* ctr_mariadb_query_insert_id(ctr_object* myself, ctr_argument* argumentList) {
 	MYSQL_STMT* prepared_statement;
 	ctr_object* insert_id;

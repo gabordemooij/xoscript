@@ -1,0 +1,16 @@
+Server init.
+
+>> db := Maria-DB new host: ['localhost'],
+	username: ['xo'],
+	password: ['pass123'],
+	dbname: ['xobase'],
+	connect.
+
+>> query := db query: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameters: ( List new ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  query execute. db commit. } except: { :e db rollback.  }, start.
+
+Out write: ['Can we insert? '] + ( query insert-id > 0 ), stop.
