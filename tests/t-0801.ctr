@@ -1,0 +1,13 @@
+Server init.
+
+>> db := Maria-DB new host: ['localhost'],
+	username: ['xo'],
+	password: ['pass123'],
+	dbname: ['xobase'],
+	connect.
+
+>> del := db query: ['DELETE FROM book WHERE id > 0'].
+{  del execute. db commit. } except: { :e db rollback.  }, start.
+
+>> count := db query: ['SELECT COUNT(*) AS num FROM book'].
+count fetch: { :row Out write: row num, stop. }.
