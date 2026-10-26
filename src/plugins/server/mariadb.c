@@ -241,11 +241,6 @@ static int ctr_is_binary(MYSQL_FIELD f) {
 	return f.charsetnr == 63;  /* binary collation */
 }
 
-/**
- * [ Maria-Query ] execute
- *
- * @test801
- */
 ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argumentList, int fetch_mode) {
 	int            count;
 	MYSQL_BIND*    parambinds = NULL;
@@ -521,6 +516,11 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 	return myself;
 }
 
+/**
+ * [ Maria-Query ] execute
+ *
+ * @test801
+ */
 ctr_object* ctr_mariadb_query_execute(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_internal_mariadb_execute(myself, argumentList, 0);
 }
