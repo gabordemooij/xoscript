@@ -199,6 +199,11 @@ ctr_object* ctr_mariadb_query_new_set(ctr_object* myself, ctr_argument* argument
 	return query;
 }
 
+/**
+ * [ Maria-Query ] string
+ *
+ * @test802
+ */
 ctr_object* ctr_mariadb_query_tostring(ctr_object* myself, ctr_argument* argumentList) {
 	return ctr_internal_object_property(myself, "query", NULL);
 }
