@@ -577,6 +577,11 @@ ctr_object* ctr_mariadb_close(ctr_object* myself, ctr_argument* argumentList) {
 	return CtrStdBoolTrue;
 }
 
+/**
+ * [ Maria-DB ] commit
+ *
+ * @test803
+ */
 ctr_object* ctr_mariadb_commit(ctr_object* myself, ctr_argument* argumentList) {
 	MYSQL *conn;
 	if (myself->value.rvalue->ptr) {

@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB new host: ['localhost'],
+	username: ['xo'],
+	password: ['pass123'],
+	dbname: ['xobase'],
+	connect.
+
+>> conn2 := Maria-DB new host: ['localhost'],
+	username: ['xo'],
+	password: ['pass123'],
+	dbname: ['xobase'],
+	connect.
+
+>> del := conn1 query: ['DELETE FROM book WHERE id > 0'].
+{  del execute. conn1 commit. } except: { :e conn1 rollback.  }, start.
+
+>> insert := conn1 query: ['INSERT INTO book (id) VALUES(null)'].
+insert execute.
+
+>> count := conn1 query: ['SELECT COUNT(*) AS num FROM book'].
+count fetch: { :row Out write: row num, stop. }.
+
+# does not show up
+# insert not committed on connection 1
+>> count := conn2 query: ['SELECT COUNT(*) AS num FROM book'].
+count fetch: { :row Out write: row num, stop. }.
