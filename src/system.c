@@ -169,6 +169,7 @@ void  ctr_gc_internal_collect(void) {
 	while(ctr_context_id > -1) {
 		ctr_gc_mark(context);
 		ctr_context_id--;
+		if (ctr_context_id<0) break;
 		context = ctr_contexts[ctr_context_id];
 	}
 	ctr_gc_sweep( 0 );
