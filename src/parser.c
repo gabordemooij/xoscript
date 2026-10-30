@@ -140,7 +140,7 @@ ctr_tnode* ctr_cparse_message(int mode) {
 			if (t == CTR_TOKEN_PARCLOSE) break;
 			if (t == CTR_TOKEN_REF) {
 				long l = ctr_clex_tok_value_length(); 
-				if ((msgpartlen + l) > 255) {
+				if ((msgpartlen + l) > 254) {
 					ctr_cparse_emit_error_unexpected( t, CTR_ERR_LONG );
 					return NULL;
 				}
