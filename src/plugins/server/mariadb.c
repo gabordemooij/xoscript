@@ -12,11 +12,22 @@ ctr_object* CtrMariaDB;
 ctr_object* CtrMariaDBQuery;
 
 void ctr_mariadb_destructor(ctr_resource* rs) {
-	//@no need
+	MYSQL *conn;
+	if (rs->ptr) {
+		conn = (MYSQL*) rs->ptr;
+		mysql_close(conn);
+		rs->ptr = NULL;
+	}
 }
 
 void ctr_mariadb_stm_destructor(ctr_resource* rs) {
-	//@no need
+	MYSQL_STMT* prepared_statement;
+	if (rs->ptr) {
+		prepared_statement = (MYSQL_STMT*) rs->ptr;
+		if ( mysql_stmt_close(prepared_statement) == 0 ) {
+			rs->ptr = NULL;
+		}
+	}
 }
 
 // Define classes
@@ -488,7 +499,9 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 				if (CtrStdFlow == CtrStdContinue) CtrStdFlow = NULL; /* consume continue */
 				if (CtrStdFlow) break;
 			}
-			mysql_stmt_close(prepared_statement);
+			if ( mysql_stmt_close(prepared_statement) == 0) {
+				myself->value.rvalue->ptr = NULL;
+			}
 			if (CtrStdFlow == CtrStdBreak) {
 				CtrStdFlow = NULL; /* consume break */
 			}
@@ -546,7 +559,7 @@ ctr_object* ctr_mariadb_query_close(ctr_object* myself, ctr_argument* argumentLi
 	if (myself->value.rvalue->ptr) {
 		prepared_statement = (MYSQL_STMT*) myself->value.rvalue->ptr;
 		ok = ctr_build_bool( ( ( (int) mysql_stmt_close(prepared_statement) ) == 0 ) );
-		if (ok) {
+		if (ok == CtrStdBoolTrue) {
 			myself->value.rvalue->ptr = NULL;
 		}
 	}
