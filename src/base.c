@@ -1491,14 +1491,16 @@ ctr_object* ctr_string_to_code(ctr_object* myself, ctr_argument* argumentList) {
 	char* d = r;
 	memcpy(d, q1,l1); d += l1;
 	//q1 and q2 cannot be equal and may not overlap
-	for(size_t i = 0; i < vlen; i++ ) {
-		if ((i <= vlen - l1) && memcmp(v + i, q1, l1)==0) {
-			*d++ = '\\'; //prefix the next sequence with escape char
+	for (size_t i = 0; i < vlen; i++) {
+		if (l1 > 0 && (size_t)l1 <= vlen - i &&
+			memcmp(v + i, q1, (size_t)l1) == 0) {
+			*d++ = '\\';
 		}
-		if ((i <= vlen - l2) && memcmp(v + i, q2, l2)==0) {
-			*d++ = '\\'; //prefix the next sequence with escape char
+		if (l2 > 0 && (size_t)l2 <= vlen - i &&
+			memcmp(v + i, q2, (size_t)l2) == 0) {
+			*d++ = '\\';
 		}
-		*d++ = v[i]; //just copy from here
+		*d++ = v[i];
 	}
 	memcpy(d, q2, l2);
 	ctr_object* result = ctr_build_string_from_cstring(r);
