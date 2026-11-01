@@ -130,7 +130,7 @@ ctr_object* ctr_json_new(ctr_object* myself, ctr_argument* argumentList) {
 /**
  * @internal
  */
-ctr_object* ctr_jsmn_dump( char* data, jsmntok_t** tt ) {
+ctr_object* ctr_jsmn_dump(char* data, jsmntok_t** tt, jsmntok_t* end) {
 	ctr_object* answer;
 	ctr_argument* a;
 	ctr_argument* b;
@@ -138,23 +138,24 @@ ctr_object* ctr_jsmn_dump( char* data, jsmntok_t** tt ) {
 	a = NULL;
 	b = NULL;
 	int i;
-	jsmntok_t* t = *(tt);
+	jsmntok_t* t;
 	ctr_size len = strlen(data);
 	if (CtrStdFlow != NULL) {
 		return CtrStdNil;
 	}
-	if (t == NULL) {
+	if (tt == NULL || *tt == NULL || *tt >= end) {
 		CtrStdFlow = ctr_error(CTR_SRV_JSON_ERR_INVALID, 0);
 		return CtrStdNil;
 	}
-	if (t->start < 0 || t->end < 0 || t->start >= len || ((t->end - t->start) < 0) || (( t->end - t->start ) > len) ) {
+	t = *tt;
+	if (t->start < 0 || t->end < 0 || t->start > t->end || t->start >= len || t->end > len) {
 		CtrStdFlow = ctr_error(CTR_SRV_JSON_ERR_INVALID, 0);
 		return CtrStdNil;
 	}
 	if (t->type == JSMN_STRING) {
 		answer = ctr_build_string( (data + t->start), (t->end - t->start) );
 		answer = ctr_string_unescape( answer );
-		*(tt)+=1;
+		(*tt)++;
 	}
 	else if (t->type == JSMN_PRIMITIVE ) {
 		c = *(data + t->start);
@@ -165,18 +166,21 @@ ctr_object* ctr_jsmn_dump( char* data, jsmntok_t** tt ) {
 		} else if ( c == 'n' ) {
 			answer = ctr_build_nil();
 		} else if ( c == '-' || ( c >= '0' && c <= '9' ) ) {
-			answer = ctr_string_to_number( ctr_build_string( (char*) (data + t->start), (t->end - t->start) ), a );
+			answer = ctr_string_to_number(ctr_build_string(data + t->start, t->end - t->start), NULL);
 		} else {
-			answer = CtrStdNil;
+			CtrStdFlow = ctr_error(CTR_SRV_JSON_ERR_INVALID, 0);
+			return CtrStdNil;
 		}
-		*(tt)+=1;
+		(*tt)++;
 	}
 	else if (t->type == JSMN_ARRAY) {
 		a = ctr_heap_allocate( sizeof(ctr_argument) );
+		a->next = NULL;
 		answer = ctr_array_new( CtrStdArray, NULL );
 		*(tt)+=1;
 		for(i = 0; i<t->size; i++ ) {
-			ctr_object* element = ctr_jsmn_dump( data, tt );
+			ctr_object* element = ctr_jsmn_dump(data, tt, end);
+			if (CtrStdFlow != NULL) break;
 			a->object = element;
 			ctr_array_push( answer, a );
 		}
@@ -185,15 +189,19 @@ ctr_object* ctr_jsmn_dump( char* data, jsmntok_t** tt ) {
 	else if (t->type == JSMN_OBJECT ) {
 		a = ctr_heap_allocate( sizeof(ctr_argument) );
 		b = ctr_heap_allocate( sizeof(ctr_argument) );
+		a->next = b;
+		b->next = NULL;
 		answer = ctr_map_new( CtrStdMap, NULL );
-		*(tt)+=1;
+		(*tt)++;
 		for (i = 0; i<(t->size); i+=1) {
-			ctr_object* property = ctr_jsmn_dump( data, tt );
-			ctr_object* value = ctr_jsmn_dump( data, tt );
+			ctr_object* property = ctr_jsmn_dump(data, tt, end);
+			if (CtrStdFlow != NULL) break;
+			ctr_object* value = ctr_jsmn_dump(data, tt, end);
 			if (CtrStdFlow != NULL) break;
 			a->object = value;
 			b->object = property;
 			a->next = b;
+			b->next = NULL;
 			ctr_map_put( answer, a );
 		}
 		ctr_heap_free(a);
@@ -242,7 +250,7 @@ ctr_object* ctr_json_parse(ctr_object* myself, ctr_argument* argumentList) {
 		CtrStdFlow = ctr_error(CTR_SRV_JSON_ERR_INVALID, 0);
 		return CtrStdNil;
 	}
-	answer = ctr_jsmn_dump(jsonString, &t);
+	answer = ctr_jsmn_dump(jsonString, &t, ot + size);
 	ctr_heap_free( ot );
 	ctr_heap_free( jsonString );
 	return answer;
