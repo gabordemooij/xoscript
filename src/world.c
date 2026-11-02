@@ -1119,7 +1119,7 @@ ctr_object* ctr_internal_tmp_msg = NULL;
 ctr_object* ctr_send_message(ctr_object* receiverObject, char* message, long vlen, ctr_argument* argumentList) {
 	ctr_object* methodObject;
 	ctr_object* searchObject;
-	ctr_object* returnValue;
+	ctr_object* returnValue = CtrStdNil;
 	ctr_argument* argCounter;
 	ctr_argument* mesgArgument;
 	ctr_object* result = CtrStdNil;
