@@ -2686,6 +2686,14 @@ You can also craft dictionaries by hand, the format is:
 Type can be t for tokens or s for strings (in case you want to
 translate string literals as well).
 
+# XOTEST
+
+XOTEST is the XOScript testing system. It consists of two scripts
+(ksh/bash) that run the tests. Each test is t-XXXX.ctr file
+containing XOScript code and a .exp file with the expected output.
+The main runner script in the root folder (runtests) switches
+based on the platform.
+
 # Credits
 
 Original developer of xoscript: Gabor de Mooij
