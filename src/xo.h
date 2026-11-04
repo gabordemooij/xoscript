@@ -915,7 +915,7 @@ extern char* ctr_heap_allocate_cstring( ctr_object* o );
 extern size_t ctr_heap_size( void* ptr );
 extern ctr_object* ctr_error( const char* error_string, int error_code );
 
-extern ctr_object* ctr_error_text( char* error_string );
+extern ctr_object* ctr_error_text( const char* error_string );
 
 extern char ctr_deserialize_mode;
 
