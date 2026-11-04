@@ -120,6 +120,7 @@ int ctr_internal_object_is_equal(ctr_object* object1, ctr_object* object2) {
 		len1 = object1->value.svalue->vlen;
 		len2 = object2->value.svalue->vlen;
 		if (len1 != len2) return 0;
+		if (len1 == 0) return 1;
 		d = memcmp(string1, string2, len1);
 		if (d==0) return 1;
 		return 0;
