@@ -97,7 +97,7 @@ void ctr_coretest_tokens(void) {
 void ctr_coretest_parser(void) {
 	char* buffer;
 	ctr_program_length = 40;
-	buffer = calloc(40,1);
+	buffer = calloc(41,1);
 	sprintf(buffer, ">> x := 1.");
 	ctr_clex_load(buffer);
 	ctr_tnode* tree_node = ctr_cparse_expr(0);
