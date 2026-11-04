@@ -1966,8 +1966,8 @@ UPLOAD data:
 >> selected := request post-list: ['sel[]'].
 >> cookie   := request cookie: ['session-id'].
 >> upload   := request upload: ['file'].
->> temppath := upload ? 0.
->> filename := upload ? 1.
+>> temppath := upload ? 1.
+>> filename := upload ? 0.
 ```
 
 ## Maxpost/length
@@ -2177,7 +2177,9 @@ Program end.
 
 This will serve the user uploaded content with the appropriate
 mime type. Only white listed mime types are supported:
-GIF, JPG, PNG, WEBP, MP4, WEBM, MP3, ZIP, GZIP and PDF.
+GIF, JPG, PNG, WEBP, MP4, WEBM, MP3, ZIP, GZIP, PDF and SVG.
+SVG, ZIP and GZIP files are sent as a download, because an SVG
+can contain scripts that would otherwise run on your domain.
 This method prevents TOCTOU-attacks, path traversals, 
 malicious code execution (injection), symlink attacks,
 DDoS attacks (file limit = 50MB), sniffing attacks and 
@@ -2201,6 +2203,8 @@ To decode JSON into a xoscript object:
 ```
 >> dict := ((JSON object: json) abc ? 1).
 ```
+
+JSON with more than 500 levels of nesting is rejected as invalid.
 
 To directly output a Dict as json with the correct headers:
 
@@ -2282,6 +2286,20 @@ adding zeroes. It uses the printf syntax.
 ```
 >> fmt := Format new: ['%06.0f'].
 fmt apply: 56. # gives 000056
+```
+
+A format can contain one conversion and it has to fit the value,
+otherwise you get an error:
+
+- `apply:` with a string: `%s`
+- `apply:` with a number: `%f`, `%e`, `%g` or `%a`
+- `apply-int:` with a number: `%d`, `%i`, `%o`, `%u`, `%x` or `%c`
+
+Values from a request are strings. To format one as a number,
+convert it first:
+
+```
+fmt apply: (request get: ['amount']) number.
 ```
 
 ## Encoders
