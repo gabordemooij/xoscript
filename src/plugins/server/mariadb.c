@@ -183,7 +183,7 @@ ctr_object* ctr_mariadb_connect(ctr_object* myself, ctr_argument* argumentList) 
 						   pass,
 						   name,
 						   port, NULL, 0) == NULL) {
-		ctr_error(mysql_error(conn), 0);
+		ctr_error_text(mysql_error(conn));
 		mysql_close(conn);
 		myself->value.rvalue->ptr = NULL;
 	} else {
@@ -320,21 +320,21 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 	}
 	myself->value.rvalue->ptr = (void*) prepared_statement;
 	if (mysql_stmt_prepare(prepared_statement,query, query_length)) {
-		ctr_error(mysql_stmt_error(prepared_statement), 0);
+		ctr_error_text(mysql_stmt_error(prepared_statement));
 		goto free_query;
 	}
 	if (count && mysql_stmt_bind_param(prepared_statement, parambinds)) {
-		ctr_error(mysql_stmt_error(prepared_statement),0);
+		ctr_error_text(mysql_stmt_error(prepared_statement));
 		goto free_query;
 	}
 	if (mysql_stmt_execute(prepared_statement)) {
-		ctr_error(mysql_stmt_error(prepared_statement),0);
+		ctr_error_text(mysql_stmt_error(prepared_statement));
 		goto free_query;
 	}
 	if (fetch_mode) {
 		MYSQL_RES* rparams = mysql_stmt_result_metadata(prepared_statement);
 		if (!rparams) {
-			ctr_error(mysql_stmt_error(prepared_statement),0);
+			ctr_error_text(mysql_stmt_error(prepared_statement));
 			goto free_query;
 		} else {
 			num_fields = mysql_num_fields(rparams);
@@ -363,7 +363,7 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 				}
 			}
 			if (mysql_stmt_bind_result(prepared_statement, rbindings)) {
-				ctr_error(mysql_stmt_error(prepared_statement),0);
+				ctr_error_text(mysql_stmt_error(prepared_statement));
 				goto free_rbuffers;
 			}
 			ctr_argument* resultArgs;
@@ -381,7 +381,7 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 				int s = mysql_stmt_fetch(prepared_statement);
 				if (s == MYSQL_NO_DATA) break;
 				if (s == 1) {
-					ctr_error(mysql_stmt_error(prepared_statement),0);
+					ctr_error_text(mysql_stmt_error(prepared_statement));
 					goto free_rbuffers;
 				}
 				ctr_object* map = ctr_map_new(CtrStdMap, none);
