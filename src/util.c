@@ -124,6 +124,19 @@ ctr_object* ctr_error( const char* message, int error_code ) {
 	return CtrStdFlow;
 }
 
+/**
+ * @internal
+ *
+ * Like ctr_error, but takes the message literally. Use this for text that
+ * is not a format string, such as messages from external libraries.
+ */
+ctr_object* ctr_error_text( const char* message ) {
+	CtrStdFlow = ctr_build_string_from_cstring( (char*) message );
+	CtrStdFlow->info.sticky = 1;
+	errstack = 0;
+	return CtrStdFlow;
+}
+
 
 /**
  * @internal
