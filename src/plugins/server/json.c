@@ -88,16 +88,8 @@ ctr_object* ctr_string_unescape(ctr_object* myself )  {
 	ctr_size q;
 	long i=0;
 	long k=0;
-	ctr_size tlen = len;
 	numOfCharacters = strlen(characters);
-	for (q = 0; q < numOfCharacters; q ++) {
-		for(i = 0; i < len; i++) {
-			if (i<len-1 && str[i] == '\\' && str[i+1] == descriptions[q]) {
-				tlen -= 1;
-			}
-		}
-	}
-	tstr = ctr_heap_allocate( tlen );
+	tstr = ctr_heap_allocate( len );
 	for(i = 0; i < len; i++) {
 		if (str[i] == 0) {
 			tstr[k++] = '?'; // filter 0 bytes
@@ -116,7 +108,7 @@ ctr_object* ctr_string_unescape(ctr_object* myself )  {
 			tstr[k++] = str[i];
 		}
 	}
-	newString = ctr_build_string(tstr, tlen);
+	newString = ctr_build_string(tstr, k);
 	ctr_heap_free( tstr );
 	return newString;
 }
