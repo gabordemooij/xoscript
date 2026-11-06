@@ -152,7 +152,8 @@ ctr_object* ctr_request_file(ctr_object* myself, ctr_argument* argumentList) {
 	int i = 0;
 	cgiVarObject = ctr_internal_cast2string(argumentList->object);
 	cgiVar = ctr_heap_allocate_cstring( cgiVarObject );
-	value = CGI_lookup_all(varlistPost, (const char*)cgiVar);
+	/* not varlistPost: plain fields from the client must not pass for an upload */
+	value = CGI_lookup_all(CGI_uploads, (const char*)cgiVar);
 	ctr_heap_free( cgiVar );
 	list = ctr_array_new(CtrStdArray, NULL);
 	if (value == 0 || value[1] == 0) return list;

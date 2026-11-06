@@ -15,6 +15,7 @@ void CGI_set_max_time(int n);
 void ccgi_tgetc_setup(int fd);
 
 typedef struct CGI_varlist CGI_varlist;
+extern CGI_varlist *CGI_uploads;
 
 typedef const char * const CGI_value;
 char *CGI_decode_url(const char *p);

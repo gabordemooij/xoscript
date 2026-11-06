@@ -134,6 +134,13 @@ int CCGI_MAX_TIME = 5000;
 static size_t postfieldcount = 0;
 static size_t contentlengthcount = 0;
 
+/*
+ * Real uploads only, filled by read_multipart after creating the temp file.
+ * In the normal list a client can send plain fields that look like an upload
+ * and choose the temp path that the script will then open.
+ */
+CGI_varlist *CGI_uploads = NULL;
+
 void CGI_set_max_postfields(size_t n) {
 	CCGI_MAX_POSTFIELDS = n;
 }
@@ -692,6 +699,8 @@ static CGI_varlist* read_multipart(CGI_varlist *v, const char *template) {
 				fclose(out);
 				v = CGI_add_var(v, name, filename);
 				v = CGI_add_var(v, name, localname);
+				CGI_uploads = CGI_add_var(CGI_uploads, name, filename);
+				CGI_uploads = CGI_add_var(CGI_uploads, name, localname);
 			}
 		}
 		else {
