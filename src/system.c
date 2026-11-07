@@ -918,8 +918,15 @@ ctr_object* ctr_clock_wait(ctr_object* myself, ctr_argument* argumentList) {
 
 ctr_object* ctr_clock_new_set( ctr_object* myself, ctr_argument* argumentList ) {
 	ctr_object* clock;
+	time_t stamp = (time_t) ctr_tonum(argumentList->object);
+	// localtime gives NULL for a time it cannot represent, and all clock
+	// functions use its result without checking, so refuse such a time here
+	if (localtime(&stamp) == NULL) {
+		ctr_error("Invalid time value.", 0);
+		return CtrStdNil;
+	}
 	clock = ctr_clock_new( myself, argumentList );
-	((ctr_clock*)clock->value.rvalue->ptr)->time = ctr_tonum(argumentList->object);
+	((ctr_clock*)clock->value.rvalue->ptr)->time = stamp;
 	return clock;
 }
 
