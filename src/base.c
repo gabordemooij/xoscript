@@ -1,4 +1,5 @@
 #include "xo.h"
+#include <limits.h>
 
 ctr_size ctr_program_length;
 uint64_t ctr_cwlk_subprogram;
@@ -1253,7 +1254,9 @@ ctr_object* ctr_internal_number_to_string(ctr_object* myself, ctr_argument* argu
 		if (qual != CtrStdNil) {
 			qual = ctr_internal_cast2string(qual);
 			i = p - buf;
-			buf = ctr_heap_reallocate(buf, i + 1 + qual->value.svalue->vlen);
+			// i + 1 characters of the number, 1 space and then the qualifier:
+			// with i + 1 the last byte of the qualifier lands past the buffer
+			buf = ctr_heap_reallocate(buf, i + 2 + qual->value.svalue->vlen);
 			p = buf + i;
 			*(p + 1) = ' ';
 			memcpy(p + 2,  qual->value.svalue->value, qual->value.svalue->vlen);
@@ -1492,6 +1495,13 @@ ctr_object* ctr_string_to_code(ctr_object* myself, ctr_argument* argumentList) {
 	memcpy(d, q1,l1); d += l1;
 	//q1 and q2 cannot be equal and may not overlap
 	for (size_t i = 0; i < vlen; i++) {
+		// escape backslashes too: one in front of a quote would cancel the
+		// escape of that quote, the string would end early and the rest of
+		// the value would be read as code when the string is evaluated
+		if (v[i] == '\\') *d++ = '\\';
+		// a value ending in the first part of the opening quote would form a new
+		// opening quote with the closing quote, and the string would never end
+		if (i == vlen - 1 && v[i] == q1[0] && q1[1] == q2[0]) *d++ = '\\';
 		if (l1 > 0 && (size_t)l1 <= vlen - i &&
 			memcmp(v + i, q1, (size_t)l1) == 0) {
 			*d++ = '\\';
@@ -1517,9 +1527,16 @@ ctr_object* ctr_string_to_code(ctr_object* myself, ctr_argument* argumentList) {
 ctr_object* ctr_string_from_length(ctr_object* myself, ctr_argument* argumentList) {
 	ctr_object* fromPos = ctr_internal_cast2number(argumentList->object);
 	ctr_object* length = ctr_internal_cast2number(argumentList->next->object);
-	long len = myself->value.svalue->vlen;
-	long a = (fromPos->value.nvalue);
-	long b = (length->value.nvalue);
+	// positions count characters, so the bounds must too: with a limit in
+	// bytes, multibyte text makes getBytesUtf8 read past the end of the string
+	long len = ctr_getutf8len(myself->value.svalue->value, myself->value.svalue->vlen);
+	// limit the numbers before casting: huge values and NaN do not fit in a
+	// long and would overflow the calculations below
+	double lim = (double) LONG_MAX / 4;
+	double fa = fromPos->value.nvalue;
+	double fb = length->value.nvalue;
+	long a = (fa != fa) ? 0 : (long) fmax(-lim, fmin(fa, lim));
+	long b = (fb != fb) ? 0 : (long) fmax(-lim, fmin(fb, lim));
 	long ua, ub;
 	char* dest;
 	if (b == 0 || len == 0) {
@@ -1536,8 +1553,7 @@ ctr_object* ctr_string_from_length(ctr_object* myself, ctr_argument* argumentLis
 	}
 	if (a < 0) a = 0;
 	if (a > len) a = len;
-	if ((a + b)>len) b = len - a;
-	if ((a + b)<0) b = b - a;
+	if (b > len - a) b = len - a;
 	ua = getBytesUtf8(myself->value.svalue->value, 0, a);
 	ub = getBytesUtf8(myself->value.svalue->value, ua, b);
 	if (ub == 0) {
@@ -1631,6 +1647,7 @@ ctr_object* ctr_string_index_of(ctr_object* myself, ctr_argument* argumentList) 
 ctr_object* ctr_string_to_upper(ctr_object* myself, ctr_argument* argumentList) {
 	char* str = myself->value.svalue->value;
 	size_t  len = myself->value.svalue->vlen;
+	if (len == 0) return myself;
 	char* tstr = ctr_heap_allocate( len * sizeof( char ) );
 	ctr_size i=0;
 	for(i =0; i < len; i++) {
@@ -1651,6 +1668,7 @@ ctr_object* ctr_string_to_upper(ctr_object* myself, ctr_argument* argumentList) 
 ctr_object* ctr_string_to_lower(ctr_object* myself, ctr_argument* argumentList) {
 	char* str = myself->value.svalue->value;
 	size_t len = myself->value.svalue->vlen;
+	if (len == 0) return myself;
 	char* tstr = ctr_heap_allocate( len * sizeof( char ) );
 	ctr_size i=0;
 	for(i =0; i < len; i++) {
@@ -1756,7 +1774,8 @@ ctr_object* ctr_string_fill_in(ctr_object* myself, ctr_argument* argumentList) {
 	// apply the mask to the string to avoid recusive replacement
 	size_t j = 0;
 	for(size_t i = 0; i<myself->value.svalue->vlen; i++) {
-		if ((unsigned char)mask->value.svalue->value[i]==MASK_BYTE) {
+		// the string can have grown since the last fill-in, the mask has not
+		if (i < mask->value.svalue->vlen && (unsigned char)mask->value.svalue->value[i]==MASK_BYTE) {
 			mbuf[j++] = myself->value.svalue->value[i]; //copy the byte because it can be displaced
 			myself->value.svalue->value[i] = MASK_BYTE;
 		}
@@ -2082,7 +2101,9 @@ ctr_object* ctr_string_tccompare(ctr_object* myself, ctr_argument* argumentList)
 		maxlen
 	);
 	other->info.sticky = sticky;
-	return ctr_build_bool( ( q == 0 ) );
+	// only the shared part has been compared: without the length check an empty
+	// string or a prefix of a secret counts as equal
+	return ctr_build_bool( q == 0 && myself->value.svalue->vlen == other->value.svalue->vlen );
 }
 
 /**
@@ -2764,6 +2785,28 @@ ctr_object* ctr_format_new_set(ctr_object* myself, ctr_argument* argumentList) {
 }
 
 /**
+ * Checks whether a format has at most one conversion and whether it fits
+ * the value: s for strings, f for floats, i for ints, I for 64-bit integers.
+ * The type of a value can come from a client (JSON), and with a wrong conversion
+ * printf reads unrelated memory. %n and * need other arguments and are never
+ * accepted. A length modifier changes what printf reads, so it has to fit as well.
+ */
+static int ctr_format_fits(const char* format, char kind) {
+	const char* allowed = (kind == 's') ? "s" : (kind == 'f') ? "aAeEfFgG" : "cdiouxX";
+	const char* modifiers = (kind == 'I') ? "hlqjzt" :(kind == 'f') ? "l" : (kind == 'i') ? "h" : "";
+	int conversions = 0;
+	for (const char* p = format; *p; p++) {
+		if (*p != '%') continue;
+		p++;
+		if (*p == '%') continue;
+		while (*p && strchr("-+ #0123456789.'", *p)) p++;
+		while (*p && strchr(modifiers, *p)) p++;
+		if (!*p || !strchr(allowed, *p) || ++conversions > 1) return 0;
+	}
+	return 1;
+}
+
+/**
  * Applies format with cast.
  */
 ctr_object* ctr_format_apply_to_general(ctr_object* myself, ctr_argument* argumentList, int cast) {
@@ -2774,29 +2817,47 @@ ctr_object* ctr_format_apply_to_general(ctr_object* myself, ctr_argument* argume
 	char* result = "";
 	char* s;
 	ctr_object* answer;
+	char kind = 0;
+	if (value->info.type == CTR_OBJECT_TYPE_OTSTRING) {
+		kind = 's';
+	} else if (value->info.type == CTR_OBJECT_TYPE_OTEX && value->value.rvalue->type == CTR_OBJECT_RESOURCE_INT64) {
+		kind = 'I';
+	} else if (value->info.type == CTR_OBJECT_TYPE_OTNUMBER) {
+		kind = cast ? 'i' : 'f';
+	}
+	if (kind && !ctr_format_fits(format_str, kind)) {
+		ctr_heap_free(format_str);
+		ctr_error("Format does not fit the value.", 0);
+		return CtrStdNil;
+	}
+	// asprintf gives -1 on failure (for instance a huge width), the result
+	// is then NULL or undefined and must not be used
+	int n = 0;
 	if (value->info.type == CTR_OBJECT_TYPE_OTSTRING) {
 		s = ctr_heap_allocate_cstring(value);
-		asprintf(&result, format_str, s);
+		n = asprintf(&result, format_str, s);
 		ctr_heap_free(s);
-		answer = ctr_build_string_from_cstring(result);
-		free(result);
-	} else if (value->info.type == CTR_OBJECT_TYPE_OTEX && value->value.rvalue->type == CTR_OBJECT_RESOURCE_INT64) { 
-		asprintf(&result, format_str, (uint64_t) *((uint64_t*)value->value.rvalue->ptr));
-		answer = ctr_build_string_from_cstring(result);
-		free(result);
+	} else if (value->info.type == CTR_OBJECT_TYPE_OTEX && value->value.rvalue->type == CTR_OBJECT_RESOURCE_INT64) {
+		n = asprintf(&result, format_str, (uint64_t) *((uint64_t*)value->value.rvalue->ptr));
 	} else if (value->info.type == CTR_OBJECT_TYPE_OTNUMBER)  {
 		if (cast == 1) {
 			// cast to int (to print octals or decimals for instance %o/%d etc..)
-			asprintf(&result, format_str, (int) value->value.nvalue);
+			n = asprintf(&result, format_str, (int) value->value.nvalue);
 		} else {
-			asprintf(&result, format_str, (double) value->value.nvalue);
+			n = asprintf(&result, format_str, (double) value->value.nvalue);
 		}
-		answer = ctr_build_string_from_cstring(result);
-		free(result);
 	} else {
 		answer = ctr_build_string_from_cstring(format_str);
+		ctr_heap_free(format_str);
+		return answer;
 	}
 	ctr_heap_free(format_str);
+	if (n < 0) {
+		ctr_error("Unable to apply format.", 0);
+		return CtrStdNil;
+	}
+	answer = ctr_build_string_from_cstring(result);
+	free(result);
 	return answer;
 }
 
