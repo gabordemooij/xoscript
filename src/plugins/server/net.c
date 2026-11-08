@@ -52,8 +52,13 @@ ctr_object* ctr_network_basic_text_send(ctr_object* myself, ctr_argument* argume
 	curl_easy_setopt(curl, CURLOPT_URL, destination);
 	curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 	//restrict to http(s)
+#if LIBCURL_VERSION_NUM >= 0x075500
+	curl_easy_setopt(curl, CURLOPT_PROTOCOLS_STR, "http,https");
+	curl_easy_setopt(curl, CURLOPT_REDIR_PROTOCOLS_STR, "http,https");
+#else
 	curl_easy_setopt(curl, CURLOPT_PROTOCOLS, (long) (CURLPROTO_HTTP | CURLPROTO_HTTPS));
 	curl_easy_setopt(curl, CURLOPT_REDIR_PROTOCOLS, (long) (CURLPROTO_HTTP | CURLPROTO_HTTPS));
+#endif
 	if (argumentList->object != CtrStdNil) {
 		message_str = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
 		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, message_str);
