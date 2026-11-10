@@ -2686,7 +2686,7 @@ other GUI toolkits will be added (or you can add it yourself).
 This assumes the target GUI toolkit can already process XML, if not
 (like Motif), an additional XML adapter is needed.
 
-# XOTR
+## XOTR
 
 XOTR (XO translate) translates the XO code file in the 2nd argument with
 the provided dictionary file in the 1st argument and writes the result to
@@ -2704,7 +2704,7 @@ You can also craft dictionaries by hand, the format is:
 Type can be t for tokens or s for strings (in case you want to
 translate string literals as well).
 
-# XOTEST
+## XOTEST
 
 XOTEST is the XOScript testing system. It consists of two scripts
 (ksh/bash) that run the tests. Each test is t-XXXX.ctr file
