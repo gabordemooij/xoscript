@@ -323,6 +323,12 @@ ctr_object* ctr_internal_mariadb_execute(ctr_object* myself, ctr_argument* argum
 		ctr_error_text(mysql_stmt_error(prepared_statement));
 		goto free_query;
 	}
+	// bind_param reads one binding for every ? in the query, with fewer
+	// parameters than that it would read past the end of parambinds
+	if (mysql_stmt_param_count(prepared_statement) > (unsigned long) count) {
+		ctr_error("Too few parameters for this query.", 0);
+		goto free_query;
+	}
 	if (count && mysql_stmt_bind_param(prepared_statement, parambinds)) {
 		ctr_error_text(mysql_stmt_error(prepared_statement));
 		goto free_query;
