@@ -485,7 +485,9 @@ ctr_object* ctr_server_vault_pki_sign(ctr_object* myself, ctr_argument* argument
 	signKey = ctr_internal_cast2string(argumentList->next->object);
 	char* sk64  = ctr_heap_allocate_cstring(signKey);
 	uint8_t* msg = (uint8_t*) ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
-	uint8_t sk[64];
+	/* 66, not 64: the length check above allows input that decodes to 66
+	 * bytes, and base64_decode writes them before the result is checked */
+	uint8_t sk[66];
 	if (BASE64_DECODE_OUT_SIZE(signKey->value.svalue->vlen) > BASE64_DECODE_OUT_SIZE(BASE64_ENCODE_OUT_SIZE(64))) {
 		 goto cleanup;
 	}
@@ -502,7 +504,7 @@ ctr_object* ctr_server_vault_pki_sign(ctr_object* myself, ctr_argument* argument
 	}
 	sig = ctr_build_string_from_cstring(sig64);
 	cleanup:
-		crypto_wipe(sk, 64);
+		crypto_wipe(sk, sizeof(sk));
 		ctr_heap_free(sk64);
 		ctr_heap_free(msg);
 		if (sig64) ctr_heap_free(sig64);
@@ -524,8 +526,10 @@ ctr_object* ctr_server_vault_pki_check(ctr_object* myself, ctr_argument* argumen
 	char* msg   = ctr_heap_allocate_cstring(ctr_internal_cast2string(argumentList->object));
 	char* sig64  = ctr_heap_allocate_cstring(sig64Object);
 	char* pk64 = ctr_heap_allocate_cstring(pk64Object);
-	uint8_t pk[32];
-	uint8_t signature[64];
+	/* 33 and 66, not 32 and 64: the length check below allows input that decodes
+	 * to these sizes, and base64_decode writes them before the result is checked */
+	uint8_t pk[33];
+	uint8_t signature[66];
 	if ( BASE64_DECODE_OUT_SIZE(pk64Object->value.svalue->vlen) > BASE64_DECODE_OUT_SIZE(BASE64_ENCODE_OUT_SIZE(32)) ||  BASE64_DECODE_OUT_SIZE(sig64Object->value.svalue->vlen) > BASE64_DECODE_OUT_SIZE(BASE64_ENCODE_OUT_SIZE(64))) goto cleanup;
 	if (base64_decode(pk64, strlen(pk64), pk)!=32) {
 		ctr_error("base64 decoding failed", 0);
