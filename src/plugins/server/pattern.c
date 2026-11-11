@@ -92,10 +92,11 @@ char* ctr_internal_server_pcre2_replace_callback(const char *pattern, const char
 			if (q != 0) l=0;
 			size_t room = (l * 4 * sizeof(PCRE2_UCHAR)) + 1;
 			PCRE2_UCHAR* pbuf = ctr_heap_allocate(room);
-			int qq = pcre2_substring_copy_bynumber(match, j, pbuf, &room);
-			if (qq) {
-				ctr_heap_free(pbuf);
-				continue;
+			// a group that is not part of the match (like one side of (a)|(b))
+			// cannot be copied: use an empty string, so its slot is not left
+			// empty and the groups after it keep their numbers
+			if (pcre2_substring_copy_bynumber(match, j, pbuf, &room)) {
+				pbuf[0] = '\0';
 			}
 			ctr_object* subgroup = ctr_build_string_from_cstring((char*)pbuf);
 			subgroup->info.sticky = 1;
