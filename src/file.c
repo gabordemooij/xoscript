@@ -437,6 +437,13 @@ ctr_object* ctr_file_csvlines( ctr_object* myself, ctr_argument* argumentList ) 
 		o = fgetc(f);
 		col++;
 		if (o == EOF) eof = 1;
+		// end of file inside a quoted value: the quote never closes, without
+		// this check the loop would keep adding bytes until out of memory
+		if (eof && st == 1) {
+			snprintf(error_message, 200, "Unexpected end of file in quoted value on line: %zu", row + 1);
+			ctr_error(error_message, 0);
+			goto cleanup;
+		}
 		c = (char) o;
 		if (c == '\n') { col = 0; line++; }
 		if (st == 3) {
