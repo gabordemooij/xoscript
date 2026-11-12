@@ -39,6 +39,12 @@ Email on: ['body:'] do: { :body
 	own body := body.
 }.
 
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email on: ['header:'] do: { :line
+	<- line replace: ['\r'] with: [''], replace: ['\n'] with: [''].
+}.
+
 Email on: ['send'] do: {
 	>> f := File tempwrite: self generate.
 	Program os: ['sendmail -t < '] + f path, stop.
@@ -47,15 +53,15 @@ Email on: ['send'] do: {
 Email on: ['generate'] do: {
 	>> brk  := ['\r\n'].
 	>> str := [''].
-	str append: ['From: '] + own from-name + [' <'] + ( own from ) + ['>'] + brk.
-	str append: ['To: '] + ( own recipients combine: [','] ) + brk.
+	str append: (self header: ['From: '] + own from-name + [' <'] + ( own from ) + ['>']) + brk.
+	str append: (self header: ['To: '] + ( own recipients combine: [','] )) + brk.
 	own cc count true: {
-		str append: ['Cc: '] + ( own cc combine: [','] ) + brk.
+		str append: (self header: ['Cc: '] + ( own cc combine: [','] )) + brk.
 	}.
 	own bcc count true: {
-		str append: ['Bcc: '] + ( own bcc combine: [','] ) + brk.
+		str append: (self header: ['Bcc: '] + ( own bcc combine: [','] )) + brk.
 	}.
-	str append: ['Subject: '] + own subject + brk.
+	str append: (self header: ['Subject: '] + own subject) + brk.
 	str append: brk.
 	str append: own body.
 	str append: brk.
@@ -86,15 +92,15 @@ HTML-Email on: ['attach:'] do: { :file
 HTML-Email on: ['generate'] do: {
 	>> brk  := ['\r\n'].
 	>> str := [''].
-	str append: ['From: '] + own from-name + [' <'] + ( own from ) + ['>'] + brk.
-	str append: ['To: '] + ( own recipients combine: [','] ) + brk.
+	str append: (self header: ['From: '] + own from-name + [' <'] + ( own from ) + ['>']) + brk.
+	str append: (self header: ['To: '] + ( own recipients combine: [','] )) + brk.
 	own cc count true: {
-		str append: ['Cc: '] + ( own cc combine: [','] ) + brk.
+		str append: (self header: ['Cc: '] + ( own cc combine: [','] )) + brk.
 	}.
 	own bcc count true: {
-		str append: ['Bcc: '] + ( own bcc combine: [','] ) + brk.
+		str append: (self header: ['Bcc: '] + ( own bcc combine: [','] )) + brk.
 	}.
-	str append: ['Subject: '] + own subject + brk.
+	str append: (self header: ['Subject: '] + own subject) + brk.
 	str append: ['MIME-Version: 1.0'] + brk.
 	str append: ['Content-Type: multipart/related; boundary="'] + own boundary + ['"; type=text/html'] + brk.
 	str append: brk.
