@@ -23,7 +23,11 @@ Cabezera-HTTP al: ['clave'] hacer: { <- mi clave.
 Cabezera-HTTP al: ['valor'] hacer: { <- mi valor.
 }.
 
-Cabezera-HTTP al: ['texto'] hacer: { <- mi clave + [': '] + mi valor + [' \r\n']. }.
+Cabezera-HTTP al: ['texto'] hacer: {
+	>> línea := mi clave + [': '] + mi valor.
+	línea reemplazar: ['\r'] con: [''], reemplazar: ['\n'] con: [''].
+	<- línea + [' \r\n'].
+}.
 
 # Documento web, une los encabezados , HTML and sesión
 
@@ -94,8 +98,11 @@ Documento-Web al: ['empezar-sesión'] hacer: {
 	yo comprobar-cabezeras.
 	>> solicitud := mi solicitud.
 	>> id-sesión := solicitud cookie: ['xsid'].
-
-
+	id-sesión ¿nulo? falso: {
+		(( Patrón crear: ['^[A-Za-z0-9]+\\z'], coincidir: id-sesión ) = 0) verdadero: {
+			id-sesión := Nulo.
+		}.
+	}.
 	id-sesión ¿nulo? verdadero: {
 		id-sesión := Contenedor-seguro token: 30.
 		>> cabezera-sesión := Cabezera-HTTP crear
@@ -198,7 +205,7 @@ Documento-Web al: ['finalizar:'] hacer: { :salida
 }.
 
 Documento-Web al: ['json:'] hacer: { :salida
-	yo salida: ( JSON jsonify: salida ) tipo: ['Content-Type: application/json'].
+	yo salida: ( JSON jsonify: salida ) tipo: ['application/json'].
 }.
 
 Documento-Web al: ['no-encontrado:'] hacer: { :salida

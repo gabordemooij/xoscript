@@ -26,8 +26,11 @@ HTTP-Header on: ['value'] do: {
 	<- own value.
 }.
 
-HTTP-Header on: ['string'] do: { 
-	<- own key + [': '] + own value + [' \r\n'].
+
+HTTP-Header on: ['string'] do: {
+	>> line := own key + [': '] + own value.
+	line replace: ['\r'] with: [''], replace: ['\n'] with: [''].
+	<- line + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
@@ -101,6 +104,11 @@ Web-Document on: ['session-start'] do: {
 	self check-headers.
 	>> request := own request.
 	>> sess-id := request cookie: ['xsid'].
+	sess-id None? false: {
+		(( Pattern new: ['^[A-Za-z0-9]+\\z'], match: sess-id ) = 0) true: {
+			sess-id := None.
+		}.
+	}.
 	sess-id None? true: {
 		sess-id := Vault token: 30.
 		>> session-header := HTTP-Header new
@@ -203,7 +211,7 @@ Web-Document on: ['finish:'] do: { :output
 }.
 
 Web-Document on: ['json:'] do: { :output
-	self out: ( JSON jsonify: output ) type: ['Content-Type: application/json'].
+	self out: ( JSON jsonify: output ) type: ['application/json'].
 }.
 
 Web-Document on: ['not-found:'] do: { :output
