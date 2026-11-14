@@ -135,8 +135,14 @@ ctr_object* ctr_file_tempwrite(ctr_object* myself, ctr_argument* argumentList) {
 		return CtrStdNil;
 	}
 	ctr_object* str = ctr_internal_cast2string(argumentList->object);
-	write(f,str->value.svalue->value, str->value.svalue->vlen);
+	// a short write (like a full disk) would silently give a truncated file
+	ssize_t n = write(f,str->value.svalue->value, str->value.svalue->vlen);
 	close(f);
+	if (n < 0 || (size_t) n != str->value.svalue->vlen) {
+		unlink(path);
+		ctr_error("Unable to write temporary file", 0);
+		return CtrStdNil;
+	}
 	ctr_argument a;
 	a.object = ctr_build_string_from_cstring(path);
 	a.next = NULL;
