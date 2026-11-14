@@ -1,0 +1,13 @@
+# database error messages must not be treated as format strings
+Server init.
+
+>> db := Maria-DB new host: ['localhost'],
+	username: ['xo'],
+	password: ['pass123'],
+	dbname: ['xobase'],
+	connect.
+
+>> query := db query: ['SELECT %% FROM'].
+{ query execute. } except: { :e
+	Out write: ( e contains: ['%%'] ), stop.
+}, start.
