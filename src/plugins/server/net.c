@@ -65,10 +65,10 @@ ctr_object* ctr_network_basic_text_send(ctr_object* myself, ctr_argument* argume
 	}
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &ctr_curl_write_callback);
 	res = curl_easy_perform(curl);
+	curl_easy_cleanup(curl);
 	if(res != CURLE_OK) {
 		result = ctr_error((char*)curl_easy_strerror(res), 0);
 	} else {
-		curl_easy_cleanup(curl);
 		result = ctr_build_string_from_cstring(CtrCurlBuffer);
 	}
 	CtrCurlBytesRead = 0;
