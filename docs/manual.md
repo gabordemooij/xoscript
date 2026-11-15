@@ -1903,6 +1903,7 @@ Program use: ['template.xo'].
 You can set the following server settings:
 
 ```
+
 	# default values are given
 	# so if you do not set anything these
 	# values are used...
@@ -2289,12 +2290,7 @@ fmt apply: 56. # gives 000056
 ```
 
 A format can contain one conversion and it has to fit the value,
-otherwise you get an error:
-
-- `apply:` with a string: `%s`
-- `apply:` with a number: `%f`, `%e`, `%g` or `%a`
-- `apply-int:` with a number: `%d`, `%i`, `%o`, `%u`, `%x` or `%c`
-
+otherwise you get an error (follows printf conventions).
 Values from a request are strings. To format one as a number,
 convert it first:
 
