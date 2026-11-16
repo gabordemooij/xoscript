@@ -2217,10 +2217,11 @@ web json: dict.
 ## Regex
 
 You can use regular expressions by creating a pattern.
+Start your pattern with (*UTF)(*UCP) for UTF-8.
 For instance to match the hrefs and targets of hyperlinks:
 
 ```
-Pattern new: ['href="([^"]+)" target="([^"]+)"'].
+Pattern new: ['(*UTF)(*UCP)href="([^"]+)" target="([^"]+)"'].
 ```
 
 Now, apply the pattern to the subject string like this:
@@ -2236,7 +2237,7 @@ Full example:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Pattern new: ['href="([^"]+)" target="([^"]+)"'].
+>> pattern := Pattern new: ['(*UTF)(*UCP)href="([^"]+)" target="([^"]+)"'].
 >> result  := pattern match: subject do: { :m :x
 	Out write: m, stop.
 	Out write: x, stop.
