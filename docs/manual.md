@@ -1945,6 +1945,16 @@ web-document out: ['
 
 ```
 
+{{note}}
+It's often better to use 'finish:' instead of 'out:', if you
+wish to output all contents in one go. The 'finish:' message
+sets the content-length header to the correct number of bytes,
+making sure the client can close the connection as soon as the
+bytes have been transferred. This improves performance. You can
+use 'finish:' only once though whereas you can use 'out:' as
+many times as you want.
+{{/note}}
+
 If you don't want to use the Web-Document object, that's fine, but
 then you have to write the HTTP headers yourself:
 
