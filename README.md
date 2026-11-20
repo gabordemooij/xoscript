@@ -43,7 +43,7 @@ XOScript with something like:
 To run one of the example programs in the package:
 
 ```
-./example.sh <name> <Linux/Win64> [clean]
+./example.sh <name> <Linux/OBSD> [clean]
 ```
 
 For example, to run the FizzBuzz example on Linux:
