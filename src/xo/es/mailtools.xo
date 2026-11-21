@@ -1,0 +1,128 @@
+>> Email := Objeto crear.
+
+Email al: ['init'] hacer: {
+	mi recipients := Lista crear.
+	mi cc := Lista crear.
+	mi bcc := Lista crear.
+	mi from := Nulo.
+	mi from-name := Nulo.
+	mi subject := Nulo.
+	mi body := Nulo.
+}.
+
+Email al: ['crear'] hacer: { <- yo crear init.
+}.
+
+Email al: ['to:'] hacer: { :list
+	mi recipients := list.
+}.
+ 
+Email al: ['cc:'] hacer: { :list
+	mi cc := list.
+}.
+
+Email al: ['bcc:'] hacer: { :list
+	mi bcc := list.
+}.
+
+Email al: ['subject:'] hacer: { :subject
+	mi subject := subject.
+}.
+
+Email al: ['from:name:'] hacer: { :from :nombre
+	mi from := from.
+	mi from-name := nombre.
+}.
+
+Email al: ['body:'] hacer: { :body
+	mi body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email al: ['header:'] hacer: { :line <- line reemplazar: ['\r'] con: [''], reemplazar: ['\n'] con: [''].
+}.
+
+Email al: ['send'] hacer: {
+	>> f := Archivo escritura-temporal: yo generate.
+	Programa sistema: ['sendmail -t < '] + f ruta, detener.
+}.
+
+Email al: ['generate'] hacer: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str adjuntar: (yo header: ['From: '] + mi from-name + [' <'] + ( mi from ) + ['>']) + brk.
+	str adjuntar: (yo header: ['To: '] + ( mi recipients unir: [','] )) + brk.
+	mi cc contar verdadero: {
+		str adjuntar: (yo header: ['Cc: '] + ( mi cc unir: [','] )) + brk.
+	}.
+	mi bcc contar verdadero: {
+		str adjuntar: (yo header: ['Bcc: '] + ( mi bcc unir: [','] )) + brk.
+	}.
+	str adjuntar: (yo header: ['Subject: '] + mi subject) + brk.
+	str adjuntar: brk.
+	str adjuntar: mi body.
+	str adjuntar: brk. <- str.
+}.
+
+>> HTML-Email := Email crear.
+
+HTML-Email al: ['init'] hacer: {
+	yo init.
+	mi attachments := Lista crear.
+	mi boundary := Contenedor-seguro token: 40.
+}.
+
+HTML-Email al: ['attach:'] hacer: { :file
+	>> id := mi attachments contar.
+	>> blob := file blob.
+	mi attachments adjuntar: (
+		Diccionario crear
+			file: file ruta,
+			mime: ['image/'] + (Server tipo-mime: file ruta),
+			data: blob codificación-base64
+	).
+	blob liberar. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email al: ['generate'] hacer: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str adjuntar: (yo header: ['From: '] + mi from-name + [' <'] + ( mi from ) + ['>']) + brk.
+	str adjuntar: (yo header: ['To: '] + ( mi recipients unir: [','] )) + brk.
+	mi cc contar verdadero: {
+		str adjuntar: (yo header: ['Cc: '] + ( mi cc unir: [','] )) + brk.
+	}.
+	mi bcc contar verdadero: {
+		str adjuntar: (yo header: ['Bcc: '] + ( mi bcc unir: [','] )) + brk.
+	}.
+	str adjuntar: (yo header: ['Subject: '] + mi subject) + brk.
+	str adjuntar: ['MIME-Version: 1.0'] + brk.
+	str adjuntar: ['Content-Type: multipart/related; boundary="'] + mi boundary + ['"; type=text/html'] + brk.
+	str adjuntar: brk.
+	str adjuntar: ['--'] + mi boundary + brk.
+	str adjuntar: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str adjuntar: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str adjuntar: brk.
+	str adjuntar: mi body.
+	str adjuntar: brk.
+	mi attachments cada: { :id :info
+		>> blob := info data.
+		str adjuntar: ['--'] + mi boundary + brk.
+		str adjuntar: ['Content-Type: '] + info mime + brk.
+		str adjuntar: ['Content-Transfer-Encoding: base64'] + brk.
+		str adjuntar: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str adjuntar: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str adjuntar: brk.
+		>> max := 76.
+		>> len := blob longitud.
+		>> chunks := (len / max) redondear-alto.
+		{ :i
+			>> chunk := blob copiar desde: i * max longitud: max.
+			str adjuntar: chunk + brk.
+		} * chunks.
+		str adjuntar: brk.
+		str adjuntar: brk.
+	}.
+	str adjuntar: ['--'] + mi boundary + ['--'] + brk. <- str.
+}.
