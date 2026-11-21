@@ -1,0 +1,128 @@
+>> Email := Objekt uus.
+
+Email kui: ['init'] tee: {
+	oma recipients := Loend uus.
+	oma cc := Loend uus.
+	oma bcc := Loend uus.
+	oma from := Tühi.
+	oma from-name := Tühi.
+	oma subject := Tühi.
+	oma body := Tühi.
+}.
+
+Email kui: ['uus'] tee: { <- ise uus init.
+}.
+
+Email kui: ['to:'] tee: { :list
+	oma recipients := list.
+}.
+ 
+Email kui: ['cc:'] tee: { :list
+	oma cc := list.
+}.
+
+Email kui: ['bcc:'] tee: { :list
+	oma bcc := list.
+}.
+
+Email kui: ['subject:'] tee: { :subject
+	oma subject := subject.
+}.
+
+Email kui: ['from:name:'] tee: { :from :nimi
+	oma from := from.
+	oma from-name := nimi.
+}.
+
+Email kui: ['body:'] tee: { :body
+	oma body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email kui: ['header:'] tee: { :line <- line asenda: ['\r'] väärtusega: [''], asenda: ['\n'] väärtusega: [''].
+}.
+
+Email kui: ['send'] tee: {
+	>> f := Fail tempwrite: ise generate.
+	Programm süsteem: ['sendmail -t < '] + f rada, reavahetus.
+}.
+
+Email kui: ['generate'] tee: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str lisa-lõppu: (ise header: ['From: '] + oma from-name + [' <'] + ( oma from ) + ['>']) + brk.
+	str lisa-lõppu: (ise header: ['To: '] + ( oma recipients ühenda: [','] )) + brk.
+	oma cc arvuta tõsi: {
+		str lisa-lõppu: (ise header: ['Cc: '] + ( oma cc ühenda: [','] )) + brk.
+	}.
+	oma bcc arvuta tõsi: {
+		str lisa-lõppu: (ise header: ['Bcc: '] + ( oma bcc ühenda: [','] )) + brk.
+	}.
+	str lisa-lõppu: (ise header: ['Subject: '] + oma subject) + brk.
+	str lisa-lõppu: brk.
+	str lisa-lõppu: oma body.
+	str lisa-lõppu: brk. <- str.
+}.
+
+>> HTML-Email := Email uus.
+
+HTML-Email kui: ['init'] tee: {
+	ise init.
+	oma attachments := Loend uus.
+	oma boundary := Seif tunnus: 40.
+}.
+
+HTML-Email kui: ['attach:'] tee: { :file
+	>> id := oma attachments arvuta.
+	>> blob := file blob.
+	oma attachments lisa-lõppu: (
+		Sõnastik uus
+			file: file rada,
+			mime: ['image/'] + (Server mimetype: file rada),
+			data: blob base64-kodeeri
+	).
+	blob vabasta. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email kui: ['generate'] tee: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str lisa-lõppu: (ise header: ['From: '] + oma from-name + [' <'] + ( oma from ) + ['>']) + brk.
+	str lisa-lõppu: (ise header: ['To: '] + ( oma recipients ühenda: [','] )) + brk.
+	oma cc arvuta tõsi: {
+		str lisa-lõppu: (ise header: ['Cc: '] + ( oma cc ühenda: [','] )) + brk.
+	}.
+	oma bcc arvuta tõsi: {
+		str lisa-lõppu: (ise header: ['Bcc: '] + ( oma bcc ühenda: [','] )) + brk.
+	}.
+	str lisa-lõppu: (ise header: ['Subject: '] + oma subject) + brk.
+	str lisa-lõppu: ['MIME-Version: 1.0'] + brk.
+	str lisa-lõppu: ['Content-Type: multipart/related; boundary="'] + oma boundary + ['"; type=text/html'] + brk.
+	str lisa-lõppu: brk.
+	str lisa-lõppu: ['--'] + oma boundary + brk.
+	str lisa-lõppu: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str lisa-lõppu: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str lisa-lõppu: brk.
+	str lisa-lõppu: oma body.
+	str lisa-lõppu: brk.
+	oma attachments iga: { :id :info
+		>> blob := info data.
+		str lisa-lõppu: ['--'] + oma boundary + brk.
+		str lisa-lõppu: ['Content-Type: '] + info mime + brk.
+		str lisa-lõppu: ['Content-Transfer-Encoding: base64'] + brk.
+		str lisa-lõppu: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str lisa-lõppu: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str lisa-lõppu: brk.
+		>> max := 76.
+		>> len := blob pikkus.
+		>> chunks := (len / max) ümarda-üles.
+		{ :i
+			>> chunk := blob kopeeri alates: i * max pikkus: max.
+			str lisa-lõppu: chunk + brk.
+		} * chunks.
+		str lisa-lõppu: brk.
+		str lisa-lõppu: brk.
+	}.
+	str lisa-lõppu: ['--'] + oma boundary + ['--'] + brk. <- str.
+}.

@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Объект саҥа.
+
+Template в: ['саҥа'] сделать: { <- бэйэ саҥа content: [''].
+}.
+
+Template в: ['content:'] сделать: { :content
+	бэйэм content := content. 
+}.
+
+Template в: ['саҥа:'] сделать: { :content <- бэйэ саҥа content: content.
+}.
+
+Template в: ['cut:'] сделать: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := бэйэм content чаастар: startmarker.
+	>> prefix := parts первый.
+	>> parts2 := parts последний чаастар: endmarker.
+	>> suffix := parts2 последний.
+	>> part := parts2 первый.
+	>> rest := prefix + suffix.
+	бэйэм content := rest. <- Template саҥа: part.
+	
+}.
+
+Template в: ['скопировать'] сделать: { <- бэйэ саҥа: бэйэ к-тексту скопировать.
+}.
+	
+Template в: ['paste:at:'] сделать: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	бэйэм content солбуй: pastemarker на: ( snippet к-тексту + pastemarker ).
+}.
+
+Template в: ['туруор:суолта:'] сделать: { :slot :value
+	бэйэм content солбуй: ['<!-- slot:'] + slot + [' -->'] на: ( Server html-кодировать: value ).
+}.
+
+Template в: ['set:html:'] сделать: { :slot :html
+	бэйэм content солбуй: ['<!-- slot:'] + slot + [' -->'] на: html.
+}.
+
+Template в: ['хоруй:и:'] сделать: { :slot :value
+	бэйэ туруор: (slot от: 0 уһуна: (slot уһуна - 1)) суолта: value.
+}.
+
+Template в: ['nl2br'] сделать: {
+	бэйэм content солбуй: ['\n'] на: ['<br>'].
+}.
+
+Template в: ['clean'] сделать: {
+	бэйэм content :=
+		Шаблон
+		саҥа: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		сөп-түбэһии: бэйэм content
+		оҥор: { <- ['']. }.
+}.
+
+Template в: ['clean-cuts'] сделать: {
+	>> items := Испииһэк саҥа.
+	Шаблон
+	саҥа: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	сөп-түбэһии: бэйэм content
+	оҥор: { :_ :part
+		items эбэн-биэр: part ? 1.
+	}.
+	items хас-биирдии: { :_ :id
+		бэйэм content :=
+			Шаблон саҥа: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			сөп-түбэһии: бэйэм content
+			оҥор: { <- ['']. }.
+	 }.
+}.
+
+Template в: ['clean-space'] сделать: {
+	бэйэм content :=
+		Шаблон
+		саҥа: ['\\s*\\n'],
+		сөп-түбэһии: бэйэм content
+		оҥор: { <- ['\n']. }.
+	бэйэм content :=
+		Шаблон
+		саҥа: ['\\n[\\s\\t]+'],
+		сөп-түбэһии: бэйэм content
+		оҥор: { <- ['\n']. }.
+}.
+
+Template в: ['clean-all'] сделать: {
+	бэйэ clean.
+	бэйэ clean-cuts.
+	бэйэ clean-space.
+}.
+
+Template в: ['к-тексту'] сделать: { <- бэйэм content.
+}.

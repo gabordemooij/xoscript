@@ -1,0 +1,128 @@
+>> Email := Ahanoa hou.
+
+Email ina-tae: ['init'] mahia: {
+	ake recipients := Rārangi hou.
+	ake cc := Rārangi hou.
+	ake bcc := Rārangi hou.
+	ake from := Kore.
+	ake from-name := Kore.
+	ake subject := Kore.
+	ake body := Kore.
+}.
+
+Email ina-tae: ['hou'] mahia: { <- whaiaro hou init.
+}.
+
+Email ina-tae: ['to:'] mahia: { :list
+	ake recipients := list.
+}.
+ 
+Email ina-tae: ['cc:'] mahia: { :list
+	ake cc := list.
+}.
+
+Email ina-tae: ['bcc:'] mahia: { :list
+	ake bcc := list.
+}.
+
+Email ina-tae: ['subject:'] mahia: { :subject
+	ake subject := subject.
+}.
+
+Email ina-tae: ['from:name:'] mahia: { :from :ingoa
+	ake from := from.
+	ake from-name := ingoa.
+}.
+
+Email ina-tae: ['body:'] mahia: { :body
+	ake body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ina-tae: ['header:'] mahia: { :line <- line whakakapihia: ['\r'] me: [''], whakakapihia: ['\n'] me: [''].
+}.
+
+Email ina-tae: ['send'] mahia: {
+	>> f := Kōnae tempwrite: whaiaro generate.
+	Papatono pūnaha: ['sendmail -t < '] + f ara-kōnae, rārangi-hou.
+}.
+
+Email ina-tae: ['generate'] mahia: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tāpiri-muri: (whaiaro header: ['From: '] + ake from-name + [' <'] + ( ake from ) + ['>']) + brk.
+	str tāpiri-muri: (whaiaro header: ['To: '] + ( ake recipients honoa: [','] )) + brk.
+	ake cc tatau pono: {
+		str tāpiri-muri: (whaiaro header: ['Cc: '] + ( ake cc honoa: [','] )) + brk.
+	}.
+	ake bcc tatau pono: {
+		str tāpiri-muri: (whaiaro header: ['Bcc: '] + ( ake bcc honoa: [','] )) + brk.
+	}.
+	str tāpiri-muri: (whaiaro header: ['Subject: '] + ake subject) + brk.
+	str tāpiri-muri: brk.
+	str tāpiri-muri: ake body.
+	str tāpiri-muri: brk. <- str.
+}.
+
+>> HTML-Email := Email hou.
+
+HTML-Email ina-tae: ['init'] mahia: {
+	whaiaro init.
+	ake attachments := Rārangi hou.
+	ake boundary := Pākoro token: 40.
+}.
+
+HTML-Email ina-tae: ['attach:'] mahia: { :file
+	>> id := ake attachments tatau.
+	>> blob := file blob.
+	ake attachments tāpiri-muri: (
+		Papakupu hou
+			file: file ara-kōnae,
+			mime: ['image/'] + (Server mimetype: file ara-kōnae),
+			data: blob base64-whakawaehere
+	).
+	blob wewete. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ina-tae: ['generate'] mahia: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tāpiri-muri: (whaiaro header: ['From: '] + ake from-name + [' <'] + ( ake from ) + ['>']) + brk.
+	str tāpiri-muri: (whaiaro header: ['To: '] + ( ake recipients honoa: [','] )) + brk.
+	ake cc tatau pono: {
+		str tāpiri-muri: (whaiaro header: ['Cc: '] + ( ake cc honoa: [','] )) + brk.
+	}.
+	ake bcc tatau pono: {
+		str tāpiri-muri: (whaiaro header: ['Bcc: '] + ( ake bcc honoa: [','] )) + brk.
+	}.
+	str tāpiri-muri: (whaiaro header: ['Subject: '] + ake subject) + brk.
+	str tāpiri-muri: ['MIME-Version: 1.0'] + brk.
+	str tāpiri-muri: ['Content-Type: multipart/related; boundary="'] + ake boundary + ['"; type=text/html'] + brk.
+	str tāpiri-muri: brk.
+	str tāpiri-muri: ['--'] + ake boundary + brk.
+	str tāpiri-muri: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str tāpiri-muri: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str tāpiri-muri: brk.
+	str tāpiri-muri: ake body.
+	str tāpiri-muri: brk.
+	ake attachments ia: { :id :info
+		>> blob := info data.
+		str tāpiri-muri: ['--'] + ake boundary + brk.
+		str tāpiri-muri: ['Content-Type: '] + info mime + brk.
+		str tāpiri-muri: ['Content-Transfer-Encoding: base64'] + brk.
+		str tāpiri-muri: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str tāpiri-muri: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str tāpiri-muri: brk.
+		>> max := 76.
+		>> len := blob roa.
+		>> chunks := (len / max) whakaawhiwhi-ake.
+		{ :i
+			>> chunk := blob tārua mai: i * max roa: max.
+			str tāpiri-muri: chunk + brk.
+		} * chunks.
+		str tāpiri-muri: brk.
+		str tāpiri-muri: brk.
+	}.
+	str tāpiri-muri: ['--'] + ake boundary + ['--'] + brk. <- str.
+}.

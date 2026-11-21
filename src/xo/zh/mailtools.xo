@@ -1,0 +1,128 @@
+>> Email := 对象 新建.
+
+Email 在: ['init'] 执行: {
+	拥有 recipients := 数组对象 新建.
+	拥有 cc := 数组对象 新建.
+	拥有 bcc := 数组对象 新建.
+	拥有 from := 空.
+	拥有 from-name := 空.
+	拥有 subject := 空.
+	拥有 body := 空.
+}.
+
+Email 在: ['新建'] 执行: { <- 自身 新建 init.
+}.
+
+Email 在: ['to:'] 执行: { :list
+	拥有 recipients := list.
+}.
+ 
+Email 在: ['cc:'] 执行: { :list
+	拥有 cc := list.
+}.
+
+Email 在: ['bcc:'] 执行: { :list
+	拥有 bcc := list.
+}.
+
+Email 在: ['subject:'] 执行: { :subject
+	拥有 subject := subject.
+}.
+
+Email 在: ['from:name:'] 执行: { :from :名称
+	拥有 from := from.
+	拥有 from-name := 名称.
+}.
+
+Email 在: ['body:'] 执行: { :body
+	拥有 body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email 在: ['header:'] 执行: { :line <- line 替换: ['\r'] 为: [''], 替换: ['\n'] 为: [''].
+}.
+
+Email 在: ['send'] 执行: {
+	>> f := 文件 临时写: 自身 generate.
+	程序 系统命令: ['sendmail -t < '] + f 路径, 停止.
+}.
+
+Email 在: ['generate'] 执行: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str 追加: (自身 header: ['From: '] + 拥有 from-name + [' <'] + ( 拥有 from ) + ['>']) + brk.
+	str 追加: (自身 header: ['To: '] + ( 拥有 recipients 连接: [','] )) + brk.
+	拥有 cc 计数 是: {
+		str 追加: (自身 header: ['Cc: '] + ( 拥有 cc 连接: [','] )) + brk.
+	}.
+	拥有 bcc 计数 是: {
+		str 追加: (自身 header: ['Bcc: '] + ( 拥有 bcc 连接: [','] )) + brk.
+	}.
+	str 追加: (自身 header: ['Subject: '] + 拥有 subject) + brk.
+	str 追加: brk.
+	str 追加: 拥有 body.
+	str 追加: brk. <- str.
+}.
+
+>> HTML-Email := Email 新建.
+
+HTML-Email 在: ['init'] 执行: {
+	自身 init.
+	拥有 attachments := 数组对象 新建.
+	拥有 boundary := 保险库 令牌: 40.
+}.
+
+HTML-Email 在: ['attach:'] 执行: { :file
+	>> id := 拥有 attachments 计数.
+	>> 二进制对象 := file 二进制对象.
+	拥有 attachments 追加: (
+		映射对象 新建
+			file: file 路径,
+			mime: ['image/'] + (Server 内容类型: file 路径),
+			data: 二进制对象 互联网编码
+	).
+	二进制对象 释放. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email 在: ['generate'] 执行: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str 追加: (自身 header: ['From: '] + 拥有 from-name + [' <'] + ( 拥有 from ) + ['>']) + brk.
+	str 追加: (自身 header: ['To: '] + ( 拥有 recipients 连接: [','] )) + brk.
+	拥有 cc 计数 是: {
+		str 追加: (自身 header: ['Cc: '] + ( 拥有 cc 连接: [','] )) + brk.
+	}.
+	拥有 bcc 计数 是: {
+		str 追加: (自身 header: ['Bcc: '] + ( 拥有 bcc 连接: [','] )) + brk.
+	}.
+	str 追加: (自身 header: ['Subject: '] + 拥有 subject) + brk.
+	str 追加: ['MIME-Version: 1.0'] + brk.
+	str 追加: ['Content-Type: multipart/related; boundary="'] + 拥有 boundary + ['"; type=text/html'] + brk.
+	str 追加: brk.
+	str 追加: ['--'] + 拥有 boundary + brk.
+	str 追加: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str 追加: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str 追加: brk.
+	str 追加: 拥有 body.
+	str 追加: brk.
+	拥有 attachments 每个: { :id :info
+		>> 二进制对象 := info data.
+		str 追加: ['--'] + 拥有 boundary + brk.
+		str 追加: ['Content-Type: '] + info mime + brk.
+		str 追加: ['Content-Transfer-Encoding: base64'] + brk.
+		str 追加: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str 追加: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str 追加: brk.
+		>> max := 76.
+		>> len := 二进制对象 长度.
+		>> chunks := (len / max) 上取整.
+		{ :i
+			>> chunk := 二进制对象 复制 从: i * max 长度: max.
+			str 追加: chunk + brk.
+		} * chunks.
+		str 追加: brk.
+		str 追加: brk.
+	}.
+	str 追加: ['--'] + 拥有 boundary + ['--'] + brk. <- str.
+}.

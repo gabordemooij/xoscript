@@ -1,0 +1,325 @@
+Panjaluk-HTTP nalika: ['HTTP-header:'] tindakna: { :key <- Program setelan: key.
+}.
+
+>> HTTP-Header := Obyek anyar.
+
+HTTP-Header nalika: ['anyar'] tindakna: { <- dhiri anyar init.
+}.
+
+HTTP-Header nalika: ['init'] tindakna: {
+	duweke key := Kosong.
+	duweke value := Kosong.
+}.
+
+HTTP-Header nalika: ['key:value:'] tindakna: { :key :value
+	duweke key := key.
+	duweke value := value.
+}.
+
+HTTP-Header nalika: ['key'] tindakna: { <- duweke key.
+}.
+
+HTTP-Header nalika: ['value'] tindakna: { <- duweke value.
+}.
+
+
+HTTP-Header nalika: ['tèks'] tindakna: {
+	>> line := duweke key + [': '] + duweke value.
+	line ganti: ['\r'] nganggo: [''], ganti: ['\n'] nganggo: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Obyek anyar.
+
+Web-Document nalika: ['anyar'] tindakna: { <- dhiri anyar init.
+}.
+
+Web-Document nalika: ['init'] tindakna: {
+	duweke headers := Dhaptar anyar.
+	duweke sess-id := Kosong.
+	duweke session-manager := Tempfile-Session anyar.
+	duweke sessdata := Kosong.
+	duweke secure := Bener.
+	duweke same-site := ['Strict'].
+	duweke headers-out := Salah.
+	duweke request := Panjaluk-HTTP anyar.
+}.
+
+Web-Document nalika: ['request:'] tindakna: { :request
+	duweke request := request.
+}. 
+
+Web-Document nalika: ['secure-session-cookie:'] tindakna: { :secure
+	dhiri check-headers.
+	duweke secure := secure.
+}.
+
+Web-Document nalika: ['same-site-session-cookie:'] tindakna: { :value
+	dhiri check-headers.
+	>> options := Dhaptar anyar 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options ngemot: value, salah: {
+		tugas-iki kesalahan: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	duweke same-site := value.
+}.
+
+Web-Document nalika: ['header:'] tindakna: { :header
+	dhiri check-headers.
+	duweke headers tambah-ing-mburi: header.
+}.
+
+Web-Document nalika: ['clear-headers'] tindakna: {
+	dhiri check-headers.
+	duweke headers := Dhaptar anyar.
+}.
+
+Web-Document nalika: ['session-manager:'] tindakna: { :manager
+	dhiri check-headers.
+	duweke session-manager := manager.
+}.
+
+Web-Document nalika: ['session-manager'] tindakna: { <- duweke session-manager.
+}.
+
+Web-Document nalika: ['check-headers'] tindakna: {
+	duweke headers-out bener: {
+		tugas-iki kesalahan: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document nalika: ['session-start'] tindakna: {
+	dhiri check-headers.
+	>> request := duweke request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Kosong? salah: {
+		(( Pola anyar: ['^[A-Za-z0-9]+\\z'], cocog: sess-id ) = 0) bener: {
+			sess-id := Kosong.
+		}.
+	}.
+	sess-id Kosong? bener: {
+		sess-id := Brankas token: 30.
+		>> session-header := HTTP-Header anyar
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (duweke secure pilih: ['Secure'] utawa: ['']),
+		SSITE: (duweke same-site),
+		XSID: sess-id
+		).
+		duweke headers tambah-ing-mburi: session-header.
+	}.
+	duweke sessdata := duweke session-manager for: sess-id, load. <- duweke sessdata. # reference
+}.
+
+Web-Document nalika: ['goto:'] tindakna: { :url
+	dhiri check-headers.
+	dhiri clear-headers.
+	duweke headers
+	tambah-ing-mburi: (
+		HTTP-Header anyar
+		key: ['Status'] value: ['303 See Other']
+	),
+	tambah-ing-mburi: (
+		HTTP-Header anyar
+		key: ['Location'] value: url
+	).
+	dhiri out: ['Redirect'].
+}.
+
+Web-Document nalika: ['session-destroy'] tindakna: {
+	dhiri check-headers.
+	>> request := duweke request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Kosong? salah: {
+		>> session-header := HTTP-Header anyar.
+		>> when := Wektu anyar taun: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (duweke secure pilih: ['Secure'] utawa: ['']),
+			SSITE: (duweke same-site),
+			XSID: sess-id
+		).
+		duweke session-manager destroy.
+		duweke headers tambah-ing-mburi: session-header.
+	}.
+}.
+
+
+Web-Document nalika: ['template:'] tindakna: { :dalan <- Template anyar: (Berkas anyar: dalan, waca).
+}.
+
+Web-Document nalika: ['out:type:'] tindakna: { :output :jinis
+	duweke headers-out salah: {
+		duweke sessdata Kosong? salah: {
+			duweke session-manager save: duweke sessdata.
+		}.
+		duweke headers tambah-ing-mburi: (
+			HTTP-Header anyar
+			key: ['Content-type'] value: jinis
+		).
+		duweke headers saben: { :_ :header
+			Wetonan tulis: header.
+		}.
+		duweke headers-out := Bener.
+		Wetonan tulis: ['\r\n'].
+	}.
+	Wetonan tulis: output.
+}.
+
+Web-Document nalika: ['finish:type:'] tindakna: { :output :jinis
+	duweke headers-out salah: {
+		duweke sessdata Kosong? salah: {
+			duweke session-manager save: duweke sessdata.
+		}.
+		duweke headers tambah-ing-mburi: (
+			HTTP-Header anyar
+			key: ['Content-type'] value: jinis
+		).
+		duweke headers tambah-ing-mburi: (
+			HTTP-Header anyar
+			key: ['Content-Length'] value: output tèks bytes
+		).
+		duweke headers saben: { :_ :header
+			Wetonan tulis: header.
+		}.
+		duweke headers-out := Bener.
+		Wetonan tulis: ['\r\n'].
+	}.
+	Wetonan tulis: output.
+}.
+
+Web-Document nalika: ['out:'] tindakna: { :output
+	dhiri out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document nalika: ['finish:'] tindakna: { :output
+	dhiri finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document nalika: ['json:'] tindakna: { :output
+	dhiri out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document nalika: ['not-found:'] tindakna: { :output
+	dhiri clear-headers header: (
+		HTTP-Header anyar key: ['Status'] value: ['404 Not Found']
+	).
+	dhiri out: output.
+}.
+
+
+# Interface
+
+>> Session := Obyek anyar.
+
+Session nalika: ['anyar'] tindakna: { <- dhiri anyar init for: Kosong.
+}.
+
+Session nalika: ['for:'] tindakna: { :id
+	duweke id := id.
+}.
+
+Session nalika: ['load'] tindakna: {
+	tugas-iki kesalahan: ['Not implemented.'].
+}.
+
+Session nalika: ['save:'] tindakna: {
+	tugas-iki kesalahan: ['Not implemented.'].
+}.
+
+Session nalika: ['destroy'] tindakna: {
+	tugas-iki kesalahan: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session anyar.
+
+Tempfile-Session nalika: ['init'] tindakna: {
+	duweke pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session nalika: ['path-prefix:'] tindakna: { :str
+	duweke pathprefix := str.
+}.
+
+Tempfile-Session nalika: ['file'] tindakna: { <- ( Berkas anyar: ( duweke pathprefix + duweke id + ['.txt'] ) ).
+}.
+
+Tempfile-Session nalika: ['load'] tindakna: {
+	>> file := dhiri file.
+	file ana salah: {
+		file tulis: (Kamus anyar kode).
+	}. <- file waca obyek.
+}.
+
+Tempfile-Session nalika: ['save:'] tindakna: { :data
+	>> file := dhiri file.
+	file ana bener: {
+		file tulis: data kode.
+	}.
+}.
+
+Tempfile-Session nalika: ['destroy'] tindakna: {
+	>> file := dhiri file.
+	file ana bener: {
+		file busak.
+	}.
+}.
+
+
+>> URL := Obyek anyar.
+
+URL nalika: ['init'] tindakna: {
+	duweke protocol := ['https://'].
+	duweke hos := ['localhost'].
+	duweke dalan := [''].
+	duweke params := [''].
+	duweke hash := [''].
+}.
+
+URL nalika: ['anyar'] tindakna: { <- dhiri anyar init.
+}.
+
+URL nalika: ['tèks'] tindakna: { <- (
+	duweke protocol +
+	duweke hos +
+	duweke dalan +
+	duweke params +
+	duweke hash ).
+}.
+
+URL nalika: ['protocol:'] tindakna: { :protocol
+	((Dhaptar anyar: ['http'] ; ['https']) ngemot: protocol) bener: {
+		duweke protocol := protocol + ['://'].
+	}, salah: {
+		tugas-iki kesalahan: ['Invalid protocol'].
+	}.
+}.
+
+URL nalika: ['hos:'] tindakna: { :hos
+	#todo validate according to rfc
+	duweke hos := hos.
+}.
+
+URL nalika: ['path:'] tindakna: { :dalan
+	duweke dalan := ['/'] + dalan url-enkode.
+}.
+
+URL nalika: ['params:'] tindakna: { :map
+	>> params := Dhaptar anyar.
+	map saben: { :key :value
+		params tambah-ing-mburi: key tèks url-enkode + ['='] + value tèks url-enkode.
+	}.
+	duweke params := ['?'] + ( params gabung: ['&'] ).
+}.
+
+URL nalika: ['hash:'] tindakna: { :hash
+	duweke hash := ['#'] + hash url-enkode.
+}.
+

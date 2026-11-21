@@ -1,0 +1,325 @@
+Tono-HTTP ina-tae: ['HTTP-header:'] mahia: { :key <- Papatono tautuhinga: key.
+}.
+
+>> HTTP-Header := Ahanoa hou.
+
+HTTP-Header ina-tae: ['hou'] mahia: { <- whaiaro hou init.
+}.
+
+HTTP-Header ina-tae: ['init'] mahia: {
+	ake key := Kore.
+	ake value := Kore.
+}.
+
+HTTP-Header ina-tae: ['key:value:'] mahia: { :key :value
+	ake key := key.
+	ake value := value.
+}.
+
+HTTP-Header ina-tae: ['key'] mahia: { <- ake key.
+}.
+
+HTTP-Header ina-tae: ['value'] mahia: { <- ake value.
+}.
+
+
+HTTP-Header ina-tae: ['aho'] mahia: {
+	>> line := ake key + [': '] + ake value.
+	line whakakapihia: ['\r'] me: [''], whakakapihia: ['\n'] me: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Ahanoa hou.
+
+Web-Document ina-tae: ['hou'] mahia: { <- whaiaro hou init.
+}.
+
+Web-Document ina-tae: ['init'] mahia: {
+	ake headers := Rārangi hou.
+	ake sess-id := Kore.
+	ake session-manager := Tempfile-Session hou.
+	ake sessdata := Kore.
+	ake secure := Pono.
+	ake same-site := ['Strict'].
+	ake headers-out := Teka.
+	ake request := Tono-HTTP hou.
+}.
+
+Web-Document ina-tae: ['request:'] mahia: { :request
+	ake request := request.
+}. 
+
+Web-Document ina-tae: ['secure-session-cookie:'] mahia: { :secure
+	whaiaro check-headers.
+	ake secure := secure.
+}.
+
+Web-Document ina-tae: ['same-site-session-cookie:'] mahia: { :value
+	whaiaro check-headers.
+	>> options := Rārangi hou 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options kei-roto: value, teka: {
+		tēnei-mahi hapa: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	ake same-site := value.
+}.
+
+Web-Document ina-tae: ['header:'] mahia: { :header
+	whaiaro check-headers.
+	ake headers tāpiri-muri: header.
+}.
+
+Web-Document ina-tae: ['clear-headers'] mahia: {
+	whaiaro check-headers.
+	ake headers := Rārangi hou.
+}.
+
+Web-Document ina-tae: ['session-manager:'] mahia: { :manager
+	whaiaro check-headers.
+	ake session-manager := manager.
+}.
+
+Web-Document ina-tae: ['session-manager'] mahia: { <- ake session-manager.
+}.
+
+Web-Document ina-tae: ['check-headers'] mahia: {
+	ake headers-out pono: {
+		tēnei-mahi hapa: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document ina-tae: ['session-start'] mahia: {
+	whaiaro check-headers.
+	>> request := ake request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Kore? teka: {
+		(( Tauira-rapu hou: ['^[A-Za-z0-9]+\\z'], ōritenga: sess-id ) = 0) pono: {
+			sess-id := Kore.
+		}.
+	}.
+	sess-id Kore? pono: {
+		sess-id := Pākoro token: 30.
+		>> session-header := HTTP-Header hou
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (ake secure tēnei: ['Secure'] tērā-rānei: ['']),
+		SSITE: (ake same-site),
+		XSID: sess-id
+		).
+		ake headers tāpiri-muri: session-header.
+	}.
+	ake sessdata := ake session-manager for: sess-id, load. <- ake sessdata. # reference
+}.
+
+Web-Document ina-tae: ['goto:'] mahia: { :url
+	whaiaro check-headers.
+	whaiaro clear-headers.
+	ake headers
+	tāpiri-muri: (
+		HTTP-Header hou
+		key: ['Status'] value: ['303 See Other']
+	),
+	tāpiri-muri: (
+		HTTP-Header hou
+		key: ['Location'] value: url
+	).
+	whaiaro out: ['Redirect'].
+}.
+
+Web-Document ina-tae: ['session-destroy'] mahia: {
+	whaiaro check-headers.
+	>> request := ake request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Kore? teka: {
+		>> session-header := HTTP-Header hou.
+		>> when := Wā hou tau-maramataka: 1970, hōputu: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (ake secure tēnei: ['Secure'] tērā-rānei: ['']),
+			SSITE: (ake same-site),
+			XSID: sess-id
+		).
+		ake session-manager destroy.
+		ake headers tāpiri-muri: session-header.
+	}.
+}.
+
+
+Web-Document ina-tae: ['template:'] mahia: { :ara-kōnae <- Template hou: (Kōnae hou: ara-kōnae, pānui).
+}.
+
+Web-Document ina-tae: ['out:type:'] mahia: { :output :momo
+	ake headers-out teka: {
+		ake sessdata Kore? teka: {
+			ake session-manager save: ake sessdata.
+		}.
+		ake headers tāpiri-muri: (
+			HTTP-Header hou
+			key: ['Content-type'] value: momo
+		).
+		ake headers ia: { :_ :header
+			Huaputa tuhi: header.
+		}.
+		ake headers-out := Pono.
+		Huaputa tuhi: ['\r\n'].
+	}.
+	Huaputa tuhi: output.
+}.
+
+Web-Document ina-tae: ['finish:type:'] mahia: { :output :momo
+	ake headers-out teka: {
+		ake sessdata Kore? teka: {
+			ake session-manager save: ake sessdata.
+		}.
+		ake headers tāpiri-muri: (
+			HTTP-Header hou
+			key: ['Content-type'] value: momo
+		).
+		ake headers tāpiri-muri: (
+			HTTP-Header hou
+			key: ['Content-Length'] value: output aho bytes
+		).
+		ake headers ia: { :_ :header
+			Huaputa tuhi: header.
+		}.
+		ake headers-out := Pono.
+		Huaputa tuhi: ['\r\n'].
+	}.
+	Huaputa tuhi: output.
+}.
+
+Web-Document ina-tae: ['out:'] mahia: { :output
+	whaiaro out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ina-tae: ['finish:'] mahia: { :output
+	whaiaro finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ina-tae: ['json:'] mahia: { :output
+	whaiaro out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document ina-tae: ['not-found:'] mahia: { :output
+	whaiaro clear-headers header: (
+		HTTP-Header hou key: ['Status'] value: ['404 Not Found']
+	).
+	whaiaro out: output.
+}.
+
+
+# Interface
+
+>> Session := Ahanoa hou.
+
+Session ina-tae: ['hou'] mahia: { <- whaiaro hou init for: Kore.
+}.
+
+Session ina-tae: ['for:'] mahia: { :id
+	ake id := id.
+}.
+
+Session ina-tae: ['load'] mahia: {
+	tēnei-mahi hapa: ['Not implemented.'].
+}.
+
+Session ina-tae: ['save:'] mahia: {
+	tēnei-mahi hapa: ['Not implemented.'].
+}.
+
+Session ina-tae: ['destroy'] mahia: {
+	tēnei-mahi hapa: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session hou.
+
+Tempfile-Session ina-tae: ['init'] mahia: {
+	ake pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session ina-tae: ['path-prefix:'] mahia: { :str
+	ake pathprefix := str.
+}.
+
+Tempfile-Session ina-tae: ['file'] mahia: { <- ( Kōnae hou: ( ake pathprefix + ake id + ['.txt'] ) ).
+}.
+
+Tempfile-Session ina-tae: ['load'] mahia: {
+	>> file := whaiaro file.
+	file kei-te-noho teka: {
+		file tuhi: (Papakupu hou waehere).
+	}. <- file pānui ahanoa.
+}.
+
+Tempfile-Session ina-tae: ['save:'] mahia: { :data
+	>> file := whaiaro file.
+	file kei-te-noho pono: {
+		file tuhi: data waehere.
+	}.
+}.
+
+Tempfile-Session ina-tae: ['destroy'] mahia: {
+	>> file := whaiaro file.
+	file kei-te-noho pono: {
+		file muku.
+	}.
+}.
+
+
+>> URL := Ahanoa hou.
+
+URL ina-tae: ['init'] mahia: {
+	ake protocol := ['https://'].
+	ake manaaki := ['localhost'].
+	ake ara-kōnae := [''].
+	ake params := [''].
+	ake hash := [''].
+}.
+
+URL ina-tae: ['hou'] mahia: { <- whaiaro hou init.
+}.
+
+URL ina-tae: ['aho'] mahia: { <- (
+	ake protocol +
+	ake manaaki +
+	ake ara-kōnae +
+	ake params +
+	ake hash ).
+}.
+
+URL ina-tae: ['protocol:'] mahia: { :protocol
+	((Rārangi hou: ['http'] ; ['https']) kei-roto: protocol) pono: {
+		ake protocol := protocol + ['://'].
+	}, teka: {
+		tēnei-mahi hapa: ['Invalid protocol'].
+	}.
+}.
+
+URL ina-tae: ['manaaki:'] mahia: { :manaaki
+	#todo validate according to rfc
+	ake manaaki := manaaki.
+}.
+
+URL ina-tae: ['path:'] mahia: { :ara-kōnae
+	ake ara-kōnae := ['/'] + ara-kōnae url-whakawaehere.
+}.
+
+URL ina-tae: ['params:'] mahia: { :map
+	>> params := Rārangi hou.
+	map ia: { :key :value
+		params tāpiri-muri: key aho url-whakawaehere + ['='] + value aho url-whakawaehere.
+	}.
+	ake params := ['?'] + ( params honoa: ['&'] ).
+}.
+
+URL ina-tae: ['tāmi:'] mahia: { :hash
+	ake hash := ['#'] + hash url-whakawaehere.
+}.
+

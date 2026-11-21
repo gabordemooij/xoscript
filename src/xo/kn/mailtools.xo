@@ -1,0 +1,128 @@
+>> Email := ವಸ್ತು ಹೊಸ.
+
+Email ಬಂದಾಗ: ['init'] ಮಾಡು: {
+	ತನ್ನ recipients := ಸರಣಿ ಹೊಸ.
+	ತನ್ನ cc := ಸರಣಿ ಹೊಸ.
+	ತನ್ನ bcc := ಸರಣಿ ಹೊಸ.
+	ತನ್ನ from := ಶೂನ್ಯ.
+	ತನ್ನ from-name := ಶೂನ್ಯ.
+	ತನ್ನ subject := ಶೂನ್ಯ.
+	ತನ್ನ body := ಶೂನ್ಯ.
+}.
+
+Email ಬಂದಾಗ: ['ಹೊಸ'] ಮಾಡು: { <- ತಾನು ಹೊಸ init.
+}.
+
+Email ಬಂದಾಗ: ['to:'] ಮಾಡು: { :list
+	ತನ್ನ recipients := list.
+}.
+ 
+Email ಬಂದಾಗ: ['cc:'] ಮಾಡು: { :list
+	ತನ್ನ cc := list.
+}.
+
+Email ಬಂದಾಗ: ['bcc:'] ಮಾಡು: { :list
+	ತನ್ನ bcc := list.
+}.
+
+Email ಬಂದಾಗ: ['subject:'] ಮಾಡು: { :subject
+	ತನ್ನ subject := subject.
+}.
+
+Email ಬಂದಾಗ: ['from:name:'] ಮಾಡು: { :from :ಹೆಸರು
+	ತನ್ನ from := from.
+	ತನ್ನ from-name := ಹೆಸರು.
+}.
+
+Email ಬಂದಾಗ: ['body:'] ಮಾಡು: { :body
+	ತನ್ನ body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ಬಂದಾಗ: ['header:'] ಮಾಡು: { :line <- line ಬದಲಿಸು: ['\r'] ಇದರಿಂದ: [''], ಬದಲಿಸು: ['\n'] ಇದರಿಂದ: [''].
+}.
+
+Email ಬಂದಾಗ: ['send'] ಮಾಡು: {
+	>> f := ಕಡತ tempwrite: ತಾನು generate.
+	ಪ್ರೋಗ್ರಾಂ ವ್ಯವಸ್ಥೆ: ['sendmail -t < '] + f ಕಡತ-ಮಾರ್ಗ, ಹೊಸ-ಸಾಲು.
+}.
+
+Email ಬಂದಾಗ: ['generate'] ಮಾಡು: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: (ತಾನು header: ['From: '] + ತನ್ನ from-name + [' <'] + ( ತನ್ನ from ) + ['>']) + brk.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: (ತಾನು header: ['To: '] + ( ತನ್ನ recipients ಸೇರಿಸು: [','] )) + brk.
+	ತನ್ನ cc ಎಣಿಕೆ ಸತ್ಯವಾದರೆ: {
+		str ಕೊನೆಗೆ-ಸೇರಿಸು: (ತಾನು header: ['Cc: '] + ( ತನ್ನ cc ಸೇರಿಸು: [','] )) + brk.
+	}.
+	ತನ್ನ bcc ಎಣಿಕೆ ಸತ್ಯವಾದರೆ: {
+		str ಕೊನೆಗೆ-ಸೇರಿಸು: (ತಾನು header: ['Bcc: '] + ( ತನ್ನ bcc ಸೇರಿಸು: [','] )) + brk.
+	}.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: (ತಾನು header: ['Subject: '] + ತನ್ನ subject) + brk.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: brk.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: ತನ್ನ body.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: brk. <- str.
+}.
+
+>> HTML-Email := Email ಹೊಸ.
+
+HTML-Email ಬಂದಾಗ: ['init'] ಮಾಡು: {
+	ತಾನು init.
+	ತನ್ನ attachments := ಸರಣಿ ಹೊಸ.
+	ತನ್ನ boundary := ತಿಜೋರಿ ಟೋಕನ್: 40.
+}.
+
+HTML-Email ಬಂದಾಗ: ['attach:'] ಮಾಡು: { :file
+	>> id := ತನ್ನ attachments ಎಣಿಕೆ.
+	>> blob := file blob.
+	ತನ್ನ attachments ಕೊನೆಗೆ-ಸೇರಿಸು: (
+		ನಿಘಂಟು ಹೊಸ
+			file: file ಕಡತ-ಮಾರ್ಗ,
+			mime: ['image/'] + (Server mimetype: file ಕಡತ-ಮಾರ್ಗ),
+			data: blob base64-ಎನ್-ಕೋಡ್
+	).
+	blob ಬಿಡುಗಡೆ. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ಬಂದಾಗ: ['generate'] ಮಾಡು: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: (ತಾನು header: ['From: '] + ತನ್ನ from-name + [' <'] + ( ತನ್ನ from ) + ['>']) + brk.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: (ತಾನು header: ['To: '] + ( ತನ್ನ recipients ಸೇರಿಸು: [','] )) + brk.
+	ತನ್ನ cc ಎಣಿಕೆ ಸತ್ಯವಾದರೆ: {
+		str ಕೊನೆಗೆ-ಸೇರಿಸು: (ತಾನು header: ['Cc: '] + ( ತನ್ನ cc ಸೇರಿಸು: [','] )) + brk.
+	}.
+	ತನ್ನ bcc ಎಣಿಕೆ ಸತ್ಯವಾದರೆ: {
+		str ಕೊನೆಗೆ-ಸೇರಿಸು: (ತಾನು header: ['Bcc: '] + ( ತನ್ನ bcc ಸೇರಿಸು: [','] )) + brk.
+	}.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: (ತಾನು header: ['Subject: '] + ತನ್ನ subject) + brk.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: ['MIME-Version: 1.0'] + brk.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: ['Content-Type: multipart/related; boundary="'] + ತನ್ನ boundary + ['"; type=text/html'] + brk.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: brk.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: ['--'] + ತನ್ನ boundary + brk.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: brk.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: ತನ್ನ body.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: brk.
+	ತನ್ನ attachments ಪ್ರತಿಯೊಂದು: { :id :info
+		>> blob := info data.
+		str ಕೊನೆಗೆ-ಸೇರಿಸು: ['--'] + ತನ್ನ boundary + brk.
+		str ಕೊನೆಗೆ-ಸೇರಿಸು: ['Content-Type: '] + info mime + brk.
+		str ಕೊನೆಗೆ-ಸೇರಿಸು: ['Content-Transfer-Encoding: base64'] + brk.
+		str ಕೊನೆಗೆ-ಸೇರಿಸು: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str ಕೊನೆಗೆ-ಸೇರಿಸು: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str ಕೊನೆಗೆ-ಸೇರಿಸು: brk.
+		>> max := 76.
+		>> len := blob ಉದ್ದ.
+		>> chunks := (len / max) ಮೇಲ್-ಪೂರ್ಣಾಂಕ.
+		{ :i
+			>> chunk := blob ನಕಲು ಆರಂಭ: i * max ಉದ್ದ: max.
+			str ಕೊನೆಗೆ-ಸೇರಿಸು: chunk + brk.
+		} * chunks.
+		str ಕೊನೆಗೆ-ಸೇರಿಸು: brk.
+		str ಕೊನೆಗೆ-ಸೇರಿಸು: brk.
+	}.
+	str ಕೊನೆಗೆ-ಸೇರಿಸು: ['--'] + ತನ್ನ boundary + ['--'] + brk. <- str.
+}.

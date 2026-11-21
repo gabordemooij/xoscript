@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := ობიექტი ახალი.
+
+Template როცა: ['ახალი'] გააკეთე: { <- თავად ახალი content: [''].
+}.
+
+Template როცა: ['content:'] გააკეთე: { :content
+	საკუთარი content := content. 
+}.
+
+Template როცა: ['ახალი:'] გააკეთე: { :content <- თავად ახალი content: content.
+}.
+
+Template როცა: ['cut:'] გააკეთე: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := საკუთარი content გაყოფა: startmarker.
+	>> prefix := parts პირველი.
+	>> parts2 := parts ბოლო გაყოფა: endmarker.
+	>> suffix := parts2 ბოლო.
+	>> part := parts2 პირველი.
+	>> rest := prefix + suffix.
+	საკუთარი content := rest. <- Template ახალი: part.
+	
+}.
+
+Template როცა: ['კოპირება'] გააკეთე: { <- თავად ახალი: თავად ტექსტად კოპირება.
+}.
+	
+Template როცა: ['paste:at:'] გააკეთე: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	საკუთარი content შეცვლა: pastemarker ახლით: ( snippet ტექსტად + pastemarker ).
+}.
+
+Template როცა: ['დაყენება:მნიშვნელობა:'] გააკეთე: { :slot :value
+	საკუთარი content შეცვლა: ['<!-- slot:'] + slot + [' -->'] ახლით: ( Server html-კოდირება: value ).
+}.
+
+Template როცა: ['set:html:'] გააკეთე: { :slot :html
+	საკუთარი content შეცვლა: ['<!-- slot:'] + slot + [' -->'] ახლით: html.
+}.
+
+Template როცა: ['უპასუხე:და:'] გააკეთე: { :slot :value
+	თავად დაყენება: (slot საიდან: 0 სიგრძე: (slot სიგრძე - 1)) მნიშვნელობა: value.
+}.
+
+Template როცა: ['nl2br'] გააკეთე: {
+	საკუთარი content შეცვლა: ['\n'] ახლით: ['<br>'].
+}.
+
+Template როცა: ['clean'] გააკეთე: {
+	საკუთარი content :=
+		შაბლონი
+		ახალი: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		დამთხვევა: საკუთარი content
+		გააკეთე: { <- ['']. }.
+}.
+
+Template როცა: ['clean-cuts'] გააკეთე: {
+	>> items := სია ახალი.
+	შაბლონი
+	ახალი: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	დამთხვევა: საკუთარი content
+	გააკეთე: { :_ :part
+		items ბოლოში-დამატება: part ? 1.
+	}.
+	items თითოეული: { :_ :id
+		საკუთარი content :=
+			შაბლონი ახალი: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			დამთხვევა: საკუთარი content
+			გააკეთე: { <- ['']. }.
+	 }.
+}.
+
+Template როცა: ['clean-space'] გააკეთე: {
+	საკუთარი content :=
+		შაბლონი
+		ახალი: ['\\s*\\n'],
+		დამთხვევა: საკუთარი content
+		გააკეთე: { <- ['\n']. }.
+	საკუთარი content :=
+		შაბლონი
+		ახალი: ['\\n[\\s\\t]+'],
+		დამთხვევა: საკუთარი content
+		გააკეთე: { <- ['\n']. }.
+}.
+
+Template როცა: ['clean-all'] გააკეთე: {
+	თავად clean.
+	თავად clean-cuts.
+	თავად clean-space.
+}.
+
+Template როცა: ['ტექსტად'] გააკეთე: { <- საკუთარი content.
+}.

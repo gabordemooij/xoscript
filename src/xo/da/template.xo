@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objekt ny.
+
+Template ved: ['ny'] gør: { <- selv ny content: [''].
+}.
+
+Template ved: ['content:'] gør: { :content
+	egen content := content. 
+}.
+
+Template ved: ['ny:'] gør: { :content <- selv ny content: content.
+}.
+
+Template ved: ['cut:'] gør: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := egen content opdel: startmarker.
+	>> prefix := parts første.
+	>> parts2 := parts sidste opdel: endmarker.
+	>> suffix := parts2 sidste.
+	>> part := parts2 første.
+	>> rest := prefix + suffix.
+	egen content := rest. <- Template ny: part.
+	
+}.
+
+Template ved: ['kopiér'] gør: { <- selv ny: selv tekst kopiér.
+}.
+	
+Template ved: ['paste:at:'] gør: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	egen content erstat: pastemarker med: ( snippet tekst + pastemarker ).
+}.
+
+Template ved: ['sæt:værdi:'] gør: { :slot :value
+	egen content erstat: ['<!-- slot:'] + slot + [' -->'] med: ( Server html-kode: value ).
+}.
+
+Template ved: ['set:html:'] gør: { :slot :html
+	egen content erstat: ['<!-- slot:'] + slot + [' -->'] med: html.
+}.
+
+Template ved: ['svar:og:'] gør: { :slot :value
+	selv sæt: (slot fra: 0 længde: (slot længde - 1)) værdi: value.
+}.
+
+Template ved: ['nl2br'] gør: {
+	egen content erstat: ['\n'] med: ['<br>'].
+}.
+
+Template ved: ['clean'] gør: {
+	egen content :=
+		Mønster
+		ny: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		match: egen content
+		gør: { <- ['']. }.
+}.
+
+Template ved: ['clean-cuts'] gør: {
+	>> items := Liste ny.
+	Mønster
+	ny: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	match: egen content
+	gør: { :_ :part
+		items tilføj: part ? 1.
+	}.
+	items hver: { :_ :id
+		egen content :=
+			Mønster ny: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			match: egen content
+			gør: { <- ['']. }.
+	 }.
+}.
+
+Template ved: ['clean-space'] gør: {
+	egen content :=
+		Mønster
+		ny: ['\\s*\\n'],
+		match: egen content
+		gør: { <- ['\n']. }.
+	egen content :=
+		Mønster
+		ny: ['\\n[\\s\\t]+'],
+		match: egen content
+		gør: { <- ['\n']. }.
+}.
+
+Template ved: ['clean-all'] gør: {
+	selv clean.
+	selv clean-cuts.
+	selv clean-space.
+}.
+
+Template ved: ['tekst'] gør: { <- egen content.
+}.

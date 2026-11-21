@@ -1,0 +1,128 @@
+>> Email := Αντικείμενο νέο.
+
+Email όταν: ['init'] κάνε: {
+	δικό recipients := Λίστα νέο.
+	δικό cc := Λίστα νέο.
+	δικό bcc := Λίστα νέο.
+	δικό from := Κενό.
+	δικό from-name := Κενό.
+	δικό subject := Κενό.
+	δικό body := Κενό.
+}.
+
+Email όταν: ['νέο'] κάνε: { <- εαυτός νέο init.
+}.
+
+Email όταν: ['to:'] κάνε: { :list
+	δικό recipients := list.
+}.
+ 
+Email όταν: ['cc:'] κάνε: { :list
+	δικό cc := list.
+}.
+
+Email όταν: ['bcc:'] κάνε: { :list
+	δικό bcc := list.
+}.
+
+Email όταν: ['subject:'] κάνε: { :subject
+	δικό subject := subject.
+}.
+
+Email όταν: ['from:name:'] κάνε: { :from :όνομα
+	δικό from := from.
+	δικό from-name := όνομα.
+}.
+
+Email όταν: ['body:'] κάνε: { :body
+	δικό body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email όταν: ['header:'] κάνε: { :line <- line αντικατάσταση: ['\r'] με: [''], αντικατάσταση: ['\n'] με: [''].
+}.
+
+Email όταν: ['send'] κάνε: {
+	>> f := Αρχείο tempwrite: εαυτός generate.
+	Πρόγραμμα σύστημα: ['sendmail -t < '] + f διαδρομή, νέα-γραμμή.
+}.
+
+Email όταν: ['generate'] κάνε: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str προσθήκη-στο-τέλος: (εαυτός header: ['From: '] + δικό from-name + [' <'] + ( δικό from ) + ['>']) + brk.
+	str προσθήκη-στο-τέλος: (εαυτός header: ['To: '] + ( δικό recipients συνένωση: [','] )) + brk.
+	δικό cc πλήθος αληθές: {
+		str προσθήκη-στο-τέλος: (εαυτός header: ['Cc: '] + ( δικό cc συνένωση: [','] )) + brk.
+	}.
+	δικό bcc πλήθος αληθές: {
+		str προσθήκη-στο-τέλος: (εαυτός header: ['Bcc: '] + ( δικό bcc συνένωση: [','] )) + brk.
+	}.
+	str προσθήκη-στο-τέλος: (εαυτός header: ['Subject: '] + δικό subject) + brk.
+	str προσθήκη-στο-τέλος: brk.
+	str προσθήκη-στο-τέλος: δικό body.
+	str προσθήκη-στο-τέλος: brk. <- str.
+}.
+
+>> HTML-Email := Email νέο.
+
+HTML-Email όταν: ['init'] κάνε: {
+	εαυτός init.
+	δικό attachments := Λίστα νέο.
+	δικό boundary := Θησαυροφυλάκιο διακριτικό: 40.
+}.
+
+HTML-Email όταν: ['attach:'] κάνε: { :file
+	>> id := δικό attachments πλήθος.
+	>> blob := file blob.
+	δικό attachments προσθήκη-στο-τέλος: (
+		Λεξικό νέο
+			file: file διαδρομή,
+			mime: ['image/'] + (Server mimetype: file διαδρομή),
+			data: blob base64-κωδικοποίηση
+	).
+	blob αποδέσμευση. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email όταν: ['generate'] κάνε: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str προσθήκη-στο-τέλος: (εαυτός header: ['From: '] + δικό from-name + [' <'] + ( δικό from ) + ['>']) + brk.
+	str προσθήκη-στο-τέλος: (εαυτός header: ['To: '] + ( δικό recipients συνένωση: [','] )) + brk.
+	δικό cc πλήθος αληθές: {
+		str προσθήκη-στο-τέλος: (εαυτός header: ['Cc: '] + ( δικό cc συνένωση: [','] )) + brk.
+	}.
+	δικό bcc πλήθος αληθές: {
+		str προσθήκη-στο-τέλος: (εαυτός header: ['Bcc: '] + ( δικό bcc συνένωση: [','] )) + brk.
+	}.
+	str προσθήκη-στο-τέλος: (εαυτός header: ['Subject: '] + δικό subject) + brk.
+	str προσθήκη-στο-τέλος: ['MIME-Version: 1.0'] + brk.
+	str προσθήκη-στο-τέλος: ['Content-Type: multipart/related; boundary="'] + δικό boundary + ['"; type=text/html'] + brk.
+	str προσθήκη-στο-τέλος: brk.
+	str προσθήκη-στο-τέλος: ['--'] + δικό boundary + brk.
+	str προσθήκη-στο-τέλος: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str προσθήκη-στο-τέλος: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str προσθήκη-στο-τέλος: brk.
+	str προσθήκη-στο-τέλος: δικό body.
+	str προσθήκη-στο-τέλος: brk.
+	δικό attachments κάθε: { :id :info
+		>> blob := info data.
+		str προσθήκη-στο-τέλος: ['--'] + δικό boundary + brk.
+		str προσθήκη-στο-τέλος: ['Content-Type: '] + info mime + brk.
+		str προσθήκη-στο-τέλος: ['Content-Transfer-Encoding: base64'] + brk.
+		str προσθήκη-στο-τέλος: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str προσθήκη-στο-τέλος: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str προσθήκη-στο-τέλος: brk.
+		>> max := 76.
+		>> len := blob μήκος.
+		>> chunks := (len / max) στρογγύλευση-πάνω.
+		{ :i
+			>> chunk := blob αντιγραφή από: i * max μήκος: max.
+			str προσθήκη-στο-τέλος: chunk + brk.
+		} * chunks.
+		str προσθήκη-στο-τέλος: brk.
+		str προσθήκη-στο-τέλος: brk.
+	}.
+	str προσθήκη-στο-τέλος: ['--'] + δικό boundary + ['--'] + brk. <- str.
+}.

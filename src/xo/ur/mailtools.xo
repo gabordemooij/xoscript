@@ -1,0 +1,128 @@
+>> Email := آبجیکٹ نیا.
+
+Email جب: ['init'] کرو: {
+	اپنا recipients := لسٹ نیا.
+	اپنا cc := لسٹ نیا.
+	اپنا bcc := لسٹ نیا.
+	اپنا from := خالی.
+	اپنا from-name := خالی.
+	اپنا subject := خالی.
+	اپنا body := خالی.
+}.
+
+Email جب: ['نیا'] کرو: { <- خود نیا init.
+}.
+
+Email جب: ['to:'] کرو: { :list
+	اپنا recipients := list.
+}.
+ 
+Email جب: ['cc:'] کرو: { :list
+	اپنا cc := list.
+}.
+
+Email جب: ['bcc:'] کرو: { :list
+	اپنا bcc := list.
+}.
+
+Email جب: ['subject:'] کرو: { :subject
+	اپنا subject := subject.
+}.
+
+Email جب: ['from:name:'] کرو: { :from :نام
+	اپنا from := from.
+	اپنا from-name := نام.
+}.
+
+Email جب: ['body:'] کرو: { :body
+	اپنا body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email جب: ['header:'] کرو: { :line <- line بدلو: ['\r'] سے: [''], بدلو: ['\n'] سے: [''].
+}.
+
+Email جب: ['send'] کرو: {
+	>> f := فائل عارضی-لکھائی: خود generate.
+	پروگرام سسٹم: ['sendmail -t < '] + f فائل-راستہ, نئی-سطر.
+}.
+
+Email جب: ['generate'] کرو: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str آخر-میں-جوڑو: (خود header: ['From: '] + اپنا from-name + [' <'] + ( اپنا from ) + ['>']) + brk.
+	str آخر-میں-جوڑو: (خود header: ['To: '] + ( اپنا recipients جوڑو: [','] )) + brk.
+	اپنا cc تعداد اگر-سچ: {
+		str آخر-میں-جوڑو: (خود header: ['Cc: '] + ( اپنا cc جوڑو: [','] )) + brk.
+	}.
+	اپنا bcc تعداد اگر-سچ: {
+		str آخر-میں-جوڑو: (خود header: ['Bcc: '] + ( اپنا bcc جوڑو: [','] )) + brk.
+	}.
+	str آخر-میں-جوڑو: (خود header: ['Subject: '] + اپنا subject) + brk.
+	str آخر-میں-جوڑو: brk.
+	str آخر-میں-جوڑو: اپنا body.
+	str آخر-میں-جوڑو: brk. <- str.
+}.
+
+>> HTML-Email := Email نیا.
+
+HTML-Email جب: ['init'] کرو: {
+	خود init.
+	اپنا attachments := لسٹ نیا.
+	اپنا boundary := تجوری ٹوکن: 40.
+}.
+
+HTML-Email جب: ['attach:'] کرو: { :file
+	>> id := اپنا attachments تعداد.
+	>> blob := file blob.
+	اپنا attachments آخر-میں-جوڑو: (
+		لغت نیا
+			file: file فائل-راستہ,
+			mime: ['image/'] + (Server mimetype: file فائل-راستہ),
+			data: blob base64-انکوڈ
+	).
+	blob آزاد-کرو. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email جب: ['generate'] کرو: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str آخر-میں-جوڑو: (خود header: ['From: '] + اپنا from-name + [' <'] + ( اپنا from ) + ['>']) + brk.
+	str آخر-میں-جوڑو: (خود header: ['To: '] + ( اپنا recipients جوڑو: [','] )) + brk.
+	اپنا cc تعداد اگر-سچ: {
+		str آخر-میں-جوڑو: (خود header: ['Cc: '] + ( اپنا cc جوڑو: [','] )) + brk.
+	}.
+	اپنا bcc تعداد اگر-سچ: {
+		str آخر-میں-جوڑو: (خود header: ['Bcc: '] + ( اپنا bcc جوڑو: [','] )) + brk.
+	}.
+	str آخر-میں-جوڑو: (خود header: ['Subject: '] + اپنا subject) + brk.
+	str آخر-میں-جوڑو: ['MIME-Version: 1.0'] + brk.
+	str آخر-میں-جوڑو: ['Content-Type: multipart/related; boundary="'] + اپنا boundary + ['"; type=text/html'] + brk.
+	str آخر-میں-جوڑو: brk.
+	str آخر-میں-جوڑو: ['--'] + اپنا boundary + brk.
+	str آخر-میں-جوڑو: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str آخر-میں-جوڑو: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str آخر-میں-جوڑو: brk.
+	str آخر-میں-جوڑو: اپنا body.
+	str آخر-میں-جوڑو: brk.
+	اپنا attachments ہر-ایک: { :id :info
+		>> blob := info data.
+		str آخر-میں-جوڑو: ['--'] + اپنا boundary + brk.
+		str آخر-میں-جوڑو: ['Content-Type: '] + info mime + brk.
+		str آخر-میں-جوڑو: ['Content-Transfer-Encoding: base64'] + brk.
+		str آخر-میں-جوڑو: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str آخر-میں-جوڑو: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str آخر-میں-جوڑو: brk.
+		>> max := 76.
+		>> len := blob لمبائی.
+		>> chunks := (len / max) اوپر-گول.
+		{ :i
+			>> chunk := blob نقل آغاز: i * max لمبائی: max.
+			str آخر-میں-جوڑو: chunk + brk.
+		} * chunks.
+		str آخر-میں-جوڑو: brk.
+		str آخر-میں-جوڑو: brk.
+	}.
+	str آخر-میں-جوڑو: ['--'] + اپنا boundary + ['--'] + brk. <- str.
+}.

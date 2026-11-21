@@ -1,0 +1,128 @@
+>> Email := វត្ថុ ថ្មី.
+
+Email ពេលទទួល: ['init'] ធ្វើ: {
+	ផ្ទាល់ recipients := ស៊េរី ថ្មី.
+	ផ្ទាល់ cc := ស៊េរី ថ្មី.
+	ផ្ទាល់ bcc := ស៊េរី ថ្មី.
+	ផ្ទាល់ from := ទទេ.
+	ផ្ទាល់ from-name := ទទេ.
+	ផ្ទាល់ subject := ទទេ.
+	ផ្ទាល់ body := ទទេ.
+}.
+
+Email ពេលទទួល: ['ថ្មី'] ធ្វើ: { <- ខ្លួន ថ្មី init.
+}.
+
+Email ពេលទទួល: ['to:'] ធ្វើ: { :list
+	ផ្ទាល់ recipients := list.
+}.
+ 
+Email ពេលទទួល: ['cc:'] ធ្វើ: { :list
+	ផ្ទាល់ cc := list.
+}.
+
+Email ពេលទទួល: ['bcc:'] ធ្វើ: { :list
+	ផ្ទាល់ bcc := list.
+}.
+
+Email ពេលទទួល: ['subject:'] ធ្វើ: { :subject
+	ផ្ទាល់ subject := subject.
+}.
+
+Email ពេលទទួល: ['from:name:'] ធ្វើ: { :from :ឈ្មោះ
+	ផ្ទាល់ from := from.
+	ផ្ទាល់ from-name := ឈ្មោះ.
+}.
+
+Email ពេលទទួល: ['body:'] ធ្វើ: { :body
+	ផ្ទាល់ body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ពេលទទួល: ['header:'] ធ្វើ: { :line <- line ជំនួស: ['\r'] ដោយ: [''], ជំនួស: ['\n'] ដោយ: [''].
+}.
+
+Email ពេលទទួល: ['send'] ធ្វើ: {
+	>> f := ឯកសារ tempwrite: ខ្លួន generate.
+	កម្មវិធី ប្រព័ន្ធ: ['sendmail -t < '] + f ផ្លូវឯកសារ, បន្ទាត់ថ្មី.
+}.
+
+Email ពេលទទួល: ['generate'] ធ្វើ: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str បន្ថែមខាងចុង: (ខ្លួន header: ['From: '] + ផ្ទាល់ from-name + [' <'] + ( ផ្ទាល់ from ) + ['>']) + brk.
+	str បន្ថែមខាងចុង: (ខ្លួន header: ['To: '] + ( ផ្ទាល់ recipients ភ្ជាប់: [','] )) + brk.
+	ផ្ទាល់ cc ចំនួនធាតុ បើពិត: {
+		str បន្ថែមខាងចុង: (ខ្លួន header: ['Cc: '] + ( ផ្ទាល់ cc ភ្ជាប់: [','] )) + brk.
+	}.
+	ផ្ទាល់ bcc ចំនួនធាតុ បើពិត: {
+		str បន្ថែមខាងចុង: (ខ្លួន header: ['Bcc: '] + ( ផ្ទាល់ bcc ភ្ជាប់: [','] )) + brk.
+	}.
+	str បន្ថែមខាងចុង: (ខ្លួន header: ['Subject: '] + ផ្ទាល់ subject) + brk.
+	str បន្ថែមខាងចុង: brk.
+	str បន្ថែមខាងចុង: ផ្ទាល់ body.
+	str បន្ថែមខាងចុង: brk. <- str.
+}.
+
+>> HTML-Email := Email ថ្មី.
+
+HTML-Email ពេលទទួល: ['init'] ធ្វើ: {
+	ខ្លួន init.
+	ផ្ទាល់ attachments := ស៊េរី ថ្មី.
+	ផ្ទាល់ boundary := ទូដែក ថូខឹន: 40.
+}.
+
+HTML-Email ពេលទទួល: ['attach:'] ធ្វើ: { :file
+	>> id := ផ្ទាល់ attachments ចំនួនធាតុ.
+	>> blob := file blob.
+	ផ្ទាល់ attachments បន្ថែមខាងចុង: (
+		វចនានុក្រម ថ្មី
+			file: file ផ្លូវឯកសារ,
+			mime: ['image/'] + (Server mimetype: file ផ្លូវឯកសារ),
+			data: blob base64-អ៊ិនកូដ
+	).
+	blob ដោះលែង. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ពេលទទួល: ['generate'] ធ្វើ: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str បន្ថែមខាងចុង: (ខ្លួន header: ['From: '] + ផ្ទាល់ from-name + [' <'] + ( ផ្ទាល់ from ) + ['>']) + brk.
+	str បន្ថែមខាងចុង: (ខ្លួន header: ['To: '] + ( ផ្ទាល់ recipients ភ្ជាប់: [','] )) + brk.
+	ផ្ទាល់ cc ចំនួនធាតុ បើពិត: {
+		str បន្ថែមខាងចុង: (ខ្លួន header: ['Cc: '] + ( ផ្ទាល់ cc ភ្ជាប់: [','] )) + brk.
+	}.
+	ផ្ទាល់ bcc ចំនួនធាតុ បើពិត: {
+		str បន្ថែមខាងចុង: (ខ្លួន header: ['Bcc: '] + ( ផ្ទាល់ bcc ភ្ជាប់: [','] )) + brk.
+	}.
+	str បន្ថែមខាងចុង: (ខ្លួន header: ['Subject: '] + ផ្ទាល់ subject) + brk.
+	str បន្ថែមខាងចុង: ['MIME-Version: 1.0'] + brk.
+	str បន្ថែមខាងចុង: ['Content-Type: multipart/related; boundary="'] + ផ្ទាល់ boundary + ['"; type=text/html'] + brk.
+	str បន្ថែមខាងចុង: brk.
+	str បន្ថែមខាងចុង: ['--'] + ផ្ទាល់ boundary + brk.
+	str បន្ថែមខាងចុង: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str បន្ថែមខាងចុង: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str បន្ថែមខាងចុង: brk.
+	str បន្ថែមខាងចុង: ផ្ទាល់ body.
+	str បន្ថែមខាងចុង: brk.
+	ផ្ទាល់ attachments នីមួយៗ: { :id :info
+		>> blob := info data.
+		str បន្ថែមខាងចុង: ['--'] + ផ្ទាល់ boundary + brk.
+		str បន្ថែមខាងចុង: ['Content-Type: '] + info mime + brk.
+		str បន្ថែមខាងចុង: ['Content-Transfer-Encoding: base64'] + brk.
+		str បន្ថែមខាងចុង: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str បន្ថែមខាងចុង: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str បន្ថែមខាងចុង: brk.
+		>> max := 76.
+		>> len := blob ប្រវែង.
+		>> chunks := (len / max) បង្គត់ឡើង.
+		{ :i
+			>> chunk := blob ចម្លង ចាប់ពី: i * max ប្រវែង: max.
+			str បន្ថែមខាងចុង: chunk + brk.
+		} * chunks.
+		str បន្ថែមខាងចុង: brk.
+		str បន្ថែមខាងចុង: brk.
+	}.
+	str បន្ថែមខាងចុង: ['--'] + ផ្ទាល់ boundary + ['--'] + brk. <- str.
+}.

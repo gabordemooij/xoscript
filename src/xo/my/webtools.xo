@@ -1,0 +1,325 @@
+HTTP-တောင်းဆိုချက် ရလျှင်: ['HTTP-header:'] လုပ်: { :key <- ပရိုဂရမ် ဆက်တင်: key.
+}.
+
+>> HTTP-Header := အရာဝတ္ထု အသစ်.
+
+HTTP-Header ရလျှင်: ['အသစ်'] လုပ်: { <- မိမိ အသစ် init.
+}.
+
+HTTP-Header ရလျှင်: ['init'] လုပ်: {
+	ကိုယ်ပိုင် key := ဗလာ.
+	ကိုယ်ပိုင် value := ဗလာ.
+}.
+
+HTTP-Header ရလျှင်: ['key:value:'] လုပ်: { :key :value
+	ကိုယ်ပိုင် key := key.
+	ကိုယ်ပိုင် value := value.
+}.
+
+HTTP-Header ရလျှင်: ['key'] လုပ်: { <- ကိုယ်ပိုင် key.
+}.
+
+HTTP-Header ရလျှင်: ['value'] လုပ်: { <- ကိုယ်ပိုင် value.
+}.
+
+
+HTTP-Header ရလျှင်: ['စာသားသို့'] လုပ်: {
+	>> line := ကိုယ်ပိုင် key + [': '] + ကိုယ်ပိုင် value.
+	line အစားထိုး: ['\r'] ဖြင့်: [''], အစားထိုး: ['\n'] ဖြင့်: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := အရာဝတ္ထု အသစ်.
+
+Web-Document ရလျှင်: ['အသစ်'] လုပ်: { <- မိမိ အသစ် init.
+}.
+
+Web-Document ရလျှင်: ['init'] လုပ်: {
+	ကိုယ်ပိုင် headers := အစီအစဉ် အသစ်.
+	ကိုယ်ပိုင် sess-id := ဗလာ.
+	ကိုယ်ပိုင် session-manager := Tempfile-Session အသစ်.
+	ကိုယ်ပိုင် sessdata := ဗလာ.
+	ကိုယ်ပိုင် secure := မှန်.
+	ကိုယ်ပိုင် same-site := ['Strict'].
+	ကိုယ်ပိုင် headers-out := မှား.
+	ကိုယ်ပိုင် request := HTTP-တောင်းဆိုချက် အသစ်.
+}.
+
+Web-Document ရလျှင်: ['request:'] လုပ်: { :request
+	ကိုယ်ပိုင် request := request.
+}. 
+
+Web-Document ရလျှင်: ['secure-session-cookie:'] လုပ်: { :secure
+	မိမိ check-headers.
+	ကိုယ်ပိုင် secure := secure.
+}.
+
+Web-Document ရလျှင်: ['same-site-session-cookie:'] လုပ်: { :value
+	မိမိ check-headers.
+	>> options := အစီအစဉ် အသစ် 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options ပါဝင်: value, မှားလျှင်: {
+		ဤလုပ်ငန်း အမှား: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	ကိုယ်ပိုင် same-site := value.
+}.
+
+Web-Document ရလျှင်: ['header:'] လုပ်: { :header
+	မိမိ check-headers.
+	ကိုယ်ပိုင် headers အဆုံးတွင်ထည့်: header.
+}.
+
+Web-Document ရလျှင်: ['clear-headers'] လုပ်: {
+	မိမိ check-headers.
+	ကိုယ်ပိုင် headers := အစီအစဉ် အသစ်.
+}.
+
+Web-Document ရလျှင်: ['session-manager:'] လုပ်: { :manager
+	မိမိ check-headers.
+	ကိုယ်ပိုင် session-manager := manager.
+}.
+
+Web-Document ရလျှင်: ['session-manager'] လုပ်: { <- ကိုယ်ပိုင် session-manager.
+}.
+
+Web-Document ရလျှင်: ['check-headers'] လုပ်: {
+	ကိုယ်ပိုင် headers-out မှန်လျှင်: {
+		ဤလုပ်ငန်း အမှား: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document ရလျှင်: ['session-start'] လုပ်: {
+	မိမိ check-headers.
+	>> request := ကိုယ်ပိုင် request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ဗလာလား? မှားလျှင်: {
+		(( ပုံစံတူရှာ အသစ်: ['^[A-Za-z0-9]+\\z'], ကိုက်ညီ: sess-id ) = 0) မှန်လျှင်: {
+			sess-id := ဗလာ.
+		}.
+	}.
+	sess-id ဗလာလား? မှန်လျှင်: {
+		sess-id := မီးခံသေတ္တာ တိုကင်: 30.
+		>> session-header := HTTP-Header အသစ်
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (ကိုယ်ပိုင် secure ဤအရာ: ['Secure'] မဟုတ်က: ['']),
+		SSITE: (ကိုယ်ပိုင် same-site),
+		XSID: sess-id
+		).
+		ကိုယ်ပိုင် headers အဆုံးတွင်ထည့်: session-header.
+	}.
+	ကိုယ်ပိုင် sessdata := ကိုယ်ပိုင် session-manager for: sess-id, load. <- ကိုယ်ပိုင် sessdata. # reference
+}.
+
+Web-Document ရလျှင်: ['goto:'] လုပ်: { :url
+	မိမိ check-headers.
+	မိမိ clear-headers.
+	ကိုယ်ပိုင် headers
+	အဆုံးတွင်ထည့်: (
+		HTTP-Header အသစ်
+		key: ['Status'] value: ['303 See Other']
+	),
+	အဆုံးတွင်ထည့်: (
+		HTTP-Header အသစ်
+		key: ['Location'] value: url
+	).
+	မိမိ out: ['Redirect'].
+}.
+
+Web-Document ရလျှင်: ['session-destroy'] လုပ်: {
+	မိမိ check-headers.
+	>> request := ကိုယ်ပိုင် request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ဗလာလား? မှားလျှင်: {
+		>> session-header := HTTP-Header အသစ်.
+		>> when := အချိန်မှတ် အသစ် နှစ်: 1970, ပုံစံဖြင့်: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (ကိုယ်ပိုင် secure ဤအရာ: ['Secure'] မဟုတ်က: ['']),
+			SSITE: (ကိုယ်ပိုင် same-site),
+			XSID: sess-id
+		).
+		ကိုယ်ပိုင် session-manager destroy.
+		ကိုယ်ပိုင် headers အဆုံးတွင်ထည့်: session-header.
+	}.
+}.
+
+
+Web-Document ရလျှင်: ['template:'] လုပ်: { :ဖိုင်လမ်းကြောင်း <- Template အသစ်: (ဖိုင် အသစ်: ဖိုင်လမ်းကြောင်း, ဖတ်).
+}.
+
+Web-Document ရလျှင်: ['out:type:'] လုပ်: { :output :အမျိုးအစား
+	ကိုယ်ပိုင် headers-out မှားလျှင်: {
+		ကိုယ်ပိုင် sessdata ဗလာလား? မှားလျှင်: {
+			ကိုယ်ပိုင် session-manager save: ကိုယ်ပိုင် sessdata.
+		}.
+		ကိုယ်ပိုင် headers အဆုံးတွင်ထည့်: (
+			HTTP-Header အသစ်
+			key: ['Content-type'] value: အမျိုးအစား
+		).
+		ကိုယ်ပိုင် headers တစ်ခုစီ: { :_ :header
+			အထွက် ရေး: header.
+		}.
+		ကိုယ်ပိုင် headers-out := မှန်.
+		အထွက် ရေး: ['\r\n'].
+	}.
+	အထွက် ရေး: output.
+}.
+
+Web-Document ရလျှင်: ['finish:type:'] လုပ်: { :output :အမျိုးအစား
+	ကိုယ်ပိုင် headers-out မှားလျှင်: {
+		ကိုယ်ပိုင် sessdata ဗလာလား? မှားလျှင်: {
+			ကိုယ်ပိုင် session-manager save: ကိုယ်ပိုင် sessdata.
+		}.
+		ကိုယ်ပိုင် headers အဆုံးတွင်ထည့်: (
+			HTTP-Header အသစ်
+			key: ['Content-type'] value: အမျိုးအစား
+		).
+		ကိုယ်ပိုင် headers အဆုံးတွင်ထည့်: (
+			HTTP-Header အသစ်
+			key: ['Content-Length'] value: output စာသားသို့ bytes
+		).
+		ကိုယ်ပိုင် headers တစ်ခုစီ: { :_ :header
+			အထွက် ရေး: header.
+		}.
+		ကိုယ်ပိုင် headers-out := မှန်.
+		အထွက် ရေး: ['\r\n'].
+	}.
+	အထွက် ရေး: output.
+}.
+
+Web-Document ရလျှင်: ['out:'] လုပ်: { :output
+	မိမိ out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ရလျှင်: ['finish:'] လုပ်: { :output
+	မိမိ finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ရလျှင်: ['json:'] လုပ်: { :output
+	မိမိ out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document ရလျှင်: ['not-found:'] လုပ်: { :output
+	မိမိ clear-headers header: (
+		HTTP-Header အသစ် key: ['Status'] value: ['404 Not Found']
+	).
+	မိမိ out: output.
+}.
+
+
+# Interface
+
+>> Session := အရာဝတ္ထု အသစ်.
+
+Session ရလျှင်: ['အသစ်'] လုပ်: { <- မိမိ အသစ် init for: ဗလာ.
+}.
+
+Session ရလျှင်: ['for:'] လုပ်: { :id
+	ကိုယ်ပိုင် id := id.
+}.
+
+Session ရလျှင်: ['load'] လုပ်: {
+	ဤလုပ်ငန်း အမှား: ['Not implemented.'].
+}.
+
+Session ရလျှင်: ['save:'] လုပ်: {
+	ဤလုပ်ငန်း အမှား: ['Not implemented.'].
+}.
+
+Session ရလျှင်: ['destroy'] လုပ်: {
+	ဤလုပ်ငန်း အမှား: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session အသစ်.
+
+Tempfile-Session ရလျှင်: ['init'] လုပ်: {
+	ကိုယ်ပိုင် pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session ရလျှင်: ['path-prefix:'] လုပ်: { :str
+	ကိုယ်ပိုင် pathprefix := str.
+}.
+
+Tempfile-Session ရလျှင်: ['file'] လုပ်: { <- ( ဖိုင် အသစ်: ( ကိုယ်ပိုင် pathprefix + ကိုယ်ပိုင် id + ['.txt'] ) ).
+}.
+
+Tempfile-Session ရလျှင်: ['load'] လုပ်: {
+	>> file := မိမိ file.
+	file ရှိသည် မှားလျှင်: {
+		file ရေး: (အဘိဓာန် အသစ် ကုဒ်).
+	}. <- file ဖတ် အရာဝတ္ထုသို့.
+}.
+
+Tempfile-Session ရလျှင်: ['save:'] လုပ်: { :data
+	>> file := မိမိ file.
+	file ရှိသည် မှန်လျှင်: {
+		file ရေး: data ကုဒ်.
+	}.
+}.
+
+Tempfile-Session ရလျှင်: ['destroy'] လုပ်: {
+	>> file := မိမိ file.
+	file ရှိသည် မှန်လျှင်: {
+		file ဖျက်.
+	}.
+}.
+
+
+>> URL := အရာဝတ္ထု အသစ်.
+
+URL ရလျှင်: ['init'] လုပ်: {
+	ကိုယ်ပိုင် protocol := ['https://'].
+	ကိုယ်ပိုင် ဟို့စ် := ['localhost'].
+	ကိုယ်ပိုင် ဖိုင်လမ်းကြောင်း := [''].
+	ကိုယ်ပိုင် params := [''].
+	ကိုယ်ပိုင် hash := [''].
+}.
+
+URL ရလျှင်: ['အသစ်'] လုပ်: { <- မိမိ အသစ် init.
+}.
+
+URL ရလျှင်: ['စာသားသို့'] လုပ်: { <- (
+	ကိုယ်ပိုင် protocol +
+	ကိုယ်ပိုင် ဟို့စ် +
+	ကိုယ်ပိုင် ဖိုင်လမ်းကြောင်း +
+	ကိုယ်ပိုင် params +
+	ကိုယ်ပိုင် hash ).
+}.
+
+URL ရလျှင်: ['protocol:'] လုပ်: { :protocol
+	((အစီအစဉ် အသစ်: ['http'] ; ['https']) ပါဝင်: protocol) မှန်လျှင်: {
+		ကိုယ်ပိုင် protocol := protocol + ['://'].
+	}, မှားလျှင်: {
+		ဤလုပ်ငန်း အမှား: ['Invalid protocol'].
+	}.
+}.
+
+URL ရလျှင်: ['ဟို့စ်:'] လုပ်: { :ဟို့စ်
+	#todo validate according to rfc
+	ကိုယ်ပိုင် ဟို့စ် := ဟို့စ်.
+}.
+
+URL ရလျှင်: ['path:'] လုပ်: { :ဖိုင်လမ်းကြောင်း
+	ကိုယ်ပိုင် ဖိုင်လမ်းကြောင်း := ['/'] + ဖိုင်လမ်းကြောင်း url-ကုဒ်သွင်း.
+}.
+
+URL ရလျှင်: ['params:'] လုပ်: { :map
+	>> params := အစီအစဉ် အသစ်.
+	map တစ်ခုစီ: { :key :value
+		params အဆုံးတွင်ထည့်: key စာသားသို့ url-ကုဒ်သွင်း + ['='] + value စာသားသို့ url-ကုဒ်သွင်း.
+	}.
+	ကိုယ်ပိုင် params := ['?'] + ( params ပေါင်းစပ်: ['&'] ).
+}.
+
+URL ရလျှင်: ['ဟက်ရှ်:'] လုပ်: { :hash
+	ကိုယ်ပိုင် hash := ['#'] + hash url-ကုဒ်သွင်း.
+}.
+

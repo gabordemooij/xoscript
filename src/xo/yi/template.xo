@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := אָביעקט ניי.
+
+Template ווען: ['ניי'] טו: { <- זיך ניי content: [''].
+}.
+
+Template ווען: ['content:'] טו: { :content
+	אייגן content := content. 
+}.
+
+Template ווען: ['ניי:'] טו: { :content <- זיך ניי content: content.
+}.
+
+Template ווען: ['cut:'] טו: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := אייגן content צעטייל: startmarker.
+	>> prefix := parts ערשטער.
+	>> parts2 := parts לעצטער צעטייל: endmarker.
+	>> suffix := parts2 לעצטער.
+	>> part := parts2 ערשטער.
+	>> rest := prefix + suffix.
+	אייגן content := rest. <- Template ניי: part.
+	
+}.
+
+Template ווען: ['קאָפּיר'] טו: { <- זיך ניי: זיך צו-טעקסט קאָפּיר.
+}.
+	
+Template ווען: ['paste:at:'] טו: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	אייגן content פֿאַרבײַט: pastemarker מיט: ( snippet צו-טעקסט + pastemarker ).
+}.
+
+Template ווען: ['שטעל:ווערט:'] טו: { :slot :value
+	אייגן content פֿאַרבײַט: ['<!-- slot:'] + slot + [' -->'] מיט: ( Server html-קאָדירן: value ).
+}.
+
+Template ווען: ['set:html:'] טו: { :slot :html
+	אייגן content פֿאַרבײַט: ['<!-- slot:'] + slot + [' -->'] מיט: html.
+}.
+
+Template ווען: ['ענטפֿער:און:'] טו: { :slot :value
+	זיך שטעל: (slot אָנהייב: 0 לענג: (slot לענג - 1)) ווערט: value.
+}.
+
+Template ווען: ['nl2br'] טו: {
+	אייגן content פֿאַרבײַט: ['\n'] מיט: ['<br>'].
+}.
+
+Template ווען: ['clean'] טו: {
+	אייגן content :=
+		מוסטער
+		ניי: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		טרעפֿונג: אייגן content
+		טו: { <- ['']. }.
+}.
+
+Template ווען: ['clean-cuts'] טו: {
+	>> items := ליסטע ניי.
+	מוסטער
+	ניי: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	טרעפֿונג: אייגן content
+	טו: { :_ :part
+		items לייג-צו-סוף: part ? 1.
+	}.
+	items יעדער: { :_ :id
+		אייגן content :=
+			מוסטער ניי: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			טרעפֿונג: אייגן content
+			טו: { <- ['']. }.
+	 }.
+}.
+
+Template ווען: ['clean-space'] טו: {
+	אייגן content :=
+		מוסטער
+		ניי: ['\\s*\\n'],
+		טרעפֿונג: אייגן content
+		טו: { <- ['\n']. }.
+	אייגן content :=
+		מוסטער
+		ניי: ['\\n[\\s\\t]+'],
+		טרעפֿונג: אייגן content
+		טו: { <- ['\n']. }.
+}.
+
+Template ווען: ['clean-all'] טו: {
+	זיך clean.
+	זיך clean-cuts.
+	זיך clean-space.
+}.
+
+Template ווען: ['צו-טעקסט'] טו: { <- אייגן content.
+}.

@@ -1,0 +1,325 @@
+HTTP-അഭ്യർത്ഥന കിട്ടുമ്പോൾ: ['HTTP-header:'] ചെയ്യുക: { :key <- പ്രോഗ്രാം ക്രമീകരണം: key.
+}.
+
+>> HTTP-Header := വസ്തു പുതിയ.
+
+HTTP-Header കിട്ടുമ്പോൾ: ['പുതിയ'] ചെയ്യുക: { <- താൻ പുതിയ init.
+}.
+
+HTTP-Header കിട്ടുമ്പോൾ: ['init'] ചെയ്യുക: {
+	തന്റെ key := ശൂന്യം.
+	തന്റെ value := ശൂന്യം.
+}.
+
+HTTP-Header കിട്ടുമ്പോൾ: ['key:value:'] ചെയ്യുക: { :key :value
+	തന്റെ key := key.
+	തന്റെ value := value.
+}.
+
+HTTP-Header കിട്ടുമ്പോൾ: ['key'] ചെയ്യുക: { <- തന്റെ key.
+}.
+
+HTTP-Header കിട്ടുമ്പോൾ: ['value'] ചെയ്യുക: { <- തന്റെ value.
+}.
+
+
+HTTP-Header കിട്ടുമ്പോൾ: ['വാചകമായി'] ചെയ്യുക: {
+	>> line := തന്റെ key + [': '] + തന്റെ value.
+	line മാറ്റുക: ['\r'] പകരം: [''], മാറ്റുക: ['\n'] പകരം: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := വസ്തു പുതിയ.
+
+Web-Document കിട്ടുമ്പോൾ: ['പുതിയ'] ചെയ്യുക: { <- താൻ പുതിയ init.
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['init'] ചെയ്യുക: {
+	തന്റെ headers := ശ്രേണി പുതിയ.
+	തന്റെ sess-id := ശൂന്യം.
+	തന്റെ session-manager := Tempfile-Session പുതിയ.
+	തന്റെ sessdata := ശൂന്യം.
+	തന്റെ secure := ശരി.
+	തന്റെ same-site := ['Strict'].
+	തന്റെ headers-out := തെറ്റ്.
+	തന്റെ request := HTTP-അഭ്യർത്ഥന പുതിയ.
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['request:'] ചെയ്യുക: { :request
+	തന്റെ request := request.
+}. 
+
+Web-Document കിട്ടുമ്പോൾ: ['secure-session-cookie:'] ചെയ്യുക: { :secure
+	താൻ check-headers.
+	തന്റെ secure := secure.
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['same-site-session-cookie:'] ചെയ്യുക: { :value
+	താൻ check-headers.
+	>> options := ശ്രേണി പുതിയ 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options ഉൾക്കൊള്ളുന്നു: value, തെറ്റെങ്കിൽ: {
+		ഈ-ജോലി പിശക്: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	തന്റെ same-site := value.
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['header:'] ചെയ്യുക: { :header
+	താൻ check-headers.
+	തന്റെ headers അവസാനം-ചേർക്കുക: header.
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['clear-headers'] ചെയ്യുക: {
+	താൻ check-headers.
+	തന്റെ headers := ശ്രേണി പുതിയ.
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['session-manager:'] ചെയ്യുക: { :manager
+	താൻ check-headers.
+	തന്റെ session-manager := manager.
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['session-manager'] ചെയ്യുക: { <- തന്റെ session-manager.
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['check-headers'] ചെയ്യുക: {
+	തന്റെ headers-out ശരിയെങ്കിൽ: {
+		ഈ-ജോലി പിശക്: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['session-start'] ചെയ്യുക: {
+	താൻ check-headers.
+	>> request := തന്റെ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ശൂന്യമോ? തെറ്റെങ്കിൽ: {
+		(( മാതൃക പുതിയ: ['^[A-Za-z0-9]+\\z'], പൊരുത്തം: sess-id ) = 0) ശരിയെങ്കിൽ: {
+			sess-id := ശൂന്യം.
+		}.
+	}.
+	sess-id ശൂന്യമോ? ശരിയെങ്കിൽ: {
+		sess-id := നിലവറ ടോക്കൺ: 30.
+		>> session-header := HTTP-Header പുതിയ
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (തന്റെ secure ഇത്: ['Secure'] അതല്ലെങ്കിൽ: ['']),
+		SSITE: (തന്റെ same-site),
+		XSID: sess-id
+		).
+		തന്റെ headers അവസാനം-ചേർക്കുക: session-header.
+	}.
+	തന്റെ sessdata := തന്റെ session-manager for: sess-id, load. <- തന്റെ sessdata. # reference
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['goto:'] ചെയ്യുക: { :url
+	താൻ check-headers.
+	താൻ clear-headers.
+	തന്റെ headers
+	അവസാനം-ചേർക്കുക: (
+		HTTP-Header പുതിയ
+		key: ['Status'] value: ['303 See Other']
+	),
+	അവസാനം-ചേർക്കുക: (
+		HTTP-Header പുതിയ
+		key: ['Location'] value: url
+	).
+	താൻ out: ['Redirect'].
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['session-destroy'] ചെയ്യുക: {
+	താൻ check-headers.
+	>> request := തന്റെ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ശൂന്യമോ? തെറ്റെങ്കിൽ: {
+		>> session-header := HTTP-Header പുതിയ.
+		>> when := നിമിഷം പുതിയ വർഷം: 1970, രൂപത്തിൽ: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (തന്റെ secure ഇത്: ['Secure'] അതല്ലെങ്കിൽ: ['']),
+			SSITE: (തന്റെ same-site),
+			XSID: sess-id
+		).
+		തന്റെ session-manager destroy.
+		തന്റെ headers അവസാനം-ചേർക്കുക: session-header.
+	}.
+}.
+
+
+Web-Document കിട്ടുമ്പോൾ: ['template:'] ചെയ്യുക: { :ഫയൽ-പാത <- Template പുതിയ: (ഫയൽ പുതിയ: ഫയൽ-പാത, വായിക്കുക).
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['out:type:'] ചെയ്യുക: { :output :തരം
+	തന്റെ headers-out തെറ്റെങ്കിൽ: {
+		തന്റെ sessdata ശൂന്യമോ? തെറ്റെങ്കിൽ: {
+			തന്റെ session-manager save: തന്റെ sessdata.
+		}.
+		തന്റെ headers അവസാനം-ചേർക്കുക: (
+			HTTP-Header പുതിയ
+			key: ['Content-type'] value: തരം
+		).
+		തന്റെ headers ഓരോന്നും: { :_ :header
+			ഔട്ട്പുട്ട് എഴുതുക: header.
+		}.
+		തന്റെ headers-out := ശരി.
+		ഔട്ട്പുട്ട് എഴുതുക: ['\r\n'].
+	}.
+	ഔട്ട്പുട്ട് എഴുതുക: output.
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['finish:type:'] ചെയ്യുക: { :output :തരം
+	തന്റെ headers-out തെറ്റെങ്കിൽ: {
+		തന്റെ sessdata ശൂന്യമോ? തെറ്റെങ്കിൽ: {
+			തന്റെ session-manager save: തന്റെ sessdata.
+		}.
+		തന്റെ headers അവസാനം-ചേർക്കുക: (
+			HTTP-Header പുതിയ
+			key: ['Content-type'] value: തരം
+		).
+		തന്റെ headers അവസാനം-ചേർക്കുക: (
+			HTTP-Header പുതിയ
+			key: ['Content-Length'] value: output വാചകമായി bytes
+		).
+		തന്റെ headers ഓരോന്നും: { :_ :header
+			ഔട്ട്പുട്ട് എഴുതുക: header.
+		}.
+		തന്റെ headers-out := ശരി.
+		ഔട്ട്പുട്ട് എഴുതുക: ['\r\n'].
+	}.
+	ഔട്ട്പുട്ട് എഴുതുക: output.
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['out:'] ചെയ്യുക: { :output
+	താൻ out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['finish:'] ചെയ്യുക: { :output
+	താൻ finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['json:'] ചെയ്യുക: { :output
+	താൻ out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document കിട്ടുമ്പോൾ: ['not-found:'] ചെയ്യുക: { :output
+	താൻ clear-headers header: (
+		HTTP-Header പുതിയ key: ['Status'] value: ['404 Not Found']
+	).
+	താൻ out: output.
+}.
+
+
+# Interface
+
+>> Session := വസ്തു പുതിയ.
+
+Session കിട്ടുമ്പോൾ: ['പുതിയ'] ചെയ്യുക: { <- താൻ പുതിയ init for: ശൂന്യം.
+}.
+
+Session കിട്ടുമ്പോൾ: ['for:'] ചെയ്യുക: { :id
+	തന്റെ id := id.
+}.
+
+Session കിട്ടുമ്പോൾ: ['load'] ചെയ്യുക: {
+	ഈ-ജോലി പിശക്: ['Not implemented.'].
+}.
+
+Session കിട്ടുമ്പോൾ: ['save:'] ചെയ്യുക: {
+	ഈ-ജോലി പിശക്: ['Not implemented.'].
+}.
+
+Session കിട്ടുമ്പോൾ: ['destroy'] ചെയ്യുക: {
+	ഈ-ജോലി പിശക്: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session പുതിയ.
+
+Tempfile-Session കിട്ടുമ്പോൾ: ['init'] ചെയ്യുക: {
+	തന്റെ pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session കിട്ടുമ്പോൾ: ['path-prefix:'] ചെയ്യുക: { :str
+	തന്റെ pathprefix := str.
+}.
+
+Tempfile-Session കിട്ടുമ്പോൾ: ['file'] ചെയ്യുക: { <- ( ഫയൽ പുതിയ: ( തന്റെ pathprefix + തന്റെ id + ['.txt'] ) ).
+}.
+
+Tempfile-Session കിട്ടുമ്പോൾ: ['load'] ചെയ്യുക: {
+	>> file := താൻ file.
+	file ഉണ്ട് തെറ്റെങ്കിൽ: {
+		file എഴുതുക: (നിഘണ്ടു പുതിയ കോഡ്).
+	}. <- file വായിക്കുക വസ്തുവായി.
+}.
+
+Tempfile-Session കിട്ടുമ്പോൾ: ['save:'] ചെയ്യുക: { :data
+	>> file := താൻ file.
+	file ഉണ്ട് ശരിയെങ്കിൽ: {
+		file എഴുതുക: data കോഡ്.
+	}.
+}.
+
+Tempfile-Session കിട്ടുമ്പോൾ: ['destroy'] ചെയ്യുക: {
+	>> file := താൻ file.
+	file ഉണ്ട് ശരിയെങ്കിൽ: {
+		file മായ്ക്കുക.
+	}.
+}.
+
+
+>> URL := വസ്തു പുതിയ.
+
+URL കിട്ടുമ്പോൾ: ['init'] ചെയ്യുക: {
+	തന്റെ protocol := ['https://'].
+	തന്റെ ഹോസ്റ്റ് := ['localhost'].
+	തന്റെ ഫയൽ-പാത := [''].
+	തന്റെ params := [''].
+	തന്റെ hash := [''].
+}.
+
+URL കിട്ടുമ്പോൾ: ['പുതിയ'] ചെയ്യുക: { <- താൻ പുതിയ init.
+}.
+
+URL കിട്ടുമ്പോൾ: ['വാചകമായി'] ചെയ്യുക: { <- (
+	തന്റെ protocol +
+	തന്റെ ഹോസ്റ്റ് +
+	തന്റെ ഫയൽ-പാത +
+	തന്റെ params +
+	തന്റെ hash ).
+}.
+
+URL കിട്ടുമ്പോൾ: ['protocol:'] ചെയ്യുക: { :protocol
+	((ശ്രേണി പുതിയ: ['http'] ; ['https']) ഉൾക്കൊള്ളുന്നു: protocol) ശരിയെങ്കിൽ: {
+		തന്റെ protocol := protocol + ['://'].
+	}, തെറ്റെങ്കിൽ: {
+		ഈ-ജോലി പിശക്: ['Invalid protocol'].
+	}.
+}.
+
+URL കിട്ടുമ്പോൾ: ['ഹോസ്റ്റ്:'] ചെയ്യുക: { :ഹോസ്റ്റ്
+	#todo validate according to rfc
+	തന്റെ ഹോസ്റ്റ് := ഹോസ്റ്റ്.
+}.
+
+URL കിട്ടുമ്പോൾ: ['path:'] ചെയ്യുക: { :ഫയൽ-പാത
+	തന്റെ ഫയൽ-പാത := ['/'] + ഫയൽ-പാത url-എൻകോഡ്.
+}.
+
+URL കിട്ടുമ്പോൾ: ['params:'] ചെയ്യുക: { :map
+	>> params := ശ്രേണി പുതിയ.
+	map ഓരോന്നും: { :key :value
+		params അവസാനം-ചേർക്കുക: key വാചകമായി url-എൻകോഡ് + ['='] + value വാചകമായി url-എൻകോഡ്.
+	}.
+	തന്റെ params := ['?'] + ( params ചേർക്കുക: ['&'] ).
+}.
+
+URL കിട്ടുമ്പോൾ: ['ഹാഷ്:'] ചെയ്യുക: { :hash
+	തന്റെ hash := ['#'] + hash url-എൻകോഡ്.
+}.
+

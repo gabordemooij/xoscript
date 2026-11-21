@@ -1,0 +1,128 @@
+>> Email := বস্তু নতুন.
+
+Email যখন: ['init'] করো: {
+	নিজের recipients := লিস্ট নতুন.
+	নিজের cc := লিস্ট নতুন.
+	নিজের bcc := লিস্ট নতুন.
+	নিজের from := শূন্য.
+	নিজের from-name := শূন্য.
+	নিজের subject := শূন্য.
+	নিজের body := শূন্য.
+}.
+
+Email যখন: ['নতুন'] করো: { <- নিজে নতুন init.
+}.
+
+Email যখন: ['to:'] করো: { :list
+	নিজের recipients := list.
+}.
+ 
+Email যখন: ['cc:'] করো: { :list
+	নিজের cc := list.
+}.
+
+Email যখন: ['bcc:'] করো: { :list
+	নিজের bcc := list.
+}.
+
+Email যখন: ['subject:'] করো: { :subject
+	নিজের subject := subject.
+}.
+
+Email যখন: ['from:name:'] করো: { :from :নাম
+	নিজের from := from.
+	নিজের from-name := নাম.
+}.
+
+Email যখন: ['body:'] করো: { :body
+	নিজের body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email যখন: ['header:'] করো: { :line <- line বদলাও: ['\r'] দিয়ে: [''], বদলাও: ['\n'] দিয়ে: [''].
+}.
+
+Email যখন: ['send'] করো: {
+	>> f := ফাইল tempwrite: নিজে generate.
+	প্রোগ্রাম সিস্টেম: ['sendmail -t < '] + f ফাইল-পথ, নতুন-লাইন.
+}.
+
+Email যখন: ['generate'] করো: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str শেষে-যোগ: (নিজে header: ['From: '] + নিজের from-name + [' <'] + ( নিজের from ) + ['>']) + brk.
+	str শেষে-যোগ: (নিজে header: ['To: '] + ( নিজের recipients জোড়া-দাও: [','] )) + brk.
+	নিজের cc গণনা সত্য-হলে: {
+		str শেষে-যোগ: (নিজে header: ['Cc: '] + ( নিজের cc জোড়া-দাও: [','] )) + brk.
+	}.
+	নিজের bcc গণনা সত্য-হলে: {
+		str শেষে-যোগ: (নিজে header: ['Bcc: '] + ( নিজের bcc জোড়া-দাও: [','] )) + brk.
+	}.
+	str শেষে-যোগ: (নিজে header: ['Subject: '] + নিজের subject) + brk.
+	str শেষে-যোগ: brk.
+	str শেষে-যোগ: নিজের body.
+	str শেষে-যোগ: brk. <- str.
+}.
+
+>> HTML-Email := Email নতুন.
+
+HTML-Email যখন: ['init'] করো: {
+	নিজে init.
+	নিজের attachments := লিস্ট নতুন.
+	নিজের boundary := সিন্দুক টোকেন: 40.
+}.
+
+HTML-Email যখন: ['attach:'] করো: { :file
+	>> id := নিজের attachments গণনা.
+	>> blob := file blob.
+	নিজের attachments শেষে-যোগ: (
+		অভিধান নতুন
+			file: file ফাইল-পথ,
+			mime: ['image/'] + (Server mimetype: file ফাইল-পথ),
+			data: blob base64-এনকোড
+	).
+	blob মুক্ত. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email যখন: ['generate'] করো: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str শেষে-যোগ: (নিজে header: ['From: '] + নিজের from-name + [' <'] + ( নিজের from ) + ['>']) + brk.
+	str শেষে-যোগ: (নিজে header: ['To: '] + ( নিজের recipients জোড়া-দাও: [','] )) + brk.
+	নিজের cc গণনা সত্য-হলে: {
+		str শেষে-যোগ: (নিজে header: ['Cc: '] + ( নিজের cc জোড়া-দাও: [','] )) + brk.
+	}.
+	নিজের bcc গণনা সত্য-হলে: {
+		str শেষে-যোগ: (নিজে header: ['Bcc: '] + ( নিজের bcc জোড়া-দাও: [','] )) + brk.
+	}.
+	str শেষে-যোগ: (নিজে header: ['Subject: '] + নিজের subject) + brk.
+	str শেষে-যোগ: ['MIME-Version: 1.0'] + brk.
+	str শেষে-যোগ: ['Content-Type: multipart/related; boundary="'] + নিজের boundary + ['"; type=text/html'] + brk.
+	str শেষে-যোগ: brk.
+	str শেষে-যোগ: ['--'] + নিজের boundary + brk.
+	str শেষে-যোগ: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str শেষে-যোগ: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str শেষে-যোগ: brk.
+	str শেষে-যোগ: নিজের body.
+	str শেষে-যোগ: brk.
+	নিজের attachments প্রতিটি: { :id :info
+		>> blob := info data.
+		str শেষে-যোগ: ['--'] + নিজের boundary + brk.
+		str শেষে-যোগ: ['Content-Type: '] + info mime + brk.
+		str শেষে-যোগ: ['Content-Transfer-Encoding: base64'] + brk.
+		str শেষে-যোগ: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str শেষে-যোগ: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str শেষে-যোগ: brk.
+		>> max := 76.
+		>> len := blob দৈর্ঘ্য.
+		>> chunks := (len / max) উপরে-পূর্ণ.
+		{ :i
+			>> chunk := blob অনুলিপি শুরু: i * max দৈর্ঘ্য: max.
+			str শেষে-যোগ: chunk + brk.
+		} * chunks.
+		str শেষে-যোগ: brk.
+		str শেষে-যোগ: brk.
+	}.
+	str শেষে-যোগ: ['--'] + নিজের boundary + ['--'] + brk. <- str.
+}.

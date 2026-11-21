@@ -1,0 +1,325 @@
+درخواست-HTTP هنگام: ['HTTP-header:'] انجام: { :key <- برنامه پیکربندی: key.
+}.
+
+>> HTTP-Header := شیء جدید.
+
+HTTP-Header هنگام: ['جدید'] انجام: { <- خود جدید init.
+}.
+
+HTTP-Header هنگام: ['init'] انجام: {
+	خودم key := هیچ.
+	خودم value := هیچ.
+}.
+
+HTTP-Header هنگام: ['key:value:'] انجام: { :key :value
+	خودم key := key.
+	خودم value := value.
+}.
+
+HTTP-Header هنگام: ['key'] انجام: { <- خودم key.
+}.
+
+HTTP-Header هنگام: ['value'] انجام: { <- خودم value.
+}.
+
+
+HTTP-Header هنگام: ['به-رشته'] انجام: {
+	>> line := خودم key + [': '] + خودم value.
+	line جایگزین: ['\r'] با: [''], جایگزین: ['\n'] با: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := شیء جدید.
+
+Web-Document هنگام: ['جدید'] انجام: { <- خود جدید init.
+}.
+
+Web-Document هنگام: ['init'] انجام: {
+	خودم headers := لیست جدید.
+	خودم sess-id := هیچ.
+	خودم session-manager := Tempfile-Session جدید.
+	خودم sessdata := هیچ.
+	خودم secure := درست.
+	خودم same-site := ['Strict'].
+	خودم headers-out := نادرست.
+	خودم request := درخواست-HTTP جدید.
+}.
+
+Web-Document هنگام: ['request:'] انجام: { :request
+	خودم request := request.
+}. 
+
+Web-Document هنگام: ['secure-session-cookie:'] انجام: { :secure
+	خود check-headers.
+	خودم secure := secure.
+}.
+
+Web-Document هنگام: ['same-site-session-cookie:'] انجام: { :value
+	خود check-headers.
+	>> options := لیست جدید 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options شامل: value, اگر-نادرست: {
+		این-کار خطا: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	خودم same-site := value.
+}.
+
+Web-Document هنگام: ['header:'] انجام: { :header
+	خود check-headers.
+	خودم headers بیفزا-به-پایان: header.
+}.
+
+Web-Document هنگام: ['clear-headers'] انجام: {
+	خود check-headers.
+	خودم headers := لیست جدید.
+}.
+
+Web-Document هنگام: ['session-manager:'] انجام: { :manager
+	خود check-headers.
+	خودم session-manager := manager.
+}.
+
+Web-Document هنگام: ['session-manager'] انجام: { <- خودم session-manager.
+}.
+
+Web-Document هنگام: ['check-headers'] انجام: {
+	خودم headers-out اگر-درست: {
+		این-کار خطا: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document هنگام: ['session-start'] انجام: {
+	خود check-headers.
+	>> request := خودم request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id هیچ? اگر-نادرست: {
+		(( الگو جدید: ['^[A-Za-z0-9]+\\z'], تطبیق: sess-id ) = 0) اگر-درست: {
+			sess-id := هیچ.
+		}.
+	}.
+	sess-id هیچ? اگر-درست: {
+		sess-id := گاوصندوق توکن: 30.
+		>> session-header := HTTP-Header جدید
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (خودم secure یکی: ['Secure'] یا-دیگری: ['']),
+		SSITE: (خودم same-site),
+		XSID: sess-id
+		).
+		خودم headers بیفزا-به-پایان: session-header.
+	}.
+	خودم sessdata := خودم session-manager for: sess-id, load. <- خودم sessdata. # reference
+}.
+
+Web-Document هنگام: ['goto:'] انجام: { :url
+	خود check-headers.
+	خود clear-headers.
+	خودم headers
+	بیفزا-به-پایان: (
+		HTTP-Header جدید
+		key: ['Status'] value: ['303 See Other']
+	),
+	بیفزا-به-پایان: (
+		HTTP-Header جدید
+		key: ['Location'] value: url
+	).
+	خود out: ['Redirect'].
+}.
+
+Web-Document هنگام: ['session-destroy'] انجام: {
+	خود check-headers.
+	>> request := خودم request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id هیچ? اگر-نادرست: {
+		>> session-header := HTTP-Header جدید.
+		>> when := لحظه جدید سال: 1970, با-قالب: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (خودم secure یکی: ['Secure'] یا-دیگری: ['']),
+			SSITE: (خودم same-site),
+			XSID: sess-id
+		).
+		خودم session-manager destroy.
+		خودم headers بیفزا-به-پایان: session-header.
+	}.
+}.
+
+
+Web-Document هنگام: ['template:'] انجام: { :مسیر-پرونده <- Template جدید: (پرونده جدید: مسیر-پرونده, بخوان).
+}.
+
+Web-Document هنگام: ['out:type:'] انجام: { :output :نوع
+	خودم headers-out اگر-نادرست: {
+		خودم sessdata هیچ? اگر-نادرست: {
+			خودم session-manager save: خودم sessdata.
+		}.
+		خودم headers بیفزا-به-پایان: (
+			HTTP-Header جدید
+			key: ['Content-type'] value: نوع
+		).
+		خودم headers هرکدام: { :_ :header
+			خروجی بنویس: header.
+		}.
+		خودم headers-out := درست.
+		خروجی بنویس: ['\r\n'].
+	}.
+	خروجی بنویس: output.
+}.
+
+Web-Document هنگام: ['finish:type:'] انجام: { :output :نوع
+	خودم headers-out اگر-نادرست: {
+		خودم sessdata هیچ? اگر-نادرست: {
+			خودم session-manager save: خودم sessdata.
+		}.
+		خودم headers بیفزا-به-پایان: (
+			HTTP-Header جدید
+			key: ['Content-type'] value: نوع
+		).
+		خودم headers بیفزا-به-پایان: (
+			HTTP-Header جدید
+			key: ['Content-Length'] value: output به-رشته بایت-ها
+		).
+		خودم headers هرکدام: { :_ :header
+			خروجی بنویس: header.
+		}.
+		خودم headers-out := درست.
+		خروجی بنویس: ['\r\n'].
+	}.
+	خروجی بنویس: output.
+}.
+
+Web-Document هنگام: ['out:'] انجام: { :output
+	خود out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document هنگام: ['finish:'] انجام: { :output
+	خود finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document هنگام: ['json:'] انجام: { :output
+	خود out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document هنگام: ['not-found:'] انجام: { :output
+	خود clear-headers header: (
+		HTTP-Header جدید key: ['Status'] value: ['404 Not Found']
+	).
+	خود out: output.
+}.
+
+
+# Interface
+
+>> Session := شیء جدید.
+
+Session هنگام: ['جدید'] انجام: { <- خود جدید init for: هیچ.
+}.
+
+Session هنگام: ['for:'] انجام: { :id
+	خودم id := id.
+}.
+
+Session هنگام: ['load'] انجام: {
+	این-کار خطا: ['Not implemented.'].
+}.
+
+Session هنگام: ['save:'] انجام: {
+	این-کار خطا: ['Not implemented.'].
+}.
+
+Session هنگام: ['destroy'] انجام: {
+	این-کار خطا: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session جدید.
+
+Tempfile-Session هنگام: ['init'] انجام: {
+	خودم pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session هنگام: ['path-prefix:'] انجام: { :str
+	خودم pathprefix := str.
+}.
+
+Tempfile-Session هنگام: ['file'] انجام: { <- ( پرونده جدید: ( خودم pathprefix + خودم id + ['.txt'] ) ).
+}.
+
+Tempfile-Session هنگام: ['load'] انجام: {
+	>> file := خود file.
+	file هست اگر-نادرست: {
+		file بنویس: (واژه-نامه جدید کد).
+	}. <- file بخوان به-شیء.
+}.
+
+Tempfile-Session هنگام: ['save:'] انجام: { :data
+	>> file := خود file.
+	file هست اگر-درست: {
+		file بنویس: data کد.
+	}.
+}.
+
+Tempfile-Session هنگام: ['destroy'] انجام: {
+	>> file := خود file.
+	file هست اگر-درست: {
+		file پاک-کن.
+	}.
+}.
+
+
+>> URL := شیء جدید.
+
+URL هنگام: ['init'] انجام: {
+	خودم protocol := ['https://'].
+	خودم میزبان := ['localhost'].
+	خودم مسیر-پرونده := [''].
+	خودم params := [''].
+	خودم hash := [''].
+}.
+
+URL هنگام: ['جدید'] انجام: { <- خود جدید init.
+}.
+
+URL هنگام: ['به-رشته'] انجام: { <- (
+	خودم protocol +
+	خودم میزبان +
+	خودم مسیر-پرونده +
+	خودم params +
+	خودم hash ).
+}.
+
+URL هنگام: ['protocol:'] انجام: { :protocol
+	((لیست جدید: ['http'] ; ['https']) شامل: protocol) اگر-درست: {
+		خودم protocol := protocol + ['://'].
+	}, اگر-نادرست: {
+		این-کار خطا: ['Invalid protocol'].
+	}.
+}.
+
+URL هنگام: ['میزبان:'] انجام: { :میزبان
+	#todo validate according to rfc
+	خودم میزبان := میزبان.
+}.
+
+URL هنگام: ['path:'] انجام: { :مسیر-پرونده
+	خودم مسیر-پرونده := ['/'] + مسیر-پرونده url-کدگذاری.
+}.
+
+URL هنگام: ['params:'] انجام: { :map
+	>> params := لیست جدید.
+	map هرکدام: { :key :value
+		params بیفزا-به-پایان: key به-رشته url-کدگذاری + ['='] + value به-رشته url-کدگذاری.
+	}.
+	خودم params := ['?'] + ( params بپیوند: ['&'] ).
+}.
+
+URL هنگام: ['درهم-سازی:'] انجام: { :hash
+	خودم hash := ['#'] + hash url-کدگذاری.
+}.
+

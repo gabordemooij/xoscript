@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objektas naujas.
+
+Template kai: ['naujas'] daryti: { <- pats naujas content: [''].
+}.
+
+Template kai: ['content:'] daryti: { :content
+	savas content := content. 
+}.
+
+Template kai: ['naujas:'] daryti: { :content <- pats naujas content: content.
+}.
+
+Template kai: ['cut:'] daryti: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := savas content padalinti: startmarker.
+	>> prefix := parts pirmas.
+	>> parts2 := parts paskutinis padalinti: endmarker.
+	>> suffix := parts2 paskutinis.
+	>> part := parts2 pirmas.
+	>> rest := prefix + suffix.
+	savas content := rest. <- Template naujas: part.
+	
+}.
+
+Template kai: ['kopijuoti'] daryti: { <- pats naujas: pats tekstas kopijuoti.
+}.
+	
+Template kai: ['paste:at:'] daryti: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	savas content pakeisti: pastemarker į: ( snippet tekstas + pastemarker ).
+}.
+
+Template kai: ['nustatyti:reikšmė:'] daryti: { :slot :value
+	savas content pakeisti: ['<!-- slot:'] + slot + [' -->'] į: ( Server html-koduoti: value ).
+}.
+
+Template kai: ['set:html:'] daryti: { :slot :html
+	savas content pakeisti: ['<!-- slot:'] + slot + [' -->'] į: html.
+}.
+
+Template kai: ['atsakyti:ir:'] daryti: { :slot :value
+	pats nustatyti: (slot nuo: 0 ilgis: (slot ilgis - 1)) reikšmė: value.
+}.
+
+Template kai: ['nl2br'] daryti: {
+	savas content pakeisti: ['\n'] į: ['<br>'].
+}.
+
+Template kai: ['clean'] daryti: {
+	savas content :=
+		Šablonas
+		naujas: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		atitikmuo: savas content
+		daryti: { <- ['']. }.
+}.
+
+Template kai: ['clean-cuts'] daryti: {
+	>> items := Sąrašas naujas.
+	Šablonas
+	naujas: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	atitikmuo: savas content
+	daryti: { :_ :part
+		items pridėti: part ? 1.
+	}.
+	items kiekvienas: { :_ :id
+		savas content :=
+			Šablonas naujas: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			atitikmuo: savas content
+			daryti: { <- ['']. }.
+	 }.
+}.
+
+Template kai: ['clean-space'] daryti: {
+	savas content :=
+		Šablonas
+		naujas: ['\\s*\\n'],
+		atitikmuo: savas content
+		daryti: { <- ['\n']. }.
+	savas content :=
+		Šablonas
+		naujas: ['\\n[\\s\\t]+'],
+		atitikmuo: savas content
+		daryti: { <- ['\n']. }.
+}.
+
+Template kai: ['clean-all'] daryti: {
+	pats clean.
+	pats clean-cuts.
+	pats clean-space.
+}.
+
+Template kai: ['tekstas'] daryti: { <- savas content.
+}.

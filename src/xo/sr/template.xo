@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Објекат нови.
+
+Template на: ['нови'] уради: { <- себе нови content: [''].
+}.
+
+Template на: ['content:'] уради: { :content
+	свој content := content. 
+}.
+
+Template на: ['нови:'] уради: { :content <- себе нови content: content.
+}.
+
+Template на: ['cut:'] уради: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := свој content подели: startmarker.
+	>> prefix := parts први.
+	>> parts2 := parts последњи подели: endmarker.
+	>> suffix := parts2 последњи.
+	>> part := parts2 први.
+	>> rest := prefix + suffix.
+	свој content := rest. <- Template нови: part.
+	
+}.
+
+Template на: ['копирај'] уради: { <- себе нови: себе текст копирај.
+}.
+	
+Template на: ['paste:at:'] уради: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	свој content замени: pastemarker са: ( snippet текст + pastemarker ).
+}.
+
+Template на: ['постави:вредност:'] уради: { :slot :value
+	свој content замени: ['<!-- slot:'] + slot + [' -->'] са: ( Server html-кодирај: value ).
+}.
+
+Template на: ['set:html:'] уради: { :slot :html
+	свој content замени: ['<!-- slot:'] + slot + [' -->'] са: html.
+}.
+
+Template на: ['одговори:и:'] уради: { :slot :value
+	себе постави: (slot од: 0 дужина: (slot дужина - 1)) вредност: value.
+}.
+
+Template на: ['nl2br'] уради: {
+	свој content замени: ['\n'] са: ['<br>'].
+}.
+
+Template на: ['clean'] уради: {
+	свој content :=
+		Образац
+		нови: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		подударање: свој content
+		уради: { <- ['']. }.
+}.
+
+Template на: ['clean-cuts'] уради: {
+	>> items := Листа нови.
+	Образац
+	нови: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	подударање: свој content
+	уради: { :_ :part
+		items додај-на-крај: part ? 1.
+	}.
+	items сваки: { :_ :id
+		свој content :=
+			Образац нови: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			подударање: свој content
+			уради: { <- ['']. }.
+	 }.
+}.
+
+Template на: ['clean-space'] уради: {
+	свој content :=
+		Образац
+		нови: ['\\s*\\n'],
+		подударање: свој content
+		уради: { <- ['\n']. }.
+	свој content :=
+		Образац
+		нови: ['\\n[\\s\\t]+'],
+		подударање: свој content
+		уради: { <- ['\n']. }.
+}.
+
+Template на: ['clean-all'] уради: {
+	себе clean.
+	себе clean-cuts.
+	себе clean-space.
+}.
+
+Template на: ['текст'] уради: { <- свој content.
+}.

@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objek nuut.
+
+Template by: ['nuut'] doen: { <- self nuut content: [''].
+}.
+
+Template by: ['content:'] doen: { :content
+	eie content := content. 
+}.
+
+Template by: ['nuut:'] doen: { :content <- self nuut content: content.
+}.
+
+Template by: ['cut:'] doen: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := eie content verdeel: startmarker.
+	>> prefix := parts eerste.
+	>> parts2 := parts laaste verdeel: endmarker.
+	>> suffix := parts2 laaste.
+	>> part := parts2 eerste.
+	>> rest := prefix + suffix.
+	eie content := rest. <- Template nuut: part.
+	
+}.
+
+Template by: ['kopieer'] doen: { <- self nuut: self teks kopieer.
+}.
+	
+Template by: ['paste:at:'] doen: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	eie content vervang: pastemarker met: ( snippet teks + pastemarker ).
+}.
+
+Template by: ['stel:waarde:'] doen: { :slot :value
+	eie content vervang: ['<!-- slot:'] + slot + [' -->'] met: ( Server html-kodeer: value ).
+}.
+
+Template by: ['set:html:'] doen: { :slot :html
+	eie content vervang: ['<!-- slot:'] + slot + [' -->'] met: html.
+}.
+
+Template by: ['reageer:en:'] doen: { :slot :value
+	self stel: (slot vanaf: 0 lengte: (slot lengte - 1)) waarde: value.
+}.
+
+Template by: ['nl2br'] doen: {
+	eie content vervang: ['\n'] met: ['<br>'].
+}.
+
+Template by: ['clean'] doen: {
+	eie content :=
+		Patroon
+		nuut: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		passing: eie content
+		doen: { <- ['']. }.
+}.
+
+Template by: ['clean-cuts'] doen: {
+	>> items := Lys nuut.
+	Patroon
+	nuut: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	passing: eie content
+	doen: { :_ :part
+		items voeg-agter: part ? 1.
+	}.
+	items elk: { :_ :id
+		eie content :=
+			Patroon nuut: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			passing: eie content
+			doen: { <- ['']. }.
+	 }.
+}.
+
+Template by: ['clean-space'] doen: {
+	eie content :=
+		Patroon
+		nuut: ['\\s*\\n'],
+		passing: eie content
+		doen: { <- ['\n']. }.
+	eie content :=
+		Patroon
+		nuut: ['\\n[\\s\\t]+'],
+		passing: eie content
+		doen: { <- ['\n']. }.
+}.
+
+Template by: ['clean-all'] doen: {
+	self clean.
+	self clean-cuts.
+	self clean-space.
+}.
+
+Template by: ['teks'] doen: { <- eie content.
+}.

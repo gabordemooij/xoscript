@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Абʼект новы.
+
+Template пры: ['новы'] выканаць: { <- сам новы content: [''].
+}.
+
+Template пры: ['content:'] выканаць: { :content
+	свой content := content. 
+}.
+
+Template пры: ['новы:'] выканаць: { :content <- сам новы content: content.
+}.
+
+Template пры: ['cut:'] выканаць: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := свой content падзяліць: startmarker.
+	>> prefix := parts першы.
+	>> parts2 := parts апошні падзяліць: endmarker.
+	>> suffix := parts2 апошні.
+	>> part := parts2 першы.
+	>> rest := prefix + suffix.
+	свой content := rest. <- Template новы: part.
+	
+}.
+
+Template пры: ['капіяваць'] выканаць: { <- сам новы: сам тэкст капіяваць.
+}.
+	
+Template пры: ['paste:at:'] выканаць: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	свой content замяніць: pastemarker на: ( snippet тэкст + pastemarker ).
+}.
+
+Template пры: ['задаць:значэнне:'] выканаць: { :slot :value
+	свой content замяніць: ['<!-- slot:'] + slot + [' -->'] на: ( Server html-кадаваць: value ).
+}.
+
+Template пры: ['set:html:'] выканаць: { :slot :html
+	свой content замяніць: ['<!-- slot:'] + slot + [' -->'] на: html.
+}.
+
+Template пры: ['адказаць:і:'] выканаць: { :slot :value
+	сам задаць: (slot ад: 0 даўжыня: (slot даўжыня - 1)) значэнне: value.
+}.
+
+Template пры: ['nl2br'] выканаць: {
+	свой content замяніць: ['\n'] на: ['<br>'].
+}.
+
+Template пры: ['clean'] выканаць: {
+	свой content :=
+		Шаблон
+		новы: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		супадзенне: свой content
+		выканаць: { <- ['']. }.
+}.
+
+Template пры: ['clean-cuts'] выканаць: {
+	>> items := Спіс новы.
+	Шаблон
+	новы: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	супадзенне: свой content
+	выканаць: { :_ :part
+		items дадаць-у-канец: part ? 1.
+	}.
+	items кожны: { :_ :id
+		свой content :=
+			Шаблон новы: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			супадзенне: свой content
+			выканаць: { <- ['']. }.
+	 }.
+}.
+
+Template пры: ['clean-space'] выканаць: {
+	свой content :=
+		Шаблон
+		новы: ['\\s*\\n'],
+		супадзенне: свой content
+		выканаць: { <- ['\n']. }.
+	свой content :=
+		Шаблон
+		новы: ['\\n[\\s\\t]+'],
+		супадзенне: свой content
+		выканаць: { <- ['\n']. }.
+}.
+
+Template пры: ['clean-all'] выканаць: {
+	сам clean.
+	сам clean-cuts.
+	сам clean-space.
+}.
+
+Template пры: ['тэкст'] выканаць: { <- свой content.
+}.

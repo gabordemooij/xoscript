@@ -1,0 +1,128 @@
+>> Email := Нысан жаңа.
+
+Email келгенде: ['init'] орында: {
+	өзінің recipients := Тізім жаңа.
+	өзінің cc := Тізім жаңа.
+	өзінің bcc := Тізім жаңа.
+	өзінің from := Бос.
+	өзінің from-name := Бос.
+	өзінің subject := Бос.
+	өзінің body := Бос.
+}.
+
+Email келгенде: ['жаңа'] орында: { <- өзі жаңа init.
+}.
+
+Email келгенде: ['to:'] орында: { :list
+	өзінің recipients := list.
+}.
+ 
+Email келгенде: ['cc:'] орында: { :list
+	өзінің cc := list.
+}.
+
+Email келгенде: ['bcc:'] орында: { :list
+	өзінің bcc := list.
+}.
+
+Email келгенде: ['subject:'] орында: { :subject
+	өзінің subject := subject.
+}.
+
+Email келгенде: ['from:name:'] орында: { :from :атау
+	өзінің from := from.
+	өзінің from-name := атау.
+}.
+
+Email келгенде: ['body:'] орында: { :body
+	өзінің body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email келгенде: ['header:'] орында: { :line <- line ауыстыру: ['\r'] мынаған: [''], ауыстыру: ['\n'] мынаған: [''].
+}.
+
+Email келгенде: ['send'] орында: {
+	>> f := Файл tempwrite: өзі generate.
+	Бағдарлама жүйе: ['sendmail -t < '] + f жол, жаңа-жол.
+}.
+
+Email келгенде: ['generate'] орында: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str соңына-қосу: (өзі header: ['From: '] + өзінің from-name + [' <'] + ( өзінің from ) + ['>']) + brk.
+	str соңына-қосу: (өзі header: ['To: '] + ( өзінің recipients біріктіру: [','] )) + brk.
+	өзінің cc саны ақиқат-болса: {
+		str соңына-қосу: (өзі header: ['Cc: '] + ( өзінің cc біріктіру: [','] )) + brk.
+	}.
+	өзінің bcc саны ақиқат-болса: {
+		str соңына-қосу: (өзі header: ['Bcc: '] + ( өзінің bcc біріктіру: [','] )) + brk.
+	}.
+	str соңына-қосу: (өзі header: ['Subject: '] + өзінің subject) + brk.
+	str соңына-қосу: brk.
+	str соңына-қосу: өзінің body.
+	str соңына-қосу: brk. <- str.
+}.
+
+>> HTML-Email := Email жаңа.
+
+HTML-Email келгенде: ['init'] орында: {
+	өзі init.
+	өзінің attachments := Тізім жаңа.
+	өзінің boundary := Сейф токен: 40.
+}.
+
+HTML-Email келгенде: ['attach:'] орында: { :file
+	>> id := өзінің attachments саны.
+	>> blob := file blob.
+	өзінің attachments соңына-қосу: (
+		Сөздік жаңа
+			file: file жол,
+			mime: ['image/'] + (Server mimetype: file жол),
+			data: blob base64-кодтау
+	).
+	blob босату. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email келгенде: ['generate'] орында: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str соңына-қосу: (өзі header: ['From: '] + өзінің from-name + [' <'] + ( өзінің from ) + ['>']) + brk.
+	str соңына-қосу: (өзі header: ['To: '] + ( өзінің recipients біріктіру: [','] )) + brk.
+	өзінің cc саны ақиқат-болса: {
+		str соңына-қосу: (өзі header: ['Cc: '] + ( өзінің cc біріктіру: [','] )) + brk.
+	}.
+	өзінің bcc саны ақиқат-болса: {
+		str соңына-қосу: (өзі header: ['Bcc: '] + ( өзінің bcc біріктіру: [','] )) + brk.
+	}.
+	str соңына-қосу: (өзі header: ['Subject: '] + өзінің subject) + brk.
+	str соңына-қосу: ['MIME-Version: 1.0'] + brk.
+	str соңына-қосу: ['Content-Type: multipart/related; boundary="'] + өзінің boundary + ['"; type=text/html'] + brk.
+	str соңына-қосу: brk.
+	str соңына-қосу: ['--'] + өзінің boundary + brk.
+	str соңына-қосу: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str соңына-қосу: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str соңына-қосу: brk.
+	str соңына-қосу: өзінің body.
+	str соңына-қосу: brk.
+	өзінің attachments әрбір: { :id :info
+		>> blob := info data.
+		str соңына-қосу: ['--'] + өзінің boundary + brk.
+		str соңына-қосу: ['Content-Type: '] + info mime + brk.
+		str соңына-қосу: ['Content-Transfer-Encoding: base64'] + brk.
+		str соңына-қосу: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str соңына-қосу: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str соңына-қосу: brk.
+		>> max := 76.
+		>> len := blob ұзындық.
+		>> chunks := (len / max) жоғары-дөңгелектеу.
+		{ :i
+			>> chunk := blob көшіру бастап: i * max ұзындық: max.
+			str соңына-қосу: chunk + brk.
+		} * chunks.
+		str соңына-қосу: brk.
+		str соңына-қосу: brk.
+	}.
+	str соңына-қосу: ['--'] + өзінің boundary + ['--'] + brk. <- str.
+}.

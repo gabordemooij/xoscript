@@ -1,0 +1,128 @@
+>> Email := Objet nouveau.
+
+Email quand: ['init'] faire: {
+	propre recipients := Liste nouveau.
+	propre cc := Liste nouveau.
+	propre bcc := Liste nouveau.
+	propre from := Rien.
+	propre from-name := Rien.
+	propre subject := Rien.
+	propre body := Rien.
+}.
+
+Email quand: ['nouveau'] faire: { <- soi nouveau init.
+}.
+
+Email quand: ['to:'] faire: { :list
+	propre recipients := list.
+}.
+ 
+Email quand: ['cc:'] faire: { :list
+	propre cc := list.
+}.
+
+Email quand: ['bcc:'] faire: { :list
+	propre bcc := list.
+}.
+
+Email quand: ['subject:'] faire: { :subject
+	propre subject := subject.
+}.
+
+Email quand: ['from:name:'] faire: { :from :nom
+	propre from := from.
+	propre from-name := nom.
+}.
+
+Email quand: ['body:'] faire: { :body
+	propre body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email quand: ['header:'] faire: { :line <- line remplacer: ['\r'] par: [''], remplacer: ['\n'] par: [''].
+}.
+
+Email quand: ['send'] faire: {
+	>> f := Fichier tempwrite: soi generate.
+	Programme système: ['sendmail -t < '] + f chemin, stop.
+}.
+
+Email quand: ['generate'] faire: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ajouter: (soi header: ['From: '] + propre from-name + [' <'] + ( propre from ) + ['>']) + brk.
+	str ajouter: (soi header: ['To: '] + ( propre recipients joindre: [','] )) + brk.
+	propre cc compter oui: {
+		str ajouter: (soi header: ['Cc: '] + ( propre cc joindre: [','] )) + brk.
+	}.
+	propre bcc compter oui: {
+		str ajouter: (soi header: ['Bcc: '] + ( propre bcc joindre: [','] )) + brk.
+	}.
+	str ajouter: (soi header: ['Subject: '] + propre subject) + brk.
+	str ajouter: brk.
+	str ajouter: propre body.
+	str ajouter: brk. <- str.
+}.
+
+>> HTML-Email := Email nouveau.
+
+HTML-Email quand: ['init'] faire: {
+	soi init.
+	propre attachments := Liste nouveau.
+	propre boundary := Coffre jeton: 40.
+}.
+
+HTML-Email quand: ['attach:'] faire: { :file
+	>> id := propre attachments compter.
+	>> blob := file blob.
+	propre attachments ajouter: (
+		Dictionnaire nouveau
+			file: file chemin,
+			mime: ['image/'] + (Server mimetype: file chemin),
+			data: blob base64-encoder
+	).
+	blob libérer. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email quand: ['generate'] faire: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ajouter: (soi header: ['From: '] + propre from-name + [' <'] + ( propre from ) + ['>']) + brk.
+	str ajouter: (soi header: ['To: '] + ( propre recipients joindre: [','] )) + brk.
+	propre cc compter oui: {
+		str ajouter: (soi header: ['Cc: '] + ( propre cc joindre: [','] )) + brk.
+	}.
+	propre bcc compter oui: {
+		str ajouter: (soi header: ['Bcc: '] + ( propre bcc joindre: [','] )) + brk.
+	}.
+	str ajouter: (soi header: ['Subject: '] + propre subject) + brk.
+	str ajouter: ['MIME-Version: 1.0'] + brk.
+	str ajouter: ['Content-Type: multipart/related; boundary="'] + propre boundary + ['"; type=text/html'] + brk.
+	str ajouter: brk.
+	str ajouter: ['--'] + propre boundary + brk.
+	str ajouter: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str ajouter: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str ajouter: brk.
+	str ajouter: propre body.
+	str ajouter: brk.
+	propre attachments chaque: { :id :info
+		>> blob := info data.
+		str ajouter: ['--'] + propre boundary + brk.
+		str ajouter: ['Content-Type: '] + info mime + brk.
+		str ajouter: ['Content-Transfer-Encoding: base64'] + brk.
+		str ajouter: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str ajouter: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str ajouter: brk.
+		>> max := 76.
+		>> len := blob longueur.
+		>> chunks := (len / max) plafond.
+		{ :i
+			>> chunk := blob copier de: i * max longueur: max.
+			str ajouter: chunk + brk.
+		} * chunks.
+		str ajouter: brk.
+		str ajouter: brk.
+	}.
+	str ajouter: ['--'] + propre boundary + ['--'] + brk. <- str.
+}.

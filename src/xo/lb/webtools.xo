@@ -1,0 +1,325 @@
+HTTP-Ufro bei: ['HTTP-header:'] maachen: { :key <- Programm astellung: key.
+}.
+
+>> HTTP-Header := Objet nei.
+
+HTTP-Header bei: ['nei'] maachen: { <- selwer nei init.
+}.
+
+HTTP-Header bei: ['init'] maachen: {
+	eegen key := Näischt.
+	eegen value := Näischt.
+}.
+
+HTTP-Header bei: ['key:value:'] maachen: { :key :value
+	eegen key := key.
+	eegen value := value.
+}.
+
+HTTP-Header bei: ['key'] maachen: { <- eegen key.
+}.
+
+HTTP-Header bei: ['value'] maachen: { <- eegen value.
+}.
+
+
+HTTP-Header bei: ['text'] maachen: {
+	>> line := eegen key + [': '] + eegen value.
+	line ersetzen: ['\r'] mat: [''], ersetzen: ['\n'] mat: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Objet nei.
+
+Web-Document bei: ['nei'] maachen: { <- selwer nei init.
+}.
+
+Web-Document bei: ['init'] maachen: {
+	eegen headers := Lëscht nei.
+	eegen sess-id := Näischt.
+	eegen session-manager := Tempfile-Session nei.
+	eegen sessdata := Näischt.
+	eegen secure := Wouer.
+	eegen same-site := ['Strict'].
+	eegen headers-out := Falsch.
+	eegen request := HTTP-Ufro nei.
+}.
+
+Web-Document bei: ['request:'] maachen: { :request
+	eegen request := request.
+}. 
+
+Web-Document bei: ['secure-session-cookie:'] maachen: { :secure
+	selwer check-headers.
+	eegen secure := secure.
+}.
+
+Web-Document bei: ['same-site-session-cookie:'] maachen: { :value
+	selwer check-headers.
+	>> options := Lëscht nei 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options enthält: value, falsch: {
+		dës-aufgab feeler: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	eegen same-site := value.
+}.
+
+Web-Document bei: ['header:'] maachen: { :header
+	selwer check-headers.
+	eegen headers drunhänken: header.
+}.
+
+Web-Document bei: ['clear-headers'] maachen: {
+	selwer check-headers.
+	eegen headers := Lëscht nei.
+}.
+
+Web-Document bei: ['session-manager:'] maachen: { :manager
+	selwer check-headers.
+	eegen session-manager := manager.
+}.
+
+Web-Document bei: ['session-manager'] maachen: { <- eegen session-manager.
+}.
+
+Web-Document bei: ['check-headers'] maachen: {
+	eegen headers-out wouer: {
+		dës-aufgab feeler: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document bei: ['session-start'] maachen: {
+	selwer check-headers.
+	>> request := eegen request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Näischt? falsch: {
+		(( Muster nei: ['^[A-Za-z0-9]+\\z'], treffer: sess-id ) = 0) wouer: {
+			sess-id := Näischt.
+		}.
+	}.
+	sess-id Näischt? wouer: {
+		sess-id := Tresor token: 30.
+		>> session-header := HTTP-Header nei
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (eegen secure entweder: ['Secure'] oder: ['']),
+		SSITE: (eegen same-site),
+		XSID: sess-id
+		).
+		eegen headers drunhänken: session-header.
+	}.
+	eegen sessdata := eegen session-manager for: sess-id, load. <- eegen sessdata. # reference
+}.
+
+Web-Document bei: ['goto:'] maachen: { :url
+	selwer check-headers.
+	selwer clear-headers.
+	eegen headers
+	drunhänken: (
+		HTTP-Header nei
+		key: ['Status'] value: ['303 See Other']
+	),
+	drunhänken: (
+		HTTP-Header nei
+		key: ['Location'] value: url
+	).
+	selwer out: ['Redirect'].
+}.
+
+Web-Document bei: ['session-destroy'] maachen: {
+	selwer check-headers.
+	>> request := eegen request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Näischt? falsch: {
+		>> session-header := HTTP-Header nei.
+		>> when := Moment nei joer: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (eegen secure entweder: ['Secure'] oder: ['']),
+			SSITE: (eegen same-site),
+			XSID: sess-id
+		).
+		eegen session-manager destroy.
+		eegen headers drunhänken: session-header.
+	}.
+}.
+
+
+Web-Document bei: ['template:'] maachen: { :wee <- Template nei: (Fichier nei: wee, liesen).
+}.
+
+Web-Document bei: ['out:type:'] maachen: { :output :typ
+	eegen headers-out falsch: {
+		eegen sessdata Näischt? falsch: {
+			eegen session-manager save: eegen sessdata.
+		}.
+		eegen headers drunhänken: (
+			HTTP-Header nei
+			key: ['Content-type'] value: typ
+		).
+		eegen headers all: { :_ :header
+			Ausgab schreiwen: header.
+		}.
+		eegen headers-out := Wouer.
+		Ausgab schreiwen: ['\r\n'].
+	}.
+	Ausgab schreiwen: output.
+}.
+
+Web-Document bei: ['finish:type:'] maachen: { :output :typ
+	eegen headers-out falsch: {
+		eegen sessdata Näischt? falsch: {
+			eegen session-manager save: eegen sessdata.
+		}.
+		eegen headers drunhänken: (
+			HTTP-Header nei
+			key: ['Content-type'] value: typ
+		).
+		eegen headers drunhänken: (
+			HTTP-Header nei
+			key: ['Content-Length'] value: output text bytes
+		).
+		eegen headers all: { :_ :header
+			Ausgab schreiwen: header.
+		}.
+		eegen headers-out := Wouer.
+		Ausgab schreiwen: ['\r\n'].
+	}.
+	Ausgab schreiwen: output.
+}.
+
+Web-Document bei: ['out:'] maachen: { :output
+	selwer out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document bei: ['finish:'] maachen: { :output
+	selwer finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document bei: ['json:'] maachen: { :output
+	selwer out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document bei: ['not-found:'] maachen: { :output
+	selwer clear-headers header: (
+		HTTP-Header nei key: ['Status'] value: ['404 Not Found']
+	).
+	selwer out: output.
+}.
+
+
+# Interface
+
+>> Session := Objet nei.
+
+Session bei: ['nei'] maachen: { <- selwer nei init for: Näischt.
+}.
+
+Session bei: ['for:'] maachen: { :id
+	eegen id := id.
+}.
+
+Session bei: ['load'] maachen: {
+	dës-aufgab feeler: ['Not implemented.'].
+}.
+
+Session bei: ['save:'] maachen: {
+	dës-aufgab feeler: ['Not implemented.'].
+}.
+
+Session bei: ['destroy'] maachen: {
+	dës-aufgab feeler: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session nei.
+
+Tempfile-Session bei: ['init'] maachen: {
+	eegen pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session bei: ['path-prefix:'] maachen: { :str
+	eegen pathprefix := str.
+}.
+
+Tempfile-Session bei: ['file'] maachen: { <- ( Fichier nei: ( eegen pathprefix + eegen id + ['.txt'] ) ).
+}.
+
+Tempfile-Session bei: ['load'] maachen: {
+	>> file := selwer file.
+	file existéiert falsch: {
+		file schreiwen: (Dictionnaire nei code).
+	}. <- file liesen objet.
+}.
+
+Tempfile-Session bei: ['save:'] maachen: { :data
+	>> file := selwer file.
+	file existéiert wouer: {
+		file schreiwen: data code.
+	}.
+}.
+
+Tempfile-Session bei: ['destroy'] maachen: {
+	>> file := selwer file.
+	file existéiert wouer: {
+		file läschen.
+	}.
+}.
+
+
+>> URL := Objet nei.
+
+URL bei: ['init'] maachen: {
+	eegen protocol := ['https://'].
+	eegen host := ['localhost'].
+	eegen wee := [''].
+	eegen params := [''].
+	eegen hash := [''].
+}.
+
+URL bei: ['nei'] maachen: { <- selwer nei init.
+}.
+
+URL bei: ['text'] maachen: { <- (
+	eegen protocol +
+	eegen host +
+	eegen wee +
+	eegen params +
+	eegen hash ).
+}.
+
+URL bei: ['protocol:'] maachen: { :protocol
+	((Lëscht nei: ['http'] ; ['https']) enthält: protocol) wouer: {
+		eegen protocol := protocol + ['://'].
+	}, falsch: {
+		dës-aufgab feeler: ['Invalid protocol'].
+	}.
+}.
+
+URL bei: ['host:'] maachen: { :host
+	#todo validate according to rfc
+	eegen host := host.
+}.
+
+URL bei: ['path:'] maachen: { :wee
+	eegen wee := ['/'] + wee url-kodéieren.
+}.
+
+URL bei: ['params:'] maachen: { :map
+	>> params := Lëscht nei.
+	map all: { :key :value
+		params drunhänken: key text url-kodéieren + ['='] + value text url-kodéieren.
+	}.
+	eegen params := ['?'] + ( params zesummesetzen: ['&'] ).
+}.
+
+URL bei: ['hash:'] maachen: { :hash
+	eegen hash := ['#'] + hash url-kodéieren.
+}.
+

@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objekts jauns.
+
+Template kad: ['jauns'] darīt: { <- pats jauns content: [''].
+}.
+
+Template kad: ['content:'] darīt: { :content
+	savs content := content. 
+}.
+
+Template kad: ['jauns:'] darīt: { :content <- pats jauns content: content.
+}.
+
+Template kad: ['cut:'] darīt: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := savs content sadalīt: startmarker.
+	>> prefix := parts pirmais.
+	>> parts2 := parts pēdējais sadalīt: endmarker.
+	>> suffix := parts2 pēdējais.
+	>> part := parts2 pirmais.
+	>> rest := prefix + suffix.
+	savs content := rest. <- Template jauns: part.
+	
+}.
+
+Template kad: ['kopēt'] darīt: { <- pats jauns: pats teksts kopēt.
+}.
+	
+Template kad: ['paste:at:'] darīt: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	savs content aizstāt: pastemarker ar: ( snippet teksts + pastemarker ).
+}.
+
+Template kad: ['iestatīt:vērtība:'] darīt: { :slot :value
+	savs content aizstāt: ['<!-- slot:'] + slot + [' -->'] ar: ( Server html-kodēt: value ).
+}.
+
+Template kad: ['set:html:'] darīt: { :slot :html
+	savs content aizstāt: ['<!-- slot:'] + slot + [' -->'] ar: html.
+}.
+
+Template kad: ['atbildēt:un:'] darīt: { :slot :value
+	pats iestatīt: (slot no: 0 garums: (slot garums - 1)) vērtība: value.
+}.
+
+Template kad: ['nl2br'] darīt: {
+	savs content aizstāt: ['\n'] ar: ['<br>'].
+}.
+
+Template kad: ['clean'] darīt: {
+	savs content :=
+		Šablons
+		jauns: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		atbilstība: savs content
+		darīt: { <- ['']. }.
+}.
+
+Template kad: ['clean-cuts'] darīt: {
+	>> items := Saraksts jauns.
+	Šablons
+	jauns: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	atbilstība: savs content
+	darīt: { :_ :part
+		items pievienot-beigās: part ? 1.
+	}.
+	items katrs: { :_ :id
+		savs content :=
+			Šablons jauns: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			atbilstība: savs content
+			darīt: { <- ['']. }.
+	 }.
+}.
+
+Template kad: ['clean-space'] darīt: {
+	savs content :=
+		Šablons
+		jauns: ['\\s*\\n'],
+		atbilstība: savs content
+		darīt: { <- ['\n']. }.
+	savs content :=
+		Šablons
+		jauns: ['\\n[\\s\\t]+'],
+		atbilstība: savs content
+		darīt: { <- ['\n']. }.
+}.
+
+Template kad: ['clean-all'] darīt: {
+	pats clean.
+	pats clean-cuts.
+	pats clean-space.
+}.
+
+Template kad: ['teksts'] darīt: { <- savs content.
+}.

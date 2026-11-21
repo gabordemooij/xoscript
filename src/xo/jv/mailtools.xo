@@ -1,0 +1,128 @@
+>> Email := Obyek anyar.
+
+Email nalika: ['init'] tindakna: {
+	duweke recipients := Dhaptar anyar.
+	duweke cc := Dhaptar anyar.
+	duweke bcc := Dhaptar anyar.
+	duweke from := Kosong.
+	duweke from-name := Kosong.
+	duweke subject := Kosong.
+	duweke body := Kosong.
+}.
+
+Email nalika: ['anyar'] tindakna: { <- dhiri anyar init.
+}.
+
+Email nalika: ['to:'] tindakna: { :list
+	duweke recipients := list.
+}.
+ 
+Email nalika: ['cc:'] tindakna: { :list
+	duweke cc := list.
+}.
+
+Email nalika: ['bcc:'] tindakna: { :list
+	duweke bcc := list.
+}.
+
+Email nalika: ['subject:'] tindakna: { :subject
+	duweke subject := subject.
+}.
+
+Email nalika: ['from:name:'] tindakna: { :from :jeneng
+	duweke from := from.
+	duweke from-name := jeneng.
+}.
+
+Email nalika: ['body:'] tindakna: { :body
+	duweke body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email nalika: ['header:'] tindakna: { :line <- line ganti: ['\r'] nganggo: [''], ganti: ['\n'] nganggo: [''].
+}.
+
+Email nalika: ['send'] tindakna: {
+	>> f := Berkas tempwrite: dhiri generate.
+	Program sistem: ['sendmail -t < '] + f dalan, baris-anyar.
+}.
+
+Email nalika: ['generate'] tindakna: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tambah-ing-mburi: (dhiri header: ['From: '] + duweke from-name + [' <'] + ( duweke from ) + ['>']) + brk.
+	str tambah-ing-mburi: (dhiri header: ['To: '] + ( duweke recipients gabung: [','] )) + brk.
+	duweke cc cacah bener: {
+		str tambah-ing-mburi: (dhiri header: ['Cc: '] + ( duweke cc gabung: [','] )) + brk.
+	}.
+	duweke bcc cacah bener: {
+		str tambah-ing-mburi: (dhiri header: ['Bcc: '] + ( duweke bcc gabung: [','] )) + brk.
+	}.
+	str tambah-ing-mburi: (dhiri header: ['Subject: '] + duweke subject) + brk.
+	str tambah-ing-mburi: brk.
+	str tambah-ing-mburi: duweke body.
+	str tambah-ing-mburi: brk. <- str.
+}.
+
+>> HTML-Email := Email anyar.
+
+HTML-Email nalika: ['init'] tindakna: {
+	dhiri init.
+	duweke attachments := Dhaptar anyar.
+	duweke boundary := Brankas token: 40.
+}.
+
+HTML-Email nalika: ['attach:'] tindakna: { :file
+	>> id := duweke attachments cacah.
+	>> blob := file blob.
+	duweke attachments tambah-ing-mburi: (
+		Kamus anyar
+			file: file dalan,
+			mime: ['image/'] + (Server mimetype: file dalan),
+			data: blob base64-enkode
+	).
+	blob bebasna. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email nalika: ['generate'] tindakna: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tambah-ing-mburi: (dhiri header: ['From: '] + duweke from-name + [' <'] + ( duweke from ) + ['>']) + brk.
+	str tambah-ing-mburi: (dhiri header: ['To: '] + ( duweke recipients gabung: [','] )) + brk.
+	duweke cc cacah bener: {
+		str tambah-ing-mburi: (dhiri header: ['Cc: '] + ( duweke cc gabung: [','] )) + brk.
+	}.
+	duweke bcc cacah bener: {
+		str tambah-ing-mburi: (dhiri header: ['Bcc: '] + ( duweke bcc gabung: [','] )) + brk.
+	}.
+	str tambah-ing-mburi: (dhiri header: ['Subject: '] + duweke subject) + brk.
+	str tambah-ing-mburi: ['MIME-Version: 1.0'] + brk.
+	str tambah-ing-mburi: ['Content-Type: multipart/related; boundary="'] + duweke boundary + ['"; type=text/html'] + brk.
+	str tambah-ing-mburi: brk.
+	str tambah-ing-mburi: ['--'] + duweke boundary + brk.
+	str tambah-ing-mburi: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str tambah-ing-mburi: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str tambah-ing-mburi: brk.
+	str tambah-ing-mburi: duweke body.
+	str tambah-ing-mburi: brk.
+	duweke attachments saben: { :id :info
+		>> blob := info data.
+		str tambah-ing-mburi: ['--'] + duweke boundary + brk.
+		str tambah-ing-mburi: ['Content-Type: '] + info mime + brk.
+		str tambah-ing-mburi: ['Content-Transfer-Encoding: base64'] + brk.
+		str tambah-ing-mburi: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str tambah-ing-mburi: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str tambah-ing-mburi: brk.
+		>> max := 76.
+		>> len := blob dawa.
+		>> chunks := (len / max) bunderake-munggah.
+		{ :i
+			>> chunk := blob salin saka: i * max dawa: max.
+			str tambah-ing-mburi: chunk + brk.
+		} * chunks.
+		str tambah-ing-mburi: brk.
+		str tambah-ing-mburi: brk.
+	}.
+	str tambah-ing-mburi: ['--'] + duweke boundary + ['--'] + brk. <- str.
+}.

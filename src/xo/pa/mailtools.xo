@@ -1,0 +1,128 @@
+>> Email := ਵਸਤੂ ਨਵਾਂ.
+
+Email ਜਦੋਂ: ['init'] ਕਰੋ: {
+	ਆਪਣਾ recipients := ਲਿਸਟ ਨਵਾਂ.
+	ਆਪਣਾ cc := ਲਿਸਟ ਨਵਾਂ.
+	ਆਪਣਾ bcc := ਲਿਸਟ ਨਵਾਂ.
+	ਆਪਣਾ from := ਖਾਲੀ.
+	ਆਪਣਾ from-name := ਖਾਲੀ.
+	ਆਪਣਾ subject := ਖਾਲੀ.
+	ਆਪਣਾ body := ਖਾਲੀ.
+}.
+
+Email ਜਦੋਂ: ['ਨਵਾਂ'] ਕਰੋ: { <- ਆਪ ਨਵਾਂ init.
+}.
+
+Email ਜਦੋਂ: ['to:'] ਕਰੋ: { :list
+	ਆਪਣਾ recipients := list.
+}.
+ 
+Email ਜਦੋਂ: ['cc:'] ਕਰੋ: { :list
+	ਆਪਣਾ cc := list.
+}.
+
+Email ਜਦੋਂ: ['bcc:'] ਕਰੋ: { :list
+	ਆਪਣਾ bcc := list.
+}.
+
+Email ਜਦੋਂ: ['subject:'] ਕਰੋ: { :subject
+	ਆਪਣਾ subject := subject.
+}.
+
+Email ਜਦੋਂ: ['from:name:'] ਕਰੋ: { :from :ਨਾਮ
+	ਆਪਣਾ from := from.
+	ਆਪਣਾ from-name := ਨਾਮ.
+}.
+
+Email ਜਦੋਂ: ['body:'] ਕਰੋ: { :body
+	ਆਪਣਾ body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ਜਦੋਂ: ['header:'] ਕਰੋ: { :line <- line ਬਦਲੋ: ['\r'] ਨਾਲ: [''], ਬਦਲੋ: ['\n'] ਨਾਲ: [''].
+}.
+
+Email ਜਦੋਂ: ['send'] ਕਰੋ: {
+	>> f := ਫਾਈਲ tempwrite: ਆਪ generate.
+	ਪ੍ਰੋਗਰਾਮ ਸਿਸਟਮ: ['sendmail -t < '] + f ਫਾਈਲ-ਰਾਹ, ਨਵੀਂ-ਲਾਈਨ.
+}.
+
+Email ਜਦੋਂ: ['generate'] ਕਰੋ: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: (ਆਪ header: ['From: '] + ਆਪਣਾ from-name + [' <'] + ( ਆਪਣਾ from ) + ['>']) + brk.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: (ਆਪ header: ['To: '] + ( ਆਪਣਾ recipients ਜੋੜੋ: [','] )) + brk.
+	ਆਪਣਾ cc ਗਿਣਤੀ ਸੱਚ-ਹੋਵੇ-ਤਾਂ: {
+		str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: (ਆਪ header: ['Cc: '] + ( ਆਪਣਾ cc ਜੋੜੋ: [','] )) + brk.
+	}.
+	ਆਪਣਾ bcc ਗਿਣਤੀ ਸੱਚ-ਹੋਵੇ-ਤਾਂ: {
+		str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: (ਆਪ header: ['Bcc: '] + ( ਆਪਣਾ bcc ਜੋੜੋ: [','] )) + brk.
+	}.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: (ਆਪ header: ['Subject: '] + ਆਪਣਾ subject) + brk.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: brk.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: ਆਪਣਾ body.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: brk. <- str.
+}.
+
+>> HTML-Email := Email ਨਵਾਂ.
+
+HTML-Email ਜਦੋਂ: ['init'] ਕਰੋ: {
+	ਆਪ init.
+	ਆਪਣਾ attachments := ਲਿਸਟ ਨਵਾਂ.
+	ਆਪਣਾ boundary := ਤਿਜੋਰੀ ਟੋਕਨ: 40.
+}.
+
+HTML-Email ਜਦੋਂ: ['attach:'] ਕਰੋ: { :file
+	>> id := ਆਪਣਾ attachments ਗਿਣਤੀ.
+	>> blob := file blob.
+	ਆਪਣਾ attachments ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: (
+		ਸ਼ਬਦਕੋਸ਼ ਨਵਾਂ
+			file: file ਫਾਈਲ-ਰਾਹ,
+			mime: ['image/'] + (Server mimetype: file ਫਾਈਲ-ਰਾਹ),
+			data: blob base64-ਇਨਕੋਡ
+	).
+	blob ਮੁਕਤ. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ਜਦੋਂ: ['generate'] ਕਰੋ: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: (ਆਪ header: ['From: '] + ਆਪਣਾ from-name + [' <'] + ( ਆਪਣਾ from ) + ['>']) + brk.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: (ਆਪ header: ['To: '] + ( ਆਪਣਾ recipients ਜੋੜੋ: [','] )) + brk.
+	ਆਪਣਾ cc ਗਿਣਤੀ ਸੱਚ-ਹੋਵੇ-ਤਾਂ: {
+		str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: (ਆਪ header: ['Cc: '] + ( ਆਪਣਾ cc ਜੋੜੋ: [','] )) + brk.
+	}.
+	ਆਪਣਾ bcc ਗਿਣਤੀ ਸੱਚ-ਹੋਵੇ-ਤਾਂ: {
+		str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: (ਆਪ header: ['Bcc: '] + ( ਆਪਣਾ bcc ਜੋੜੋ: [','] )) + brk.
+	}.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: (ਆਪ header: ['Subject: '] + ਆਪਣਾ subject) + brk.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: ['MIME-Version: 1.0'] + brk.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: ['Content-Type: multipart/related; boundary="'] + ਆਪਣਾ boundary + ['"; type=text/html'] + brk.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: brk.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: ['--'] + ਆਪਣਾ boundary + brk.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: brk.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: ਆਪਣਾ body.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: brk.
+	ਆਪਣਾ attachments ਹਰੇਕ: { :id :info
+		>> blob := info data.
+		str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: ['--'] + ਆਪਣਾ boundary + brk.
+		str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: ['Content-Type: '] + info mime + brk.
+		str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: ['Content-Transfer-Encoding: base64'] + brk.
+		str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: brk.
+		>> max := 76.
+		>> len := blob ਲੰਬਾਈ.
+		>> chunks := (len / max) ਉੱਪਰ-ਪੂਰਨ.
+		{ :i
+			>> chunk := blob ਨਕਲ ਸ਼ੁਰੂ: i * max ਲੰਬਾਈ: max.
+			str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: chunk + brk.
+		} * chunks.
+		str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: brk.
+		str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: brk.
+	}.
+	str ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: ['--'] + ਆਪਣਾ boundary + ['--'] + brk. <- str.
+}.

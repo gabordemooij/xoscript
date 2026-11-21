@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := אובייקט חדש.
+
+Template בקבלת: ['חדש'] בצע: { <- עצמי חדש content: [''].
+}.
+
+Template בקבלת: ['content:'] בצע: { :content
+	שלי content := content. 
+}.
+
+Template בקבלת: ['חדש:'] בצע: { :content <- עצמי חדש content: content.
+}.
+
+Template בקבלת: ['cut:'] בצע: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := שלי content פצל: startmarker.
+	>> prefix := parts ראשון.
+	>> parts2 := parts אחרון פצל: endmarker.
+	>> suffix := parts2 אחרון.
+	>> part := parts2 ראשון.
+	>> rest := prefix + suffix.
+	שלי content := rest. <- Template חדש: part.
+	
+}.
+
+Template בקבלת: ['העתק'] בצע: { <- עצמי חדש: עצמי למחרוזת העתק.
+}.
+	
+Template בקבלת: ['paste:at:'] בצע: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	שלי content החלף: pastemarker בערך: ( snippet למחרוזת + pastemarker ).
+}.
+
+Template בקבלת: ['קבע:ערך:'] בצע: { :slot :value
+	שלי content החלף: ['<!-- slot:'] + slot + [' -->'] בערך: ( Server html-קידוד: value ).
+}.
+
+Template בקבלת: ['set:html:'] בצע: { :slot :html
+	שלי content החלף: ['<!-- slot:'] + slot + [' -->'] בערך: html.
+}.
+
+Template בקבלת: ['הגב:וגם:'] בצע: { :slot :value
+	עצמי קבע: (slot התחלה: 0 אורך: (slot אורך - 1)) ערך: value.
+}.
+
+Template בקבלת: ['nl2br'] בצע: {
+	שלי content החלף: ['\n'] בערך: ['<br>'].
+}.
+
+Template בקבלת: ['clean'] בצע: {
+	שלי content :=
+		דפוס
+		חדש: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		התאמה: שלי content
+		בצע: { <- ['']. }.
+}.
+
+Template בקבלת: ['clean-cuts'] בצע: {
+	>> items := רשימה חדש.
+	דפוס
+	חדש: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	התאמה: שלי content
+	בצע: { :_ :part
+		items הוסף-בסוף: part ? 1.
+	}.
+	items לכל: { :_ :id
+		שלי content :=
+			דפוס חדש: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			התאמה: שלי content
+			בצע: { <- ['']. }.
+	 }.
+}.
+
+Template בקבלת: ['clean-space'] בצע: {
+	שלי content :=
+		דפוס
+		חדש: ['\\s*\\n'],
+		התאמה: שלי content
+		בצע: { <- ['\n']. }.
+	שלי content :=
+		דפוס
+		חדש: ['\\n[\\s\\t]+'],
+		התאמה: שלי content
+		בצע: { <- ['\n']. }.
+}.
+
+Template בקבלת: ['clean-all'] בצע: {
+	עצמי clean.
+	עצמי clean-cuts.
+	עצמי clean-space.
+}.
+
+Template בקבלת: ['למחרוזת'] בצע: { <- שלי content.
+}.

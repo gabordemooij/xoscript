@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Into entsha.
+
+Template xa-kufika: ['entsha'] yenza: { <- ngokwakho entsha content: [''].
+}.
+
+Template xa-kufika: ['content:'] yenza: { :content
+	eyakho content := content. 
+}.
+
+Template xa-kufika: ['entsha:'] yenza: { :content <- ngokwakho entsha content: content.
+}.
+
+Template xa-kufika: ['cut:'] yenza: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := eyakho content yahlula: startmarker.
+	>> prefix := parts eyokuqala.
+	>> parts2 := parts eyokugqibela yahlula: endmarker.
+	>> suffix := parts2 eyokugqibela.
+	>> part := parts2 eyokuqala.
+	>> rest := prefix + suffix.
+	eyakho content := rest. <- Template entsha: part.
+	
+}.
+
+Template xa-kufika: ['kopa'] yenza: { <- ngokwakho entsha: ngokwakho umbhalo kopa.
+}.
+	
+Template xa-kufika: ['paste:at:'] yenza: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	eyakho content buyisela: pastemarker nge: ( snippet umbhalo + pastemarker ).
+}.
+
+Template xa-kufika: ['misela:ixabiso:'] yenza: { :slot :value
+	eyakho content buyisela: ['<!-- slot:'] + slot + [' -->'] nge: ( Server html-faka-ikhowudi: value ).
+}.
+
+Template xa-kufika: ['set:html:'] yenza: { :slot :html
+	eyakho content buyisela: ['<!-- slot:'] + slot + [' -->'] nge: html.
+}.
+
+Template xa-kufika: ['phendula:kwaye:'] yenza: { :slot :value
+	ngokwakho misela: (slot ukusuka: 0 ubude: (slot ubude - 1)) ixabiso: value.
+}.
+
+Template xa-kufika: ['nl2br'] yenza: {
+	eyakho content buyisela: ['\n'] nge: ['<br>'].
+}.
+
+Template xa-kufika: ['clean'] yenza: {
+	eyakho content :=
+		Ipateni
+		entsha: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ukungqamana: eyakho content
+		yenza: { <- ['']. }.
+}.
+
+Template xa-kufika: ['clean-cuts'] yenza: {
+	>> items := Uluhlu entsha.
+	Ipateni
+	entsha: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ukungqamana: eyakho content
+	yenza: { :_ :part
+		items yongeza-ekugqibeleni: part ? 1.
+	}.
+	items nganye: { :_ :id
+		eyakho content :=
+			Ipateni entsha: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ukungqamana: eyakho content
+			yenza: { <- ['']. }.
+	 }.
+}.
+
+Template xa-kufika: ['clean-space'] yenza: {
+	eyakho content :=
+		Ipateni
+		entsha: ['\\s*\\n'],
+		ukungqamana: eyakho content
+		yenza: { <- ['\n']. }.
+	eyakho content :=
+		Ipateni
+		entsha: ['\\n[\\s\\t]+'],
+		ukungqamana: eyakho content
+		yenza: { <- ['\n']. }.
+}.
+
+Template xa-kufika: ['clean-all'] yenza: {
+	ngokwakho clean.
+	ngokwakho clean-cuts.
+	ngokwakho clean-space.
+}.
+
+Template xa-kufika: ['umbhalo'] yenza: { <- eyakho content.
+}.

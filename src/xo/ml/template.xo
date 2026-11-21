@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := വസ്തു പുതിയ.
+
+Template കിട്ടുമ്പോൾ: ['പുതിയ'] ചെയ്യുക: { <- താൻ പുതിയ content: [''].
+}.
+
+Template കിട്ടുമ്പോൾ: ['content:'] ചെയ്യുക: { :content
+	തന്റെ content := content. 
+}.
+
+Template കിട്ടുമ്പോൾ: ['പുതിയ:'] ചെയ്യുക: { :content <- താൻ പുതിയ content: content.
+}.
+
+Template കിട്ടുമ്പോൾ: ['cut:'] ചെയ്യുക: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := തന്റെ content വിഭജിക്കുക: startmarker.
+	>> prefix := parts ആദ്യത്തേത്.
+	>> parts2 := parts അവസാനത്തേത് വിഭജിക്കുക: endmarker.
+	>> suffix := parts2 അവസാനത്തേത്.
+	>> part := parts2 ആദ്യത്തേത്.
+	>> rest := prefix + suffix.
+	തന്റെ content := rest. <- Template പുതിയ: part.
+	
+}.
+
+Template കിട്ടുമ്പോൾ: ['പകർപ്പ്'] ചെയ്യുക: { <- താൻ പുതിയ: താൻ വാചകമായി പകർപ്പ്.
+}.
+	
+Template കിട്ടുമ്പോൾ: ['paste:at:'] ചെയ്യുക: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	തന്റെ content മാറ്റുക: pastemarker പകരം: ( snippet വാചകമായി + pastemarker ).
+}.
+
+Template കിട്ടുമ്പോൾ: ['നിശ്ചയിക്കുക:മൂല്യം:'] ചെയ്യുക: { :slot :value
+	തന്റെ content മാറ്റുക: ['<!-- slot:'] + slot + [' -->'] പകരം: ( Server html-എൻകോഡ്: value ).
+}.
+
+Template കിട്ടുമ്പോൾ: ['set:html:'] ചെയ്യുക: { :slot :html
+	തന്റെ content മാറ്റുക: ['<!-- slot:'] + slot + [' -->'] പകരം: html.
+}.
+
+Template കിട്ടുമ്പോൾ: ['മറുപടി:കൂടാതെ:'] ചെയ്യുക: { :slot :value
+	താൻ നിശ്ചയിക്കുക: (slot തുടക്കം: 0 നീളം: (slot നീളം - 1)) മൂല്യം: value.
+}.
+
+Template കിട്ടുമ്പോൾ: ['nl2br'] ചെയ്യുക: {
+	തന്റെ content മാറ്റുക: ['\n'] പകരം: ['<br>'].
+}.
+
+Template കിട്ടുമ്പോൾ: ['clean'] ചെയ്യുക: {
+	തന്റെ content :=
+		മാതൃക
+		പുതിയ: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		പൊരുത്തം: തന്റെ content
+		ചെയ്യുക: { <- ['']. }.
+}.
+
+Template കിട്ടുമ്പോൾ: ['clean-cuts'] ചെയ്യുക: {
+	>> items := ശ്രേണി പുതിയ.
+	മാതൃക
+	പുതിയ: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	പൊരുത്തം: തന്റെ content
+	ചെയ്യുക: { :_ :part
+		items അവസാനം-ചേർക്കുക: part ? 1.
+	}.
+	items ഓരോന്നും: { :_ :id
+		തന്റെ content :=
+			മാതൃക പുതിയ: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			പൊരുത്തം: തന്റെ content
+			ചെയ്യുക: { <- ['']. }.
+	 }.
+}.
+
+Template കിട്ടുമ്പോൾ: ['clean-space'] ചെയ്യുക: {
+	തന്റെ content :=
+		മാതൃക
+		പുതിയ: ['\\s*\\n'],
+		പൊരുത്തം: തന്റെ content
+		ചെയ്യുക: { <- ['\n']. }.
+	തന്റെ content :=
+		മാതൃക
+		പുതിയ: ['\\n[\\s\\t]+'],
+		പൊരുത്തം: തന്റെ content
+		ചെയ്യുക: { <- ['\n']. }.
+}.
+
+Template കിട്ടുമ്പോൾ: ['clean-all'] ചെയ്യുക: {
+	താൻ clean.
+	താൻ clean-cuts.
+	താൻ clean-space.
+}.
+
+Template കിട്ടുമ്പോൾ: ['വാചകമായി'] ചെയ്യുക: { <- തന്റെ content.
+}.

@@ -1,0 +1,128 @@
+>> Email := Oibseact ùr.
+
+Email air: ['init'] dèan: {
+	leis recipients := Liosta ùr.
+	leis cc := Liosta ùr.
+	leis bcc := Liosta ùr.
+	leis from := Neoni.
+	leis from-name := Neoni.
+	leis subject := Neoni.
+	leis body := Neoni.
+}.
+
+Email air: ['ùr'] dèan: { <- fhèin ùr init.
+}.
+
+Email air: ['to:'] dèan: { :list
+	leis recipients := list.
+}.
+ 
+Email air: ['cc:'] dèan: { :list
+	leis cc := list.
+}.
+
+Email air: ['bcc:'] dèan: { :list
+	leis bcc := list.
+}.
+
+Email air: ['subject:'] dèan: { :subject
+	leis subject := subject.
+}.
+
+Email air: ['from:name:'] dèan: { :from :ainm
+	leis from := from.
+	leis from-name := ainm.
+}.
+
+Email air: ['body:'] dèan: { :body
+	leis body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email air: ['header:'] dèan: { :line <- line cuir-an-àite: ['\r'] le: [''], cuir-an-àite: ['\n'] le: [''].
+}.
+
+Email air: ['send'] dèan: {
+	>> f := Faidhle tempwrite: fhèin generate.
+	Prògram siostam: ['sendmail -t < '] + f slighe, loidhne-ùr.
+}.
+
+Email air: ['generate'] dèan: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str cuir-ris: (fhèin header: ['From: '] + leis from-name + [' <'] + ( leis from ) + ['>']) + brk.
+	str cuir-ris: (fhèin header: ['To: '] + ( leis recipients ceangail: [','] )) + brk.
+	leis cc cunnt fìor: {
+		str cuir-ris: (fhèin header: ['Cc: '] + ( leis cc ceangail: [','] )) + brk.
+	}.
+	leis bcc cunnt fìor: {
+		str cuir-ris: (fhèin header: ['Bcc: '] + ( leis bcc ceangail: [','] )) + brk.
+	}.
+	str cuir-ris: (fhèin header: ['Subject: '] + leis subject) + brk.
+	str cuir-ris: brk.
+	str cuir-ris: leis body.
+	str cuir-ris: brk. <- str.
+}.
+
+>> HTML-Email := Email ùr.
+
+HTML-Email air: ['init'] dèan: {
+	fhèin init.
+	leis attachments := Liosta ùr.
+	leis boundary := Tasgaidh tòcan: 40.
+}.
+
+HTML-Email air: ['attach:'] dèan: { :file
+	>> id := leis attachments cunnt.
+	>> blob := file blob.
+	leis attachments cuir-ris: (
+		Faclair ùr
+			file: file slighe,
+			mime: ['image/'] + (Server mimetype: file slighe),
+			data: blob base64-còdaich
+	).
+	blob saor. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email air: ['generate'] dèan: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str cuir-ris: (fhèin header: ['From: '] + leis from-name + [' <'] + ( leis from ) + ['>']) + brk.
+	str cuir-ris: (fhèin header: ['To: '] + ( leis recipients ceangail: [','] )) + brk.
+	leis cc cunnt fìor: {
+		str cuir-ris: (fhèin header: ['Cc: '] + ( leis cc ceangail: [','] )) + brk.
+	}.
+	leis bcc cunnt fìor: {
+		str cuir-ris: (fhèin header: ['Bcc: '] + ( leis bcc ceangail: [','] )) + brk.
+	}.
+	str cuir-ris: (fhèin header: ['Subject: '] + leis subject) + brk.
+	str cuir-ris: ['MIME-Version: 1.0'] + brk.
+	str cuir-ris: ['Content-Type: multipart/related; boundary="'] + leis boundary + ['"; type=text/html'] + brk.
+	str cuir-ris: brk.
+	str cuir-ris: ['--'] + leis boundary + brk.
+	str cuir-ris: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str cuir-ris: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str cuir-ris: brk.
+	str cuir-ris: leis body.
+	str cuir-ris: brk.
+	leis attachments gach: { :id :info
+		>> blob := info data.
+		str cuir-ris: ['--'] + leis boundary + brk.
+		str cuir-ris: ['Content-Type: '] + info mime + brk.
+		str cuir-ris: ['Content-Transfer-Encoding: base64'] + brk.
+		str cuir-ris: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str cuir-ris: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str cuir-ris: brk.
+		>> max := 76.
+		>> len := blob faid.
+		>> chunks := (len / max) cruinnich-suas.
+		{ :i
+			>> chunk := blob dèan-lethbhreac bho: i * max faid: max.
+			str cuir-ris: chunk + brk.
+		} * chunks.
+		str cuir-ris: brk.
+		str cuir-ris: brk.
+	}.
+	str cuir-ris: ['--'] + leis boundary + ['--'] + brk. <- str.
+}.

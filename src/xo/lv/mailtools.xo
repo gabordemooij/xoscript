@@ -1,0 +1,128 @@
+>> Email := Objekts jauns.
+
+Email kad: ['init'] darīt: {
+	savs recipients := Saraksts jauns.
+	savs cc := Saraksts jauns.
+	savs bcc := Saraksts jauns.
+	savs from := Nekas.
+	savs from-name := Nekas.
+	savs subject := Nekas.
+	savs body := Nekas.
+}.
+
+Email kad: ['jauns'] darīt: { <- pats jauns init.
+}.
+
+Email kad: ['to:'] darīt: { :list
+	savs recipients := list.
+}.
+ 
+Email kad: ['cc:'] darīt: { :list
+	savs cc := list.
+}.
+
+Email kad: ['bcc:'] darīt: { :list
+	savs bcc := list.
+}.
+
+Email kad: ['subject:'] darīt: { :subject
+	savs subject := subject.
+}.
+
+Email kad: ['from:name:'] darīt: { :from :nosaukums
+	savs from := from.
+	savs from-name := nosaukums.
+}.
+
+Email kad: ['body:'] darīt: { :body
+	savs body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email kad: ['header:'] darīt: { :line <- line aizstāt: ['\r'] ar: [''], aizstāt: ['\n'] ar: [''].
+}.
+
+Email kad: ['send'] darīt: {
+	>> f := Fails tempwrite: pats generate.
+	Programma sistēma: ['sendmail -t < '] + f ceļš, jauna-rinda.
+}.
+
+Email kad: ['generate'] darīt: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str pievienot-beigās: (pats header: ['From: '] + savs from-name + [' <'] + ( savs from ) + ['>']) + brk.
+	str pievienot-beigās: (pats header: ['To: '] + ( savs recipients apvienot: [','] )) + brk.
+	savs cc skaits patiess: {
+		str pievienot-beigās: (pats header: ['Cc: '] + ( savs cc apvienot: [','] )) + brk.
+	}.
+	savs bcc skaits patiess: {
+		str pievienot-beigās: (pats header: ['Bcc: '] + ( savs bcc apvienot: [','] )) + brk.
+	}.
+	str pievienot-beigās: (pats header: ['Subject: '] + savs subject) + brk.
+	str pievienot-beigās: brk.
+	str pievienot-beigās: savs body.
+	str pievienot-beigās: brk. <- str.
+}.
+
+>> HTML-Email := Email jauns.
+
+HTML-Email kad: ['init'] darīt: {
+	pats init.
+	savs attachments := Saraksts jauns.
+	savs boundary := Seifs marķieris: 40.
+}.
+
+HTML-Email kad: ['attach:'] darīt: { :file
+	>> id := savs attachments skaits.
+	>> blob := file blob.
+	savs attachments pievienot-beigās: (
+		Vārdnīca jauns
+			file: file ceļš,
+			mime: ['image/'] + (Server mimetype: file ceļš),
+			data: blob base64-kodēt
+	).
+	blob atbrīvot. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email kad: ['generate'] darīt: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str pievienot-beigās: (pats header: ['From: '] + savs from-name + [' <'] + ( savs from ) + ['>']) + brk.
+	str pievienot-beigās: (pats header: ['To: '] + ( savs recipients apvienot: [','] )) + brk.
+	savs cc skaits patiess: {
+		str pievienot-beigās: (pats header: ['Cc: '] + ( savs cc apvienot: [','] )) + brk.
+	}.
+	savs bcc skaits patiess: {
+		str pievienot-beigās: (pats header: ['Bcc: '] + ( savs bcc apvienot: [','] )) + brk.
+	}.
+	str pievienot-beigās: (pats header: ['Subject: '] + savs subject) + brk.
+	str pievienot-beigās: ['MIME-Version: 1.0'] + brk.
+	str pievienot-beigās: ['Content-Type: multipart/related; boundary="'] + savs boundary + ['"; type=text/html'] + brk.
+	str pievienot-beigās: brk.
+	str pievienot-beigās: ['--'] + savs boundary + brk.
+	str pievienot-beigās: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str pievienot-beigās: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str pievienot-beigās: brk.
+	str pievienot-beigās: savs body.
+	str pievienot-beigās: brk.
+	savs attachments katrs: { :id :info
+		>> blob := info data.
+		str pievienot-beigās: ['--'] + savs boundary + brk.
+		str pievienot-beigās: ['Content-Type: '] + info mime + brk.
+		str pievienot-beigās: ['Content-Transfer-Encoding: base64'] + brk.
+		str pievienot-beigās: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str pievienot-beigās: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str pievienot-beigās: brk.
+		>> max := 76.
+		>> len := blob garums.
+		>> chunks := (len / max) noapaļot-uz-augšu.
+		{ :i
+			>> chunk := blob kopēt no: i * max garums: max.
+			str pievienot-beigās: chunk + brk.
+		} * chunks.
+		str pievienot-beigās: brk.
+		str pievienot-beigās: brk.
+	}.
+	str pievienot-beigās: ['--'] + savs boundary + ['--'] + brk. <- str.
+}.

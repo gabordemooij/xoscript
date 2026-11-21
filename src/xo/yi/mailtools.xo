@@ -1,0 +1,128 @@
+>> Email := אָביעקט ניי.
+
+Email ווען: ['init'] טו: {
+	אייגן recipients := ליסטע ניי.
+	אייגן cc := ליסטע ניי.
+	אייגן bcc := ליסטע ניי.
+	אייגן from := גאָרנישט.
+	אייגן from-name := גאָרנישט.
+	אייגן subject := גאָרנישט.
+	אייגן body := גאָרנישט.
+}.
+
+Email ווען: ['ניי'] טו: { <- זיך ניי init.
+}.
+
+Email ווען: ['to:'] טו: { :list
+	אייגן recipients := list.
+}.
+ 
+Email ווען: ['cc:'] טו: { :list
+	אייגן cc := list.
+}.
+
+Email ווען: ['bcc:'] טו: { :list
+	אייגן bcc := list.
+}.
+
+Email ווען: ['subject:'] טו: { :subject
+	אייגן subject := subject.
+}.
+
+Email ווען: ['from:name:'] טו: { :from :נאָמען
+	אייגן from := from.
+	אייגן from-name := נאָמען.
+}.
+
+Email ווען: ['body:'] טו: { :body
+	אייגן body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ווען: ['header:'] טו: { :line <- line פֿאַרבײַט: ['\r'] מיט: [''], פֿאַרבײַט: ['\n'] מיט: [''].
+}.
+
+Email ווען: ['send'] טו: {
+	>> f := טעקע צײַטווײַליק-שרײַבן: זיך generate.
+	פּראָגראַם סיסטעם: ['sendmail -t < '] + f טעקע-וועג, נײַע-שורה.
+}.
+
+Email ווען: ['generate'] טו: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str לייג-צו-סוף: (זיך header: ['From: '] + אייגן from-name + [' <'] + ( אייגן from ) + ['>']) + brk.
+	str לייג-צו-סוף: (זיך header: ['To: '] + ( אייגן recipients פֿאַראייניק: [','] )) + brk.
+	אייגן cc צאָל-עלעמענטן אויב-אמת: {
+		str לייג-צו-סוף: (זיך header: ['Cc: '] + ( אייגן cc פֿאַראייניק: [','] )) + brk.
+	}.
+	אייגן bcc צאָל-עלעמענטן אויב-אמת: {
+		str לייג-צו-סוף: (זיך header: ['Bcc: '] + ( אייגן bcc פֿאַראייניק: [','] )) + brk.
+	}.
+	str לייג-צו-סוף: (זיך header: ['Subject: '] + אייגן subject) + brk.
+	str לייג-צו-סוף: brk.
+	str לייג-צו-סוף: אייגן body.
+	str לייג-צו-סוף: brk. <- str.
+}.
+
+>> HTML-Email := Email ניי.
+
+HTML-Email ווען: ['init'] טו: {
+	זיך init.
+	אייגן attachments := ליסטע ניי.
+	אייגן boundary := סייף צייכן: 40.
+}.
+
+HTML-Email ווען: ['attach:'] טו: { :file
+	>> id := אייגן attachments צאָל-עלעמענטן.
+	>> blob := file blob.
+	אייגן attachments לייג-צו-סוף: (
+		ווערטערבוך ניי
+			file: file טעקע-וועג,
+			mime: ['image/'] + (Server mimetype: file טעקע-וועג),
+			data: blob base64-קאָדירן
+	).
+	blob באַפֿרײַ. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ווען: ['generate'] טו: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str לייג-צו-סוף: (זיך header: ['From: '] + אייגן from-name + [' <'] + ( אייגן from ) + ['>']) + brk.
+	str לייג-צו-סוף: (זיך header: ['To: '] + ( אייגן recipients פֿאַראייניק: [','] )) + brk.
+	אייגן cc צאָל-עלעמענטן אויב-אמת: {
+		str לייג-צו-סוף: (זיך header: ['Cc: '] + ( אייגן cc פֿאַראייניק: [','] )) + brk.
+	}.
+	אייגן bcc צאָל-עלעמענטן אויב-אמת: {
+		str לייג-צו-סוף: (זיך header: ['Bcc: '] + ( אייגן bcc פֿאַראייניק: [','] )) + brk.
+	}.
+	str לייג-צו-סוף: (זיך header: ['Subject: '] + אייגן subject) + brk.
+	str לייג-צו-סוף: ['MIME-Version: 1.0'] + brk.
+	str לייג-צו-סוף: ['Content-Type: multipart/related; boundary="'] + אייגן boundary + ['"; type=text/html'] + brk.
+	str לייג-צו-סוף: brk.
+	str לייג-צו-סוף: ['--'] + אייגן boundary + brk.
+	str לייג-צו-סוף: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str לייג-צו-סוף: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str לייג-צו-סוף: brk.
+	str לייג-צו-סוף: אייגן body.
+	str לייג-צו-סוף: brk.
+	אייגן attachments יעדער: { :id :info
+		>> blob := info data.
+		str לייג-צו-סוף: ['--'] + אייגן boundary + brk.
+		str לייג-צו-סוף: ['Content-Type: '] + info mime + brk.
+		str לייג-צו-סוף: ['Content-Transfer-Encoding: base64'] + brk.
+		str לייג-צו-סוף: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str לייג-צו-סוף: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str לייג-צו-סוף: brk.
+		>> max := 76.
+		>> len := blob לענג.
+		>> chunks := (len / max) רונד-אַרויף.
+		{ :i
+			>> chunk := blob קאָפּיר אָנהייב: i * max לענג: max.
+			str לייג-צו-סוף: chunk + brk.
+		} * chunks.
+		str לייג-צו-סוף: brk.
+		str לייג-צו-סוף: brk.
+	}.
+	str לייג-צו-סוף: ['--'] + אייגן boundary + ['--'] + brk. <- str.
+}.

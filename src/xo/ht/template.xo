@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objè nouvo.
+
+Template lè: ['nouvo'] fè: { <- tèt-li nouvo content: [''].
+}.
+
+Template lè: ['content:'] fè: { :content
+	pwòp content := content. 
+}.
+
+Template lè: ['nouvo:'] fè: { :content <- tèt-li nouvo content: content.
+}.
+
+Template lè: ['cut:'] fè: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := pwòp content divize: startmarker.
+	>> prefix := parts premye.
+	>> parts2 := parts dènye divize: endmarker.
+	>> suffix := parts2 dènye.
+	>> part := parts2 premye.
+	>> rest := prefix + suffix.
+	pwòp content := rest. <- Template nouvo: part.
+	
+}.
+
+Template lè: ['kopye'] fè: { <- tèt-li nouvo: tèt-li tèks kopye.
+}.
+	
+Template lè: ['paste:at:'] fè: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	pwòp content ranplase: pastemarker ak: ( snippet tèks + pastemarker ).
+}.
+
+Template lè: ['fikse:valè:'] fè: { :slot :value
+	pwòp content ranplase: ['<!-- slot:'] + slot + [' -->'] ak: ( Server html-kode: value ).
+}.
+
+Template lè: ['set:html:'] fè: { :slot :html
+	pwòp content ranplase: ['<!-- slot:'] + slot + [' -->'] ak: html.
+}.
+
+Template lè: ['reponn:ak:'] fè: { :slot :value
+	tèt-li fikse: (slot soti-nan: 0 longè: (slot longè - 1)) valè: value.
+}.
+
+Template lè: ['nl2br'] fè: {
+	pwòp content ranplase: ['\n'] ak: ['<br>'].
+}.
+
+Template lè: ['clean'] fè: {
+	pwòp content :=
+		Modèl
+		nouvo: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		koresponn: pwòp content
+		fè: { <- ['']. }.
+}.
+
+Template lè: ['clean-cuts'] fè: {
+	>> items := Lis nouvo.
+	Modèl
+	nouvo: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	koresponn: pwòp content
+	fè: { :_ :part
+		items ajoute-nan-fen: part ? 1.
+	}.
+	items chak: { :_ :id
+		pwòp content :=
+			Modèl nouvo: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			koresponn: pwòp content
+			fè: { <- ['']. }.
+	 }.
+}.
+
+Template lè: ['clean-space'] fè: {
+	pwòp content :=
+		Modèl
+		nouvo: ['\\s*\\n'],
+		koresponn: pwòp content
+		fè: { <- ['\n']. }.
+	pwòp content :=
+		Modèl
+		nouvo: ['\\n[\\s\\t]+'],
+		koresponn: pwòp content
+		fè: { <- ['\n']. }.
+}.
+
+Template lè: ['clean-all'] fè: {
+	tèt-li clean.
+	tèt-li clean-cuts.
+	tèt-li clean-space.
+}.
+
+Template lè: ['tèks'] fè: { <- pwòp content.
+}.

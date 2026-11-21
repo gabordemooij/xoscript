@@ -1,0 +1,325 @@
+HTTP-ವಿನಂತಿ ಬಂದಾಗ: ['HTTP-header:'] ಮಾಡು: { :key <- ಪ್ರೋಗ್ರಾಂ ಸಂಯೋಜನೆ: key.
+}.
+
+>> HTTP-Header := ವಸ್ತು ಹೊಸ.
+
+HTTP-Header ಬಂದಾಗ: ['ಹೊಸ'] ಮಾಡು: { <- ತಾನು ಹೊಸ init.
+}.
+
+HTTP-Header ಬಂದಾಗ: ['init'] ಮಾಡು: {
+	ತನ್ನ key := ಶೂನ್ಯ.
+	ತನ್ನ value := ಶೂನ್ಯ.
+}.
+
+HTTP-Header ಬಂದಾಗ: ['key:value:'] ಮಾಡು: { :key :value
+	ತನ್ನ key := key.
+	ತನ್ನ value := value.
+}.
+
+HTTP-Header ಬಂದಾಗ: ['key'] ಮಾಡು: { <- ತನ್ನ key.
+}.
+
+HTTP-Header ಬಂದಾಗ: ['value'] ಮಾಡು: { <- ತನ್ನ value.
+}.
+
+
+HTTP-Header ಬಂದಾಗ: ['ಪಠ್ಯವಾಗಿ'] ಮಾಡು: {
+	>> line := ತನ್ನ key + [': '] + ತನ್ನ value.
+	line ಬದಲಿಸು: ['\r'] ಇದರಿಂದ: [''], ಬದಲಿಸು: ['\n'] ಇದರಿಂದ: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := ವಸ್ತು ಹೊಸ.
+
+Web-Document ಬಂದಾಗ: ['ಹೊಸ'] ಮಾಡು: { <- ತಾನು ಹೊಸ init.
+}.
+
+Web-Document ಬಂದಾಗ: ['init'] ಮಾಡು: {
+	ತನ್ನ headers := ಸರಣಿ ಹೊಸ.
+	ತನ್ನ sess-id := ಶೂನ್ಯ.
+	ತನ್ನ session-manager := Tempfile-Session ಹೊಸ.
+	ತನ್ನ sessdata := ಶೂನ್ಯ.
+	ತನ್ನ secure := ಸತ್ಯ.
+	ತನ್ನ same-site := ['Strict'].
+	ತನ್ನ headers-out := ಸುಳ್ಳು.
+	ತನ್ನ request := HTTP-ವಿನಂತಿ ಹೊಸ.
+}.
+
+Web-Document ಬಂದಾಗ: ['request:'] ಮಾಡು: { :request
+	ತನ್ನ request := request.
+}. 
+
+Web-Document ಬಂದಾಗ: ['secure-session-cookie:'] ಮಾಡು: { :secure
+	ತಾನು check-headers.
+	ತನ್ನ secure := secure.
+}.
+
+Web-Document ಬಂದಾಗ: ['same-site-session-cookie:'] ಮಾಡು: { :value
+	ತಾನು check-headers.
+	>> options := ಸರಣಿ ಹೊಸ 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options ಒಳಗೊಂಡಿದೆ: value, ಸುಳ್ಳಾದರೆ: {
+		ಈ-ಕಾರ್ಯ ದೋಷ: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	ತನ್ನ same-site := value.
+}.
+
+Web-Document ಬಂದಾಗ: ['header:'] ಮಾಡು: { :header
+	ತಾನು check-headers.
+	ತನ್ನ headers ಕೊನೆಗೆ-ಸೇರಿಸು: header.
+}.
+
+Web-Document ಬಂದಾಗ: ['clear-headers'] ಮಾಡು: {
+	ತಾನು check-headers.
+	ತನ್ನ headers := ಸರಣಿ ಹೊಸ.
+}.
+
+Web-Document ಬಂದಾಗ: ['session-manager:'] ಮಾಡು: { :manager
+	ತಾನು check-headers.
+	ತನ್ನ session-manager := manager.
+}.
+
+Web-Document ಬಂದಾಗ: ['session-manager'] ಮಾಡು: { <- ತನ್ನ session-manager.
+}.
+
+Web-Document ಬಂದಾಗ: ['check-headers'] ಮಾಡು: {
+	ತನ್ನ headers-out ಸತ್ಯವಾದರೆ: {
+		ಈ-ಕಾರ್ಯ ದೋಷ: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document ಬಂದಾಗ: ['session-start'] ಮಾಡು: {
+	ತಾನು check-headers.
+	>> request := ತನ್ನ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ಶೂನ್ಯವೇ? ಸುಳ್ಳಾದರೆ: {
+		(( ಮಾದರಿ ಹೊಸ: ['^[A-Za-z0-9]+\\z'], ಹೊಂದಿಕೆ: sess-id ) = 0) ಸತ್ಯವಾದರೆ: {
+			sess-id := ಶೂನ್ಯ.
+		}.
+	}.
+	sess-id ಶೂನ್ಯವೇ? ಸತ್ಯವಾದರೆ: {
+		sess-id := ತಿಜೋರಿ ಟೋಕನ್: 30.
+		>> session-header := HTTP-Header ಹೊಸ
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (ತನ್ನ secure ಇದು: ['Secure'] ಇಲ್ಲವೇ: ['']),
+		SSITE: (ತನ್ನ same-site),
+		XSID: sess-id
+		).
+		ತನ್ನ headers ಕೊನೆಗೆ-ಸೇರಿಸು: session-header.
+	}.
+	ತನ್ನ sessdata := ತನ್ನ session-manager for: sess-id, load. <- ತನ್ನ sessdata. # reference
+}.
+
+Web-Document ಬಂದಾಗ: ['goto:'] ಮಾಡು: { :url
+	ತಾನು check-headers.
+	ತಾನು clear-headers.
+	ತನ್ನ headers
+	ಕೊನೆಗೆ-ಸೇರಿಸು: (
+		HTTP-Header ಹೊಸ
+		key: ['Status'] value: ['303 See Other']
+	),
+	ಕೊನೆಗೆ-ಸೇರಿಸು: (
+		HTTP-Header ಹೊಸ
+		key: ['Location'] value: url
+	).
+	ತಾನು out: ['Redirect'].
+}.
+
+Web-Document ಬಂದಾಗ: ['session-destroy'] ಮಾಡು: {
+	ತಾನು check-headers.
+	>> request := ತನ್ನ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ಶೂನ್ಯವೇ? ಸುಳ್ಳಾದರೆ: {
+		>> session-header := HTTP-Header ಹೊಸ.
+		>> when := ಕ್ಷಣ ಹೊಸ ವರ್ಷ: 1970, ಸ್ವರೂಪದಲ್ಲಿ: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (ತನ್ನ secure ಇದು: ['Secure'] ಇಲ್ಲವೇ: ['']),
+			SSITE: (ತನ್ನ same-site),
+			XSID: sess-id
+		).
+		ತನ್ನ session-manager destroy.
+		ತನ್ನ headers ಕೊನೆಗೆ-ಸೇರಿಸು: session-header.
+	}.
+}.
+
+
+Web-Document ಬಂದಾಗ: ['template:'] ಮಾಡು: { :ಕಡತ-ಮಾರ್ಗ <- Template ಹೊಸ: (ಕಡತ ಹೊಸ: ಕಡತ-ಮಾರ್ಗ, ಓದು).
+}.
+
+Web-Document ಬಂದಾಗ: ['out:type:'] ಮಾಡು: { :output :ಬಗೆ
+	ತನ್ನ headers-out ಸುಳ್ಳಾದರೆ: {
+		ತನ್ನ sessdata ಶೂನ್ಯವೇ? ಸುಳ್ಳಾದರೆ: {
+			ತನ್ನ session-manager save: ತನ್ನ sessdata.
+		}.
+		ತನ್ನ headers ಕೊನೆಗೆ-ಸೇರಿಸು: (
+			HTTP-Header ಹೊಸ
+			key: ['Content-type'] value: ಬಗೆ
+		).
+		ತನ್ನ headers ಪ್ರತಿಯೊಂದು: { :_ :header
+			ಔಟ್-ಪುಟ್ ಬರೆ: header.
+		}.
+		ತನ್ನ headers-out := ಸತ್ಯ.
+		ಔಟ್-ಪುಟ್ ಬರೆ: ['\r\n'].
+	}.
+	ಔಟ್-ಪುಟ್ ಬರೆ: output.
+}.
+
+Web-Document ಬಂದಾಗ: ['finish:type:'] ಮಾಡು: { :output :ಬಗೆ
+	ತನ್ನ headers-out ಸುಳ್ಳಾದರೆ: {
+		ತನ್ನ sessdata ಶೂನ್ಯವೇ? ಸುಳ್ಳಾದರೆ: {
+			ತನ್ನ session-manager save: ತನ್ನ sessdata.
+		}.
+		ತನ್ನ headers ಕೊನೆಗೆ-ಸೇರಿಸು: (
+			HTTP-Header ಹೊಸ
+			key: ['Content-type'] value: ಬಗೆ
+		).
+		ತನ್ನ headers ಕೊನೆಗೆ-ಸೇರಿಸು: (
+			HTTP-Header ಹೊಸ
+			key: ['Content-Length'] value: output ಪಠ್ಯವಾಗಿ bytes
+		).
+		ತನ್ನ headers ಪ್ರತಿಯೊಂದು: { :_ :header
+			ಔಟ್-ಪುಟ್ ಬರೆ: header.
+		}.
+		ತನ್ನ headers-out := ಸತ್ಯ.
+		ಔಟ್-ಪುಟ್ ಬರೆ: ['\r\n'].
+	}.
+	ಔಟ್-ಪುಟ್ ಬರೆ: output.
+}.
+
+Web-Document ಬಂದಾಗ: ['out:'] ಮಾಡು: { :output
+	ತಾನು out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ಬಂದಾಗ: ['finish:'] ಮಾಡು: { :output
+	ತಾನು finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ಬಂದಾಗ: ['json:'] ಮಾಡು: { :output
+	ತಾನು out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document ಬಂದಾಗ: ['not-found:'] ಮಾಡು: { :output
+	ತಾನು clear-headers header: (
+		HTTP-Header ಹೊಸ key: ['Status'] value: ['404 Not Found']
+	).
+	ತಾನು out: output.
+}.
+
+
+# Interface
+
+>> Session := ವಸ್ತು ಹೊಸ.
+
+Session ಬಂದಾಗ: ['ಹೊಸ'] ಮಾಡು: { <- ತಾನು ಹೊಸ init for: ಶೂನ್ಯ.
+}.
+
+Session ಬಂದಾಗ: ['for:'] ಮಾಡು: { :id
+	ತನ್ನ id := id.
+}.
+
+Session ಬಂದಾಗ: ['load'] ಮಾಡು: {
+	ಈ-ಕಾರ್ಯ ದೋಷ: ['Not implemented.'].
+}.
+
+Session ಬಂದಾಗ: ['save:'] ಮಾಡು: {
+	ಈ-ಕಾರ್ಯ ದೋಷ: ['Not implemented.'].
+}.
+
+Session ಬಂದಾಗ: ['destroy'] ಮಾಡು: {
+	ಈ-ಕಾರ್ಯ ದೋಷ: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session ಹೊಸ.
+
+Tempfile-Session ಬಂದಾಗ: ['init'] ಮಾಡು: {
+	ತನ್ನ pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session ಬಂದಾಗ: ['path-prefix:'] ಮಾಡು: { :str
+	ತನ್ನ pathprefix := str.
+}.
+
+Tempfile-Session ಬಂದಾಗ: ['file'] ಮಾಡು: { <- ( ಕಡತ ಹೊಸ: ( ತನ್ನ pathprefix + ತನ್ನ id + ['.txt'] ) ).
+}.
+
+Tempfile-Session ಬಂದಾಗ: ['load'] ಮಾಡು: {
+	>> file := ತಾನು file.
+	file ಇದೆ ಸುಳ್ಳಾದರೆ: {
+		file ಬರೆ: (ನಿಘಂಟು ಹೊಸ ಕೋಡ್).
+	}. <- file ಓದು ವಸ್ತುವಾಗಿ.
+}.
+
+Tempfile-Session ಬಂದಾಗ: ['save:'] ಮಾಡು: { :data
+	>> file := ತಾನು file.
+	file ಇದೆ ಸತ್ಯವಾದರೆ: {
+		file ಬರೆ: data ಕೋಡ್.
+	}.
+}.
+
+Tempfile-Session ಬಂದಾಗ: ['destroy'] ಮಾಡು: {
+	>> file := ತಾನು file.
+	file ಇದೆ ಸತ್ಯವಾದರೆ: {
+		file ಅಳಿಸು.
+	}.
+}.
+
+
+>> URL := ವಸ್ತು ಹೊಸ.
+
+URL ಬಂದಾಗ: ['init'] ಮಾಡು: {
+	ತನ್ನ protocol := ['https://'].
+	ತನ್ನ ಹೋಸ್ಟ್ := ['localhost'].
+	ತನ್ನ ಕಡತ-ಮಾರ್ಗ := [''].
+	ತನ್ನ params := [''].
+	ತನ್ನ hash := [''].
+}.
+
+URL ಬಂದಾಗ: ['ಹೊಸ'] ಮಾಡು: { <- ತಾನು ಹೊಸ init.
+}.
+
+URL ಬಂದಾಗ: ['ಪಠ್ಯವಾಗಿ'] ಮಾಡು: { <- (
+	ತನ್ನ protocol +
+	ತನ್ನ ಹೋಸ್ಟ್ +
+	ತನ್ನ ಕಡತ-ಮಾರ್ಗ +
+	ತನ್ನ params +
+	ತನ್ನ hash ).
+}.
+
+URL ಬಂದಾಗ: ['protocol:'] ಮಾಡು: { :protocol
+	((ಸರಣಿ ಹೊಸ: ['http'] ; ['https']) ಒಳಗೊಂಡಿದೆ: protocol) ಸತ್ಯವಾದರೆ: {
+		ತನ್ನ protocol := protocol + ['://'].
+	}, ಸುಳ್ಳಾದರೆ: {
+		ಈ-ಕಾರ್ಯ ದೋಷ: ['Invalid protocol'].
+	}.
+}.
+
+URL ಬಂದಾಗ: ['ಹೋಸ್ಟ್:'] ಮಾಡು: { :ಹೋಸ್ಟ್
+	#todo validate according to rfc
+	ತನ್ನ ಹೋಸ್ಟ್ := ಹೋಸ್ಟ್.
+}.
+
+URL ಬಂದಾಗ: ['path:'] ಮಾಡು: { :ಕಡತ-ಮಾರ್ಗ
+	ತನ್ನ ಕಡತ-ಮಾರ್ಗ := ['/'] + ಕಡತ-ಮಾರ್ಗ url-ಎನ್-ಕೋಡ್.
+}.
+
+URL ಬಂದಾಗ: ['params:'] ಮಾಡು: { :map
+	>> params := ಸರಣಿ ಹೊಸ.
+	map ಪ್ರತಿಯೊಂದು: { :key :value
+		params ಕೊನೆಗೆ-ಸೇರಿಸು: key ಪಠ್ಯವಾಗಿ url-ಎನ್-ಕೋಡ್ + ['='] + value ಪಠ್ಯವಾಗಿ url-ಎನ್-ಕೋಡ್.
+	}.
+	ತನ್ನ params := ['?'] + ( params ಸೇರಿಸು: ['&'] ).
+}.
+
+URL ಬಂದಾಗ: ['ಹ್ಯಾಶ್:'] ಮಾಡು: { :hash
+	ತನ್ನ hash := ['#'] + hash url-ಎನ್-ಕೋಡ್.
+}.
+

@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Obyek anyar.
+
+Template nalika: ['anyar'] lakukeun: { <- diri anyar content: [''].
+}.
+
+Template nalika: ['content:'] lakukeun: { :content
+	milik content := content. 
+}.
+
+Template nalika: ['anyar:'] lakukeun: { :content <- diri anyar content: content.
+}.
+
+Template nalika: ['cut:'] lakukeun: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := milik content pisahkeun: startmarker.
+	>> prefix := parts kahiji.
+	>> parts2 := parts pamungkas pisahkeun: endmarker.
+	>> suffix := parts2 pamungkas.
+	>> part := parts2 kahiji.
+	>> rest := prefix + suffix.
+	milik content := rest. <- Template anyar: part.
+	
+}.
+
+Template nalika: ['salin'] lakukeun: { <- diri anyar: diri téks salin.
+}.
+	
+Template nalika: ['paste:at:'] lakukeun: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	milik content ganti: pastemarker ku: ( snippet téks + pastemarker ).
+}.
+
+Template nalika: ['atur:nilai:'] lakukeun: { :slot :value
+	milik content ganti: ['<!-- slot:'] + slot + [' -->'] ku: ( Server html-énkode: value ).
+}.
+
+Template nalika: ['set:html:'] lakukeun: { :slot :html
+	milik content ganti: ['<!-- slot:'] + slot + [' -->'] ku: html.
+}.
+
+Template nalika: ['jawab:jeung:'] lakukeun: { :slot :value
+	diri atur: (slot tina: 0 panjang: (slot panjang - 1)) nilai: value.
+}.
+
+Template nalika: ['nl2br'] lakukeun: {
+	milik content ganti: ['\n'] ku: ['<br>'].
+}.
+
+Template nalika: ['clean'] lakukeun: {
+	milik content :=
+		Pola
+		anyar: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		cocog: milik content
+		lakukeun: { <- ['']. }.
+}.
+
+Template nalika: ['clean-cuts'] lakukeun: {
+	>> items := Daptar anyar.
+	Pola
+	anyar: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	cocog: milik content
+	lakukeun: { :_ :part
+		items tambah-di-tungtung: part ? 1.
+	}.
+	items unggal: { :_ :id
+		milik content :=
+			Pola anyar: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			cocog: milik content
+			lakukeun: { <- ['']. }.
+	 }.
+}.
+
+Template nalika: ['clean-space'] lakukeun: {
+	milik content :=
+		Pola
+		anyar: ['\\s*\\n'],
+		cocog: milik content
+		lakukeun: { <- ['\n']. }.
+	milik content :=
+		Pola
+		anyar: ['\\n[\\s\\t]+'],
+		cocog: milik content
+		lakukeun: { <- ['\n']. }.
+}.
+
+Template nalika: ['clean-all'] lakukeun: {
+	diri clean.
+	diri clean-cuts.
+	diri clean-space.
+}.
+
+Template nalika: ['téks'] lakukeun: { <- milik content.
+}.

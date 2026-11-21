@@ -1,0 +1,128 @@
+>> Email := Hlutur nýtt.
+
+Email við: ['init'] gera: {
+	eigin recipients := Listi nýtt.
+	eigin cc := Listi nýtt.
+	eigin bcc := Listi nýtt.
+	eigin from := Ekkert.
+	eigin from-name := Ekkert.
+	eigin subject := Ekkert.
+	eigin body := Ekkert.
+}.
+
+Email við: ['nýtt'] gera: { <- sjálfur nýtt init.
+}.
+
+Email við: ['to:'] gera: { :list
+	eigin recipients := list.
+}.
+ 
+Email við: ['cc:'] gera: { :list
+	eigin cc := list.
+}.
+
+Email við: ['bcc:'] gera: { :list
+	eigin bcc := list.
+}.
+
+Email við: ['subject:'] gera: { :subject
+	eigin subject := subject.
+}.
+
+Email við: ['from:name:'] gera: { :from :nafn
+	eigin from := from.
+	eigin from-name := nafn.
+}.
+
+Email við: ['body:'] gera: { :body
+	eigin body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email við: ['header:'] gera: { :line <- line skipta: ['\r'] fyrir: [''], skipta: ['\n'] fyrir: [''].
+}.
+
+Email við: ['send'] gera: {
+	>> f := Skrá tempwrite: sjálfur generate.
+	Forrit kerfi: ['sendmail -t < '] + f slóð, ný-lína.
+}.
+
+Email við: ['generate'] gera: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str bæta-aftast: (sjálfur header: ['From: '] + eigin from-name + [' <'] + ( eigin from ) + ['>']) + brk.
+	str bæta-aftast: (sjálfur header: ['To: '] + ( eigin recipients sameina: [','] )) + brk.
+	eigin cc fjöldi satt: {
+		str bæta-aftast: (sjálfur header: ['Cc: '] + ( eigin cc sameina: [','] )) + brk.
+	}.
+	eigin bcc fjöldi satt: {
+		str bæta-aftast: (sjálfur header: ['Bcc: '] + ( eigin bcc sameina: [','] )) + brk.
+	}.
+	str bæta-aftast: (sjálfur header: ['Subject: '] + eigin subject) + brk.
+	str bæta-aftast: brk.
+	str bæta-aftast: eigin body.
+	str bæta-aftast: brk. <- str.
+}.
+
+>> HTML-Email := Email nýtt.
+
+HTML-Email við: ['init'] gera: {
+	sjálfur init.
+	eigin attachments := Listi nýtt.
+	eigin boundary := Hvelfing tóki: 40.
+}.
+
+HTML-Email við: ['attach:'] gera: { :file
+	>> id := eigin attachments fjöldi.
+	>> blob := file blob.
+	eigin attachments bæta-aftast: (
+		Orðabók nýtt
+			file: file slóð,
+			mime: ['image/'] + (Server mimetype: file slóð),
+			data: blob base64-kóða
+	).
+	blob losa. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email við: ['generate'] gera: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str bæta-aftast: (sjálfur header: ['From: '] + eigin from-name + [' <'] + ( eigin from ) + ['>']) + brk.
+	str bæta-aftast: (sjálfur header: ['To: '] + ( eigin recipients sameina: [','] )) + brk.
+	eigin cc fjöldi satt: {
+		str bæta-aftast: (sjálfur header: ['Cc: '] + ( eigin cc sameina: [','] )) + brk.
+	}.
+	eigin bcc fjöldi satt: {
+		str bæta-aftast: (sjálfur header: ['Bcc: '] + ( eigin bcc sameina: [','] )) + brk.
+	}.
+	str bæta-aftast: (sjálfur header: ['Subject: '] + eigin subject) + brk.
+	str bæta-aftast: ['MIME-Version: 1.0'] + brk.
+	str bæta-aftast: ['Content-Type: multipart/related; boundary="'] + eigin boundary + ['"; type=text/html'] + brk.
+	str bæta-aftast: brk.
+	str bæta-aftast: ['--'] + eigin boundary + brk.
+	str bæta-aftast: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str bæta-aftast: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str bæta-aftast: brk.
+	str bæta-aftast: eigin body.
+	str bæta-aftast: brk.
+	eigin attachments hver: { :id :info
+		>> blob := info data.
+		str bæta-aftast: ['--'] + eigin boundary + brk.
+		str bæta-aftast: ['Content-Type: '] + info mime + brk.
+		str bæta-aftast: ['Content-Transfer-Encoding: base64'] + brk.
+		str bæta-aftast: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str bæta-aftast: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str bæta-aftast: brk.
+		>> max := 76.
+		>> len := blob lengd.
+		>> chunks := (len / max) námunda-upp.
+		{ :i
+			>> chunk := blob afrita frá: i * max lengd: max.
+			str bæta-aftast: chunk + brk.
+		} * chunks.
+		str bæta-aftast: brk.
+		str bæta-aftast: brk.
+	}.
+	str bæta-aftast: ['--'] + eigin boundary + ['--'] + brk. <- str.
+}.

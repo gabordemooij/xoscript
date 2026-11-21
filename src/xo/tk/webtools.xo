@@ -1,0 +1,325 @@
+HTTP-Haýyş gelende: ['HTTP-header:'] et: { :key <- Programma sazlama: key.
+}.
+
+>> HTTP-Header := Obýekt täze.
+
+HTTP-Header gelende: ['täze'] et: { <- özi täze init.
+}.
+
+HTTP-Header gelende: ['init'] et: {
+	öz key := Boş.
+	öz value := Boş.
+}.
+
+HTTP-Header gelende: ['key:value:'] et: { :key :value
+	öz key := key.
+	öz value := value.
+}.
+
+HTTP-Header gelende: ['key'] et: { <- öz key.
+}.
+
+HTTP-Header gelende: ['value'] et: { <- öz value.
+}.
+
+
+HTTP-Header gelende: ['tekst'] et: {
+	>> line := öz key + [': '] + öz value.
+	line çalyş: ['\r'] bilen: [''], çalyş: ['\n'] bilen: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Obýekt täze.
+
+Web-Document gelende: ['täze'] et: { <- özi täze init.
+}.
+
+Web-Document gelende: ['init'] et: {
+	öz headers := Sanaw täze.
+	öz sess-id := Boş.
+	öz session-manager := Tempfile-Session täze.
+	öz sessdata := Boş.
+	öz secure := Dogry.
+	öz same-site := ['Strict'].
+	öz headers-out := Ýalňyş.
+	öz request := HTTP-Haýyş täze.
+}.
+
+Web-Document gelende: ['request:'] et: { :request
+	öz request := request.
+}. 
+
+Web-Document gelende: ['secure-session-cookie:'] et: { :secure
+	özi check-headers.
+	öz secure := secure.
+}.
+
+Web-Document gelende: ['same-site-session-cookie:'] et: { :value
+	özi check-headers.
+	>> options := Sanaw täze 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options öz-içine-alýar: value, ýalňyş: {
+		şu-wezipe ýalňyşlyk: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	öz same-site := value.
+}.
+
+Web-Document gelende: ['header:'] et: { :header
+	özi check-headers.
+	öz headers soňuna-goş: header.
+}.
+
+Web-Document gelende: ['clear-headers'] et: {
+	özi check-headers.
+	öz headers := Sanaw täze.
+}.
+
+Web-Document gelende: ['session-manager:'] et: { :manager
+	özi check-headers.
+	öz session-manager := manager.
+}.
+
+Web-Document gelende: ['session-manager'] et: { <- öz session-manager.
+}.
+
+Web-Document gelende: ['check-headers'] et: {
+	öz headers-out dogry: {
+		şu-wezipe ýalňyşlyk: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document gelende: ['session-start'] et: {
+	özi check-headers.
+	>> request := öz request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Boş? ýalňyş: {
+		(( Nusga täze: ['^[A-Za-z0-9]+\\z'], gabat-gelme: sess-id ) = 0) dogry: {
+			sess-id := Boş.
+		}.
+	}.
+	sess-id Boş? dogry: {
+		sess-id := Seýf token: 30.
+		>> session-header := HTTP-Header täze
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (öz secure ýa: ['Secure'] ýa-da: ['']),
+		SSITE: (öz same-site),
+		XSID: sess-id
+		).
+		öz headers soňuna-goş: session-header.
+	}.
+	öz sessdata := öz session-manager for: sess-id, load. <- öz sessdata. # reference
+}.
+
+Web-Document gelende: ['goto:'] et: { :url
+	özi check-headers.
+	özi clear-headers.
+	öz headers
+	soňuna-goş: (
+		HTTP-Header täze
+		key: ['Status'] value: ['303 See Other']
+	),
+	soňuna-goş: (
+		HTTP-Header täze
+		key: ['Location'] value: url
+	).
+	özi out: ['Redirect'].
+}.
+
+Web-Document gelende: ['session-destroy'] et: {
+	özi check-headers.
+	>> request := öz request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Boş? ýalňyş: {
+		>> session-header := HTTP-Header täze.
+		>> when := Pursat täze ýyl: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (öz secure ýa: ['Secure'] ýa-da: ['']),
+			SSITE: (öz same-site),
+			XSID: sess-id
+		).
+		öz session-manager destroy.
+		öz headers soňuna-goş: session-header.
+	}.
+}.
+
+
+Web-Document gelende: ['template:'] et: { :ýol <- Template täze: (Faýl täze: ýol, oka).
+}.
+
+Web-Document gelende: ['out:type:'] et: { :output :görnüş
+	öz headers-out ýalňyş: {
+		öz sessdata Boş? ýalňyş: {
+			öz session-manager save: öz sessdata.
+		}.
+		öz headers soňuna-goş: (
+			HTTP-Header täze
+			key: ['Content-type'] value: görnüş
+		).
+		öz headers her: { :_ :header
+			Çykyş ýaz: header.
+		}.
+		öz headers-out := Dogry.
+		Çykyş ýaz: ['\r\n'].
+	}.
+	Çykyş ýaz: output.
+}.
+
+Web-Document gelende: ['finish:type:'] et: { :output :görnüş
+	öz headers-out ýalňyş: {
+		öz sessdata Boş? ýalňyş: {
+			öz session-manager save: öz sessdata.
+		}.
+		öz headers soňuna-goş: (
+			HTTP-Header täze
+			key: ['Content-type'] value: görnüş
+		).
+		öz headers soňuna-goş: (
+			HTTP-Header täze
+			key: ['Content-Length'] value: output tekst bytes
+		).
+		öz headers her: { :_ :header
+			Çykyş ýaz: header.
+		}.
+		öz headers-out := Dogry.
+		Çykyş ýaz: ['\r\n'].
+	}.
+	Çykyş ýaz: output.
+}.
+
+Web-Document gelende: ['out:'] et: { :output
+	özi out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document gelende: ['finish:'] et: { :output
+	özi finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document gelende: ['json:'] et: { :output
+	özi out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document gelende: ['not-found:'] et: { :output
+	özi clear-headers header: (
+		HTTP-Header täze key: ['Status'] value: ['404 Not Found']
+	).
+	özi out: output.
+}.
+
+
+# Interface
+
+>> Session := Obýekt täze.
+
+Session gelende: ['täze'] et: { <- özi täze init for: Boş.
+}.
+
+Session gelende: ['for:'] et: { :id
+	öz id := id.
+}.
+
+Session gelende: ['load'] et: {
+	şu-wezipe ýalňyşlyk: ['Not implemented.'].
+}.
+
+Session gelende: ['save:'] et: {
+	şu-wezipe ýalňyşlyk: ['Not implemented.'].
+}.
+
+Session gelende: ['destroy'] et: {
+	şu-wezipe ýalňyşlyk: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session täze.
+
+Tempfile-Session gelende: ['init'] et: {
+	öz pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session gelende: ['path-prefix:'] et: { :str
+	öz pathprefix := str.
+}.
+
+Tempfile-Session gelende: ['file'] et: { <- ( Faýl täze: ( öz pathprefix + öz id + ['.txt'] ) ).
+}.
+
+Tempfile-Session gelende: ['load'] et: {
+	>> file := özi file.
+	file bar ýalňyş: {
+		file ýaz: (Sözlük täze kod).
+	}. <- file oka obýekt.
+}.
+
+Tempfile-Session gelende: ['save:'] et: { :data
+	>> file := özi file.
+	file bar dogry: {
+		file ýaz: data kod.
+	}.
+}.
+
+Tempfile-Session gelende: ['destroy'] et: {
+	>> file := özi file.
+	file bar dogry: {
+		file poz.
+	}.
+}.
+
+
+>> URL := Obýekt täze.
+
+URL gelende: ['init'] et: {
+	öz protocol := ['https://'].
+	öz host := ['localhost'].
+	öz ýol := [''].
+	öz params := [''].
+	öz hash := [''].
+}.
+
+URL gelende: ['täze'] et: { <- özi täze init.
+}.
+
+URL gelende: ['tekst'] et: { <- (
+	öz protocol +
+	öz host +
+	öz ýol +
+	öz params +
+	öz hash ).
+}.
+
+URL gelende: ['protocol:'] et: { :protocol
+	((Sanaw täze: ['http'] ; ['https']) öz-içine-alýar: protocol) dogry: {
+		öz protocol := protocol + ['://'].
+	}, ýalňyş: {
+		şu-wezipe ýalňyşlyk: ['Invalid protocol'].
+	}.
+}.
+
+URL gelende: ['host:'] et: { :host
+	#todo validate according to rfc
+	öz host := host.
+}.
+
+URL gelende: ['path:'] et: { :ýol
+	öz ýol := ['/'] + ýol url-kodla.
+}.
+
+URL gelende: ['params:'] et: { :map
+	>> params := Sanaw täze.
+	map her: { :key :value
+		params soňuna-goş: key tekst url-kodla + ['='] + value tekst url-kodla.
+	}.
+	öz params := ['?'] + ( params birleşdir: ['&'] ).
+}.
+
+URL gelende: ['heş:'] et: { :hash
+	öz hash := ['#'] + hash url-kodla.
+}.
+

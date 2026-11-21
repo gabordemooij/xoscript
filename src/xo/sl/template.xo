@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objekt nov.
+
+Template ob: ['nov'] izvedi: { <- sebe nov content: [''].
+}.
+
+Template ob: ['content:'] izvedi: { :content
+	svoj content := content. 
+}.
+
+Template ob: ['nov:'] izvedi: { :content <- sebe nov content: content.
+}.
+
+Template ob: ['cut:'] izvedi: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := svoj content razdeli: startmarker.
+	>> prefix := parts prvi.
+	>> parts2 := parts zadnji razdeli: endmarker.
+	>> suffix := parts2 zadnji.
+	>> part := parts2 prvi.
+	>> rest := prefix + suffix.
+	svoj content := rest. <- Template nov: part.
+	
+}.
+
+Template ob: ['kopiraj'] izvedi: { <- sebe nov: sebe besedilo kopiraj.
+}.
+	
+Template ob: ['paste:at:'] izvedi: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	svoj content zamenjaj: pastemarker z: ( snippet besedilo + pastemarker ).
+}.
+
+Template ob: ['nastavi:vrednost:'] izvedi: { :slot :value
+	svoj content zamenjaj: ['<!-- slot:'] + slot + [' -->'] z: ( Server html-kodiraj: value ).
+}.
+
+Template ob: ['set:html:'] izvedi: { :slot :html
+	svoj content zamenjaj: ['<!-- slot:'] + slot + [' -->'] z: html.
+}.
+
+Template ob: ['odgovori:in:'] izvedi: { :slot :value
+	sebe nastavi: (slot od: 0 dolžina: (slot dolžina - 1)) vrednost: value.
+}.
+
+Template ob: ['nl2br'] izvedi: {
+	svoj content zamenjaj: ['\n'] z: ['<br>'].
+}.
+
+Template ob: ['clean'] izvedi: {
+	svoj content :=
+		Vzorec
+		nov: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ujemanje: svoj content
+		izvedi: { <- ['']. }.
+}.
+
+Template ob: ['clean-cuts'] izvedi: {
+	>> items := Seznam nov.
+	Vzorec
+	nov: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ujemanje: svoj content
+	izvedi: { :_ :part
+		items dodaj-na-konec: part ? 1.
+	}.
+	items vsak: { :_ :id
+		svoj content :=
+			Vzorec nov: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ujemanje: svoj content
+			izvedi: { <- ['']. }.
+	 }.
+}.
+
+Template ob: ['clean-space'] izvedi: {
+	svoj content :=
+		Vzorec
+		nov: ['\\s*\\n'],
+		ujemanje: svoj content
+		izvedi: { <- ['\n']. }.
+	svoj content :=
+		Vzorec
+		nov: ['\\n[\\s\\t]+'],
+		ujemanje: svoj content
+		izvedi: { <- ['\n']. }.
+}.
+
+Template ob: ['clean-all'] izvedi: {
+	sebe clean.
+	sebe clean-cuts.
+	sebe clean-space.
+}.
+
+Template ob: ['besedilo'] izvedi: { <- svoj content.
+}.

@@ -1,0 +1,128 @@
+>> Email := Obyekt yangi.
+
+Email kelganda: ['init'] bajar: {
+	oʻzining recipients := Roʻyxat yangi.
+	oʻzining cc := Roʻyxat yangi.
+	oʻzining bcc := Roʻyxat yangi.
+	oʻzining from := Hech.
+	oʻzining from-name := Hech.
+	oʻzining subject := Hech.
+	oʻzining body := Hech.
+}.
+
+Email kelganda: ['yangi'] bajar: { <- oʻzi yangi init.
+}.
+
+Email kelganda: ['to:'] bajar: { :list
+	oʻzining recipients := list.
+}.
+ 
+Email kelganda: ['cc:'] bajar: { :list
+	oʻzining cc := list.
+}.
+
+Email kelganda: ['bcc:'] bajar: { :list
+	oʻzining bcc := list.
+}.
+
+Email kelganda: ['subject:'] bajar: { :subject
+	oʻzining subject := subject.
+}.
+
+Email kelganda: ['from:name:'] bajar: { :from :nom
+	oʻzining from := from.
+	oʻzining from-name := nom.
+}.
+
+Email kelganda: ['body:'] bajar: { :body
+	oʻzining body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email kelganda: ['header:'] bajar: { :line <- line almashtirish: ['\r'] bunga: [''], almashtirish: ['\n'] bunga: [''].
+}.
+
+Email kelganda: ['send'] bajar: {
+	>> f := Fayl tempwrite: oʻzi generate.
+	Dastur tizim: ['sendmail -t < '] + f yoʻl, yangi-qator.
+}.
+
+Email kelganda: ['generate'] bajar: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str oxiriga-qoʻshish: (oʻzi header: ['From: '] + oʻzining from-name + [' <'] + ( oʻzining from ) + ['>']) + brk.
+	str oxiriga-qoʻshish: (oʻzi header: ['To: '] + ( oʻzining recipients birlashtirish: [','] )) + brk.
+	oʻzining cc soni rost-boʻlsa: {
+		str oxiriga-qoʻshish: (oʻzi header: ['Cc: '] + ( oʻzining cc birlashtirish: [','] )) + brk.
+	}.
+	oʻzining bcc soni rost-boʻlsa: {
+		str oxiriga-qoʻshish: (oʻzi header: ['Bcc: '] + ( oʻzining bcc birlashtirish: [','] )) + brk.
+	}.
+	str oxiriga-qoʻshish: (oʻzi header: ['Subject: '] + oʻzining subject) + brk.
+	str oxiriga-qoʻshish: brk.
+	str oxiriga-qoʻshish: oʻzining body.
+	str oxiriga-qoʻshish: brk. <- str.
+}.
+
+>> HTML-Email := Email yangi.
+
+HTML-Email kelganda: ['init'] bajar: {
+	oʻzi init.
+	oʻzining attachments := Roʻyxat yangi.
+	oʻzining boundary := Seyf token: 40.
+}.
+
+HTML-Email kelganda: ['attach:'] bajar: { :file
+	>> id := oʻzining attachments soni.
+	>> blob := file blob.
+	oʻzining attachments oxiriga-qoʻshish: (
+		Lugʻat yangi
+			file: file yoʻl,
+			mime: ['image/'] + (Server mimetype: file yoʻl),
+			data: blob base64-kodlash
+	).
+	blob boʻshatish. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email kelganda: ['generate'] bajar: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str oxiriga-qoʻshish: (oʻzi header: ['From: '] + oʻzining from-name + [' <'] + ( oʻzining from ) + ['>']) + brk.
+	str oxiriga-qoʻshish: (oʻzi header: ['To: '] + ( oʻzining recipients birlashtirish: [','] )) + brk.
+	oʻzining cc soni rost-boʻlsa: {
+		str oxiriga-qoʻshish: (oʻzi header: ['Cc: '] + ( oʻzining cc birlashtirish: [','] )) + brk.
+	}.
+	oʻzining bcc soni rost-boʻlsa: {
+		str oxiriga-qoʻshish: (oʻzi header: ['Bcc: '] + ( oʻzining bcc birlashtirish: [','] )) + brk.
+	}.
+	str oxiriga-qoʻshish: (oʻzi header: ['Subject: '] + oʻzining subject) + brk.
+	str oxiriga-qoʻshish: ['MIME-Version: 1.0'] + brk.
+	str oxiriga-qoʻshish: ['Content-Type: multipart/related; boundary="'] + oʻzining boundary + ['"; type=text/html'] + brk.
+	str oxiriga-qoʻshish: brk.
+	str oxiriga-qoʻshish: ['--'] + oʻzining boundary + brk.
+	str oxiriga-qoʻshish: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str oxiriga-qoʻshish: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str oxiriga-qoʻshish: brk.
+	str oxiriga-qoʻshish: oʻzining body.
+	str oxiriga-qoʻshish: brk.
+	oʻzining attachments har-bir: { :id :info
+		>> blob := info data.
+		str oxiriga-qoʻshish: ['--'] + oʻzining boundary + brk.
+		str oxiriga-qoʻshish: ['Content-Type: '] + info mime + brk.
+		str oxiriga-qoʻshish: ['Content-Transfer-Encoding: base64'] + brk.
+		str oxiriga-qoʻshish: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str oxiriga-qoʻshish: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str oxiriga-qoʻshish: brk.
+		>> max := 76.
+		>> len := blob uzunlik.
+		>> chunks := (len / max) yuqoriga-yaxlitlash.
+		{ :i
+			>> chunk := blob nusxa boshlab: i * max uzunlik: max.
+			str oxiriga-qoʻshish: chunk + brk.
+		} * chunks.
+		str oxiriga-qoʻshish: brk.
+		str oxiriga-qoʻshish: brk.
+	}.
+	str oxiriga-qoʻshish: ['--'] + oʻzining boundary + ['--'] + brk. <- str.
+}.

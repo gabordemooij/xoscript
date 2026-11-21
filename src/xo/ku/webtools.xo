@@ -1,0 +1,325 @@
+Daxwaza-HTTP gava: ['HTTP-header:'] bike: { :key <- Bername mîheng: key.
+}.
+
+>> HTTP-Header := Tişt nû.
+
+HTTP-Header gava: ['nû'] bike: { <- xwe nû init.
+}.
+
+HTTP-Header gava: ['init'] bike: {
+	xweyî key := Tune.
+	xweyî value := Tune.
+}.
+
+HTTP-Header gava: ['key:value:'] bike: { :key :value
+	xweyî key := key.
+	xweyî value := value.
+}.
+
+HTTP-Header gava: ['key'] bike: { <- xweyî key.
+}.
+
+HTTP-Header gava: ['value'] bike: { <- xweyî value.
+}.
+
+
+HTTP-Header gava: ['nivîs'] bike: {
+	>> line := xweyî key + [': '] + xweyî value.
+	line biguherîne: ['\r'] bi: [''], biguherîne: ['\n'] bi: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Tişt nû.
+
+Web-Document gava: ['nû'] bike: { <- xwe nû init.
+}.
+
+Web-Document gava: ['init'] bike: {
+	xweyî headers := Lîste nû.
+	xweyî sess-id := Tune.
+	xweyî session-manager := Tempfile-Session nû.
+	xweyî sessdata := Tune.
+	xweyî secure := Rast.
+	xweyî same-site := ['Strict'].
+	xweyî headers-out := Şaş.
+	xweyî request := Daxwaza-HTTP nû.
+}.
+
+Web-Document gava: ['request:'] bike: { :request
+	xweyî request := request.
+}. 
+
+Web-Document gava: ['secure-session-cookie:'] bike: { :secure
+	xwe check-headers.
+	xweyî secure := secure.
+}.
+
+Web-Document gava: ['same-site-session-cookie:'] bike: { :value
+	xwe check-headers.
+	>> options := Lîste nû 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options dihewîne: value, şaş: {
+		ev-kar şaşî: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	xweyî same-site := value.
+}.
+
+Web-Document gava: ['header:'] bike: { :header
+	xwe check-headers.
+	xweyî headers li-dawiyê-zêde-bike: header.
+}.
+
+Web-Document gava: ['clear-headers'] bike: {
+	xwe check-headers.
+	xweyî headers := Lîste nû.
+}.
+
+Web-Document gava: ['session-manager:'] bike: { :manager
+	xwe check-headers.
+	xweyî session-manager := manager.
+}.
+
+Web-Document gava: ['session-manager'] bike: { <- xweyî session-manager.
+}.
+
+Web-Document gava: ['check-headers'] bike: {
+	xweyî headers-out rast: {
+		ev-kar şaşî: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document gava: ['session-start'] bike: {
+	xwe check-headers.
+	>> request := xweyî request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Tune? şaş: {
+		(( Qalib nû: ['^[A-Za-z0-9]+\\z'], lihevhatin: sess-id ) = 0) rast: {
+			sess-id := Tune.
+		}.
+	}.
+	sess-id Tune? rast: {
+		sess-id := Qasa token: 30.
+		>> session-header := HTTP-Header nû
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (xweyî secure ev: ['Secure'] an-ew: ['']),
+		SSITE: (xweyî same-site),
+		XSID: sess-id
+		).
+		xweyî headers li-dawiyê-zêde-bike: session-header.
+	}.
+	xweyî sessdata := xweyî session-manager for: sess-id, load. <- xweyî sessdata. # reference
+}.
+
+Web-Document gava: ['goto:'] bike: { :url
+	xwe check-headers.
+	xwe clear-headers.
+	xweyî headers
+	li-dawiyê-zêde-bike: (
+		HTTP-Header nû
+		key: ['Status'] value: ['303 See Other']
+	),
+	li-dawiyê-zêde-bike: (
+		HTTP-Header nû
+		key: ['Location'] value: url
+	).
+	xwe out: ['Redirect'].
+}.
+
+Web-Document gava: ['session-destroy'] bike: {
+	xwe check-headers.
+	>> request := xweyî request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Tune? şaş: {
+		>> session-header := HTTP-Header nû.
+		>> when := Kêlî nû sal: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (xweyî secure ev: ['Secure'] an-ew: ['']),
+			SSITE: (xweyî same-site),
+			XSID: sess-id
+		).
+		xweyî session-manager destroy.
+		xweyî headers li-dawiyê-zêde-bike: session-header.
+	}.
+}.
+
+
+Web-Document gava: ['template:'] bike: { :riya-pelê <- Template nû: (Pel nû: riya-pelê, bixwîne).
+}.
+
+Web-Document gava: ['out:type:'] bike: { :output :cure
+	xweyî headers-out şaş: {
+		xweyî sessdata Tune? şaş: {
+			xweyî session-manager save: xweyî sessdata.
+		}.
+		xweyî headers li-dawiyê-zêde-bike: (
+			HTTP-Header nû
+			key: ['Content-type'] value: cure
+		).
+		xweyî headers her-yek: { :_ :header
+			Derketin binivîse: header.
+		}.
+		xweyî headers-out := Rast.
+		Derketin binivîse: ['\r\n'].
+	}.
+	Derketin binivîse: output.
+}.
+
+Web-Document gava: ['finish:type:'] bike: { :output :cure
+	xweyî headers-out şaş: {
+		xweyî sessdata Tune? şaş: {
+			xweyî session-manager save: xweyî sessdata.
+		}.
+		xweyî headers li-dawiyê-zêde-bike: (
+			HTTP-Header nû
+			key: ['Content-type'] value: cure
+		).
+		xweyî headers li-dawiyê-zêde-bike: (
+			HTTP-Header nû
+			key: ['Content-Length'] value: output nivîs bytes
+		).
+		xweyî headers her-yek: { :_ :header
+			Derketin binivîse: header.
+		}.
+		xweyî headers-out := Rast.
+		Derketin binivîse: ['\r\n'].
+	}.
+	Derketin binivîse: output.
+}.
+
+Web-Document gava: ['out:'] bike: { :output
+	xwe out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document gava: ['finish:'] bike: { :output
+	xwe finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document gava: ['json:'] bike: { :output
+	xwe out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document gava: ['not-found:'] bike: { :output
+	xwe clear-headers header: (
+		HTTP-Header nû key: ['Status'] value: ['404 Not Found']
+	).
+	xwe out: output.
+}.
+
+
+# Interface
+
+>> Session := Tişt nû.
+
+Session gava: ['nû'] bike: { <- xwe nû init for: Tune.
+}.
+
+Session gava: ['for:'] bike: { :id
+	xweyî id := id.
+}.
+
+Session gava: ['load'] bike: {
+	ev-kar şaşî: ['Not implemented.'].
+}.
+
+Session gava: ['save:'] bike: {
+	ev-kar şaşî: ['Not implemented.'].
+}.
+
+Session gava: ['destroy'] bike: {
+	ev-kar şaşî: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session nû.
+
+Tempfile-Session gava: ['init'] bike: {
+	xweyî pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session gava: ['path-prefix:'] bike: { :str
+	xweyî pathprefix := str.
+}.
+
+Tempfile-Session gava: ['file'] bike: { <- ( Pel nû: ( xweyî pathprefix + xweyî id + ['.txt'] ) ).
+}.
+
+Tempfile-Session gava: ['load'] bike: {
+	>> file := xwe file.
+	file heye şaş: {
+		file binivîse: (Ferheng nû kod).
+	}. <- file bixwîne tişt.
+}.
+
+Tempfile-Session gava: ['save:'] bike: { :data
+	>> file := xwe file.
+	file heye rast: {
+		file binivîse: data kod.
+	}.
+}.
+
+Tempfile-Session gava: ['destroy'] bike: {
+	>> file := xwe file.
+	file heye rast: {
+		file jê-bibe.
+	}.
+}.
+
+
+>> URL := Tişt nû.
+
+URL gava: ['init'] bike: {
+	xweyî protocol := ['https://'].
+	xweyî mêvandar := ['localhost'].
+	xweyî riya-pelê := [''].
+	xweyî params := [''].
+	xweyî hash := [''].
+}.
+
+URL gava: ['nû'] bike: { <- xwe nû init.
+}.
+
+URL gava: ['nivîs'] bike: { <- (
+	xweyî protocol +
+	xweyî mêvandar +
+	xweyî riya-pelê +
+	xweyî params +
+	xweyî hash ).
+}.
+
+URL gava: ['protocol:'] bike: { :protocol
+	((Lîste nû: ['http'] ; ['https']) dihewîne: protocol) rast: {
+		xweyî protocol := protocol + ['://'].
+	}, şaş: {
+		ev-kar şaşî: ['Invalid protocol'].
+	}.
+}.
+
+URL gava: ['mêvandar:'] bike: { :mêvandar
+	#todo validate according to rfc
+	xweyî mêvandar := mêvandar.
+}.
+
+URL gava: ['path:'] bike: { :riya-pelê
+	xweyî riya-pelê := ['/'] + riya-pelê url-kod-bike.
+}.
+
+URL gava: ['params:'] bike: { :map
+	>> params := Lîste nû.
+	map her-yek: { :key :value
+		params li-dawiyê-zêde-bike: key nivîs url-kod-bike + ['='] + value nivîs url-kod-bike.
+	}.
+	xweyî params := ['?'] + ( params bigihîne-hev: ['&'] ).
+}.
+
+URL gava: ['haş:'] bike: { :hash
+	xweyî hash := ['#'] + hash url-kod-bike.
+}.
+

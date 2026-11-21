@@ -1,0 +1,128 @@
+>> Email := Objekt ny.
+
+Email vid: ['init'] gör: {
+	egen recipients := Lista ny.
+	egen cc := Lista ny.
+	egen bcc := Lista ny.
+	egen from := Inget.
+	egen from-name := Inget.
+	egen subject := Inget.
+	egen body := Inget.
+}.
+
+Email vid: ['ny'] gör: { <- själv ny init.
+}.
+
+Email vid: ['to:'] gör: { :list
+	egen recipients := list.
+}.
+ 
+Email vid: ['cc:'] gör: { :list
+	egen cc := list.
+}.
+
+Email vid: ['bcc:'] gör: { :list
+	egen bcc := list.
+}.
+
+Email vid: ['subject:'] gör: { :subject
+	egen subject := subject.
+}.
+
+Email vid: ['from:name:'] gör: { :from :namn
+	egen from := from.
+	egen from-name := namn.
+}.
+
+Email vid: ['body:'] gör: { :body
+	egen body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email vid: ['header:'] gör: { :line <- line ersätt: ['\r'] med: [''], ersätt: ['\n'] med: [''].
+}.
+
+Email vid: ['send'] gör: {
+	>> f := Fil tempwrite: själv generate.
+	Program system: ['sendmail -t < '] + f sökväg, stop.
+}.
+
+Email vid: ['generate'] gör: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str lägg-till-sist: (själv header: ['From: '] + egen from-name + [' <'] + ( egen from ) + ['>']) + brk.
+	str lägg-till-sist: (själv header: ['To: '] + ( egen recipients sammanfoga: [','] )) + brk.
+	egen cc antal sann: {
+		str lägg-till-sist: (själv header: ['Cc: '] + ( egen cc sammanfoga: [','] )) + brk.
+	}.
+	egen bcc antal sann: {
+		str lägg-till-sist: (själv header: ['Bcc: '] + ( egen bcc sammanfoga: [','] )) + brk.
+	}.
+	str lägg-till-sist: (själv header: ['Subject: '] + egen subject) + brk.
+	str lägg-till-sist: brk.
+	str lägg-till-sist: egen body.
+	str lägg-till-sist: brk. <- str.
+}.
+
+>> HTML-Email := Email ny.
+
+HTML-Email vid: ['init'] gör: {
+	själv init.
+	egen attachments := Lista ny.
+	egen boundary := Valv token: 40.
+}.
+
+HTML-Email vid: ['attach:'] gör: { :file
+	>> id := egen attachments antal.
+	>> blob := file blob.
+	egen attachments lägg-till-sist: (
+		Ordbok ny
+			file: file sökväg,
+			mime: ['image/'] + (Server mimetype: file sökväg),
+			data: blob base64-koda
+	).
+	blob frigör. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email vid: ['generate'] gör: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str lägg-till-sist: (själv header: ['From: '] + egen from-name + [' <'] + ( egen from ) + ['>']) + brk.
+	str lägg-till-sist: (själv header: ['To: '] + ( egen recipients sammanfoga: [','] )) + brk.
+	egen cc antal sann: {
+		str lägg-till-sist: (själv header: ['Cc: '] + ( egen cc sammanfoga: [','] )) + brk.
+	}.
+	egen bcc antal sann: {
+		str lägg-till-sist: (själv header: ['Bcc: '] + ( egen bcc sammanfoga: [','] )) + brk.
+	}.
+	str lägg-till-sist: (själv header: ['Subject: '] + egen subject) + brk.
+	str lägg-till-sist: ['MIME-Version: 1.0'] + brk.
+	str lägg-till-sist: ['Content-Type: multipart/related; boundary="'] + egen boundary + ['"; type=text/html'] + brk.
+	str lägg-till-sist: brk.
+	str lägg-till-sist: ['--'] + egen boundary + brk.
+	str lägg-till-sist: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str lägg-till-sist: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str lägg-till-sist: brk.
+	str lägg-till-sist: egen body.
+	str lägg-till-sist: brk.
+	egen attachments varje: { :id :info
+		>> blob := info data.
+		str lägg-till-sist: ['--'] + egen boundary + brk.
+		str lägg-till-sist: ['Content-Type: '] + info mime + brk.
+		str lägg-till-sist: ['Content-Transfer-Encoding: base64'] + brk.
+		str lägg-till-sist: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str lägg-till-sist: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str lägg-till-sist: brk.
+		>> max := 76.
+		>> len := blob längd.
+		>> chunks := (len / max) avrunda-uppåt.
+		{ :i
+			>> chunk := blob kopiera från: i * max längd: max.
+			str lägg-till-sist: chunk + brk.
+		} * chunks.
+		str lägg-till-sist: brk.
+		str lägg-till-sist: brk.
+	}.
+	str lägg-till-sist: ['--'] + egen boundary + ['--'] + brk. <- str.
+}.

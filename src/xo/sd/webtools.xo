@@ -1,0 +1,325 @@
+درخواست-HTTP جڏهن: ['HTTP-header:'] ڪريو: { :key <- پروگرام سيٽنگ: key.
+}.
+
+>> HTTP-Header := شيء نئون.
+
+HTTP-Header جڏهن: ['نئون'] ڪريو: { <- پاڻ نئون init.
+}.
+
+HTTP-Header جڏهن: ['init'] ڪريو: {
+	پنهنجو key := خالي.
+	پنهنجو value := خالي.
+}.
+
+HTTP-Header جڏهن: ['key:value:'] ڪريو: { :key :value
+	پنهنجو key := key.
+	پنهنجو value := value.
+}.
+
+HTTP-Header جڏهن: ['key'] ڪريو: { <- پنهنجو key.
+}.
+
+HTTP-Header جڏهن: ['value'] ڪريو: { <- پنهنجو value.
+}.
+
+
+HTTP-Header جڏهن: ['متن-طور'] ڪريو: {
+	>> line := پنهنجو key + [': '] + پنهنجو value.
+	line مٽايو: ['\r'] سان: [''], مٽايو: ['\n'] سان: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := شيء نئون.
+
+Web-Document جڏهن: ['نئون'] ڪريو: { <- پاڻ نئون init.
+}.
+
+Web-Document جڏهن: ['init'] ڪريو: {
+	پنهنجو headers := لسٽ نئون.
+	پنهنجو sess-id := خالي.
+	پنهنجو session-manager := Tempfile-Session نئون.
+	پنهنجو sessdata := خالي.
+	پنهنجو secure := سچ.
+	پنهنجو same-site := ['Strict'].
+	پنهنجو headers-out := ڪوڙ.
+	پنهنجو request := درخواست-HTTP نئون.
+}.
+
+Web-Document جڏهن: ['request:'] ڪريو: { :request
+	پنهنجو request := request.
+}. 
+
+Web-Document جڏهن: ['secure-session-cookie:'] ڪريو: { :secure
+	پاڻ check-headers.
+	پنهنجو secure := secure.
+}.
+
+Web-Document جڏهن: ['same-site-session-cookie:'] ڪريو: { :value
+	پاڻ check-headers.
+	>> options := لسٽ نئون 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options شامل-آهي: value, جيڪڏهن-ڪوڙ: {
+		هي-ڪم غلطي: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	پنهنجو same-site := value.
+}.
+
+Web-Document جڏهن: ['header:'] ڪريو: { :header
+	پاڻ check-headers.
+	پنهنجو headers آخر-۾-جوڙيو: header.
+}.
+
+Web-Document جڏهن: ['clear-headers'] ڪريو: {
+	پاڻ check-headers.
+	پنهنجو headers := لسٽ نئون.
+}.
+
+Web-Document جڏهن: ['session-manager:'] ڪريو: { :manager
+	پاڻ check-headers.
+	پنهنجو session-manager := manager.
+}.
+
+Web-Document جڏهن: ['session-manager'] ڪريو: { <- پنهنجو session-manager.
+}.
+
+Web-Document جڏهن: ['check-headers'] ڪريو: {
+	پنهنجو headers-out جيڪڏهن-سچ: {
+		هي-ڪم غلطي: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document جڏهن: ['session-start'] ڪريو: {
+	پاڻ check-headers.
+	>> request := پنهنجو request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id خالي? جيڪڏهن-ڪوڙ: {
+		(( نمونو-ڳولا نئون: ['^[A-Za-z0-9]+\\z'], ميلاپ: sess-id ) = 0) جيڪڏهن-سچ: {
+			sess-id := خالي.
+		}.
+	}.
+	sess-id خالي? جيڪڏهن-سچ: {
+		sess-id := ٽجوڙي ٽوڪن: 30.
+		>> session-header := HTTP-Header نئون
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (پنهنجو secure هي: ['Secure'] يا-هو: ['']),
+		SSITE: (پنهنجو same-site),
+		XSID: sess-id
+		).
+		پنهنجو headers آخر-۾-جوڙيو: session-header.
+	}.
+	پنهنجو sessdata := پنهنجو session-manager for: sess-id, load. <- پنهنجو sessdata. # reference
+}.
+
+Web-Document جڏهن: ['goto:'] ڪريو: { :url
+	پاڻ check-headers.
+	پاڻ clear-headers.
+	پنهنجو headers
+	آخر-۾-جوڙيو: (
+		HTTP-Header نئون
+		key: ['Status'] value: ['303 See Other']
+	),
+	آخر-۾-جوڙيو: (
+		HTTP-Header نئون
+		key: ['Location'] value: url
+	).
+	پاڻ out: ['Redirect'].
+}.
+
+Web-Document جڏهن: ['session-destroy'] ڪريو: {
+	پاڻ check-headers.
+	>> request := پنهنجو request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id خالي? جيڪڏهن-ڪوڙ: {
+		>> session-header := HTTP-Header نئون.
+		>> when := لمحو نئون سال: 1970, فارميٽ-۾: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (پنهنجو secure هي: ['Secure'] يا-هو: ['']),
+			SSITE: (پنهنجو same-site),
+			XSID: sess-id
+		).
+		پنهنجو session-manager destroy.
+		پنهنجو headers آخر-۾-جوڙيو: session-header.
+	}.
+}.
+
+
+Web-Document جڏهن: ['template:'] ڪريو: { :فائل-رستو <- Template نئون: (فائل نئون: فائل-رستو, پڙهو).
+}.
+
+Web-Document جڏهن: ['out:type:'] ڪريو: { :output :قسم
+	پنهنجو headers-out جيڪڏهن-ڪوڙ: {
+		پنهنجو sessdata خالي? جيڪڏهن-ڪوڙ: {
+			پنهنجو session-manager save: پنهنجو sessdata.
+		}.
+		پنهنجو headers آخر-۾-جوڙيو: (
+			HTTP-Header نئون
+			key: ['Content-type'] value: قسم
+		).
+		پنهنجو headers هر-هڪ: { :_ :header
+			آئوٽ-پٽ لکو: header.
+		}.
+		پنهنجو headers-out := سچ.
+		آئوٽ-پٽ لکو: ['\r\n'].
+	}.
+	آئوٽ-پٽ لکو: output.
+}.
+
+Web-Document جڏهن: ['finish:type:'] ڪريو: { :output :قسم
+	پنهنجو headers-out جيڪڏهن-ڪوڙ: {
+		پنهنجو sessdata خالي? جيڪڏهن-ڪوڙ: {
+			پنهنجو session-manager save: پنهنجو sessdata.
+		}.
+		پنهنجو headers آخر-۾-جوڙيو: (
+			HTTP-Header نئون
+			key: ['Content-type'] value: قسم
+		).
+		پنهنجو headers آخر-۾-جوڙيو: (
+			HTTP-Header نئون
+			key: ['Content-Length'] value: output متن-طور بائيٽس
+		).
+		پنهنجو headers هر-هڪ: { :_ :header
+			آئوٽ-پٽ لکو: header.
+		}.
+		پنهنجو headers-out := سچ.
+		آئوٽ-پٽ لکو: ['\r\n'].
+	}.
+	آئوٽ-پٽ لکو: output.
+}.
+
+Web-Document جڏهن: ['out:'] ڪريو: { :output
+	پاڻ out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document جڏهن: ['finish:'] ڪريو: { :output
+	پاڻ finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document جڏهن: ['json:'] ڪريو: { :output
+	پاڻ out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document جڏهن: ['not-found:'] ڪريو: { :output
+	پاڻ clear-headers header: (
+		HTTP-Header نئون key: ['Status'] value: ['404 Not Found']
+	).
+	پاڻ out: output.
+}.
+
+
+# Interface
+
+>> Session := شيء نئون.
+
+Session جڏهن: ['نئون'] ڪريو: { <- پاڻ نئون init for: خالي.
+}.
+
+Session جڏهن: ['for:'] ڪريو: { :id
+	پنهنجو id := id.
+}.
+
+Session جڏهن: ['load'] ڪريو: {
+	هي-ڪم غلطي: ['Not implemented.'].
+}.
+
+Session جڏهن: ['save:'] ڪريو: {
+	هي-ڪم غلطي: ['Not implemented.'].
+}.
+
+Session جڏهن: ['destroy'] ڪريو: {
+	هي-ڪم غلطي: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session نئون.
+
+Tempfile-Session جڏهن: ['init'] ڪريو: {
+	پنهنجو pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session جڏهن: ['path-prefix:'] ڪريو: { :str
+	پنهنجو pathprefix := str.
+}.
+
+Tempfile-Session جڏهن: ['file'] ڪريو: { <- ( فائل نئون: ( پنهنجو pathprefix + پنهنجو id + ['.txt'] ) ).
+}.
+
+Tempfile-Session جڏهن: ['load'] ڪريو: {
+	>> file := پاڻ file.
+	file موجود جيڪڏهن-ڪوڙ: {
+		file لکو: (لغت نئون ڪوڊ).
+	}. <- file پڙهو شيء-طور.
+}.
+
+Tempfile-Session جڏهن: ['save:'] ڪريو: { :data
+	>> file := پاڻ file.
+	file موجود جيڪڏهن-سچ: {
+		file لکو: data ڪوڊ.
+	}.
+}.
+
+Tempfile-Session جڏهن: ['destroy'] ڪريو: {
+	>> file := پاڻ file.
+	file موجود جيڪڏهن-سچ: {
+		file ڊاهيو.
+	}.
+}.
+
+
+>> URL := شيء نئون.
+
+URL جڏهن: ['init'] ڪريو: {
+	پنهنجو protocol := ['https://'].
+	پنهنجو ميزبان := ['localhost'].
+	پنهنجو فائل-رستو := [''].
+	پنهنجو params := [''].
+	پنهنجو hash := [''].
+}.
+
+URL جڏهن: ['نئون'] ڪريو: { <- پاڻ نئون init.
+}.
+
+URL جڏهن: ['متن-طور'] ڪريو: { <- (
+	پنهنجو protocol +
+	پنهنجو ميزبان +
+	پنهنجو فائل-رستو +
+	پنهنجو params +
+	پنهنجو hash ).
+}.
+
+URL جڏهن: ['protocol:'] ڪريو: { :protocol
+	((لسٽ نئون: ['http'] ; ['https']) شامل-آهي: protocol) جيڪڏهن-سچ: {
+		پنهنجو protocol := protocol + ['://'].
+	}, جيڪڏهن-ڪوڙ: {
+		هي-ڪم غلطي: ['Invalid protocol'].
+	}.
+}.
+
+URL جڏهن: ['ميزبان:'] ڪريو: { :ميزبان
+	#todo validate according to rfc
+	پنهنجو ميزبان := ميزبان.
+}.
+
+URL جڏهن: ['path:'] ڪريو: { :فائل-رستو
+	پنهنجو فائل-رستو := ['/'] + فائل-رستو url-انڪوڊ.
+}.
+
+URL جڏهن: ['params:'] ڪريو: { :map
+	>> params := لسٽ نئون.
+	map هر-هڪ: { :key :value
+		params آخر-۾-جوڙيو: key متن-طور url-انڪوڊ + ['='] + value متن-طور url-انڪوڊ.
+	}.
+	پنهنجو params := ['?'] + ( params ملايو: ['&'] ).
+}.
+
+URL جڏهن: ['هيش:'] ڪريو: { :hash
+	پنهنجو hash := ['#'] + hash url-انڪوڊ.
+}.
+

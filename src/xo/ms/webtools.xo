@@ -1,0 +1,325 @@
+Permintaan-HTTP apabila: ['HTTP-header:'] lakukan: { :key <- Atur-cara tetapan: key.
+}.
+
+>> HTTP-Header := Objek baharu.
+
+HTTP-Header apabila: ['baharu'] lakukan: { <- diri baharu init.
+}.
+
+HTTP-Header apabila: ['init'] lakukan: {
+	milik key := Tiada.
+	milik value := Tiada.
+}.
+
+HTTP-Header apabila: ['key:value:'] lakukan: { :key :value
+	milik key := key.
+	milik value := value.
+}.
+
+HTTP-Header apabila: ['key'] lakukan: { <- milik key.
+}.
+
+HTTP-Header apabila: ['value'] lakukan: { <- milik value.
+}.
+
+
+HTTP-Header apabila: ['teks'] lakukan: {
+	>> line := milik key + [': '] + milik value.
+	line ganti: ['\r'] dengan: [''], ganti: ['\n'] dengan: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Objek baharu.
+
+Web-Document apabila: ['baharu'] lakukan: { <- diri baharu init.
+}.
+
+Web-Document apabila: ['init'] lakukan: {
+	milik headers := Senarai baharu.
+	milik sess-id := Tiada.
+	milik session-manager := Tempfile-Session baharu.
+	milik sessdata := Tiada.
+	milik secure := Benar.
+	milik same-site := ['Strict'].
+	milik headers-out := Palsu.
+	milik request := Permintaan-HTTP baharu.
+}.
+
+Web-Document apabila: ['request:'] lakukan: { :request
+	milik request := request.
+}. 
+
+Web-Document apabila: ['secure-session-cookie:'] lakukan: { :secure
+	diri check-headers.
+	milik secure := secure.
+}.
+
+Web-Document apabila: ['same-site-session-cookie:'] lakukan: { :value
+	diri check-headers.
+	>> options := Senarai baharu 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options mengandungi: value, palsu: {
+		tugas-ini ralat: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	milik same-site := value.
+}.
+
+Web-Document apabila: ['header:'] lakukan: { :header
+	diri check-headers.
+	milik headers tambah-di-hujung: header.
+}.
+
+Web-Document apabila: ['clear-headers'] lakukan: {
+	diri check-headers.
+	milik headers := Senarai baharu.
+}.
+
+Web-Document apabila: ['session-manager:'] lakukan: { :manager
+	diri check-headers.
+	milik session-manager := manager.
+}.
+
+Web-Document apabila: ['session-manager'] lakukan: { <- milik session-manager.
+}.
+
+Web-Document apabila: ['check-headers'] lakukan: {
+	milik headers-out benar: {
+		tugas-ini ralat: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document apabila: ['session-start'] lakukan: {
+	diri check-headers.
+	>> request := milik request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Tiada? palsu: {
+		(( Corak baharu: ['^[A-Za-z0-9]+\\z'], padan: sess-id ) = 0) benar: {
+			sess-id := Tiada.
+		}.
+	}.
+	sess-id Tiada? benar: {
+		sess-id := Peti-besi token: 30.
+		>> session-header := HTTP-Header baharu
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (milik secure pilih: ['Secure'] atau: ['']),
+		SSITE: (milik same-site),
+		XSID: sess-id
+		).
+		milik headers tambah-di-hujung: session-header.
+	}.
+	milik sessdata := milik session-manager for: sess-id, load. <- milik sessdata. # reference
+}.
+
+Web-Document apabila: ['goto:'] lakukan: { :url
+	diri check-headers.
+	diri clear-headers.
+	milik headers
+	tambah-di-hujung: (
+		HTTP-Header baharu
+		key: ['Status'] value: ['303 See Other']
+	),
+	tambah-di-hujung: (
+		HTTP-Header baharu
+		key: ['Location'] value: url
+	).
+	diri out: ['Redirect'].
+}.
+
+Web-Document apabila: ['session-destroy'] lakukan: {
+	diri check-headers.
+	>> request := milik request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Tiada? palsu: {
+		>> session-header := HTTP-Header baharu.
+		>> when := Detik baharu tahun: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (milik secure pilih: ['Secure'] atau: ['']),
+			SSITE: (milik same-site),
+			XSID: sess-id
+		).
+		milik session-manager destroy.
+		milik headers tambah-di-hujung: session-header.
+	}.
+}.
+
+
+Web-Document apabila: ['template:'] lakukan: { :laluan <- Template baharu: (Fail baharu: laluan, baca).
+}.
+
+Web-Document apabila: ['out:type:'] lakukan: { :output :jenis
+	milik headers-out palsu: {
+		milik sessdata Tiada? palsu: {
+			milik session-manager save: milik sessdata.
+		}.
+		milik headers tambah-di-hujung: (
+			HTTP-Header baharu
+			key: ['Content-type'] value: jenis
+		).
+		milik headers setiap: { :_ :header
+			Keluaran tulis: header.
+		}.
+		milik headers-out := Benar.
+		Keluaran tulis: ['\r\n'].
+	}.
+	Keluaran tulis: output.
+}.
+
+Web-Document apabila: ['finish:type:'] lakukan: { :output :jenis
+	milik headers-out palsu: {
+		milik sessdata Tiada? palsu: {
+			milik session-manager save: milik sessdata.
+		}.
+		milik headers tambah-di-hujung: (
+			HTTP-Header baharu
+			key: ['Content-type'] value: jenis
+		).
+		milik headers tambah-di-hujung: (
+			HTTP-Header baharu
+			key: ['Content-Length'] value: output teks bytes
+		).
+		milik headers setiap: { :_ :header
+			Keluaran tulis: header.
+		}.
+		milik headers-out := Benar.
+		Keluaran tulis: ['\r\n'].
+	}.
+	Keluaran tulis: output.
+}.
+
+Web-Document apabila: ['out:'] lakukan: { :output
+	diri out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document apabila: ['finish:'] lakukan: { :output
+	diri finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document apabila: ['json:'] lakukan: { :output
+	diri out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document apabila: ['not-found:'] lakukan: { :output
+	diri clear-headers header: (
+		HTTP-Header baharu key: ['Status'] value: ['404 Not Found']
+	).
+	diri out: output.
+}.
+
+
+# Interface
+
+>> Session := Objek baharu.
+
+Session apabila: ['baharu'] lakukan: { <- diri baharu init for: Tiada.
+}.
+
+Session apabila: ['for:'] lakukan: { :id
+	milik id := id.
+}.
+
+Session apabila: ['load'] lakukan: {
+	tugas-ini ralat: ['Not implemented.'].
+}.
+
+Session apabila: ['save:'] lakukan: {
+	tugas-ini ralat: ['Not implemented.'].
+}.
+
+Session apabila: ['destroy'] lakukan: {
+	tugas-ini ralat: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session baharu.
+
+Tempfile-Session apabila: ['init'] lakukan: {
+	milik pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session apabila: ['path-prefix:'] lakukan: { :str
+	milik pathprefix := str.
+}.
+
+Tempfile-Session apabila: ['file'] lakukan: { <- ( Fail baharu: ( milik pathprefix + milik id + ['.txt'] ) ).
+}.
+
+Tempfile-Session apabila: ['load'] lakukan: {
+	>> file := diri file.
+	file wujud palsu: {
+		file tulis: (Kamus baharu kod).
+	}. <- file baca objek.
+}.
+
+Tempfile-Session apabila: ['save:'] lakukan: { :data
+	>> file := diri file.
+	file wujud benar: {
+		file tulis: data kod.
+	}.
+}.
+
+Tempfile-Session apabila: ['destroy'] lakukan: {
+	>> file := diri file.
+	file wujud benar: {
+		file padam.
+	}.
+}.
+
+
+>> URL := Objek baharu.
+
+URL apabila: ['init'] lakukan: {
+	milik protocol := ['https://'].
+	milik hos := ['localhost'].
+	milik laluan := [''].
+	milik params := [''].
+	milik hash := [''].
+}.
+
+URL apabila: ['baharu'] lakukan: { <- diri baharu init.
+}.
+
+URL apabila: ['teks'] lakukan: { <- (
+	milik protocol +
+	milik hos +
+	milik laluan +
+	milik params +
+	milik hash ).
+}.
+
+URL apabila: ['protocol:'] lakukan: { :protocol
+	((Senarai baharu: ['http'] ; ['https']) mengandungi: protocol) benar: {
+		milik protocol := protocol + ['://'].
+	}, palsu: {
+		tugas-ini ralat: ['Invalid protocol'].
+	}.
+}.
+
+URL apabila: ['hos:'] lakukan: { :hos
+	#todo validate according to rfc
+	milik hos := hos.
+}.
+
+URL apabila: ['path:'] lakukan: { :laluan
+	milik laluan := ['/'] + laluan url-kodkan.
+}.
+
+URL apabila: ['params:'] lakukan: { :map
+	>> params := Senarai baharu.
+	map setiap: { :key :value
+		params tambah-di-hujung: key teks url-kodkan + ['='] + value teks url-kodkan.
+	}.
+	milik params := ['?'] + ( params gabungkan: ['&'] ).
+}.
+
+URL apabila: ['cincang:'] lakukan: { :hash
+	milik hash := ['#'] + hash url-kodkan.
+}.
+

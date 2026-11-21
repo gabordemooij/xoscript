@@ -1,0 +1,128 @@
+>> Email := Butang bag-o.
+
+Email kon: ['init'] buhata: {
+	akoa recipients := Lista bag-o.
+	akoa cc := Lista bag-o.
+	akoa bcc := Lista bag-o.
+	akoa from := Wala.
+	akoa from-name := Wala.
+	akoa subject := Wala.
+	akoa body := Wala.
+}.
+
+Email kon: ['bag-o'] buhata: { <- kaugalingon bag-o init.
+}.
+
+Email kon: ['to:'] buhata: { :list
+	akoa recipients := list.
+}.
+ 
+Email kon: ['cc:'] buhata: { :list
+	akoa cc := list.
+}.
+
+Email kon: ['bcc:'] buhata: { :list
+	akoa bcc := list.
+}.
+
+Email kon: ['subject:'] buhata: { :subject
+	akoa subject := subject.
+}.
+
+Email kon: ['from:name:'] buhata: { :from :ngalan
+	akoa from := from.
+	akoa from-name := ngalan.
+}.
+
+Email kon: ['body:'] buhata: { :body
+	akoa body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email kon: ['header:'] buhata: { :line <- line ilisi: ['\r'] ug: [''], ilisi: ['\n'] ug: [''].
+}.
+
+Email kon: ['send'] buhata: {
+	>> f := Payl tempwrite: kaugalingon generate.
+	Programa sistema: ['sendmail -t < '] + f dalan-sa-payl, bag-ong-linya.
+}.
+
+Email kon: ['generate'] buhata: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str idugang-sa-tumoy: (kaugalingon header: ['From: '] + akoa from-name + [' <'] + ( akoa from ) + ['>']) + brk.
+	str idugang-sa-tumoy: (kaugalingon header: ['To: '] + ( akoa recipients hiusaha: [','] )) + brk.
+	akoa cc ihap tinuod: {
+		str idugang-sa-tumoy: (kaugalingon header: ['Cc: '] + ( akoa cc hiusaha: [','] )) + brk.
+	}.
+	akoa bcc ihap tinuod: {
+		str idugang-sa-tumoy: (kaugalingon header: ['Bcc: '] + ( akoa bcc hiusaha: [','] )) + brk.
+	}.
+	str idugang-sa-tumoy: (kaugalingon header: ['Subject: '] + akoa subject) + brk.
+	str idugang-sa-tumoy: brk.
+	str idugang-sa-tumoy: akoa body.
+	str idugang-sa-tumoy: brk. <- str.
+}.
+
+>> HTML-Email := Email bag-o.
+
+HTML-Email kon: ['init'] buhata: {
+	kaugalingon init.
+	akoa attachments := Lista bag-o.
+	akoa boundary := Kaha token: 40.
+}.
+
+HTML-Email kon: ['attach:'] buhata: { :file
+	>> id := akoa attachments ihap.
+	>> blob := file blob.
+	akoa attachments idugang-sa-tumoy: (
+		Diksyonaryo bag-o
+			file: file dalan-sa-payl,
+			mime: ['image/'] + (Server mimetype: file dalan-sa-payl),
+			data: blob base64-i-encode
+	).
+	blob buhii. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email kon: ['generate'] buhata: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str idugang-sa-tumoy: (kaugalingon header: ['From: '] + akoa from-name + [' <'] + ( akoa from ) + ['>']) + brk.
+	str idugang-sa-tumoy: (kaugalingon header: ['To: '] + ( akoa recipients hiusaha: [','] )) + brk.
+	akoa cc ihap tinuod: {
+		str idugang-sa-tumoy: (kaugalingon header: ['Cc: '] + ( akoa cc hiusaha: [','] )) + brk.
+	}.
+	akoa bcc ihap tinuod: {
+		str idugang-sa-tumoy: (kaugalingon header: ['Bcc: '] + ( akoa bcc hiusaha: [','] )) + brk.
+	}.
+	str idugang-sa-tumoy: (kaugalingon header: ['Subject: '] + akoa subject) + brk.
+	str idugang-sa-tumoy: ['MIME-Version: 1.0'] + brk.
+	str idugang-sa-tumoy: ['Content-Type: multipart/related; boundary="'] + akoa boundary + ['"; type=text/html'] + brk.
+	str idugang-sa-tumoy: brk.
+	str idugang-sa-tumoy: ['--'] + akoa boundary + brk.
+	str idugang-sa-tumoy: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str idugang-sa-tumoy: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str idugang-sa-tumoy: brk.
+	str idugang-sa-tumoy: akoa body.
+	str idugang-sa-tumoy: brk.
+	akoa attachments matag: { :id :info
+		>> blob := info data.
+		str idugang-sa-tumoy: ['--'] + akoa boundary + brk.
+		str idugang-sa-tumoy: ['Content-Type: '] + info mime + brk.
+		str idugang-sa-tumoy: ['Content-Transfer-Encoding: base64'] + brk.
+		str idugang-sa-tumoy: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str idugang-sa-tumoy: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str idugang-sa-tumoy: brk.
+		>> max := 76.
+		>> len := blob gitas-on.
+		>> chunks := (len / max) lingina-pataas.
+		{ :i
+			>> chunk := blob kopyaha gikan-sa: i * max gitas-on: max.
+			str idugang-sa-tumoy: chunk + brk.
+		} * chunks.
+		str idugang-sa-tumoy: brk.
+		str idugang-sa-tumoy: brk.
+	}.
+	str idugang-sa-tumoy: ['--'] + akoa boundary + ['--'] + brk. <- str.
+}.

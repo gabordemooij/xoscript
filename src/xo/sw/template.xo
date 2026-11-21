@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Kipengee mpya.
+
+Template ikija: ['mpya'] fanya: { <- binafsi mpya content: [''].
+}.
+
+Template ikija: ['content:'] fanya: { :content
+	yangu content := content. 
+}.
+
+Template ikija: ['mpya:'] fanya: { :content <- binafsi mpya content: content.
+}.
+
+Template ikija: ['cut:'] fanya: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := yangu content gawa: startmarker.
+	>> prefix := parts wa-kwanza.
+	>> parts2 := parts wa-mwisho gawa: endmarker.
+	>> suffix := parts2 wa-mwisho.
+	>> part := parts2 wa-kwanza.
+	>> rest := prefix + suffix.
+	yangu content := rest. <- Template mpya: part.
+	
+}.
+
+Template ikija: ['nakala'] fanya: { <- binafsi mpya: binafsi maandishi nakala.
+}.
+	
+Template ikija: ['paste:at:'] fanya: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	yangu content badilisha: pastemarker kwa: ( snippet maandishi + pastemarker ).
+}.
+
+Template ikija: ['weka:thamani:'] fanya: { :slot :value
+	yangu content badilisha: ['<!-- slot:'] + slot + [' -->'] kwa: ( Server html-simba: value ).
+}.
+
+Template ikija: ['set:html:'] fanya: { :slot :html
+	yangu content badilisha: ['<!-- slot:'] + slot + [' -->'] kwa: html.
+}.
+
+Template ikija: ['jibu:na:'] fanya: { :slot :value
+	binafsi weka: (slot kutoka: 0 urefu: (slot urefu - 1)) thamani: value.
+}.
+
+Template ikija: ['nl2br'] fanya: {
+	yangu content badilisha: ['\n'] kwa: ['<br>'].
+}.
+
+Template ikija: ['clean'] fanya: {
+	yangu content :=
+		Ruwaza
+		mpya: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		linganifu: yangu content
+		fanya: { <- ['']. }.
+}.
+
+Template ikija: ['clean-cuts'] fanya: {
+	>> items := Orodha mpya.
+	Ruwaza
+	mpya: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	linganifu: yangu content
+	fanya: { :_ :part
+		items ongeza-mwishoni: part ? 1.
+	}.
+	items kila: { :_ :id
+		yangu content :=
+			Ruwaza mpya: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			linganifu: yangu content
+			fanya: { <- ['']. }.
+	 }.
+}.
+
+Template ikija: ['clean-space'] fanya: {
+	yangu content :=
+		Ruwaza
+		mpya: ['\\s*\\n'],
+		linganifu: yangu content
+		fanya: { <- ['\n']. }.
+	yangu content :=
+		Ruwaza
+		mpya: ['\\n[\\s\\t]+'],
+		linganifu: yangu content
+		fanya: { <- ['\n']. }.
+}.
+
+Template ikija: ['clean-all'] fanya: {
+	binafsi clean.
+	binafsi clean-cuts.
+	binafsi clean-space.
+}.
+
+Template ikija: ['maandishi'] fanya: { <- yangu content.
+}.

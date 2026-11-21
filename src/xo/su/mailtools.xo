@@ -1,0 +1,128 @@
+>> Email := Obyek anyar.
+
+Email nalika: ['init'] lakukeun: {
+	milik recipients := Daptar anyar.
+	milik cc := Daptar anyar.
+	milik bcc := Daptar anyar.
+	milik from := Kosong.
+	milik from-name := Kosong.
+	milik subject := Kosong.
+	milik body := Kosong.
+}.
+
+Email nalika: ['anyar'] lakukeun: { <- diri anyar init.
+}.
+
+Email nalika: ['to:'] lakukeun: { :list
+	milik recipients := list.
+}.
+ 
+Email nalika: ['cc:'] lakukeun: { :list
+	milik cc := list.
+}.
+
+Email nalika: ['bcc:'] lakukeun: { :list
+	milik bcc := list.
+}.
+
+Email nalika: ['subject:'] lakukeun: { :subject
+	milik subject := subject.
+}.
+
+Email nalika: ['from:name:'] lakukeun: { :from :ngaran
+	milik from := from.
+	milik from-name := ngaran.
+}.
+
+Email nalika: ['body:'] lakukeun: { :body
+	milik body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email nalika: ['header:'] lakukeun: { :line <- line ganti: ['\r'] ku: [''], ganti: ['\n'] ku: [''].
+}.
+
+Email nalika: ['send'] lakukeun: {
+	>> f := Berkas tempwrite: diri generate.
+	Program sistem: ['sendmail -t < '] + f jalur, baris-anyar.
+}.
+
+Email nalika: ['generate'] lakukeun: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tambah-di-tungtung: (diri header: ['From: '] + milik from-name + [' <'] + ( milik from ) + ['>']) + brk.
+	str tambah-di-tungtung: (diri header: ['To: '] + ( milik recipients gabungkeun: [','] )) + brk.
+	milik cc jumlah bener: {
+		str tambah-di-tungtung: (diri header: ['Cc: '] + ( milik cc gabungkeun: [','] )) + brk.
+	}.
+	milik bcc jumlah bener: {
+		str tambah-di-tungtung: (diri header: ['Bcc: '] + ( milik bcc gabungkeun: [','] )) + brk.
+	}.
+	str tambah-di-tungtung: (diri header: ['Subject: '] + milik subject) + brk.
+	str tambah-di-tungtung: brk.
+	str tambah-di-tungtung: milik body.
+	str tambah-di-tungtung: brk. <- str.
+}.
+
+>> HTML-Email := Email anyar.
+
+HTML-Email nalika: ['init'] lakukeun: {
+	diri init.
+	milik attachments := Daptar anyar.
+	milik boundary := Brankas token: 40.
+}.
+
+HTML-Email nalika: ['attach:'] lakukeun: { :file
+	>> id := milik attachments jumlah.
+	>> blob := file blob.
+	milik attachments tambah-di-tungtung: (
+		Kamus anyar
+			file: file jalur,
+			mime: ['image/'] + (Server mimetype: file jalur),
+			data: blob base64-énkode
+	).
+	blob bébaskeun. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email nalika: ['generate'] lakukeun: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tambah-di-tungtung: (diri header: ['From: '] + milik from-name + [' <'] + ( milik from ) + ['>']) + brk.
+	str tambah-di-tungtung: (diri header: ['To: '] + ( milik recipients gabungkeun: [','] )) + brk.
+	milik cc jumlah bener: {
+		str tambah-di-tungtung: (diri header: ['Cc: '] + ( milik cc gabungkeun: [','] )) + brk.
+	}.
+	milik bcc jumlah bener: {
+		str tambah-di-tungtung: (diri header: ['Bcc: '] + ( milik bcc gabungkeun: [','] )) + brk.
+	}.
+	str tambah-di-tungtung: (diri header: ['Subject: '] + milik subject) + brk.
+	str tambah-di-tungtung: ['MIME-Version: 1.0'] + brk.
+	str tambah-di-tungtung: ['Content-Type: multipart/related; boundary="'] + milik boundary + ['"; type=text/html'] + brk.
+	str tambah-di-tungtung: brk.
+	str tambah-di-tungtung: ['--'] + milik boundary + brk.
+	str tambah-di-tungtung: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str tambah-di-tungtung: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str tambah-di-tungtung: brk.
+	str tambah-di-tungtung: milik body.
+	str tambah-di-tungtung: brk.
+	milik attachments unggal: { :id :info
+		>> blob := info data.
+		str tambah-di-tungtung: ['--'] + milik boundary + brk.
+		str tambah-di-tungtung: ['Content-Type: '] + info mime + brk.
+		str tambah-di-tungtung: ['Content-Transfer-Encoding: base64'] + brk.
+		str tambah-di-tungtung: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str tambah-di-tungtung: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str tambah-di-tungtung: brk.
+		>> max := 76.
+		>> len := blob panjang.
+		>> chunks := (len / max) buleudkeun-ka-luhur.
+		{ :i
+			>> chunk := blob salin tina: i * max panjang: max.
+			str tambah-di-tungtung: chunk + brk.
+		} * chunks.
+		str tambah-di-tungtung: brk.
+		str tambah-di-tungtung: brk.
+	}.
+	str tambah-di-tungtung: ['--'] + milik boundary + ['--'] + brk. <- str.
+}.

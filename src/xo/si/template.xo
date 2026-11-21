@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := වස්තුව නව.
+
+Template ලැබුණු-විට: ['නව'] කරන්න: { <- තමා නව content: [''].
+}.
+
+Template ලැබුණු-විට: ['content:'] කරන්න: { :content
+	තමාගේ content := content. 
+}.
+
+Template ලැබුණු-විට: ['නව:'] කරන්න: { :content <- තමා නව content: content.
+}.
+
+Template ලැබුණු-විට: ['cut:'] කරන්න: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := තමාගේ content බෙදන්න: startmarker.
+	>> prefix := parts පළමු.
+	>> parts2 := parts අවසාන බෙදන්න: endmarker.
+	>> suffix := parts2 අවසාන.
+	>> part := parts2 පළමු.
+	>> rest := prefix + suffix.
+	තමාගේ content := rest. <- Template නව: part.
+	
+}.
+
+Template ලැබුණු-විට: ['පිටපත'] කරන්න: { <- තමා නව: තමා පෙළට පිටපත.
+}.
+	
+Template ලැබුණු-විට: ['paste:at:'] කරන්න: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	තමාගේ content ආදේශය: pastemarker සමග: ( snippet පෙළට + pastemarker ).
+}.
+
+Template ලැබුණු-විට: ['සකසන්න:අගය:'] කරන්න: { :slot :value
+	තමාගේ content ආදේශය: ['<!-- slot:'] + slot + [' -->'] සමග: ( Server html-කේතනය: value ).
+}.
+
+Template ලැබුණු-විට: ['set:html:'] කරන්න: { :slot :html
+	තමාගේ content ආදේශය: ['<!-- slot:'] + slot + [' -->'] සමග: html.
+}.
+
+Template ලැබුණු-විට: ['පිළිතුර:සහ:'] කරන්න: { :slot :value
+	තමා සකසන්න: (slot ආරම්භය: 0 දිග: (slot දිග - 1)) අගය: value.
+}.
+
+Template ලැබුණු-විට: ['nl2br'] කරන්න: {
+	තමාගේ content ආදේශය: ['\n'] සමග: ['<br>'].
+}.
+
+Template ලැබුණු-විට: ['clean'] කරන්න: {
+	තමාගේ content :=
+		රටාව
+		නව: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ගැළපීම: තමාගේ content
+		කරන්න: { <- ['']. }.
+}.
+
+Template ලැබුණු-විට: ['clean-cuts'] කරන්න: {
+	>> items := ලේඛනය නව.
+	රටාව
+	නව: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ගැළපීම: තමාගේ content
+	කරන්න: { :_ :part
+		items අගට-එක්කරන්න: part ? 1.
+	}.
+	items එකිනෙක: { :_ :id
+		තමාගේ content :=
+			රටාව නව: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ගැළපීම: තමාගේ content
+			කරන්න: { <- ['']. }.
+	 }.
+}.
+
+Template ලැබුණු-විට: ['clean-space'] කරන්න: {
+	තමාගේ content :=
+		රටාව
+		නව: ['\\s*\\n'],
+		ගැළපීම: තමාගේ content
+		කරන්න: { <- ['\n']. }.
+	තමාගේ content :=
+		රටාව
+		නව: ['\\n[\\s\\t]+'],
+		ගැළපීම: තමාගේ content
+		කරන්න: { <- ['\n']. }.
+}.
+
+Template ලැබුණු-විට: ['clean-all'] කරන්න: {
+	තමා clean.
+	තමා clean-cuts.
+	තමා clean-space.
+}.
+
+Template ලැබුණු-විට: ['පෙළට'] කරන්න: { <- තමාගේ content.
+}.

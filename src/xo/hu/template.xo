@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objektum új.
+
+Template ha: ['új'] tedd: { <- maga új content: [''].
+}.
+
+Template ha: ['content:'] tedd: { :content
+	saját content := content. 
+}.
+
+Template ha: ['új:'] tedd: { :content <- maga új content: content.
+}.
+
+Template ha: ['cut:'] tedd: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := saját content feloszt: startmarker.
+	>> prefix := parts első.
+	>> parts2 := parts utolsó feloszt: endmarker.
+	>> suffix := parts2 utolsó.
+	>> part := parts2 első.
+	>> rest := prefix + suffix.
+	saját content := rest. <- Template új: part.
+	
+}.
+
+Template ha: ['másol'] tedd: { <- maga új: maga szöveg másol.
+}.
+	
+Template ha: ['paste:at:'] tedd: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	saját content csere: pastemarker erre: ( snippet szöveg + pastemarker ).
+}.
+
+Template ha: ['beállít:érték:'] tedd: { :slot :value
+	saját content csere: ['<!-- slot:'] + slot + [' -->'] erre: ( Server html-kódolás: value ).
+}.
+
+Template ha: ['set:html:'] tedd: { :slot :html
+	saját content csere: ['<!-- slot:'] + slot + [' -->'] erre: html.
+}.
+
+Template ha: ['válaszol:és:'] tedd: { :slot :value
+	maga beállít: (slot ettől: 0 hossz: (slot hossz - 1)) érték: value.
+}.
+
+Template ha: ['nl2br'] tedd: {
+	saját content csere: ['\n'] erre: ['<br>'].
+}.
+
+Template ha: ['clean'] tedd: {
+	saját content :=
+		Minta
+		új: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		egyezés: saját content
+		tedd: { <- ['']. }.
+}.
+
+Template ha: ['clean-cuts'] tedd: {
+	>> items := Lista új.
+	Minta
+	új: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	egyezés: saját content
+	tedd: { :_ :part
+		items hozzáfűz: part ? 1.
+	}.
+	items mindegyik: { :_ :id
+		saját content :=
+			Minta új: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			egyezés: saját content
+			tedd: { <- ['']. }.
+	 }.
+}.
+
+Template ha: ['clean-space'] tedd: {
+	saját content :=
+		Minta
+		új: ['\\s*\\n'],
+		egyezés: saját content
+		tedd: { <- ['\n']. }.
+	saját content :=
+		Minta
+		új: ['\\n[\\s\\t]+'],
+		egyezés: saját content
+		tedd: { <- ['\n']. }.
+}.
+
+Template ha: ['clean-all'] tedd: {
+	maga clean.
+	maga clean-cuts.
+	maga clean-space.
+}.
+
+Template ha: ['szöveg'] tedd: { <- saját content.
+}.

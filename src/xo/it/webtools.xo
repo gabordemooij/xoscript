@@ -1,0 +1,325 @@
+Richiesta-HTTP on: ['HTTP-header:'] fare: { :key <- Programma instelling: key.
+}.
+
+>> HTTP-Header := Oggetto nuovo.
+
+HTTP-Header on: ['nuovo'] fare: { <- io nuovo init.
+}.
+
+HTTP-Header on: ['init'] fare: {
+	mio key := Nil.
+	mio value := Nil.
+}.
+
+HTTP-Header on: ['key:value:'] fare: { :key :value
+	mio key := key.
+	mio value := value.
+}.
+
+HTTP-Header on: ['key'] fare: { <- mio key.
+}.
+
+HTTP-Header on: ['value'] fare: { <- mio value.
+}.
+
+
+HTTP-Header on: ['testo'] fare: {
+	>> line := mio key + [': '] + mio value.
+	line sostituirlo: ['\r'] con: [''], sostituirlo: ['\n'] con: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Oggetto nuovo.
+
+Web-Document on: ['nuovo'] fare: { <- io nuovo init.
+}.
+
+Web-Document on: ['init'] fare: {
+	mio headers := Serie nuovo.
+	mio sess-id := Nil.
+	mio session-manager := Tempfile-Session nuovo.
+	mio sessdata := Nil.
+	mio secure := Vero.
+	mio same-site := ['Strict'].
+	mio headers-out := Falso.
+	mio request := Richiesta-HTTP nuovo.
+}.
+
+Web-Document on: ['request:'] fare: { :request
+	mio request := request.
+}. 
+
+Web-Document on: ['secure-session-cookie:'] fare: { :secure
+	io check-headers.
+	mio secure := secure.
+}.
+
+Web-Document on: ['same-site-session-cookie:'] fare: { :value
+	io check-headers.
+	>> options := Serie nuovo 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options contiene: value, falso: {
+		questo-compito errore: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	mio same-site := value.
+}.
+
+Web-Document on: ['header:'] fare: { :header
+	io check-headers.
+	mio headers aggiungere: header.
+}.
+
+Web-Document on: ['clear-headers'] fare: {
+	io check-headers.
+	mio headers := Serie nuovo.
+}.
+
+Web-Document on: ['session-manager:'] fare: { :manager
+	io check-headers.
+	mio session-manager := manager.
+}.
+
+Web-Document on: ['session-manager'] fare: { <- mio session-manager.
+}.
+
+Web-Document on: ['check-headers'] fare: {
+	mio headers-out vero: {
+		questo-compito errore: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document on: ['session-start'] fare: {
+	io check-headers.
+	>> request := mio request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id nil? falso: {
+		(( Modello nuovo: ['^[A-Za-z0-9]+\\z'], corrispondenza: sess-id ) = 0) vero: {
+			sess-id := Nil.
+		}.
+	}.
+	sess-id nil? vero: {
+		sess-id := Caveau token: 30.
+		>> session-header := HTTP-Header nuovo
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (mio secure o: ['Secure'] o: ['']),
+		SSITE: (mio same-site),
+		XSID: sess-id
+		).
+		mio headers aggiungere: session-header.
+	}.
+	mio sessdata := mio session-manager for: sess-id, load. <- mio sessdata. # reference
+}.
+
+Web-Document on: ['goto:'] fare: { :url
+	io check-headers.
+	io clear-headers.
+	mio headers
+	aggiungere: (
+		HTTP-Header nuovo
+		key: ['Status'] value: ['303 See Other']
+	),
+	aggiungere: (
+		HTTP-Header nuovo
+		key: ['Location'] value: url
+	).
+	io out: ['Redirect'].
+}.
+
+Web-Document on: ['session-destroy'] fare: {
+	io check-headers.
+	>> request := mio request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id nil? falso: {
+		>> session-header := HTTP-Header nuovo.
+		>> when := Momento nuovo anno: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (mio secure o: ['Secure'] o: ['']),
+			SSITE: (mio same-site),
+			XSID: sess-id
+		).
+		mio session-manager destroy.
+		mio headers aggiungere: session-header.
+	}.
+}.
+
+
+Web-Document on: ['template:'] fare: { :sentiero <- Template nuovo: (File nuovo: sentiero, leggere).
+}.
+
+Web-Document on: ['out:type:'] fare: { :output :genere
+	mio headers-out falso: {
+		mio sessdata nil? falso: {
+			mio session-manager save: mio sessdata.
+		}.
+		mio headers aggiungere: (
+			HTTP-Header nuovo
+			key: ['Content-type'] value: genere
+		).
+		mio headers ogni: { :_ :header
+			Uscita scrivi: header.
+		}.
+		mio headers-out := Vero.
+		Uscita scrivi: ['\r\n'].
+	}.
+	Uscita scrivi: output.
+}.
+
+Web-Document on: ['finish:type:'] fare: { :output :genere
+	mio headers-out falso: {
+		mio sessdata nil? falso: {
+			mio session-manager save: mio sessdata.
+		}.
+		mio headers aggiungere: (
+			HTTP-Header nuovo
+			key: ['Content-type'] value: genere
+		).
+		mio headers aggiungere: (
+			HTTP-Header nuovo
+			key: ['Content-Length'] value: output testo bytes
+		).
+		mio headers ogni: { :_ :header
+			Uscita scrivi: header.
+		}.
+		mio headers-out := Vero.
+		Uscita scrivi: ['\r\n'].
+	}.
+	Uscita scrivi: output.
+}.
+
+Web-Document on: ['out:'] fare: { :output
+	io out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document on: ['finish:'] fare: { :output
+	io finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document on: ['json:'] fare: { :output
+	io out: ( JSON jsonifica: output ) type: ['application/json'].
+}.
+
+Web-Document on: ['not-found:'] fare: { :output
+	io clear-headers header: (
+		HTTP-Header nuovo key: ['Status'] value: ['404 Not Found']
+	).
+	io out: output.
+}.
+
+
+# Interface
+
+>> Session := Oggetto nuovo.
+
+Session on: ['nuovo'] fare: { <- io nuovo init for: Nil.
+}.
+
+Session on: ['for:'] fare: { :id
+	mio id := id.
+}.
+
+Session on: ['load'] fare: {
+	questo-compito errore: ['Not implemented.'].
+}.
+
+Session on: ['save:'] fare: {
+	questo-compito errore: ['Not implemented.'].
+}.
+
+Session on: ['destroy'] fare: {
+	questo-compito errore: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session nuovo.
+
+Tempfile-Session on: ['init'] fare: {
+	mio pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session on: ['path-prefix:'] fare: { :str
+	mio pathprefix := str.
+}.
+
+Tempfile-Session on: ['file'] fare: { <- ( File nuovo: ( mio pathprefix + mio id + ['.txt'] ) ).
+}.
+
+Tempfile-Session on: ['load'] fare: {
+	>> file := io file.
+	file esiste falso: {
+		file scrivi: (Elenco nuovo code).
+	}. <- file leggere oggetto.
+}.
+
+Tempfile-Session on: ['save:'] fare: { :data
+	>> file := io file.
+	file esiste vero: {
+		file scrivi: data code.
+	}.
+}.
+
+Tempfile-Session on: ['destroy'] fare: {
+	>> file := io file.
+	file esiste vero: {
+		file elimina.
+	}.
+}.
+
+
+>> URL := Oggetto nuovo.
+
+URL on: ['init'] fare: {
+	mio protocol := ['https://'].
+	mio host := ['localhost'].
+	mio sentiero := [''].
+	mio params := [''].
+	mio hash := [''].
+}.
+
+URL on: ['nuovo'] fare: { <- io nuovo init.
+}.
+
+URL on: ['testo'] fare: { <- (
+	mio protocol +
+	mio host +
+	mio sentiero +
+	mio params +
+	mio hash ).
+}.
+
+URL on: ['protocol:'] fare: { :protocol
+	((Serie nuovo: ['http'] ; ['https']) contiene: protocol) vero: {
+		mio protocol := protocol + ['://'].
+	}, falso: {
+		questo-compito errore: ['Invalid protocol'].
+	}.
+}.
+
+URL on: ['host:'] fare: { :host
+	#todo validate according to rfc
+	mio host := host.
+}.
+
+URL on: ['path:'] fare: { :sentiero
+	mio sentiero := ['/'] + sentiero url-codifica.
+}.
+
+URL on: ['params:'] fare: { :map
+	>> params := Serie nuovo.
+	map ogni: { :key :value
+		params aggiungere: key testo url-codifica + ['='] + value testo url-codifica.
+	}.
+	mio params := ['?'] + ( params aderire: ['&'] ).
+}.
+
+URL on: ['hash:'] fare: { :hash
+	mio hash := ['#'] + hash url-codifica.
+}.
+

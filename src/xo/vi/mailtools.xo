@@ -1,0 +1,128 @@
+>> Email := Đối-tượng mới.
+
+Email khi: ['init'] làm: {
+	riêng recipients := Danh-sách mới.
+	riêng cc := Danh-sách mới.
+	riêng bcc := Danh-sách mới.
+	riêng from := Rỗng.
+	riêng from-name := Rỗng.
+	riêng subject := Rỗng.
+	riêng body := Rỗng.
+}.
+
+Email khi: ['mới'] làm: { <- bản-thân mới init.
+}.
+
+Email khi: ['to:'] làm: { :list
+	riêng recipients := list.
+}.
+ 
+Email khi: ['cc:'] làm: { :list
+	riêng cc := list.
+}.
+
+Email khi: ['bcc:'] làm: { :list
+	riêng bcc := list.
+}.
+
+Email khi: ['subject:'] làm: { :subject
+	riêng subject := subject.
+}.
+
+Email khi: ['from:name:'] làm: { :from :tên
+	riêng from := from.
+	riêng from-name := tên.
+}.
+
+Email khi: ['body:'] làm: { :body
+	riêng body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email khi: ['header:'] làm: { :line <- line thay: ['\r'] bằng: [''], thay: ['\n'] bằng: [''].
+}.
+
+Email khi: ['send'] làm: {
+	>> f := Tệp tempwrite: bản-thân generate.
+	Chương-trình hệ-thống: ['sendmail -t < '] + f đường-dẫn, xuống-dòng.
+}.
+
+Email khi: ['generate'] làm: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str thêm-cuối: (bản-thân header: ['From: '] + riêng from-name + [' <'] + ( riêng from ) + ['>']) + brk.
+	str thêm-cuối: (bản-thân header: ['To: '] + ( riêng recipients nối: [','] )) + brk.
+	riêng cc đếm đúng: {
+		str thêm-cuối: (bản-thân header: ['Cc: '] + ( riêng cc nối: [','] )) + brk.
+	}.
+	riêng bcc đếm đúng: {
+		str thêm-cuối: (bản-thân header: ['Bcc: '] + ( riêng bcc nối: [','] )) + brk.
+	}.
+	str thêm-cuối: (bản-thân header: ['Subject: '] + riêng subject) + brk.
+	str thêm-cuối: brk.
+	str thêm-cuối: riêng body.
+	str thêm-cuối: brk. <- str.
+}.
+
+>> HTML-Email := Email mới.
+
+HTML-Email khi: ['init'] làm: {
+	bản-thân init.
+	riêng attachments := Danh-sách mới.
+	riêng boundary := Két mã-thông-báo: 40.
+}.
+
+HTML-Email khi: ['attach:'] làm: { :file
+	>> id := riêng attachments đếm.
+	>> blob := file blob.
+	riêng attachments thêm-cuối: (
+		Từ-điển mới
+			file: file đường-dẫn,
+			mime: ['image/'] + (Server mimetype: file đường-dẫn),
+			data: blob base64-mã-hóa
+	).
+	blob giải-phóng. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email khi: ['generate'] làm: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str thêm-cuối: (bản-thân header: ['From: '] + riêng from-name + [' <'] + ( riêng from ) + ['>']) + brk.
+	str thêm-cuối: (bản-thân header: ['To: '] + ( riêng recipients nối: [','] )) + brk.
+	riêng cc đếm đúng: {
+		str thêm-cuối: (bản-thân header: ['Cc: '] + ( riêng cc nối: [','] )) + brk.
+	}.
+	riêng bcc đếm đúng: {
+		str thêm-cuối: (bản-thân header: ['Bcc: '] + ( riêng bcc nối: [','] )) + brk.
+	}.
+	str thêm-cuối: (bản-thân header: ['Subject: '] + riêng subject) + brk.
+	str thêm-cuối: ['MIME-Version: 1.0'] + brk.
+	str thêm-cuối: ['Content-Type: multipart/related; boundary="'] + riêng boundary + ['"; type=text/html'] + brk.
+	str thêm-cuối: brk.
+	str thêm-cuối: ['--'] + riêng boundary + brk.
+	str thêm-cuối: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str thêm-cuối: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str thêm-cuối: brk.
+	str thêm-cuối: riêng body.
+	str thêm-cuối: brk.
+	riêng attachments mỗi: { :id :info
+		>> blob := info data.
+		str thêm-cuối: ['--'] + riêng boundary + brk.
+		str thêm-cuối: ['Content-Type: '] + info mime + brk.
+		str thêm-cuối: ['Content-Transfer-Encoding: base64'] + brk.
+		str thêm-cuối: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str thêm-cuối: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str thêm-cuối: brk.
+		>> max := 76.
+		>> len := blob độ-dài.
+		>> chunks := (len / max) làm-tròn-lên.
+		{ :i
+			>> chunk := blob sao-chép từ: i * max độ-dài: max.
+			str thêm-cuối: chunk + brk.
+		} * chunks.
+		str thêm-cuối: brk.
+		str thêm-cuối: brk.
+	}.
+	str thêm-cuối: ['--'] + riêng boundary + ['--'] + brk. <- str.
+}.

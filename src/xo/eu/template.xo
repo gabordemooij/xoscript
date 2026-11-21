@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objektua berria.
+
+Template noiz: ['berria'] egin: { <- norbera berria content: [''].
+}.
+
+Template noiz: ['content:'] egin: { :content
+	berezko content := content. 
+}.
+
+Template noiz: ['berria:'] egin: { :content <- norbera berria content: content.
+}.
+
+Template noiz: ['cut:'] egin: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := berezko content zatitu: startmarker.
+	>> prefix := parts lehena.
+	>> parts2 := parts azkena zatitu: endmarker.
+	>> suffix := parts2 azkena.
+	>> part := parts2 lehena.
+	>> rest := prefix + suffix.
+	berezko content := rest. <- Template berria: part.
+	
+}.
+
+Template noiz: ['kopiatu'] egin: { <- norbera berria: norbera testua kopiatu.
+}.
+	
+Template noiz: ['paste:at:'] egin: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	berezko content ordeztu: pastemarker honekin: ( snippet testua + pastemarker ).
+}.
+
+Template noiz: ['ezarri:balioa:'] egin: { :slot :value
+	berezko content ordeztu: ['<!-- slot:'] + slot + [' -->'] honekin: ( Server html-kodetu: value ).
+}.
+
+Template noiz: ['set:html:'] egin: { :slot :html
+	berezko content ordeztu: ['<!-- slot:'] + slot + [' -->'] honekin: html.
+}.
+
+Template noiz: ['erantzun:eta:'] egin: { :slot :value
+	norbera ezarri: (slot nondik: 0 luzera: (slot luzera - 1)) balioa: value.
+}.
+
+Template noiz: ['nl2br'] egin: {
+	berezko content ordeztu: ['\n'] honekin: ['<br>'].
+}.
+
+Template noiz: ['clean'] egin: {
+	berezko content :=
+		Eredua
+		berria: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		bat-etortzea: berezko content
+		egin: { <- ['']. }.
+}.
+
+Template noiz: ['clean-cuts'] egin: {
+	>> items := Zerrenda berria.
+	Eredua
+	berria: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	bat-etortzea: berezko content
+	egin: { :_ :part
+		items erantsi: part ? 1.
+	}.
+	items bakoitza: { :_ :id
+		berezko content :=
+			Eredua berria: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			bat-etortzea: berezko content
+			egin: { <- ['']. }.
+	 }.
+}.
+
+Template noiz: ['clean-space'] egin: {
+	berezko content :=
+		Eredua
+		berria: ['\\s*\\n'],
+		bat-etortzea: berezko content
+		egin: { <- ['\n']. }.
+	berezko content :=
+		Eredua
+		berria: ['\\n[\\s\\t]+'],
+		bat-etortzea: berezko content
+		egin: { <- ['\n']. }.
+}.
+
+Template noiz: ['clean-all'] egin: {
+	norbera clean.
+	norbera clean-cuts.
+	norbera clean-space.
+}.
+
+Template noiz: ['testua'] egin: { <- berezko content.
+}.

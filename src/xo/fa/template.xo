@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := شیء جدید.
+
+Template هنگام: ['جدید'] انجام: { <- خود جدید content: [''].
+}.
+
+Template هنگام: ['content:'] انجام: { :content
+	خودم content := content. 
+}.
+
+Template هنگام: ['جدید:'] انجام: { :content <- خود جدید content: content.
+}.
+
+Template هنگام: ['cut:'] انجام: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := خودم content جدا-کن: startmarker.
+	>> prefix := parts نخست.
+	>> parts2 := parts آخری جدا-کن: endmarker.
+	>> suffix := parts2 آخری.
+	>> part := parts2 نخست.
+	>> rest := prefix + suffix.
+	خودم content := rest. <- Template جدید: part.
+	
+}.
+
+Template هنگام: ['رونوشت'] انجام: { <- خود جدید: خود به-رشته رونوشت.
+}.
+	
+Template هنگام: ['paste:at:'] انجام: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	خودم content جایگزین: pastemarker با: ( snippet به-رشته + pastemarker ).
+}.
+
+Template هنگام: ['تنظیم:مقدار:'] انجام: { :slot :value
+	خودم content جایگزین: ['<!-- slot:'] + slot + [' -->'] با: ( Server html-کدگذاری: value ).
+}.
+
+Template هنگام: ['set:html:'] انجام: { :slot :html
+	خودم content جایگزین: ['<!-- slot:'] + slot + [' -->'] با: html.
+}.
+
+Template هنگام: ['پاسخ:و:'] انجام: { :slot :value
+	خود تنظیم: (slot آغاز: 0 طول: (slot طول - 1)) مقدار: value.
+}.
+
+Template هنگام: ['nl2br'] انجام: {
+	خودم content جایگزین: ['\n'] با: ['<br>'].
+}.
+
+Template هنگام: ['clean'] انجام: {
+	خودم content :=
+		الگو
+		جدید: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		تطبیق: خودم content
+		انجام: { <- ['']. }.
+}.
+
+Template هنگام: ['clean-cuts'] انجام: {
+	>> items := لیست جدید.
+	الگو
+	جدید: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	تطبیق: خودم content
+	انجام: { :_ :part
+		items بیفزا-به-پایان: part ? 1.
+	}.
+	items هرکدام: { :_ :id
+		خودم content :=
+			الگو جدید: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			تطبیق: خودم content
+			انجام: { <- ['']. }.
+	 }.
+}.
+
+Template هنگام: ['clean-space'] انجام: {
+	خودم content :=
+		الگو
+		جدید: ['\\s*\\n'],
+		تطبیق: خودم content
+		انجام: { <- ['\n']. }.
+	خودم content :=
+		الگو
+		جدید: ['\\n[\\s\\t]+'],
+		تطبیق: خودم content
+		انجام: { <- ['\n']. }.
+}.
+
+Template هنگام: ['clean-all'] انجام: {
+	خود clean.
+	خود clean-cuts.
+	خود clean-space.
+}.
+
+Template هنگام: ['به-رشته'] انجام: { <- خودم content.
+}.

@@ -1,0 +1,128 @@
+>> Email := Objè nouvo.
+
+Email lè: ['init'] fè: {
+	pwòp recipients := Lis nouvo.
+	pwòp cc := Lis nouvo.
+	pwòp bcc := Lis nouvo.
+	pwòp from := Anyen.
+	pwòp from-name := Anyen.
+	pwòp subject := Anyen.
+	pwòp body := Anyen.
+}.
+
+Email lè: ['nouvo'] fè: { <- tèt-li nouvo init.
+}.
+
+Email lè: ['to:'] fè: { :list
+	pwòp recipients := list.
+}.
+ 
+Email lè: ['cc:'] fè: { :list
+	pwòp cc := list.
+}.
+
+Email lè: ['bcc:'] fè: { :list
+	pwòp bcc := list.
+}.
+
+Email lè: ['subject:'] fè: { :subject
+	pwòp subject := subject.
+}.
+
+Email lè: ['from:name:'] fè: { :from :non
+	pwòp from := from.
+	pwòp from-name := non.
+}.
+
+Email lè: ['body:'] fè: { :body
+	pwòp body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email lè: ['header:'] fè: { :line <- line ranplase: ['\r'] ak: [''], ranplase: ['\n'] ak: [''].
+}.
+
+Email lè: ['send'] fè: {
+	>> f := Fichye tempwrite: tèt-li generate.
+	Pwogram sistèm: ['sendmail -t < '] + f chemen-fichye, nouvo-liy.
+}.
+
+Email lè: ['generate'] fè: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ajoute-nan-fen: (tèt-li header: ['From: '] + pwòp from-name + [' <'] + ( pwòp from ) + ['>']) + brk.
+	str ajoute-nan-fen: (tèt-li header: ['To: '] + ( pwòp recipients kole-ansanm: [','] )) + brk.
+	pwòp cc konte vre: {
+		str ajoute-nan-fen: (tèt-li header: ['Cc: '] + ( pwòp cc kole-ansanm: [','] )) + brk.
+	}.
+	pwòp bcc konte vre: {
+		str ajoute-nan-fen: (tèt-li header: ['Bcc: '] + ( pwòp bcc kole-ansanm: [','] )) + brk.
+	}.
+	str ajoute-nan-fen: (tèt-li header: ['Subject: '] + pwòp subject) + brk.
+	str ajoute-nan-fen: brk.
+	str ajoute-nan-fen: pwòp body.
+	str ajoute-nan-fen: brk. <- str.
+}.
+
+>> HTML-Email := Email nouvo.
+
+HTML-Email lè: ['init'] fè: {
+	tèt-li init.
+	pwòp attachments := Lis nouvo.
+	pwòp boundary := Kòfrefò jeton: 40.
+}.
+
+HTML-Email lè: ['attach:'] fè: { :file
+	>> id := pwòp attachments konte.
+	>> blob := file blob.
+	pwòp attachments ajoute-nan-fen: (
+		Diksyonè nouvo
+			file: file chemen-fichye,
+			mime: ['image/'] + (Server mimetype: file chemen-fichye),
+			data: blob base64-kode
+	).
+	blob libere. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email lè: ['generate'] fè: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ajoute-nan-fen: (tèt-li header: ['From: '] + pwòp from-name + [' <'] + ( pwòp from ) + ['>']) + brk.
+	str ajoute-nan-fen: (tèt-li header: ['To: '] + ( pwòp recipients kole-ansanm: [','] )) + brk.
+	pwòp cc konte vre: {
+		str ajoute-nan-fen: (tèt-li header: ['Cc: '] + ( pwòp cc kole-ansanm: [','] )) + brk.
+	}.
+	pwòp bcc konte vre: {
+		str ajoute-nan-fen: (tèt-li header: ['Bcc: '] + ( pwòp bcc kole-ansanm: [','] )) + brk.
+	}.
+	str ajoute-nan-fen: (tèt-li header: ['Subject: '] + pwòp subject) + brk.
+	str ajoute-nan-fen: ['MIME-Version: 1.0'] + brk.
+	str ajoute-nan-fen: ['Content-Type: multipart/related; boundary="'] + pwòp boundary + ['"; type=text/html'] + brk.
+	str ajoute-nan-fen: brk.
+	str ajoute-nan-fen: ['--'] + pwòp boundary + brk.
+	str ajoute-nan-fen: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str ajoute-nan-fen: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str ajoute-nan-fen: brk.
+	str ajoute-nan-fen: pwòp body.
+	str ajoute-nan-fen: brk.
+	pwòp attachments chak: { :id :info
+		>> blob := info data.
+		str ajoute-nan-fen: ['--'] + pwòp boundary + brk.
+		str ajoute-nan-fen: ['Content-Type: '] + info mime + brk.
+		str ajoute-nan-fen: ['Content-Transfer-Encoding: base64'] + brk.
+		str ajoute-nan-fen: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str ajoute-nan-fen: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str ajoute-nan-fen: brk.
+		>> max := 76.
+		>> len := blob longè.
+		>> chunks := (len / max) awondi-anwo.
+		{ :i
+			>> chunk := blob kopye soti-nan: i * max longè: max.
+			str ajoute-nan-fen: chunk + brk.
+		} * chunks.
+		str ajoute-nan-fen: brk.
+		str ajoute-nan-fen: brk.
+	}.
+	str ajoute-nan-fen: ['--'] + pwòp boundary + ['--'] + brk. <- str.
+}.

@@ -1,0 +1,128 @@
+>> Email := Objek nuut.
+
+Email by: ['init'] doen: {
+	eie recipients := Lys nuut.
+	eie cc := Lys nuut.
+	eie bcc := Lys nuut.
+	eie from := Niks.
+	eie from-name := Niks.
+	eie subject := Niks.
+	eie body := Niks.
+}.
+
+Email by: ['nuut'] doen: { <- self nuut init.
+}.
+
+Email by: ['to:'] doen: { :list
+	eie recipients := list.
+}.
+ 
+Email by: ['cc:'] doen: { :list
+	eie cc := list.
+}.
+
+Email by: ['bcc:'] doen: { :list
+	eie bcc := list.
+}.
+
+Email by: ['subject:'] doen: { :subject
+	eie subject := subject.
+}.
+
+Email by: ['from:name:'] doen: { :from :naam
+	eie from := from.
+	eie from-name := naam.
+}.
+
+Email by: ['body:'] doen: { :body
+	eie body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email by: ['header:'] doen: { :line <- line vervang: ['\r'] met: [''], vervang: ['\n'] met: [''].
+}.
+
+Email by: ['send'] doen: {
+	>> f := Lêer tempwrite: self generate.
+	Program stelsel: ['sendmail -t < '] + f pad, nuwe-reël.
+}.
+
+Email by: ['generate'] doen: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str voeg-agter: (self header: ['From: '] + eie from-name + [' <'] + ( eie from ) + ['>']) + brk.
+	str voeg-agter: (self header: ['To: '] + ( eie recipients voeg-saam: [','] )) + brk.
+	eie cc tel ja: {
+		str voeg-agter: (self header: ['Cc: '] + ( eie cc voeg-saam: [','] )) + brk.
+	}.
+	eie bcc tel ja: {
+		str voeg-agter: (self header: ['Bcc: '] + ( eie bcc voeg-saam: [','] )) + brk.
+	}.
+	str voeg-agter: (self header: ['Subject: '] + eie subject) + brk.
+	str voeg-agter: brk.
+	str voeg-agter: eie body.
+	str voeg-agter: brk. <- str.
+}.
+
+>> HTML-Email := Email nuut.
+
+HTML-Email by: ['init'] doen: {
+	self init.
+	eie attachments := Lys nuut.
+	eie boundary := Kluis token: 40.
+}.
+
+HTML-Email by: ['attach:'] doen: { :file
+	>> id := eie attachments tel.
+	>> blob := file blob.
+	eie attachments voeg-agter: (
+		Woordeboek nuut
+			file: file pad,
+			mime: ['image/'] + (Server mimetype: file pad),
+			data: blob base64-kodeer
+	).
+	blob stel-vry. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email by: ['generate'] doen: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str voeg-agter: (self header: ['From: '] + eie from-name + [' <'] + ( eie from ) + ['>']) + brk.
+	str voeg-agter: (self header: ['To: '] + ( eie recipients voeg-saam: [','] )) + brk.
+	eie cc tel ja: {
+		str voeg-agter: (self header: ['Cc: '] + ( eie cc voeg-saam: [','] )) + brk.
+	}.
+	eie bcc tel ja: {
+		str voeg-agter: (self header: ['Bcc: '] + ( eie bcc voeg-saam: [','] )) + brk.
+	}.
+	str voeg-agter: (self header: ['Subject: '] + eie subject) + brk.
+	str voeg-agter: ['MIME-Version: 1.0'] + brk.
+	str voeg-agter: ['Content-Type: multipart/related; boundary="'] + eie boundary + ['"; type=text/html'] + brk.
+	str voeg-agter: brk.
+	str voeg-agter: ['--'] + eie boundary + brk.
+	str voeg-agter: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str voeg-agter: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str voeg-agter: brk.
+	str voeg-agter: eie body.
+	str voeg-agter: brk.
+	eie attachments elk: { :id :info
+		>> blob := info data.
+		str voeg-agter: ['--'] + eie boundary + brk.
+		str voeg-agter: ['Content-Type: '] + info mime + brk.
+		str voeg-agter: ['Content-Transfer-Encoding: base64'] + brk.
+		str voeg-agter: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str voeg-agter: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str voeg-agter: brk.
+		>> max := 76.
+		>> len := blob lengte.
+		>> chunks := (len / max) rond-op.
+		{ :i
+			>> chunk := blob kopieer vanaf: i * max lengte: max.
+			str voeg-agter: chunk + brk.
+		} * chunks.
+		str voeg-agter: brk.
+		str voeg-agter: brk.
+	}.
+	str voeg-agter: ['--'] + eie boundary + ['--'] + brk. <- str.
+}.

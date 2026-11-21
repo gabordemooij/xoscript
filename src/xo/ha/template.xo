@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Abu sabo.
+
+Template idan: ['sabo'] yi: { <- kai sabo content: [''].
+}.
+
+Template idan: ['content:'] yi: { :content
+	nasa content := content. 
+}.
+
+Template idan: ['sabo:'] yi: { :content <- kai sabo content: content.
+}.
+
+Template idan: ['cut:'] yi: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := nasa content tsaga: startmarker.
+	>> prefix := parts na-farko.
+	>> parts2 := parts na-ƙarshe tsaga: endmarker.
+	>> suffix := parts2 na-ƙarshe.
+	>> part := parts2 na-farko.
+	>> rest := prefix + suffix.
+	nasa content := rest. <- Template sabo: part.
+	
+}.
+
+Template idan: ['kwafi'] yi: { <- kai sabo: kai rubutu kwafi.
+}.
+	
+Template idan: ['paste:at:'] yi: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	nasa content musanya: pastemarker da: ( snippet rubutu + pastemarker ).
+}.
+
+Template idan: ['saita:ƙima:'] yi: { :slot :value
+	nasa content musanya: ['<!-- slot:'] + slot + [' -->'] da: ( Server html-ɓoye-lamba: value ).
+}.
+
+Template idan: ['set:html:'] yi: { :slot :html
+	nasa content musanya: ['<!-- slot:'] + slot + [' -->'] da: html.
+}.
+
+Template idan: ['amsa:da:'] yi: { :slot :value
+	kai saita: (slot daga: 0 tsawo: (slot tsawo - 1)) ƙima: value.
+}.
+
+Template idan: ['nl2br'] yi: {
+	nasa content musanya: ['\n'] da: ['<br>'].
+}.
+
+Template idan: ['clean'] yi: {
+	nasa content :=
+		Salo
+		sabo: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		dacewa: nasa content
+		yi: { <- ['']. }.
+}.
+
+Template idan: ['clean-cuts'] yi: {
+	>> items := Jeri sabo.
+	Salo
+	sabo: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	dacewa: nasa content
+	yi: { :_ :part
+		items ƙara-a-ƙarshe: part ? 1.
+	}.
+	items kowane: { :_ :id
+		nasa content :=
+			Salo sabo: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			dacewa: nasa content
+			yi: { <- ['']. }.
+	 }.
+}.
+
+Template idan: ['clean-space'] yi: {
+	nasa content :=
+		Salo
+		sabo: ['\\s*\\n'],
+		dacewa: nasa content
+		yi: { <- ['\n']. }.
+	nasa content :=
+		Salo
+		sabo: ['\\n[\\s\\t]+'],
+		dacewa: nasa content
+		yi: { <- ['\n']. }.
+}.
+
+Template idan: ['clean-all'] yi: {
+	kai clean.
+	kai clean-cuts.
+	kai clean-space.
+}.
+
+Template idan: ['rubutu'] yi: { <- nasa content.
+}.

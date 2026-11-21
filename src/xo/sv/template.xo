@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objekt ny.
+
+Template vid: ['ny'] gör: { <- själv ny content: [''].
+}.
+
+Template vid: ['content:'] gör: { :content
+	egen content := content. 
+}.
+
+Template vid: ['ny:'] gör: { :content <- själv ny content: content.
+}.
+
+Template vid: ['cut:'] gör: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := egen content dela: startmarker.
+	>> prefix := parts första.
+	>> parts2 := parts sista dela: endmarker.
+	>> suffix := parts2 sista.
+	>> part := parts2 första.
+	>> rest := prefix + suffix.
+	egen content := rest. <- Template ny: part.
+	
+}.
+
+Template vid: ['kopiera'] gör: { <- själv ny: själv text kopiera.
+}.
+	
+Template vid: ['paste:at:'] gör: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	egen content ersätt: pastemarker med: ( snippet text + pastemarker ).
+}.
+
+Template vid: ['sätt:värde:'] gör: { :slot :value
+	egen content ersätt: ['<!-- slot:'] + slot + [' -->'] med: ( Server html-koda: value ).
+}.
+
+Template vid: ['set:html:'] gör: { :slot :html
+	egen content ersätt: ['<!-- slot:'] + slot + [' -->'] med: html.
+}.
+
+Template vid: ['svara:och:'] gör: { :slot :value
+	själv sätt: (slot från: 0 längd: (slot längd - 1)) värde: value.
+}.
+
+Template vid: ['nl2br'] gör: {
+	egen content ersätt: ['\n'] med: ['<br>'].
+}.
+
+Template vid: ['clean'] gör: {
+	egen content :=
+		Mönster
+		ny: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		matcha: egen content
+		gör: { <- ['']. }.
+}.
+
+Template vid: ['clean-cuts'] gör: {
+	>> items := Lista ny.
+	Mönster
+	ny: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	matcha: egen content
+	gör: { :_ :part
+		items lägg-till-sist: part ? 1.
+	}.
+	items varje: { :_ :id
+		egen content :=
+			Mönster ny: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			matcha: egen content
+			gör: { <- ['']. }.
+	 }.
+}.
+
+Template vid: ['clean-space'] gör: {
+	egen content :=
+		Mönster
+		ny: ['\\s*\\n'],
+		matcha: egen content
+		gör: { <- ['\n']. }.
+	egen content :=
+		Mönster
+		ny: ['\\n[\\s\\t]+'],
+		matcha: egen content
+		gör: { <- ['\n']. }.
+}.
+
+Template vid: ['clean-all'] gör: {
+	själv clean.
+	själv clean-cuts.
+	själv clean-space.
+}.
+
+Template vid: ['text'] gör: { <- egen content.
+}.

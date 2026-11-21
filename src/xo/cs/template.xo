@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objekt nový.
+
+Template při: ['nový'] udělat: { <- sebe nový content: [''].
+}.
+
+Template při: ['content:'] udělat: { :content
+	vlastní content := content. 
+}.
+
+Template při: ['nový:'] udělat: { :content <- sebe nový content: content.
+}.
+
+Template při: ['cut:'] udělat: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := vlastní content rozdělit: startmarker.
+	>> prefix := parts první.
+	>> parts2 := parts poslední rozdělit: endmarker.
+	>> suffix := parts2 poslední.
+	>> part := parts2 první.
+	>> rest := prefix + suffix.
+	vlastní content := rest. <- Template nový: part.
+	
+}.
+
+Template při: ['kopírovat'] udělat: { <- sebe nový: sebe řetězec kopírovat.
+}.
+	
+Template při: ['paste:at:'] udělat: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	vlastní content nahradit: pastemarker za: ( snippet řetězec + pastemarker ).
+}.
+
+Template při: ['nastavit:na:'] udělat: { :slot :value
+	vlastní content nahradit: ['<!-- slot:'] + slot + [' -->'] za: ( Server html-kódovat: value ).
+}.
+
+Template při: ['set:html:'] udělat: { :slot :html
+	vlastní content nahradit: ['<!-- slot:'] + slot + [' -->'] za: html.
+}.
+
+Template při: ['odpovědět:a:'] udělat: { :slot :value
+	sebe nastavit: (slot od: 0 délka: (slot délka - 1)) na: value.
+}.
+
+Template při: ['nl2br'] udělat: {
+	vlastní content nahradit: ['\n'] za: ['<br>'].
+}.
+
+Template při: ['clean'] udělat: {
+	vlastní content :=
+		Vzor
+		nový: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		shoda: vlastní content
+		udělat: { <- ['']. }.
+}.
+
+Template při: ['clean-cuts'] udělat: {
+	>> items := Seznam nový.
+	Vzor
+	nový: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	shoda: vlastní content
+	udělat: { :_ :part
+		items připojit: part ? 1.
+	}.
+	items každý: { :_ :id
+		vlastní content :=
+			Vzor nový: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			shoda: vlastní content
+			udělat: { <- ['']. }.
+	 }.
+}.
+
+Template při: ['clean-space'] udělat: {
+	vlastní content :=
+		Vzor
+		nový: ['\\s*\\n'],
+		shoda: vlastní content
+		udělat: { <- ['\n']. }.
+	vlastní content :=
+		Vzor
+		nový: ['\\n[\\s\\t]+'],
+		shoda: vlastní content
+		udělat: { <- ['\n']. }.
+}.
+
+Template při: ['clean-all'] udělat: {
+	sebe clean.
+	sebe clean-cuts.
+	sebe clean-space.
+}.
+
+Template při: ['řetězec'] udělat: { <- vlastní content.
+}.

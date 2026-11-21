@@ -1,0 +1,325 @@
+Codsi-HTTP marka: ['HTTP-header:'] samee: { :key <- Barnaamij dejin: key.
+}.
+
+>> HTTP-Header := Walax cusub.
+
+HTTP-Header marka: ['cusub'] samee: { <- naf cusub init.
+}.
+
+HTTP-Header marka: ['init'] samee: {
+	iska-leh key := Waxba.
+	iska-leh value := Waxba.
+}.
+
+HTTP-Header marka: ['key:value:'] samee: { :key :value
+	iska-leh key := key.
+	iska-leh value := value.
+}.
+
+HTTP-Header marka: ['key'] samee: { <- iska-leh key.
+}.
+
+HTTP-Header marka: ['value'] samee: { <- iska-leh value.
+}.
+
+
+HTTP-Header marka: ['qoraal'] samee: {
+	>> line := iska-leh key + [': '] + iska-leh value.
+	line beddel: ['\r'] ku: [''], beddel: ['\n'] ku: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Walax cusub.
+
+Web-Document marka: ['cusub'] samee: { <- naf cusub init.
+}.
+
+Web-Document marka: ['init'] samee: {
+	iska-leh headers := Liis cusub.
+	iska-leh sess-id := Waxba.
+	iska-leh session-manager := Tempfile-Session cusub.
+	iska-leh sessdata := Waxba.
+	iska-leh secure := Run.
+	iska-leh same-site := ['Strict'].
+	iska-leh headers-out := Been.
+	iska-leh request := Codsi-HTTP cusub.
+}.
+
+Web-Document marka: ['request:'] samee: { :request
+	iska-leh request := request.
+}. 
+
+Web-Document marka: ['secure-session-cookie:'] samee: { :secure
+	naf check-headers.
+	iska-leh secure := secure.
+}.
+
+Web-Document marka: ['same-site-session-cookie:'] samee: { :value
+	naf check-headers.
+	>> options := Liis cusub 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options ku-jira: value, been: {
+		hawshan qalad: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	iska-leh same-site := value.
+}.
+
+Web-Document marka: ['header:'] samee: { :header
+	naf check-headers.
+	iska-leh headers dhammaadka-ku-dar: header.
+}.
+
+Web-Document marka: ['clear-headers'] samee: {
+	naf check-headers.
+	iska-leh headers := Liis cusub.
+}.
+
+Web-Document marka: ['session-manager:'] samee: { :manager
+	naf check-headers.
+	iska-leh session-manager := manager.
+}.
+
+Web-Document marka: ['session-manager'] samee: { <- iska-leh session-manager.
+}.
+
+Web-Document marka: ['check-headers'] samee: {
+	iska-leh headers-out run: {
+		hawshan qalad: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document marka: ['session-start'] samee: {
+	naf check-headers.
+	>> request := iska-leh request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Waxba? been: {
+		(( Hannaan cusub: ['^[A-Za-z0-9]+\\z'], is-waafaq: sess-id ) = 0) run: {
+			sess-id := Waxba.
+		}.
+	}.
+	sess-id Waxba? run: {
+		sess-id := Khasnad token: 30.
+		>> session-header := HTTP-Header cusub
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (iska-leh secure kan: ['Secure'] ama-kaas: ['']),
+		SSITE: (iska-leh same-site),
+		XSID: sess-id
+		).
+		iska-leh headers dhammaadka-ku-dar: session-header.
+	}.
+	iska-leh sessdata := iska-leh session-manager for: sess-id, load. <- iska-leh sessdata. # reference
+}.
+
+Web-Document marka: ['goto:'] samee: { :url
+	naf check-headers.
+	naf clear-headers.
+	iska-leh headers
+	dhammaadka-ku-dar: (
+		HTTP-Header cusub
+		key: ['Status'] value: ['303 See Other']
+	),
+	dhammaadka-ku-dar: (
+		HTTP-Header cusub
+		key: ['Location'] value: url
+	).
+	naf out: ['Redirect'].
+}.
+
+Web-Document marka: ['session-destroy'] samee: {
+	naf check-headers.
+	>> request := iska-leh request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Waxba? been: {
+		>> session-header := HTTP-Header cusub.
+		>> when := Xilli cusub sannad: 1970, qaab: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (iska-leh secure kan: ['Secure'] ama-kaas: ['']),
+			SSITE: (iska-leh same-site),
+			XSID: sess-id
+		).
+		iska-leh session-manager destroy.
+		iska-leh headers dhammaadka-ku-dar: session-header.
+	}.
+}.
+
+
+Web-Document marka: ['template:'] samee: { :waddada-faylka <- Template cusub: (Fayl cusub: waddada-faylka, akhri).
+}.
+
+Web-Document marka: ['out:type:'] samee: { :output :nooc
+	iska-leh headers-out been: {
+		iska-leh sessdata Waxba? been: {
+			iska-leh session-manager save: iska-leh sessdata.
+		}.
+		iska-leh headers dhammaadka-ku-dar: (
+			HTTP-Header cusub
+			key: ['Content-type'] value: nooc
+		).
+		iska-leh headers mid-kasta: { :_ :header
+			Soo-saar qor: header.
+		}.
+		iska-leh headers-out := Run.
+		Soo-saar qor: ['\r\n'].
+	}.
+	Soo-saar qor: output.
+}.
+
+Web-Document marka: ['finish:type:'] samee: { :output :nooc
+	iska-leh headers-out been: {
+		iska-leh sessdata Waxba? been: {
+			iska-leh session-manager save: iska-leh sessdata.
+		}.
+		iska-leh headers dhammaadka-ku-dar: (
+			HTTP-Header cusub
+			key: ['Content-type'] value: nooc
+		).
+		iska-leh headers dhammaadka-ku-dar: (
+			HTTP-Header cusub
+			key: ['Content-Length'] value: output qoraal bytes
+		).
+		iska-leh headers mid-kasta: { :_ :header
+			Soo-saar qor: header.
+		}.
+		iska-leh headers-out := Run.
+		Soo-saar qor: ['\r\n'].
+	}.
+	Soo-saar qor: output.
+}.
+
+Web-Document marka: ['out:'] samee: { :output
+	naf out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document marka: ['finish:'] samee: { :output
+	naf finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document marka: ['json:'] samee: { :output
+	naf out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document marka: ['not-found:'] samee: { :output
+	naf clear-headers header: (
+		HTTP-Header cusub key: ['Status'] value: ['404 Not Found']
+	).
+	naf out: output.
+}.
+
+
+# Interface
+
+>> Session := Walax cusub.
+
+Session marka: ['cusub'] samee: { <- naf cusub init for: Waxba.
+}.
+
+Session marka: ['for:'] samee: { :id
+	iska-leh id := id.
+}.
+
+Session marka: ['load'] samee: {
+	hawshan qalad: ['Not implemented.'].
+}.
+
+Session marka: ['save:'] samee: {
+	hawshan qalad: ['Not implemented.'].
+}.
+
+Session marka: ['destroy'] samee: {
+	hawshan qalad: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session cusub.
+
+Tempfile-Session marka: ['init'] samee: {
+	iska-leh pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session marka: ['path-prefix:'] samee: { :str
+	iska-leh pathprefix := str.
+}.
+
+Tempfile-Session marka: ['file'] samee: { <- ( Fayl cusub: ( iska-leh pathprefix + iska-leh id + ['.txt'] ) ).
+}.
+
+Tempfile-Session marka: ['load'] samee: {
+	>> file := naf file.
+	file jira been: {
+		file qor: (Qaamuus cusub koodh).
+	}. <- file akhri walax.
+}.
+
+Tempfile-Session marka: ['save:'] samee: { :data
+	>> file := naf file.
+	file jira run: {
+		file qor: data koodh.
+	}.
+}.
+
+Tempfile-Session marka: ['destroy'] samee: {
+	>> file := naf file.
+	file jira run: {
+		file tirtir.
+	}.
+}.
+
+
+>> URL := Walax cusub.
+
+URL marka: ['init'] samee: {
+	iska-leh protocol := ['https://'].
+	iska-leh martigeliye := ['localhost'].
+	iska-leh waddada-faylka := [''].
+	iska-leh params := [''].
+	iska-leh hash := [''].
+}.
+
+URL marka: ['cusub'] samee: { <- naf cusub init.
+}.
+
+URL marka: ['qoraal'] samee: { <- (
+	iska-leh protocol +
+	iska-leh martigeliye +
+	iska-leh waddada-faylka +
+	iska-leh params +
+	iska-leh hash ).
+}.
+
+URL marka: ['protocol:'] samee: { :protocol
+	((Liis cusub: ['http'] ; ['https']) ku-jira: protocol) run: {
+		iska-leh protocol := protocol + ['://'].
+	}, been: {
+		hawshan qalad: ['Invalid protocol'].
+	}.
+}.
+
+URL marka: ['martigeliye:'] samee: { :martigeliye
+	#todo validate according to rfc
+	iska-leh martigeliye := martigeliye.
+}.
+
+URL marka: ['path:'] samee: { :waddada-faylka
+	iska-leh waddada-faylka := ['/'] + waddada-faylka url-koodee.
+}.
+
+URL marka: ['params:'] samee: { :map
+	>> params := Liis cusub.
+	map mid-kasta: { :key :value
+		params dhammaadka-ku-dar: key qoraal url-koodee + ['='] + value qoraal url-koodee.
+	}.
+	iska-leh params := ['?'] + ( params isku-dar: ['&'] ).
+}.
+
+URL marka: ['hash:'] samee: { :hash
+	iska-leh hash := ['#'] + hash url-koodee.
+}.
+

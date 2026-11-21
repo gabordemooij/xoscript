@@ -1,0 +1,128 @@
+>> Email := වස්තුව නව.
+
+Email ලැබුණු-විට: ['init'] කරන්න: {
+	තමාගේ recipients := ලේඛනය නව.
+	තමාගේ cc := ලේඛනය නව.
+	තමාගේ bcc := ලේඛනය නව.
+	තමාගේ from := හිස්.
+	තමාගේ from-name := හිස්.
+	තමාගේ subject := හිස්.
+	තමාගේ body := හිස්.
+}.
+
+Email ලැබුණු-විට: ['නව'] කරන්න: { <- තමා නව init.
+}.
+
+Email ලැබුණු-විට: ['to:'] කරන්න: { :list
+	තමාගේ recipients := list.
+}.
+ 
+Email ලැබුණු-විට: ['cc:'] කරන්න: { :list
+	තමාගේ cc := list.
+}.
+
+Email ලැබුණු-විට: ['bcc:'] කරන්න: { :list
+	තමාගේ bcc := list.
+}.
+
+Email ලැබුණු-විට: ['subject:'] කරන්න: { :subject
+	තමාගේ subject := subject.
+}.
+
+Email ලැබුණු-විට: ['from:name:'] කරන්න: { :from :නම
+	තමාගේ from := from.
+	තමාගේ from-name := නම.
+}.
+
+Email ලැබුණු-විට: ['body:'] කරන්න: { :body
+	තමාගේ body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ලැබුණු-විට: ['header:'] කරන්න: { :line <- line ආදේශය: ['\r'] සමග: [''], ආදේශය: ['\n'] සමග: [''].
+}.
+
+Email ලැබුණු-විට: ['send'] කරන්න: {
+	>> f := ගොනුව tempwrite: තමා generate.
+	වැඩසටහන පද්ධතිය: ['sendmail -t < '] + f ගොනු-මාර්ගය, නව-පේළිය.
+}.
+
+Email ලැබුණු-විට: ['generate'] කරන්න: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str අගට-එක්කරන්න: (තමා header: ['From: '] + තමාගේ from-name + [' <'] + ( තමාගේ from ) + ['>']) + brk.
+	str අගට-එක්කරන්න: (තමා header: ['To: '] + ( තමාගේ recipients එක්කරන්න: [','] )) + brk.
+	තමාගේ cc ගණන ඇත්ත-නම්: {
+		str අගට-එක්කරන්න: (තමා header: ['Cc: '] + ( තමාගේ cc එක්කරන්න: [','] )) + brk.
+	}.
+	තමාගේ bcc ගණන ඇත්ත-නම්: {
+		str අගට-එක්කරන්න: (තමා header: ['Bcc: '] + ( තමාගේ bcc එක්කරන්න: [','] )) + brk.
+	}.
+	str අගට-එක්කරන්න: (තමා header: ['Subject: '] + තමාගේ subject) + brk.
+	str අගට-එක්කරන්න: brk.
+	str අගට-එක්කරන්න: තමාගේ body.
+	str අගට-එක්කරන්න: brk. <- str.
+}.
+
+>> HTML-Email := Email නව.
+
+HTML-Email ලැබුණු-විට: ['init'] කරන්න: {
+	තමා init.
+	තමාගේ attachments := ලේඛනය නව.
+	තමාගේ boundary := සුරක්ෂිතාගාරය ටෝකනය: 40.
+}.
+
+HTML-Email ලැබුණු-විට: ['attach:'] කරන්න: { :file
+	>> id := තමාගේ attachments ගණන.
+	>> blob := file blob.
+	තමාගේ attachments අගට-එක්කරන්න: (
+		ශබ්දකෝෂය නව
+			file: file ගොනු-මාර්ගය,
+			mime: ['image/'] + (Server mimetype: file ගොනු-මාර්ගය),
+			data: blob base64-කේතනය
+	).
+	blob නිදහස්-කරන්න. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ලැබුණු-විට: ['generate'] කරන්න: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str අගට-එක්කරන්න: (තමා header: ['From: '] + තමාගේ from-name + [' <'] + ( තමාගේ from ) + ['>']) + brk.
+	str අගට-එක්කරන්න: (තමා header: ['To: '] + ( තමාගේ recipients එක්කරන්න: [','] )) + brk.
+	තමාගේ cc ගණන ඇත්ත-නම්: {
+		str අගට-එක්කරන්න: (තමා header: ['Cc: '] + ( තමාගේ cc එක්කරන්න: [','] )) + brk.
+	}.
+	තමාගේ bcc ගණන ඇත්ත-නම්: {
+		str අගට-එක්කරන්න: (තමා header: ['Bcc: '] + ( තමාගේ bcc එක්කරන්න: [','] )) + brk.
+	}.
+	str අගට-එක්කරන්න: (තමා header: ['Subject: '] + තමාගේ subject) + brk.
+	str අගට-එක්කරන්න: ['MIME-Version: 1.0'] + brk.
+	str අගට-එක්කරන්න: ['Content-Type: multipart/related; boundary="'] + තමාගේ boundary + ['"; type=text/html'] + brk.
+	str අගට-එක්කරන්න: brk.
+	str අගට-එක්කරන්න: ['--'] + තමාගේ boundary + brk.
+	str අගට-එක්කරන්න: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str අගට-එක්කරන්න: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str අගට-එක්කරන්න: brk.
+	str අගට-එක්කරන්න: තමාගේ body.
+	str අගට-එක්කරන්න: brk.
+	තමාගේ attachments එකිනෙක: { :id :info
+		>> blob := info data.
+		str අගට-එක්කරන්න: ['--'] + තමාගේ boundary + brk.
+		str අගට-එක්කරන්න: ['Content-Type: '] + info mime + brk.
+		str අගට-එක්කරන්න: ['Content-Transfer-Encoding: base64'] + brk.
+		str අගට-එක්කරන්න: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str අගට-එක්කරන්න: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str අගට-එක්කරන්න: brk.
+		>> max := 76.
+		>> len := blob දිග.
+		>> chunks := (len / max) ඉහළට-වටයන්න.
+		{ :i
+			>> chunk := blob පිටපත ආරම්භය: i * max දිග: max.
+			str අගට-එක්කරන්න: chunk + brk.
+		} * chunks.
+		str අගට-එක්කරන්න: brk.
+		str අගට-එක්කරන්න: brk.
+	}.
+	str අගට-එක්කරන්න: ['--'] + තමාගේ boundary + ['--'] + brk. <- str.
+}.

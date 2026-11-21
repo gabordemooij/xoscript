@@ -1,0 +1,128 @@
+>> Email := Obyekt yeni.
+
+Email olanda: ['init'] et: {
+	öz recipients := Siyahı yeni.
+	öz cc := Siyahı yeni.
+	öz bcc := Siyahı yeni.
+	öz from := Heç.
+	öz from-name := Heç.
+	öz subject := Heç.
+	öz body := Heç.
+}.
+
+Email olanda: ['yeni'] et: { <- özü yeni init.
+}.
+
+Email olanda: ['to:'] et: { :list
+	öz recipients := list.
+}.
+ 
+Email olanda: ['cc:'] et: { :list
+	öz cc := list.
+}.
+
+Email olanda: ['bcc:'] et: { :list
+	öz bcc := list.
+}.
+
+Email olanda: ['subject:'] et: { :subject
+	öz subject := subject.
+}.
+
+Email olanda: ['from:name:'] et: { :from :ad
+	öz from := from.
+	öz from-name := ad.
+}.
+
+Email olanda: ['body:'] et: { :body
+	öz body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email olanda: ['header:'] et: { :line <- line əvəzlə: ['\r'] ilə: [''], əvəzlə: ['\n'] ilə: [''].
+}.
+
+Email olanda: ['send'] et: {
+	>> f := Fayl tempwrite: özü generate.
+	Proqram sistem: ['sendmail -t < '] + f yol, yeni-sətir.
+}.
+
+Email olanda: ['generate'] et: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str sona-əlavə-et: (özü header: ['From: '] + öz from-name + [' <'] + ( öz from ) + ['>']) + brk.
+	str sona-əlavə-et: (özü header: ['To: '] + ( öz recipients birləşdir: [','] )) + brk.
+	öz cc say doğru: {
+		str sona-əlavə-et: (özü header: ['Cc: '] + ( öz cc birləşdir: [','] )) + brk.
+	}.
+	öz bcc say doğru: {
+		str sona-əlavə-et: (özü header: ['Bcc: '] + ( öz bcc birləşdir: [','] )) + brk.
+	}.
+	str sona-əlavə-et: (özü header: ['Subject: '] + öz subject) + brk.
+	str sona-əlavə-et: brk.
+	str sona-əlavə-et: öz body.
+	str sona-əlavə-et: brk. <- str.
+}.
+
+>> HTML-Email := Email yeni.
+
+HTML-Email olanda: ['init'] et: {
+	özü init.
+	öz attachments := Siyahı yeni.
+	öz boundary := Seyf token: 40.
+}.
+
+HTML-Email olanda: ['attach:'] et: { :file
+	>> id := öz attachments say.
+	>> blob := file blob.
+	öz attachments sona-əlavə-et: (
+		Lüğət yeni
+			file: file yol,
+			mime: ['image/'] + (Server mimetype: file yol),
+			data: blob base64-kodla
+	).
+	blob azad-et. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email olanda: ['generate'] et: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str sona-əlavə-et: (özü header: ['From: '] + öz from-name + [' <'] + ( öz from ) + ['>']) + brk.
+	str sona-əlavə-et: (özü header: ['To: '] + ( öz recipients birləşdir: [','] )) + brk.
+	öz cc say doğru: {
+		str sona-əlavə-et: (özü header: ['Cc: '] + ( öz cc birləşdir: [','] )) + brk.
+	}.
+	öz bcc say doğru: {
+		str sona-əlavə-et: (özü header: ['Bcc: '] + ( öz bcc birləşdir: [','] )) + brk.
+	}.
+	str sona-əlavə-et: (özü header: ['Subject: '] + öz subject) + brk.
+	str sona-əlavə-et: ['MIME-Version: 1.0'] + brk.
+	str sona-əlavə-et: ['Content-Type: multipart/related; boundary="'] + öz boundary + ['"; type=text/html'] + brk.
+	str sona-əlavə-et: brk.
+	str sona-əlavə-et: ['--'] + öz boundary + brk.
+	str sona-əlavə-et: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str sona-əlavə-et: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str sona-əlavə-et: brk.
+	str sona-əlavə-et: öz body.
+	str sona-əlavə-et: brk.
+	öz attachments hər: { :id :info
+		>> blob := info data.
+		str sona-əlavə-et: ['--'] + öz boundary + brk.
+		str sona-əlavə-et: ['Content-Type: '] + info mime + brk.
+		str sona-əlavə-et: ['Content-Transfer-Encoding: base64'] + brk.
+		str sona-əlavə-et: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str sona-əlavə-et: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str sona-əlavə-et: brk.
+		>> max := 76.
+		>> len := blob uzunluq.
+		>> chunks := (len / max) yuxarı-yuvarlaqlaşdır.
+		{ :i
+			>> chunk := blob surət başlanğıc: i * max uzunluq: max.
+			str sona-əlavə-et: chunk + brk.
+		} * chunks.
+		str sona-əlavə-et: brk.
+		str sona-əlavə-et: brk.
+	}.
+	str sona-əlavə-et: ['--'] + öz boundary + ['--'] + brk. <- str.
+}.

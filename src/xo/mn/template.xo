@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Объект шинэ.
+
+Template ирэхэд: ['шинэ'] гүйцэтгэ: { <- өөрөө шинэ content: [''].
+}.
+
+Template ирэхэд: ['content:'] гүйцэтгэ: { :content
+	өөрийн content := content. 
+}.
+
+Template ирэхэд: ['шинэ:'] гүйцэтгэ: { :content <- өөрөө шинэ content: content.
+}.
+
+Template ирэхэд: ['cut:'] гүйцэтгэ: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := өөрийн content хуваах: startmarker.
+	>> prefix := parts эхний.
+	>> parts2 := parts сүүлийн хуваах: endmarker.
+	>> suffix := parts2 сүүлийн.
+	>> part := parts2 эхний.
+	>> rest := prefix + suffix.
+	өөрийн content := rest. <- Template шинэ: part.
+	
+}.
+
+Template ирэхэд: ['хуулах'] гүйцэтгэ: { <- өөрөө шинэ: өөрөө тэмдэгт-мөр хуулах.
+}.
+	
+Template ирэхэд: ['paste:at:'] гүйцэтгэ: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	өөрийн content солих: pastemarker үүгээр: ( snippet тэмдэгт-мөр + pastemarker ).
+}.
+
+Template ирэхэд: ['тохируулах:утга:'] гүйцэтгэ: { :slot :value
+	өөрийн content солих: ['<!-- slot:'] + slot + [' -->'] үүгээр: ( Server html-кодлох: value ).
+}.
+
+Template ирэхэд: ['set:html:'] гүйцэтгэ: { :slot :html
+	өөрийн content солих: ['<!-- slot:'] + slot + [' -->'] үүгээр: html.
+}.
+
+Template ирэхэд: ['хариулах:ба:'] гүйцэтгэ: { :slot :value
+	өөрөө тохируулах: (slot эхлэл: 0 урт: (slot урт - 1)) утга: value.
+}.
+
+Template ирэхэд: ['nl2br'] гүйцэтгэ: {
+	өөрийн content солих: ['\n'] үүгээр: ['<br>'].
+}.
+
+Template ирэхэд: ['clean'] гүйцэтгэ: {
+	өөрийн content :=
+		Загвар
+		шинэ: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		таарал: өөрийн content
+		гүйцэтгэ: { <- ['']. }.
+}.
+
+Template ирэхэд: ['clean-cuts'] гүйцэтгэ: {
+	>> items := Жагсаалт шинэ.
+	Загвар
+	шинэ: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	таарал: өөрийн content
+	гүйцэтгэ: { :_ :part
+		items төгсгөлд-нэмэх: part ? 1.
+	}.
+	items бүр: { :_ :id
+		өөрийн content :=
+			Загвар шинэ: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			таарал: өөрийн content
+			гүйцэтгэ: { <- ['']. }.
+	 }.
+}.
+
+Template ирэхэд: ['clean-space'] гүйцэтгэ: {
+	өөрийн content :=
+		Загвар
+		шинэ: ['\\s*\\n'],
+		таарал: өөрийн content
+		гүйцэтгэ: { <- ['\n']. }.
+	өөрийн content :=
+		Загвар
+		шинэ: ['\\n[\\s\\t]+'],
+		таарал: өөрийн content
+		гүйцэтгэ: { <- ['\n']. }.
+}.
+
+Template ирэхэд: ['clean-all'] гүйцэтгэ: {
+	өөрөө clean.
+	өөрөө clean-cuts.
+	өөрөө clean-space.
+}.
+
+Template ирэхэд: ['тэмдэгт-мөр'] гүйцэтгэ: { <- өөрийн content.
+}.

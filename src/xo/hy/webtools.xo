@@ -1,0 +1,325 @@
+HTTP-Հարցում ստանալիս: ['HTTP-header:'] կատարել: { :key <- Ծրագիր կարգավորում: key.
+}.
+
+>> HTTP-Header := Օբյեկտ նոր.
+
+HTTP-Header ստանալիս: ['նոր'] կատարել: { <- ինքը նոր init.
+}.
+
+HTTP-Header ստանալիս: ['init'] կատարել: {
+	սեփական key := Դատարկ.
+	սեփական value := Դատարկ.
+}.
+
+HTTP-Header ստանալիս: ['key:value:'] կատարել: { :key :value
+	սեփական key := key.
+	սեփական value := value.
+}.
+
+HTTP-Header ստանալիս: ['key'] կատարել: { <- սեփական key.
+}.
+
+HTTP-Header ստանալիս: ['value'] կատարել: { <- սեփական value.
+}.
+
+
+HTTP-Header ստանալիս: ['տող'] կատարել: {
+	>> line := սեփական key + [': '] + սեփական value.
+	line փոխարինել: ['\r'] սրանով: [''], փոխարինել: ['\n'] սրանով: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Օբյեկտ նոր.
+
+Web-Document ստանալիս: ['նոր'] կատարել: { <- ինքը նոր init.
+}.
+
+Web-Document ստանալիս: ['init'] կատարել: {
+	սեփական headers := Ցուցակ նոր.
+	սեփական sess-id := Դատարկ.
+	սեփական session-manager := Tempfile-Session նոր.
+	սեփական sessdata := Դատարկ.
+	սեփական secure := Ճիշտ.
+	սեփական same-site := ['Strict'].
+	սեփական headers-out := Սխալ.
+	սեփական request := HTTP-Հարցում նոր.
+}.
+
+Web-Document ստանալիս: ['request:'] կատարել: { :request
+	սեփական request := request.
+}. 
+
+Web-Document ստանալիս: ['secure-session-cookie:'] կատարել: { :secure
+	ինքը check-headers.
+	սեփական secure := secure.
+}.
+
+Web-Document ստանալիս: ['same-site-session-cookie:'] կատարել: { :value
+	ինքը check-headers.
+	>> options := Ցուցակ նոր 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options պարունակում-է: value, եթե-սխալ: {
+		այս-առաջադրանքը սխալի-ելք: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	սեփական same-site := value.
+}.
+
+Web-Document ստանալիս: ['header:'] կատարել: { :header
+	ինքը check-headers.
+	սեփական headers ավելացնել-վերջում: header.
+}.
+
+Web-Document ստանալիս: ['clear-headers'] կատարել: {
+	ինքը check-headers.
+	սեփական headers := Ցուցակ նոր.
+}.
+
+Web-Document ստանալիս: ['session-manager:'] կատարել: { :manager
+	ինքը check-headers.
+	սեփական session-manager := manager.
+}.
+
+Web-Document ստանալիս: ['session-manager'] կատարել: { <- սեփական session-manager.
+}.
+
+Web-Document ստանալիս: ['check-headers'] կատարել: {
+	սեփական headers-out եթե-ճիշտ: {
+		այս-առաջադրանքը սխալի-ելք: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document ստանալիս: ['session-start'] կատարել: {
+	ինքը check-headers.
+	>> request := սեփական request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Դատարկ? եթե-սխալ: {
+		(( Նմուշ նոր: ['^[A-Za-z0-9]+\\z'], համընկնում: sess-id ) = 0) եթե-ճիշտ: {
+			sess-id := Դատարկ.
+		}.
+	}.
+	sess-id Դատարկ? եթե-ճիշտ: {
+		sess-id := Չհրկիզվող-պահարան թոքեն: 30.
+		>> session-header := HTTP-Header նոր
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (սեփական secure կամ-սա: ['Secure'] կամ-դա: ['']),
+		SSITE: (սեփական same-site),
+		XSID: sess-id
+		).
+		սեփական headers ավելացնել-վերջում: session-header.
+	}.
+	սեփական sessdata := սեփական session-manager for: sess-id, load. <- սեփական sessdata. # reference
+}.
+
+Web-Document ստանալիս: ['goto:'] կատարել: { :url
+	ինքը check-headers.
+	ինքը clear-headers.
+	սեփական headers
+	ավելացնել-վերջում: (
+		HTTP-Header նոր
+		key: ['Status'] value: ['303 See Other']
+	),
+	ավելացնել-վերջում: (
+		HTTP-Header նոր
+		key: ['Location'] value: url
+	).
+	ինքը out: ['Redirect'].
+}.
+
+Web-Document ստանալիս: ['session-destroy'] կատարել: {
+	ինքը check-headers.
+	>> request := սեփական request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Դատարկ? եթե-սխալ: {
+		>> session-header := HTTP-Header նոր.
+		>> when := Պահ նոր տարի: 1970, ձևաչափ: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (սեփական secure կամ-սա: ['Secure'] կամ-դա: ['']),
+			SSITE: (սեփական same-site),
+			XSID: sess-id
+		).
+		սեփական session-manager destroy.
+		սեփական headers ավելացնել-վերջում: session-header.
+	}.
+}.
+
+
+Web-Document ստանալիս: ['template:'] կատարել: { :ուղի <- Template նոր: (Ֆայլ նոր: ուղի, կարդալ).
+}.
+
+Web-Document ստանալիս: ['out:type:'] կատարել: { :output :տեսակ
+	սեփական headers-out եթե-սխալ: {
+		սեփական sessdata Դատարկ? եթե-սխալ: {
+			սեփական session-manager save: սեփական sessdata.
+		}.
+		սեփական headers ավելացնել-վերջում: (
+			HTTP-Header նոր
+			key: ['Content-type'] value: տեսակ
+		).
+		սեփական headers յուրաքանչյուր: { :_ :header
+			Ելք գրել: header.
+		}.
+		սեփական headers-out := Ճիշտ.
+		Ելք գրել: ['\r\n'].
+	}.
+	Ելք գրել: output.
+}.
+
+Web-Document ստանալիս: ['finish:type:'] կատարել: { :output :տեսակ
+	սեփական headers-out եթե-սխալ: {
+		սեփական sessdata Դատարկ? եթե-սխալ: {
+			սեփական session-manager save: սեփական sessdata.
+		}.
+		սեփական headers ավելացնել-վերջում: (
+			HTTP-Header նոր
+			key: ['Content-type'] value: տեսակ
+		).
+		սեփական headers ավելացնել-վերջում: (
+			HTTP-Header նոր
+			key: ['Content-Length'] value: output տող bytes
+		).
+		սեփական headers յուրաքանչյուր: { :_ :header
+			Ելք գրել: header.
+		}.
+		սեփական headers-out := Ճիշտ.
+		Ելք գրել: ['\r\n'].
+	}.
+	Ելք գրել: output.
+}.
+
+Web-Document ստանալիս: ['out:'] կատարել: { :output
+	ինքը out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ստանալիս: ['finish:'] կատարել: { :output
+	ինքը finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ստանալիս: ['json:'] կատարել: { :output
+	ինքը out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document ստանալիս: ['not-found:'] կատարել: { :output
+	ինքը clear-headers header: (
+		HTTP-Header նոր key: ['Status'] value: ['404 Not Found']
+	).
+	ինքը out: output.
+}.
+
+
+# Interface
+
+>> Session := Օբյեկտ նոր.
+
+Session ստանալիս: ['նոր'] կատարել: { <- ինքը նոր init for: Դատարկ.
+}.
+
+Session ստանալիս: ['for:'] կատարել: { :id
+	սեփական id := id.
+}.
+
+Session ստանալիս: ['load'] կատարել: {
+	այս-առաջադրանքը սխալի-ելք: ['Not implemented.'].
+}.
+
+Session ստանալիս: ['save:'] կատարել: {
+	այս-առաջադրանքը սխալի-ելք: ['Not implemented.'].
+}.
+
+Session ստանալիս: ['destroy'] կատարել: {
+	այս-առաջադրանքը սխալի-ելք: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session նոր.
+
+Tempfile-Session ստանալիս: ['init'] կատարել: {
+	սեփական pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session ստանալիս: ['path-prefix:'] կատարել: { :str
+	սեփական pathprefix := str.
+}.
+
+Tempfile-Session ստանալիս: ['file'] կատարել: { <- ( Ֆայլ նոր: ( սեփական pathprefix + սեփական id + ['.txt'] ) ).
+}.
+
+Tempfile-Session ստանալիս: ['load'] կատարել: {
+	>> file := ինքը file.
+	file գոյություն-ունի եթե-սխալ: {
+		file գրել: (Բառարան նոր կոդ).
+	}. <- file կարդալ օբյեկտ.
+}.
+
+Tempfile-Session ստանալիս: ['save:'] կատարել: { :data
+	>> file := ինքը file.
+	file գոյություն-ունի եթե-ճիշտ: {
+		file գրել: data կոդ.
+	}.
+}.
+
+Tempfile-Session ստանալիս: ['destroy'] կատարել: {
+	>> file := ինքը file.
+	file գոյություն-ունի եթե-ճիշտ: {
+		file ջնջել.
+	}.
+}.
+
+
+>> URL := Օբյեկտ նոր.
+
+URL ստանալիս: ['init'] կատարել: {
+	սեփական protocol := ['https://'].
+	սեփական հոսթ := ['localhost'].
+	սեփական ուղի := [''].
+	սեփական params := [''].
+	սեփական hash := [''].
+}.
+
+URL ստանալիս: ['նոր'] կատարել: { <- ինքը նոր init.
+}.
+
+URL ստանալիս: ['տող'] կատարել: { <- (
+	սեփական protocol +
+	սեփական հոսթ +
+	սեփական ուղի +
+	սեփական params +
+	սեփական hash ).
+}.
+
+URL ստանալիս: ['protocol:'] կատարել: { :protocol
+	((Ցուցակ նոր: ['http'] ; ['https']) պարունակում-է: protocol) եթե-ճիշտ: {
+		սեփական protocol := protocol + ['://'].
+	}, եթե-սխալ: {
+		այս-առաջադրանքը սխալի-ելք: ['Invalid protocol'].
+	}.
+}.
+
+URL ստանալիս: ['հոսթ:'] կատարել: { :հոսթ
+	#todo validate according to rfc
+	սեփական հոսթ := հոսթ.
+}.
+
+URL ստանալիս: ['path:'] կատարել: { :ուղի
+	սեփական ուղի := ['/'] + ուղի url-կոդավորել.
+}.
+
+URL ստանալիս: ['params:'] կատարել: { :map
+	>> params := Ցուցակ նոր.
+	map յուրաքանչյուր: { :key :value
+		params ավելացնել-վերջում: key տող url-կոդավորել + ['='] + value տող url-կոդավորել.
+	}.
+	սեփական params := ['?'] + ( params միացնել: ['&'] ).
+}.
+
+URL ստանալիս: ['հեշ:'] կատարել: { :hash
+	սեփական hash := ['#'] + hash url-կոդավորել.
+}.
+

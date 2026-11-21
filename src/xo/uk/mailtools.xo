@@ -1,0 +1,128 @@
+>> Email := Обʼєкт новий.
+
+Email при: ['init'] виконати: {
+	свій recipients := Список новий.
+	свій cc := Список новий.
+	свій bcc := Список новий.
+	свій from := Ніщо.
+	свій from-name := Ніщо.
+	свій subject := Ніщо.
+	свій body := Ніщо.
+}.
+
+Email при: ['новий'] виконати: { <- сам новий init.
+}.
+
+Email при: ['to:'] виконати: { :list
+	свій recipients := list.
+}.
+ 
+Email при: ['cc:'] виконати: { :list
+	свій cc := list.
+}.
+
+Email при: ['bcc:'] виконати: { :list
+	свій bcc := list.
+}.
+
+Email при: ['subject:'] виконати: { :subject
+	свій subject := subject.
+}.
+
+Email при: ['from:name:'] виконати: { :from :імʼя
+	свій from := from.
+	свій from-name := імʼя.
+}.
+
+Email при: ['body:'] виконати: { :body
+	свій body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email при: ['header:'] виконати: { :line <- line замінити: ['\r'] на: [''], замінити: ['\n'] на: [''].
+}.
+
+Email при: ['send'] виконати: {
+	>> f := Файл tempwrite: сам generate.
+	Програма система: ['sendmail -t < '] + f шлях, новий-рядок.
+}.
+
+Email при: ['generate'] виконати: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str додати-в-кінець: (сам header: ['From: '] + свій from-name + [' <'] + ( свій from ) + ['>']) + brk.
+	str додати-в-кінець: (сам header: ['To: '] + ( свій recipients зʼєднати: [','] )) + brk.
+	свій cc кількість істина: {
+		str додати-в-кінець: (сам header: ['Cc: '] + ( свій cc зʼєднати: [','] )) + brk.
+	}.
+	свій bcc кількість істина: {
+		str додати-в-кінець: (сам header: ['Bcc: '] + ( свій bcc зʼєднати: [','] )) + brk.
+	}.
+	str додати-в-кінець: (сам header: ['Subject: '] + свій subject) + brk.
+	str додати-в-кінець: brk.
+	str додати-в-кінець: свій body.
+	str додати-в-кінець: brk. <- str.
+}.
+
+>> HTML-Email := Email новий.
+
+HTML-Email при: ['init'] виконати: {
+	сам init.
+	свій attachments := Список новий.
+	свій boundary := Сховище токен: 40.
+}.
+
+HTML-Email при: ['attach:'] виконати: { :file
+	>> id := свій attachments кількість.
+	>> blob := file blob.
+	свій attachments додати-в-кінець: (
+		Словник новий
+			file: file шлях,
+			mime: ['image/'] + (Server mimetype: file шлях),
+			data: blob base64-кодувати
+	).
+	blob звільнити. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email при: ['generate'] виконати: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str додати-в-кінець: (сам header: ['From: '] + свій from-name + [' <'] + ( свій from ) + ['>']) + brk.
+	str додати-в-кінець: (сам header: ['To: '] + ( свій recipients зʼєднати: [','] )) + brk.
+	свій cc кількість істина: {
+		str додати-в-кінець: (сам header: ['Cc: '] + ( свій cc зʼєднати: [','] )) + brk.
+	}.
+	свій bcc кількість істина: {
+		str додати-в-кінець: (сам header: ['Bcc: '] + ( свій bcc зʼєднати: [','] )) + brk.
+	}.
+	str додати-в-кінець: (сам header: ['Subject: '] + свій subject) + brk.
+	str додати-в-кінець: ['MIME-Version: 1.0'] + brk.
+	str додати-в-кінець: ['Content-Type: multipart/related; boundary="'] + свій boundary + ['"; type=text/html'] + brk.
+	str додати-в-кінець: brk.
+	str додати-в-кінець: ['--'] + свій boundary + brk.
+	str додати-в-кінець: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str додати-в-кінець: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str додати-в-кінець: brk.
+	str додати-в-кінець: свій body.
+	str додати-в-кінець: brk.
+	свій attachments кожен: { :id :info
+		>> blob := info data.
+		str додати-в-кінець: ['--'] + свій boundary + brk.
+		str додати-в-кінець: ['Content-Type: '] + info mime + brk.
+		str додати-в-кінець: ['Content-Transfer-Encoding: base64'] + brk.
+		str додати-в-кінець: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str додати-в-кінець: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str додати-в-кінець: brk.
+		>> max := 76.
+		>> len := blob довжина.
+		>> chunks := (len / max) округлити-вгору.
+		{ :i
+			>> chunk := blob копіювати від: i * max довжина: max.
+			str додати-в-кінець: chunk + brk.
+		} * chunks.
+		str додати-в-кінець: brk.
+		str додати-в-кінець: brk.
+	}.
+	str додати-в-кінець: ['--'] + свій boundary + ['--'] + brk. <- str.
+}.

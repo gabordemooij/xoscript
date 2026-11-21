@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Tişt nû.
+
+Template gava: ['nû'] bike: { <- xwe nû content: [''].
+}.
+
+Template gava: ['content:'] bike: { :content
+	xweyî content := content. 
+}.
+
+Template gava: ['nû:'] bike: { :content <- xwe nû content: content.
+}.
+
+Template gava: ['cut:'] bike: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := xweyî content parçe-bike: startmarker.
+	>> prefix := parts yekem.
+	>> parts2 := parts ya-dawî parçe-bike: endmarker.
+	>> suffix := parts2 ya-dawî.
+	>> part := parts2 yekem.
+	>> rest := prefix + suffix.
+	xweyî content := rest. <- Template nû: part.
+	
+}.
+
+Template gava: ['kopî-bike'] bike: { <- xwe nû: xwe nivîs kopî-bike.
+}.
+	
+Template gava: ['paste:at:'] bike: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	xweyî content biguherîne: pastemarker bi: ( snippet nivîs + pastemarker ).
+}.
+
+Template gava: ['saz-bike:nirx:'] bike: { :slot :value
+	xweyî content biguherîne: ['<!-- slot:'] + slot + [' -->'] bi: ( Server html-kod-bike: value ).
+}.
+
+Template gava: ['set:html:'] bike: { :slot :html
+	xweyî content biguherîne: ['<!-- slot:'] + slot + [' -->'] bi: html.
+}.
+
+Template gava: ['bersiv-bide:û:'] bike: { :slot :value
+	xwe saz-bike: (slot ji: 0 dirêjî: (slot dirêjî - 1)) nirx: value.
+}.
+
+Template gava: ['nl2br'] bike: {
+	xweyî content biguherîne: ['\n'] bi: ['<br>'].
+}.
+
+Template gava: ['clean'] bike: {
+	xweyî content :=
+		Qalib
+		nû: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		lihevhatin: xweyî content
+		bike: { <- ['']. }.
+}.
+
+Template gava: ['clean-cuts'] bike: {
+	>> items := Lîste nû.
+	Qalib
+	nû: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	lihevhatin: xweyî content
+	bike: { :_ :part
+		items li-dawiyê-zêde-bike: part ? 1.
+	}.
+	items her-yek: { :_ :id
+		xweyî content :=
+			Qalib nû: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			lihevhatin: xweyî content
+			bike: { <- ['']. }.
+	 }.
+}.
+
+Template gava: ['clean-space'] bike: {
+	xweyî content :=
+		Qalib
+		nû: ['\\s*\\n'],
+		lihevhatin: xweyî content
+		bike: { <- ['\n']. }.
+	xweyî content :=
+		Qalib
+		nû: ['\\n[\\s\\t]+'],
+		lihevhatin: xweyî content
+		bike: { <- ['\n']. }.
+}.
+
+Template gava: ['clean-all'] bike: {
+	xwe clean.
+	xwe clean-cuts.
+	xwe clean-space.
+}.
+
+Template gava: ['nivîs'] bike: { <- xweyî content.
+}.

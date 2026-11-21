@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Denc xees.
+
+Template bu: ['xees'] def: { <- man xees content: [''].
+}.
+
+Template bu: ['content:'] def: { :content
+	sama content := content. 
+}.
+
+Template bu: ['xees:'] def: { :content <- man xees content: content.
+}.
+
+Template bu: ['cut:'] def: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := sama content xaaj: startmarker.
+	>> prefix := parts njëkk.
+	>> parts2 := parts mujj xaaj: endmarker.
+	>> suffix := parts2 mujj.
+	>> part := parts2 njëkk.
+	>> rest := prefix + suffix.
+	sama content := rest. <- Template xees: part.
+	
+}.
+
+Template bu: ['duppitu'] def: { <- man xees: man mbind duppitu.
+}.
+	
+Template bu: ['paste:at:'] def: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	sama content wuutal: pastemarker ci: ( snippet mbind + pastemarker ).
+}.
+
+Template bu: ['denc:njëg:'] def: { :slot :value
+	sama content wuutal: ['<!-- slot:'] + slot + [' -->'] ci: ( Server html-koode: value ).
+}.
+
+Template bu: ['set:html:'] def: { :slot :html
+	sama content wuutal: ['<!-- slot:'] + slot + [' -->'] ci: html.
+}.
+
+Template bu: ['tontu:ak:'] def: { :slot :value
+	man denc: (slot dale: 0 guddaay: (slot guddaay - 1)) njëg: value.
+}.
+
+Template bu: ['nl2br'] def: {
+	sama content wuutal: ['\n'] ci: ['<br>'].
+}.
+
+Template bu: ['clean'] def: {
+	sama content :=
+		Nataal-seet
+		xees: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		méngoo: sama content
+		def: { <- ['']. }.
+}.
+
+Template bu: ['clean-cuts'] def: {
+	>> items := Jokkalante xees.
+	Nataal-seet
+	xees: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	méngoo: sama content
+	def: { :_ :part
+		items yokk-ci-mujj: part ? 1.
+	}.
+	items kenn-ci-kenn: { :_ :id
+		sama content :=
+			Nataal-seet xees: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			méngoo: sama content
+			def: { <- ['']. }.
+	 }.
+}.
+
+Template bu: ['clean-space'] def: {
+	sama content :=
+		Nataal-seet
+		xees: ['\\s*\\n'],
+		méngoo: sama content
+		def: { <- ['\n']. }.
+	sama content :=
+		Nataal-seet
+		xees: ['\\n[\\s\\t]+'],
+		méngoo: sama content
+		def: { <- ['\n']. }.
+}.
+
+Template bu: ['clean-all'] def: {
+	man clean.
+	man clean-cuts.
+	man clean-space.
+}.
+
+Template bu: ['mbind'] def: { <- sama content.
+}.

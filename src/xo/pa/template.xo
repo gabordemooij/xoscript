@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := ਵਸਤੂ ਨਵਾਂ.
+
+Template ਜਦੋਂ: ['ਨਵਾਂ'] ਕਰੋ: { <- ਆਪ ਨਵਾਂ content: [''].
+}.
+
+Template ਜਦੋਂ: ['content:'] ਕਰੋ: { :content
+	ਆਪਣਾ content := content. 
+}.
+
+Template ਜਦੋਂ: ['ਨਵਾਂ:'] ਕਰੋ: { :content <- ਆਪ ਨਵਾਂ content: content.
+}.
+
+Template ਜਦੋਂ: ['cut:'] ਕਰੋ: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := ਆਪਣਾ content ਵੰਡੋ: startmarker.
+	>> prefix := parts ਪਹਿਲਾ.
+	>> parts2 := parts ਆਖਰੀ ਵੰਡੋ: endmarker.
+	>> suffix := parts2 ਆਖਰੀ.
+	>> part := parts2 ਪਹਿਲਾ.
+	>> rest := prefix + suffix.
+	ਆਪਣਾ content := rest. <- Template ਨਵਾਂ: part.
+	
+}.
+
+Template ਜਦੋਂ: ['ਨਕਲ'] ਕਰੋ: { <- ਆਪ ਨਵਾਂ: ਆਪ ਲਿਖਤ-ਵਿੱਚ ਨਕਲ.
+}.
+	
+Template ਜਦੋਂ: ['paste:at:'] ਕਰੋ: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	ਆਪਣਾ content ਬਦਲੋ: pastemarker ਨਾਲ: ( snippet ਲਿਖਤ-ਵਿੱਚ + pastemarker ).
+}.
+
+Template ਜਦੋਂ: ['ਨਿਯਤ:ਮੁੱਲ:'] ਕਰੋ: { :slot :value
+	ਆਪਣਾ content ਬਦਲੋ: ['<!-- slot:'] + slot + [' -->'] ਨਾਲ: ( Server html-ਇਨਕੋਡ: value ).
+}.
+
+Template ਜਦੋਂ: ['set:html:'] ਕਰੋ: { :slot :html
+	ਆਪਣਾ content ਬਦਲੋ: ['<!-- slot:'] + slot + [' -->'] ਨਾਲ: html.
+}.
+
+Template ਜਦੋਂ: ['ਜਵਾਬ:ਅਤੇ:'] ਕਰੋ: { :slot :value
+	ਆਪ ਨਿਯਤ: (slot ਸ਼ੁਰੂ: 0 ਲੰਬਾਈ: (slot ਲੰਬਾਈ - 1)) ਮੁੱਲ: value.
+}.
+
+Template ਜਦੋਂ: ['nl2br'] ਕਰੋ: {
+	ਆਪਣਾ content ਬਦਲੋ: ['\n'] ਨਾਲ: ['<br>'].
+}.
+
+Template ਜਦੋਂ: ['clean'] ਕਰੋ: {
+	ਆਪਣਾ content :=
+		ਪੈਟਰਨ
+		ਨਵਾਂ: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ਮੇਲ: ਆਪਣਾ content
+		ਕਰੋ: { <- ['']. }.
+}.
+
+Template ਜਦੋਂ: ['clean-cuts'] ਕਰੋ: {
+	>> items := ਲਿਸਟ ਨਵਾਂ.
+	ਪੈਟਰਨ
+	ਨਵਾਂ: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ਮੇਲ: ਆਪਣਾ content
+	ਕਰੋ: { :_ :part
+		items ਅੰਤ-ਵਿੱਚ-ਜੋੜੋ: part ? 1.
+	}.
+	items ਹਰੇਕ: { :_ :id
+		ਆਪਣਾ content :=
+			ਪੈਟਰਨ ਨਵਾਂ: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ਮੇਲ: ਆਪਣਾ content
+			ਕਰੋ: { <- ['']. }.
+	 }.
+}.
+
+Template ਜਦੋਂ: ['clean-space'] ਕਰੋ: {
+	ਆਪਣਾ content :=
+		ਪੈਟਰਨ
+		ਨਵਾਂ: ['\\s*\\n'],
+		ਮੇਲ: ਆਪਣਾ content
+		ਕਰੋ: { <- ['\n']. }.
+	ਆਪਣਾ content :=
+		ਪੈਟਰਨ
+		ਨਵਾਂ: ['\\n[\\s\\t]+'],
+		ਮੇਲ: ਆਪਣਾ content
+		ਕਰੋ: { <- ['\n']. }.
+}.
+
+Template ਜਦੋਂ: ['clean-all'] ਕਰੋ: {
+	ਆਪ clean.
+	ਆਪ clean-cuts.
+	ਆਪ clean-space.
+}.
+
+Template ਜਦੋਂ: ['ਲਿਖਤ-ਵਿੱਚ'] ਕਰੋ: { <- ਆਪਣਾ content.
+}.

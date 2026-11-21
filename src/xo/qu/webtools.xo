@@ -1,0 +1,325 @@
+Mañakuy-HTTP patapi: ['HTTP-header:'] ruway: { :key <- Programa wakichina: key.
+}.
+
+>> HTTP-Header := Ima musuq.
+
+HTTP-Header patapi: ['musuq'] ruway: { <- kikin musuq init.
+}.
+
+HTTP-Header patapi: ['init'] ruway: {
+	ñuqap key := Mana.
+	ñuqap value := Mana.
+}.
+
+HTTP-Header patapi: ['key:value:'] ruway: { :key :value
+	ñuqap key := key.
+	ñuqap value := value.
+}.
+
+HTTP-Header patapi: ['key'] ruway: { <- ñuqap key.
+}.
+
+HTTP-Header patapi: ['value'] ruway: { <- ñuqap value.
+}.
+
+
+HTTP-Header patapi: ['qillqaman'] ruway: {
+	>> line := ñuqap key + [': '] + ñuqap value.
+	line rantinpay: ['\r'] kayta: [''], rantinpay: ['\n'] kayta: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Ima musuq.
+
+Web-Document patapi: ['musuq'] ruway: { <- kikin musuq init.
+}.
+
+Web-Document patapi: ['init'] ruway: {
+	ñuqap headers := Katiray musuq.
+	ñuqap sess-id := Mana.
+	ñuqap session-manager := Tempfile-Session musuq.
+	ñuqap sessdata := Mana.
+	ñuqap secure := Chiqap.
+	ñuqap same-site := ['Strict'].
+	ñuqap headers-out := Llulla.
+	ñuqap request := Mañakuy-HTTP musuq.
+}.
+
+Web-Document patapi: ['request:'] ruway: { :request
+	ñuqap request := request.
+}. 
+
+Web-Document patapi: ['secure-session-cookie:'] ruway: { :secure
+	kikin check-headers.
+	ñuqap secure := secure.
+}.
+
+Web-Document patapi: ['same-site-session-cookie:'] ruway: { :value
+	kikin check-headers.
+	>> options := Katiray musuq 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options kapun: value, llullaqtin: {
+		kay-ruway pantay: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	ñuqap same-site := value.
+}.
+
+Web-Document patapi: ['header:'] ruway: { :header
+	kikin check-headers.
+	ñuqap headers yapay-qhepaman: header.
+}.
+
+Web-Document patapi: ['clear-headers'] ruway: {
+	kikin check-headers.
+	ñuqap headers := Katiray musuq.
+}.
+
+Web-Document patapi: ['session-manager:'] ruway: { :manager
+	kikin check-headers.
+	ñuqap session-manager := manager.
+}.
+
+Web-Document patapi: ['session-manager'] ruway: { <- ñuqap session-manager.
+}.
+
+Web-Document patapi: ['check-headers'] ruway: {
+	ñuqap headers-out chiqapqtin: {
+		kay-ruway pantay: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document patapi: ['session-start'] ruway: {
+	kikin check-headers.
+	>> request := ñuqap request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Manachu? llullaqtin: {
+		(( Rikchʼaq musuq: ['^[A-Za-z0-9]+\\z'], tinkuy: sess-id ) = 0) chiqapqtin: {
+			sess-id := Mana.
+		}.
+	}.
+	sess-id Manachu? chiqapqtin: {
+		sess-id := Waqaychana token: 30.
+		>> session-header := HTTP-Header musuq
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (ñuqap secure kaypas: ['Secure'] chaypas: ['']),
+		SSITE: (ñuqap same-site),
+		XSID: sess-id
+		).
+		ñuqap headers yapay-qhepaman: session-header.
+	}.
+	ñuqap sessdata := ñuqap session-manager for: sess-id, load. <- ñuqap sessdata. # reference
+}.
+
+Web-Document patapi: ['goto:'] ruway: { :url
+	kikin check-headers.
+	kikin clear-headers.
+	ñuqap headers
+	yapay-qhepaman: (
+		HTTP-Header musuq
+		key: ['Status'] value: ['303 See Other']
+	),
+	yapay-qhepaman: (
+		HTTP-Header musuq
+		key: ['Location'] value: url
+	).
+	kikin out: ['Redirect'].
+}.
+
+Web-Document patapi: ['session-destroy'] ruway: {
+	kikin check-headers.
+	>> request := ñuqap request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Manachu? llullaqtin: {
+		>> session-header := HTTP-Header musuq.
+		>> when := Pacha musuq wata: 1970, formatopi: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (ñuqap secure kaypas: ['Secure'] chaypas: ['']),
+			SSITE: (ñuqap same-site),
+			XSID: sess-id
+		).
+		ñuqap session-manager destroy.
+		ñuqap headers yapay-qhepaman: session-header.
+	}.
+}.
+
+
+Web-Document patapi: ['template:'] ruway: { :ñan <- Template musuq: (Khipu musuq: ñan, ñawiy).
+}.
+
+Web-Document patapi: ['out:type:'] ruway: { :output :laya
+	ñuqap headers-out llullaqtin: {
+		ñuqap sessdata Manachu? llullaqtin: {
+			ñuqap session-manager save: ñuqap sessdata.
+		}.
+		ñuqap headers yapay-qhepaman: (
+			HTTP-Header musuq
+			key: ['Content-type'] value: laya
+		).
+		ñuqap headers sapallanpaq: { :_ :header
+			Lluqsiy qillqay: header.
+		}.
+		ñuqap headers-out := Chiqap.
+		Lluqsiy qillqay: ['\r\n'].
+	}.
+	Lluqsiy qillqay: output.
+}.
+
+Web-Document patapi: ['finish:type:'] ruway: { :output :laya
+	ñuqap headers-out llullaqtin: {
+		ñuqap sessdata Manachu? llullaqtin: {
+			ñuqap session-manager save: ñuqap sessdata.
+		}.
+		ñuqap headers yapay-qhepaman: (
+			HTTP-Header musuq
+			key: ['Content-type'] value: laya
+		).
+		ñuqap headers yapay-qhepaman: (
+			HTTP-Header musuq
+			key: ['Content-Length'] value: output qillqaman bytes
+		).
+		ñuqap headers sapallanpaq: { :_ :header
+			Lluqsiy qillqay: header.
+		}.
+		ñuqap headers-out := Chiqap.
+		Lluqsiy qillqay: ['\r\n'].
+	}.
+	Lluqsiy qillqay: output.
+}.
+
+Web-Document patapi: ['out:'] ruway: { :output
+	kikin out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document patapi: ['finish:'] ruway: { :output
+	kikin finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document patapi: ['json:'] ruway: { :output
+	kikin out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document patapi: ['not-found:'] ruway: { :output
+	kikin clear-headers header: (
+		HTTP-Header musuq key: ['Status'] value: ['404 Not Found']
+	).
+	kikin out: output.
+}.
+
+
+# Interface
+
+>> Session := Ima musuq.
+
+Session patapi: ['musuq'] ruway: { <- kikin musuq init for: Mana.
+}.
+
+Session patapi: ['for:'] ruway: { :id
+	ñuqap id := id.
+}.
+
+Session patapi: ['load'] ruway: {
+	kay-ruway pantay: ['Not implemented.'].
+}.
+
+Session patapi: ['save:'] ruway: {
+	kay-ruway pantay: ['Not implemented.'].
+}.
+
+Session patapi: ['destroy'] ruway: {
+	kay-ruway pantay: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session musuq.
+
+Tempfile-Session patapi: ['init'] ruway: {
+	ñuqap pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session patapi: ['path-prefix:'] ruway: { :str
+	ñuqap pathprefix := str.
+}.
+
+Tempfile-Session patapi: ['file'] ruway: { <- ( Khipu musuq: ( ñuqap pathprefix + ñuqap id + ['.txt'] ) ).
+}.
+
+Tempfile-Session patapi: ['load'] ruway: {
+	>> file := kikin file.
+	file kan llullaqtin: {
+		file qillqay: (Simi-taqi musuq codigo).
+	}. <- file ñawiy imaman.
+}.
+
+Tempfile-Session patapi: ['save:'] ruway: { :data
+	>> file := kikin file.
+	file kan chiqapqtin: {
+		file qillqay: data codigo.
+	}.
+}.
+
+Tempfile-Session patapi: ['destroy'] ruway: {
+	>> file := kikin file.
+	file kan chiqapqtin: {
+		file pichay.
+	}.
+}.
+
+
+>> URL := Ima musuq.
+
+URL patapi: ['init'] ruway: {
+	ñuqap protocol := ['https://'].
+	ñuqap samachiq := ['localhost'].
+	ñuqap ñan := [''].
+	ñuqap params := [''].
+	ñuqap hash := [''].
+}.
+
+URL patapi: ['musuq'] ruway: { <- kikin musuq init.
+}.
+
+URL patapi: ['qillqaman'] ruway: { <- (
+	ñuqap protocol +
+	ñuqap samachiq +
+	ñuqap ñan +
+	ñuqap params +
+	ñuqap hash ).
+}.
+
+URL patapi: ['protocol:'] ruway: { :protocol
+	((Katiray musuq: ['http'] ; ['https']) kapun: protocol) chiqapqtin: {
+		ñuqap protocol := protocol + ['://'].
+	}, llullaqtin: {
+		kay-ruway pantay: ['Invalid protocol'].
+	}.
+}.
+
+URL patapi: ['samachiq:'] ruway: { :samachiq
+	#todo validate according to rfc
+	ñuqap samachiq := samachiq.
+}.
+
+URL patapi: ['path:'] ruway: { :ñan
+	ñuqap ñan := ['/'] + ñan url-kodificay.
+}.
+
+URL patapi: ['params:'] ruway: { :map
+	>> params := Katiray musuq.
+	map sapallanpaq: { :key :value
+		params yapay-qhepaman: key qillqaman url-kodificay + ['='] + value qillqaman url-kodificay.
+	}.
+	ñuqap params := ['?'] + ( params huñuy: ['&'] ).
+}.
+
+URL patapi: ['chaqruy:'] ruway: { :hash
+	ñuqap hash := ['#'] + hash url-kodificay.
+}.
+

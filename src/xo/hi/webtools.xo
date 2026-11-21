@@ -1,0 +1,325 @@
+HTTP-अनुरोध जब: ['HTTP-header:'] करो: { :key <- प्रोग्राम सेटिंग: key.
+}.
+
+>> HTTP-Header := वस्तु नया.
+
+HTTP-Header जब: ['नया'] करो: { <- स्वयं नया init.
+}.
+
+HTTP-Header जब: ['init'] करो: {
+	अपना key := शून्य.
+	अपना value := शून्य.
+}.
+
+HTTP-Header जब: ['key:value:'] करो: { :key :value
+	अपना key := key.
+	अपना value := value.
+}.
+
+HTTP-Header जब: ['key'] करो: { <- अपना key.
+}.
+
+HTTP-Header जब: ['value'] करो: { <- अपना value.
+}.
+
+
+HTTP-Header जब: ['पाठ-में'] करो: {
+	>> line := अपना key + [': '] + अपना value.
+	line बदलो: ['\r'] से: [''], बदलो: ['\n'] से: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := वस्तु नया.
+
+Web-Document जब: ['नया'] करो: { <- स्वयं नया init.
+}.
+
+Web-Document जब: ['init'] करो: {
+	अपना headers := सूची नया.
+	अपना sess-id := शून्य.
+	अपना session-manager := Tempfile-Session नया.
+	अपना sessdata := शून्य.
+	अपना secure := सत्य.
+	अपना same-site := ['Strict'].
+	अपना headers-out := असत्य.
+	अपना request := HTTP-अनुरोध नया.
+}.
+
+Web-Document जब: ['request:'] करो: { :request
+	अपना request := request.
+}. 
+
+Web-Document जब: ['secure-session-cookie:'] करो: { :secure
+	स्वयं check-headers.
+	अपना secure := secure.
+}.
+
+Web-Document जब: ['same-site-session-cookie:'] करो: { :value
+	स्वयं check-headers.
+	>> options := सूची नया 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options शामिल-है: value, असत्य-हो-तो: {
+		यह-कार्य त्रुटि: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	अपना same-site := value.
+}.
+
+Web-Document जब: ['header:'] करो: { :header
+	स्वयं check-headers.
+	अपना headers अंत-में-जोड़ो: header.
+}.
+
+Web-Document जब: ['clear-headers'] करो: {
+	स्वयं check-headers.
+	अपना headers := सूची नया.
+}.
+
+Web-Document जब: ['session-manager:'] करो: { :manager
+	स्वयं check-headers.
+	अपना session-manager := manager.
+}.
+
+Web-Document जब: ['session-manager'] करो: { <- अपना session-manager.
+}.
+
+Web-Document जब: ['check-headers'] करो: {
+	अपना headers-out सत्य-हो-तो: {
+		यह-कार्य त्रुटि: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document जब: ['session-start'] करो: {
+	स्वयं check-headers.
+	>> request := अपना request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id शून्य? असत्य-हो-तो: {
+		(( पैटर्न नया: ['^[A-Za-z0-9]+\\z'], मिलान: sess-id ) = 0) सत्य-हो-तो: {
+			sess-id := शून्य.
+		}.
+	}.
+	sess-id शून्य? सत्य-हो-तो: {
+		sess-id := तिजोरी टोकन: 30.
+		>> session-header := HTTP-Header नया
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (अपना secure यह: ['Secure'] या-वह: ['']),
+		SSITE: (अपना same-site),
+		XSID: sess-id
+		).
+		अपना headers अंत-में-जोड़ो: session-header.
+	}.
+	अपना sessdata := अपना session-manager for: sess-id, load. <- अपना sessdata. # reference
+}.
+
+Web-Document जब: ['goto:'] करो: { :url
+	स्वयं check-headers.
+	स्वयं clear-headers.
+	अपना headers
+	अंत-में-जोड़ो: (
+		HTTP-Header नया
+		key: ['Status'] value: ['303 See Other']
+	),
+	अंत-में-जोड़ो: (
+		HTTP-Header नया
+		key: ['Location'] value: url
+	).
+	स्वयं out: ['Redirect'].
+}.
+
+Web-Document जब: ['session-destroy'] करो: {
+	स्वयं check-headers.
+	>> request := अपना request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id शून्य? असत्य-हो-तो: {
+		>> session-header := HTTP-Header नया.
+		>> when := क्षण नया वर्ष: 1970, प्रारूप-में: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (अपना secure यह: ['Secure'] या-वह: ['']),
+			SSITE: (अपना same-site),
+			XSID: sess-id
+		).
+		अपना session-manager destroy.
+		अपना headers अंत-में-जोड़ो: session-header.
+	}.
+}.
+
+
+Web-Document जब: ['template:'] करो: { :फ़ाइल-पथ <- Template नया: (फ़ाइल नया: फ़ाइल-पथ, पढ़ो).
+}.
+
+Web-Document जब: ['out:type:'] करो: { :output :प्रकार
+	अपना headers-out असत्य-हो-तो: {
+		अपना sessdata शून्य? असत्य-हो-तो: {
+			अपना session-manager save: अपना sessdata.
+		}.
+		अपना headers अंत-में-जोड़ो: (
+			HTTP-Header नया
+			key: ['Content-type'] value: प्रकार
+		).
+		अपना headers प्रत्येक: { :_ :header
+			निर्गम लिखो: header.
+		}.
+		अपना headers-out := सत्य.
+		निर्गम लिखो: ['\r\n'].
+	}.
+	निर्गम लिखो: output.
+}.
+
+Web-Document जब: ['finish:type:'] करो: { :output :प्रकार
+	अपना headers-out असत्य-हो-तो: {
+		अपना sessdata शून्य? असत्य-हो-तो: {
+			अपना session-manager save: अपना sessdata.
+		}.
+		अपना headers अंत-में-जोड़ो: (
+			HTTP-Header नया
+			key: ['Content-type'] value: प्रकार
+		).
+		अपना headers अंत-में-जोड़ो: (
+			HTTP-Header नया
+			key: ['Content-Length'] value: output पाठ-में bytes
+		).
+		अपना headers प्रत्येक: { :_ :header
+			निर्गम लिखो: header.
+		}.
+		अपना headers-out := सत्य.
+		निर्गम लिखो: ['\r\n'].
+	}.
+	निर्गम लिखो: output.
+}.
+
+Web-Document जब: ['out:'] करो: { :output
+	स्वयं out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document जब: ['finish:'] करो: { :output
+	स्वयं finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document जब: ['json:'] करो: { :output
+	स्वयं out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document जब: ['not-found:'] करो: { :output
+	स्वयं clear-headers header: (
+		HTTP-Header नया key: ['Status'] value: ['404 Not Found']
+	).
+	स्वयं out: output.
+}.
+
+
+# Interface
+
+>> Session := वस्तु नया.
+
+Session जब: ['नया'] करो: { <- स्वयं नया init for: शून्य.
+}.
+
+Session जब: ['for:'] करो: { :id
+	अपना id := id.
+}.
+
+Session जब: ['load'] करो: {
+	यह-कार्य त्रुटि: ['Not implemented.'].
+}.
+
+Session जब: ['save:'] करो: {
+	यह-कार्य त्रुटि: ['Not implemented.'].
+}.
+
+Session जब: ['destroy'] करो: {
+	यह-कार्य त्रुटि: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session नया.
+
+Tempfile-Session जब: ['init'] करो: {
+	अपना pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session जब: ['path-prefix:'] करो: { :str
+	अपना pathprefix := str.
+}.
+
+Tempfile-Session जब: ['file'] करो: { <- ( फ़ाइल नया: ( अपना pathprefix + अपना id + ['.txt'] ) ).
+}.
+
+Tempfile-Session जब: ['load'] करो: {
+	>> file := स्वयं file.
+	file मौजूद असत्य-हो-तो: {
+		file लिखो: (शब्दकोश नया कोड).
+	}. <- file पढ़ो वस्तु-में.
+}.
+
+Tempfile-Session जब: ['save:'] करो: { :data
+	>> file := स्वयं file.
+	file मौजूद सत्य-हो-तो: {
+		file लिखो: data कोड.
+	}.
+}.
+
+Tempfile-Session जब: ['destroy'] करो: {
+	>> file := स्वयं file.
+	file मौजूद सत्य-हो-तो: {
+		file मिटाओ.
+	}.
+}.
+
+
+>> URL := वस्तु नया.
+
+URL जब: ['init'] करो: {
+	अपना protocol := ['https://'].
+	अपना होस्ट := ['localhost'].
+	अपना फ़ाइल-पथ := [''].
+	अपना params := [''].
+	अपना hash := [''].
+}.
+
+URL जब: ['नया'] करो: { <- स्वयं नया init.
+}.
+
+URL जब: ['पाठ-में'] करो: { <- (
+	अपना protocol +
+	अपना होस्ट +
+	अपना फ़ाइल-पथ +
+	अपना params +
+	अपना hash ).
+}.
+
+URL जब: ['protocol:'] करो: { :protocol
+	((सूची नया: ['http'] ; ['https']) शामिल-है: protocol) सत्य-हो-तो: {
+		अपना protocol := protocol + ['://'].
+	}, असत्य-हो-तो: {
+		यह-कार्य त्रुटि: ['Invalid protocol'].
+	}.
+}.
+
+URL जब: ['होस्ट:'] करो: { :होस्ट
+	#todo validate according to rfc
+	अपना होस्ट := होस्ट.
+}.
+
+URL जब: ['path:'] करो: { :फ़ाइल-पथ
+	अपना फ़ाइल-पथ := ['/'] + फ़ाइल-पथ url-एनकोड.
+}.
+
+URL जब: ['params:'] करो: { :map
+	>> params := सूची नया.
+	map प्रत्येक: { :key :value
+		params अंत-में-जोड़ो: key पाठ-में url-एनकोड + ['='] + value पाठ-में url-एनकोड.
+	}.
+	अपना params := ['?'] + ( params जोड़ो: ['&'] ).
+}.
+
+URL जब: ['हैश:'] करो: { :hash
+	अपना hash := ['#'] + hash url-एनकोड.
+}.
+

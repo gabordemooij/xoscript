@@ -1,0 +1,128 @@
+>> Email := Object nieuw.
+
+Email bij: ['init'] doen: {
+	eigen recipients := Reeks nieuw.
+	eigen cc := Reeks nieuw.
+	eigen bcc := Reeks nieuw.
+	eigen from := Niets.
+	eigen from-name := Niets.
+	eigen subject := Niets.
+	eigen body := Niets.
+}.
+
+Email bij: ['nieuw'] doen: { <- zelf nieuw init.
+}.
+
+Email bij: ['to:'] doen: { :list
+	eigen recipients := list.
+}.
+ 
+Email bij: ['cc:'] doen: { :list
+	eigen cc := list.
+}.
+
+Email bij: ['bcc:'] doen: { :list
+	eigen bcc := list.
+}.
+
+Email bij: ['subject:'] doen: { :subject
+	eigen subject := subject.
+}.
+
+Email bij: ['from:name:'] doen: { :from :naam
+	eigen from := from.
+	eigen from-name := naam.
+}.
+
+Email bij: ['body:'] doen: { :body
+	eigen body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email bij: ['header:'] doen: { :line <- line vervang: ['\r'] door: [''], vervang: ['\n'] door: [''].
+}.
+
+Email bij: ['send'] doen: {
+	>> f := Bestand tempwrite: zelf generate.
+	Programma opdrachtregel: ['sendmail -t < '] + f pad, stop.
+}.
+
+Email bij: ['generate'] doen: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str toevoegen: (zelf header: ['From: '] + eigen from-name + [' <'] + ( eigen from ) + ['>']) + brk.
+	str toevoegen: (zelf header: ['To: '] + ( eigen recipients samenvoegen: [','] )) + brk.
+	eigen cc aantal ja: {
+		str toevoegen: (zelf header: ['Cc: '] + ( eigen cc samenvoegen: [','] )) + brk.
+	}.
+	eigen bcc aantal ja: {
+		str toevoegen: (zelf header: ['Bcc: '] + ( eigen bcc samenvoegen: [','] )) + brk.
+	}.
+	str toevoegen: (zelf header: ['Subject: '] + eigen subject) + brk.
+	str toevoegen: brk.
+	str toevoegen: eigen body.
+	str toevoegen: brk. <- str.
+}.
+
+>> HTML-Email := Email nieuw.
+
+HTML-Email bij: ['init'] doen: {
+	zelf init.
+	eigen attachments := Reeks nieuw.
+	eigen boundary := Kluis token: 40.
+}.
+
+HTML-Email bij: ['attach:'] doen: { :file
+	>> id := eigen attachments aantal.
+	>> blob := file blob.
+	eigen attachments toevoegen: (
+		Lijst nieuw
+			file: file pad,
+			mime: ['image/'] + (Server mimetype: file pad),
+			data: blob base64-coderen
+	).
+	blob vrij. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email bij: ['generate'] doen: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str toevoegen: (zelf header: ['From: '] + eigen from-name + [' <'] + ( eigen from ) + ['>']) + brk.
+	str toevoegen: (zelf header: ['To: '] + ( eigen recipients samenvoegen: [','] )) + brk.
+	eigen cc aantal ja: {
+		str toevoegen: (zelf header: ['Cc: '] + ( eigen cc samenvoegen: [','] )) + brk.
+	}.
+	eigen bcc aantal ja: {
+		str toevoegen: (zelf header: ['Bcc: '] + ( eigen bcc samenvoegen: [','] )) + brk.
+	}.
+	str toevoegen: (zelf header: ['Subject: '] + eigen subject) + brk.
+	str toevoegen: ['MIME-Version: 1.0'] + brk.
+	str toevoegen: ['Content-Type: multipart/related; boundary="'] + eigen boundary + ['"; type=text/html'] + brk.
+	str toevoegen: brk.
+	str toevoegen: ['--'] + eigen boundary + brk.
+	str toevoegen: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str toevoegen: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str toevoegen: brk.
+	str toevoegen: eigen body.
+	str toevoegen: brk.
+	eigen attachments elk: { :id :info
+		>> blob := info data.
+		str toevoegen: ['--'] + eigen boundary + brk.
+		str toevoegen: ['Content-Type: '] + info mime + brk.
+		str toevoegen: ['Content-Transfer-Encoding: base64'] + brk.
+		str toevoegen: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str toevoegen: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str toevoegen: brk.
+		>> max := 76.
+		>> len := blob lengte.
+		>> chunks := (len / max) hoog.
+		{ :i
+			>> chunk := blob kopieer van: i * max lengte: max.
+			str toevoegen: chunk + brk.
+		} * chunks.
+		str toevoegen: brk.
+		str toevoegen: brk.
+	}.
+	str toevoegen: ['--'] + eigen boundary + ['--'] + brk. <- str.
+}.

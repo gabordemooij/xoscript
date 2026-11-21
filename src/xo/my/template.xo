@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := အရာဝတ္ထု အသစ်.
+
+Template ရလျှင်: ['အသစ်'] လုပ်: { <- မိမိ အသစ် content: [''].
+}.
+
+Template ရလျှင်: ['content:'] လုပ်: { :content
+	ကိုယ်ပိုင် content := content. 
+}.
+
+Template ရလျှင်: ['အသစ်:'] လုပ်: { :content <- မိမိ အသစ် content: content.
+}.
+
+Template ရလျှင်: ['cut:'] လုပ်: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := ကိုယ်ပိုင် content ခွဲ: startmarker.
+	>> prefix := parts ပထမ.
+	>> parts2 := parts နောက်ဆုံး ခွဲ: endmarker.
+	>> suffix := parts2 နောက်ဆုံး.
+	>> part := parts2 ပထမ.
+	>> rest := prefix + suffix.
+	ကိုယ်ပိုင် content := rest. <- Template အသစ်: part.
+	
+}.
+
+Template ရလျှင်: ['ကူးယူ'] လုပ်: { <- မိမိ အသစ်: မိမိ စာသားသို့ ကူးယူ.
+}.
+	
+Template ရလျှင်: ['paste:at:'] လုပ်: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	ကိုယ်ပိုင် content အစားထိုး: pastemarker ဖြင့်: ( snippet စာသားသို့ + pastemarker ).
+}.
+
+Template ရလျှင်: ['သတ်မှတ်:တန်ဖိုး:'] လုပ်: { :slot :value
+	ကိုယ်ပိုင် content အစားထိုး: ['<!-- slot:'] + slot + [' -->'] ဖြင့်: ( Server html-ကုဒ်သွင်း: value ).
+}.
+
+Template ရလျှင်: ['set:html:'] လုပ်: { :slot :html
+	ကိုယ်ပိုင် content အစားထိုး: ['<!-- slot:'] + slot + [' -->'] ဖြင့်: html.
+}.
+
+Template ရလျှင်: ['ဖြေ:နှင့်:'] လုပ်: { :slot :value
+	မိမိ သတ်မှတ်: (slot အစ: 0 အရှည်: (slot အရှည် - 1)) တန်ဖိုး: value.
+}.
+
+Template ရလျှင်: ['nl2br'] လုပ်: {
+	ကိုယ်ပိုင် content အစားထိုး: ['\n'] ဖြင့်: ['<br>'].
+}.
+
+Template ရလျှင်: ['clean'] လုပ်: {
+	ကိုယ်ပိုင် content :=
+		ပုံစံတူရှာ
+		အသစ်: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ကိုက်ညီ: ကိုယ်ပိုင် content
+		လုပ်: { <- ['']. }.
+}.
+
+Template ရလျှင်: ['clean-cuts'] လုပ်: {
+	>> items := အစီအစဉ် အသစ်.
+	ပုံစံတူရှာ
+	အသစ်: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ကိုက်ညီ: ကိုယ်ပိုင် content
+	လုပ်: { :_ :part
+		items အဆုံးတွင်ထည့်: part ? 1.
+	}.
+	items တစ်ခုစီ: { :_ :id
+		ကိုယ်ပိုင် content :=
+			ပုံစံတူရှာ အသစ်: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ကိုက်ညီ: ကိုယ်ပိုင် content
+			လုပ်: { <- ['']. }.
+	 }.
+}.
+
+Template ရလျှင်: ['clean-space'] လုပ်: {
+	ကိုယ်ပိုင် content :=
+		ပုံစံတူရှာ
+		အသစ်: ['\\s*\\n'],
+		ကိုက်ညီ: ကိုယ်ပိုင် content
+		လုပ်: { <- ['\n']. }.
+	ကိုယ်ပိုင် content :=
+		ပုံစံတူရှာ
+		အသစ်: ['\\n[\\s\\t]+'],
+		ကိုက်ညီ: ကိုယ်ပိုင် content
+		လုပ်: { <- ['\n']. }.
+}.
+
+Template ရလျှင်: ['clean-all'] လုပ်: {
+	မိမိ clean.
+	မိမိ clean-cuts.
+	မိမိ clean-space.
+}.
+
+Template ရလျှင်: ['စာသားသို့'] လုပ်: { <- ကိုယ်ပိုင် content.
+}.

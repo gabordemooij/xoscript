@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Oggetto nuovo.
+
+Template on: ['nuovo'] fare: { <- io nuovo content: [''].
+}.
+
+Template on: ['content:'] fare: { :content
+	mio content := content. 
+}.
+
+Template on: ['nuovo:'] fare: { :content <- io nuovo content: content.
+}.
+
+Template on: ['cut:'] fare: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := mio content diviso: startmarker.
+	>> prefix := parts primo.
+	>> parts2 := parts scorso diviso: endmarker.
+	>> suffix := parts2 scorso.
+	>> part := parts2 primo.
+	>> rest := prefix + suffix.
+	mio content := rest. <- Template nuovo: part.
+	
+}.
+
+Template on: ['copia'] fare: { <- io nuovo: io testo copia.
+}.
+	
+Template on: ['paste:at:'] fare: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	mio content sostituirlo: pastemarker con: ( snippet testo + pastemarker ).
+}.
+
+Template on: ['valore:impostato:'] fare: { :slot :value
+	mio content sostituirlo: ['<!-- slot:'] + slot + [' -->'] con: ( Server html-codifica: value ).
+}.
+
+Template on: ['set:html:'] fare: { :slot :html
+	mio content sostituirlo: ['<!-- slot:'] + slot + [' -->'] con: html.
+}.
+
+Template on: ['rispondere:e:'] fare: { :slot :value
+	io valore: (slot da: 0 lunghezza: (slot lunghezza - 1)) impostato: value.
+}.
+
+Template on: ['nl2br'] fare: {
+	mio content sostituirlo: ['\n'] con: ['<br>'].
+}.
+
+Template on: ['clean'] fare: {
+	mio content :=
+		Modello
+		nuovo: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		corrispondenza: mio content
+		fai: { <- ['']. }.
+}.
+
+Template on: ['clean-cuts'] fare: {
+	>> items := Serie nuovo.
+	Modello
+	nuovo: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	corrispondenza: mio content
+	fai: { :_ :part
+		items aggiungere: part ? 1.
+	}.
+	items ogni: { :_ :id
+		mio content :=
+			Modello nuovo: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			corrispondenza: mio content
+			fai: { <- ['']. }.
+	 }.
+}.
+
+Template on: ['clean-space'] fare: {
+	mio content :=
+		Modello
+		nuovo: ['\\s*\\n'],
+		corrispondenza: mio content
+		fai: { <- ['\n']. }.
+	mio content :=
+		Modello
+		nuovo: ['\\n[\\s\\t]+'],
+		corrispondenza: mio content
+		fai: { <- ['\n']. }.
+}.
+
+Template on: ['clean-all'] fare: {
+	io clean.
+	io clean-cuts.
+	io clean-space.
+}.
+
+Template on: ['testo'] fare: { <- mio content.
+}.

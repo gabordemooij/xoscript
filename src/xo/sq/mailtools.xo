@@ -1,0 +1,128 @@
+>> Email := Objekt ri.
+
+Email kur: ['init'] bëj: {
+	vetjak recipients := Listë ri.
+	vetjak cc := Listë ri.
+	vetjak bcc := Listë ri.
+	vetjak from := Asgjë.
+	vetjak from-name := Asgjë.
+	vetjak subject := Asgjë.
+	vetjak body := Asgjë.
+}.
+
+Email kur: ['ri'] bëj: { <- vetja ri init.
+}.
+
+Email kur: ['to:'] bëj: { :list
+	vetjak recipients := list.
+}.
+ 
+Email kur: ['cc:'] bëj: { :list
+	vetjak cc := list.
+}.
+
+Email kur: ['bcc:'] bëj: { :list
+	vetjak bcc := list.
+}.
+
+Email kur: ['subject:'] bëj: { :subject
+	vetjak subject := subject.
+}.
+
+Email kur: ['from:name:'] bëj: { :from :emër
+	vetjak from := from.
+	vetjak from-name := emër.
+}.
+
+Email kur: ['body:'] bëj: { :body
+	vetjak body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email kur: ['header:'] bëj: { :line <- line zëvendëso: ['\r'] me: [''], zëvendëso: ['\n'] me: [''].
+}.
+
+Email kur: ['send'] bëj: {
+	>> f := Skedar tempwrite: vetja generate.
+	Program sistem: ['sendmail -t < '] + f shteg, rresht-ri.
+}.
+
+Email kur: ['generate'] bëj: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str shto-në-fund: (vetja header: ['From: '] + vetjak from-name + [' <'] + ( vetjak from ) + ['>']) + brk.
+	str shto-në-fund: (vetja header: ['To: '] + ( vetjak recipients bashko: [','] )) + brk.
+	vetjak cc numëro vërtetë: {
+		str shto-në-fund: (vetja header: ['Cc: '] + ( vetjak cc bashko: [','] )) + brk.
+	}.
+	vetjak bcc numëro vërtetë: {
+		str shto-në-fund: (vetja header: ['Bcc: '] + ( vetjak bcc bashko: [','] )) + brk.
+	}.
+	str shto-në-fund: (vetja header: ['Subject: '] + vetjak subject) + brk.
+	str shto-në-fund: brk.
+	str shto-në-fund: vetjak body.
+	str shto-në-fund: brk. <- str.
+}.
+
+>> HTML-Email := Email ri.
+
+HTML-Email kur: ['init'] bëj: {
+	vetja init.
+	vetjak attachments := Listë ri.
+	vetjak boundary := Kasafortë token: 40.
+}.
+
+HTML-Email kur: ['attach:'] bëj: { :file
+	>> id := vetjak attachments numëro.
+	>> blob := file blob.
+	vetjak attachments shto-në-fund: (
+		Fjalor ri
+			file: file shteg,
+			mime: ['image/'] + (Server mimetype: file shteg),
+			data: blob base64-kodo
+	).
+	blob liro. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email kur: ['generate'] bëj: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str shto-në-fund: (vetja header: ['From: '] + vetjak from-name + [' <'] + ( vetjak from ) + ['>']) + brk.
+	str shto-në-fund: (vetja header: ['To: '] + ( vetjak recipients bashko: [','] )) + brk.
+	vetjak cc numëro vërtetë: {
+		str shto-në-fund: (vetja header: ['Cc: '] + ( vetjak cc bashko: [','] )) + brk.
+	}.
+	vetjak bcc numëro vërtetë: {
+		str shto-në-fund: (vetja header: ['Bcc: '] + ( vetjak bcc bashko: [','] )) + brk.
+	}.
+	str shto-në-fund: (vetja header: ['Subject: '] + vetjak subject) + brk.
+	str shto-në-fund: ['MIME-Version: 1.0'] + brk.
+	str shto-në-fund: ['Content-Type: multipart/related; boundary="'] + vetjak boundary + ['"; type=text/html'] + brk.
+	str shto-në-fund: brk.
+	str shto-në-fund: ['--'] + vetjak boundary + brk.
+	str shto-në-fund: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str shto-në-fund: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str shto-në-fund: brk.
+	str shto-në-fund: vetjak body.
+	str shto-në-fund: brk.
+	vetjak attachments secili: { :id :info
+		>> blob := info data.
+		str shto-në-fund: ['--'] + vetjak boundary + brk.
+		str shto-në-fund: ['Content-Type: '] + info mime + brk.
+		str shto-në-fund: ['Content-Transfer-Encoding: base64'] + brk.
+		str shto-në-fund: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str shto-në-fund: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str shto-në-fund: brk.
+		>> max := 76.
+		>> len := blob gjatësi.
+		>> chunks := (len / max) rrumbullakos-lart.
+		{ :i
+			>> chunk := blob kopjo nga: i * max gjatësi: max.
+			str shto-në-fund: chunk + brk.
+		} * chunks.
+		str shto-në-fund: brk.
+		str shto-në-fund: brk.
+	}.
+	str shto-në-fund: ['--'] + vetjak boundary + ['--'] + brk. <- str.
+}.

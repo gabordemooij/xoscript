@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := பொருள் புதிய.
+
+Template பெறும்போது: ['புதிய'] செய்: { <- தான் புதிய content: [''].
+}.
+
+Template பெறும்போது: ['content:'] செய்: { :content
+	தனது content := content. 
+}.
+
+Template பெறும்போது: ['புதிய:'] செய்: { :content <- தான் புதிய content: content.
+}.
+
+Template பெறும்போது: ['cut:'] செய்: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := தனது content பிரி: startmarker.
+	>> prefix := parts முதல்.
+	>> parts2 := parts கடைசி பிரி: endmarker.
+	>> suffix := parts2 கடைசி.
+	>> part := parts2 முதல்.
+	>> rest := prefix + suffix.
+	தனது content := rest. <- Template புதிய: part.
+	
+}.
+
+Template பெறும்போது: ['நகல்'] செய்: { <- தான் புதிய: தான் சரமாக நகல்.
+}.
+	
+Template பெறும்போது: ['paste:at:'] செய்: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	தனது content மாற்று: pastemarker கொண்டு: ( snippet சரமாக + pastemarker ).
+}.
+
+Template பெறும்போது: ['அமை:மதிப்பு:'] செய்: { :slot :value
+	தனது content மாற்று: ['<!-- slot:'] + slot + [' -->'] கொண்டு: ( Server html-குறியாக்கு: value ).
+}.
+
+Template பெறும்போது: ['set:html:'] செய்: { :slot :html
+	தனது content மாற்று: ['<!-- slot:'] + slot + [' -->'] கொண்டு: html.
+}.
+
+Template பெறும்போது: ['பதில்:மற்றும்:'] செய்: { :slot :value
+	தான் அமை: (slot தொடக்கம்: 0 நீளம்: (slot நீளம் - 1)) மதிப்பு: value.
+}.
+
+Template பெறும்போது: ['nl2br'] செய்: {
+	தனது content மாற்று: ['\n'] கொண்டு: ['<br>'].
+}.
+
+Template பெறும்போது: ['clean'] செய்: {
+	தனது content :=
+		பாங்கு
+		புதிய: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		பொருத்தம்: தனது content
+		செய்: { <- ['']. }.
+}.
+
+Template பெறும்போது: ['clean-cuts'] செய்: {
+	>> items := வரிசை புதிய.
+	பாங்கு
+	புதிய: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	பொருத்தம்: தனது content
+	செய்: { :_ :part
+		items இறுதியில்-சேர்: part ? 1.
+	}.
+	items ஒவ்வொன்றும்: { :_ :id
+		தனது content :=
+			பாங்கு புதிய: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			பொருத்தம்: தனது content
+			செய்: { <- ['']. }.
+	 }.
+}.
+
+Template பெறும்போது: ['clean-space'] செய்: {
+	தனது content :=
+		பாங்கு
+		புதிய: ['\\s*\\n'],
+		பொருத்தம்: தனது content
+		செய்: { <- ['\n']. }.
+	தனது content :=
+		பாங்கு
+		புதிய: ['\\n[\\s\\t]+'],
+		பொருத்தம்: தனது content
+		செய்: { <- ['\n']. }.
+}.
+
+Template பெறும்போது: ['clean-all'] செய்: {
+	தான் clean.
+	தான் clean-cuts.
+	தான் clean-space.
+}.
+
+Template பெறும்போது: ['சரமாக'] செய்: { <- தனது content.
+}.

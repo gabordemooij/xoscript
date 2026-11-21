@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Ima musuq.
+
+Template patapi: ['musuq'] ruway: { <- kikin musuq content: [''].
+}.
+
+Template patapi: ['content:'] ruway: { :content
+	ñuqap content := content. 
+}.
+
+Template patapi: ['musuq:'] ruway: { :content <- kikin musuq content: content.
+}.
+
+Template patapi: ['cut:'] ruway: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := ñuqap content rakiy: startmarker.
+	>> prefix := parts ñawpaq.
+	>> parts2 := parts qhepa rakiy: endmarker.
+	>> suffix := parts2 qhepa.
+	>> part := parts2 ñawpaq.
+	>> rest := prefix + suffix.
+	ñuqap content := rest. <- Template musuq: part.
+	
+}.
+
+Template patapi: ['kikinchasqa'] ruway: { <- kikin musuq: kikin qillqaman kikinchasqa.
+}.
+	
+Template patapi: ['paste:at:'] ruway: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	ñuqap content rantinpay: pastemarker kayta: ( snippet qillqaman + pastemarker ).
+}.
+
+Template patapi: ['churay:chanin:'] ruway: { :slot :value
+	ñuqap content rantinpay: ['<!-- slot:'] + slot + [' -->'] kayta: ( Server html-kodificay: value ).
+}.
+
+Template patapi: ['set:html:'] ruway: { :slot :html
+	ñuqap content rantinpay: ['<!-- slot:'] + slot + [' -->'] kayta: html.
+}.
+
+Template patapi: ['kutichiy:wan:'] ruway: { :slot :value
+	kikin churay: (slot manta: 0 suni: (slot suni - 1)) chanin: value.
+}.
+
+Template patapi: ['nl2br'] ruway: {
+	ñuqap content rantinpay: ['\n'] kayta: ['<br>'].
+}.
+
+Template patapi: ['clean'] ruway: {
+	ñuqap content :=
+		Rikchʼaq
+		musuq: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		tinkuy: ñuqap content
+		ruway: { <- ['']. }.
+}.
+
+Template patapi: ['clean-cuts'] ruway: {
+	>> items := Katiray musuq.
+	Rikchʼaq
+	musuq: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	tinkuy: ñuqap content
+	ruway: { :_ :part
+		items yapay-qhepaman: part ? 1.
+	}.
+	items sapallanpaq: { :_ :id
+		ñuqap content :=
+			Rikchʼaq musuq: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			tinkuy: ñuqap content
+			ruway: { <- ['']. }.
+	 }.
+}.
+
+Template patapi: ['clean-space'] ruway: {
+	ñuqap content :=
+		Rikchʼaq
+		musuq: ['\\s*\\n'],
+		tinkuy: ñuqap content
+		ruway: { <- ['\n']. }.
+	ñuqap content :=
+		Rikchʼaq
+		musuq: ['\\n[\\s\\t]+'],
+		tinkuy: ñuqap content
+		ruway: { <- ['\n']. }.
+}.
+
+Template patapi: ['clean-all'] ruway: {
+	kikin clean.
+	kikin clean-cuts.
+	kikin clean-space.
+}.
+
+Template patapi: ['qillqaman'] ruway: { <- ñuqap content.
+}.

@@ -1,0 +1,325 @@
+Kahilingan-HTTP kapag: ['HTTP-header:'] gawin: { :key <- Programa kaayusan: key.
+}.
+
+>> HTTP-Header := Bagay bago.
+
+HTTP-Header kapag: ['bago'] gawin: { <- sarili bago init.
+}.
+
+HTTP-Header kapag: ['init'] gawin: {
+	sarili-ko key := Wala.
+	sarili-ko value := Wala.
+}.
+
+HTTP-Header kapag: ['key:value:'] gawin: { :key :value
+	sarili-ko key := key.
+	sarili-ko value := value.
+}.
+
+HTTP-Header kapag: ['key'] gawin: { <- sarili-ko key.
+}.
+
+HTTP-Header kapag: ['value'] gawin: { <- sarili-ko value.
+}.
+
+
+HTTP-Header kapag: ['teksto'] gawin: {
+	>> line := sarili-ko key + [': '] + sarili-ko value.
+	line palitan: ['\r'] ng: [''], palitan: ['\n'] ng: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Bagay bago.
+
+Web-Document kapag: ['bago'] gawin: { <- sarili bago init.
+}.
+
+Web-Document kapag: ['init'] gawin: {
+	sarili-ko headers := Listahan bago.
+	sarili-ko sess-id := Wala.
+	sarili-ko session-manager := Tempfile-Session bago.
+	sarili-ko sessdata := Wala.
+	sarili-ko secure := Totoo.
+	sarili-ko same-site := ['Strict'].
+	sarili-ko headers-out := Mali.
+	sarili-ko request := Kahilingan-HTTP bago.
+}.
+
+Web-Document kapag: ['request:'] gawin: { :request
+	sarili-ko request := request.
+}. 
+
+Web-Document kapag: ['secure-session-cookie:'] gawin: { :secure
+	sarili check-headers.
+	sarili-ko secure := secure.
+}.
+
+Web-Document kapag: ['same-site-session-cookie:'] gawin: { :value
+	sarili check-headers.
+	>> options := Listahan bago 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options naglalaman: value, mali: {
+		gawaing-ito mali-sa-labas: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	sarili-ko same-site := value.
+}.
+
+Web-Document kapag: ['header:'] gawin: { :header
+	sarili check-headers.
+	sarili-ko headers idagdag-sa-dulo: header.
+}.
+
+Web-Document kapag: ['clear-headers'] gawin: {
+	sarili check-headers.
+	sarili-ko headers := Listahan bago.
+}.
+
+Web-Document kapag: ['session-manager:'] gawin: { :manager
+	sarili check-headers.
+	sarili-ko session-manager := manager.
+}.
+
+Web-Document kapag: ['session-manager'] gawin: { <- sarili-ko session-manager.
+}.
+
+Web-Document kapag: ['check-headers'] gawin: {
+	sarili-ko headers-out totoo: {
+		gawaing-ito mali-sa-labas: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document kapag: ['session-start'] gawin: {
+	sarili check-headers.
+	>> request := sarili-ko request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Wala? mali: {
+		(( Padron bago: ['^[A-Za-z0-9]+\\z'], tugma: sess-id ) = 0) totoo: {
+			sess-id := Wala.
+		}.
+	}.
+	sess-id Wala? totoo: {
+		sess-id := Kaha token: 30.
+		>> session-header := HTTP-Header bago
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (sarili-ko secure alinman: ['Secure'] o: ['']),
+		SSITE: (sarili-ko same-site),
+		XSID: sess-id
+		).
+		sarili-ko headers idagdag-sa-dulo: session-header.
+	}.
+	sarili-ko sessdata := sarili-ko session-manager for: sess-id, load. <- sarili-ko sessdata. # reference
+}.
+
+Web-Document kapag: ['goto:'] gawin: { :url
+	sarili check-headers.
+	sarili clear-headers.
+	sarili-ko headers
+	idagdag-sa-dulo: (
+		HTTP-Header bago
+		key: ['Status'] value: ['303 See Other']
+	),
+	idagdag-sa-dulo: (
+		HTTP-Header bago
+		key: ['Location'] value: url
+	).
+	sarili out: ['Redirect'].
+}.
+
+Web-Document kapag: ['session-destroy'] gawin: {
+	sarili check-headers.
+	>> request := sarili-ko request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Wala? mali: {
+		>> session-header := HTTP-Header bago.
+		>> when := Sandali bago taon: 1970, anyo: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (sarili-ko secure alinman: ['Secure'] o: ['']),
+			SSITE: (sarili-ko same-site),
+			XSID: sess-id
+		).
+		sarili-ko session-manager destroy.
+		sarili-ko headers idagdag-sa-dulo: session-header.
+	}.
+}.
+
+
+Web-Document kapag: ['template:'] gawin: { :landas-ng-file <- Template bago: (Talaksan bago: landas-ng-file, basahin).
+}.
+
+Web-Document kapag: ['out:type:'] gawin: { :output :uri
+	sarili-ko headers-out mali: {
+		sarili-ko sessdata Wala? mali: {
+			sarili-ko session-manager save: sarili-ko sessdata.
+		}.
+		sarili-ko headers idagdag-sa-dulo: (
+			HTTP-Header bago
+			key: ['Content-type'] value: uri
+		).
+		sarili-ko headers bawat: { :_ :header
+			Labas isulat: header.
+		}.
+		sarili-ko headers-out := Totoo.
+		Labas isulat: ['\r\n'].
+	}.
+	Labas isulat: output.
+}.
+
+Web-Document kapag: ['finish:type:'] gawin: { :output :uri
+	sarili-ko headers-out mali: {
+		sarili-ko sessdata Wala? mali: {
+			sarili-ko session-manager save: sarili-ko sessdata.
+		}.
+		sarili-ko headers idagdag-sa-dulo: (
+			HTTP-Header bago
+			key: ['Content-type'] value: uri
+		).
+		sarili-ko headers idagdag-sa-dulo: (
+			HTTP-Header bago
+			key: ['Content-Length'] value: output teksto bytes
+		).
+		sarili-ko headers bawat: { :_ :header
+			Labas isulat: header.
+		}.
+		sarili-ko headers-out := Totoo.
+		Labas isulat: ['\r\n'].
+	}.
+	Labas isulat: output.
+}.
+
+Web-Document kapag: ['out:'] gawin: { :output
+	sarili out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document kapag: ['finish:'] gawin: { :output
+	sarili finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document kapag: ['json:'] gawin: { :output
+	sarili out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document kapag: ['not-found:'] gawin: { :output
+	sarili clear-headers header: (
+		HTTP-Header bago key: ['Status'] value: ['404 Not Found']
+	).
+	sarili out: output.
+}.
+
+
+# Interface
+
+>> Session := Bagay bago.
+
+Session kapag: ['bago'] gawin: { <- sarili bago init for: Wala.
+}.
+
+Session kapag: ['for:'] gawin: { :id
+	sarili-ko id := id.
+}.
+
+Session kapag: ['load'] gawin: {
+	gawaing-ito mali-sa-labas: ['Not implemented.'].
+}.
+
+Session kapag: ['save:'] gawin: {
+	gawaing-ito mali-sa-labas: ['Not implemented.'].
+}.
+
+Session kapag: ['destroy'] gawin: {
+	gawaing-ito mali-sa-labas: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session bago.
+
+Tempfile-Session kapag: ['init'] gawin: {
+	sarili-ko pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session kapag: ['path-prefix:'] gawin: { :str
+	sarili-ko pathprefix := str.
+}.
+
+Tempfile-Session kapag: ['file'] gawin: { <- ( Talaksan bago: ( sarili-ko pathprefix + sarili-ko id + ['.txt'] ) ).
+}.
+
+Tempfile-Session kapag: ['load'] gawin: {
+	>> file := sarili file.
+	file umiiral mali: {
+		file isulat: (Diksyunaryo bago kodigo).
+	}. <- file basahin bagay.
+}.
+
+Tempfile-Session kapag: ['save:'] gawin: { :data
+	>> file := sarili file.
+	file umiiral totoo: {
+		file isulat: data kodigo.
+	}.
+}.
+
+Tempfile-Session kapag: ['destroy'] gawin: {
+	>> file := sarili file.
+	file umiiral totoo: {
+		file tanggalin.
+	}.
+}.
+
+
+>> URL := Bagay bago.
+
+URL kapag: ['init'] gawin: {
+	sarili-ko protocol := ['https://'].
+	sarili-ko host := ['localhost'].
+	sarili-ko landas-ng-file := [''].
+	sarili-ko params := [''].
+	sarili-ko hash := [''].
+}.
+
+URL kapag: ['bago'] gawin: { <- sarili bago init.
+}.
+
+URL kapag: ['teksto'] gawin: { <- (
+	sarili-ko protocol +
+	sarili-ko host +
+	sarili-ko landas-ng-file +
+	sarili-ko params +
+	sarili-ko hash ).
+}.
+
+URL kapag: ['protocol:'] gawin: { :protocol
+	((Listahan bago: ['http'] ; ['https']) naglalaman: protocol) totoo: {
+		sarili-ko protocol := protocol + ['://'].
+	}, mali: {
+		gawaing-ito mali-sa-labas: ['Invalid protocol'].
+	}.
+}.
+
+URL kapag: ['host:'] gawin: { :host
+	#todo validate according to rfc
+	sarili-ko host := host.
+}.
+
+URL kapag: ['path:'] gawin: { :landas-ng-file
+	sarili-ko landas-ng-file := ['/'] + landas-ng-file url-i-encode.
+}.
+
+URL kapag: ['params:'] gawin: { :map
+	>> params := Listahan bago.
+	map bawat: { :key :value
+		params idagdag-sa-dulo: key teksto url-i-encode + ['='] + value teksto url-i-encode.
+	}.
+	sarili-ko params := ['?'] + ( params pagsamahin: ['&'] ).
+}.
+
+URL kapag: ['hash:'] gawin: { :hash
+	sarili-ko hash := ['#'] + hash url-i-encode.
+}.
+

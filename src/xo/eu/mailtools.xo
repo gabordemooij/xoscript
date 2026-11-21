@@ -1,0 +1,128 @@
+>> Email := Objektua berria.
+
+Email noiz: ['init'] egin: {
+	berezko recipients := Zerrenda berria.
+	berezko cc := Zerrenda berria.
+	berezko bcc := Zerrenda berria.
+	berezko from := Ezer.
+	berezko from-name := Ezer.
+	berezko subject := Ezer.
+	berezko body := Ezer.
+}.
+
+Email noiz: ['berria'] egin: { <- norbera berria init.
+}.
+
+Email noiz: ['to:'] egin: { :list
+	berezko recipients := list.
+}.
+ 
+Email noiz: ['cc:'] egin: { :list
+	berezko cc := list.
+}.
+
+Email noiz: ['bcc:'] egin: { :list
+	berezko bcc := list.
+}.
+
+Email noiz: ['subject:'] egin: { :subject
+	berezko subject := subject.
+}.
+
+Email noiz: ['from:name:'] egin: { :from :izena
+	berezko from := from.
+	berezko from-name := izena.
+}.
+
+Email noiz: ['body:'] egin: { :body
+	berezko body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email noiz: ['header:'] egin: { :line <- line ordeztu: ['\r'] honekin: [''], ordeztu: ['\n'] honekin: [''].
+}.
+
+Email noiz: ['send'] egin: {
+	>> f := Fitxategia tempwrite: norbera generate.
+	Programa sistema: ['sendmail -t < '] + f bidea, lerro-jauzia.
+}.
+
+Email noiz: ['generate'] egin: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str erantsi: (norbera header: ['From: '] + berezko from-name + [' <'] + ( berezko from ) + ['>']) + brk.
+	str erantsi: (norbera header: ['To: '] + ( berezko recipients batu: [','] )) + brk.
+	berezko cc zenbatu egia: {
+		str erantsi: (norbera header: ['Cc: '] + ( berezko cc batu: [','] )) + brk.
+	}.
+	berezko bcc zenbatu egia: {
+		str erantsi: (norbera header: ['Bcc: '] + ( berezko bcc batu: [','] )) + brk.
+	}.
+	str erantsi: (norbera header: ['Subject: '] + berezko subject) + brk.
+	str erantsi: brk.
+	str erantsi: berezko body.
+	str erantsi: brk. <- str.
+}.
+
+>> HTML-Email := Email berria.
+
+HTML-Email noiz: ['init'] egin: {
+	norbera init.
+	berezko attachments := Zerrenda berria.
+	berezko boundary := Kutxa-gotorra token: 40.
+}.
+
+HTML-Email noiz: ['attach:'] egin: { :file
+	>> id := berezko attachments zenbatu.
+	>> blob := file blob.
+	berezko attachments erantsi: (
+		Hiztegia berria
+			file: file bidea,
+			mime: ['image/'] + (Server mimetype: file bidea),
+			data: blob base64-kodetu
+	).
+	blob askatu. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email noiz: ['generate'] egin: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str erantsi: (norbera header: ['From: '] + berezko from-name + [' <'] + ( berezko from ) + ['>']) + brk.
+	str erantsi: (norbera header: ['To: '] + ( berezko recipients batu: [','] )) + brk.
+	berezko cc zenbatu egia: {
+		str erantsi: (norbera header: ['Cc: '] + ( berezko cc batu: [','] )) + brk.
+	}.
+	berezko bcc zenbatu egia: {
+		str erantsi: (norbera header: ['Bcc: '] + ( berezko bcc batu: [','] )) + brk.
+	}.
+	str erantsi: (norbera header: ['Subject: '] + berezko subject) + brk.
+	str erantsi: ['MIME-Version: 1.0'] + brk.
+	str erantsi: ['Content-Type: multipart/related; boundary="'] + berezko boundary + ['"; type=text/html'] + brk.
+	str erantsi: brk.
+	str erantsi: ['--'] + berezko boundary + brk.
+	str erantsi: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str erantsi: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str erantsi: brk.
+	str erantsi: berezko body.
+	str erantsi: brk.
+	berezko attachments bakoitza: { :id :info
+		>> blob := info data.
+		str erantsi: ['--'] + berezko boundary + brk.
+		str erantsi: ['Content-Type: '] + info mime + brk.
+		str erantsi: ['Content-Transfer-Encoding: base64'] + brk.
+		str erantsi: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str erantsi: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str erantsi: brk.
+		>> max := 76.
+		>> len := blob luzera.
+		>> chunks := (len / max) gora-biribildu.
+		{ :i
+			>> chunk := blob kopiatu nondik: i * max luzera: max.
+			str erantsi: chunk + brk.
+		} * chunks.
+		str erantsi: brk.
+		str erantsi: brk.
+	}.
+	str erantsi: ['--'] + berezko boundary + ['--'] + brk. <- str.
+}.

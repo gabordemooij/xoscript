@@ -1,0 +1,325 @@
+HTTP-ຄຳຂໍ ເມື່ອ: ['HTTP-header:'] ເຮັດ: { :key <- ໂປຣແກຣມ ການຕັ້ງຄ່າ: key.
+}.
+
+>> HTTP-Header := ວັດຖຸ ໃໝ່.
+
+HTTP-Header ເມື່ອ: ['ໃໝ່'] ເຮັດ: { <- ຕົນເອງ ໃໝ່ init.
+}.
+
+HTTP-Header ເມື່ອ: ['init'] ເຮັດ: {
+	ຂອງຕົນ key := ວ່າງ.
+	ຂອງຕົນ value := ວ່າງ.
+}.
+
+HTTP-Header ເມື່ອ: ['key:value:'] ເຮັດ: { :key :value
+	ຂອງຕົນ key := key.
+	ຂອງຕົນ value := value.
+}.
+
+HTTP-Header ເມື່ອ: ['key'] ເຮັດ: { <- ຂອງຕົນ key.
+}.
+
+HTTP-Header ເມື່ອ: ['value'] ເຮັດ: { <- ຂອງຕົນ value.
+}.
+
+
+HTTP-Header ເມື່ອ: ['ເປັນຂໍ້ຄວາມ'] ເຮັດ: {
+	>> line := ຂອງຕົນ key + [': '] + ຂອງຕົນ value.
+	line ແທນທີ່: ['\r'] ດ້ວຍ: [''], ແທນທີ່: ['\n'] ດ້ວຍ: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := ວັດຖຸ ໃໝ່.
+
+Web-Document ເມື່ອ: ['ໃໝ່'] ເຮັດ: { <- ຕົນເອງ ໃໝ່ init.
+}.
+
+Web-Document ເມື່ອ: ['init'] ເຮັດ: {
+	ຂອງຕົນ headers := ລິສ ໃໝ່.
+	ຂອງຕົນ sess-id := ວ່າງ.
+	ຂອງຕົນ session-manager := Tempfile-Session ໃໝ່.
+	ຂອງຕົນ sessdata := ວ່າງ.
+	ຂອງຕົນ secure := ຈິງ.
+	ຂອງຕົນ same-site := ['Strict'].
+	ຂອງຕົນ headers-out := ເທັດ.
+	ຂອງຕົນ request := HTTP-ຄຳຂໍ ໃໝ່.
+}.
+
+Web-Document ເມື່ອ: ['request:'] ເຮັດ: { :request
+	ຂອງຕົນ request := request.
+}. 
+
+Web-Document ເມື່ອ: ['secure-session-cookie:'] ເຮັດ: { :secure
+	ຕົນເອງ check-headers.
+	ຂອງຕົນ secure := secure.
+}.
+
+Web-Document ເມື່ອ: ['same-site-session-cookie:'] ເຮັດ: { :value
+	ຕົນເອງ check-headers.
+	>> options := ລິສ ໃໝ່ 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options ປະກອບດ້ວຍ: value, ຖ້າເທັດ: {
+		ວຽກນີ້ ຂໍ້ຜິດພາດ: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	ຂອງຕົນ same-site := value.
+}.
+
+Web-Document ເມື່ອ: ['header:'] ເຮັດ: { :header
+	ຕົນເອງ check-headers.
+	ຂອງຕົນ headers ຕໍ່ທ້າຍ: header.
+}.
+
+Web-Document ເມື່ອ: ['clear-headers'] ເຮັດ: {
+	ຕົນເອງ check-headers.
+	ຂອງຕົນ headers := ລິສ ໃໝ່.
+}.
+
+Web-Document ເມື່ອ: ['session-manager:'] ເຮັດ: { :manager
+	ຕົນເອງ check-headers.
+	ຂອງຕົນ session-manager := manager.
+}.
+
+Web-Document ເມື່ອ: ['session-manager'] ເຮັດ: { <- ຂອງຕົນ session-manager.
+}.
+
+Web-Document ເມື່ອ: ['check-headers'] ເຮັດ: {
+	ຂອງຕົນ headers-out ຖ້າຈິງ: {
+		ວຽກນີ້ ຂໍ້ຜິດພາດ: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document ເມື່ອ: ['session-start'] ເຮັດ: {
+	ຕົນເອງ check-headers.
+	>> request := ຂອງຕົນ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ວ່າງບໍ? ຖ້າເທັດ: {
+		(( ແພັດເທີນ ໃໝ່: ['^[A-Za-z0-9]+\\z'], ກົງກັບ: sess-id ) = 0) ຖ້າຈິງ: {
+			sess-id := ວ່າງ.
+		}.
+	}.
+	sess-id ວ່າງບໍ? ຖ້າຈິງ: {
+		sess-id := ຕູ້ນິລະໄພ ໂທເຄັນ: 30.
+		>> session-header := HTTP-Header ໃໝ່
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (ຂອງຕົນ secure ເລືອກ: ['Secure'] ຫຼືອັນນີ້: ['']),
+		SSITE: (ຂອງຕົນ same-site),
+		XSID: sess-id
+		).
+		ຂອງຕົນ headers ຕໍ່ທ້າຍ: session-header.
+	}.
+	ຂອງຕົນ sessdata := ຂອງຕົນ session-manager for: sess-id, load. <- ຂອງຕົນ sessdata. # reference
+}.
+
+Web-Document ເມື່ອ: ['goto:'] ເຮັດ: { :url
+	ຕົນເອງ check-headers.
+	ຕົນເອງ clear-headers.
+	ຂອງຕົນ headers
+	ຕໍ່ທ້າຍ: (
+		HTTP-Header ໃໝ່
+		key: ['Status'] value: ['303 See Other']
+	),
+	ຕໍ່ທ້າຍ: (
+		HTTP-Header ໃໝ່
+		key: ['Location'] value: url
+	).
+	ຕົນເອງ out: ['Redirect'].
+}.
+
+Web-Document ເມື່ອ: ['session-destroy'] ເຮັດ: {
+	ຕົນເອງ check-headers.
+	>> request := ຂອງຕົນ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ວ່າງບໍ? ຖ້າເທັດ: {
+		>> session-header := HTTP-Header ໃໝ່.
+		>> when := ຂະນະ ໃໝ່ ປີ: 1970, ຕາມຮູບແບບ: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (ຂອງຕົນ secure ເລືອກ: ['Secure'] ຫຼືອັນນີ້: ['']),
+			SSITE: (ຂອງຕົນ same-site),
+			XSID: sess-id
+		).
+		ຂອງຕົນ session-manager destroy.
+		ຂອງຕົນ headers ຕໍ່ທ້າຍ: session-header.
+	}.
+}.
+
+
+Web-Document ເມື່ອ: ['template:'] ເຮັດ: { :ເສັ້ນທາງ <- Template ໃໝ່: (ໄຟລ໌ ໃໝ່: ເສັ້ນທາງ, ອ່ານ).
+}.
+
+Web-Document ເມື່ອ: ['out:type:'] ເຮັດ: { :output :ປະເພດ
+	ຂອງຕົນ headers-out ຖ້າເທັດ: {
+		ຂອງຕົນ sessdata ວ່າງບໍ? ຖ້າເທັດ: {
+			ຂອງຕົນ session-manager save: ຂອງຕົນ sessdata.
+		}.
+		ຂອງຕົນ headers ຕໍ່ທ້າຍ: (
+			HTTP-Header ໃໝ່
+			key: ['Content-type'] value: ປະເພດ
+		).
+		ຂອງຕົນ headers ແຕ່ລະຕົວ: { :_ :header
+			ຜົນອອກ ຂຽນ: header.
+		}.
+		ຂອງຕົນ headers-out := ຈິງ.
+		ຜົນອອກ ຂຽນ: ['\r\n'].
+	}.
+	ຜົນອອກ ຂຽນ: output.
+}.
+
+Web-Document ເມື່ອ: ['finish:type:'] ເຮັດ: { :output :ປະເພດ
+	ຂອງຕົນ headers-out ຖ້າເທັດ: {
+		ຂອງຕົນ sessdata ວ່າງບໍ? ຖ້າເທັດ: {
+			ຂອງຕົນ session-manager save: ຂອງຕົນ sessdata.
+		}.
+		ຂອງຕົນ headers ຕໍ່ທ້າຍ: (
+			HTTP-Header ໃໝ່
+			key: ['Content-type'] value: ປະເພດ
+		).
+		ຂອງຕົນ headers ຕໍ່ທ້າຍ: (
+			HTTP-Header ໃໝ່
+			key: ['Content-Length'] value: output ເປັນຂໍ້ຄວາມ bytes
+		).
+		ຂອງຕົນ headers ແຕ່ລະຕົວ: { :_ :header
+			ຜົນອອກ ຂຽນ: header.
+		}.
+		ຂອງຕົນ headers-out := ຈິງ.
+		ຜົນອອກ ຂຽນ: ['\r\n'].
+	}.
+	ຜົນອອກ ຂຽນ: output.
+}.
+
+Web-Document ເມື່ອ: ['out:'] ເຮັດ: { :output
+	ຕົນເອງ out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ເມື່ອ: ['finish:'] ເຮັດ: { :output
+	ຕົນເອງ finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ເມື່ອ: ['json:'] ເຮັດ: { :output
+	ຕົນເອງ out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document ເມື່ອ: ['not-found:'] ເຮັດ: { :output
+	ຕົນເອງ clear-headers header: (
+		HTTP-Header ໃໝ່ key: ['Status'] value: ['404 Not Found']
+	).
+	ຕົນເອງ out: output.
+}.
+
+
+# Interface
+
+>> Session := ວັດຖຸ ໃໝ່.
+
+Session ເມື່ອ: ['ໃໝ່'] ເຮັດ: { <- ຕົນເອງ ໃໝ່ init for: ວ່າງ.
+}.
+
+Session ເມື່ອ: ['for:'] ເຮັດ: { :id
+	ຂອງຕົນ id := id.
+}.
+
+Session ເມື່ອ: ['load'] ເຮັດ: {
+	ວຽກນີ້ ຂໍ້ຜິດພາດ: ['Not implemented.'].
+}.
+
+Session ເມື່ອ: ['save:'] ເຮັດ: {
+	ວຽກນີ້ ຂໍ້ຜິດພາດ: ['Not implemented.'].
+}.
+
+Session ເມື່ອ: ['destroy'] ເຮັດ: {
+	ວຽກນີ້ ຂໍ້ຜິດພາດ: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session ໃໝ່.
+
+Tempfile-Session ເມື່ອ: ['init'] ເຮັດ: {
+	ຂອງຕົນ pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session ເມື່ອ: ['path-prefix:'] ເຮັດ: { :str
+	ຂອງຕົນ pathprefix := str.
+}.
+
+Tempfile-Session ເມື່ອ: ['file'] ເຮັດ: { <- ( ໄຟລ໌ ໃໝ່: ( ຂອງຕົນ pathprefix + ຂອງຕົນ id + ['.txt'] ) ).
+}.
+
+Tempfile-Session ເມື່ອ: ['load'] ເຮັດ: {
+	>> file := ຕົນເອງ file.
+	file ມີຢູ່ ຖ້າເທັດ: {
+		file ຂຽນ: (ວັດຈະນານຸກົມ ໃໝ່ ໂຄດ).
+	}. <- file ອ່ານ ເປັນວັດຖຸ.
+}.
+
+Tempfile-Session ເມື່ອ: ['save:'] ເຮັດ: { :data
+	>> file := ຕົນເອງ file.
+	file ມີຢູ່ ຖ້າຈິງ: {
+		file ຂຽນ: data ໂຄດ.
+	}.
+}.
+
+Tempfile-Session ເມື່ອ: ['destroy'] ເຮັດ: {
+	>> file := ຕົນເອງ file.
+	file ມີຢູ່ ຖ້າຈິງ: {
+		file ລຶບ.
+	}.
+}.
+
+
+>> URL := ວັດຖຸ ໃໝ່.
+
+URL ເມື່ອ: ['init'] ເຮັດ: {
+	ຂອງຕົນ protocol := ['https://'].
+	ຂອງຕົນ ໂຮສ := ['localhost'].
+	ຂອງຕົນ ເສັ້ນທາງ := [''].
+	ຂອງຕົນ params := [''].
+	ຂອງຕົນ hash := [''].
+}.
+
+URL ເມື່ອ: ['ໃໝ່'] ເຮັດ: { <- ຕົນເອງ ໃໝ່ init.
+}.
+
+URL ເມື່ອ: ['ເປັນຂໍ້ຄວາມ'] ເຮັດ: { <- (
+	ຂອງຕົນ protocol +
+	ຂອງຕົນ ໂຮສ +
+	ຂອງຕົນ ເສັ້ນທາງ +
+	ຂອງຕົນ params +
+	ຂອງຕົນ hash ).
+}.
+
+URL ເມື່ອ: ['protocol:'] ເຮັດ: { :protocol
+	((ລິສ ໃໝ່: ['http'] ; ['https']) ປະກອບດ້ວຍ: protocol) ຖ້າຈິງ: {
+		ຂອງຕົນ protocol := protocol + ['://'].
+	}, ຖ້າເທັດ: {
+		ວຽກນີ້ ຂໍ້ຜິດພາດ: ['Invalid protocol'].
+	}.
+}.
+
+URL ເມື່ອ: ['ໂຮສ:'] ເຮັດ: { :ໂຮສ
+	#todo validate according to rfc
+	ຂອງຕົນ ໂຮສ := ໂຮສ.
+}.
+
+URL ເມື່ອ: ['path:'] ເຮັດ: { :ເສັ້ນທາງ
+	ຂອງຕົນ ເສັ້ນທາງ := ['/'] + ເສັ້ນທາງ url-ເຂົ້າລະຫັດ.
+}.
+
+URL ເມື່ອ: ['params:'] ເຮັດ: { :map
+	>> params := ລິສ ໃໝ່.
+	map ແຕ່ລະຕົວ: { :key :value
+		params ຕໍ່ທ້າຍ: key ເປັນຂໍ້ຄວາມ url-ເຂົ້າລະຫັດ + ['='] + value ເປັນຂໍ້ຄວາມ url-ເຂົ້າລະຫັດ.
+	}.
+	ຂອງຕົນ params := ['?'] + ( params ລວມ: ['&'] ).
+}.
+
+URL ເມື່ອ: ['ແຮຊ:'] ເຮັດ: { :hash
+	ຂອງຕົນ hash := ['#'] + hash url-ເຂົ້າລະຫັດ.
+}.
+

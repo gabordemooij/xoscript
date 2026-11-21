@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Obyek anyar.
+
+Template nalika: ['anyar'] tindakna: { <- dhiri anyar content: [''].
+}.
+
+Template nalika: ['content:'] tindakna: { :content
+	duweke content := content. 
+}.
+
+Template nalika: ['anyar:'] tindakna: { :content <- dhiri anyar content: content.
+}.
+
+Template nalika: ['cut:'] tindakna: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := duweke content pisah: startmarker.
+	>> prefix := parts pisanan.
+	>> parts2 := parts pungkasan pisah: endmarker.
+	>> suffix := parts2 pungkasan.
+	>> part := parts2 pisanan.
+	>> rest := prefix + suffix.
+	duweke content := rest. <- Template anyar: part.
+	
+}.
+
+Template nalika: ['salin'] tindakna: { <- dhiri anyar: dhiri tèks salin.
+}.
+	
+Template nalika: ['paste:at:'] tindakna: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	duweke content ganti: pastemarker nganggo: ( snippet tèks + pastemarker ).
+}.
+
+Template nalika: ['atur:nilai:'] tindakna: { :slot :value
+	duweke content ganti: ['<!-- slot:'] + slot + [' -->'] nganggo: ( Server html-enkode: value ).
+}.
+
+Template nalika: ['set:html:'] tindakna: { :slot :html
+	duweke content ganti: ['<!-- slot:'] + slot + [' -->'] nganggo: html.
+}.
+
+Template nalika: ['wangsuli:lan:'] tindakna: { :slot :value
+	dhiri atur: (slot saka: 0 dawa: (slot dawa - 1)) nilai: value.
+}.
+
+Template nalika: ['nl2br'] tindakna: {
+	duweke content ganti: ['\n'] nganggo: ['<br>'].
+}.
+
+Template nalika: ['clean'] tindakna: {
+	duweke content :=
+		Pola
+		anyar: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		cocog: duweke content
+		tindakna: { <- ['']. }.
+}.
+
+Template nalika: ['clean-cuts'] tindakna: {
+	>> items := Dhaptar anyar.
+	Pola
+	anyar: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	cocog: duweke content
+	tindakna: { :_ :part
+		items tambah-ing-mburi: part ? 1.
+	}.
+	items saben: { :_ :id
+		duweke content :=
+			Pola anyar: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			cocog: duweke content
+			tindakna: { <- ['']. }.
+	 }.
+}.
+
+Template nalika: ['clean-space'] tindakna: {
+	duweke content :=
+		Pola
+		anyar: ['\\s*\\n'],
+		cocog: duweke content
+		tindakna: { <- ['\n']. }.
+	duweke content :=
+		Pola
+		anyar: ['\\n[\\s\\t]+'],
+		cocog: duweke content
+		tindakna: { <- ['\n']. }.
+}.
+
+Template nalika: ['clean-all'] tindakna: {
+	dhiri clean.
+	dhiri clean-cuts.
+	dhiri clean-space.
+}.
+
+Template nalika: ['tèks'] tindakna: { <- duweke content.
+}.

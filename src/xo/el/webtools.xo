@@ -1,0 +1,325 @@
+HTTP-Αίτημα όταν: ['HTTP-header:'] κάνε: { :key <- Πρόγραμμα ρύθμιση: key.
+}.
+
+>> HTTP-Header := Αντικείμενο νέο.
+
+HTTP-Header όταν: ['νέο'] κάνε: { <- εαυτός νέο init.
+}.
+
+HTTP-Header όταν: ['init'] κάνε: {
+	δικό key := Κενό.
+	δικό value := Κενό.
+}.
+
+HTTP-Header όταν: ['key:value:'] κάνε: { :key :value
+	δικό key := key.
+	δικό value := value.
+}.
+
+HTTP-Header όταν: ['key'] κάνε: { <- δικό key.
+}.
+
+HTTP-Header όταν: ['value'] κάνε: { <- δικό value.
+}.
+
+
+HTTP-Header όταν: ['κείμενο'] κάνε: {
+	>> line := δικό key + [': '] + δικό value.
+	line αντικατάσταση: ['\r'] με: [''], αντικατάσταση: ['\n'] με: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Αντικείμενο νέο.
+
+Web-Document όταν: ['νέο'] κάνε: { <- εαυτός νέο init.
+}.
+
+Web-Document όταν: ['init'] κάνε: {
+	δικό headers := Λίστα νέο.
+	δικό sess-id := Κενό.
+	δικό session-manager := Tempfile-Session νέο.
+	δικό sessdata := Κενό.
+	δικό secure := Αληθές.
+	δικό same-site := ['Strict'].
+	δικό headers-out := Ψευδές.
+	δικό request := HTTP-Αίτημα νέο.
+}.
+
+Web-Document όταν: ['request:'] κάνε: { :request
+	δικό request := request.
+}. 
+
+Web-Document όταν: ['secure-session-cookie:'] κάνε: { :secure
+	εαυτός check-headers.
+	δικό secure := secure.
+}.
+
+Web-Document όταν: ['same-site-session-cookie:'] κάνε: { :value
+	εαυτός check-headers.
+	>> options := Λίστα νέο 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options περιέχει: value, ψευδές: {
+		αυτή-η-εργασία λάθος: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	δικό same-site := value.
+}.
+
+Web-Document όταν: ['header:'] κάνε: { :header
+	εαυτός check-headers.
+	δικό headers προσθήκη-στο-τέλος: header.
+}.
+
+Web-Document όταν: ['clear-headers'] κάνε: {
+	εαυτός check-headers.
+	δικό headers := Λίστα νέο.
+}.
+
+Web-Document όταν: ['session-manager:'] κάνε: { :manager
+	εαυτός check-headers.
+	δικό session-manager := manager.
+}.
+
+Web-Document όταν: ['session-manager'] κάνε: { <- δικό session-manager.
+}.
+
+Web-Document όταν: ['check-headers'] κάνε: {
+	δικό headers-out αληθές: {
+		αυτή-η-εργασία λάθος: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document όταν: ['session-start'] κάνε: {
+	εαυτός check-headers.
+	>> request := δικό request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Κενό? ψευδές: {
+		(( Μοτίβο νέο: ['^[A-Za-z0-9]+\\z'], ταίριασμα: sess-id ) = 0) αληθές: {
+			sess-id := Κενό.
+		}.
+	}.
+	sess-id Κενό? αληθές: {
+		sess-id := Θησαυροφυλάκιο διακριτικό: 30.
+		>> session-header := HTTP-Header νέο
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (δικό secure είτε: ['Secure'] είτε: ['']),
+		SSITE: (δικό same-site),
+		XSID: sess-id
+		).
+		δικό headers προσθήκη-στο-τέλος: session-header.
+	}.
+	δικό sessdata := δικό session-manager for: sess-id, load. <- δικό sessdata. # reference
+}.
+
+Web-Document όταν: ['goto:'] κάνε: { :url
+	εαυτός check-headers.
+	εαυτός clear-headers.
+	δικό headers
+	προσθήκη-στο-τέλος: (
+		HTTP-Header νέο
+		key: ['Status'] value: ['303 See Other']
+	),
+	προσθήκη-στο-τέλος: (
+		HTTP-Header νέο
+		key: ['Location'] value: url
+	).
+	εαυτός out: ['Redirect'].
+}.
+
+Web-Document όταν: ['session-destroy'] κάνε: {
+	εαυτός check-headers.
+	>> request := δικό request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Κενό? ψευδές: {
+		>> session-header := HTTP-Header νέο.
+		>> when := Στιγμή νέο έτος: 1970, μορφή: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (δικό secure είτε: ['Secure'] είτε: ['']),
+			SSITE: (δικό same-site),
+			XSID: sess-id
+		).
+		δικό session-manager destroy.
+		δικό headers προσθήκη-στο-τέλος: session-header.
+	}.
+}.
+
+
+Web-Document όταν: ['template:'] κάνε: { :διαδρομή <- Template νέο: (Αρχείο νέο: διαδρομή, διάβασε).
+}.
+
+Web-Document όταν: ['out:type:'] κάνε: { :output :τύπος
+	δικό headers-out ψευδές: {
+		δικό sessdata Κενό? ψευδές: {
+			δικό session-manager save: δικό sessdata.
+		}.
+		δικό headers προσθήκη-στο-τέλος: (
+			HTTP-Header νέο
+			key: ['Content-type'] value: τύπος
+		).
+		δικό headers κάθε: { :_ :header
+			Έξοδος γράψε: header.
+		}.
+		δικό headers-out := Αληθές.
+		Έξοδος γράψε: ['\r\n'].
+	}.
+	Έξοδος γράψε: output.
+}.
+
+Web-Document όταν: ['finish:type:'] κάνε: { :output :τύπος
+	δικό headers-out ψευδές: {
+		δικό sessdata Κενό? ψευδές: {
+			δικό session-manager save: δικό sessdata.
+		}.
+		δικό headers προσθήκη-στο-τέλος: (
+			HTTP-Header νέο
+			key: ['Content-type'] value: τύπος
+		).
+		δικό headers προσθήκη-στο-τέλος: (
+			HTTP-Header νέο
+			key: ['Content-Length'] value: output κείμενο bytes
+		).
+		δικό headers κάθε: { :_ :header
+			Έξοδος γράψε: header.
+		}.
+		δικό headers-out := Αληθές.
+		Έξοδος γράψε: ['\r\n'].
+	}.
+	Έξοδος γράψε: output.
+}.
+
+Web-Document όταν: ['out:'] κάνε: { :output
+	εαυτός out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document όταν: ['finish:'] κάνε: { :output
+	εαυτός finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document όταν: ['json:'] κάνε: { :output
+	εαυτός out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document όταν: ['not-found:'] κάνε: { :output
+	εαυτός clear-headers header: (
+		HTTP-Header νέο key: ['Status'] value: ['404 Not Found']
+	).
+	εαυτός out: output.
+}.
+
+
+# Interface
+
+>> Session := Αντικείμενο νέο.
+
+Session όταν: ['νέο'] κάνε: { <- εαυτός νέο init for: Κενό.
+}.
+
+Session όταν: ['for:'] κάνε: { :id
+	δικό id := id.
+}.
+
+Session όταν: ['load'] κάνε: {
+	αυτή-η-εργασία λάθος: ['Not implemented.'].
+}.
+
+Session όταν: ['save:'] κάνε: {
+	αυτή-η-εργασία λάθος: ['Not implemented.'].
+}.
+
+Session όταν: ['destroy'] κάνε: {
+	αυτή-η-εργασία λάθος: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session νέο.
+
+Tempfile-Session όταν: ['init'] κάνε: {
+	δικό pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session όταν: ['path-prefix:'] κάνε: { :str
+	δικό pathprefix := str.
+}.
+
+Tempfile-Session όταν: ['file'] κάνε: { <- ( Αρχείο νέο: ( δικό pathprefix + δικό id + ['.txt'] ) ).
+}.
+
+Tempfile-Session όταν: ['load'] κάνε: {
+	>> file := εαυτός file.
+	file υπάρχει ψευδές: {
+		file γράψε: (Λεξικό νέο κώδικας).
+	}. <- file διάβασε αντικείμενο.
+}.
+
+Tempfile-Session όταν: ['save:'] κάνε: { :data
+	>> file := εαυτός file.
+	file υπάρχει αληθές: {
+		file γράψε: data κώδικας.
+	}.
+}.
+
+Tempfile-Session όταν: ['destroy'] κάνε: {
+	>> file := εαυτός file.
+	file υπάρχει αληθές: {
+		file διαγραφή.
+	}.
+}.
+
+
+>> URL := Αντικείμενο νέο.
+
+URL όταν: ['init'] κάνε: {
+	δικό protocol := ['https://'].
+	δικό κόμβος := ['localhost'].
+	δικό διαδρομή := [''].
+	δικό params := [''].
+	δικό hash := [''].
+}.
+
+URL όταν: ['νέο'] κάνε: { <- εαυτός νέο init.
+}.
+
+URL όταν: ['κείμενο'] κάνε: { <- (
+	δικό protocol +
+	δικό κόμβος +
+	δικό διαδρομή +
+	δικό params +
+	δικό hash ).
+}.
+
+URL όταν: ['protocol:'] κάνε: { :protocol
+	((Λίστα νέο: ['http'] ; ['https']) περιέχει: protocol) αληθές: {
+		δικό protocol := protocol + ['://'].
+	}, ψευδές: {
+		αυτή-η-εργασία λάθος: ['Invalid protocol'].
+	}.
+}.
+
+URL όταν: ['κόμβος:'] κάνε: { :κόμβος
+	#todo validate according to rfc
+	δικό κόμβος := κόμβος.
+}.
+
+URL όταν: ['path:'] κάνε: { :διαδρομή
+	δικό διαδρομή := ['/'] + διαδρομή url-κωδικοποίηση.
+}.
+
+URL όταν: ['params:'] κάνε: { :map
+	>> params := Λίστα νέο.
+	map κάθε: { :key :value
+		params προσθήκη-στο-τέλος: key κείμενο url-κωδικοποίηση + ['='] + value κείμενο url-κωδικοποίηση.
+	}.
+	δικό params := ['?'] + ( params συνένωση: ['&'] ).
+}.
+
+URL όταν: ['κατακερματισμός:'] κάνε: { :hash
+	δικό hash := ['#'] + hash url-κωδικοποίηση.
+}.
+

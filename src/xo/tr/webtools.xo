@@ -1,0 +1,325 @@
+HTTP-İstek olunca: ['HTTP-header:'] yap: { :key <- Program ayar: key.
+}.
+
+>> HTTP-Header := Nesne yeni.
+
+HTTP-Header olunca: ['yeni'] yap: { <- kendi yeni init.
+}.
+
+HTTP-Header olunca: ['init'] yap: {
+	öz key := Hiç.
+	öz value := Hiç.
+}.
+
+HTTP-Header olunca: ['key:value:'] yap: { :key :value
+	öz key := key.
+	öz value := value.
+}.
+
+HTTP-Header olunca: ['key'] yap: { <- öz key.
+}.
+
+HTTP-Header olunca: ['value'] yap: { <- öz value.
+}.
+
+
+HTTP-Header olunca: ['metin'] yap: {
+	>> line := öz key + [': '] + öz value.
+	line değiştir: ['\r'] yenisi: [''], değiştir: ['\n'] yenisi: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Nesne yeni.
+
+Web-Document olunca: ['yeni'] yap: { <- kendi yeni init.
+}.
+
+Web-Document olunca: ['init'] yap: {
+	öz headers := Liste yeni.
+	öz sess-id := Hiç.
+	öz session-manager := Tempfile-Session yeni.
+	öz sessdata := Hiç.
+	öz secure := Doğru.
+	öz same-site := ['Strict'].
+	öz headers-out := Yanlış.
+	öz request := HTTP-İstek yeni.
+}.
+
+Web-Document olunca: ['request:'] yap: { :request
+	öz request := request.
+}. 
+
+Web-Document olunca: ['secure-session-cookie:'] yap: { :secure
+	kendi check-headers.
+	öz secure := secure.
+}.
+
+Web-Document olunca: ['same-site-session-cookie:'] yap: { :value
+	kendi check-headers.
+	>> options := Liste yeni 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options kapsar: value, yanlış: {
+		bu-görev hata: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	öz same-site := value.
+}.
+
+Web-Document olunca: ['header:'] yap: { :header
+	kendi check-headers.
+	öz headers sona-ekle: header.
+}.
+
+Web-Document olunca: ['clear-headers'] yap: {
+	kendi check-headers.
+	öz headers := Liste yeni.
+}.
+
+Web-Document olunca: ['session-manager:'] yap: { :manager
+	kendi check-headers.
+	öz session-manager := manager.
+}.
+
+Web-Document olunca: ['session-manager'] yap: { <- öz session-manager.
+}.
+
+Web-Document olunca: ['check-headers'] yap: {
+	öz headers-out doğru: {
+		bu-görev hata: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document olunca: ['session-start'] yap: {
+	kendi check-headers.
+	>> request := öz request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Hiç? yanlış: {
+		(( Desen yeni: ['^[A-Za-z0-9]+\\z'], eşleş: sess-id ) = 0) doğru: {
+			sess-id := Hiç.
+		}.
+	}.
+	sess-id Hiç? doğru: {
+		sess-id := Kasa jeton: 30.
+		>> session-header := HTTP-Header yeni
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (öz secure ya: ['Secure'] veya: ['']),
+		SSITE: (öz same-site),
+		XSID: sess-id
+		).
+		öz headers sona-ekle: session-header.
+	}.
+	öz sessdata := öz session-manager for: sess-id, load. <- öz sessdata. # reference
+}.
+
+Web-Document olunca: ['goto:'] yap: { :url
+	kendi check-headers.
+	kendi clear-headers.
+	öz headers
+	sona-ekle: (
+		HTTP-Header yeni
+		key: ['Status'] value: ['303 See Other']
+	),
+	sona-ekle: (
+		HTTP-Header yeni
+		key: ['Location'] value: url
+	).
+	kendi out: ['Redirect'].
+}.
+
+Web-Document olunca: ['session-destroy'] yap: {
+	kendi check-headers.
+	>> request := öz request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Hiç? yanlış: {
+		>> session-header := HTTP-Header yeni.
+		>> when := An yeni yıl: 1970, biçim: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (öz secure ya: ['Secure'] veya: ['']),
+			SSITE: (öz same-site),
+			XSID: sess-id
+		).
+		öz session-manager destroy.
+		öz headers sona-ekle: session-header.
+	}.
+}.
+
+
+Web-Document olunca: ['template:'] yap: { :yol <- Template yeni: (Dosya yeni: yol, oku).
+}.
+
+Web-Document olunca: ['out:type:'] yap: { :output :tür
+	öz headers-out yanlış: {
+		öz sessdata Hiç? yanlış: {
+			öz session-manager save: öz sessdata.
+		}.
+		öz headers sona-ekle: (
+			HTTP-Header yeni
+			key: ['Content-type'] value: tür
+		).
+		öz headers her: { :_ :header
+			Çıktı yaz: header.
+		}.
+		öz headers-out := Doğru.
+		Çıktı yaz: ['\r\n'].
+	}.
+	Çıktı yaz: output.
+}.
+
+Web-Document olunca: ['finish:type:'] yap: { :output :tür
+	öz headers-out yanlış: {
+		öz sessdata Hiç? yanlış: {
+			öz session-manager save: öz sessdata.
+		}.
+		öz headers sona-ekle: (
+			HTTP-Header yeni
+			key: ['Content-type'] value: tür
+		).
+		öz headers sona-ekle: (
+			HTTP-Header yeni
+			key: ['Content-Length'] value: output metin bytes
+		).
+		öz headers her: { :_ :header
+			Çıktı yaz: header.
+		}.
+		öz headers-out := Doğru.
+		Çıktı yaz: ['\r\n'].
+	}.
+	Çıktı yaz: output.
+}.
+
+Web-Document olunca: ['out:'] yap: { :output
+	kendi out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document olunca: ['finish:'] yap: { :output
+	kendi finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document olunca: ['json:'] yap: { :output
+	kendi out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document olunca: ['not-found:'] yap: { :output
+	kendi clear-headers header: (
+		HTTP-Header yeni key: ['Status'] value: ['404 Not Found']
+	).
+	kendi out: output.
+}.
+
+
+# Interface
+
+>> Session := Nesne yeni.
+
+Session olunca: ['yeni'] yap: { <- kendi yeni init for: Hiç.
+}.
+
+Session olunca: ['for:'] yap: { :id
+	öz id := id.
+}.
+
+Session olunca: ['load'] yap: {
+	bu-görev hata: ['Not implemented.'].
+}.
+
+Session olunca: ['save:'] yap: {
+	bu-görev hata: ['Not implemented.'].
+}.
+
+Session olunca: ['destroy'] yap: {
+	bu-görev hata: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session yeni.
+
+Tempfile-Session olunca: ['init'] yap: {
+	öz pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session olunca: ['path-prefix:'] yap: { :str
+	öz pathprefix := str.
+}.
+
+Tempfile-Session olunca: ['file'] yap: { <- ( Dosya yeni: ( öz pathprefix + öz id + ['.txt'] ) ).
+}.
+
+Tempfile-Session olunca: ['load'] yap: {
+	>> file := kendi file.
+	file var yanlış: {
+		file yaz: (Sözlük yeni kod).
+	}. <- file oku nesne.
+}.
+
+Tempfile-Session olunca: ['save:'] yap: { :data
+	>> file := kendi file.
+	file var doğru: {
+		file yaz: data kod.
+	}.
+}.
+
+Tempfile-Session olunca: ['destroy'] yap: {
+	>> file := kendi file.
+	file var doğru: {
+		file sil.
+	}.
+}.
+
+
+>> URL := Nesne yeni.
+
+URL olunca: ['init'] yap: {
+	öz protocol := ['https://'].
+	öz sunucu-adı := ['localhost'].
+	öz yol := [''].
+	öz params := [''].
+	öz hash := [''].
+}.
+
+URL olunca: ['yeni'] yap: { <- kendi yeni init.
+}.
+
+URL olunca: ['metin'] yap: { <- (
+	öz protocol +
+	öz sunucu-adı +
+	öz yol +
+	öz params +
+	öz hash ).
+}.
+
+URL olunca: ['protocol:'] yap: { :protocol
+	((Liste yeni: ['http'] ; ['https']) kapsar: protocol) doğru: {
+		öz protocol := protocol + ['://'].
+	}, yanlış: {
+		bu-görev hata: ['Invalid protocol'].
+	}.
+}.
+
+URL olunca: ['sunucu-adı:'] yap: { :sunucu-adı
+	#todo validate according to rfc
+	öz sunucu-adı := sunucu-adı.
+}.
+
+URL olunca: ['path:'] yap: { :yol
+	öz yol := ['/'] + yol url-kodla.
+}.
+
+URL olunca: ['params:'] yap: { :map
+	>> params := Liste yeni.
+	map her: { :key :value
+		params sona-ekle: key metin url-kodla + ['='] + value metin url-kodla.
+	}.
+	öz params := ['?'] + ( params birleştir: ['&'] ).
+}.
+
+URL olunca: ['özet:'] yap: { :hash
+	öz hash := ['#'] + hash url-kodla.
+}.
+

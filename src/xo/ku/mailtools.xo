@@ -1,0 +1,128 @@
+>> Email := Tişt nû.
+
+Email gava: ['init'] bike: {
+	xweyî recipients := Lîste nû.
+	xweyî cc := Lîste nû.
+	xweyî bcc := Lîste nû.
+	xweyî from := Tune.
+	xweyî from-name := Tune.
+	xweyî subject := Tune.
+	xweyî body := Tune.
+}.
+
+Email gava: ['nû'] bike: { <- xwe nû init.
+}.
+
+Email gava: ['to:'] bike: { :list
+	xweyî recipients := list.
+}.
+ 
+Email gava: ['cc:'] bike: { :list
+	xweyî cc := list.
+}.
+
+Email gava: ['bcc:'] bike: { :list
+	xweyî bcc := list.
+}.
+
+Email gava: ['subject:'] bike: { :subject
+	xweyî subject := subject.
+}.
+
+Email gava: ['from:name:'] bike: { :from :nav
+	xweyî from := from.
+	xweyî from-name := nav.
+}.
+
+Email gava: ['body:'] bike: { :body
+	xweyî body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email gava: ['header:'] bike: { :line <- line biguherîne: ['\r'] bi: [''], biguherîne: ['\n'] bi: [''].
+}.
+
+Email gava: ['send'] bike: {
+	>> f := Pel tempwrite: xwe generate.
+	Bername pergal: ['sendmail -t < '] + f riya-pelê, rêza-nû.
+}.
+
+Email gava: ['generate'] bike: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str li-dawiyê-zêde-bike: (xwe header: ['From: '] + xweyî from-name + [' <'] + ( xweyî from ) + ['>']) + brk.
+	str li-dawiyê-zêde-bike: (xwe header: ['To: '] + ( xweyî recipients bigihîne-hev: [','] )) + brk.
+	xweyî cc hejmara-tiştan rast: {
+		str li-dawiyê-zêde-bike: (xwe header: ['Cc: '] + ( xweyî cc bigihîne-hev: [','] )) + brk.
+	}.
+	xweyî bcc hejmara-tiştan rast: {
+		str li-dawiyê-zêde-bike: (xwe header: ['Bcc: '] + ( xweyî bcc bigihîne-hev: [','] )) + brk.
+	}.
+	str li-dawiyê-zêde-bike: (xwe header: ['Subject: '] + xweyî subject) + brk.
+	str li-dawiyê-zêde-bike: brk.
+	str li-dawiyê-zêde-bike: xweyî body.
+	str li-dawiyê-zêde-bike: brk. <- str.
+}.
+
+>> HTML-Email := Email nû.
+
+HTML-Email gava: ['init'] bike: {
+	xwe init.
+	xweyî attachments := Lîste nû.
+	xweyî boundary := Qasa token: 40.
+}.
+
+HTML-Email gava: ['attach:'] bike: { :file
+	>> id := xweyî attachments hejmara-tiştan.
+	>> blob := file blob.
+	xweyî attachments li-dawiyê-zêde-bike: (
+		Ferheng nû
+			file: file riya-pelê,
+			mime: ['image/'] + (Server mimetype: file riya-pelê),
+			data: blob base64-kod-bike
+	).
+	blob azad-bike. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email gava: ['generate'] bike: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str li-dawiyê-zêde-bike: (xwe header: ['From: '] + xweyî from-name + [' <'] + ( xweyî from ) + ['>']) + brk.
+	str li-dawiyê-zêde-bike: (xwe header: ['To: '] + ( xweyî recipients bigihîne-hev: [','] )) + brk.
+	xweyî cc hejmara-tiştan rast: {
+		str li-dawiyê-zêde-bike: (xwe header: ['Cc: '] + ( xweyî cc bigihîne-hev: [','] )) + brk.
+	}.
+	xweyî bcc hejmara-tiştan rast: {
+		str li-dawiyê-zêde-bike: (xwe header: ['Bcc: '] + ( xweyî bcc bigihîne-hev: [','] )) + brk.
+	}.
+	str li-dawiyê-zêde-bike: (xwe header: ['Subject: '] + xweyî subject) + brk.
+	str li-dawiyê-zêde-bike: ['MIME-Version: 1.0'] + brk.
+	str li-dawiyê-zêde-bike: ['Content-Type: multipart/related; boundary="'] + xweyî boundary + ['"; type=text/html'] + brk.
+	str li-dawiyê-zêde-bike: brk.
+	str li-dawiyê-zêde-bike: ['--'] + xweyî boundary + brk.
+	str li-dawiyê-zêde-bike: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str li-dawiyê-zêde-bike: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str li-dawiyê-zêde-bike: brk.
+	str li-dawiyê-zêde-bike: xweyî body.
+	str li-dawiyê-zêde-bike: brk.
+	xweyî attachments her-yek: { :id :info
+		>> blob := info data.
+		str li-dawiyê-zêde-bike: ['--'] + xweyî boundary + brk.
+		str li-dawiyê-zêde-bike: ['Content-Type: '] + info mime + brk.
+		str li-dawiyê-zêde-bike: ['Content-Transfer-Encoding: base64'] + brk.
+		str li-dawiyê-zêde-bike: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str li-dawiyê-zêde-bike: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str li-dawiyê-zêde-bike: brk.
+		>> max := 76.
+		>> len := blob dirêjî.
+		>> chunks := (len / max) ber-bi-jor-gilover.
+		{ :i
+			>> chunk := blob kopî-bike ji: i * max dirêjî: max.
+			str li-dawiyê-zêde-bike: chunk + brk.
+		} * chunks.
+		str li-dawiyê-zêde-bike: brk.
+		str li-dawiyê-zêde-bike: brk.
+	}.
+	str li-dawiyê-zêde-bike: ['--'] + xweyî boundary + ['--'] + brk. <- str.
+}.

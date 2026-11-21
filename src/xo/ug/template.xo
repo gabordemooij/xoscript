@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := ئوبيېكت يېڭى.
+
+Template كەلگەندە: ['يېڭى'] قىل: { <- ئۆزى يېڭى content: [''].
+}.
+
+Template كەلگەندە: ['content:'] قىل: { :content
+	ئۆزىنىڭ content := content. 
+}.
+
+Template كەلگەندە: ['يېڭى:'] قىل: { :content <- ئۆزى يېڭى content: content.
+}.
+
+Template كەلگەندە: ['cut:'] قىل: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := ئۆزىنىڭ content پارچىلا: startmarker.
+	>> prefix := parts بىرىنچى.
+	>> parts2 := parts ئاخىرقى پارچىلا: endmarker.
+	>> suffix := parts2 ئاخىرقى.
+	>> part := parts2 بىرىنچى.
+	>> rest := prefix + suffix.
+	ئۆزىنىڭ content := rest. <- Template يېڭى: part.
+	
+}.
+
+Template كەلگەندە: ['كۆچۈر'] قىل: { <- ئۆزى يېڭى: ئۆزى تېكىستكە كۆچۈر.
+}.
+	
+Template كەلگەندە: ['paste:at:'] قىل: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	ئۆزىنىڭ content ئالماشتۇر: pastemarker بىلەن: ( snippet تېكىستكە + pastemarker ).
+}.
+
+Template كەلگەندە: ['بەلگىلە:قىممەت:'] قىل: { :slot :value
+	ئۆزىنىڭ content ئالماشتۇر: ['<!-- slot:'] + slot + [' -->'] بىلەن: ( Server html-كودلاش: value ).
+}.
+
+Template كەلگەندە: ['set:html:'] قىل: { :slot :html
+	ئۆزىنىڭ content ئالماشتۇر: ['<!-- slot:'] + slot + [' -->'] بىلەن: html.
+}.
+
+Template كەلگەندە: ['جاۋاب:ۋە:'] قىل: { :slot :value
+	ئۆزى بەلگىلە: (slot باشلىنىش: 0 ئۇزۇنلۇق: (slot ئۇزۇنلۇق - 1)) قىممەت: value.
+}.
+
+Template كەلگەندە: ['nl2br'] قىل: {
+	ئۆزىنىڭ content ئالماشتۇر: ['\n'] بىلەن: ['<br>'].
+}.
+
+Template كەلگەندە: ['clean'] قىل: {
+	ئۆزىنىڭ content :=
+		ئەندىزە
+		يېڭى: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ماسلىق: ئۆزىنىڭ content
+		قىل: { <- ['']. }.
+}.
+
+Template كەلگەندە: ['clean-cuts'] قىل: {
+	>> items := تىزىم يېڭى.
+	ئەندىزە
+	يېڭى: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ماسلىق: ئۆزىنىڭ content
+	قىل: { :_ :part
+		items ئاخىرىغا-قوش: part ? 1.
+	}.
+	items ھەربىر: { :_ :id
+		ئۆزىنىڭ content :=
+			ئەندىزە يېڭى: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ماسلىق: ئۆزىنىڭ content
+			قىل: { <- ['']. }.
+	 }.
+}.
+
+Template كەلگەندە: ['clean-space'] قىل: {
+	ئۆزىنىڭ content :=
+		ئەندىزە
+		يېڭى: ['\\s*\\n'],
+		ماسلىق: ئۆزىنىڭ content
+		قىل: { <- ['\n']. }.
+	ئۆزىنىڭ content :=
+		ئەندىزە
+		يېڭى: ['\\n[\\s\\t]+'],
+		ماسلىق: ئۆزىنىڭ content
+		قىل: { <- ['\n']. }.
+}.
+
+Template كەلگەندە: ['clean-all'] قىل: {
+	ئۆزى clean.
+	ئۆزى clean-cuts.
+	ئۆزى clean-space.
+}.
+
+Template كەلگەندە: ['تېكىستكە'] قىل: { <- ئۆزىنىڭ content.
+}.

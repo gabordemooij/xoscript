@@ -1,0 +1,128 @@
+>> Email := ବସ୍ତୁ ନୂତନ.
+
+Email ଯେବେ: ['init'] କର: {
+	ନିଜର recipients := ସାରଣୀ ନୂତନ.
+	ନିଜର cc := ସାରଣୀ ନୂତନ.
+	ନିଜର bcc := ସାରଣୀ ନୂତନ.
+	ନିଜର from := ଶୂନ୍ୟ.
+	ନିଜର from-name := ଶୂନ୍ୟ.
+	ନିଜର subject := ଶୂନ୍ୟ.
+	ନିଜର body := ଶୂନ୍ୟ.
+}.
+
+Email ଯେବେ: ['ନୂତନ'] କର: { <- ନିଜେ ନୂତନ init.
+}.
+
+Email ଯେବେ: ['to:'] କର: { :list
+	ନିଜର recipients := list.
+}.
+ 
+Email ଯେବେ: ['cc:'] କର: { :list
+	ନିଜର cc := list.
+}.
+
+Email ଯେବେ: ['bcc:'] କର: { :list
+	ନିଜର bcc := list.
+}.
+
+Email ଯେବେ: ['subject:'] କର: { :subject
+	ନିଜର subject := subject.
+}.
+
+Email ଯେବେ: ['from:name:'] କର: { :from :ନାମ
+	ନିଜର from := from.
+	ନିଜର from-name := ନାମ.
+}.
+
+Email ଯେବେ: ['body:'] କର: { :body
+	ନିଜର body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ଯେବେ: ['header:'] କର: { :line <- line ବଦଳାଅ: ['\r'] ସହିତ: [''], ବଦଳାଅ: ['\n'] ସହିତ: [''].
+}.
+
+Email ଯେବେ: ['send'] କର: {
+	>> f := ଫାଇଲ୍ tempwrite: ନିଜେ generate.
+	ପ୍ରୋଗ୍ରାମ୍ ସିଷ୍ଟମ୍: ['sendmail -t < '] + f ଫାଇଲ୍-ପଥ, ନୂଆ-ଧାଡ଼ି.
+}.
+
+Email ଯେବେ: ['generate'] କର: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ଶେଷରେ-ଯୋଡ଼: (ନିଜେ header: ['From: '] + ନିଜର from-name + [' <'] + ( ନିଜର from ) + ['>']) + brk.
+	str ଶେଷରେ-ଯୋଡ଼: (ନିଜେ header: ['To: '] + ( ନିଜର recipients ଯୋଡ଼: [','] )) + brk.
+	ନିଜର cc ଗଣନା ସତ୍ୟ-ହେଲେ: {
+		str ଶେଷରେ-ଯୋଡ଼: (ନିଜେ header: ['Cc: '] + ( ନିଜର cc ଯୋଡ଼: [','] )) + brk.
+	}.
+	ନିଜର bcc ଗଣନା ସତ୍ୟ-ହେଲେ: {
+		str ଶେଷରେ-ଯୋଡ଼: (ନିଜେ header: ['Bcc: '] + ( ନିଜର bcc ଯୋଡ଼: [','] )) + brk.
+	}.
+	str ଶେଷରେ-ଯୋଡ଼: (ନିଜେ header: ['Subject: '] + ନିଜର subject) + brk.
+	str ଶେଷରେ-ଯୋଡ଼: brk.
+	str ଶେଷରେ-ଯୋଡ଼: ନିଜର body.
+	str ଶେଷରେ-ଯୋଡ଼: brk. <- str.
+}.
+
+>> HTML-Email := Email ନୂତନ.
+
+HTML-Email ଯେବେ: ['init'] କର: {
+	ନିଜେ init.
+	ନିଜର attachments := ସାରଣୀ ନୂତନ.
+	ନିଜର boundary := ସିନ୍ଦୁକ ଟୋକନ୍: 40.
+}.
+
+HTML-Email ଯେବେ: ['attach:'] କର: { :file
+	>> id := ନିଜର attachments ଗଣନା.
+	>> blob := file blob.
+	ନିଜର attachments ଶେଷରେ-ଯୋଡ଼: (
+		ଅଭିଧାନ ନୂତନ
+			file: file ଫାଇଲ୍-ପଥ,
+			mime: ['image/'] + (Server mimetype: file ଫାଇଲ୍-ପଥ),
+			data: blob base64-ଏନକୋଡ୍
+	).
+	blob ମୁକ୍ତ. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ଯେବେ: ['generate'] କର: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ଶେଷରେ-ଯୋଡ଼: (ନିଜେ header: ['From: '] + ନିଜର from-name + [' <'] + ( ନିଜର from ) + ['>']) + brk.
+	str ଶେଷରେ-ଯୋଡ଼: (ନିଜେ header: ['To: '] + ( ନିଜର recipients ଯୋଡ଼: [','] )) + brk.
+	ନିଜର cc ଗଣନା ସତ୍ୟ-ହେଲେ: {
+		str ଶେଷରେ-ଯୋଡ଼: (ନିଜେ header: ['Cc: '] + ( ନିଜର cc ଯୋଡ଼: [','] )) + brk.
+	}.
+	ନିଜର bcc ଗଣନା ସତ୍ୟ-ହେଲେ: {
+		str ଶେଷରେ-ଯୋଡ଼: (ନିଜେ header: ['Bcc: '] + ( ନିଜର bcc ଯୋଡ଼: [','] )) + brk.
+	}.
+	str ଶେଷରେ-ଯୋଡ଼: (ନିଜେ header: ['Subject: '] + ନିଜର subject) + brk.
+	str ଶେଷରେ-ଯୋଡ଼: ['MIME-Version: 1.0'] + brk.
+	str ଶେଷରେ-ଯୋଡ଼: ['Content-Type: multipart/related; boundary="'] + ନିଜର boundary + ['"; type=text/html'] + brk.
+	str ଶେଷରେ-ଯୋଡ଼: brk.
+	str ଶେଷରେ-ଯୋଡ଼: ['--'] + ନିଜର boundary + brk.
+	str ଶେଷରେ-ଯୋଡ଼: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str ଶେଷରେ-ଯୋଡ଼: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str ଶେଷରେ-ଯୋଡ଼: brk.
+	str ଶେଷରେ-ଯୋଡ଼: ନିଜର body.
+	str ଶେଷରେ-ଯୋଡ଼: brk.
+	ନିଜର attachments ପ୍ରତ୍ୟେକ: { :id :info
+		>> blob := info data.
+		str ଶେଷରେ-ଯୋଡ଼: ['--'] + ନିଜର boundary + brk.
+		str ଶେଷରେ-ଯୋଡ଼: ['Content-Type: '] + info mime + brk.
+		str ଶେଷରେ-ଯୋଡ଼: ['Content-Transfer-Encoding: base64'] + brk.
+		str ଶେଷରେ-ଯୋଡ଼: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str ଶେଷରେ-ଯୋଡ଼: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str ଶେଷରେ-ଯୋଡ଼: brk.
+		>> max := 76.
+		>> len := blob ଲମ୍ବ.
+		>> chunks := (len / max) ଉପରକୁ-ପୂର୍ଣ୍ଣ.
+		{ :i
+			>> chunk := blob ନକଲ ଆରମ୍ଭ: i * max ଲମ୍ବ: max.
+			str ଶେଷରେ-ଯୋଡ଼: chunk + brk.
+		} * chunks.
+		str ଶେଷରେ-ଯୋଡ଼: brk.
+		str ଶେଷରେ-ଯୋଡ଼: brk.
+	}.
+	str ଶେଷରେ-ଯୋଡ଼: ['--'] + ନିଜର boundary + ['--'] + brk. <- str.
+}.

@@ -1,0 +1,325 @@
+HTTP-Požiadavka pri: ['HTTP-header:'] urobiť: { :key <- Program nastavenie: key.
+}.
+
+>> HTTP-Header := Objekt nový.
+
+HTTP-Header pri: ['nový'] urobiť: { <- seba nový init.
+}.
+
+HTTP-Header pri: ['init'] urobiť: {
+	vlastný key := Nič.
+	vlastný value := Nič.
+}.
+
+HTTP-Header pri: ['key:value:'] urobiť: { :key :value
+	vlastný key := key.
+	vlastný value := value.
+}.
+
+HTTP-Header pri: ['key'] urobiť: { <- vlastný key.
+}.
+
+HTTP-Header pri: ['value'] urobiť: { <- vlastný value.
+}.
+
+
+HTTP-Header pri: ['text'] urobiť: {
+	>> line := vlastný key + [': '] + vlastný value.
+	line nahradiť: ['\r'] za: [''], nahradiť: ['\n'] za: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Objekt nový.
+
+Web-Document pri: ['nový'] urobiť: { <- seba nový init.
+}.
+
+Web-Document pri: ['init'] urobiť: {
+	vlastný headers := Zoznam nový.
+	vlastný sess-id := Nič.
+	vlastný session-manager := Tempfile-Session nový.
+	vlastný sessdata := Nič.
+	vlastný secure := Pravda.
+	vlastný same-site := ['Strict'].
+	vlastný headers-out := Nepravda.
+	vlastný request := HTTP-Požiadavka nový.
+}.
+
+Web-Document pri: ['request:'] urobiť: { :request
+	vlastný request := request.
+}. 
+
+Web-Document pri: ['secure-session-cookie:'] urobiť: { :secure
+	seba check-headers.
+	vlastný secure := secure.
+}.
+
+Web-Document pri: ['same-site-session-cookie:'] urobiť: { :value
+	seba check-headers.
+	>> options := Zoznam nový 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options obsahuje: value, nepravda: {
+		táto-úloha chyba: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	vlastný same-site := value.
+}.
+
+Web-Document pri: ['header:'] urobiť: { :header
+	seba check-headers.
+	vlastný headers pripojiť: header.
+}.
+
+Web-Document pri: ['clear-headers'] urobiť: {
+	seba check-headers.
+	vlastný headers := Zoznam nový.
+}.
+
+Web-Document pri: ['session-manager:'] urobiť: { :manager
+	seba check-headers.
+	vlastný session-manager := manager.
+}.
+
+Web-Document pri: ['session-manager'] urobiť: { <- vlastný session-manager.
+}.
+
+Web-Document pri: ['check-headers'] urobiť: {
+	vlastný headers-out pravda: {
+		táto-úloha chyba: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document pri: ['session-start'] urobiť: {
+	seba check-headers.
+	>> request := vlastný request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Nič? nepravda: {
+		(( Vzor nový: ['^[A-Za-z0-9]+\\z'], zhoda: sess-id ) = 0) pravda: {
+			sess-id := Nič.
+		}.
+	}.
+	sess-id Nič? pravda: {
+		sess-id := Trezor token: 30.
+		>> session-header := HTTP-Header nový
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (vlastný secure buď: ['Secure'] alebo: ['']),
+		SSITE: (vlastný same-site),
+		XSID: sess-id
+		).
+		vlastný headers pripojiť: session-header.
+	}.
+	vlastný sessdata := vlastný session-manager for: sess-id, load. <- vlastný sessdata. # reference
+}.
+
+Web-Document pri: ['goto:'] urobiť: { :url
+	seba check-headers.
+	seba clear-headers.
+	vlastný headers
+	pripojiť: (
+		HTTP-Header nový
+		key: ['Status'] value: ['303 See Other']
+	),
+	pripojiť: (
+		HTTP-Header nový
+		key: ['Location'] value: url
+	).
+	seba out: ['Redirect'].
+}.
+
+Web-Document pri: ['session-destroy'] urobiť: {
+	seba check-headers.
+	>> request := vlastný request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Nič? nepravda: {
+		>> session-header := HTTP-Header nový.
+		>> when := Okamih nový rok: 1970, formát: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (vlastný secure buď: ['Secure'] alebo: ['']),
+			SSITE: (vlastný same-site),
+			XSID: sess-id
+		).
+		vlastný session-manager destroy.
+		vlastný headers pripojiť: session-header.
+	}.
+}.
+
+
+Web-Document pri: ['template:'] urobiť: { :cesta <- Template nový: (Súbor nový: cesta, čítať).
+}.
+
+Web-Document pri: ['out:type:'] urobiť: { :output :typ
+	vlastný headers-out nepravda: {
+		vlastný sessdata Nič? nepravda: {
+			vlastný session-manager save: vlastný sessdata.
+		}.
+		vlastný headers pripojiť: (
+			HTTP-Header nový
+			key: ['Content-type'] value: typ
+		).
+		vlastný headers každý: { :_ :header
+			Výstup písať: header.
+		}.
+		vlastný headers-out := Pravda.
+		Výstup písať: ['\r\n'].
+	}.
+	Výstup písať: output.
+}.
+
+Web-Document pri: ['finish:type:'] urobiť: { :output :typ
+	vlastný headers-out nepravda: {
+		vlastný sessdata Nič? nepravda: {
+			vlastný session-manager save: vlastný sessdata.
+		}.
+		vlastný headers pripojiť: (
+			HTTP-Header nový
+			key: ['Content-type'] value: typ
+		).
+		vlastný headers pripojiť: (
+			HTTP-Header nový
+			key: ['Content-Length'] value: output text bytes
+		).
+		vlastný headers každý: { :_ :header
+			Výstup písať: header.
+		}.
+		vlastný headers-out := Pravda.
+		Výstup písať: ['\r\n'].
+	}.
+	Výstup písať: output.
+}.
+
+Web-Document pri: ['out:'] urobiť: { :output
+	seba out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document pri: ['finish:'] urobiť: { :output
+	seba finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document pri: ['json:'] urobiť: { :output
+	seba out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document pri: ['not-found:'] urobiť: { :output
+	seba clear-headers header: (
+		HTTP-Header nový key: ['Status'] value: ['404 Not Found']
+	).
+	seba out: output.
+}.
+
+
+# Interface
+
+>> Session := Objekt nový.
+
+Session pri: ['nový'] urobiť: { <- seba nový init for: Nič.
+}.
+
+Session pri: ['for:'] urobiť: { :id
+	vlastný id := id.
+}.
+
+Session pri: ['load'] urobiť: {
+	táto-úloha chyba: ['Not implemented.'].
+}.
+
+Session pri: ['save:'] urobiť: {
+	táto-úloha chyba: ['Not implemented.'].
+}.
+
+Session pri: ['destroy'] urobiť: {
+	táto-úloha chyba: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session nový.
+
+Tempfile-Session pri: ['init'] urobiť: {
+	vlastný pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session pri: ['path-prefix:'] urobiť: { :str
+	vlastný pathprefix := str.
+}.
+
+Tempfile-Session pri: ['file'] urobiť: { <- ( Súbor nový: ( vlastný pathprefix + vlastný id + ['.txt'] ) ).
+}.
+
+Tempfile-Session pri: ['load'] urobiť: {
+	>> file := seba file.
+	file existuje nepravda: {
+		file písať: (Slovník nový kód).
+	}. <- file čítať objekt.
+}.
+
+Tempfile-Session pri: ['save:'] urobiť: { :data
+	>> file := seba file.
+	file existuje pravda: {
+		file písať: data kód.
+	}.
+}.
+
+Tempfile-Session pri: ['destroy'] urobiť: {
+	>> file := seba file.
+	file existuje pravda: {
+		file vymazať.
+	}.
+}.
+
+
+>> URL := Objekt nový.
+
+URL pri: ['init'] urobiť: {
+	vlastný protocol := ['https://'].
+	vlastný hostiteľ := ['localhost'].
+	vlastný cesta := [''].
+	vlastný params := [''].
+	vlastný hash := [''].
+}.
+
+URL pri: ['nový'] urobiť: { <- seba nový init.
+}.
+
+URL pri: ['text'] urobiť: { <- (
+	vlastný protocol +
+	vlastný hostiteľ +
+	vlastný cesta +
+	vlastný params +
+	vlastný hash ).
+}.
+
+URL pri: ['protocol:'] urobiť: { :protocol
+	((Zoznam nový: ['http'] ; ['https']) obsahuje: protocol) pravda: {
+		vlastný protocol := protocol + ['://'].
+	}, nepravda: {
+		táto-úloha chyba: ['Invalid protocol'].
+	}.
+}.
+
+URL pri: ['hostiteľ:'] urobiť: { :hostiteľ
+	#todo validate according to rfc
+	vlastný hostiteľ := hostiteľ.
+}.
+
+URL pri: ['path:'] urobiť: { :cesta
+	vlastný cesta := ['/'] + cesta url-kódovať.
+}.
+
+URL pri: ['params:'] urobiť: { :map
+	>> params := Zoznam nový.
+	map každý: { :key :value
+		params pripojiť: key text url-kódovať + ['='] + value text url-kódovať.
+	}.
+	vlastný params := ['?'] + ( params spojiť: ['&'] ).
+}.
+
+URL pri: ['heš:'] urobiť: { :hash
+	vlastný hash := ['#'] + hash url-kódovať.
+}.
+

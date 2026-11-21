@@ -1,0 +1,128 @@
+>> Email := ออบเจกต์ สร้างใหม่.
+
+Email เมื่อ: ['init'] ทำ: {
+	ของตน recipients := ลิสต์ สร้างใหม่.
+	ของตน cc := ลิสต์ สร้างใหม่.
+	ของตน bcc := ลิสต์ สร้างใหม่.
+	ของตน from := ว่าง.
+	ของตน from-name := ว่าง.
+	ของตน subject := ว่าง.
+	ของตน body := ว่าง.
+}.
+
+Email เมื่อ: ['สร้างใหม่'] ทำ: { <- ตัวเอง สร้างใหม่ init.
+}.
+
+Email เมื่อ: ['to:'] ทำ: { :list
+	ของตน recipients := list.
+}.
+ 
+Email เมื่อ: ['cc:'] ทำ: { :list
+	ของตน cc := list.
+}.
+
+Email เมื่อ: ['bcc:'] ทำ: { :list
+	ของตน bcc := list.
+}.
+
+Email เมื่อ: ['subject:'] ทำ: { :subject
+	ของตน subject := subject.
+}.
+
+Email เมื่อ: ['from:name:'] ทำ: { :from :ชื่อ
+	ของตน from := from.
+	ของตน from-name := ชื่อ.
+}.
+
+Email เมื่อ: ['body:'] ทำ: { :body
+	ของตน body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email เมื่อ: ['header:'] ทำ: { :line <- line แทนที่: ['\r'] ด้วย: [''], แทนที่: ['\n'] ด้วย: [''].
+}.
+
+Email เมื่อ: ['send'] ทำ: {
+	>> f := ไฟล์ tempwrite: ตัวเอง generate.
+	โปรแกรม ระบบ: ['sendmail -t < '] + f เส้นทาง, ขึ้นบรรทัดใหม่.
+}.
+
+Email เมื่อ: ['generate'] ทำ: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ต่อท้าย: (ตัวเอง header: ['From: '] + ของตน from-name + [' <'] + ( ของตน from ) + ['>']) + brk.
+	str ต่อท้าย: (ตัวเอง header: ['To: '] + ( ของตน recipients รวม: [','] )) + brk.
+	ของตน cc จำนวน ถ้าจริง: {
+		str ต่อท้าย: (ตัวเอง header: ['Cc: '] + ( ของตน cc รวม: [','] )) + brk.
+	}.
+	ของตน bcc จำนวน ถ้าจริง: {
+		str ต่อท้าย: (ตัวเอง header: ['Bcc: '] + ( ของตน bcc รวม: [','] )) + brk.
+	}.
+	str ต่อท้าย: (ตัวเอง header: ['Subject: '] + ของตน subject) + brk.
+	str ต่อท้าย: brk.
+	str ต่อท้าย: ของตน body.
+	str ต่อท้าย: brk. <- str.
+}.
+
+>> HTML-Email := Email สร้างใหม่.
+
+HTML-Email เมื่อ: ['init'] ทำ: {
+	ตัวเอง init.
+	ของตน attachments := ลิสต์ สร้างใหม่.
+	ของตน boundary := ตู้นิรภัย โทเค็น: 40.
+}.
+
+HTML-Email เมื่อ: ['attach:'] ทำ: { :file
+	>> id := ของตน attachments จำนวน.
+	>> blob := file blob.
+	ของตน attachments ต่อท้าย: (
+		พจนานุกรม สร้างใหม่
+			file: file เส้นทาง,
+			mime: ['image/'] + (Server mimetype: file เส้นทาง),
+			data: blob base64-เข้ารหัส
+	).
+	blob คืนหน่วยความจำ. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email เมื่อ: ['generate'] ทำ: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ต่อท้าย: (ตัวเอง header: ['From: '] + ของตน from-name + [' <'] + ( ของตน from ) + ['>']) + brk.
+	str ต่อท้าย: (ตัวเอง header: ['To: '] + ( ของตน recipients รวม: [','] )) + brk.
+	ของตน cc จำนวน ถ้าจริง: {
+		str ต่อท้าย: (ตัวเอง header: ['Cc: '] + ( ของตน cc รวม: [','] )) + brk.
+	}.
+	ของตน bcc จำนวน ถ้าจริง: {
+		str ต่อท้าย: (ตัวเอง header: ['Bcc: '] + ( ของตน bcc รวม: [','] )) + brk.
+	}.
+	str ต่อท้าย: (ตัวเอง header: ['Subject: '] + ของตน subject) + brk.
+	str ต่อท้าย: ['MIME-Version: 1.0'] + brk.
+	str ต่อท้าย: ['Content-Type: multipart/related; boundary="'] + ของตน boundary + ['"; type=text/html'] + brk.
+	str ต่อท้าย: brk.
+	str ต่อท้าย: ['--'] + ของตน boundary + brk.
+	str ต่อท้าย: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str ต่อท้าย: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str ต่อท้าย: brk.
+	str ต่อท้าย: ของตน body.
+	str ต่อท้าย: brk.
+	ของตน attachments แต่ละตัว: { :id :info
+		>> blob := info data.
+		str ต่อท้าย: ['--'] + ของตน boundary + brk.
+		str ต่อท้าย: ['Content-Type: '] + info mime + brk.
+		str ต่อท้าย: ['Content-Transfer-Encoding: base64'] + brk.
+		str ต่อท้าย: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str ต่อท้าย: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str ต่อท้าย: brk.
+		>> max := 76.
+		>> len := blob ความยาว.
+		>> chunks := (len / max) ปัดขึ้น.
+		{ :i
+			>> chunk := blob คัดลอก เริ่มที่: i * max ความยาว: max.
+			str ต่อท้าย: chunk + brk.
+		} * chunks.
+		str ต่อท้าย: brk.
+		str ต่อท้าย: brk.
+	}.
+	str ต่อท้าย: ['--'] + ของตน boundary + ['--'] + brk. <- str.
+}.

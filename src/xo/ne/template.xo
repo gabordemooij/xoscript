@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := वस्तु नयाँ.
+
+Template जब: ['नयाँ'] गर: { <- आफू नयाँ content: [''].
+}.
+
+Template जब: ['content:'] गर: { :content
+	आफ्नो content := content. 
+}.
+
+Template जब: ['नयाँ:'] गर: { :content <- आफू नयाँ content: content.
+}.
+
+Template जब: ['cut:'] गर: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := आफ्नो content टुक्र्याऊ: startmarker.
+	>> prefix := parts पहिलो.
+	>> parts2 := parts अन्तिम टुक्र्याऊ: endmarker.
+	>> suffix := parts2 अन्तिम.
+	>> part := parts2 पहिलो.
+	>> rest := prefix + suffix.
+	आफ्नो content := rest. <- Template नयाँ: part.
+	
+}.
+
+Template जब: ['प्रतिलिपि'] गर: { <- आफू नयाँ: आफू पाठमा प्रतिलिपि.
+}.
+	
+Template जब: ['paste:at:'] गर: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	आफ्नो content बदल: pastemarker ले: ( snippet पाठमा + pastemarker ).
+}.
+
+Template जब: ['तोक:मान:'] गर: { :slot :value
+	आफ्नो content बदल: ['<!-- slot:'] + slot + [' -->'] ले: ( Server html-इन्कोड: value ).
+}.
+
+Template जब: ['set:html:'] गर: { :slot :html
+	आफ्नो content बदल: ['<!-- slot:'] + slot + [' -->'] ले: html.
+}.
+
+Template जब: ['जवाफ:र:'] गर: { :slot :value
+	आफू तोक: (slot सुरु: 0 लम्बाइ: (slot लम्बाइ - 1)) मान: value.
+}.
+
+Template जब: ['nl2br'] गर: {
+	आफ्नो content बदल: ['\n'] ले: ['<br>'].
+}.
+
+Template जब: ['clean'] गर: {
+	आफ्नो content :=
+		ढाँचा-खोज
+		नयाँ: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		मिलान: आफ्नो content
+		गर: { <- ['']. }.
+}.
+
+Template जब: ['clean-cuts'] गर: {
+	>> items := तालिका नयाँ.
+	ढाँचा-खोज
+	नयाँ: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	मिलान: आफ्नो content
+	गर: { :_ :part
+		items अन्त्यमा-थप: part ? 1.
+	}.
+	items प्रत्येक: { :_ :id
+		आफ्नो content :=
+			ढाँचा-खोज नयाँ: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			मिलान: आफ्नो content
+			गर: { <- ['']. }.
+	 }.
+}.
+
+Template जब: ['clean-space'] गर: {
+	आफ्नो content :=
+		ढाँचा-खोज
+		नयाँ: ['\\s*\\n'],
+		मिलान: आफ्नो content
+		गर: { <- ['\n']. }.
+	आफ्नो content :=
+		ढाँचा-खोज
+		नयाँ: ['\\n[\\s\\t]+'],
+		मिलान: आफ्नो content
+		गर: { <- ['\n']. }.
+}.
+
+Template जब: ['clean-all'] गर: {
+	आफू clean.
+	आफू clean-cuts.
+	आफू clean-space.
+}.
+
+Template जब: ['पाठमा'] गर: { <- आफ्नो content.
+}.

@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Объект нав.
+
+Template ҳангоми: ['нав'] иҷро: { <- худ нав content: [''].
+}.
+
+Template ҳангоми: ['content:'] иҷро: { :content
+	худӣ content := content. 
+}.
+
+Template ҳангоми: ['нав:'] иҷро: { :content <- худ нав content: content.
+}.
+
+Template ҳангоми: ['cut:'] иҷро: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := худӣ content тақсим: startmarker.
+	>> prefix := parts якум.
+	>> parts2 := parts охирин тақсим: endmarker.
+	>> suffix := parts2 охирин.
+	>> part := parts2 якум.
+	>> rest := prefix + suffix.
+	худӣ content := rest. <- Template нав: part.
+	
+}.
+
+Template ҳангоми: ['нусха'] иҷро: { <- худ нав: худ матн нусха.
+}.
+	
+Template ҳангоми: ['paste:at:'] иҷро: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	худӣ content иваз: pastemarker бо: ( snippet матн + pastemarker ).
+}.
+
+Template ҳангоми: ['муқаррар:қимат:'] иҷро: { :slot :value
+	худӣ content иваз: ['<!-- slot:'] + slot + [' -->'] бо: ( Server html-рамзгузорӣ: value ).
+}.
+
+Template ҳангоми: ['set:html:'] иҷро: { :slot :html
+	худӣ content иваз: ['<!-- slot:'] + slot + [' -->'] бо: html.
+}.
+
+Template ҳангоми: ['ҷавоб:ва:'] иҷро: { :slot :value
+	худ муқаррар: (slot оғоз: 0 дарозӣ: (slot дарозӣ - 1)) қимат: value.
+}.
+
+Template ҳангоми: ['nl2br'] иҷро: {
+	худӣ content иваз: ['\n'] бо: ['<br>'].
+}.
+
+Template ҳангоми: ['clean'] иҷро: {
+	худӣ content :=
+		Қолаб
+		нав: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		мувофиқат: худӣ content
+		иҷро: { <- ['']. }.
+}.
+
+Template ҳангоми: ['clean-cuts'] иҷро: {
+	>> items := Феҳрист нав.
+	Қолаб
+	нав: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	мувофиқат: худӣ content
+	иҷро: { :_ :part
+		items ба-охир-илова: part ? 1.
+	}.
+	items ҳар-як: { :_ :id
+		худӣ content :=
+			Қолаб нав: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			мувофиқат: худӣ content
+			иҷро: { <- ['']. }.
+	 }.
+}.
+
+Template ҳангоми: ['clean-space'] иҷро: {
+	худӣ content :=
+		Қолаб
+		нав: ['\\s*\\n'],
+		мувофиқат: худӣ content
+		иҷро: { <- ['\n']. }.
+	худӣ content :=
+		Қолаб
+		нав: ['\\n[\\s\\t]+'],
+		мувофиқат: худӣ content
+		иҷро: { <- ['\n']. }.
+}.
+
+Template ҳангоми: ['clean-all'] иҷро: {
+	худ clean.
+	худ clean-cuts.
+	худ clean-space.
+}.
+
+Template ҳангоми: ['матн'] иҷро: { <- худӣ content.
+}.

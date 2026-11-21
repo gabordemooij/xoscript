@@ -1,0 +1,128 @@
+>> Email := Օբյեկտ նոր.
+
+Email ստանալիս: ['init'] կատարել: {
+	սեփական recipients := Ցուցակ նոր.
+	սեփական cc := Ցուցակ նոր.
+	սեփական bcc := Ցուցակ նոր.
+	սեփական from := Դատարկ.
+	սեփական from-name := Դատարկ.
+	սեփական subject := Դատարկ.
+	սեփական body := Դատարկ.
+}.
+
+Email ստանալիս: ['նոր'] կատարել: { <- ինքը նոր init.
+}.
+
+Email ստանալիս: ['to:'] կատարել: { :list
+	սեփական recipients := list.
+}.
+ 
+Email ստանալիս: ['cc:'] կատարել: { :list
+	սեփական cc := list.
+}.
+
+Email ստանալիս: ['bcc:'] կատարել: { :list
+	սեփական bcc := list.
+}.
+
+Email ստանալիս: ['subject:'] կատարել: { :subject
+	սեփական subject := subject.
+}.
+
+Email ստանալիս: ['from:name:'] կատարել: { :from :անուն
+	սեփական from := from.
+	սեփական from-name := անուն.
+}.
+
+Email ստանալիս: ['body:'] կատարել: { :body
+	սեփական body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ստանալիս: ['header:'] կատարել: { :line <- line փոխարինել: ['\r'] սրանով: [''], փոխարինել: ['\n'] սրանով: [''].
+}.
+
+Email ստանալիս: ['send'] կատարել: {
+	>> f := Ֆայլ tempwrite: ինքը generate.
+	Ծրագիր համակարգ: ['sendmail -t < '] + f ուղի, նոր-տող.
+}.
+
+Email ստանալիս: ['generate'] կատարել: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ավելացնել-վերջում: (ինքը header: ['From: '] + սեփական from-name + [' <'] + ( սեփական from ) + ['>']) + brk.
+	str ավելացնել-վերջում: (ինքը header: ['To: '] + ( սեփական recipients միացնել: [','] )) + brk.
+	սեփական cc քանակ եթե-ճիշտ: {
+		str ավելացնել-վերջում: (ինքը header: ['Cc: '] + ( սեփական cc միացնել: [','] )) + brk.
+	}.
+	սեփական bcc քանակ եթե-ճիշտ: {
+		str ավելացնել-վերջում: (ինքը header: ['Bcc: '] + ( սեփական bcc միացնել: [','] )) + brk.
+	}.
+	str ավելացնել-վերջում: (ինքը header: ['Subject: '] + սեփական subject) + brk.
+	str ավելացնել-վերջում: brk.
+	str ավելացնել-վերջում: սեփական body.
+	str ավելացնել-վերջում: brk. <- str.
+}.
+
+>> HTML-Email := Email նոր.
+
+HTML-Email ստանալիս: ['init'] կատարել: {
+	ինքը init.
+	սեփական attachments := Ցուցակ նոր.
+	սեփական boundary := Չհրկիզվող-պահարան թոքեն: 40.
+}.
+
+HTML-Email ստանալիս: ['attach:'] կատարել: { :file
+	>> id := սեփական attachments քանակ.
+	>> blob := file blob.
+	սեփական attachments ավելացնել-վերջում: (
+		Բառարան նոր
+			file: file ուղի,
+			mime: ['image/'] + (Server mimetype: file ուղի),
+			data: blob base64-կոդավորել
+	).
+	blob ազատել. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ստանալիս: ['generate'] կատարել: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ավելացնել-վերջում: (ինքը header: ['From: '] + սեփական from-name + [' <'] + ( սեփական from ) + ['>']) + brk.
+	str ավելացնել-վերջում: (ինքը header: ['To: '] + ( սեփական recipients միացնել: [','] )) + brk.
+	սեփական cc քանակ եթե-ճիշտ: {
+		str ավելացնել-վերջում: (ինքը header: ['Cc: '] + ( սեփական cc միացնել: [','] )) + brk.
+	}.
+	սեփական bcc քանակ եթե-ճիշտ: {
+		str ավելացնել-վերջում: (ինքը header: ['Bcc: '] + ( սեփական bcc միացնել: [','] )) + brk.
+	}.
+	str ավելացնել-վերջում: (ինքը header: ['Subject: '] + սեփական subject) + brk.
+	str ավելացնել-վերջում: ['MIME-Version: 1.0'] + brk.
+	str ավելացնել-վերջում: ['Content-Type: multipart/related; boundary="'] + սեփական boundary + ['"; type=text/html'] + brk.
+	str ավելացնել-վերջում: brk.
+	str ավելացնել-վերջում: ['--'] + սեփական boundary + brk.
+	str ավելացնել-վերջում: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str ավելացնել-վերջում: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str ավելացնել-վերջում: brk.
+	str ավելացնել-վերջում: սեփական body.
+	str ավելացնել-վերջում: brk.
+	սեփական attachments յուրաքանչյուր: { :id :info
+		>> blob := info data.
+		str ավելացնել-վերջում: ['--'] + սեփական boundary + brk.
+		str ավելացնել-վերջում: ['Content-Type: '] + info mime + brk.
+		str ավելացնել-վերջում: ['Content-Transfer-Encoding: base64'] + brk.
+		str ավելացնել-վերջում: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str ավելացնել-վերջում: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str ավելացնել-վերջում: brk.
+		>> max := 76.
+		>> len := blob երկարություն.
+		>> chunks := (len / max) կլորացնել-վերև.
+		{ :i
+			>> chunk := blob պատճենել սկիզբ: i * max երկարություն: max.
+			str ավելացնել-վերջում: chunk + brk.
+		} * chunks.
+		str ավելացնել-վերջում: brk.
+		str ավելացնել-վերջում: brk.
+	}.
+	str ավելացնել-վերջում: ['--'] + սեփական boundary + ['--'] + brk. <- str.
+}.

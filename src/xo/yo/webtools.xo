@@ -1,0 +1,325 @@
+Ibeere-HTTP nigbati: ['HTTP-header:'] ṣe: { :key <- Eto eto: key.
+}.
+
+>> HTTP-Header := Nkan tuntun.
+
+HTTP-Header nigbati: ['tuntun'] ṣe: { <- ara-rẹ tuntun init.
+}.
+
+HTTP-Header nigbati: ['init'] ṣe: {
+	tirẹ key := Ofo.
+	tirẹ value := Ofo.
+}.
+
+HTTP-Header nigbati: ['key:value:'] ṣe: { :key :value
+	tirẹ key := key.
+	tirẹ value := value.
+}.
+
+HTTP-Header nigbati: ['key'] ṣe: { <- tirẹ key.
+}.
+
+HTTP-Header nigbati: ['value'] ṣe: { <- tirẹ value.
+}.
+
+
+HTTP-Header nigbati: ['ọrọ'] ṣe: {
+	>> line := tirẹ key + [': '] + tirẹ value.
+	line rọpo: ['\r'] pẹlu: [''], rọpo: ['\n'] pẹlu: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Nkan tuntun.
+
+Web-Document nigbati: ['tuntun'] ṣe: { <- ara-rẹ tuntun init.
+}.
+
+Web-Document nigbati: ['init'] ṣe: {
+	tirẹ headers := Akojọ tuntun.
+	tirẹ sess-id := Ofo.
+	tirẹ session-manager := Tempfile-Session tuntun.
+	tirẹ sessdata := Ofo.
+	tirẹ secure := Otitọ.
+	tirẹ same-site := ['Strict'].
+	tirẹ headers-out := Irọ.
+	tirẹ request := Ibeere-HTTP tuntun.
+}.
+
+Web-Document nigbati: ['request:'] ṣe: { :request
+	tirẹ request := request.
+}. 
+
+Web-Document nigbati: ['secure-session-cookie:'] ṣe: { :secure
+	ara-rẹ check-headers.
+	tirẹ secure := secure.
+}.
+
+Web-Document nigbati: ['same-site-session-cookie:'] ṣe: { :value
+	ara-rẹ check-headers.
+	>> options := Akojọ tuntun 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options ni-akoonu: value, irọ: {
+		iṣẹ-ṣiṣe-yii aṣiṣe: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	tirẹ same-site := value.
+}.
+
+Web-Document nigbati: ['header:'] ṣe: { :header
+	ara-rẹ check-headers.
+	tirẹ headers fi-kun-opin: header.
+}.
+
+Web-Document nigbati: ['clear-headers'] ṣe: {
+	ara-rẹ check-headers.
+	tirẹ headers := Akojọ tuntun.
+}.
+
+Web-Document nigbati: ['session-manager:'] ṣe: { :manager
+	ara-rẹ check-headers.
+	tirẹ session-manager := manager.
+}.
+
+Web-Document nigbati: ['session-manager'] ṣe: { <- tirẹ session-manager.
+}.
+
+Web-Document nigbati: ['check-headers'] ṣe: {
+	tirẹ headers-out otitọ: {
+		iṣẹ-ṣiṣe-yii aṣiṣe: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document nigbati: ['session-start'] ṣe: {
+	ara-rẹ check-headers.
+	>> request := tirẹ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Ofo? irọ: {
+		(( Apẹrẹ tuntun: ['^[A-Za-z0-9]+\\z'], ibamu: sess-id ) = 0) otitọ: {
+			sess-id := Ofo.
+		}.
+	}.
+	sess-id Ofo? otitọ: {
+		sess-id := Apoti-aabo token: 30.
+		>> session-header := HTTP-Header tuntun
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (tirẹ secure boya: ['Secure'] tabi: ['']),
+		SSITE: (tirẹ same-site),
+		XSID: sess-id
+		).
+		tirẹ headers fi-kun-opin: session-header.
+	}.
+	tirẹ sessdata := tirẹ session-manager for: sess-id, load. <- tirẹ sessdata. # reference
+}.
+
+Web-Document nigbati: ['goto:'] ṣe: { :url
+	ara-rẹ check-headers.
+	ara-rẹ clear-headers.
+	tirẹ headers
+	fi-kun-opin: (
+		HTTP-Header tuntun
+		key: ['Status'] value: ['303 See Other']
+	),
+	fi-kun-opin: (
+		HTTP-Header tuntun
+		key: ['Location'] value: url
+	).
+	ara-rẹ out: ['Redirect'].
+}.
+
+Web-Document nigbati: ['session-destroy'] ṣe: {
+	ara-rẹ check-headers.
+	>> request := tirẹ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Ofo? irọ: {
+		>> session-header := HTTP-Header tuntun.
+		>> when := Akoko tuntun ọdun: 1970, ọna-kika: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (tirẹ secure boya: ['Secure'] tabi: ['']),
+			SSITE: (tirẹ same-site),
+			XSID: sess-id
+		).
+		tirẹ session-manager destroy.
+		tirẹ headers fi-kun-opin: session-header.
+	}.
+}.
+
+
+Web-Document nigbati: ['template:'] ṣe: { :ọna-faili <- Template tuntun: (Faili tuntun: ọna-faili, ka).
+}.
+
+Web-Document nigbati: ['out:type:'] ṣe: { :output :oriṣi
+	tirẹ headers-out irọ: {
+		tirẹ sessdata Ofo? irọ: {
+			tirẹ session-manager save: tirẹ sessdata.
+		}.
+		tirẹ headers fi-kun-opin: (
+			HTTP-Header tuntun
+			key: ['Content-type'] value: oriṣi
+		).
+		tirẹ headers kọọkan: { :_ :header
+			Ijade kọ: header.
+		}.
+		tirẹ headers-out := Otitọ.
+		Ijade kọ: ['\r\n'].
+	}.
+	Ijade kọ: output.
+}.
+
+Web-Document nigbati: ['finish:type:'] ṣe: { :output :oriṣi
+	tirẹ headers-out irọ: {
+		tirẹ sessdata Ofo? irọ: {
+			tirẹ session-manager save: tirẹ sessdata.
+		}.
+		tirẹ headers fi-kun-opin: (
+			HTTP-Header tuntun
+			key: ['Content-type'] value: oriṣi
+		).
+		tirẹ headers fi-kun-opin: (
+			HTTP-Header tuntun
+			key: ['Content-Length'] value: output ọrọ bytes
+		).
+		tirẹ headers kọọkan: { :_ :header
+			Ijade kọ: header.
+		}.
+		tirẹ headers-out := Otitọ.
+		Ijade kọ: ['\r\n'].
+	}.
+	Ijade kọ: output.
+}.
+
+Web-Document nigbati: ['out:'] ṣe: { :output
+	ara-rẹ out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document nigbati: ['finish:'] ṣe: { :output
+	ara-rẹ finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document nigbati: ['json:'] ṣe: { :output
+	ara-rẹ out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document nigbati: ['not-found:'] ṣe: { :output
+	ara-rẹ clear-headers header: (
+		HTTP-Header tuntun key: ['Status'] value: ['404 Not Found']
+	).
+	ara-rẹ out: output.
+}.
+
+
+# Interface
+
+>> Session := Nkan tuntun.
+
+Session nigbati: ['tuntun'] ṣe: { <- ara-rẹ tuntun init for: Ofo.
+}.
+
+Session nigbati: ['for:'] ṣe: { :id
+	tirẹ id := id.
+}.
+
+Session nigbati: ['load'] ṣe: {
+	iṣẹ-ṣiṣe-yii aṣiṣe: ['Not implemented.'].
+}.
+
+Session nigbati: ['save:'] ṣe: {
+	iṣẹ-ṣiṣe-yii aṣiṣe: ['Not implemented.'].
+}.
+
+Session nigbati: ['destroy'] ṣe: {
+	iṣẹ-ṣiṣe-yii aṣiṣe: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session tuntun.
+
+Tempfile-Session nigbati: ['init'] ṣe: {
+	tirẹ pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session nigbati: ['path-prefix:'] ṣe: { :str
+	tirẹ pathprefix := str.
+}.
+
+Tempfile-Session nigbati: ['file'] ṣe: { <- ( Faili tuntun: ( tirẹ pathprefix + tirẹ id + ['.txt'] ) ).
+}.
+
+Tempfile-Session nigbati: ['load'] ṣe: {
+	>> file := ara-rẹ file.
+	file wa irọ: {
+		file kọ: (Atumọ-ede tuntun koodu).
+	}. <- file ka nkan.
+}.
+
+Tempfile-Session nigbati: ['save:'] ṣe: { :data
+	>> file := ara-rẹ file.
+	file wa otitọ: {
+		file kọ: data koodu.
+	}.
+}.
+
+Tempfile-Session nigbati: ['destroy'] ṣe: {
+	>> file := ara-rẹ file.
+	file wa otitọ: {
+		file paarẹ.
+	}.
+}.
+
+
+>> URL := Nkan tuntun.
+
+URL nigbati: ['init'] ṣe: {
+	tirẹ protocol := ['https://'].
+	tirẹ agbalejo := ['localhost'].
+	tirẹ ọna-faili := [''].
+	tirẹ params := [''].
+	tirẹ hash := [''].
+}.
+
+URL nigbati: ['tuntun'] ṣe: { <- ara-rẹ tuntun init.
+}.
+
+URL nigbati: ['ọrọ'] ṣe: { <- (
+	tirẹ protocol +
+	tirẹ agbalejo +
+	tirẹ ọna-faili +
+	tirẹ params +
+	tirẹ hash ).
+}.
+
+URL nigbati: ['protocol:'] ṣe: { :protocol
+	((Akojọ tuntun: ['http'] ; ['https']) ni-akoonu: protocol) otitọ: {
+		tirẹ protocol := protocol + ['://'].
+	}, irọ: {
+		iṣẹ-ṣiṣe-yii aṣiṣe: ['Invalid protocol'].
+	}.
+}.
+
+URL nigbati: ['agbalejo:'] ṣe: { :agbalejo
+	#todo validate according to rfc
+	tirẹ agbalejo := agbalejo.
+}.
+
+URL nigbati: ['path:'] ṣe: { :ọna-faili
+	tirẹ ọna-faili := ['/'] + ọna-faili url-ṣe-koodu.
+}.
+
+URL nigbati: ['params:'] ṣe: { :map
+	>> params := Akojọ tuntun.
+	map kọọkan: { :key :value
+		params fi-kun-opin: key ọrọ url-ṣe-koodu + ['='] + value ọrọ url-ṣe-koodu.
+	}.
+	tirẹ params := ['?'] + ( params so-pọ: ['&'] ).
+}.
+
+URL nigbati: ['haṣi:'] ṣe: { :hash
+	tirẹ hash := ['#'] + hash url-ṣe-koodu.
+}.
+

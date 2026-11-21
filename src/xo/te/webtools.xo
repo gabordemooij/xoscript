@@ -1,0 +1,325 @@
+HTTP-అభ్యర్థన అందినప్పుడు: ['HTTP-header:'] చేయి: { :key <- ప్రోగ్రామ్ అమరిక: key.
+}.
+
+>> HTTP-Header := వస్తువు కొత్త.
+
+HTTP-Header అందినప్పుడు: ['కొత్త'] చేయి: { <- తాను కొత్త init.
+}.
+
+HTTP-Header అందినప్పుడు: ['init'] చేయి: {
+	తన key := శూన్యం.
+	తన value := శూన్యం.
+}.
+
+HTTP-Header అందినప్పుడు: ['key:value:'] చేయి: { :key :value
+	తన key := key.
+	తన value := value.
+}.
+
+HTTP-Header అందినప్పుడు: ['key'] చేయి: { <- తన key.
+}.
+
+HTTP-Header అందినప్పుడు: ['value'] చేయి: { <- తన value.
+}.
+
+
+HTTP-Header అందినప్పుడు: ['పాఠ్యంగా'] చేయి: {
+	>> line := తన key + [': '] + తన value.
+	line మార్చు: ['\r'] తో: [''], మార్చు: ['\n'] తో: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := వస్తువు కొత్త.
+
+Web-Document అందినప్పుడు: ['కొత్త'] చేయి: { <- తాను కొత్త init.
+}.
+
+Web-Document అందినప్పుడు: ['init'] చేయి: {
+	తన headers := వరుస కొత్త.
+	తన sess-id := శూన్యం.
+	తన session-manager := Tempfile-Session కొత్త.
+	తన sessdata := శూన్యం.
+	తన secure := నిజం.
+	తన same-site := ['Strict'].
+	తన headers-out := అబద్ధం.
+	తన request := HTTP-అభ్యర్థన కొత్త.
+}.
+
+Web-Document అందినప్పుడు: ['request:'] చేయి: { :request
+	తన request := request.
+}. 
+
+Web-Document అందినప్పుడు: ['secure-session-cookie:'] చేయి: { :secure
+	తాను check-headers.
+	తన secure := secure.
+}.
+
+Web-Document అందినప్పుడు: ['same-site-session-cookie:'] చేయి: { :value
+	తాను check-headers.
+	>> options := వరుస కొత్త 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options ఇమిడి-ఉంది: value, అబద్ధమైతే: {
+		ఈ-పని లోపం: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	తన same-site := value.
+}.
+
+Web-Document అందినప్పుడు: ['header:'] చేయి: { :header
+	తాను check-headers.
+	తన headers చివర-చేర్చు: header.
+}.
+
+Web-Document అందినప్పుడు: ['clear-headers'] చేయి: {
+	తాను check-headers.
+	తన headers := వరుస కొత్త.
+}.
+
+Web-Document అందినప్పుడు: ['session-manager:'] చేయి: { :manager
+	తాను check-headers.
+	తన session-manager := manager.
+}.
+
+Web-Document అందినప్పుడు: ['session-manager'] చేయి: { <- తన session-manager.
+}.
+
+Web-Document అందినప్పుడు: ['check-headers'] చేయి: {
+	తన headers-out నిజమైతే: {
+		ఈ-పని లోపం: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document అందినప్పుడు: ['session-start'] చేయి: {
+	తాను check-headers.
+	>> request := తన request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id శూన్యమా? అబద్ధమైతే: {
+		(( ప్యాటర్న్ కొత్త: ['^[A-Za-z0-9]+\\z'], సరిపోలిక: sess-id ) = 0) నిజమైతే: {
+			sess-id := శూన్యం.
+		}.
+	}.
+	sess-id శూన్యమా? నిజమైతే: {
+		sess-id := ఖజానా టోకెన్: 30.
+		>> session-header := HTTP-Header కొత్త
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (తన secure ఇది: ['Secure'] లేకుంటే: ['']),
+		SSITE: (తన same-site),
+		XSID: sess-id
+		).
+		తన headers చివర-చేర్చు: session-header.
+	}.
+	తన sessdata := తన session-manager for: sess-id, load. <- తన sessdata. # reference
+}.
+
+Web-Document అందినప్పుడు: ['goto:'] చేయి: { :url
+	తాను check-headers.
+	తాను clear-headers.
+	తన headers
+	చివర-చేర్చు: (
+		HTTP-Header కొత్త
+		key: ['Status'] value: ['303 See Other']
+	),
+	చివర-చేర్చు: (
+		HTTP-Header కొత్త
+		key: ['Location'] value: url
+	).
+	తాను out: ['Redirect'].
+}.
+
+Web-Document అందినప్పుడు: ['session-destroy'] చేయి: {
+	తాను check-headers.
+	>> request := తన request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id శూన్యమా? అబద్ధమైతే: {
+		>> session-header := HTTP-Header కొత్త.
+		>> when := క్షణం కొత్త సంవత్సరం: 1970, ఆకృతిలో: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (తన secure ఇది: ['Secure'] లేకుంటే: ['']),
+			SSITE: (తన same-site),
+			XSID: sess-id
+		).
+		తన session-manager destroy.
+		తన headers చివర-చేర్చు: session-header.
+	}.
+}.
+
+
+Web-Document అందినప్పుడు: ['template:'] చేయి: { :ఫైల్-మార్గం <- Template కొత్త: (ఫైల్ కొత్త: ఫైల్-మార్గం, చదువు).
+}.
+
+Web-Document అందినప్పుడు: ['out:type:'] చేయి: { :output :రకం
+	తన headers-out అబద్ధమైతే: {
+		తన sessdata శూన్యమా? అబద్ధమైతే: {
+			తన session-manager save: తన sessdata.
+		}.
+		తన headers చివర-చేర్చు: (
+			HTTP-Header కొత్త
+			key: ['Content-type'] value: రకం
+		).
+		తన headers ప్రతి: { :_ :header
+			అవుట్-పుట్ రాయి: header.
+		}.
+		తన headers-out := నిజం.
+		అవుట్-పుట్ రాయి: ['\r\n'].
+	}.
+	అవుట్-పుట్ రాయి: output.
+}.
+
+Web-Document అందినప్పుడు: ['finish:type:'] చేయి: { :output :రకం
+	తన headers-out అబద్ధమైతే: {
+		తన sessdata శూన్యమా? అబద్ధమైతే: {
+			తన session-manager save: తన sessdata.
+		}.
+		తన headers చివర-చేర్చు: (
+			HTTP-Header కొత్త
+			key: ['Content-type'] value: రకం
+		).
+		తన headers చివర-చేర్చు: (
+			HTTP-Header కొత్త
+			key: ['Content-Length'] value: output పాఠ్యంగా bytes
+		).
+		తన headers ప్రతి: { :_ :header
+			అవుట్-పుట్ రాయి: header.
+		}.
+		తన headers-out := నిజం.
+		అవుట్-పుట్ రాయి: ['\r\n'].
+	}.
+	అవుట్-పుట్ రాయి: output.
+}.
+
+Web-Document అందినప్పుడు: ['out:'] చేయి: { :output
+	తాను out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document అందినప్పుడు: ['finish:'] చేయి: { :output
+	తాను finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document అందినప్పుడు: ['json:'] చేయి: { :output
+	తాను out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document అందినప్పుడు: ['not-found:'] చేయి: { :output
+	తాను clear-headers header: (
+		HTTP-Header కొత్త key: ['Status'] value: ['404 Not Found']
+	).
+	తాను out: output.
+}.
+
+
+# Interface
+
+>> Session := వస్తువు కొత్త.
+
+Session అందినప్పుడు: ['కొత్త'] చేయి: { <- తాను కొత్త init for: శూన్యం.
+}.
+
+Session అందినప్పుడు: ['for:'] చేయి: { :id
+	తన id := id.
+}.
+
+Session అందినప్పుడు: ['load'] చేయి: {
+	ఈ-పని లోపం: ['Not implemented.'].
+}.
+
+Session అందినప్పుడు: ['save:'] చేయి: {
+	ఈ-పని లోపం: ['Not implemented.'].
+}.
+
+Session అందినప్పుడు: ['destroy'] చేయి: {
+	ఈ-పని లోపం: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session కొత్త.
+
+Tempfile-Session అందినప్పుడు: ['init'] చేయి: {
+	తన pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session అందినప్పుడు: ['path-prefix:'] చేయి: { :str
+	తన pathprefix := str.
+}.
+
+Tempfile-Session అందినప్పుడు: ['file'] చేయి: { <- ( ఫైల్ కొత్త: ( తన pathprefix + తన id + ['.txt'] ) ).
+}.
+
+Tempfile-Session అందినప్పుడు: ['load'] చేయి: {
+	>> file := తాను file.
+	file ఉంది అబద్ధమైతే: {
+		file రాయి: (నిఘంటువు కొత్త కోడ్).
+	}. <- file చదువు వస్తువుగా.
+}.
+
+Tempfile-Session అందినప్పుడు: ['save:'] చేయి: { :data
+	>> file := తాను file.
+	file ఉంది నిజమైతే: {
+		file రాయి: data కోడ్.
+	}.
+}.
+
+Tempfile-Session అందినప్పుడు: ['destroy'] చేయి: {
+	>> file := తాను file.
+	file ఉంది నిజమైతే: {
+		file తొలగించు.
+	}.
+}.
+
+
+>> URL := వస్తువు కొత్త.
+
+URL అందినప్పుడు: ['init'] చేయి: {
+	తన protocol := ['https://'].
+	తన హోస్ట్ := ['localhost'].
+	తన ఫైల్-మార్గం := [''].
+	తన params := [''].
+	తన hash := [''].
+}.
+
+URL అందినప్పుడు: ['కొత్త'] చేయి: { <- తాను కొత్త init.
+}.
+
+URL అందినప్పుడు: ['పాఠ్యంగా'] చేయి: { <- (
+	తన protocol +
+	తన హోస్ట్ +
+	తన ఫైల్-మార్గం +
+	తన params +
+	తన hash ).
+}.
+
+URL అందినప్పుడు: ['protocol:'] చేయి: { :protocol
+	((వరుస కొత్త: ['http'] ; ['https']) ఇమిడి-ఉంది: protocol) నిజమైతే: {
+		తన protocol := protocol + ['://'].
+	}, అబద్ధమైతే: {
+		ఈ-పని లోపం: ['Invalid protocol'].
+	}.
+}.
+
+URL అందినప్పుడు: ['హోస్ట్:'] చేయి: { :హోస్ట్
+	#todo validate according to rfc
+	తన హోస్ట్ := హోస్ట్.
+}.
+
+URL అందినప్పుడు: ['path:'] చేయి: { :ఫైల్-మార్గం
+	తన ఫైల్-మార్గం := ['/'] + ఫైల్-మార్గం url-ఎన్-కోడ్.
+}.
+
+URL అందినప్పుడు: ['params:'] చేయి: { :map
+	>> params := వరుస కొత్త.
+	map ప్రతి: { :key :value
+		params చివర-చేర్చు: key పాఠ్యంగా url-ఎన్-కోడ్ + ['='] + value పాఠ్యంగా url-ఎన్-కోడ్.
+	}.
+	తన params := ['?'] + ( params కలుపు: ['&'] ).
+}.
+
+URL అందినప్పుడు: ['హ్యాష్:'] చేయి: { :hash
+	తన hash := ['#'] + hash url-ఎన్-కోడ్.
+}.
+

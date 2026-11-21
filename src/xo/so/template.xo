@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Walax cusub.
+
+Template marka: ['cusub'] samee: { <- naf cusub content: [''].
+}.
+
+Template marka: ['content:'] samee: { :content
+	iska-leh content := content. 
+}.
+
+Template marka: ['cusub:'] samee: { :content <- naf cusub content: content.
+}.
+
+Template marka: ['cut:'] samee: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := iska-leh content kala-qaybi: startmarker.
+	>> prefix := parts ugu-horreeya.
+	>> parts2 := parts ugu-dambeeya kala-qaybi: endmarker.
+	>> suffix := parts2 ugu-dambeeya.
+	>> part := parts2 ugu-horreeya.
+	>> rest := prefix + suffix.
+	iska-leh content := rest. <- Template cusub: part.
+	
+}.
+
+Template marka: ['koobiyee'] samee: { <- naf cusub: naf qoraal koobiyee.
+}.
+	
+Template marka: ['paste:at:'] samee: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	iska-leh content beddel: pastemarker ku: ( snippet qoraal + pastemarker ).
+}.
+
+Template marka: ['deji:qiime:'] samee: { :slot :value
+	iska-leh content beddel: ['<!-- slot:'] + slot + [' -->'] ku: ( Server html-koodee: value ).
+}.
+
+Template marka: ['set:html:'] samee: { :slot :html
+	iska-leh content beddel: ['<!-- slot:'] + slot + [' -->'] ku: html.
+}.
+
+Template marka: ['jawaab:iyo:'] samee: { :slot :value
+	naf deji: (slot ka: 0 dherer: (slot dherer - 1)) qiime: value.
+}.
+
+Template marka: ['nl2br'] samee: {
+	iska-leh content beddel: ['\n'] ku: ['<br>'].
+}.
+
+Template marka: ['clean'] samee: {
+	iska-leh content :=
+		Hannaan
+		cusub: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		is-waafaq: iska-leh content
+		samee: { <- ['']. }.
+}.
+
+Template marka: ['clean-cuts'] samee: {
+	>> items := Liis cusub.
+	Hannaan
+	cusub: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	is-waafaq: iska-leh content
+	samee: { :_ :part
+		items dhammaadka-ku-dar: part ? 1.
+	}.
+	items mid-kasta: { :_ :id
+		iska-leh content :=
+			Hannaan cusub: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			is-waafaq: iska-leh content
+			samee: { <- ['']. }.
+	 }.
+}.
+
+Template marka: ['clean-space'] samee: {
+	iska-leh content :=
+		Hannaan
+		cusub: ['\\s*\\n'],
+		is-waafaq: iska-leh content
+		samee: { <- ['\n']. }.
+	iska-leh content :=
+		Hannaan
+		cusub: ['\\n[\\s\\t]+'],
+		is-waafaq: iska-leh content
+		samee: { <- ['\n']. }.
+}.
+
+Template marka: ['clean-all'] samee: {
+	naf clean.
+	naf clean-cuts.
+	naf clean-space.
+}.
+
+Template marka: ['qoraal'] samee: { <- iska-leh content.
+}.

@@ -1,0 +1,128 @@
+>> Email := Into okusha.
+
+Email uma-kufika: ['init'] yenza: {
+	okwakho recipients := Uhlu okusha.
+	okwakho cc := Uhlu okusha.
+	okwakho bcc := Uhlu okusha.
+	okwakho from := Lutho.
+	okwakho from-name := Lutho.
+	okwakho subject := Lutho.
+	okwakho body := Lutho.
+}.
+
+Email uma-kufika: ['okusha'] yenza: { <- uqobo okusha init.
+}.
+
+Email uma-kufika: ['to:'] yenza: { :list
+	okwakho recipients := list.
+}.
+ 
+Email uma-kufika: ['cc:'] yenza: { :list
+	okwakho cc := list.
+}.
+
+Email uma-kufika: ['bcc:'] yenza: { :list
+	okwakho bcc := list.
+}.
+
+Email uma-kufika: ['subject:'] yenza: { :subject
+	okwakho subject := subject.
+}.
+
+Email uma-kufika: ['from:name:'] yenza: { :from :igama
+	okwakho from := from.
+	okwakho from-name := igama.
+}.
+
+Email uma-kufika: ['body:'] yenza: { :body
+	okwakho body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email uma-kufika: ['header:'] yenza: { :line <- line buyisela: ['\r'] nge: [''], buyisela: ['\n'] nge: [''].
+}.
+
+Email uma-kufika: ['send'] yenza: {
+	>> f := Ifayela tempwrite: uqobo generate.
+	Uhlelo isistimu: ['sendmail -t < '] + f indlela-yefayela, umugqa-omusha.
+}.
+
+Email uma-kufika: ['generate'] yenza: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str engeza-ekugcineni: (uqobo header: ['From: '] + okwakho from-name + [' <'] + ( okwakho from ) + ['>']) + brk.
+	str engeza-ekugcineni: (uqobo header: ['To: '] + ( okwakho recipients hlanganisa: [','] )) + brk.
+	okwakho cc inani iqiniso: {
+		str engeza-ekugcineni: (uqobo header: ['Cc: '] + ( okwakho cc hlanganisa: [','] )) + brk.
+	}.
+	okwakho bcc inani iqiniso: {
+		str engeza-ekugcineni: (uqobo header: ['Bcc: '] + ( okwakho bcc hlanganisa: [','] )) + brk.
+	}.
+	str engeza-ekugcineni: (uqobo header: ['Subject: '] + okwakho subject) + brk.
+	str engeza-ekugcineni: brk.
+	str engeza-ekugcineni: okwakho body.
+	str engeza-ekugcineni: brk. <- str.
+}.
+
+>> HTML-Email := Email okusha.
+
+HTML-Email uma-kufika: ['init'] yenza: {
+	uqobo init.
+	okwakho attachments := Uhlu okusha.
+	okwakho boundary := Isisefo ithokheni: 40.
+}.
+
+HTML-Email uma-kufika: ['attach:'] yenza: { :file
+	>> id := okwakho attachments inani.
+	>> blob := file blob.
+	okwakho attachments engeza-ekugcineni: (
+		Isichazamazwi okusha
+			file: file indlela-yefayela,
+			mime: ['image/'] + (Server mimetype: file indlela-yefayela),
+			data: blob base64-faka-ikhodi
+	).
+	blob khulula. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email uma-kufika: ['generate'] yenza: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str engeza-ekugcineni: (uqobo header: ['From: '] + okwakho from-name + [' <'] + ( okwakho from ) + ['>']) + brk.
+	str engeza-ekugcineni: (uqobo header: ['To: '] + ( okwakho recipients hlanganisa: [','] )) + brk.
+	okwakho cc inani iqiniso: {
+		str engeza-ekugcineni: (uqobo header: ['Cc: '] + ( okwakho cc hlanganisa: [','] )) + brk.
+	}.
+	okwakho bcc inani iqiniso: {
+		str engeza-ekugcineni: (uqobo header: ['Bcc: '] + ( okwakho bcc hlanganisa: [','] )) + brk.
+	}.
+	str engeza-ekugcineni: (uqobo header: ['Subject: '] + okwakho subject) + brk.
+	str engeza-ekugcineni: ['MIME-Version: 1.0'] + brk.
+	str engeza-ekugcineni: ['Content-Type: multipart/related; boundary="'] + okwakho boundary + ['"; type=text/html'] + brk.
+	str engeza-ekugcineni: brk.
+	str engeza-ekugcineni: ['--'] + okwakho boundary + brk.
+	str engeza-ekugcineni: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str engeza-ekugcineni: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str engeza-ekugcineni: brk.
+	str engeza-ekugcineni: okwakho body.
+	str engeza-ekugcineni: brk.
+	okwakho attachments ngamunye: { :id :info
+		>> blob := info data.
+		str engeza-ekugcineni: ['--'] + okwakho boundary + brk.
+		str engeza-ekugcineni: ['Content-Type: '] + info mime + brk.
+		str engeza-ekugcineni: ['Content-Transfer-Encoding: base64'] + brk.
+		str engeza-ekugcineni: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str engeza-ekugcineni: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str engeza-ekugcineni: brk.
+		>> max := 76.
+		>> len := blob ubude.
+		>> chunks := (len / max) khuphula-inani.
+		{ :i
+			>> chunk := blob kopisha kusuka: i * max ubude: max.
+			str engeza-ekugcineni: chunk + brk.
+		} * chunks.
+		str engeza-ekugcineni: brk.
+		str engeza-ekugcineni: brk.
+	}.
+	str engeza-ekugcineni: ['--'] + okwakho boundary + ['--'] + brk. <- str.
+}.

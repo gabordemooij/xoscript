@@ -1,0 +1,325 @@
+Requête-HTTP quand: ['HTTP-header:'] faire: { :key <- Programme paramètre: key.
+}.
+
+>> HTTP-Header := Objet nouveau.
+
+HTTP-Header quand: ['nouveau'] faire: { <- soi nouveau init.
+}.
+
+HTTP-Header quand: ['init'] faire: {
+	propre key := Rien.
+	propre value := Rien.
+}.
+
+HTTP-Header quand: ['key:value:'] faire: { :key :value
+	propre key := key.
+	propre value := value.
+}.
+
+HTTP-Header quand: ['key'] faire: { <- propre key.
+}.
+
+HTTP-Header quand: ['value'] faire: { <- propre value.
+}.
+
+
+HTTP-Header quand: ['texte'] faire: {
+	>> line := propre key + [': '] + propre value.
+	line remplacer: ['\r'] par: [''], remplacer: ['\n'] par: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Objet nouveau.
+
+Web-Document quand: ['nouveau'] faire: { <- soi nouveau init.
+}.
+
+Web-Document quand: ['init'] faire: {
+	propre headers := Liste nouveau.
+	propre sess-id := Rien.
+	propre session-manager := Tempfile-Session nouveau.
+	propre sessdata := Rien.
+	propre secure := Oui.
+	propre same-site := ['Strict'].
+	propre headers-out := Non.
+	propre request := Requête-HTTP nouveau.
+}.
+
+Web-Document quand: ['request:'] faire: { :request
+	propre request := request.
+}. 
+
+Web-Document quand: ['secure-session-cookie:'] faire: { :secure
+	soi check-headers.
+	propre secure := secure.
+}.
+
+Web-Document quand: ['same-site-session-cookie:'] faire: { :value
+	soi check-headers.
+	>> options := Liste nouveau 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options contient: value, non: {
+		cette-tâche erreur: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	propre same-site := value.
+}.
+
+Web-Document quand: ['header:'] faire: { :header
+	soi check-headers.
+	propre headers ajouter: header.
+}.
+
+Web-Document quand: ['clear-headers'] faire: {
+	soi check-headers.
+	propre headers := Liste nouveau.
+}.
+
+Web-Document quand: ['session-manager:'] faire: { :manager
+	soi check-headers.
+	propre session-manager := manager.
+}.
+
+Web-Document quand: ['session-manager'] faire: { <- propre session-manager.
+}.
+
+Web-Document quand: ['check-headers'] faire: {
+	propre headers-out oui: {
+		cette-tâche erreur: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document quand: ['session-start'] faire: {
+	soi check-headers.
+	>> request := propre request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Rien? non: {
+		(( Motif nouveau: ['^[A-Za-z0-9]+\\z'], correspondance: sess-id ) = 0) oui: {
+			sess-id := Rien.
+		}.
+	}.
+	sess-id Rien? oui: {
+		sess-id := Coffre jeton: 30.
+		>> session-header := HTTP-Header nouveau
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (propre secure soit: ['Secure'] soit: ['']),
+		SSITE: (propre same-site),
+		XSID: sess-id
+		).
+		propre headers ajouter: session-header.
+	}.
+	propre sessdata := propre session-manager for: sess-id, load. <- propre sessdata. # reference
+}.
+
+Web-Document quand: ['goto:'] faire: { :url
+	soi check-headers.
+	soi clear-headers.
+	propre headers
+	ajouter: (
+		HTTP-Header nouveau
+		key: ['Status'] value: ['303 See Other']
+	),
+	ajouter: (
+		HTTP-Header nouveau
+		key: ['Location'] value: url
+	).
+	soi out: ['Redirect'].
+}.
+
+Web-Document quand: ['session-destroy'] faire: {
+	soi check-headers.
+	>> request := propre request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Rien? non: {
+		>> session-header := HTTP-Header nouveau.
+		>> when := Moment nouveau année: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (propre secure soit: ['Secure'] soit: ['']),
+			SSITE: (propre same-site),
+			XSID: sess-id
+		).
+		propre session-manager destroy.
+		propre headers ajouter: session-header.
+	}.
+}.
+
+
+Web-Document quand: ['template:'] faire: { :chemin <- Template nouveau: (Fichier nouveau: chemin, lire).
+}.
+
+Web-Document quand: ['out:type:'] faire: { :output :type
+	propre headers-out non: {
+		propre sessdata Rien? non: {
+			propre session-manager save: propre sessdata.
+		}.
+		propre headers ajouter: (
+			HTTP-Header nouveau
+			key: ['Content-type'] value: type
+		).
+		propre headers chaque: { :_ :header
+			Sortie écrire: header.
+		}.
+		propre headers-out := Oui.
+		Sortie écrire: ['\r\n'].
+	}.
+	Sortie écrire: output.
+}.
+
+Web-Document quand: ['finish:type:'] faire: { :output :type
+	propre headers-out non: {
+		propre sessdata Rien? non: {
+			propre session-manager save: propre sessdata.
+		}.
+		propre headers ajouter: (
+			HTTP-Header nouveau
+			key: ['Content-type'] value: type
+		).
+		propre headers ajouter: (
+			HTTP-Header nouveau
+			key: ['Content-Length'] value: output texte bytes
+		).
+		propre headers chaque: { :_ :header
+			Sortie écrire: header.
+		}.
+		propre headers-out := Oui.
+		Sortie écrire: ['\r\n'].
+	}.
+	Sortie écrire: output.
+}.
+
+Web-Document quand: ['out:'] faire: { :output
+	soi out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document quand: ['finish:'] faire: { :output
+	soi finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document quand: ['json:'] faire: { :output
+	soi out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document quand: ['not-found:'] faire: { :output
+	soi clear-headers header: (
+		HTTP-Header nouveau key: ['Status'] value: ['404 Not Found']
+	).
+	soi out: output.
+}.
+
+
+# Interface
+
+>> Session := Objet nouveau.
+
+Session quand: ['nouveau'] faire: { <- soi nouveau init for: Rien.
+}.
+
+Session quand: ['for:'] faire: { :id
+	propre id := id.
+}.
+
+Session quand: ['load'] faire: {
+	cette-tâche erreur: ['Not implemented.'].
+}.
+
+Session quand: ['save:'] faire: {
+	cette-tâche erreur: ['Not implemented.'].
+}.
+
+Session quand: ['destroy'] faire: {
+	cette-tâche erreur: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session nouveau.
+
+Tempfile-Session quand: ['init'] faire: {
+	propre pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session quand: ['path-prefix:'] faire: { :str
+	propre pathprefix := str.
+}.
+
+Tempfile-Session quand: ['file'] faire: { <- ( Fichier nouveau: ( propre pathprefix + propre id + ['.txt'] ) ).
+}.
+
+Tempfile-Session quand: ['load'] faire: {
+	>> file := soi file.
+	file existe non: {
+		file écrire: (Dictionnaire nouveau code).
+	}. <- file lire objet.
+}.
+
+Tempfile-Session quand: ['save:'] faire: { :data
+	>> file := soi file.
+	file existe oui: {
+		file écrire: data code.
+	}.
+}.
+
+Tempfile-Session quand: ['destroy'] faire: {
+	>> file := soi file.
+	file existe oui: {
+		file supprimer.
+	}.
+}.
+
+
+>> URL := Objet nouveau.
+
+URL quand: ['init'] faire: {
+	propre protocol := ['https://'].
+	propre hôte := ['localhost'].
+	propre chemin := [''].
+	propre params := [''].
+	propre hash := [''].
+}.
+
+URL quand: ['nouveau'] faire: { <- soi nouveau init.
+}.
+
+URL quand: ['texte'] faire: { <- (
+	propre protocol +
+	propre hôte +
+	propre chemin +
+	propre params +
+	propre hash ).
+}.
+
+URL quand: ['protocol:'] faire: { :protocol
+	((Liste nouveau: ['http'] ; ['https']) contient: protocol) oui: {
+		propre protocol := protocol + ['://'].
+	}, non: {
+		cette-tâche erreur: ['Invalid protocol'].
+	}.
+}.
+
+URL quand: ['hôte:'] faire: { :hôte
+	#todo validate according to rfc
+	propre hôte := hôte.
+}.
+
+URL quand: ['path:'] faire: { :chemin
+	propre chemin := ['/'] + chemin url-encoder.
+}.
+
+URL quand: ['params:'] faire: { :map
+	>> params := Liste nouveau.
+	map chaque: { :key :value
+		params ajouter: key texte url-encoder + ['='] + value texte url-encoder.
+	}.
+	propre params := ['?'] + ( params joindre: ['&'] ).
+}.
+
+URL quand: ['hachage:'] faire: { :hash
+	propre hash := ['#'] + hash url-encoder.
+}.
+

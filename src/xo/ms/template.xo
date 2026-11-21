@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objek baharu.
+
+Template apabila: ['baharu'] lakukan: { <- diri baharu content: [''].
+}.
+
+Template apabila: ['content:'] lakukan: { :content
+	milik content := content. 
+}.
+
+Template apabila: ['baharu:'] lakukan: { :content <- diri baharu content: content.
+}.
+
+Template apabila: ['cut:'] lakukan: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := milik content pisahkan: startmarker.
+	>> prefix := parts pertama.
+	>> parts2 := parts terakhir pisahkan: endmarker.
+	>> suffix := parts2 terakhir.
+	>> part := parts2 pertama.
+	>> rest := prefix + suffix.
+	milik content := rest. <- Template baharu: part.
+	
+}.
+
+Template apabila: ['salin'] lakukan: { <- diri baharu: diri teks salin.
+}.
+	
+Template apabila: ['paste:at:'] lakukan: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	milik content ganti: pastemarker dengan: ( snippet teks + pastemarker ).
+}.
+
+Template apabila: ['tetapkan:nilai:'] lakukan: { :slot :value
+	milik content ganti: ['<!-- slot:'] + slot + [' -->'] dengan: ( Server html-kodkan: value ).
+}.
+
+Template apabila: ['set:html:'] lakukan: { :slot :html
+	milik content ganti: ['<!-- slot:'] + slot + [' -->'] dengan: html.
+}.
+
+Template apabila: ['balas:dan:'] lakukan: { :slot :value
+	diri tetapkan: (slot dari: 0 panjang: (slot panjang - 1)) nilai: value.
+}.
+
+Template apabila: ['nl2br'] lakukan: {
+	milik content ganti: ['\n'] dengan: ['<br>'].
+}.
+
+Template apabila: ['clean'] lakukan: {
+	milik content :=
+		Corak
+		baharu: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		padan: milik content
+		lakukan: { <- ['']. }.
+}.
+
+Template apabila: ['clean-cuts'] lakukan: {
+	>> items := Senarai baharu.
+	Corak
+	baharu: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	padan: milik content
+	lakukan: { :_ :part
+		items tambah-di-hujung: part ? 1.
+	}.
+	items setiap: { :_ :id
+		milik content :=
+			Corak baharu: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			padan: milik content
+			lakukan: { <- ['']. }.
+	 }.
+}.
+
+Template apabila: ['clean-space'] lakukan: {
+	milik content :=
+		Corak
+		baharu: ['\\s*\\n'],
+		padan: milik content
+		lakukan: { <- ['\n']. }.
+	milik content :=
+		Corak
+		baharu: ['\\n[\\s\\t]+'],
+		padan: milik content
+		lakukan: { <- ['\n']. }.
+}.
+
+Template apabila: ['clean-all'] lakukan: {
+	diri clean.
+	diri clean-cuts.
+	diri clean-space.
+}.
+
+Template apabila: ['teks'] lakukan: { <- milik content.
+}.

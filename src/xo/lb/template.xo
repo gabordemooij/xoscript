@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objet nei.
+
+Template bei: ['nei'] maachen: { <- selwer nei content: [''].
+}.
+
+Template bei: ['content:'] maachen: { :content
+	eegen content := content. 
+}.
+
+Template bei: ['nei:'] maachen: { :content <- selwer nei content: content.
+}.
+
+Template bei: ['cut:'] maachen: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := eegen content deelen: startmarker.
+	>> prefix := parts éischten.
+	>> parts2 := parts lescht deelen: endmarker.
+	>> suffix := parts2 lescht.
+	>> part := parts2 éischten.
+	>> rest := prefix + suffix.
+	eegen content := rest. <- Template nei: part.
+	
+}.
+
+Template bei: ['kopéieren'] maachen: { <- selwer nei: selwer text kopéieren.
+}.
+	
+Template bei: ['paste:at:'] maachen: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	eegen content ersetzen: pastemarker mat: ( snippet text + pastemarker ).
+}.
+
+Template bei: ['setzen:wäert:'] maachen: { :slot :value
+	eegen content ersetzen: ['<!-- slot:'] + slot + [' -->'] mat: ( Server html-kodéieren: value ).
+}.
+
+Template bei: ['set:html:'] maachen: { :slot :html
+	eegen content ersetzen: ['<!-- slot:'] + slot + [' -->'] mat: html.
+}.
+
+Template bei: ['äntweren:an:'] maachen: { :slot :value
+	selwer setzen: (slot vun: 0 längt: (slot längt - 1)) wäert: value.
+}.
+
+Template bei: ['nl2br'] maachen: {
+	eegen content ersetzen: ['\n'] mat: ['<br>'].
+}.
+
+Template bei: ['clean'] maachen: {
+	eegen content :=
+		Muster
+		nei: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		treffer: eegen content
+		maachen: { <- ['']. }.
+}.
+
+Template bei: ['clean-cuts'] maachen: {
+	>> items := Lëscht nei.
+	Muster
+	nei: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	treffer: eegen content
+	maachen: { :_ :part
+		items drunhänken: part ? 1.
+	}.
+	items all: { :_ :id
+		eegen content :=
+			Muster nei: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			treffer: eegen content
+			maachen: { <- ['']. }.
+	 }.
+}.
+
+Template bei: ['clean-space'] maachen: {
+	eegen content :=
+		Muster
+		nei: ['\\s*\\n'],
+		treffer: eegen content
+		maachen: { <- ['\n']. }.
+	eegen content :=
+		Muster
+		nei: ['\\n[\\s\\t]+'],
+		treffer: eegen content
+		maachen: { <- ['\n']. }.
+}.
+
+Template bei: ['clean-all'] maachen: {
+	selwer clean.
+	selwer clean-cuts.
+	selwer clean-space.
+}.
+
+Template bei: ['text'] maachen: { <- eegen content.
+}.

@@ -1,0 +1,128 @@
+>> Email := Објекат нови.
+
+Email на: ['init'] уради: {
+	свој recipients := Листа нови.
+	свој cc := Листа нови.
+	свој bcc := Листа нови.
+	свој from := Ништа.
+	свој from-name := Ништа.
+	свој subject := Ништа.
+	свој body := Ништа.
+}.
+
+Email на: ['нови'] уради: { <- себе нови init.
+}.
+
+Email на: ['to:'] уради: { :list
+	свој recipients := list.
+}.
+ 
+Email на: ['cc:'] уради: { :list
+	свој cc := list.
+}.
+
+Email на: ['bcc:'] уради: { :list
+	свој bcc := list.
+}.
+
+Email на: ['subject:'] уради: { :subject
+	свој subject := subject.
+}.
+
+Email на: ['from:name:'] уради: { :from :назив
+	свој from := from.
+	свој from-name := назив.
+}.
+
+Email на: ['body:'] уради: { :body
+	свој body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email на: ['header:'] уради: { :line <- line замени: ['\r'] са: [''], замени: ['\n'] са: [''].
+}.
+
+Email на: ['send'] уради: {
+	>> f := Датотека tempwrite: себе generate.
+	Програм систем: ['sendmail -t < '] + f путања, нови-ред.
+}.
+
+Email на: ['generate'] уради: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str додај-на-крај: (себе header: ['From: '] + свој from-name + [' <'] + ( свој from ) + ['>']) + brk.
+	str додај-на-крај: (себе header: ['To: '] + ( свој recipients споји: [','] )) + brk.
+	свој cc број-елемената тачно: {
+		str додај-на-крај: (себе header: ['Cc: '] + ( свој cc споји: [','] )) + brk.
+	}.
+	свој bcc број-елемената тачно: {
+		str додај-на-крај: (себе header: ['Bcc: '] + ( свој bcc споји: [','] )) + brk.
+	}.
+	str додај-на-крај: (себе header: ['Subject: '] + свој subject) + brk.
+	str додај-на-крај: brk.
+	str додај-на-крај: свој body.
+	str додај-на-крај: brk. <- str.
+}.
+
+>> HTML-Email := Email нови.
+
+HTML-Email на: ['init'] уради: {
+	себе init.
+	свој attachments := Листа нови.
+	свој boundary := Сеф токен: 40.
+}.
+
+HTML-Email на: ['attach:'] уради: { :file
+	>> id := свој attachments број-елемената.
+	>> blob := file blob.
+	свој attachments додај-на-крај: (
+		Речник нови
+			file: file путања,
+			mime: ['image/'] + (Server mimetype: file путања),
+			data: blob base64-кодирај
+	).
+	blob ослободи. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email на: ['generate'] уради: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str додај-на-крај: (себе header: ['From: '] + свој from-name + [' <'] + ( свој from ) + ['>']) + brk.
+	str додај-на-крај: (себе header: ['To: '] + ( свој recipients споји: [','] )) + brk.
+	свој cc број-елемената тачно: {
+		str додај-на-крај: (себе header: ['Cc: '] + ( свој cc споји: [','] )) + brk.
+	}.
+	свој bcc број-елемената тачно: {
+		str додај-на-крај: (себе header: ['Bcc: '] + ( свој bcc споји: [','] )) + brk.
+	}.
+	str додај-на-крај: (себе header: ['Subject: '] + свој subject) + brk.
+	str додај-на-крај: ['MIME-Version: 1.0'] + brk.
+	str додај-на-крај: ['Content-Type: multipart/related; boundary="'] + свој boundary + ['"; type=text/html'] + brk.
+	str додај-на-крај: brk.
+	str додај-на-крај: ['--'] + свој boundary + brk.
+	str додај-на-крај: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str додај-на-крај: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str додај-на-крај: brk.
+	str додај-на-крај: свој body.
+	str додај-на-крај: brk.
+	свој attachments сваки: { :id :info
+		>> blob := info data.
+		str додај-на-крај: ['--'] + свој boundary + brk.
+		str додај-на-крај: ['Content-Type: '] + info mime + brk.
+		str додај-на-крај: ['Content-Transfer-Encoding: base64'] + brk.
+		str додај-на-крај: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str додај-на-крај: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str додај-на-крај: brk.
+		>> max := 76.
+		>> len := blob дужина.
+		>> chunks := (len / max) заокружи-нагоре.
+		{ :i
+			>> chunk := blob копирај од: i * max дужина: max.
+			str додај-на-крај: chunk + brk.
+		} * chunks.
+		str додај-на-крај: brk.
+		str додај-на-крај: brk.
+	}.
+	str додај-на-крај: ['--'] + свој boundary + ['--'] + brk. <- str.
+}.

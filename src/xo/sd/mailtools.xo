@@ -1,0 +1,128 @@
+>> Email := شيء نئون.
+
+Email جڏهن: ['init'] ڪريو: {
+	پنهنجو recipients := لسٽ نئون.
+	پنهنجو cc := لسٽ نئون.
+	پنهنجو bcc := لسٽ نئون.
+	پنهنجو from := خالي.
+	پنهنجو from-name := خالي.
+	پنهنجو subject := خالي.
+	پنهنجو body := خالي.
+}.
+
+Email جڏهن: ['نئون'] ڪريو: { <- پاڻ نئون init.
+}.
+
+Email جڏهن: ['to:'] ڪريو: { :list
+	پنهنجو recipients := list.
+}.
+ 
+Email جڏهن: ['cc:'] ڪريو: { :list
+	پنهنجو cc := list.
+}.
+
+Email جڏهن: ['bcc:'] ڪريو: { :list
+	پنهنجو bcc := list.
+}.
+
+Email جڏهن: ['subject:'] ڪريو: { :subject
+	پنهنجو subject := subject.
+}.
+
+Email جڏهن: ['from:name:'] ڪريو: { :from :نالو
+	پنهنجو from := from.
+	پنهنجو from-name := نالو.
+}.
+
+Email جڏهن: ['body:'] ڪريو: { :body
+	پنهنجو body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email جڏهن: ['header:'] ڪريو: { :line <- line مٽايو: ['\r'] سان: [''], مٽايو: ['\n'] سان: [''].
+}.
+
+Email جڏهن: ['send'] ڪريو: {
+	>> f := فائل عارضي-لکت: پاڻ generate.
+	پروگرام سسٽم: ['sendmail -t < '] + f فائل-رستو, نئين-سٽ.
+}.
+
+Email جڏهن: ['generate'] ڪريو: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str آخر-۾-جوڙيو: (پاڻ header: ['From: '] + پنهنجو from-name + [' <'] + ( پنهنجو from ) + ['>']) + brk.
+	str آخر-۾-جوڙيو: (پاڻ header: ['To: '] + ( پنهنجو recipients ملايو: [','] )) + brk.
+	پنهنجو cc ڳڻپ جيڪڏهن-سچ: {
+		str آخر-۾-جوڙيو: (پاڻ header: ['Cc: '] + ( پنهنجو cc ملايو: [','] )) + brk.
+	}.
+	پنهنجو bcc ڳڻپ جيڪڏهن-سچ: {
+		str آخر-۾-جوڙيو: (پاڻ header: ['Bcc: '] + ( پنهنجو bcc ملايو: [','] )) + brk.
+	}.
+	str آخر-۾-جوڙيو: (پاڻ header: ['Subject: '] + پنهنجو subject) + brk.
+	str آخر-۾-جوڙيو: brk.
+	str آخر-۾-جوڙيو: پنهنجو body.
+	str آخر-۾-جوڙيو: brk. <- str.
+}.
+
+>> HTML-Email := Email نئون.
+
+HTML-Email جڏهن: ['init'] ڪريو: {
+	پاڻ init.
+	پنهنجو attachments := لسٽ نئون.
+	پنهنجو boundary := ٽجوڙي ٽوڪن: 40.
+}.
+
+HTML-Email جڏهن: ['attach:'] ڪريو: { :file
+	>> id := پنهنجو attachments ڳڻپ.
+	>> blob := file blob.
+	پنهنجو attachments آخر-۾-جوڙيو: (
+		لغت نئون
+			file: file فائل-رستو,
+			mime: ['image/'] + (Server mimetype: file فائل-رستو),
+			data: blob base64-انڪوڊ
+	).
+	blob آزاد-ڪريو. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email جڏهن: ['generate'] ڪريو: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str آخر-۾-جوڙيو: (پاڻ header: ['From: '] + پنهنجو from-name + [' <'] + ( پنهنجو from ) + ['>']) + brk.
+	str آخر-۾-جوڙيو: (پاڻ header: ['To: '] + ( پنهنجو recipients ملايو: [','] )) + brk.
+	پنهنجو cc ڳڻپ جيڪڏهن-سچ: {
+		str آخر-۾-جوڙيو: (پاڻ header: ['Cc: '] + ( پنهنجو cc ملايو: [','] )) + brk.
+	}.
+	پنهنجو bcc ڳڻپ جيڪڏهن-سچ: {
+		str آخر-۾-جوڙيو: (پاڻ header: ['Bcc: '] + ( پنهنجو bcc ملايو: [','] )) + brk.
+	}.
+	str آخر-۾-جوڙيو: (پاڻ header: ['Subject: '] + پنهنجو subject) + brk.
+	str آخر-۾-جوڙيو: ['MIME-Version: 1.0'] + brk.
+	str آخر-۾-جوڙيو: ['Content-Type: multipart/related; boundary="'] + پنهنجو boundary + ['"; type=text/html'] + brk.
+	str آخر-۾-جوڙيو: brk.
+	str آخر-۾-جوڙيو: ['--'] + پنهنجو boundary + brk.
+	str آخر-۾-جوڙيو: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str آخر-۾-جوڙيو: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str آخر-۾-جوڙيو: brk.
+	str آخر-۾-جوڙيو: پنهنجو body.
+	str آخر-۾-جوڙيو: brk.
+	پنهنجو attachments هر-هڪ: { :id :info
+		>> blob := info data.
+		str آخر-۾-جوڙيو: ['--'] + پنهنجو boundary + brk.
+		str آخر-۾-جوڙيو: ['Content-Type: '] + info mime + brk.
+		str آخر-۾-جوڙيو: ['Content-Transfer-Encoding: base64'] + brk.
+		str آخر-۾-جوڙيو: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str آخر-۾-جوڙيو: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str آخر-۾-جوڙيو: brk.
+		>> max := 76.
+		>> len := blob ڊيگهه.
+		>> chunks := (len / max) مٿي-گول.
+		{ :i
+			>> chunk := blob نقل شروعات: i * max ڊيگهه: max.
+			str آخر-۾-جوڙيو: chunk + brk.
+		} * chunks.
+		str آخر-۾-جوڙيو: brk.
+		str آخر-۾-جوڙيو: brk.
+	}.
+	str آخر-۾-جوڙيو: ['--'] + پنهنجو boundary + ['--'] + brk. <- str.
+}.

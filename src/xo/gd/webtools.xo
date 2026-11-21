@@ -1,0 +1,325 @@
+HTTP-Iarrtas air: ['HTTP-header:'] dèan: { :key <- Prògram suidheachadh: key.
+}.
+
+>> HTTP-Header := Oibseact ùr.
+
+HTTP-Header air: ['ùr'] dèan: { <- fhèin ùr init.
+}.
+
+HTTP-Header air: ['init'] dèan: {
+	leis key := Neoni.
+	leis value := Neoni.
+}.
+
+HTTP-Header air: ['key:value:'] dèan: { :key :value
+	leis key := key.
+	leis value := value.
+}.
+
+HTTP-Header air: ['key'] dèan: { <- leis key.
+}.
+
+HTTP-Header air: ['value'] dèan: { <- leis value.
+}.
+
+
+HTTP-Header air: ['sreang'] dèan: {
+	>> line := leis key + [': '] + leis value.
+	line cuir-an-àite: ['\r'] le: [''], cuir-an-àite: ['\n'] le: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Oibseact ùr.
+
+Web-Document air: ['ùr'] dèan: { <- fhèin ùr init.
+}.
+
+Web-Document air: ['init'] dèan: {
+	leis headers := Liosta ùr.
+	leis sess-id := Neoni.
+	leis session-manager := Tempfile-Session ùr.
+	leis sessdata := Neoni.
+	leis secure := Fìor.
+	leis same-site := ['Strict'].
+	leis headers-out := Breugach.
+	leis request := HTTP-Iarrtas ùr.
+}.
+
+Web-Document air: ['request:'] dèan: { :request
+	leis request := request.
+}. 
+
+Web-Document air: ['secure-session-cookie:'] dèan: { :secure
+	fhèin check-headers.
+	leis secure := secure.
+}.
+
+Web-Document air: ['same-site-session-cookie:'] dèan: { :value
+	fhèin check-headers.
+	>> options := Liosta ùr 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options tha-ann: value, breugach: {
+		an-obair-seo mearachd: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	leis same-site := value.
+}.
+
+Web-Document air: ['header:'] dèan: { :header
+	fhèin check-headers.
+	leis headers cuir-ris: header.
+}.
+
+Web-Document air: ['clear-headers'] dèan: {
+	fhèin check-headers.
+	leis headers := Liosta ùr.
+}.
+
+Web-Document air: ['session-manager:'] dèan: { :manager
+	fhèin check-headers.
+	leis session-manager := manager.
+}.
+
+Web-Document air: ['session-manager'] dèan: { <- leis session-manager.
+}.
+
+Web-Document air: ['check-headers'] dèan: {
+	leis headers-out fìor: {
+		an-obair-seo mearachd: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document air: ['session-start'] dèan: {
+	fhèin check-headers.
+	>> request := leis request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Neoni? breugach: {
+		(( Pàtran ùr: ['^[A-Za-z0-9]+\\z'], maids: sess-id ) = 0) fìor: {
+			sess-id := Neoni.
+		}.
+	}.
+	sess-id Neoni? fìor: {
+		sess-id := Tasgaidh tòcan: 30.
+		>> session-header := HTTP-Header ùr
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (leis secure an-dàrna-cuid: ['Secure'] no: ['']),
+		SSITE: (leis same-site),
+		XSID: sess-id
+		).
+		leis headers cuir-ris: session-header.
+	}.
+	leis sessdata := leis session-manager for: sess-id, load. <- leis sessdata. # reference
+}.
+
+Web-Document air: ['goto:'] dèan: { :url
+	fhèin check-headers.
+	fhèin clear-headers.
+	leis headers
+	cuir-ris: (
+		HTTP-Header ùr
+		key: ['Status'] value: ['303 See Other']
+	),
+	cuir-ris: (
+		HTTP-Header ùr
+		key: ['Location'] value: url
+	).
+	fhèin out: ['Redirect'].
+}.
+
+Web-Document air: ['session-destroy'] dèan: {
+	fhèin check-headers.
+	>> request := leis request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Neoni? breugach: {
+		>> session-header := HTTP-Header ùr.
+		>> when := Àm ùr bliadhna: 1970, fòrmat: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (leis secure an-dàrna-cuid: ['Secure'] no: ['']),
+			SSITE: (leis same-site),
+			XSID: sess-id
+		).
+		leis session-manager destroy.
+		leis headers cuir-ris: session-header.
+	}.
+}.
+
+
+Web-Document air: ['template:'] dèan: { :slighe <- Template ùr: (Faidhle ùr: slighe, leugh).
+}.
+
+Web-Document air: ['out:type:'] dèan: { :output :seòrsa
+	leis headers-out breugach: {
+		leis sessdata Neoni? breugach: {
+			leis session-manager save: leis sessdata.
+		}.
+		leis headers cuir-ris: (
+			HTTP-Header ùr
+			key: ['Content-type'] value: seòrsa
+		).
+		leis headers gach: { :_ :header
+			Às-chur sgrìobh: header.
+		}.
+		leis headers-out := Fìor.
+		Às-chur sgrìobh: ['\r\n'].
+	}.
+	Às-chur sgrìobh: output.
+}.
+
+Web-Document air: ['finish:type:'] dèan: { :output :seòrsa
+	leis headers-out breugach: {
+		leis sessdata Neoni? breugach: {
+			leis session-manager save: leis sessdata.
+		}.
+		leis headers cuir-ris: (
+			HTTP-Header ùr
+			key: ['Content-type'] value: seòrsa
+		).
+		leis headers cuir-ris: (
+			HTTP-Header ùr
+			key: ['Content-Length'] value: output sreang bytes
+		).
+		leis headers gach: { :_ :header
+			Às-chur sgrìobh: header.
+		}.
+		leis headers-out := Fìor.
+		Às-chur sgrìobh: ['\r\n'].
+	}.
+	Às-chur sgrìobh: output.
+}.
+
+Web-Document air: ['out:'] dèan: { :output
+	fhèin out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document air: ['finish:'] dèan: { :output
+	fhèin finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document air: ['json:'] dèan: { :output
+	fhèin out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document air: ['not-found:'] dèan: { :output
+	fhèin clear-headers header: (
+		HTTP-Header ùr key: ['Status'] value: ['404 Not Found']
+	).
+	fhèin out: output.
+}.
+
+
+# Interface
+
+>> Session := Oibseact ùr.
+
+Session air: ['ùr'] dèan: { <- fhèin ùr init for: Neoni.
+}.
+
+Session air: ['for:'] dèan: { :id
+	leis id := id.
+}.
+
+Session air: ['load'] dèan: {
+	an-obair-seo mearachd: ['Not implemented.'].
+}.
+
+Session air: ['save:'] dèan: {
+	an-obair-seo mearachd: ['Not implemented.'].
+}.
+
+Session air: ['destroy'] dèan: {
+	an-obair-seo mearachd: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session ùr.
+
+Tempfile-Session air: ['init'] dèan: {
+	leis pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session air: ['path-prefix:'] dèan: { :str
+	leis pathprefix := str.
+}.
+
+Tempfile-Session air: ['file'] dèan: { <- ( Faidhle ùr: ( leis pathprefix + leis id + ['.txt'] ) ).
+}.
+
+Tempfile-Session air: ['load'] dèan: {
+	>> file := fhèin file.
+	file ann breugach: {
+		file sgrìobh: (Faclair ùr còd).
+	}. <- file leugh oibseact.
+}.
+
+Tempfile-Session air: ['save:'] dèan: { :data
+	>> file := fhèin file.
+	file ann fìor: {
+		file sgrìobh: data còd.
+	}.
+}.
+
+Tempfile-Session air: ['destroy'] dèan: {
+	>> file := fhèin file.
+	file ann fìor: {
+		file cuir-às.
+	}.
+}.
+
+
+>> URL := Oibseact ùr.
+
+URL air: ['init'] dèan: {
+	leis protocol := ['https://'].
+	leis òstair := ['localhost'].
+	leis slighe := [''].
+	leis params := [''].
+	leis hash := [''].
+}.
+
+URL air: ['ùr'] dèan: { <- fhèin ùr init.
+}.
+
+URL air: ['sreang'] dèan: { <- (
+	leis protocol +
+	leis òstair +
+	leis slighe +
+	leis params +
+	leis hash ).
+}.
+
+URL air: ['protocol:'] dèan: { :protocol
+	((Liosta ùr: ['http'] ; ['https']) tha-ann: protocol) fìor: {
+		leis protocol := protocol + ['://'].
+	}, breugach: {
+		an-obair-seo mearachd: ['Invalid protocol'].
+	}.
+}.
+
+URL air: ['òstair:'] dèan: { :òstair
+	#todo validate according to rfc
+	leis òstair := òstair.
+}.
+
+URL air: ['path:'] dèan: { :slighe
+	leis slighe := ['/'] + slighe url-còdaich.
+}.
+
+URL air: ['params:'] dèan: { :map
+	>> params := Liosta ùr.
+	map gach: { :key :value
+		params cuir-ris: key sreang url-còdaich + ['='] + value sreang url-còdaich.
+	}.
+	leis params := ['?'] + ( params ceangail: ['&'] ).
+}.
+
+URL air: ['hais:'] dèan: { :hash
+	leis hash := ['#'] + hash url-còdaich.
+}.
+

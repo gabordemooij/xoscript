@@ -1,0 +1,128 @@
+>> Email := Objekt nov.
+
+Email ob: ['init'] izvedi: {
+	svoj recipients := Seznam nov.
+	svoj cc := Seznam nov.
+	svoj bcc := Seznam nov.
+	svoj from := Nič.
+	svoj from-name := Nič.
+	svoj subject := Nič.
+	svoj body := Nič.
+}.
+
+Email ob: ['nov'] izvedi: { <- sebe nov init.
+}.
+
+Email ob: ['to:'] izvedi: { :list
+	svoj recipients := list.
+}.
+ 
+Email ob: ['cc:'] izvedi: { :list
+	svoj cc := list.
+}.
+
+Email ob: ['bcc:'] izvedi: { :list
+	svoj bcc := list.
+}.
+
+Email ob: ['subject:'] izvedi: { :subject
+	svoj subject := subject.
+}.
+
+Email ob: ['from:name:'] izvedi: { :from :ime
+	svoj from := from.
+	svoj from-name := ime.
+}.
+
+Email ob: ['body:'] izvedi: { :body
+	svoj body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ob: ['header:'] izvedi: { :line <- line zamenjaj: ['\r'] z: [''], zamenjaj: ['\n'] z: [''].
+}.
+
+Email ob: ['send'] izvedi: {
+	>> f := Datoteka tempwrite: sebe generate.
+	Program sistem: ['sendmail -t < '] + f pot, nova-vrstica.
+}.
+
+Email ob: ['generate'] izvedi: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str dodaj-na-konec: (sebe header: ['From: '] + svoj from-name + [' <'] + ( svoj from ) + ['>']) + brk.
+	str dodaj-na-konec: (sebe header: ['To: '] + ( svoj recipients združi: [','] )) + brk.
+	svoj cc število-elementov resnično: {
+		str dodaj-na-konec: (sebe header: ['Cc: '] + ( svoj cc združi: [','] )) + brk.
+	}.
+	svoj bcc število-elementov resnično: {
+		str dodaj-na-konec: (sebe header: ['Bcc: '] + ( svoj bcc združi: [','] )) + brk.
+	}.
+	str dodaj-na-konec: (sebe header: ['Subject: '] + svoj subject) + brk.
+	str dodaj-na-konec: brk.
+	str dodaj-na-konec: svoj body.
+	str dodaj-na-konec: brk. <- str.
+}.
+
+>> HTML-Email := Email nov.
+
+HTML-Email ob: ['init'] izvedi: {
+	sebe init.
+	svoj attachments := Seznam nov.
+	svoj boundary := Sef žeton: 40.
+}.
+
+HTML-Email ob: ['attach:'] izvedi: { :file
+	>> id := svoj attachments število-elementov.
+	>> blob := file blob.
+	svoj attachments dodaj-na-konec: (
+		Slovar nov
+			file: file pot,
+			mime: ['image/'] + (Server mimetype: file pot),
+			data: blob base64-kodiraj
+	).
+	blob sprosti. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ob: ['generate'] izvedi: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str dodaj-na-konec: (sebe header: ['From: '] + svoj from-name + [' <'] + ( svoj from ) + ['>']) + brk.
+	str dodaj-na-konec: (sebe header: ['To: '] + ( svoj recipients združi: [','] )) + brk.
+	svoj cc število-elementov resnično: {
+		str dodaj-na-konec: (sebe header: ['Cc: '] + ( svoj cc združi: [','] )) + brk.
+	}.
+	svoj bcc število-elementov resnično: {
+		str dodaj-na-konec: (sebe header: ['Bcc: '] + ( svoj bcc združi: [','] )) + brk.
+	}.
+	str dodaj-na-konec: (sebe header: ['Subject: '] + svoj subject) + brk.
+	str dodaj-na-konec: ['MIME-Version: 1.0'] + brk.
+	str dodaj-na-konec: ['Content-Type: multipart/related; boundary="'] + svoj boundary + ['"; type=text/html'] + brk.
+	str dodaj-na-konec: brk.
+	str dodaj-na-konec: ['--'] + svoj boundary + brk.
+	str dodaj-na-konec: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str dodaj-na-konec: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str dodaj-na-konec: brk.
+	str dodaj-na-konec: svoj body.
+	str dodaj-na-konec: brk.
+	svoj attachments vsak: { :id :info
+		>> blob := info data.
+		str dodaj-na-konec: ['--'] + svoj boundary + brk.
+		str dodaj-na-konec: ['Content-Type: '] + info mime + brk.
+		str dodaj-na-konec: ['Content-Transfer-Encoding: base64'] + brk.
+		str dodaj-na-konec: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str dodaj-na-konec: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str dodaj-na-konec: brk.
+		>> max := 76.
+		>> len := blob dolžina.
+		>> chunks := (len / max) zaokroži-navzgor.
+		{ :i
+			>> chunk := blob kopiraj od: i * max dolžina: max.
+			str dodaj-na-konec: chunk + brk.
+		} * chunks.
+		str dodaj-na-konec: brk.
+		str dodaj-na-konec: brk.
+	}.
+	str dodaj-na-konec: ['--'] + svoj boundary + ['--'] + brk. <- str.
+}.

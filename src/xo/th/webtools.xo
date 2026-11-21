@@ -1,0 +1,325 @@
+HTTP-คำขอ เมื่อ: ['HTTP-header:'] ทำ: { :key <- โปรแกรม การตั้งค่า: key.
+}.
+
+>> HTTP-Header := ออบเจกต์ สร้างใหม่.
+
+HTTP-Header เมื่อ: ['สร้างใหม่'] ทำ: { <- ตัวเอง สร้างใหม่ init.
+}.
+
+HTTP-Header เมื่อ: ['init'] ทำ: {
+	ของตน key := ว่าง.
+	ของตน value := ว่าง.
+}.
+
+HTTP-Header เมื่อ: ['key:value:'] ทำ: { :key :value
+	ของตน key := key.
+	ของตน value := value.
+}.
+
+HTTP-Header เมื่อ: ['key'] ทำ: { <- ของตน key.
+}.
+
+HTTP-Header เมื่อ: ['value'] ทำ: { <- ของตน value.
+}.
+
+
+HTTP-Header เมื่อ: ['เป็นข้อความ'] ทำ: {
+	>> line := ของตน key + [': '] + ของตน value.
+	line แทนที่: ['\r'] ด้วย: [''], แทนที่: ['\n'] ด้วย: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := ออบเจกต์ สร้างใหม่.
+
+Web-Document เมื่อ: ['สร้างใหม่'] ทำ: { <- ตัวเอง สร้างใหม่ init.
+}.
+
+Web-Document เมื่อ: ['init'] ทำ: {
+	ของตน headers := ลิสต์ สร้างใหม่.
+	ของตน sess-id := ว่าง.
+	ของตน session-manager := Tempfile-Session สร้างใหม่.
+	ของตน sessdata := ว่าง.
+	ของตน secure := จริง.
+	ของตน same-site := ['Strict'].
+	ของตน headers-out := เท็จ.
+	ของตน request := HTTP-คำขอ สร้างใหม่.
+}.
+
+Web-Document เมื่อ: ['request:'] ทำ: { :request
+	ของตน request := request.
+}. 
+
+Web-Document เมื่อ: ['secure-session-cookie:'] ทำ: { :secure
+	ตัวเอง check-headers.
+	ของตน secure := secure.
+}.
+
+Web-Document เมื่อ: ['same-site-session-cookie:'] ทำ: { :value
+	ตัวเอง check-headers.
+	>> options := ลิสต์ สร้างใหม่ 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options ประกอบด้วย: value, ถ้าเท็จ: {
+		งานนี้ ข้อผิดพลาด: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	ของตน same-site := value.
+}.
+
+Web-Document เมื่อ: ['header:'] ทำ: { :header
+	ตัวเอง check-headers.
+	ของตน headers ต่อท้าย: header.
+}.
+
+Web-Document เมื่อ: ['clear-headers'] ทำ: {
+	ตัวเอง check-headers.
+	ของตน headers := ลิสต์ สร้างใหม่.
+}.
+
+Web-Document เมื่อ: ['session-manager:'] ทำ: { :manager
+	ตัวเอง check-headers.
+	ของตน session-manager := manager.
+}.
+
+Web-Document เมื่อ: ['session-manager'] ทำ: { <- ของตน session-manager.
+}.
+
+Web-Document เมื่อ: ['check-headers'] ทำ: {
+	ของตน headers-out ถ้าจริง: {
+		งานนี้ ข้อผิดพลาด: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document เมื่อ: ['session-start'] ทำ: {
+	ตัวเอง check-headers.
+	>> request := ของตน request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ว่างไหม? ถ้าเท็จ: {
+		(( แพตเทิร์น สร้างใหม่: ['^[A-Za-z0-9]+\\z'], ตรงกับ: sess-id ) = 0) ถ้าจริง: {
+			sess-id := ว่าง.
+		}.
+	}.
+	sess-id ว่างไหม? ถ้าจริง: {
+		sess-id := ตู้นิรภัย โทเค็น: 30.
+		>> session-header := HTTP-Header สร้างใหม่
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (ของตน secure เลือก: ['Secure'] หรือ: ['']),
+		SSITE: (ของตน same-site),
+		XSID: sess-id
+		).
+		ของตน headers ต่อท้าย: session-header.
+	}.
+	ของตน sessdata := ของตน session-manager for: sess-id, load. <- ของตน sessdata. # reference
+}.
+
+Web-Document เมื่อ: ['goto:'] ทำ: { :url
+	ตัวเอง check-headers.
+	ตัวเอง clear-headers.
+	ของตน headers
+	ต่อท้าย: (
+		HTTP-Header สร้างใหม่
+		key: ['Status'] value: ['303 See Other']
+	),
+	ต่อท้าย: (
+		HTTP-Header สร้างใหม่
+		key: ['Location'] value: url
+	).
+	ตัวเอง out: ['Redirect'].
+}.
+
+Web-Document เมื่อ: ['session-destroy'] ทำ: {
+	ตัวเอง check-headers.
+	>> request := ของตน request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ว่างไหม? ถ้าเท็จ: {
+		>> session-header := HTTP-Header สร้างใหม่.
+		>> when := ช่วงเวลา สร้างใหม่ ปี: 1970, รูปแบบ: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (ของตน secure เลือก: ['Secure'] หรือ: ['']),
+			SSITE: (ของตน same-site),
+			XSID: sess-id
+		).
+		ของตน session-manager destroy.
+		ของตน headers ต่อท้าย: session-header.
+	}.
+}.
+
+
+Web-Document เมื่อ: ['template:'] ทำ: { :เส้นทาง <- Template สร้างใหม่: (ไฟล์ สร้างใหม่: เส้นทาง, อ่าน).
+}.
+
+Web-Document เมื่อ: ['out:type:'] ทำ: { :output :ชนิด
+	ของตน headers-out ถ้าเท็จ: {
+		ของตน sessdata ว่างไหม? ถ้าเท็จ: {
+			ของตน session-manager save: ของตน sessdata.
+		}.
+		ของตน headers ต่อท้าย: (
+			HTTP-Header สร้างใหม่
+			key: ['Content-type'] value: ชนิด
+		).
+		ของตน headers แต่ละตัว: { :_ :header
+			แสดงผล เขียน: header.
+		}.
+		ของตน headers-out := จริง.
+		แสดงผล เขียน: ['\r\n'].
+	}.
+	แสดงผล เขียน: output.
+}.
+
+Web-Document เมื่อ: ['finish:type:'] ทำ: { :output :ชนิด
+	ของตน headers-out ถ้าเท็จ: {
+		ของตน sessdata ว่างไหม? ถ้าเท็จ: {
+			ของตน session-manager save: ของตน sessdata.
+		}.
+		ของตน headers ต่อท้าย: (
+			HTTP-Header สร้างใหม่
+			key: ['Content-type'] value: ชนิด
+		).
+		ของตน headers ต่อท้าย: (
+			HTTP-Header สร้างใหม่
+			key: ['Content-Length'] value: output เป็นข้อความ bytes
+		).
+		ของตน headers แต่ละตัว: { :_ :header
+			แสดงผล เขียน: header.
+		}.
+		ของตน headers-out := จริง.
+		แสดงผล เขียน: ['\r\n'].
+	}.
+	แสดงผล เขียน: output.
+}.
+
+Web-Document เมื่อ: ['out:'] ทำ: { :output
+	ตัวเอง out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document เมื่อ: ['finish:'] ทำ: { :output
+	ตัวเอง finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document เมื่อ: ['json:'] ทำ: { :output
+	ตัวเอง out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document เมื่อ: ['not-found:'] ทำ: { :output
+	ตัวเอง clear-headers header: (
+		HTTP-Header สร้างใหม่ key: ['Status'] value: ['404 Not Found']
+	).
+	ตัวเอง out: output.
+}.
+
+
+# Interface
+
+>> Session := ออบเจกต์ สร้างใหม่.
+
+Session เมื่อ: ['สร้างใหม่'] ทำ: { <- ตัวเอง สร้างใหม่ init for: ว่าง.
+}.
+
+Session เมื่อ: ['for:'] ทำ: { :id
+	ของตน id := id.
+}.
+
+Session เมื่อ: ['load'] ทำ: {
+	งานนี้ ข้อผิดพลาด: ['Not implemented.'].
+}.
+
+Session เมื่อ: ['save:'] ทำ: {
+	งานนี้ ข้อผิดพลาด: ['Not implemented.'].
+}.
+
+Session เมื่อ: ['destroy'] ทำ: {
+	งานนี้ ข้อผิดพลาด: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session สร้างใหม่.
+
+Tempfile-Session เมื่อ: ['init'] ทำ: {
+	ของตน pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session เมื่อ: ['path-prefix:'] ทำ: { :str
+	ของตน pathprefix := str.
+}.
+
+Tempfile-Session เมื่อ: ['file'] ทำ: { <- ( ไฟล์ สร้างใหม่: ( ของตน pathprefix + ของตน id + ['.txt'] ) ).
+}.
+
+Tempfile-Session เมื่อ: ['load'] ทำ: {
+	>> file := ตัวเอง file.
+	file มีอยู่ ถ้าเท็จ: {
+		file เขียน: (พจนานุกรม สร้างใหม่ โค้ด).
+	}. <- file อ่าน เป็นออบเจกต์.
+}.
+
+Tempfile-Session เมื่อ: ['save:'] ทำ: { :data
+	>> file := ตัวเอง file.
+	file มีอยู่ ถ้าจริง: {
+		file เขียน: data โค้ด.
+	}.
+}.
+
+Tempfile-Session เมื่อ: ['destroy'] ทำ: {
+	>> file := ตัวเอง file.
+	file มีอยู่ ถ้าจริง: {
+		file ลบ.
+	}.
+}.
+
+
+>> URL := ออบเจกต์ สร้างใหม่.
+
+URL เมื่อ: ['init'] ทำ: {
+	ของตน protocol := ['https://'].
+	ของตน โฮสต์ := ['localhost'].
+	ของตน เส้นทาง := [''].
+	ของตน params := [''].
+	ของตน hash := [''].
+}.
+
+URL เมื่อ: ['สร้างใหม่'] ทำ: { <- ตัวเอง สร้างใหม่ init.
+}.
+
+URL เมื่อ: ['เป็นข้อความ'] ทำ: { <- (
+	ของตน protocol +
+	ของตน โฮสต์ +
+	ของตน เส้นทาง +
+	ของตน params +
+	ของตน hash ).
+}.
+
+URL เมื่อ: ['protocol:'] ทำ: { :protocol
+	((ลิสต์ สร้างใหม่: ['http'] ; ['https']) ประกอบด้วย: protocol) ถ้าจริง: {
+		ของตน protocol := protocol + ['://'].
+	}, ถ้าเท็จ: {
+		งานนี้ ข้อผิดพลาด: ['Invalid protocol'].
+	}.
+}.
+
+URL เมื่อ: ['โฮสต์:'] ทำ: { :โฮสต์
+	#todo validate according to rfc
+	ของตน โฮสต์ := โฮสต์.
+}.
+
+URL เมื่อ: ['path:'] ทำ: { :เส้นทาง
+	ของตน เส้นทาง := ['/'] + เส้นทาง url-เข้ารหัส.
+}.
+
+URL เมื่อ: ['params:'] ทำ: { :map
+	>> params := ลิสต์ สร้างใหม่.
+	map แต่ละตัว: { :key :value
+		params ต่อท้าย: key เป็นข้อความ url-เข้ารหัส + ['='] + value เป็นข้อความ url-เข้ารหัส.
+	}.
+	ของตน params := ['?'] + ( params รวม: ['&'] ).
+}.
+
+URL เมื่อ: ['แฮช:'] ทำ: { :hash
+	ของตน hash := ['#'] + hash url-เข้ารหัส.
+}.
+

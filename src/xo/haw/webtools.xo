@@ -1,0 +1,325 @@
+Noi-HTTP i: ['HTTP-header:'] hana: { :key <- Polokalamu hoʻonohonoho: key.
+}.
+
+>> HTTP-Header := Mea hou.
+
+HTTP-Header i: ['hou'] hana: { <- iho hou init.
+}.
+
+HTTP-Header i: ['init'] hana: {
+	ponoʻī key := ʻOle.
+	ponoʻī value := ʻOle.
+}.
+
+HTTP-Header i: ['key:value:'] hana: { :key :value
+	ponoʻī key := key.
+	ponoʻī value := value.
+}.
+
+HTTP-Header i: ['key'] hana: { <- ponoʻī key.
+}.
+
+HTTP-Header i: ['value'] hana: { <- ponoʻī value.
+}.
+
+
+HTTP-Header i: ['kaula'] hana: {
+	>> line := ponoʻī key + [': '] + ponoʻī value.
+	line pani: ['\r'] me: [''], pani: ['\n'] me: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Mea hou.
+
+Web-Document i: ['hou'] hana: { <- iho hou init.
+}.
+
+Web-Document i: ['init'] hana: {
+	ponoʻī headers := Papa hou.
+	ponoʻī sess-id := ʻOle.
+	ponoʻī session-manager := Tempfile-Session hou.
+	ponoʻī sessdata := ʻOle.
+	ponoʻī secure := ʻOiaʻiʻo.
+	ponoʻī same-site := ['Strict'].
+	ponoʻī headers-out := Wahaheʻe.
+	ponoʻī request := Noi-HTTP hou.
+}.
+
+Web-Document i: ['request:'] hana: { :request
+	ponoʻī request := request.
+}. 
+
+Web-Document i: ['secure-session-cookie:'] hana: { :secure
+	iho check-headers.
+	ponoʻī secure := secure.
+}.
+
+Web-Document i: ['same-site-session-cookie:'] hana: { :value
+	iho check-headers.
+	>> options := Papa hou 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options aia-i-loko: value, wahaheʻe: {
+		kēia-hana kuhi-hewa: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	ponoʻī same-site := value.
+}.
+
+Web-Document i: ['header:'] hana: { :header
+	iho check-headers.
+	ponoʻī headers pākuʻi-hope: header.
+}.
+
+Web-Document i: ['clear-headers'] hana: {
+	iho check-headers.
+	ponoʻī headers := Papa hou.
+}.
+
+Web-Document i: ['session-manager:'] hana: { :manager
+	iho check-headers.
+	ponoʻī session-manager := manager.
+}.
+
+Web-Document i: ['session-manager'] hana: { <- ponoʻī session-manager.
+}.
+
+Web-Document i: ['check-headers'] hana: {
+	ponoʻī headers-out ʻoiaʻiʻo: {
+		kēia-hana kuhi-hewa: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document i: ['session-start'] hana: {
+	iho check-headers.
+	>> request := ponoʻī request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ʻOle? wahaheʻe: {
+		(( Lauana hou: ['^[A-Za-z0-9]+\\z'], kūlike: sess-id ) = 0) ʻoiaʻiʻo: {
+			sess-id := ʻOle.
+		}.
+	}.
+	sess-id ʻOle? ʻoiaʻiʻo: {
+		sess-id := Pahu-kūʻono token: 30.
+		>> session-header := HTTP-Header hou
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (ponoʻī secure a-i-ʻole: ['Secure'] a-i: ['']),
+		SSITE: (ponoʻī same-site),
+		XSID: sess-id
+		).
+		ponoʻī headers pākuʻi-hope: session-header.
+	}.
+	ponoʻī sessdata := ponoʻī session-manager for: sess-id, load. <- ponoʻī sessdata. # reference
+}.
+
+Web-Document i: ['goto:'] hana: { :url
+	iho check-headers.
+	iho clear-headers.
+	ponoʻī headers
+	pākuʻi-hope: (
+		HTTP-Header hou
+		key: ['Status'] value: ['303 See Other']
+	),
+	pākuʻi-hope: (
+		HTTP-Header hou
+		key: ['Location'] value: url
+	).
+	iho out: ['Redirect'].
+}.
+
+Web-Document i: ['session-destroy'] hana: {
+	iho check-headers.
+	>> request := ponoʻī request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ʻOle? wahaheʻe: {
+		>> session-header := HTTP-Header hou.
+		>> when := Manawa hou makahiki: 1970, hōʻano: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (ponoʻī secure a-i-ʻole: ['Secure'] a-i: ['']),
+			SSITE: (ponoʻī same-site),
+			XSID: sess-id
+		).
+		ponoʻī session-manager destroy.
+		ponoʻī headers pākuʻi-hope: session-header.
+	}.
+}.
+
+
+Web-Document i: ['template:'] hana: { :ala-waihona <- Template hou: (Waihona hou: ala-waihona, heluhelu).
+}.
+
+Web-Document i: ['out:type:'] hana: { :output :ʻano
+	ponoʻī headers-out wahaheʻe: {
+		ponoʻī sessdata ʻOle? wahaheʻe: {
+			ponoʻī session-manager save: ponoʻī sessdata.
+		}.
+		ponoʻī headers pākuʻi-hope: (
+			HTTP-Header hou
+			key: ['Content-type'] value: ʻano
+		).
+		ponoʻī headers pākahi: { :_ :header
+			Huapuka kākau: header.
+		}.
+		ponoʻī headers-out := ʻOiaʻiʻo.
+		Huapuka kākau: ['\r\n'].
+	}.
+	Huapuka kākau: output.
+}.
+
+Web-Document i: ['finish:type:'] hana: { :output :ʻano
+	ponoʻī headers-out wahaheʻe: {
+		ponoʻī sessdata ʻOle? wahaheʻe: {
+			ponoʻī session-manager save: ponoʻī sessdata.
+		}.
+		ponoʻī headers pākuʻi-hope: (
+			HTTP-Header hou
+			key: ['Content-type'] value: ʻano
+		).
+		ponoʻī headers pākuʻi-hope: (
+			HTTP-Header hou
+			key: ['Content-Length'] value: output kaula bytes
+		).
+		ponoʻī headers pākahi: { :_ :header
+			Huapuka kākau: header.
+		}.
+		ponoʻī headers-out := ʻOiaʻiʻo.
+		Huapuka kākau: ['\r\n'].
+	}.
+	Huapuka kākau: output.
+}.
+
+Web-Document i: ['out:'] hana: { :output
+	iho out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document i: ['finish:'] hana: { :output
+	iho finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document i: ['json:'] hana: { :output
+	iho out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document i: ['not-found:'] hana: { :output
+	iho clear-headers header: (
+		HTTP-Header hou key: ['Status'] value: ['404 Not Found']
+	).
+	iho out: output.
+}.
+
+
+# Interface
+
+>> Session := Mea hou.
+
+Session i: ['hou'] hana: { <- iho hou init for: ʻOle.
+}.
+
+Session i: ['for:'] hana: { :id
+	ponoʻī id := id.
+}.
+
+Session i: ['load'] hana: {
+	kēia-hana kuhi-hewa: ['Not implemented.'].
+}.
+
+Session i: ['save:'] hana: {
+	kēia-hana kuhi-hewa: ['Not implemented.'].
+}.
+
+Session i: ['destroy'] hana: {
+	kēia-hana kuhi-hewa: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session hou.
+
+Tempfile-Session i: ['init'] hana: {
+	ponoʻī pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session i: ['path-prefix:'] hana: { :str
+	ponoʻī pathprefix := str.
+}.
+
+Tempfile-Session i: ['file'] hana: { <- ( Waihona hou: ( ponoʻī pathprefix + ponoʻī id + ['.txt'] ) ).
+}.
+
+Tempfile-Session i: ['load'] hana: {
+	>> file := iho file.
+	file aia wahaheʻe: {
+		file kākau: (Puke-wehewehe hou pāʻālua).
+	}. <- file heluhelu mea.
+}.
+
+Tempfile-Session i: ['save:'] hana: { :data
+	>> file := iho file.
+	file aia ʻoiaʻiʻo: {
+		file kākau: data pāʻālua.
+	}.
+}.
+
+Tempfile-Session i: ['destroy'] hana: {
+	>> file := iho file.
+	file aia ʻoiaʻiʻo: {
+		file hoʻopau.
+	}.
+}.
+
+
+>> URL := Mea hou.
+
+URL i: ['init'] hana: {
+	ponoʻī protocol := ['https://'].
+	ponoʻī hoʻokipa := ['localhost'].
+	ponoʻī ala-waihona := [''].
+	ponoʻī params := [''].
+	ponoʻī hash := [''].
+}.
+
+URL i: ['hou'] hana: { <- iho hou init.
+}.
+
+URL i: ['kaula'] hana: { <- (
+	ponoʻī protocol +
+	ponoʻī hoʻokipa +
+	ponoʻī ala-waihona +
+	ponoʻī params +
+	ponoʻī hash ).
+}.
+
+URL i: ['protocol:'] hana: { :protocol
+	((Papa hou: ['http'] ; ['https']) aia-i-loko: protocol) ʻoiaʻiʻo: {
+		ponoʻī protocol := protocol + ['://'].
+	}, wahaheʻe: {
+		kēia-hana kuhi-hewa: ['Invalid protocol'].
+	}.
+}.
+
+URL i: ['hoʻokipa:'] hana: { :hoʻokipa
+	#todo validate according to rfc
+	ponoʻī hoʻokipa := hoʻokipa.
+}.
+
+URL i: ['path:'] hana: { :ala-waihona
+	ponoʻī ala-waihona := ['/'] + ala-waihona url-hoʻopāʻālua.
+}.
+
+URL i: ['params:'] hana: { :map
+	>> params := Papa hou.
+	map pākahi: { :key :value
+		params pākuʻi-hope: key kaula url-hoʻopāʻālua + ['='] + value kaula url-hoʻopāʻālua.
+	}.
+	ponoʻī params := ['?'] + ( params hoʻohui: ['&'] ).
+}.
+
+URL i: ['hash:'] hana: { :hash
+	ponoʻī hash := ['#'] + hash url-hoʻopāʻālua.
+}.
+

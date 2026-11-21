@@ -1,0 +1,128 @@
+>> Email := Abu sabo.
+
+Email idan: ['init'] yi: {
+	nasa recipients := Jeri sabo.
+	nasa cc := Jeri sabo.
+	nasa bcc := Jeri sabo.
+	nasa from := Babu.
+	nasa from-name := Babu.
+	nasa subject := Babu.
+	nasa body := Babu.
+}.
+
+Email idan: ['sabo'] yi: { <- kai sabo init.
+}.
+
+Email idan: ['to:'] yi: { :list
+	nasa recipients := list.
+}.
+ 
+Email idan: ['cc:'] yi: { :list
+	nasa cc := list.
+}.
+
+Email idan: ['bcc:'] yi: { :list
+	nasa bcc := list.
+}.
+
+Email idan: ['subject:'] yi: { :subject
+	nasa subject := subject.
+}.
+
+Email idan: ['from:name:'] yi: { :from :suna
+	nasa from := from.
+	nasa from-name := suna.
+}.
+
+Email idan: ['body:'] yi: { :body
+	nasa body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email idan: ['header:'] yi: { :line <- line musanya: ['\r'] da: [''], musanya: ['\n'] da: [''].
+}.
+
+Email idan: ['send'] yi: {
+	>> f := Fayil tempwrite: kai generate.
+	Shiri tsarin-aiki: ['sendmail -t < '] + f hanyar-fayil, sabon-layi.
+}.
+
+Email idan: ['generate'] yi: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ƙara-a-ƙarshe: (kai header: ['From: '] + nasa from-name + [' <'] + ( nasa from ) + ['>']) + brk.
+	str ƙara-a-ƙarshe: (kai header: ['To: '] + ( nasa recipients haɗa: [','] )) + brk.
+	nasa cc ƙidaya gaskiya: {
+		str ƙara-a-ƙarshe: (kai header: ['Cc: '] + ( nasa cc haɗa: [','] )) + brk.
+	}.
+	nasa bcc ƙidaya gaskiya: {
+		str ƙara-a-ƙarshe: (kai header: ['Bcc: '] + ( nasa bcc haɗa: [','] )) + brk.
+	}.
+	str ƙara-a-ƙarshe: (kai header: ['Subject: '] + nasa subject) + brk.
+	str ƙara-a-ƙarshe: brk.
+	str ƙara-a-ƙarshe: nasa body.
+	str ƙara-a-ƙarshe: brk. <- str.
+}.
+
+>> HTML-Email := Email sabo.
+
+HTML-Email idan: ['init'] yi: {
+	kai init.
+	nasa attachments := Jeri sabo.
+	nasa boundary := Asusu token: 40.
+}.
+
+HTML-Email idan: ['attach:'] yi: { :file
+	>> id := nasa attachments ƙidaya.
+	>> blob := file blob.
+	nasa attachments ƙara-a-ƙarshe: (
+		Ƙamus sabo
+			file: file hanyar-fayil,
+			mime: ['image/'] + (Server mimetype: file hanyar-fayil),
+			data: blob base64-ɓoye-lamba
+	).
+	blob saki. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email idan: ['generate'] yi: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ƙara-a-ƙarshe: (kai header: ['From: '] + nasa from-name + [' <'] + ( nasa from ) + ['>']) + brk.
+	str ƙara-a-ƙarshe: (kai header: ['To: '] + ( nasa recipients haɗa: [','] )) + brk.
+	nasa cc ƙidaya gaskiya: {
+		str ƙara-a-ƙarshe: (kai header: ['Cc: '] + ( nasa cc haɗa: [','] )) + brk.
+	}.
+	nasa bcc ƙidaya gaskiya: {
+		str ƙara-a-ƙarshe: (kai header: ['Bcc: '] + ( nasa bcc haɗa: [','] )) + brk.
+	}.
+	str ƙara-a-ƙarshe: (kai header: ['Subject: '] + nasa subject) + brk.
+	str ƙara-a-ƙarshe: ['MIME-Version: 1.0'] + brk.
+	str ƙara-a-ƙarshe: ['Content-Type: multipart/related; boundary="'] + nasa boundary + ['"; type=text/html'] + brk.
+	str ƙara-a-ƙarshe: brk.
+	str ƙara-a-ƙarshe: ['--'] + nasa boundary + brk.
+	str ƙara-a-ƙarshe: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str ƙara-a-ƙarshe: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str ƙara-a-ƙarshe: brk.
+	str ƙara-a-ƙarshe: nasa body.
+	str ƙara-a-ƙarshe: brk.
+	nasa attachments kowane: { :id :info
+		>> blob := info data.
+		str ƙara-a-ƙarshe: ['--'] + nasa boundary + brk.
+		str ƙara-a-ƙarshe: ['Content-Type: '] + info mime + brk.
+		str ƙara-a-ƙarshe: ['Content-Transfer-Encoding: base64'] + brk.
+		str ƙara-a-ƙarshe: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str ƙara-a-ƙarshe: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str ƙara-a-ƙarshe: brk.
+		>> max := 76.
+		>> len := blob tsawo.
+		>> chunks := (len / max) zagaye-sama.
+		{ :i
+			>> chunk := blob kwafi daga: i * max tsawo: max.
+			str ƙara-a-ƙarshe: chunk + brk.
+		} * chunks.
+		str ƙara-a-ƙarshe: brk.
+		str ƙara-a-ƙarshe: brk.
+	}.
+	str ƙara-a-ƙarshe: ['--'] + nasa boundary + ['--'] + brk. <- str.
+}.

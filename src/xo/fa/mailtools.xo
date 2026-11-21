@@ -1,0 +1,128 @@
+>> Email := شیء جدید.
+
+Email هنگام: ['init'] انجام: {
+	خودم recipients := لیست جدید.
+	خودم cc := لیست جدید.
+	خودم bcc := لیست جدید.
+	خودم from := هیچ.
+	خودم from-name := هیچ.
+	خودم subject := هیچ.
+	خودم body := هیچ.
+}.
+
+Email هنگام: ['جدید'] انجام: { <- خود جدید init.
+}.
+
+Email هنگام: ['to:'] انجام: { :list
+	خودم recipients := list.
+}.
+ 
+Email هنگام: ['cc:'] انجام: { :list
+	خودم cc := list.
+}.
+
+Email هنگام: ['bcc:'] انجام: { :list
+	خودم bcc := list.
+}.
+
+Email هنگام: ['subject:'] انجام: { :subject
+	خودم subject := subject.
+}.
+
+Email هنگام: ['from:name:'] انجام: { :from :نام
+	خودم from := from.
+	خودم from-name := نام.
+}.
+
+Email هنگام: ['body:'] انجام: { :body
+	خودم body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email هنگام: ['header:'] انجام: { :line <- line جایگزین: ['\r'] با: [''], جایگزین: ['\n'] با: [''].
+}.
+
+Email هنگام: ['send'] انجام: {
+	>> f := پرونده نوشتن-موقت: خود generate.
+	برنامه سیستم: ['sendmail -t < '] + f مسیر-پرونده, سطر-نو.
+}.
+
+Email هنگام: ['generate'] انجام: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str بیفزا-به-پایان: (خود header: ['From: '] + خودم from-name + [' <'] + ( خودم from ) + ['>']) + brk.
+	str بیفزا-به-پایان: (خود header: ['To: '] + ( خودم recipients بپیوند: [','] )) + brk.
+	خودم cc تعداد اگر-درست: {
+		str بیفزا-به-پایان: (خود header: ['Cc: '] + ( خودم cc بپیوند: [','] )) + brk.
+	}.
+	خودم bcc تعداد اگر-درست: {
+		str بیفزا-به-پایان: (خود header: ['Bcc: '] + ( خودم bcc بپیوند: [','] )) + brk.
+	}.
+	str بیفزا-به-پایان: (خود header: ['Subject: '] + خودم subject) + brk.
+	str بیفزا-به-پایان: brk.
+	str بیفزا-به-پایان: خودم body.
+	str بیفزا-به-پایان: brk. <- str.
+}.
+
+>> HTML-Email := Email جدید.
+
+HTML-Email هنگام: ['init'] انجام: {
+	خود init.
+	خودم attachments := لیست جدید.
+	خودم boundary := گاوصندوق توکن: 40.
+}.
+
+HTML-Email هنگام: ['attach:'] انجام: { :file
+	>> id := خودم attachments تعداد.
+	>> blob := file blob.
+	خودم attachments بیفزا-به-پایان: (
+		واژه-نامه جدید
+			file: file مسیر-پرونده,
+			mime: ['image/'] + (Server mimetype: file مسیر-پرونده),
+			data: blob base64-کدگذاری
+	).
+	blob آزاد-کن. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email هنگام: ['generate'] انجام: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str بیفزا-به-پایان: (خود header: ['From: '] + خودم from-name + [' <'] + ( خودم from ) + ['>']) + brk.
+	str بیفزا-به-پایان: (خود header: ['To: '] + ( خودم recipients بپیوند: [','] )) + brk.
+	خودم cc تعداد اگر-درست: {
+		str بیفزا-به-پایان: (خود header: ['Cc: '] + ( خودم cc بپیوند: [','] )) + brk.
+	}.
+	خودم bcc تعداد اگر-درست: {
+		str بیفزا-به-پایان: (خود header: ['Bcc: '] + ( خودم bcc بپیوند: [','] )) + brk.
+	}.
+	str بیفزا-به-پایان: (خود header: ['Subject: '] + خودم subject) + brk.
+	str بیفزا-به-پایان: ['MIME-Version: 1.0'] + brk.
+	str بیفزا-به-پایان: ['Content-Type: multipart/related; boundary="'] + خودم boundary + ['"; type=text/html'] + brk.
+	str بیفزا-به-پایان: brk.
+	str بیفزا-به-پایان: ['--'] + خودم boundary + brk.
+	str بیفزا-به-پایان: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str بیفزا-به-پایان: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str بیفزا-به-پایان: brk.
+	str بیفزا-به-پایان: خودم body.
+	str بیفزا-به-پایان: brk.
+	خودم attachments هرکدام: { :id :info
+		>> blob := info data.
+		str بیفزا-به-پایان: ['--'] + خودم boundary + brk.
+		str بیفزا-به-پایان: ['Content-Type: '] + info mime + brk.
+		str بیفزا-به-پایان: ['Content-Transfer-Encoding: base64'] + brk.
+		str بیفزا-به-پایان: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str بیفزا-به-پایان: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str بیفزا-به-پایان: brk.
+		>> max := 76.
+		>> len := blob طول.
+		>> chunks := (len / max) گرد-بالا.
+		{ :i
+			>> chunk := blob رونوشت آغاز: i * max طول: max.
+			str بیفزا-به-پایان: chunk + brk.
+		} * chunks.
+		str بیفزا-به-پایان: brk.
+		str بیفزا-به-پایان: brk.
+	}.
+	str بیفزا-به-پایان: ['--'] + خودم boundary + ['--'] + brk. <- str.
+}.

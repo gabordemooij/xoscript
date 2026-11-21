@@ -1,0 +1,325 @@
+HTTP-Förfrågan vid: ['HTTP-header:'] gör: { :key <- Program inställning: key.
+}.
+
+>> HTTP-Header := Objekt ny.
+
+HTTP-Header vid: ['ny'] gör: { <- själv ny init.
+}.
+
+HTTP-Header vid: ['init'] gör: {
+	egen key := Inget.
+	egen value := Inget.
+}.
+
+HTTP-Header vid: ['key:value:'] gör: { :key :value
+	egen key := key.
+	egen value := value.
+}.
+
+HTTP-Header vid: ['key'] gör: { <- egen key.
+}.
+
+HTTP-Header vid: ['value'] gör: { <- egen value.
+}.
+
+
+HTTP-Header vid: ['text'] gör: {
+	>> line := egen key + [': '] + egen value.
+	line ersätt: ['\r'] med: [''], ersätt: ['\n'] med: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Objekt ny.
+
+Web-Document vid: ['ny'] gör: { <- själv ny init.
+}.
+
+Web-Document vid: ['init'] gör: {
+	egen headers := Lista ny.
+	egen sess-id := Inget.
+	egen session-manager := Tempfile-Session ny.
+	egen sessdata := Inget.
+	egen secure := Sann.
+	egen same-site := ['Strict'].
+	egen headers-out := Falsk.
+	egen request := HTTP-Förfrågan ny.
+}.
+
+Web-Document vid: ['request:'] gör: { :request
+	egen request := request.
+}. 
+
+Web-Document vid: ['secure-session-cookie:'] gör: { :secure
+	själv check-headers.
+	egen secure := secure.
+}.
+
+Web-Document vid: ['same-site-session-cookie:'] gör: { :value
+	själv check-headers.
+	>> options := Lista ny 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options innehåller: value, falsk: {
+		denna-uppgift fel: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	egen same-site := value.
+}.
+
+Web-Document vid: ['header:'] gör: { :header
+	själv check-headers.
+	egen headers lägg-till-sist: header.
+}.
+
+Web-Document vid: ['clear-headers'] gör: {
+	själv check-headers.
+	egen headers := Lista ny.
+}.
+
+Web-Document vid: ['session-manager:'] gör: { :manager
+	själv check-headers.
+	egen session-manager := manager.
+}.
+
+Web-Document vid: ['session-manager'] gör: { <- egen session-manager.
+}.
+
+Web-Document vid: ['check-headers'] gör: {
+	egen headers-out sann: {
+		denna-uppgift fel: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document vid: ['session-start'] gör: {
+	själv check-headers.
+	>> request := egen request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Inget? falsk: {
+		(( Mönster ny: ['^[A-Za-z0-9]+\\z'], matcha: sess-id ) = 0) sann: {
+			sess-id := Inget.
+		}.
+	}.
+	sess-id Inget? sann: {
+		sess-id := Valv token: 30.
+		>> session-header := HTTP-Header ny
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (egen secure antingen: ['Secure'] eller: ['']),
+		SSITE: (egen same-site),
+		XSID: sess-id
+		).
+		egen headers lägg-till-sist: session-header.
+	}.
+	egen sessdata := egen session-manager for: sess-id, load. <- egen sessdata. # reference
+}.
+
+Web-Document vid: ['goto:'] gör: { :url
+	själv check-headers.
+	själv clear-headers.
+	egen headers
+	lägg-till-sist: (
+		HTTP-Header ny
+		key: ['Status'] value: ['303 See Other']
+	),
+	lägg-till-sist: (
+		HTTP-Header ny
+		key: ['Location'] value: url
+	).
+	själv out: ['Redirect'].
+}.
+
+Web-Document vid: ['session-destroy'] gör: {
+	själv check-headers.
+	>> request := egen request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Inget? falsk: {
+		>> session-header := HTTP-Header ny.
+		>> when := Moment ny år: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (egen secure antingen: ['Secure'] eller: ['']),
+			SSITE: (egen same-site),
+			XSID: sess-id
+		).
+		egen session-manager destroy.
+		egen headers lägg-till-sist: session-header.
+	}.
+}.
+
+
+Web-Document vid: ['template:'] gör: { :sökväg <- Template ny: (Fil ny: sökväg, läs).
+}.
+
+Web-Document vid: ['out:type:'] gör: { :output :typ
+	egen headers-out falsk: {
+		egen sessdata Inget? falsk: {
+			egen session-manager save: egen sessdata.
+		}.
+		egen headers lägg-till-sist: (
+			HTTP-Header ny
+			key: ['Content-type'] value: typ
+		).
+		egen headers varje: { :_ :header
+			Utdata skriv: header.
+		}.
+		egen headers-out := Sann.
+		Utdata skriv: ['\r\n'].
+	}.
+	Utdata skriv: output.
+}.
+
+Web-Document vid: ['finish:type:'] gör: { :output :typ
+	egen headers-out falsk: {
+		egen sessdata Inget? falsk: {
+			egen session-manager save: egen sessdata.
+		}.
+		egen headers lägg-till-sist: (
+			HTTP-Header ny
+			key: ['Content-type'] value: typ
+		).
+		egen headers lägg-till-sist: (
+			HTTP-Header ny
+			key: ['Content-Length'] value: output text bytes
+		).
+		egen headers varje: { :_ :header
+			Utdata skriv: header.
+		}.
+		egen headers-out := Sann.
+		Utdata skriv: ['\r\n'].
+	}.
+	Utdata skriv: output.
+}.
+
+Web-Document vid: ['out:'] gör: { :output
+	själv out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document vid: ['finish:'] gör: { :output
+	själv finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document vid: ['json:'] gör: { :output
+	själv out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document vid: ['not-found:'] gör: { :output
+	själv clear-headers header: (
+		HTTP-Header ny key: ['Status'] value: ['404 Not Found']
+	).
+	själv out: output.
+}.
+
+
+# Interface
+
+>> Session := Objekt ny.
+
+Session vid: ['ny'] gör: { <- själv ny init for: Inget.
+}.
+
+Session vid: ['for:'] gör: { :id
+	egen id := id.
+}.
+
+Session vid: ['load'] gör: {
+	denna-uppgift fel: ['Not implemented.'].
+}.
+
+Session vid: ['save:'] gör: {
+	denna-uppgift fel: ['Not implemented.'].
+}.
+
+Session vid: ['destroy'] gör: {
+	denna-uppgift fel: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session ny.
+
+Tempfile-Session vid: ['init'] gör: {
+	egen pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session vid: ['path-prefix:'] gör: { :str
+	egen pathprefix := str.
+}.
+
+Tempfile-Session vid: ['file'] gör: { <- ( Fil ny: ( egen pathprefix + egen id + ['.txt'] ) ).
+}.
+
+Tempfile-Session vid: ['load'] gör: {
+	>> file := själv file.
+	file finns falsk: {
+		file skriv: (Ordbok ny code).
+	}. <- file läs objekt.
+}.
+
+Tempfile-Session vid: ['save:'] gör: { :data
+	>> file := själv file.
+	file finns sann: {
+		file skriv: data code.
+	}.
+}.
+
+Tempfile-Session vid: ['destroy'] gör: {
+	>> file := själv file.
+	file finns sann: {
+		file radera.
+	}.
+}.
+
+
+>> URL := Objekt ny.
+
+URL vid: ['init'] gör: {
+	egen protocol := ['https://'].
+	egen värd := ['localhost'].
+	egen sökväg := [''].
+	egen params := [''].
+	egen hash := [''].
+}.
+
+URL vid: ['ny'] gör: { <- själv ny init.
+}.
+
+URL vid: ['text'] gör: { <- (
+	egen protocol +
+	egen värd +
+	egen sökväg +
+	egen params +
+	egen hash ).
+}.
+
+URL vid: ['protocol:'] gör: { :protocol
+	((Lista ny: ['http'] ; ['https']) innehåller: protocol) sann: {
+		egen protocol := protocol + ['://'].
+	}, falsk: {
+		denna-uppgift fel: ['Invalid protocol'].
+	}.
+}.
+
+URL vid: ['värd:'] gör: { :värd
+	#todo validate according to rfc
+	egen värd := värd.
+}.
+
+URL vid: ['path:'] gör: { :sökväg
+	egen sökväg := ['/'] + sökväg url-koda.
+}.
+
+URL vid: ['params:'] gör: { :map
+	>> params := Lista ny.
+	map varje: { :key :value
+		params lägg-till-sist: key text url-koda + ['='] + value text url-koda.
+	}.
+	egen params := ['?'] + ( params sammanfoga: ['&'] ).
+}.
+
+URL vid: ['hash:'] gör: { :hash
+	egen hash := ['#'] + hash url-koda.
+}.
+

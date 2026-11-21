@@ -1,0 +1,128 @@
+>> Email := אובייקט חדש.
+
+Email בקבלת: ['init'] בצע: {
+	שלי recipients := רשימה חדש.
+	שלי cc := רשימה חדש.
+	שלי bcc := רשימה חדש.
+	שלי from := כלום.
+	שלי from-name := כלום.
+	שלי subject := כלום.
+	שלי body := כלום.
+}.
+
+Email בקבלת: ['חדש'] בצע: { <- עצמי חדש init.
+}.
+
+Email בקבלת: ['to:'] בצע: { :list
+	שלי recipients := list.
+}.
+ 
+Email בקבלת: ['cc:'] בצע: { :list
+	שלי cc := list.
+}.
+
+Email בקבלת: ['bcc:'] בצע: { :list
+	שלי bcc := list.
+}.
+
+Email בקבלת: ['subject:'] בצע: { :subject
+	שלי subject := subject.
+}.
+
+Email בקבלת: ['from:name:'] בצע: { :from :שם
+	שלי from := from.
+	שלי from-name := שם.
+}.
+
+Email בקבלת: ['body:'] בצע: { :body
+	שלי body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email בקבלת: ['header:'] בצע: { :line <- line החלף: ['\r'] בערך: [''], החלף: ['\n'] בערך: [''].
+}.
+
+Email בקבלת: ['send'] בצע: {
+	>> f := קובץ כתיבה-זמנית: עצמי generate.
+	תוכנית מערכת: ['sendmail -t < '] + f נתיב-קובץ, שורה-חדשה.
+}.
+
+Email בקבלת: ['generate'] בצע: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str הוסף-בסוף: (עצמי header: ['From: '] + שלי from-name + [' <'] + ( שלי from ) + ['>']) + brk.
+	str הוסף-בסוף: (עצמי header: ['To: '] + ( שלי recipients אחד: [','] )) + brk.
+	שלי cc כמות אם-אמת: {
+		str הוסף-בסוף: (עצמי header: ['Cc: '] + ( שלי cc אחד: [','] )) + brk.
+	}.
+	שלי bcc כמות אם-אמת: {
+		str הוסף-בסוף: (עצמי header: ['Bcc: '] + ( שלי bcc אחד: [','] )) + brk.
+	}.
+	str הוסף-בסוף: (עצמי header: ['Subject: '] + שלי subject) + brk.
+	str הוסף-בסוף: brk.
+	str הוסף-בסוף: שלי body.
+	str הוסף-בסוף: brk. <- str.
+}.
+
+>> HTML-Email := Email חדש.
+
+HTML-Email בקבלת: ['init'] בצע: {
+	עצמי init.
+	שלי attachments := רשימה חדש.
+	שלי boundary := כספת אסימון: 40.
+}.
+
+HTML-Email בקבלת: ['attach:'] בצע: { :file
+	>> id := שלי attachments כמות.
+	>> blob := file blob.
+	שלי attachments הוסף-בסוף: (
+		מילון חדש
+			file: file נתיב-קובץ,
+			mime: ['image/'] + (Server mimetype: file נתיב-קובץ),
+			data: blob base64-קידוד
+	).
+	blob שחרר. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email בקבלת: ['generate'] בצע: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str הוסף-בסוף: (עצמי header: ['From: '] + שלי from-name + [' <'] + ( שלי from ) + ['>']) + brk.
+	str הוסף-בסוף: (עצמי header: ['To: '] + ( שלי recipients אחד: [','] )) + brk.
+	שלי cc כמות אם-אמת: {
+		str הוסף-בסוף: (עצמי header: ['Cc: '] + ( שלי cc אחד: [','] )) + brk.
+	}.
+	שלי bcc כמות אם-אמת: {
+		str הוסף-בסוף: (עצמי header: ['Bcc: '] + ( שלי bcc אחד: [','] )) + brk.
+	}.
+	str הוסף-בסוף: (עצמי header: ['Subject: '] + שלי subject) + brk.
+	str הוסף-בסוף: ['MIME-Version: 1.0'] + brk.
+	str הוסף-בסוף: ['Content-Type: multipart/related; boundary="'] + שלי boundary + ['"; type=text/html'] + brk.
+	str הוסף-בסוף: brk.
+	str הוסף-בסוף: ['--'] + שלי boundary + brk.
+	str הוסף-בסוף: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str הוסף-בסוף: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str הוסף-בסוף: brk.
+	str הוסף-בסוף: שלי body.
+	str הוסף-בסוף: brk.
+	שלי attachments לכל: { :id :info
+		>> blob := info data.
+		str הוסף-בסוף: ['--'] + שלי boundary + brk.
+		str הוסף-בסוף: ['Content-Type: '] + info mime + brk.
+		str הוסף-בסוף: ['Content-Transfer-Encoding: base64'] + brk.
+		str הוסף-בסוף: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str הוסף-בסוף: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str הוסף-בסוף: brk.
+		>> max := 76.
+		>> len := blob אורך.
+		>> chunks := (len / max) עיגול-למעלה.
+		{ :i
+			>> chunk := blob העתק התחלה: i * max אורך: max.
+			str הוסף-בסוף: chunk + brk.
+		} * chunks.
+		str הוסף-בסוף: brk.
+		str הוסף-בסוף: brk.
+	}.
+	str הוסף-בסוף: ['--'] + שלי boundary + ['--'] + brk. <- str.
+}.

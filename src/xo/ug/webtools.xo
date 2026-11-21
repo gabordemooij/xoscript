@@ -1,0 +1,325 @@
+ئىلتىماس-HTTP كەلگەندە: ['HTTP-header:'] قىل: { :key <- پروگرامما تەڭشەك: key.
+}.
+
+>> HTTP-Header := ئوبيېكت يېڭى.
+
+HTTP-Header كەلگەندە: ['يېڭى'] قىل: { <- ئۆزى يېڭى init.
+}.
+
+HTTP-Header كەلگەندە: ['init'] قىل: {
+	ئۆزىنىڭ key := قۇرۇق.
+	ئۆزىنىڭ value := قۇرۇق.
+}.
+
+HTTP-Header كەلگەندە: ['key:value:'] قىل: { :key :value
+	ئۆزىنىڭ key := key.
+	ئۆزىنىڭ value := value.
+}.
+
+HTTP-Header كەلگەندە: ['key'] قىل: { <- ئۆزىنىڭ key.
+}.
+
+HTTP-Header كەلگەندە: ['value'] قىل: { <- ئۆزىنىڭ value.
+}.
+
+
+HTTP-Header كەلگەندە: ['تېكىستكە'] قىل: {
+	>> line := ئۆزىنىڭ key + [': '] + ئۆزىنىڭ value.
+	line ئالماشتۇر: ['\r'] بىلەن: [''], ئالماشتۇر: ['\n'] بىلەن: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := ئوبيېكت يېڭى.
+
+Web-Document كەلگەندە: ['يېڭى'] قىل: { <- ئۆزى يېڭى init.
+}.
+
+Web-Document كەلگەندە: ['init'] قىل: {
+	ئۆزىنىڭ headers := تىزىم يېڭى.
+	ئۆزىنىڭ sess-id := قۇرۇق.
+	ئۆزىنىڭ session-manager := Tempfile-Session يېڭى.
+	ئۆزىنىڭ sessdata := قۇرۇق.
+	ئۆزىنىڭ secure := راست.
+	ئۆزىنىڭ same-site := ['Strict'].
+	ئۆزىنىڭ headers-out := يالغان.
+	ئۆزىنىڭ request := ئىلتىماس-HTTP يېڭى.
+}.
+
+Web-Document كەلگەندە: ['request:'] قىل: { :request
+	ئۆزىنىڭ request := request.
+}. 
+
+Web-Document كەلگەندە: ['secure-session-cookie:'] قىل: { :secure
+	ئۆزى check-headers.
+	ئۆزىنىڭ secure := secure.
+}.
+
+Web-Document كەلگەندە: ['same-site-session-cookie:'] قىل: { :value
+	ئۆزى check-headers.
+	>> options := تىزىم يېڭى 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options ئىچىدە-بار: value, يالغان-بولسا: {
+		بۇ-ۋەزىپە خاتالىق: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	ئۆزىنىڭ same-site := value.
+}.
+
+Web-Document كەلگەندە: ['header:'] قىل: { :header
+	ئۆزى check-headers.
+	ئۆزىنىڭ headers ئاخىرىغا-قوش: header.
+}.
+
+Web-Document كەلگەندە: ['clear-headers'] قىل: {
+	ئۆزى check-headers.
+	ئۆزىنىڭ headers := تىزىم يېڭى.
+}.
+
+Web-Document كەلگەندە: ['session-manager:'] قىل: { :manager
+	ئۆزى check-headers.
+	ئۆزىنىڭ session-manager := manager.
+}.
+
+Web-Document كەلگەندە: ['session-manager'] قىل: { <- ئۆزىنىڭ session-manager.
+}.
+
+Web-Document كەلگەندە: ['check-headers'] قىل: {
+	ئۆزىنىڭ headers-out راست-بولسا: {
+		بۇ-ۋەزىپە خاتالىق: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document كەلگەندە: ['session-start'] قىل: {
+	ئۆزى check-headers.
+	>> request := ئۆزىنىڭ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id قۇرۇق? يالغان-بولسا: {
+		(( ئەندىزە يېڭى: ['^[A-Za-z0-9]+\\z'], ماسلىق: sess-id ) = 0) راست-بولسا: {
+			sess-id := قۇرۇق.
+		}.
+	}.
+	sess-id قۇرۇق? راست-بولسا: {
+		sess-id := ساندۇق بەلگە: 30.
+		>> session-header := HTTP-Header يېڭى
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (ئۆزىنىڭ secure بۇ: ['Secure'] ياكى-ئۇ: ['']),
+		SSITE: (ئۆزىنىڭ same-site),
+		XSID: sess-id
+		).
+		ئۆزىنىڭ headers ئاخىرىغا-قوش: session-header.
+	}.
+	ئۆزىنىڭ sessdata := ئۆزىنىڭ session-manager for: sess-id, load. <- ئۆزىنىڭ sessdata. # reference
+}.
+
+Web-Document كەلگەندە: ['goto:'] قىل: { :url
+	ئۆزى check-headers.
+	ئۆزى clear-headers.
+	ئۆزىنىڭ headers
+	ئاخىرىغا-قوش: (
+		HTTP-Header يېڭى
+		key: ['Status'] value: ['303 See Other']
+	),
+	ئاخىرىغا-قوش: (
+		HTTP-Header يېڭى
+		key: ['Location'] value: url
+	).
+	ئۆزى out: ['Redirect'].
+}.
+
+Web-Document كەلگەندە: ['session-destroy'] قىل: {
+	ئۆزى check-headers.
+	>> request := ئۆزىنىڭ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id قۇرۇق? يالغان-بولسا: {
+		>> session-header := HTTP-Header يېڭى.
+		>> when := پەيت يېڭى يىل: 1970, فورماتتا: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (ئۆزىنىڭ secure بۇ: ['Secure'] ياكى-ئۇ: ['']),
+			SSITE: (ئۆزىنىڭ same-site),
+			XSID: sess-id
+		).
+		ئۆزىنىڭ session-manager destroy.
+		ئۆزىنىڭ headers ئاخىرىغا-قوش: session-header.
+	}.
+}.
+
+
+Web-Document كەلگەندە: ['template:'] قىل: { :ھۆججەت-يولى <- Template يېڭى: (ھۆججەت يېڭى: ھۆججەت-يولى, ئوقۇ).
+}.
+
+Web-Document كەلگەندە: ['out:type:'] قىل: { :output :تىپ
+	ئۆزىنىڭ headers-out يالغان-بولسا: {
+		ئۆزىنىڭ sessdata قۇرۇق? يالغان-بولسا: {
+			ئۆزىنىڭ session-manager save: ئۆزىنىڭ sessdata.
+		}.
+		ئۆزىنىڭ headers ئاخىرىغا-قوش: (
+			HTTP-Header يېڭى
+			key: ['Content-type'] value: تىپ
+		).
+		ئۆزىنىڭ headers ھەربىر: { :_ :header
+			چىقىرىش ياز: header.
+		}.
+		ئۆزىنىڭ headers-out := راست.
+		چىقىرىش ياز: ['\r\n'].
+	}.
+	چىقىرىش ياز: output.
+}.
+
+Web-Document كەلگەندە: ['finish:type:'] قىل: { :output :تىپ
+	ئۆزىنىڭ headers-out يالغان-بولسا: {
+		ئۆزىنىڭ sessdata قۇرۇق? يالغان-بولسا: {
+			ئۆزىنىڭ session-manager save: ئۆزىنىڭ sessdata.
+		}.
+		ئۆزىنىڭ headers ئاخىرىغا-قوش: (
+			HTTP-Header يېڭى
+			key: ['Content-type'] value: تىپ
+		).
+		ئۆزىنىڭ headers ئاخىرىغا-قوش: (
+			HTTP-Header يېڭى
+			key: ['Content-Length'] value: output تېكىستكە بايتلار
+		).
+		ئۆزىنىڭ headers ھەربىر: { :_ :header
+			چىقىرىش ياز: header.
+		}.
+		ئۆزىنىڭ headers-out := راست.
+		چىقىرىش ياز: ['\r\n'].
+	}.
+	چىقىرىش ياز: output.
+}.
+
+Web-Document كەلگەندە: ['out:'] قىل: { :output
+	ئۆزى out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document كەلگەندە: ['finish:'] قىل: { :output
+	ئۆزى finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document كەلگەندە: ['json:'] قىل: { :output
+	ئۆزى out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document كەلگەندە: ['not-found:'] قىل: { :output
+	ئۆزى clear-headers header: (
+		HTTP-Header يېڭى key: ['Status'] value: ['404 Not Found']
+	).
+	ئۆزى out: output.
+}.
+
+
+# Interface
+
+>> Session := ئوبيېكت يېڭى.
+
+Session كەلگەندە: ['يېڭى'] قىل: { <- ئۆزى يېڭى init for: قۇرۇق.
+}.
+
+Session كەلگەندە: ['for:'] قىل: { :id
+	ئۆزىنىڭ id := id.
+}.
+
+Session كەلگەندە: ['load'] قىل: {
+	بۇ-ۋەزىپە خاتالىق: ['Not implemented.'].
+}.
+
+Session كەلگەندە: ['save:'] قىل: {
+	بۇ-ۋەزىپە خاتالىق: ['Not implemented.'].
+}.
+
+Session كەلگەندە: ['destroy'] قىل: {
+	بۇ-ۋەزىپە خاتالىق: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session يېڭى.
+
+Tempfile-Session كەلگەندە: ['init'] قىل: {
+	ئۆزىنىڭ pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session كەلگەندە: ['path-prefix:'] قىل: { :str
+	ئۆزىنىڭ pathprefix := str.
+}.
+
+Tempfile-Session كەلگەندە: ['file'] قىل: { <- ( ھۆججەت يېڭى: ( ئۆزىنىڭ pathprefix + ئۆزىنىڭ id + ['.txt'] ) ).
+}.
+
+Tempfile-Session كەلگەندە: ['load'] قىل: {
+	>> file := ئۆزى file.
+	file مەۋجۇت يالغان-بولسا: {
+		file ياز: (لۇغەت يېڭى كود).
+	}. <- file ئوقۇ ئوبيېكتقا.
+}.
+
+Tempfile-Session كەلگەندە: ['save:'] قىل: { :data
+	>> file := ئۆزى file.
+	file مەۋجۇت راست-بولسا: {
+		file ياز: data كود.
+	}.
+}.
+
+Tempfile-Session كەلگەندە: ['destroy'] قىل: {
+	>> file := ئۆزى file.
+	file مەۋجۇت راست-بولسا: {
+		file ئۆچۈر.
+	}.
+}.
+
+
+>> URL := ئوبيېكت يېڭى.
+
+URL كەلگەندە: ['init'] قىل: {
+	ئۆزىنىڭ protocol := ['https://'].
+	ئۆزىنىڭ باش-ماشىنا := ['localhost'].
+	ئۆزىنىڭ ھۆججەت-يولى := [''].
+	ئۆزىنىڭ params := [''].
+	ئۆزىنىڭ hash := [''].
+}.
+
+URL كەلگەندە: ['يېڭى'] قىل: { <- ئۆزى يېڭى init.
+}.
+
+URL كەلگەندە: ['تېكىستكە'] قىل: { <- (
+	ئۆزىنىڭ protocol +
+	ئۆزىنىڭ باش-ماشىنا +
+	ئۆزىنىڭ ھۆججەت-يولى +
+	ئۆزىنىڭ params +
+	ئۆزىنىڭ hash ).
+}.
+
+URL كەلگەندە: ['protocol:'] قىل: { :protocol
+	((تىزىم يېڭى: ['http'] ; ['https']) ئىچىدە-بار: protocol) راست-بولسا: {
+		ئۆزىنىڭ protocol := protocol + ['://'].
+	}, يالغان-بولسا: {
+		بۇ-ۋەزىپە خاتالىق: ['Invalid protocol'].
+	}.
+}.
+
+URL كەلگەندە: ['باش-ماشىنا:'] قىل: { :باش-ماشىنا
+	#todo validate according to rfc
+	ئۆزىنىڭ باش-ماشىنا := باش-ماشىنا.
+}.
+
+URL كەلگەندە: ['path:'] قىل: { :ھۆججەت-يولى
+	ئۆزىنىڭ ھۆججەت-يولى := ['/'] + ھۆججەت-يولى url-كودلاش.
+}.
+
+URL كەلگەندە: ['params:'] قىل: { :map
+	>> params := تىزىم يېڭى.
+	map ھەربىر: { :key :value
+		params ئاخىرىغا-قوش: key تېكىستكە url-كودلاش + ['='] + value تېكىستكە url-كودلاش.
+	}.
+	ئۆزىنىڭ params := ['?'] + ( params بىرلەشتۈر: ['&'] ).
+}.
+
+URL كەلگەندە: ['خەش:'] قىل: { :hash
+	ئۆزىنىڭ hash := ['#'] + hash url-كودلاش.
+}.
+

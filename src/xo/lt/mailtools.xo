@@ -1,0 +1,128 @@
+>> Email := Objektas naujas.
+
+Email kai: ['init'] daryti: {
+	savas recipients := Sąrašas naujas.
+	savas cc := Sąrašas naujas.
+	savas bcc := Sąrašas naujas.
+	savas from := Niekas.
+	savas from-name := Niekas.
+	savas subject := Niekas.
+	savas body := Niekas.
+}.
+
+Email kai: ['naujas'] daryti: { <- pats naujas init.
+}.
+
+Email kai: ['to:'] daryti: { :list
+	savas recipients := list.
+}.
+ 
+Email kai: ['cc:'] daryti: { :list
+	savas cc := list.
+}.
+
+Email kai: ['bcc:'] daryti: { :list
+	savas bcc := list.
+}.
+
+Email kai: ['subject:'] daryti: { :subject
+	savas subject := subject.
+}.
+
+Email kai: ['from:name:'] daryti: { :from :pavadinimas
+	savas from := from.
+	savas from-name := pavadinimas.
+}.
+
+Email kai: ['body:'] daryti: { :body
+	savas body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email kai: ['header:'] daryti: { :line <- line pakeisti: ['\r'] į: [''], pakeisti: ['\n'] į: [''].
+}.
+
+Email kai: ['send'] daryti: {
+	>> f := Failas tempwrite: pats generate.
+	Programa sistema: ['sendmail -t < '] + f kelias, nauja-eilutė.
+}.
+
+Email kai: ['generate'] daryti: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str pridėti: (pats header: ['From: '] + savas from-name + [' <'] + ( savas from ) + ['>']) + brk.
+	str pridėti: (pats header: ['To: '] + ( savas recipients sujungti: [','] )) + brk.
+	savas cc kiekis tiesa: {
+		str pridėti: (pats header: ['Cc: '] + ( savas cc sujungti: [','] )) + brk.
+	}.
+	savas bcc kiekis tiesa: {
+		str pridėti: (pats header: ['Bcc: '] + ( savas bcc sujungti: [','] )) + brk.
+	}.
+	str pridėti: (pats header: ['Subject: '] + savas subject) + brk.
+	str pridėti: brk.
+	str pridėti: savas body.
+	str pridėti: brk. <- str.
+}.
+
+>> HTML-Email := Email naujas.
+
+HTML-Email kai: ['init'] daryti: {
+	pats init.
+	savas attachments := Sąrašas naujas.
+	savas boundary := Seifas žetonas: 40.
+}.
+
+HTML-Email kai: ['attach:'] daryti: { :file
+	>> id := savas attachments kiekis.
+	>> blob := file blob.
+	savas attachments pridėti: (
+		Žodynas naujas
+			file: file kelias,
+			mime: ['image/'] + (Server mimetype: file kelias),
+			data: blob base64-koduoti
+	).
+	blob atlaisvinti. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email kai: ['generate'] daryti: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str pridėti: (pats header: ['From: '] + savas from-name + [' <'] + ( savas from ) + ['>']) + brk.
+	str pridėti: (pats header: ['To: '] + ( savas recipients sujungti: [','] )) + brk.
+	savas cc kiekis tiesa: {
+		str pridėti: (pats header: ['Cc: '] + ( savas cc sujungti: [','] )) + brk.
+	}.
+	savas bcc kiekis tiesa: {
+		str pridėti: (pats header: ['Bcc: '] + ( savas bcc sujungti: [','] )) + brk.
+	}.
+	str pridėti: (pats header: ['Subject: '] + savas subject) + brk.
+	str pridėti: ['MIME-Version: 1.0'] + brk.
+	str pridėti: ['Content-Type: multipart/related; boundary="'] + savas boundary + ['"; type=text/html'] + brk.
+	str pridėti: brk.
+	str pridėti: ['--'] + savas boundary + brk.
+	str pridėti: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str pridėti: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str pridėti: brk.
+	str pridėti: savas body.
+	str pridėti: brk.
+	savas attachments kiekvienas: { :id :info
+		>> blob := info data.
+		str pridėti: ['--'] + savas boundary + brk.
+		str pridėti: ['Content-Type: '] + info mime + brk.
+		str pridėti: ['Content-Transfer-Encoding: base64'] + brk.
+		str pridėti: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str pridėti: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str pridėti: brk.
+		>> max := 76.
+		>> len := blob ilgis.
+		>> chunks := (len / max) apvalinti-aukštyn.
+		{ :i
+			>> chunk := blob kopijuoti nuo: i * max ilgis: max.
+			str pridėti: chunk + brk.
+		} * chunks.
+		str pridėti: brk.
+		str pridėti: brk.
+	}.
+	str pridėti: ['--'] + savas boundary + ['--'] + brk. <- str.
+}.

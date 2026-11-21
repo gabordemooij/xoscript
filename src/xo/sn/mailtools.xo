@@ -1,0 +1,128 @@
+>> Email := Chinhu nyowani.
+
+Email kana-zvasvika: ['init'] ita: {
+	zvako recipients := Rondedzero nyowani.
+	zvako cc := Rondedzero nyowani.
+	zvako bcc := Rondedzero nyowani.
+	zvako from := Hapana.
+	zvako from-name := Hapana.
+	zvako subject := Hapana.
+	zvako body := Hapana.
+}.
+
+Email kana-zvasvika: ['nyowani'] ita: { <- pachako nyowani init.
+}.
+
+Email kana-zvasvika: ['to:'] ita: { :list
+	zvako recipients := list.
+}.
+ 
+Email kana-zvasvika: ['cc:'] ita: { :list
+	zvako cc := list.
+}.
+
+Email kana-zvasvika: ['bcc:'] ita: { :list
+	zvako bcc := list.
+}.
+
+Email kana-zvasvika: ['subject:'] ita: { :subject
+	zvako subject := subject.
+}.
+
+Email kana-zvasvika: ['from:name:'] ita: { :from :zita
+	zvako from := from.
+	zvako from-name := zita.
+}.
+
+Email kana-zvasvika: ['body:'] ita: { :body
+	zvako body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email kana-zvasvika: ['header:'] ita: { :line <- line tsiva: ['\r'] na: [''], tsiva: ['\n'] na: [''].
+}.
+
+Email kana-zvasvika: ['send'] ita: {
+	>> f := Faira tempwrite: pachako generate.
+	Chirongwa sisitimu: ['sendmail -t < '] + f nzira-yefaira, mutsara-mutsva.
+}.
+
+Email kana-zvasvika: ['generate'] ita: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str wedzera-kumagumo: (pachako header: ['From: '] + zvako from-name + [' <'] + ( zvako from ) + ['>']) + brk.
+	str wedzera-kumagumo: (pachako header: ['To: '] + ( zvako recipients batanidza: [','] )) + brk.
+	zvako cc huwandu chokwadi: {
+		str wedzera-kumagumo: (pachako header: ['Cc: '] + ( zvako cc batanidza: [','] )) + brk.
+	}.
+	zvako bcc huwandu chokwadi: {
+		str wedzera-kumagumo: (pachako header: ['Bcc: '] + ( zvako bcc batanidza: [','] )) + brk.
+	}.
+	str wedzera-kumagumo: (pachako header: ['Subject: '] + zvako subject) + brk.
+	str wedzera-kumagumo: brk.
+	str wedzera-kumagumo: zvako body.
+	str wedzera-kumagumo: brk. <- str.
+}.
+
+>> HTML-Email := Email nyowani.
+
+HTML-Email kana-zvasvika: ['init'] ita: {
+	pachako init.
+	zvako attachments := Rondedzero nyowani.
+	zvako boundary := Dura-rakachengeteka token: 40.
+}.
+
+HTML-Email kana-zvasvika: ['attach:'] ita: { :file
+	>> id := zvako attachments huwandu.
+	>> blob := file blob.
+	zvako attachments wedzera-kumagumo: (
+		Duramazwi nyowani
+			file: file nzira-yefaira,
+			mime: ['image/'] + (Server mimetype: file nzira-yefaira),
+			data: blob base64-isa-kodhi
+	).
+	blob sunungura. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email kana-zvasvika: ['generate'] ita: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str wedzera-kumagumo: (pachako header: ['From: '] + zvako from-name + [' <'] + ( zvako from ) + ['>']) + brk.
+	str wedzera-kumagumo: (pachako header: ['To: '] + ( zvako recipients batanidza: [','] )) + brk.
+	zvako cc huwandu chokwadi: {
+		str wedzera-kumagumo: (pachako header: ['Cc: '] + ( zvako cc batanidza: [','] )) + brk.
+	}.
+	zvako bcc huwandu chokwadi: {
+		str wedzera-kumagumo: (pachako header: ['Bcc: '] + ( zvako bcc batanidza: [','] )) + brk.
+	}.
+	str wedzera-kumagumo: (pachako header: ['Subject: '] + zvako subject) + brk.
+	str wedzera-kumagumo: ['MIME-Version: 1.0'] + brk.
+	str wedzera-kumagumo: ['Content-Type: multipart/related; boundary="'] + zvako boundary + ['"; type=text/html'] + brk.
+	str wedzera-kumagumo: brk.
+	str wedzera-kumagumo: ['--'] + zvako boundary + brk.
+	str wedzera-kumagumo: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str wedzera-kumagumo: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str wedzera-kumagumo: brk.
+	str wedzera-kumagumo: zvako body.
+	str wedzera-kumagumo: brk.
+	zvako attachments chimwe-nechimwe: { :id :info
+		>> blob := info data.
+		str wedzera-kumagumo: ['--'] + zvako boundary + brk.
+		str wedzera-kumagumo: ['Content-Type: '] + info mime + brk.
+		str wedzera-kumagumo: ['Content-Transfer-Encoding: base64'] + brk.
+		str wedzera-kumagumo: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str wedzera-kumagumo: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str wedzera-kumagumo: brk.
+		>> max := 76.
+		>> len := blob kureba.
+		>> chunks := (len / max) kwidza-nhamba.
+		{ :i
+			>> chunk := blob kopa kubva: i * max kureba: max.
+			str wedzera-kumagumo: chunk + brk.
+		} * chunks.
+		str wedzera-kumagumo: brk.
+		str wedzera-kumagumo: brk.
+	}.
+	str wedzera-kumagumo: ['--'] + zvako boundary + ['--'] + brk. <- str.
+}.

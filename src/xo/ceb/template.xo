@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Butang bag-o.
+
+Template kon: ['bag-o'] buhata: { <- kaugalingon bag-o content: [''].
+}.
+
+Template kon: ['content:'] buhata: { :content
+	akoa content := content. 
+}.
+
+Template kon: ['bag-o:'] buhata: { :content <- kaugalingon bag-o content: content.
+}.
+
+Template kon: ['cut:'] buhata: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := akoa content bahina: startmarker.
+	>> prefix := parts una.
+	>> parts2 := parts katapusan bahina: endmarker.
+	>> suffix := parts2 katapusan.
+	>> part := parts2 una.
+	>> rest := prefix + suffix.
+	akoa content := rest. <- Template bag-o: part.
+	
+}.
+
+Template kon: ['kopyaha'] buhata: { <- kaugalingon bag-o: kaugalingon teksto kopyaha.
+}.
+	
+Template kon: ['paste:at:'] buhata: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	akoa content ilisi: pastemarker ug: ( snippet teksto + pastemarker ).
+}.
+
+Template kon: ['ibutang:bili:'] buhata: { :slot :value
+	akoa content ilisi: ['<!-- slot:'] + slot + [' -->'] ug: ( Server html-i-encode: value ).
+}.
+
+Template kon: ['set:html:'] buhata: { :slot :html
+	akoa content ilisi: ['<!-- slot:'] + slot + [' -->'] ug: html.
+}.
+
+Template kon: ['tubag:ug:'] buhata: { :slot :value
+	kaugalingon ibutang: (slot gikan-sa: 0 gitas-on: (slot gitas-on - 1)) bili: value.
+}.
+
+Template kon: ['nl2br'] buhata: {
+	akoa content ilisi: ['\n'] ug: ['<br>'].
+}.
+
+Template kon: ['clean'] buhata: {
+	akoa content :=
+		Sumbanan
+		bag-o: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		tukma: akoa content
+		buhata: { <- ['']. }.
+}.
+
+Template kon: ['clean-cuts'] buhata: {
+	>> items := Lista bag-o.
+	Sumbanan
+	bag-o: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	tukma: akoa content
+	buhata: { :_ :part
+		items idugang-sa-tumoy: part ? 1.
+	}.
+	items matag: { :_ :id
+		akoa content :=
+			Sumbanan bag-o: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			tukma: akoa content
+			buhata: { <- ['']. }.
+	 }.
+}.
+
+Template kon: ['clean-space'] buhata: {
+	akoa content :=
+		Sumbanan
+		bag-o: ['\\s*\\n'],
+		tukma: akoa content
+		buhata: { <- ['\n']. }.
+	akoa content :=
+		Sumbanan
+		bag-o: ['\\n[\\s\\t]+'],
+		tukma: akoa content
+		buhata: { <- ['\n']. }.
+}.
+
+Template kon: ['clean-all'] buhata: {
+	kaugalingon clean.
+	kaugalingon clean-cuts.
+	kaugalingon clean-space.
+}.
+
+Template kon: ['teksto'] buhata: { <- akoa content.
+}.

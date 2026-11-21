@@ -1,0 +1,325 @@
+Isicelo-HTTP xa-kufika: ['HTTP-header:'] yenza: { :key <- Inkqubo isicwangciso: key.
+}.
+
+>> HTTP-Header := Into entsha.
+
+HTTP-Header xa-kufika: ['entsha'] yenza: { <- ngokwakho entsha init.
+}.
+
+HTTP-Header xa-kufika: ['init'] yenza: {
+	eyakho key := Engenanto.
+	eyakho value := Engenanto.
+}.
+
+HTTP-Header xa-kufika: ['key:value:'] yenza: { :key :value
+	eyakho key := key.
+	eyakho value := value.
+}.
+
+HTTP-Header xa-kufika: ['key'] yenza: { <- eyakho key.
+}.
+
+HTTP-Header xa-kufika: ['value'] yenza: { <- eyakho value.
+}.
+
+
+HTTP-Header xa-kufika: ['umbhalo'] yenza: {
+	>> line := eyakho key + [': '] + eyakho value.
+	line buyisela: ['\r'] nge: [''], buyisela: ['\n'] nge: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Into entsha.
+
+Web-Document xa-kufika: ['entsha'] yenza: { <- ngokwakho entsha init.
+}.
+
+Web-Document xa-kufika: ['init'] yenza: {
+	eyakho headers := Uluhlu entsha.
+	eyakho sess-id := Engenanto.
+	eyakho session-manager := Tempfile-Session entsha.
+	eyakho sessdata := Engenanto.
+	eyakho secure := Inyaniso.
+	eyakho same-site := ['Strict'].
+	eyakho headers-out := Ubuxoki.
+	eyakho request := Isicelo-HTTP entsha.
+}.
+
+Web-Document xa-kufika: ['request:'] yenza: { :request
+	eyakho request := request.
+}. 
+
+Web-Document xa-kufika: ['secure-session-cookie:'] yenza: { :secure
+	ngokwakho check-headers.
+	eyakho secure := secure.
+}.
+
+Web-Document xa-kufika: ['same-site-session-cookie:'] yenza: { :value
+	ngokwakho check-headers.
+	>> options := Uluhlu entsha 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options iqulethe: value, ubuxoki: {
+		lo-msebenzi impazamo: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	eyakho same-site := value.
+}.
+
+Web-Document xa-kufika: ['header:'] yenza: { :header
+	ngokwakho check-headers.
+	eyakho headers yongeza-ekugqibeleni: header.
+}.
+
+Web-Document xa-kufika: ['clear-headers'] yenza: {
+	ngokwakho check-headers.
+	eyakho headers := Uluhlu entsha.
+}.
+
+Web-Document xa-kufika: ['session-manager:'] yenza: { :manager
+	ngokwakho check-headers.
+	eyakho session-manager := manager.
+}.
+
+Web-Document xa-kufika: ['session-manager'] yenza: { <- eyakho session-manager.
+}.
+
+Web-Document xa-kufika: ['check-headers'] yenza: {
+	eyakho headers-out inyaniso: {
+		lo-msebenzi impazamo: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document xa-kufika: ['session-start'] yenza: {
+	ngokwakho check-headers.
+	>> request := eyakho request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Engenanto? ubuxoki: {
+		(( Ipateni entsha: ['^[A-Za-z0-9]+\\z'], ukungqamana: sess-id ) = 0) inyaniso: {
+			sess-id := Engenanto.
+		}.
+	}.
+	sess-id Engenanto? inyaniso: {
+		sess-id := Isisefu ithokheni: 30.
+		>> session-header := HTTP-Header entsha
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (eyakho secure oku: ['Secure'] okanye-oko: ['']),
+		SSITE: (eyakho same-site),
+		XSID: sess-id
+		).
+		eyakho headers yongeza-ekugqibeleni: session-header.
+	}.
+	eyakho sessdata := eyakho session-manager for: sess-id, load. <- eyakho sessdata. # reference
+}.
+
+Web-Document xa-kufika: ['goto:'] yenza: { :url
+	ngokwakho check-headers.
+	ngokwakho clear-headers.
+	eyakho headers
+	yongeza-ekugqibeleni: (
+		HTTP-Header entsha
+		key: ['Status'] value: ['303 See Other']
+	),
+	yongeza-ekugqibeleni: (
+		HTTP-Header entsha
+		key: ['Location'] value: url
+	).
+	ngokwakho out: ['Redirect'].
+}.
+
+Web-Document xa-kufika: ['session-destroy'] yenza: {
+	ngokwakho check-headers.
+	>> request := eyakho request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Engenanto? ubuxoki: {
+		>> session-header := HTTP-Header entsha.
+		>> when := Ixesha entsha unyaka: 1970, ifomathi: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (eyakho secure oku: ['Secure'] okanye-oko: ['']),
+			SSITE: (eyakho same-site),
+			XSID: sess-id
+		).
+		eyakho session-manager destroy.
+		eyakho headers yongeza-ekugqibeleni: session-header.
+	}.
+}.
+
+
+Web-Document xa-kufika: ['template:'] yenza: { :indlela-yefayile <- Template entsha: (Ifayile entsha: indlela-yefayile, funda).
+}.
+
+Web-Document xa-kufika: ['out:type:'] yenza: { :output :uhlobo
+	eyakho headers-out ubuxoki: {
+		eyakho sessdata Engenanto? ubuxoki: {
+			eyakho session-manager save: eyakho sessdata.
+		}.
+		eyakho headers yongeza-ekugqibeleni: (
+			HTTP-Header entsha
+			key: ['Content-type'] value: uhlobo
+		).
+		eyakho headers nganye: { :_ :header
+			Imveliso bhala: header.
+		}.
+		eyakho headers-out := Inyaniso.
+		Imveliso bhala: ['\r\n'].
+	}.
+	Imveliso bhala: output.
+}.
+
+Web-Document xa-kufika: ['finish:type:'] yenza: { :output :uhlobo
+	eyakho headers-out ubuxoki: {
+		eyakho sessdata Engenanto? ubuxoki: {
+			eyakho session-manager save: eyakho sessdata.
+		}.
+		eyakho headers yongeza-ekugqibeleni: (
+			HTTP-Header entsha
+			key: ['Content-type'] value: uhlobo
+		).
+		eyakho headers yongeza-ekugqibeleni: (
+			HTTP-Header entsha
+			key: ['Content-Length'] value: output umbhalo bytes
+		).
+		eyakho headers nganye: { :_ :header
+			Imveliso bhala: header.
+		}.
+		eyakho headers-out := Inyaniso.
+		Imveliso bhala: ['\r\n'].
+	}.
+	Imveliso bhala: output.
+}.
+
+Web-Document xa-kufika: ['out:'] yenza: { :output
+	ngokwakho out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document xa-kufika: ['finish:'] yenza: { :output
+	ngokwakho finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document xa-kufika: ['json:'] yenza: { :output
+	ngokwakho out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document xa-kufika: ['not-found:'] yenza: { :output
+	ngokwakho clear-headers header: (
+		HTTP-Header entsha key: ['Status'] value: ['404 Not Found']
+	).
+	ngokwakho out: output.
+}.
+
+
+# Interface
+
+>> Session := Into entsha.
+
+Session xa-kufika: ['entsha'] yenza: { <- ngokwakho entsha init for: Engenanto.
+}.
+
+Session xa-kufika: ['for:'] yenza: { :id
+	eyakho id := id.
+}.
+
+Session xa-kufika: ['load'] yenza: {
+	lo-msebenzi impazamo: ['Not implemented.'].
+}.
+
+Session xa-kufika: ['save:'] yenza: {
+	lo-msebenzi impazamo: ['Not implemented.'].
+}.
+
+Session xa-kufika: ['destroy'] yenza: {
+	lo-msebenzi impazamo: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session entsha.
+
+Tempfile-Session xa-kufika: ['init'] yenza: {
+	eyakho pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session xa-kufika: ['path-prefix:'] yenza: { :str
+	eyakho pathprefix := str.
+}.
+
+Tempfile-Session xa-kufika: ['file'] yenza: { <- ( Ifayile entsha: ( eyakho pathprefix + eyakho id + ['.txt'] ) ).
+}.
+
+Tempfile-Session xa-kufika: ['load'] yenza: {
+	>> file := ngokwakho file.
+	file ikhona ubuxoki: {
+		file bhala: (Isichazimagama entsha ikhowudi).
+	}. <- file funda into.
+}.
+
+Tempfile-Session xa-kufika: ['save:'] yenza: { :data
+	>> file := ngokwakho file.
+	file ikhona inyaniso: {
+		file bhala: data ikhowudi.
+	}.
+}.
+
+Tempfile-Session xa-kufika: ['destroy'] yenza: {
+	>> file := ngokwakho file.
+	file ikhona inyaniso: {
+		file cima.
+	}.
+}.
+
+
+>> URL := Into entsha.
+
+URL xa-kufika: ['init'] yenza: {
+	eyakho protocol := ['https://'].
+	eyakho umamkeli := ['localhost'].
+	eyakho indlela-yefayile := [''].
+	eyakho params := [''].
+	eyakho hash := [''].
+}.
+
+URL xa-kufika: ['entsha'] yenza: { <- ngokwakho entsha init.
+}.
+
+URL xa-kufika: ['umbhalo'] yenza: { <- (
+	eyakho protocol +
+	eyakho umamkeli +
+	eyakho indlela-yefayile +
+	eyakho params +
+	eyakho hash ).
+}.
+
+URL xa-kufika: ['protocol:'] yenza: { :protocol
+	((Uluhlu entsha: ['http'] ; ['https']) iqulethe: protocol) inyaniso: {
+		eyakho protocol := protocol + ['://'].
+	}, ubuxoki: {
+		lo-msebenzi impazamo: ['Invalid protocol'].
+	}.
+}.
+
+URL xa-kufika: ['umamkeli:'] yenza: { :umamkeli
+	#todo validate according to rfc
+	eyakho umamkeli := umamkeli.
+}.
+
+URL xa-kufika: ['path:'] yenza: { :indlela-yefayile
+	eyakho indlela-yefayile := ['/'] + indlela-yefayile url-faka-ikhowudi.
+}.
+
+URL xa-kufika: ['params:'] yenza: { :map
+	>> params := Uluhlu entsha.
+	map nganye: { :key :value
+		params yongeza-ekugqibeleni: key umbhalo url-faka-ikhowudi + ['='] + value umbhalo url-faka-ikhowudi.
+	}.
+	eyakho params := ['?'] + ( params dibanisa: ['&'] ).
+}.
+
+URL xa-kufika: ['ihashi:'] yenza: { :hash
+	eyakho hash := ['#'] + hash url-faka-ikhowudi.
+}.
+

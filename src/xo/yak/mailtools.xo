@@ -1,0 +1,128 @@
+>> Email := Объект саҥа.
+
+Email в: ['init'] сделать: {
+	бэйэм recipients := Испииһэк саҥа.
+	бэйэм cc := Испииһэк саҥа.
+	бэйэм bcc := Испииһэк саҥа.
+	бэйэм from := Кураанах.
+	бэйэм from-name := Кураанах.
+	бэйэм subject := Кураанах.
+	бэйэм body := Кураанах.
+}.
+
+Email в: ['саҥа'] сделать: { <- бэйэ саҥа init.
+}.
+
+Email в: ['to:'] сделать: { :list
+	бэйэм recipients := list.
+}.
+ 
+Email в: ['cc:'] сделать: { :list
+	бэйэм cc := list.
+}.
+
+Email в: ['bcc:'] сделать: { :list
+	бэйэм bcc := list.
+}.
+
+Email в: ['subject:'] сделать: { :subject
+	бэйэм subject := subject.
+}.
+
+Email в: ['from:name:'] сделать: { :from :аат
+	бэйэм from := from.
+	бэйэм from-name := аат.
+}.
+
+Email в: ['body:'] сделать: { :body
+	бэйэм body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email в: ['header:'] сделать: { :line <- line солбуй: ['\r'] на: [''], солбуй: ['\n'] на: [''].
+}.
+
+Email в: ['send'] сделать: {
+	>> f := Файл tempwrite: бэйэ generate.
+	Программа система: ['sendmail -t < '] + f путь, стоп.
+}.
+
+Email в: ['generate'] сделать: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str эбэн-биэр: (бэйэ header: ['From: '] + бэйэм from-name + [' <'] + ( бэйэм from ) + ['>']) + brk.
+	str эбэн-биэр: (бэйэ header: ['To: '] + ( бэйэм recipients присоединить: [','] )) + brk.
+	бэйэм cc счетчик даа: {
+		str эбэн-биэр: (бэйэ header: ['Cc: '] + ( бэйэм cc присоединить: [','] )) + brk.
+	}.
+	бэйэм bcc счетчик даа: {
+		str эбэн-биэр: (бэйэ header: ['Bcc: '] + ( бэйэм bcc присоединить: [','] )) + brk.
+	}.
+	str эбэн-биэр: (бэйэ header: ['Subject: '] + бэйэм subject) + brk.
+	str эбэн-биэр: brk.
+	str эбэн-биэр: бэйэм body.
+	str эбэн-биэр: brk. <- str.
+}.
+
+>> HTML-Email := Email саҥа.
+
+HTML-Email в: ['init'] сделать: {
+	бэйэ init.
+	бэйэм attachments := Испииһэк саҥа.
+	бэйэм boundary := Сейф токен: 40.
+}.
+
+HTML-Email в: ['attach:'] сделать: { :file
+	>> id := бэйэм attachments счетчик.
+	>> blob := file blob.
+	бэйэм attachments эбэн-биэр: (
+		Тылдьыт саҥа
+			file: file путь,
+			mime: ['image/'] + (Server mimetype: file путь),
+			data: blob base64-кодировать
+	).
+	blob босхолоо. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email в: ['generate'] сделать: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str эбэн-биэр: (бэйэ header: ['From: '] + бэйэм from-name + [' <'] + ( бэйэм from ) + ['>']) + brk.
+	str эбэн-биэр: (бэйэ header: ['To: '] + ( бэйэм recipients присоединить: [','] )) + brk.
+	бэйэм cc счетчик даа: {
+		str эбэн-биэр: (бэйэ header: ['Cc: '] + ( бэйэм cc присоединить: [','] )) + brk.
+	}.
+	бэйэм bcc счетчик даа: {
+		str эбэн-биэр: (бэйэ header: ['Bcc: '] + ( бэйэм bcc присоединить: [','] )) + brk.
+	}.
+	str эбэн-биэр: (бэйэ header: ['Subject: '] + бэйэм subject) + brk.
+	str эбэн-биэр: ['MIME-Version: 1.0'] + brk.
+	str эбэн-биэр: ['Content-Type: multipart/related; boundary="'] + бэйэм boundary + ['"; type=text/html'] + brk.
+	str эбэн-биэр: brk.
+	str эбэн-биэр: ['--'] + бэйэм boundary + brk.
+	str эбэн-биэр: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str эбэн-биэр: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str эбэн-биэр: brk.
+	str эбэн-биэр: бэйэм body.
+	str эбэн-биэр: brk.
+	бэйэм attachments хас-биирдии: { :id :info
+		>> blob := info data.
+		str эбэн-биэр: ['--'] + бэйэм boundary + brk.
+		str эбэн-биэр: ['Content-Type: '] + info mime + brk.
+		str эбэн-биэр: ['Content-Transfer-Encoding: base64'] + brk.
+		str эбэн-биэр: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str эбэн-биэр: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str эбэн-биэр: brk.
+		>> max := 76.
+		>> len := blob уһуна.
+		>> chunks := (len / max) үрдүк.
+		{ :i
+			>> chunk := blob скопировать от: i * max уһуна: max.
+			str эбэн-биэр: chunk + brk.
+		} * chunks.
+		str эбэн-биэр: brk.
+		str эбэн-биэр: brk.
+	}.
+	str эбэн-биэр: ['--'] + бэйэм boundary + ['--'] + brk. <- str.
+}.

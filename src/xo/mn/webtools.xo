@@ -1,0 +1,325 @@
+HTTP-Хүсэлт ирэхэд: ['HTTP-header:'] гүйцэтгэ: { :key <- Програм тохиргоо: key.
+}.
+
+>> HTTP-Header := Объект шинэ.
+
+HTTP-Header ирэхэд: ['шинэ'] гүйцэтгэ: { <- өөрөө шинэ init.
+}.
+
+HTTP-Header ирэхэд: ['init'] гүйцэтгэ: {
+	өөрийн key := Хоосон.
+	өөрийн value := Хоосон.
+}.
+
+HTTP-Header ирэхэд: ['key:value:'] гүйцэтгэ: { :key :value
+	өөрийн key := key.
+	өөрийн value := value.
+}.
+
+HTTP-Header ирэхэд: ['key'] гүйцэтгэ: { <- өөрийн key.
+}.
+
+HTTP-Header ирэхэд: ['value'] гүйцэтгэ: { <- өөрийн value.
+}.
+
+
+HTTP-Header ирэхэд: ['тэмдэгт-мөр'] гүйцэтгэ: {
+	>> line := өөрийн key + [': '] + өөрийн value.
+	line солих: ['\r'] үүгээр: [''], солих: ['\n'] үүгээр: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Объект шинэ.
+
+Web-Document ирэхэд: ['шинэ'] гүйцэтгэ: { <- өөрөө шинэ init.
+}.
+
+Web-Document ирэхэд: ['init'] гүйцэтгэ: {
+	өөрийн headers := Жагсаалт шинэ.
+	өөрийн sess-id := Хоосон.
+	өөрийн session-manager := Tempfile-Session шинэ.
+	өөрийн sessdata := Хоосон.
+	өөрийн secure := Үнэн.
+	өөрийн same-site := ['Strict'].
+	өөрийн headers-out := Худал.
+	өөрийн request := HTTP-Хүсэлт шинэ.
+}.
+
+Web-Document ирэхэд: ['request:'] гүйцэтгэ: { :request
+	өөрийн request := request.
+}. 
+
+Web-Document ирэхэд: ['secure-session-cookie:'] гүйцэтгэ: { :secure
+	өөрөө check-headers.
+	өөрийн secure := secure.
+}.
+
+Web-Document ирэхэд: ['same-site-session-cookie:'] гүйцэтгэ: { :value
+	өөрөө check-headers.
+	>> options := Жагсаалт шинэ 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options багтаасан: value, худал-бол: {
+		энэ-даалгавар алдаа: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	өөрийн same-site := value.
+}.
+
+Web-Document ирэхэд: ['header:'] гүйцэтгэ: { :header
+	өөрөө check-headers.
+	өөрийн headers төгсгөлд-нэмэх: header.
+}.
+
+Web-Document ирэхэд: ['clear-headers'] гүйцэтгэ: {
+	өөрөө check-headers.
+	өөрийн headers := Жагсаалт шинэ.
+}.
+
+Web-Document ирэхэд: ['session-manager:'] гүйцэтгэ: { :manager
+	өөрөө check-headers.
+	өөрийн session-manager := manager.
+}.
+
+Web-Document ирэхэд: ['session-manager'] гүйцэтгэ: { <- өөрийн session-manager.
+}.
+
+Web-Document ирэхэд: ['check-headers'] гүйцэтгэ: {
+	өөрийн headers-out үнэн-бол: {
+		энэ-даалгавар алдаа: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document ирэхэд: ['session-start'] гүйцэтгэ: {
+	өөрөө check-headers.
+	>> request := өөрийн request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Хоосон? худал-бол: {
+		(( Загвар шинэ: ['^[A-Za-z0-9]+\\z'], таарал: sess-id ) = 0) үнэн-бол: {
+			sess-id := Хоосон.
+		}.
+	}.
+	sess-id Хоосон? үнэн-бол: {
+		sess-id := Сейф токен: 30.
+		>> session-header := HTTP-Header шинэ
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (өөрийн secure энэ: ['Secure'] эс-бөгөөс: ['']),
+		SSITE: (өөрийн same-site),
+		XSID: sess-id
+		).
+		өөрийн headers төгсгөлд-нэмэх: session-header.
+	}.
+	өөрийн sessdata := өөрийн session-manager for: sess-id, load. <- өөрийн sessdata. # reference
+}.
+
+Web-Document ирэхэд: ['goto:'] гүйцэтгэ: { :url
+	өөрөө check-headers.
+	өөрөө clear-headers.
+	өөрийн headers
+	төгсгөлд-нэмэх: (
+		HTTP-Header шинэ
+		key: ['Status'] value: ['303 See Other']
+	),
+	төгсгөлд-нэмэх: (
+		HTTP-Header шинэ
+		key: ['Location'] value: url
+	).
+	өөрөө out: ['Redirect'].
+}.
+
+Web-Document ирэхэд: ['session-destroy'] гүйцэтгэ: {
+	өөрөө check-headers.
+	>> request := өөрийн request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Хоосон? худал-бол: {
+		>> session-header := HTTP-Header шинэ.
+		>> when := Агшин шинэ жил: 1970, хэлбэр: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (өөрийн secure энэ: ['Secure'] эс-бөгөөс: ['']),
+			SSITE: (өөрийн same-site),
+			XSID: sess-id
+		).
+		өөрийн session-manager destroy.
+		өөрийн headers төгсгөлд-нэмэх: session-header.
+	}.
+}.
+
+
+Web-Document ирэхэд: ['template:'] гүйцэтгэ: { :зам <- Template шинэ: (Файл шинэ: зам, унших).
+}.
+
+Web-Document ирэхэд: ['out:type:'] гүйцэтгэ: { :output :төрөл
+	өөрийн headers-out худал-бол: {
+		өөрийн sessdata Хоосон? худал-бол: {
+			өөрийн session-manager save: өөрийн sessdata.
+		}.
+		өөрийн headers төгсгөлд-нэмэх: (
+			HTTP-Header шинэ
+			key: ['Content-type'] value: төрөл
+		).
+		өөрийн headers бүр: { :_ :header
+			Гаралт бичих: header.
+		}.
+		өөрийн headers-out := Үнэн.
+		Гаралт бичих: ['\r\n'].
+	}.
+	Гаралт бичих: output.
+}.
+
+Web-Document ирэхэд: ['finish:type:'] гүйцэтгэ: { :output :төрөл
+	өөрийн headers-out худал-бол: {
+		өөрийн sessdata Хоосон? худал-бол: {
+			өөрийн session-manager save: өөрийн sessdata.
+		}.
+		өөрийн headers төгсгөлд-нэмэх: (
+			HTTP-Header шинэ
+			key: ['Content-type'] value: төрөл
+		).
+		өөрийн headers төгсгөлд-нэмэх: (
+			HTTP-Header шинэ
+			key: ['Content-Length'] value: output тэмдэгт-мөр bytes
+		).
+		өөрийн headers бүр: { :_ :header
+			Гаралт бичих: header.
+		}.
+		өөрийн headers-out := Үнэн.
+		Гаралт бичих: ['\r\n'].
+	}.
+	Гаралт бичих: output.
+}.
+
+Web-Document ирэхэд: ['out:'] гүйцэтгэ: { :output
+	өөрөө out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ирэхэд: ['finish:'] гүйцэтгэ: { :output
+	өөрөө finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ирэхэд: ['json:'] гүйцэтгэ: { :output
+	өөрөө out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document ирэхэд: ['not-found:'] гүйцэтгэ: { :output
+	өөрөө clear-headers header: (
+		HTTP-Header шинэ key: ['Status'] value: ['404 Not Found']
+	).
+	өөрөө out: output.
+}.
+
+
+# Interface
+
+>> Session := Объект шинэ.
+
+Session ирэхэд: ['шинэ'] гүйцэтгэ: { <- өөрөө шинэ init for: Хоосон.
+}.
+
+Session ирэхэд: ['for:'] гүйцэтгэ: { :id
+	өөрийн id := id.
+}.
+
+Session ирэхэд: ['load'] гүйцэтгэ: {
+	энэ-даалгавар алдаа: ['Not implemented.'].
+}.
+
+Session ирэхэд: ['save:'] гүйцэтгэ: {
+	энэ-даалгавар алдаа: ['Not implemented.'].
+}.
+
+Session ирэхэд: ['destroy'] гүйцэтгэ: {
+	энэ-даалгавар алдаа: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session шинэ.
+
+Tempfile-Session ирэхэд: ['init'] гүйцэтгэ: {
+	өөрийн pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session ирэхэд: ['path-prefix:'] гүйцэтгэ: { :str
+	өөрийн pathprefix := str.
+}.
+
+Tempfile-Session ирэхэд: ['file'] гүйцэтгэ: { <- ( Файл шинэ: ( өөрийн pathprefix + өөрийн id + ['.txt'] ) ).
+}.
+
+Tempfile-Session ирэхэд: ['load'] гүйцэтгэ: {
+	>> file := өөрөө file.
+	file байгаа худал-бол: {
+		file бичих: (Толь шинэ код).
+	}. <- file унших объект.
+}.
+
+Tempfile-Session ирэхэд: ['save:'] гүйцэтгэ: { :data
+	>> file := өөрөө file.
+	file байгаа үнэн-бол: {
+		file бичих: data код.
+	}.
+}.
+
+Tempfile-Session ирэхэд: ['destroy'] гүйцэтгэ: {
+	>> file := өөрөө file.
+	file байгаа үнэн-бол: {
+		file устгах.
+	}.
+}.
+
+
+>> URL := Объект шинэ.
+
+URL ирэхэд: ['init'] гүйцэтгэ: {
+	өөрийн protocol := ['https://'].
+	өөрийн хост := ['localhost'].
+	өөрийн зам := [''].
+	өөрийн params := [''].
+	өөрийн hash := [''].
+}.
+
+URL ирэхэд: ['шинэ'] гүйцэтгэ: { <- өөрөө шинэ init.
+}.
+
+URL ирэхэд: ['тэмдэгт-мөр'] гүйцэтгэ: { <- (
+	өөрийн protocol +
+	өөрийн хост +
+	өөрийн зам +
+	өөрийн params +
+	өөрийн hash ).
+}.
+
+URL ирэхэд: ['protocol:'] гүйцэтгэ: { :protocol
+	((Жагсаалт шинэ: ['http'] ; ['https']) багтаасан: protocol) үнэн-бол: {
+		өөрийн protocol := protocol + ['://'].
+	}, худал-бол: {
+		энэ-даалгавар алдаа: ['Invalid protocol'].
+	}.
+}.
+
+URL ирэхэд: ['хост:'] гүйцэтгэ: { :хост
+	#todo validate according to rfc
+	өөрийн хост := хост.
+}.
+
+URL ирэхэд: ['path:'] гүйцэтгэ: { :зам
+	өөрийн зам := ['/'] + зам url-кодлох.
+}.
+
+URL ирэхэд: ['params:'] гүйцэтгэ: { :map
+	>> params := Жагсаалт шинэ.
+	map бүр: { :key :value
+		params төгсгөлд-нэмэх: key тэмдэгт-мөр url-кодлох + ['='] + value тэмдэгт-мөр url-кодлох.
+	}.
+	өөрийн params := ['?'] + ( params нэгтгэх: ['&'] ).
+}.
+
+URL ирэхэд: ['хэш:'] гүйцэтгэ: { :hash
+	өөрийн hash := ['#'] + hash url-кодлох.
+}.
+

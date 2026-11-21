@@ -1,0 +1,128 @@
+>> Email := كائن جديد.
+
+Email عند: ['init'] نفذ: {
+	خاص recipients := قائمة جديد.
+	خاص cc := قائمة جديد.
+	خاص bcc := قائمة جديد.
+	خاص from := لاشيء.
+	خاص from-name := لاشيء.
+	خاص subject := لاشيء.
+	خاص body := لاشيء.
+}.
+
+Email عند: ['جديد'] نفذ: { <- ذات جديد init.
+}.
+
+Email عند: ['to:'] نفذ: { :list
+	خاص recipients := list.
+}.
+ 
+Email عند: ['cc:'] نفذ: { :list
+	خاص cc := list.
+}.
+
+Email عند: ['bcc:'] نفذ: { :list
+	خاص bcc := list.
+}.
+
+Email عند: ['subject:'] نفذ: { :subject
+	خاص subject := subject.
+}.
+
+Email عند: ['from:name:'] نفذ: { :from :اسم
+	خاص from := from.
+	خاص from-name := اسم.
+}.
+
+Email عند: ['body:'] نفذ: { :body
+	خاص body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email عند: ['header:'] نفذ: { :line <- line استبدل: ['\r'] ببديل: [''], استبدل: ['\n'] ببديل: [''].
+}.
+
+Email عند: ['send'] نفذ: {
+	>> f := ملف كتابة-مؤقتة: ذات generate.
+	برنامج نظام: ['sendmail -t < '] + f مسار-الملف, سطر-جديد.
+}.
+
+Email عند: ['generate'] نفذ: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ألحق: (ذات header: ['From: '] + خاص from-name + [' <'] + ( خاص from ) + ['>']) + brk.
+	str ألحق: (ذات header: ['To: '] + ( خاص recipients ادمج: [','] )) + brk.
+	خاص cc عدد-العناصر إذا-صحيح: {
+		str ألحق: (ذات header: ['Cc: '] + ( خاص cc ادمج: [','] )) + brk.
+	}.
+	خاص bcc عدد-العناصر إذا-صحيح: {
+		str ألحق: (ذات header: ['Bcc: '] + ( خاص bcc ادمج: [','] )) + brk.
+	}.
+	str ألحق: (ذات header: ['Subject: '] + خاص subject) + brk.
+	str ألحق: brk.
+	str ألحق: خاص body.
+	str ألحق: brk. <- str.
+}.
+
+>> HTML-Email := Email جديد.
+
+HTML-Email عند: ['init'] نفذ: {
+	ذات init.
+	خاص attachments := قائمة جديد.
+	خاص boundary := خزنة رمز-مميز: 40.
+}.
+
+HTML-Email عند: ['attach:'] نفذ: { :file
+	>> id := خاص attachments عدد-العناصر.
+	>> blob := file blob.
+	خاص attachments ألحق: (
+		قاموس جديد
+			file: file مسار-الملف,
+			mime: ['image/'] + (Server mimetype: file مسار-الملف),
+			data: blob base64-ترميز
+	).
+	blob حرر. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email عند: ['generate'] نفذ: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ألحق: (ذات header: ['From: '] + خاص from-name + [' <'] + ( خاص from ) + ['>']) + brk.
+	str ألحق: (ذات header: ['To: '] + ( خاص recipients ادمج: [','] )) + brk.
+	خاص cc عدد-العناصر إذا-صحيح: {
+		str ألحق: (ذات header: ['Cc: '] + ( خاص cc ادمج: [','] )) + brk.
+	}.
+	خاص bcc عدد-العناصر إذا-صحيح: {
+		str ألحق: (ذات header: ['Bcc: '] + ( خاص bcc ادمج: [','] )) + brk.
+	}.
+	str ألحق: (ذات header: ['Subject: '] + خاص subject) + brk.
+	str ألحق: ['MIME-Version: 1.0'] + brk.
+	str ألحق: ['Content-Type: multipart/related; boundary="'] + خاص boundary + ['"; type=text/html'] + brk.
+	str ألحق: brk.
+	str ألحق: ['--'] + خاص boundary + brk.
+	str ألحق: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str ألحق: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str ألحق: brk.
+	str ألحق: خاص body.
+	str ألحق: brk.
+	خاص attachments لكل: { :id :info
+		>> blob := info data.
+		str ألحق: ['--'] + خاص boundary + brk.
+		str ألحق: ['Content-Type: '] + info mime + brk.
+		str ألحق: ['Content-Transfer-Encoding: base64'] + brk.
+		str ألحق: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str ألحق: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str ألحق: brk.
+		>> max := 76.
+		>> len := blob طول.
+		>> chunks := (len / max) تقريب-للأعلى.
+		{ :i
+			>> chunk := blob انسخ بداية: i * max طول: max.
+			str ألحق: chunk + brk.
+		} * chunks.
+		str ألحق: brk.
+		str ألحق: brk.
+	}.
+	str ألحق: ['--'] + خاص boundary + ['--'] + brk. <- str.
+}.

@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Oibseact ùr.
+
+Template air: ['ùr'] dèan: { <- fhèin ùr content: [''].
+}.
+
+Template air: ['content:'] dèan: { :content
+	leis content := content. 
+}.
+
+Template air: ['ùr:'] dèan: { :content <- fhèin ùr content: content.
+}.
+
+Template air: ['cut:'] dèan: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := leis content sgoilt: startmarker.
+	>> prefix := parts ciad.
+	>> parts2 := parts deireannach sgoilt: endmarker.
+	>> suffix := parts2 deireannach.
+	>> part := parts2 ciad.
+	>> rest := prefix + suffix.
+	leis content := rest. <- Template ùr: part.
+	
+}.
+
+Template air: ['dèan-lethbhreac'] dèan: { <- fhèin ùr: fhèin sreang dèan-lethbhreac.
+}.
+	
+Template air: ['paste:at:'] dèan: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	leis content cuir-an-àite: pastemarker le: ( snippet sreang + pastemarker ).
+}.
+
+Template air: ['suidhich:luach:'] dèan: { :slot :value
+	leis content cuir-an-àite: ['<!-- slot:'] + slot + [' -->'] le: ( Server html-còdaich: value ).
+}.
+
+Template air: ['set:html:'] dèan: { :slot :html
+	leis content cuir-an-àite: ['<!-- slot:'] + slot + [' -->'] le: html.
+}.
+
+Template air: ['freagair:agus:'] dèan: { :slot :value
+	fhèin suidhich: (slot bho: 0 faid: (slot faid - 1)) luach: value.
+}.
+
+Template air: ['nl2br'] dèan: {
+	leis content cuir-an-àite: ['\n'] le: ['<br>'].
+}.
+
+Template air: ['clean'] dèan: {
+	leis content :=
+		Pàtran
+		ùr: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		maids: leis content
+		dèan: { <- ['']. }.
+}.
+
+Template air: ['clean-cuts'] dèan: {
+	>> items := Liosta ùr.
+	Pàtran
+	ùr: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	maids: leis content
+	dèan: { :_ :part
+		items cuir-ris: part ? 1.
+	}.
+	items gach: { :_ :id
+		leis content :=
+			Pàtran ùr: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			maids: leis content
+			dèan: { <- ['']. }.
+	 }.
+}.
+
+Template air: ['clean-space'] dèan: {
+	leis content :=
+		Pàtran
+		ùr: ['\\s*\\n'],
+		maids: leis content
+		dèan: { <- ['\n']. }.
+	leis content :=
+		Pàtran
+		ùr: ['\\n[\\s\\t]+'],
+		maids: leis content
+		dèan: { <- ['\n']. }.
+}.
+
+Template air: ['clean-all'] dèan: {
+	fhèin clean.
+	fhèin clean-cuts.
+	fhèin clean-space.
+}.
+
+Template air: ['sreang'] dèan: { <- leis content.
+}.

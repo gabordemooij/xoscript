@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Обект нов.
+
+Template при: ['нов'] изпълни: { <- себе нов content: [''].
+}.
+
+Template при: ['content:'] изпълни: { :content
+	свой content := content. 
+}.
+
+Template при: ['нов:'] изпълни: { :content <- себе нов content: content.
+}.
+
+Template при: ['cut:'] изпълни: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := свой content раздели: startmarker.
+	>> prefix := parts първи.
+	>> parts2 := parts последен раздели: endmarker.
+	>> suffix := parts2 последен.
+	>> part := parts2 първи.
+	>> rest := prefix + suffix.
+	свой content := rest. <- Template нов: part.
+	
+}.
+
+Template при: ['копирай'] изпълни: { <- себе нов: себе текст копирай.
+}.
+	
+Template при: ['paste:at:'] изпълни: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	свой content замени: pastemarker с: ( snippet текст + pastemarker ).
+}.
+
+Template при: ['задай:стойност:'] изпълни: { :slot :value
+	свой content замени: ['<!-- slot:'] + slot + [' -->'] с: ( Server html-кодирай: value ).
+}.
+
+Template при: ['set:html:'] изпълни: { :slot :html
+	свой content замени: ['<!-- slot:'] + slot + [' -->'] с: html.
+}.
+
+Template при: ['отговори:и:'] изпълни: { :slot :value
+	себе задай: (slot от: 0 дължина: (slot дължина - 1)) стойност: value.
+}.
+
+Template при: ['nl2br'] изпълни: {
+	свой content замени: ['\n'] с: ['<br>'].
+}.
+
+Template при: ['clean'] изпълни: {
+	свой content :=
+		Шаблон
+		нов: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		съвпадение: свой content
+		изпълни: { <- ['']. }.
+}.
+
+Template при: ['clean-cuts'] изпълни: {
+	>> items := Списък нов.
+	Шаблон
+	нов: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	съвпадение: свой content
+	изпълни: { :_ :part
+		items добави-в-края: part ? 1.
+	}.
+	items всеки: { :_ :id
+		свой content :=
+			Шаблон нов: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			съвпадение: свой content
+			изпълни: { <- ['']. }.
+	 }.
+}.
+
+Template при: ['clean-space'] изпълни: {
+	свой content :=
+		Шаблон
+		нов: ['\\s*\\n'],
+		съвпадение: свой content
+		изпълни: { <- ['\n']. }.
+	свой content :=
+		Шаблон
+		нов: ['\\n[\\s\\t]+'],
+		съвпадение: свой content
+		изпълни: { <- ['\n']. }.
+}.
+
+Template при: ['clean-all'] изпълни: {
+	себе clean.
+	себе clean-cuts.
+	себе clean-space.
+}.
+
+Template при: ['текст'] изпълни: { <- свой content.
+}.

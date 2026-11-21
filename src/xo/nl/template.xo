@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Object nieuw.
+
+Template bij: ['nieuw'] doen: { <- zelf nieuw content: [''].
+}.
+
+Template bij: ['content:'] doen: { :content
+	eigen content := content. 
+}.
+
+Template bij: ['nieuw:'] doen: { :content <- zelf nieuw content: content.
+}.
+
+Template bij: ['cut:'] doen: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := eigen content opsplitsen: startmarker.
+	>> prefix := parts eerste.
+	>> parts2 := parts laatste opsplitsen: endmarker.
+	>> suffix := parts2 laatste.
+	>> part := parts2 eerste.
+	>> rest := prefix + suffix.
+	eigen content := rest. <- Template nieuw: part.
+	
+}.
+
+Template bij: ['kopieer'] doen: { <- zelf nieuw: zelf tekst kopieer.
+}.
+	
+Template bij: ['paste:at:'] doen: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	eigen content vervang: pastemarker door: ( snippet tekst + pastemarker ).
+}.
+
+Template bij: ['gebruik:waarde:'] doen: { :slot :value
+	eigen content vervang: ['<!-- slot:'] + slot + [' -->'] door: ( Server html-coderen: value ).
+}.
+
+Template bij: ['set:html:'] doen: { :slot :html
+	eigen content vervang: ['<!-- slot:'] + slot + [' -->'] door: html.
+}.
+
+Template bij: ['reactie:argument:'] doen: { :slot :value
+	zelf gebruik: (slot van: 0 lengte: (slot lengte - 1)) waarde: value.
+}.
+
+Template bij: ['nl2br'] doen: {
+	eigen content vervang: ['\n'] door: ['<br>'].
+}.
+
+Template bij: ['clean'] doen: {
+	eigen content :=
+		Patroon
+		nieuw: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		overeenkomst: eigen content
+		doen: { <- ['']. }.
+}.
+
+Template bij: ['clean-cuts'] doen: {
+	>> items := Reeks nieuw.
+	Patroon
+	nieuw: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	overeenkomst: eigen content
+	doen: { :_ :part
+		items toevoegen: part ? 1.
+	}.
+	items elk: { :_ :id
+		eigen content :=
+			Patroon nieuw: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			overeenkomst: eigen content
+			doen: { <- ['']. }.
+	 }.
+}.
+
+Template bij: ['clean-space'] doen: {
+	eigen content :=
+		Patroon
+		nieuw: ['\\s*\\n'],
+		overeenkomst: eigen content
+		doen: { <- ['\n']. }.
+	eigen content :=
+		Patroon
+		nieuw: ['\\n[\\s\\t]+'],
+		overeenkomst: eigen content
+		doen: { <- ['\n']. }.
+}.
+
+Template bij: ['clean-all'] doen: {
+	zelf clean.
+	zelf clean-cuts.
+	zelf clean-space.
+}.
+
+Template bij: ['tekst'] doen: { <- eigen content.
+}.

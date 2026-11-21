@@ -1,0 +1,128 @@
+>> Email := Oġġett ġdid.
+
+Email meta: ['init'] agħmel: {
+	proprju recipients := Lista ġdid.
+	proprju cc := Lista ġdid.
+	proprju bcc := Lista ġdid.
+	proprju from := Xejn.
+	proprju from-name := Xejn.
+	proprju subject := Xejn.
+	proprju body := Xejn.
+}.
+
+Email meta: ['ġdid'] agħmel: { <- innifsu ġdid init.
+}.
+
+Email meta: ['to:'] agħmel: { :list
+	proprju recipients := list.
+}.
+ 
+Email meta: ['cc:'] agħmel: { :list
+	proprju cc := list.
+}.
+
+Email meta: ['bcc:'] agħmel: { :list
+	proprju bcc := list.
+}.
+
+Email meta: ['subject:'] agħmel: { :subject
+	proprju subject := subject.
+}.
+
+Email meta: ['from:name:'] agħmel: { :from :isem
+	proprju from := from.
+	proprju from-name := isem.
+}.
+
+Email meta: ['body:'] agħmel: { :body
+	proprju body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email meta: ['header:'] agħmel: { :line <- line ibdel: ['\r'] bi: [''], ibdel: ['\n'] bi: [''].
+}.
+
+Email meta: ['send'] agħmel: {
+	>> f := Fajl tempwrite: innifsu generate.
+	Programm sistema: ['sendmail -t < '] + f mogħdija, linja-ġdida.
+}.
+
+Email meta: ['generate'] agħmel: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str żid-fit-tmiem: (innifsu header: ['From: '] + proprju from-name + [' <'] + ( proprju from ) + ['>']) + brk.
+	str żid-fit-tmiem: (innifsu header: ['To: '] + ( proprju recipients għaqqad: [','] )) + brk.
+	proprju cc għodd veru: {
+		str żid-fit-tmiem: (innifsu header: ['Cc: '] + ( proprju cc għaqqad: [','] )) + brk.
+	}.
+	proprju bcc għodd veru: {
+		str żid-fit-tmiem: (innifsu header: ['Bcc: '] + ( proprju bcc għaqqad: [','] )) + brk.
+	}.
+	str żid-fit-tmiem: (innifsu header: ['Subject: '] + proprju subject) + brk.
+	str żid-fit-tmiem: brk.
+	str żid-fit-tmiem: proprju body.
+	str żid-fit-tmiem: brk. <- str.
+}.
+
+>> HTML-Email := Email ġdid.
+
+HTML-Email meta: ['init'] agħmel: {
+	innifsu init.
+	proprju attachments := Lista ġdid.
+	proprju boundary := Kaxxaforti token: 40.
+}.
+
+HTML-Email meta: ['attach:'] agħmel: { :file
+	>> id := proprju attachments għodd.
+	>> blob := file blob.
+	proprju attachments żid-fit-tmiem: (
+		Dizzjunarju ġdid
+			file: file mogħdija,
+			mime: ['image/'] + (Server mimetype: file mogħdija),
+			data: blob base64-ikkodifika
+	).
+	blob eħles. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email meta: ['generate'] agħmel: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str żid-fit-tmiem: (innifsu header: ['From: '] + proprju from-name + [' <'] + ( proprju from ) + ['>']) + brk.
+	str żid-fit-tmiem: (innifsu header: ['To: '] + ( proprju recipients għaqqad: [','] )) + brk.
+	proprju cc għodd veru: {
+		str żid-fit-tmiem: (innifsu header: ['Cc: '] + ( proprju cc għaqqad: [','] )) + brk.
+	}.
+	proprju bcc għodd veru: {
+		str żid-fit-tmiem: (innifsu header: ['Bcc: '] + ( proprju bcc għaqqad: [','] )) + brk.
+	}.
+	str żid-fit-tmiem: (innifsu header: ['Subject: '] + proprju subject) + brk.
+	str żid-fit-tmiem: ['MIME-Version: 1.0'] + brk.
+	str żid-fit-tmiem: ['Content-Type: multipart/related; boundary="'] + proprju boundary + ['"; type=text/html'] + brk.
+	str żid-fit-tmiem: brk.
+	str żid-fit-tmiem: ['--'] + proprju boundary + brk.
+	str żid-fit-tmiem: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str żid-fit-tmiem: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str żid-fit-tmiem: brk.
+	str żid-fit-tmiem: proprju body.
+	str żid-fit-tmiem: brk.
+	proprju attachments kull: { :id :info
+		>> blob := info data.
+		str żid-fit-tmiem: ['--'] + proprju boundary + brk.
+		str żid-fit-tmiem: ['Content-Type: '] + info mime + brk.
+		str żid-fit-tmiem: ['Content-Transfer-Encoding: base64'] + brk.
+		str żid-fit-tmiem: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str żid-fit-tmiem: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str żid-fit-tmiem: brk.
+		>> max := 76.
+		>> len := blob tul.
+		>> chunks := (len / max) arrotonda-fuq.
+		{ :i
+			>> chunk := blob ikkopja minn: i * max tul: max.
+			str żid-fit-tmiem: chunk + brk.
+		} * chunks.
+		str żid-fit-tmiem: brk.
+		str żid-fit-tmiem: brk.
+	}.
+	str żid-fit-tmiem: ['--'] + proprju boundary + ['--'] + brk. <- str.
+}.

@@ -1,0 +1,128 @@
+>> Email := Objet nei.
+
+Email bei: ['init'] maachen: {
+	eegen recipients := Lëscht nei.
+	eegen cc := Lëscht nei.
+	eegen bcc := Lëscht nei.
+	eegen from := Näischt.
+	eegen from-name := Näischt.
+	eegen subject := Näischt.
+	eegen body := Näischt.
+}.
+
+Email bei: ['nei'] maachen: { <- selwer nei init.
+}.
+
+Email bei: ['to:'] maachen: { :list
+	eegen recipients := list.
+}.
+ 
+Email bei: ['cc:'] maachen: { :list
+	eegen cc := list.
+}.
+
+Email bei: ['bcc:'] maachen: { :list
+	eegen bcc := list.
+}.
+
+Email bei: ['subject:'] maachen: { :subject
+	eegen subject := subject.
+}.
+
+Email bei: ['from:name:'] maachen: { :from :numm
+	eegen from := from.
+	eegen from-name := numm.
+}.
+
+Email bei: ['body:'] maachen: { :body
+	eegen body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email bei: ['header:'] maachen: { :line <- line ersetzen: ['\r'] mat: [''], ersetzen: ['\n'] mat: [''].
+}.
+
+Email bei: ['send'] maachen: {
+	>> f := Fichier tempwrite: selwer generate.
+	Programm system: ['sendmail -t < '] + f wee, nei-zeil.
+}.
+
+Email bei: ['generate'] maachen: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str drunhänken: (selwer header: ['From: '] + eegen from-name + [' <'] + ( eegen from ) + ['>']) + brk.
+	str drunhänken: (selwer header: ['To: '] + ( eegen recipients zesummesetzen: [','] )) + brk.
+	eegen cc zielen wouer: {
+		str drunhänken: (selwer header: ['Cc: '] + ( eegen cc zesummesetzen: [','] )) + brk.
+	}.
+	eegen bcc zielen wouer: {
+		str drunhänken: (selwer header: ['Bcc: '] + ( eegen bcc zesummesetzen: [','] )) + brk.
+	}.
+	str drunhänken: (selwer header: ['Subject: '] + eegen subject) + brk.
+	str drunhänken: brk.
+	str drunhänken: eegen body.
+	str drunhänken: brk. <- str.
+}.
+
+>> HTML-Email := Email nei.
+
+HTML-Email bei: ['init'] maachen: {
+	selwer init.
+	eegen attachments := Lëscht nei.
+	eegen boundary := Tresor token: 40.
+}.
+
+HTML-Email bei: ['attach:'] maachen: { :file
+	>> id := eegen attachments zielen.
+	>> blob := file blob.
+	eegen attachments drunhänken: (
+		Dictionnaire nei
+			file: file wee,
+			mime: ['image/'] + (Server mimetype: file wee),
+			data: blob base64-kodéieren
+	).
+	blob fräiginn. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email bei: ['generate'] maachen: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str drunhänken: (selwer header: ['From: '] + eegen from-name + [' <'] + ( eegen from ) + ['>']) + brk.
+	str drunhänken: (selwer header: ['To: '] + ( eegen recipients zesummesetzen: [','] )) + brk.
+	eegen cc zielen wouer: {
+		str drunhänken: (selwer header: ['Cc: '] + ( eegen cc zesummesetzen: [','] )) + brk.
+	}.
+	eegen bcc zielen wouer: {
+		str drunhänken: (selwer header: ['Bcc: '] + ( eegen bcc zesummesetzen: [','] )) + brk.
+	}.
+	str drunhänken: (selwer header: ['Subject: '] + eegen subject) + brk.
+	str drunhänken: ['MIME-Version: 1.0'] + brk.
+	str drunhänken: ['Content-Type: multipart/related; boundary="'] + eegen boundary + ['"; type=text/html'] + brk.
+	str drunhänken: brk.
+	str drunhänken: ['--'] + eegen boundary + brk.
+	str drunhänken: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str drunhänken: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str drunhänken: brk.
+	str drunhänken: eegen body.
+	str drunhänken: brk.
+	eegen attachments all: { :id :info
+		>> blob := info data.
+		str drunhänken: ['--'] + eegen boundary + brk.
+		str drunhänken: ['Content-Type: '] + info mime + brk.
+		str drunhänken: ['Content-Transfer-Encoding: base64'] + brk.
+		str drunhänken: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str drunhänken: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str drunhänken: brk.
+		>> max := 76.
+		>> len := blob längt.
+		>> chunks := (len / max) opronnen.
+		{ :i
+			>> chunk := blob kopéieren vun: i * max längt: max.
+			str drunhänken: chunk + brk.
+		} * chunks.
+		str drunhänken: brk.
+		str drunhänken: brk.
+	}.
+	str drunhänken: ['--'] + eegen boundary + ['--'] + brk. <- str.
+}.

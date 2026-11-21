@@ -1,0 +1,325 @@
+Isicelo-HTTP uma-kufika: ['HTTP-header:'] yenza: { :key <- Uhlelo isilungiselelo: key.
+}.
+
+>> HTTP-Header := Into okusha.
+
+HTTP-Header uma-kufika: ['okusha'] yenza: { <- uqobo okusha init.
+}.
+
+HTTP-Header uma-kufika: ['init'] yenza: {
+	okwakho key := Lutho.
+	okwakho value := Lutho.
+}.
+
+HTTP-Header uma-kufika: ['key:value:'] yenza: { :key :value
+	okwakho key := key.
+	okwakho value := value.
+}.
+
+HTTP-Header uma-kufika: ['key'] yenza: { <- okwakho key.
+}.
+
+HTTP-Header uma-kufika: ['value'] yenza: { <- okwakho value.
+}.
+
+
+HTTP-Header uma-kufika: ['umbhalo'] yenza: {
+	>> line := okwakho key + [': '] + okwakho value.
+	line buyisela: ['\r'] nge: [''], buyisela: ['\n'] nge: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Into okusha.
+
+Web-Document uma-kufika: ['okusha'] yenza: { <- uqobo okusha init.
+}.
+
+Web-Document uma-kufika: ['init'] yenza: {
+	okwakho headers := Uhlu okusha.
+	okwakho sess-id := Lutho.
+	okwakho session-manager := Tempfile-Session okusha.
+	okwakho sessdata := Lutho.
+	okwakho secure := Iqiniso.
+	okwakho same-site := ['Strict'].
+	okwakho headers-out := Amanga.
+	okwakho request := Isicelo-HTTP okusha.
+}.
+
+Web-Document uma-kufika: ['request:'] yenza: { :request
+	okwakho request := request.
+}. 
+
+Web-Document uma-kufika: ['secure-session-cookie:'] yenza: { :secure
+	uqobo check-headers.
+	okwakho secure := secure.
+}.
+
+Web-Document uma-kufika: ['same-site-session-cookie:'] yenza: { :value
+	uqobo check-headers.
+	>> options := Uhlu okusha 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options iqukethe: value, amanga: {
+		lo-msebenzi iphutha: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	okwakho same-site := value.
+}.
+
+Web-Document uma-kufika: ['header:'] yenza: { :header
+	uqobo check-headers.
+	okwakho headers engeza-ekugcineni: header.
+}.
+
+Web-Document uma-kufika: ['clear-headers'] yenza: {
+	uqobo check-headers.
+	okwakho headers := Uhlu okusha.
+}.
+
+Web-Document uma-kufika: ['session-manager:'] yenza: { :manager
+	uqobo check-headers.
+	okwakho session-manager := manager.
+}.
+
+Web-Document uma-kufika: ['session-manager'] yenza: { <- okwakho session-manager.
+}.
+
+Web-Document uma-kufika: ['check-headers'] yenza: {
+	okwakho headers-out iqiniso: {
+		lo-msebenzi iphutha: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document uma-kufika: ['session-start'] yenza: {
+	uqobo check-headers.
+	>> request := okwakho request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Lutho? amanga: {
+		(( Iphethini okusha: ['^[A-Za-z0-9]+\\z'], ukufana: sess-id ) = 0) iqiniso: {
+			sess-id := Lutho.
+		}.
+	}.
+	sess-id Lutho? iqiniso: {
+		sess-id := Isisefo ithokheni: 30.
+		>> session-header := HTTP-Header okusha
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (okwakho secure lokhu: ['Secure'] noma-lokho: ['']),
+		SSITE: (okwakho same-site),
+		XSID: sess-id
+		).
+		okwakho headers engeza-ekugcineni: session-header.
+	}.
+	okwakho sessdata := okwakho session-manager for: sess-id, load. <- okwakho sessdata. # reference
+}.
+
+Web-Document uma-kufika: ['goto:'] yenza: { :url
+	uqobo check-headers.
+	uqobo clear-headers.
+	okwakho headers
+	engeza-ekugcineni: (
+		HTTP-Header okusha
+		key: ['Status'] value: ['303 See Other']
+	),
+	engeza-ekugcineni: (
+		HTTP-Header okusha
+		key: ['Location'] value: url
+	).
+	uqobo out: ['Redirect'].
+}.
+
+Web-Document uma-kufika: ['session-destroy'] yenza: {
+	uqobo check-headers.
+	>> request := okwakho request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Lutho? amanga: {
+		>> session-header := HTTP-Header okusha.
+		>> when := Isikhathi okusha unyaka: 1970, ifomethi: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (okwakho secure lokhu: ['Secure'] noma-lokho: ['']),
+			SSITE: (okwakho same-site),
+			XSID: sess-id
+		).
+		okwakho session-manager destroy.
+		okwakho headers engeza-ekugcineni: session-header.
+	}.
+}.
+
+
+Web-Document uma-kufika: ['template:'] yenza: { :indlela-yefayela <- Template okusha: (Ifayela okusha: indlela-yefayela, funda).
+}.
+
+Web-Document uma-kufika: ['out:type:'] yenza: { :output :uhlobo
+	okwakho headers-out amanga: {
+		okwakho sessdata Lutho? amanga: {
+			okwakho session-manager save: okwakho sessdata.
+		}.
+		okwakho headers engeza-ekugcineni: (
+			HTTP-Header okusha
+			key: ['Content-type'] value: uhlobo
+		).
+		okwakho headers ngamunye: { :_ :header
+			Okuphumayo bhala: header.
+		}.
+		okwakho headers-out := Iqiniso.
+		Okuphumayo bhala: ['\r\n'].
+	}.
+	Okuphumayo bhala: output.
+}.
+
+Web-Document uma-kufika: ['finish:type:'] yenza: { :output :uhlobo
+	okwakho headers-out amanga: {
+		okwakho sessdata Lutho? amanga: {
+			okwakho session-manager save: okwakho sessdata.
+		}.
+		okwakho headers engeza-ekugcineni: (
+			HTTP-Header okusha
+			key: ['Content-type'] value: uhlobo
+		).
+		okwakho headers engeza-ekugcineni: (
+			HTTP-Header okusha
+			key: ['Content-Length'] value: output umbhalo bytes
+		).
+		okwakho headers ngamunye: { :_ :header
+			Okuphumayo bhala: header.
+		}.
+		okwakho headers-out := Iqiniso.
+		Okuphumayo bhala: ['\r\n'].
+	}.
+	Okuphumayo bhala: output.
+}.
+
+Web-Document uma-kufika: ['out:'] yenza: { :output
+	uqobo out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document uma-kufika: ['finish:'] yenza: { :output
+	uqobo finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document uma-kufika: ['json:'] yenza: { :output
+	uqobo out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document uma-kufika: ['not-found:'] yenza: { :output
+	uqobo clear-headers header: (
+		HTTP-Header okusha key: ['Status'] value: ['404 Not Found']
+	).
+	uqobo out: output.
+}.
+
+
+# Interface
+
+>> Session := Into okusha.
+
+Session uma-kufika: ['okusha'] yenza: { <- uqobo okusha init for: Lutho.
+}.
+
+Session uma-kufika: ['for:'] yenza: { :id
+	okwakho id := id.
+}.
+
+Session uma-kufika: ['load'] yenza: {
+	lo-msebenzi iphutha: ['Not implemented.'].
+}.
+
+Session uma-kufika: ['save:'] yenza: {
+	lo-msebenzi iphutha: ['Not implemented.'].
+}.
+
+Session uma-kufika: ['destroy'] yenza: {
+	lo-msebenzi iphutha: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session okusha.
+
+Tempfile-Session uma-kufika: ['init'] yenza: {
+	okwakho pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session uma-kufika: ['path-prefix:'] yenza: { :str
+	okwakho pathprefix := str.
+}.
+
+Tempfile-Session uma-kufika: ['file'] yenza: { <- ( Ifayela okusha: ( okwakho pathprefix + okwakho id + ['.txt'] ) ).
+}.
+
+Tempfile-Session uma-kufika: ['load'] yenza: {
+	>> file := uqobo file.
+	file ikhona amanga: {
+		file bhala: (Isichazamazwi okusha ikhodi).
+	}. <- file funda into.
+}.
+
+Tempfile-Session uma-kufika: ['save:'] yenza: { :data
+	>> file := uqobo file.
+	file ikhona iqiniso: {
+		file bhala: data ikhodi.
+	}.
+}.
+
+Tempfile-Session uma-kufika: ['destroy'] yenza: {
+	>> file := uqobo file.
+	file ikhona iqiniso: {
+		file susa.
+	}.
+}.
+
+
+>> URL := Into okusha.
+
+URL uma-kufika: ['init'] yenza: {
+	okwakho protocol := ['https://'].
+	okwakho umsingathi := ['localhost'].
+	okwakho indlela-yefayela := [''].
+	okwakho params := [''].
+	okwakho hash := [''].
+}.
+
+URL uma-kufika: ['okusha'] yenza: { <- uqobo okusha init.
+}.
+
+URL uma-kufika: ['umbhalo'] yenza: { <- (
+	okwakho protocol +
+	okwakho umsingathi +
+	okwakho indlela-yefayela +
+	okwakho params +
+	okwakho hash ).
+}.
+
+URL uma-kufika: ['protocol:'] yenza: { :protocol
+	((Uhlu okusha: ['http'] ; ['https']) iqukethe: protocol) iqiniso: {
+		okwakho protocol := protocol + ['://'].
+	}, amanga: {
+		lo-msebenzi iphutha: ['Invalid protocol'].
+	}.
+}.
+
+URL uma-kufika: ['umsingathi:'] yenza: { :umsingathi
+	#todo validate according to rfc
+	okwakho umsingathi := umsingathi.
+}.
+
+URL uma-kufika: ['path:'] yenza: { :indlela-yefayela
+	okwakho indlela-yefayela := ['/'] + indlela-yefayela url-faka-ikhodi.
+}.
+
+URL uma-kufika: ['params:'] yenza: { :map
+	>> params := Uhlu okusha.
+	map ngamunye: { :key :value
+		params engeza-ekugcineni: key umbhalo url-faka-ikhodi + ['='] + value umbhalo url-faka-ikhodi.
+	}.
+	okwakho params := ['?'] + ( params hlanganisa: ['&'] ).
+}.
+
+URL uma-kufika: ['hashi:'] yenza: { :hash
+	okwakho hash := ['#'] + hash url-faka-ikhodi.
+}.
+

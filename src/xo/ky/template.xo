@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Объект жаңы.
+
+Template келгенде: ['жаңы'] аткар: { <- өзү жаңы content: [''].
+}.
+
+Template келгенде: ['content:'] аткар: { :content
+	өзүнүн content := content. 
+}.
+
+Template келгенде: ['жаңы:'] аткар: { :content <- өзү жаңы content: content.
+}.
+
+Template келгенде: ['cut:'] аткар: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := өзүнүн content бөлүү: startmarker.
+	>> prefix := parts биринчи.
+	>> parts2 := parts акыркы бөлүү: endmarker.
+	>> suffix := parts2 акыркы.
+	>> part := parts2 биринчи.
+	>> rest := prefix + suffix.
+	өзүнүн content := rest. <- Template жаңы: part.
+	
+}.
+
+Template келгенде: ['көчүрүү'] аткар: { <- өзү жаңы: өзү текст көчүрүү.
+}.
+	
+Template келгенде: ['paste:at:'] аткар: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	өзүнүн content алмаштыруу: pastemarker буга: ( snippet текст + pastemarker ).
+}.
+
+Template келгенде: ['коюу:маани:'] аткар: { :slot :value
+	өзүнүн content алмаштыруу: ['<!-- slot:'] + slot + [' -->'] буга: ( Server html-коддоо: value ).
+}.
+
+Template келгенде: ['set:html:'] аткар: { :slot :html
+	өзүнүн content алмаштыруу: ['<!-- slot:'] + slot + [' -->'] буга: html.
+}.
+
+Template келгенде: ['жооп:жана:'] аткар: { :slot :value
+	өзү коюу: (slot баштап: 0 узундук: (slot узундук - 1)) маани: value.
+}.
+
+Template келгенде: ['nl2br'] аткар: {
+	өзүнүн content алмаштыруу: ['\n'] буга: ['<br>'].
+}.
+
+Template келгенде: ['clean'] аткар: {
+	өзүнүн content :=
+		Үлгү
+		жаңы: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		дал-келүү: өзүнүн content
+		аткар: { <- ['']. }.
+}.
+
+Template келгенде: ['clean-cuts'] аткар: {
+	>> items := Тизме жаңы.
+	Үлгү
+	жаңы: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	дал-келүү: өзүнүн content
+	аткар: { :_ :part
+		items аягына-кошуу: part ? 1.
+	}.
+	items ар-бир: { :_ :id
+		өзүнүн content :=
+			Үлгү жаңы: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			дал-келүү: өзүнүн content
+			аткар: { <- ['']. }.
+	 }.
+}.
+
+Template келгенде: ['clean-space'] аткар: {
+	өзүнүн content :=
+		Үлгү
+		жаңы: ['\\s*\\n'],
+		дал-келүү: өзүнүн content
+		аткар: { <- ['\n']. }.
+	өзүнүн content :=
+		Үлгү
+		жаңы: ['\\n[\\s\\t]+'],
+		дал-келүү: өзүнүн content
+		аткар: { <- ['\n']. }.
+}.
+
+Template келгенде: ['clean-all'] аткар: {
+	өзү clean.
+	өзү clean-cuts.
+	өзү clean-space.
+}.
+
+Template келгенде: ['текст'] аткар: { <- өзүнүн content.
+}.

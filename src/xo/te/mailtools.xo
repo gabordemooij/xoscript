@@ -1,0 +1,128 @@
+>> Email := వస్తువు కొత్త.
+
+Email అందినప్పుడు: ['init'] చేయి: {
+	తన recipients := వరుస కొత్త.
+	తన cc := వరుస కొత్త.
+	తన bcc := వరుస కొత్త.
+	తన from := శూన్యం.
+	తన from-name := శూన్యం.
+	తన subject := శూన్యం.
+	తన body := శూన్యం.
+}.
+
+Email అందినప్పుడు: ['కొత్త'] చేయి: { <- తాను కొత్త init.
+}.
+
+Email అందినప్పుడు: ['to:'] చేయి: { :list
+	తన recipients := list.
+}.
+ 
+Email అందినప్పుడు: ['cc:'] చేయి: { :list
+	తన cc := list.
+}.
+
+Email అందినప్పుడు: ['bcc:'] చేయి: { :list
+	తన bcc := list.
+}.
+
+Email అందినప్పుడు: ['subject:'] చేయి: { :subject
+	తన subject := subject.
+}.
+
+Email అందినప్పుడు: ['from:name:'] చేయి: { :from :పేరు
+	తన from := from.
+	తన from-name := పేరు.
+}.
+
+Email అందినప్పుడు: ['body:'] చేయి: { :body
+	తన body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email అందినప్పుడు: ['header:'] చేయి: { :line <- line మార్చు: ['\r'] తో: [''], మార్చు: ['\n'] తో: [''].
+}.
+
+Email అందినప్పుడు: ['send'] చేయి: {
+	>> f := ఫైల్ tempwrite: తాను generate.
+	ప్రోగ్రామ్ వ్యవస్థ: ['sendmail -t < '] + f ఫైల్-మార్గం, కొత్త-పంక్తి.
+}.
+
+Email అందినప్పుడు: ['generate'] చేయి: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str చివర-చేర్చు: (తాను header: ['From: '] + తన from-name + [' <'] + ( తన from ) + ['>']) + brk.
+	str చివర-చేర్చు: (తాను header: ['To: '] + ( తన recipients కలుపు: [','] )) + brk.
+	తన cc లెక్క నిజమైతే: {
+		str చివర-చేర్చు: (తాను header: ['Cc: '] + ( తన cc కలుపు: [','] )) + brk.
+	}.
+	తన bcc లెక్క నిజమైతే: {
+		str చివర-చేర్చు: (తాను header: ['Bcc: '] + ( తన bcc కలుపు: [','] )) + brk.
+	}.
+	str చివర-చేర్చు: (తాను header: ['Subject: '] + తన subject) + brk.
+	str చివర-చేర్చు: brk.
+	str చివర-చేర్చు: తన body.
+	str చివర-చేర్చు: brk. <- str.
+}.
+
+>> HTML-Email := Email కొత్త.
+
+HTML-Email అందినప్పుడు: ['init'] చేయి: {
+	తాను init.
+	తన attachments := వరుస కొత్త.
+	తన boundary := ఖజానా టోకెన్: 40.
+}.
+
+HTML-Email అందినప్పుడు: ['attach:'] చేయి: { :file
+	>> id := తన attachments లెక్క.
+	>> blob := file blob.
+	తన attachments చివర-చేర్చు: (
+		నిఘంటువు కొత్త
+			file: file ఫైల్-మార్గం,
+			mime: ['image/'] + (Server mimetype: file ఫైల్-మార్గం),
+			data: blob base64-ఎన్-కోడ్
+	).
+	blob విడుదల. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email అందినప్పుడు: ['generate'] చేయి: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str చివర-చేర్చు: (తాను header: ['From: '] + తన from-name + [' <'] + ( తన from ) + ['>']) + brk.
+	str చివర-చేర్చు: (తాను header: ['To: '] + ( తన recipients కలుపు: [','] )) + brk.
+	తన cc లెక్క నిజమైతే: {
+		str చివర-చేర్చు: (తాను header: ['Cc: '] + ( తన cc కలుపు: [','] )) + brk.
+	}.
+	తన bcc లెక్క నిజమైతే: {
+		str చివర-చేర్చు: (తాను header: ['Bcc: '] + ( తన bcc కలుపు: [','] )) + brk.
+	}.
+	str చివర-చేర్చు: (తాను header: ['Subject: '] + తన subject) + brk.
+	str చివర-చేర్చు: ['MIME-Version: 1.0'] + brk.
+	str చివర-చేర్చు: ['Content-Type: multipart/related; boundary="'] + తన boundary + ['"; type=text/html'] + brk.
+	str చివర-చేర్చు: brk.
+	str చివర-చేర్చు: ['--'] + తన boundary + brk.
+	str చివర-చేర్చు: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str చివర-చేర్చు: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str చివర-చేర్చు: brk.
+	str చివర-చేర్చు: తన body.
+	str చివర-చేర్చు: brk.
+	తన attachments ప్రతి: { :id :info
+		>> blob := info data.
+		str చివర-చేర్చు: ['--'] + తన boundary + brk.
+		str చివర-చేర్చు: ['Content-Type: '] + info mime + brk.
+		str చివర-చేర్చు: ['Content-Transfer-Encoding: base64'] + brk.
+		str చివర-చేర్చు: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str చివర-చేర్చు: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str చివర-చేర్చు: brk.
+		>> max := 76.
+		>> len := blob పొడవు.
+		>> chunks := (len / max) పై-పూర్ణాంకం.
+		{ :i
+			>> chunk := blob నకలు మొదలు: i * max పొడవు: max.
+			str చివర-చేర్చు: chunk + brk.
+		} * chunks.
+		str చివర-చేర్చు: brk.
+		str చివర-చేర్చు: brk.
+	}.
+	str చివర-చేర్చు: ['--'] + తన boundary + ['--'] + brk. <- str.
+}.

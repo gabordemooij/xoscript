@@ -1,0 +1,128 @@
+>> Email := Obxecto novo.
+
+Email en: ['init'] facer: {
+	propio recipients := Lista novo.
+	propio cc := Lista novo.
+	propio bcc := Lista novo.
+	propio from := Nada.
+	propio from-name := Nada.
+	propio subject := Nada.
+	propio body := Nada.
+}.
+
+Email en: ['novo'] facer: { <- eu novo init.
+}.
+
+Email en: ['to:'] facer: { :list
+	propio recipients := list.
+}.
+ 
+Email en: ['cc:'] facer: { :list
+	propio cc := list.
+}.
+
+Email en: ['bcc:'] facer: { :list
+	propio bcc := list.
+}.
+
+Email en: ['subject:'] facer: { :subject
+	propio subject := subject.
+}.
+
+Email en: ['from:name:'] facer: { :from :nome
+	propio from := from.
+	propio from-name := nome.
+}.
+
+Email en: ['body:'] facer: { :body
+	propio body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email en: ['header:'] facer: { :line <- line substituír: ['\r'] por: [''], substituír: ['\n'] por: [''].
+}.
+
+Email en: ['send'] facer: {
+	>> f := Ficheiro tempwrite: eu generate.
+	Programa sistema: ['sendmail -t < '] + f camiño, salto-de-liña.
+}.
+
+Email en: ['generate'] facer: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str engadir-ao-final: (eu header: ['From: '] + propio from-name + [' <'] + ( propio from ) + ['>']) + brk.
+	str engadir-ao-final: (eu header: ['To: '] + ( propio recipients unir: [','] )) + brk.
+	propio cc contar certo: {
+		str engadir-ao-final: (eu header: ['Cc: '] + ( propio cc unir: [','] )) + brk.
+	}.
+	propio bcc contar certo: {
+		str engadir-ao-final: (eu header: ['Bcc: '] + ( propio bcc unir: [','] )) + brk.
+	}.
+	str engadir-ao-final: (eu header: ['Subject: '] + propio subject) + brk.
+	str engadir-ao-final: brk.
+	str engadir-ao-final: propio body.
+	str engadir-ao-final: brk. <- str.
+}.
+
+>> HTML-Email := Email novo.
+
+HTML-Email en: ['init'] facer: {
+	eu init.
+	propio attachments := Lista novo.
+	propio boundary := Caixa-forte token: 40.
+}.
+
+HTML-Email en: ['attach:'] facer: { :file
+	>> id := propio attachments contar.
+	>> blob := file blob.
+	propio attachments engadir-ao-final: (
+		Dicionario novo
+			file: file camiño,
+			mime: ['image/'] + (Server mimetype: file camiño),
+			data: blob base64-codificar
+	).
+	blob liberar. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email en: ['generate'] facer: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str engadir-ao-final: (eu header: ['From: '] + propio from-name + [' <'] + ( propio from ) + ['>']) + brk.
+	str engadir-ao-final: (eu header: ['To: '] + ( propio recipients unir: [','] )) + brk.
+	propio cc contar certo: {
+		str engadir-ao-final: (eu header: ['Cc: '] + ( propio cc unir: [','] )) + brk.
+	}.
+	propio bcc contar certo: {
+		str engadir-ao-final: (eu header: ['Bcc: '] + ( propio bcc unir: [','] )) + brk.
+	}.
+	str engadir-ao-final: (eu header: ['Subject: '] + propio subject) + brk.
+	str engadir-ao-final: ['MIME-Version: 1.0'] + brk.
+	str engadir-ao-final: ['Content-Type: multipart/related; boundary="'] + propio boundary + ['"; type=text/html'] + brk.
+	str engadir-ao-final: brk.
+	str engadir-ao-final: ['--'] + propio boundary + brk.
+	str engadir-ao-final: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str engadir-ao-final: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str engadir-ao-final: brk.
+	str engadir-ao-final: propio body.
+	str engadir-ao-final: brk.
+	propio attachments cada: { :id :info
+		>> blob := info data.
+		str engadir-ao-final: ['--'] + propio boundary + brk.
+		str engadir-ao-final: ['Content-Type: '] + info mime + brk.
+		str engadir-ao-final: ['Content-Transfer-Encoding: base64'] + brk.
+		str engadir-ao-final: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str engadir-ao-final: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str engadir-ao-final: brk.
+		>> max := 76.
+		>> len := blob lonxitude.
+		>> chunks := (len / max) arredondar-arriba.
+		{ :i
+			>> chunk := blob copiar de: i * max lonxitude: max.
+			str engadir-ao-final: chunk + brk.
+		} * chunks.
+		str engadir-ao-final: brk.
+		str engadir-ao-final: brk.
+	}.
+	str engadir-ao-final: ['--'] + propio boundary + ['--'] + brk. <- str.
+}.

@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Αντικείμενο νέο.
+
+Template όταν: ['νέο'] κάνε: { <- εαυτός νέο content: [''].
+}.
+
+Template όταν: ['content:'] κάνε: { :content
+	δικό content := content. 
+}.
+
+Template όταν: ['νέο:'] κάνε: { :content <- εαυτός νέο content: content.
+}.
+
+Template όταν: ['cut:'] κάνε: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := δικό content διαχωρισμός: startmarker.
+	>> prefix := parts πρώτο.
+	>> parts2 := parts τελευταίο διαχωρισμός: endmarker.
+	>> suffix := parts2 τελευταίο.
+	>> part := parts2 πρώτο.
+	>> rest := prefix + suffix.
+	δικό content := rest. <- Template νέο: part.
+	
+}.
+
+Template όταν: ['αντιγραφή'] κάνε: { <- εαυτός νέο: εαυτός κείμενο αντιγραφή.
+}.
+	
+Template όταν: ['paste:at:'] κάνε: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	δικό content αντικατάσταση: pastemarker με: ( snippet κείμενο + pastemarker ).
+}.
+
+Template όταν: ['ορισμός:τιμή:'] κάνε: { :slot :value
+	δικό content αντικατάσταση: ['<!-- slot:'] + slot + [' -->'] με: ( Server html-κωδικοποίηση: value ).
+}.
+
+Template όταν: ['set:html:'] κάνε: { :slot :html
+	δικό content αντικατάσταση: ['<!-- slot:'] + slot + [' -->'] με: html.
+}.
+
+Template όταν: ['απάντηση:και:'] κάνε: { :slot :value
+	εαυτός ορισμός: (slot από: 0 μήκος: (slot μήκος - 1)) τιμή: value.
+}.
+
+Template όταν: ['nl2br'] κάνε: {
+	δικό content αντικατάσταση: ['\n'] με: ['<br>'].
+}.
+
+Template όταν: ['clean'] κάνε: {
+	δικό content :=
+		Μοτίβο
+		νέο: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ταίριασμα: δικό content
+		κάνε: { <- ['']. }.
+}.
+
+Template όταν: ['clean-cuts'] κάνε: {
+	>> items := Λίστα νέο.
+	Μοτίβο
+	νέο: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ταίριασμα: δικό content
+	κάνε: { :_ :part
+		items προσθήκη-στο-τέλος: part ? 1.
+	}.
+	items κάθε: { :_ :id
+		δικό content :=
+			Μοτίβο νέο: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ταίριασμα: δικό content
+			κάνε: { <- ['']. }.
+	 }.
+}.
+
+Template όταν: ['clean-space'] κάνε: {
+	δικό content :=
+		Μοτίβο
+		νέο: ['\\s*\\n'],
+		ταίριασμα: δικό content
+		κάνε: { <- ['\n']. }.
+	δικό content :=
+		Μοτίβο
+		νέο: ['\\n[\\s\\t]+'],
+		ταίριασμα: δικό content
+		κάνε: { <- ['\n']. }.
+}.
+
+Template όταν: ['clean-all'] κάνε: {
+	εαυτός clean.
+	εαυτός clean-cuts.
+	εαυτός clean-space.
+}.
+
+Template όταν: ['κείμενο'] κάνε: { <- δικό content.
+}.

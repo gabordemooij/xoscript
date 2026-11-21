@@ -1,0 +1,325 @@
+HTTP-Запрос в: ['HTTP-header:'] сделать: { :key <- Программа параметр: key.
+}.
+
+>> HTTP-Header := Объект саҥа.
+
+HTTP-Header в: ['саҥа'] сделать: { <- бэйэ саҥа init.
+}.
+
+HTTP-Header в: ['init'] сделать: {
+	бэйэм key := Кураанах.
+	бэйэм value := Кураанах.
+}.
+
+HTTP-Header в: ['key:value:'] сделать: { :key :value
+	бэйэм key := key.
+	бэйэм value := value.
+}.
+
+HTTP-Header в: ['key'] сделать: { <- бэйэм key.
+}.
+
+HTTP-Header в: ['value'] сделать: { <- бэйэм value.
+}.
+
+
+HTTP-Header в: ['к-тексту'] сделать: {
+	>> line := бэйэм key + [': '] + бэйэм value.
+	line солбуй: ['\r'] на: [''], солбуй: ['\n'] на: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Объект саҥа.
+
+Web-Document в: ['саҥа'] сделать: { <- бэйэ саҥа init.
+}.
+
+Web-Document в: ['init'] сделать: {
+	бэйэм headers := Испииһэк саҥа.
+	бэйэм sess-id := Кураанах.
+	бэйэм session-manager := Tempfile-Session саҥа.
+	бэйэм sessdata := Кураанах.
+	бэйэм secure := Даа.
+	бэйэм same-site := ['Strict'].
+	бэйэм headers-out := Суох.
+	бэйэм request := HTTP-Запрос саҥа.
+}.
+
+Web-Document в: ['request:'] сделать: { :request
+	бэйэм request := request.
+}. 
+
+Web-Document в: ['secure-session-cookie:'] сделать: { :secure
+	бэйэ check-headers.
+	бэйэм secure := secure.
+}.
+
+Web-Document в: ['same-site-session-cookie:'] сделать: { :value
+	бэйэ check-headers.
+	>> options := Испииһэк саҥа 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options содержит: value, суох: {
+		этот-блок-кода алҕас: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	бэйэм same-site := value.
+}.
+
+Web-Document в: ['header:'] сделать: { :header
+	бэйэ check-headers.
+	бэйэм headers эбэн-биэр: header.
+}.
+
+Web-Document в: ['clear-headers'] сделать: {
+	бэйэ check-headers.
+	бэйэм headers := Испииһэк саҥа.
+}.
+
+Web-Document в: ['session-manager:'] сделать: { :manager
+	бэйэ check-headers.
+	бэйэм session-manager := manager.
+}.
+
+Web-Document в: ['session-manager'] сделать: { <- бэйэм session-manager.
+}.
+
+Web-Document в: ['check-headers'] сделать: {
+	бэйэм headers-out даа: {
+		этот-блок-кода алҕас: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document в: ['session-start'] сделать: {
+	бэйэ check-headers.
+	>> request := бэйэм request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Кураанах? суох: {
+		(( Шаблон саҥа: ['^[A-Za-z0-9]+\\z'], сөп-түбэһии: sess-id ) = 0) даа: {
+			sess-id := Кураанах.
+		}.
+	}.
+	sess-id Кураанах? даа: {
+		sess-id := Сейф токен: 30.
+		>> session-header := HTTP-Header саҥа
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (бэйэм secure эбэтэр: ['Secure'] эбэтэр: ['']),
+		SSITE: (бэйэм same-site),
+		XSID: sess-id
+		).
+		бэйэм headers эбэн-биэр: session-header.
+	}.
+	бэйэм sessdata := бэйэм session-manager for: sess-id, load. <- бэйэм sessdata. # reference
+}.
+
+Web-Document в: ['goto:'] сделать: { :url
+	бэйэ check-headers.
+	бэйэ clear-headers.
+	бэйэм headers
+	эбэн-биэр: (
+		HTTP-Header саҥа
+		key: ['Status'] value: ['303 See Other']
+	),
+	эбэн-биэр: (
+		HTTP-Header саҥа
+		key: ['Location'] value: url
+	).
+	бэйэ out: ['Redirect'].
+}.
+
+Web-Document в: ['session-destroy'] сделать: {
+	бэйэ check-headers.
+	>> request := бэйэм request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Кураанах? суох: {
+		>> session-header := HTTP-Header саҥа.
+		>> when := Түгэн саҥа год: 1970, формат: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (бэйэм secure эбэтэр: ['Secure'] эбэтэр: ['']),
+			SSITE: (бэйэм same-site),
+			XSID: sess-id
+		).
+		бэйэм session-manager destroy.
+		бэйэм headers эбэн-биэр: session-header.
+	}.
+}.
+
+
+Web-Document в: ['template:'] сделать: { :путь <- Template саҥа: (Файл саҥа: путь, аах).
+}.
+
+Web-Document в: ['out:type:'] сделать: { :output :тип
+	бэйэм headers-out суох: {
+		бэйэм sessdata Кураанах? суох: {
+			бэйэм session-manager save: бэйэм sessdata.
+		}.
+		бэйэм headers эбэн-биэр: (
+			HTTP-Header саҥа
+			key: ['Content-type'] value: тип
+		).
+		бэйэм headers хас-биирдии: { :_ :header
+			Таһаарыы суруй: header.
+		}.
+		бэйэм headers-out := Даа.
+		Таһаарыы суруй: ['\r\n'].
+	}.
+	Таһаарыы суруй: output.
+}.
+
+Web-Document в: ['finish:type:'] сделать: { :output :тип
+	бэйэм headers-out суох: {
+		бэйэм sessdata Кураанах? суох: {
+			бэйэм session-manager save: бэйэм sessdata.
+		}.
+		бэйэм headers эбэн-биэр: (
+			HTTP-Header саҥа
+			key: ['Content-type'] value: тип
+		).
+		бэйэм headers эбэн-биэр: (
+			HTTP-Header саҥа
+			key: ['Content-Length'] value: output к-тексту bytes
+		).
+		бэйэм headers хас-биирдии: { :_ :header
+			Таһаарыы суруй: header.
+		}.
+		бэйэм headers-out := Даа.
+		Таһаарыы суруй: ['\r\n'].
+	}.
+	Таһаарыы суруй: output.
+}.
+
+Web-Document в: ['out:'] сделать: { :output
+	бэйэ out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document в: ['finish:'] сделать: { :output
+	бэйэ finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document в: ['json:'] сделать: { :output
+	бэйэ out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document в: ['not-found:'] сделать: { :output
+	бэйэ clear-headers header: (
+		HTTP-Header саҥа key: ['Status'] value: ['404 Not Found']
+	).
+	бэйэ out: output.
+}.
+
+
+# Interface
+
+>> Session := Объект саҥа.
+
+Session в: ['саҥа'] сделать: { <- бэйэ саҥа init for: Кураанах.
+}.
+
+Session в: ['for:'] сделать: { :id
+	бэйэм id := id.
+}.
+
+Session в: ['load'] сделать: {
+	этот-блок-кода алҕас: ['Not implemented.'].
+}.
+
+Session в: ['save:'] сделать: {
+	этот-блок-кода алҕас: ['Not implemented.'].
+}.
+
+Session в: ['destroy'] сделать: {
+	этот-блок-кода алҕас: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session саҥа.
+
+Tempfile-Session в: ['init'] сделать: {
+	бэйэм pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session в: ['path-prefix:'] сделать: { :str
+	бэйэм pathprefix := str.
+}.
+
+Tempfile-Session в: ['file'] сделать: { <- ( Файл саҥа: ( бэйэм pathprefix + бэйэм id + ['.txt'] ) ).
+}.
+
+Tempfile-Session в: ['load'] сделать: {
+	>> file := бэйэ file.
+	file существует суох: {
+		file суруй: (Тылдьыт саҥа код).
+	}. <- file аах объект.
+}.
+
+Tempfile-Session в: ['save:'] сделать: { :data
+	>> file := бэйэ file.
+	file существует даа: {
+		file суруй: data код.
+	}.
+}.
+
+Tempfile-Session в: ['destroy'] сделать: {
+	>> file := бэйэ file.
+	file существует даа: {
+		file ыраас.
+	}.
+}.
+
+
+>> URL := Объект саҥа.
+
+URL в: ['init'] сделать: {
+	бэйэм protocol := ['https://'].
+	бэйэм хост := ['localhost'].
+	бэйэм путь := [''].
+	бэйэм params := [''].
+	бэйэм hash := [''].
+}.
+
+URL в: ['саҥа'] сделать: { <- бэйэ саҥа init.
+}.
+
+URL в: ['к-тексту'] сделать: { <- (
+	бэйэм protocol +
+	бэйэм хост +
+	бэйэм путь +
+	бэйэм params +
+	бэйэм hash ).
+}.
+
+URL в: ['protocol:'] сделать: { :protocol
+	((Испииһэк саҥа: ['http'] ; ['https']) содержит: protocol) даа: {
+		бэйэм protocol := protocol + ['://'].
+	}, суох: {
+		этот-блок-кода алҕас: ['Invalid protocol'].
+	}.
+}.
+
+URL в: ['хост:'] сделать: { :хост
+	#todo validate according to rfc
+	бэйэм хост := хост.
+}.
+
+URL в: ['path:'] сделать: { :путь
+	бэйэм путь := ['/'] + путь url-кодировать.
+}.
+
+URL в: ['params:'] сделать: { :map
+	>> params := Испииһэк саҥа.
+	map хас-биирдии: { :key :value
+		params эбэн-биэр: key к-тексту url-кодировать + ['='] + value к-тексту url-кодировать.
+	}.
+	бэйэм params := ['?'] + ( params присоединить: ['&'] ).
+}.
+
+URL в: ['хэш:'] сделать: { :hash
+	бэйэм hash := ['#'] + hash url-кодировать.
+}.
+

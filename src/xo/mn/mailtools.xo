@@ -1,0 +1,128 @@
+>> Email := Объект шинэ.
+
+Email ирэхэд: ['init'] гүйцэтгэ: {
+	өөрийн recipients := Жагсаалт шинэ.
+	өөрийн cc := Жагсаалт шинэ.
+	өөрийн bcc := Жагсаалт шинэ.
+	өөрийн from := Хоосон.
+	өөрийн from-name := Хоосон.
+	өөрийн subject := Хоосон.
+	өөрийн body := Хоосон.
+}.
+
+Email ирэхэд: ['шинэ'] гүйцэтгэ: { <- өөрөө шинэ init.
+}.
+
+Email ирэхэд: ['to:'] гүйцэтгэ: { :list
+	өөрийн recipients := list.
+}.
+ 
+Email ирэхэд: ['cc:'] гүйцэтгэ: { :list
+	өөрийн cc := list.
+}.
+
+Email ирэхэд: ['bcc:'] гүйцэтгэ: { :list
+	өөрийн bcc := list.
+}.
+
+Email ирэхэд: ['subject:'] гүйцэтгэ: { :subject
+	өөрийн subject := subject.
+}.
+
+Email ирэхэд: ['from:name:'] гүйцэтгэ: { :from :нэр
+	өөрийн from := from.
+	өөрийн from-name := нэр.
+}.
+
+Email ирэхэд: ['body:'] гүйцэтгэ: { :body
+	өөрийн body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ирэхэд: ['header:'] гүйцэтгэ: { :line <- line солих: ['\r'] үүгээр: [''], солих: ['\n'] үүгээр: [''].
+}.
+
+Email ирэхэд: ['send'] гүйцэтгэ: {
+	>> f := Файл tempwrite: өөрөө generate.
+	Програм систем: ['sendmail -t < '] + f зам, шинэ-мөр.
+}.
+
+Email ирэхэд: ['generate'] гүйцэтгэ: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str төгсгөлд-нэмэх: (өөрөө header: ['From: '] + өөрийн from-name + [' <'] + ( өөрийн from ) + ['>']) + brk.
+	str төгсгөлд-нэмэх: (өөрөө header: ['To: '] + ( өөрийн recipients нэгтгэх: [','] )) + brk.
+	өөрийн cc тоо-ширхэг үнэн-бол: {
+		str төгсгөлд-нэмэх: (өөрөө header: ['Cc: '] + ( өөрийн cc нэгтгэх: [','] )) + brk.
+	}.
+	өөрийн bcc тоо-ширхэг үнэн-бол: {
+		str төгсгөлд-нэмэх: (өөрөө header: ['Bcc: '] + ( өөрийн bcc нэгтгэх: [','] )) + brk.
+	}.
+	str төгсгөлд-нэмэх: (өөрөө header: ['Subject: '] + өөрийн subject) + brk.
+	str төгсгөлд-нэмэх: brk.
+	str төгсгөлд-нэмэх: өөрийн body.
+	str төгсгөлд-нэмэх: brk. <- str.
+}.
+
+>> HTML-Email := Email шинэ.
+
+HTML-Email ирэхэд: ['init'] гүйцэтгэ: {
+	өөрөө init.
+	өөрийн attachments := Жагсаалт шинэ.
+	өөрийн boundary := Сейф токен: 40.
+}.
+
+HTML-Email ирэхэд: ['attach:'] гүйцэтгэ: { :file
+	>> id := өөрийн attachments тоо-ширхэг.
+	>> blob := file blob.
+	өөрийн attachments төгсгөлд-нэмэх: (
+		Толь шинэ
+			file: file зам,
+			mime: ['image/'] + (Server mimetype: file зам),
+			data: blob base64-кодлох
+	).
+	blob чөлөөлөх. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ирэхэд: ['generate'] гүйцэтгэ: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str төгсгөлд-нэмэх: (өөрөө header: ['From: '] + өөрийн from-name + [' <'] + ( өөрийн from ) + ['>']) + brk.
+	str төгсгөлд-нэмэх: (өөрөө header: ['To: '] + ( өөрийн recipients нэгтгэх: [','] )) + brk.
+	өөрийн cc тоо-ширхэг үнэн-бол: {
+		str төгсгөлд-нэмэх: (өөрөө header: ['Cc: '] + ( өөрийн cc нэгтгэх: [','] )) + brk.
+	}.
+	өөрийн bcc тоо-ширхэг үнэн-бол: {
+		str төгсгөлд-нэмэх: (өөрөө header: ['Bcc: '] + ( өөрийн bcc нэгтгэх: [','] )) + brk.
+	}.
+	str төгсгөлд-нэмэх: (өөрөө header: ['Subject: '] + өөрийн subject) + brk.
+	str төгсгөлд-нэмэх: ['MIME-Version: 1.0'] + brk.
+	str төгсгөлд-нэмэх: ['Content-Type: multipart/related; boundary="'] + өөрийн boundary + ['"; type=text/html'] + brk.
+	str төгсгөлд-нэмэх: brk.
+	str төгсгөлд-нэмэх: ['--'] + өөрийн boundary + brk.
+	str төгсгөлд-нэмэх: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str төгсгөлд-нэмэх: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str төгсгөлд-нэмэх: brk.
+	str төгсгөлд-нэмэх: өөрийн body.
+	str төгсгөлд-нэмэх: brk.
+	өөрийн attachments бүр: { :id :info
+		>> blob := info data.
+		str төгсгөлд-нэмэх: ['--'] + өөрийн boundary + brk.
+		str төгсгөлд-нэмэх: ['Content-Type: '] + info mime + brk.
+		str төгсгөлд-нэмэх: ['Content-Transfer-Encoding: base64'] + brk.
+		str төгсгөлд-нэмэх: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str төгсгөлд-нэмэх: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str төгсгөлд-нэмэх: brk.
+		>> max := 76.
+		>> len := blob урт.
+		>> chunks := (len / max) дээш-бүхэлтгэх.
+		{ :i
+			>> chunk := blob хуулах эхлэл: i * max урт: max.
+			str төгсгөлд-нэмэх: chunk + brk.
+		} * chunks.
+		str төгсгөлд-нэмэх: brk.
+		str төгсгөлд-нэмэх: brk.
+	}.
+	str төгсгөлд-нэмэх: ['--'] + өөрийн boundary + ['--'] + brk. <- str.
+}.

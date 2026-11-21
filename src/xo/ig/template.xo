@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Ihe ohuru.
+
+Template mgbe-ọbịara: ['ohuru'] mee: { <- onwe ohuru content: [''].
+}.
+
+Template mgbe-ọbịara: ['content:'] mee: { :content
+	nke-ya content := content. 
+}.
+
+Template mgbe-ọbịara: ['ohuru:'] mee: { :content <- onwe ohuru content: content.
+}.
+
+Template mgbe-ọbịara: ['cut:'] mee: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := nke-ya content kewaa: startmarker.
+	>> prefix := parts mbụ.
+	>> parts2 := parts nke-ikpeazụ kewaa: endmarker.
+	>> suffix := parts2 nke-ikpeazụ.
+	>> part := parts2 mbụ.
+	>> rest := prefix + suffix.
+	nke-ya content := rest. <- Template ohuru: part.
+	
+}.
+
+Template mgbe-ọbịara: ['detuo'] mee: { <- onwe ohuru: onwe ederede detuo.
+}.
+	
+Template mgbe-ọbịara: ['paste:at:'] mee: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	nke-ya content dochie: pastemarker na: ( snippet ederede + pastemarker ).
+}.
+
+Template mgbe-ọbịara: ['dozie:uru:'] mee: { :slot :value
+	nke-ya content dochie: ['<!-- slot:'] + slot + [' -->'] na: ( Server html-tinye-koodu: value ).
+}.
+
+Template mgbe-ọbịara: ['set:html:'] mee: { :slot :html
+	nke-ya content dochie: ['<!-- slot:'] + slot + [' -->'] na: html.
+}.
+
+Template mgbe-ọbịara: ['zaghachi:na:'] mee: { :slot :value
+	onwe dozie: (slot site-na: 0 ogologo: (slot ogologo - 1)) uru: value.
+}.
+
+Template mgbe-ọbịara: ['nl2br'] mee: {
+	nke-ya content dochie: ['\n'] na: ['<br>'].
+}.
+
+Template mgbe-ọbịara: ['clean'] mee: {
+	nke-ya content :=
+		Ụkpụrụ-ọchụchọ
+		ohuru: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		dakọtara: nke-ya content
+		mee: { <- ['']. }.
+}.
+
+Template mgbe-ọbịara: ['clean-cuts'] mee: {
+	>> items := Ndepụta ohuru.
+	Ụkpụrụ-ọchụchọ
+	ohuru: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	dakọtara: nke-ya content
+	mee: { :_ :part
+		items tinye-na-njedebe: part ? 1.
+	}.
+	items nke-ọ-bụla: { :_ :id
+		nke-ya content :=
+			Ụkpụrụ-ọchụchọ ohuru: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			dakọtara: nke-ya content
+			mee: { <- ['']. }.
+	 }.
+}.
+
+Template mgbe-ọbịara: ['clean-space'] mee: {
+	nke-ya content :=
+		Ụkpụrụ-ọchụchọ
+		ohuru: ['\\s*\\n'],
+		dakọtara: nke-ya content
+		mee: { <- ['\n']. }.
+	nke-ya content :=
+		Ụkpụrụ-ọchụchọ
+		ohuru: ['\\n[\\s\\t]+'],
+		dakọtara: nke-ya content
+		mee: { <- ['\n']. }.
+}.
+
+Template mgbe-ọbịara: ['clean-all'] mee: {
+	onwe clean.
+	onwe clean-cuts.
+	onwe clean-space.
+}.
+
+Template mgbe-ọbịara: ['ederede'] mee: { <- nke-ya content.
+}.

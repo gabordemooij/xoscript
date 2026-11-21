@@ -1,0 +1,128 @@
+>> Email := Objekat novi.
+
+Email na: ['init'] uradi: {
+	svoj recipients := Lista novi.
+	svoj cc := Lista novi.
+	svoj bcc := Lista novi.
+	svoj from := Ništa.
+	svoj from-name := Ništa.
+	svoj subject := Ništa.
+	svoj body := Ništa.
+}.
+
+Email na: ['novi'] uradi: { <- sebe novi init.
+}.
+
+Email na: ['to:'] uradi: { :list
+	svoj recipients := list.
+}.
+ 
+Email na: ['cc:'] uradi: { :list
+	svoj cc := list.
+}.
+
+Email na: ['bcc:'] uradi: { :list
+	svoj bcc := list.
+}.
+
+Email na: ['subject:'] uradi: { :subject
+	svoj subject := subject.
+}.
+
+Email na: ['from:name:'] uradi: { :from :naziv
+	svoj from := from.
+	svoj from-name := naziv.
+}.
+
+Email na: ['body:'] uradi: { :body
+	svoj body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email na: ['header:'] uradi: { :line <- line zamijeni: ['\r'] sa: [''], zamijeni: ['\n'] sa: [''].
+}.
+
+Email na: ['send'] uradi: {
+	>> f := Datoteka tempwrite: sebe generate.
+	Program sistem: ['sendmail -t < '] + f putanja, novi-red.
+}.
+
+Email na: ['generate'] uradi: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str dodaj-na-kraj: (sebe header: ['From: '] + svoj from-name + [' <'] + ( svoj from ) + ['>']) + brk.
+	str dodaj-na-kraj: (sebe header: ['To: '] + ( svoj recipients spoji: [','] )) + brk.
+	svoj cc broj-elemenata tačno: {
+		str dodaj-na-kraj: (sebe header: ['Cc: '] + ( svoj cc spoji: [','] )) + brk.
+	}.
+	svoj bcc broj-elemenata tačno: {
+		str dodaj-na-kraj: (sebe header: ['Bcc: '] + ( svoj bcc spoji: [','] )) + brk.
+	}.
+	str dodaj-na-kraj: (sebe header: ['Subject: '] + svoj subject) + brk.
+	str dodaj-na-kraj: brk.
+	str dodaj-na-kraj: svoj body.
+	str dodaj-na-kraj: brk. <- str.
+}.
+
+>> HTML-Email := Email novi.
+
+HTML-Email na: ['init'] uradi: {
+	sebe init.
+	svoj attachments := Lista novi.
+	svoj boundary := Sef token: 40.
+}.
+
+HTML-Email na: ['attach:'] uradi: { :file
+	>> id := svoj attachments broj-elemenata.
+	>> blob := file blob.
+	svoj attachments dodaj-na-kraj: (
+		Rječnik novi
+			file: file putanja,
+			mime: ['image/'] + (Server mimetype: file putanja),
+			data: blob base64-kodiraj
+	).
+	blob oslobodi. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email na: ['generate'] uradi: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str dodaj-na-kraj: (sebe header: ['From: '] + svoj from-name + [' <'] + ( svoj from ) + ['>']) + brk.
+	str dodaj-na-kraj: (sebe header: ['To: '] + ( svoj recipients spoji: [','] )) + brk.
+	svoj cc broj-elemenata tačno: {
+		str dodaj-na-kraj: (sebe header: ['Cc: '] + ( svoj cc spoji: [','] )) + brk.
+	}.
+	svoj bcc broj-elemenata tačno: {
+		str dodaj-na-kraj: (sebe header: ['Bcc: '] + ( svoj bcc spoji: [','] )) + brk.
+	}.
+	str dodaj-na-kraj: (sebe header: ['Subject: '] + svoj subject) + brk.
+	str dodaj-na-kraj: ['MIME-Version: 1.0'] + brk.
+	str dodaj-na-kraj: ['Content-Type: multipart/related; boundary="'] + svoj boundary + ['"; type=text/html'] + brk.
+	str dodaj-na-kraj: brk.
+	str dodaj-na-kraj: ['--'] + svoj boundary + brk.
+	str dodaj-na-kraj: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str dodaj-na-kraj: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str dodaj-na-kraj: brk.
+	str dodaj-na-kraj: svoj body.
+	str dodaj-na-kraj: brk.
+	svoj attachments svaki: { :id :info
+		>> blob := info data.
+		str dodaj-na-kraj: ['--'] + svoj boundary + brk.
+		str dodaj-na-kraj: ['Content-Type: '] + info mime + brk.
+		str dodaj-na-kraj: ['Content-Transfer-Encoding: base64'] + brk.
+		str dodaj-na-kraj: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str dodaj-na-kraj: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str dodaj-na-kraj: brk.
+		>> max := 76.
+		>> len := blob dužina.
+		>> chunks := (len / max) zaokruži-gore.
+		{ :i
+			>> chunk := blob kopiraj od: i * max dužina: max.
+			str dodaj-na-kraj: chunk + brk.
+		} * chunks.
+		str dodaj-na-kraj: brk.
+		str dodaj-na-kraj: brk.
+	}.
+	str dodaj-na-kraj: ['--'] + svoj boundary + ['--'] + brk. <- str.
+}.

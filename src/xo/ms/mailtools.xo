@@ -1,0 +1,128 @@
+>> Email := Objek baharu.
+
+Email apabila: ['init'] lakukan: {
+	milik recipients := Senarai baharu.
+	milik cc := Senarai baharu.
+	milik bcc := Senarai baharu.
+	milik from := Tiada.
+	milik from-name := Tiada.
+	milik subject := Tiada.
+	milik body := Tiada.
+}.
+
+Email apabila: ['baharu'] lakukan: { <- diri baharu init.
+}.
+
+Email apabila: ['to:'] lakukan: { :list
+	milik recipients := list.
+}.
+ 
+Email apabila: ['cc:'] lakukan: { :list
+	milik cc := list.
+}.
+
+Email apabila: ['bcc:'] lakukan: { :list
+	milik bcc := list.
+}.
+
+Email apabila: ['subject:'] lakukan: { :subject
+	milik subject := subject.
+}.
+
+Email apabila: ['from:name:'] lakukan: { :from :nama
+	milik from := from.
+	milik from-name := nama.
+}.
+
+Email apabila: ['body:'] lakukan: { :body
+	milik body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email apabila: ['header:'] lakukan: { :line <- line ganti: ['\r'] dengan: [''], ganti: ['\n'] dengan: [''].
+}.
+
+Email apabila: ['send'] lakukan: {
+	>> f := Fail tempwrite: diri generate.
+	Atur-cara sistem: ['sendmail -t < '] + f laluan, baris-baharu.
+}.
+
+Email apabila: ['generate'] lakukan: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tambah-di-hujung: (diri header: ['From: '] + milik from-name + [' <'] + ( milik from ) + ['>']) + brk.
+	str tambah-di-hujung: (diri header: ['To: '] + ( milik recipients gabungkan: [','] )) + brk.
+	milik cc bilangan benar: {
+		str tambah-di-hujung: (diri header: ['Cc: '] + ( milik cc gabungkan: [','] )) + brk.
+	}.
+	milik bcc bilangan benar: {
+		str tambah-di-hujung: (diri header: ['Bcc: '] + ( milik bcc gabungkan: [','] )) + brk.
+	}.
+	str tambah-di-hujung: (diri header: ['Subject: '] + milik subject) + brk.
+	str tambah-di-hujung: brk.
+	str tambah-di-hujung: milik body.
+	str tambah-di-hujung: brk. <- str.
+}.
+
+>> HTML-Email := Email baharu.
+
+HTML-Email apabila: ['init'] lakukan: {
+	diri init.
+	milik attachments := Senarai baharu.
+	milik boundary := Peti-besi token: 40.
+}.
+
+HTML-Email apabila: ['attach:'] lakukan: { :file
+	>> id := milik attachments bilangan.
+	>> blob := file blob.
+	milik attachments tambah-di-hujung: (
+		Kamus baharu
+			file: file laluan,
+			mime: ['image/'] + (Server mimetype: file laluan),
+			data: blob base64-kodkan
+	).
+	blob bebaskan. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email apabila: ['generate'] lakukan: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tambah-di-hujung: (diri header: ['From: '] + milik from-name + [' <'] + ( milik from ) + ['>']) + brk.
+	str tambah-di-hujung: (diri header: ['To: '] + ( milik recipients gabungkan: [','] )) + brk.
+	milik cc bilangan benar: {
+		str tambah-di-hujung: (diri header: ['Cc: '] + ( milik cc gabungkan: [','] )) + brk.
+	}.
+	milik bcc bilangan benar: {
+		str tambah-di-hujung: (diri header: ['Bcc: '] + ( milik bcc gabungkan: [','] )) + brk.
+	}.
+	str tambah-di-hujung: (diri header: ['Subject: '] + milik subject) + brk.
+	str tambah-di-hujung: ['MIME-Version: 1.0'] + brk.
+	str tambah-di-hujung: ['Content-Type: multipart/related; boundary="'] + milik boundary + ['"; type=text/html'] + brk.
+	str tambah-di-hujung: brk.
+	str tambah-di-hujung: ['--'] + milik boundary + brk.
+	str tambah-di-hujung: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str tambah-di-hujung: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str tambah-di-hujung: brk.
+	str tambah-di-hujung: milik body.
+	str tambah-di-hujung: brk.
+	milik attachments setiap: { :id :info
+		>> blob := info data.
+		str tambah-di-hujung: ['--'] + milik boundary + brk.
+		str tambah-di-hujung: ['Content-Type: '] + info mime + brk.
+		str tambah-di-hujung: ['Content-Transfer-Encoding: base64'] + brk.
+		str tambah-di-hujung: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str tambah-di-hujung: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str tambah-di-hujung: brk.
+		>> max := 76.
+		>> len := blob panjang.
+		>> chunks := (len / max) bundar-ke-atas.
+		{ :i
+			>> chunk := blob salin dari: i * max panjang: max.
+			str tambah-di-hujung: chunk + brk.
+		} * chunks.
+		str tambah-di-hujung: brk.
+		str tambah-di-hujung: brk.
+	}.
+	str tambah-di-hujung: ['--'] + milik boundary + ['--'] + brk. <- str.
+}.

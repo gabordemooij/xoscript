@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := كائن جديد.
+
+Template عند: ['جديد'] نفذ: { <- ذات جديد content: [''].
+}.
+
+Template عند: ['content:'] نفذ: { :content
+	خاص content := content. 
+}.
+
+Template عند: ['جديد:'] نفذ: { :content <- ذات جديد content: content.
+}.
+
+Template عند: ['cut:'] نفذ: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := خاص content قسم: startmarker.
+	>> prefix := parts الأول.
+	>> parts2 := parts الأخير قسم: endmarker.
+	>> suffix := parts2 الأخير.
+	>> part := parts2 الأول.
+	>> rest := prefix + suffix.
+	خاص content := rest. <- Template جديد: part.
+	
+}.
+
+Template عند: ['انسخ'] نفذ: { <- ذات جديد: ذات كنص انسخ.
+}.
+	
+Template عند: ['paste:at:'] نفذ: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	خاص content استبدل: pastemarker ببديل: ( snippet كنص + pastemarker ).
+}.
+
+Template عند: ['عين:قيمة:'] نفذ: { :slot :value
+	خاص content استبدل: ['<!-- slot:'] + slot + [' -->'] ببديل: ( Server html-ترميز: value ).
+}.
+
+Template عند: ['set:html:'] نفذ: { :slot :html
+	خاص content استبدل: ['<!-- slot:'] + slot + [' -->'] ببديل: html.
+}.
+
+Template عند: ['استجب:و:'] نفذ: { :slot :value
+	ذات عين: (slot بداية: 0 طول: (slot طول - 1)) قيمة: value.
+}.
+
+Template عند: ['nl2br'] نفذ: {
+	خاص content استبدل: ['\n'] ببديل: ['<br>'].
+}.
+
+Template عند: ['clean'] نفذ: {
+	خاص content :=
+		نمط
+		جديد: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		طابق: خاص content
+		نفذ: { <- ['']. }.
+}.
+
+Template عند: ['clean-cuts'] نفذ: {
+	>> items := قائمة جديد.
+	نمط
+	جديد: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	طابق: خاص content
+	نفذ: { :_ :part
+		items ألحق: part ? 1.
+	}.
+	items لكل: { :_ :id
+		خاص content :=
+			نمط جديد: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			طابق: خاص content
+			نفذ: { <- ['']. }.
+	 }.
+}.
+
+Template عند: ['clean-space'] نفذ: {
+	خاص content :=
+		نمط
+		جديد: ['\\s*\\n'],
+		طابق: خاص content
+		نفذ: { <- ['\n']. }.
+	خاص content :=
+		نمط
+		جديد: ['\\n[\\s\\t]+'],
+		طابق: خاص content
+		نفذ: { <- ['\n']. }.
+}.
+
+Template عند: ['clean-all'] نفذ: {
+	ذات clean.
+	ذات clean-cuts.
+	ذات clean-space.
+}.
+
+Template عند: ['كنص'] نفذ: { <- خاص content.
+}.

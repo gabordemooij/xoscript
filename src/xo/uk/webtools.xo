@@ -1,0 +1,325 @@
+HTTP-Запит при: ['HTTP-header:'] виконати: { :key <- Програма налаштування: key.
+}.
+
+>> HTTP-Header := Обʼєкт новий.
+
+HTTP-Header при: ['новий'] виконати: { <- сам новий init.
+}.
+
+HTTP-Header при: ['init'] виконати: {
+	свій key := Ніщо.
+	свій value := Ніщо.
+}.
+
+HTTP-Header при: ['key:value:'] виконати: { :key :value
+	свій key := key.
+	свій value := value.
+}.
+
+HTTP-Header при: ['key'] виконати: { <- свій key.
+}.
+
+HTTP-Header при: ['value'] виконати: { <- свій value.
+}.
+
+
+HTTP-Header при: ['текст'] виконати: {
+	>> line := свій key + [': '] + свій value.
+	line замінити: ['\r'] на: [''], замінити: ['\n'] на: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Обʼєкт новий.
+
+Web-Document при: ['новий'] виконати: { <- сам новий init.
+}.
+
+Web-Document при: ['init'] виконати: {
+	свій headers := Список новий.
+	свій sess-id := Ніщо.
+	свій session-manager := Tempfile-Session новий.
+	свій sessdata := Ніщо.
+	свій secure := Істина.
+	свій same-site := ['Strict'].
+	свій headers-out := Хиба.
+	свій request := HTTP-Запит новий.
+}.
+
+Web-Document при: ['request:'] виконати: { :request
+	свій request := request.
+}. 
+
+Web-Document при: ['secure-session-cookie:'] виконати: { :secure
+	сам check-headers.
+	свій secure := secure.
+}.
+
+Web-Document при: ['same-site-session-cookie:'] виконати: { :value
+	сам check-headers.
+	>> options := Список новий 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options містить: value, хиба: {
+		це-завдання помилка: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	свій same-site := value.
+}.
+
+Web-Document при: ['header:'] виконати: { :header
+	сам check-headers.
+	свій headers додати-в-кінець: header.
+}.
+
+Web-Document при: ['clear-headers'] виконати: {
+	сам check-headers.
+	свій headers := Список новий.
+}.
+
+Web-Document при: ['session-manager:'] виконати: { :manager
+	сам check-headers.
+	свій session-manager := manager.
+}.
+
+Web-Document при: ['session-manager'] виконати: { <- свій session-manager.
+}.
+
+Web-Document при: ['check-headers'] виконати: {
+	свій headers-out істина: {
+		це-завдання помилка: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document при: ['session-start'] виконати: {
+	сам check-headers.
+	>> request := свій request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Ніщо? хиба: {
+		(( Шаблон новий: ['^[A-Za-z0-9]+\\z'], збіг: sess-id ) = 0) істина: {
+			sess-id := Ніщо.
+		}.
+	}.
+	sess-id Ніщо? істина: {
+		sess-id := Сховище токен: 30.
+		>> session-header := HTTP-Header новий
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (свій secure або: ['Secure'] або: ['']),
+		SSITE: (свій same-site),
+		XSID: sess-id
+		).
+		свій headers додати-в-кінець: session-header.
+	}.
+	свій sessdata := свій session-manager for: sess-id, load. <- свій sessdata. # reference
+}.
+
+Web-Document при: ['goto:'] виконати: { :url
+	сам check-headers.
+	сам clear-headers.
+	свій headers
+	додати-в-кінець: (
+		HTTP-Header новий
+		key: ['Status'] value: ['303 See Other']
+	),
+	додати-в-кінець: (
+		HTTP-Header новий
+		key: ['Location'] value: url
+	).
+	сам out: ['Redirect'].
+}.
+
+Web-Document при: ['session-destroy'] виконати: {
+	сам check-headers.
+	>> request := свій request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Ніщо? хиба: {
+		>> session-header := HTTP-Header новий.
+		>> when := Момент новий рік: 1970, формат: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (свій secure або: ['Secure'] або: ['']),
+			SSITE: (свій same-site),
+			XSID: sess-id
+		).
+		свій session-manager destroy.
+		свій headers додати-в-кінець: session-header.
+	}.
+}.
+
+
+Web-Document при: ['template:'] виконати: { :шлях <- Template новий: (Файл новий: шлях, читати).
+}.
+
+Web-Document при: ['out:type:'] виконати: { :output :тип
+	свій headers-out хиба: {
+		свій sessdata Ніщо? хиба: {
+			свій session-manager save: свій sessdata.
+		}.
+		свій headers додати-в-кінець: (
+			HTTP-Header новий
+			key: ['Content-type'] value: тип
+		).
+		свій headers кожен: { :_ :header
+			Вивід написати: header.
+		}.
+		свій headers-out := Істина.
+		Вивід написати: ['\r\n'].
+	}.
+	Вивід написати: output.
+}.
+
+Web-Document при: ['finish:type:'] виконати: { :output :тип
+	свій headers-out хиба: {
+		свій sessdata Ніщо? хиба: {
+			свій session-manager save: свій sessdata.
+		}.
+		свій headers додати-в-кінець: (
+			HTTP-Header новий
+			key: ['Content-type'] value: тип
+		).
+		свій headers додати-в-кінець: (
+			HTTP-Header новий
+			key: ['Content-Length'] value: output текст bytes
+		).
+		свій headers кожен: { :_ :header
+			Вивід написати: header.
+		}.
+		свій headers-out := Істина.
+		Вивід написати: ['\r\n'].
+	}.
+	Вивід написати: output.
+}.
+
+Web-Document при: ['out:'] виконати: { :output
+	сам out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document при: ['finish:'] виконати: { :output
+	сам finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document при: ['json:'] виконати: { :output
+	сам out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document при: ['not-found:'] виконати: { :output
+	сам clear-headers header: (
+		HTTP-Header новий key: ['Status'] value: ['404 Not Found']
+	).
+	сам out: output.
+}.
+
+
+# Interface
+
+>> Session := Обʼєкт новий.
+
+Session при: ['новий'] виконати: { <- сам новий init for: Ніщо.
+}.
+
+Session при: ['for:'] виконати: { :id
+	свій id := id.
+}.
+
+Session при: ['load'] виконати: {
+	це-завдання помилка: ['Not implemented.'].
+}.
+
+Session при: ['save:'] виконати: {
+	це-завдання помилка: ['Not implemented.'].
+}.
+
+Session при: ['destroy'] виконати: {
+	це-завдання помилка: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session новий.
+
+Tempfile-Session при: ['init'] виконати: {
+	свій pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session при: ['path-prefix:'] виконати: { :str
+	свій pathprefix := str.
+}.
+
+Tempfile-Session при: ['file'] виконати: { <- ( Файл новий: ( свій pathprefix + свій id + ['.txt'] ) ).
+}.
+
+Tempfile-Session при: ['load'] виконати: {
+	>> file := сам file.
+	file існує хиба: {
+		file написати: (Словник новий код).
+	}. <- file читати обʼєкт.
+}.
+
+Tempfile-Session при: ['save:'] виконати: { :data
+	>> file := сам file.
+	file існує істина: {
+		file написати: data код.
+	}.
+}.
+
+Tempfile-Session при: ['destroy'] виконати: {
+	>> file := сам file.
+	file існує істина: {
+		file видалити.
+	}.
+}.
+
+
+>> URL := Обʼєкт новий.
+
+URL при: ['init'] виконати: {
+	свій protocol := ['https://'].
+	свій хост := ['localhost'].
+	свій шлях := [''].
+	свій params := [''].
+	свій hash := [''].
+}.
+
+URL при: ['новий'] виконати: { <- сам новий init.
+}.
+
+URL при: ['текст'] виконати: { <- (
+	свій protocol +
+	свій хост +
+	свій шлях +
+	свій params +
+	свій hash ).
+}.
+
+URL при: ['protocol:'] виконати: { :protocol
+	((Список новий: ['http'] ; ['https']) містить: protocol) істина: {
+		свій protocol := protocol + ['://'].
+	}, хиба: {
+		це-завдання помилка: ['Invalid protocol'].
+	}.
+}.
+
+URL при: ['хост:'] виконати: { :хост
+	#todo validate according to rfc
+	свій хост := хост.
+}.
+
+URL при: ['path:'] виконати: { :шлях
+	свій шлях := ['/'] + шлях url-кодувати.
+}.
+
+URL при: ['params:'] виконати: { :map
+	>> params := Список новий.
+	map кожен: { :key :value
+		params додати-в-кінець: key текст url-кодувати + ['='] + value текст url-кодувати.
+	}.
+	свій params := ['?'] + ( params зʼєднати: ['&'] ).
+}.
+
+URL при: ['хеш:'] виконати: { :hash
+	свій hash := ['#'] + hash url-кодувати.
+}.
+

@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := వస్తువు కొత్త.
+
+Template అందినప్పుడు: ['కొత్త'] చేయి: { <- తాను కొత్త content: [''].
+}.
+
+Template అందినప్పుడు: ['content:'] చేయి: { :content
+	తన content := content. 
+}.
+
+Template అందినప్పుడు: ['కొత్త:'] చేయి: { :content <- తాను కొత్త content: content.
+}.
+
+Template అందినప్పుడు: ['cut:'] చేయి: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := తన content విభజించు: startmarker.
+	>> prefix := parts మొదటి.
+	>> parts2 := parts చివరి విభజించు: endmarker.
+	>> suffix := parts2 చివరి.
+	>> part := parts2 మొదటి.
+	>> rest := prefix + suffix.
+	తన content := rest. <- Template కొత్త: part.
+	
+}.
+
+Template అందినప్పుడు: ['నకలు'] చేయి: { <- తాను కొత్త: తాను పాఠ్యంగా నకలు.
+}.
+	
+Template అందినప్పుడు: ['paste:at:'] చేయి: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	తన content మార్చు: pastemarker తో: ( snippet పాఠ్యంగా + pastemarker ).
+}.
+
+Template అందినప్పుడు: ['నిర్ణయించు:విలువ:'] చేయి: { :slot :value
+	తన content మార్చు: ['<!-- slot:'] + slot + [' -->'] తో: ( Server html-ఎన్-కోడ్: value ).
+}.
+
+Template అందినప్పుడు: ['set:html:'] చేయి: { :slot :html
+	తన content మార్చు: ['<!-- slot:'] + slot + [' -->'] తో: html.
+}.
+
+Template అందినప్పుడు: ['జవాబు:మరియు:'] చేయి: { :slot :value
+	తాను నిర్ణయించు: (slot మొదలు: 0 పొడవు: (slot పొడవు - 1)) విలువ: value.
+}.
+
+Template అందినప్పుడు: ['nl2br'] చేయి: {
+	తన content మార్చు: ['\n'] తో: ['<br>'].
+}.
+
+Template అందినప్పుడు: ['clean'] చేయి: {
+	తన content :=
+		ప్యాటర్న్
+		కొత్త: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		సరిపోలిక: తన content
+		చేయి: { <- ['']. }.
+}.
+
+Template అందినప్పుడు: ['clean-cuts'] చేయి: {
+	>> items := వరుస కొత్త.
+	ప్యాటర్న్
+	కొత్త: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	సరిపోలిక: తన content
+	చేయి: { :_ :part
+		items చివర-చేర్చు: part ? 1.
+	}.
+	items ప్రతి: { :_ :id
+		తన content :=
+			ప్యాటర్న్ కొత్త: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			సరిపోలిక: తన content
+			చేయి: { <- ['']. }.
+	 }.
+}.
+
+Template అందినప్పుడు: ['clean-space'] చేయి: {
+	తన content :=
+		ప్యాటర్న్
+		కొత్త: ['\\s*\\n'],
+		సరిపోలిక: తన content
+		చేయి: { <- ['\n']. }.
+	తన content :=
+		ప్యాటర్న్
+		కొత్త: ['\\n[\\s\\t]+'],
+		సరిపోలిక: తన content
+		చేయి: { <- ['\n']. }.
+}.
+
+Template అందినప్పుడు: ['clean-all'] చేయి: {
+	తాను clean.
+	తాను clean-cuts.
+	తాను clean-space.
+}.
+
+Template అందినప్పుడు: ['పాఠ్యంగా'] చేయి: { <- తన content.
+}.

@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := ବସ୍ତୁ ନୂତନ.
+
+Template ଯେବେ: ['ନୂତନ'] କର: { <- ନିଜେ ନୂତନ content: [''].
+}.
+
+Template ଯେବେ: ['content:'] କର: { :content
+	ନିଜର content := content. 
+}.
+
+Template ଯେବେ: ['ନୂତନ:'] କର: { :content <- ନିଜେ ନୂତନ content: content.
+}.
+
+Template ଯେବେ: ['cut:'] କର: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := ନିଜର content ବିଭାଜନ: startmarker.
+	>> prefix := parts ପ୍ରଥମ.
+	>> parts2 := parts ଶେଷଟି ବିଭାଜନ: endmarker.
+	>> suffix := parts2 ଶେଷଟି.
+	>> part := parts2 ପ୍ରଥମ.
+	>> rest := prefix + suffix.
+	ନିଜର content := rest. <- Template ନୂତନ: part.
+	
+}.
+
+Template ଯେବେ: ['ନକଲ'] କର: { <- ନିଜେ ନୂତନ: ନିଜେ ପାଠ୍ୟରେ ନକଲ.
+}.
+	
+Template ଯେବେ: ['paste:at:'] କର: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	ନିଜର content ବଦଳାଅ: pastemarker ସହିତ: ( snippet ପାଠ୍ୟରେ + pastemarker ).
+}.
+
+Template ଯେବେ: ['ନିର୍ଦ୍ଧାରଣ:ମୂଲ୍ୟ:'] କର: { :slot :value
+	ନିଜର content ବଦଳାଅ: ['<!-- slot:'] + slot + [' -->'] ସହିତ: ( Server html-ଏନକୋଡ୍: value ).
+}.
+
+Template ଯେବେ: ['set:html:'] କର: { :slot :html
+	ନିଜର content ବଦଳାଅ: ['<!-- slot:'] + slot + [' -->'] ସହିତ: html.
+}.
+
+Template ଯେବେ: ['ଉତ୍ତର:ଏବଂ:'] କର: { :slot :value
+	ନିଜେ ନିର୍ଦ୍ଧାରଣ: (slot ଆରମ୍ଭ: 0 ଲମ୍ବ: (slot ଲମ୍ବ - 1)) ମୂଲ୍ୟ: value.
+}.
+
+Template ଯେବେ: ['nl2br'] କର: {
+	ନିଜର content ବଦଳାଅ: ['\n'] ସହିତ: ['<br>'].
+}.
+
+Template ଯେବେ: ['clean'] କର: {
+	ନିଜର content :=
+		ପ୍ୟାଟର୍ନ
+		ନୂତନ: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ମେଳ: ନିଜର content
+		କର: { <- ['']. }.
+}.
+
+Template ଯେବେ: ['clean-cuts'] କର: {
+	>> items := ସାରଣୀ ନୂତନ.
+	ପ୍ୟାଟର୍ନ
+	ନୂତନ: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ମେଳ: ନିଜର content
+	କର: { :_ :part
+		items ଶେଷରେ-ଯୋଡ଼: part ? 1.
+	}.
+	items ପ୍ରତ୍ୟେକ: { :_ :id
+		ନିଜର content :=
+			ପ୍ୟାଟର୍ନ ନୂତନ: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ମେଳ: ନିଜର content
+			କର: { <- ['']. }.
+	 }.
+}.
+
+Template ଯେବେ: ['clean-space'] କର: {
+	ନିଜର content :=
+		ପ୍ୟାଟର୍ନ
+		ନୂତନ: ['\\s*\\n'],
+		ମେଳ: ନିଜର content
+		କର: { <- ['\n']. }.
+	ନିଜର content :=
+		ପ୍ୟାଟର୍ନ
+		ନୂତନ: ['\\n[\\s\\t]+'],
+		ମେଳ: ନିଜର content
+		କର: { <- ['\n']. }.
+}.
+
+Template ଯେବେ: ['clean-all'] କର: {
+	ନିଜେ clean.
+	ନିଜେ clean-cuts.
+	ନିଜେ clean-space.
+}.
+
+Template ଯେବେ: ['ପାଠ୍ୟରେ'] କର: { <- ନିଜର content.
+}.

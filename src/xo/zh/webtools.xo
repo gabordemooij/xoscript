@@ -1,0 +1,325 @@
+互联网请求 在: ['HTTP-header:'] 执行: { :key <- 程序 环境变量: key.
+}.
+
+>> HTTP-Header := 对象 新建.
+
+HTTP-Header 在: ['新建'] 执行: { <- 自身 新建 init.
+}.
+
+HTTP-Header 在: ['init'] 执行: {
+	拥有 key := 空.
+	拥有 value := 空.
+}.
+
+HTTP-Header 在: ['key:value:'] 执行: { :key :value
+	拥有 key := key.
+	拥有 value := value.
+}.
+
+HTTP-Header 在: ['key'] 执行: { <- 拥有 key.
+}.
+
+HTTP-Header 在: ['value'] 执行: { <- 拥有 value.
+}.
+
+
+HTTP-Header 在: ['转文本'] 执行: {
+	>> line := 拥有 key + [': '] + 拥有 value.
+	line 替换: ['\r'] 为: [''], 替换: ['\n'] 为: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := 对象 新建.
+
+Web-Document 在: ['新建'] 执行: { <- 自身 新建 init.
+}.
+
+Web-Document 在: ['init'] 执行: {
+	拥有 headers := 数组对象 新建.
+	拥有 sess-id := 空.
+	拥有 session-manager := Tempfile-Session 新建.
+	拥有 sessdata := 空.
+	拥有 secure := 是.
+	拥有 same-site := ['Strict'].
+	拥有 headers-out := 否.
+	拥有 request := 互联网请求 新建.
+}.
+
+Web-Document 在: ['request:'] 执行: { :request
+	拥有 request := request.
+}. 
+
+Web-Document 在: ['secure-session-cookie:'] 执行: { :secure
+	自身 check-headers.
+	拥有 secure := secure.
+}.
+
+Web-Document 在: ['same-site-session-cookie:'] 执行: { :value
+	自身 check-headers.
+	>> options := 数组对象 新建 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options 包含: value, 否: {
+		当前任务 错误: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	拥有 same-site := value.
+}.
+
+Web-Document 在: ['header:'] 执行: { :header
+	自身 check-headers.
+	拥有 headers 追加: header.
+}.
+
+Web-Document 在: ['clear-headers'] 执行: {
+	自身 check-headers.
+	拥有 headers := 数组对象 新建.
+}.
+
+Web-Document 在: ['session-manager:'] 执行: { :manager
+	自身 check-headers.
+	拥有 session-manager := manager.
+}.
+
+Web-Document 在: ['session-manager'] 执行: { <- 拥有 session-manager.
+}.
+
+Web-Document 在: ['check-headers'] 执行: {
+	拥有 headers-out 是: {
+		当前任务 错误: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document 在: ['session-start'] 执行: {
+	自身 check-headers.
+	>> request := 拥有 request.
+	>> sess-id := request 曲奇饼: ['xsid'].
+	sess-id 为空? 否: {
+		(( 模式 新建: ['^[A-Za-z0-9]+\\z'], 匹配: sess-id ) = 0) 是: {
+			sess-id := 空.
+		}.
+	}.
+	sess-id 为空? 是: {
+		sess-id := 保险库 令牌: 30.
+		>> session-header := HTTP-Header 新建
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (拥有 secure 或: ['Secure'] 或: ['']),
+		SSITE: (拥有 same-site),
+		XSID: sess-id
+		).
+		拥有 headers 追加: session-header.
+	}.
+	拥有 sessdata := 拥有 session-manager for: sess-id, load. <- 拥有 sessdata. # reference
+}.
+
+Web-Document 在: ['goto:'] 执行: { :url
+	自身 check-headers.
+	自身 clear-headers.
+	拥有 headers
+	追加: (
+		HTTP-Header 新建
+		key: ['Status'] value: ['303 See Other']
+	),
+	追加: (
+		HTTP-Header 新建
+		key: ['Location'] value: url
+	).
+	自身 out: ['Redirect'].
+}.
+
+Web-Document 在: ['session-destroy'] 执行: {
+	自身 check-headers.
+	>> request := 拥有 request.
+	>> sess-id := request 曲奇饼: ['xsid'].
+	sess-id 为空? 否: {
+		>> session-header := HTTP-Header 新建.
+		>> when := 时间对象 新建 年: 1970, 格式: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (拥有 secure 或: ['Secure'] 或: ['']),
+			SSITE: (拥有 same-site),
+			XSID: sess-id
+		).
+		拥有 session-manager destroy.
+		拥有 headers 追加: session-header.
+	}.
+}.
+
+
+Web-Document 在: ['template:'] 执行: { :路径 <- Template 新建: (文件 新建: 路径, 读取).
+}.
+
+Web-Document 在: ['out:type:'] 执行: { :output :类型
+	拥有 headers-out 否: {
+		拥有 sessdata 为空? 否: {
+			拥有 session-manager save: 拥有 sessdata.
+		}.
+		拥有 headers 追加: (
+			HTTP-Header 新建
+			key: ['Content-type'] value: 类型
+		).
+		拥有 headers 每个: { :_ :header
+			输出 写入: header.
+		}.
+		拥有 headers-out := 是.
+		输出 写入: ['\r\n'].
+	}.
+	输出 写入: output.
+}.
+
+Web-Document 在: ['finish:type:'] 执行: { :output :类型
+	拥有 headers-out 否: {
+		拥有 sessdata 为空? 否: {
+			拥有 session-manager save: 拥有 sessdata.
+		}.
+		拥有 headers 追加: (
+			HTTP-Header 新建
+			key: ['Content-type'] value: 类型
+		).
+		拥有 headers 追加: (
+			HTTP-Header 新建
+			key: ['Content-Length'] value: output 转文本 字节范围
+		).
+		拥有 headers 每个: { :_ :header
+			输出 写入: header.
+		}.
+		拥有 headers-out := 是.
+		输出 写入: ['\r\n'].
+	}.
+	输出 写入: output.
+}.
+
+Web-Document 在: ['out:'] 执行: { :output
+	自身 out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document 在: ['finish:'] 执行: { :output
+	自身 finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document 在: ['json:'] 执行: { :output
+	自身 out: ( 杰森 杰森风格: output ) type: ['application/json'].
+}.
+
+Web-Document 在: ['not-found:'] 执行: { :output
+	自身 clear-headers header: (
+		HTTP-Header 新建 key: ['Status'] value: ['404 Not Found']
+	).
+	自身 out: output.
+}.
+
+
+# Interface
+
+>> Session := 对象 新建.
+
+Session 在: ['新建'] 执行: { <- 自身 新建 init for: 空.
+}.
+
+Session 在: ['for:'] 执行: { :id
+	拥有 id := id.
+}.
+
+Session 在: ['load'] 执行: {
+	当前任务 错误: ['Not implemented.'].
+}.
+
+Session 在: ['save:'] 执行: {
+	当前任务 错误: ['Not implemented.'].
+}.
+
+Session 在: ['destroy'] 执行: {
+	当前任务 错误: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session 新建.
+
+Tempfile-Session 在: ['init'] 执行: {
+	拥有 pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session 在: ['path-prefix:'] 执行: { :str
+	拥有 pathprefix := str.
+}.
+
+Tempfile-Session 在: ['file'] 执行: { <- ( 文件 新建: ( 拥有 pathprefix + 拥有 id + ['.txt'] ) ).
+}.
+
+Tempfile-Session 在: ['load'] 执行: {
+	>> file := 自身 file.
+	file 存在 否: {
+		file 写入: (映射对象 新建 代码).
+	}. <- file 读取 转对象.
+}.
+
+Tempfile-Session 在: ['save:'] 执行: { :data
+	>> file := 自身 file.
+	file 存在 是: {
+		file 写入: data 代码.
+	}.
+}.
+
+Tempfile-Session 在: ['destroy'] 执行: {
+	>> file := 自身 file.
+	file 存在 是: {
+		file 删除.
+	}.
+}.
+
+
+>> URL := 对象 新建.
+
+URL 在: ['init'] 执行: {
+	拥有 protocol := ['https://'].
+	拥有 主机 := ['localhost'].
+	拥有 路径 := [''].
+	拥有 params := [''].
+	拥有 hash := [''].
+}.
+
+URL 在: ['新建'] 执行: { <- 自身 新建 init.
+}.
+
+URL 在: ['转文本'] 执行: { <- (
+	拥有 protocol +
+	拥有 主机 +
+	拥有 路径 +
+	拥有 params +
+	拥有 hash ).
+}.
+
+URL 在: ['protocol:'] 执行: { :protocol
+	((数组对象 新建: ['http'] ; ['https']) 包含: protocol) 是: {
+		拥有 protocol := protocol + ['://'].
+	}, 否: {
+		当前任务 错误: ['Invalid protocol'].
+	}.
+}.
+
+URL 在: ['主机:'] 执行: { :主机
+	#todo validate according to rfc
+	拥有 主机 := 主机.
+}.
+
+URL 在: ['path:'] 执行: { :路径
+	拥有 路径 := ['/'] + 路径 互联网地址编码.
+}.
+
+URL 在: ['params:'] 执行: { :map
+	>> params := 数组对象 新建.
+	map 每个: { :key :value
+		params 追加: key 转文本 互联网地址编码 + ['='] + value 转文本 互联网地址编码.
+	}.
+	拥有 params := ['?'] + ( params 连接: ['&'] ).
+}.
+
+URL 在: ['哈希:'] 执行: { :hash
+	拥有 hash := ['#'] + hash 互联网地址编码.
+}.
+

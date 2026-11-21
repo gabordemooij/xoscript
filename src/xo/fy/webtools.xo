@@ -1,0 +1,325 @@
+HTTP-Fersyk by: ['HTTP-header:'] dwaan: { :key <- Programma ynstelling: key.
+}.
+
+>> HTTP-Header := Objekt nĳ.
+
+HTTP-Header by: ['nĳ'] dwaan: { <- sels nĳ init.
+}.
+
+HTTP-Header by: ['init'] dwaan: {
+	eigen key := Neat.
+	eigen value := Neat.
+}.
+
+HTTP-Header by: ['key:value:'] dwaan: { :key :value
+	eigen key := key.
+	eigen value := value.
+}.
+
+HTTP-Header by: ['key'] dwaan: { <- eigen key.
+}.
+
+HTTP-Header by: ['value'] dwaan: { <- eigen value.
+}.
+
+
+HTTP-Header by: ['tekst'] dwaan: {
+	>> line := eigen key + [': '] + eigen value.
+	line ferfange: ['\r'] troch: [''], ferfange: ['\n'] troch: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Objekt nĳ.
+
+Web-Document by: ['nĳ'] dwaan: { <- sels nĳ init.
+}.
+
+Web-Document by: ['init'] dwaan: {
+	eigen headers := Rige nĳ.
+	eigen sess-id := Neat.
+	eigen session-manager := Tempfile-Session nĳ.
+	eigen sessdata := Neat.
+	eigen secure := Ja.
+	eigen same-site := ['Strict'].
+	eigen headers-out := Nee.
+	eigen request := HTTP-Fersyk nĳ.
+}.
+
+Web-Document by: ['request:'] dwaan: { :request
+	eigen request := request.
+}. 
+
+Web-Document by: ['secure-session-cookie:'] dwaan: { :secure
+	sels check-headers.
+	eigen secure := secure.
+}.
+
+Web-Document by: ['same-site-session-cookie:'] dwaan: { :value
+	sels check-headers.
+	>> options := Rige nĳ 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options befettet: value, nee: {
+		dizze-taak flater: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	eigen same-site := value.
+}.
+
+Web-Document by: ['header:'] dwaan: { :header
+	sels check-headers.
+	eigen headers tafoegje: header.
+}.
+
+Web-Document by: ['clear-headers'] dwaan: {
+	sels check-headers.
+	eigen headers := Rige nĳ.
+}.
+
+Web-Document by: ['session-manager:'] dwaan: { :manager
+	sels check-headers.
+	eigen session-manager := manager.
+}.
+
+Web-Document by: ['session-manager'] dwaan: { <- eigen session-manager.
+}.
+
+Web-Document by: ['check-headers'] dwaan: {
+	eigen headers-out ja: {
+		dizze-taak flater: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document by: ['session-start'] dwaan: {
+	sels check-headers.
+	>> request := eigen request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Neat? nee: {
+		(( Patroan nĳ: ['^[A-Za-z0-9]+\\z'], oerienkomst: sess-id ) = 0) ja: {
+			sess-id := Neat.
+		}.
+	}.
+	sess-id Neat? ja: {
+		sess-id := Klûs token: 30.
+		>> session-header := HTTP-Header nĳ
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (eigen secure of: ['Secure'] of: ['']),
+		SSITE: (eigen same-site),
+		XSID: sess-id
+		).
+		eigen headers tafoegje: session-header.
+	}.
+	eigen sessdata := eigen session-manager for: sess-id, load. <- eigen sessdata. # reference
+}.
+
+Web-Document by: ['goto:'] dwaan: { :url
+	sels check-headers.
+	sels clear-headers.
+	eigen headers
+	tafoegje: (
+		HTTP-Header nĳ
+		key: ['Status'] value: ['303 See Other']
+	),
+	tafoegje: (
+		HTTP-Header nĳ
+		key: ['Location'] value: url
+	).
+	sels out: ['Redirect'].
+}.
+
+Web-Document by: ['session-destroy'] dwaan: {
+	sels check-headers.
+	>> request := eigen request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Neat? nee: {
+		>> session-header := HTTP-Header nĳ.
+		>> when := Momint nĳ jier: 1970, formaat: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (eigen secure of: ['Secure'] of: ['']),
+			SSITE: (eigen same-site),
+			XSID: sess-id
+		).
+		eigen session-manager destroy.
+		eigen headers tafoegje: session-header.
+	}.
+}.
+
+
+Web-Document by: ['template:'] dwaan: { :paad <- Template nĳ: (Bestand nĳ: paad, lêze).
+}.
+
+Web-Document by: ['out:type:'] dwaan: { :output :type
+	eigen headers-out nee: {
+		eigen sessdata Neat? nee: {
+			eigen session-manager save: eigen sessdata.
+		}.
+		eigen headers tafoegje: (
+			HTTP-Header nĳ
+			key: ['Content-type'] value: type
+		).
+		eigen headers elk: { :_ :header
+			Utfier skriuwe: header.
+		}.
+		eigen headers-out := Ja.
+		Utfier skriuwe: ['\r\n'].
+	}.
+	Utfier skriuwe: output.
+}.
+
+Web-Document by: ['finish:type:'] dwaan: { :output :type
+	eigen headers-out nee: {
+		eigen sessdata Neat? nee: {
+			eigen session-manager save: eigen sessdata.
+		}.
+		eigen headers tafoegje: (
+			HTTP-Header nĳ
+			key: ['Content-type'] value: type
+		).
+		eigen headers tafoegje: (
+			HTTP-Header nĳ
+			key: ['Content-Length'] value: output tekst bytes
+		).
+		eigen headers elk: { :_ :header
+			Utfier skriuwe: header.
+		}.
+		eigen headers-out := Ja.
+		Utfier skriuwe: ['\r\n'].
+	}.
+	Utfier skriuwe: output.
+}.
+
+Web-Document by: ['out:'] dwaan: { :output
+	sels out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document by: ['finish:'] dwaan: { :output
+	sels finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document by: ['json:'] dwaan: { :output
+	sels out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document by: ['not-found:'] dwaan: { :output
+	sels clear-headers header: (
+		HTTP-Header nĳ key: ['Status'] value: ['404 Not Found']
+	).
+	sels out: output.
+}.
+
+
+# Interface
+
+>> Session := Objekt nĳ.
+
+Session by: ['nĳ'] dwaan: { <- sels nĳ init for: Neat.
+}.
+
+Session by: ['for:'] dwaan: { :id
+	eigen id := id.
+}.
+
+Session by: ['load'] dwaan: {
+	dizze-taak flater: ['Not implemented.'].
+}.
+
+Session by: ['save:'] dwaan: {
+	dizze-taak flater: ['Not implemented.'].
+}.
+
+Session by: ['destroy'] dwaan: {
+	dizze-taak flater: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session nĳ.
+
+Tempfile-Session by: ['init'] dwaan: {
+	eigen pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session by: ['path-prefix:'] dwaan: { :str
+	eigen pathprefix := str.
+}.
+
+Tempfile-Session by: ['file'] dwaan: { <- ( Bestand nĳ: ( eigen pathprefix + eigen id + ['.txt'] ) ).
+}.
+
+Tempfile-Session by: ['load'] dwaan: {
+	>> file := sels file.
+	file bestiet nee: {
+		file skriuwe: (List nĳ koade).
+	}. <- file lêze objekt.
+}.
+
+Tempfile-Session by: ['save:'] dwaan: { :data
+	>> file := sels file.
+	file bestiet ja: {
+		file skriuwe: data koade.
+	}.
+}.
+
+Tempfile-Session by: ['destroy'] dwaan: {
+	>> file := sels file.
+	file bestiet ja: {
+		file wiskje.
+	}.
+}.
+
+
+>> URL := Objekt nĳ.
+
+URL by: ['init'] dwaan: {
+	eigen protocol := ['https://'].
+	eigen host := ['localhost'].
+	eigen paad := [''].
+	eigen params := [''].
+	eigen hash := [''].
+}.
+
+URL by: ['nĳ'] dwaan: { <- sels nĳ init.
+}.
+
+URL by: ['tekst'] dwaan: { <- (
+	eigen protocol +
+	eigen host +
+	eigen paad +
+	eigen params +
+	eigen hash ).
+}.
+
+URL by: ['protocol:'] dwaan: { :protocol
+	((Rige nĳ: ['http'] ; ['https']) befettet: protocol) ja: {
+		eigen protocol := protocol + ['://'].
+	}, nee: {
+		dizze-taak flater: ['Invalid protocol'].
+	}.
+}.
+
+URL by: ['host:'] dwaan: { :host
+	#todo validate according to rfc
+	eigen host := host.
+}.
+
+URL by: ['path:'] dwaan: { :paad
+	eigen paad := ['/'] + paad url-kodearje.
+}.
+
+URL by: ['params:'] dwaan: { :map
+	>> params := Rige nĳ.
+	map elk: { :key :value
+		params tafoegje: key tekst url-kodearje + ['='] + value tekst url-kodearje.
+	}.
+	eigen params := ['?'] + ( params gearfoegje: ['&'] ).
+}.
+
+URL by: ['hash:'] dwaan: { :hash
+	eigen hash := ['#'] + hash url-kodearje.
+}.
+

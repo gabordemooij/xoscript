@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Obyekt yeni.
+
+Template olanda: ['yeni'] et: { <- özü yeni content: [''].
+}.
+
+Template olanda: ['content:'] et: { :content
+	öz content := content. 
+}.
+
+Template olanda: ['yeni:'] et: { :content <- özü yeni content: content.
+}.
+
+Template olanda: ['cut:'] et: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := öz content böl: startmarker.
+	>> prefix := parts birinci.
+	>> parts2 := parts sonuncu böl: endmarker.
+	>> suffix := parts2 sonuncu.
+	>> part := parts2 birinci.
+	>> rest := prefix + suffix.
+	öz content := rest. <- Template yeni: part.
+	
+}.
+
+Template olanda: ['surət'] et: { <- özü yeni: özü mətn surət.
+}.
+	
+Template olanda: ['paste:at:'] et: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	öz content əvəzlə: pastemarker ilə: ( snippet mətn + pastemarker ).
+}.
+
+Template olanda: ['təyin-et:dəyər:'] et: { :slot :value
+	öz content əvəzlə: ['<!-- slot:'] + slot + [' -->'] ilə: ( Server html-kodla: value ).
+}.
+
+Template olanda: ['set:html:'] et: { :slot :html
+	öz content əvəzlə: ['<!-- slot:'] + slot + [' -->'] ilə: html.
+}.
+
+Template olanda: ['cavab-ver:və:'] et: { :slot :value
+	özü təyin-et: (slot başlanğıc: 0 uzunluq: (slot uzunluq - 1)) dəyər: value.
+}.
+
+Template olanda: ['nl2br'] et: {
+	öz content əvəzlə: ['\n'] ilə: ['<br>'].
+}.
+
+Template olanda: ['clean'] et: {
+	öz content :=
+		Şablon
+		yeni: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		uyğunluq: öz content
+		et: { <- ['']. }.
+}.
+
+Template olanda: ['clean-cuts'] et: {
+	>> items := Siyahı yeni.
+	Şablon
+	yeni: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	uyğunluq: öz content
+	et: { :_ :part
+		items sona-əlavə-et: part ? 1.
+	}.
+	items hər: { :_ :id
+		öz content :=
+			Şablon yeni: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			uyğunluq: öz content
+			et: { <- ['']. }.
+	 }.
+}.
+
+Template olanda: ['clean-space'] et: {
+	öz content :=
+		Şablon
+		yeni: ['\\s*\\n'],
+		uyğunluq: öz content
+		et: { <- ['\n']. }.
+	öz content :=
+		Şablon
+		yeni: ['\\n[\\s\\t]+'],
+		uyğunluq: öz content
+		et: { <- ['\n']. }.
+}.
+
+Template olanda: ['clean-all'] et: {
+	özü clean.
+	özü clean-cuts.
+	özü clean-space.
+}.
+
+Template olanda: ['mətn'] et: { <- öz content.
+}.

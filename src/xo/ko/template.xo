@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := 객체 새로.
+
+Template 받으면: ['새로'] 실행: { <- 자신 새로 content: [''].
+}.
+
+Template 받으면: ['content:'] 실행: { :content
+	자기 content := content. 
+}.
+
+Template 받으면: ['새로:'] 실행: { :content <- 자신 새로 content: content.
+}.
+
+Template 받으면: ['cut:'] 실행: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := 자기 content 나누기: startmarker.
+	>> prefix := parts 첫번째.
+	>> parts2 := parts 마지막 나누기: endmarker.
+	>> suffix := parts2 마지막.
+	>> part := parts2 첫번째.
+	>> rest := prefix + suffix.
+	자기 content := rest. <- Template 새로: part.
+	
+}.
+
+Template 받으면: ['복사'] 실행: { <- 자신 새로: 자신 문자열로 복사.
+}.
+	
+Template 받으면: ['paste:at:'] 실행: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	자기 content 바꾸기: pastemarker 새값: ( snippet 문자열로 + pastemarker ).
+}.
+
+Template 받으면: ['설정:값:'] 실행: { :slot :value
+	자기 content 바꾸기: ['<!-- slot:'] + slot + [' -->'] 새값: ( Server html-인코딩: value ).
+}.
+
+Template 받으면: ['set:html:'] 실행: { :slot :html
+	자기 content 바꾸기: ['<!-- slot:'] + slot + [' -->'] 새값: html.
+}.
+
+Template 받으면: ['응답:그리고:'] 실행: { :slot :value
+	자신 설정: (slot 시작: 0 길이: (slot 길이 - 1)) 값: value.
+}.
+
+Template 받으면: ['nl2br'] 실행: {
+	자기 content 바꾸기: ['\n'] 새값: ['<br>'].
+}.
+
+Template 받으면: ['clean'] 실행: {
+	자기 content :=
+		패턴
+		새로: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		일치: 자기 content
+		실행: { <- ['']. }.
+}.
+
+Template 받으면: ['clean-cuts'] 실행: {
+	>> items := 리스트 새로.
+	패턴
+	새로: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	일치: 자기 content
+	실행: { :_ :part
+		items 뒤에추가: part ? 1.
+	}.
+	items 각각: { :_ :id
+		자기 content :=
+			패턴 새로: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			일치: 자기 content
+			실행: { <- ['']. }.
+	 }.
+}.
+
+Template 받으면: ['clean-space'] 실행: {
+	자기 content :=
+		패턴
+		새로: ['\\s*\\n'],
+		일치: 자기 content
+		실행: { <- ['\n']. }.
+	자기 content :=
+		패턴
+		새로: ['\\n[\\s\\t]+'],
+		일치: 자기 content
+		실행: { <- ['\n']. }.
+}.
+
+Template 받으면: ['clean-all'] 실행: {
+	자신 clean.
+	자신 clean-cuts.
+	자신 clean-space.
+}.
+
+Template 받으면: ['문자열로'] 실행: { <- 자기 content.
+}.

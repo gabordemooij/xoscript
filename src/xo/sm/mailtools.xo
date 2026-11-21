@@ -1,0 +1,128 @@
+>> Email := Mea fou.
+
+Email pe-a-oo-mai: ['init'] fai: {
+	lana-lava recipients := Lisi fou.
+	lana-lava cc := Lisi fou.
+	lana-lava bcc := Lisi fou.
+	lana-lava from := Leai-se-mea.
+	lana-lava from-name := Leai-se-mea.
+	lana-lava subject := Leai-se-mea.
+	lana-lava body := Leai-se-mea.
+}.
+
+Email pe-a-oo-mai: ['fou'] fai: { <- ia-lava fou init.
+}.
+
+Email pe-a-oo-mai: ['to:'] fai: { :list
+	lana-lava recipients := list.
+}.
+ 
+Email pe-a-oo-mai: ['cc:'] fai: { :list
+	lana-lava cc := list.
+}.
+
+Email pe-a-oo-mai: ['bcc:'] fai: { :list
+	lana-lava bcc := list.
+}.
+
+Email pe-a-oo-mai: ['subject:'] fai: { :subject
+	lana-lava subject := subject.
+}.
+
+Email pe-a-oo-mai: ['from:name:'] fai: { :from :igoa
+	lana-lava from := from.
+	lana-lava from-name := igoa.
+}.
+
+Email pe-a-oo-mai: ['body:'] fai: { :body
+	lana-lava body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email pe-a-oo-mai: ['header:'] fai: { :line <- line sui: ['\r'] i-le: [''], sui: ['\n'] i-le: [''].
+}.
+
+Email pe-a-oo-mai: ['send'] fai: {
+	>> f := Faila tempwrite: ia-lava generate.
+	Polokalama faiga-masini: ['sendmail -t < '] + f ala-faila, laina-fou.
+}.
+
+Email pe-a-oo-mai: ['generate'] fai: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str faaopoopo-i-le-iuga: (ia-lava header: ['From: '] + lana-lava from-name + [' <'] + ( lana-lava from ) + ['>']) + brk.
+	str faaopoopo-i-le-iuga: (ia-lava header: ['To: '] + ( lana-lava recipients tuufaatasi: [','] )) + brk.
+	lana-lava cc aofaiga moni: {
+		str faaopoopo-i-le-iuga: (ia-lava header: ['Cc: '] + ( lana-lava cc tuufaatasi: [','] )) + brk.
+	}.
+	lana-lava bcc aofaiga moni: {
+		str faaopoopo-i-le-iuga: (ia-lava header: ['Bcc: '] + ( lana-lava bcc tuufaatasi: [','] )) + brk.
+	}.
+	str faaopoopo-i-le-iuga: (ia-lava header: ['Subject: '] + lana-lava subject) + brk.
+	str faaopoopo-i-le-iuga: brk.
+	str faaopoopo-i-le-iuga: lana-lava body.
+	str faaopoopo-i-le-iuga: brk. <- str.
+}.
+
+>> HTML-Email := Email fou.
+
+HTML-Email pe-a-oo-mai: ['init'] fai: {
+	ia-lava init.
+	lana-lava attachments := Lisi fou.
+	lana-lava boundary := Pusa-malu token: 40.
+}.
+
+HTML-Email pe-a-oo-mai: ['attach:'] fai: { :file
+	>> id := lana-lava attachments aofaiga.
+	>> blob := file blob.
+	lana-lava attachments faaopoopo-i-le-iuga: (
+		Lomifefiloi fou
+			file: file ala-faila,
+			mime: ['image/'] + (Server mimetype: file ala-faila),
+			data: blob base64-faʻailoga-numera
+	).
+	blob faasaoloto. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email pe-a-oo-mai: ['generate'] fai: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str faaopoopo-i-le-iuga: (ia-lava header: ['From: '] + lana-lava from-name + [' <'] + ( lana-lava from ) + ['>']) + brk.
+	str faaopoopo-i-le-iuga: (ia-lava header: ['To: '] + ( lana-lava recipients tuufaatasi: [','] )) + brk.
+	lana-lava cc aofaiga moni: {
+		str faaopoopo-i-le-iuga: (ia-lava header: ['Cc: '] + ( lana-lava cc tuufaatasi: [','] )) + brk.
+	}.
+	lana-lava bcc aofaiga moni: {
+		str faaopoopo-i-le-iuga: (ia-lava header: ['Bcc: '] + ( lana-lava bcc tuufaatasi: [','] )) + brk.
+	}.
+	str faaopoopo-i-le-iuga: (ia-lava header: ['Subject: '] + lana-lava subject) + brk.
+	str faaopoopo-i-le-iuga: ['MIME-Version: 1.0'] + brk.
+	str faaopoopo-i-le-iuga: ['Content-Type: multipart/related; boundary="'] + lana-lava boundary + ['"; type=text/html'] + brk.
+	str faaopoopo-i-le-iuga: brk.
+	str faaopoopo-i-le-iuga: ['--'] + lana-lava boundary + brk.
+	str faaopoopo-i-le-iuga: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str faaopoopo-i-le-iuga: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str faaopoopo-i-le-iuga: brk.
+	str faaopoopo-i-le-iuga: lana-lava body.
+	str faaopoopo-i-le-iuga: brk.
+	lana-lava attachments taʻitasi: { :id :info
+		>> blob := info data.
+		str faaopoopo-i-le-iuga: ['--'] + lana-lava boundary + brk.
+		str faaopoopo-i-le-iuga: ['Content-Type: '] + info mime + brk.
+		str faaopoopo-i-le-iuga: ['Content-Transfer-Encoding: base64'] + brk.
+		str faaopoopo-i-le-iuga: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str faaopoopo-i-le-iuga: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str faaopoopo-i-le-iuga: brk.
+		>> max := 76.
+		>> len := blob umi.
+		>> chunks := (len / max) faʻasili-numera.
+		{ :i
+			>> chunk := blob kopi-mea amata: i * max umi: max.
+			str faaopoopo-i-le-iuga: chunk + brk.
+		} * chunks.
+		str faaopoopo-i-le-iuga: brk.
+		str faaopoopo-i-le-iuga: brk.
+	}.
+	str faaopoopo-i-le-iuga: ['--'] + lana-lava boundary + ['--'] + brk. <- str.
+}.

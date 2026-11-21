@@ -1,0 +1,325 @@
+Demann-HTTP lè: ['HTTP-header:'] fè: { :key <- Pwogram paramèt: key.
+}.
+
+>> HTTP-Header := Objè nouvo.
+
+HTTP-Header lè: ['nouvo'] fè: { <- tèt-li nouvo init.
+}.
+
+HTTP-Header lè: ['init'] fè: {
+	pwòp key := Anyen.
+	pwòp value := Anyen.
+}.
+
+HTTP-Header lè: ['key:value:'] fè: { :key :value
+	pwòp key := key.
+	pwòp value := value.
+}.
+
+HTTP-Header lè: ['key'] fè: { <- pwòp key.
+}.
+
+HTTP-Header lè: ['value'] fè: { <- pwòp value.
+}.
+
+
+HTTP-Header lè: ['tèks'] fè: {
+	>> line := pwòp key + [': '] + pwòp value.
+	line ranplase: ['\r'] ak: [''], ranplase: ['\n'] ak: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Objè nouvo.
+
+Web-Document lè: ['nouvo'] fè: { <- tèt-li nouvo init.
+}.
+
+Web-Document lè: ['init'] fè: {
+	pwòp headers := Lis nouvo.
+	pwòp sess-id := Anyen.
+	pwòp session-manager := Tempfile-Session nouvo.
+	pwòp sessdata := Anyen.
+	pwòp secure := Vre.
+	pwòp same-site := ['Strict'].
+	pwòp headers-out := Fo.
+	pwòp request := Demann-HTTP nouvo.
+}.
+
+Web-Document lè: ['request:'] fè: { :request
+	pwòp request := request.
+}. 
+
+Web-Document lè: ['secure-session-cookie:'] fè: { :secure
+	tèt-li check-headers.
+	pwòp secure := secure.
+}.
+
+Web-Document lè: ['same-site-session-cookie:'] fè: { :value
+	tèt-li check-headers.
+	>> options := Lis nouvo 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options gen-ladan: value, fo: {
+		travay-sa-a erè: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	pwòp same-site := value.
+}.
+
+Web-Document lè: ['header:'] fè: { :header
+	tèt-li check-headers.
+	pwòp headers ajoute-nan-fen: header.
+}.
+
+Web-Document lè: ['clear-headers'] fè: {
+	tèt-li check-headers.
+	pwòp headers := Lis nouvo.
+}.
+
+Web-Document lè: ['session-manager:'] fè: { :manager
+	tèt-li check-headers.
+	pwòp session-manager := manager.
+}.
+
+Web-Document lè: ['session-manager'] fè: { <- pwòp session-manager.
+}.
+
+Web-Document lè: ['check-headers'] fè: {
+	pwòp headers-out vre: {
+		travay-sa-a erè: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document lè: ['session-start'] fè: {
+	tèt-li check-headers.
+	>> request := pwòp request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Anyen? fo: {
+		(( Modèl nouvo: ['^[A-Za-z0-9]+\\z'], koresponn: sess-id ) = 0) vre: {
+			sess-id := Anyen.
+		}.
+	}.
+	sess-id Anyen? vre: {
+		sess-id := Kòfrefò jeton: 30.
+		>> session-header := HTTP-Header nouvo
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (pwòp secure swa: ['Secure'] oswa: ['']),
+		SSITE: (pwòp same-site),
+		XSID: sess-id
+		).
+		pwòp headers ajoute-nan-fen: session-header.
+	}.
+	pwòp sessdata := pwòp session-manager for: sess-id, load. <- pwòp sessdata. # reference
+}.
+
+Web-Document lè: ['goto:'] fè: { :url
+	tèt-li check-headers.
+	tèt-li clear-headers.
+	pwòp headers
+	ajoute-nan-fen: (
+		HTTP-Header nouvo
+		key: ['Status'] value: ['303 See Other']
+	),
+	ajoute-nan-fen: (
+		HTTP-Header nouvo
+		key: ['Location'] value: url
+	).
+	tèt-li out: ['Redirect'].
+}.
+
+Web-Document lè: ['session-destroy'] fè: {
+	tèt-li check-headers.
+	>> request := pwòp request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Anyen? fo: {
+		>> session-header := HTTP-Header nouvo.
+		>> when := Moman nouvo ane: 1970, fòma: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (pwòp secure swa: ['Secure'] oswa: ['']),
+			SSITE: (pwòp same-site),
+			XSID: sess-id
+		).
+		pwòp session-manager destroy.
+		pwòp headers ajoute-nan-fen: session-header.
+	}.
+}.
+
+
+Web-Document lè: ['template:'] fè: { :chemen-fichye <- Template nouvo: (Fichye nouvo: chemen-fichye, li-done).
+}.
+
+Web-Document lè: ['out:type:'] fè: { :output :kalite
+	pwòp headers-out fo: {
+		pwòp sessdata Anyen? fo: {
+			pwòp session-manager save: pwòp sessdata.
+		}.
+		pwòp headers ajoute-nan-fen: (
+			HTTP-Header nouvo
+			key: ['Content-type'] value: kalite
+		).
+		pwòp headers chak: { :_ :header
+			Sòti ekri: header.
+		}.
+		pwòp headers-out := Vre.
+		Sòti ekri: ['\r\n'].
+	}.
+	Sòti ekri: output.
+}.
+
+Web-Document lè: ['finish:type:'] fè: { :output :kalite
+	pwòp headers-out fo: {
+		pwòp sessdata Anyen? fo: {
+			pwòp session-manager save: pwòp sessdata.
+		}.
+		pwòp headers ajoute-nan-fen: (
+			HTTP-Header nouvo
+			key: ['Content-type'] value: kalite
+		).
+		pwòp headers ajoute-nan-fen: (
+			HTTP-Header nouvo
+			key: ['Content-Length'] value: output tèks bytes
+		).
+		pwòp headers chak: { :_ :header
+			Sòti ekri: header.
+		}.
+		pwòp headers-out := Vre.
+		Sòti ekri: ['\r\n'].
+	}.
+	Sòti ekri: output.
+}.
+
+Web-Document lè: ['out:'] fè: { :output
+	tèt-li out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document lè: ['finish:'] fè: { :output
+	tèt-li finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document lè: ['json:'] fè: { :output
+	tèt-li out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document lè: ['not-found:'] fè: { :output
+	tèt-li clear-headers header: (
+		HTTP-Header nouvo key: ['Status'] value: ['404 Not Found']
+	).
+	tèt-li out: output.
+}.
+
+
+# Interface
+
+>> Session := Objè nouvo.
+
+Session lè: ['nouvo'] fè: { <- tèt-li nouvo init for: Anyen.
+}.
+
+Session lè: ['for:'] fè: { :id
+	pwòp id := id.
+}.
+
+Session lè: ['load'] fè: {
+	travay-sa-a erè: ['Not implemented.'].
+}.
+
+Session lè: ['save:'] fè: {
+	travay-sa-a erè: ['Not implemented.'].
+}.
+
+Session lè: ['destroy'] fè: {
+	travay-sa-a erè: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session nouvo.
+
+Tempfile-Session lè: ['init'] fè: {
+	pwòp pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session lè: ['path-prefix:'] fè: { :str
+	pwòp pathprefix := str.
+}.
+
+Tempfile-Session lè: ['file'] fè: { <- ( Fichye nouvo: ( pwòp pathprefix + pwòp id + ['.txt'] ) ).
+}.
+
+Tempfile-Session lè: ['load'] fè: {
+	>> file := tèt-li file.
+	file egziste fo: {
+		file ekri: (Diksyonè nouvo kòd).
+	}. <- file li-done objè.
+}.
+
+Tempfile-Session lè: ['save:'] fè: { :data
+	>> file := tèt-li file.
+	file egziste vre: {
+		file ekri: data kòd.
+	}.
+}.
+
+Tempfile-Session lè: ['destroy'] fè: {
+	>> file := tèt-li file.
+	file egziste vre: {
+		file efase.
+	}.
+}.
+
+
+>> URL := Objè nouvo.
+
+URL lè: ['init'] fè: {
+	pwòp protocol := ['https://'].
+	pwòp lame := ['localhost'].
+	pwòp chemen-fichye := [''].
+	pwòp params := [''].
+	pwòp hash := [''].
+}.
+
+URL lè: ['nouvo'] fè: { <- tèt-li nouvo init.
+}.
+
+URL lè: ['tèks'] fè: { <- (
+	pwòp protocol +
+	pwòp lame +
+	pwòp chemen-fichye +
+	pwòp params +
+	pwòp hash ).
+}.
+
+URL lè: ['protocol:'] fè: { :protocol
+	((Lis nouvo: ['http'] ; ['https']) gen-ladan: protocol) vre: {
+		pwòp protocol := protocol + ['://'].
+	}, fo: {
+		travay-sa-a erè: ['Invalid protocol'].
+	}.
+}.
+
+URL lè: ['lame:'] fè: { :lame
+	#todo validate according to rfc
+	pwòp lame := lame.
+}.
+
+URL lè: ['path:'] fè: { :chemen-fichye
+	pwòp chemen-fichye := ['/'] + chemen-fichye url-kode.
+}.
+
+URL lè: ['params:'] fè: { :map
+	>> params := Lis nouvo.
+	map chak: { :key :value
+		params ajoute-nan-fen: key tèks url-kode + ['='] + value tèks url-kode.
+	}.
+	pwòp params := ['?'] + ( params kole-ansanm: ['&'] ).
+}.
+
+URL lè: ['rache:'] fè: { :hash
+	pwòp hash := ['#'] + hash url-kode.
+}.
+

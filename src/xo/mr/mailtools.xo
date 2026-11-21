@@ -1,0 +1,128 @@
+>> Email := वस्तू नवीन.
+
+Email जेव्हा: ['init'] करा: {
+	स्वतःचे recipients := सूची नवीन.
+	स्वतःचे cc := सूची नवीन.
+	स्वतःचे bcc := सूची नवीन.
+	स्वतःचे from := शून्य.
+	स्वतःचे from-name := शून्य.
+	स्वतःचे subject := शून्य.
+	स्वतःचे body := शून्य.
+}.
+
+Email जेव्हा: ['नवीन'] करा: { <- स्वतः नवीन init.
+}.
+
+Email जेव्हा: ['to:'] करा: { :list
+	स्वतःचे recipients := list.
+}.
+ 
+Email जेव्हा: ['cc:'] करा: { :list
+	स्वतःचे cc := list.
+}.
+
+Email जेव्हा: ['bcc:'] करा: { :list
+	स्वतःचे bcc := list.
+}.
+
+Email जेव्हा: ['subject:'] करा: { :subject
+	स्वतःचे subject := subject.
+}.
+
+Email जेव्हा: ['from:name:'] करा: { :from :नाव
+	स्वतःचे from := from.
+	स्वतःचे from-name := नाव.
+}.
+
+Email जेव्हा: ['body:'] करा: { :body
+	स्वतःचे body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email जेव्हा: ['header:'] करा: { :line <- line बदला: ['\r'] ने: [''], बदला: ['\n'] ने: [''].
+}.
+
+Email जेव्हा: ['send'] करा: {
+	>> f := फाइल tempwrite: स्वतः generate.
+	प्रोग्राम सिस्टम: ['sendmail -t < '] + f फाइल-मार्ग, नवी-ओळ.
+}.
+
+Email जेव्हा: ['generate'] करा: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str शेवटी-जोडा: (स्वतः header: ['From: '] + स्वतःचे from-name + [' <'] + ( स्वतःचे from ) + ['>']) + brk.
+	str शेवटी-जोडा: (स्वतः header: ['To: '] + ( स्वतःचे recipients जोडा: [','] )) + brk.
+	स्वतःचे cc मोजणी खरे-असल्यास: {
+		str शेवटी-जोडा: (स्वतः header: ['Cc: '] + ( स्वतःचे cc जोडा: [','] )) + brk.
+	}.
+	स्वतःचे bcc मोजणी खरे-असल्यास: {
+		str शेवटी-जोडा: (स्वतः header: ['Bcc: '] + ( स्वतःचे bcc जोडा: [','] )) + brk.
+	}.
+	str शेवटी-जोडा: (स्वतः header: ['Subject: '] + स्वतःचे subject) + brk.
+	str शेवटी-जोडा: brk.
+	str शेवटी-जोडा: स्वतःचे body.
+	str शेवटी-जोडा: brk. <- str.
+}.
+
+>> HTML-Email := Email नवीन.
+
+HTML-Email जेव्हा: ['init'] करा: {
+	स्वतः init.
+	स्वतःचे attachments := सूची नवीन.
+	स्वतःचे boundary := तिजोरी टोकन: 40.
+}.
+
+HTML-Email जेव्हा: ['attach:'] करा: { :file
+	>> id := स्वतःचे attachments मोजणी.
+	>> blob := file blob.
+	स्वतःचे attachments शेवटी-जोडा: (
+		शब्दकोश नवीन
+			file: file फाइल-मार्ग,
+			mime: ['image/'] + (Server mimetype: file फाइल-मार्ग),
+			data: blob base64-एनकोड
+	).
+	blob मुक्त. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email जेव्हा: ['generate'] करा: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str शेवटी-जोडा: (स्वतः header: ['From: '] + स्वतःचे from-name + [' <'] + ( स्वतःचे from ) + ['>']) + brk.
+	str शेवटी-जोडा: (स्वतः header: ['To: '] + ( स्वतःचे recipients जोडा: [','] )) + brk.
+	स्वतःचे cc मोजणी खरे-असल्यास: {
+		str शेवटी-जोडा: (स्वतः header: ['Cc: '] + ( स्वतःचे cc जोडा: [','] )) + brk.
+	}.
+	स्वतःचे bcc मोजणी खरे-असल्यास: {
+		str शेवटी-जोडा: (स्वतः header: ['Bcc: '] + ( स्वतःचे bcc जोडा: [','] )) + brk.
+	}.
+	str शेवटी-जोडा: (स्वतः header: ['Subject: '] + स्वतःचे subject) + brk.
+	str शेवटी-जोडा: ['MIME-Version: 1.0'] + brk.
+	str शेवटी-जोडा: ['Content-Type: multipart/related; boundary="'] + स्वतःचे boundary + ['"; type=text/html'] + brk.
+	str शेवटी-जोडा: brk.
+	str शेवटी-जोडा: ['--'] + स्वतःचे boundary + brk.
+	str शेवटी-जोडा: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str शेवटी-जोडा: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str शेवटी-जोडा: brk.
+	str शेवटी-जोडा: स्वतःचे body.
+	str शेवटी-जोडा: brk.
+	स्वतःचे attachments प्रत्येक: { :id :info
+		>> blob := info data.
+		str शेवटी-जोडा: ['--'] + स्वतःचे boundary + brk.
+		str शेवटी-जोडा: ['Content-Type: '] + info mime + brk.
+		str शेवटी-जोडा: ['Content-Transfer-Encoding: base64'] + brk.
+		str शेवटी-जोडा: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str शेवटी-जोडा: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str शेवटी-जोडा: brk.
+		>> max := 76.
+		>> len := blob लांबी.
+		>> chunks := (len / max) वर-पूर्णांक.
+		{ :i
+			>> chunk := blob प्रत सुरुवात: i * max लांबी: max.
+			str शेवटी-जोडा: chunk + brk.
+		} * chunks.
+		str शेवटी-जोडा: brk.
+		str शेवटी-जोडा: brk.
+	}.
+	str शेवटी-जोडा: ['--'] + स्वतःचे boundary + ['--'] + brk. <- str.
+}.

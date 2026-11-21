@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := ວັດຖຸ ໃໝ່.
+
+Template ເມື່ອ: ['ໃໝ່'] ເຮັດ: { <- ຕົນເອງ ໃໝ່ content: [''].
+}.
+
+Template ເມື່ອ: ['content:'] ເຮັດ: { :content
+	ຂອງຕົນ content := content. 
+}.
+
+Template ເມື່ອ: ['ໃໝ່:'] ເຮັດ: { :content <- ຕົນເອງ ໃໝ່ content: content.
+}.
+
+Template ເມື່ອ: ['cut:'] ເຮັດ: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := ຂອງຕົນ content ແຍກ: startmarker.
+	>> prefix := parts ຕົວທຳອິດ.
+	>> parts2 := parts ຕົວສຸດທ້າຍ ແຍກ: endmarker.
+	>> suffix := parts2 ຕົວສຸດທ້າຍ.
+	>> part := parts2 ຕົວທຳອິດ.
+	>> rest := prefix + suffix.
+	ຂອງຕົນ content := rest. <- Template ໃໝ່: part.
+	
+}.
+
+Template ເມື່ອ: ['ສຳເນົາ'] ເຮັດ: { <- ຕົນເອງ ໃໝ່: ຕົນເອງ ເປັນຂໍ້ຄວາມ ສຳເນົາ.
+}.
+	
+Template ເມື່ອ: ['paste:at:'] ເຮັດ: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	ຂອງຕົນ content ແທນທີ່: pastemarker ດ້ວຍ: ( snippet ເປັນຂໍ້ຄວາມ + pastemarker ).
+}.
+
+Template ເມື່ອ: ['ກຳນົດ:ຄ່າ:'] ເຮັດ: { :slot :value
+	ຂອງຕົນ content ແທນທີ່: ['<!-- slot:'] + slot + [' -->'] ດ້ວຍ: ( Server html-ເຂົ້າລະຫັດ: value ).
+}.
+
+Template ເມື່ອ: ['set:html:'] ເຮັດ: { :slot :html
+	ຂອງຕົນ content ແທນທີ່: ['<!-- slot:'] + slot + [' -->'] ດ້ວຍ: html.
+}.
+
+Template ເມື່ອ: ['ຕອບ:ແລະ:'] ເຮັດ: { :slot :value
+	ຕົນເອງ ກຳນົດ: (slot ເລີ່ມທີ່: 0 ຄວາມຍາວ: (slot ຄວາມຍາວ - 1)) ຄ່າ: value.
+}.
+
+Template ເມື່ອ: ['nl2br'] ເຮັດ: {
+	ຂອງຕົນ content ແທນທີ່: ['\n'] ດ້ວຍ: ['<br>'].
+}.
+
+Template ເມື່ອ: ['clean'] ເຮັດ: {
+	ຂອງຕົນ content :=
+		ແພັດເທີນ
+		ໃໝ່: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ກົງກັບ: ຂອງຕົນ content
+		ເຮັດ: { <- ['']. }.
+}.
+
+Template ເມື່ອ: ['clean-cuts'] ເຮັດ: {
+	>> items := ລິສ ໃໝ່.
+	ແພັດເທີນ
+	ໃໝ່: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ກົງກັບ: ຂອງຕົນ content
+	ເຮັດ: { :_ :part
+		items ຕໍ່ທ້າຍ: part ? 1.
+	}.
+	items ແຕ່ລະຕົວ: { :_ :id
+		ຂອງຕົນ content :=
+			ແພັດເທີນ ໃໝ່: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ກົງກັບ: ຂອງຕົນ content
+			ເຮັດ: { <- ['']. }.
+	 }.
+}.
+
+Template ເມື່ອ: ['clean-space'] ເຮັດ: {
+	ຂອງຕົນ content :=
+		ແພັດເທີນ
+		ໃໝ່: ['\\s*\\n'],
+		ກົງກັບ: ຂອງຕົນ content
+		ເຮັດ: { <- ['\n']. }.
+	ຂອງຕົນ content :=
+		ແພັດເທີນ
+		ໃໝ່: ['\\n[\\s\\t]+'],
+		ກົງກັບ: ຂອງຕົນ content
+		ເຮັດ: { <- ['\n']. }.
+}.
+
+Template ເມື່ອ: ['clean-all'] ເຮັດ: {
+	ຕົນເອງ clean.
+	ຕົນເອງ clean-cuts.
+	ຕົນເອງ clean-space.
+}.
+
+Template ເມື່ອ: ['ເປັນຂໍ້ຄວາມ'] ເຮັດ: { <- ຂອງຕົນ content.
+}.

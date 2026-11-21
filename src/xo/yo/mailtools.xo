@@ -1,0 +1,128 @@
+>> Email := Nkan tuntun.
+
+Email nigbati: ['init'] ṣe: {
+	tirẹ recipients := Akojọ tuntun.
+	tirẹ cc := Akojọ tuntun.
+	tirẹ bcc := Akojọ tuntun.
+	tirẹ from := Ofo.
+	tirẹ from-name := Ofo.
+	tirẹ subject := Ofo.
+	tirẹ body := Ofo.
+}.
+
+Email nigbati: ['tuntun'] ṣe: { <- ara-rẹ tuntun init.
+}.
+
+Email nigbati: ['to:'] ṣe: { :list
+	tirẹ recipients := list.
+}.
+ 
+Email nigbati: ['cc:'] ṣe: { :list
+	tirẹ cc := list.
+}.
+
+Email nigbati: ['bcc:'] ṣe: { :list
+	tirẹ bcc := list.
+}.
+
+Email nigbati: ['subject:'] ṣe: { :subject
+	tirẹ subject := subject.
+}.
+
+Email nigbati: ['from:name:'] ṣe: { :from :orukọ
+	tirẹ from := from.
+	tirẹ from-name := orukọ.
+}.
+
+Email nigbati: ['body:'] ṣe: { :body
+	tirẹ body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email nigbati: ['header:'] ṣe: { :line <- line rọpo: ['\r'] pẹlu: [''], rọpo: ['\n'] pẹlu: [''].
+}.
+
+Email nigbati: ['send'] ṣe: {
+	>> f := Faili tempwrite: ara-rẹ generate.
+	Eto eto-iṣẹ: ['sendmail -t < '] + f ọna-faili, ila-tuntun.
+}.
+
+Email nigbati: ['generate'] ṣe: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str fi-kun-opin: (ara-rẹ header: ['From: '] + tirẹ from-name + [' <'] + ( tirẹ from ) + ['>']) + brk.
+	str fi-kun-opin: (ara-rẹ header: ['To: '] + ( tirẹ recipients so-pọ: [','] )) + brk.
+	tirẹ cc iye-nọmba otitọ: {
+		str fi-kun-opin: (ara-rẹ header: ['Cc: '] + ( tirẹ cc so-pọ: [','] )) + brk.
+	}.
+	tirẹ bcc iye-nọmba otitọ: {
+		str fi-kun-opin: (ara-rẹ header: ['Bcc: '] + ( tirẹ bcc so-pọ: [','] )) + brk.
+	}.
+	str fi-kun-opin: (ara-rẹ header: ['Subject: '] + tirẹ subject) + brk.
+	str fi-kun-opin: brk.
+	str fi-kun-opin: tirẹ body.
+	str fi-kun-opin: brk. <- str.
+}.
+
+>> HTML-Email := Email tuntun.
+
+HTML-Email nigbati: ['init'] ṣe: {
+	ara-rẹ init.
+	tirẹ attachments := Akojọ tuntun.
+	tirẹ boundary := Apoti-aabo token: 40.
+}.
+
+HTML-Email nigbati: ['attach:'] ṣe: { :file
+	>> id := tirẹ attachments iye-nọmba.
+	>> blob := file blob.
+	tirẹ attachments fi-kun-opin: (
+		Atumọ-ede tuntun
+			file: file ọna-faili,
+			mime: ['image/'] + (Server mimetype: file ọna-faili),
+			data: blob base64-ṣe-koodu
+	).
+	blob tu-silẹ. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email nigbati: ['generate'] ṣe: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str fi-kun-opin: (ara-rẹ header: ['From: '] + tirẹ from-name + [' <'] + ( tirẹ from ) + ['>']) + brk.
+	str fi-kun-opin: (ara-rẹ header: ['To: '] + ( tirẹ recipients so-pọ: [','] )) + brk.
+	tirẹ cc iye-nọmba otitọ: {
+		str fi-kun-opin: (ara-rẹ header: ['Cc: '] + ( tirẹ cc so-pọ: [','] )) + brk.
+	}.
+	tirẹ bcc iye-nọmba otitọ: {
+		str fi-kun-opin: (ara-rẹ header: ['Bcc: '] + ( tirẹ bcc so-pọ: [','] )) + brk.
+	}.
+	str fi-kun-opin: (ara-rẹ header: ['Subject: '] + tirẹ subject) + brk.
+	str fi-kun-opin: ['MIME-Version: 1.0'] + brk.
+	str fi-kun-opin: ['Content-Type: multipart/related; boundary="'] + tirẹ boundary + ['"; type=text/html'] + brk.
+	str fi-kun-opin: brk.
+	str fi-kun-opin: ['--'] + tirẹ boundary + brk.
+	str fi-kun-opin: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str fi-kun-opin: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str fi-kun-opin: brk.
+	str fi-kun-opin: tirẹ body.
+	str fi-kun-opin: brk.
+	tirẹ attachments kọọkan: { :id :info
+		>> blob := info data.
+		str fi-kun-opin: ['--'] + tirẹ boundary + brk.
+		str fi-kun-opin: ['Content-Type: '] + info mime + brk.
+		str fi-kun-opin: ['Content-Transfer-Encoding: base64'] + brk.
+		str fi-kun-opin: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str fi-kun-opin: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str fi-kun-opin: brk.
+		>> max := 76.
+		>> len := blob gigun.
+		>> chunks := (len / max) yika-soke.
+		{ :i
+			>> chunk := blob ṣe-ẹda lati: i * max gigun: max.
+			str fi-kun-opin: chunk + brk.
+		} * chunks.
+		str fi-kun-opin: brk.
+		str fi-kun-opin: brk.
+	}.
+	str fi-kun-opin: ['--'] + tirẹ boundary + ['--'] + brk. <- str.
+}.

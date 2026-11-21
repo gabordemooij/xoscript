@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := آبجیکٹ نیا.
+
+Template جب: ['نیا'] کرو: { <- خود نیا content: [''].
+}.
+
+Template جب: ['content:'] کرو: { :content
+	اپنا content := content. 
+}.
+
+Template جب: ['نیا:'] کرو: { :content <- خود نیا content: content.
+}.
+
+Template جب: ['cut:'] کرو: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := اپنا content تقسیم: startmarker.
+	>> prefix := parts پہلا.
+	>> parts2 := parts آخری تقسیم: endmarker.
+	>> suffix := parts2 آخری.
+	>> part := parts2 پہلا.
+	>> rest := prefix + suffix.
+	اپنا content := rest. <- Template نیا: part.
+	
+}.
+
+Template جب: ['نقل'] کرو: { <- خود نیا: خود بطور-متن نقل.
+}.
+	
+Template جب: ['paste:at:'] کرو: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	اپنا content بدلو: pastemarker سے: ( snippet بطور-متن + pastemarker ).
+}.
+
+Template جب: ['مقرر:قدر:'] کرو: { :slot :value
+	اپنا content بدلو: ['<!-- slot:'] + slot + [' -->'] سے: ( Server html-انکوڈ: value ).
+}.
+
+Template جب: ['set:html:'] کرو: { :slot :html
+	اپنا content بدلو: ['<!-- slot:'] + slot + [' -->'] سے: html.
+}.
+
+Template جب: ['جواب:اور:'] کرو: { :slot :value
+	خود مقرر: (slot آغاز: 0 لمبائی: (slot لمبائی - 1)) قدر: value.
+}.
+
+Template جب: ['nl2br'] کرو: {
+	اپنا content بدلو: ['\n'] سے: ['<br>'].
+}.
+
+Template جب: ['clean'] کرو: {
+	اپنا content :=
+		نمونہ
+		نیا: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		مطابقت: اپنا content
+		کرو: { <- ['']. }.
+}.
+
+Template جب: ['clean-cuts'] کرو: {
+	>> items := لسٹ نیا.
+	نمونہ
+	نیا: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	مطابقت: اپنا content
+	کرو: { :_ :part
+		items آخر-میں-جوڑو: part ? 1.
+	}.
+	items ہر-ایک: { :_ :id
+		اپنا content :=
+			نمونہ نیا: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			مطابقت: اپنا content
+			کرو: { <- ['']. }.
+	 }.
+}.
+
+Template جب: ['clean-space'] کرو: {
+	اپنا content :=
+		نمونہ
+		نیا: ['\\s*\\n'],
+		مطابقت: اپنا content
+		کرو: { <- ['\n']. }.
+	اپنا content :=
+		نمونہ
+		نیا: ['\\n[\\s\\t]+'],
+		مطابقت: اپنا content
+		کرو: { <- ['\n']. }.
+}.
+
+Template جب: ['clean-all'] کرو: {
+	خود clean.
+	خود clean-cuts.
+	خود clean-space.
+}.
+
+Template جب: ['بطور-متن'] کرو: { <- اپنا content.
+}.

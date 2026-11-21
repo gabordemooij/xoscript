@@ -1,0 +1,325 @@
+Fangatahana-HTTP rehefa: ['HTTP-header:'] ataovy: { :key <- Fandaharana fikirakirana: key.
+}.
+
+>> HTTP-Header := Zavatra vaovao.
+
+HTTP-Header rehefa: ['vaovao'] ataovy: { <- tena vaovao init.
+}.
+
+HTTP-Header rehefa: ['init'] ataovy: {
+	azy key := Tsinontsinona.
+	azy value := Tsinontsinona.
+}.
+
+HTTP-Header rehefa: ['key:value:'] ataovy: { :key :value
+	azy key := key.
+	azy value := value.
+}.
+
+HTTP-Header rehefa: ['key'] ataovy: { <- azy key.
+}.
+
+HTTP-Header rehefa: ['value'] ataovy: { <- azy value.
+}.
+
+
+HTTP-Header rehefa: ['soratra'] ataovy: {
+	>> line := azy key + [': '] + azy value.
+	line soloy: ['\r'] amin: [''], soloy: ['\n'] amin: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Zavatra vaovao.
+
+Web-Document rehefa: ['vaovao'] ataovy: { <- tena vaovao init.
+}.
+
+Web-Document rehefa: ['init'] ataovy: {
+	azy headers := Lisitra vaovao.
+	azy sess-id := Tsinontsinona.
+	azy session-manager := Tempfile-Session vaovao.
+	azy sessdata := Tsinontsinona.
+	azy secure := Marina.
+	azy same-site := ['Strict'].
+	azy headers-out := Diso.
+	azy request := Fangatahana-HTTP vaovao.
+}.
+
+Web-Document rehefa: ['request:'] ataovy: { :request
+	azy request := request.
+}. 
+
+Web-Document rehefa: ['secure-session-cookie:'] ataovy: { :secure
+	tena check-headers.
+	azy secure := secure.
+}.
+
+Web-Document rehefa: ['same-site-session-cookie:'] ataovy: { :value
+	tena check-headers.
+	>> options := Lisitra vaovao 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options misy: value, diso: {
+		ity-asa-ity fahadisoana: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	azy same-site := value.
+}.
+
+Web-Document rehefa: ['header:'] ataovy: { :header
+	tena check-headers.
+	azy headers ampio-any-amin-ny-farany: header.
+}.
+
+Web-Document rehefa: ['clear-headers'] ataovy: {
+	tena check-headers.
+	azy headers := Lisitra vaovao.
+}.
+
+Web-Document rehefa: ['session-manager:'] ataovy: { :manager
+	tena check-headers.
+	azy session-manager := manager.
+}.
+
+Web-Document rehefa: ['session-manager'] ataovy: { <- azy session-manager.
+}.
+
+Web-Document rehefa: ['check-headers'] ataovy: {
+	azy headers-out marina: {
+		ity-asa-ity fahadisoana: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document rehefa: ['session-start'] ataovy: {
+	tena check-headers.
+	>> request := azy request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Tsinontsinona? diso: {
+		(( Lamina vaovao: ['^[A-Za-z0-9]+\\z'], fifanarahana: sess-id ) = 0) marina: {
+			sess-id := Tsinontsinona.
+		}.
+	}.
+	sess-id Tsinontsinona? marina: {
+		sess-id := Vata-fiarovana token: 30.
+		>> session-header := HTTP-Header vaovao
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (azy secure ity: ['Secure'] na-iry: ['']),
+		SSITE: (azy same-site),
+		XSID: sess-id
+		).
+		azy headers ampio-any-amin-ny-farany: session-header.
+	}.
+	azy sessdata := azy session-manager for: sess-id, load. <- azy sessdata. # reference
+}.
+
+Web-Document rehefa: ['goto:'] ataovy: { :url
+	tena check-headers.
+	tena clear-headers.
+	azy headers
+	ampio-any-amin-ny-farany: (
+		HTTP-Header vaovao
+		key: ['Status'] value: ['303 See Other']
+	),
+	ampio-any-amin-ny-farany: (
+		HTTP-Header vaovao
+		key: ['Location'] value: url
+	).
+	tena out: ['Redirect'].
+}.
+
+Web-Document rehefa: ['session-destroy'] ataovy: {
+	tena check-headers.
+	>> request := azy request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Tsinontsinona? diso: {
+		>> session-header := HTTP-Header vaovao.
+		>> when := Fotoana vaovao taona: 1970, endrika: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (azy secure ity: ['Secure'] na-iry: ['']),
+			SSITE: (azy same-site),
+			XSID: sess-id
+		).
+		azy session-manager destroy.
+		azy headers ampio-any-amin-ny-farany: session-header.
+	}.
+}.
+
+
+Web-Document rehefa: ['template:'] ataovy: { :lalan-drakitra <- Template vaovao: (Rakitra vaovao: lalan-drakitra, vakio).
+}.
+
+Web-Document rehefa: ['out:type:'] ataovy: { :output :karazana
+	azy headers-out diso: {
+		azy sessdata Tsinontsinona? diso: {
+			azy session-manager save: azy sessdata.
+		}.
+		azy headers ampio-any-amin-ny-farany: (
+			HTTP-Header vaovao
+			key: ['Content-type'] value: karazana
+		).
+		azy headers tsirairay: { :_ :header
+			Vokatra soraty: header.
+		}.
+		azy headers-out := Marina.
+		Vokatra soraty: ['\r\n'].
+	}.
+	Vokatra soraty: output.
+}.
+
+Web-Document rehefa: ['finish:type:'] ataovy: { :output :karazana
+	azy headers-out diso: {
+		azy sessdata Tsinontsinona? diso: {
+			azy session-manager save: azy sessdata.
+		}.
+		azy headers ampio-any-amin-ny-farany: (
+			HTTP-Header vaovao
+			key: ['Content-type'] value: karazana
+		).
+		azy headers ampio-any-amin-ny-farany: (
+			HTTP-Header vaovao
+			key: ['Content-Length'] value: output soratra bytes
+		).
+		azy headers tsirairay: { :_ :header
+			Vokatra soraty: header.
+		}.
+		azy headers-out := Marina.
+		Vokatra soraty: ['\r\n'].
+	}.
+	Vokatra soraty: output.
+}.
+
+Web-Document rehefa: ['out:'] ataovy: { :output
+	tena out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document rehefa: ['finish:'] ataovy: { :output
+	tena finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document rehefa: ['json:'] ataovy: { :output
+	tena out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document rehefa: ['not-found:'] ataovy: { :output
+	tena clear-headers header: (
+		HTTP-Header vaovao key: ['Status'] value: ['404 Not Found']
+	).
+	tena out: output.
+}.
+
+
+# Interface
+
+>> Session := Zavatra vaovao.
+
+Session rehefa: ['vaovao'] ataovy: { <- tena vaovao init for: Tsinontsinona.
+}.
+
+Session rehefa: ['for:'] ataovy: { :id
+	azy id := id.
+}.
+
+Session rehefa: ['load'] ataovy: {
+	ity-asa-ity fahadisoana: ['Not implemented.'].
+}.
+
+Session rehefa: ['save:'] ataovy: {
+	ity-asa-ity fahadisoana: ['Not implemented.'].
+}.
+
+Session rehefa: ['destroy'] ataovy: {
+	ity-asa-ity fahadisoana: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session vaovao.
+
+Tempfile-Session rehefa: ['init'] ataovy: {
+	azy pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session rehefa: ['path-prefix:'] ataovy: { :str
+	azy pathprefix := str.
+}.
+
+Tempfile-Session rehefa: ['file'] ataovy: { <- ( Rakitra vaovao: ( azy pathprefix + azy id + ['.txt'] ) ).
+}.
+
+Tempfile-Session rehefa: ['load'] ataovy: {
+	>> file := tena file.
+	file misy diso: {
+		file soraty: (Rakibolana vaovao kaody).
+	}. <- file vakio zavatra.
+}.
+
+Tempfile-Session rehefa: ['save:'] ataovy: { :data
+	>> file := tena file.
+	file misy marina: {
+		file soraty: data kaody.
+	}.
+}.
+
+Tempfile-Session rehefa: ['destroy'] ataovy: {
+	>> file := tena file.
+	file misy marina: {
+		file fafao.
+	}.
+}.
+
+
+>> URL := Zavatra vaovao.
+
+URL rehefa: ['init'] ataovy: {
+	azy protocol := ['https://'].
+	azy mpampiantrano := ['localhost'].
+	azy lalan-drakitra := [''].
+	azy params := [''].
+	azy hash := [''].
+}.
+
+URL rehefa: ['vaovao'] ataovy: { <- tena vaovao init.
+}.
+
+URL rehefa: ['soratra'] ataovy: { <- (
+	azy protocol +
+	azy mpampiantrano +
+	azy lalan-drakitra +
+	azy params +
+	azy hash ).
+}.
+
+URL rehefa: ['protocol:'] ataovy: { :protocol
+	((Lisitra vaovao: ['http'] ; ['https']) misy: protocol) marina: {
+		azy protocol := protocol + ['://'].
+	}, diso: {
+		ity-asa-ity fahadisoana: ['Invalid protocol'].
+	}.
+}.
+
+URL rehefa: ['mpampiantrano:'] ataovy: { :mpampiantrano
+	#todo validate according to rfc
+	azy mpampiantrano := mpampiantrano.
+}.
+
+URL rehefa: ['path:'] ataovy: { :lalan-drakitra
+	azy lalan-drakitra := ['/'] + lalan-drakitra url-asio-kaody.
+}.
+
+URL rehefa: ['params:'] ataovy: { :map
+	>> params := Lisitra vaovao.
+	map tsirairay: { :key :value
+		params ampio-any-amin-ny-farany: key soratra url-asio-kaody + ['='] + value soratra url-asio-kaody.
+	}.
+	azy params := ['?'] + ( params atambaro: ['&'] ).
+}.
+
+URL rehefa: ['hash:'] ataovy: { :hash
+	azy hash := ['#'] + hash url-asio-kaody.
+}.
+

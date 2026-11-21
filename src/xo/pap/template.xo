@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Opheto nobo.
+
+Template ora: ['nobo'] hasi: { <- mes nobo content: [''].
+}.
+
+Template ora: ['content:'] hasi: { :content
+	propio content := content. 
+}.
+
+Template ora: ['nobo:'] hasi: { :content <- mes nobo content: content.
+}.
+
+Template ora: ['cut:'] hasi: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := propio content parti: startmarker.
+	>> prefix := parts promé.
+	>> parts2 := parts último parti: endmarker.
+	>> suffix := parts2 último.
+	>> part := parts2 promé.
+	>> rest := prefix + suffix.
+	propio content := rest. <- Template nobo: part.
+	
+}.
+
+Template ora: ['kopia'] hasi: { <- mes nobo: mes teksto kopia.
+}.
+	
+Template ora: ['paste:at:'] hasi: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	propio content remplasá: pastemarker ku: ( snippet teksto + pastemarker ).
+}.
+
+Template ora: ['pone:balor:'] hasi: { :slot :value
+	propio content remplasá: ['<!-- slot:'] + slot + [' -->'] ku: ( Server html-kodifiká: value ).
+}.
+
+Template ora: ['set:html:'] hasi: { :slot :html
+	propio content remplasá: ['<!-- slot:'] + slot + [' -->'] ku: html.
+}.
+
+Template ora: ['kontestá:i:'] hasi: { :slot :value
+	mes pone: (slot kuminsá: 0 largura: (slot largura - 1)) balor: value.
+}.
+
+Template ora: ['nl2br'] hasi: {
+	propio content remplasá: ['\n'] ku: ['<br>'].
+}.
+
+Template ora: ['clean'] hasi: {
+	propio content :=
+		Patronchi
+		nobo: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		kuadra: propio content
+		hasi: { <- ['']. }.
+}.
+
+Template ora: ['clean-cuts'] hasi: {
+	>> items := Lista nobo.
+	Patronchi
+	nobo: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	kuadra: propio content
+	hasi: { :_ :part
+		items agregá-na-fin: part ? 1.
+	}.
+	items kada: { :_ :id
+		propio content :=
+			Patronchi nobo: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			kuadra: propio content
+			hasi: { <- ['']. }.
+	 }.
+}.
+
+Template ora: ['clean-space'] hasi: {
+	propio content :=
+		Patronchi
+		nobo: ['\\s*\\n'],
+		kuadra: propio content
+		hasi: { <- ['\n']. }.
+	propio content :=
+		Patronchi
+		nobo: ['\\n[\\s\\t]+'],
+		kuadra: propio content
+		hasi: { <- ['\n']. }.
+}.
+
+Template ora: ['clean-all'] hasi: {
+	mes clean.
+	mes clean-cuts.
+	mes clean-space.
+}.
+
+Template ora: ['teksto'] hasi: { <- propio content.
+}.

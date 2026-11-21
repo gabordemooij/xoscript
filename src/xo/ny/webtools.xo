@@ -1,0 +1,325 @@
+Pempho-HTTP chikafika: ['HTTP-header:'] chitani: { :key <- Pulogalamu kakhazikitsidwe: key.
+}.
+
+>> HTTP-Header := Chinthu chatsopano.
+
+HTTP-Header chikafika: ['chatsopano'] chitani: { <- wekha chatsopano init.
+}.
+
+HTTP-Header chikafika: ['init'] chitani: {
+	zake key := Palibe.
+	zake value := Palibe.
+}.
+
+HTTP-Header chikafika: ['key:value:'] chitani: { :key :value
+	zake key := key.
+	zake value := value.
+}.
+
+HTTP-Header chikafika: ['key'] chitani: { <- zake key.
+}.
+
+HTTP-Header chikafika: ['value'] chitani: { <- zake value.
+}.
+
+
+HTTP-Header chikafika: ['malemba-a-mawu'] chitani: {
+	>> line := zake key + [': '] + zake value.
+	line sinthani: ['\r'] ndi: [''], sinthani: ['\n'] ndi: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Chinthu chatsopano.
+
+Web-Document chikafika: ['chatsopano'] chitani: { <- wekha chatsopano init.
+}.
+
+Web-Document chikafika: ['init'] chitani: {
+	zake headers := Mndandanda chatsopano.
+	zake sess-id := Palibe.
+	zake session-manager := Tempfile-Session chatsopano.
+	zake sessdata := Palibe.
+	zake secure := Zoona.
+	zake same-site := ['Strict'].
+	zake headers-out := Zabodza.
+	zake request := Pempho-HTTP chatsopano.
+}.
+
+Web-Document chikafika: ['request:'] chitani: { :request
+	zake request := request.
+}. 
+
+Web-Document chikafika: ['secure-session-cookie:'] chitani: { :secure
+	wekha check-headers.
+	zake secure := secure.
+}.
+
+Web-Document chikafika: ['same-site-session-cookie:'] chitani: { :value
+	wekha check-headers.
+	>> options := Mndandanda chatsopano 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options muli: value, zabodza: {
+		ntchito-iyi cholakwika: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	zake same-site := value.
+}.
+
+Web-Document chikafika: ['header:'] chitani: { :header
+	wekha check-headers.
+	zake headers onjeza-kumapeto: header.
+}.
+
+Web-Document chikafika: ['clear-headers'] chitani: {
+	wekha check-headers.
+	zake headers := Mndandanda chatsopano.
+}.
+
+Web-Document chikafika: ['session-manager:'] chitani: { :manager
+	wekha check-headers.
+	zake session-manager := manager.
+}.
+
+Web-Document chikafika: ['session-manager'] chitani: { <- zake session-manager.
+}.
+
+Web-Document chikafika: ['check-headers'] chitani: {
+	zake headers-out zoona: {
+		ntchito-iyi cholakwika: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document chikafika: ['session-start'] chitani: {
+	wekha check-headers.
+	>> request := zake request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Palibe? zabodza: {
+		(( Chitsanzo-chofufuzira chatsopano: ['^[A-Za-z0-9]+\\z'], kufanana: sess-id ) = 0) zoona: {
+			sess-id := Palibe.
+		}.
+	}.
+	sess-id Palibe? zoona: {
+		sess-id := Nkhokwe-yotetezedwa token: 30.
+		>> session-header := HTTP-Header chatsopano
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (zake secure ichi: ['Secure'] kapena-icho: ['']),
+		SSITE: (zake same-site),
+		XSID: sess-id
+		).
+		zake headers onjeza-kumapeto: session-header.
+	}.
+	zake sessdata := zake session-manager for: sess-id, load. <- zake sessdata. # reference
+}.
+
+Web-Document chikafika: ['goto:'] chitani: { :url
+	wekha check-headers.
+	wekha clear-headers.
+	zake headers
+	onjeza-kumapeto: (
+		HTTP-Header chatsopano
+		key: ['Status'] value: ['303 See Other']
+	),
+	onjeza-kumapeto: (
+		HTTP-Header chatsopano
+		key: ['Location'] value: url
+	).
+	wekha out: ['Redirect'].
+}.
+
+Web-Document chikafika: ['session-destroy'] chitani: {
+	wekha check-headers.
+	>> request := zake request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Palibe? zabodza: {
+		>> session-header := HTTP-Header chatsopano.
+		>> when := Nthawi-yeniyeni chatsopano chaka: 1970, kapangidwe: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (zake secure ichi: ['Secure'] kapena-icho: ['']),
+			SSITE: (zake same-site),
+			XSID: sess-id
+		).
+		zake session-manager destroy.
+		zake headers onjeza-kumapeto: session-header.
+	}.
+}.
+
+
+Web-Document chikafika: ['template:'] chitani: { :njira-ya-fayilo <- Template chatsopano: (Fayilo chatsopano: njira-ya-fayilo, werengani).
+}.
+
+Web-Document chikafika: ['out:type:'] chitani: { :output :mtundu
+	zake headers-out zabodza: {
+		zake sessdata Palibe? zabodza: {
+			zake session-manager save: zake sessdata.
+		}.
+		zake headers onjeza-kumapeto: (
+			HTTP-Header chatsopano
+			key: ['Content-type'] value: mtundu
+		).
+		zake headers chilichonse: { :_ :header
+			Zotuluka lembani: header.
+		}.
+		zake headers-out := Zoona.
+		Zotuluka lembani: ['\r\n'].
+	}.
+	Zotuluka lembani: output.
+}.
+
+Web-Document chikafika: ['finish:type:'] chitani: { :output :mtundu
+	zake headers-out zabodza: {
+		zake sessdata Palibe? zabodza: {
+			zake session-manager save: zake sessdata.
+		}.
+		zake headers onjeza-kumapeto: (
+			HTTP-Header chatsopano
+			key: ['Content-type'] value: mtundu
+		).
+		zake headers onjeza-kumapeto: (
+			HTTP-Header chatsopano
+			key: ['Content-Length'] value: output malemba-a-mawu bytes
+		).
+		zake headers chilichonse: { :_ :header
+			Zotuluka lembani: header.
+		}.
+		zake headers-out := Zoona.
+		Zotuluka lembani: ['\r\n'].
+	}.
+	Zotuluka lembani: output.
+}.
+
+Web-Document chikafika: ['out:'] chitani: { :output
+	wekha out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document chikafika: ['finish:'] chitani: { :output
+	wekha finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document chikafika: ['json:'] chitani: { :output
+	wekha out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document chikafika: ['not-found:'] chitani: { :output
+	wekha clear-headers header: (
+		HTTP-Header chatsopano key: ['Status'] value: ['404 Not Found']
+	).
+	wekha out: output.
+}.
+
+
+# Interface
+
+>> Session := Chinthu chatsopano.
+
+Session chikafika: ['chatsopano'] chitani: { <- wekha chatsopano init for: Palibe.
+}.
+
+Session chikafika: ['for:'] chitani: { :id
+	zake id := id.
+}.
+
+Session chikafika: ['load'] chitani: {
+	ntchito-iyi cholakwika: ['Not implemented.'].
+}.
+
+Session chikafika: ['save:'] chitani: {
+	ntchito-iyi cholakwika: ['Not implemented.'].
+}.
+
+Session chikafika: ['destroy'] chitani: {
+	ntchito-iyi cholakwika: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session chatsopano.
+
+Tempfile-Session chikafika: ['init'] chitani: {
+	zake pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session chikafika: ['path-prefix:'] chitani: { :str
+	zake pathprefix := str.
+}.
+
+Tempfile-Session chikafika: ['file'] chitani: { <- ( Fayilo chatsopano: ( zake pathprefix + zake id + ['.txt'] ) ).
+}.
+
+Tempfile-Session chikafika: ['load'] chitani: {
+	>> file := wekha file.
+	file lilipo zabodza: {
+		file lembani: (Mtanthauziramawu chatsopano khodi).
+	}. <- file werengani chinthu.
+}.
+
+Tempfile-Session chikafika: ['save:'] chitani: { :data
+	>> file := wekha file.
+	file lilipo zoona: {
+		file lembani: data khodi.
+	}.
+}.
+
+Tempfile-Session chikafika: ['destroy'] chitani: {
+	>> file := wekha file.
+	file lilipo zoona: {
+		file chotsani.
+	}.
+}.
+
+
+>> URL := Chinthu chatsopano.
+
+URL chikafika: ['init'] chitani: {
+	zake protocol := ['https://'].
+	zake wolandira := ['localhost'].
+	zake njira-ya-fayilo := [''].
+	zake params := [''].
+	zake hash := [''].
+}.
+
+URL chikafika: ['chatsopano'] chitani: { <- wekha chatsopano init.
+}.
+
+URL chikafika: ['malemba-a-mawu'] chitani: { <- (
+	zake protocol +
+	zake wolandira +
+	zake njira-ya-fayilo +
+	zake params +
+	zake hash ).
+}.
+
+URL chikafika: ['protocol:'] chitani: { :protocol
+	((Mndandanda chatsopano: ['http'] ; ['https']) muli: protocol) zoona: {
+		zake protocol := protocol + ['://'].
+	}, zabodza: {
+		ntchito-iyi cholakwika: ['Invalid protocol'].
+	}.
+}.
+
+URL chikafika: ['wolandira:'] chitani: { :wolandira
+	#todo validate according to rfc
+	zake wolandira := wolandira.
+}.
+
+URL chikafika: ['path:'] chitani: { :njira-ya-fayilo
+	zake njira-ya-fayilo := ['/'] + njira-ya-fayilo url-ika-khodi.
+}.
+
+URL chikafika: ['params:'] chitani: { :map
+	>> params := Mndandanda chatsopano.
+	map chilichonse: { :key :value
+		params onjeza-kumapeto: key malemba-a-mawu url-ika-khodi + ['='] + value malemba-a-mawu url-ika-khodi.
+	}.
+	zake params := ['?'] + ( params lumikiza: ['&'] ).
+}.
+
+URL chikafika: ['hash:'] chitani: { :hash
+	zake hash := ['#'] + hash url-ika-khodi.
+}.
+

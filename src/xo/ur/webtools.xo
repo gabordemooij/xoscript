@@ -1,0 +1,325 @@
+درخواست-HTTP جب: ['HTTP-header:'] کرو: { :key <- پروگرام ترتیب-قدر: key.
+}.
+
+>> HTTP-Header := آبجیکٹ نیا.
+
+HTTP-Header جب: ['نیا'] کرو: { <- خود نیا init.
+}.
+
+HTTP-Header جب: ['init'] کرو: {
+	اپنا key := خالی.
+	اپنا value := خالی.
+}.
+
+HTTP-Header جب: ['key:value:'] کرو: { :key :value
+	اپنا key := key.
+	اپنا value := value.
+}.
+
+HTTP-Header جب: ['key'] کرو: { <- اپنا key.
+}.
+
+HTTP-Header جب: ['value'] کرو: { <- اپنا value.
+}.
+
+
+HTTP-Header جب: ['بطور-متن'] کرو: {
+	>> line := اپنا key + [': '] + اپنا value.
+	line بدلو: ['\r'] سے: [''], بدلو: ['\n'] سے: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := آبجیکٹ نیا.
+
+Web-Document جب: ['نیا'] کرو: { <- خود نیا init.
+}.
+
+Web-Document جب: ['init'] کرو: {
+	اپنا headers := لسٹ نیا.
+	اپنا sess-id := خالی.
+	اپنا session-manager := Tempfile-Session نیا.
+	اپنا sessdata := خالی.
+	اپنا secure := سچ.
+	اپنا same-site := ['Strict'].
+	اپنا headers-out := جھوٹ.
+	اپنا request := درخواست-HTTP نیا.
+}.
+
+Web-Document جب: ['request:'] کرو: { :request
+	اپنا request := request.
+}. 
+
+Web-Document جب: ['secure-session-cookie:'] کرو: { :secure
+	خود check-headers.
+	اپنا secure := secure.
+}.
+
+Web-Document جب: ['same-site-session-cookie:'] کرو: { :value
+	خود check-headers.
+	>> options := لسٹ نیا 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options شامل-ہے: value, اگر-جھوٹ: {
+		یہ-کام خرابی: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	اپنا same-site := value.
+}.
+
+Web-Document جب: ['header:'] کرو: { :header
+	خود check-headers.
+	اپنا headers آخر-میں-جوڑو: header.
+}.
+
+Web-Document جب: ['clear-headers'] کرو: {
+	خود check-headers.
+	اپنا headers := لسٹ نیا.
+}.
+
+Web-Document جب: ['session-manager:'] کرو: { :manager
+	خود check-headers.
+	اپنا session-manager := manager.
+}.
+
+Web-Document جب: ['session-manager'] کرو: { <- اپنا session-manager.
+}.
+
+Web-Document جب: ['check-headers'] کرو: {
+	اپنا headers-out اگر-سچ: {
+		یہ-کام خرابی: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document جب: ['session-start'] کرو: {
+	خود check-headers.
+	>> request := اپنا request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id خالی? اگر-جھوٹ: {
+		(( نمونہ نیا: ['^[A-Za-z0-9]+\\z'], مطابقت: sess-id ) = 0) اگر-سچ: {
+			sess-id := خالی.
+		}.
+	}.
+	sess-id خالی? اگر-سچ: {
+		sess-id := تجوری ٹوکن: 30.
+		>> session-header := HTTP-Header نیا
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (اپنا secure یہ: ['Secure'] ورنہ-وہ: ['']),
+		SSITE: (اپنا same-site),
+		XSID: sess-id
+		).
+		اپنا headers آخر-میں-جوڑو: session-header.
+	}.
+	اپنا sessdata := اپنا session-manager for: sess-id, load. <- اپنا sessdata. # reference
+}.
+
+Web-Document جب: ['goto:'] کرو: { :url
+	خود check-headers.
+	خود clear-headers.
+	اپنا headers
+	آخر-میں-جوڑو: (
+		HTTP-Header نیا
+		key: ['Status'] value: ['303 See Other']
+	),
+	آخر-میں-جوڑو: (
+		HTTP-Header نیا
+		key: ['Location'] value: url
+	).
+	خود out: ['Redirect'].
+}.
+
+Web-Document جب: ['session-destroy'] کرو: {
+	خود check-headers.
+	>> request := اپنا request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id خالی? اگر-جھوٹ: {
+		>> session-header := HTTP-Header نیا.
+		>> when := لمحہ نیا سال: 1970, بوضع: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (اپنا secure یہ: ['Secure'] ورنہ-وہ: ['']),
+			SSITE: (اپنا same-site),
+			XSID: sess-id
+		).
+		اپنا session-manager destroy.
+		اپنا headers آخر-میں-جوڑو: session-header.
+	}.
+}.
+
+
+Web-Document جب: ['template:'] کرو: { :فائل-راستہ <- Template نیا: (فائل نیا: فائل-راستہ, پڑھو).
+}.
+
+Web-Document جب: ['out:type:'] کرو: { :output :قسم
+	اپنا headers-out اگر-جھوٹ: {
+		اپنا sessdata خالی? اگر-جھوٹ: {
+			اپنا session-manager save: اپنا sessdata.
+		}.
+		اپنا headers آخر-میں-جوڑو: (
+			HTTP-Header نیا
+			key: ['Content-type'] value: قسم
+		).
+		اپنا headers ہر-ایک: { :_ :header
+			آؤٹ-پٹ لکھو: header.
+		}.
+		اپنا headers-out := سچ.
+		آؤٹ-پٹ لکھو: ['\r\n'].
+	}.
+	آؤٹ-پٹ لکھو: output.
+}.
+
+Web-Document جب: ['finish:type:'] کرو: { :output :قسم
+	اپنا headers-out اگر-جھوٹ: {
+		اپنا sessdata خالی? اگر-جھوٹ: {
+			اپنا session-manager save: اپنا sessdata.
+		}.
+		اپنا headers آخر-میں-جوڑو: (
+			HTTP-Header نیا
+			key: ['Content-type'] value: قسم
+		).
+		اپنا headers آخر-میں-جوڑو: (
+			HTTP-Header نیا
+			key: ['Content-Length'] value: output بطور-متن بائٹس
+		).
+		اپنا headers ہر-ایک: { :_ :header
+			آؤٹ-پٹ لکھو: header.
+		}.
+		اپنا headers-out := سچ.
+		آؤٹ-پٹ لکھو: ['\r\n'].
+	}.
+	آؤٹ-پٹ لکھو: output.
+}.
+
+Web-Document جب: ['out:'] کرو: { :output
+	خود out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document جب: ['finish:'] کرو: { :output
+	خود finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document جب: ['json:'] کرو: { :output
+	خود out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document جب: ['not-found:'] کرو: { :output
+	خود clear-headers header: (
+		HTTP-Header نیا key: ['Status'] value: ['404 Not Found']
+	).
+	خود out: output.
+}.
+
+
+# Interface
+
+>> Session := آبجیکٹ نیا.
+
+Session جب: ['نیا'] کرو: { <- خود نیا init for: خالی.
+}.
+
+Session جب: ['for:'] کرو: { :id
+	اپنا id := id.
+}.
+
+Session جب: ['load'] کرو: {
+	یہ-کام خرابی: ['Not implemented.'].
+}.
+
+Session جب: ['save:'] کرو: {
+	یہ-کام خرابی: ['Not implemented.'].
+}.
+
+Session جب: ['destroy'] کرو: {
+	یہ-کام خرابی: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session نیا.
+
+Tempfile-Session جب: ['init'] کرو: {
+	اپنا pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session جب: ['path-prefix:'] کرو: { :str
+	اپنا pathprefix := str.
+}.
+
+Tempfile-Session جب: ['file'] کرو: { <- ( فائل نیا: ( اپنا pathprefix + اپنا id + ['.txt'] ) ).
+}.
+
+Tempfile-Session جب: ['load'] کرو: {
+	>> file := خود file.
+	file موجود اگر-جھوٹ: {
+		file لکھو: (لغت نیا کوڈ).
+	}. <- file پڑھو بطور-آبجیکٹ.
+}.
+
+Tempfile-Session جب: ['save:'] کرو: { :data
+	>> file := خود file.
+	file موجود اگر-سچ: {
+		file لکھو: data کوڈ.
+	}.
+}.
+
+Tempfile-Session جب: ['destroy'] کرو: {
+	>> file := خود file.
+	file موجود اگر-سچ: {
+		file مٹاؤ.
+	}.
+}.
+
+
+>> URL := آبجیکٹ نیا.
+
+URL جب: ['init'] کرو: {
+	اپنا protocol := ['https://'].
+	اپنا میزبان := ['localhost'].
+	اپنا فائل-راستہ := [''].
+	اپنا params := [''].
+	اپنا hash := [''].
+}.
+
+URL جب: ['نیا'] کرو: { <- خود نیا init.
+}.
+
+URL جب: ['بطور-متن'] کرو: { <- (
+	اپنا protocol +
+	اپنا میزبان +
+	اپنا فائل-راستہ +
+	اپنا params +
+	اپنا hash ).
+}.
+
+URL جب: ['protocol:'] کرو: { :protocol
+	((لسٹ نیا: ['http'] ; ['https']) شامل-ہے: protocol) اگر-سچ: {
+		اپنا protocol := protocol + ['://'].
+	}, اگر-جھوٹ: {
+		یہ-کام خرابی: ['Invalid protocol'].
+	}.
+}.
+
+URL جب: ['میزبان:'] کرو: { :میزبان
+	#todo validate according to rfc
+	اپنا میزبان := میزبان.
+}.
+
+URL جب: ['path:'] کرو: { :فائل-راستہ
+	اپنا فائل-راستہ := ['/'] + فائل-راستہ url-انکوڈ.
+}.
+
+URL جب: ['params:'] کرو: { :map
+	>> params := لسٹ نیا.
+	map ہر-ایک: { :key :value
+		params آخر-میں-جوڑو: key بطور-متن url-انکوڈ + ['='] + value بطور-متن url-انکوڈ.
+	}.
+	اپنا params := ['?'] + ( params جوڑو: ['&'] ).
+}.
+
+URL جب: ['ہیش:'] کرو: { :hash
+	اپنا hash := ['#'] + hash url-انکوڈ.
+}.
+

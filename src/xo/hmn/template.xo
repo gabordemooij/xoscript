@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Yam-khoom tshiab.
+
+Template thaum-tuaj: ['tshiab'] ua: { <- tus-kheej tshiab content: [''].
+}.
+
+Template thaum-tuaj: ['content:'] ua: { :content
+	nws-li content := content. 
+}.
+
+Template thaum-tuaj: ['tshiab:'] ua: { :content <- tus-kheej tshiab content: content.
+}.
+
+Template thaum-tuaj: ['cut:'] ua: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := nws-li content phua: startmarker.
+	>> prefix := parts thawj-zaug.
+	>> parts2 := parts kawg phua: endmarker.
+	>> suffix := parts2 kawg.
+	>> part := parts2 thawj-zaug.
+	>> rest := prefix + suffix.
+	nws-li content := rest. <- Template tshiab: part.
+	
+}.
+
+Template thaum-tuaj: ['luam'] ua: { <- tus-kheej tshiab: tus-kheej kab-ntawv luam.
+}.
+	
+Template thaum-tuaj: ['paste:at:'] ua: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	nws-li content hloov: pastemarker nrog: ( snippet kab-ntawv + pastemarker ).
+}.
+
+Template thaum-tuaj: ['teem:tus-nqi:'] ua: { :slot :value
+	nws-li content hloov: ['<!-- slot:'] + slot + [' -->'] nrog: ( Server html-ua-cim: value ).
+}.
+
+Template thaum-tuaj: ['set:html:'] ua: { :slot :html
+	nws-li content hloov: ['<!-- slot:'] + slot + [' -->'] nrog: html.
+}.
+
+Template thaum-tuaj: ['teb:thiab:'] ua: { :slot :value
+	tus-kheej teem: (slot los-ntawm: 0 ntev: (slot qhov-ntev - 1)) tus-nqi: value.
+}.
+
+Template thaum-tuaj: ['nl2br'] ua: {
+	nws-li content hloov: ['\n'] nrog: ['<br>'].
+}.
+
+Template thaum-tuaj: ['clean'] ua: {
+	nws-li content :=
+		Qauv-nrhiav
+		tshiab: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		sib-phim: nws-li content
+		ua: { <- ['']. }.
+}.
+
+Template thaum-tuaj: ['clean-cuts'] ua: {
+	>> items := Daim-teev tshiab.
+	Qauv-nrhiav
+	tshiab: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	sib-phim: nws-li content
+	ua: { :_ :part
+		items ntxiv-tom-kawg: part ? 1.
+	}.
+	items txhua: { :_ :id
+		nws-li content :=
+			Qauv-nrhiav tshiab: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			sib-phim: nws-li content
+			ua: { <- ['']. }.
+	 }.
+}.
+
+Template thaum-tuaj: ['clean-space'] ua: {
+	nws-li content :=
+		Qauv-nrhiav
+		tshiab: ['\\s*\\n'],
+		sib-phim: nws-li content
+		ua: { <- ['\n']. }.
+	nws-li content :=
+		Qauv-nrhiav
+		tshiab: ['\\n[\\s\\t]+'],
+		sib-phim: nws-li content
+		ua: { <- ['\n']. }.
+}.
+
+Template thaum-tuaj: ['clean-all'] ua: {
+	tus-kheej clean.
+	tus-kheej clean-cuts.
+	tus-kheej clean-space.
+}.
+
+Template thaum-tuaj: ['kab-ntawv'] ua: { <- nws-li content.
+}.

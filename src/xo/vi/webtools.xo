@@ -1,0 +1,325 @@
+Yêu-cầu-HTTP khi: ['HTTP-header:'] làm: { :key <- Chương-trình thiết-lập: key.
+}.
+
+>> HTTP-Header := Đối-tượng mới.
+
+HTTP-Header khi: ['mới'] làm: { <- bản-thân mới init.
+}.
+
+HTTP-Header khi: ['init'] làm: {
+	riêng key := Rỗng.
+	riêng value := Rỗng.
+}.
+
+HTTP-Header khi: ['key:value:'] làm: { :key :value
+	riêng key := key.
+	riêng value := value.
+}.
+
+HTTP-Header khi: ['key'] làm: { <- riêng key.
+}.
+
+HTTP-Header khi: ['value'] làm: { <- riêng value.
+}.
+
+
+HTTP-Header khi: ['chuỗi'] làm: {
+	>> line := riêng key + [': '] + riêng value.
+	line thay: ['\r'] bằng: [''], thay: ['\n'] bằng: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Đối-tượng mới.
+
+Web-Document khi: ['mới'] làm: { <- bản-thân mới init.
+}.
+
+Web-Document khi: ['init'] làm: {
+	riêng headers := Danh-sách mới.
+	riêng sess-id := Rỗng.
+	riêng session-manager := Tempfile-Session mới.
+	riêng sessdata := Rỗng.
+	riêng secure := Đúng.
+	riêng same-site := ['Strict'].
+	riêng headers-out := Sai.
+	riêng request := Yêu-cầu-HTTP mới.
+}.
+
+Web-Document khi: ['request:'] làm: { :request
+	riêng request := request.
+}. 
+
+Web-Document khi: ['secure-session-cookie:'] làm: { :secure
+	bản-thân check-headers.
+	riêng secure := secure.
+}.
+
+Web-Document khi: ['same-site-session-cookie:'] làm: { :value
+	bản-thân check-headers.
+	>> options := Danh-sách mới 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options chứa: value, sai: {
+		tác-vụ-này lỗi: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	riêng same-site := value.
+}.
+
+Web-Document khi: ['header:'] làm: { :header
+	bản-thân check-headers.
+	riêng headers thêm-cuối: header.
+}.
+
+Web-Document khi: ['clear-headers'] làm: {
+	bản-thân check-headers.
+	riêng headers := Danh-sách mới.
+}.
+
+Web-Document khi: ['session-manager:'] làm: { :manager
+	bản-thân check-headers.
+	riêng session-manager := manager.
+}.
+
+Web-Document khi: ['session-manager'] làm: { <- riêng session-manager.
+}.
+
+Web-Document khi: ['check-headers'] làm: {
+	riêng headers-out đúng: {
+		tác-vụ-này lỗi: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document khi: ['session-start'] làm: {
+	bản-thân check-headers.
+	>> request := riêng request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Rỗng? sai: {
+		(( Mẫu mới: ['^[A-Za-z0-9]+\\z'], khớp: sess-id ) = 0) đúng: {
+			sess-id := Rỗng.
+		}.
+	}.
+	sess-id Rỗng? đúng: {
+		sess-id := Két mã-thông-báo: 30.
+		>> session-header := HTTP-Header mới
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (riêng secure hoặc-là: ['Secure'] hay: ['']),
+		SSITE: (riêng same-site),
+		XSID: sess-id
+		).
+		riêng headers thêm-cuối: session-header.
+	}.
+	riêng sessdata := riêng session-manager for: sess-id, load. <- riêng sessdata. # reference
+}.
+
+Web-Document khi: ['goto:'] làm: { :url
+	bản-thân check-headers.
+	bản-thân clear-headers.
+	riêng headers
+	thêm-cuối: (
+		HTTP-Header mới
+		key: ['Status'] value: ['303 See Other']
+	),
+	thêm-cuối: (
+		HTTP-Header mới
+		key: ['Location'] value: url
+	).
+	bản-thân out: ['Redirect'].
+}.
+
+Web-Document khi: ['session-destroy'] làm: {
+	bản-thân check-headers.
+	>> request := riêng request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Rỗng? sai: {
+		>> session-header := HTTP-Header mới.
+		>> when := Thời-điểm mới năm: 1970, định-dạng: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (riêng secure hoặc-là: ['Secure'] hay: ['']),
+			SSITE: (riêng same-site),
+			XSID: sess-id
+		).
+		riêng session-manager destroy.
+		riêng headers thêm-cuối: session-header.
+	}.
+}.
+
+
+Web-Document khi: ['template:'] làm: { :đường-dẫn <- Template mới: (Tệp mới: đường-dẫn, đọc).
+}.
+
+Web-Document khi: ['out:type:'] làm: { :output :kiểu
+	riêng headers-out sai: {
+		riêng sessdata Rỗng? sai: {
+			riêng session-manager save: riêng sessdata.
+		}.
+		riêng headers thêm-cuối: (
+			HTTP-Header mới
+			key: ['Content-type'] value: kiểu
+		).
+		riêng headers mỗi: { :_ :header
+			Xuất ghi: header.
+		}.
+		riêng headers-out := Đúng.
+		Xuất ghi: ['\r\n'].
+	}.
+	Xuất ghi: output.
+}.
+
+Web-Document khi: ['finish:type:'] làm: { :output :kiểu
+	riêng headers-out sai: {
+		riêng sessdata Rỗng? sai: {
+			riêng session-manager save: riêng sessdata.
+		}.
+		riêng headers thêm-cuối: (
+			HTTP-Header mới
+			key: ['Content-type'] value: kiểu
+		).
+		riêng headers thêm-cuối: (
+			HTTP-Header mới
+			key: ['Content-Length'] value: output chuỗi bytes
+		).
+		riêng headers mỗi: { :_ :header
+			Xuất ghi: header.
+		}.
+		riêng headers-out := Đúng.
+		Xuất ghi: ['\r\n'].
+	}.
+	Xuất ghi: output.
+}.
+
+Web-Document khi: ['out:'] làm: { :output
+	bản-thân out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document khi: ['finish:'] làm: { :output
+	bản-thân finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document khi: ['json:'] làm: { :output
+	bản-thân out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document khi: ['not-found:'] làm: { :output
+	bản-thân clear-headers header: (
+		HTTP-Header mới key: ['Status'] value: ['404 Not Found']
+	).
+	bản-thân out: output.
+}.
+
+
+# Interface
+
+>> Session := Đối-tượng mới.
+
+Session khi: ['mới'] làm: { <- bản-thân mới init for: Rỗng.
+}.
+
+Session khi: ['for:'] làm: { :id
+	riêng id := id.
+}.
+
+Session khi: ['load'] làm: {
+	tác-vụ-này lỗi: ['Not implemented.'].
+}.
+
+Session khi: ['save:'] làm: {
+	tác-vụ-này lỗi: ['Not implemented.'].
+}.
+
+Session khi: ['destroy'] làm: {
+	tác-vụ-này lỗi: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session mới.
+
+Tempfile-Session khi: ['init'] làm: {
+	riêng pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session khi: ['path-prefix:'] làm: { :str
+	riêng pathprefix := str.
+}.
+
+Tempfile-Session khi: ['file'] làm: { <- ( Tệp mới: ( riêng pathprefix + riêng id + ['.txt'] ) ).
+}.
+
+Tempfile-Session khi: ['load'] làm: {
+	>> file := bản-thân file.
+	file tồn-tại sai: {
+		file ghi: (Từ-điển mới mã).
+	}. <- file đọc đối-tượng.
+}.
+
+Tempfile-Session khi: ['save:'] làm: { :data
+	>> file := bản-thân file.
+	file tồn-tại đúng: {
+		file ghi: data mã.
+	}.
+}.
+
+Tempfile-Session khi: ['destroy'] làm: {
+	>> file := bản-thân file.
+	file tồn-tại đúng: {
+		file xóa.
+	}.
+}.
+
+
+>> URL := Đối-tượng mới.
+
+URL khi: ['init'] làm: {
+	riêng protocol := ['https://'].
+	riêng máy-trạm := ['localhost'].
+	riêng đường-dẫn := [''].
+	riêng params := [''].
+	riêng hash := [''].
+}.
+
+URL khi: ['mới'] làm: { <- bản-thân mới init.
+}.
+
+URL khi: ['chuỗi'] làm: { <- (
+	riêng protocol +
+	riêng máy-trạm +
+	riêng đường-dẫn +
+	riêng params +
+	riêng hash ).
+}.
+
+URL khi: ['protocol:'] làm: { :protocol
+	((Danh-sách mới: ['http'] ; ['https']) chứa: protocol) đúng: {
+		riêng protocol := protocol + ['://'].
+	}, sai: {
+		tác-vụ-này lỗi: ['Invalid protocol'].
+	}.
+}.
+
+URL khi: ['máy-trạm:'] làm: { :máy-trạm
+	#todo validate according to rfc
+	riêng máy-trạm := máy-trạm.
+}.
+
+URL khi: ['path:'] làm: { :đường-dẫn
+	riêng đường-dẫn := ['/'] + đường-dẫn url-mã-hóa.
+}.
+
+URL khi: ['params:'] làm: { :map
+	>> params := Danh-sách mới.
+	map mỗi: { :key :value
+		params thêm-cuối: key chuỗi url-mã-hóa + ['='] + value chuỗi url-mã-hóa.
+	}.
+	riêng params := ['?'] + ( params nối: ['&'] ).
+}.
+
+URL khi: ['băm:'] làm: { :hash
+	riêng hash := ['#'] + hash url-mã-hóa.
+}.
+

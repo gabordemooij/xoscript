@@ -1,0 +1,128 @@
+>> Email := Объект яңа.
+
+Email килгәндә: ['init'] эшлә: {
+	үзенең recipients := Тезмә яңа.
+	үзенең cc := Тезмә яңа.
+	үзенең bcc := Тезмә яңа.
+	үзенең from := Буш.
+	үзенең from-name := Буш.
+	үзенең subject := Буш.
+	үзенең body := Буш.
+}.
+
+Email килгәндә: ['яңа'] эшлә: { <- үзе яңа init.
+}.
+
+Email килгәндә: ['to:'] эшлә: { :list
+	үзенең recipients := list.
+}.
+ 
+Email килгәндә: ['cc:'] эшлә: { :list
+	үзенең cc := list.
+}.
+
+Email килгәндә: ['bcc:'] эшлә: { :list
+	үзенең bcc := list.
+}.
+
+Email килгәндә: ['subject:'] эшлә: { :subject
+	үзенең subject := subject.
+}.
+
+Email килгәндә: ['from:name:'] эшлә: { :from :исем
+	үзенең from := from.
+	үзенең from-name := исем.
+}.
+
+Email килгәндә: ['body:'] эшлә: { :body
+	үзенең body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email килгәндә: ['header:'] эшлә: { :line <- line алыштыр: ['\r'] белән: [''], алыштыр: ['\n'] белән: [''].
+}.
+
+Email килгәндә: ['send'] эшлә: {
+	>> f := Файл tempwrite: үзе generate.
+	Программа система: ['sendmail -t < '] + f юл, яңа-юл.
+}.
+
+Email килгәндә: ['generate'] эшлә: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ахырга-өстә: (үзе header: ['From: '] + үзенең from-name + [' <'] + ( үзенең from ) + ['>']) + brk.
+	str ахырга-өстә: (үзе header: ['To: '] + ( үзенең recipients берләштер: [','] )) + brk.
+	үзенең cc саны дөрес: {
+		str ахырга-өстә: (үзе header: ['Cc: '] + ( үзенең cc берләштер: [','] )) + brk.
+	}.
+	үзенең bcc саны дөрес: {
+		str ахырга-өстә: (үзе header: ['Bcc: '] + ( үзенең bcc берләштер: [','] )) + brk.
+	}.
+	str ахырга-өстә: (үзе header: ['Subject: '] + үзенең subject) + brk.
+	str ахырга-өстә: brk.
+	str ахырга-өстә: үзенең body.
+	str ахырга-өстә: brk. <- str.
+}.
+
+>> HTML-Email := Email яңа.
+
+HTML-Email килгәндә: ['init'] эшлә: {
+	үзе init.
+	үзенең attachments := Тезмә яңа.
+	үзенең boundary := Сейф токен: 40.
+}.
+
+HTML-Email килгәндә: ['attach:'] эшлә: { :file
+	>> id := үзенең attachments саны.
+	>> blob := file blob.
+	үзенең attachments ахырга-өстә: (
+		Сүзлек яңа
+			file: file юл,
+			mime: ['image/'] + (Server mimetype: file юл),
+			data: blob base64-кодлау
+	).
+	blob бушат. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email килгәндә: ['generate'] эшлә: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ахырга-өстә: (үзе header: ['From: '] + үзенең from-name + [' <'] + ( үзенең from ) + ['>']) + brk.
+	str ахырга-өстә: (үзе header: ['To: '] + ( үзенең recipients берләштер: [','] )) + brk.
+	үзенең cc саны дөрес: {
+		str ахырга-өстә: (үзе header: ['Cc: '] + ( үзенең cc берләштер: [','] )) + brk.
+	}.
+	үзенең bcc саны дөрес: {
+		str ахырга-өстә: (үзе header: ['Bcc: '] + ( үзенең bcc берләштер: [','] )) + brk.
+	}.
+	str ахырга-өстә: (үзе header: ['Subject: '] + үзенең subject) + brk.
+	str ахырга-өстә: ['MIME-Version: 1.0'] + brk.
+	str ахырга-өстә: ['Content-Type: multipart/related; boundary="'] + үзенең boundary + ['"; type=text/html'] + brk.
+	str ахырга-өстә: brk.
+	str ахырга-өстә: ['--'] + үзенең boundary + brk.
+	str ахырга-өстә: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str ахырга-өстә: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str ахырга-өстә: brk.
+	str ахырга-өстә: үзенең body.
+	str ахырга-өстә: brk.
+	үзенең attachments һәрбер: { :id :info
+		>> blob := info data.
+		str ахырга-өстә: ['--'] + үзенең boundary + brk.
+		str ахырга-өстә: ['Content-Type: '] + info mime + brk.
+		str ахырга-өстә: ['Content-Transfer-Encoding: base64'] + brk.
+		str ахырга-өстә: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str ахырга-өстә: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str ахырга-өстә: brk.
+		>> max := 76.
+		>> len := blob озынлык.
+		>> chunks := (len / max) өскә-түгәрәкләү.
+		{ :i
+			>> chunk := blob күчермә башлап: i * max озынлык: max.
+			str ахырга-өстә: chunk + brk.
+		} * chunks.
+		str ахырга-өстә: brk.
+		str ахырга-өстә: brk.
+	}.
+	str ахырга-өстә: ['--'] + үзенең boundary + ['--'] + brk. <- str.
+}.

@@ -1,0 +1,325 @@
+HTTP-Дархост ҳангоми: ['HTTP-header:'] иҷро: { :key <- Барнома танзим: key.
+}.
+
+>> HTTP-Header := Объект нав.
+
+HTTP-Header ҳангоми: ['нав'] иҷро: { <- худ нав init.
+}.
+
+HTTP-Header ҳангоми: ['init'] иҷро: {
+	худӣ key := Ҳеҷ.
+	худӣ value := Ҳеҷ.
+}.
+
+HTTP-Header ҳангоми: ['key:value:'] иҷро: { :key :value
+	худӣ key := key.
+	худӣ value := value.
+}.
+
+HTTP-Header ҳангоми: ['key'] иҷро: { <- худӣ key.
+}.
+
+HTTP-Header ҳангоми: ['value'] иҷро: { <- худӣ value.
+}.
+
+
+HTTP-Header ҳангоми: ['матн'] иҷро: {
+	>> line := худӣ key + [': '] + худӣ value.
+	line иваз: ['\r'] бо: [''], иваз: ['\n'] бо: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Объект нав.
+
+Web-Document ҳангоми: ['нав'] иҷро: { <- худ нав init.
+}.
+
+Web-Document ҳангоми: ['init'] иҷро: {
+	худӣ headers := Феҳрист нав.
+	худӣ sess-id := Ҳеҷ.
+	худӣ session-manager := Tempfile-Session нав.
+	худӣ sessdata := Ҳеҷ.
+	худӣ secure := Рост.
+	худӣ same-site := ['Strict'].
+	худӣ headers-out := Дурӯғ.
+	худӣ request := HTTP-Дархост нав.
+}.
+
+Web-Document ҳангоми: ['request:'] иҷро: { :request
+	худӣ request := request.
+}. 
+
+Web-Document ҳангоми: ['secure-session-cookie:'] иҷро: { :secure
+	худ check-headers.
+	худӣ secure := secure.
+}.
+
+Web-Document ҳангоми: ['same-site-session-cookie:'] иҷро: { :value
+	худ check-headers.
+	>> options := Феҳрист нав 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options дар-бар-дорад: value, агар-дурӯғ: {
+		ин-вазифа хато: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	худӣ same-site := value.
+}.
+
+Web-Document ҳангоми: ['header:'] иҷро: { :header
+	худ check-headers.
+	худӣ headers ба-охир-илова: header.
+}.
+
+Web-Document ҳангоми: ['clear-headers'] иҷро: {
+	худ check-headers.
+	худӣ headers := Феҳрист нав.
+}.
+
+Web-Document ҳангоми: ['session-manager:'] иҷро: { :manager
+	худ check-headers.
+	худӣ session-manager := manager.
+}.
+
+Web-Document ҳангоми: ['session-manager'] иҷро: { <- худӣ session-manager.
+}.
+
+Web-Document ҳангоми: ['check-headers'] иҷро: {
+	худӣ headers-out агар-рост: {
+		ин-вазифа хато: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document ҳангоми: ['session-start'] иҷро: {
+	худ check-headers.
+	>> request := худӣ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Ҳеҷ? агар-дурӯғ: {
+		(( Қолаб нав: ['^[A-Za-z0-9]+\\z'], мувофиқат: sess-id ) = 0) агар-рост: {
+			sess-id := Ҳеҷ.
+		}.
+	}.
+	sess-id Ҳеҷ? агар-рост: {
+		sess-id := Сейф токен: 30.
+		>> session-header := HTTP-Header нав
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (худӣ secure ин: ['Secure'] ё-он: ['']),
+		SSITE: (худӣ same-site),
+		XSID: sess-id
+		).
+		худӣ headers ба-охир-илова: session-header.
+	}.
+	худӣ sessdata := худӣ session-manager for: sess-id, load. <- худӣ sessdata. # reference
+}.
+
+Web-Document ҳангоми: ['goto:'] иҷро: { :url
+	худ check-headers.
+	худ clear-headers.
+	худӣ headers
+	ба-охир-илова: (
+		HTTP-Header нав
+		key: ['Status'] value: ['303 See Other']
+	),
+	ба-охир-илова: (
+		HTTP-Header нав
+		key: ['Location'] value: url
+	).
+	худ out: ['Redirect'].
+}.
+
+Web-Document ҳангоми: ['session-destroy'] иҷро: {
+	худ check-headers.
+	>> request := худӣ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Ҳеҷ? агар-дурӯғ: {
+		>> session-header := HTTP-Header нав.
+		>> when := Лаҳза нав сол: 1970, формат: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (худӣ secure ин: ['Secure'] ё-он: ['']),
+			SSITE: (худӣ same-site),
+			XSID: sess-id
+		).
+		худӣ session-manager destroy.
+		худӣ headers ба-охир-илова: session-header.
+	}.
+}.
+
+
+Web-Document ҳангоми: ['template:'] иҷро: { :роҳ <- Template нав: (Файл нав: роҳ, хон).
+}.
+
+Web-Document ҳангоми: ['out:type:'] иҷро: { :output :навъ
+	худӣ headers-out агар-дурӯғ: {
+		худӣ sessdata Ҳеҷ? агар-дурӯғ: {
+			худӣ session-manager save: худӣ sessdata.
+		}.
+		худӣ headers ба-охир-илова: (
+			HTTP-Header нав
+			key: ['Content-type'] value: навъ
+		).
+		худӣ headers ҳар-як: { :_ :header
+			Баромад навис: header.
+		}.
+		худӣ headers-out := Рост.
+		Баромад навис: ['\r\n'].
+	}.
+	Баромад навис: output.
+}.
+
+Web-Document ҳангоми: ['finish:type:'] иҷро: { :output :навъ
+	худӣ headers-out агар-дурӯғ: {
+		худӣ sessdata Ҳеҷ? агар-дурӯғ: {
+			худӣ session-manager save: худӣ sessdata.
+		}.
+		худӣ headers ба-охир-илова: (
+			HTTP-Header нав
+			key: ['Content-type'] value: навъ
+		).
+		худӣ headers ба-охир-илова: (
+			HTTP-Header нав
+			key: ['Content-Length'] value: output матн bytes
+		).
+		худӣ headers ҳар-як: { :_ :header
+			Баромад навис: header.
+		}.
+		худӣ headers-out := Рост.
+		Баромад навис: ['\r\n'].
+	}.
+	Баромад навис: output.
+}.
+
+Web-Document ҳангоми: ['out:'] иҷро: { :output
+	худ out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ҳангоми: ['finish:'] иҷро: { :output
+	худ finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ҳангоми: ['json:'] иҷро: { :output
+	худ out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document ҳангоми: ['not-found:'] иҷро: { :output
+	худ clear-headers header: (
+		HTTP-Header нав key: ['Status'] value: ['404 Not Found']
+	).
+	худ out: output.
+}.
+
+
+# Interface
+
+>> Session := Объект нав.
+
+Session ҳангоми: ['нав'] иҷро: { <- худ нав init for: Ҳеҷ.
+}.
+
+Session ҳангоми: ['for:'] иҷро: { :id
+	худӣ id := id.
+}.
+
+Session ҳангоми: ['load'] иҷро: {
+	ин-вазифа хато: ['Not implemented.'].
+}.
+
+Session ҳангоми: ['save:'] иҷро: {
+	ин-вазифа хато: ['Not implemented.'].
+}.
+
+Session ҳангоми: ['destroy'] иҷро: {
+	ин-вазифа хато: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session нав.
+
+Tempfile-Session ҳангоми: ['init'] иҷро: {
+	худӣ pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session ҳангоми: ['path-prefix:'] иҷро: { :str
+	худӣ pathprefix := str.
+}.
+
+Tempfile-Session ҳангоми: ['file'] иҷро: { <- ( Файл нав: ( худӣ pathprefix + худӣ id + ['.txt'] ) ).
+}.
+
+Tempfile-Session ҳангоми: ['load'] иҷро: {
+	>> file := худ file.
+	file мавҷуд агар-дурӯғ: {
+		file навис: (Луғат нав код).
+	}. <- file хон объект.
+}.
+
+Tempfile-Session ҳангоми: ['save:'] иҷро: { :data
+	>> file := худ file.
+	file мавҷуд агар-рост: {
+		file навис: data код.
+	}.
+}.
+
+Tempfile-Session ҳангоми: ['destroy'] иҷро: {
+	>> file := худ file.
+	file мавҷуд агар-рост: {
+		file ҳазф.
+	}.
+}.
+
+
+>> URL := Объект нав.
+
+URL ҳангоми: ['init'] иҷро: {
+	худӣ protocol := ['https://'].
+	худӣ мизбон := ['localhost'].
+	худӣ роҳ := [''].
+	худӣ params := [''].
+	худӣ hash := [''].
+}.
+
+URL ҳангоми: ['нав'] иҷро: { <- худ нав init.
+}.
+
+URL ҳангоми: ['матн'] иҷро: { <- (
+	худӣ protocol +
+	худӣ мизбон +
+	худӣ роҳ +
+	худӣ params +
+	худӣ hash ).
+}.
+
+URL ҳангоми: ['protocol:'] иҷро: { :protocol
+	((Феҳрист нав: ['http'] ; ['https']) дар-бар-дорад: protocol) агар-рост: {
+		худӣ protocol := protocol + ['://'].
+	}, агар-дурӯғ: {
+		ин-вазифа хато: ['Invalid protocol'].
+	}.
+}.
+
+URL ҳангоми: ['мизбон:'] иҷро: { :мизбон
+	#todo validate according to rfc
+	худӣ мизбон := мизбон.
+}.
+
+URL ҳангоми: ['path:'] иҷро: { :роҳ
+	худӣ роҳ := ['/'] + роҳ url-рамзгузорӣ.
+}.
+
+URL ҳангоми: ['params:'] иҷро: { :map
+	>> params := Феҳрист нав.
+	map ҳар-як: { :key :value
+		params ба-охир-илова: key матн url-рамзгузорӣ + ['='] + value матн url-рамзгузорӣ.
+	}.
+	худӣ params := ['?'] + ( params пайваст: ['&'] ).
+}.
+
+URL ҳангоми: ['ҳеш:'] иҷро: { :hash
+	худӣ hash := ['#'] + hash url-рамзгузорӣ.
+}.
+

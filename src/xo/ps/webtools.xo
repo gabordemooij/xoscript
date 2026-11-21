@@ -1,0 +1,325 @@
+غوښتنه-HTTP کله: ['HTTP-header:'] وکړه: { :key <- پروګرام تنظیم: key.
+}.
+
+>> HTTP-Header := څیز نوی.
+
+HTTP-Header کله: ['نوی'] وکړه: { <- ځان نوی init.
+}.
+
+HTTP-Header کله: ['init'] وکړه: {
+	خپل key := هیڅ.
+	خپل value := هیڅ.
+}.
+
+HTTP-Header کله: ['key:value:'] وکړه: { :key :value
+	خپل key := key.
+	خپل value := value.
+}.
+
+HTTP-Header کله: ['key'] وکړه: { <- خپل key.
+}.
+
+HTTP-Header کله: ['value'] وکړه: { <- خپل value.
+}.
+
+
+HTTP-Header کله: ['په-متن'] وکړه: {
+	>> line := خپل key + [': '] + خپل value.
+	line بدل-کړه: ['\r'] په: [''], بدل-کړه: ['\n'] په: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := څیز نوی.
+
+Web-Document کله: ['نوی'] وکړه: { <- ځان نوی init.
+}.
+
+Web-Document کله: ['init'] وکړه: {
+	خپل headers := لیست نوی.
+	خپل sess-id := هیڅ.
+	خپل session-manager := Tempfile-Session نوی.
+	خپل sessdata := هیڅ.
+	خپل secure := رښتیا.
+	خپل same-site := ['Strict'].
+	خپل headers-out := دروغ.
+	خپل request := غوښتنه-HTTP نوی.
+}.
+
+Web-Document کله: ['request:'] وکړه: { :request
+	خپل request := request.
+}. 
+
+Web-Document کله: ['secure-session-cookie:'] وکړه: { :secure
+	ځان check-headers.
+	خپل secure := secure.
+}.
+
+Web-Document کله: ['same-site-session-cookie:'] وکړه: { :value
+	ځان check-headers.
+	>> options := لیست نوی 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options شامل-دی: value, که-دروغ: {
+		دا-دنده تېروتنه: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	خپل same-site := value.
+}.
+
+Web-Document کله: ['header:'] وکړه: { :header
+	ځان check-headers.
+	خپل headers پای-ته-زیات-کړه: header.
+}.
+
+Web-Document کله: ['clear-headers'] وکړه: {
+	ځان check-headers.
+	خپل headers := لیست نوی.
+}.
+
+Web-Document کله: ['session-manager:'] وکړه: { :manager
+	ځان check-headers.
+	خپل session-manager := manager.
+}.
+
+Web-Document کله: ['session-manager'] وکړه: { <- خپل session-manager.
+}.
+
+Web-Document کله: ['check-headers'] وکړه: {
+	خپل headers-out که-رښتیا: {
+		دا-دنده تېروتنه: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document کله: ['session-start'] وکړه: {
+	ځان check-headers.
+	>> request := خپل request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id هیڅ? که-دروغ: {
+		(( بېلګه نوی: ['^[A-Za-z0-9]+\\z'], سمون: sess-id ) = 0) که-رښتیا: {
+			sess-id := هیڅ.
+		}.
+	}.
+	sess-id هیڅ? که-رښتیا: {
+		sess-id := خزانه ټوکن: 30.
+		>> session-header := HTTP-Header نوی
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (خپل secure دا: ['Secure'] یا-هغه: ['']),
+		SSITE: (خپل same-site),
+		XSID: sess-id
+		).
+		خپل headers پای-ته-زیات-کړه: session-header.
+	}.
+	خپل sessdata := خپل session-manager for: sess-id, load. <- خپل sessdata. # reference
+}.
+
+Web-Document کله: ['goto:'] وکړه: { :url
+	ځان check-headers.
+	ځان clear-headers.
+	خپل headers
+	پای-ته-زیات-کړه: (
+		HTTP-Header نوی
+		key: ['Status'] value: ['303 See Other']
+	),
+	پای-ته-زیات-کړه: (
+		HTTP-Header نوی
+		key: ['Location'] value: url
+	).
+	ځان out: ['Redirect'].
+}.
+
+Web-Document کله: ['session-destroy'] وکړه: {
+	ځان check-headers.
+	>> request := خپل request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id هیڅ? که-دروغ: {
+		>> session-header := HTTP-Header نوی.
+		>> when := شیبه نوی کال: 1970, په-بڼه: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (خپل secure دا: ['Secure'] یا-هغه: ['']),
+			SSITE: (خپل same-site),
+			XSID: sess-id
+		).
+		خپل session-manager destroy.
+		خپل headers پای-ته-زیات-کړه: session-header.
+	}.
+}.
+
+
+Web-Document کله: ['template:'] وکړه: { :د-دوتنې-لار <- Template نوی: (دوتنه نوی: د-دوتنې-لار, ولوله).
+}.
+
+Web-Document کله: ['out:type:'] وکړه: { :output :ډول
+	خپل headers-out که-دروغ: {
+		خپل sessdata هیڅ? که-دروغ: {
+			خپل session-manager save: خپل sessdata.
+		}.
+		خپل headers پای-ته-زیات-کړه: (
+			HTTP-Header نوی
+			key: ['Content-type'] value: ډول
+		).
+		خپل headers هر-یو: { :_ :header
+			وتنه ولیکه: header.
+		}.
+		خپل headers-out := رښتیا.
+		وتنه ولیکه: ['\r\n'].
+	}.
+	وتنه ولیکه: output.
+}.
+
+Web-Document کله: ['finish:type:'] وکړه: { :output :ډول
+	خپل headers-out که-دروغ: {
+		خپل sessdata هیڅ? که-دروغ: {
+			خپل session-manager save: خپل sessdata.
+		}.
+		خپل headers پای-ته-زیات-کړه: (
+			HTTP-Header نوی
+			key: ['Content-type'] value: ډول
+		).
+		خپل headers پای-ته-زیات-کړه: (
+			HTTP-Header نوی
+			key: ['Content-Length'] value: output په-متن بایټونه
+		).
+		خپل headers هر-یو: { :_ :header
+			وتنه ولیکه: header.
+		}.
+		خپل headers-out := رښتیا.
+		وتنه ولیکه: ['\r\n'].
+	}.
+	وتنه ولیکه: output.
+}.
+
+Web-Document کله: ['out:'] وکړه: { :output
+	ځان out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document کله: ['finish:'] وکړه: { :output
+	ځان finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document کله: ['json:'] وکړه: { :output
+	ځان out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document کله: ['not-found:'] وکړه: { :output
+	ځان clear-headers header: (
+		HTTP-Header نوی key: ['Status'] value: ['404 Not Found']
+	).
+	ځان out: output.
+}.
+
+
+# Interface
+
+>> Session := څیز نوی.
+
+Session کله: ['نوی'] وکړه: { <- ځان نوی init for: هیڅ.
+}.
+
+Session کله: ['for:'] وکړه: { :id
+	خپل id := id.
+}.
+
+Session کله: ['load'] وکړه: {
+	دا-دنده تېروتنه: ['Not implemented.'].
+}.
+
+Session کله: ['save:'] وکړه: {
+	دا-دنده تېروتنه: ['Not implemented.'].
+}.
+
+Session کله: ['destroy'] وکړه: {
+	دا-دنده تېروتنه: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session نوی.
+
+Tempfile-Session کله: ['init'] وکړه: {
+	خپل pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session کله: ['path-prefix:'] وکړه: { :str
+	خپل pathprefix := str.
+}.
+
+Tempfile-Session کله: ['file'] وکړه: { <- ( دوتنه نوی: ( خپل pathprefix + خپل id + ['.txt'] ) ).
+}.
+
+Tempfile-Session کله: ['load'] وکړه: {
+	>> file := ځان file.
+	file شته که-دروغ: {
+		file ولیکه: (قاموس نوی کوډ).
+	}. <- file ولوله په-څیز.
+}.
+
+Tempfile-Session کله: ['save:'] وکړه: { :data
+	>> file := ځان file.
+	file شته که-رښتیا: {
+		file ولیکه: data کوډ.
+	}.
+}.
+
+Tempfile-Session کله: ['destroy'] وکړه: {
+	>> file := ځان file.
+	file شته که-رښتیا: {
+		file ړنګ-کړه.
+	}.
+}.
+
+
+>> URL := څیز نوی.
+
+URL کله: ['init'] وکړه: {
+	خپل protocol := ['https://'].
+	خپل کوربه := ['localhost'].
+	خپل د-دوتنې-لار := [''].
+	خپل params := [''].
+	خپل hash := [''].
+}.
+
+URL کله: ['نوی'] وکړه: { <- ځان نوی init.
+}.
+
+URL کله: ['په-متن'] وکړه: { <- (
+	خپل protocol +
+	خپل کوربه +
+	خپل د-دوتنې-لار +
+	خپل params +
+	خپل hash ).
+}.
+
+URL کله: ['protocol:'] وکړه: { :protocol
+	((لیست نوی: ['http'] ; ['https']) شامل-دی: protocol) که-رښتیا: {
+		خپل protocol := protocol + ['://'].
+	}, که-دروغ: {
+		دا-دنده تېروتنه: ['Invalid protocol'].
+	}.
+}.
+
+URL کله: ['کوربه:'] وکړه: { :کوربه
+	#todo validate according to rfc
+	خپل کوربه := کوربه.
+}.
+
+URL کله: ['path:'] وکړه: { :د-دوتنې-لار
+	خپل د-دوتنې-لار := ['/'] + د-دوتنې-لار url-کوډول.
+}.
+
+URL کله: ['params:'] وکړه: { :map
+	>> params := لیست نوی.
+	map هر-یو: { :key :value
+		params پای-ته-زیات-کړه: key په-متن url-کوډول + ['='] + value په-متن url-کوډول.
+	}.
+	خپل params := ['?'] + ( params یوځای-کړه: ['&'] ).
+}.
+
+URL کله: ['هش:'] وکړه: { :hash
+	خپل hash := ['#'] + hash url-کوډول.
+}.
+

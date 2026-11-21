@@ -1,0 +1,128 @@
+>> Email := Obýekt täze.
+
+Email gelende: ['init'] et: {
+	öz recipients := Sanaw täze.
+	öz cc := Sanaw täze.
+	öz bcc := Sanaw täze.
+	öz from := Boş.
+	öz from-name := Boş.
+	öz subject := Boş.
+	öz body := Boş.
+}.
+
+Email gelende: ['täze'] et: { <- özi täze init.
+}.
+
+Email gelende: ['to:'] et: { :list
+	öz recipients := list.
+}.
+ 
+Email gelende: ['cc:'] et: { :list
+	öz cc := list.
+}.
+
+Email gelende: ['bcc:'] et: { :list
+	öz bcc := list.
+}.
+
+Email gelende: ['subject:'] et: { :subject
+	öz subject := subject.
+}.
+
+Email gelende: ['from:name:'] et: { :from :at
+	öz from := from.
+	öz from-name := at.
+}.
+
+Email gelende: ['body:'] et: { :body
+	öz body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email gelende: ['header:'] et: { :line <- line çalyş: ['\r'] bilen: [''], çalyş: ['\n'] bilen: [''].
+}.
+
+Email gelende: ['send'] et: {
+	>> f := Faýl tempwrite: özi generate.
+	Programma ulgam: ['sendmail -t < '] + f ýol, täze-setir.
+}.
+
+Email gelende: ['generate'] et: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str soňuna-goş: (özi header: ['From: '] + öz from-name + [' <'] + ( öz from ) + ['>']) + brk.
+	str soňuna-goş: (özi header: ['To: '] + ( öz recipients birleşdir: [','] )) + brk.
+	öz cc sany dogry: {
+		str soňuna-goş: (özi header: ['Cc: '] + ( öz cc birleşdir: [','] )) + brk.
+	}.
+	öz bcc sany dogry: {
+		str soňuna-goş: (özi header: ['Bcc: '] + ( öz bcc birleşdir: [','] )) + brk.
+	}.
+	str soňuna-goş: (özi header: ['Subject: '] + öz subject) + brk.
+	str soňuna-goş: brk.
+	str soňuna-goş: öz body.
+	str soňuna-goş: brk. <- str.
+}.
+
+>> HTML-Email := Email täze.
+
+HTML-Email gelende: ['init'] et: {
+	özi init.
+	öz attachments := Sanaw täze.
+	öz boundary := Seýf token: 40.
+}.
+
+HTML-Email gelende: ['attach:'] et: { :file
+	>> id := öz attachments sany.
+	>> blob := file blob.
+	öz attachments soňuna-goş: (
+		Sözlük täze
+			file: file ýol,
+			mime: ['image/'] + (Server mimetype: file ýol),
+			data: blob base64-kodla
+	).
+	blob boşat. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email gelende: ['generate'] et: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str soňuna-goş: (özi header: ['From: '] + öz from-name + [' <'] + ( öz from ) + ['>']) + brk.
+	str soňuna-goş: (özi header: ['To: '] + ( öz recipients birleşdir: [','] )) + brk.
+	öz cc sany dogry: {
+		str soňuna-goş: (özi header: ['Cc: '] + ( öz cc birleşdir: [','] )) + brk.
+	}.
+	öz bcc sany dogry: {
+		str soňuna-goş: (özi header: ['Bcc: '] + ( öz bcc birleşdir: [','] )) + brk.
+	}.
+	str soňuna-goş: (özi header: ['Subject: '] + öz subject) + brk.
+	str soňuna-goş: ['MIME-Version: 1.0'] + brk.
+	str soňuna-goş: ['Content-Type: multipart/related; boundary="'] + öz boundary + ['"; type=text/html'] + brk.
+	str soňuna-goş: brk.
+	str soňuna-goş: ['--'] + öz boundary + brk.
+	str soňuna-goş: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str soňuna-goş: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str soňuna-goş: brk.
+	str soňuna-goş: öz body.
+	str soňuna-goş: brk.
+	öz attachments her: { :id :info
+		>> blob := info data.
+		str soňuna-goş: ['--'] + öz boundary + brk.
+		str soňuna-goş: ['Content-Type: '] + info mime + brk.
+		str soňuna-goş: ['Content-Transfer-Encoding: base64'] + brk.
+		str soňuna-goş: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str soňuna-goş: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str soňuna-goş: brk.
+		>> max := 76.
+		>> len := blob uzynlyk.
+		>> chunks := (len / max) ýokary-tegelekle.
+		{ :i
+			>> chunk := blob göçür başlap: i * max uzynlyk: max.
+			str soňuna-goş: chunk + brk.
+		} * chunks.
+		str soňuna-goş: brk.
+		str soňuna-goş: brk.
+	}.
+	str soňuna-goş: ['--'] + öz boundary + ['--'] + brk. <- str.
+}.

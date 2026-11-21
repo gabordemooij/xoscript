@@ -1,0 +1,325 @@
+HTTP-Eskaera noiz: ['HTTP-header:'] egin: { :key <- Programa ezarpena: key.
+}.
+
+>> HTTP-Header := Objektua berria.
+
+HTTP-Header noiz: ['berria'] egin: { <- norbera berria init.
+}.
+
+HTTP-Header noiz: ['init'] egin: {
+	berezko key := Ezer.
+	berezko value := Ezer.
+}.
+
+HTTP-Header noiz: ['key:value:'] egin: { :key :value
+	berezko key := key.
+	berezko value := value.
+}.
+
+HTTP-Header noiz: ['key'] egin: { <- berezko key.
+}.
+
+HTTP-Header noiz: ['value'] egin: { <- berezko value.
+}.
+
+
+HTTP-Header noiz: ['testua'] egin: {
+	>> line := berezko key + [': '] + berezko value.
+	line ordeztu: ['\r'] honekin: [''], ordeztu: ['\n'] honekin: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Objektua berria.
+
+Web-Document noiz: ['berria'] egin: { <- norbera berria init.
+}.
+
+Web-Document noiz: ['init'] egin: {
+	berezko headers := Zerrenda berria.
+	berezko sess-id := Ezer.
+	berezko session-manager := Tempfile-Session berria.
+	berezko sessdata := Ezer.
+	berezko secure := Egia.
+	berezko same-site := ['Strict'].
+	berezko headers-out := Faltsua.
+	berezko request := HTTP-Eskaera berria.
+}.
+
+Web-Document noiz: ['request:'] egin: { :request
+	berezko request := request.
+}. 
+
+Web-Document noiz: ['secure-session-cookie:'] egin: { :secure
+	norbera check-headers.
+	berezko secure := secure.
+}.
+
+Web-Document noiz: ['same-site-session-cookie:'] egin: { :value
+	norbera check-headers.
+	>> options := Zerrenda berria 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options barne-dauka: value, faltsua: {
+		ataza-hau errorea: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	berezko same-site := value.
+}.
+
+Web-Document noiz: ['header:'] egin: { :header
+	norbera check-headers.
+	berezko headers erantsi: header.
+}.
+
+Web-Document noiz: ['clear-headers'] egin: {
+	norbera check-headers.
+	berezko headers := Zerrenda berria.
+}.
+
+Web-Document noiz: ['session-manager:'] egin: { :manager
+	norbera check-headers.
+	berezko session-manager := manager.
+}.
+
+Web-Document noiz: ['session-manager'] egin: { <- berezko session-manager.
+}.
+
+Web-Document noiz: ['check-headers'] egin: {
+	berezko headers-out egia: {
+		ataza-hau errorea: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document noiz: ['session-start'] egin: {
+	norbera check-headers.
+	>> request := berezko request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Ezer? faltsua: {
+		(( Eredua berria: ['^[A-Za-z0-9]+\\z'], bat-etortzea: sess-id ) = 0) egia: {
+			sess-id := Ezer.
+		}.
+	}.
+	sess-id Ezer? egia: {
+		sess-id := Kutxa-gotorra token: 30.
+		>> session-header := HTTP-Header berria
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (berezko secure edo: ['Secure'] edo: ['']),
+		SSITE: (berezko same-site),
+		XSID: sess-id
+		).
+		berezko headers erantsi: session-header.
+	}.
+	berezko sessdata := berezko session-manager for: sess-id, load. <- berezko sessdata. # reference
+}.
+
+Web-Document noiz: ['goto:'] egin: { :url
+	norbera check-headers.
+	norbera clear-headers.
+	berezko headers
+	erantsi: (
+		HTTP-Header berria
+		key: ['Status'] value: ['303 See Other']
+	),
+	erantsi: (
+		HTTP-Header berria
+		key: ['Location'] value: url
+	).
+	norbera out: ['Redirect'].
+}.
+
+Web-Document noiz: ['session-destroy'] egin: {
+	norbera check-headers.
+	>> request := berezko request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Ezer? faltsua: {
+		>> session-header := HTTP-Header berria.
+		>> when := Unea berria urtea: 1970, formatua: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (berezko secure edo: ['Secure'] edo: ['']),
+			SSITE: (berezko same-site),
+			XSID: sess-id
+		).
+		berezko session-manager destroy.
+		berezko headers erantsi: session-header.
+	}.
+}.
+
+
+Web-Document noiz: ['template:'] egin: { :bidea <- Template berria: (Fitxategia berria: bidea, irakurri).
+}.
+
+Web-Document noiz: ['out:type:'] egin: { :output :mota
+	berezko headers-out faltsua: {
+		berezko sessdata Ezer? faltsua: {
+			berezko session-manager save: berezko sessdata.
+		}.
+		berezko headers erantsi: (
+			HTTP-Header berria
+			key: ['Content-type'] value: mota
+		).
+		berezko headers bakoitza: { :_ :header
+			Irteera idatzi: header.
+		}.
+		berezko headers-out := Egia.
+		Irteera idatzi: ['\r\n'].
+	}.
+	Irteera idatzi: output.
+}.
+
+Web-Document noiz: ['finish:type:'] egin: { :output :mota
+	berezko headers-out faltsua: {
+		berezko sessdata Ezer? faltsua: {
+			berezko session-manager save: berezko sessdata.
+		}.
+		berezko headers erantsi: (
+			HTTP-Header berria
+			key: ['Content-type'] value: mota
+		).
+		berezko headers erantsi: (
+			HTTP-Header berria
+			key: ['Content-Length'] value: output testua bytes
+		).
+		berezko headers bakoitza: { :_ :header
+			Irteera idatzi: header.
+		}.
+		berezko headers-out := Egia.
+		Irteera idatzi: ['\r\n'].
+	}.
+	Irteera idatzi: output.
+}.
+
+Web-Document noiz: ['out:'] egin: { :output
+	norbera out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document noiz: ['finish:'] egin: { :output
+	norbera finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document noiz: ['json:'] egin: { :output
+	norbera out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document noiz: ['not-found:'] egin: { :output
+	norbera clear-headers header: (
+		HTTP-Header berria key: ['Status'] value: ['404 Not Found']
+	).
+	norbera out: output.
+}.
+
+
+# Interface
+
+>> Session := Objektua berria.
+
+Session noiz: ['berria'] egin: { <- norbera berria init for: Ezer.
+}.
+
+Session noiz: ['for:'] egin: { :id
+	berezko id := id.
+}.
+
+Session noiz: ['load'] egin: {
+	ataza-hau errorea: ['Not implemented.'].
+}.
+
+Session noiz: ['save:'] egin: {
+	ataza-hau errorea: ['Not implemented.'].
+}.
+
+Session noiz: ['destroy'] egin: {
+	ataza-hau errorea: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session berria.
+
+Tempfile-Session noiz: ['init'] egin: {
+	berezko pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session noiz: ['path-prefix:'] egin: { :str
+	berezko pathprefix := str.
+}.
+
+Tempfile-Session noiz: ['file'] egin: { <- ( Fitxategia berria: ( berezko pathprefix + berezko id + ['.txt'] ) ).
+}.
+
+Tempfile-Session noiz: ['load'] egin: {
+	>> file := norbera file.
+	file badago faltsua: {
+		file idatzi: (Hiztegia berria kodea).
+	}. <- file irakurri objektua.
+}.
+
+Tempfile-Session noiz: ['save:'] egin: { :data
+	>> file := norbera file.
+	file badago egia: {
+		file idatzi: data kodea.
+	}.
+}.
+
+Tempfile-Session noiz: ['destroy'] egin: {
+	>> file := norbera file.
+	file badago egia: {
+		file ezabatu.
+	}.
+}.
+
+
+>> URL := Objektua berria.
+
+URL noiz: ['init'] egin: {
+	berezko protocol := ['https://'].
+	berezko ostalaria := ['localhost'].
+	berezko bidea := [''].
+	berezko params := [''].
+	berezko hash := [''].
+}.
+
+URL noiz: ['berria'] egin: { <- norbera berria init.
+}.
+
+URL noiz: ['testua'] egin: { <- (
+	berezko protocol +
+	berezko ostalaria +
+	berezko bidea +
+	berezko params +
+	berezko hash ).
+}.
+
+URL noiz: ['protocol:'] egin: { :protocol
+	((Zerrenda berria: ['http'] ; ['https']) barne-dauka: protocol) egia: {
+		berezko protocol := protocol + ['://'].
+	}, faltsua: {
+		ataza-hau errorea: ['Invalid protocol'].
+	}.
+}.
+
+URL noiz: ['ostalaria:'] egin: { :ostalaria
+	#todo validate according to rfc
+	berezko ostalaria := ostalaria.
+}.
+
+URL noiz: ['path:'] egin: { :bidea
+	berezko bidea := ['/'] + bidea url-kodetu.
+}.
+
+URL noiz: ['params:'] egin: { :map
+	>> params := Zerrenda berria.
+	map bakoitza: { :key :value
+		params erantsi: key testua url-kodetu + ['='] + value testua url-kodetu.
+	}.
+	berezko params := ['?'] + ( params batu: ['&'] ).
+}.
+
+URL noiz: ['laburpena:'] egin: { :hash
+	berezko hash := ['#'] + hash url-kodetu.
+}.
+

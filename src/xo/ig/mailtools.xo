@@ -1,0 +1,128 @@
+>> Email := Ihe ohuru.
+
+Email mgbe-ọbịara: ['init'] mee: {
+	nke-ya recipients := Ndepụta ohuru.
+	nke-ya cc := Ndepụta ohuru.
+	nke-ya bcc := Ndepụta ohuru.
+	nke-ya from := Efu.
+	nke-ya from-name := Efu.
+	nke-ya subject := Efu.
+	nke-ya body := Efu.
+}.
+
+Email mgbe-ọbịara: ['ohuru'] mee: { <- onwe ohuru init.
+}.
+
+Email mgbe-ọbịara: ['to:'] mee: { :list
+	nke-ya recipients := list.
+}.
+ 
+Email mgbe-ọbịara: ['cc:'] mee: { :list
+	nke-ya cc := list.
+}.
+
+Email mgbe-ọbịara: ['bcc:'] mee: { :list
+	nke-ya bcc := list.
+}.
+
+Email mgbe-ọbịara: ['subject:'] mee: { :subject
+	nke-ya subject := subject.
+}.
+
+Email mgbe-ọbịara: ['from:name:'] mee: { :from :aha
+	nke-ya from := from.
+	nke-ya from-name := aha.
+}.
+
+Email mgbe-ọbịara: ['body:'] mee: { :body
+	nke-ya body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email mgbe-ọbịara: ['header:'] mee: { :line <- line dochie: ['\r'] na: [''], dochie: ['\n'] na: [''].
+}.
+
+Email mgbe-ọbịara: ['send'] mee: {
+	>> f := Faịlụ tempwrite: onwe generate.
+	Mmemme sistemụ: ['sendmail -t < '] + f ụzọ-faịlụ, ahịrị-ọhụrụ.
+}.
+
+Email mgbe-ọbịara: ['generate'] mee: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tinye-na-njedebe: (onwe header: ['From: '] + nke-ya from-name + [' <'] + ( nke-ya from ) + ['>']) + brk.
+	str tinye-na-njedebe: (onwe header: ['To: '] + ( nke-ya recipients jikọọ: [','] )) + brk.
+	nke-ya cc ọnụ-ọgụgụ eziokwu: {
+		str tinye-na-njedebe: (onwe header: ['Cc: '] + ( nke-ya cc jikọọ: [','] )) + brk.
+	}.
+	nke-ya bcc ọnụ-ọgụgụ eziokwu: {
+		str tinye-na-njedebe: (onwe header: ['Bcc: '] + ( nke-ya bcc jikọọ: [','] )) + brk.
+	}.
+	str tinye-na-njedebe: (onwe header: ['Subject: '] + nke-ya subject) + brk.
+	str tinye-na-njedebe: brk.
+	str tinye-na-njedebe: nke-ya body.
+	str tinye-na-njedebe: brk. <- str.
+}.
+
+>> HTML-Email := Email ohuru.
+
+HTML-Email mgbe-ọbịara: ['init'] mee: {
+	onwe init.
+	nke-ya attachments := Ndepụta ohuru.
+	nke-ya boundary := Igbe-nchekwa token: 40.
+}.
+
+HTML-Email mgbe-ọbịara: ['attach:'] mee: { :file
+	>> id := nke-ya attachments ọnụ-ọgụgụ.
+	>> blob := file blob.
+	nke-ya attachments tinye-na-njedebe: (
+		Akwụkwọ-okwu ohuru
+			file: file ụzọ-faịlụ,
+			mime: ['image/'] + (Server mimetype: file ụzọ-faịlụ),
+			data: blob base64-tinye-koodu
+	).
+	blob hapụ. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email mgbe-ọbịara: ['generate'] mee: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tinye-na-njedebe: (onwe header: ['From: '] + nke-ya from-name + [' <'] + ( nke-ya from ) + ['>']) + brk.
+	str tinye-na-njedebe: (onwe header: ['To: '] + ( nke-ya recipients jikọọ: [','] )) + brk.
+	nke-ya cc ọnụ-ọgụgụ eziokwu: {
+		str tinye-na-njedebe: (onwe header: ['Cc: '] + ( nke-ya cc jikọọ: [','] )) + brk.
+	}.
+	nke-ya bcc ọnụ-ọgụgụ eziokwu: {
+		str tinye-na-njedebe: (onwe header: ['Bcc: '] + ( nke-ya bcc jikọọ: [','] )) + brk.
+	}.
+	str tinye-na-njedebe: (onwe header: ['Subject: '] + nke-ya subject) + brk.
+	str tinye-na-njedebe: ['MIME-Version: 1.0'] + brk.
+	str tinye-na-njedebe: ['Content-Type: multipart/related; boundary="'] + nke-ya boundary + ['"; type=text/html'] + brk.
+	str tinye-na-njedebe: brk.
+	str tinye-na-njedebe: ['--'] + nke-ya boundary + brk.
+	str tinye-na-njedebe: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str tinye-na-njedebe: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str tinye-na-njedebe: brk.
+	str tinye-na-njedebe: nke-ya body.
+	str tinye-na-njedebe: brk.
+	nke-ya attachments nke-ọ-bụla: { :id :info
+		>> blob := info data.
+		str tinye-na-njedebe: ['--'] + nke-ya boundary + brk.
+		str tinye-na-njedebe: ['Content-Type: '] + info mime + brk.
+		str tinye-na-njedebe: ['Content-Transfer-Encoding: base64'] + brk.
+		str tinye-na-njedebe: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str tinye-na-njedebe: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str tinye-na-njedebe: brk.
+		>> max := 76.
+		>> len := blob ogologo.
+		>> chunks := (len / max) gbago-elu.
+		{ :i
+			>> chunk := blob detuo site-na: i * max ogologo: max.
+			str tinye-na-njedebe: chunk + brk.
+		} * chunks.
+		str tinye-na-njedebe: brk.
+		str tinye-na-njedebe: brk.
+	}.
+	str tinye-na-njedebe: ['--'] + nke-ya boundary + ['--'] + brk. <- str.
+}.

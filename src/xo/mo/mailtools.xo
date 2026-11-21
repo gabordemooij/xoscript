@@ -1,0 +1,128 @@
+>> Email := Obiect nou.
+
+Email la: ['init'] execută: {
+	propriu recipients := Listă nou.
+	propriu cc := Listă nou.
+	propriu bcc := Listă nou.
+	propriu from := Nimic.
+	propriu from-name := Nimic.
+	propriu subject := Nimic.
+	propriu body := Nimic.
+}.
+
+Email la: ['nou'] execută: { <- sine nou init.
+}.
+
+Email la: ['to:'] execută: { :list
+	propriu recipients := list.
+}.
+ 
+Email la: ['cc:'] execută: { :list
+	propriu cc := list.
+}.
+
+Email la: ['bcc:'] execută: { :list
+	propriu bcc := list.
+}.
+
+Email la: ['subject:'] execută: { :subject
+	propriu subject := subject.
+}.
+
+Email la: ['from:name:'] execută: { :from :nume
+	propriu from := from.
+	propriu from-name := nume.
+}.
+
+Email la: ['body:'] execută: { :body
+	propriu body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email la: ['header:'] execută: { :line <- line înlocuiește: ['\r'] cu: [''], înlocuiește: ['\n'] cu: [''].
+}.
+
+Email la: ['send'] execută: {
+	>> f := Fișier tempwrite: sine generate.
+	Program sistem: ['sendmail -t < '] + f cale, rând-nou.
+}.
+
+Email la: ['generate'] execută: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str adaugă-la-sfârșit: (sine header: ['From: '] + propriu from-name + [' <'] + ( propriu from ) + ['>']) + brk.
+	str adaugă-la-sfârșit: (sine header: ['To: '] + ( propriu recipients unește: [','] )) + brk.
+	propriu cc numără adevărat: {
+		str adaugă-la-sfârșit: (sine header: ['Cc: '] + ( propriu cc unește: [','] )) + brk.
+	}.
+	propriu bcc numără adevărat: {
+		str adaugă-la-sfârșit: (sine header: ['Bcc: '] + ( propriu bcc unește: [','] )) + brk.
+	}.
+	str adaugă-la-sfârșit: (sine header: ['Subject: '] + propriu subject) + brk.
+	str adaugă-la-sfârșit: brk.
+	str adaugă-la-sfârșit: propriu body.
+	str adaugă-la-sfârșit: brk. <- str.
+}.
+
+>> HTML-Email := Email nou.
+
+HTML-Email la: ['init'] execută: {
+	sine init.
+	propriu attachments := Listă nou.
+	propriu boundary := Seif jeton: 40.
+}.
+
+HTML-Email la: ['attach:'] execută: { :file
+	>> id := propriu attachments numără.
+	>> blob := file blob.
+	propriu attachments adaugă-la-sfârșit: (
+		Dicționar nou
+			file: file cale,
+			mime: ['image/'] + (Server mimetype: file cale),
+			data: blob base64-codifică
+	).
+	blob eliberează. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email la: ['generate'] execută: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str adaugă-la-sfârșit: (sine header: ['From: '] + propriu from-name + [' <'] + ( propriu from ) + ['>']) + brk.
+	str adaugă-la-sfârșit: (sine header: ['To: '] + ( propriu recipients unește: [','] )) + brk.
+	propriu cc numără adevărat: {
+		str adaugă-la-sfârșit: (sine header: ['Cc: '] + ( propriu cc unește: [','] )) + brk.
+	}.
+	propriu bcc numără adevărat: {
+		str adaugă-la-sfârșit: (sine header: ['Bcc: '] + ( propriu bcc unește: [','] )) + brk.
+	}.
+	str adaugă-la-sfârșit: (sine header: ['Subject: '] + propriu subject) + brk.
+	str adaugă-la-sfârșit: ['MIME-Version: 1.0'] + brk.
+	str adaugă-la-sfârșit: ['Content-Type: multipart/related; boundary="'] + propriu boundary + ['"; type=text/html'] + brk.
+	str adaugă-la-sfârșit: brk.
+	str adaugă-la-sfârșit: ['--'] + propriu boundary + brk.
+	str adaugă-la-sfârșit: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str adaugă-la-sfârșit: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str adaugă-la-sfârșit: brk.
+	str adaugă-la-sfârșit: propriu body.
+	str adaugă-la-sfârșit: brk.
+	propriu attachments fiecare: { :id :info
+		>> blob := info data.
+		str adaugă-la-sfârșit: ['--'] + propriu boundary + brk.
+		str adaugă-la-sfârșit: ['Content-Type: '] + info mime + brk.
+		str adaugă-la-sfârșit: ['Content-Transfer-Encoding: base64'] + brk.
+		str adaugă-la-sfârșit: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str adaugă-la-sfârșit: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str adaugă-la-sfârșit: brk.
+		>> max := 76.
+		>> len := blob lungime.
+		>> chunks := (len / max) rotunjește-în-sus.
+		{ :i
+			>> chunk := blob copiază de-la: i * max lungime: max.
+			str adaugă-la-sfârșit: chunk + brk.
+		} * chunks.
+		str adaugă-la-sfârșit: brk.
+		str adaugă-la-sfârșit: brk.
+	}.
+	str adaugă-la-sfârșit: ['--'] + propriu boundary + ['--'] + brk. <- str.
+}.

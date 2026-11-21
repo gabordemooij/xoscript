@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Mea fou.
+
+Template pe-a-oo-mai: ['fou'] fai: { <- ia-lava fou content: [''].
+}.
+
+Template pe-a-oo-mai: ['content:'] fai: { :content
+	lana-lava content := content. 
+}.
+
+Template pe-a-oo-mai: ['fou:'] fai: { :content <- ia-lava fou content: content.
+}.
+
+Template pe-a-oo-mai: ['cut:'] fai: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := lana-lava content vaevae: startmarker.
+	>> prefix := parts tulaga-tasi.
+	>> parts2 := parts mulimuli vaevae: endmarker.
+	>> suffix := parts2 mulimuli.
+	>> part := parts2 tulaga-tasi.
+	>> rest := prefix + suffix.
+	lana-lava content := rest. <- Template fou: part.
+	
+}.
+
+Template pe-a-oo-mai: ['kopi-mea'] fai: { <- ia-lava fou: ia-lava manoa kopi-mea.
+}.
+	
+Template pe-a-oo-mai: ['paste:at:'] fai: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	lana-lava content sui: pastemarker i-le: ( snippet manoa + pastemarker ).
+}.
+
+Template pe-a-oo-mai: ['seti:tau:'] fai: { :slot :value
+	lana-lava content sui: ['<!-- slot:'] + slot + [' -->'] i-le: ( Server html-faʻailoga-numera: value ).
+}.
+
+Template pe-a-oo-mai: ['set:html:'] fai: { :slot :html
+	lana-lava content sui: ['<!-- slot:'] + slot + [' -->'] i-le: html.
+}.
+
+Template pe-a-oo-mai: ['tali-atu:ma:'] fai: { :slot :value
+	ia-lava seti: (slot amata: 0 umi: (slot umi - 1)) tau: value.
+}.
+
+Template pe-a-oo-mai: ['nl2br'] fai: {
+	lana-lava content sui: ['\n'] i-le: ['<br>'].
+}.
+
+Template pe-a-oo-mai: ['clean'] fai: {
+	lana-lava content :=
+		Mamanu
+		fou: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		fetaui: lana-lava content
+		fai: { <- ['']. }.
+}.
+
+Template pe-a-oo-mai: ['clean-cuts'] fai: {
+	>> items := Lisi fou.
+	Mamanu
+	fou: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	fetaui: lana-lava content
+	fai: { :_ :part
+		items faaopoopo-i-le-iuga: part ? 1.
+	}.
+	items taʻitasi: { :_ :id
+		lana-lava content :=
+			Mamanu fou: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			fetaui: lana-lava content
+			fai: { <- ['']. }.
+	 }.
+}.
+
+Template pe-a-oo-mai: ['clean-space'] fai: {
+	lana-lava content :=
+		Mamanu
+		fou: ['\\s*\\n'],
+		fetaui: lana-lava content
+		fai: { <- ['\n']. }.
+	lana-lava content :=
+		Mamanu
+		fou: ['\\n[\\s\\t]+'],
+		fetaui: lana-lava content
+		fai: { <- ['\n']. }.
+}.
+
+Template pe-a-oo-mai: ['clean-all'] fai: {
+	ia-lava clean.
+	ia-lava clean-cuts.
+	ia-lava clean-space.
+}.
+
+Template pe-a-oo-mai: ['manoa'] fai: { <- lana-lava content.
+}.

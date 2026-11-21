@@ -1,0 +1,325 @@
+HTTP-សំណើ ពេលទទួល: ['HTTP-header:'] ធ្វើ: { :key <- កម្មវិធី ការកំណត់: key.
+}.
+
+>> HTTP-Header := វត្ថុ ថ្មី.
+
+HTTP-Header ពេលទទួល: ['ថ្មី'] ធ្វើ: { <- ខ្លួន ថ្មី init.
+}.
+
+HTTP-Header ពេលទទួល: ['init'] ធ្វើ: {
+	ផ្ទាល់ key := ទទេ.
+	ផ្ទាល់ value := ទទេ.
+}.
+
+HTTP-Header ពេលទទួល: ['key:value:'] ធ្វើ: { :key :value
+	ផ្ទាល់ key := key.
+	ផ្ទាល់ value := value.
+}.
+
+HTTP-Header ពេលទទួល: ['key'] ធ្វើ: { <- ផ្ទាល់ key.
+}.
+
+HTTP-Header ពេលទទួល: ['value'] ធ្វើ: { <- ផ្ទាល់ value.
+}.
+
+
+HTTP-Header ពេលទទួល: ['ជាអត្ថបទ'] ធ្វើ: {
+	>> line := ផ្ទាល់ key + [': '] + ផ្ទាល់ value.
+	line ជំនួស: ['\r'] ដោយ: [''], ជំនួស: ['\n'] ដោយ: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := វត្ថុ ថ្មី.
+
+Web-Document ពេលទទួល: ['ថ្មី'] ធ្វើ: { <- ខ្លួន ថ្មី init.
+}.
+
+Web-Document ពេលទទួល: ['init'] ធ្វើ: {
+	ផ្ទាល់ headers := ស៊េរី ថ្មី.
+	ផ្ទាល់ sess-id := ទទេ.
+	ផ្ទាល់ session-manager := Tempfile-Session ថ្មី.
+	ផ្ទាល់ sessdata := ទទេ.
+	ផ្ទាល់ secure := ពិត.
+	ផ្ទាល់ same-site := ['Strict'].
+	ផ្ទាល់ headers-out := មិនពិត.
+	ផ្ទាល់ request := HTTP-សំណើ ថ្មី.
+}.
+
+Web-Document ពេលទទួល: ['request:'] ធ្វើ: { :request
+	ផ្ទាល់ request := request.
+}. 
+
+Web-Document ពេលទទួល: ['secure-session-cookie:'] ធ្វើ: { :secure
+	ខ្លួន check-headers.
+	ផ្ទាល់ secure := secure.
+}.
+
+Web-Document ពេលទទួល: ['same-site-session-cookie:'] ធ្វើ: { :value
+	ខ្លួន check-headers.
+	>> options := ស៊េរី ថ្មី 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options រួមមាន: value, បើមិនពិត: {
+		កិច្ចការនេះ កំហុស: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	ផ្ទាល់ same-site := value.
+}.
+
+Web-Document ពេលទទួល: ['header:'] ធ្វើ: { :header
+	ខ្លួន check-headers.
+	ផ្ទាល់ headers បន្ថែមខាងចុង: header.
+}.
+
+Web-Document ពេលទទួល: ['clear-headers'] ធ្វើ: {
+	ខ្លួន check-headers.
+	ផ្ទាល់ headers := ស៊េរី ថ្មី.
+}.
+
+Web-Document ពេលទទួល: ['session-manager:'] ធ្វើ: { :manager
+	ខ្លួន check-headers.
+	ផ្ទាល់ session-manager := manager.
+}.
+
+Web-Document ពេលទទួល: ['session-manager'] ធ្វើ: { <- ផ្ទាល់ session-manager.
+}.
+
+Web-Document ពេលទទួល: ['check-headers'] ធ្វើ: {
+	ផ្ទាល់ headers-out បើពិត: {
+		កិច្ចការនេះ កំហុស: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document ពេលទទួល: ['session-start'] ធ្វើ: {
+	ខ្លួន check-headers.
+	>> request := ផ្ទាល់ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ទទេឬ? បើមិនពិត: {
+		(( លំនាំ ថ្មី: ['^[A-Za-z0-9]+\\z'], ផ្គូផ្គង: sess-id ) = 0) បើពិត: {
+			sess-id := ទទេ.
+		}.
+	}.
+	sess-id ទទេឬ? បើពិត: {
+		sess-id := ទូដែក ថូខឹន: 30.
+		>> session-header := HTTP-Header ថ្មី
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (ផ្ទាល់ secure មួយនេះ: ['Secure'] ឬមួយនោះ: ['']),
+		SSITE: (ផ្ទាល់ same-site),
+		XSID: sess-id
+		).
+		ផ្ទាល់ headers បន្ថែមខាងចុង: session-header.
+	}.
+	ផ្ទាល់ sessdata := ផ្ទាល់ session-manager for: sess-id, load. <- ផ្ទាល់ sessdata. # reference
+}.
+
+Web-Document ពេលទទួល: ['goto:'] ធ្វើ: { :url
+	ខ្លួន check-headers.
+	ខ្លួន clear-headers.
+	ផ្ទាល់ headers
+	បន្ថែមខាងចុង: (
+		HTTP-Header ថ្មី
+		key: ['Status'] value: ['303 See Other']
+	),
+	បន្ថែមខាងចុង: (
+		HTTP-Header ថ្មី
+		key: ['Location'] value: url
+	).
+	ខ្លួន out: ['Redirect'].
+}.
+
+Web-Document ពេលទទួល: ['session-destroy'] ធ្វើ: {
+	ខ្លួន check-headers.
+	>> request := ផ្ទាល់ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ទទេឬ? បើមិនពិត: {
+		>> session-header := HTTP-Header ថ្មី.
+		>> when := ខណៈ ថ្មី ឆ្នាំ: 1970, តាមទម្រង់: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (ផ្ទាល់ secure មួយនេះ: ['Secure'] ឬមួយនោះ: ['']),
+			SSITE: (ផ្ទាល់ same-site),
+			XSID: sess-id
+		).
+		ផ្ទាល់ session-manager destroy.
+		ផ្ទាល់ headers បន្ថែមខាងចុង: session-header.
+	}.
+}.
+
+
+Web-Document ពេលទទួល: ['template:'] ធ្វើ: { :ផ្លូវឯកសារ <- Template ថ្មី: (ឯកសារ ថ្មី: ផ្លូវឯកសារ, អាន).
+}.
+
+Web-Document ពេលទទួល: ['out:type:'] ធ្វើ: { :output :ប្រភេទ
+	ផ្ទាល់ headers-out បើមិនពិត: {
+		ផ្ទាល់ sessdata ទទេឬ? បើមិនពិត: {
+			ផ្ទាល់ session-manager save: ផ្ទាល់ sessdata.
+		}.
+		ផ្ទាល់ headers បន្ថែមខាងចុង: (
+			HTTP-Header ថ្មី
+			key: ['Content-type'] value: ប្រភេទ
+		).
+		ផ្ទាល់ headers នីមួយៗ: { :_ :header
+			លទ្ធផល សរសេរ: header.
+		}.
+		ផ្ទាល់ headers-out := ពិត.
+		លទ្ធផល សរសេរ: ['\r\n'].
+	}.
+	លទ្ធផល សរសេរ: output.
+}.
+
+Web-Document ពេលទទួល: ['finish:type:'] ធ្វើ: { :output :ប្រភេទ
+	ផ្ទាល់ headers-out បើមិនពិត: {
+		ផ្ទាល់ sessdata ទទេឬ? បើមិនពិត: {
+			ផ្ទាល់ session-manager save: ផ្ទាល់ sessdata.
+		}.
+		ផ្ទាល់ headers បន្ថែមខាងចុង: (
+			HTTP-Header ថ្មី
+			key: ['Content-type'] value: ប្រភេទ
+		).
+		ផ្ទាល់ headers បន្ថែមខាងចុង: (
+			HTTP-Header ថ្មី
+			key: ['Content-Length'] value: output ជាអត្ថបទ bytes
+		).
+		ផ្ទាល់ headers នីមួយៗ: { :_ :header
+			លទ្ធផល សរសេរ: header.
+		}.
+		ផ្ទាល់ headers-out := ពិត.
+		លទ្ធផល សរសេរ: ['\r\n'].
+	}.
+	លទ្ធផល សរសេរ: output.
+}.
+
+Web-Document ពេលទទួល: ['out:'] ធ្វើ: { :output
+	ខ្លួន out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ពេលទទួល: ['finish:'] ធ្វើ: { :output
+	ខ្លួន finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ពេលទទួល: ['json:'] ធ្វើ: { :output
+	ខ្លួន out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document ពេលទទួល: ['not-found:'] ធ្វើ: { :output
+	ខ្លួន clear-headers header: (
+		HTTP-Header ថ្មី key: ['Status'] value: ['404 Not Found']
+	).
+	ខ្លួន out: output.
+}.
+
+
+# Interface
+
+>> Session := វត្ថុ ថ្មី.
+
+Session ពេលទទួល: ['ថ្មី'] ធ្វើ: { <- ខ្លួន ថ្មី init for: ទទេ.
+}.
+
+Session ពេលទទួល: ['for:'] ធ្វើ: { :id
+	ផ្ទាល់ id := id.
+}.
+
+Session ពេលទទួល: ['load'] ធ្វើ: {
+	កិច្ចការនេះ កំហុស: ['Not implemented.'].
+}.
+
+Session ពេលទទួល: ['save:'] ធ្វើ: {
+	កិច្ចការនេះ កំហុស: ['Not implemented.'].
+}.
+
+Session ពេលទទួល: ['destroy'] ធ្វើ: {
+	កិច្ចការនេះ កំហុស: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session ថ្មី.
+
+Tempfile-Session ពេលទទួល: ['init'] ធ្វើ: {
+	ផ្ទាល់ pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session ពេលទទួល: ['path-prefix:'] ធ្វើ: { :str
+	ផ្ទាល់ pathprefix := str.
+}.
+
+Tempfile-Session ពេលទទួល: ['file'] ធ្វើ: { <- ( ឯកសារ ថ្មី: ( ផ្ទាល់ pathprefix + ផ្ទាល់ id + ['.txt'] ) ).
+}.
+
+Tempfile-Session ពេលទទួល: ['load'] ធ្វើ: {
+	>> file := ខ្លួន file.
+	file មាន បើមិនពិត: {
+		file សរសេរ: (វចនានុក្រម ថ្មី កូដ).
+	}. <- file អាន ជាវត្ថុ.
+}.
+
+Tempfile-Session ពេលទទួល: ['save:'] ធ្វើ: { :data
+	>> file := ខ្លួន file.
+	file មាន បើពិត: {
+		file សរសេរ: data កូដ.
+	}.
+}.
+
+Tempfile-Session ពេលទទួល: ['destroy'] ធ្វើ: {
+	>> file := ខ្លួន file.
+	file មាន បើពិត: {
+		file លុប.
+	}.
+}.
+
+
+>> URL := វត្ថុ ថ្មី.
+
+URL ពេលទទួល: ['init'] ធ្វើ: {
+	ផ្ទាល់ protocol := ['https://'].
+	ផ្ទាល់ ម៉ាស៊ីនបង្ហោះ := ['localhost'].
+	ផ្ទាល់ ផ្លូវឯកសារ := [''].
+	ផ្ទាល់ params := [''].
+	ផ្ទាល់ hash := [''].
+}.
+
+URL ពេលទទួល: ['ថ្មី'] ធ្វើ: { <- ខ្លួន ថ្មី init.
+}.
+
+URL ពេលទទួល: ['ជាអត្ថបទ'] ធ្វើ: { <- (
+	ផ្ទាល់ protocol +
+	ផ្ទាល់ ម៉ាស៊ីនបង្ហោះ +
+	ផ្ទាល់ ផ្លូវឯកសារ +
+	ផ្ទាល់ params +
+	ផ្ទាល់ hash ).
+}.
+
+URL ពេលទទួល: ['protocol:'] ធ្វើ: { :protocol
+	((ស៊េរី ថ្មី: ['http'] ; ['https']) រួមមាន: protocol) បើពិត: {
+		ផ្ទាល់ protocol := protocol + ['://'].
+	}, បើមិនពិត: {
+		កិច្ចការនេះ កំហុស: ['Invalid protocol'].
+	}.
+}.
+
+URL ពេលទទួល: ['ម៉ាស៊ីនបង្ហោះ:'] ធ្វើ: { :ម៉ាស៊ីនបង្ហោះ
+	#todo validate according to rfc
+	ផ្ទាល់ ម៉ាស៊ីនបង្ហោះ := ម៉ាស៊ីនបង្ហោះ.
+}.
+
+URL ពេលទទួល: ['path:'] ធ្វើ: { :ផ្លូវឯកសារ
+	ផ្ទាល់ ផ្លូវឯកសារ := ['/'] + ផ្លូវឯកសារ url-អ៊ិនកូដ.
+}.
+
+URL ពេលទទួល: ['params:'] ធ្វើ: { :map
+	>> params := ស៊េរី ថ្មី.
+	map នីមួយៗ: { :key :value
+		params បន្ថែមខាងចុង: key ជាអត្ថបទ url-អ៊ិនកូដ + ['='] + value ជាអត្ថបទ url-អ៊ិនកូដ.
+	}.
+	ផ្ទាល់ params := ['?'] + ( params ភ្ជាប់: ['&'] ).
+}.
+
+URL ពេលទទួល: ['ហាស:'] ធ្វើ: { :hash
+	ផ្ទាល់ hash := ['#'] + hash url-អ៊ិនកូដ.
+}.
+

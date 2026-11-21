@@ -1,0 +1,128 @@
+>> Email := Walax cusub.
+
+Email marka: ['init'] samee: {
+	iska-leh recipients := Liis cusub.
+	iska-leh cc := Liis cusub.
+	iska-leh bcc := Liis cusub.
+	iska-leh from := Waxba.
+	iska-leh from-name := Waxba.
+	iska-leh subject := Waxba.
+	iska-leh body := Waxba.
+}.
+
+Email marka: ['cusub'] samee: { <- naf cusub init.
+}.
+
+Email marka: ['to:'] samee: { :list
+	iska-leh recipients := list.
+}.
+ 
+Email marka: ['cc:'] samee: { :list
+	iska-leh cc := list.
+}.
+
+Email marka: ['bcc:'] samee: { :list
+	iska-leh bcc := list.
+}.
+
+Email marka: ['subject:'] samee: { :subject
+	iska-leh subject := subject.
+}.
+
+Email marka: ['from:name:'] samee: { :from :magac
+	iska-leh from := from.
+	iska-leh from-name := magac.
+}.
+
+Email marka: ['body:'] samee: { :body
+	iska-leh body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email marka: ['header:'] samee: { :line <- line beddel: ['\r'] ku: [''], beddel: ['\n'] ku: [''].
+}.
+
+Email marka: ['send'] samee: {
+	>> f := Fayl tempwrite: naf generate.
+	Barnaamij nidaam: ['sendmail -t < '] + f waddada-faylka, sadar-cusub.
+}.
+
+Email marka: ['generate'] samee: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str dhammaadka-ku-dar: (naf header: ['From: '] + iska-leh from-name + [' <'] + ( iska-leh from ) + ['>']) + brk.
+	str dhammaadka-ku-dar: (naf header: ['To: '] + ( iska-leh recipients isku-dar: [','] )) + brk.
+	iska-leh cc tirada-guud run: {
+		str dhammaadka-ku-dar: (naf header: ['Cc: '] + ( iska-leh cc isku-dar: [','] )) + brk.
+	}.
+	iska-leh bcc tirada-guud run: {
+		str dhammaadka-ku-dar: (naf header: ['Bcc: '] + ( iska-leh bcc isku-dar: [','] )) + brk.
+	}.
+	str dhammaadka-ku-dar: (naf header: ['Subject: '] + iska-leh subject) + brk.
+	str dhammaadka-ku-dar: brk.
+	str dhammaadka-ku-dar: iska-leh body.
+	str dhammaadka-ku-dar: brk. <- str.
+}.
+
+>> HTML-Email := Email cusub.
+
+HTML-Email marka: ['init'] samee: {
+	naf init.
+	iska-leh attachments := Liis cusub.
+	iska-leh boundary := Khasnad token: 40.
+}.
+
+HTML-Email marka: ['attach:'] samee: { :file
+	>> id := iska-leh attachments tirada-guud.
+	>> blob := file blob.
+	iska-leh attachments dhammaadka-ku-dar: (
+		Qaamuus cusub
+			file: file waddada-faylka,
+			mime: ['image/'] + (Server mimetype: file waddada-faylka),
+			data: blob base64-koodee
+	).
+	blob sii-daa. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email marka: ['generate'] samee: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str dhammaadka-ku-dar: (naf header: ['From: '] + iska-leh from-name + [' <'] + ( iska-leh from ) + ['>']) + brk.
+	str dhammaadka-ku-dar: (naf header: ['To: '] + ( iska-leh recipients isku-dar: [','] )) + brk.
+	iska-leh cc tirada-guud run: {
+		str dhammaadka-ku-dar: (naf header: ['Cc: '] + ( iska-leh cc isku-dar: [','] )) + brk.
+	}.
+	iska-leh bcc tirada-guud run: {
+		str dhammaadka-ku-dar: (naf header: ['Bcc: '] + ( iska-leh bcc isku-dar: [','] )) + brk.
+	}.
+	str dhammaadka-ku-dar: (naf header: ['Subject: '] + iska-leh subject) + brk.
+	str dhammaadka-ku-dar: ['MIME-Version: 1.0'] + brk.
+	str dhammaadka-ku-dar: ['Content-Type: multipart/related; boundary="'] + iska-leh boundary + ['"; type=text/html'] + brk.
+	str dhammaadka-ku-dar: brk.
+	str dhammaadka-ku-dar: ['--'] + iska-leh boundary + brk.
+	str dhammaadka-ku-dar: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str dhammaadka-ku-dar: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str dhammaadka-ku-dar: brk.
+	str dhammaadka-ku-dar: iska-leh body.
+	str dhammaadka-ku-dar: brk.
+	iska-leh attachments mid-kasta: { :id :info
+		>> blob := info data.
+		str dhammaadka-ku-dar: ['--'] + iska-leh boundary + brk.
+		str dhammaadka-ku-dar: ['Content-Type: '] + info mime + brk.
+		str dhammaadka-ku-dar: ['Content-Transfer-Encoding: base64'] + brk.
+		str dhammaadka-ku-dar: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str dhammaadka-ku-dar: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str dhammaadka-ku-dar: brk.
+		>> max := 76.
+		>> len := blob dherer.
+		>> chunks := (len / max) kor-u-soo-koob.
+		{ :i
+			>> chunk := blob koobiyee ka: i * max dherer: max.
+			str dhammaadka-ku-dar: chunk + brk.
+		} * chunks.
+		str dhammaadka-ku-dar: brk.
+		str dhammaadka-ku-dar: brk.
+	}.
+	str dhammaadka-ku-dar: ['--'] + iska-leh boundary + ['--'] + brk. <- str.
+}.

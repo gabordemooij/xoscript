@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Mea hou.
+
+Template i: ['hou'] hana: { <- iho hou content: [''].
+}.
+
+Template i: ['content:'] hana: { :content
+	ponoʻī content := content. 
+}.
+
+Template i: ['hou:'] hana: { :content <- iho hou content: content.
+}.
+
+Template i: ['cut:'] hana: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := ponoʻī content hoʻokaʻawale: startmarker.
+	>> prefix := parts mua.
+	>> parts2 := parts hope hoʻokaʻawale: endmarker.
+	>> suffix := parts2 hope.
+	>> part := parts2 mua.
+	>> rest := prefix + suffix.
+	ponoʻī content := rest. <- Template hou: part.
+	
+}.
+
+Template i: ['kope'] hana: { <- iho hou: iho kaula kope.
+}.
+	
+Template i: ['paste:at:'] hana: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	ponoʻī content pani: pastemarker me: ( snippet kaula + pastemarker ).
+}.
+
+Template i: ['kau:waiwai:'] hana: { :slot :value
+	ponoʻī content pani: ['<!-- slot:'] + slot + [' -->'] me: ( Server html-hoʻopāʻālua: value ).
+}.
+
+Template i: ['set:html:'] hana: { :slot :html
+	ponoʻī content pani: ['<!-- slot:'] + slot + [' -->'] me: html.
+}.
+
+Template i: ['pane:a:'] hana: { :slot :value
+	iho kau: (slot mai: 0 lōʻihi: (slot lōʻihi - 1)) waiwai: value.
+}.
+
+Template i: ['nl2br'] hana: {
+	ponoʻī content pani: ['\n'] me: ['<br>'].
+}.
+
+Template i: ['clean'] hana: {
+	ponoʻī content :=
+		Lauana
+		hou: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		kūlike: ponoʻī content
+		hana: { <- ['']. }.
+}.
+
+Template i: ['clean-cuts'] hana: {
+	>> items := Papa hou.
+	Lauana
+	hou: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	kūlike: ponoʻī content
+	hana: { :_ :part
+		items pākuʻi-hope: part ? 1.
+	}.
+	items pākahi: { :_ :id
+		ponoʻī content :=
+			Lauana hou: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			kūlike: ponoʻī content
+			hana: { <- ['']. }.
+	 }.
+}.
+
+Template i: ['clean-space'] hana: {
+	ponoʻī content :=
+		Lauana
+		hou: ['\\s*\\n'],
+		kūlike: ponoʻī content
+		hana: { <- ['\n']. }.
+	ponoʻī content :=
+		Lauana
+		hou: ['\\n[\\s\\t]+'],
+		kūlike: ponoʻī content
+		hana: { <- ['\n']. }.
+}.
+
+Template i: ['clean-all'] hana: {
+	iho clean.
+	iho clean-cuts.
+	iho clean-space.
+}.
+
+Template i: ['kaula'] hana: { <- ponoʻī content.
+}.

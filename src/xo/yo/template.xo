@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Nkan tuntun.
+
+Template nigbati: ['tuntun'] ṣe: { <- ara-rẹ tuntun content: [''].
+}.
+
+Template nigbati: ['content:'] ṣe: { :content
+	tirẹ content := content. 
+}.
+
+Template nigbati: ['tuntun:'] ṣe: { :content <- ara-rẹ tuntun content: content.
+}.
+
+Template nigbati: ['cut:'] ṣe: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := tirẹ content pin: startmarker.
+	>> prefix := parts akọkọ.
+	>> parts2 := parts ikẹhin pin: endmarker.
+	>> suffix := parts2 ikẹhin.
+	>> part := parts2 akọkọ.
+	>> rest := prefix + suffix.
+	tirẹ content := rest. <- Template tuntun: part.
+	
+}.
+
+Template nigbati: ['ṣe-ẹda'] ṣe: { <- ara-rẹ tuntun: ara-rẹ ọrọ ṣe-ẹda.
+}.
+	
+Template nigbati: ['paste:at:'] ṣe: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	tirẹ content rọpo: pastemarker pẹlu: ( snippet ọrọ + pastemarker ).
+}.
+
+Template nigbati: ['ṣeto:iye:'] ṣe: { :slot :value
+	tirẹ content rọpo: ['<!-- slot:'] + slot + [' -->'] pẹlu: ( Server html-ṣe-koodu: value ).
+}.
+
+Template nigbati: ['set:html:'] ṣe: { :slot :html
+	tirẹ content rọpo: ['<!-- slot:'] + slot + [' -->'] pẹlu: html.
+}.
+
+Template nigbati: ['fesi:ati:'] ṣe: { :slot :value
+	ara-rẹ ṣeto: (slot lati: 0 gigun: (slot gigun - 1)) iye: value.
+}.
+
+Template nigbati: ['nl2br'] ṣe: {
+	tirẹ content rọpo: ['\n'] pẹlu: ['<br>'].
+}.
+
+Template nigbati: ['clean'] ṣe: {
+	tirẹ content :=
+		Apẹrẹ
+		tuntun: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ibamu: tirẹ content
+		ṣe: { <- ['']. }.
+}.
+
+Template nigbati: ['clean-cuts'] ṣe: {
+	>> items := Akojọ tuntun.
+	Apẹrẹ
+	tuntun: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ibamu: tirẹ content
+	ṣe: { :_ :part
+		items fi-kun-opin: part ? 1.
+	}.
+	items kọọkan: { :_ :id
+		tirẹ content :=
+			Apẹrẹ tuntun: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ibamu: tirẹ content
+			ṣe: { <- ['']. }.
+	 }.
+}.
+
+Template nigbati: ['clean-space'] ṣe: {
+	tirẹ content :=
+		Apẹrẹ
+		tuntun: ['\\s*\\n'],
+		ibamu: tirẹ content
+		ṣe: { <- ['\n']. }.
+	tirẹ content :=
+		Apẹrẹ
+		tuntun: ['\\n[\\s\\t]+'],
+		ibamu: tirẹ content
+		ṣe: { <- ['\n']. }.
+}.
+
+Template nigbati: ['clean-all'] ṣe: {
+	ara-rẹ clean.
+	ara-rẹ clean-cuts.
+	ara-rẹ clean-space.
+}.
+
+Template nigbati: ['ọrọ'] ṣe: { <- tirẹ content.
+}.

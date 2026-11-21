@@ -1,0 +1,325 @@
+HTTP-Сұраныс келгенде: ['HTTP-header:'] орында: { :key <- Бағдарлама баптау: key.
+}.
+
+>> HTTP-Header := Нысан жаңа.
+
+HTTP-Header келгенде: ['жаңа'] орында: { <- өзі жаңа init.
+}.
+
+HTTP-Header келгенде: ['init'] орында: {
+	өзінің key := Бос.
+	өзінің value := Бос.
+}.
+
+HTTP-Header келгенде: ['key:value:'] орында: { :key :value
+	өзінің key := key.
+	өзінің value := value.
+}.
+
+HTTP-Header келгенде: ['key'] орында: { <- өзінің key.
+}.
+
+HTTP-Header келгенде: ['value'] орында: { <- өзінің value.
+}.
+
+
+HTTP-Header келгенде: ['мәтін'] орында: {
+	>> line := өзінің key + [': '] + өзінің value.
+	line ауыстыру: ['\r'] мынаған: [''], ауыстыру: ['\n'] мынаған: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Нысан жаңа.
+
+Web-Document келгенде: ['жаңа'] орында: { <- өзі жаңа init.
+}.
+
+Web-Document келгенде: ['init'] орында: {
+	өзінің headers := Тізім жаңа.
+	өзінің sess-id := Бос.
+	өзінің session-manager := Tempfile-Session жаңа.
+	өзінің sessdata := Бос.
+	өзінің secure := Ақиқат.
+	өзінің same-site := ['Strict'].
+	өзінің headers-out := Жалған.
+	өзінің request := HTTP-Сұраныс жаңа.
+}.
+
+Web-Document келгенде: ['request:'] орында: { :request
+	өзінің request := request.
+}. 
+
+Web-Document келгенде: ['secure-session-cookie:'] орында: { :secure
+	өзі check-headers.
+	өзінің secure := secure.
+}.
+
+Web-Document келгенде: ['same-site-session-cookie:'] орында: { :value
+	өзі check-headers.
+	>> options := Тізім жаңа 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options қамтиды: value, жалған-болса: {
+		осы-тапсырма қате: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	өзінің same-site := value.
+}.
+
+Web-Document келгенде: ['header:'] орында: { :header
+	өзі check-headers.
+	өзінің headers соңына-қосу: header.
+}.
+
+Web-Document келгенде: ['clear-headers'] орында: {
+	өзі check-headers.
+	өзінің headers := Тізім жаңа.
+}.
+
+Web-Document келгенде: ['session-manager:'] орында: { :manager
+	өзі check-headers.
+	өзінің session-manager := manager.
+}.
+
+Web-Document келгенде: ['session-manager'] орында: { <- өзінің session-manager.
+}.
+
+Web-Document келгенде: ['check-headers'] орында: {
+	өзінің headers-out ақиқат-болса: {
+		осы-тапсырма қате: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document келгенде: ['session-start'] орында: {
+	өзі check-headers.
+	>> request := өзінің request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Бос? жалған-болса: {
+		(( Үлгі жаңа: ['^[A-Za-z0-9]+\\z'], сәйкестік: sess-id ) = 0) ақиқат-болса: {
+			sess-id := Бос.
+		}.
+	}.
+	sess-id Бос? ақиқат-болса: {
+		sess-id := Сейф токен: 30.
+		>> session-header := HTTP-Header жаңа
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (өзінің secure бұл: ['Secure'] не-ол: ['']),
+		SSITE: (өзінің same-site),
+		XSID: sess-id
+		).
+		өзінің headers соңына-қосу: session-header.
+	}.
+	өзінің sessdata := өзінің session-manager for: sess-id, load. <- өзінің sessdata. # reference
+}.
+
+Web-Document келгенде: ['goto:'] орында: { :url
+	өзі check-headers.
+	өзі clear-headers.
+	өзінің headers
+	соңына-қосу: (
+		HTTP-Header жаңа
+		key: ['Status'] value: ['303 See Other']
+	),
+	соңына-қосу: (
+		HTTP-Header жаңа
+		key: ['Location'] value: url
+	).
+	өзі out: ['Redirect'].
+}.
+
+Web-Document келгенде: ['session-destroy'] орында: {
+	өзі check-headers.
+	>> request := өзінің request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Бос? жалған-болса: {
+		>> session-header := HTTP-Header жаңа.
+		>> when := Сәт жаңа жыл: 1970, пішім: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (өзінің secure бұл: ['Secure'] не-ол: ['']),
+			SSITE: (өзінің same-site),
+			XSID: sess-id
+		).
+		өзінің session-manager destroy.
+		өзінің headers соңына-қосу: session-header.
+	}.
+}.
+
+
+Web-Document келгенде: ['template:'] орында: { :жол <- Template жаңа: (Файл жаңа: жол, оқу).
+}.
+
+Web-Document келгенде: ['out:type:'] орында: { :output :түр
+	өзінің headers-out жалған-болса: {
+		өзінің sessdata Бос? жалған-болса: {
+			өзінің session-manager save: өзінің sessdata.
+		}.
+		өзінің headers соңына-қосу: (
+			HTTP-Header жаңа
+			key: ['Content-type'] value: түр
+		).
+		өзінің headers әрбір: { :_ :header
+			Шығыс жазу: header.
+		}.
+		өзінің headers-out := Ақиқат.
+		Шығыс жазу: ['\r\n'].
+	}.
+	Шығыс жазу: output.
+}.
+
+Web-Document келгенде: ['finish:type:'] орында: { :output :түр
+	өзінің headers-out жалған-болса: {
+		өзінің sessdata Бос? жалған-болса: {
+			өзінің session-manager save: өзінің sessdata.
+		}.
+		өзінің headers соңына-қосу: (
+			HTTP-Header жаңа
+			key: ['Content-type'] value: түр
+		).
+		өзінің headers соңына-қосу: (
+			HTTP-Header жаңа
+			key: ['Content-Length'] value: output мәтін bytes
+		).
+		өзінің headers әрбір: { :_ :header
+			Шығыс жазу: header.
+		}.
+		өзінің headers-out := Ақиқат.
+		Шығыс жазу: ['\r\n'].
+	}.
+	Шығыс жазу: output.
+}.
+
+Web-Document келгенде: ['out:'] орында: { :output
+	өзі out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document келгенде: ['finish:'] орында: { :output
+	өзі finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document келгенде: ['json:'] орында: { :output
+	өзі out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document келгенде: ['not-found:'] орында: { :output
+	өзі clear-headers header: (
+		HTTP-Header жаңа key: ['Status'] value: ['404 Not Found']
+	).
+	өзі out: output.
+}.
+
+
+# Interface
+
+>> Session := Нысан жаңа.
+
+Session келгенде: ['жаңа'] орында: { <- өзі жаңа init for: Бос.
+}.
+
+Session келгенде: ['for:'] орында: { :id
+	өзінің id := id.
+}.
+
+Session келгенде: ['load'] орында: {
+	осы-тапсырма қате: ['Not implemented.'].
+}.
+
+Session келгенде: ['save:'] орында: {
+	осы-тапсырма қате: ['Not implemented.'].
+}.
+
+Session келгенде: ['destroy'] орында: {
+	осы-тапсырма қате: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session жаңа.
+
+Tempfile-Session келгенде: ['init'] орында: {
+	өзінің pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session келгенде: ['path-prefix:'] орында: { :str
+	өзінің pathprefix := str.
+}.
+
+Tempfile-Session келгенде: ['file'] орында: { <- ( Файл жаңа: ( өзінің pathprefix + өзінің id + ['.txt'] ) ).
+}.
+
+Tempfile-Session келгенде: ['load'] орында: {
+	>> file := өзі file.
+	file бар жалған-болса: {
+		file жазу: (Сөздік жаңа код).
+	}. <- file оқу нысан.
+}.
+
+Tempfile-Session келгенде: ['save:'] орында: { :data
+	>> file := өзі file.
+	file бар ақиқат-болса: {
+		file жазу: data код.
+	}.
+}.
+
+Tempfile-Session келгенде: ['destroy'] орында: {
+	>> file := өзі file.
+	file бар ақиқат-болса: {
+		file жою.
+	}.
+}.
+
+
+>> URL := Нысан жаңа.
+
+URL келгенде: ['init'] орында: {
+	өзінің protocol := ['https://'].
+	өзінің хост := ['localhost'].
+	өзінің жол := [''].
+	өзінің params := [''].
+	өзінің hash := [''].
+}.
+
+URL келгенде: ['жаңа'] орында: { <- өзі жаңа init.
+}.
+
+URL келгенде: ['мәтін'] орында: { <- (
+	өзінің protocol +
+	өзінің хост +
+	өзінің жол +
+	өзінің params +
+	өзінің hash ).
+}.
+
+URL келгенде: ['protocol:'] орында: { :protocol
+	((Тізім жаңа: ['http'] ; ['https']) қамтиды: protocol) ақиқат-болса: {
+		өзінің protocol := protocol + ['://'].
+	}, жалған-болса: {
+		осы-тапсырма қате: ['Invalid protocol'].
+	}.
+}.
+
+URL келгенде: ['хост:'] орында: { :хост
+	#todo validate according to rfc
+	өзінің хост := хост.
+}.
+
+URL келгенде: ['path:'] орында: { :жол
+	өзінің жол := ['/'] + жол url-кодтау.
+}.
+
+URL келгенде: ['params:'] орында: { :map
+	>> params := Тізім жаңа.
+	map әрбір: { :key :value
+		params соңына-қосу: key мәтін url-кодтау + ['='] + value мәтін url-кодтау.
+	}.
+	өзінің params := ['?'] + ( params біріктіру: ['&'] ).
+}.
+
+URL келгенде: ['хэш:'] орында: { :hash
+	өзінің hash := ['#'] + hash url-кодтау.
+}.
+

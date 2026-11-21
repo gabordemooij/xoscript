@@ -1,0 +1,128 @@
+>> Email := ነገር አዲስ.
+
+Email ሲደርስ: ['init'] አድርግ: {
+	የራሱ recipients := ሰልፍ አዲስ.
+	የራሱ cc := ሰልፍ አዲስ.
+	የራሱ bcc := ሰልፍ አዲስ.
+	የራሱ from := ባዶ.
+	የራሱ from-name := ባዶ.
+	የራሱ subject := ባዶ.
+	የራሱ body := ባዶ.
+}.
+
+Email ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ init.
+}.
+
+Email ሲደርስ: ['to:'] አድርግ: { :list
+	የራሱ recipients := list.
+}.
+ 
+Email ሲደርስ: ['cc:'] አድርግ: { :list
+	የራሱ cc := list.
+}.
+
+Email ሲደርስ: ['bcc:'] አድርግ: { :list
+	የራሱ bcc := list.
+}.
+
+Email ሲደርስ: ['subject:'] አድርግ: { :subject
+	የራሱ subject := subject.
+}.
+
+Email ሲደርስ: ['from:name:'] አድርግ: { :from :ስም
+	የራሱ from := from.
+	የራሱ from-name := ስም.
+}.
+
+Email ሲደርስ: ['body:'] አድርግ: { :body
+	የራሱ body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ሲደርስ: ['header:'] አድርግ: { :line <- line ተካ: ['\r'] በዚህ: [''], ተካ: ['\n'] በዚህ: [''].
+}.
+
+Email ሲደርስ: ['send'] አድርግ: {
+	>> f := ፋይል tempwrite: ራሱ generate.
+	ፕሮግራም ሥርዓት: ['sendmail -t < '] + f የፋይል-መንገድ, አዲስ-መስመር.
+}.
+
+Email ሲደርስ: ['generate'] አድርግ: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str መጨረሻ-ላይ-ጨምር: (ራሱ header: ['From: '] + የራሱ from-name + [' <'] + ( የራሱ from ) + ['>']) + brk.
+	str መጨረሻ-ላይ-ጨምር: (ራሱ header: ['To: '] + ( የራሱ recipients አገናኝ: [','] )) + brk.
+	የራሱ cc ብዛት እውነት-ከሆነ: {
+		str መጨረሻ-ላይ-ጨምር: (ራሱ header: ['Cc: '] + ( የራሱ cc አገናኝ: [','] )) + brk.
+	}.
+	የራሱ bcc ብዛት እውነት-ከሆነ: {
+		str መጨረሻ-ላይ-ጨምር: (ራሱ header: ['Bcc: '] + ( የራሱ bcc አገናኝ: [','] )) + brk.
+	}.
+	str መጨረሻ-ላይ-ጨምር: (ራሱ header: ['Subject: '] + የራሱ subject) + brk.
+	str መጨረሻ-ላይ-ጨምር: brk.
+	str መጨረሻ-ላይ-ጨምር: የራሱ body.
+	str መጨረሻ-ላይ-ጨምር: brk. <- str.
+}.
+
+>> HTML-Email := Email አዲስ.
+
+HTML-Email ሲደርስ: ['init'] አድርግ: {
+	ራሱ init.
+	የራሱ attachments := ሰልፍ አዲስ.
+	የራሱ boundary := ካዝና ቶከን: 40.
+}.
+
+HTML-Email ሲደርስ: ['attach:'] አድርግ: { :file
+	>> id := የራሱ attachments ብዛት.
+	>> blob := file blob.
+	የራሱ attachments መጨረሻ-ላይ-ጨምር: (
+		መዝገበ-ቃላት አዲስ
+			file: file የፋይል-መንገድ,
+			mime: ['image/'] + (Server mimetype: file የፋይል-መንገድ),
+			data: blob base64-ኮድ-አድርግ
+	).
+	blob ልቀቅ. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ሲደርስ: ['generate'] አድርግ: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str መጨረሻ-ላይ-ጨምር: (ራሱ header: ['From: '] + የራሱ from-name + [' <'] + ( የራሱ from ) + ['>']) + brk.
+	str መጨረሻ-ላይ-ጨምር: (ራሱ header: ['To: '] + ( የራሱ recipients አገናኝ: [','] )) + brk.
+	የራሱ cc ብዛት እውነት-ከሆነ: {
+		str መጨረሻ-ላይ-ጨምር: (ራሱ header: ['Cc: '] + ( የራሱ cc አገናኝ: [','] )) + brk.
+	}.
+	የራሱ bcc ብዛት እውነት-ከሆነ: {
+		str መጨረሻ-ላይ-ጨምር: (ራሱ header: ['Bcc: '] + ( የራሱ bcc አገናኝ: [','] )) + brk.
+	}.
+	str መጨረሻ-ላይ-ጨምር: (ራሱ header: ['Subject: '] + የራሱ subject) + brk.
+	str መጨረሻ-ላይ-ጨምር: ['MIME-Version: 1.0'] + brk.
+	str መጨረሻ-ላይ-ጨምር: ['Content-Type: multipart/related; boundary="'] + የራሱ boundary + ['"; type=text/html'] + brk.
+	str መጨረሻ-ላይ-ጨምር: brk.
+	str መጨረሻ-ላይ-ጨምር: ['--'] + የራሱ boundary + brk.
+	str መጨረሻ-ላይ-ጨምር: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str መጨረሻ-ላይ-ጨምር: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str መጨረሻ-ላይ-ጨምር: brk.
+	str መጨረሻ-ላይ-ጨምር: የራሱ body.
+	str መጨረሻ-ላይ-ጨምር: brk.
+	የራሱ attachments እያንዳንዱ: { :id :info
+		>> blob := info data.
+		str መጨረሻ-ላይ-ጨምር: ['--'] + የራሱ boundary + brk.
+		str መጨረሻ-ላይ-ጨምር: ['Content-Type: '] + info mime + brk.
+		str መጨረሻ-ላይ-ጨምር: ['Content-Transfer-Encoding: base64'] + brk.
+		str መጨረሻ-ላይ-ጨምር: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str መጨረሻ-ላይ-ጨምር: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str መጨረሻ-ላይ-ጨምር: brk.
+		>> max := 76.
+		>> len := blob ርዝመት.
+		>> chunks := (len / max) ወደላይ-አጠጋጋ.
+		{ :i
+			>> chunk := blob ቅዳ መነሻ: i * max ርዝመት: max.
+			str መጨረሻ-ላይ-ጨምር: chunk + brk.
+		} * chunks.
+		str መጨረሻ-ላይ-ጨምር: brk.
+		str መጨረሻ-ላይ-ጨምር: brk.
+	}.
+	str መጨረሻ-ላይ-ጨምር: ['--'] + የራሱ boundary + ['--'] + brk. <- str.
+}.

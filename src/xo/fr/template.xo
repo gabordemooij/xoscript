@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objet nouveau.
+
+Template quand: ['nouveau'] faire: { <- soi nouveau content: [''].
+}.
+
+Template quand: ['content:'] faire: { :content
+	propre content := content. 
+}.
+
+Template quand: ['nouveau:'] faire: { :content <- soi nouveau content: content.
+}.
+
+Template quand: ['cut:'] faire: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := propre content diviser: startmarker.
+	>> prefix := parts premier.
+	>> parts2 := parts dernier diviser: endmarker.
+	>> suffix := parts2 dernier.
+	>> part := parts2 premier.
+	>> rest := prefix + suffix.
+	propre content := rest. <- Template nouveau: part.
+	
+}.
+
+Template quand: ['copier'] faire: { <- soi nouveau: soi texte copier.
+}.
+	
+Template quand: ['paste:at:'] faire: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	propre content remplacer: pastemarker par: ( snippet texte + pastemarker ).
+}.
+
+Template quand: ['donner:valeur:'] faire: { :slot :value
+	propre content remplacer: ['<!-- slot:'] + slot + [' -->'] par: ( Server html-encoder: value ).
+}.
+
+Template quand: ['set:html:'] faire: { :slot :html
+	propre content remplacer: ['<!-- slot:'] + slot + [' -->'] par: html.
+}.
+
+Template quand: ['répondre:et:'] faire: { :slot :value
+	soi donner: (slot de: 0 longueur: (slot longueur - 1)) valeur: value.
+}.
+
+Template quand: ['nl2br'] faire: {
+	propre content remplacer: ['\n'] par: ['<br>'].
+}.
+
+Template quand: ['clean'] faire: {
+	propre content :=
+		Motif
+		nouveau: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		correspondance: propre content
+		faire: { <- ['']. }.
+}.
+
+Template quand: ['clean-cuts'] faire: {
+	>> items := Liste nouveau.
+	Motif
+	nouveau: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	correspondance: propre content
+	faire: { :_ :part
+		items ajouter: part ? 1.
+	}.
+	items chaque: { :_ :id
+		propre content :=
+			Motif nouveau: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			correspondance: propre content
+			faire: { <- ['']. }.
+	 }.
+}.
+
+Template quand: ['clean-space'] faire: {
+	propre content :=
+		Motif
+		nouveau: ['\\s*\\n'],
+		correspondance: propre content
+		faire: { <- ['\n']. }.
+	propre content :=
+		Motif
+		nouveau: ['\\n[\\s\\t]+'],
+		correspondance: propre content
+		faire: { <- ['\n']. }.
+}.
+
+Template quand: ['clean-all'] faire: {
+	soi clean.
+	soi clean-cuts.
+	soi clean-space.
+}.
+
+Template quand: ['texte'] faire: { <- propre content.
+}.

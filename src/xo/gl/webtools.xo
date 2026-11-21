@@ -1,0 +1,325 @@
+Petición-HTTP en: ['HTTP-header:'] facer: { :key <- Programa configuración: key.
+}.
+
+>> HTTP-Header := Obxecto novo.
+
+HTTP-Header en: ['novo'] facer: { <- eu novo init.
+}.
+
+HTTP-Header en: ['init'] facer: {
+	propio key := Nada.
+	propio value := Nada.
+}.
+
+HTTP-Header en: ['key:value:'] facer: { :key :value
+	propio key := key.
+	propio value := value.
+}.
+
+HTTP-Header en: ['key'] facer: { <- propio key.
+}.
+
+HTTP-Header en: ['value'] facer: { <- propio value.
+}.
+
+
+HTTP-Header en: ['texto'] facer: {
+	>> line := propio key + [': '] + propio value.
+	line substituír: ['\r'] por: [''], substituír: ['\n'] por: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Obxecto novo.
+
+Web-Document en: ['novo'] facer: { <- eu novo init.
+}.
+
+Web-Document en: ['init'] facer: {
+	propio headers := Lista novo.
+	propio sess-id := Nada.
+	propio session-manager := Tempfile-Session novo.
+	propio sessdata := Nada.
+	propio secure := Certo.
+	propio same-site := ['Strict'].
+	propio headers-out := Falso.
+	propio request := Petición-HTTP novo.
+}.
+
+Web-Document en: ['request:'] facer: { :request
+	propio request := request.
+}. 
+
+Web-Document en: ['secure-session-cookie:'] facer: { :secure
+	eu check-headers.
+	propio secure := secure.
+}.
+
+Web-Document en: ['same-site-session-cookie:'] facer: { :value
+	eu check-headers.
+	>> options := Lista novo 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options contén: value, falso: {
+		esta-tarefa erro: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	propio same-site := value.
+}.
+
+Web-Document en: ['header:'] facer: { :header
+	eu check-headers.
+	propio headers engadir-ao-final: header.
+}.
+
+Web-Document en: ['clear-headers'] facer: {
+	eu check-headers.
+	propio headers := Lista novo.
+}.
+
+Web-Document en: ['session-manager:'] facer: { :manager
+	eu check-headers.
+	propio session-manager := manager.
+}.
+
+Web-Document en: ['session-manager'] facer: { <- propio session-manager.
+}.
+
+Web-Document en: ['check-headers'] facer: {
+	propio headers-out certo: {
+		esta-tarefa erro: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document en: ['session-start'] facer: {
+	eu check-headers.
+	>> request := propio request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Nada? falso: {
+		(( Patrón novo: ['^[A-Za-z0-9]+\\z'], coincidencia: sess-id ) = 0) certo: {
+			sess-id := Nada.
+		}.
+	}.
+	sess-id Nada? certo: {
+		sess-id := Caixa-forte token: 30.
+		>> session-header := HTTP-Header novo
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (propio secure ou: ['Secure'] ou: ['']),
+		SSITE: (propio same-site),
+		XSID: sess-id
+		).
+		propio headers engadir-ao-final: session-header.
+	}.
+	propio sessdata := propio session-manager for: sess-id, load. <- propio sessdata. # reference
+}.
+
+Web-Document en: ['goto:'] facer: { :url
+	eu check-headers.
+	eu clear-headers.
+	propio headers
+	engadir-ao-final: (
+		HTTP-Header novo
+		key: ['Status'] value: ['303 See Other']
+	),
+	engadir-ao-final: (
+		HTTP-Header novo
+		key: ['Location'] value: url
+	).
+	eu out: ['Redirect'].
+}.
+
+Web-Document en: ['session-destroy'] facer: {
+	eu check-headers.
+	>> request := propio request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Nada? falso: {
+		>> session-header := HTTP-Header novo.
+		>> when := Momento novo ano: 1970, formato: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (propio secure ou: ['Secure'] ou: ['']),
+			SSITE: (propio same-site),
+			XSID: sess-id
+		).
+		propio session-manager destroy.
+		propio headers engadir-ao-final: session-header.
+	}.
+}.
+
+
+Web-Document en: ['template:'] facer: { :camiño <- Template novo: (Ficheiro novo: camiño, ler).
+}.
+
+Web-Document en: ['out:type:'] facer: { :output :tipo
+	propio headers-out falso: {
+		propio sessdata Nada? falso: {
+			propio session-manager save: propio sessdata.
+		}.
+		propio headers engadir-ao-final: (
+			HTTP-Header novo
+			key: ['Content-type'] value: tipo
+		).
+		propio headers cada: { :_ :header
+			Saída escribir: header.
+		}.
+		propio headers-out := Certo.
+		Saída escribir: ['\r\n'].
+	}.
+	Saída escribir: output.
+}.
+
+Web-Document en: ['finish:type:'] facer: { :output :tipo
+	propio headers-out falso: {
+		propio sessdata Nada? falso: {
+			propio session-manager save: propio sessdata.
+		}.
+		propio headers engadir-ao-final: (
+			HTTP-Header novo
+			key: ['Content-type'] value: tipo
+		).
+		propio headers engadir-ao-final: (
+			HTTP-Header novo
+			key: ['Content-Length'] value: output texto bytes
+		).
+		propio headers cada: { :_ :header
+			Saída escribir: header.
+		}.
+		propio headers-out := Certo.
+		Saída escribir: ['\r\n'].
+	}.
+	Saída escribir: output.
+}.
+
+Web-Document en: ['out:'] facer: { :output
+	eu out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document en: ['finish:'] facer: { :output
+	eu finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document en: ['json:'] facer: { :output
+	eu out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document en: ['not-found:'] facer: { :output
+	eu clear-headers header: (
+		HTTP-Header novo key: ['Status'] value: ['404 Not Found']
+	).
+	eu out: output.
+}.
+
+
+# Interface
+
+>> Session := Obxecto novo.
+
+Session en: ['novo'] facer: { <- eu novo init for: Nada.
+}.
+
+Session en: ['for:'] facer: { :id
+	propio id := id.
+}.
+
+Session en: ['load'] facer: {
+	esta-tarefa erro: ['Not implemented.'].
+}.
+
+Session en: ['save:'] facer: {
+	esta-tarefa erro: ['Not implemented.'].
+}.
+
+Session en: ['destroy'] facer: {
+	esta-tarefa erro: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session novo.
+
+Tempfile-Session en: ['init'] facer: {
+	propio pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session en: ['path-prefix:'] facer: { :str
+	propio pathprefix := str.
+}.
+
+Tempfile-Session en: ['file'] facer: { <- ( Ficheiro novo: ( propio pathprefix + propio id + ['.txt'] ) ).
+}.
+
+Tempfile-Session en: ['load'] facer: {
+	>> file := eu file.
+	file existe falso: {
+		file escribir: (Dicionario novo código).
+	}. <- file ler obxecto.
+}.
+
+Tempfile-Session en: ['save:'] facer: { :data
+	>> file := eu file.
+	file existe certo: {
+		file escribir: data código.
+	}.
+}.
+
+Tempfile-Session en: ['destroy'] facer: {
+	>> file := eu file.
+	file existe certo: {
+		file eliminar.
+	}.
+}.
+
+
+>> URL := Obxecto novo.
+
+URL en: ['init'] facer: {
+	propio protocol := ['https://'].
+	propio anfitrión := ['localhost'].
+	propio camiño := [''].
+	propio params := [''].
+	propio hash := [''].
+}.
+
+URL en: ['novo'] facer: { <- eu novo init.
+}.
+
+URL en: ['texto'] facer: { <- (
+	propio protocol +
+	propio anfitrión +
+	propio camiño +
+	propio params +
+	propio hash ).
+}.
+
+URL en: ['protocol:'] facer: { :protocol
+	((Lista novo: ['http'] ; ['https']) contén: protocol) certo: {
+		propio protocol := protocol + ['://'].
+	}, falso: {
+		esta-tarefa erro: ['Invalid protocol'].
+	}.
+}.
+
+URL en: ['anfitrión:'] facer: { :anfitrión
+	#todo validate according to rfc
+	propio anfitrión := anfitrión.
+}.
+
+URL en: ['path:'] facer: { :camiño
+	propio camiño := ['/'] + camiño url-codificar.
+}.
+
+URL en: ['params:'] facer: { :map
+	>> params := Lista novo.
+	map cada: { :key :value
+		params engadir-ao-final: key texto url-codificar + ['='] + value texto url-codificar.
+	}.
+	propio params := ['?'] + ( params unir: ['&'] ).
+}.
+
+URL en: ['resumo:'] facer: { :hash
+	propio hash := ['#'] + hash url-codificar.
+}.
+

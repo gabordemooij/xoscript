@@ -1,0 +1,128 @@
+>> Email := Обект нов.
+
+Email при: ['init'] изпълни: {
+	свой recipients := Списък нов.
+	свой cc := Списък нов.
+	свой bcc := Списък нов.
+	свой from := Нищо.
+	свой from-name := Нищо.
+	свой subject := Нищо.
+	свой body := Нищо.
+}.
+
+Email при: ['нов'] изпълни: { <- себе нов init.
+}.
+
+Email при: ['to:'] изпълни: { :list
+	свой recipients := list.
+}.
+ 
+Email при: ['cc:'] изпълни: { :list
+	свой cc := list.
+}.
+
+Email при: ['bcc:'] изпълни: { :list
+	свой bcc := list.
+}.
+
+Email при: ['subject:'] изпълни: { :subject
+	свой subject := subject.
+}.
+
+Email при: ['from:name:'] изпълни: { :from :име
+	свой from := from.
+	свой from-name := име.
+}.
+
+Email при: ['body:'] изпълни: { :body
+	свой body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email при: ['header:'] изпълни: { :line <- line замени: ['\r'] с: [''], замени: ['\n'] с: [''].
+}.
+
+Email при: ['send'] изпълни: {
+	>> f := Файл tempwrite: себе generate.
+	Програма система: ['sendmail -t < '] + f път, нов-ред.
+}.
+
+Email при: ['generate'] изпълни: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str добави-в-края: (себе header: ['From: '] + свой from-name + [' <'] + ( свой from ) + ['>']) + brk.
+	str добави-в-края: (себе header: ['To: '] + ( свой recipients съедини: [','] )) + brk.
+	свой cc брой вярно: {
+		str добави-в-края: (себе header: ['Cc: '] + ( свой cc съедини: [','] )) + brk.
+	}.
+	свой bcc брой вярно: {
+		str добави-в-края: (себе header: ['Bcc: '] + ( свой bcc съедини: [','] )) + brk.
+	}.
+	str добави-в-края: (себе header: ['Subject: '] + свой subject) + brk.
+	str добави-в-края: brk.
+	str добави-в-края: свой body.
+	str добави-в-края: brk. <- str.
+}.
+
+>> HTML-Email := Email нов.
+
+HTML-Email при: ['init'] изпълни: {
+	себе init.
+	свой attachments := Списък нов.
+	свой boundary := Трезор токен: 40.
+}.
+
+HTML-Email при: ['attach:'] изпълни: { :file
+	>> id := свой attachments брой.
+	>> blob := file blob.
+	свой attachments добави-в-края: (
+		Речник нов
+			file: file път,
+			mime: ['image/'] + (Server mimetype: file път),
+			data: blob base64-кодирай
+	).
+	blob освободи. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email при: ['generate'] изпълни: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str добави-в-края: (себе header: ['From: '] + свой from-name + [' <'] + ( свой from ) + ['>']) + brk.
+	str добави-в-края: (себе header: ['To: '] + ( свой recipients съедини: [','] )) + brk.
+	свой cc брой вярно: {
+		str добави-в-края: (себе header: ['Cc: '] + ( свой cc съедини: [','] )) + brk.
+	}.
+	свой bcc брой вярно: {
+		str добави-в-края: (себе header: ['Bcc: '] + ( свой bcc съедини: [','] )) + brk.
+	}.
+	str добави-в-края: (себе header: ['Subject: '] + свой subject) + brk.
+	str добави-в-края: ['MIME-Version: 1.0'] + brk.
+	str добави-в-края: ['Content-Type: multipart/related; boundary="'] + свой boundary + ['"; type=text/html'] + brk.
+	str добави-в-края: brk.
+	str добави-в-края: ['--'] + свой boundary + brk.
+	str добави-в-края: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str добави-в-края: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str добави-в-края: brk.
+	str добави-в-края: свой body.
+	str добави-в-края: brk.
+	свой attachments всеки: { :id :info
+		>> blob := info data.
+		str добави-в-края: ['--'] + свой boundary + brk.
+		str добави-в-края: ['Content-Type: '] + info mime + brk.
+		str добави-в-края: ['Content-Transfer-Encoding: base64'] + brk.
+		str добави-в-края: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str добави-в-края: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str добави-в-края: brk.
+		>> max := 76.
+		>> len := blob дължина.
+		>> chunks := (len / max) закръгли-нагоре.
+		{ :i
+			>> chunk := blob копирай от: i * max дължина: max.
+			str добави-в-края: chunk + brk.
+		} * chunks.
+		str добави-в-края: brk.
+		str добави-в-края: brk.
+	}.
+	str добави-в-края: ['--'] + свой boundary + ['--'] + brk. <- str.
+}.

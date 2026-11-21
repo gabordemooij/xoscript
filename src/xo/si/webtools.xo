@@ -1,0 +1,325 @@
+HTTP-ඉල්ලීම ලැබුණු-විට: ['HTTP-header:'] කරන්න: { :key <- වැඩසටහන සැකසුම: key.
+}.
+
+>> HTTP-Header := වස්තුව නව.
+
+HTTP-Header ලැබුණු-විට: ['නව'] කරන්න: { <- තමා නව init.
+}.
+
+HTTP-Header ලැබුණු-විට: ['init'] කරන්න: {
+	තමාගේ key := හිස්.
+	තමාගේ value := හිස්.
+}.
+
+HTTP-Header ලැබුණු-විට: ['key:value:'] කරන්න: { :key :value
+	තමාගේ key := key.
+	තමාගේ value := value.
+}.
+
+HTTP-Header ලැබුණු-විට: ['key'] කරන්න: { <- තමාගේ key.
+}.
+
+HTTP-Header ලැබුණු-විට: ['value'] කරන්න: { <- තමාගේ value.
+}.
+
+
+HTTP-Header ලැබුණු-විට: ['පෙළට'] කරන්න: {
+	>> line := තමාගේ key + [': '] + තමාගේ value.
+	line ආදේශය: ['\r'] සමග: [''], ආදේශය: ['\n'] සමග: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := වස්තුව නව.
+
+Web-Document ලැබුණු-විට: ['නව'] කරන්න: { <- තමා නව init.
+}.
+
+Web-Document ලැබුණු-විට: ['init'] කරන්න: {
+	තමාගේ headers := ලේඛනය නව.
+	තමාගේ sess-id := හිස්.
+	තමාගේ session-manager := Tempfile-Session නව.
+	තමාගේ sessdata := හිස්.
+	තමාගේ secure := ඇත්ත.
+	තමාගේ same-site := ['Strict'].
+	තමාගේ headers-out := බොරු.
+	තමාගේ request := HTTP-ඉල්ලීම නව.
+}.
+
+Web-Document ලැබුණු-විට: ['request:'] කරන්න: { :request
+	තමාගේ request := request.
+}. 
+
+Web-Document ලැබුණු-විට: ['secure-session-cookie:'] කරන්න: { :secure
+	තමා check-headers.
+	තමාගේ secure := secure.
+}.
+
+Web-Document ලැබුණු-විට: ['same-site-session-cookie:'] කරන්න: { :value
+	තමා check-headers.
+	>> options := ලේඛනය නව 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options අඩංගුයි: value, බොරු-නම්: {
+		මෙම-කාර්යය දෝෂය: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	තමාගේ same-site := value.
+}.
+
+Web-Document ලැබුණු-විට: ['header:'] කරන්න: { :header
+	තමා check-headers.
+	තමාගේ headers අගට-එක්කරන්න: header.
+}.
+
+Web-Document ලැබුණු-විට: ['clear-headers'] කරන්න: {
+	තමා check-headers.
+	තමාගේ headers := ලේඛනය නව.
+}.
+
+Web-Document ලැබුණු-විට: ['session-manager:'] කරන්න: { :manager
+	තමා check-headers.
+	තමාගේ session-manager := manager.
+}.
+
+Web-Document ලැබුණු-විට: ['session-manager'] කරන්න: { <- තමාගේ session-manager.
+}.
+
+Web-Document ලැබුණු-විට: ['check-headers'] කරන්න: {
+	තමාගේ headers-out ඇත්ත-නම්: {
+		මෙම-කාර්යය දෝෂය: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document ලැබුණු-විට: ['session-start'] කරන්න: {
+	තමා check-headers.
+	>> request := තමාගේ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id හිස්ද? බොරු-නම්: {
+		(( රටාව නව: ['^[A-Za-z0-9]+\\z'], ගැළපීම: sess-id ) = 0) ඇත්ත-නම්: {
+			sess-id := හිස්.
+		}.
+	}.
+	sess-id හිස්ද? ඇත්ත-නම්: {
+		sess-id := සුරක්ෂිතාගාරය ටෝකනය: 30.
+		>> session-header := HTTP-Header නව
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (තමාගේ secure මෙය: ['Secure'] නැතිනම්-එය: ['']),
+		SSITE: (තමාගේ same-site),
+		XSID: sess-id
+		).
+		තමාගේ headers අගට-එක්කරන්න: session-header.
+	}.
+	තමාගේ sessdata := තමාගේ session-manager for: sess-id, load. <- තමාගේ sessdata. # reference
+}.
+
+Web-Document ලැබුණු-විට: ['goto:'] කරන්න: { :url
+	තමා check-headers.
+	තමා clear-headers.
+	තමාගේ headers
+	අගට-එක්කරන්න: (
+		HTTP-Header නව
+		key: ['Status'] value: ['303 See Other']
+	),
+	අගට-එක්කරන්න: (
+		HTTP-Header නව
+		key: ['Location'] value: url
+	).
+	තමා out: ['Redirect'].
+}.
+
+Web-Document ලැබුණු-විට: ['session-destroy'] කරන්න: {
+	තමා check-headers.
+	>> request := තමාගේ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id හිස්ද? බොරු-නම්: {
+		>> session-header := HTTP-Header නව.
+		>> when := මොහොත නව වසර: 1970, ආකෘතියෙන්: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (තමාගේ secure මෙය: ['Secure'] නැතිනම්-එය: ['']),
+			SSITE: (තමාගේ same-site),
+			XSID: sess-id
+		).
+		තමාගේ session-manager destroy.
+		තමාගේ headers අගට-එක්කරන්න: session-header.
+	}.
+}.
+
+
+Web-Document ලැබුණු-විට: ['template:'] කරන්න: { :ගොනු-මාර්ගය <- Template නව: (ගොනුව නව: ගොනු-මාර්ගය, කියවන්න).
+}.
+
+Web-Document ලැබුණු-විට: ['out:type:'] කරන්න: { :output :වර්ගය
+	තමාගේ headers-out බොරු-නම්: {
+		තමාගේ sessdata හිස්ද? බොරු-නම්: {
+			තමාගේ session-manager save: තමාගේ sessdata.
+		}.
+		තමාගේ headers අගට-එක්කරන්න: (
+			HTTP-Header නව
+			key: ['Content-type'] value: වර්ගය
+		).
+		තමාගේ headers එකිනෙක: { :_ :header
+			නිමැවුම ලියන්න: header.
+		}.
+		තමාගේ headers-out := ඇත්ත.
+		නිමැවුම ලියන්න: ['\r\n'].
+	}.
+	නිමැවුම ලියන්න: output.
+}.
+
+Web-Document ලැබුණු-විට: ['finish:type:'] කරන්න: { :output :වර්ගය
+	තමාගේ headers-out බොරු-නම්: {
+		තමාගේ sessdata හිස්ද? බොරු-නම්: {
+			තමාගේ session-manager save: තමාගේ sessdata.
+		}.
+		තමාගේ headers අගට-එක්කරන්න: (
+			HTTP-Header නව
+			key: ['Content-type'] value: වර්ගය
+		).
+		තමාගේ headers අගට-එක්කරන්න: (
+			HTTP-Header නව
+			key: ['Content-Length'] value: output පෙළට bytes
+		).
+		තමාගේ headers එකිනෙක: { :_ :header
+			නිමැවුම ලියන්න: header.
+		}.
+		තමාගේ headers-out := ඇත්ත.
+		නිමැවුම ලියන්න: ['\r\n'].
+	}.
+	නිමැවුම ලියන්න: output.
+}.
+
+Web-Document ලැබුණු-විට: ['out:'] කරන්න: { :output
+	තමා out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ලැබුණු-විට: ['finish:'] කරන්න: { :output
+	තමා finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ලැබුණු-විට: ['json:'] කරන්න: { :output
+	තමා out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document ලැබුණු-විට: ['not-found:'] කරන්න: { :output
+	තමා clear-headers header: (
+		HTTP-Header නව key: ['Status'] value: ['404 Not Found']
+	).
+	තමා out: output.
+}.
+
+
+# Interface
+
+>> Session := වස්තුව නව.
+
+Session ලැබුණු-විට: ['නව'] කරන්න: { <- තමා නව init for: හිස්.
+}.
+
+Session ලැබුණු-විට: ['for:'] කරන්න: { :id
+	තමාගේ id := id.
+}.
+
+Session ලැබුණු-විට: ['load'] කරන්න: {
+	මෙම-කාර්යය දෝෂය: ['Not implemented.'].
+}.
+
+Session ලැබුණු-විට: ['save:'] කරන්න: {
+	මෙම-කාර්යය දෝෂය: ['Not implemented.'].
+}.
+
+Session ලැබුණු-විට: ['destroy'] කරන්න: {
+	මෙම-කාර්යය දෝෂය: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session නව.
+
+Tempfile-Session ලැබුණු-විට: ['init'] කරන්න: {
+	තමාගේ pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session ලැබුණු-විට: ['path-prefix:'] කරන්න: { :str
+	තමාගේ pathprefix := str.
+}.
+
+Tempfile-Session ලැබුණු-විට: ['file'] කරන්න: { <- ( ගොනුව නව: ( තමාගේ pathprefix + තමාගේ id + ['.txt'] ) ).
+}.
+
+Tempfile-Session ලැබුණු-විට: ['load'] කරන්න: {
+	>> file := තමා file.
+	file පවතී බොරු-නම්: {
+		file ලියන්න: (ශබ්දකෝෂය නව කේතය).
+	}. <- file කියවන්න වස්තුවට.
+}.
+
+Tempfile-Session ලැබුණු-විට: ['save:'] කරන්න: { :data
+	>> file := තමා file.
+	file පවතී ඇත්ත-නම්: {
+		file ලියන්න: data කේතය.
+	}.
+}.
+
+Tempfile-Session ලැබුණු-විට: ['destroy'] කරන්න: {
+	>> file := තමා file.
+	file පවතී ඇත්ත-නම්: {
+		file මකන්න.
+	}.
+}.
+
+
+>> URL := වස්තුව නව.
+
+URL ලැබුණු-විට: ['init'] කරන්න: {
+	තමාගේ protocol := ['https://'].
+	තමාගේ සත්කාරකය := ['localhost'].
+	තමාගේ ගොනු-මාර්ගය := [''].
+	තමාගේ params := [''].
+	තමාගේ hash := [''].
+}.
+
+URL ලැබුණු-විට: ['නව'] කරන්න: { <- තමා නව init.
+}.
+
+URL ලැබුණු-විට: ['පෙළට'] කරන්න: { <- (
+	තමාගේ protocol +
+	තමාගේ සත්කාරකය +
+	තමාගේ ගොනු-මාර්ගය +
+	තමාගේ params +
+	තමාගේ hash ).
+}.
+
+URL ලැබුණු-විට: ['protocol:'] කරන්න: { :protocol
+	((ලේඛනය නව: ['http'] ; ['https']) අඩංගුයි: protocol) ඇත්ත-නම්: {
+		තමාගේ protocol := protocol + ['://'].
+	}, බොරු-නම්: {
+		මෙම-කාර්යය දෝෂය: ['Invalid protocol'].
+	}.
+}.
+
+URL ලැබුණු-විට: ['සත්කාරකය:'] කරන්න: { :සත්කාරකය
+	#todo validate according to rfc
+	තමාගේ සත්කාරකය := සත්කාරකය.
+}.
+
+URL ලැබුණු-විට: ['path:'] කරන්න: { :ගොනු-මාර්ගය
+	තමාගේ ගොනු-මාර්ගය := ['/'] + ගොනු-මාර්ගය url-කේතනය.
+}.
+
+URL ලැබුණු-විට: ['params:'] කරන්න: { :map
+	>> params := ලේඛනය නව.
+	map එකිනෙක: { :key :value
+		params අගට-එක්කරන්න: key පෙළට url-කේතනය + ['='] + value පෙළට url-කේතනය.
+	}.
+	තමාගේ params := ['?'] + ( params එක්කරන්න: ['&'] ).
+}.
+
+URL ලැබුණු-විට: ['හෑෂ්:'] කරන්න: { :hash
+	තමාගේ hash := ['#'] + hash url-කේතනය.
+}.
+

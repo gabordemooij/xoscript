@@ -1,0 +1,128 @@
+>> Email := オブジェクト 新規.
+
+Email 受信時: ['init'] 実行: {
+	自分の recipients := リスト 新規.
+	自分の cc := リスト 新規.
+	自分の bcc := リスト 新規.
+	自分の from := 無.
+	自分の from-name := 無.
+	自分の subject := 無.
+	自分の body := 無.
+}.
+
+Email 受信時: ['新規'] 実行: { <- 自身 新規 init.
+}.
+
+Email 受信時: ['to:'] 実行: { :list
+	自分の recipients := list.
+}.
+ 
+Email 受信時: ['cc:'] 実行: { :list
+	自分の cc := list.
+}.
+
+Email 受信時: ['bcc:'] 実行: { :list
+	自分の bcc := list.
+}.
+
+Email 受信時: ['subject:'] 実行: { :subject
+	自分の subject := subject.
+}.
+
+Email 受信時: ['from:name:'] 実行: { :from :名前
+	自分の from := from.
+	自分の from-name := 名前.
+}.
+
+Email 受信時: ['body:'] 実行: { :body
+	自分の body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email 受信時: ['header:'] 実行: { :line <- line 置換: ['\r'] 新: [''], 置換: ['\n'] 新: [''].
+}.
+
+Email 受信時: ['send'] 実行: {
+	>> f := ファイル tempwrite: 自身 generate.
+	プログラム システム: ['sendmail -t < '] + f 経路, 改行.
+}.
+
+Email 受信時: ['generate'] 実行: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str 末尾に追加: (自身 header: ['From: '] + 自分の from-name + [' <'] + ( 自分の from ) + ['>']) + brk.
+	str 末尾に追加: (自身 header: ['To: '] + ( 自分の recipients 結合: [','] )) + brk.
+	自分の cc 個数 真なら: {
+		str 末尾に追加: (自身 header: ['Cc: '] + ( 自分の cc 結合: [','] )) + brk.
+	}.
+	自分の bcc 個数 真なら: {
+		str 末尾に追加: (自身 header: ['Bcc: '] + ( 自分の bcc 結合: [','] )) + brk.
+	}.
+	str 末尾に追加: (自身 header: ['Subject: '] + 自分の subject) + brk.
+	str 末尾に追加: brk.
+	str 末尾に追加: 自分の body.
+	str 末尾に追加: brk. <- str.
+}.
+
+>> HTML-Email := Email 新規.
+
+HTML-Email 受信時: ['init'] 実行: {
+	自身 init.
+	自分の attachments := リスト 新規.
+	自分の boundary := 金庫 トークン: 40.
+}.
+
+HTML-Email 受信時: ['attach:'] 実行: { :file
+	>> id := 自分の attachments 個数.
+	>> blob := file blob.
+	自分の attachments 末尾に追加: (
+		辞書 新規
+			file: file 経路,
+			mime: ['image/'] + (Server mimetype: file 経路),
+			data: blob base64-エンコード
+	).
+	blob 解放. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email 受信時: ['generate'] 実行: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str 末尾に追加: (自身 header: ['From: '] + 自分の from-name + [' <'] + ( 自分の from ) + ['>']) + brk.
+	str 末尾に追加: (自身 header: ['To: '] + ( 自分の recipients 結合: [','] )) + brk.
+	自分の cc 個数 真なら: {
+		str 末尾に追加: (自身 header: ['Cc: '] + ( 自分の cc 結合: [','] )) + brk.
+	}.
+	自分の bcc 個数 真なら: {
+		str 末尾に追加: (自身 header: ['Bcc: '] + ( 自分の bcc 結合: [','] )) + brk.
+	}.
+	str 末尾に追加: (自身 header: ['Subject: '] + 自分の subject) + brk.
+	str 末尾に追加: ['MIME-Version: 1.0'] + brk.
+	str 末尾に追加: ['Content-Type: multipart/related; boundary="'] + 自分の boundary + ['"; type=text/html'] + brk.
+	str 末尾に追加: brk.
+	str 末尾に追加: ['--'] + 自分の boundary + brk.
+	str 末尾に追加: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str 末尾に追加: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str 末尾に追加: brk.
+	str 末尾に追加: 自分の body.
+	str 末尾に追加: brk.
+	自分の attachments 各要素: { :id :info
+		>> blob := info data.
+		str 末尾に追加: ['--'] + 自分の boundary + brk.
+		str 末尾に追加: ['Content-Type: '] + info mime + brk.
+		str 末尾に追加: ['Content-Transfer-Encoding: base64'] + brk.
+		str 末尾に追加: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str 末尾に追加: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str 末尾に追加: brk.
+		>> max := 76.
+		>> len := blob 長さ.
+		>> chunks := (len / max) 切り上げ.
+		{ :i
+			>> chunk := blob 複製 開始: i * max 長さ: max.
+			str 末尾に追加: chunk + brk.
+		} * chunks.
+		str 末尾に追加: brk.
+		str 末尾に追加: brk.
+	}.
+	str 末尾に追加: ['--'] + 自分の boundary + ['--'] + brk. <- str.
+}.

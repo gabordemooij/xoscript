@@ -1,0 +1,325 @@
+HTTP-リクエスト 受信時: ['HTTP-header:'] 実行: { :key <- プログラム 設定値: key.
+}.
+
+>> HTTP-Header := オブジェクト 新規.
+
+HTTP-Header 受信時: ['新規'] 実行: { <- 自身 新規 init.
+}.
+
+HTTP-Header 受信時: ['init'] 実行: {
+	自分の key := 無.
+	自分の value := 無.
+}.
+
+HTTP-Header 受信時: ['key:value:'] 実行: { :key :value
+	自分の key := key.
+	自分の value := value.
+}.
+
+HTTP-Header 受信時: ['key'] 実行: { <- 自分の key.
+}.
+
+HTTP-Header 受信時: ['value'] 実行: { <- 自分の value.
+}.
+
+
+HTTP-Header 受信時: ['文字列化'] 実行: {
+	>> line := 自分の key + [': '] + 自分の value.
+	line 置換: ['\r'] 新: [''], 置換: ['\n'] 新: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := オブジェクト 新規.
+
+Web-Document 受信時: ['新規'] 実行: { <- 自身 新規 init.
+}.
+
+Web-Document 受信時: ['init'] 実行: {
+	自分の headers := リスト 新規.
+	自分の sess-id := 無.
+	自分の session-manager := Tempfile-Session 新規.
+	自分の sessdata := 無.
+	自分の secure := 真.
+	自分の same-site := ['Strict'].
+	自分の headers-out := 偽.
+	自分の request := HTTP-リクエスト 新規.
+}.
+
+Web-Document 受信時: ['request:'] 実行: { :request
+	自分の request := request.
+}. 
+
+Web-Document 受信時: ['secure-session-cookie:'] 実行: { :secure
+	自身 check-headers.
+	自分の secure := secure.
+}.
+
+Web-Document 受信時: ['same-site-session-cookie:'] 実行: { :value
+	自身 check-headers.
+	>> options := リスト 新規 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options 含む: value, 偽なら: {
+		このタスク エラー: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	自分の same-site := value.
+}.
+
+Web-Document 受信時: ['header:'] 実行: { :header
+	自身 check-headers.
+	自分の headers 末尾に追加: header.
+}.
+
+Web-Document 受信時: ['clear-headers'] 実行: {
+	自身 check-headers.
+	自分の headers := リスト 新規.
+}.
+
+Web-Document 受信時: ['session-manager:'] 実行: { :manager
+	自身 check-headers.
+	自分の session-manager := manager.
+}.
+
+Web-Document 受信時: ['session-manager'] 実行: { <- 自分の session-manager.
+}.
+
+Web-Document 受信時: ['check-headers'] 実行: {
+	自分の headers-out 真なら: {
+		このタスク エラー: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document 受信時: ['session-start'] 実行: {
+	自身 check-headers.
+	>> request := 自分の request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id 無か? 偽なら: {
+		(( パターン 新規: ['^[A-Za-z0-9]+\\z'], 一致: sess-id ) = 0) 真なら: {
+			sess-id := 無.
+		}.
+	}.
+	sess-id 無か? 真なら: {
+		sess-id := 金庫 トークン: 30.
+		>> session-header := HTTP-Header 新規
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (自分の secure どちらか: ['Secure'] または: ['']),
+		SSITE: (自分の same-site),
+		XSID: sess-id
+		).
+		自分の headers 末尾に追加: session-header.
+	}.
+	自分の sessdata := 自分の session-manager for: sess-id, load. <- 自分の sessdata. # reference
+}.
+
+Web-Document 受信時: ['goto:'] 実行: { :url
+	自身 check-headers.
+	自身 clear-headers.
+	自分の headers
+	末尾に追加: (
+		HTTP-Header 新規
+		key: ['Status'] value: ['303 See Other']
+	),
+	末尾に追加: (
+		HTTP-Header 新規
+		key: ['Location'] value: url
+	).
+	自身 out: ['Redirect'].
+}.
+
+Web-Document 受信時: ['session-destroy'] 実行: {
+	自身 check-headers.
+	>> request := 自分の request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id 無か? 偽なら: {
+		>> session-header := HTTP-Header 新規.
+		>> when := 時点 新規 年値: 1970, 書式: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (自分の secure どちらか: ['Secure'] または: ['']),
+			SSITE: (自分の same-site),
+			XSID: sess-id
+		).
+		自分の session-manager destroy.
+		自分の headers 末尾に追加: session-header.
+	}.
+}.
+
+
+Web-Document 受信時: ['template:'] 実行: { :経路 <- Template 新規: (ファイル 新規: 経路, 読む).
+}.
+
+Web-Document 受信時: ['out:type:'] 実行: { :output :型名
+	自分の headers-out 偽なら: {
+		自分の sessdata 無か? 偽なら: {
+			自分の session-manager save: 自分の sessdata.
+		}.
+		自分の headers 末尾に追加: (
+			HTTP-Header 新規
+			key: ['Content-type'] value: 型名
+		).
+		自分の headers 各要素: { :_ :header
+			出力 書く: header.
+		}.
+		自分の headers-out := 真.
+		出力 書く: ['\r\n'].
+	}.
+	出力 書く: output.
+}.
+
+Web-Document 受信時: ['finish:type:'] 実行: { :output :型名
+	自分の headers-out 偽なら: {
+		自分の sessdata 無か? 偽なら: {
+			自分の session-manager save: 自分の sessdata.
+		}.
+		自分の headers 末尾に追加: (
+			HTTP-Header 新規
+			key: ['Content-type'] value: 型名
+		).
+		自分の headers 末尾に追加: (
+			HTTP-Header 新規
+			key: ['Content-Length'] value: output 文字列化 bytes
+		).
+		自分の headers 各要素: { :_ :header
+			出力 書く: header.
+		}.
+		自分の headers-out := 真.
+		出力 書く: ['\r\n'].
+	}.
+	出力 書く: output.
+}.
+
+Web-Document 受信時: ['out:'] 実行: { :output
+	自身 out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document 受信時: ['finish:'] 実行: { :output
+	自身 finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document 受信時: ['json:'] 実行: { :output
+	自身 out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document 受信時: ['not-found:'] 実行: { :output
+	自身 clear-headers header: (
+		HTTP-Header 新規 key: ['Status'] value: ['404 Not Found']
+	).
+	自身 out: output.
+}.
+
+
+# Interface
+
+>> Session := オブジェクト 新規.
+
+Session 受信時: ['新規'] 実行: { <- 自身 新規 init for: 無.
+}.
+
+Session 受信時: ['for:'] 実行: { :id
+	自分の id := id.
+}.
+
+Session 受信時: ['load'] 実行: {
+	このタスク エラー: ['Not implemented.'].
+}.
+
+Session 受信時: ['save:'] 実行: {
+	このタスク エラー: ['Not implemented.'].
+}.
+
+Session 受信時: ['destroy'] 実行: {
+	このタスク エラー: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session 新規.
+
+Tempfile-Session 受信時: ['init'] 実行: {
+	自分の pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session 受信時: ['path-prefix:'] 実行: { :str
+	自分の pathprefix := str.
+}.
+
+Tempfile-Session 受信時: ['file'] 実行: { <- ( ファイル 新規: ( 自分の pathprefix + 自分の id + ['.txt'] ) ).
+}.
+
+Tempfile-Session 受信時: ['load'] 実行: {
+	>> file := 自身 file.
+	file 存在する 偽なら: {
+		file 書く: (辞書 新規 コード).
+	}. <- file 読む オブジェクト化.
+}.
+
+Tempfile-Session 受信時: ['save:'] 実行: { :data
+	>> file := 自身 file.
+	file 存在する 真なら: {
+		file 書く: data コード.
+	}.
+}.
+
+Tempfile-Session 受信時: ['destroy'] 実行: {
+	>> file := 自身 file.
+	file 存在する 真なら: {
+		file 削除.
+	}.
+}.
+
+
+>> URL := オブジェクト 新規.
+
+URL 受信時: ['init'] 実行: {
+	自分の protocol := ['https://'].
+	自分の ホスト := ['localhost'].
+	自分の 経路 := [''].
+	自分の params := [''].
+	自分の hash := [''].
+}.
+
+URL 受信時: ['新規'] 実行: { <- 自身 新規 init.
+}.
+
+URL 受信時: ['文字列化'] 実行: { <- (
+	自分の protocol +
+	自分の ホスト +
+	自分の 経路 +
+	自分の params +
+	自分の hash ).
+}.
+
+URL 受信時: ['protocol:'] 実行: { :protocol
+	((リスト 新規: ['http'] ; ['https']) 含む: protocol) 真なら: {
+		自分の protocol := protocol + ['://'].
+	}, 偽なら: {
+		このタスク エラー: ['Invalid protocol'].
+	}.
+}.
+
+URL 受信時: ['ホスト:'] 実行: { :ホスト
+	#todo validate according to rfc
+	自分の ホスト := ホスト.
+}.
+
+URL 受信時: ['path:'] 実行: { :経路
+	自分の 経路 := ['/'] + 経路 url-エンコード.
+}.
+
+URL 受信時: ['params:'] 実行: { :map
+	>> params := リスト 新規.
+	map 各要素: { :key :value
+		params 末尾に追加: key 文字列化 url-エンコード + ['='] + value 文字列化 url-エンコード.
+	}.
+	自分の params := ['?'] + ( params 結合: ['&'] ).
+}.
+
+URL 受信時: ['ハッシュ:'] 実行: { :hash
+	自分の hash := ['#'] + hash url-エンコード.
+}.
+

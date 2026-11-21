@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := څیز نوی.
+
+Template کله: ['نوی'] وکړه: { <- ځان نوی content: [''].
+}.
+
+Template کله: ['content:'] وکړه: { :content
+	خپل content := content. 
+}.
+
+Template کله: ['نوی:'] وکړه: { :content <- ځان نوی content: content.
+}.
+
+Template کله: ['cut:'] وکړه: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := خپل content وویشه: startmarker.
+	>> prefix := parts لومړی.
+	>> parts2 := parts وروستی وویشه: endmarker.
+	>> suffix := parts2 وروستی.
+	>> part := parts2 لومړی.
+	>> rest := prefix + suffix.
+	خپل content := rest. <- Template نوی: part.
+	
+}.
+
+Template کله: ['کاپي'] وکړه: { <- ځان نوی: ځان په-متن کاپي.
+}.
+	
+Template کله: ['paste:at:'] وکړه: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	خپل content بدل-کړه: pastemarker په: ( snippet په-متن + pastemarker ).
+}.
+
+Template کله: ['وټاکه:ارزښت:'] وکړه: { :slot :value
+	خپل content بدل-کړه: ['<!-- slot:'] + slot + [' -->'] په: ( Server html-کوډول: value ).
+}.
+
+Template کله: ['set:html:'] وکړه: { :slot :html
+	خپل content بدل-کړه: ['<!-- slot:'] + slot + [' -->'] په: html.
+}.
+
+Template کله: ['ځواب:او:'] وکړه: { :slot :value
+	ځان وټاکه: (slot پیل: 0 اوږدوالی: (slot اوږدوالی - 1)) ارزښت: value.
+}.
+
+Template کله: ['nl2br'] وکړه: {
+	خپل content بدل-کړه: ['\n'] په: ['<br>'].
+}.
+
+Template کله: ['clean'] وکړه: {
+	خپل content :=
+		بېلګه
+		نوی: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		سمون: خپل content
+		وکړه: { <- ['']. }.
+}.
+
+Template کله: ['clean-cuts'] وکړه: {
+	>> items := لیست نوی.
+	بېلګه
+	نوی: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	سمون: خپل content
+	وکړه: { :_ :part
+		items پای-ته-زیات-کړه: part ? 1.
+	}.
+	items هر-یو: { :_ :id
+		خپل content :=
+			بېلګه نوی: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			سمون: خپل content
+			وکړه: { <- ['']. }.
+	 }.
+}.
+
+Template کله: ['clean-space'] وکړه: {
+	خپل content :=
+		بېلګه
+		نوی: ['\\s*\\n'],
+		سمون: خپل content
+		وکړه: { <- ['\n']. }.
+	خپل content :=
+		بېلګه
+		نوی: ['\\n[\\s\\t]+'],
+		سمون: خپل content
+		وکړه: { <- ['\n']. }.
+}.
+
+Template کله: ['clean-all'] وکړه: {
+	ځان clean.
+	ځان clean-cuts.
+	ځان clean-space.
+}.
+
+Template کله: ['په-متن'] وکړه: { <- خپل content.
+}.

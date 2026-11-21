@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Zavatra vaovao.
+
+Template rehefa: ['vaovao'] ataovy: { <- tena vaovao content: [''].
+}.
+
+Template rehefa: ['content:'] ataovy: { :content
+	azy content := content. 
+}.
+
+Template rehefa: ['vaovao:'] ataovy: { :content <- tena vaovao content: content.
+}.
+
+Template rehefa: ['cut:'] ataovy: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := azy content zarao: startmarker.
+	>> prefix := parts voalohany.
+	>> parts2 := parts farany zarao: endmarker.
+	>> suffix := parts2 farany.
+	>> part := parts2 voalohany.
+	>> rest := prefix + suffix.
+	azy content := rest. <- Template vaovao: part.
+	
+}.
+
+Template rehefa: ['adikao'] ataovy: { <- tena vaovao: tena soratra adikao.
+}.
+	
+Template rehefa: ['paste:at:'] ataovy: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	azy content soloy: pastemarker amin: ( snippet soratra + pastemarker ).
+}.
+
+Template rehefa: ['apetraho:sanda:'] ataovy: { :slot :value
+	azy content soloy: ['<!-- slot:'] + slot + [' -->'] amin: ( Server html-asio-kaody: value ).
+}.
+
+Template rehefa: ['set:html:'] ataovy: { :slot :html
+	azy content soloy: ['<!-- slot:'] + slot + [' -->'] amin: html.
+}.
+
+Template rehefa: ['valio:ary:'] ataovy: { :slot :value
+	tena apetraho: (slot manomboka: 0 halavany: (slot halavany - 1)) sanda: value.
+}.
+
+Template rehefa: ['nl2br'] ataovy: {
+	azy content soloy: ['\n'] amin: ['<br>'].
+}.
+
+Template rehefa: ['clean'] ataovy: {
+	azy content :=
+		Lamina
+		vaovao: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		fifanarahana: azy content
+		ataovy: { <- ['']. }.
+}.
+
+Template rehefa: ['clean-cuts'] ataovy: {
+	>> items := Lisitra vaovao.
+	Lamina
+	vaovao: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	fifanarahana: azy content
+	ataovy: { :_ :part
+		items ampio-any-amin-ny-farany: part ? 1.
+	}.
+	items tsirairay: { :_ :id
+		azy content :=
+			Lamina vaovao: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			fifanarahana: azy content
+			ataovy: { <- ['']. }.
+	 }.
+}.
+
+Template rehefa: ['clean-space'] ataovy: {
+	azy content :=
+		Lamina
+		vaovao: ['\\s*\\n'],
+		fifanarahana: azy content
+		ataovy: { <- ['\n']. }.
+	azy content :=
+		Lamina
+		vaovao: ['\\n[\\s\\t]+'],
+		fifanarahana: azy content
+		ataovy: { <- ['\n']. }.
+}.
+
+Template rehefa: ['clean-all'] ataovy: {
+	tena clean.
+	tena clean-cuts.
+	tena clean-space.
+}.
+
+Template rehefa: ['soratra'] ataovy: { <- azy content.
+}.

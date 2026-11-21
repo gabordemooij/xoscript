@@ -1,0 +1,325 @@
+Arịrịọ-HTTP mgbe-ọbịara: ['HTTP-header:'] mee: { :key <- Mmemme ntọala: key.
+}.
+
+>> HTTP-Header := Ihe ohuru.
+
+HTTP-Header mgbe-ọbịara: ['ohuru'] mee: { <- onwe ohuru init.
+}.
+
+HTTP-Header mgbe-ọbịara: ['init'] mee: {
+	nke-ya key := Efu.
+	nke-ya value := Efu.
+}.
+
+HTTP-Header mgbe-ọbịara: ['key:value:'] mee: { :key :value
+	nke-ya key := key.
+	nke-ya value := value.
+}.
+
+HTTP-Header mgbe-ọbịara: ['key'] mee: { <- nke-ya key.
+}.
+
+HTTP-Header mgbe-ọbịara: ['value'] mee: { <- nke-ya value.
+}.
+
+
+HTTP-Header mgbe-ọbịara: ['ederede'] mee: {
+	>> line := nke-ya key + [': '] + nke-ya value.
+	line dochie: ['\r'] na: [''], dochie: ['\n'] na: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Ihe ohuru.
+
+Web-Document mgbe-ọbịara: ['ohuru'] mee: { <- onwe ohuru init.
+}.
+
+Web-Document mgbe-ọbịara: ['init'] mee: {
+	nke-ya headers := Ndepụta ohuru.
+	nke-ya sess-id := Efu.
+	nke-ya session-manager := Tempfile-Session ohuru.
+	nke-ya sessdata := Efu.
+	nke-ya secure := Eziokwu.
+	nke-ya same-site := ['Strict'].
+	nke-ya headers-out := Ụgha.
+	nke-ya request := Arịrịọ-HTTP ohuru.
+}.
+
+Web-Document mgbe-ọbịara: ['request:'] mee: { :request
+	nke-ya request := request.
+}. 
+
+Web-Document mgbe-ọbịara: ['secure-session-cookie:'] mee: { :secure
+	onwe check-headers.
+	nke-ya secure := secure.
+}.
+
+Web-Document mgbe-ọbịara: ['same-site-session-cookie:'] mee: { :value
+	onwe check-headers.
+	>> options := Ndepụta ohuru 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options nwere: value, ụgha: {
+		ọrụ-a njehie: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	nke-ya same-site := value.
+}.
+
+Web-Document mgbe-ọbịara: ['header:'] mee: { :header
+	onwe check-headers.
+	nke-ya headers tinye-na-njedebe: header.
+}.
+
+Web-Document mgbe-ọbịara: ['clear-headers'] mee: {
+	onwe check-headers.
+	nke-ya headers := Ndepụta ohuru.
+}.
+
+Web-Document mgbe-ọbịara: ['session-manager:'] mee: { :manager
+	onwe check-headers.
+	nke-ya session-manager := manager.
+}.
+
+Web-Document mgbe-ọbịara: ['session-manager'] mee: { <- nke-ya session-manager.
+}.
+
+Web-Document mgbe-ọbịara: ['check-headers'] mee: {
+	nke-ya headers-out eziokwu: {
+		ọrụ-a njehie: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document mgbe-ọbịara: ['session-start'] mee: {
+	onwe check-headers.
+	>> request := nke-ya request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Efu? ụgha: {
+		(( Ụkpụrụ-ọchụchọ ohuru: ['^[A-Za-z0-9]+\\z'], dakọtara: sess-id ) = 0) eziokwu: {
+			sess-id := Efu.
+		}.
+	}.
+	sess-id Efu? eziokwu: {
+		sess-id := Igbe-nchekwa token: 30.
+		>> session-header := HTTP-Header ohuru
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (nke-ya secure nke-a: ['Secure'] ma-ọ-bụ-nke-ahụ: ['']),
+		SSITE: (nke-ya same-site),
+		XSID: sess-id
+		).
+		nke-ya headers tinye-na-njedebe: session-header.
+	}.
+	nke-ya sessdata := nke-ya session-manager for: sess-id, load. <- nke-ya sessdata. # reference
+}.
+
+Web-Document mgbe-ọbịara: ['goto:'] mee: { :url
+	onwe check-headers.
+	onwe clear-headers.
+	nke-ya headers
+	tinye-na-njedebe: (
+		HTTP-Header ohuru
+		key: ['Status'] value: ['303 See Other']
+	),
+	tinye-na-njedebe: (
+		HTTP-Header ohuru
+		key: ['Location'] value: url
+	).
+	onwe out: ['Redirect'].
+}.
+
+Web-Document mgbe-ọbịara: ['session-destroy'] mee: {
+	onwe check-headers.
+	>> request := nke-ya request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Efu? ụgha: {
+		>> session-header := HTTP-Header ohuru.
+		>> when := Oge ohuru afọ: 1970, usoro-ọdịdị: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (nke-ya secure nke-a: ['Secure'] ma-ọ-bụ-nke-ahụ: ['']),
+			SSITE: (nke-ya same-site),
+			XSID: sess-id
+		).
+		nke-ya session-manager destroy.
+		nke-ya headers tinye-na-njedebe: session-header.
+	}.
+}.
+
+
+Web-Document mgbe-ọbịara: ['template:'] mee: { :ụzọ-faịlụ <- Template ohuru: (Faịlụ ohuru: ụzọ-faịlụ, gụọ).
+}.
+
+Web-Document mgbe-ọbịara: ['out:type:'] mee: { :output :ụdị
+	nke-ya headers-out ụgha: {
+		nke-ya sessdata Efu? ụgha: {
+			nke-ya session-manager save: nke-ya sessdata.
+		}.
+		nke-ya headers tinye-na-njedebe: (
+			HTTP-Header ohuru
+			key: ['Content-type'] value: ụdị
+		).
+		nke-ya headers nke-ọ-bụla: { :_ :header
+			Mpụta dee: header.
+		}.
+		nke-ya headers-out := Eziokwu.
+		Mpụta dee: ['\r\n'].
+	}.
+	Mpụta dee: output.
+}.
+
+Web-Document mgbe-ọbịara: ['finish:type:'] mee: { :output :ụdị
+	nke-ya headers-out ụgha: {
+		nke-ya sessdata Efu? ụgha: {
+			nke-ya session-manager save: nke-ya sessdata.
+		}.
+		nke-ya headers tinye-na-njedebe: (
+			HTTP-Header ohuru
+			key: ['Content-type'] value: ụdị
+		).
+		nke-ya headers tinye-na-njedebe: (
+			HTTP-Header ohuru
+			key: ['Content-Length'] value: output ederede bytes
+		).
+		nke-ya headers nke-ọ-bụla: { :_ :header
+			Mpụta dee: header.
+		}.
+		nke-ya headers-out := Eziokwu.
+		Mpụta dee: ['\r\n'].
+	}.
+	Mpụta dee: output.
+}.
+
+Web-Document mgbe-ọbịara: ['out:'] mee: { :output
+	onwe out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document mgbe-ọbịara: ['finish:'] mee: { :output
+	onwe finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document mgbe-ọbịara: ['json:'] mee: { :output
+	onwe out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document mgbe-ọbịara: ['not-found:'] mee: { :output
+	onwe clear-headers header: (
+		HTTP-Header ohuru key: ['Status'] value: ['404 Not Found']
+	).
+	onwe out: output.
+}.
+
+
+# Interface
+
+>> Session := Ihe ohuru.
+
+Session mgbe-ọbịara: ['ohuru'] mee: { <- onwe ohuru init for: Efu.
+}.
+
+Session mgbe-ọbịara: ['for:'] mee: { :id
+	nke-ya id := id.
+}.
+
+Session mgbe-ọbịara: ['load'] mee: {
+	ọrụ-a njehie: ['Not implemented.'].
+}.
+
+Session mgbe-ọbịara: ['save:'] mee: {
+	ọrụ-a njehie: ['Not implemented.'].
+}.
+
+Session mgbe-ọbịara: ['destroy'] mee: {
+	ọrụ-a njehie: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session ohuru.
+
+Tempfile-Session mgbe-ọbịara: ['init'] mee: {
+	nke-ya pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session mgbe-ọbịara: ['path-prefix:'] mee: { :str
+	nke-ya pathprefix := str.
+}.
+
+Tempfile-Session mgbe-ọbịara: ['file'] mee: { <- ( Faịlụ ohuru: ( nke-ya pathprefix + nke-ya id + ['.txt'] ) ).
+}.
+
+Tempfile-Session mgbe-ọbịara: ['load'] mee: {
+	>> file := onwe file.
+	file dị ụgha: {
+		file dee: (Akwụkwọ-okwu ohuru koodu).
+	}. <- file gụọ ihe.
+}.
+
+Tempfile-Session mgbe-ọbịara: ['save:'] mee: { :data
+	>> file := onwe file.
+	file dị eziokwu: {
+		file dee: data koodu.
+	}.
+}.
+
+Tempfile-Session mgbe-ọbịara: ['destroy'] mee: {
+	>> file := onwe file.
+	file dị eziokwu: {
+		file hichapụ.
+	}.
+}.
+
+
+>> URL := Ihe ohuru.
+
+URL mgbe-ọbịara: ['init'] mee: {
+	nke-ya protocol := ['https://'].
+	nke-ya onye-nnabata := ['localhost'].
+	nke-ya ụzọ-faịlụ := [''].
+	nke-ya params := [''].
+	nke-ya hash := [''].
+}.
+
+URL mgbe-ọbịara: ['ohuru'] mee: { <- onwe ohuru init.
+}.
+
+URL mgbe-ọbịara: ['ederede'] mee: { <- (
+	nke-ya protocol +
+	nke-ya onye-nnabata +
+	nke-ya ụzọ-faịlụ +
+	nke-ya params +
+	nke-ya hash ).
+}.
+
+URL mgbe-ọbịara: ['protocol:'] mee: { :protocol
+	((Ndepụta ohuru: ['http'] ; ['https']) nwere: protocol) eziokwu: {
+		nke-ya protocol := protocol + ['://'].
+	}, ụgha: {
+		ọrụ-a njehie: ['Invalid protocol'].
+	}.
+}.
+
+URL mgbe-ọbịara: ['onye-nnabata:'] mee: { :onye-nnabata
+	#todo validate according to rfc
+	nke-ya onye-nnabata := onye-nnabata.
+}.
+
+URL mgbe-ọbịara: ['path:'] mee: { :ụzọ-faịlụ
+	nke-ya ụzọ-faịlụ := ['/'] + ụzọ-faịlụ url-tinye-koodu.
+}.
+
+URL mgbe-ọbịara: ['params:'] mee: { :map
+	>> params := Ndepụta ohuru.
+	map nke-ọ-bụla: { :key :value
+		params tinye-na-njedebe: key ederede url-tinye-koodu + ['='] + value ederede url-tinye-koodu.
+	}.
+	nke-ya params := ['?'] + ( params jikọọ: ['&'] ).
+}.
+
+URL mgbe-ọbịara: ['hash:'] mee: { :hash
+	nke-ya hash := ['#'] + hash url-tinye-koodu.
+}.
+

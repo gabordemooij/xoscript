@@ -1,0 +1,128 @@
+>> Email := Yam-khoom tshiab.
+
+Email thaum-tuaj: ['init'] ua: {
+	nws-li recipients := Daim-teev tshiab.
+	nws-li cc := Daim-teev tshiab.
+	nws-li bcc := Daim-teev tshiab.
+	nws-li from := Tsis-muaj-dabtsi.
+	nws-li from-name := Tsis-muaj-dabtsi.
+	nws-li subject := Tsis-muaj-dabtsi.
+	nws-li body := Tsis-muaj-dabtsi.
+}.
+
+Email thaum-tuaj: ['tshiab'] ua: { <- tus-kheej tshiab init.
+}.
+
+Email thaum-tuaj: ['to:'] ua: { :list
+	nws-li recipients := list.
+}.
+ 
+Email thaum-tuaj: ['cc:'] ua: { :list
+	nws-li cc := list.
+}.
+
+Email thaum-tuaj: ['bcc:'] ua: { :list
+	nws-li bcc := list.
+}.
+
+Email thaum-tuaj: ['subject:'] ua: { :subject
+	nws-li subject := subject.
+}.
+
+Email thaum-tuaj: ['from:name:'] ua: { :from :npe
+	nws-li from := from.
+	nws-li from-name := npe.
+}.
+
+Email thaum-tuaj: ['body:'] ua: { :body
+	nws-li body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email thaum-tuaj: ['header:'] ua: { :line <- line hloov: ['\r'] nrog: [''], hloov: ['\n'] nrog: [''].
+}.
+
+Email thaum-tuaj: ['send'] ua: {
+	>> f := Ntaub-ntawv tempwrite: tus-kheej generate.
+	Kev-pab-cuam-khoos-phis-tawj txheej-txheem-tshuab: ['sendmail -t < '] + f txoj-kev-ntaub-ntawv, kab-tshiab.
+}.
+
+Email thaum-tuaj: ['generate'] ua: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ntxiv-tom-kawg: (tus-kheej header: ['From: '] + nws-li from-name + [' <'] + ( nws-li from ) + ['>']) + brk.
+	str ntxiv-tom-kawg: (tus-kheej header: ['To: '] + ( nws-li recipients muab-sib-txuas: [','] )) + brk.
+	nws-li cc tus-lej-suav tseeb: {
+		str ntxiv-tom-kawg: (tus-kheej header: ['Cc: '] + ( nws-li cc muab-sib-txuas: [','] )) + brk.
+	}.
+	nws-li bcc tus-lej-suav tseeb: {
+		str ntxiv-tom-kawg: (tus-kheej header: ['Bcc: '] + ( nws-li bcc muab-sib-txuas: [','] )) + brk.
+	}.
+	str ntxiv-tom-kawg: (tus-kheej header: ['Subject: '] + nws-li subject) + brk.
+	str ntxiv-tom-kawg: brk.
+	str ntxiv-tom-kawg: nws-li body.
+	str ntxiv-tom-kawg: brk. <- str.
+}.
+
+>> HTML-Email := Email tshiab.
+
+HTML-Email thaum-tuaj: ['init'] ua: {
+	tus-kheej init.
+	nws-li attachments := Daim-teev tshiab.
+	nws-li boundary := Lub-thawv-ruaj-ntseg token: 40.
+}.
+
+HTML-Email thaum-tuaj: ['attach:'] ua: { :file
+	>> id := nws-li attachments tus-lej-suav.
+	>> blob := file blob.
+	nws-li attachments ntxiv-tom-kawg: (
+		Phau-txhais-lus tshiab
+			file: file txoj-kev-ntaub-ntawv,
+			mime: ['image/'] + (Server mimetype: file txoj-kev-ntaub-ntawv),
+			data: blob base64-ua-cim
+	).
+	blob tso-tawm. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email thaum-tuaj: ['generate'] ua: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ntxiv-tom-kawg: (tus-kheej header: ['From: '] + nws-li from-name + [' <'] + ( nws-li from ) + ['>']) + brk.
+	str ntxiv-tom-kawg: (tus-kheej header: ['To: '] + ( nws-li recipients muab-sib-txuas: [','] )) + brk.
+	nws-li cc tus-lej-suav tseeb: {
+		str ntxiv-tom-kawg: (tus-kheej header: ['Cc: '] + ( nws-li cc muab-sib-txuas: [','] )) + brk.
+	}.
+	nws-li bcc tus-lej-suav tseeb: {
+		str ntxiv-tom-kawg: (tus-kheej header: ['Bcc: '] + ( nws-li bcc muab-sib-txuas: [','] )) + brk.
+	}.
+	str ntxiv-tom-kawg: (tus-kheej header: ['Subject: '] + nws-li subject) + brk.
+	str ntxiv-tom-kawg: ['MIME-Version: 1.0'] + brk.
+	str ntxiv-tom-kawg: ['Content-Type: multipart/related; boundary="'] + nws-li boundary + ['"; type=text/html'] + brk.
+	str ntxiv-tom-kawg: brk.
+	str ntxiv-tom-kawg: ['--'] + nws-li boundary + brk.
+	str ntxiv-tom-kawg: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str ntxiv-tom-kawg: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str ntxiv-tom-kawg: brk.
+	str ntxiv-tom-kawg: nws-li body.
+	str ntxiv-tom-kawg: brk.
+	nws-li attachments txhua: { :id :info
+		>> blob := info data.
+		str ntxiv-tom-kawg: ['--'] + nws-li boundary + brk.
+		str ntxiv-tom-kawg: ['Content-Type: '] + info mime + brk.
+		str ntxiv-tom-kawg: ['Content-Transfer-Encoding: base64'] + brk.
+		str ntxiv-tom-kawg: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str ntxiv-tom-kawg: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str ntxiv-tom-kawg: brk.
+		>> max := 76.
+		>> len := blob qhov-ntev.
+		>> chunks := (len / max) puag-ncig-nce.
+		{ :i
+			>> chunk := blob luam los-ntawm: i * max ntev: max.
+			str ntxiv-tom-kawg: chunk + brk.
+		} * chunks.
+		str ntxiv-tom-kawg: brk.
+		str ntxiv-tom-kawg: brk.
+	}.
+	str ntxiv-tom-kawg: ['--'] + nws-li boundary + ['--'] + brk. <- str.
+}.

@@ -1,0 +1,128 @@
+>> Email := အရာဝတ္ထု အသစ်.
+
+Email ရလျှင်: ['init'] လုပ်: {
+	ကိုယ်ပိုင် recipients := အစီအစဉ် အသစ်.
+	ကိုယ်ပိုင် cc := အစီအစဉ် အသစ်.
+	ကိုယ်ပိုင် bcc := အစီအစဉ် အသစ်.
+	ကိုယ်ပိုင် from := ဗလာ.
+	ကိုယ်ပိုင် from-name := ဗလာ.
+	ကိုယ်ပိုင် subject := ဗလာ.
+	ကိုယ်ပိုင် body := ဗလာ.
+}.
+
+Email ရလျှင်: ['အသစ်'] လုပ်: { <- မိမိ အသစ် init.
+}.
+
+Email ရလျှင်: ['to:'] လုပ်: { :list
+	ကိုယ်ပိုင် recipients := list.
+}.
+ 
+Email ရလျှင်: ['cc:'] လုပ်: { :list
+	ကိုယ်ပိုင် cc := list.
+}.
+
+Email ရလျှင်: ['bcc:'] လုပ်: { :list
+	ကိုယ်ပိုင် bcc := list.
+}.
+
+Email ရလျှင်: ['subject:'] လုပ်: { :subject
+	ကိုယ်ပိုင် subject := subject.
+}.
+
+Email ရလျှင်: ['from:name:'] လုပ်: { :from :အမည်
+	ကိုယ်ပိုင် from := from.
+	ကိုယ်ပိုင် from-name := အမည်.
+}.
+
+Email ရလျှင်: ['body:'] လုပ်: { :body
+	ကိုယ်ပိုင် body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ရလျှင်: ['header:'] လုပ်: { :line <- line အစားထိုး: ['\r'] ဖြင့်: [''], အစားထိုး: ['\n'] ဖြင့်: [''].
+}.
+
+Email ရလျှင်: ['send'] လုပ်: {
+	>> f := ဖိုင် tempwrite: မိမိ generate.
+	ပရိုဂရမ် စနစ်: ['sendmail -t < '] + f ဖိုင်လမ်းကြောင်း, စာကြောင်းသစ်.
+}.
+
+Email ရလျှင်: ['generate'] လုပ်: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str အဆုံးတွင်ထည့်: (မိမိ header: ['From: '] + ကိုယ်ပိုင် from-name + [' <'] + ( ကိုယ်ပိုင် from ) + ['>']) + brk.
+	str အဆုံးတွင်ထည့်: (မိမိ header: ['To: '] + ( ကိုယ်ပိုင် recipients ပေါင်းစပ်: [','] )) + brk.
+	ကိုယ်ပိုင် cc အရေအတွက် မှန်လျှင်: {
+		str အဆုံးတွင်ထည့်: (မိမိ header: ['Cc: '] + ( ကိုယ်ပိုင် cc ပေါင်းစပ်: [','] )) + brk.
+	}.
+	ကိုယ်ပိုင် bcc အရေအတွက် မှန်လျှင်: {
+		str အဆုံးတွင်ထည့်: (မိမိ header: ['Bcc: '] + ( ကိုယ်ပိုင် bcc ပေါင်းစပ်: [','] )) + brk.
+	}.
+	str အဆုံးတွင်ထည့်: (မိမိ header: ['Subject: '] + ကိုယ်ပိုင် subject) + brk.
+	str အဆုံးတွင်ထည့်: brk.
+	str အဆုံးတွင်ထည့်: ကိုယ်ပိုင် body.
+	str အဆုံးတွင်ထည့်: brk. <- str.
+}.
+
+>> HTML-Email := Email အသစ်.
+
+HTML-Email ရလျှင်: ['init'] လုပ်: {
+	မိမိ init.
+	ကိုယ်ပိုင် attachments := အစီအစဉ် အသစ်.
+	ကိုယ်ပိုင် boundary := မီးခံသေတ္တာ တိုကင်: 40.
+}.
+
+HTML-Email ရလျှင်: ['attach:'] လုပ်: { :file
+	>> id := ကိုယ်ပိုင် attachments အရေအတွက်.
+	>> blob := file blob.
+	ကိုယ်ပိုင် attachments အဆုံးတွင်ထည့်: (
+		အဘိဓာန် အသစ်
+			file: file ဖိုင်လမ်းကြောင်း,
+			mime: ['image/'] + (Server mimetype: file ဖိုင်လမ်းကြောင်း),
+			data: blob base64-ကုဒ်သွင်း
+	).
+	blob လွှတ်ပေး. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ရလျှင်: ['generate'] လုပ်: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str အဆုံးတွင်ထည့်: (မိမိ header: ['From: '] + ကိုယ်ပိုင် from-name + [' <'] + ( ကိုယ်ပိုင် from ) + ['>']) + brk.
+	str အဆုံးတွင်ထည့်: (မိမိ header: ['To: '] + ( ကိုယ်ပိုင် recipients ပေါင်းစပ်: [','] )) + brk.
+	ကိုယ်ပိုင် cc အရေအတွက် မှန်လျှင်: {
+		str အဆုံးတွင်ထည့်: (မိမိ header: ['Cc: '] + ( ကိုယ်ပိုင် cc ပေါင်းစပ်: [','] )) + brk.
+	}.
+	ကိုယ်ပိုင် bcc အရေအတွက် မှန်လျှင်: {
+		str အဆုံးတွင်ထည့်: (မိမိ header: ['Bcc: '] + ( ကိုယ်ပိုင် bcc ပေါင်းစပ်: [','] )) + brk.
+	}.
+	str အဆုံးတွင်ထည့်: (မိမိ header: ['Subject: '] + ကိုယ်ပိုင် subject) + brk.
+	str အဆုံးတွင်ထည့်: ['MIME-Version: 1.0'] + brk.
+	str အဆုံးတွင်ထည့်: ['Content-Type: multipart/related; boundary="'] + ကိုယ်ပိုင် boundary + ['"; type=text/html'] + brk.
+	str အဆုံးတွင်ထည့်: brk.
+	str အဆုံးတွင်ထည့်: ['--'] + ကိုယ်ပိုင် boundary + brk.
+	str အဆုံးတွင်ထည့်: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str အဆုံးတွင်ထည့်: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str အဆုံးတွင်ထည့်: brk.
+	str အဆုံးတွင်ထည့်: ကိုယ်ပိုင် body.
+	str အဆုံးတွင်ထည့်: brk.
+	ကိုယ်ပိုင် attachments တစ်ခုစီ: { :id :info
+		>> blob := info data.
+		str အဆုံးတွင်ထည့်: ['--'] + ကိုယ်ပိုင် boundary + brk.
+		str အဆုံးတွင်ထည့်: ['Content-Type: '] + info mime + brk.
+		str အဆုံးတွင်ထည့်: ['Content-Transfer-Encoding: base64'] + brk.
+		str အဆုံးတွင်ထည့်: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str အဆုံးတွင်ထည့်: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str အဆုံးတွင်ထည့်: brk.
+		>> max := 76.
+		>> len := blob အရှည်.
+		>> chunks := (len / max) အထက်သို့တင်.
+		{ :i
+			>> chunk := blob ကူးယူ အစ: i * max အရှည်: max.
+			str အဆုံးတွင်ထည့်: chunk + brk.
+		} * chunks.
+		str အဆုံးတွင်ထည့်: brk.
+		str အဆုံးတွင်ထည့်: brk.
+	}.
+	str အဆုံးတွင်ထည့်: ['--'] + ကိုယ်ပိုင် boundary + ['--'] + brk. <- str.
+}.

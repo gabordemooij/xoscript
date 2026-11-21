@@ -1,0 +1,325 @@
+HTTP-கோரிக்கை பெறும்போது: ['HTTP-header:'] செய்: { :key <- நிரல் அமைப்பு-மதிப்பு: key.
+}.
+
+>> HTTP-Header := பொருள் புதிய.
+
+HTTP-Header பெறும்போது: ['புதிய'] செய்: { <- தான் புதிய init.
+}.
+
+HTTP-Header பெறும்போது: ['init'] செய்: {
+	தனது key := வெற்று.
+	தனது value := வெற்று.
+}.
+
+HTTP-Header பெறும்போது: ['key:value:'] செய்: { :key :value
+	தனது key := key.
+	தனது value := value.
+}.
+
+HTTP-Header பெறும்போது: ['key'] செய்: { <- தனது key.
+}.
+
+HTTP-Header பெறும்போது: ['value'] செய்: { <- தனது value.
+}.
+
+
+HTTP-Header பெறும்போது: ['சரமாக'] செய்: {
+	>> line := தனது key + [': '] + தனது value.
+	line மாற்று: ['\r'] கொண்டு: [''], மாற்று: ['\n'] கொண்டு: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := பொருள் புதிய.
+
+Web-Document பெறும்போது: ['புதிய'] செய்: { <- தான் புதிய init.
+}.
+
+Web-Document பெறும்போது: ['init'] செய்: {
+	தனது headers := வரிசை புதிய.
+	தனது sess-id := வெற்று.
+	தனது session-manager := Tempfile-Session புதிய.
+	தனது sessdata := வெற்று.
+	தனது secure := உண்மை.
+	தனது same-site := ['Strict'].
+	தனது headers-out := பொய்.
+	தனது request := HTTP-கோரிக்கை புதிய.
+}.
+
+Web-Document பெறும்போது: ['request:'] செய்: { :request
+	தனது request := request.
+}. 
+
+Web-Document பெறும்போது: ['secure-session-cookie:'] செய்: { :secure
+	தான் check-headers.
+	தனது secure := secure.
+}.
+
+Web-Document பெறும்போது: ['same-site-session-cookie:'] செய்: { :value
+	தான் check-headers.
+	>> options := வரிசை புதிய 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options உள்ளடக்கியது: value, பொய்யெனில்: {
+		இந்தப்-பணி பிழை: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	தனது same-site := value.
+}.
+
+Web-Document பெறும்போது: ['header:'] செய்: { :header
+	தான் check-headers.
+	தனது headers இறுதியில்-சேர்: header.
+}.
+
+Web-Document பெறும்போது: ['clear-headers'] செய்: {
+	தான் check-headers.
+	தனது headers := வரிசை புதிய.
+}.
+
+Web-Document பெறும்போது: ['session-manager:'] செய்: { :manager
+	தான் check-headers.
+	தனது session-manager := manager.
+}.
+
+Web-Document பெறும்போது: ['session-manager'] செய்: { <- தனது session-manager.
+}.
+
+Web-Document பெறும்போது: ['check-headers'] செய்: {
+	தனது headers-out உண்மையெனில்: {
+		இந்தப்-பணி பிழை: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document பெறும்போது: ['session-start'] செய்: {
+	தான் check-headers.
+	>> request := தனது request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id வெற்றா? பொய்யெனில்: {
+		(( பாங்கு புதிய: ['^[A-Za-z0-9]+\\z'], பொருத்தம்: sess-id ) = 0) உண்மையெனில்: {
+			sess-id := வெற்று.
+		}.
+	}.
+	sess-id வெற்றா? உண்மையெனில்: {
+		sess-id := பெட்டகம் டோக்கன்: 30.
+		>> session-header := HTTP-Header புதிய
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (தனது secure இது: ['Secure'] இல்லையேல்: ['']),
+		SSITE: (தனது same-site),
+		XSID: sess-id
+		).
+		தனது headers இறுதியில்-சேர்: session-header.
+	}.
+	தனது sessdata := தனது session-manager for: sess-id, load. <- தனது sessdata. # reference
+}.
+
+Web-Document பெறும்போது: ['goto:'] செய்: { :url
+	தான் check-headers.
+	தான் clear-headers.
+	தனது headers
+	இறுதியில்-சேர்: (
+		HTTP-Header புதிய
+		key: ['Status'] value: ['303 See Other']
+	),
+	இறுதியில்-சேர்: (
+		HTTP-Header புதிய
+		key: ['Location'] value: url
+	).
+	தான் out: ['Redirect'].
+}.
+
+Web-Document பெறும்போது: ['session-destroy'] செய்: {
+	தான் check-headers.
+	>> request := தனது request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id வெற்றா? பொய்யெனில்: {
+		>> session-header := HTTP-Header புதிய.
+		>> when := கணம் புதிய ஆண்டு: 1970, வடிவத்தில்: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (தனது secure இது: ['Secure'] இல்லையேல்: ['']),
+			SSITE: (தனது same-site),
+			XSID: sess-id
+		).
+		தனது session-manager destroy.
+		தனது headers இறுதியில்-சேர்: session-header.
+	}.
+}.
+
+
+Web-Document பெறும்போது: ['template:'] செய்: { :கோப்பு-பாதை <- Template புதிய: (கோப்பு புதிய: கோப்பு-பாதை, படி).
+}.
+
+Web-Document பெறும்போது: ['out:type:'] செய்: { :output :வகை
+	தனது headers-out பொய்யெனில்: {
+		தனது sessdata வெற்றா? பொய்யெனில்: {
+			தனது session-manager save: தனது sessdata.
+		}.
+		தனது headers இறுதியில்-சேர்: (
+			HTTP-Header புதிய
+			key: ['Content-type'] value: வகை
+		).
+		தனது headers ஒவ்வொன்றும்: { :_ :header
+			வெளியீடு எழுது: header.
+		}.
+		தனது headers-out := உண்மை.
+		வெளியீடு எழுது: ['\r\n'].
+	}.
+	வெளியீடு எழுது: output.
+}.
+
+Web-Document பெறும்போது: ['finish:type:'] செய்: { :output :வகை
+	தனது headers-out பொய்யெனில்: {
+		தனது sessdata வெற்றா? பொய்யெனில்: {
+			தனது session-manager save: தனது sessdata.
+		}.
+		தனது headers இறுதியில்-சேர்: (
+			HTTP-Header புதிய
+			key: ['Content-type'] value: வகை
+		).
+		தனது headers இறுதியில்-சேர்: (
+			HTTP-Header புதிய
+			key: ['Content-Length'] value: output சரமாக bytes
+		).
+		தனது headers ஒவ்வொன்றும்: { :_ :header
+			வெளியீடு எழுது: header.
+		}.
+		தனது headers-out := உண்மை.
+		வெளியீடு எழுது: ['\r\n'].
+	}.
+	வெளியீடு எழுது: output.
+}.
+
+Web-Document பெறும்போது: ['out:'] செய்: { :output
+	தான் out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document பெறும்போது: ['finish:'] செய்: { :output
+	தான் finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document பெறும்போது: ['json:'] செய்: { :output
+	தான் out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document பெறும்போது: ['not-found:'] செய்: { :output
+	தான் clear-headers header: (
+		HTTP-Header புதிய key: ['Status'] value: ['404 Not Found']
+	).
+	தான் out: output.
+}.
+
+
+# Interface
+
+>> Session := பொருள் புதிய.
+
+Session பெறும்போது: ['புதிய'] செய்: { <- தான் புதிய init for: வெற்று.
+}.
+
+Session பெறும்போது: ['for:'] செய்: { :id
+	தனது id := id.
+}.
+
+Session பெறும்போது: ['load'] செய்: {
+	இந்தப்-பணி பிழை: ['Not implemented.'].
+}.
+
+Session பெறும்போது: ['save:'] செய்: {
+	இந்தப்-பணி பிழை: ['Not implemented.'].
+}.
+
+Session பெறும்போது: ['destroy'] செய்: {
+	இந்தப்-பணி பிழை: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session புதிய.
+
+Tempfile-Session பெறும்போது: ['init'] செய்: {
+	தனது pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session பெறும்போது: ['path-prefix:'] செய்: { :str
+	தனது pathprefix := str.
+}.
+
+Tempfile-Session பெறும்போது: ['file'] செய்: { <- ( கோப்பு புதிய: ( தனது pathprefix + தனது id + ['.txt'] ) ).
+}.
+
+Tempfile-Session பெறும்போது: ['load'] செய்: {
+	>> file := தான் file.
+	file உள்ளது பொய்யெனில்: {
+		file எழுது: (அகராதி புதிய குறிமுறை).
+	}. <- file படி பொருளாக.
+}.
+
+Tempfile-Session பெறும்போது: ['save:'] செய்: { :data
+	>> file := தான் file.
+	file உள்ளது உண்மையெனில்: {
+		file எழுது: data குறிமுறை.
+	}.
+}.
+
+Tempfile-Session பெறும்போது: ['destroy'] செய்: {
+	>> file := தான் file.
+	file உள்ளது உண்மையெனில்: {
+		file நீக்கு.
+	}.
+}.
+
+
+>> URL := பொருள் புதிய.
+
+URL பெறும்போது: ['init'] செய்: {
+	தனது protocol := ['https://'].
+	தனது புரவலன் := ['localhost'].
+	தனது கோப்பு-பாதை := [''].
+	தனது params := [''].
+	தனது hash := [''].
+}.
+
+URL பெறும்போது: ['புதிய'] செய்: { <- தான் புதிய init.
+}.
+
+URL பெறும்போது: ['சரமாக'] செய்: { <- (
+	தனது protocol +
+	தனது புரவலன் +
+	தனது கோப்பு-பாதை +
+	தனது params +
+	தனது hash ).
+}.
+
+URL பெறும்போது: ['protocol:'] செய்: { :protocol
+	((வரிசை புதிய: ['http'] ; ['https']) உள்ளடக்கியது: protocol) உண்மையெனில்: {
+		தனது protocol := protocol + ['://'].
+	}, பொய்யெனில்: {
+		இந்தப்-பணி பிழை: ['Invalid protocol'].
+	}.
+}.
+
+URL பெறும்போது: ['புரவலன்:'] செய்: { :புரவலன்
+	#todo validate according to rfc
+	தனது புரவலன் := புரவலன்.
+}.
+
+URL பெறும்போது: ['path:'] செய்: { :கோப்பு-பாதை
+	தனது கோப்பு-பாதை := ['/'] + கோப்பு-பாதை url-குறியாக்கு.
+}.
+
+URL பெறும்போது: ['params:'] செய்: { :map
+	>> params := வரிசை புதிய.
+	map ஒவ்வொன்றும்: { :key :value
+		params இறுதியில்-சேர்: key சரமாக url-குறியாக்கு + ['='] + value சரமாக url-குறியாக்கு.
+	}.
+	தனது params := ['?'] + ( params இணை: ['&'] ).
+}.
+
+URL பெறும்போது: ['ஹாஷ்:'] செய்: { :hash
+	தனது hash := ['#'] + hash url-குறியாக்கு.
+}.
+

@@ -1,0 +1,325 @@
+Requisição-HTTP em: ['HTTP-header:'] fazer: { :key <- Programa configurar: key.
+}.
+
+>> HTTP-Header := Objeto novo.
+
+HTTP-Header em: ['novo'] fazer: { <- isto novo init.
+}.
+
+HTTP-Header em: ['init'] fazer: {
+	prop key := Nulo.
+	prop value := Nulo.
+}.
+
+HTTP-Header em: ['key:value:'] fazer: { :key :value
+	prop key := key.
+	prop value := value.
+}.
+
+HTTP-Header em: ['key'] fazer: { <- prop key.
+}.
+
+HTTP-Header em: ['value'] fazer: { <- prop value.
+}.
+
+
+HTTP-Header em: ['string'] fazer: {
+	>> line := prop key + [': '] + prop value.
+	line substituir: ['\r'] com: [''], substituir: ['\n'] com: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Objeto novo.
+
+Web-Document em: ['novo'] fazer: { <- isto novo init.
+}.
+
+Web-Document em: ['init'] fazer: {
+	prop headers := Listar novo.
+	prop sess-id := Nulo.
+	prop session-manager := Tempfile-Session novo.
+	prop sessdata := Nulo.
+	prop secure := Sim.
+	prop same-site := ['Strict'].
+	prop headers-out := Não.
+	prop request := Requisição-HTTP novo.
+}.
+
+Web-Document em: ['request:'] fazer: { :request
+	prop request := request.
+}. 
+
+Web-Document em: ['secure-session-cookie:'] fazer: { :secure
+	isto check-headers.
+	prop secure := secure.
+}.
+
+Web-Document em: ['same-site-session-cookie:'] fazer: { :value
+	isto check-headers.
+	>> options := Listar novo 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options contem: value, não: {
+		este-bloco-de-código erro: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	prop same-site := value.
+}.
+
+Web-Document em: ['header:'] fazer: { :header
+	isto check-headers.
+	prop headers acrescentar: header.
+}.
+
+Web-Document em: ['clear-headers'] fazer: {
+	isto check-headers.
+	prop headers := Listar novo.
+}.
+
+Web-Document em: ['session-manager:'] fazer: { :manager
+	isto check-headers.
+	prop session-manager := manager.
+}.
+
+Web-Document em: ['session-manager'] fazer: { <- prop session-manager.
+}.
+
+Web-Document em: ['check-headers'] fazer: {
+	prop headers-out sim: {
+		este-bloco-de-código erro: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document em: ['session-start'] fazer: {
+	isto check-headers.
+	>> request := prop request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Nulo? não: {
+		(( Padrão novo: ['^[A-Za-z0-9]+\\z'], corresponder: sess-id ) = 0) sim: {
+			sess-id := Nulo.
+		}.
+	}.
+	sess-id Nulo? sim: {
+		sess-id := Cofre token: 30.
+		>> session-header := HTTP-Header novo
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (prop secure outro: ['Secure'] ou: ['']),
+		SSITE: (prop same-site),
+		XSID: sess-id
+		).
+		prop headers acrescentar: session-header.
+	}.
+	prop sessdata := prop session-manager for: sess-id, load. <- prop sessdata. # reference
+}.
+
+Web-Document em: ['goto:'] fazer: { :url
+	isto check-headers.
+	isto clear-headers.
+	prop headers
+	acrescentar: (
+		HTTP-Header novo
+		key: ['Status'] value: ['303 See Other']
+	),
+	acrescentar: (
+		HTTP-Header novo
+		key: ['Location'] value: url
+	).
+	isto out: ['Redirect'].
+}.
+
+Web-Document em: ['session-destroy'] fazer: {
+	isto check-headers.
+	>> request := prop request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Nulo? não: {
+		>> session-header := HTTP-Header novo.
+		>> when := Momento novo ano: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (prop secure outro: ['Secure'] ou: ['']),
+			SSITE: (prop same-site),
+			XSID: sess-id
+		).
+		prop session-manager destroy.
+		prop headers acrescentar: session-header.
+	}.
+}.
+
+
+Web-Document em: ['template:'] fazer: { :caminho <- Template novo: (Arquivo novo: caminho, ler).
+}.
+
+Web-Document em: ['out:type:'] fazer: { :output :tipo
+	prop headers-out não: {
+		prop sessdata Nulo? não: {
+			prop session-manager save: prop sessdata.
+		}.
+		prop headers acrescentar: (
+			HTTP-Header novo
+			key: ['Content-type'] value: tipo
+		).
+		prop headers cada-um: { :_ :header
+			Saída escrever: header.
+		}.
+		prop headers-out := Sim.
+		Saída escrever: ['\r\n'].
+	}.
+	Saída escrever: output.
+}.
+
+Web-Document em: ['finish:type:'] fazer: { :output :tipo
+	prop headers-out não: {
+		prop sessdata Nulo? não: {
+			prop session-manager save: prop sessdata.
+		}.
+		prop headers acrescentar: (
+			HTTP-Header novo
+			key: ['Content-type'] value: tipo
+		).
+		prop headers acrescentar: (
+			HTTP-Header novo
+			key: ['Content-Length'] value: output string bytes
+		).
+		prop headers cada-um: { :_ :header
+			Saída escrever: header.
+		}.
+		prop headers-out := Sim.
+		Saída escrever: ['\r\n'].
+	}.
+	Saída escrever: output.
+}.
+
+Web-Document em: ['out:'] fazer: { :output
+	isto out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document em: ['finish:'] fazer: { :output
+	isto finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document em: ['json:'] fazer: { :output
+	isto out: ( JSON jsonificar: output ) type: ['application/json'].
+}.
+
+Web-Document em: ['not-found:'] fazer: { :output
+	isto clear-headers header: (
+		HTTP-Header novo key: ['Status'] value: ['404 Not Found']
+	).
+	isto out: output.
+}.
+
+
+# Interface
+
+>> Session := Objeto novo.
+
+Session em: ['novo'] fazer: { <- isto novo init for: Nulo.
+}.
+
+Session em: ['for:'] fazer: { :id
+	prop id := id.
+}.
+
+Session em: ['load'] fazer: {
+	este-bloco-de-código erro: ['Not implemented.'].
+}.
+
+Session em: ['save:'] fazer: {
+	este-bloco-de-código erro: ['Not implemented.'].
+}.
+
+Session em: ['destroy'] fazer: {
+	este-bloco-de-código erro: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session novo.
+
+Tempfile-Session em: ['init'] fazer: {
+	prop pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session em: ['path-prefix:'] fazer: { :str
+	prop pathprefix := str.
+}.
+
+Tempfile-Session em: ['file'] fazer: { <- ( Arquivo novo: ( prop pathprefix + prop id + ['.txt'] ) ).
+}.
+
+Tempfile-Session em: ['load'] fazer: {
+	>> file := isto file.
+	file existe não: {
+		file escrever: (Mapa novo code).
+	}. <- file ler objeto.
+}.
+
+Tempfile-Session em: ['save:'] fazer: { :data
+	>> file := isto file.
+	file existe sim: {
+		file escrever: data code.
+	}.
+}.
+
+Tempfile-Session em: ['destroy'] fazer: {
+	>> file := isto file.
+	file existe sim: {
+		file apagar.
+	}.
+}.
+
+
+>> URL := Objeto novo.
+
+URL em: ['init'] fazer: {
+	prop protocol := ['https://'].
+	prop host := ['localhost'].
+	prop caminho := [''].
+	prop params := [''].
+	prop hash := [''].
+}.
+
+URL em: ['novo'] fazer: { <- isto novo init.
+}.
+
+URL em: ['string'] fazer: { <- (
+	prop protocol +
+	prop host +
+	prop caminho +
+	prop params +
+	prop hash ).
+}.
+
+URL em: ['protocol:'] fazer: { :protocol
+	((Listar novo: ['http'] ; ['https']) contem: protocol) sim: {
+		prop protocol := protocol + ['://'].
+	}, não: {
+		este-bloco-de-código erro: ['Invalid protocol'].
+	}.
+}.
+
+URL em: ['host:'] fazer: { :host
+	#todo validate according to rfc
+	prop host := host.
+}.
+
+URL em: ['path:'] fazer: { :caminho
+	prop caminho := ['/'] + caminho url-codificar.
+}.
+
+URL em: ['params:'] fazer: { :map
+	>> params := Listar novo.
+	map cada-um: { :key :value
+		params acrescentar: key string url-codificar + ['='] + value string url-codificar.
+	}.
+	prop params := ['?'] + ( params juntar: ['&'] ).
+}.
+
+URL em: ['hash:'] fazer: { :hash
+	prop hash := ['#'] + hash url-codificar.
+}.
+

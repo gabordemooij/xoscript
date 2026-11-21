@@ -1,0 +1,128 @@
+>> Email := ئوبيېكت يېڭى.
+
+Email كەلگەندە: ['init'] قىل: {
+	ئۆزىنىڭ recipients := تىزىم يېڭى.
+	ئۆزىنىڭ cc := تىزىم يېڭى.
+	ئۆزىنىڭ bcc := تىزىم يېڭى.
+	ئۆزىنىڭ from := قۇرۇق.
+	ئۆزىنىڭ from-name := قۇرۇق.
+	ئۆزىنىڭ subject := قۇرۇق.
+	ئۆزىنىڭ body := قۇرۇق.
+}.
+
+Email كەلگەندە: ['يېڭى'] قىل: { <- ئۆزى يېڭى init.
+}.
+
+Email كەلگەندە: ['to:'] قىل: { :list
+	ئۆزىنىڭ recipients := list.
+}.
+ 
+Email كەلگەندە: ['cc:'] قىل: { :list
+	ئۆزىنىڭ cc := list.
+}.
+
+Email كەلگەندە: ['bcc:'] قىل: { :list
+	ئۆزىنىڭ bcc := list.
+}.
+
+Email كەلگەندە: ['subject:'] قىل: { :subject
+	ئۆزىنىڭ subject := subject.
+}.
+
+Email كەلگەندە: ['from:name:'] قىل: { :from :ئات
+	ئۆزىنىڭ from := from.
+	ئۆزىنىڭ from-name := ئات.
+}.
+
+Email كەلگەندە: ['body:'] قىل: { :body
+	ئۆزىنىڭ body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email كەلگەندە: ['header:'] قىل: { :line <- line ئالماشتۇر: ['\r'] بىلەن: [''], ئالماشتۇر: ['\n'] بىلەن: [''].
+}.
+
+Email كەلگەندە: ['send'] قىل: {
+	>> f := ھۆججەت ۋاقىتلىق-يېزىش: ئۆزى generate.
+	پروگرامما سىستېما: ['sendmail -t < '] + f ھۆججەت-يولى, يېڭى-قۇر.
+}.
+
+Email كەلگەندە: ['generate'] قىل: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ئاخىرىغا-قوش: (ئۆزى header: ['From: '] + ئۆزىنىڭ from-name + [' <'] + ( ئۆزىنىڭ from ) + ['>']) + brk.
+	str ئاخىرىغا-قوش: (ئۆزى header: ['To: '] + ( ئۆزىنىڭ recipients بىرلەشتۈر: [','] )) + brk.
+	ئۆزىنىڭ cc سانى راست-بولسا: {
+		str ئاخىرىغا-قوش: (ئۆزى header: ['Cc: '] + ( ئۆزىنىڭ cc بىرلەشتۈر: [','] )) + brk.
+	}.
+	ئۆزىنىڭ bcc سانى راست-بولسا: {
+		str ئاخىرىغا-قوش: (ئۆزى header: ['Bcc: '] + ( ئۆزىنىڭ bcc بىرلەشتۈر: [','] )) + brk.
+	}.
+	str ئاخىرىغا-قوش: (ئۆزى header: ['Subject: '] + ئۆزىنىڭ subject) + brk.
+	str ئاخىرىغا-قوش: brk.
+	str ئاخىرىغا-قوش: ئۆزىنىڭ body.
+	str ئاخىرىغا-قوش: brk. <- str.
+}.
+
+>> HTML-Email := Email يېڭى.
+
+HTML-Email كەلگەندە: ['init'] قىل: {
+	ئۆزى init.
+	ئۆزىنىڭ attachments := تىزىم يېڭى.
+	ئۆزىنىڭ boundary := ساندۇق بەلگە: 40.
+}.
+
+HTML-Email كەلگەندە: ['attach:'] قىل: { :file
+	>> id := ئۆزىنىڭ attachments سانى.
+	>> blob := file blob.
+	ئۆزىنىڭ attachments ئاخىرىغا-قوش: (
+		لۇغەت يېڭى
+			file: file ھۆججەت-يولى,
+			mime: ['image/'] + (Server mimetype: file ھۆججەت-يولى),
+			data: blob base64-كودلاش
+	).
+	blob بوشات. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email كەلگەندە: ['generate'] قىل: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ئاخىرىغا-قوش: (ئۆزى header: ['From: '] + ئۆزىنىڭ from-name + [' <'] + ( ئۆزىنىڭ from ) + ['>']) + brk.
+	str ئاخىرىغا-قوش: (ئۆزى header: ['To: '] + ( ئۆزىنىڭ recipients بىرلەشتۈر: [','] )) + brk.
+	ئۆزىنىڭ cc سانى راست-بولسا: {
+		str ئاخىرىغا-قوش: (ئۆزى header: ['Cc: '] + ( ئۆزىنىڭ cc بىرلەشتۈر: [','] )) + brk.
+	}.
+	ئۆزىنىڭ bcc سانى راست-بولسا: {
+		str ئاخىرىغا-قوش: (ئۆزى header: ['Bcc: '] + ( ئۆزىنىڭ bcc بىرلەشتۈر: [','] )) + brk.
+	}.
+	str ئاخىرىغا-قوش: (ئۆزى header: ['Subject: '] + ئۆزىنىڭ subject) + brk.
+	str ئاخىرىغا-قوش: ['MIME-Version: 1.0'] + brk.
+	str ئاخىرىغا-قوش: ['Content-Type: multipart/related; boundary="'] + ئۆزىنىڭ boundary + ['"; type=text/html'] + brk.
+	str ئاخىرىغا-قوش: brk.
+	str ئاخىرىغا-قوش: ['--'] + ئۆزىنىڭ boundary + brk.
+	str ئاخىرىغا-قوش: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str ئاخىرىغا-قوش: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str ئاخىرىغا-قوش: brk.
+	str ئاخىرىغا-قوش: ئۆزىنىڭ body.
+	str ئاخىرىغا-قوش: brk.
+	ئۆزىنىڭ attachments ھەربىر: { :id :info
+		>> blob := info data.
+		str ئاخىرىغا-قوش: ['--'] + ئۆزىنىڭ boundary + brk.
+		str ئاخىرىغا-قوش: ['Content-Type: '] + info mime + brk.
+		str ئاخىرىغا-قوش: ['Content-Transfer-Encoding: base64'] + brk.
+		str ئاخىرىغا-قوش: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str ئاخىرىغا-قوش: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str ئاخىرىغا-قوش: brk.
+		>> max := 76.
+		>> len := blob ئۇزۇنلۇق.
+		>> chunks := (len / max) يۇقىرىغا-پۈتۈنلە.
+		{ :i
+			>> chunk := blob كۆچۈر باشلىنىش: i * max ئۇزۇنلۇق: max.
+			str ئاخىرىغا-قوش: chunk + brk.
+		} * chunks.
+		str ئاخىرىغا-قوش: brk.
+		str ئاخىرىغا-قوش: brk.
+	}.
+	str ئاخىرىغا-قوش: ['--'] + ئۆزىنىڭ boundary + ['--'] + brk. <- str.
+}.

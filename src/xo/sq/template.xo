@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objekt ri.
+
+Template kur: ['ri'] bëj: { <- vetja ri content: [''].
+}.
+
+Template kur: ['content:'] bëj: { :content
+	vetjak content := content. 
+}.
+
+Template kur: ['ri:'] bëj: { :content <- vetja ri content: content.
+}.
+
+Template kur: ['cut:'] bëj: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := vetjak content ndaj: startmarker.
+	>> prefix := parts parë.
+	>> parts2 := parts fundit ndaj: endmarker.
+	>> suffix := parts2 fundit.
+	>> part := parts2 parë.
+	>> rest := prefix + suffix.
+	vetjak content := rest. <- Template ri: part.
+	
+}.
+
+Template kur: ['kopjo'] bëj: { <- vetja ri: vetja tekst kopjo.
+}.
+	
+Template kur: ['paste:at:'] bëj: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	vetjak content zëvendëso: pastemarker me: ( snippet tekst + pastemarker ).
+}.
+
+Template kur: ['cakto:vlerë:'] bëj: { :slot :value
+	vetjak content zëvendëso: ['<!-- slot:'] + slot + [' -->'] me: ( Server html-kodo: value ).
+}.
+
+Template kur: ['set:html:'] bëj: { :slot :html
+	vetjak content zëvendëso: ['<!-- slot:'] + slot + [' -->'] me: html.
+}.
+
+Template kur: ['përgjigju:dhe:'] bëj: { :slot :value
+	vetja cakto: (slot nga: 0 gjatësi: (slot gjatësi - 1)) vlerë: value.
+}.
+
+Template kur: ['nl2br'] bëj: {
+	vetjak content zëvendëso: ['\n'] me: ['<br>'].
+}.
+
+Template kur: ['clean'] bëj: {
+	vetjak content :=
+		Model
+		ri: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		përputhje: vetjak content
+		bëj: { <- ['']. }.
+}.
+
+Template kur: ['clean-cuts'] bëj: {
+	>> items := Listë ri.
+	Model
+	ri: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	përputhje: vetjak content
+	bëj: { :_ :part
+		items shto-në-fund: part ? 1.
+	}.
+	items secili: { :_ :id
+		vetjak content :=
+			Model ri: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			përputhje: vetjak content
+			bëj: { <- ['']. }.
+	 }.
+}.
+
+Template kur: ['clean-space'] bëj: {
+	vetjak content :=
+		Model
+		ri: ['\\s*\\n'],
+		përputhje: vetjak content
+		bëj: { <- ['\n']. }.
+	vetjak content :=
+		Model
+		ri: ['\\n[\\s\\t]+'],
+		përputhje: vetjak content
+		bëj: { <- ['\n']. }.
+}.
+
+Template kur: ['clean-all'] bëj: {
+	vetja clean.
+	vetja clean-cuts.
+	vetja clean-space.
+}.
+
+Template kur: ['tekst'] bëj: { <- vetjak content.
+}.

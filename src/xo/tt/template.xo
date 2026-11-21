@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Объект яңа.
+
+Template килгәндә: ['яңа'] эшлә: { <- үзе яңа content: [''].
+}.
+
+Template килгәндә: ['content:'] эшлә: { :content
+	үзенең content := content. 
+}.
+
+Template килгәндә: ['яңа:'] эшлә: { :content <- үзе яңа content: content.
+}.
+
+Template килгәндә: ['cut:'] эшлә: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := үзенең content бүл: startmarker.
+	>> prefix := parts беренче.
+	>> parts2 := parts соңгы бүл: endmarker.
+	>> suffix := parts2 соңгы.
+	>> part := parts2 беренче.
+	>> rest := prefix + suffix.
+	үзенең content := rest. <- Template яңа: part.
+	
+}.
+
+Template килгәндә: ['күчермә'] эшлә: { <- үзе яңа: үзе текст күчермә.
+}.
+	
+Template килгәндә: ['paste:at:'] эшлә: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	үзенең content алыштыр: pastemarker белән: ( snippet текст + pastemarker ).
+}.
+
+Template килгәндә: ['билгелә:кыйммәт:'] эшлә: { :slot :value
+	үзенең content алыштыр: ['<!-- slot:'] + slot + [' -->'] белән: ( Server html-кодлау: value ).
+}.
+
+Template килгәндә: ['set:html:'] эшлә: { :slot :html
+	үзенең content алыштыр: ['<!-- slot:'] + slot + [' -->'] белән: html.
+}.
+
+Template килгәндә: ['җавап-бир:һәм:'] эшлә: { :slot :value
+	үзе билгелә: (slot башлап: 0 озынлык: (slot озынлык - 1)) кыйммәт: value.
+}.
+
+Template килгәндә: ['nl2br'] эшлә: {
+	үзенең content алыштыр: ['\n'] белән: ['<br>'].
+}.
+
+Template килгәндә: ['clean'] эшлә: {
+	үзенең content :=
+		Үрнәк
+		яңа: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		туры-килү: үзенең content
+		эшлә: { <- ['']. }.
+}.
+
+Template килгәндә: ['clean-cuts'] эшлә: {
+	>> items := Тезмә яңа.
+	Үрнәк
+	яңа: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	туры-килү: үзенең content
+	эшлә: { :_ :part
+		items ахырга-өстә: part ? 1.
+	}.
+	items һәрбер: { :_ :id
+		үзенең content :=
+			Үрнәк яңа: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			туры-килү: үзенең content
+			эшлә: { <- ['']. }.
+	 }.
+}.
+
+Template килгәндә: ['clean-space'] эшлә: {
+	үзенең content :=
+		Үрнәк
+		яңа: ['\\s*\\n'],
+		туры-килү: үзенең content
+		эшлә: { <- ['\n']. }.
+	үзенең content :=
+		Үрнәк
+		яңа: ['\\n[\\s\\t]+'],
+		туры-килү: үзенең content
+		эшлә: { <- ['\n']. }.
+}.
+
+Template килгәндә: ['clean-all'] эшлә: {
+	үзе clean.
+	үзе clean-cuts.
+	үзе clean-space.
+}.
+
+Template килгәндә: ['текст'] эшлә: { <- үзенең content.
+}.

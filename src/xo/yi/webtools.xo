@@ -1,0 +1,325 @@
+בקשה-HTTP ווען: ['HTTP-header:'] טו: { :key <- פּראָגראַם אײַנשטעלונג: key.
+}.
+
+>> HTTP-Header := אָביעקט ניי.
+
+HTTP-Header ווען: ['ניי'] טו: { <- זיך ניי init.
+}.
+
+HTTP-Header ווען: ['init'] טו: {
+	אייגן key := גאָרנישט.
+	אייגן value := גאָרנישט.
+}.
+
+HTTP-Header ווען: ['key:value:'] טו: { :key :value
+	אייגן key := key.
+	אייגן value := value.
+}.
+
+HTTP-Header ווען: ['key'] טו: { <- אייגן key.
+}.
+
+HTTP-Header ווען: ['value'] טו: { <- אייגן value.
+}.
+
+
+HTTP-Header ווען: ['צו-טעקסט'] טו: {
+	>> line := אייגן key + [': '] + אייגן value.
+	line פֿאַרבײַט: ['\r'] מיט: [''], פֿאַרבײַט: ['\n'] מיט: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := אָביעקט ניי.
+
+Web-Document ווען: ['ניי'] טו: { <- זיך ניי init.
+}.
+
+Web-Document ווען: ['init'] טו: {
+	אייגן headers := ליסטע ניי.
+	אייגן sess-id := גאָרנישט.
+	אייגן session-manager := Tempfile-Session ניי.
+	אייגן sessdata := גאָרנישט.
+	אייגן secure := אמת.
+	אייגן same-site := ['Strict'].
+	אייגן headers-out := פֿאַלש.
+	אייגן request := בקשה-HTTP ניי.
+}.
+
+Web-Document ווען: ['request:'] טו: { :request
+	אייגן request := request.
+}. 
+
+Web-Document ווען: ['secure-session-cookie:'] טו: { :secure
+	זיך check-headers.
+	אייגן secure := secure.
+}.
+
+Web-Document ווען: ['same-site-session-cookie:'] טו: { :value
+	זיך check-headers.
+	>> options := ליסטע ניי 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options אַנטהאַלט: value, אויב-פֿאַלש: {
+		די-אויפֿגאַבע טעות: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	אייגן same-site := value.
+}.
+
+Web-Document ווען: ['header:'] טו: { :header
+	זיך check-headers.
+	אייגן headers לייג-צו-סוף: header.
+}.
+
+Web-Document ווען: ['clear-headers'] טו: {
+	זיך check-headers.
+	אייגן headers := ליסטע ניי.
+}.
+
+Web-Document ווען: ['session-manager:'] טו: { :manager
+	זיך check-headers.
+	אייגן session-manager := manager.
+}.
+
+Web-Document ווען: ['session-manager'] טו: { <- אייגן session-manager.
+}.
+
+Web-Document ווען: ['check-headers'] טו: {
+	אייגן headers-out אויב-אמת: {
+		די-אויפֿגאַבע טעות: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document ווען: ['session-start'] טו: {
+	זיך check-headers.
+	>> request := אייגן request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id גאָרנישט? אויב-פֿאַלש: {
+		(( מוסטער ניי: ['^[A-Za-z0-9]+\\z'], טרעפֿונג: sess-id ) = 0) אויב-אמת: {
+			sess-id := גאָרנישט.
+		}.
+	}.
+	sess-id גאָרנישט? אויב-אמת: {
+		sess-id := סייף צייכן: 30.
+		>> session-header := HTTP-Header ניי
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (אייגן secure דאָס: ['Secure'] אָדער-יענץ: ['']),
+		SSITE: (אייגן same-site),
+		XSID: sess-id
+		).
+		אייגן headers לייג-צו-סוף: session-header.
+	}.
+	אייגן sessdata := אייגן session-manager for: sess-id, load. <- אייגן sessdata. # reference
+}.
+
+Web-Document ווען: ['goto:'] טו: { :url
+	זיך check-headers.
+	זיך clear-headers.
+	אייגן headers
+	לייג-צו-סוף: (
+		HTTP-Header ניי
+		key: ['Status'] value: ['303 See Other']
+	),
+	לייג-צו-סוף: (
+		HTTP-Header ניי
+		key: ['Location'] value: url
+	).
+	זיך out: ['Redirect'].
+}.
+
+Web-Document ווען: ['session-destroy'] טו: {
+	זיך check-headers.
+	>> request := אייגן request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id גאָרנישט? אויב-פֿאַלש: {
+		>> session-header := HTTP-Header ניי.
+		>> when := מאָמענט ניי יאָר: 1970, אין-פֿאָרמאַט: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (אייגן secure דאָס: ['Secure'] אָדער-יענץ: ['']),
+			SSITE: (אייגן same-site),
+			XSID: sess-id
+		).
+		אייגן session-manager destroy.
+		אייגן headers לייג-צו-סוף: session-header.
+	}.
+}.
+
+
+Web-Document ווען: ['template:'] טו: { :טעקע-וועג <- Template ניי: (טעקע ניי: טעקע-וועג, לייען).
+}.
+
+Web-Document ווען: ['out:type:'] טו: { :output :טיפּ
+	אייגן headers-out אויב-פֿאַלש: {
+		אייגן sessdata גאָרנישט? אויב-פֿאַלש: {
+			אייגן session-manager save: אייגן sessdata.
+		}.
+		אייגן headers לייג-צו-סוף: (
+			HTTP-Header ניי
+			key: ['Content-type'] value: טיפּ
+		).
+		אייגן headers יעדער: { :_ :header
+			אויסגאָב שרײַב: header.
+		}.
+		אייגן headers-out := אמת.
+		אויסגאָב שרײַב: ['\r\n'].
+	}.
+	אויסגאָב שרײַב: output.
+}.
+
+Web-Document ווען: ['finish:type:'] טו: { :output :טיפּ
+	אייגן headers-out אויב-פֿאַלש: {
+		אייגן sessdata גאָרנישט? אויב-פֿאַלש: {
+			אייגן session-manager save: אייגן sessdata.
+		}.
+		אייגן headers לייג-צו-סוף: (
+			HTTP-Header ניי
+			key: ['Content-type'] value: טיפּ
+		).
+		אייגן headers לייג-צו-סוף: (
+			HTTP-Header ניי
+			key: ['Content-Length'] value: output צו-טעקסט בייטן
+		).
+		אייגן headers יעדער: { :_ :header
+			אויסגאָב שרײַב: header.
+		}.
+		אייגן headers-out := אמת.
+		אויסגאָב שרײַב: ['\r\n'].
+	}.
+	אויסגאָב שרײַב: output.
+}.
+
+Web-Document ווען: ['out:'] טו: { :output
+	זיך out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ווען: ['finish:'] טו: { :output
+	זיך finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ווען: ['json:'] טו: { :output
+	זיך out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document ווען: ['not-found:'] טו: { :output
+	זיך clear-headers header: (
+		HTTP-Header ניי key: ['Status'] value: ['404 Not Found']
+	).
+	זיך out: output.
+}.
+
+
+# Interface
+
+>> Session := אָביעקט ניי.
+
+Session ווען: ['ניי'] טו: { <- זיך ניי init for: גאָרנישט.
+}.
+
+Session ווען: ['for:'] טו: { :id
+	אייגן id := id.
+}.
+
+Session ווען: ['load'] טו: {
+	די-אויפֿגאַבע טעות: ['Not implemented.'].
+}.
+
+Session ווען: ['save:'] טו: {
+	די-אויפֿגאַבע טעות: ['Not implemented.'].
+}.
+
+Session ווען: ['destroy'] טו: {
+	די-אויפֿגאַבע טעות: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session ניי.
+
+Tempfile-Session ווען: ['init'] טו: {
+	אייגן pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session ווען: ['path-prefix:'] טו: { :str
+	אייגן pathprefix := str.
+}.
+
+Tempfile-Session ווען: ['file'] טו: { <- ( טעקע ניי: ( אייגן pathprefix + אייגן id + ['.txt'] ) ).
+}.
+
+Tempfile-Session ווען: ['load'] טו: {
+	>> file := זיך file.
+	file עקזיסטירט אויב-פֿאַלש: {
+		file שרײַב: (ווערטערבוך ניי קאָד).
+	}. <- file לייען צו-אָביעקט.
+}.
+
+Tempfile-Session ווען: ['save:'] טו: { :data
+	>> file := זיך file.
+	file עקזיסטירט אויב-אמת: {
+		file שרײַב: data קאָד.
+	}.
+}.
+
+Tempfile-Session ווען: ['destroy'] טו: {
+	>> file := זיך file.
+	file עקזיסטירט אויב-אמת: {
+		file מעק-אויס.
+	}.
+}.
+
+
+>> URL := אָביעקט ניי.
+
+URL ווען: ['init'] טו: {
+	אייגן protocol := ['https://'].
+	אייגן באַלעבאָס := ['localhost'].
+	אייגן טעקע-וועג := [''].
+	אייגן params := [''].
+	אייגן hash := [''].
+}.
+
+URL ווען: ['ניי'] טו: { <- זיך ניי init.
+}.
+
+URL ווען: ['צו-טעקסט'] טו: { <- (
+	אייגן protocol +
+	אייגן באַלעבאָס +
+	אייגן טעקע-וועג +
+	אייגן params +
+	אייגן hash ).
+}.
+
+URL ווען: ['protocol:'] טו: { :protocol
+	((ליסטע ניי: ['http'] ; ['https']) אַנטהאַלט: protocol) אויב-אמת: {
+		אייגן protocol := protocol + ['://'].
+	}, אויב-פֿאַלש: {
+		די-אויפֿגאַבע טעות: ['Invalid protocol'].
+	}.
+}.
+
+URL ווען: ['באַלעבאָס:'] טו: { :באַלעבאָס
+	#todo validate according to rfc
+	אייגן באַלעבאָס := באַלעבאָס.
+}.
+
+URL ווען: ['path:'] טו: { :טעקע-וועג
+	אייגן טעקע-וועג := ['/'] + טעקע-וועג url-קאָדירן.
+}.
+
+URL ווען: ['params:'] טו: { :map
+	>> params := ליסטע ניי.
+	map יעדער: { :key :value
+		params לייג-צו-סוף: key צו-טעקסט url-קאָדירן + ['='] + value צו-טעקסט url-קאָדירן.
+	}.
+	אייגן params := ['?'] + ( params פֿאַראייניק: ['&'] ).
+}.
+
+URL ווען: ['העש:'] טו: { :hash
+	אייגן hash := ['#'] + hash url-קאָדירן.
+}.
+

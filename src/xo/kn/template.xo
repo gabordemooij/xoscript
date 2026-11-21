@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := ವಸ್ತು ಹೊಸ.
+
+Template ಬಂದಾಗ: ['ಹೊಸ'] ಮಾಡು: { <- ತಾನು ಹೊಸ content: [''].
+}.
+
+Template ಬಂದಾಗ: ['content:'] ಮಾಡು: { :content
+	ತನ್ನ content := content. 
+}.
+
+Template ಬಂದಾಗ: ['ಹೊಸ:'] ಮಾಡು: { :content <- ತಾನು ಹೊಸ content: content.
+}.
+
+Template ಬಂದಾಗ: ['cut:'] ಮಾಡು: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := ತನ್ನ content ವಿಭಜಿಸು: startmarker.
+	>> prefix := parts ಮೊದಲ.
+	>> parts2 := parts ಕೊನೆಯ ವಿಭಜಿಸು: endmarker.
+	>> suffix := parts2 ಕೊನೆಯ.
+	>> part := parts2 ಮೊದಲ.
+	>> rest := prefix + suffix.
+	ತನ್ನ content := rest. <- Template ಹೊಸ: part.
+	
+}.
+
+Template ಬಂದಾಗ: ['ನಕಲು'] ಮಾಡು: { <- ತಾನು ಹೊಸ: ತಾನು ಪಠ್ಯವಾಗಿ ನಕಲು.
+}.
+	
+Template ಬಂದಾಗ: ['paste:at:'] ಮಾಡು: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	ತನ್ನ content ಬದಲಿಸು: pastemarker ಇದರಿಂದ: ( snippet ಪಠ್ಯವಾಗಿ + pastemarker ).
+}.
+
+Template ಬಂದಾಗ: ['ನಿಗದಿಪಡಿಸು:ಮೌಲ್ಯ:'] ಮಾಡು: { :slot :value
+	ತನ್ನ content ಬದಲಿಸು: ['<!-- slot:'] + slot + [' -->'] ಇದರಿಂದ: ( Server html-ಎನ್-ಕೋಡ್: value ).
+}.
+
+Template ಬಂದಾಗ: ['set:html:'] ಮಾಡು: { :slot :html
+	ತನ್ನ content ಬದಲಿಸು: ['<!-- slot:'] + slot + [' -->'] ಇದರಿಂದ: html.
+}.
+
+Template ಬಂದಾಗ: ['ಉತ್ತರಿಸು:ಮತ್ತು:'] ಮಾಡು: { :slot :value
+	ತಾನು ನಿಗದಿಪಡಿಸು: (slot ಆರಂಭ: 0 ಉದ್ದ: (slot ಉದ್ದ - 1)) ಮೌಲ್ಯ: value.
+}.
+
+Template ಬಂದಾಗ: ['nl2br'] ಮಾಡು: {
+	ತನ್ನ content ಬದಲಿಸು: ['\n'] ಇದರಿಂದ: ['<br>'].
+}.
+
+Template ಬಂದಾಗ: ['clean'] ಮಾಡು: {
+	ತನ್ನ content :=
+		ಮಾದರಿ
+		ಹೊಸ: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ಹೊಂದಿಕೆ: ತನ್ನ content
+		ಮಾಡು: { <- ['']. }.
+}.
+
+Template ಬಂದಾಗ: ['clean-cuts'] ಮಾಡು: {
+	>> items := ಸರಣಿ ಹೊಸ.
+	ಮಾದರಿ
+	ಹೊಸ: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ಹೊಂದಿಕೆ: ತನ್ನ content
+	ಮಾಡು: { :_ :part
+		items ಕೊನೆಗೆ-ಸೇರಿಸು: part ? 1.
+	}.
+	items ಪ್ರತಿಯೊಂದು: { :_ :id
+		ತನ್ನ content :=
+			ಮಾದರಿ ಹೊಸ: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ಹೊಂದಿಕೆ: ತನ್ನ content
+			ಮಾಡು: { <- ['']. }.
+	 }.
+}.
+
+Template ಬಂದಾಗ: ['clean-space'] ಮಾಡು: {
+	ತನ್ನ content :=
+		ಮಾದರಿ
+		ಹೊಸ: ['\\s*\\n'],
+		ಹೊಂದಿಕೆ: ತನ್ನ content
+		ಮಾಡು: { <- ['\n']. }.
+	ತನ್ನ content :=
+		ಮಾದರಿ
+		ಹೊಸ: ['\\n[\\s\\t]+'],
+		ಹೊಂದಿಕೆ: ತನ್ನ content
+		ಮಾಡು: { <- ['\n']. }.
+}.
+
+Template ಬಂದಾಗ: ['clean-all'] ಮಾಡು: {
+	ತಾನು clean.
+	ತಾನು clean-cuts.
+	ತಾನು clean-space.
+}.
+
+Template ಬಂದಾಗ: ['ಪಠ್ಯವಾಗಿ'] ಮಾಡು: { <- ತನ್ನ content.
+}.

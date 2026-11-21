@@ -1,0 +1,325 @@
+Kev-thov-HTTP thaum-tuaj: ['HTTP-header:'] ua: { :key <- Kev-pab-cuam-khoos-phis-tawj kev-teeb-tsa: key.
+}.
+
+>> HTTP-Header := Yam-khoom tshiab.
+
+HTTP-Header thaum-tuaj: ['tshiab'] ua: { <- tus-kheej tshiab init.
+}.
+
+HTTP-Header thaum-tuaj: ['init'] ua: {
+	nws-li key := Tsis-muaj-dabtsi.
+	nws-li value := Tsis-muaj-dabtsi.
+}.
+
+HTTP-Header thaum-tuaj: ['key:value:'] ua: { :key :value
+	nws-li key := key.
+	nws-li value := value.
+}.
+
+HTTP-Header thaum-tuaj: ['key'] ua: { <- nws-li key.
+}.
+
+HTTP-Header thaum-tuaj: ['value'] ua: { <- nws-li value.
+}.
+
+
+HTTP-Header thaum-tuaj: ['kab-ntawv'] ua: {
+	>> line := nws-li key + [': '] + nws-li value.
+	line hloov: ['\r'] nrog: [''], hloov: ['\n'] nrog: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Yam-khoom tshiab.
+
+Web-Document thaum-tuaj: ['tshiab'] ua: { <- tus-kheej tshiab init.
+}.
+
+Web-Document thaum-tuaj: ['init'] ua: {
+	nws-li headers := Daim-teev tshiab.
+	nws-li sess-id := Tsis-muaj-dabtsi.
+	nws-li session-manager := Tempfile-Session tshiab.
+	nws-li sessdata := Tsis-muaj-dabtsi.
+	nws-li secure := Tseeb.
+	nws-li same-site := ['Strict'].
+	nws-li headers-out := Cuav.
+	nws-li request := Kev-thov-HTTP tshiab.
+}.
+
+Web-Document thaum-tuaj: ['request:'] ua: { :request
+	nws-li request := request.
+}. 
+
+Web-Document thaum-tuaj: ['secure-session-cookie:'] ua: { :secure
+	tus-kheej check-headers.
+	nws-li secure := secure.
+}.
+
+Web-Document thaum-tuaj: ['same-site-session-cookie:'] ua: { :value
+	tus-kheej check-headers.
+	>> options := Daim-teev tshiab 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options muaj: value, cuav: {
+		txoj-haujlwm-no yuam-kev: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	nws-li same-site := value.
+}.
+
+Web-Document thaum-tuaj: ['header:'] ua: { :header
+	tus-kheej check-headers.
+	nws-li headers ntxiv-tom-kawg: header.
+}.
+
+Web-Document thaum-tuaj: ['clear-headers'] ua: {
+	tus-kheej check-headers.
+	nws-li headers := Daim-teev tshiab.
+}.
+
+Web-Document thaum-tuaj: ['session-manager:'] ua: { :manager
+	tus-kheej check-headers.
+	nws-li session-manager := manager.
+}.
+
+Web-Document thaum-tuaj: ['session-manager'] ua: { <- nws-li session-manager.
+}.
+
+Web-Document thaum-tuaj: ['check-headers'] ua: {
+	nws-li headers-out tseeb: {
+		txoj-haujlwm-no yuam-kev: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document thaum-tuaj: ['session-start'] ua: {
+	tus-kheej check-headers.
+	>> request := nws-li request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Tsis-muaj-dabtsi? cuav: {
+		(( Qauv-nrhiav tshiab: ['^[A-Za-z0-9]+\\z'], sib-phim: sess-id ) = 0) tseeb: {
+			sess-id := Tsis-muaj-dabtsi.
+		}.
+	}.
+	sess-id Tsis-muaj-dabtsi? tseeb: {
+		sess-id := Lub-thawv-ruaj-ntseg token: 30.
+		>> session-header := HTTP-Header tshiab
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (nws-li secure qhov-no: ['Secure'] lossis-qhov-ntawd: ['']),
+		SSITE: (nws-li same-site),
+		XSID: sess-id
+		).
+		nws-li headers ntxiv-tom-kawg: session-header.
+	}.
+	nws-li sessdata := nws-li session-manager for: sess-id, load. <- nws-li sessdata. # reference
+}.
+
+Web-Document thaum-tuaj: ['goto:'] ua: { :url
+	tus-kheej check-headers.
+	tus-kheej clear-headers.
+	nws-li headers
+	ntxiv-tom-kawg: (
+		HTTP-Header tshiab
+		key: ['Status'] value: ['303 See Other']
+	),
+	ntxiv-tom-kawg: (
+		HTTP-Header tshiab
+		key: ['Location'] value: url
+	).
+	tus-kheej out: ['Redirect'].
+}.
+
+Web-Document thaum-tuaj: ['session-destroy'] ua: {
+	tus-kheej check-headers.
+	>> request := nws-li request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Tsis-muaj-dabtsi? cuav: {
+		>> session-header := HTTP-Header tshiab.
+		>> when := Lub-sijhawm tshiab xyoo: 1970, hom-ntawv: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (nws-li secure qhov-no: ['Secure'] lossis-qhov-ntawd: ['']),
+			SSITE: (nws-li same-site),
+			XSID: sess-id
+		).
+		nws-li session-manager destroy.
+		nws-li headers ntxiv-tom-kawg: session-header.
+	}.
+}.
+
+
+Web-Document thaum-tuaj: ['template:'] ua: { :txoj-kev-ntaub-ntawv <- Template tshiab: (Ntaub-ntawv tshiab: txoj-kev-ntaub-ntawv, nyeem).
+}.
+
+Web-Document thaum-tuaj: ['out:type:'] ua: { :output :hom
+	nws-li headers-out cuav: {
+		nws-li sessdata Tsis-muaj-dabtsi? cuav: {
+			nws-li session-manager save: nws-li sessdata.
+		}.
+		nws-li headers ntxiv-tom-kawg: (
+			HTTP-Header tshiab
+			key: ['Content-type'] value: hom
+		).
+		nws-li headers txhua: { :_ :header
+			Tawm sau-ntawv: header.
+		}.
+		nws-li headers-out := Tseeb.
+		Tawm sau-ntawv: ['\r\n'].
+	}.
+	Tawm sau-ntawv: output.
+}.
+
+Web-Document thaum-tuaj: ['finish:type:'] ua: { :output :hom
+	nws-li headers-out cuav: {
+		nws-li sessdata Tsis-muaj-dabtsi? cuav: {
+			nws-li session-manager save: nws-li sessdata.
+		}.
+		nws-li headers ntxiv-tom-kawg: (
+			HTTP-Header tshiab
+			key: ['Content-type'] value: hom
+		).
+		nws-li headers ntxiv-tom-kawg: (
+			HTTP-Header tshiab
+			key: ['Content-Length'] value: output kab-ntawv bytes
+		).
+		nws-li headers txhua: { :_ :header
+			Tawm sau-ntawv: header.
+		}.
+		nws-li headers-out := Tseeb.
+		Tawm sau-ntawv: ['\r\n'].
+	}.
+	Tawm sau-ntawv: output.
+}.
+
+Web-Document thaum-tuaj: ['out:'] ua: { :output
+	tus-kheej out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document thaum-tuaj: ['finish:'] ua: { :output
+	tus-kheej finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document thaum-tuaj: ['json:'] ua: { :output
+	tus-kheej out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document thaum-tuaj: ['not-found:'] ua: { :output
+	tus-kheej clear-headers header: (
+		HTTP-Header tshiab key: ['Status'] value: ['404 Not Found']
+	).
+	tus-kheej out: output.
+}.
+
+
+# Interface
+
+>> Session := Yam-khoom tshiab.
+
+Session thaum-tuaj: ['tshiab'] ua: { <- tus-kheej tshiab init for: Tsis-muaj-dabtsi.
+}.
+
+Session thaum-tuaj: ['for:'] ua: { :id
+	nws-li id := id.
+}.
+
+Session thaum-tuaj: ['load'] ua: {
+	txoj-haujlwm-no yuam-kev: ['Not implemented.'].
+}.
+
+Session thaum-tuaj: ['save:'] ua: {
+	txoj-haujlwm-no yuam-kev: ['Not implemented.'].
+}.
+
+Session thaum-tuaj: ['destroy'] ua: {
+	txoj-haujlwm-no yuam-kev: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session tshiab.
+
+Tempfile-Session thaum-tuaj: ['init'] ua: {
+	nws-li pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session thaum-tuaj: ['path-prefix:'] ua: { :str
+	nws-li pathprefix := str.
+}.
+
+Tempfile-Session thaum-tuaj: ['file'] ua: { <- ( Ntaub-ntawv tshiab: ( nws-li pathprefix + nws-li id + ['.txt'] ) ).
+}.
+
+Tempfile-Session thaum-tuaj: ['load'] ua: {
+	>> file := tus-kheej file.
+	file muaj-nyob cuav: {
+		file sau-ntawv: (Phau-txhais-lus tshiab cim-khoos-phis-tawj).
+	}. <- file nyeem yam-khoom.
+}.
+
+Tempfile-Session thaum-tuaj: ['save:'] ua: { :data
+	>> file := tus-kheej file.
+	file muaj-nyob tseeb: {
+		file sau-ntawv: data cim-khoos-phis-tawj.
+	}.
+}.
+
+Tempfile-Session thaum-tuaj: ['destroy'] ua: {
+	>> file := tus-kheej file.
+	file muaj-nyob tseeb: {
+		file rho-tawm.
+	}.
+}.
+
+
+>> URL := Yam-khoom tshiab.
+
+URL thaum-tuaj: ['init'] ua: {
+	nws-li protocol := ['https://'].
+	nws-li tus-tswv-tsev := ['localhost'].
+	nws-li txoj-kev-ntaub-ntawv := [''].
+	nws-li params := [''].
+	nws-li hash := [''].
+}.
+
+URL thaum-tuaj: ['tshiab'] ua: { <- tus-kheej tshiab init.
+}.
+
+URL thaum-tuaj: ['kab-ntawv'] ua: { <- (
+	nws-li protocol +
+	nws-li tus-tswv-tsev +
+	nws-li txoj-kev-ntaub-ntawv +
+	nws-li params +
+	nws-li hash ).
+}.
+
+URL thaum-tuaj: ['protocol:'] ua: { :protocol
+	((Daim-teev tshiab: ['http'] ; ['https']) muaj: protocol) tseeb: {
+		nws-li protocol := protocol + ['://'].
+	}, cuav: {
+		txoj-haujlwm-no yuam-kev: ['Invalid protocol'].
+	}.
+}.
+
+URL thaum-tuaj: ['tus-tswv-tsev:'] ua: { :tus-tswv-tsev
+	#todo validate according to rfc
+	nws-li tus-tswv-tsev := tus-tswv-tsev.
+}.
+
+URL thaum-tuaj: ['path:'] ua: { :txoj-kev-ntaub-ntawv
+	nws-li txoj-kev-ntaub-ntawv := ['/'] + txoj-kev-ntaub-ntawv url-ua-cim.
+}.
+
+URL thaum-tuaj: ['params:'] ua: { :map
+	>> params := Daim-teev tshiab.
+	map txhua: { :key :value
+		params ntxiv-tom-kawg: key kab-ntawv url-ua-cim + ['='] + value kab-ntawv url-ua-cim.
+	}.
+	nws-li params := ['?'] + ( params muab-sib-txuas: ['&'] ).
+}.
+
+URL thaum-tuaj: ['hash:'] ua: { :hash
+	nws-li hash := ['#'] + hash url-ua-cim.
+}.
+

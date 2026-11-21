@@ -1,0 +1,325 @@
+HTTP-ጥያቄ ሲደርስ: ['HTTP-header:'] አድርግ: { :key <- ፕሮግራም ቅንብር: key.
+}.
+
+>> HTTP-Header := ነገር አዲስ.
+
+HTTP-Header ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ init.
+}.
+
+HTTP-Header ሲደርስ: ['init'] አድርግ: {
+	የራሱ key := ባዶ.
+	የራሱ value := ባዶ.
+}.
+
+HTTP-Header ሲደርስ: ['key:value:'] አድርግ: { :key :value
+	የራሱ key := key.
+	የራሱ value := value.
+}.
+
+HTTP-Header ሲደርስ: ['key'] አድርግ: { <- የራሱ key.
+}.
+
+HTTP-Header ሲደርስ: ['value'] አድርግ: { <- የራሱ value.
+}.
+
+
+HTTP-Header ሲደርስ: ['በጽሑፍ'] አድርግ: {
+	>> line := የራሱ key + [': '] + የራሱ value.
+	line ተካ: ['\r'] በዚህ: [''], ተካ: ['\n'] በዚህ: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := ነገር አዲስ.
+
+Web-Document ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ init.
+}.
+
+Web-Document ሲደርስ: ['init'] አድርግ: {
+	የራሱ headers := ሰልፍ አዲስ.
+	የራሱ sess-id := ባዶ.
+	የራሱ session-manager := Tempfile-Session አዲስ.
+	የራሱ sessdata := ባዶ.
+	የራሱ secure := እውነት.
+	የራሱ same-site := ['Strict'].
+	የራሱ headers-out := ሐሰት.
+	የራሱ request := HTTP-ጥያቄ አዲስ.
+}.
+
+Web-Document ሲደርስ: ['request:'] አድርግ: { :request
+	የራሱ request := request.
+}. 
+
+Web-Document ሲደርስ: ['secure-session-cookie:'] አድርግ: { :secure
+	ራሱ check-headers.
+	የራሱ secure := secure.
+}.
+
+Web-Document ሲደርስ: ['same-site-session-cookie:'] አድርግ: { :value
+	ራሱ check-headers.
+	>> options := ሰልፍ አዲስ 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options ይዟል: value, ሐሰት-ከሆነ: {
+		ይህ-ሥራ ስህተት: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	የራሱ same-site := value.
+}.
+
+Web-Document ሲደርስ: ['header:'] አድርግ: { :header
+	ራሱ check-headers.
+	የራሱ headers መጨረሻ-ላይ-ጨምር: header.
+}.
+
+Web-Document ሲደርስ: ['clear-headers'] አድርግ: {
+	ራሱ check-headers.
+	የራሱ headers := ሰልፍ አዲስ.
+}.
+
+Web-Document ሲደርስ: ['session-manager:'] አድርግ: { :manager
+	ራሱ check-headers.
+	የራሱ session-manager := manager.
+}.
+
+Web-Document ሲደርስ: ['session-manager'] አድርግ: { <- የራሱ session-manager.
+}.
+
+Web-Document ሲደርስ: ['check-headers'] አድርግ: {
+	የራሱ headers-out እውነት-ከሆነ: {
+		ይህ-ሥራ ስህተት: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document ሲደርስ: ['session-start'] አድርግ: {
+	ራሱ check-headers.
+	>> request := የራሱ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ባዶ? ሐሰት-ከሆነ: {
+		(( ንድፍ አዲስ: ['^[A-Za-z0-9]+\\z'], ግጥሚያ: sess-id ) = 0) እውነት-ከሆነ: {
+			sess-id := ባዶ.
+		}.
+	}.
+	sess-id ባዶ? እውነት-ከሆነ: {
+		sess-id := ካዝና ቶከን: 30.
+		>> session-header := HTTP-Header አዲስ
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (የራሱ secure ይህ: ['Secure'] ወይም-ያ: ['']),
+		SSITE: (የራሱ same-site),
+		XSID: sess-id
+		).
+		የራሱ headers መጨረሻ-ላይ-ጨምር: session-header.
+	}.
+	የራሱ sessdata := የራሱ session-manager for: sess-id, load. <- የራሱ sessdata. # reference
+}.
+
+Web-Document ሲደርስ: ['goto:'] አድርግ: { :url
+	ራሱ check-headers.
+	ራሱ clear-headers.
+	የራሱ headers
+	መጨረሻ-ላይ-ጨምር: (
+		HTTP-Header አዲስ
+		key: ['Status'] value: ['303 See Other']
+	),
+	መጨረሻ-ላይ-ጨምር: (
+		HTTP-Header አዲስ
+		key: ['Location'] value: url
+	).
+	ራሱ out: ['Redirect'].
+}.
+
+Web-Document ሲደርስ: ['session-destroy'] አድርግ: {
+	ራሱ check-headers.
+	>> request := የራሱ request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id ባዶ? ሐሰት-ከሆነ: {
+		>> session-header := HTTP-Header አዲስ.
+		>> when := አፍታ አዲስ አመት: 1970, በቅርጸት: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (የራሱ secure ይህ: ['Secure'] ወይም-ያ: ['']),
+			SSITE: (የራሱ same-site),
+			XSID: sess-id
+		).
+		የራሱ session-manager destroy.
+		የራሱ headers መጨረሻ-ላይ-ጨምር: session-header.
+	}.
+}.
+
+
+Web-Document ሲደርስ: ['template:'] አድርግ: { :የፋይል-መንገድ <- Template አዲስ: (ፋይል አዲስ: የፋይል-መንገድ, አንብብ).
+}.
+
+Web-Document ሲደርስ: ['out:type:'] አድርግ: { :output :ዓይነት
+	የራሱ headers-out ሐሰት-ከሆነ: {
+		የራሱ sessdata ባዶ? ሐሰት-ከሆነ: {
+			የራሱ session-manager save: የራሱ sessdata.
+		}.
+		የራሱ headers መጨረሻ-ላይ-ጨምር: (
+			HTTP-Header አዲስ
+			key: ['Content-type'] value: ዓይነት
+		).
+		የራሱ headers እያንዳንዱ: { :_ :header
+			ውጤት ፃፍ: header.
+		}.
+		የራሱ headers-out := እውነት.
+		ውጤት ፃፍ: ['\r\n'].
+	}.
+	ውጤት ፃፍ: output.
+}.
+
+Web-Document ሲደርስ: ['finish:type:'] አድርግ: { :output :ዓይነት
+	የራሱ headers-out ሐሰት-ከሆነ: {
+		የራሱ sessdata ባዶ? ሐሰት-ከሆነ: {
+			የራሱ session-manager save: የራሱ sessdata.
+		}.
+		የራሱ headers መጨረሻ-ላይ-ጨምር: (
+			HTTP-Header አዲስ
+			key: ['Content-type'] value: ዓይነት
+		).
+		የራሱ headers መጨረሻ-ላይ-ጨምር: (
+			HTTP-Header አዲስ
+			key: ['Content-Length'] value: output በጽሑፍ bytes
+		).
+		የራሱ headers እያንዳንዱ: { :_ :header
+			ውጤት ፃፍ: header.
+		}.
+		የራሱ headers-out := እውነት.
+		ውጤት ፃፍ: ['\r\n'].
+	}.
+	ውጤት ፃፍ: output.
+}.
+
+Web-Document ሲደርስ: ['out:'] አድርግ: { :output
+	ራሱ out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ሲደርስ: ['finish:'] አድርግ: { :output
+	ራሱ finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ሲደርስ: ['json:'] አድርግ: { :output
+	ራሱ out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document ሲደርስ: ['not-found:'] አድርግ: { :output
+	ራሱ clear-headers header: (
+		HTTP-Header አዲስ key: ['Status'] value: ['404 Not Found']
+	).
+	ራሱ out: output.
+}.
+
+
+# Interface
+
+>> Session := ነገር አዲስ.
+
+Session ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ init for: ባዶ.
+}.
+
+Session ሲደርስ: ['for:'] አድርግ: { :id
+	የራሱ id := id.
+}.
+
+Session ሲደርስ: ['load'] አድርግ: {
+	ይህ-ሥራ ስህተት: ['Not implemented.'].
+}.
+
+Session ሲደርስ: ['save:'] አድርግ: {
+	ይህ-ሥራ ስህተት: ['Not implemented.'].
+}.
+
+Session ሲደርስ: ['destroy'] አድርግ: {
+	ይህ-ሥራ ስህተት: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session አዲስ.
+
+Tempfile-Session ሲደርስ: ['init'] አድርግ: {
+	የራሱ pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session ሲደርስ: ['path-prefix:'] አድርግ: { :str
+	የራሱ pathprefix := str.
+}.
+
+Tempfile-Session ሲደርስ: ['file'] አድርግ: { <- ( ፋይል አዲስ: ( የራሱ pathprefix + የራሱ id + ['.txt'] ) ).
+}.
+
+Tempfile-Session ሲደርስ: ['load'] አድርግ: {
+	>> file := ራሱ file.
+	file አለ ሐሰት-ከሆነ: {
+		file ፃፍ: (መዝገበ-ቃላት አዲስ ኮድ).
+	}. <- file አንብብ እንደ-ነገር.
+}.
+
+Tempfile-Session ሲደርስ: ['save:'] አድርግ: { :data
+	>> file := ራሱ file.
+	file አለ እውነት-ከሆነ: {
+		file ፃፍ: data ኮድ.
+	}.
+}.
+
+Tempfile-Session ሲደርስ: ['destroy'] አድርግ: {
+	>> file := ራሱ file.
+	file አለ እውነት-ከሆነ: {
+		file ሰርዝ.
+	}.
+}.
+
+
+>> URL := ነገር አዲስ.
+
+URL ሲደርስ: ['init'] አድርግ: {
+	የራሱ protocol := ['https://'].
+	የራሱ አስተናጋጅ := ['localhost'].
+	የራሱ የፋይል-መንገድ := [''].
+	የራሱ params := [''].
+	የራሱ hash := [''].
+}.
+
+URL ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ init.
+}.
+
+URL ሲደርስ: ['በጽሑፍ'] አድርግ: { <- (
+	የራሱ protocol +
+	የራሱ አስተናጋጅ +
+	የራሱ የፋይል-መንገድ +
+	የራሱ params +
+	የራሱ hash ).
+}.
+
+URL ሲደርስ: ['protocol:'] አድርግ: { :protocol
+	((ሰልፍ አዲስ: ['http'] ; ['https']) ይዟል: protocol) እውነት-ከሆነ: {
+		የራሱ protocol := protocol + ['://'].
+	}, ሐሰት-ከሆነ: {
+		ይህ-ሥራ ስህተት: ['Invalid protocol'].
+	}.
+}.
+
+URL ሲደርስ: ['አስተናጋጅ:'] አድርግ: { :አስተናጋጅ
+	#todo validate according to rfc
+	የራሱ አስተናጋጅ := አስተናጋጅ.
+}.
+
+URL ሲደርስ: ['path:'] አድርግ: { :የፋይል-መንገድ
+	የራሱ የፋይል-መንገድ := ['/'] + የፋይል-መንገድ url-ኮድ-አድርግ.
+}.
+
+URL ሲደርስ: ['params:'] አድርግ: { :map
+	>> params := ሰልፍ አዲስ.
+	map እያንዳንዱ: { :key :value
+		params መጨረሻ-ላይ-ጨምር: key በጽሑፍ url-ኮድ-አድርግ + ['='] + value በጽሑፍ url-ኮድ-አድርግ.
+	}.
+	የራሱ params := ['?'] + ( params አገናኝ: ['&'] ).
+}.
+
+URL ሲደርስ: ['ሃሽ:'] አድርግ: { :hash
+	የራሱ hash := ['#'] + hash url-ኮድ-አድርግ.
+}.
+

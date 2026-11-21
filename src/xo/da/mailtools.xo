@@ -1,0 +1,128 @@
+>> Email := Objekt ny.
+
+Email ved: ['init'] gør: {
+	egen recipients := Liste ny.
+	egen cc := Liste ny.
+	egen bcc := Liste ny.
+	egen from := Intet.
+	egen from-name := Intet.
+	egen subject := Intet.
+	egen body := Intet.
+}.
+
+Email ved: ['ny'] gør: { <- selv ny init.
+}.
+
+Email ved: ['to:'] gør: { :list
+	egen recipients := list.
+}.
+ 
+Email ved: ['cc:'] gør: { :list
+	egen cc := list.
+}.
+
+Email ved: ['bcc:'] gør: { :list
+	egen bcc := list.
+}.
+
+Email ved: ['subject:'] gør: { :subject
+	egen subject := subject.
+}.
+
+Email ved: ['from:name:'] gør: { :from :navn
+	egen from := from.
+	egen from-name := navn.
+}.
+
+Email ved: ['body:'] gør: { :body
+	egen body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ved: ['header:'] gør: { :line <- line erstat: ['\r'] med: [''], erstat: ['\n'] med: [''].
+}.
+
+Email ved: ['send'] gør: {
+	>> f := Fil tempwrite: selv generate.
+	Program system: ['sendmail -t < '] + f sti, stop.
+}.
+
+Email ved: ['generate'] gør: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tilføj: (selv header: ['From: '] + egen from-name + [' <'] + ( egen from ) + ['>']) + brk.
+	str tilføj: (selv header: ['To: '] + ( egen recipients saml: [','] )) + brk.
+	egen cc antal sand: {
+		str tilføj: (selv header: ['Cc: '] + ( egen cc saml: [','] )) + brk.
+	}.
+	egen bcc antal sand: {
+		str tilføj: (selv header: ['Bcc: '] + ( egen bcc saml: [','] )) + brk.
+	}.
+	str tilføj: (selv header: ['Subject: '] + egen subject) + brk.
+	str tilføj: brk.
+	str tilføj: egen body.
+	str tilføj: brk. <- str.
+}.
+
+>> HTML-Email := Email ny.
+
+HTML-Email ved: ['init'] gør: {
+	selv init.
+	egen attachments := Liste ny.
+	egen boundary := Boks token: 40.
+}.
+
+HTML-Email ved: ['attach:'] gør: { :file
+	>> id := egen attachments antal.
+	>> blob := file blob.
+	egen attachments tilføj: (
+		Ordbog ny
+			file: file sti,
+			mime: ['image/'] + (Server mimetype: file sti),
+			data: blob base64-kode
+	).
+	blob frigiv. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ved: ['generate'] gør: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tilføj: (selv header: ['From: '] + egen from-name + [' <'] + ( egen from ) + ['>']) + brk.
+	str tilføj: (selv header: ['To: '] + ( egen recipients saml: [','] )) + brk.
+	egen cc antal sand: {
+		str tilføj: (selv header: ['Cc: '] + ( egen cc saml: [','] )) + brk.
+	}.
+	egen bcc antal sand: {
+		str tilføj: (selv header: ['Bcc: '] + ( egen bcc saml: [','] )) + brk.
+	}.
+	str tilføj: (selv header: ['Subject: '] + egen subject) + brk.
+	str tilføj: ['MIME-Version: 1.0'] + brk.
+	str tilføj: ['Content-Type: multipart/related; boundary="'] + egen boundary + ['"; type=text/html'] + brk.
+	str tilføj: brk.
+	str tilføj: ['--'] + egen boundary + brk.
+	str tilføj: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str tilføj: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str tilføj: brk.
+	str tilføj: egen body.
+	str tilføj: brk.
+	egen attachments hver: { :id :info
+		>> blob := info data.
+		str tilføj: ['--'] + egen boundary + brk.
+		str tilføj: ['Content-Type: '] + info mime + brk.
+		str tilføj: ['Content-Transfer-Encoding: base64'] + brk.
+		str tilføj: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str tilføj: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str tilføj: brk.
+		>> max := 76.
+		>> len := blob længde.
+		>> chunks := (len / max) rund-op.
+		{ :i
+			>> chunk := blob kopiér fra: i * max længde: max.
+			str tilføj: chunk + brk.
+		} * chunks.
+		str tilføj: brk.
+		str tilføj: brk.
+	}.
+	str tilføj: ['--'] + egen boundary + ['--'] + brk. <- str.
+}.

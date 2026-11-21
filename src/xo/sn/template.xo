@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Chinhu nyowani.
+
+Template kana-zvasvika: ['nyowani'] ita: { <- pachako nyowani content: [''].
+}.
+
+Template kana-zvasvika: ['content:'] ita: { :content
+	zvako content := content. 
+}.
+
+Template kana-zvasvika: ['nyowani:'] ita: { :content <- pachako nyowani content: content.
+}.
+
+Template kana-zvasvika: ['cut:'] ita: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := zvako content patsanura: startmarker.
+	>> prefix := parts chekutanga.
+	>> parts2 := parts chekupedzisira patsanura: endmarker.
+	>> suffix := parts2 chekupedzisira.
+	>> part := parts2 chekutanga.
+	>> rest := prefix + suffix.
+	zvako content := rest. <- Template nyowani: part.
+	
+}.
+
+Template kana-zvasvika: ['kopa'] ita: { <- pachako nyowani: pachako mavara-emashoko kopa.
+}.
+	
+Template kana-zvasvika: ['paste:at:'] ita: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	zvako content tsiva: pastemarker na: ( snippet mavara-emashoko + pastemarker ).
+}.
+
+Template kana-zvasvika: ['gadza:kukosha:'] ita: { :slot :value
+	zvako content tsiva: ['<!-- slot:'] + slot + [' -->'] na: ( Server html-isa-kodhi: value ).
+}.
+
+Template kana-zvasvika: ['set:html:'] ita: { :slot :html
+	zvako content tsiva: ['<!-- slot:'] + slot + [' -->'] na: html.
+}.
+
+Template kana-zvasvika: ['pindura:uye:'] ita: { :slot :value
+	pachako gadza: (slot kubva: 0 kureba: (slot kureba - 1)) kukosha: value.
+}.
+
+Template kana-zvasvika: ['nl2br'] ita: {
+	zvako content tsiva: ['\n'] na: ['<br>'].
+}.
+
+Template kana-zvasvika: ['clean'] ita: {
+	zvako content :=
+		Pateni
+		nyowani: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		kuenderana: zvako content
+		ita: { <- ['']. }.
+}.
+
+Template kana-zvasvika: ['clean-cuts'] ita: {
+	>> items := Rondedzero nyowani.
+	Pateni
+	nyowani: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	kuenderana: zvako content
+	ita: { :_ :part
+		items wedzera-kumagumo: part ? 1.
+	}.
+	items chimwe-nechimwe: { :_ :id
+		zvako content :=
+			Pateni nyowani: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			kuenderana: zvako content
+			ita: { <- ['']. }.
+	 }.
+}.
+
+Template kana-zvasvika: ['clean-space'] ita: {
+	zvako content :=
+		Pateni
+		nyowani: ['\\s*\\n'],
+		kuenderana: zvako content
+		ita: { <- ['\n']. }.
+	zvako content :=
+		Pateni
+		nyowani: ['\\n[\\s\\t]+'],
+		kuenderana: zvako content
+		ita: { <- ['\n']. }.
+}.
+
+Template kana-zvasvika: ['clean-all'] ita: {
+	pachako clean.
+	pachako clean-cuts.
+	pachako clean-space.
+}.
+
+Template kana-zvasvika: ['mavara-emashoko'] ita: { <- zvako content.
+}.

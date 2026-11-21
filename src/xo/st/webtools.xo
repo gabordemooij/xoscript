@@ -1,0 +1,325 @@
+Kopo-HTTP ha-ho-fihla: ['HTTP-header:'] etsa: { :key <- Lenaneo tlhophiso: key.
+}.
+
+>> HTTP-Header := Ntho ncha.
+
+HTTP-Header ha-ho-fihla: ['ncha'] etsa: { <- uena ncha init.
+}.
+
+HTTP-Header ha-ho-fihla: ['init'] etsa: {
+	ea-hao key := Letho.
+	ea-hao value := Letho.
+}.
+
+HTTP-Header ha-ho-fihla: ['key:value:'] etsa: { :key :value
+	ea-hao key := key.
+	ea-hao value := value.
+}.
+
+HTTP-Header ha-ho-fihla: ['key'] etsa: { <- ea-hao key.
+}.
+
+HTTP-Header ha-ho-fihla: ['value'] etsa: { <- ea-hao value.
+}.
+
+
+HTTP-Header ha-ho-fihla: ['mongolo'] etsa: {
+	>> line := ea-hao key + [': '] + ea-hao value.
+	line nkela-sebaka: ['\r'] ka: [''], nkela-sebaka: ['\n'] ka: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Ntho ncha.
+
+Web-Document ha-ho-fihla: ['ncha'] etsa: { <- uena ncha init.
+}.
+
+Web-Document ha-ho-fihla: ['init'] etsa: {
+	ea-hao headers := Lethathamo ncha.
+	ea-hao sess-id := Letho.
+	ea-hao session-manager := Tempfile-Session ncha.
+	ea-hao sessdata := Letho.
+	ea-hao secure := Nnete.
+	ea-hao same-site := ['Strict'].
+	ea-hao headers-out := Leshano.
+	ea-hao request := Kopo-HTTP ncha.
+}.
+
+Web-Document ha-ho-fihla: ['request:'] etsa: { :request
+	ea-hao request := request.
+}. 
+
+Web-Document ha-ho-fihla: ['secure-session-cookie:'] etsa: { :secure
+	uena check-headers.
+	ea-hao secure := secure.
+}.
+
+Web-Document ha-ho-fihla: ['same-site-session-cookie:'] etsa: { :value
+	uena check-headers.
+	>> options := Lethathamo ncha 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options e-kenyelletsa: value, leshano: {
+		mosebetsi-ona phoso: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	ea-hao same-site := value.
+}.
+
+Web-Document ha-ho-fihla: ['header:'] etsa: { :header
+	uena check-headers.
+	ea-hao headers eketsa-qetellong: header.
+}.
+
+Web-Document ha-ho-fihla: ['clear-headers'] etsa: {
+	uena check-headers.
+	ea-hao headers := Lethathamo ncha.
+}.
+
+Web-Document ha-ho-fihla: ['session-manager:'] etsa: { :manager
+	uena check-headers.
+	ea-hao session-manager := manager.
+}.
+
+Web-Document ha-ho-fihla: ['session-manager'] etsa: { <- ea-hao session-manager.
+}.
+
+Web-Document ha-ho-fihla: ['check-headers'] etsa: {
+	ea-hao headers-out nnete: {
+		mosebetsi-ona phoso: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document ha-ho-fihla: ['session-start'] etsa: {
+	uena check-headers.
+	>> request := ea-hao request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Letho? leshano: {
+		(( Paterone ncha: ['^[A-Za-z0-9]+\\z'], tumellano: sess-id ) = 0) nnete: {
+			sess-id := Letho.
+		}.
+	}.
+	sess-id Letho? nnete: {
+		sess-id := Polokelo-e-sireletsehileng token: 30.
+		>> session-header := HTTP-Header ncha
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (ea-hao secure ena: ['Secure'] kapa-eane: ['']),
+		SSITE: (ea-hao same-site),
+		XSID: sess-id
+		).
+		ea-hao headers eketsa-qetellong: session-header.
+	}.
+	ea-hao sessdata := ea-hao session-manager for: sess-id, load. <- ea-hao sessdata. # reference
+}.
+
+Web-Document ha-ho-fihla: ['goto:'] etsa: { :url
+	uena check-headers.
+	uena clear-headers.
+	ea-hao headers
+	eketsa-qetellong: (
+		HTTP-Header ncha
+		key: ['Status'] value: ['303 See Other']
+	),
+	eketsa-qetellong: (
+		HTTP-Header ncha
+		key: ['Location'] value: url
+	).
+	uena out: ['Redirect'].
+}.
+
+Web-Document ha-ho-fihla: ['session-destroy'] etsa: {
+	uena check-headers.
+	>> request := ea-hao request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Letho? leshano: {
+		>> session-header := HTTP-Header ncha.
+		>> when := Motsotso-nako ncha selemo: 1970, sebopeho: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (ea-hao secure ena: ['Secure'] kapa-eane: ['']),
+			SSITE: (ea-hao same-site),
+			XSID: sess-id
+		).
+		ea-hao session-manager destroy.
+		ea-hao headers eketsa-qetellong: session-header.
+	}.
+}.
+
+
+Web-Document ha-ho-fihla: ['template:'] etsa: { :tsela-ea-faele <- Template ncha: (Faele ncha: tsela-ea-faele, bala).
+}.
+
+Web-Document ha-ho-fihla: ['out:type:'] etsa: { :output :mofuta
+	ea-hao headers-out leshano: {
+		ea-hao sessdata Letho? leshano: {
+			ea-hao session-manager save: ea-hao sessdata.
+		}.
+		ea-hao headers eketsa-qetellong: (
+			HTTP-Header ncha
+			key: ['Content-type'] value: mofuta
+		).
+		ea-hao headers e-ngoe-le-e-ngoe: { :_ :header
+			Sephetho ngola: header.
+		}.
+		ea-hao headers-out := Nnete.
+		Sephetho ngola: ['\r\n'].
+	}.
+	Sephetho ngola: output.
+}.
+
+Web-Document ha-ho-fihla: ['finish:type:'] etsa: { :output :mofuta
+	ea-hao headers-out leshano: {
+		ea-hao sessdata Letho? leshano: {
+			ea-hao session-manager save: ea-hao sessdata.
+		}.
+		ea-hao headers eketsa-qetellong: (
+			HTTP-Header ncha
+			key: ['Content-type'] value: mofuta
+		).
+		ea-hao headers eketsa-qetellong: (
+			HTTP-Header ncha
+			key: ['Content-Length'] value: output mongolo bytes
+		).
+		ea-hao headers e-ngoe-le-e-ngoe: { :_ :header
+			Sephetho ngola: header.
+		}.
+		ea-hao headers-out := Nnete.
+		Sephetho ngola: ['\r\n'].
+	}.
+	Sephetho ngola: output.
+}.
+
+Web-Document ha-ho-fihla: ['out:'] etsa: { :output
+	uena out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ha-ho-fihla: ['finish:'] etsa: { :output
+	uena finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ha-ho-fihla: ['json:'] etsa: { :output
+	uena out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document ha-ho-fihla: ['not-found:'] etsa: { :output
+	uena clear-headers header: (
+		HTTP-Header ncha key: ['Status'] value: ['404 Not Found']
+	).
+	uena out: output.
+}.
+
+
+# Interface
+
+>> Session := Ntho ncha.
+
+Session ha-ho-fihla: ['ncha'] etsa: { <- uena ncha init for: Letho.
+}.
+
+Session ha-ho-fihla: ['for:'] etsa: { :id
+	ea-hao id := id.
+}.
+
+Session ha-ho-fihla: ['load'] etsa: {
+	mosebetsi-ona phoso: ['Not implemented.'].
+}.
+
+Session ha-ho-fihla: ['save:'] etsa: {
+	mosebetsi-ona phoso: ['Not implemented.'].
+}.
+
+Session ha-ho-fihla: ['destroy'] etsa: {
+	mosebetsi-ona phoso: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session ncha.
+
+Tempfile-Session ha-ho-fihla: ['init'] etsa: {
+	ea-hao pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session ha-ho-fihla: ['path-prefix:'] etsa: { :str
+	ea-hao pathprefix := str.
+}.
+
+Tempfile-Session ha-ho-fihla: ['file'] etsa: { <- ( Faele ncha: ( ea-hao pathprefix + ea-hao id + ['.txt'] ) ).
+}.
+
+Tempfile-Session ha-ho-fihla: ['load'] etsa: {
+	>> file := uena file.
+	file e-teng leshano: {
+		file ngola: (Bukantswe ncha khoutu).
+	}. <- file bala ntho.
+}.
+
+Tempfile-Session ha-ho-fihla: ['save:'] etsa: { :data
+	>> file := uena file.
+	file e-teng nnete: {
+		file ngola: data khoutu.
+	}.
+}.
+
+Tempfile-Session ha-ho-fihla: ['destroy'] etsa: {
+	>> file := uena file.
+	file e-teng nnete: {
+		file hlakola.
+	}.
+}.
+
+
+>> URL := Ntho ncha.
+
+URL ha-ho-fihla: ['init'] etsa: {
+	ea-hao protocol := ['https://'].
+	ea-hao moamoheli := ['localhost'].
+	ea-hao tsela-ea-faele := [''].
+	ea-hao params := [''].
+	ea-hao hash := [''].
+}.
+
+URL ha-ho-fihla: ['ncha'] etsa: { <- uena ncha init.
+}.
+
+URL ha-ho-fihla: ['mongolo'] etsa: { <- (
+	ea-hao protocol +
+	ea-hao moamoheli +
+	ea-hao tsela-ea-faele +
+	ea-hao params +
+	ea-hao hash ).
+}.
+
+URL ha-ho-fihla: ['protocol:'] etsa: { :protocol
+	((Lethathamo ncha: ['http'] ; ['https']) e-kenyelletsa: protocol) nnete: {
+		ea-hao protocol := protocol + ['://'].
+	}, leshano: {
+		mosebetsi-ona phoso: ['Invalid protocol'].
+	}.
+}.
+
+URL ha-ho-fihla: ['moamoheli:'] etsa: { :moamoheli
+	#todo validate according to rfc
+	ea-hao moamoheli := moamoheli.
+}.
+
+URL ha-ho-fihla: ['path:'] etsa: { :tsela-ea-faele
+	ea-hao tsela-ea-faele := ['/'] + tsela-ea-faele url-kenya-khoutu.
+}.
+
+URL ha-ho-fihla: ['params:'] etsa: { :map
+	>> params := Lethathamo ncha.
+	map e-ngoe-le-e-ngoe: { :key :value
+		params eketsa-qetellong: key mongolo url-kenya-khoutu + ['='] + value mongolo url-kenya-khoutu.
+	}.
+	ea-hao params := ['?'] + ( params kopanya: ['&'] ).
+}.
+
+URL ha-ho-fihla: ['hash:'] etsa: { :hash
+	ea-hao hash := ['#'] + hash url-kenya-khoutu.
+}.
+

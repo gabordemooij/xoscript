@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Obyekt yangi.
+
+Template kelganda: ['yangi'] bajar: { <- oʻzi yangi content: [''].
+}.
+
+Template kelganda: ['content:'] bajar: { :content
+	oʻzining content := content. 
+}.
+
+Template kelganda: ['yangi:'] bajar: { :content <- oʻzi yangi content: content.
+}.
+
+Template kelganda: ['cut:'] bajar: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := oʻzining content boʻlish: startmarker.
+	>> prefix := parts birinchi.
+	>> parts2 := parts oxirgi boʻlish: endmarker.
+	>> suffix := parts2 oxirgi.
+	>> part := parts2 birinchi.
+	>> rest := prefix + suffix.
+	oʻzining content := rest. <- Template yangi: part.
+	
+}.
+
+Template kelganda: ['nusxa'] bajar: { <- oʻzi yangi: oʻzi matn nusxa.
+}.
+	
+Template kelganda: ['paste:at:'] bajar: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	oʻzining content almashtirish: pastemarker bunga: ( snippet matn + pastemarker ).
+}.
+
+Template kelganda: ['oʻrnatish:qiymat:'] bajar: { :slot :value
+	oʻzining content almashtirish: ['<!-- slot:'] + slot + [' -->'] bunga: ( Server html-kodlash: value ).
+}.
+
+Template kelganda: ['set:html:'] bajar: { :slot :html
+	oʻzining content almashtirish: ['<!-- slot:'] + slot + [' -->'] bunga: html.
+}.
+
+Template kelganda: ['javob:va:'] bajar: { :slot :value
+	oʻzi oʻrnatish: (slot boshlab: 0 uzunlik: (slot uzunlik - 1)) qiymat: value.
+}.
+
+Template kelganda: ['nl2br'] bajar: {
+	oʻzining content almashtirish: ['\n'] bunga: ['<br>'].
+}.
+
+Template kelganda: ['clean'] bajar: {
+	oʻzining content :=
+		Andoza
+		yangi: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		moslik: oʻzining content
+		bajar: { <- ['']. }.
+}.
+
+Template kelganda: ['clean-cuts'] bajar: {
+	>> items := Roʻyxat yangi.
+	Andoza
+	yangi: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	moslik: oʻzining content
+	bajar: { :_ :part
+		items oxiriga-qoʻshish: part ? 1.
+	}.
+	items har-bir: { :_ :id
+		oʻzining content :=
+			Andoza yangi: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			moslik: oʻzining content
+			bajar: { <- ['']. }.
+	 }.
+}.
+
+Template kelganda: ['clean-space'] bajar: {
+	oʻzining content :=
+		Andoza
+		yangi: ['\\s*\\n'],
+		moslik: oʻzining content
+		bajar: { <- ['\n']. }.
+	oʻzining content :=
+		Andoza
+		yangi: ['\\n[\\s\\t]+'],
+		moslik: oʻzining content
+		bajar: { <- ['\n']. }.
+}.
+
+Template kelganda: ['clean-all'] bajar: {
+	oʻzi clean.
+	oʻzi clean-cuts.
+	oʻzi clean-space.
+}.
+
+Template kelganda: ['matn'] bajar: { <- oʻzining content.
+}.

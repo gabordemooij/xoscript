@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Obxecto novo.
+
+Template en: ['novo'] facer: { <- eu novo content: [''].
+}.
+
+Template en: ['content:'] facer: { :content
+	propio content := content. 
+}.
+
+Template en: ['novo:'] facer: { :content <- eu novo content: content.
+}.
+
+Template en: ['cut:'] facer: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := propio content partir: startmarker.
+	>> prefix := parts primeiro.
+	>> parts2 := parts último partir: endmarker.
+	>> suffix := parts2 último.
+	>> part := parts2 primeiro.
+	>> rest := prefix + suffix.
+	propio content := rest. <- Template novo: part.
+	
+}.
+
+Template en: ['copiar'] facer: { <- eu novo: eu texto copiar.
+}.
+	
+Template en: ['paste:at:'] facer: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	propio content substituír: pastemarker por: ( snippet texto + pastemarker ).
+}.
+
+Template en: ['establecer:valor:'] facer: { :slot :value
+	propio content substituír: ['<!-- slot:'] + slot + [' -->'] por: ( Server html-codificar: value ).
+}.
+
+Template en: ['set:html:'] facer: { :slot :html
+	propio content substituír: ['<!-- slot:'] + slot + [' -->'] por: html.
+}.
+
+Template en: ['responder:e:'] facer: { :slot :value
+	eu establecer: (slot de: 0 lonxitude: (slot lonxitude - 1)) valor: value.
+}.
+
+Template en: ['nl2br'] facer: {
+	propio content substituír: ['\n'] por: ['<br>'].
+}.
+
+Template en: ['clean'] facer: {
+	propio content :=
+		Patrón
+		novo: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		coincidencia: propio content
+		facer: { <- ['']. }.
+}.
+
+Template en: ['clean-cuts'] facer: {
+	>> items := Lista novo.
+	Patrón
+	novo: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	coincidencia: propio content
+	facer: { :_ :part
+		items engadir-ao-final: part ? 1.
+	}.
+	items cada: { :_ :id
+		propio content :=
+			Patrón novo: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			coincidencia: propio content
+			facer: { <- ['']. }.
+	 }.
+}.
+
+Template en: ['clean-space'] facer: {
+	propio content :=
+		Patrón
+		novo: ['\\s*\\n'],
+		coincidencia: propio content
+		facer: { <- ['\n']. }.
+	propio content :=
+		Patrón
+		novo: ['\\n[\\s\\t]+'],
+		coincidencia: propio content
+		facer: { <- ['\n']. }.
+}.
+
+Template en: ['clean-all'] facer: {
+	eu clean.
+	eu clean-cuts.
+	eu clean-space.
+}.
+
+Template en: ['texto'] facer: { <- propio content.
+}.

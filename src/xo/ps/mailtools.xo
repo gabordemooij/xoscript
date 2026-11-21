@@ -1,0 +1,128 @@
+>> Email := څیز نوی.
+
+Email کله: ['init'] وکړه: {
+	خپل recipients := لیست نوی.
+	خپل cc := لیست نوی.
+	خپل bcc := لیست نوی.
+	خپل from := هیڅ.
+	خپل from-name := هیڅ.
+	خپل subject := هیڅ.
+	خپل body := هیڅ.
+}.
+
+Email کله: ['نوی'] وکړه: { <- ځان نوی init.
+}.
+
+Email کله: ['to:'] وکړه: { :list
+	خپل recipients := list.
+}.
+ 
+Email کله: ['cc:'] وکړه: { :list
+	خپل cc := list.
+}.
+
+Email کله: ['bcc:'] وکړه: { :list
+	خپل bcc := list.
+}.
+
+Email کله: ['subject:'] وکړه: { :subject
+	خپل subject := subject.
+}.
+
+Email کله: ['from:name:'] وکړه: { :from :نوم
+	خپل from := from.
+	خپل from-name := نوم.
+}.
+
+Email کله: ['body:'] وکړه: { :body
+	خپل body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email کله: ['header:'] وکړه: { :line <- line بدل-کړه: ['\r'] په: [''], بدل-کړه: ['\n'] په: [''].
+}.
+
+Email کله: ['send'] وکړه: {
+	>> f := دوتنه لنډمهاله-لیکنه: ځان generate.
+	پروګرام سیسټم: ['sendmail -t < '] + f د-دوتنې-لار, نوې-کرښه.
+}.
+
+Email کله: ['generate'] وکړه: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str پای-ته-زیات-کړه: (ځان header: ['From: '] + خپل from-name + [' <'] + ( خپل from ) + ['>']) + brk.
+	str پای-ته-زیات-کړه: (ځان header: ['To: '] + ( خپل recipients یوځای-کړه: [','] )) + brk.
+	خپل cc شمېر که-رښتیا: {
+		str پای-ته-زیات-کړه: (ځان header: ['Cc: '] + ( خپل cc یوځای-کړه: [','] )) + brk.
+	}.
+	خپل bcc شمېر که-رښتیا: {
+		str پای-ته-زیات-کړه: (ځان header: ['Bcc: '] + ( خپل bcc یوځای-کړه: [','] )) + brk.
+	}.
+	str پای-ته-زیات-کړه: (ځان header: ['Subject: '] + خپل subject) + brk.
+	str پای-ته-زیات-کړه: brk.
+	str پای-ته-زیات-کړه: خپل body.
+	str پای-ته-زیات-کړه: brk. <- str.
+}.
+
+>> HTML-Email := Email نوی.
+
+HTML-Email کله: ['init'] وکړه: {
+	ځان init.
+	خپل attachments := لیست نوی.
+	خپل boundary := خزانه ټوکن: 40.
+}.
+
+HTML-Email کله: ['attach:'] وکړه: { :file
+	>> id := خپل attachments شمېر.
+	>> blob := file blob.
+	خپل attachments پای-ته-زیات-کړه: (
+		قاموس نوی
+			file: file د-دوتنې-لار,
+			mime: ['image/'] + (Server mimetype: file د-دوتنې-لار),
+			data: blob base64-کوډول
+	).
+	blob ازاد-کړه. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email کله: ['generate'] وکړه: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str پای-ته-زیات-کړه: (ځان header: ['From: '] + خپل from-name + [' <'] + ( خپل from ) + ['>']) + brk.
+	str پای-ته-زیات-کړه: (ځان header: ['To: '] + ( خپل recipients یوځای-کړه: [','] )) + brk.
+	خپل cc شمېر که-رښتیا: {
+		str پای-ته-زیات-کړه: (ځان header: ['Cc: '] + ( خپل cc یوځای-کړه: [','] )) + brk.
+	}.
+	خپل bcc شمېر که-رښتیا: {
+		str پای-ته-زیات-کړه: (ځان header: ['Bcc: '] + ( خپل bcc یوځای-کړه: [','] )) + brk.
+	}.
+	str پای-ته-زیات-کړه: (ځان header: ['Subject: '] + خپل subject) + brk.
+	str پای-ته-زیات-کړه: ['MIME-Version: 1.0'] + brk.
+	str پای-ته-زیات-کړه: ['Content-Type: multipart/related; boundary="'] + خپل boundary + ['"; type=text/html'] + brk.
+	str پای-ته-زیات-کړه: brk.
+	str پای-ته-زیات-کړه: ['--'] + خپل boundary + brk.
+	str پای-ته-زیات-کړه: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str پای-ته-زیات-کړه: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str پای-ته-زیات-کړه: brk.
+	str پای-ته-زیات-کړه: خپل body.
+	str پای-ته-زیات-کړه: brk.
+	خپل attachments هر-یو: { :id :info
+		>> blob := info data.
+		str پای-ته-زیات-کړه: ['--'] + خپل boundary + brk.
+		str پای-ته-زیات-کړه: ['Content-Type: '] + info mime + brk.
+		str پای-ته-زیات-کړه: ['Content-Transfer-Encoding: base64'] + brk.
+		str پای-ته-زیات-کړه: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str پای-ته-زیات-کړه: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str پای-ته-زیات-کړه: brk.
+		>> max := 76.
+		>> len := blob اوږدوالی.
+		>> chunks := (len / max) پورته-ګردول.
+		{ :i
+			>> chunk := blob کاپي پیل: i * max اوږدوالی: max.
+			str پای-ته-زیات-کړه: chunk + brk.
+		} * chunks.
+		str پای-ته-زیات-کړه: brk.
+		str پای-ته-زیات-کړه: brk.
+	}.
+	str پای-ته-زیات-کړه: ['--'] + خپل boundary + ['--'] + brk. <- str.
+}.

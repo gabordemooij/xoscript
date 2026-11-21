@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Ahanoa hou.
+
+Template ina-tae: ['hou'] mahia: { <- whaiaro hou content: [''].
+}.
+
+Template ina-tae: ['content:'] mahia: { :content
+	ake content := content. 
+}.
+
+Template ina-tae: ['hou:'] mahia: { :content <- whaiaro hou content: content.
+}.
+
+Template ina-tae: ['cut:'] mahia: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := ake content wehewehe: startmarker.
+	>> prefix := parts tuatahi.
+	>> parts2 := parts whakamutunga wehewehe: endmarker.
+	>> suffix := parts2 whakamutunga.
+	>> part := parts2 tuatahi.
+	>> rest := prefix + suffix.
+	ake content := rest. <- Template hou: part.
+	
+}.
+
+Template ina-tae: ['tārua'] mahia: { <- whaiaro hou: whaiaro aho tārua.
+}.
+	
+Template ina-tae: ['paste:at:'] mahia: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	ake content whakakapihia: pastemarker me: ( snippet aho + pastemarker ).
+}.
+
+Template ina-tae: ['tautuhi:uara:'] mahia: { :slot :value
+	ake content whakakapihia: ['<!-- slot:'] + slot + [' -->'] me: ( Server html-whakawaehere: value ).
+}.
+
+Template ina-tae: ['set:html:'] mahia: { :slot :html
+	ake content whakakapihia: ['<!-- slot:'] + slot + [' -->'] me: html.
+}.
+
+Template ina-tae: ['whakautu:a:'] mahia: { :slot :value
+	whaiaro tautuhi: (slot mai: 0 roa: (slot roa - 1)) uara: value.
+}.
+
+Template ina-tae: ['nl2br'] mahia: {
+	ake content whakakapihia: ['\n'] me: ['<br>'].
+}.
+
+Template ina-tae: ['clean'] mahia: {
+	ake content :=
+		Tauira-rapu
+		hou: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ōritenga: ake content
+		mahia: { <- ['']. }.
+}.
+
+Template ina-tae: ['clean-cuts'] mahia: {
+	>> items := Rārangi hou.
+	Tauira-rapu
+	hou: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ōritenga: ake content
+	mahia: { :_ :part
+		items tāpiri-muri: part ? 1.
+	}.
+	items ia: { :_ :id
+		ake content :=
+			Tauira-rapu hou: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ōritenga: ake content
+			mahia: { <- ['']. }.
+	 }.
+}.
+
+Template ina-tae: ['clean-space'] mahia: {
+	ake content :=
+		Tauira-rapu
+		hou: ['\\s*\\n'],
+		ōritenga: ake content
+		mahia: { <- ['\n']. }.
+	ake content :=
+		Tauira-rapu
+		hou: ['\\n[\\s\\t]+'],
+		ōritenga: ake content
+		mahia: { <- ['\n']. }.
+}.
+
+Template ina-tae: ['clean-all'] mahia: {
+	whaiaro clean.
+	whaiaro clean-cuts.
+	whaiaro clean-space.
+}.
+
+Template ina-tae: ['aho'] mahia: { <- ake content.
+}.

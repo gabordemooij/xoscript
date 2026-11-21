@@ -1,0 +1,128 @@
+>> Email := वस्तु नया.
+
+Email जब: ['init'] करो: {
+	अपना recipients := सूची नया.
+	अपना cc := सूची नया.
+	अपना bcc := सूची नया.
+	अपना from := शून्य.
+	अपना from-name := शून्य.
+	अपना subject := शून्य.
+	अपना body := शून्य.
+}.
+
+Email जब: ['नया'] करो: { <- स्वयं नया init.
+}.
+
+Email जब: ['to:'] करो: { :list
+	अपना recipients := list.
+}.
+ 
+Email जब: ['cc:'] करो: { :list
+	अपना cc := list.
+}.
+
+Email जब: ['bcc:'] करो: { :list
+	अपना bcc := list.
+}.
+
+Email जब: ['subject:'] करो: { :subject
+	अपना subject := subject.
+}.
+
+Email जब: ['from:name:'] करो: { :from :नाम
+	अपना from := from.
+	अपना from-name := नाम.
+}.
+
+Email जब: ['body:'] करो: { :body
+	अपना body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email जब: ['header:'] करो: { :line <- line बदलो: ['\r'] से: [''], बदलो: ['\n'] से: [''].
+}.
+
+Email जब: ['send'] करो: {
+	>> f := फ़ाइल tempwrite: स्वयं generate.
+	प्रोग्राम सिस्टम: ['sendmail -t < '] + f फ़ाइल-पथ, नई-पंक्ति.
+}.
+
+Email जब: ['generate'] करो: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str अंत-में-जोड़ो: (स्वयं header: ['From: '] + अपना from-name + [' <'] + ( अपना from ) + ['>']) + brk.
+	str अंत-में-जोड़ो: (स्वयं header: ['To: '] + ( अपना recipients जोड़ो: [','] )) + brk.
+	अपना cc गिनती सत्य-हो-तो: {
+		str अंत-में-जोड़ो: (स्वयं header: ['Cc: '] + ( अपना cc जोड़ो: [','] )) + brk.
+	}.
+	अपना bcc गिनती सत्य-हो-तो: {
+		str अंत-में-जोड़ो: (स्वयं header: ['Bcc: '] + ( अपना bcc जोड़ो: [','] )) + brk.
+	}.
+	str अंत-में-जोड़ो: (स्वयं header: ['Subject: '] + अपना subject) + brk.
+	str अंत-में-जोड़ो: brk.
+	str अंत-में-जोड़ो: अपना body.
+	str अंत-में-जोड़ो: brk. <- str.
+}.
+
+>> HTML-Email := Email नया.
+
+HTML-Email जब: ['init'] करो: {
+	स्वयं init.
+	अपना attachments := सूची नया.
+	अपना boundary := तिजोरी टोकन: 40.
+}.
+
+HTML-Email जब: ['attach:'] करो: { :file
+	>> id := अपना attachments गिनती.
+	>> blob := file blob.
+	अपना attachments अंत-में-जोड़ो: (
+		शब्दकोश नया
+			file: file फ़ाइल-पथ,
+			mime: ['image/'] + (Server mimetype: file फ़ाइल-पथ),
+			data: blob base64-एनकोड
+	).
+	blob मुक्त. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email जब: ['generate'] करो: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str अंत-में-जोड़ो: (स्वयं header: ['From: '] + अपना from-name + [' <'] + ( अपना from ) + ['>']) + brk.
+	str अंत-में-जोड़ो: (स्वयं header: ['To: '] + ( अपना recipients जोड़ो: [','] )) + brk.
+	अपना cc गिनती सत्य-हो-तो: {
+		str अंत-में-जोड़ो: (स्वयं header: ['Cc: '] + ( अपना cc जोड़ो: [','] )) + brk.
+	}.
+	अपना bcc गिनती सत्य-हो-तो: {
+		str अंत-में-जोड़ो: (स्वयं header: ['Bcc: '] + ( अपना bcc जोड़ो: [','] )) + brk.
+	}.
+	str अंत-में-जोड़ो: (स्वयं header: ['Subject: '] + अपना subject) + brk.
+	str अंत-में-जोड़ो: ['MIME-Version: 1.0'] + brk.
+	str अंत-में-जोड़ो: ['Content-Type: multipart/related; boundary="'] + अपना boundary + ['"; type=text/html'] + brk.
+	str अंत-में-जोड़ो: brk.
+	str अंत-में-जोड़ो: ['--'] + अपना boundary + brk.
+	str अंत-में-जोड़ो: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str अंत-में-जोड़ो: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str अंत-में-जोड़ो: brk.
+	str अंत-में-जोड़ो: अपना body.
+	str अंत-में-जोड़ो: brk.
+	अपना attachments प्रत्येक: { :id :info
+		>> blob := info data.
+		str अंत-में-जोड़ो: ['--'] + अपना boundary + brk.
+		str अंत-में-जोड़ो: ['Content-Type: '] + info mime + brk.
+		str अंत-में-जोड़ो: ['Content-Transfer-Encoding: base64'] + brk.
+		str अंत-में-जोड़ो: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str अंत-में-जोड़ो: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str अंत-में-जोड़ो: brk.
+		>> max := 76.
+		>> len := blob लंबाई.
+		>> chunks := (len / max) ऊपर-पूर्णांक.
+		{ :i
+			>> chunk := blob प्रतिलिपि आरंभ: i * max लंबाई: max.
+			str अंत-में-जोड़ो: chunk + brk.
+		} * chunks.
+		str अंत-में-जोड़ो: brk.
+		str अंत-में-जोड़ो: brk.
+	}.
+	str अंत-में-जोड़ो: ['--'] + अपना boundary + ['--'] + brk. <- str.
+}.

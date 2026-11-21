@@ -1,0 +1,325 @@
+HTTP-Užklausa kai: ['HTTP-header:'] daryti: { :key <- Programa nustatymas: key.
+}.
+
+>> HTTP-Header := Objektas naujas.
+
+HTTP-Header kai: ['naujas'] daryti: { <- pats naujas init.
+}.
+
+HTTP-Header kai: ['init'] daryti: {
+	savas key := Niekas.
+	savas value := Niekas.
+}.
+
+HTTP-Header kai: ['key:value:'] daryti: { :key :value
+	savas key := key.
+	savas value := value.
+}.
+
+HTTP-Header kai: ['key'] daryti: { <- savas key.
+}.
+
+HTTP-Header kai: ['value'] daryti: { <- savas value.
+}.
+
+
+HTTP-Header kai: ['tekstas'] daryti: {
+	>> line := savas key + [': '] + savas value.
+	line pakeisti: ['\r'] į: [''], pakeisti: ['\n'] į: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Objektas naujas.
+
+Web-Document kai: ['naujas'] daryti: { <- pats naujas init.
+}.
+
+Web-Document kai: ['init'] daryti: {
+	savas headers := Sąrašas naujas.
+	savas sess-id := Niekas.
+	savas session-manager := Tempfile-Session naujas.
+	savas sessdata := Niekas.
+	savas secure := Tiesa.
+	savas same-site := ['Strict'].
+	savas headers-out := Netiesa.
+	savas request := HTTP-Užklausa naujas.
+}.
+
+Web-Document kai: ['request:'] daryti: { :request
+	savas request := request.
+}. 
+
+Web-Document kai: ['secure-session-cookie:'] daryti: { :secure
+	pats check-headers.
+	savas secure := secure.
+}.
+
+Web-Document kai: ['same-site-session-cookie:'] daryti: { :value
+	pats check-headers.
+	>> options := Sąrašas naujas 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options apima: value, netiesa: {
+		ši-užduotis klaida: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	savas same-site := value.
+}.
+
+Web-Document kai: ['header:'] daryti: { :header
+	pats check-headers.
+	savas headers pridėti: header.
+}.
+
+Web-Document kai: ['clear-headers'] daryti: {
+	pats check-headers.
+	savas headers := Sąrašas naujas.
+}.
+
+Web-Document kai: ['session-manager:'] daryti: { :manager
+	pats check-headers.
+	savas session-manager := manager.
+}.
+
+Web-Document kai: ['session-manager'] daryti: { <- savas session-manager.
+}.
+
+Web-Document kai: ['check-headers'] daryti: {
+	savas headers-out tiesa: {
+		ši-užduotis klaida: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document kai: ['session-start'] daryti: {
+	pats check-headers.
+	>> request := savas request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Niekas? netiesa: {
+		(( Šablonas naujas: ['^[A-Za-z0-9]+\\z'], atitikmuo: sess-id ) = 0) tiesa: {
+			sess-id := Niekas.
+		}.
+	}.
+	sess-id Niekas? tiesa: {
+		sess-id := Seifas žetonas: 30.
+		>> session-header := HTTP-Header naujas
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (savas secure arba: ['Secure'] arba: ['']),
+		SSITE: (savas same-site),
+		XSID: sess-id
+		).
+		savas headers pridėti: session-header.
+	}.
+	savas sessdata := savas session-manager for: sess-id, load. <- savas sessdata. # reference
+}.
+
+Web-Document kai: ['goto:'] daryti: { :url
+	pats check-headers.
+	pats clear-headers.
+	savas headers
+	pridėti: (
+		HTTP-Header naujas
+		key: ['Status'] value: ['303 See Other']
+	),
+	pridėti: (
+		HTTP-Header naujas
+		key: ['Location'] value: url
+	).
+	pats out: ['Redirect'].
+}.
+
+Web-Document kai: ['session-destroy'] daryti: {
+	pats check-headers.
+	>> request := savas request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Niekas? netiesa: {
+		>> session-header := HTTP-Header naujas.
+		>> when := Momentas naujas metai: 1970, formatas: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (savas secure arba: ['Secure'] arba: ['']),
+			SSITE: (savas same-site),
+			XSID: sess-id
+		).
+		savas session-manager destroy.
+		savas headers pridėti: session-header.
+	}.
+}.
+
+
+Web-Document kai: ['template:'] daryti: { :kelias <- Template naujas: (Failas naujas: kelias, skaityti).
+}.
+
+Web-Document kai: ['out:type:'] daryti: { :output :tipas
+	savas headers-out netiesa: {
+		savas sessdata Niekas? netiesa: {
+			savas session-manager save: savas sessdata.
+		}.
+		savas headers pridėti: (
+			HTTP-Header naujas
+			key: ['Content-type'] value: tipas
+		).
+		savas headers kiekvienas: { :_ :header
+			Išvestis rašyti: header.
+		}.
+		savas headers-out := Tiesa.
+		Išvestis rašyti: ['\r\n'].
+	}.
+	Išvestis rašyti: output.
+}.
+
+Web-Document kai: ['finish:type:'] daryti: { :output :tipas
+	savas headers-out netiesa: {
+		savas sessdata Niekas? netiesa: {
+			savas session-manager save: savas sessdata.
+		}.
+		savas headers pridėti: (
+			HTTP-Header naujas
+			key: ['Content-type'] value: tipas
+		).
+		savas headers pridėti: (
+			HTTP-Header naujas
+			key: ['Content-Length'] value: output tekstas bytes
+		).
+		savas headers kiekvienas: { :_ :header
+			Išvestis rašyti: header.
+		}.
+		savas headers-out := Tiesa.
+		Išvestis rašyti: ['\r\n'].
+	}.
+	Išvestis rašyti: output.
+}.
+
+Web-Document kai: ['out:'] daryti: { :output
+	pats out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document kai: ['finish:'] daryti: { :output
+	pats finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document kai: ['json:'] daryti: { :output
+	pats out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document kai: ['not-found:'] daryti: { :output
+	pats clear-headers header: (
+		HTTP-Header naujas key: ['Status'] value: ['404 Not Found']
+	).
+	pats out: output.
+}.
+
+
+# Interface
+
+>> Session := Objektas naujas.
+
+Session kai: ['naujas'] daryti: { <- pats naujas init for: Niekas.
+}.
+
+Session kai: ['for:'] daryti: { :id
+	savas id := id.
+}.
+
+Session kai: ['load'] daryti: {
+	ši-užduotis klaida: ['Not implemented.'].
+}.
+
+Session kai: ['save:'] daryti: {
+	ši-užduotis klaida: ['Not implemented.'].
+}.
+
+Session kai: ['destroy'] daryti: {
+	ši-užduotis klaida: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session naujas.
+
+Tempfile-Session kai: ['init'] daryti: {
+	savas pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session kai: ['path-prefix:'] daryti: { :str
+	savas pathprefix := str.
+}.
+
+Tempfile-Session kai: ['file'] daryti: { <- ( Failas naujas: ( savas pathprefix + savas id + ['.txt'] ) ).
+}.
+
+Tempfile-Session kai: ['load'] daryti: {
+	>> file := pats file.
+	file egzistuoja netiesa: {
+		file rašyti: (Žodynas naujas kodas).
+	}. <- file skaityti objektas.
+}.
+
+Tempfile-Session kai: ['save:'] daryti: { :data
+	>> file := pats file.
+	file egzistuoja tiesa: {
+		file rašyti: data kodas.
+	}.
+}.
+
+Tempfile-Session kai: ['destroy'] daryti: {
+	>> file := pats file.
+	file egzistuoja tiesa: {
+		file ištrinti.
+	}.
+}.
+
+
+>> URL := Objektas naujas.
+
+URL kai: ['init'] daryti: {
+	savas protocol := ['https://'].
+	savas mazgas := ['localhost'].
+	savas kelias := [''].
+	savas params := [''].
+	savas hash := [''].
+}.
+
+URL kai: ['naujas'] daryti: { <- pats naujas init.
+}.
+
+URL kai: ['tekstas'] daryti: { <- (
+	savas protocol +
+	savas mazgas +
+	savas kelias +
+	savas params +
+	savas hash ).
+}.
+
+URL kai: ['protocol:'] daryti: { :protocol
+	((Sąrašas naujas: ['http'] ; ['https']) apima: protocol) tiesa: {
+		savas protocol := protocol + ['://'].
+	}, netiesa: {
+		ši-užduotis klaida: ['Invalid protocol'].
+	}.
+}.
+
+URL kai: ['mazgas:'] daryti: { :mazgas
+	#todo validate according to rfc
+	savas mazgas := mazgas.
+}.
+
+URL kai: ['path:'] daryti: { :kelias
+	savas kelias := ['/'] + kelias url-koduoti.
+}.
+
+URL kai: ['params:'] daryti: { :map
+	>> params := Sąrašas naujas.
+	map kiekvienas: { :key :value
+		params pridėti: key tekstas url-koduoti + ['='] + value tekstas url-koduoti.
+	}.
+	savas params := ['?'] + ( params sujungti: ['&'] ).
+}.
+
+URL kai: ['maiša:'] daryti: { :hash
+	savas hash := ['#'] + hash url-koduoti.
+}.
+

@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := شيء نئون.
+
+Template جڏهن: ['نئون'] ڪريو: { <- پاڻ نئون content: [''].
+}.
+
+Template جڏهن: ['content:'] ڪريو: { :content
+	پنهنجو content := content. 
+}.
+
+Template جڏهن: ['نئون:'] ڪريو: { :content <- پاڻ نئون content: content.
+}.
+
+Template جڏهن: ['cut:'] ڪريو: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := پنهنجو content ورهايو: startmarker.
+	>> prefix := parts پهريون.
+	>> parts2 := parts آخري ورهايو: endmarker.
+	>> suffix := parts2 آخري.
+	>> part := parts2 پهريون.
+	>> rest := prefix + suffix.
+	پنهنجو content := rest. <- Template نئون: part.
+	
+}.
+
+Template جڏهن: ['نقل'] ڪريو: { <- پاڻ نئون: پاڻ متن-طور نقل.
+}.
+	
+Template جڏهن: ['paste:at:'] ڪريو: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	پنهنجو content مٽايو: pastemarker سان: ( snippet متن-طور + pastemarker ).
+}.
+
+Template جڏهن: ['مقرر:قدر:'] ڪريو: { :slot :value
+	پنهنجو content مٽايو: ['<!-- slot:'] + slot + [' -->'] سان: ( Server html-انڪوڊ: value ).
+}.
+
+Template جڏهن: ['set:html:'] ڪريو: { :slot :html
+	پنهنجو content مٽايو: ['<!-- slot:'] + slot + [' -->'] سان: html.
+}.
+
+Template جڏهن: ['جواب:۽:'] ڪريو: { :slot :value
+	پاڻ مقرر: (slot شروعات: 0 ڊيگهه: (slot ڊيگهه - 1)) قدر: value.
+}.
+
+Template جڏهن: ['nl2br'] ڪريو: {
+	پنهنجو content مٽايو: ['\n'] سان: ['<br>'].
+}.
+
+Template جڏهن: ['clean'] ڪريو: {
+	پنهنجو content :=
+		نمونو-ڳولا
+		نئون: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ميلاپ: پنهنجو content
+		ڪريو: { <- ['']. }.
+}.
+
+Template جڏهن: ['clean-cuts'] ڪريو: {
+	>> items := لسٽ نئون.
+	نمونو-ڳولا
+	نئون: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ميلاپ: پنهنجو content
+	ڪريو: { :_ :part
+		items آخر-۾-جوڙيو: part ? 1.
+	}.
+	items هر-هڪ: { :_ :id
+		پنهنجو content :=
+			نمونو-ڳولا نئون: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ميلاپ: پنهنجو content
+			ڪريو: { <- ['']. }.
+	 }.
+}.
+
+Template جڏهن: ['clean-space'] ڪريو: {
+	پنهنجو content :=
+		نمونو-ڳولا
+		نئون: ['\\s*\\n'],
+		ميلاپ: پنهنجو content
+		ڪريو: { <- ['\n']. }.
+	پنهنجو content :=
+		نمونو-ڳولا
+		نئون: ['\\n[\\s\\t]+'],
+		ميلاپ: پنهنجو content
+		ڪريو: { <- ['\n']. }.
+}.
+
+Template جڏهن: ['clean-all'] ڪريو: {
+	پاڻ clean.
+	پاڻ clean-cuts.
+	پاڻ clean-space.
+}.
+
+Template جڏهن: ['متن-طور'] ڪريو: { <- پنهنجو content.
+}.

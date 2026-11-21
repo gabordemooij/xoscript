@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Օբյեկտ նոր.
+
+Template ստանալիս: ['նոր'] կատարել: { <- ինքը նոր content: [''].
+}.
+
+Template ստանալիս: ['content:'] կատարել: { :content
+	սեփական content := content. 
+}.
+
+Template ստանալիս: ['նոր:'] կատարել: { :content <- ինքը նոր content: content.
+}.
+
+Template ստանալիս: ['cut:'] կատարել: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := սեփական content բաժանել: startmarker.
+	>> prefix := parts առաջին.
+	>> parts2 := parts վերջին բաժանել: endmarker.
+	>> suffix := parts2 վերջին.
+	>> part := parts2 առաջին.
+	>> rest := prefix + suffix.
+	սեփական content := rest. <- Template նոր: part.
+	
+}.
+
+Template ստանալիս: ['պատճենել'] կատարել: { <- ինքը նոր: ինքը տող պատճենել.
+}.
+	
+Template ստանալիս: ['paste:at:'] կատարել: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	սեփական content փոխարինել: pastemarker սրանով: ( snippet տող + pastemarker ).
+}.
+
+Template ստանալիս: ['սահմանել:արժեք:'] կատարել: { :slot :value
+	սեփական content փոխարինել: ['<!-- slot:'] + slot + [' -->'] սրանով: ( Server html-կոդավորել: value ).
+}.
+
+Template ստանալիս: ['set:html:'] կատարել: { :slot :html
+	սեփական content փոխարինել: ['<!-- slot:'] + slot + [' -->'] սրանով: html.
+}.
+
+Template ստանալիս: ['պատասխանել:և:'] կատարել: { :slot :value
+	ինքը սահմանել: (slot սկիզբ: 0 երկարություն: (slot երկարություն - 1)) արժեք: value.
+}.
+
+Template ստանալիս: ['nl2br'] կատարել: {
+	սեփական content փոխարինել: ['\n'] սրանով: ['<br>'].
+}.
+
+Template ստանալիս: ['clean'] կատարել: {
+	սեփական content :=
+		Նմուշ
+		նոր: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		համընկնում: սեփական content
+		կատարել: { <- ['']. }.
+}.
+
+Template ստանալիս: ['clean-cuts'] կատարել: {
+	>> items := Ցուցակ նոր.
+	Նմուշ
+	նոր: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	համընկնում: սեփական content
+	կատարել: { :_ :part
+		items ավելացնել-վերջում: part ? 1.
+	}.
+	items յուրաքանչյուր: { :_ :id
+		սեփական content :=
+			Նմուշ նոր: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			համընկնում: սեփական content
+			կատարել: { <- ['']. }.
+	 }.
+}.
+
+Template ստանալիս: ['clean-space'] կատարել: {
+	սեփական content :=
+		Նմուշ
+		նոր: ['\\s*\\n'],
+		համընկնում: սեփական content
+		կատարել: { <- ['\n']. }.
+	սեփական content :=
+		Նմուշ
+		նոր: ['\\n[\\s\\t]+'],
+		համընկնում: սեփական content
+		կատարել: { <- ['\n']. }.
+}.
+
+Template ստանալիս: ['clean-all'] կատարել: {
+	ինքը clean.
+	ինքը clean-cuts.
+	ինքը clean-space.
+}.
+
+Template ստանալիս: ['տող'] կատարել: { <- սեփական content.
+}.

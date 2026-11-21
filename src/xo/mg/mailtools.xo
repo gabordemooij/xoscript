@@ -1,0 +1,128 @@
+>> Email := Zavatra vaovao.
+
+Email rehefa: ['init'] ataovy: {
+	azy recipients := Lisitra vaovao.
+	azy cc := Lisitra vaovao.
+	azy bcc := Lisitra vaovao.
+	azy from := Tsinontsinona.
+	azy from-name := Tsinontsinona.
+	azy subject := Tsinontsinona.
+	azy body := Tsinontsinona.
+}.
+
+Email rehefa: ['vaovao'] ataovy: { <- tena vaovao init.
+}.
+
+Email rehefa: ['to:'] ataovy: { :list
+	azy recipients := list.
+}.
+ 
+Email rehefa: ['cc:'] ataovy: { :list
+	azy cc := list.
+}.
+
+Email rehefa: ['bcc:'] ataovy: { :list
+	azy bcc := list.
+}.
+
+Email rehefa: ['subject:'] ataovy: { :subject
+	azy subject := subject.
+}.
+
+Email rehefa: ['from:name:'] ataovy: { :from :anarana
+	azy from := from.
+	azy from-name := anarana.
+}.
+
+Email rehefa: ['body:'] ataovy: { :body
+	azy body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email rehefa: ['header:'] ataovy: { :line <- line soloy: ['\r'] amin: [''], soloy: ['\n'] amin: [''].
+}.
+
+Email rehefa: ['send'] ataovy: {
+	>> f := Rakitra tempwrite: tena generate.
+	Fandaharana rafitra: ['sendmail -t < '] + f lalan-drakitra, andalana-vaovao.
+}.
+
+Email rehefa: ['generate'] ataovy: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ampio-any-amin-ny-farany: (tena header: ['From: '] + azy from-name + [' <'] + ( azy from ) + ['>']) + brk.
+	str ampio-any-amin-ny-farany: (tena header: ['To: '] + ( azy recipients atambaro: [','] )) + brk.
+	azy cc isan-javatra marina: {
+		str ampio-any-amin-ny-farany: (tena header: ['Cc: '] + ( azy cc atambaro: [','] )) + brk.
+	}.
+	azy bcc isan-javatra marina: {
+		str ampio-any-amin-ny-farany: (tena header: ['Bcc: '] + ( azy bcc atambaro: [','] )) + brk.
+	}.
+	str ampio-any-amin-ny-farany: (tena header: ['Subject: '] + azy subject) + brk.
+	str ampio-any-amin-ny-farany: brk.
+	str ampio-any-amin-ny-farany: azy body.
+	str ampio-any-amin-ny-farany: brk. <- str.
+}.
+
+>> HTML-Email := Email vaovao.
+
+HTML-Email rehefa: ['init'] ataovy: {
+	tena init.
+	azy attachments := Lisitra vaovao.
+	azy boundary := Vata-fiarovana token: 40.
+}.
+
+HTML-Email rehefa: ['attach:'] ataovy: { :file
+	>> id := azy attachments isan-javatra.
+	>> blob := file blob.
+	azy attachments ampio-any-amin-ny-farany: (
+		Rakibolana vaovao
+			file: file lalan-drakitra,
+			mime: ['image/'] + (Server mimetype: file lalan-drakitra),
+			data: blob base64-asio-kaody
+	).
+	blob afaho. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email rehefa: ['generate'] ataovy: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str ampio-any-amin-ny-farany: (tena header: ['From: '] + azy from-name + [' <'] + ( azy from ) + ['>']) + brk.
+	str ampio-any-amin-ny-farany: (tena header: ['To: '] + ( azy recipients atambaro: [','] )) + brk.
+	azy cc isan-javatra marina: {
+		str ampio-any-amin-ny-farany: (tena header: ['Cc: '] + ( azy cc atambaro: [','] )) + brk.
+	}.
+	azy bcc isan-javatra marina: {
+		str ampio-any-amin-ny-farany: (tena header: ['Bcc: '] + ( azy bcc atambaro: [','] )) + brk.
+	}.
+	str ampio-any-amin-ny-farany: (tena header: ['Subject: '] + azy subject) + brk.
+	str ampio-any-amin-ny-farany: ['MIME-Version: 1.0'] + brk.
+	str ampio-any-amin-ny-farany: ['Content-Type: multipart/related; boundary="'] + azy boundary + ['"; type=text/html'] + brk.
+	str ampio-any-amin-ny-farany: brk.
+	str ampio-any-amin-ny-farany: ['--'] + azy boundary + brk.
+	str ampio-any-amin-ny-farany: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str ampio-any-amin-ny-farany: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str ampio-any-amin-ny-farany: brk.
+	str ampio-any-amin-ny-farany: azy body.
+	str ampio-any-amin-ny-farany: brk.
+	azy attachments tsirairay: { :id :info
+		>> blob := info data.
+		str ampio-any-amin-ny-farany: ['--'] + azy boundary + brk.
+		str ampio-any-amin-ny-farany: ['Content-Type: '] + info mime + brk.
+		str ampio-any-amin-ny-farany: ['Content-Transfer-Encoding: base64'] + brk.
+		str ampio-any-amin-ny-farany: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str ampio-any-amin-ny-farany: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str ampio-any-amin-ny-farany: brk.
+		>> max := 76.
+		>> len := blob halavany.
+		>> chunks := (len / max) ampiakarina-ho-isa-feno.
+		{ :i
+			>> chunk := blob adikao manomboka: i * max halavany: max.
+			str ampio-any-amin-ny-farany: chunk + brk.
+		} * chunks.
+		str ampio-any-amin-ny-farany: brk.
+		str ampio-any-amin-ny-farany: brk.
+	}.
+	str ampio-any-amin-ny-farany: ['--'] + azy boundary + ['--'] + brk. <- str.
+}.

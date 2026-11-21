@@ -1,0 +1,325 @@
+Talosaga-HTTP pe-a-oo-mai: ['HTTP-header:'] fai: { :key <- Polokalama faatulagaga-masini: key.
+}.
+
+>> HTTP-Header := Mea fou.
+
+HTTP-Header pe-a-oo-mai: ['fou'] fai: { <- ia-lava fou init.
+}.
+
+HTTP-Header pe-a-oo-mai: ['init'] fai: {
+	lana-lava key := Leai-se-mea.
+	lana-lava value := Leai-se-mea.
+}.
+
+HTTP-Header pe-a-oo-mai: ['key:value:'] fai: { :key :value
+	lana-lava key := key.
+	lana-lava value := value.
+}.
+
+HTTP-Header pe-a-oo-mai: ['key'] fai: { <- lana-lava key.
+}.
+
+HTTP-Header pe-a-oo-mai: ['value'] fai: { <- lana-lava value.
+}.
+
+
+HTTP-Header pe-a-oo-mai: ['manoa'] fai: {
+	>> line := lana-lava key + [': '] + lana-lava value.
+	line sui: ['\r'] i-le: [''], sui: ['\n'] i-le: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Mea fou.
+
+Web-Document pe-a-oo-mai: ['fou'] fai: { <- ia-lava fou init.
+}.
+
+Web-Document pe-a-oo-mai: ['init'] fai: {
+	lana-lava headers := Lisi fou.
+	lana-lava sess-id := Leai-se-mea.
+	lana-lava session-manager := Tempfile-Session fou.
+	lana-lava sessdata := Leai-se-mea.
+	lana-lava secure := Moni.
+	lana-lava same-site := ['Strict'].
+	lana-lava headers-out := Sese.
+	lana-lava request := Talosaga-HTTP fou.
+}.
+
+Web-Document pe-a-oo-mai: ['request:'] fai: { :request
+	lana-lava request := request.
+}. 
+
+Web-Document pe-a-oo-mai: ['secure-session-cookie:'] fai: { :secure
+	ia-lava check-headers.
+	lana-lava secure := secure.
+}.
+
+Web-Document pe-a-oo-mai: ['same-site-session-cookie:'] fai: { :value
+	ia-lava check-headers.
+	>> options := Lisi fou 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options aofia-ai: value, sese: {
+		lenei-galuega mea-sese: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	lana-lava same-site := value.
+}.
+
+Web-Document pe-a-oo-mai: ['header:'] fai: { :header
+	ia-lava check-headers.
+	lana-lava headers faaopoopo-i-le-iuga: header.
+}.
+
+Web-Document pe-a-oo-mai: ['clear-headers'] fai: {
+	ia-lava check-headers.
+	lana-lava headers := Lisi fou.
+}.
+
+Web-Document pe-a-oo-mai: ['session-manager:'] fai: { :manager
+	ia-lava check-headers.
+	lana-lava session-manager := manager.
+}.
+
+Web-Document pe-a-oo-mai: ['session-manager'] fai: { <- lana-lava session-manager.
+}.
+
+Web-Document pe-a-oo-mai: ['check-headers'] fai: {
+	lana-lava headers-out moni: {
+		lenei-galuega mea-sese: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document pe-a-oo-mai: ['session-start'] fai: {
+	ia-lava check-headers.
+	>> request := lana-lava request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Leai-se-mea? sese: {
+		(( Mamanu fou: ['^[A-Za-z0-9]+\\z'], fetaui: sess-id ) = 0) moni: {
+			sess-id := Leai-se-mea.
+		}.
+	}.
+	sess-id Leai-se-mea? moni: {
+		sess-id := Pusa-malu token: 30.
+		>> session-header := HTTP-Header fou
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (lana-lava secure lenei: ['Secure'] po-o-lena: ['']),
+		SSITE: (lana-lava same-site),
+		XSID: sess-id
+		).
+		lana-lava headers faaopoopo-i-le-iuga: session-header.
+	}.
+	lana-lava sessdata := lana-lava session-manager for: sess-id, load. <- lana-lava sessdata. # reference
+}.
+
+Web-Document pe-a-oo-mai: ['goto:'] fai: { :url
+	ia-lava check-headers.
+	ia-lava clear-headers.
+	lana-lava headers
+	faaopoopo-i-le-iuga: (
+		HTTP-Header fou
+		key: ['Status'] value: ['303 See Other']
+	),
+	faaopoopo-i-le-iuga: (
+		HTTP-Header fou
+		key: ['Location'] value: url
+	).
+	ia-lava out: ['Redirect'].
+}.
+
+Web-Document pe-a-oo-mai: ['session-destroy'] fai: {
+	ia-lava check-headers.
+	>> request := lana-lava request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Leai-se-mea? sese: {
+		>> session-header := HTTP-Header fou.
+		>> when := Taimi fou tausaga: 1970, faatulagaga: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (lana-lava secure lenei: ['Secure'] po-o-lena: ['']),
+			SSITE: (lana-lava same-site),
+			XSID: sess-id
+		).
+		lana-lava session-manager destroy.
+		lana-lava headers faaopoopo-i-le-iuga: session-header.
+	}.
+}.
+
+
+Web-Document pe-a-oo-mai: ['template:'] fai: { :ala-faila <- Template fou: (Faila fou: ala-faila, faitau).
+}.
+
+Web-Document pe-a-oo-mai: ['out:type:'] fai: { :output :ituaiga
+	lana-lava headers-out sese: {
+		lana-lava sessdata Leai-se-mea? sese: {
+			lana-lava session-manager save: lana-lava sessdata.
+		}.
+		lana-lava headers faaopoopo-i-le-iuga: (
+			HTTP-Header fou
+			key: ['Content-type'] value: ituaiga
+		).
+		lana-lava headers taʻitasi: { :_ :header
+			Tuuina-atu tusi: header.
+		}.
+		lana-lava headers-out := Moni.
+		Tuuina-atu tusi: ['\r\n'].
+	}.
+	Tuuina-atu tusi: output.
+}.
+
+Web-Document pe-a-oo-mai: ['finish:type:'] fai: { :output :ituaiga
+	lana-lava headers-out sese: {
+		lana-lava sessdata Leai-se-mea? sese: {
+			lana-lava session-manager save: lana-lava sessdata.
+		}.
+		lana-lava headers faaopoopo-i-le-iuga: (
+			HTTP-Header fou
+			key: ['Content-type'] value: ituaiga
+		).
+		lana-lava headers faaopoopo-i-le-iuga: (
+			HTTP-Header fou
+			key: ['Content-Length'] value: output manoa bytes
+		).
+		lana-lava headers taʻitasi: { :_ :header
+			Tuuina-atu tusi: header.
+		}.
+		lana-lava headers-out := Moni.
+		Tuuina-atu tusi: ['\r\n'].
+	}.
+	Tuuina-atu tusi: output.
+}.
+
+Web-Document pe-a-oo-mai: ['out:'] fai: { :output
+	ia-lava out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document pe-a-oo-mai: ['finish:'] fai: { :output
+	ia-lava finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document pe-a-oo-mai: ['json:'] fai: { :output
+	ia-lava out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document pe-a-oo-mai: ['not-found:'] fai: { :output
+	ia-lava clear-headers header: (
+		HTTP-Header fou key: ['Status'] value: ['404 Not Found']
+	).
+	ia-lava out: output.
+}.
+
+
+# Interface
+
+>> Session := Mea fou.
+
+Session pe-a-oo-mai: ['fou'] fai: { <- ia-lava fou init for: Leai-se-mea.
+}.
+
+Session pe-a-oo-mai: ['for:'] fai: { :id
+	lana-lava id := id.
+}.
+
+Session pe-a-oo-mai: ['load'] fai: {
+	lenei-galuega mea-sese: ['Not implemented.'].
+}.
+
+Session pe-a-oo-mai: ['save:'] fai: {
+	lenei-galuega mea-sese: ['Not implemented.'].
+}.
+
+Session pe-a-oo-mai: ['destroy'] fai: {
+	lenei-galuega mea-sese: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session fou.
+
+Tempfile-Session pe-a-oo-mai: ['init'] fai: {
+	lana-lava pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session pe-a-oo-mai: ['path-prefix:'] fai: { :str
+	lana-lava pathprefix := str.
+}.
+
+Tempfile-Session pe-a-oo-mai: ['file'] fai: { <- ( Faila fou: ( lana-lava pathprefix + lana-lava id + ['.txt'] ) ).
+}.
+
+Tempfile-Session pe-a-oo-mai: ['load'] fai: {
+	>> file := ia-lava file.
+	file o-loʻo-i-ai sese: {
+		file tusi: (Lomifefiloi fou faʻailoga).
+	}. <- file faitau mea.
+}.
+
+Tempfile-Session pe-a-oo-mai: ['save:'] fai: { :data
+	>> file := ia-lava file.
+	file o-loʻo-i-ai moni: {
+		file tusi: data faʻailoga.
+	}.
+}.
+
+Tempfile-Session pe-a-oo-mai: ['destroy'] fai: {
+	>> file := ia-lava file.
+	file o-loʻo-i-ai moni: {
+		file tape.
+	}.
+}.
+
+
+>> URL := Mea fou.
+
+URL pe-a-oo-mai: ['init'] fai: {
+	lana-lava protocol := ['https://'].
+	lana-lava talimalo := ['localhost'].
+	lana-lava ala-faila := [''].
+	lana-lava params := [''].
+	lana-lava hash := [''].
+}.
+
+URL pe-a-oo-mai: ['fou'] fai: { <- ia-lava fou init.
+}.
+
+URL pe-a-oo-mai: ['manoa'] fai: { <- (
+	lana-lava protocol +
+	lana-lava talimalo +
+	lana-lava ala-faila +
+	lana-lava params +
+	lana-lava hash ).
+}.
+
+URL pe-a-oo-mai: ['protocol:'] fai: { :protocol
+	((Lisi fou: ['http'] ; ['https']) aofia-ai: protocol) moni: {
+		lana-lava protocol := protocol + ['://'].
+	}, sese: {
+		lenei-galuega mea-sese: ['Invalid protocol'].
+	}.
+}.
+
+URL pe-a-oo-mai: ['talimalo:'] fai: { :talimalo
+	#todo validate according to rfc
+	lana-lava talimalo := talimalo.
+}.
+
+URL pe-a-oo-mai: ['path:'] fai: { :ala-faila
+	lana-lava ala-faila := ['/'] + ala-faila url-faʻailoga-numera.
+}.
+
+URL pe-a-oo-mai: ['params:'] fai: { :map
+	>> params := Lisi fou.
+	map taʻitasi: { :key :value
+		params faaopoopo-i-le-iuga: key manoa url-faʻailoga-numera + ['='] + value manoa url-faʻailoga-numera.
+	}.
+	lana-lava params := ['?'] + ( params tuufaatasi: ['&'] ).
+}.
+
+URL pe-a-oo-mai: ['hash:'] fai: { :hash
+	lana-lava hash := ['#'] + hash url-faʻailoga-numera.
+}.
+

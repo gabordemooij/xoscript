@@ -1,0 +1,325 @@
+בקשת-HTTP בקבלת: ['HTTP-header:'] בצע: { :key <- תוכנית הגדרה: key.
+}.
+
+>> HTTP-Header := אובייקט חדש.
+
+HTTP-Header בקבלת: ['חדש'] בצע: { <- עצמי חדש init.
+}.
+
+HTTP-Header בקבלת: ['init'] בצע: {
+	שלי key := כלום.
+	שלי value := כלום.
+}.
+
+HTTP-Header בקבלת: ['key:value:'] בצע: { :key :value
+	שלי key := key.
+	שלי value := value.
+}.
+
+HTTP-Header בקבלת: ['key'] בצע: { <- שלי key.
+}.
+
+HTTP-Header בקבלת: ['value'] בצע: { <- שלי value.
+}.
+
+
+HTTP-Header בקבלת: ['למחרוזת'] בצע: {
+	>> line := שלי key + [': '] + שלי value.
+	line החלף: ['\r'] בערך: [''], החלף: ['\n'] בערך: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := אובייקט חדש.
+
+Web-Document בקבלת: ['חדש'] בצע: { <- עצמי חדש init.
+}.
+
+Web-Document בקבלת: ['init'] בצע: {
+	שלי headers := רשימה חדש.
+	שלי sess-id := כלום.
+	שלי session-manager := Tempfile-Session חדש.
+	שלי sessdata := כלום.
+	שלי secure := אמת.
+	שלי same-site := ['Strict'].
+	שלי headers-out := שקר.
+	שלי request := בקשת-HTTP חדש.
+}.
+
+Web-Document בקבלת: ['request:'] בצע: { :request
+	שלי request := request.
+}. 
+
+Web-Document בקבלת: ['secure-session-cookie:'] בצע: { :secure
+	עצמי check-headers.
+	שלי secure := secure.
+}.
+
+Web-Document בקבלת: ['same-site-session-cookie:'] בצע: { :value
+	עצמי check-headers.
+	>> options := רשימה חדש 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options מכיל: value, אם-שקר: {
+		משימה-זו שגיאה: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	שלי same-site := value.
+}.
+
+Web-Document בקבלת: ['header:'] בצע: { :header
+	עצמי check-headers.
+	שלי headers הוסף-בסוף: header.
+}.
+
+Web-Document בקבלת: ['clear-headers'] בצע: {
+	עצמי check-headers.
+	שלי headers := רשימה חדש.
+}.
+
+Web-Document בקבלת: ['session-manager:'] בצע: { :manager
+	עצמי check-headers.
+	שלי session-manager := manager.
+}.
+
+Web-Document בקבלת: ['session-manager'] בצע: { <- שלי session-manager.
+}.
+
+Web-Document בקבלת: ['check-headers'] בצע: {
+	שלי headers-out אם-אמת: {
+		משימה-זו שגיאה: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document בקבלת: ['session-start'] בצע: {
+	עצמי check-headers.
+	>> request := שלי request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id כלום? אם-שקר: {
+		(( דפוס חדש: ['^[A-Za-z0-9]+\\z'], התאמה: sess-id ) = 0) אם-אמת: {
+			sess-id := כלום.
+		}.
+	}.
+	sess-id כלום? אם-אמת: {
+		sess-id := כספת אסימון: 30.
+		>> session-header := HTTP-Header חדש
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (שלי secure זה: ['Secure'] אחרת: ['']),
+		SSITE: (שלי same-site),
+		XSID: sess-id
+		).
+		שלי headers הוסף-בסוף: session-header.
+	}.
+	שלי sessdata := שלי session-manager for: sess-id, load. <- שלי sessdata. # reference
+}.
+
+Web-Document בקבלת: ['goto:'] בצע: { :url
+	עצמי check-headers.
+	עצמי clear-headers.
+	שלי headers
+	הוסף-בסוף: (
+		HTTP-Header חדש
+		key: ['Status'] value: ['303 See Other']
+	),
+	הוסף-בסוף: (
+		HTTP-Header חדש
+		key: ['Location'] value: url
+	).
+	עצמי out: ['Redirect'].
+}.
+
+Web-Document בקבלת: ['session-destroy'] בצע: {
+	עצמי check-headers.
+	>> request := שלי request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id כלום? אם-שקר: {
+		>> session-header := HTTP-Header חדש.
+		>> when := רגע חדש שנה: 1970, בתבנית: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (שלי secure זה: ['Secure'] אחרת: ['']),
+			SSITE: (שלי same-site),
+			XSID: sess-id
+		).
+		שלי session-manager destroy.
+		שלי headers הוסף-בסוף: session-header.
+	}.
+}.
+
+
+Web-Document בקבלת: ['template:'] בצע: { :נתיב-קובץ <- Template חדש: (קובץ חדש: נתיב-קובץ, קרא).
+}.
+
+Web-Document בקבלת: ['out:type:'] בצע: { :output :סוג
+	שלי headers-out אם-שקר: {
+		שלי sessdata כלום? אם-שקר: {
+			שלי session-manager save: שלי sessdata.
+		}.
+		שלי headers הוסף-בסוף: (
+			HTTP-Header חדש
+			key: ['Content-type'] value: סוג
+		).
+		שלי headers לכל: { :_ :header
+			פלט כתוב: header.
+		}.
+		שלי headers-out := אמת.
+		פלט כתוב: ['\r\n'].
+	}.
+	פלט כתוב: output.
+}.
+
+Web-Document בקבלת: ['finish:type:'] בצע: { :output :סוג
+	שלי headers-out אם-שקר: {
+		שלי sessdata כלום? אם-שקר: {
+			שלי session-manager save: שלי sessdata.
+		}.
+		שלי headers הוסף-בסוף: (
+			HTTP-Header חדש
+			key: ['Content-type'] value: סוג
+		).
+		שלי headers הוסף-בסוף: (
+			HTTP-Header חדש
+			key: ['Content-Length'] value: output למחרוזת בתים
+		).
+		שלי headers לכל: { :_ :header
+			פלט כתוב: header.
+		}.
+		שלי headers-out := אמת.
+		פלט כתוב: ['\r\n'].
+	}.
+	פלט כתוב: output.
+}.
+
+Web-Document בקבלת: ['out:'] בצע: { :output
+	עצמי out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document בקבלת: ['finish:'] בצע: { :output
+	עצמי finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document בקבלת: ['json:'] בצע: { :output
+	עצמי out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document בקבלת: ['not-found:'] בצע: { :output
+	עצמי clear-headers header: (
+		HTTP-Header חדש key: ['Status'] value: ['404 Not Found']
+	).
+	עצמי out: output.
+}.
+
+
+# Interface
+
+>> Session := אובייקט חדש.
+
+Session בקבלת: ['חדש'] בצע: { <- עצמי חדש init for: כלום.
+}.
+
+Session בקבלת: ['for:'] בצע: { :id
+	שלי id := id.
+}.
+
+Session בקבלת: ['load'] בצע: {
+	משימה-זו שגיאה: ['Not implemented.'].
+}.
+
+Session בקבלת: ['save:'] בצע: {
+	משימה-זו שגיאה: ['Not implemented.'].
+}.
+
+Session בקבלת: ['destroy'] בצע: {
+	משימה-זו שגיאה: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session חדש.
+
+Tempfile-Session בקבלת: ['init'] בצע: {
+	שלי pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session בקבלת: ['path-prefix:'] בצע: { :str
+	שלי pathprefix := str.
+}.
+
+Tempfile-Session בקבלת: ['file'] בצע: { <- ( קובץ חדש: ( שלי pathprefix + שלי id + ['.txt'] ) ).
+}.
+
+Tempfile-Session בקבלת: ['load'] בצע: {
+	>> file := עצמי file.
+	file קיים אם-שקר: {
+		file כתוב: (מילון חדש קוד).
+	}. <- file קרא לאובייקט.
+}.
+
+Tempfile-Session בקבלת: ['save:'] בצע: { :data
+	>> file := עצמי file.
+	file קיים אם-אמת: {
+		file כתוב: data קוד.
+	}.
+}.
+
+Tempfile-Session בקבלת: ['destroy'] בצע: {
+	>> file := עצמי file.
+	file קיים אם-אמת: {
+		file מחק.
+	}.
+}.
+
+
+>> URL := אובייקט חדש.
+
+URL בקבלת: ['init'] בצע: {
+	שלי protocol := ['https://'].
+	שלי מארח := ['localhost'].
+	שלי נתיב-קובץ := [''].
+	שלי params := [''].
+	שלי hash := [''].
+}.
+
+URL בקבלת: ['חדש'] בצע: { <- עצמי חדש init.
+}.
+
+URL בקבלת: ['למחרוזת'] בצע: { <- (
+	שלי protocol +
+	שלי מארח +
+	שלי נתיב-קובץ +
+	שלי params +
+	שלי hash ).
+}.
+
+URL בקבלת: ['protocol:'] בצע: { :protocol
+	((רשימה חדש: ['http'] ; ['https']) מכיל: protocol) אם-אמת: {
+		שלי protocol := protocol + ['://'].
+	}, אם-שקר: {
+		משימה-זו שגיאה: ['Invalid protocol'].
+	}.
+}.
+
+URL בקבלת: ['מארח:'] בצע: { :מארח
+	#todo validate according to rfc
+	שלי מארח := מארח.
+}.
+
+URL בקבלת: ['path:'] בצע: { :נתיב-קובץ
+	שלי נתיב-קובץ := ['/'] + נתיב-קובץ url-קידוד.
+}.
+
+URL בקבלת: ['params:'] בצע: { :map
+	>> params := רשימה חדש.
+	map לכל: { :key :value
+		params הוסף-בסוף: key למחרוזת url-קידוד + ['='] + value למחרוזת url-קידוד.
+	}.
+	שלי params := ['?'] + ( params אחד: ['&'] ).
+}.
+
+URL בקבלת: ['גיבוב:'] בצע: { :hash
+	שלי hash := ['#'] + hash url-קידוד.
+}.
+

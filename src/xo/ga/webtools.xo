@@ -1,0 +1,325 @@
+HTTP-Iarratas ar: ['HTTP-header:'] déan: { :key <- Ríomhchlár socrú: key.
+}.
+
+>> HTTP-Header := Réad nua.
+
+HTTP-Header ar: ['nua'] déan: { <- féin nua init.
+}.
+
+HTTP-Header ar: ['init'] déan: {
+	dílis key := Neamhní.
+	dílis value := Neamhní.
+}.
+
+HTTP-Header ar: ['key:value:'] déan: { :key :value
+	dílis key := key.
+	dílis value := value.
+}.
+
+HTTP-Header ar: ['key'] déan: { <- dílis key.
+}.
+
+HTTP-Header ar: ['value'] déan: { <- dílis value.
+}.
+
+
+HTTP-Header ar: ['teaghrán'] déan: {
+	>> line := dílis key + [': '] + dílis value.
+	line ionadaigh: ['\r'] le: [''], ionadaigh: ['\n'] le: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Réad nua.
+
+Web-Document ar: ['nua'] déan: { <- féin nua init.
+}.
+
+Web-Document ar: ['init'] déan: {
+	dílis headers := Liosta nua.
+	dílis sess-id := Neamhní.
+	dílis session-manager := Tempfile-Session nua.
+	dílis sessdata := Neamhní.
+	dílis secure := Fíor.
+	dílis same-site := ['Strict'].
+	dílis headers-out := Bréagach.
+	dílis request := HTTP-Iarratas nua.
+}.
+
+Web-Document ar: ['request:'] déan: { :request
+	dílis request := request.
+}. 
+
+Web-Document ar: ['secure-session-cookie:'] déan: { :secure
+	féin check-headers.
+	dílis secure := secure.
+}.
+
+Web-Document ar: ['same-site-session-cookie:'] déan: { :value
+	féin check-headers.
+	>> options := Liosta nua 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options cuimsíonn: value, bréagach: {
+		an-tasc-seo earráid: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	dílis same-site := value.
+}.
+
+Web-Document ar: ['header:'] déan: { :header
+	féin check-headers.
+	dílis headers iarcheangail: header.
+}.
+
+Web-Document ar: ['clear-headers'] déan: {
+	féin check-headers.
+	dílis headers := Liosta nua.
+}.
+
+Web-Document ar: ['session-manager:'] déan: { :manager
+	féin check-headers.
+	dílis session-manager := manager.
+}.
+
+Web-Document ar: ['session-manager'] déan: { <- dílis session-manager.
+}.
+
+Web-Document ar: ['check-headers'] déan: {
+	dílis headers-out fíor: {
+		an-tasc-seo earráid: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document ar: ['session-start'] déan: {
+	féin check-headers.
+	>> request := dílis request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Neamhní? bréagach: {
+		(( Patrún nua: ['^[A-Za-z0-9]+\\z'], meaitseáil: sess-id ) = 0) fíor: {
+			sess-id := Neamhní.
+		}.
+	}.
+	sess-id Neamhní? fíor: {
+		sess-id := Taisceadán ceadchomhartha: 30.
+		>> session-header := HTTP-Header nua
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (dílis secure ceachtar: ['Secure'] nó: ['']),
+		SSITE: (dílis same-site),
+		XSID: sess-id
+		).
+		dílis headers iarcheangail: session-header.
+	}.
+	dílis sessdata := dílis session-manager for: sess-id, load. <- dílis sessdata. # reference
+}.
+
+Web-Document ar: ['goto:'] déan: { :url
+	féin check-headers.
+	féin clear-headers.
+	dílis headers
+	iarcheangail: (
+		HTTP-Header nua
+		key: ['Status'] value: ['303 See Other']
+	),
+	iarcheangail: (
+		HTTP-Header nua
+		key: ['Location'] value: url
+	).
+	féin out: ['Redirect'].
+}.
+
+Web-Document ar: ['session-destroy'] déan: {
+	féin check-headers.
+	>> request := dílis request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Neamhní? bréagach: {
+		>> session-header := HTTP-Header nua.
+		>> when := Tráth nua bliain: 1970, formáid: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (dílis secure ceachtar: ['Secure'] nó: ['']),
+			SSITE: (dílis same-site),
+			XSID: sess-id
+		).
+		dílis session-manager destroy.
+		dílis headers iarcheangail: session-header.
+	}.
+}.
+
+
+Web-Document ar: ['template:'] déan: { :conair <- Template nua: (Comhad nua: conair, léigh).
+}.
+
+Web-Document ar: ['out:type:'] déan: { :output :cineál
+	dílis headers-out bréagach: {
+		dílis sessdata Neamhní? bréagach: {
+			dílis session-manager save: dílis sessdata.
+		}.
+		dílis headers iarcheangail: (
+			HTTP-Header nua
+			key: ['Content-type'] value: cineál
+		).
+		dílis headers gach: { :_ :header
+			Aschur scríobh: header.
+		}.
+		dílis headers-out := Fíor.
+		Aschur scríobh: ['\r\n'].
+	}.
+	Aschur scríobh: output.
+}.
+
+Web-Document ar: ['finish:type:'] déan: { :output :cineál
+	dílis headers-out bréagach: {
+		dílis sessdata Neamhní? bréagach: {
+			dílis session-manager save: dílis sessdata.
+		}.
+		dílis headers iarcheangail: (
+			HTTP-Header nua
+			key: ['Content-type'] value: cineál
+		).
+		dílis headers iarcheangail: (
+			HTTP-Header nua
+			key: ['Content-Length'] value: output teaghrán bytes
+		).
+		dílis headers gach: { :_ :header
+			Aschur scríobh: header.
+		}.
+		dílis headers-out := Fíor.
+		Aschur scríobh: ['\r\n'].
+	}.
+	Aschur scríobh: output.
+}.
+
+Web-Document ar: ['out:'] déan: { :output
+	féin out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ar: ['finish:'] déan: { :output
+	féin finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document ar: ['json:'] déan: { :output
+	féin out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document ar: ['not-found:'] déan: { :output
+	féin clear-headers header: (
+		HTTP-Header nua key: ['Status'] value: ['404 Not Found']
+	).
+	féin out: output.
+}.
+
+
+# Interface
+
+>> Session := Réad nua.
+
+Session ar: ['nua'] déan: { <- féin nua init for: Neamhní.
+}.
+
+Session ar: ['for:'] déan: { :id
+	dílis id := id.
+}.
+
+Session ar: ['load'] déan: {
+	an-tasc-seo earráid: ['Not implemented.'].
+}.
+
+Session ar: ['save:'] déan: {
+	an-tasc-seo earráid: ['Not implemented.'].
+}.
+
+Session ar: ['destroy'] déan: {
+	an-tasc-seo earráid: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session nua.
+
+Tempfile-Session ar: ['init'] déan: {
+	dílis pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session ar: ['path-prefix:'] déan: { :str
+	dílis pathprefix := str.
+}.
+
+Tempfile-Session ar: ['file'] déan: { <- ( Comhad nua: ( dílis pathprefix + dílis id + ['.txt'] ) ).
+}.
+
+Tempfile-Session ar: ['load'] déan: {
+	>> file := féin file.
+	file ann bréagach: {
+		file scríobh: (Foclóir nua cód).
+	}. <- file léigh réad.
+}.
+
+Tempfile-Session ar: ['save:'] déan: { :data
+	>> file := féin file.
+	file ann fíor: {
+		file scríobh: data cód.
+	}.
+}.
+
+Tempfile-Session ar: ['destroy'] déan: {
+	>> file := féin file.
+	file ann fíor: {
+		file scrios.
+	}.
+}.
+
+
+>> URL := Réad nua.
+
+URL ar: ['init'] déan: {
+	dílis protocol := ['https://'].
+	dílis óstach := ['localhost'].
+	dílis conair := [''].
+	dílis params := [''].
+	dílis hash := [''].
+}.
+
+URL ar: ['nua'] déan: { <- féin nua init.
+}.
+
+URL ar: ['teaghrán'] déan: { <- (
+	dílis protocol +
+	dílis óstach +
+	dílis conair +
+	dílis params +
+	dílis hash ).
+}.
+
+URL ar: ['protocol:'] déan: { :protocol
+	((Liosta nua: ['http'] ; ['https']) cuimsíonn: protocol) fíor: {
+		dílis protocol := protocol + ['://'].
+	}, bréagach: {
+		an-tasc-seo earráid: ['Invalid protocol'].
+	}.
+}.
+
+URL ar: ['óstach:'] déan: { :óstach
+	#todo validate according to rfc
+	dílis óstach := óstach.
+}.
+
+URL ar: ['path:'] déan: { :conair
+	dílis conair := ['/'] + conair url-ionchódaigh.
+}.
+
+URL ar: ['params:'] déan: { :map
+	>> params := Liosta nua.
+	map gach: { :key :value
+		params iarcheangail: key teaghrán url-ionchódaigh + ['='] + value teaghrán url-ionchódaigh.
+	}.
+	dílis params := ['?'] + ( params ceangail: ['&'] ).
+}.
+
+URL ar: ['haiseáil:'] déan: { :hash
+	dílis hash := ['#'] + hash url-ionchódaigh.
+}.
+

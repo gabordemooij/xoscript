@@ -1,0 +1,128 @@
+>> Email := വസ്തു പുതിയ.
+
+Email കിട്ടുമ്പോൾ: ['init'] ചെയ്യുക: {
+	തന്റെ recipients := ശ്രേണി പുതിയ.
+	തന്റെ cc := ശ്രേണി പുതിയ.
+	തന്റെ bcc := ശ്രേണി പുതിയ.
+	തന്റെ from := ശൂന്യം.
+	തന്റെ from-name := ശൂന്യം.
+	തന്റെ subject := ശൂന്യം.
+	തന്റെ body := ശൂന്യം.
+}.
+
+Email കിട്ടുമ്പോൾ: ['പുതിയ'] ചെയ്യുക: { <- താൻ പുതിയ init.
+}.
+
+Email കിട്ടുമ്പോൾ: ['to:'] ചെയ്യുക: { :list
+	തന്റെ recipients := list.
+}.
+ 
+Email കിട്ടുമ്പോൾ: ['cc:'] ചെയ്യുക: { :list
+	തന്റെ cc := list.
+}.
+
+Email കിട്ടുമ്പോൾ: ['bcc:'] ചെയ്യുക: { :list
+	തന്റെ bcc := list.
+}.
+
+Email കിട്ടുമ്പോൾ: ['subject:'] ചെയ്യുക: { :subject
+	തന്റെ subject := subject.
+}.
+
+Email കിട്ടുമ്പോൾ: ['from:name:'] ചെയ്യുക: { :from :പേര്
+	തന്റെ from := from.
+	തന്റെ from-name := പേര്.
+}.
+
+Email കിട്ടുമ്പോൾ: ['body:'] ചെയ്യുക: { :body
+	തന്റെ body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email കിട്ടുമ്പോൾ: ['header:'] ചെയ്യുക: { :line <- line മാറ്റുക: ['\r'] പകരം: [''], മാറ്റുക: ['\n'] പകരം: [''].
+}.
+
+Email കിട്ടുമ്പോൾ: ['send'] ചെയ്യുക: {
+	>> f := ഫയൽ tempwrite: താൻ generate.
+	പ്രോഗ്രാം സിസ്റ്റം: ['sendmail -t < '] + f ഫയൽ-പാത, പുതിയ-വരി.
+}.
+
+Email കിട്ടുമ്പോൾ: ['generate'] ചെയ്യുക: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str അവസാനം-ചേർക്കുക: (താൻ header: ['From: '] + തന്റെ from-name + [' <'] + ( തന്റെ from ) + ['>']) + brk.
+	str അവസാനം-ചേർക്കുക: (താൻ header: ['To: '] + ( തന്റെ recipients ചേർക്കുക: [','] )) + brk.
+	തന്റെ cc എണ്ണം ശരിയെങ്കിൽ: {
+		str അവസാനം-ചേർക്കുക: (താൻ header: ['Cc: '] + ( തന്റെ cc ചേർക്കുക: [','] )) + brk.
+	}.
+	തന്റെ bcc എണ്ണം ശരിയെങ്കിൽ: {
+		str അവസാനം-ചേർക്കുക: (താൻ header: ['Bcc: '] + ( തന്റെ bcc ചേർക്കുക: [','] )) + brk.
+	}.
+	str അവസാനം-ചേർക്കുക: (താൻ header: ['Subject: '] + തന്റെ subject) + brk.
+	str അവസാനം-ചേർക്കുക: brk.
+	str അവസാനം-ചേർക്കുക: തന്റെ body.
+	str അവസാനം-ചേർക്കുക: brk. <- str.
+}.
+
+>> HTML-Email := Email പുതിയ.
+
+HTML-Email കിട്ടുമ്പോൾ: ['init'] ചെയ്യുക: {
+	താൻ init.
+	തന്റെ attachments := ശ്രേണി പുതിയ.
+	തന്റെ boundary := നിലവറ ടോക്കൺ: 40.
+}.
+
+HTML-Email കിട്ടുമ്പോൾ: ['attach:'] ചെയ്യുക: { :file
+	>> id := തന്റെ attachments എണ്ണം.
+	>> blob := file blob.
+	തന്റെ attachments അവസാനം-ചേർക്കുക: (
+		നിഘണ്ടു പുതിയ
+			file: file ഫയൽ-പാത,
+			mime: ['image/'] + (Server mimetype: file ഫയൽ-പാത),
+			data: blob base64-എൻകോഡ്
+	).
+	blob സ്വതന്ത്രമാക്കുക. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email കിട്ടുമ്പോൾ: ['generate'] ചെയ്യുക: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str അവസാനം-ചേർക്കുക: (താൻ header: ['From: '] + തന്റെ from-name + [' <'] + ( തന്റെ from ) + ['>']) + brk.
+	str അവസാനം-ചേർക്കുക: (താൻ header: ['To: '] + ( തന്റെ recipients ചേർക്കുക: [','] )) + brk.
+	തന്റെ cc എണ്ണം ശരിയെങ്കിൽ: {
+		str അവസാനം-ചേർക്കുക: (താൻ header: ['Cc: '] + ( തന്റെ cc ചേർക്കുക: [','] )) + brk.
+	}.
+	തന്റെ bcc എണ്ണം ശരിയെങ്കിൽ: {
+		str അവസാനം-ചേർക്കുക: (താൻ header: ['Bcc: '] + ( തന്റെ bcc ചേർക്കുക: [','] )) + brk.
+	}.
+	str അവസാനം-ചേർക്കുക: (താൻ header: ['Subject: '] + തന്റെ subject) + brk.
+	str അവസാനം-ചേർക്കുക: ['MIME-Version: 1.0'] + brk.
+	str അവസാനം-ചേർക്കുക: ['Content-Type: multipart/related; boundary="'] + തന്റെ boundary + ['"; type=text/html'] + brk.
+	str അവസാനം-ചേർക്കുക: brk.
+	str അവസാനം-ചേർക്കുക: ['--'] + തന്റെ boundary + brk.
+	str അവസാനം-ചേർക്കുക: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str അവസാനം-ചേർക്കുക: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str അവസാനം-ചേർക്കുക: brk.
+	str അവസാനം-ചേർക്കുക: തന്റെ body.
+	str അവസാനം-ചേർക്കുക: brk.
+	തന്റെ attachments ഓരോന്നും: { :id :info
+		>> blob := info data.
+		str അവസാനം-ചേർക്കുക: ['--'] + തന്റെ boundary + brk.
+		str അവസാനം-ചേർക്കുക: ['Content-Type: '] + info mime + brk.
+		str അവസാനം-ചേർക്കുക: ['Content-Transfer-Encoding: base64'] + brk.
+		str അവസാനം-ചേർക്കുക: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str അവസാനം-ചേർക്കുക: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str അവസാനം-ചേർക്കുക: brk.
+		>> max := 76.
+		>> len := blob നീളം.
+		>> chunks := (len / max) മുകളിലേക്ക്-പൂർണ്ണം.
+		{ :i
+			>> chunk := blob പകർപ്പ് തുടക്കം: i * max നീളം: max.
+			str അവസാനം-ചേർക്കുക: chunk + brk.
+		} * chunks.
+		str അവസാനം-ചേർക്കുക: brk.
+		str അവസാനം-ചേർക്കുക: brk.
+	}.
+	str അവസാനം-ചേർക്കുക: ['--'] + തന്റെ boundary + ['--'] + brk. <- str.
+}.

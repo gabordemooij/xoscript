@@ -1,0 +1,325 @@
+HTTP-Захтев на: ['HTTP-header:'] уради: { :key <- Програм подешавање: key.
+}.
+
+>> HTTP-Header := Објекат нови.
+
+HTTP-Header на: ['нови'] уради: { <- себе нови init.
+}.
+
+HTTP-Header на: ['init'] уради: {
+	свој key := Ништа.
+	свој value := Ништа.
+}.
+
+HTTP-Header на: ['key:value:'] уради: { :key :value
+	свој key := key.
+	свој value := value.
+}.
+
+HTTP-Header на: ['key'] уради: { <- свој key.
+}.
+
+HTTP-Header на: ['value'] уради: { <- свој value.
+}.
+
+
+HTTP-Header на: ['текст'] уради: {
+	>> line := свој key + [': '] + свој value.
+	line замени: ['\r'] са: [''], замени: ['\n'] са: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Објекат нови.
+
+Web-Document на: ['нови'] уради: { <- себе нови init.
+}.
+
+Web-Document на: ['init'] уради: {
+	свој headers := Листа нови.
+	свој sess-id := Ништа.
+	свој session-manager := Tempfile-Session нови.
+	свој sessdata := Ништа.
+	свој secure := Тачно.
+	свој same-site := ['Strict'].
+	свој headers-out := Нетачно.
+	свој request := HTTP-Захтев нови.
+}.
+
+Web-Document на: ['request:'] уради: { :request
+	свој request := request.
+}. 
+
+Web-Document на: ['secure-session-cookie:'] уради: { :secure
+	себе check-headers.
+	свој secure := secure.
+}.
+
+Web-Document на: ['same-site-session-cookie:'] уради: { :value
+	себе check-headers.
+	>> options := Листа нови 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options садржи: value, нетачно: {
+		овај-задатак грешка: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	свој same-site := value.
+}.
+
+Web-Document на: ['header:'] уради: { :header
+	себе check-headers.
+	свој headers додај-на-крај: header.
+}.
+
+Web-Document на: ['clear-headers'] уради: {
+	себе check-headers.
+	свој headers := Листа нови.
+}.
+
+Web-Document на: ['session-manager:'] уради: { :manager
+	себе check-headers.
+	свој session-manager := manager.
+}.
+
+Web-Document на: ['session-manager'] уради: { <- свој session-manager.
+}.
+
+Web-Document на: ['check-headers'] уради: {
+	свој headers-out тачно: {
+		овај-задатак грешка: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document на: ['session-start'] уради: {
+	себе check-headers.
+	>> request := свој request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Ништа? нетачно: {
+		(( Образац нови: ['^[A-Za-z0-9]+\\z'], подударање: sess-id ) = 0) тачно: {
+			sess-id := Ништа.
+		}.
+	}.
+	sess-id Ништа? тачно: {
+		sess-id := Сеф токен: 30.
+		>> session-header := HTTP-Header нови
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (свој secure или: ['Secure'] или: ['']),
+		SSITE: (свој same-site),
+		XSID: sess-id
+		).
+		свој headers додај-на-крај: session-header.
+	}.
+	свој sessdata := свој session-manager for: sess-id, load. <- свој sessdata. # reference
+}.
+
+Web-Document на: ['goto:'] уради: { :url
+	себе check-headers.
+	себе clear-headers.
+	свој headers
+	додај-на-крај: (
+		HTTP-Header нови
+		key: ['Status'] value: ['303 See Other']
+	),
+	додај-на-крај: (
+		HTTP-Header нови
+		key: ['Location'] value: url
+	).
+	себе out: ['Redirect'].
+}.
+
+Web-Document на: ['session-destroy'] уради: {
+	себе check-headers.
+	>> request := свој request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Ништа? нетачно: {
+		>> session-header := HTTP-Header нови.
+		>> when := Тренутак нови година: 1970, формат: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (свој secure или: ['Secure'] или: ['']),
+			SSITE: (свој same-site),
+			XSID: sess-id
+		).
+		свој session-manager destroy.
+		свој headers додај-на-крај: session-header.
+	}.
+}.
+
+
+Web-Document на: ['template:'] уради: { :путања <- Template нови: (Датотека нови: путања, читај).
+}.
+
+Web-Document на: ['out:type:'] уради: { :output :тип
+	свој headers-out нетачно: {
+		свој sessdata Ништа? нетачно: {
+			свој session-manager save: свој sessdata.
+		}.
+		свој headers додај-на-крај: (
+			HTTP-Header нови
+			key: ['Content-type'] value: тип
+		).
+		свој headers сваки: { :_ :header
+			Излаз пиши: header.
+		}.
+		свој headers-out := Тачно.
+		Излаз пиши: ['\r\n'].
+	}.
+	Излаз пиши: output.
+}.
+
+Web-Document на: ['finish:type:'] уради: { :output :тип
+	свој headers-out нетачно: {
+		свој sessdata Ништа? нетачно: {
+			свој session-manager save: свој sessdata.
+		}.
+		свој headers додај-на-крај: (
+			HTTP-Header нови
+			key: ['Content-type'] value: тип
+		).
+		свој headers додај-на-крај: (
+			HTTP-Header нови
+			key: ['Content-Length'] value: output текст bytes
+		).
+		свој headers сваки: { :_ :header
+			Излаз пиши: header.
+		}.
+		свој headers-out := Тачно.
+		Излаз пиши: ['\r\n'].
+	}.
+	Излаз пиши: output.
+}.
+
+Web-Document на: ['out:'] уради: { :output
+	себе out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document на: ['finish:'] уради: { :output
+	себе finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document на: ['json:'] уради: { :output
+	себе out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document на: ['not-found:'] уради: { :output
+	себе clear-headers header: (
+		HTTP-Header нови key: ['Status'] value: ['404 Not Found']
+	).
+	себе out: output.
+}.
+
+
+# Interface
+
+>> Session := Објекат нови.
+
+Session на: ['нови'] уради: { <- себе нови init for: Ништа.
+}.
+
+Session на: ['for:'] уради: { :id
+	свој id := id.
+}.
+
+Session на: ['load'] уради: {
+	овај-задатак грешка: ['Not implemented.'].
+}.
+
+Session на: ['save:'] уради: {
+	овај-задатак грешка: ['Not implemented.'].
+}.
+
+Session на: ['destroy'] уради: {
+	овај-задатак грешка: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session нови.
+
+Tempfile-Session на: ['init'] уради: {
+	свој pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session на: ['path-prefix:'] уради: { :str
+	свој pathprefix := str.
+}.
+
+Tempfile-Session на: ['file'] уради: { <- ( Датотека нови: ( свој pathprefix + свој id + ['.txt'] ) ).
+}.
+
+Tempfile-Session на: ['load'] уради: {
+	>> file := себе file.
+	file постоји нетачно: {
+		file пиши: (Речник нови код).
+	}. <- file читај објекат.
+}.
+
+Tempfile-Session на: ['save:'] уради: { :data
+	>> file := себе file.
+	file постоји тачно: {
+		file пиши: data код.
+	}.
+}.
+
+Tempfile-Session на: ['destroy'] уради: {
+	>> file := себе file.
+	file постоји тачно: {
+		file избриши.
+	}.
+}.
+
+
+>> URL := Објекат нови.
+
+URL на: ['init'] уради: {
+	свој protocol := ['https://'].
+	свој домаћин := ['localhost'].
+	свој путања := [''].
+	свој params := [''].
+	свој hash := [''].
+}.
+
+URL на: ['нови'] уради: { <- себе нови init.
+}.
+
+URL на: ['текст'] уради: { <- (
+	свој protocol +
+	свој домаћин +
+	свој путања +
+	свој params +
+	свој hash ).
+}.
+
+URL на: ['protocol:'] уради: { :protocol
+	((Листа нови: ['http'] ; ['https']) садржи: protocol) тачно: {
+		свој protocol := protocol + ['://'].
+	}, нетачно: {
+		овај-задатак грешка: ['Invalid protocol'].
+	}.
+}.
+
+URL на: ['домаћин:'] уради: { :домаћин
+	#todo validate according to rfc
+	свој домаћин := домаћин.
+}.
+
+URL на: ['path:'] уради: { :путања
+	свој путања := ['/'] + путања url-кодирај.
+}.
+
+URL на: ['params:'] уради: { :map
+	>> params := Листа нови.
+	map сваки: { :key :value
+		params додај-на-крај: key текст url-кодирај + ['='] + value текст url-кодирај.
+	}.
+	свој params := ['?'] + ( params споји: ['&'] ).
+}.
+
+URL на: ['хеш:'] уради: { :hash
+	свој hash := ['#'] + hash url-кодирај.
+}.
+

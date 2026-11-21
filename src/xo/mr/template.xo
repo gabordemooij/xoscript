@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := वस्तू नवीन.
+
+Template जेव्हा: ['नवीन'] करा: { <- स्वतः नवीन content: [''].
+}.
+
+Template जेव्हा: ['content:'] करा: { :content
+	स्वतःचे content := content. 
+}.
+
+Template जेव्हा: ['नवीन:'] करा: { :content <- स्वतः नवीन content: content.
+}.
+
+Template जेव्हा: ['cut:'] करा: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := स्वतःचे content विभाजित: startmarker.
+	>> prefix := parts पहिला.
+	>> parts2 := parts शेवटचा विभाजित: endmarker.
+	>> suffix := parts2 शेवटचा.
+	>> part := parts2 पहिला.
+	>> rest := prefix + suffix.
+	स्वतःचे content := rest. <- Template नवीन: part.
+	
+}.
+
+Template जेव्हा: ['प्रत'] करा: { <- स्वतः नवीन: स्वतः मजकुरात प्रत.
+}.
+	
+Template जेव्हा: ['paste:at:'] करा: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	स्वतःचे content बदला: pastemarker ने: ( snippet मजकुरात + pastemarker ).
+}.
+
+Template जेव्हा: ['निश्चित:मूल्य:'] करा: { :slot :value
+	स्वतःचे content बदला: ['<!-- slot:'] + slot + [' -->'] ने: ( Server html-एनकोड: value ).
+}.
+
+Template जेव्हा: ['set:html:'] करा: { :slot :html
+	स्वतःचे content बदला: ['<!-- slot:'] + slot + [' -->'] ने: html.
+}.
+
+Template जेव्हा: ['उत्तर:आणि:'] करा: { :slot :value
+	स्वतः निश्चित: (slot सुरुवात: 0 लांबी: (slot लांबी - 1)) मूल्य: value.
+}.
+
+Template जेव्हा: ['nl2br'] करा: {
+	स्वतःचे content बदला: ['\n'] ने: ['<br>'].
+}.
+
+Template जेव्हा: ['clean'] करा: {
+	स्वतःचे content :=
+		पॅटर्न
+		नवीन: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		जुळणी: स्वतःचे content
+		करा: { <- ['']. }.
+}.
+
+Template जेव्हा: ['clean-cuts'] करा: {
+	>> items := सूची नवीन.
+	पॅटर्न
+	नवीन: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	जुळणी: स्वतःचे content
+	करा: { :_ :part
+		items शेवटी-जोडा: part ? 1.
+	}.
+	items प्रत्येक: { :_ :id
+		स्वतःचे content :=
+			पॅटर्न नवीन: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			जुळणी: स्वतःचे content
+			करा: { <- ['']. }.
+	 }.
+}.
+
+Template जेव्हा: ['clean-space'] करा: {
+	स्वतःचे content :=
+		पॅटर्न
+		नवीन: ['\\s*\\n'],
+		जुळणी: स्वतःचे content
+		करा: { <- ['\n']. }.
+	स्वतःचे content :=
+		पॅटर्न
+		नवीन: ['\\n[\\s\\t]+'],
+		जुळणी: स्वतःचे content
+		करा: { <- ['\n']. }.
+}.
+
+Template जेव्हा: ['clean-all'] करा: {
+	स्वतः clean.
+	स्वतः clean-cuts.
+	स्वतः clean-space.
+}.
+
+Template जेव्हा: ['मजकुरात'] करा: { <- स्वतःचे content.
+}.

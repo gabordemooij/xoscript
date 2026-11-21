@@ -1,0 +1,325 @@
+Cerere-HTTP la: ['HTTP-header:'] execută: { :key <- Program setare: key.
+}.
+
+>> HTTP-Header := Obiect nou.
+
+HTTP-Header la: ['nou'] execută: { <- sine nou init.
+}.
+
+HTTP-Header la: ['init'] execută: {
+	propriu key := Nimic.
+	propriu value := Nimic.
+}.
+
+HTTP-Header la: ['key:value:'] execută: { :key :value
+	propriu key := key.
+	propriu value := value.
+}.
+
+HTTP-Header la: ['key'] execută: { <- propriu key.
+}.
+
+HTTP-Header la: ['value'] execută: { <- propriu value.
+}.
+
+
+HTTP-Header la: ['text'] execută: {
+	>> line := propriu key + [': '] + propriu value.
+	line înlocuiește: ['\r'] cu: [''], înlocuiește: ['\n'] cu: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Obiect nou.
+
+Web-Document la: ['nou'] execută: { <- sine nou init.
+}.
+
+Web-Document la: ['init'] execută: {
+	propriu headers := Listă nou.
+	propriu sess-id := Nimic.
+	propriu session-manager := Tempfile-Session nou.
+	propriu sessdata := Nimic.
+	propriu secure := Adevărat.
+	propriu same-site := ['Strict'].
+	propriu headers-out := Fals.
+	propriu request := Cerere-HTTP nou.
+}.
+
+Web-Document la: ['request:'] execută: { :request
+	propriu request := request.
+}. 
+
+Web-Document la: ['secure-session-cookie:'] execută: { :secure
+	sine check-headers.
+	propriu secure := secure.
+}.
+
+Web-Document la: ['same-site-session-cookie:'] execută: { :value
+	sine check-headers.
+	>> options := Listă nou 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options conține: value, fals: {
+		această-sarcină eroare: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	propriu same-site := value.
+}.
+
+Web-Document la: ['header:'] execută: { :header
+	sine check-headers.
+	propriu headers adaugă-la-sfârșit: header.
+}.
+
+Web-Document la: ['clear-headers'] execută: {
+	sine check-headers.
+	propriu headers := Listă nou.
+}.
+
+Web-Document la: ['session-manager:'] execută: { :manager
+	sine check-headers.
+	propriu session-manager := manager.
+}.
+
+Web-Document la: ['session-manager'] execută: { <- propriu session-manager.
+}.
+
+Web-Document la: ['check-headers'] execută: {
+	propriu headers-out adevărat: {
+		această-sarcină eroare: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document la: ['session-start'] execută: {
+	sine check-headers.
+	>> request := propriu request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Nimic? fals: {
+		(( Șablon nou: ['^[A-Za-z0-9]+\\z'], potrivire: sess-id ) = 0) adevărat: {
+			sess-id := Nimic.
+		}.
+	}.
+	sess-id Nimic? adevărat: {
+		sess-id := Seif jeton: 30.
+		>> session-header := HTTP-Header nou
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (propriu secure sau: ['Secure'] sau: ['']),
+		SSITE: (propriu same-site),
+		XSID: sess-id
+		).
+		propriu headers adaugă-la-sfârșit: session-header.
+	}.
+	propriu sessdata := propriu session-manager for: sess-id, load. <- propriu sessdata. # reference
+}.
+
+Web-Document la: ['goto:'] execută: { :url
+	sine check-headers.
+	sine clear-headers.
+	propriu headers
+	adaugă-la-sfârșit: (
+		HTTP-Header nou
+		key: ['Status'] value: ['303 See Other']
+	),
+	adaugă-la-sfârșit: (
+		HTTP-Header nou
+		key: ['Location'] value: url
+	).
+	sine out: ['Redirect'].
+}.
+
+Web-Document la: ['session-destroy'] execută: {
+	sine check-headers.
+	>> request := propriu request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Nimic? fals: {
+		>> session-header := HTTP-Header nou.
+		>> when := Moment nou an: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (propriu secure sau: ['Secure'] sau: ['']),
+			SSITE: (propriu same-site),
+			XSID: sess-id
+		).
+		propriu session-manager destroy.
+		propriu headers adaugă-la-sfârșit: session-header.
+	}.
+}.
+
+
+Web-Document la: ['template:'] execută: { :cale <- Template nou: (Fișier nou: cale, citește).
+}.
+
+Web-Document la: ['out:type:'] execută: { :output :tip
+	propriu headers-out fals: {
+		propriu sessdata Nimic? fals: {
+			propriu session-manager save: propriu sessdata.
+		}.
+		propriu headers adaugă-la-sfârșit: (
+			HTTP-Header nou
+			key: ['Content-type'] value: tip
+		).
+		propriu headers fiecare: { :_ :header
+			Ieșire scrie: header.
+		}.
+		propriu headers-out := Adevărat.
+		Ieșire scrie: ['\r\n'].
+	}.
+	Ieșire scrie: output.
+}.
+
+Web-Document la: ['finish:type:'] execută: { :output :tip
+	propriu headers-out fals: {
+		propriu sessdata Nimic? fals: {
+			propriu session-manager save: propriu sessdata.
+		}.
+		propriu headers adaugă-la-sfârșit: (
+			HTTP-Header nou
+			key: ['Content-type'] value: tip
+		).
+		propriu headers adaugă-la-sfârșit: (
+			HTTP-Header nou
+			key: ['Content-Length'] value: output text bytes
+		).
+		propriu headers fiecare: { :_ :header
+			Ieșire scrie: header.
+		}.
+		propriu headers-out := Adevărat.
+		Ieșire scrie: ['\r\n'].
+	}.
+	Ieșire scrie: output.
+}.
+
+Web-Document la: ['out:'] execută: { :output
+	sine out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document la: ['finish:'] execută: { :output
+	sine finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document la: ['json:'] execută: { :output
+	sine out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document la: ['not-found:'] execută: { :output
+	sine clear-headers header: (
+		HTTP-Header nou key: ['Status'] value: ['404 Not Found']
+	).
+	sine out: output.
+}.
+
+
+# Interface
+
+>> Session := Obiect nou.
+
+Session la: ['nou'] execută: { <- sine nou init for: Nimic.
+}.
+
+Session la: ['for:'] execută: { :id
+	propriu id := id.
+}.
+
+Session la: ['load'] execută: {
+	această-sarcină eroare: ['Not implemented.'].
+}.
+
+Session la: ['save:'] execută: {
+	această-sarcină eroare: ['Not implemented.'].
+}.
+
+Session la: ['destroy'] execută: {
+	această-sarcină eroare: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session nou.
+
+Tempfile-Session la: ['init'] execută: {
+	propriu pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session la: ['path-prefix:'] execută: { :str
+	propriu pathprefix := str.
+}.
+
+Tempfile-Session la: ['file'] execută: { <- ( Fișier nou: ( propriu pathprefix + propriu id + ['.txt'] ) ).
+}.
+
+Tempfile-Session la: ['load'] execută: {
+	>> file := sine file.
+	file există fals: {
+		file scrie: (Dicționar nou cod).
+	}. <- file citește obiect.
+}.
+
+Tempfile-Session la: ['save:'] execută: { :data
+	>> file := sine file.
+	file există adevărat: {
+		file scrie: data cod.
+	}.
+}.
+
+Tempfile-Session la: ['destroy'] execută: {
+	>> file := sine file.
+	file există adevărat: {
+		file șterge.
+	}.
+}.
+
+
+>> URL := Obiect nou.
+
+URL la: ['init'] execută: {
+	propriu protocol := ['https://'].
+	propriu gazdă := ['localhost'].
+	propriu cale := [''].
+	propriu params := [''].
+	propriu hash := [''].
+}.
+
+URL la: ['nou'] execută: { <- sine nou init.
+}.
+
+URL la: ['text'] execută: { <- (
+	propriu protocol +
+	propriu gazdă +
+	propriu cale +
+	propriu params +
+	propriu hash ).
+}.
+
+URL la: ['protocol:'] execută: { :protocol
+	((Listă nou: ['http'] ; ['https']) conține: protocol) adevărat: {
+		propriu protocol := protocol + ['://'].
+	}, fals: {
+		această-sarcină eroare: ['Invalid protocol'].
+	}.
+}.
+
+URL la: ['gazdă:'] execută: { :gazdă
+	#todo validate according to rfc
+	propriu gazdă := gazdă.
+}.
+
+URL la: ['path:'] execută: { :cale
+	propriu cale := ['/'] + cale url-codifică.
+}.
+
+URL la: ['params:'] execută: { :map
+	>> params := Listă nou.
+	map fiecare: { :key :value
+		params adaugă-la-sfârșit: key text url-codifică + ['='] + value text url-codifică.
+	}.
+	propriu params := ['?'] + ( params unește: ['&'] ).
+}.
+
+URL la: ['rezumat:'] execută: { :hash
+	propriu hash := ['#'] + hash url-codifică.
+}.
+

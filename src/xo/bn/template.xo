@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := বস্তু নতুন.
+
+Template যখন: ['নতুন'] করো: { <- নিজে নতুন content: [''].
+}.
+
+Template যখন: ['content:'] করো: { :content
+	নিজের content := content. 
+}.
+
+Template যখন: ['নতুন:'] করো: { :content <- নিজে নতুন content: content.
+}.
+
+Template যখন: ['cut:'] করো: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := নিজের content ভাগ-করো: startmarker.
+	>> prefix := parts প্রথম.
+	>> parts2 := parts শেষ-উপাদান ভাগ-করো: endmarker.
+	>> suffix := parts2 শেষ-উপাদান.
+	>> part := parts2 প্রথম.
+	>> rest := prefix + suffix.
+	নিজের content := rest. <- Template নতুন: part.
+	
+}.
+
+Template যখন: ['অনুলিপি'] করো: { <- নিজে নতুন: নিজে পাঠে অনুলিপি.
+}.
+	
+Template যখন: ['paste:at:'] করো: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	নিজের content বদলাও: pastemarker দিয়ে: ( snippet পাঠে + pastemarker ).
+}.
+
+Template যখন: ['নির্ধারণ:মান:'] করো: { :slot :value
+	নিজের content বদলাও: ['<!-- slot:'] + slot + [' -->'] দিয়ে: ( Server html-এনকোড: value ).
+}.
+
+Template যখন: ['set:html:'] করো: { :slot :html
+	নিজের content বদলাও: ['<!-- slot:'] + slot + [' -->'] দিয়ে: html.
+}.
+
+Template যখন: ['উত্তর:এবং:'] করো: { :slot :value
+	নিজে নির্ধারণ: (slot শুরু: 0 দৈর্ঘ্য: (slot দৈর্ঘ্য - 1)) মান: value.
+}.
+
+Template যখন: ['nl2br'] করো: {
+	নিজের content বদলাও: ['\n'] দিয়ে: ['<br>'].
+}.
+
+Template যখন: ['clean'] করো: {
+	নিজের content :=
+		প্যাটার্ন
+		নতুন: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		মিল: নিজের content
+		করো: { <- ['']. }.
+}.
+
+Template যখন: ['clean-cuts'] করো: {
+	>> items := লিস্ট নতুন.
+	প্যাটার্ন
+	নতুন: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	মিল: নিজের content
+	করো: { :_ :part
+		items শেষে-যোগ: part ? 1.
+	}.
+	items প্রতিটি: { :_ :id
+		নিজের content :=
+			প্যাটার্ন নতুন: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			মিল: নিজের content
+			করো: { <- ['']. }.
+	 }.
+}.
+
+Template যখন: ['clean-space'] করো: {
+	নিজের content :=
+		প্যাটার্ন
+		নতুন: ['\\s*\\n'],
+		মিল: নিজের content
+		করো: { <- ['\n']. }.
+	নিজের content :=
+		প্যাটার্ন
+		নতুন: ['\\n[\\s\\t]+'],
+		মিল: নিজের content
+		করো: { <- ['\n']. }.
+}.
+
+Template যখন: ['clean-all'] করো: {
+	নিজে clean.
+	নিজে clean-cuts.
+	নিজে clean-space.
+}.
+
+Template যখন: ['পাঠে'] করো: { <- নিজের content.
+}.

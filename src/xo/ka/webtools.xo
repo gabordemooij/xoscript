@@ -1,0 +1,325 @@
+HTTP-მოთხოვნა როცა: ['HTTP-header:'] გააკეთე: { :key <- პროგრამა პარამეტრი: key.
+}.
+
+>> HTTP-Header := ობიექტი ახალი.
+
+HTTP-Header როცა: ['ახალი'] გააკეთე: { <- თავად ახალი init.
+}.
+
+HTTP-Header როცა: ['init'] გააკეთე: {
+	საკუთარი key := არაფერი.
+	საკუთარი value := არაფერი.
+}.
+
+HTTP-Header როცა: ['key:value:'] გააკეთე: { :key :value
+	საკუთარი key := key.
+	საკუთარი value := value.
+}.
+
+HTTP-Header როცა: ['key'] გააკეთე: { <- საკუთარი key.
+}.
+
+HTTP-Header როცა: ['value'] გააკეთე: { <- საკუთარი value.
+}.
+
+
+HTTP-Header როცა: ['ტექსტად'] გააკეთე: {
+	>> line := საკუთარი key + [': '] + საკუთარი value.
+	line შეცვლა: ['\r'] ახლით: [''], შეცვლა: ['\n'] ახლით: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := ობიექტი ახალი.
+
+Web-Document როცა: ['ახალი'] გააკეთე: { <- თავად ახალი init.
+}.
+
+Web-Document როცა: ['init'] გააკეთე: {
+	საკუთარი headers := სია ახალი.
+	საკუთარი sess-id := არაფერი.
+	საკუთარი session-manager := Tempfile-Session ახალი.
+	საკუთარი sessdata := არაფერი.
+	საკუთარი secure := ჭეშმარიტი.
+	საკუთარი same-site := ['Strict'].
+	საკუთარი headers-out := მცდარი.
+	საკუთარი request := HTTP-მოთხოვნა ახალი.
+}.
+
+Web-Document როცა: ['request:'] გააკეთე: { :request
+	საკუთარი request := request.
+}. 
+
+Web-Document როცა: ['secure-session-cookie:'] გააკეთე: { :secure
+	თავად check-headers.
+	საკუთარი secure := secure.
+}.
+
+Web-Document როცა: ['same-site-session-cookie:'] გააკეთე: { :value
+	თავად check-headers.
+	>> options := სია ახალი 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options შეიცავს: value, მცდარი: {
+		ეს-ამოცანა შეცდომა: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	საკუთარი same-site := value.
+}.
+
+Web-Document როცა: ['header:'] გააკეთე: { :header
+	თავად check-headers.
+	საკუთარი headers ბოლოში-დამატება: header.
+}.
+
+Web-Document როცა: ['clear-headers'] გააკეთე: {
+	თავად check-headers.
+	საკუთარი headers := სია ახალი.
+}.
+
+Web-Document როცა: ['session-manager:'] გააკეთე: { :manager
+	თავად check-headers.
+	საკუთარი session-manager := manager.
+}.
+
+Web-Document როცა: ['session-manager'] გააკეთე: { <- საკუთარი session-manager.
+}.
+
+Web-Document როცა: ['check-headers'] გააკეთე: {
+	საკუთარი headers-out ჭეშმარიტი: {
+		ეს-ამოცანა შეცდომა: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document როცა: ['session-start'] გააკეთე: {
+	თავად check-headers.
+	>> request := საკუთარი request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id არაფერია? მცდარი: {
+		(( შაბლონი ახალი: ['^[A-Za-z0-9]+\\z'], დამთხვევა: sess-id ) = 0) ჭეშმარიტი: {
+			sess-id := არაფერი.
+		}.
+	}.
+	sess-id არაფერია? ჭეშმარიტი: {
+		sess-id := სეიფი ტოკენი: 30.
+		>> session-header := HTTP-Header ახალი
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (საკუთარი secure ან: ['Secure'] ან: ['']),
+		SSITE: (საკუთარი same-site),
+		XSID: sess-id
+		).
+		საკუთარი headers ბოლოში-დამატება: session-header.
+	}.
+	საკუთარი sessdata := საკუთარი session-manager for: sess-id, load. <- საკუთარი sessdata. # reference
+}.
+
+Web-Document როცა: ['goto:'] გააკეთე: { :url
+	თავად check-headers.
+	თავად clear-headers.
+	საკუთარი headers
+	ბოლოში-დამატება: (
+		HTTP-Header ახალი
+		key: ['Status'] value: ['303 See Other']
+	),
+	ბოლოში-დამატება: (
+		HTTP-Header ახალი
+		key: ['Location'] value: url
+	).
+	თავად out: ['Redirect'].
+}.
+
+Web-Document როცა: ['session-destroy'] გააკეთე: {
+	თავად check-headers.
+	>> request := საკუთარი request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id არაფერია? მცდარი: {
+		>> session-header := HTTP-Header ახალი.
+		>> when := მომენტი ახალი წელი: 1970, ფორმატით: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (საკუთარი secure ან: ['Secure'] ან: ['']),
+			SSITE: (საკუთარი same-site),
+			XSID: sess-id
+		).
+		საკუთარი session-manager destroy.
+		საკუთარი headers ბოლოში-დამატება: session-header.
+	}.
+}.
+
+
+Web-Document როცა: ['template:'] გააკეთე: { :ბილიკი <- Template ახალი: (ფაილი ახალი: ბილიკი, წაკითხვა).
+}.
+
+Web-Document როცა: ['out:type:'] გააკეთე: { :output :ტიპი
+	საკუთარი headers-out მცდარი: {
+		საკუთარი sessdata არაფერია? მცდარი: {
+			საკუთარი session-manager save: საკუთარი sessdata.
+		}.
+		საკუთარი headers ბოლოში-დამატება: (
+			HTTP-Header ახალი
+			key: ['Content-type'] value: ტიპი
+		).
+		საკუთარი headers თითოეული: { :_ :header
+			გამოტანა დაწერე: header.
+		}.
+		საკუთარი headers-out := ჭეშმარიტი.
+		გამოტანა დაწერე: ['\r\n'].
+	}.
+	გამოტანა დაწერე: output.
+}.
+
+Web-Document როცა: ['finish:type:'] გააკეთე: { :output :ტიპი
+	საკუთარი headers-out მცდარი: {
+		საკუთარი sessdata არაფერია? მცდარი: {
+			საკუთარი session-manager save: საკუთარი sessdata.
+		}.
+		საკუთარი headers ბოლოში-დამატება: (
+			HTTP-Header ახალი
+			key: ['Content-type'] value: ტიპი
+		).
+		საკუთარი headers ბოლოში-დამატება: (
+			HTTP-Header ახალი
+			key: ['Content-Length'] value: output ტექსტად bytes
+		).
+		საკუთარი headers თითოეული: { :_ :header
+			გამოტანა დაწერე: header.
+		}.
+		საკუთარი headers-out := ჭეშმარიტი.
+		გამოტანა დაწერე: ['\r\n'].
+	}.
+	გამოტანა დაწერე: output.
+}.
+
+Web-Document როცა: ['out:'] გააკეთე: { :output
+	თავად out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document როცა: ['finish:'] გააკეთე: { :output
+	თავად finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document როცა: ['json:'] გააკეთე: { :output
+	თავად out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document როცა: ['not-found:'] გააკეთე: { :output
+	თავად clear-headers header: (
+		HTTP-Header ახალი key: ['Status'] value: ['404 Not Found']
+	).
+	თავად out: output.
+}.
+
+
+# Interface
+
+>> Session := ობიექტი ახალი.
+
+Session როცა: ['ახალი'] გააკეთე: { <- თავად ახალი init for: არაფერი.
+}.
+
+Session როცა: ['for:'] გააკეთე: { :id
+	საკუთარი id := id.
+}.
+
+Session როცა: ['load'] გააკეთე: {
+	ეს-ამოცანა შეცდომა: ['Not implemented.'].
+}.
+
+Session როცა: ['save:'] გააკეთე: {
+	ეს-ამოცანა შეცდომა: ['Not implemented.'].
+}.
+
+Session როცა: ['destroy'] გააკეთე: {
+	ეს-ამოცანა შეცდომა: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session ახალი.
+
+Tempfile-Session როცა: ['init'] გააკეთე: {
+	საკუთარი pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session როცა: ['path-prefix:'] გააკეთე: { :str
+	საკუთარი pathprefix := str.
+}.
+
+Tempfile-Session როცა: ['file'] გააკეთე: { <- ( ფაილი ახალი: ( საკუთარი pathprefix + საკუთარი id + ['.txt'] ) ).
+}.
+
+Tempfile-Session როცა: ['load'] გააკეთე: {
+	>> file := თავად file.
+	file არსებობს მცდარი: {
+		file დაწერე: (ლექსიკონი ახალი კოდი).
+	}. <- file წაკითხვა ობიექტად.
+}.
+
+Tempfile-Session როცა: ['save:'] გააკეთე: { :data
+	>> file := თავად file.
+	file არსებობს ჭეშმარიტი: {
+		file დაწერე: data კოდი.
+	}.
+}.
+
+Tempfile-Session როცა: ['destroy'] გააკეთე: {
+	>> file := თავად file.
+	file არსებობს ჭეშმარიტი: {
+		file წაშლა.
+	}.
+}.
+
+
+>> URL := ობიექტი ახალი.
+
+URL როცა: ['init'] გააკეთე: {
+	საკუთარი protocol := ['https://'].
+	საკუთარი ჰოსტი := ['localhost'].
+	საკუთარი ბილიკი := [''].
+	საკუთარი params := [''].
+	საკუთარი hash := [''].
+}.
+
+URL როცა: ['ახალი'] გააკეთე: { <- თავად ახალი init.
+}.
+
+URL როცა: ['ტექსტად'] გააკეთე: { <- (
+	საკუთარი protocol +
+	საკუთარი ჰოსტი +
+	საკუთარი ბილიკი +
+	საკუთარი params +
+	საკუთარი hash ).
+}.
+
+URL როცა: ['protocol:'] გააკეთე: { :protocol
+	((სია ახალი: ['http'] ; ['https']) შეიცავს: protocol) ჭეშმარიტი: {
+		საკუთარი protocol := protocol + ['://'].
+	}, მცდარი: {
+		ეს-ამოცანა შეცდომა: ['Invalid protocol'].
+	}.
+}.
+
+URL როცა: ['ჰოსტი:'] გააკეთე: { :ჰოსტი
+	#todo validate according to rfc
+	საკუთარი ჰოსტი := ჰოსტი.
+}.
+
+URL როცა: ['path:'] გააკეთე: { :ბილიკი
+	საკუთარი ბილიკი := ['/'] + ბილიკი url-კოდირება.
+}.
+
+URL როცა: ['params:'] გააკეთე: { :map
+	>> params := სია ახალი.
+	map თითოეული: { :key :value
+		params ბოლოში-დამატება: key ტექსტად url-კოდირება + ['='] + value ტექსტად url-კოდირება.
+	}.
+	საკუთარი params := ['?'] + ( params გაერთიანება: ['&'] ).
+}.
+
+URL როცა: ['ჰეში:'] გააკეთე: { :hash
+	საკუთარი hash := ['#'] + hash url-კოდირება.
+}.
+

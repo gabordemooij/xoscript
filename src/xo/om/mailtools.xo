@@ -1,0 +1,128 @@
+>> Email := Wanta haaraa.
+
+Email irratti: ['init'] godhi: {
+	koo recipients := Tarree-wantootaa haaraa.
+	koo cc := Tarree-wantootaa haaraa.
+	koo bcc := Tarree-wantootaa haaraa.
+	koo from := Homaa.
+	koo from-name := Homaa.
+	koo subject := Homaa.
+	koo body := Homaa.
+}.
+
+Email irratti: ['haaraa'] godhi: { <- ofii haaraa init.
+}.
+
+Email irratti: ['to:'] godhi: { :list
+	koo recipients := list.
+}.
+ 
+Email irratti: ['cc:'] godhi: { :list
+	koo cc := list.
+}.
+
+Email irratti: ['bcc:'] godhi: { :list
+	koo bcc := list.
+}.
+
+Email irratti: ['subject:'] godhi: { :subject
+	koo subject := subject.
+}.
+
+Email irratti: ['from:name:'] godhi: { :from :maqaa
+	koo from := from.
+	koo from-name := maqaa.
+}.
+
+Email irratti: ['body:'] godhi: { :body
+	koo body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email irratti: ['header:'] godhi: { :line <- line bakka-buusi: ['\r'] tiin: [''], bakka-buusi: ['\n'] tiin: [''].
+}.
+
+Email irratti: ['send'] godhi: {
+	>> f := Faayila tempwrite: ofii generate.
+	Sagantaa shelli: ['sendmail -t < '] + f karaa, dhaabi.
+}.
+
+Email irratti: ['generate'] godhi: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str dabaliboodatti: (ofii header: ['From: '] + koo from-name + [' <'] + ( koo from ) + ['>']) + brk.
+	str dabaliboodatti: (ofii header: ['To: '] + ( koo recipients waliingalchi: [','] )) + brk.
+	koo cc lakkaaʼi yoodhugaa: {
+		str dabaliboodatti: (ofii header: ['Cc: '] + ( koo cc waliingalchi: [','] )) + brk.
+	}.
+	koo bcc lakkaaʼi yoodhugaa: {
+		str dabaliboodatti: (ofii header: ['Bcc: '] + ( koo bcc waliingalchi: [','] )) + brk.
+	}.
+	str dabaliboodatti: (ofii header: ['Subject: '] + koo subject) + brk.
+	str dabaliboodatti: brk.
+	str dabaliboodatti: koo body.
+	str dabaliboodatti: brk. <- str.
+}.
+
+>> HTML-Email := Email haaraa.
+
+HTML-Email irratti: ['init'] godhi: {
+	ofii init.
+	koo attachments := Tarree-wantootaa haaraa.
+	koo boundary := Kuusaa-nageenyaa token: 40.
+}.
+
+HTML-Email irratti: ['attach:'] godhi: { :file
+	>> id := koo attachments lakkaaʼi.
+	>> blob := file blob.
+	koo attachments dabaliboodatti: (
+		Galmee-jechootaa haaraa
+			file: file karaa,
+			mime: ['image/'] + (Server mimetype: file karaa),
+			data: blob base64-koodessi
+	).
+	blob gadi-lakkisi. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email irratti: ['generate'] godhi: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str dabaliboodatti: (ofii header: ['From: '] + koo from-name + [' <'] + ( koo from ) + ['>']) + brk.
+	str dabaliboodatti: (ofii header: ['To: '] + ( koo recipients waliingalchi: [','] )) + brk.
+	koo cc lakkaaʼi yoodhugaa: {
+		str dabaliboodatti: (ofii header: ['Cc: '] + ( koo cc waliingalchi: [','] )) + brk.
+	}.
+	koo bcc lakkaaʼi yoodhugaa: {
+		str dabaliboodatti: (ofii header: ['Bcc: '] + ( koo bcc waliingalchi: [','] )) + brk.
+	}.
+	str dabaliboodatti: (ofii header: ['Subject: '] + koo subject) + brk.
+	str dabaliboodatti: ['MIME-Version: 1.0'] + brk.
+	str dabaliboodatti: ['Content-Type: multipart/related; boundary="'] + koo boundary + ['"; type=text/html'] + brk.
+	str dabaliboodatti: brk.
+	str dabaliboodatti: ['--'] + koo boundary + brk.
+	str dabaliboodatti: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str dabaliboodatti: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str dabaliboodatti: brk.
+	str dabaliboodatti: koo body.
+	str dabaliboodatti: brk.
+	koo attachments hundaaf: { :id :info
+		>> blob := info data.
+		str dabaliboodatti: ['--'] + koo boundary + brk.
+		str dabaliboodatti: ['Content-Type: '] + info mime + brk.
+		str dabaliboodatti: ['Content-Transfer-Encoding: base64'] + brk.
+		str dabaliboodatti: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str dabaliboodatti: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str dabaliboodatti: brk.
+		>> max := 76.
+		>> len := blob dheerina.
+		>> chunks := (len / max) oli.
+		{ :i
+			>> chunk := blob kopii irraa: i * max dheerina: max.
+			str dabaliboodatti: chunk + brk.
+		} * chunks.
+		str dabaliboodatti: brk.
+		str dabaliboodatti: brk.
+	}.
+	str dabaliboodatti: ['--'] + koo boundary + ['--'] + brk. <- str.
+}.

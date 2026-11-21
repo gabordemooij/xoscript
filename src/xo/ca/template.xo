@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objecte nou.
+
+Template en: ['nou'] fes: { <- jo nou content: [''].
+}.
+
+Template en: ['content:'] fes: { :content
+	propi content := content. 
+}.
+
+Template en: ['nou:'] fes: { :content <- jo nou content: content.
+}.
+
+Template en: ['cut:'] fes: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := propi content divideix: startmarker.
+	>> prefix := parts primer.
+	>> parts2 := parts últim divideix: endmarker.
+	>> suffix := parts2 últim.
+	>> part := parts2 primer.
+	>> rest := prefix + suffix.
+	propi content := rest. <- Template nou: part.
+	
+}.
+
+Template en: ['copia'] fes: { <- jo nou: jo text copia.
+}.
+	
+Template en: ['paste:at:'] fes: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	propi content substitueix: pastemarker per: ( snippet text + pastemarker ).
+}.
+
+Template en: ['estableix:valor:'] fes: { :slot :value
+	propi content substitueix: ['<!-- slot:'] + slot + [' -->'] per: ( Server html-codifica: value ).
+}.
+
+Template en: ['set:html:'] fes: { :slot :html
+	propi content substitueix: ['<!-- slot:'] + slot + [' -->'] per: html.
+}.
+
+Template en: ['respon:i:'] fes: { :slot :value
+	jo estableix: (slot de: 0 longitud: (slot longitud - 1)) valor: value.
+}.
+
+Template en: ['nl2br'] fes: {
+	propi content substitueix: ['\n'] per: ['<br>'].
+}.
+
+Template en: ['clean'] fes: {
+	propi content :=
+		Patró
+		nou: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		coincidència: propi content
+		fes: { <- ['']. }.
+}.
+
+Template en: ['clean-cuts'] fes: {
+	>> items := Llista nou.
+	Patró
+	nou: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	coincidència: propi content
+	fes: { :_ :part
+		items afegeix-al-final: part ? 1.
+	}.
+	items cada: { :_ :id
+		propi content :=
+			Patró nou: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			coincidència: propi content
+			fes: { <- ['']. }.
+	 }.
+}.
+
+Template en: ['clean-space'] fes: {
+	propi content :=
+		Patró
+		nou: ['\\s*\\n'],
+		coincidència: propi content
+		fes: { <- ['\n']. }.
+	propi content :=
+		Patró
+		nou: ['\\n[\\s\\t]+'],
+		coincidència: propi content
+		fes: { <- ['\n']. }.
+}.
+
+Template en: ['clean-all'] fes: {
+	jo clean.
+	jo clean-cuts.
+	jo clean-space.
+}.
+
+Template en: ['text'] fes: { <- propi content.
+}.

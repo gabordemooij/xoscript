@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := វត្ថុ ថ្មី.
+
+Template ពេលទទួល: ['ថ្មី'] ធ្វើ: { <- ខ្លួន ថ្មី content: [''].
+}.
+
+Template ពេលទទួល: ['content:'] ធ្វើ: { :content
+	ផ្ទាល់ content := content. 
+}.
+
+Template ពេលទទួល: ['ថ្មី:'] ធ្វើ: { :content <- ខ្លួន ថ្មី content: content.
+}.
+
+Template ពេលទទួល: ['cut:'] ធ្វើ: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := ផ្ទាល់ content បំបែកជា: startmarker.
+	>> prefix := parts ដំបូង.
+	>> parts2 := parts ចុងក្រោយ បំបែកជា: endmarker.
+	>> suffix := parts2 ចុងក្រោយ.
+	>> part := parts2 ដំបូង.
+	>> rest := prefix + suffix.
+	ផ្ទាល់ content := rest. <- Template ថ្មី: part.
+	
+}.
+
+Template ពេលទទួល: ['ចម្លង'] ធ្វើ: { <- ខ្លួន ថ្មី: ខ្លួន ជាអត្ថបទ ចម្លង.
+}.
+	
+Template ពេលទទួល: ['paste:at:'] ធ្វើ: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	ផ្ទាល់ content ជំនួស: pastemarker ដោយ: ( snippet ជាអត្ថបទ + pastemarker ).
+}.
+
+Template ពេលទទួល: ['កំណត់:តម្លៃ:'] ធ្វើ: { :slot :value
+	ផ្ទាល់ content ជំនួស: ['<!-- slot:'] + slot + [' -->'] ដោយ: ( Server html-អ៊ិនកូដ: value ).
+}.
+
+Template ពេលទទួល: ['set:html:'] ធ្វើ: { :slot :html
+	ផ្ទាល់ content ជំនួស: ['<!-- slot:'] + slot + [' -->'] ដោយ: html.
+}.
+
+Template ពេលទទួល: ['ឆ្លើយតប:និង:'] ធ្វើ: { :slot :value
+	ខ្លួន កំណត់: (slot ចាប់ពី: 0 ប្រវែង: (slot ប្រវែង - 1)) តម្លៃ: value.
+}.
+
+Template ពេលទទួល: ['nl2br'] ធ្វើ: {
+	ផ្ទាល់ content ជំនួស: ['\n'] ដោយ: ['<br>'].
+}.
+
+Template ពេលទទួល: ['clean'] ធ្វើ: {
+	ផ្ទាល់ content :=
+		លំនាំ
+		ថ្មី: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ផ្គូផ្គង: ផ្ទាល់ content
+		ធ្វើ: { <- ['']. }.
+}.
+
+Template ពេលទទួល: ['clean-cuts'] ធ្វើ: {
+	>> items := ស៊េរី ថ្មី.
+	លំនាំ
+	ថ្មី: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ផ្គូផ្គង: ផ្ទាល់ content
+	ធ្វើ: { :_ :part
+		items បន្ថែមខាងចុង: part ? 1.
+	}.
+	items នីមួយៗ: { :_ :id
+		ផ្ទាល់ content :=
+			លំនាំ ថ្មី: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ផ្គូផ្គង: ផ្ទាល់ content
+			ធ្វើ: { <- ['']. }.
+	 }.
+}.
+
+Template ពេលទទួល: ['clean-space'] ធ្វើ: {
+	ផ្ទាល់ content :=
+		លំនាំ
+		ថ្មី: ['\\s*\\n'],
+		ផ្គូផ្គង: ផ្ទាល់ content
+		ធ្វើ: { <- ['\n']. }.
+	ផ្ទាល់ content :=
+		លំនាំ
+		ថ្មី: ['\\n[\\s\\t]+'],
+		ផ្គូផ្គង: ផ្ទាល់ content
+		ធ្វើ: { <- ['\n']. }.
+}.
+
+Template ពេលទទួល: ['clean-all'] ធ្វើ: {
+	ខ្លួន clean.
+	ខ្លួន clean-cuts.
+	ខ្លួន clean-space.
+}.
+
+Template ពេលទទួល: ['ជាអត្ថបទ'] ធ្វើ: { <- ផ្ទាល់ content.
+}.

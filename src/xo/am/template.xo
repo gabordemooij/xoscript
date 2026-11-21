@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := ነገር አዲስ.
+
+Template ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ content: [''].
+}.
+
+Template ሲደርስ: ['content:'] አድርግ: { :content
+	የራሱ content := content. 
+}.
+
+Template ሲደርስ: ['አዲስ:'] አድርግ: { :content <- ራሱ አዲስ content: content.
+}.
+
+Template ሲደርስ: ['cut:'] አድርግ: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := የራሱ content ክፈል: startmarker.
+	>> prefix := parts የመጀመሪያ.
+	>> parts2 := parts የመጨረሻ ክፈል: endmarker.
+	>> suffix := parts2 የመጨረሻ.
+	>> part := parts2 የመጀመሪያ.
+	>> rest := prefix + suffix.
+	የራሱ content := rest. <- Template አዲስ: part.
+	
+}.
+
+Template ሲደርስ: ['ቅዳ'] አድርግ: { <- ራሱ አዲስ: ራሱ በጽሑፍ ቅዳ.
+}.
+	
+Template ሲደርስ: ['paste:at:'] አድርግ: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	የራሱ content ተካ: pastemarker በዚህ: ( snippet በጽሑፍ + pastemarker ).
+}.
+
+Template ሲደርስ: ['አስቀምጥ:ዋጋ:'] አድርግ: { :slot :value
+	የራሱ content ተካ: ['<!-- slot:'] + slot + [' -->'] በዚህ: ( Server html-ኮድ-አድርግ: value ).
+}.
+
+Template ሲደርስ: ['set:html:'] አድርግ: { :slot :html
+	የራሱ content ተካ: ['<!-- slot:'] + slot + [' -->'] በዚህ: html.
+}.
+
+Template ሲደርስ: ['መልስ:እና:'] አድርግ: { :slot :value
+	ራሱ አስቀምጥ: (slot መነሻ: 0 ርዝመት: (slot ርዝመት - 1)) ዋጋ: value.
+}.
+
+Template ሲደርስ: ['nl2br'] አድርግ: {
+	የራሱ content ተካ: ['\n'] በዚህ: ['<br>'].
+}.
+
+Template ሲደርስ: ['clean'] አድርግ: {
+	የራሱ content :=
+		ንድፍ
+		አዲስ: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ግጥሚያ: የራሱ content
+		አድርግ: { <- ['']. }.
+}.
+
+Template ሲደርስ: ['clean-cuts'] አድርግ: {
+	>> items := ሰልፍ አዲስ.
+	ንድፍ
+	አዲስ: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ግጥሚያ: የራሱ content
+	አድርግ: { :_ :part
+		items መጨረሻ-ላይ-ጨምር: part ? 1.
+	}.
+	items እያንዳንዱ: { :_ :id
+		የራሱ content :=
+			ንድፍ አዲስ: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ግጥሚያ: የራሱ content
+			አድርግ: { <- ['']. }.
+	 }.
+}.
+
+Template ሲደርስ: ['clean-space'] አድርግ: {
+	የራሱ content :=
+		ንድፍ
+		አዲስ: ['\\s*\\n'],
+		ግጥሚያ: የራሱ content
+		አድርግ: { <- ['\n']. }.
+	የራሱ content :=
+		ንድፍ
+		አዲስ: ['\\n[\\s\\t]+'],
+		ግጥሚያ: የራሱ content
+		አድርግ: { <- ['\n']. }.
+}.
+
+Template ሲደርስ: ['clean-all'] አድርግ: {
+	ራሱ clean.
+	ራሱ clean-cuts.
+	ራሱ clean-space.
+}.
+
+Template ሲደርስ: ['በጽሑፍ'] አድርግ: { <- የራሱ content.
+}.

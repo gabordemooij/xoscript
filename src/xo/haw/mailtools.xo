@@ -1,0 +1,128 @@
+>> Email := Mea hou.
+
+Email i: ['init'] hana: {
+	ponoʻī recipients := Papa hou.
+	ponoʻī cc := Papa hou.
+	ponoʻī bcc := Papa hou.
+	ponoʻī from := ʻOle.
+	ponoʻī from-name := ʻOle.
+	ponoʻī subject := ʻOle.
+	ponoʻī body := ʻOle.
+}.
+
+Email i: ['hou'] hana: { <- iho hou init.
+}.
+
+Email i: ['to:'] hana: { :list
+	ponoʻī recipients := list.
+}.
+ 
+Email i: ['cc:'] hana: { :list
+	ponoʻī cc := list.
+}.
+
+Email i: ['bcc:'] hana: { :list
+	ponoʻī bcc := list.
+}.
+
+Email i: ['subject:'] hana: { :subject
+	ponoʻī subject := subject.
+}.
+
+Email i: ['from:name:'] hana: { :from :inoa
+	ponoʻī from := from.
+	ponoʻī from-name := inoa.
+}.
+
+Email i: ['body:'] hana: { :body
+	ponoʻī body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email i: ['header:'] hana: { :line <- line pani: ['\r'] me: [''], pani: ['\n'] me: [''].
+}.
+
+Email i: ['send'] hana: {
+	>> f := Waihona tempwrite: iho generate.
+	Polokalamu ʻōnaehana: ['sendmail -t < '] + f ala-waihona, laina-hou.
+}.
+
+Email i: ['generate'] hana: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str pākuʻi-hope: (iho header: ['From: '] + ponoʻī from-name + [' <'] + ( ponoʻī from ) + ['>']) + brk.
+	str pākuʻi-hope: (iho header: ['To: '] + ( ponoʻī recipients hoʻohui: [','] )) + brk.
+	ponoʻī cc heluna ʻoiaʻiʻo: {
+		str pākuʻi-hope: (iho header: ['Cc: '] + ( ponoʻī cc hoʻohui: [','] )) + brk.
+	}.
+	ponoʻī bcc heluna ʻoiaʻiʻo: {
+		str pākuʻi-hope: (iho header: ['Bcc: '] + ( ponoʻī bcc hoʻohui: [','] )) + brk.
+	}.
+	str pākuʻi-hope: (iho header: ['Subject: '] + ponoʻī subject) + brk.
+	str pākuʻi-hope: brk.
+	str pākuʻi-hope: ponoʻī body.
+	str pākuʻi-hope: brk. <- str.
+}.
+
+>> HTML-Email := Email hou.
+
+HTML-Email i: ['init'] hana: {
+	iho init.
+	ponoʻī attachments := Papa hou.
+	ponoʻī boundary := Pahu-kūʻono token: 40.
+}.
+
+HTML-Email i: ['attach:'] hana: { :file
+	>> id := ponoʻī attachments heluna.
+	>> blob := file blob.
+	ponoʻī attachments pākuʻi-hope: (
+		Puke-wehewehe hou
+			file: file ala-waihona,
+			mime: ['image/'] + (Server mimetype: file ala-waihona),
+			data: blob base64-hoʻopāʻālua
+	).
+	blob hoʻokuʻu. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email i: ['generate'] hana: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str pākuʻi-hope: (iho header: ['From: '] + ponoʻī from-name + [' <'] + ( ponoʻī from ) + ['>']) + brk.
+	str pākuʻi-hope: (iho header: ['To: '] + ( ponoʻī recipients hoʻohui: [','] )) + brk.
+	ponoʻī cc heluna ʻoiaʻiʻo: {
+		str pākuʻi-hope: (iho header: ['Cc: '] + ( ponoʻī cc hoʻohui: [','] )) + brk.
+	}.
+	ponoʻī bcc heluna ʻoiaʻiʻo: {
+		str pākuʻi-hope: (iho header: ['Bcc: '] + ( ponoʻī bcc hoʻohui: [','] )) + brk.
+	}.
+	str pākuʻi-hope: (iho header: ['Subject: '] + ponoʻī subject) + brk.
+	str pākuʻi-hope: ['MIME-Version: 1.0'] + brk.
+	str pākuʻi-hope: ['Content-Type: multipart/related; boundary="'] + ponoʻī boundary + ['"; type=text/html'] + brk.
+	str pākuʻi-hope: brk.
+	str pākuʻi-hope: ['--'] + ponoʻī boundary + brk.
+	str pākuʻi-hope: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str pākuʻi-hope: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str pākuʻi-hope: brk.
+	str pākuʻi-hope: ponoʻī body.
+	str pākuʻi-hope: brk.
+	ponoʻī attachments pākahi: { :id :info
+		>> blob := info data.
+		str pākuʻi-hope: ['--'] + ponoʻī boundary + brk.
+		str pākuʻi-hope: ['Content-Type: '] + info mime + brk.
+		str pākuʻi-hope: ['Content-Transfer-Encoding: base64'] + brk.
+		str pākuʻi-hope: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str pākuʻi-hope: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str pākuʻi-hope: brk.
+		>> max := 76.
+		>> len := blob lōʻihi.
+		>> chunks := (len / max) hoʻopiʻi-helu.
+		{ :i
+			>> chunk := blob kope mai: i * max lōʻihi: max.
+			str pākuʻi-hope: chunk + brk.
+		} * chunks.
+		str pākuʻi-hope: brk.
+		str pākuʻi-hope: brk.
+	}.
+	str pākuʻi-hope: ['--'] + ponoʻī boundary + ['--'] + brk. <- str.
+}.

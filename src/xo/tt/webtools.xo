@@ -1,0 +1,325 @@
+HTTP-Сорау килгәндә: ['HTTP-header:'] эшлә: { :key <- Программа көйләү: key.
+}.
+
+>> HTTP-Header := Объект яңа.
+
+HTTP-Header килгәндә: ['яңа'] эшлә: { <- үзе яңа init.
+}.
+
+HTTP-Header килгәндә: ['init'] эшлә: {
+	үзенең key := Буш.
+	үзенең value := Буш.
+}.
+
+HTTP-Header килгәндә: ['key:value:'] эшлә: { :key :value
+	үзенең key := key.
+	үзенең value := value.
+}.
+
+HTTP-Header килгәндә: ['key'] эшлә: { <- үзенең key.
+}.
+
+HTTP-Header килгәндә: ['value'] эшлә: { <- үзенең value.
+}.
+
+
+HTTP-Header килгәндә: ['текст'] эшлә: {
+	>> line := үзенең key + [': '] + үзенең value.
+	line алыштыр: ['\r'] белән: [''], алыштыр: ['\n'] белән: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Объект яңа.
+
+Web-Document килгәндә: ['яңа'] эшлә: { <- үзе яңа init.
+}.
+
+Web-Document килгәндә: ['init'] эшлә: {
+	үзенең headers := Тезмә яңа.
+	үзенең sess-id := Буш.
+	үзенең session-manager := Tempfile-Session яңа.
+	үзенең sessdata := Буш.
+	үзенең secure := Дөрес.
+	үзенең same-site := ['Strict'].
+	үзенең headers-out := Ялган.
+	үзенең request := HTTP-Сорау яңа.
+}.
+
+Web-Document килгәндә: ['request:'] эшлә: { :request
+	үзенең request := request.
+}. 
+
+Web-Document килгәндә: ['secure-session-cookie:'] эшлә: { :secure
+	үзе check-headers.
+	үзенең secure := secure.
+}.
+
+Web-Document килгәндә: ['same-site-session-cookie:'] эшлә: { :value
+	үзе check-headers.
+	>> options := Тезмә яңа 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options эченә-ала: value, ялган: {
+		бу-бирем хата: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	үзенең same-site := value.
+}.
+
+Web-Document килгәндә: ['header:'] эшлә: { :header
+	үзе check-headers.
+	үзенең headers ахырга-өстә: header.
+}.
+
+Web-Document килгәндә: ['clear-headers'] эшлә: {
+	үзе check-headers.
+	үзенең headers := Тезмә яңа.
+}.
+
+Web-Document килгәндә: ['session-manager:'] эшлә: { :manager
+	үзе check-headers.
+	үзенең session-manager := manager.
+}.
+
+Web-Document килгәндә: ['session-manager'] эшлә: { <- үзенең session-manager.
+}.
+
+Web-Document килгәндә: ['check-headers'] эшлә: {
+	үзенең headers-out дөрес: {
+		бу-бирем хата: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document килгәндә: ['session-start'] эшлә: {
+	үзе check-headers.
+	>> request := үзенең request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Буш? ялган: {
+		(( Үрнәк яңа: ['^[A-Za-z0-9]+\\z'], туры-килү: sess-id ) = 0) дөрес: {
+			sess-id := Буш.
+		}.
+	}.
+	sess-id Буш? дөрес: {
+		sess-id := Сейф токен: 30.
+		>> session-header := HTTP-Header яңа
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (үзенең secure бу: ['Secure'] яки-теге: ['']),
+		SSITE: (үзенең same-site),
+		XSID: sess-id
+		).
+		үзенең headers ахырга-өстә: session-header.
+	}.
+	үзенең sessdata := үзенең session-manager for: sess-id, load. <- үзенең sessdata. # reference
+}.
+
+Web-Document килгәндә: ['goto:'] эшлә: { :url
+	үзе check-headers.
+	үзе clear-headers.
+	үзенең headers
+	ахырга-өстә: (
+		HTTP-Header яңа
+		key: ['Status'] value: ['303 See Other']
+	),
+	ахырга-өстә: (
+		HTTP-Header яңа
+		key: ['Location'] value: url
+	).
+	үзе out: ['Redirect'].
+}.
+
+Web-Document килгәндә: ['session-destroy'] эшлә: {
+	үзе check-headers.
+	>> request := үзенең request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Буш? ялган: {
+		>> session-header := HTTP-Header яңа.
+		>> when := Мизгел яңа ел: 1970, формат: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (үзенең secure бу: ['Secure'] яки-теге: ['']),
+			SSITE: (үзенең same-site),
+			XSID: sess-id
+		).
+		үзенең session-manager destroy.
+		үзенең headers ахырга-өстә: session-header.
+	}.
+}.
+
+
+Web-Document килгәндә: ['template:'] эшлә: { :юл <- Template яңа: (Файл яңа: юл, укы).
+}.
+
+Web-Document килгәндә: ['out:type:'] эшлә: { :output :төр
+	үзенең headers-out ялган: {
+		үзенең sessdata Буш? ялган: {
+			үзенең session-manager save: үзенең sessdata.
+		}.
+		үзенең headers ахырга-өстә: (
+			HTTP-Header яңа
+			key: ['Content-type'] value: төр
+		).
+		үзенең headers һәрбер: { :_ :header
+			Чыгыш яз: header.
+		}.
+		үзенең headers-out := Дөрес.
+		Чыгыш яз: ['\r\n'].
+	}.
+	Чыгыш яз: output.
+}.
+
+Web-Document килгәндә: ['finish:type:'] эшлә: { :output :төр
+	үзенең headers-out ялган: {
+		үзенең sessdata Буш? ялган: {
+			үзенең session-manager save: үзенең sessdata.
+		}.
+		үзенең headers ахырга-өстә: (
+			HTTP-Header яңа
+			key: ['Content-type'] value: төр
+		).
+		үзенең headers ахырга-өстә: (
+			HTTP-Header яңа
+			key: ['Content-Length'] value: output текст bytes
+		).
+		үзенең headers һәрбер: { :_ :header
+			Чыгыш яз: header.
+		}.
+		үзенең headers-out := Дөрес.
+		Чыгыш яз: ['\r\n'].
+	}.
+	Чыгыш яз: output.
+}.
+
+Web-Document килгәндә: ['out:'] эшлә: { :output
+	үзе out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document килгәндә: ['finish:'] эшлә: { :output
+	үзе finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document килгәндә: ['json:'] эшлә: { :output
+	үзе out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document килгәндә: ['not-found:'] эшлә: { :output
+	үзе clear-headers header: (
+		HTTP-Header яңа key: ['Status'] value: ['404 Not Found']
+	).
+	үзе out: output.
+}.
+
+
+# Interface
+
+>> Session := Объект яңа.
+
+Session килгәндә: ['яңа'] эшлә: { <- үзе яңа init for: Буш.
+}.
+
+Session килгәндә: ['for:'] эшлә: { :id
+	үзенең id := id.
+}.
+
+Session килгәндә: ['load'] эшлә: {
+	бу-бирем хата: ['Not implemented.'].
+}.
+
+Session килгәндә: ['save:'] эшлә: {
+	бу-бирем хата: ['Not implemented.'].
+}.
+
+Session килгәндә: ['destroy'] эшлә: {
+	бу-бирем хата: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session яңа.
+
+Tempfile-Session килгәндә: ['init'] эшлә: {
+	үзенең pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session килгәндә: ['path-prefix:'] эшлә: { :str
+	үзенең pathprefix := str.
+}.
+
+Tempfile-Session килгәндә: ['file'] эшлә: { <- ( Файл яңа: ( үзенең pathprefix + үзенең id + ['.txt'] ) ).
+}.
+
+Tempfile-Session килгәндә: ['load'] эшлә: {
+	>> file := үзе file.
+	file бар ялган: {
+		file яз: (Сүзлек яңа код).
+	}. <- file укы объект.
+}.
+
+Tempfile-Session килгәндә: ['save:'] эшлә: { :data
+	>> file := үзе file.
+	file бар дөрес: {
+		file яз: data код.
+	}.
+}.
+
+Tempfile-Session килгәндә: ['destroy'] эшлә: {
+	>> file := үзе file.
+	file бар дөрес: {
+		file бетер.
+	}.
+}.
+
+
+>> URL := Объект яңа.
+
+URL килгәндә: ['init'] эшлә: {
+	үзенең protocol := ['https://'].
+	үзенең хост := ['localhost'].
+	үзенең юл := [''].
+	үзенең params := [''].
+	үзенең hash := [''].
+}.
+
+URL килгәндә: ['яңа'] эшлә: { <- үзе яңа init.
+}.
+
+URL килгәндә: ['текст'] эшлә: { <- (
+	үзенең protocol +
+	үзенең хост +
+	үзенең юл +
+	үзенең params +
+	үзенең hash ).
+}.
+
+URL килгәндә: ['protocol:'] эшлә: { :protocol
+	((Тезмә яңа: ['http'] ; ['https']) эченә-ала: protocol) дөрес: {
+		үзенең protocol := protocol + ['://'].
+	}, ялган: {
+		бу-бирем хата: ['Invalid protocol'].
+	}.
+}.
+
+URL килгәндә: ['хост:'] эшлә: { :хост
+	#todo validate according to rfc
+	үзенең хост := хост.
+}.
+
+URL килгәндә: ['path:'] эшлә: { :юл
+	үзенең юл := ['/'] + юл url-кодлау.
+}.
+
+URL килгәндә: ['params:'] эшлә: { :map
+	>> params := Тезмә яңа.
+	map һәрбер: { :key :value
+		params ахырга-өстә: key текст url-кодлау + ['='] + value текст url-кодлау.
+	}.
+	үзенең params := ['?'] + ( params берләштер: ['&'] ).
+}.
+
+URL килгәндә: ['хэш:'] эшлә: { :hash
+	үзенең hash := ['#'] + hash url-кодлау.
+}.
+

@@ -1,0 +1,325 @@
+HTTP-Talba meta: ['HTTP-header:'] agħmel: { :key <- Programm issettjar: key.
+}.
+
+>> HTTP-Header := Oġġett ġdid.
+
+HTTP-Header meta: ['ġdid'] agħmel: { <- innifsu ġdid init.
+}.
+
+HTTP-Header meta: ['init'] agħmel: {
+	proprju key := Xejn.
+	proprju value := Xejn.
+}.
+
+HTTP-Header meta: ['key:value:'] agħmel: { :key :value
+	proprju key := key.
+	proprju value := value.
+}.
+
+HTTP-Header meta: ['key'] agħmel: { <- proprju key.
+}.
+
+HTTP-Header meta: ['value'] agħmel: { <- proprju value.
+}.
+
+
+HTTP-Header meta: ['test'] agħmel: {
+	>> line := proprju key + [': '] + proprju value.
+	line ibdel: ['\r'] bi: [''], ibdel: ['\n'] bi: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Oġġett ġdid.
+
+Web-Document meta: ['ġdid'] agħmel: { <- innifsu ġdid init.
+}.
+
+Web-Document meta: ['init'] agħmel: {
+	proprju headers := Lista ġdid.
+	proprju sess-id := Xejn.
+	proprju session-manager := Tempfile-Session ġdid.
+	proprju sessdata := Xejn.
+	proprju secure := Veru.
+	proprju same-site := ['Strict'].
+	proprju headers-out := Falz.
+	proprju request := HTTP-Talba ġdid.
+}.
+
+Web-Document meta: ['request:'] agħmel: { :request
+	proprju request := request.
+}. 
+
+Web-Document meta: ['secure-session-cookie:'] agħmel: { :secure
+	innifsu check-headers.
+	proprju secure := secure.
+}.
+
+Web-Document meta: ['same-site-session-cookie:'] agħmel: { :value
+	innifsu check-headers.
+	>> options := Lista ġdid 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options fih: value, falz: {
+		dan-il-kompitu żball: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	proprju same-site := value.
+}.
+
+Web-Document meta: ['header:'] agħmel: { :header
+	innifsu check-headers.
+	proprju headers żid-fit-tmiem: header.
+}.
+
+Web-Document meta: ['clear-headers'] agħmel: {
+	innifsu check-headers.
+	proprju headers := Lista ġdid.
+}.
+
+Web-Document meta: ['session-manager:'] agħmel: { :manager
+	innifsu check-headers.
+	proprju session-manager := manager.
+}.
+
+Web-Document meta: ['session-manager'] agħmel: { <- proprju session-manager.
+}.
+
+Web-Document meta: ['check-headers'] agħmel: {
+	proprju headers-out veru: {
+		dan-il-kompitu żball: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document meta: ['session-start'] agħmel: {
+	innifsu check-headers.
+	>> request := proprju request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Xejn? falz: {
+		(( Mudell ġdid: ['^[A-Za-z0-9]+\\z'], taqbila: sess-id ) = 0) veru: {
+			sess-id := Xejn.
+		}.
+	}.
+	sess-id Xejn? veru: {
+		sess-id := Kaxxaforti token: 30.
+		>> session-header := HTTP-Header ġdid
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (proprju secure jew: ['Secure'] jew: ['']),
+		SSITE: (proprju same-site),
+		XSID: sess-id
+		).
+		proprju headers żid-fit-tmiem: session-header.
+	}.
+	proprju sessdata := proprju session-manager for: sess-id, load. <- proprju sessdata. # reference
+}.
+
+Web-Document meta: ['goto:'] agħmel: { :url
+	innifsu check-headers.
+	innifsu clear-headers.
+	proprju headers
+	żid-fit-tmiem: (
+		HTTP-Header ġdid
+		key: ['Status'] value: ['303 See Other']
+	),
+	żid-fit-tmiem: (
+		HTTP-Header ġdid
+		key: ['Location'] value: url
+	).
+	innifsu out: ['Redirect'].
+}.
+
+Web-Document meta: ['session-destroy'] agħmel: {
+	innifsu check-headers.
+	>> request := proprju request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Xejn? falz: {
+		>> session-header := HTTP-Header ġdid.
+		>> when := Mument ġdid sena: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (proprju secure jew: ['Secure'] jew: ['']),
+			SSITE: (proprju same-site),
+			XSID: sess-id
+		).
+		proprju session-manager destroy.
+		proprju headers żid-fit-tmiem: session-header.
+	}.
+}.
+
+
+Web-Document meta: ['template:'] agħmel: { :mogħdija <- Template ġdid: (Fajl ġdid: mogħdija, aqra).
+}.
+
+Web-Document meta: ['out:type:'] agħmel: { :output :tip
+	proprju headers-out falz: {
+		proprju sessdata Xejn? falz: {
+			proprju session-manager save: proprju sessdata.
+		}.
+		proprju headers żid-fit-tmiem: (
+			HTTP-Header ġdid
+			key: ['Content-type'] value: tip
+		).
+		proprju headers kull: { :_ :header
+			Ħruġ ikteb: header.
+		}.
+		proprju headers-out := Veru.
+		Ħruġ ikteb: ['\r\n'].
+	}.
+	Ħruġ ikteb: output.
+}.
+
+Web-Document meta: ['finish:type:'] agħmel: { :output :tip
+	proprju headers-out falz: {
+		proprju sessdata Xejn? falz: {
+			proprju session-manager save: proprju sessdata.
+		}.
+		proprju headers żid-fit-tmiem: (
+			HTTP-Header ġdid
+			key: ['Content-type'] value: tip
+		).
+		proprju headers żid-fit-tmiem: (
+			HTTP-Header ġdid
+			key: ['Content-Length'] value: output test bytes
+		).
+		proprju headers kull: { :_ :header
+			Ħruġ ikteb: header.
+		}.
+		proprju headers-out := Veru.
+		Ħruġ ikteb: ['\r\n'].
+	}.
+	Ħruġ ikteb: output.
+}.
+
+Web-Document meta: ['out:'] agħmel: { :output
+	innifsu out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document meta: ['finish:'] agħmel: { :output
+	innifsu finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document meta: ['json:'] agħmel: { :output
+	innifsu out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document meta: ['not-found:'] agħmel: { :output
+	innifsu clear-headers header: (
+		HTTP-Header ġdid key: ['Status'] value: ['404 Not Found']
+	).
+	innifsu out: output.
+}.
+
+
+# Interface
+
+>> Session := Oġġett ġdid.
+
+Session meta: ['ġdid'] agħmel: { <- innifsu ġdid init for: Xejn.
+}.
+
+Session meta: ['for:'] agħmel: { :id
+	proprju id := id.
+}.
+
+Session meta: ['load'] agħmel: {
+	dan-il-kompitu żball: ['Not implemented.'].
+}.
+
+Session meta: ['save:'] agħmel: {
+	dan-il-kompitu żball: ['Not implemented.'].
+}.
+
+Session meta: ['destroy'] agħmel: {
+	dan-il-kompitu żball: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session ġdid.
+
+Tempfile-Session meta: ['init'] agħmel: {
+	proprju pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session meta: ['path-prefix:'] agħmel: { :str
+	proprju pathprefix := str.
+}.
+
+Tempfile-Session meta: ['file'] agħmel: { <- ( Fajl ġdid: ( proprju pathprefix + proprju id + ['.txt'] ) ).
+}.
+
+Tempfile-Session meta: ['load'] agħmel: {
+	>> file := innifsu file.
+	file jeżisti falz: {
+		file ikteb: (Dizzjunarju ġdid kodiċi).
+	}. <- file aqra oġġett.
+}.
+
+Tempfile-Session meta: ['save:'] agħmel: { :data
+	>> file := innifsu file.
+	file jeżisti veru: {
+		file ikteb: data kodiċi.
+	}.
+}.
+
+Tempfile-Session meta: ['destroy'] agħmel: {
+	>> file := innifsu file.
+	file jeżisti veru: {
+		file ħassar.
+	}.
+}.
+
+
+>> URL := Oġġett ġdid.
+
+URL meta: ['init'] agħmel: {
+	proprju protocol := ['https://'].
+	proprju host := ['localhost'].
+	proprju mogħdija := [''].
+	proprju params := [''].
+	proprju hash := [''].
+}.
+
+URL meta: ['ġdid'] agħmel: { <- innifsu ġdid init.
+}.
+
+URL meta: ['test'] agħmel: { <- (
+	proprju protocol +
+	proprju host +
+	proprju mogħdija +
+	proprju params +
+	proprju hash ).
+}.
+
+URL meta: ['protocol:'] agħmel: { :protocol
+	((Lista ġdid: ['http'] ; ['https']) fih: protocol) veru: {
+		proprju protocol := protocol + ['://'].
+	}, falz: {
+		dan-il-kompitu żball: ['Invalid protocol'].
+	}.
+}.
+
+URL meta: ['host:'] agħmel: { :host
+	#todo validate according to rfc
+	proprju host := host.
+}.
+
+URL meta: ['path:'] agħmel: { :mogħdija
+	proprju mogħdija := ['/'] + mogħdija url-ikkodifika.
+}.
+
+URL meta: ['params:'] agħmel: { :map
+	>> params := Lista ġdid.
+	map kull: { :key :value
+		params żid-fit-tmiem: key test url-ikkodifika + ['='] + value test url-ikkodifika.
+	}.
+	proprju params := ['?'] + ( params għaqqad: ['&'] ).
+}.
+
+URL meta: ['hash:'] agħmel: { :hash
+	proprju hash := ['#'] + hash url-ikkodifika.
+}.
+

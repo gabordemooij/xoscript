@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objekt uus.
+
+Template kui: ['uus'] tee: { <- ise uus content: [''].
+}.
+
+Template kui: ['content:'] tee: { :content
+	oma content := content. 
+}.
+
+Template kui: ['uus:'] tee: { :content <- ise uus content: content.
+}.
+
+Template kui: ['cut:'] tee: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := oma content tükelda: startmarker.
+	>> prefix := parts esimene.
+	>> parts2 := parts viimane tükelda: endmarker.
+	>> suffix := parts2 viimane.
+	>> part := parts2 esimene.
+	>> rest := prefix + suffix.
+	oma content := rest. <- Template uus: part.
+	
+}.
+
+Template kui: ['kopeeri'] tee: { <- ise uus: ise tekst kopeeri.
+}.
+	
+Template kui: ['paste:at:'] tee: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	oma content asenda: pastemarker väärtusega: ( snippet tekst + pastemarker ).
+}.
+
+Template kui: ['sea:väärtus:'] tee: { :slot :value
+	oma content asenda: ['<!-- slot:'] + slot + [' -->'] väärtusega: ( Server html-kodeeri: value ).
+}.
+
+Template kui: ['set:html:'] tee: { :slot :html
+	oma content asenda: ['<!-- slot:'] + slot + [' -->'] väärtusega: html.
+}.
+
+Template kui: ['vasta:ja:'] tee: { :slot :value
+	ise sea: (slot alates: 0 pikkus: (slot pikkus - 1)) väärtus: value.
+}.
+
+Template kui: ['nl2br'] tee: {
+	oma content asenda: ['\n'] väärtusega: ['<br>'].
+}.
+
+Template kui: ['clean'] tee: {
+	oma content :=
+		Muster
+		uus: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		vaste: oma content
+		tee: { <- ['']. }.
+}.
+
+Template kui: ['clean-cuts'] tee: {
+	>> items := Loend uus.
+	Muster
+	uus: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	vaste: oma content
+	tee: { :_ :part
+		items lisa-lõppu: part ? 1.
+	}.
+	items iga: { :_ :id
+		oma content :=
+			Muster uus: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			vaste: oma content
+			tee: { <- ['']. }.
+	 }.
+}.
+
+Template kui: ['clean-space'] tee: {
+	oma content :=
+		Muster
+		uus: ['\\s*\\n'],
+		vaste: oma content
+		tee: { <- ['\n']. }.
+	oma content :=
+		Muster
+		uus: ['\\n[\\s\\t]+'],
+		vaste: oma content
+		tee: { <- ['\n']. }.
+}.
+
+Template kui: ['clean-all'] tee: {
+	ise clean.
+	ise clean-cuts.
+	ise clean-space.
+}.
+
+Template kui: ['tekst'] tee: { <- oma content.
+}.

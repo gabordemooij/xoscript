@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := オブジェクト 新規.
+
+Template 受信時: ['新規'] 実行: { <- 自身 新規 content: [''].
+}.
+
+Template 受信時: ['content:'] 実行: { :content
+	自分の content := content. 
+}.
+
+Template 受信時: ['新規:'] 実行: { :content <- 自身 新規 content: content.
+}.
+
+Template 受信時: ['cut:'] 実行: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := 自分の content 分割: startmarker.
+	>> prefix := parts 最初.
+	>> parts2 := parts 最後 分割: endmarker.
+	>> suffix := parts2 最後.
+	>> part := parts2 最初.
+	>> rest := prefix + suffix.
+	自分の content := rest. <- Template 新規: part.
+	
+}.
+
+Template 受信時: ['複製'] 実行: { <- 自身 新規: 自身 文字列化 複製.
+}.
+	
+Template 受信時: ['paste:at:'] 実行: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	自分の content 置換: pastemarker 新: ( snippet 文字列化 + pastemarker ).
+}.
+
+Template 受信時: ['設定:値:'] 実行: { :slot :value
+	自分の content 置換: ['<!-- slot:'] + slot + [' -->'] 新: ( Server html-エンコード: value ).
+}.
+
+Template 受信時: ['set:html:'] 実行: { :slot :html
+	自分の content 置換: ['<!-- slot:'] + slot + [' -->'] 新: html.
+}.
+
+Template 受信時: ['応答:かつ:'] 実行: { :slot :value
+	自身 設定: (slot 開始: 0 長さ: (slot 長さ - 1)) 値: value.
+}.
+
+Template 受信時: ['nl2br'] 実行: {
+	自分の content 置換: ['\n'] 新: ['<br>'].
+}.
+
+Template 受信時: ['clean'] 実行: {
+	自分の content :=
+		パターン
+		新規: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		一致: 自分の content
+		実行: { <- ['']. }.
+}.
+
+Template 受信時: ['clean-cuts'] 実行: {
+	>> items := リスト 新規.
+	パターン
+	新規: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	一致: 自分の content
+	実行: { :_ :part
+		items 末尾に追加: part ? 1.
+	}.
+	items 各要素: { :_ :id
+		自分の content :=
+			パターン 新規: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			一致: 自分の content
+			実行: { <- ['']. }.
+	 }.
+}.
+
+Template 受信時: ['clean-space'] 実行: {
+	自分の content :=
+		パターン
+		新規: ['\\s*\\n'],
+		一致: 自分の content
+		実行: { <- ['\n']. }.
+	自分の content :=
+		パターン
+		新規: ['\\n[\\s\\t]+'],
+		一致: 自分の content
+		実行: { <- ['\n']. }.
+}.
+
+Template 受信時: ['clean-all'] 実行: {
+	自身 clean.
+	自身 clean-cuts.
+	自身 clean-space.
+}.
+
+Template 受信時: ['文字列化'] 実行: { <- 自分の content.
+}.

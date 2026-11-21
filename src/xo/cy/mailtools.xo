@@ -1,0 +1,128 @@
+>> Email := Gwrthrych newydd.
+
+Email ar: ['init'] gwneud: {
+	eiddo recipients := Rhestr newydd.
+	eiddo cc := Rhestr newydd.
+	eiddo bcc := Rhestr newydd.
+	eiddo from := Dim.
+	eiddo from-name := Dim.
+	eiddo subject := Dim.
+	eiddo body := Dim.
+}.
+
+Email ar: ['newydd'] gwneud: { <- hun newydd init.
+}.
+
+Email ar: ['to:'] gwneud: { :list
+	eiddo recipients := list.
+}.
+ 
+Email ar: ['cc:'] gwneud: { :list
+	eiddo cc := list.
+}.
+
+Email ar: ['bcc:'] gwneud: { :list
+	eiddo bcc := list.
+}.
+
+Email ar: ['subject:'] gwneud: { :subject
+	eiddo subject := subject.
+}.
+
+Email ar: ['from:name:'] gwneud: { :from :enw
+	eiddo from := from.
+	eiddo from-name := enw.
+}.
+
+Email ar: ['body:'] gwneud: { :body
+	eiddo body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ar: ['header:'] gwneud: { :line <- line disodli: ['\r'] gyda: [''], disodli: ['\n'] gyda: [''].
+}.
+
+Email ar: ['send'] gwneud: {
+	>> f := Ffeil tempwrite: hun generate.
+	Rhaglen system: ['sendmail -t < '] + f llwybr, llinell-newydd.
+}.
+
+Email ar: ['generate'] gwneud: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str atodi: (hun header: ['From: '] + eiddo from-name + [' <'] + ( eiddo from ) + ['>']) + brk.
+	str atodi: (hun header: ['To: '] + ( eiddo recipients cyfuno: [','] )) + brk.
+	eiddo cc cyfrif gwir: {
+		str atodi: (hun header: ['Cc: '] + ( eiddo cc cyfuno: [','] )) + brk.
+	}.
+	eiddo bcc cyfrif gwir: {
+		str atodi: (hun header: ['Bcc: '] + ( eiddo bcc cyfuno: [','] )) + brk.
+	}.
+	str atodi: (hun header: ['Subject: '] + eiddo subject) + brk.
+	str atodi: brk.
+	str atodi: eiddo body.
+	str atodi: brk. <- str.
+}.
+
+>> HTML-Email := Email newydd.
+
+HTML-Email ar: ['init'] gwneud: {
+	hun init.
+	eiddo attachments := Rhestr newydd.
+	eiddo boundary := Cromgell tocyn: 40.
+}.
+
+HTML-Email ar: ['attach:'] gwneud: { :file
+	>> id := eiddo attachments cyfrif.
+	>> blob := file blob.
+	eiddo attachments atodi: (
+		Geiriadur newydd
+			file: file llwybr,
+			mime: ['image/'] + (Server mimetype: file llwybr),
+			data: blob base64-amgodio
+	).
+	blob rhyddhau. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ar: ['generate'] gwneud: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str atodi: (hun header: ['From: '] + eiddo from-name + [' <'] + ( eiddo from ) + ['>']) + brk.
+	str atodi: (hun header: ['To: '] + ( eiddo recipients cyfuno: [','] )) + brk.
+	eiddo cc cyfrif gwir: {
+		str atodi: (hun header: ['Cc: '] + ( eiddo cc cyfuno: [','] )) + brk.
+	}.
+	eiddo bcc cyfrif gwir: {
+		str atodi: (hun header: ['Bcc: '] + ( eiddo bcc cyfuno: [','] )) + brk.
+	}.
+	str atodi: (hun header: ['Subject: '] + eiddo subject) + brk.
+	str atodi: ['MIME-Version: 1.0'] + brk.
+	str atodi: ['Content-Type: multipart/related; boundary="'] + eiddo boundary + ['"; type=text/html'] + brk.
+	str atodi: brk.
+	str atodi: ['--'] + eiddo boundary + brk.
+	str atodi: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str atodi: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str atodi: brk.
+	str atodi: eiddo body.
+	str atodi: brk.
+	eiddo attachments pob: { :id :info
+		>> blob := info data.
+		str atodi: ['--'] + eiddo boundary + brk.
+		str atodi: ['Content-Type: '] + info mime + brk.
+		str atodi: ['Content-Transfer-Encoding: base64'] + brk.
+		str atodi: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str atodi: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str atodi: brk.
+		>> max := 76.
+		>> len := blob hyd.
+		>> chunks := (len / max) talgrynnu-i-fyny.
+		{ :i
+			>> chunk := blob copïo o: i * max hyd: max.
+			str atodi: chunk + brk.
+		} * chunks.
+		str atodi: brk.
+		str atodi: brk.
+	}.
+	str atodi: ['--'] + eiddo boundary + ['--'] + brk. <- str.
+}.

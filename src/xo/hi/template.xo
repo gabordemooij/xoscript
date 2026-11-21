@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := वस्तु नया.
+
+Template जब: ['नया'] करो: { <- स्वयं नया content: [''].
+}.
+
+Template जब: ['content:'] करो: { :content
+	अपना content := content. 
+}.
+
+Template जब: ['नया:'] करो: { :content <- स्वयं नया content: content.
+}.
+
+Template जब: ['cut:'] करो: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := अपना content विभाजित: startmarker.
+	>> prefix := parts पहला.
+	>> parts2 := parts अंतिम विभाजित: endmarker.
+	>> suffix := parts2 अंतिम.
+	>> part := parts2 पहला.
+	>> rest := prefix + suffix.
+	अपना content := rest. <- Template नया: part.
+	
+}.
+
+Template जब: ['प्रतिलिपि'] करो: { <- स्वयं नया: स्वयं पाठ-में प्रतिलिपि.
+}.
+	
+Template जब: ['paste:at:'] करो: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	अपना content बदलो: pastemarker से: ( snippet पाठ-में + pastemarker ).
+}.
+
+Template जब: ['निर्धारित:मान:'] करो: { :slot :value
+	अपना content बदलो: ['<!-- slot:'] + slot + [' -->'] से: ( Server html-एनकोड: value ).
+}.
+
+Template जब: ['set:html:'] करो: { :slot :html
+	अपना content बदलो: ['<!-- slot:'] + slot + [' -->'] से: html.
+}.
+
+Template जब: ['उत्तर:और:'] करो: { :slot :value
+	स्वयं निर्धारित: (slot आरंभ: 0 लंबाई: (slot लंबाई - 1)) मान: value.
+}.
+
+Template जब: ['nl2br'] करो: {
+	अपना content बदलो: ['\n'] से: ['<br>'].
+}.
+
+Template जब: ['clean'] करो: {
+	अपना content :=
+		पैटर्न
+		नया: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		मिलान: अपना content
+		करो: { <- ['']. }.
+}.
+
+Template जब: ['clean-cuts'] करो: {
+	>> items := सूची नया.
+	पैटर्न
+	नया: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	मिलान: अपना content
+	करो: { :_ :part
+		items अंत-में-जोड़ो: part ? 1.
+	}.
+	items प्रत्येक: { :_ :id
+		अपना content :=
+			पैटर्न नया: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			मिलान: अपना content
+			करो: { <- ['']. }.
+	 }.
+}.
+
+Template जब: ['clean-space'] करो: {
+	अपना content :=
+		पैटर्न
+		नया: ['\\s*\\n'],
+		मिलान: अपना content
+		करो: { <- ['\n']. }.
+	अपना content :=
+		पैटर्न
+		नया: ['\\n[\\s\\t]+'],
+		मिलान: अपना content
+		करो: { <- ['\n']. }.
+}.
+
+Template जब: ['clean-all'] करो: {
+	स्वयं clean.
+	स्वयं clean-cuts.
+	स्वयं clean-space.
+}.
+
+Template जब: ['पाठ-में'] करो: { <- अपना content.
+}.

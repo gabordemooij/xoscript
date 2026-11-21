@@ -1,0 +1,325 @@
+Gaaffii-HTTP irratti: ['HTTP-header:'] godhi: { :key <- Sagantaa qindaaʼina: key.
+}.
+
+>> HTTP-Header := Wanta haaraa.
+
+HTTP-Header irratti: ['haaraa'] godhi: { <- ofii haaraa init.
+}.
+
+HTTP-Header irratti: ['init'] godhi: {
+	koo key := Homaa.
+	koo value := Homaa.
+}.
+
+HTTP-Header irratti: ['key:value:'] godhi: { :key :value
+	koo key := key.
+	koo value := value.
+}.
+
+HTTP-Header irratti: ['key'] godhi: { <- koo key.
+}.
+
+HTTP-Header irratti: ['value'] godhi: { <- koo value.
+}.
+
+
+HTTP-Header irratti: ['gara-barreeffamaatti'] godhi: {
+	>> line := koo key + [': '] + koo value.
+	line bakka-buusi: ['\r'] tiin: [''], bakka-buusi: ['\n'] tiin: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Wanta haaraa.
+
+Web-Document irratti: ['haaraa'] godhi: { <- ofii haaraa init.
+}.
+
+Web-Document irratti: ['init'] godhi: {
+	koo headers := Tarree-wantootaa haaraa.
+	koo sess-id := Homaa.
+	koo session-manager := Tempfile-Session haaraa.
+	koo sessdata := Homaa.
+	koo secure := Dhugaa.
+	koo same-site := ['Strict'].
+	koo headers-out := Soba.
+	koo request := Gaaffii-HTTP haaraa.
+}.
+
+Web-Document irratti: ['request:'] godhi: { :request
+	koo request := request.
+}. 
+
+Web-Document irratti: ['secure-session-cookie:'] godhi: { :secure
+	ofii check-headers.
+	koo secure := secure.
+}.
+
+Web-Document irratti: ['same-site-session-cookie:'] godhi: { :value
+	ofii check-headers.
+	>> options := Tarree-wantootaa haaraa 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options hammataa: value, yoosoba: {
+		hojii-kana dogoggora: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	koo same-site := value.
+}.
+
+Web-Document irratti: ['header:'] godhi: { :header
+	ofii check-headers.
+	koo headers dabaliboodatti: header.
+}.
+
+Web-Document irratti: ['clear-headers'] godhi: {
+	ofii check-headers.
+	koo headers := Tarree-wantootaa haaraa.
+}.
+
+Web-Document irratti: ['session-manager:'] godhi: { :manager
+	ofii check-headers.
+	koo session-manager := manager.
+}.
+
+Web-Document irratti: ['session-manager'] godhi: { <- koo session-manager.
+}.
+
+Web-Document irratti: ['check-headers'] godhi: {
+	koo headers-out yoodhugaa: {
+		hojii-kana dogoggora: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document irratti: ['session-start'] godhi: {
+	ofii check-headers.
+	>> request := koo request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Homaa? yoosoba: {
+		(( Akkaataa haaraa: ['^[A-Za-z0-9]+\\z'], walsimannaa: sess-id ) = 0) yoodhugaa: {
+			sess-id := Homaa.
+		}.
+	}.
+	sess-id Homaa? yoodhugaa: {
+		sess-id := Kuusaa-nageenyaa token: 30.
+		>> session-header := HTTP-Header haaraa
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (koo secure tokkoykn: ['Secure'] ykn: ['']),
+		SSITE: (koo same-site),
+		XSID: sess-id
+		).
+		koo headers dabaliboodatti: session-header.
+	}.
+	koo sessdata := koo session-manager for: sess-id, load. <- koo sessdata. # reference
+}.
+
+Web-Document irratti: ['goto:'] godhi: { :url
+	ofii check-headers.
+	ofii clear-headers.
+	koo headers
+	dabaliboodatti: (
+		HTTP-Header haaraa
+		key: ['Status'] value: ['303 See Other']
+	),
+	dabaliboodatti: (
+		HTTP-Header haaraa
+		key: ['Location'] value: url
+	).
+	ofii out: ['Redirect'].
+}.
+
+Web-Document irratti: ['session-destroy'] godhi: {
+	ofii check-headers.
+	>> request := koo request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Homaa? yoosoba: {
+		>> session-header := HTTP-Header haaraa.
+		>> when := Yeroo haaraa bara: 1970, bifaan: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (koo secure tokkoykn: ['Secure'] ykn: ['']),
+			SSITE: (koo same-site),
+			XSID: sess-id
+		).
+		koo session-manager destroy.
+		koo headers dabaliboodatti: session-header.
+	}.
+}.
+
+
+Web-Document irratti: ['template:'] godhi: { :karaa <- Template haaraa: (Faayila haaraa: karaa, dubbisi).
+}.
+
+Web-Document irratti: ['out:type:'] godhi: { :output :gosa
+	koo headers-out yoosoba: {
+		koo sessdata Homaa? yoosoba: {
+			koo session-manager save: koo sessdata.
+		}.
+		koo headers dabaliboodatti: (
+			HTTP-Header haaraa
+			key: ['Content-type'] value: gosa
+		).
+		koo headers hundaaf: { :_ :header
+			Baʼii barreessi: header.
+		}.
+		koo headers-out := Dhugaa.
+		Baʼii barreessi: ['\r\n'].
+	}.
+	Baʼii barreessi: output.
+}.
+
+Web-Document irratti: ['finish:type:'] godhi: { :output :gosa
+	koo headers-out yoosoba: {
+		koo sessdata Homaa? yoosoba: {
+			koo session-manager save: koo sessdata.
+		}.
+		koo headers dabaliboodatti: (
+			HTTP-Header haaraa
+			key: ['Content-type'] value: gosa
+		).
+		koo headers dabaliboodatti: (
+			HTTP-Header haaraa
+			key: ['Content-Length'] value: output gara-barreeffamaatti bytes
+		).
+		koo headers hundaaf: { :_ :header
+			Baʼii barreessi: header.
+		}.
+		koo headers-out := Dhugaa.
+		Baʼii barreessi: ['\r\n'].
+	}.
+	Baʼii barreessi: output.
+}.
+
+Web-Document irratti: ['out:'] godhi: { :output
+	ofii out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document irratti: ['finish:'] godhi: { :output
+	ofii finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document irratti: ['json:'] godhi: { :output
+	ofii out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document irratti: ['not-found:'] godhi: { :output
+	ofii clear-headers header: (
+		HTTP-Header haaraa key: ['Status'] value: ['404 Not Found']
+	).
+	ofii out: output.
+}.
+
+
+# Interface
+
+>> Session := Wanta haaraa.
+
+Session irratti: ['haaraa'] godhi: { <- ofii haaraa init for: Homaa.
+}.
+
+Session irratti: ['for:'] godhi: { :id
+	koo id := id.
+}.
+
+Session irratti: ['load'] godhi: {
+	hojii-kana dogoggora: ['Not implemented.'].
+}.
+
+Session irratti: ['save:'] godhi: {
+	hojii-kana dogoggora: ['Not implemented.'].
+}.
+
+Session irratti: ['destroy'] godhi: {
+	hojii-kana dogoggora: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session haaraa.
+
+Tempfile-Session irratti: ['init'] godhi: {
+	koo pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session irratti: ['path-prefix:'] godhi: { :str
+	koo pathprefix := str.
+}.
+
+Tempfile-Session irratti: ['file'] godhi: { <- ( Faayila haaraa: ( koo pathprefix + koo id + ['.txt'] ) ).
+}.
+
+Tempfile-Session irratti: ['load'] godhi: {
+	>> file := ofii file.
+	file jira yoosoba: {
+		file barreessi: (Galmee-jechootaa haaraa koodii).
+	}. <- file dubbisi gara-wantaatti.
+}.
+
+Tempfile-Session irratti: ['save:'] godhi: { :data
+	>> file := ofii file.
+	file jira yoodhugaa: {
+		file barreessi: data koodii.
+	}.
+}.
+
+Tempfile-Session irratti: ['destroy'] godhi: {
+	>> file := ofii file.
+	file jira yoodhugaa: {
+		file haqi.
+	}.
+}.
+
+
+>> URL := Wanta haaraa.
+
+URL irratti: ['init'] godhi: {
+	koo protocol := ['https://'].
+	koo keessummeessaa := ['localhost'].
+	koo karaa := [''].
+	koo params := [''].
+	koo hash := [''].
+}.
+
+URL irratti: ['haaraa'] godhi: { <- ofii haaraa init.
+}.
+
+URL irratti: ['gara-barreeffamaatti'] godhi: { <- (
+	koo protocol +
+	koo keessummeessaa +
+	koo karaa +
+	koo params +
+	koo hash ).
+}.
+
+URL irratti: ['protocol:'] godhi: { :protocol
+	((Tarree-wantootaa haaraa: ['http'] ; ['https']) hammataa: protocol) yoodhugaa: {
+		koo protocol := protocol + ['://'].
+	}, yoosoba: {
+		hojii-kana dogoggora: ['Invalid protocol'].
+	}.
+}.
+
+URL irratti: ['keessummeessaa:'] godhi: { :keessummeessaa
+	#todo validate according to rfc
+	koo keessummeessaa := keessummeessaa.
+}.
+
+URL irratti: ['path:'] godhi: { :karaa
+	koo karaa := ['/'] + karaa url-koodessi.
+}.
+
+URL irratti: ['params:'] godhi: { :map
+	>> params := Tarree-wantootaa haaraa.
+	map hundaaf: { :key :value
+		params dabaliboodatti: key gara-barreeffamaatti url-koodessi + ['='] + value gara-barreeffamaatti url-koodessi.
+	}.
+	koo params := ['?'] + ( params waliingalchi: ['&'] ).
+}.
+
+URL irratti: ['haashi:'] godhi: { :hash
+	koo hash := ['#'] + hash url-koodessi.
+}.
+

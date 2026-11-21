@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := ออบเจกต์ สร้างใหม่.
+
+Template เมื่อ: ['สร้างใหม่'] ทำ: { <- ตัวเอง สร้างใหม่ content: [''].
+}.
+
+Template เมื่อ: ['content:'] ทำ: { :content
+	ของตน content := content. 
+}.
+
+Template เมื่อ: ['สร้างใหม่:'] ทำ: { :content <- ตัวเอง สร้างใหม่ content: content.
+}.
+
+Template เมื่อ: ['cut:'] ทำ: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := ของตน content แยก: startmarker.
+	>> prefix := parts ตัวแรก.
+	>> parts2 := parts ตัวสุดท้าย แยก: endmarker.
+	>> suffix := parts2 ตัวสุดท้าย.
+	>> part := parts2 ตัวแรก.
+	>> rest := prefix + suffix.
+	ของตน content := rest. <- Template สร้างใหม่: part.
+	
+}.
+
+Template เมื่อ: ['คัดลอก'] ทำ: { <- ตัวเอง สร้างใหม่: ตัวเอง เป็นข้อความ คัดลอก.
+}.
+	
+Template เมื่อ: ['paste:at:'] ทำ: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	ของตน content แทนที่: pastemarker ด้วย: ( snippet เป็นข้อความ + pastemarker ).
+}.
+
+Template เมื่อ: ['กำหนด:ค่า:'] ทำ: { :slot :value
+	ของตน content แทนที่: ['<!-- slot:'] + slot + [' -->'] ด้วย: ( Server html-เข้ารหัส: value ).
+}.
+
+Template เมื่อ: ['set:html:'] ทำ: { :slot :html
+	ของตน content แทนที่: ['<!-- slot:'] + slot + [' -->'] ด้วย: html.
+}.
+
+Template เมื่อ: ['ตอบ:และ:'] ทำ: { :slot :value
+	ตัวเอง กำหนด: (slot เริ่มที่: 0 ความยาว: (slot ความยาว - 1)) ค่า: value.
+}.
+
+Template เมื่อ: ['nl2br'] ทำ: {
+	ของตน content แทนที่: ['\n'] ด้วย: ['<br>'].
+}.
+
+Template เมื่อ: ['clean'] ทำ: {
+	ของตน content :=
+		แพตเทิร์น
+		สร้างใหม่: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		ตรงกับ: ของตน content
+		ทำ: { <- ['']. }.
+}.
+
+Template เมื่อ: ['clean-cuts'] ทำ: {
+	>> items := ลิสต์ สร้างใหม่.
+	แพตเทิร์น
+	สร้างใหม่: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	ตรงกับ: ของตน content
+	ทำ: { :_ :part
+		items ต่อท้าย: part ? 1.
+	}.
+	items แต่ละตัว: { :_ :id
+		ของตน content :=
+			แพตเทิร์น สร้างใหม่: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			ตรงกับ: ของตน content
+			ทำ: { <- ['']. }.
+	 }.
+}.
+
+Template เมื่อ: ['clean-space'] ทำ: {
+	ของตน content :=
+		แพตเทิร์น
+		สร้างใหม่: ['\\s*\\n'],
+		ตรงกับ: ของตน content
+		ทำ: { <- ['\n']. }.
+	ของตน content :=
+		แพตเทิร์น
+		สร้างใหม่: ['\\n[\\s\\t]+'],
+		ตรงกับ: ของตน content
+		ทำ: { <- ['\n']. }.
+}.
+
+Template เมื่อ: ['clean-all'] ทำ: {
+	ตัวเอง clean.
+	ตัวเอง clean-cuts.
+	ตัวเอง clean-space.
+}.
+
+Template เมื่อ: ['เป็นข้อความ'] ทำ: { <- ของตน content.
+}.

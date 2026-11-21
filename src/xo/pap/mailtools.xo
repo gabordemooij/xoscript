@@ -1,0 +1,128 @@
+>> Email := Opheto nobo.
+
+Email ora: ['init'] hasi: {
+	propio recipients := Lista nobo.
+	propio cc := Lista nobo.
+	propio bcc := Lista nobo.
+	propio from := Nada.
+	propio from-name := Nada.
+	propio subject := Nada.
+	propio body := Nada.
+}.
+
+Email ora: ['nobo'] hasi: { <- mes nobo init.
+}.
+
+Email ora: ['to:'] hasi: { :list
+	propio recipients := list.
+}.
+ 
+Email ora: ['cc:'] hasi: { :list
+	propio cc := list.
+}.
+
+Email ora: ['bcc:'] hasi: { :list
+	propio bcc := list.
+}.
+
+Email ora: ['subject:'] hasi: { :subject
+	propio subject := subject.
+}.
+
+Email ora: ['from:name:'] hasi: { :from :nòmber
+	propio from := from.
+	propio from-name := nòmber.
+}.
+
+Email ora: ['body:'] hasi: { :body
+	propio body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email ora: ['header:'] hasi: { :line <- line remplasá: ['\r'] ku: [''], remplasá: ['\n'] ku: [''].
+}.
+
+Email ora: ['send'] hasi: {
+	>> f := Archivo tempwrite: mes generate.
+	Programa sistema: ['sendmail -t < '] + f ruta, liña-nobo.
+}.
+
+Email ora: ['generate'] hasi: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str agregá-na-fin: (mes header: ['From: '] + propio from-name + [' <'] + ( propio from ) + ['>']) + brk.
+	str agregá-na-fin: (mes header: ['To: '] + ( propio recipients uni: [','] )) + brk.
+	propio cc konta bèrdat: {
+		str agregá-na-fin: (mes header: ['Cc: '] + ( propio cc uni: [','] )) + brk.
+	}.
+	propio bcc konta bèrdat: {
+		str agregá-na-fin: (mes header: ['Bcc: '] + ( propio bcc uni: [','] )) + brk.
+	}.
+	str agregá-na-fin: (mes header: ['Subject: '] + propio subject) + brk.
+	str agregá-na-fin: brk.
+	str agregá-na-fin: propio body.
+	str agregá-na-fin: brk. <- str.
+}.
+
+>> HTML-Email := Email nobo.
+
+HTML-Email ora: ['init'] hasi: {
+	mes init.
+	propio attachments := Lista nobo.
+	propio boundary := Kaha-fuerte token: 40.
+}.
+
+HTML-Email ora: ['attach:'] hasi: { :file
+	>> id := propio attachments konta.
+	>> blob := file blob.
+	propio attachments agregá-na-fin: (
+		Dikshonario nobo
+			file: file ruta,
+			mime: ['image/'] + (Server mimetype: file ruta),
+			data: blob base64-kodifiká
+	).
+	blob libra. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email ora: ['generate'] hasi: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str agregá-na-fin: (mes header: ['From: '] + propio from-name + [' <'] + ( propio from ) + ['>']) + brk.
+	str agregá-na-fin: (mes header: ['To: '] + ( propio recipients uni: [','] )) + brk.
+	propio cc konta bèrdat: {
+		str agregá-na-fin: (mes header: ['Cc: '] + ( propio cc uni: [','] )) + brk.
+	}.
+	propio bcc konta bèrdat: {
+		str agregá-na-fin: (mes header: ['Bcc: '] + ( propio bcc uni: [','] )) + brk.
+	}.
+	str agregá-na-fin: (mes header: ['Subject: '] + propio subject) + brk.
+	str agregá-na-fin: ['MIME-Version: 1.0'] + brk.
+	str agregá-na-fin: ['Content-Type: multipart/related; boundary="'] + propio boundary + ['"; type=text/html'] + brk.
+	str agregá-na-fin: brk.
+	str agregá-na-fin: ['--'] + propio boundary + brk.
+	str agregá-na-fin: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str agregá-na-fin: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str agregá-na-fin: brk.
+	str agregá-na-fin: propio body.
+	str agregá-na-fin: brk.
+	propio attachments kada: { :id :info
+		>> blob := info data.
+		str agregá-na-fin: ['--'] + propio boundary + brk.
+		str agregá-na-fin: ['Content-Type: '] + info mime + brk.
+		str agregá-na-fin: ['Content-Transfer-Encoding: base64'] + brk.
+		str agregá-na-fin: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str agregá-na-fin: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str agregá-na-fin: brk.
+		>> max := 76.
+		>> len := blob largura.
+		>> chunks := (len / max) rondia-ariba.
+		{ :i
+			>> chunk := blob kopia kuminsá: i * max largura: max.
+			str agregá-na-fin: chunk + brk.
+		} * chunks.
+		str agregá-na-fin: brk.
+		str agregá-na-fin: brk.
+	}.
+	str agregá-na-fin: ['--'] + propio boundary + ['--'] + brk. <- str.
+}.

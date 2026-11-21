@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Réad nua.
+
+Template ar: ['nua'] déan: { <- féin nua content: [''].
+}.
+
+Template ar: ['content:'] déan: { :content
+	dílis content := content. 
+}.
+
+Template ar: ['nua:'] déan: { :content <- féin nua content: content.
+}.
+
+Template ar: ['cut:'] déan: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := dílis content scoilt: startmarker.
+	>> prefix := parts céad.
+	>> parts2 := parts deireanach scoilt: endmarker.
+	>> suffix := parts2 deireanach.
+	>> part := parts2 céad.
+	>> rest := prefix + suffix.
+	dílis content := rest. <- Template nua: part.
+	
+}.
+
+Template ar: ['cóipeáil'] déan: { <- féin nua: féin teaghrán cóipeáil.
+}.
+	
+Template ar: ['paste:at:'] déan: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	dílis content ionadaigh: pastemarker le: ( snippet teaghrán + pastemarker ).
+}.
+
+Template ar: ['socraigh:luach:'] déan: { :slot :value
+	dílis content ionadaigh: ['<!-- slot:'] + slot + [' -->'] le: ( Server html-ionchódaigh: value ).
+}.
+
+Template ar: ['set:html:'] déan: { :slot :html
+	dílis content ionadaigh: ['<!-- slot:'] + slot + [' -->'] le: html.
+}.
+
+Template ar: ['freagair:agus:'] déan: { :slot :value
+	féin socraigh: (slot ó: 0 fad: (slot fad - 1)) luach: value.
+}.
+
+Template ar: ['nl2br'] déan: {
+	dílis content ionadaigh: ['\n'] le: ['<br>'].
+}.
+
+Template ar: ['clean'] déan: {
+	dílis content :=
+		Patrún
+		nua: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		meaitseáil: dílis content
+		déan: { <- ['']. }.
+}.
+
+Template ar: ['clean-cuts'] déan: {
+	>> items := Liosta nua.
+	Patrún
+	nua: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	meaitseáil: dílis content
+	déan: { :_ :part
+		items iarcheangail: part ? 1.
+	}.
+	items gach: { :_ :id
+		dílis content :=
+			Patrún nua: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			meaitseáil: dílis content
+			déan: { <- ['']. }.
+	 }.
+}.
+
+Template ar: ['clean-space'] déan: {
+	dílis content :=
+		Patrún
+		nua: ['\\s*\\n'],
+		meaitseáil: dílis content
+		déan: { <- ['\n']. }.
+	dílis content :=
+		Patrún
+		nua: ['\\n[\\s\\t]+'],
+		meaitseáil: dílis content
+		déan: { <- ['\n']. }.
+}.
+
+Template ar: ['clean-all'] déan: {
+	féin clean.
+	féin clean-cuts.
+	féin clean-space.
+}.
+
+Template ar: ['teaghrán'] déan: { <- dílis content.
+}.

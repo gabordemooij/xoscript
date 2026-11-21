@@ -1,0 +1,325 @@
+HTTP-запрос в: ['HTTP-header:'] сделать: { :key <- Программа конфигурация: key.
+}.
+
+>> HTTP-Header := Объект новый.
+
+HTTP-Header в: ['новый'] сделать: { <- сам новый init.
+}.
+
+HTTP-Header в: ['init'] сделать: {
+	мой key := Пустой.
+	мой value := Пустой.
+}.
+
+HTTP-Header в: ['key:value:'] сделать: { :key :value
+	мой key := key.
+	мой value := value.
+}.
+
+HTTP-Header в: ['key'] сделать: { <- мой key.
+}.
+
+HTTP-Header в: ['value'] сделать: { <- мой value.
+}.
+
+
+HTTP-Header в: ['к-тексту'] сделать: {
+	>> line := мой key + [': '] + мой value.
+	line заменить: ['\r'] на: [''], заменить: ['\n'] на: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Объект новый.
+
+Web-Document в: ['новый'] сделать: { <- сам новый init.
+}.
+
+Web-Document в: ['init'] сделать: {
+	мой headers := Список новый.
+	мой sess-id := Пустой.
+	мой session-manager := Tempfile-Session новый.
+	мой sessdata := Пустой.
+	мой secure := Истина.
+	мой same-site := ['Strict'].
+	мой headers-out := Ложь.
+	мой request := HTTP-запрос новый.
+}.
+
+Web-Document в: ['request:'] сделать: { :request
+	мой request := request.
+}. 
+
+Web-Document в: ['secure-session-cookie:'] сделать: { :secure
+	сам check-headers.
+	мой secure := secure.
+}.
+
+Web-Document в: ['same-site-session-cookie:'] сделать: { :value
+	сам check-headers.
+	>> options := Список новый 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options содержит: value, ложь: {
+		этот-блок-кода ошибка: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	мой same-site := value.
+}.
+
+Web-Document в: ['header:'] сделать: { :header
+	сам check-headers.
+	мой headers добавить-в-конец: header.
+}.
+
+Web-Document в: ['clear-headers'] сделать: {
+	сам check-headers.
+	мой headers := Список новый.
+}.
+
+Web-Document в: ['session-manager:'] сделать: { :manager
+	сам check-headers.
+	мой session-manager := manager.
+}.
+
+Web-Document в: ['session-manager'] сделать: { <- мой session-manager.
+}.
+
+Web-Document в: ['check-headers'] сделать: {
+	мой headers-out истина: {
+		этот-блок-кода ошибка: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document в: ['session-start'] сделать: {
+	сам check-headers.
+	>> request := мой request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id пустой? ложь: {
+		(( Шаблон новый: ['^[A-Za-z0-9]+\\z'], совпадение: sess-id ) = 0) истина: {
+			sess-id := Пустой.
+		}.
+	}.
+	sess-id пустой? истина: {
+		sess-id := Хранилище токен: 30.
+		>> session-header := HTTP-Header новый
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (мой secure либо: ['Secure'] или: ['']),
+		SSITE: (мой same-site),
+		XSID: sess-id
+		).
+		мой headers добавить-в-конец: session-header.
+	}.
+	мой sessdata := мой session-manager for: sess-id, load. <- мой sessdata. # reference
+}.
+
+Web-Document в: ['goto:'] сделать: { :url
+	сам check-headers.
+	сам clear-headers.
+	мой headers
+	добавить-в-конец: (
+		HTTP-Header новый
+		key: ['Status'] value: ['303 See Other']
+	),
+	добавить-в-конец: (
+		HTTP-Header новый
+		key: ['Location'] value: url
+	).
+	сам out: ['Redirect'].
+}.
+
+Web-Document в: ['session-destroy'] сделать: {
+	сам check-headers.
+	>> request := мой request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id пустой? ложь: {
+		>> session-header := HTTP-Header новый.
+		>> when := Момент новый год: 1970, формат: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (мой secure либо: ['Secure'] или: ['']),
+			SSITE: (мой same-site),
+			XSID: sess-id
+		).
+		мой session-manager destroy.
+		мой headers добавить-в-конец: session-header.
+	}.
+}.
+
+
+Web-Document в: ['template:'] сделать: { :путь <- Template новый: (Файл новый: путь, прочитать).
+}.
+
+Web-Document в: ['out:type:'] сделать: { :output :тип
+	мой headers-out ложь: {
+		мой sessdata пустой? ложь: {
+			мой session-manager save: мой sessdata.
+		}.
+		мой headers добавить-в-конец: (
+			HTTP-Header новый
+			key: ['Content-type'] value: тип
+		).
+		мой headers каждый: { :_ :header
+			Выход написать: header.
+		}.
+		мой headers-out := Истина.
+		Выход написать: ['\r\n'].
+	}.
+	Выход написать: output.
+}.
+
+Web-Document в: ['finish:type:'] сделать: { :output :тип
+	мой headers-out ложь: {
+		мой sessdata пустой? ложь: {
+			мой session-manager save: мой sessdata.
+		}.
+		мой headers добавить-в-конец: (
+			HTTP-Header новый
+			key: ['Content-type'] value: тип
+		).
+		мой headers добавить-в-конец: (
+			HTTP-Header новый
+			key: ['Content-Length'] value: output к-тексту bytes
+		).
+		мой headers каждый: { :_ :header
+			Выход написать: header.
+		}.
+		мой headers-out := Истина.
+		Выход написать: ['\r\n'].
+	}.
+	Выход написать: output.
+}.
+
+Web-Document в: ['out:'] сделать: { :output
+	сам out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document в: ['finish:'] сделать: { :output
+	сам finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document в: ['json:'] сделать: { :output
+	сам out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document в: ['not-found:'] сделать: { :output
+	сам clear-headers header: (
+		HTTP-Header новый key: ['Status'] value: ['404 Not Found']
+	).
+	сам out: output.
+}.
+
+
+# Interface
+
+>> Session := Объект новый.
+
+Session в: ['новый'] сделать: { <- сам новый init for: Пустой.
+}.
+
+Session в: ['for:'] сделать: { :id
+	мой id := id.
+}.
+
+Session в: ['load'] сделать: {
+	этот-блок-кода ошибка: ['Not implemented.'].
+}.
+
+Session в: ['save:'] сделать: {
+	этот-блок-кода ошибка: ['Not implemented.'].
+}.
+
+Session в: ['destroy'] сделать: {
+	этот-блок-кода ошибка: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session новый.
+
+Tempfile-Session в: ['init'] сделать: {
+	мой pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session в: ['path-prefix:'] сделать: { :str
+	мой pathprefix := str.
+}.
+
+Tempfile-Session в: ['file'] сделать: { <- ( Файл новый: ( мой pathprefix + мой id + ['.txt'] ) ).
+}.
+
+Tempfile-Session в: ['load'] сделать: {
+	>> file := сам file.
+	file существует ложь: {
+		file написать: (Карта новый код).
+	}. <- file прочитать объект.
+}.
+
+Tempfile-Session в: ['save:'] сделать: { :data
+	>> file := сам file.
+	file существует истина: {
+		file написать: data код.
+	}.
+}.
+
+Tempfile-Session в: ['destroy'] сделать: {
+	>> file := сам file.
+	file существует истина: {
+		file удалить.
+	}.
+}.
+
+
+>> URL := Объект новый.
+
+URL в: ['init'] сделать: {
+	мой protocol := ['https://'].
+	мой хост := ['localhost'].
+	мой путь := [''].
+	мой params := [''].
+	мой hash := [''].
+}.
+
+URL в: ['новый'] сделать: { <- сам новый init.
+}.
+
+URL в: ['к-тексту'] сделать: { <- (
+	мой protocol +
+	мой хост +
+	мой путь +
+	мой params +
+	мой hash ).
+}.
+
+URL в: ['protocol:'] сделать: { :protocol
+	((Список новый: ['http'] ; ['https']) содержит: protocol) истина: {
+		мой protocol := protocol + ['://'].
+	}, ложь: {
+		этот-блок-кода ошибка: ['Invalid protocol'].
+	}.
+}.
+
+URL в: ['хост:'] сделать: { :хост
+	#todo validate according to rfc
+	мой хост := хост.
+}.
+
+URL в: ['path:'] сделать: { :путь
+	мой путь := ['/'] + путь url-кодировать.
+}.
+
+URL в: ['params:'] сделать: { :map
+	>> params := Список новый.
+	map каждый: { :key :value
+		params добавить-в-конец: key к-тексту url-кодировать + ['='] + value к-тексту url-кодировать.
+	}.
+	мой params := ['?'] + ( params присоединить: ['&'] ).
+}.
+
+URL в: ['хеш:'] сделать: { :hash
+	мой hash := ['#'] + hash url-кодировать.
+}.
+

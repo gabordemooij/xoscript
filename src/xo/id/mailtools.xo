@@ -1,0 +1,128 @@
+>> Email := Objek baru.
+
+Email saat: ['init'] lakukan: {
+	milik recipients := Daftar baru.
+	milik cc := Daftar baru.
+	milik bcc := Daftar baru.
+	milik from := Kosong.
+	milik from-name := Kosong.
+	milik subject := Kosong.
+	milik body := Kosong.
+}.
+
+Email saat: ['baru'] lakukan: { <- diri baru init.
+}.
+
+Email saat: ['to:'] lakukan: { :list
+	milik recipients := list.
+}.
+ 
+Email saat: ['cc:'] lakukan: { :list
+	milik cc := list.
+}.
+
+Email saat: ['bcc:'] lakukan: { :list
+	milik bcc := list.
+}.
+
+Email saat: ['subject:'] lakukan: { :subject
+	milik subject := subject.
+}.
+
+Email saat: ['from:name:'] lakukan: { :from :nama
+	milik from := from.
+	milik from-name := nama.
+}.
+
+Email saat: ['body:'] lakukan: { :body
+	milik body := body.
+}.
+
+# A line break ends a header, and sendmail -t reads the recipients from the
+# headers. Remove them, otherwise a value could add recipients to the mail.
+Email saat: ['header:'] lakukan: { :line <- line ganti: ['\r'] dengan: [''], ganti: ['\n'] dengan: [''].
+}.
+
+Email saat: ['send'] lakukan: {
+	>> f := Berkas tempwrite: diri generate.
+	Program sistem: ['sendmail -t < '] + f jalur, baris-baru.
+}.
+
+Email saat: ['generate'] lakukan: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tambah-di-akhir: (diri header: ['From: '] + milik from-name + [' <'] + ( milik from ) + ['>']) + brk.
+	str tambah-di-akhir: (diri header: ['To: '] + ( milik recipients gabungkan: [','] )) + brk.
+	milik cc jumlah benar: {
+		str tambah-di-akhir: (diri header: ['Cc: '] + ( milik cc gabungkan: [','] )) + brk.
+	}.
+	milik bcc jumlah benar: {
+		str tambah-di-akhir: (diri header: ['Bcc: '] + ( milik bcc gabungkan: [','] )) + brk.
+	}.
+	str tambah-di-akhir: (diri header: ['Subject: '] + milik subject) + brk.
+	str tambah-di-akhir: brk.
+	str tambah-di-akhir: milik body.
+	str tambah-di-akhir: brk. <- str.
+}.
+
+>> HTML-Email := Email baru.
+
+HTML-Email saat: ['init'] lakukan: {
+	diri init.
+	milik attachments := Daftar baru.
+	milik boundary := Brankas token: 40.
+}.
+
+HTML-Email saat: ['attach:'] lakukan: { :file
+	>> id := milik attachments jumlah.
+	>> blob := file blob.
+	milik attachments tambah-di-akhir: (
+		Kamus baru
+			file: file jalur,
+			mime: ['image/'] + (Server mimetype: file jalur),
+			data: blob base64-enkode
+	).
+	blob bebaskan. <- ['cid:attachment'] + id.
+}.
+
+HTML-Email saat: ['generate'] lakukan: {
+	>> brk := ['\r\n'].
+	>> str := [''].
+	str tambah-di-akhir: (diri header: ['From: '] + milik from-name + [' <'] + ( milik from ) + ['>']) + brk.
+	str tambah-di-akhir: (diri header: ['To: '] + ( milik recipients gabungkan: [','] )) + brk.
+	milik cc jumlah benar: {
+		str tambah-di-akhir: (diri header: ['Cc: '] + ( milik cc gabungkan: [','] )) + brk.
+	}.
+	milik bcc jumlah benar: {
+		str tambah-di-akhir: (diri header: ['Bcc: '] + ( milik bcc gabungkan: [','] )) + brk.
+	}.
+	str tambah-di-akhir: (diri header: ['Subject: '] + milik subject) + brk.
+	str tambah-di-akhir: ['MIME-Version: 1.0'] + brk.
+	str tambah-di-akhir: ['Content-Type: multipart/related; boundary="'] + milik boundary + ['"; type=text/html'] + brk.
+	str tambah-di-akhir: brk.
+	str tambah-di-akhir: ['--'] + milik boundary + brk.
+	str tambah-di-akhir: ['Content-Type: text/html; charset=UTF-8'] + brk.
+	str tambah-di-akhir: ['Content-Transfer-Encoding: 7bit'] + brk.
+	str tambah-di-akhir: brk.
+	str tambah-di-akhir: milik body.
+	str tambah-di-akhir: brk.
+	milik attachments setiap: { :id :info
+		>> blob := info data.
+		str tambah-di-akhir: ['--'] + milik boundary + brk.
+		str tambah-di-akhir: ['Content-Type: '] + info mime + brk.
+		str tambah-di-akhir: ['Content-Transfer-Encoding: base64'] + brk.
+		str tambah-di-akhir: ['Content-ID: <attachment'] + id + ['>'] + brk.
+		str tambah-di-akhir: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
+		str tambah-di-akhir: brk.
+		>> max := 76.
+		>> len := blob panjang.
+		>> chunks := (len / max) bulatkan-ke-atas.
+		{ :i
+			>> chunk := blob salin dari: i * max panjang: max.
+			str tambah-di-akhir: chunk + brk.
+		} * chunks.
+		str tambah-di-akhir: brk.
+		str tambah-di-akhir: brk.
+	}.
+	str tambah-di-akhir: ['--'] + milik boundary + ['--'] + brk. <- str.
+}.

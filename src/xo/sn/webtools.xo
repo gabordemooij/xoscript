@@ -1,0 +1,325 @@
+Chikumbiro-HTTP kana-zvasvika: ['HTTP-header:'] ita: { :key <- Chirongwa gadziriso: key.
+}.
+
+>> HTTP-Header := Chinhu nyowani.
+
+HTTP-Header kana-zvasvika: ['nyowani'] ita: { <- pachako nyowani init.
+}.
+
+HTTP-Header kana-zvasvika: ['init'] ita: {
+	zvako key := Hapana.
+	zvako value := Hapana.
+}.
+
+HTTP-Header kana-zvasvika: ['key:value:'] ita: { :key :value
+	zvako key := key.
+	zvako value := value.
+}.
+
+HTTP-Header kana-zvasvika: ['key'] ita: { <- zvako key.
+}.
+
+HTTP-Header kana-zvasvika: ['value'] ita: { <- zvako value.
+}.
+
+
+HTTP-Header kana-zvasvika: ['mavara-emashoko'] ita: {
+	>> line := zvako key + [': '] + zvako value.
+	line tsiva: ['\r'] na: [''], tsiva: ['\n'] na: ['']. <- line + [' \r\n'].
+}.
+
+# Web document, ties together headers, HTML and session
+
+>> Web-Document := Chinhu nyowani.
+
+Web-Document kana-zvasvika: ['nyowani'] ita: { <- pachako nyowani init.
+}.
+
+Web-Document kana-zvasvika: ['init'] ita: {
+	zvako headers := Rondedzero nyowani.
+	zvako sess-id := Hapana.
+	zvako session-manager := Tempfile-Session nyowani.
+	zvako sessdata := Hapana.
+	zvako secure := Chokwadi.
+	zvako same-site := ['Strict'].
+	zvako headers-out := Nhema.
+	zvako request := Chikumbiro-HTTP nyowani.
+}.
+
+Web-Document kana-zvasvika: ['request:'] ita: { :request
+	zvako request := request.
+}. 
+
+Web-Document kana-zvasvika: ['secure-session-cookie:'] ita: { :secure
+	pachako check-headers.
+	zvako secure := secure.
+}.
+
+Web-Document kana-zvasvika: ['same-site-session-cookie:'] ita: { :value
+	pachako check-headers.
+	>> options := Rondedzero nyowani 
+		~ ['Strict']
+		~ ['Lax']
+		~ ['None'].
+	
+	options rine: value, nhema: {
+		basa-iri chikanganiso: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
+	}.
+
+	zvako same-site := value.
+}.
+
+Web-Document kana-zvasvika: ['header:'] ita: { :header
+	pachako check-headers.
+	zvako headers wedzera-kumagumo: header.
+}.
+
+Web-Document kana-zvasvika: ['clear-headers'] ita: {
+	pachako check-headers.
+	zvako headers := Rondedzero nyowani.
+}.
+
+Web-Document kana-zvasvika: ['session-manager:'] ita: { :manager
+	pachako check-headers.
+	zvako session-manager := manager.
+}.
+
+Web-Document kana-zvasvika: ['session-manager'] ita: { <- zvako session-manager.
+}.
+
+Web-Document kana-zvasvika: ['check-headers'] ita: {
+	zvako headers-out chokwadi: {
+		basa-iri chikanganiso: ['Headers already sent to client.'].
+	}.
+}.
+
+Web-Document kana-zvasvika: ['session-start'] ita: {
+	pachako check-headers.
+	>> request := zvako request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Hapana? nhema: {
+		(( Pateni nyowani: ['^[A-Za-z0-9]+\\z'], kuenderana: sess-id ) = 0) chokwadi: {
+			sess-id := Hapana.
+		}.
+	}.
+	sess-id Hapana? chokwadi: {
+		sess-id := Dura-rakachengeteka token: 30.
+		>> session-header := HTTP-Header nyowani
+		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (zvako secure ichi: ['Secure'] kana-icho: ['']),
+		SSITE: (zvako same-site),
+		XSID: sess-id
+		).
+		zvako headers wedzera-kumagumo: session-header.
+	}.
+	zvako sessdata := zvako session-manager for: sess-id, load. <- zvako sessdata. # reference
+}.
+
+Web-Document kana-zvasvika: ['goto:'] ita: { :url
+	pachako check-headers.
+	pachako clear-headers.
+	zvako headers
+	wedzera-kumagumo: (
+		HTTP-Header nyowani
+		key: ['Status'] value: ['303 See Other']
+	),
+	wedzera-kumagumo: (
+		HTTP-Header nyowani
+		key: ['Location'] value: url
+	).
+	pachako out: ['Redirect'].
+}.
+
+Web-Document kana-zvasvika: ['session-destroy'] ita: {
+	pachako check-headers.
+	>> request := zvako request.
+	>> sess-id := request cookie: ['xsid'].
+	sess-id Hapana? nhema: {
+		>> session-header := HTTP-Header nyowani.
+		>> when := Nguva-chaiyo nyowani gore: 1970, chimiro: ['%a, %d %b %Y %H:%M:%S GMT'].
+		session-header key: ['Set-Cookie'] value: ( 
+			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
+			EXP: when,
+			SEC: (zvako secure ichi: ['Secure'] kana-icho: ['']),
+			SSITE: (zvako same-site),
+			XSID: sess-id
+		).
+		zvako session-manager destroy.
+		zvako headers wedzera-kumagumo: session-header.
+	}.
+}.
+
+
+Web-Document kana-zvasvika: ['template:'] ita: { :nzira-yefaira <- Template nyowani: (Faira nyowani: nzira-yefaira, verenga).
+}.
+
+Web-Document kana-zvasvika: ['out:type:'] ita: { :output :mhando
+	zvako headers-out nhema: {
+		zvako sessdata Hapana? nhema: {
+			zvako session-manager save: zvako sessdata.
+		}.
+		zvako headers wedzera-kumagumo: (
+			HTTP-Header nyowani
+			key: ['Content-type'] value: mhando
+		).
+		zvako headers chimwe-nechimwe: { :_ :header
+			Zvabuda nyora: header.
+		}.
+		zvako headers-out := Chokwadi.
+		Zvabuda nyora: ['\r\n'].
+	}.
+	Zvabuda nyora: output.
+}.
+
+Web-Document kana-zvasvika: ['finish:type:'] ita: { :output :mhando
+	zvako headers-out nhema: {
+		zvako sessdata Hapana? nhema: {
+			zvako session-manager save: zvako sessdata.
+		}.
+		zvako headers wedzera-kumagumo: (
+			HTTP-Header nyowani
+			key: ['Content-type'] value: mhando
+		).
+		zvako headers wedzera-kumagumo: (
+			HTTP-Header nyowani
+			key: ['Content-Length'] value: output mavara-emashoko bytes
+		).
+		zvako headers chimwe-nechimwe: { :_ :header
+			Zvabuda nyora: header.
+		}.
+		zvako headers-out := Chokwadi.
+		Zvabuda nyora: ['\r\n'].
+	}.
+	Zvabuda nyora: output.
+}.
+
+Web-Document kana-zvasvika: ['out:'] ita: { :output
+	pachako out: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document kana-zvasvika: ['finish:'] ita: { :output
+	pachako finish: output type: ['text/html; charset=utf-8'].
+}.
+
+Web-Document kana-zvasvika: ['json:'] ita: { :output
+	pachako out: ( JSON jsonify: output ) type: ['application/json'].
+}.
+
+Web-Document kana-zvasvika: ['not-found:'] ita: { :output
+	pachako clear-headers header: (
+		HTTP-Header nyowani key: ['Status'] value: ['404 Not Found']
+	).
+	pachako out: output.
+}.
+
+
+# Interface
+
+>> Session := Chinhu nyowani.
+
+Session kana-zvasvika: ['nyowani'] ita: { <- pachako nyowani init for: Hapana.
+}.
+
+Session kana-zvasvika: ['for:'] ita: { :id
+	zvako id := id.
+}.
+
+Session kana-zvasvika: ['load'] ita: {
+	basa-iri chikanganiso: ['Not implemented.'].
+}.
+
+Session kana-zvasvika: ['save:'] ita: {
+	basa-iri chikanganiso: ['Not implemented.'].
+}.
+
+Session kana-zvasvika: ['destroy'] ita: {
+	basa-iri chikanganiso: ['Not implemented.'].
+}.
+
+# Default Session implementation, uses tempfile
+
+>> Tempfile-Session := Session nyowani.
+
+Tempfile-Session kana-zvasvika: ['init'] ita: {
+	zvako pathprefix := ['/tmp/sess-'].
+}.
+
+Tempfile-Session kana-zvasvika: ['path-prefix:'] ita: { :str
+	zvako pathprefix := str.
+}.
+
+Tempfile-Session kana-zvasvika: ['file'] ita: { <- ( Faira nyowani: ( zvako pathprefix + zvako id + ['.txt'] ) ).
+}.
+
+Tempfile-Session kana-zvasvika: ['load'] ita: {
+	>> file := pachako file.
+	file iripo nhema: {
+		file nyora: (Duramazwi nyowani kodhi).
+	}. <- file verenga chinhu.
+}.
+
+Tempfile-Session kana-zvasvika: ['save:'] ita: { :data
+	>> file := pachako file.
+	file iripo chokwadi: {
+		file nyora: data kodhi.
+	}.
+}.
+
+Tempfile-Session kana-zvasvika: ['destroy'] ita: {
+	>> file := pachako file.
+	file iripo chokwadi: {
+		file bvisa.
+	}.
+}.
+
+
+>> URL := Chinhu nyowani.
+
+URL kana-zvasvika: ['init'] ita: {
+	zvako protocol := ['https://'].
+	zvako mugamuchiri := ['localhost'].
+	zvako nzira-yefaira := [''].
+	zvako params := [''].
+	zvako hash := [''].
+}.
+
+URL kana-zvasvika: ['nyowani'] ita: { <- pachako nyowani init.
+}.
+
+URL kana-zvasvika: ['mavara-emashoko'] ita: { <- (
+	zvako protocol +
+	zvako mugamuchiri +
+	zvako nzira-yefaira +
+	zvako params +
+	zvako hash ).
+}.
+
+URL kana-zvasvika: ['protocol:'] ita: { :protocol
+	((Rondedzero nyowani: ['http'] ; ['https']) rine: protocol) chokwadi: {
+		zvako protocol := protocol + ['://'].
+	}, nhema: {
+		basa-iri chikanganiso: ['Invalid protocol'].
+	}.
+}.
+
+URL kana-zvasvika: ['mugamuchiri:'] ita: { :mugamuchiri
+	#todo validate according to rfc
+	zvako mugamuchiri := mugamuchiri.
+}.
+
+URL kana-zvasvika: ['path:'] ita: { :nzira-yefaira
+	zvako nzira-yefaira := ['/'] + nzira-yefaira url-isa-kodhi.
+}.
+
+URL kana-zvasvika: ['params:'] ita: { :map
+	>> params := Rondedzero nyowani.
+	map chimwe-nechimwe: { :key :value
+		params wedzera-kumagumo: key mavara-emashoko url-isa-kodhi + ['='] + value mavara-emashoko url-isa-kodhi.
+	}.
+	zvako params := ['?'] + ( params batanidza: ['&'] ).
+}.
+
+URL kana-zvasvika: ['hash:'] ita: { :hash
+	zvako hash := ['#'] + hash url-isa-kodhi.
+}.
+
