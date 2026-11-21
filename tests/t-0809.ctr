@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> values := List new
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+values each: { :i :value
+	>> d := Dict new.
+	d put: value at: ['k'].
+	>> r := d code object.
+	Out write: r count, stop.
+	Out write: ( (r at: ['k']) = value ), stop.
+}.
