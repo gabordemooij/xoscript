@@ -1,0 +1,97 @@
+
+# ~ Simple template engine ~
+
+>> Template := Objekt neu.
+
+Template wenn: ['neu'] tun: { <- selbst neu content: [''].
+}.
+
+Template wenn: ['content:'] tun: { :content
+	eigen content := content. 
+}.
+
+Template wenn: ['neu:'] tun: { :content <- selbst neu content: content.
+}.
+
+Template wenn: ['cut:'] tun: { :marker
+	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
+	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
+	>> parts := eigen content teilen: startmarker.
+	>> prefix := parts erstes.
+	>> parts2 := parts letztes teilen: endmarker.
+	>> suffix := parts2 letztes.
+	>> part := parts2 erstes.
+	>> rest := prefix + suffix.
+	eigen content := rest. <- Template neu: part.
+	
+}.
+
+Template wenn: ['kopieren'] tun: { <- selbst neu: selbst text kopieren.
+}.
+	
+Template wenn: ['paste:at:'] tun: { :snippet :id
+	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
+	eigen content ersetzen: pastemarker mit: ( snippet text + pastemarker ).
+}.
+
+Template wenn: ['setzen:wert:'] tun: { :slot :value
+	eigen content ersetzen: ['<!-- slot:'] + slot + [' -->'] mit: ( Server html-kodieren: value ).
+}.
+
+Template wenn: ['set:html:'] tun: { :slot :html
+	eigen content ersetzen: ['<!-- slot:'] + slot + [' -->'] mit: html.
+}.
+
+Template wenn: ['antworten:und:'] tun: { :slot :value
+	selbst setzen: (slot von: 0 länge: (slot länge - 1)) wert: value.
+}.
+
+Template wenn: ['nl2br'] tun: {
+	eigen content ersetzen: ['\n'] mit: ['<br>'].
+}.
+
+Template wenn: ['clean'] tun: {
+	eigen content :=
+		Muster
+		neu: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
+		treffer: eigen content
+		tun: { <- ['']. }.
+}.
+
+Template wenn: ['clean-cuts'] tun: {
+	>> items := Liste neu.
+	Muster
+	neu: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
+	treffer: eigen content
+	tun: { :_ :part
+		items anhängen: part ? 1.
+	}.
+	items jedes: { :_ :id
+		eigen content :=
+			Muster neu: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
+			treffer: eigen content
+			tun: { <- ['']. }.
+	 }.
+}.
+
+Template wenn: ['clean-space'] tun: {
+	eigen content :=
+		Muster
+		neu: ['\\s*\\n'],
+		treffer: eigen content
+		tun: { <- ['\n']. }.
+	eigen content :=
+		Muster
+		neu: ['\\n[\\s\\t]+'],
+		treffer: eigen content
+		tun: { <- ['\n']. }.
+}.
+
+Template wenn: ['clean-all'] tun: {
+	selbst clean.
+	selbst clean-cuts.
+	selbst clean-space.
+}.
+
+Template wenn: ['text'] tun: { <- eigen content.
+}.
