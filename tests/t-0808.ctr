@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Vault generate-keys.
+>> sk := keys first.
+>> pk := keys last.
+>> sig := Vault sign: ['abc'] with: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Vault sign: ['abc'] with: long. } except: { :e
+	Out write: e, stop.
+}, start.
+
+{ Vault check: ['abc'] signature: long with: pk. } except: { :e
+	Out write: e, stop.
+}, start.
+
+{ Vault check: ['abc'] signature: sig with: short. } except: { :e
+	Out write: e, stop.
+}, start.
