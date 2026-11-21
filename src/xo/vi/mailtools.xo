@@ -1,128 +1,128 @@
->> Email := Đối-tượng mới.
+>> Thư-điện-tử := Đối-tượng mới.
 
-Email khi: ['init'] làm: {
-	riêng recipients := Danh-sách mới.
+Thư-điện-tử khi: ['khởi-tạo'] làm: {
+	riêng người-nhận := Danh-sách mới.
 	riêng cc := Danh-sách mới.
 	riêng bcc := Danh-sách mới.
-	riêng from := Rỗng.
-	riêng from-name := Rỗng.
-	riêng subject := Rỗng.
-	riêng body := Rỗng.
+	riêng người-gửi := Rỗng.
+	riêng tên-người-gửi := Rỗng.
+	riêng chủ-đề := Rỗng.
+	riêng thân-thư := Rỗng.
 }.
 
-Email khi: ['mới'] làm: { <- bản-thân mới init.
+Thư-điện-tử khi: ['mới'] làm: { <- bản-thân mới khởi-tạo.
 }.
 
-Email khi: ['to:'] làm: { :list
-	riêng recipients := list.
+Thư-điện-tử khi: ['đến:'] làm: { :liệt-kê
+	riêng người-nhận := liệt-kê.
 }.
  
-Email khi: ['cc:'] làm: { :list
-	riêng cc := list.
+Thư-điện-tử khi: ['cc:'] làm: { :liệt-kê
+	riêng cc := liệt-kê.
 }.
 
-Email khi: ['bcc:'] làm: { :list
-	riêng bcc := list.
+Thư-điện-tử khi: ['bcc:'] làm: { :liệt-kê
+	riêng bcc := liệt-kê.
 }.
 
-Email khi: ['subject:'] làm: { :subject
-	riêng subject := subject.
+Thư-điện-tử khi: ['chủ-đề:'] làm: { :chủ-đề
+	riêng chủ-đề := chủ-đề.
 }.
 
-Email khi: ['from:name:'] làm: { :from :tên
-	riêng from := from.
-	riêng from-name := tên.
+Thư-điện-tử khi: ['người-gửi:tên:'] làm: { :người-gửi :tên
+	riêng người-gửi := người-gửi.
+	riêng tên-người-gửi := tên.
 }.
 
-Email khi: ['body:'] làm: { :body
-	riêng body := body.
+Thư-điện-tử khi: ['thân-thư:'] làm: { :thân-thư
+	riêng thân-thư := thân-thư.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email khi: ['header:'] làm: { :line <- line thay: ['\r'] bằng: [''], thay: ['\n'] bằng: [''].
+Thư-điện-tử khi: ['tiêu-đề:'] làm: { :dòng <- dòng thay: ['\r'] bằng: [''], thay: ['\n'] bằng: [''].
 }.
 
-Email khi: ['send'] làm: {
-	>> f := Tệp tempwrite: bản-thân generate.
+Thư-điện-tử khi: ['gửi'] làm: {
+	>> f := Tệp tempwrite: bản-thân tạo-ra.
 	Chương-trình hệ-thống: ['sendmail -t < '] + f đường-dẫn, xuống-dòng.
 }.
 
-Email khi: ['generate'] làm: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str thêm-cuối: (bản-thân header: ['From: '] + riêng from-name + [' <'] + ( riêng from ) + ['>']) + brk.
-	str thêm-cuối: (bản-thân header: ['To: '] + ( riêng recipients nối: [','] )) + brk.
+Thư-điện-tử khi: ['tạo-ra'] làm: {
+	>> ngắt-dòng := ['\r\n'].
+	>> chuỗi-văn-bản := [''].
+	chuỗi-văn-bản thêm-cuối: (bản-thân tiêu-đề: ['From: '] + riêng tên-người-gửi + [' <'] + ( riêng người-gửi ) + ['>']) + ngắt-dòng.
+	chuỗi-văn-bản thêm-cuối: (bản-thân tiêu-đề: ['To: '] + ( riêng người-nhận nối: [','] )) + ngắt-dòng.
 	riêng cc đếm đúng: {
-		str thêm-cuối: (bản-thân header: ['Cc: '] + ( riêng cc nối: [','] )) + brk.
+		chuỗi-văn-bản thêm-cuối: (bản-thân tiêu-đề: ['Cc: '] + ( riêng cc nối: [','] )) + ngắt-dòng.
 	}.
 	riêng bcc đếm đúng: {
-		str thêm-cuối: (bản-thân header: ['Bcc: '] + ( riêng bcc nối: [','] )) + brk.
+		chuỗi-văn-bản thêm-cuối: (bản-thân tiêu-đề: ['Bcc: '] + ( riêng bcc nối: [','] )) + ngắt-dòng.
 	}.
-	str thêm-cuối: (bản-thân header: ['Subject: '] + riêng subject) + brk.
-	str thêm-cuối: brk.
-	str thêm-cuối: riêng body.
-	str thêm-cuối: brk. <- str.
+	chuỗi-văn-bản thêm-cuối: (bản-thân tiêu-đề: ['Subject: '] + riêng chủ-đề) + ngắt-dòng.
+	chuỗi-văn-bản thêm-cuối: ngắt-dòng.
+	chuỗi-văn-bản thêm-cuối: riêng thân-thư.
+	chuỗi-văn-bản thêm-cuối: ngắt-dòng. <- chuỗi-văn-bản.
 }.
 
->> HTML-Email := Email mới.
+>> Thư-HTML := Thư-điện-tử mới.
 
-HTML-Email khi: ['init'] làm: {
-	bản-thân init.
-	riêng attachments := Danh-sách mới.
-	riêng boundary := Két mã-thông-báo: 40.
+Thư-HTML khi: ['khởi-tạo'] làm: {
+	bản-thân khởi-tạo.
+	riêng tệp-đính-kèm := Danh-sách mới.
+	riêng ranh-giới := Két mã-thông-báo: 40.
 }.
 
-HTML-Email khi: ['attach:'] làm: { :file
-	>> id := riêng attachments đếm.
-	>> blob := file blob.
-	riêng attachments thêm-cuối: (
+Thư-HTML khi: ['đính-kèm:'] làm: { :tệp-phiên
+	>> id := riêng tệp-đính-kèm đếm.
+	>> blob := tệp-phiên blob.
+	riêng tệp-đính-kèm thêm-cuối: (
 		Từ-điển mới
-			file: file đường-dẫn,
-			mime: ['image/'] + (Server mimetype: file đường-dẫn),
-			data: blob base64-mã-hóa
+			tệp-phiên: tệp-phiên đường-dẫn,
+			mime: ['image/'] + (Server mimetype: tệp-phiên đường-dẫn),
+			dữ-liệu: blob base64-mã-hóa
 	).
 	blob giải-phóng. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email khi: ['generate'] làm: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str thêm-cuối: (bản-thân header: ['From: '] + riêng from-name + [' <'] + ( riêng from ) + ['>']) + brk.
-	str thêm-cuối: (bản-thân header: ['To: '] + ( riêng recipients nối: [','] )) + brk.
+Thư-HTML khi: ['tạo-ra'] làm: {
+	>> ngắt-dòng := ['\r\n'].
+	>> chuỗi-văn-bản := [''].
+	chuỗi-văn-bản thêm-cuối: (bản-thân tiêu-đề: ['From: '] + riêng tên-người-gửi + [' <'] + ( riêng người-gửi ) + ['>']) + ngắt-dòng.
+	chuỗi-văn-bản thêm-cuối: (bản-thân tiêu-đề: ['To: '] + ( riêng người-nhận nối: [','] )) + ngắt-dòng.
 	riêng cc đếm đúng: {
-		str thêm-cuối: (bản-thân header: ['Cc: '] + ( riêng cc nối: [','] )) + brk.
+		chuỗi-văn-bản thêm-cuối: (bản-thân tiêu-đề: ['Cc: '] + ( riêng cc nối: [','] )) + ngắt-dòng.
 	}.
 	riêng bcc đếm đúng: {
-		str thêm-cuối: (bản-thân header: ['Bcc: '] + ( riêng bcc nối: [','] )) + brk.
+		chuỗi-văn-bản thêm-cuối: (bản-thân tiêu-đề: ['Bcc: '] + ( riêng bcc nối: [','] )) + ngắt-dòng.
 	}.
-	str thêm-cuối: (bản-thân header: ['Subject: '] + riêng subject) + brk.
-	str thêm-cuối: ['MIME-Version: 1.0'] + brk.
-	str thêm-cuối: ['Content-Type: multipart/related; boundary="'] + riêng boundary + ['"; type=text/html'] + brk.
-	str thêm-cuối: brk.
-	str thêm-cuối: ['--'] + riêng boundary + brk.
-	str thêm-cuối: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str thêm-cuối: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str thêm-cuối: brk.
-	str thêm-cuối: riêng body.
-	str thêm-cuối: brk.
-	riêng attachments mỗi: { :id :info
-		>> blob := info data.
-		str thêm-cuối: ['--'] + riêng boundary + brk.
-		str thêm-cuối: ['Content-Type: '] + info mime + brk.
-		str thêm-cuối: ['Content-Transfer-Encoding: base64'] + brk.
-		str thêm-cuối: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str thêm-cuối: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str thêm-cuối: brk.
-		>> max := 76.
-		>> len := blob độ-dài.
-		>> chunks := (len / max) làm-tròn-lên.
+	chuỗi-văn-bản thêm-cuối: (bản-thân tiêu-đề: ['Subject: '] + riêng chủ-đề) + ngắt-dòng.
+	chuỗi-văn-bản thêm-cuối: ['MIME-Version: 1.0'] + ngắt-dòng.
+	chuỗi-văn-bản thêm-cuối: ['Content-Type: multipart/related; boundary="'] + riêng ranh-giới + ['"; type=text/html'] + ngắt-dòng.
+	chuỗi-văn-bản thêm-cuối: ngắt-dòng.
+	chuỗi-văn-bản thêm-cuối: ['--'] + riêng ranh-giới + ngắt-dòng.
+	chuỗi-văn-bản thêm-cuối: ['Content-Type: text/html; charset=UTF-8'] + ngắt-dòng.
+	chuỗi-văn-bản thêm-cuối: ['Content-Transfer-Encoding: 7bit'] + ngắt-dòng.
+	chuỗi-văn-bản thêm-cuối: ngắt-dòng.
+	chuỗi-văn-bản thêm-cuối: riêng thân-thư.
+	chuỗi-văn-bản thêm-cuối: ngắt-dòng.
+	riêng tệp-đính-kèm mỗi: { :id :thông-tin
+		>> blob := thông-tin dữ-liệu.
+		chuỗi-văn-bản thêm-cuối: ['--'] + riêng ranh-giới + ngắt-dòng.
+		chuỗi-văn-bản thêm-cuối: ['Content-Type: '] + thông-tin mime + ngắt-dòng.
+		chuỗi-văn-bản thêm-cuối: ['Content-Transfer-Encoding: base64'] + ngắt-dòng.
+		chuỗi-văn-bản thêm-cuối: ['Content-ID: <attachment'] + id + ['>'] + ngắt-dòng.
+		chuỗi-văn-bản thêm-cuối: ['Content-Disposition: inline; filename="'] + thông-tin tệp-phiên + ['"'] + ngắt-dòng.
+		chuỗi-văn-bản thêm-cuối: ngắt-dòng.
+		>> tối-đa := 76.
+		>> độ-dài-văn-bản := blob độ-dài.
+		>> các-khúc := (độ-dài-văn-bản / tối-đa) làm-tròn-lên.
 		{ :i
-			>> chunk := blob sao-chép từ: i * max độ-dài: max.
-			str thêm-cuối: chunk + brk.
-		} * chunks.
-		str thêm-cuối: brk.
-		str thêm-cuối: brk.
+			>> khúc := blob sao-chép từ: i * tối-đa độ-dài: tối-đa.
+			chuỗi-văn-bản thêm-cuối: khúc + ngắt-dòng.
+		} * các-khúc.
+		chuỗi-văn-bản thêm-cuối: ngắt-dòng.
+		chuỗi-văn-bản thêm-cuối: ngắt-dòng.
 	}.
-	str thêm-cuối: ['--'] + riêng boundary + ['--'] + brk. <- str.
+	chuỗi-văn-bản thêm-cuối: ['--'] + riêng ranh-giới + ['--'] + ngắt-dòng. <- chuỗi-văn-bản.
 }.

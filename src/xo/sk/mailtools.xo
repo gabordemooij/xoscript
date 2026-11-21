@@ -1,128 +1,128 @@
 >> Email := Objekt nový.
 
-Email pri: ['init'] urobiť: {
-	vlastný recipients := Zoznam nový.
+Email pri: ['inicializovať'] urobiť: {
+	vlastný príjemcovia := Zoznam nový.
 	vlastný cc := Zoznam nový.
 	vlastný bcc := Zoznam nový.
-	vlastný from := Nič.
-	vlastný from-name := Nič.
-	vlastný subject := Nič.
-	vlastný body := Nič.
+	vlastný odosielateľ := Nič.
+	vlastný meno-odosielateľa := Nič.
+	vlastný predmet := Nič.
+	vlastný telo := Nič.
 }.
 
-Email pri: ['nový'] urobiť: { <- seba nový init.
+Email pri: ['nový'] urobiť: { <- seba nový inicializovať.
 }.
 
-Email pri: ['to:'] urobiť: { :list
-	vlastný recipients := list.
+Email pri: ['komu:'] urobiť: { :výpočet
+	vlastný príjemcovia := výpočet.
 }.
  
-Email pri: ['cc:'] urobiť: { :list
-	vlastný cc := list.
+Email pri: ['cc:'] urobiť: { :výpočet
+	vlastný cc := výpočet.
 }.
 
-Email pri: ['bcc:'] urobiť: { :list
-	vlastný bcc := list.
+Email pri: ['bcc:'] urobiť: { :výpočet
+	vlastný bcc := výpočet.
 }.
 
-Email pri: ['subject:'] urobiť: { :subject
-	vlastný subject := subject.
+Email pri: ['predmet:'] urobiť: { :predmet
+	vlastný predmet := predmet.
 }.
 
-Email pri: ['from:name:'] urobiť: { :from :názov
-	vlastný from := from.
-	vlastný from-name := názov.
+Email pri: ['odosielateľ:názov:'] urobiť: { :odosielateľ :názov
+	vlastný odosielateľ := odosielateľ.
+	vlastný meno-odosielateľa := názov.
 }.
 
-Email pri: ['body:'] urobiť: { :body
-	vlastný body := body.
+Email pri: ['telo:'] urobiť: { :telo
+	vlastný telo := telo.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email pri: ['header:'] urobiť: { :line <- line nahradiť: ['\r'] za: [''], nahradiť: ['\n'] za: [''].
+Email pri: ['hlavička:'] urobiť: { :riadok <- riadok nahradiť: ['\r'] za: [''], nahradiť: ['\n'] za: [''].
 }.
 
-Email pri: ['send'] urobiť: {
-	>> f := Súbor tempwrite: seba generate.
+Email pri: ['odoslať'] urobiť: {
+	>> f := Súbor tempwrite: seba generovať.
 	Program systém: ['sendmail -t < '] + f cesta, nový-riadok.
 }.
 
-Email pri: ['generate'] urobiť: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str pripojiť: (seba header: ['From: '] + vlastný from-name + [' <'] + ( vlastný from ) + ['>']) + brk.
-	str pripojiť: (seba header: ['To: '] + ( vlastný recipients spojiť: [','] )) + brk.
+Email pri: ['generovať'] urobiť: {
+	>> zalomenie := ['\r\n'].
+	>> reťazec := [''].
+	reťazec pripojiť: (seba hlavička: ['From: '] + vlastný meno-odosielateľa + [' <'] + ( vlastný odosielateľ ) + ['>']) + zalomenie.
+	reťazec pripojiť: (seba hlavička: ['To: '] + ( vlastný príjemcovia spojiť: [','] )) + zalomenie.
 	vlastný cc počet pravda: {
-		str pripojiť: (seba header: ['Cc: '] + ( vlastný cc spojiť: [','] )) + brk.
+		reťazec pripojiť: (seba hlavička: ['Cc: '] + ( vlastný cc spojiť: [','] )) + zalomenie.
 	}.
 	vlastný bcc počet pravda: {
-		str pripojiť: (seba header: ['Bcc: '] + ( vlastný bcc spojiť: [','] )) + brk.
+		reťazec pripojiť: (seba hlavička: ['Bcc: '] + ( vlastný bcc spojiť: [','] )) + zalomenie.
 	}.
-	str pripojiť: (seba header: ['Subject: '] + vlastný subject) + brk.
-	str pripojiť: brk.
-	str pripojiť: vlastný body.
-	str pripojiť: brk. <- str.
+	reťazec pripojiť: (seba hlavička: ['Subject: '] + vlastný predmet) + zalomenie.
+	reťazec pripojiť: zalomenie.
+	reťazec pripojiť: vlastný telo.
+	reťazec pripojiť: zalomenie. <- reťazec.
 }.
 
 >> HTML-Email := Email nový.
 
-HTML-Email pri: ['init'] urobiť: {
-	seba init.
-	vlastný attachments := Zoznam nový.
-	vlastný boundary := Trezor token: 40.
+HTML-Email pri: ['inicializovať'] urobiť: {
+	seba inicializovať.
+	vlastný prílohy := Zoznam nový.
+	vlastný hranica := Trezor token: 40.
 }.
 
-HTML-Email pri: ['attach:'] urobiť: { :file
-	>> id := vlastný attachments počet.
-	>> blob := file blob.
-	vlastný attachments pripojiť: (
+HTML-Email pri: ['priložiť:'] urobiť: { :súbor
+	>> id := vlastný prílohy počet.
+	>> blob := súbor blob.
+	vlastný prílohy pripojiť: (
 		Slovník nový
-			file: file cesta,
-			mime: ['image/'] + (Server mimetype: file cesta),
-			data: blob base64-kódovať
+			súbor: súbor cesta,
+			mime: ['image/'] + (Server mimetype: súbor cesta),
+			údaje: blob base64-kódovať
 	).
 	blob uvoľniť. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email pri: ['generate'] urobiť: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str pripojiť: (seba header: ['From: '] + vlastný from-name + [' <'] + ( vlastný from ) + ['>']) + brk.
-	str pripojiť: (seba header: ['To: '] + ( vlastný recipients spojiť: [','] )) + brk.
+HTML-Email pri: ['generovať'] urobiť: {
+	>> zalomenie := ['\r\n'].
+	>> reťazec := [''].
+	reťazec pripojiť: (seba hlavička: ['From: '] + vlastný meno-odosielateľa + [' <'] + ( vlastný odosielateľ ) + ['>']) + zalomenie.
+	reťazec pripojiť: (seba hlavička: ['To: '] + ( vlastný príjemcovia spojiť: [','] )) + zalomenie.
 	vlastný cc počet pravda: {
-		str pripojiť: (seba header: ['Cc: '] + ( vlastný cc spojiť: [','] )) + brk.
+		reťazec pripojiť: (seba hlavička: ['Cc: '] + ( vlastný cc spojiť: [','] )) + zalomenie.
 	}.
 	vlastný bcc počet pravda: {
-		str pripojiť: (seba header: ['Bcc: '] + ( vlastný bcc spojiť: [','] )) + brk.
+		reťazec pripojiť: (seba hlavička: ['Bcc: '] + ( vlastný bcc spojiť: [','] )) + zalomenie.
 	}.
-	str pripojiť: (seba header: ['Subject: '] + vlastný subject) + brk.
-	str pripojiť: ['MIME-Version: 1.0'] + brk.
-	str pripojiť: ['Content-Type: multipart/related; boundary="'] + vlastný boundary + ['"; type=text/html'] + brk.
-	str pripojiť: brk.
-	str pripojiť: ['--'] + vlastný boundary + brk.
-	str pripojiť: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str pripojiť: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str pripojiť: brk.
-	str pripojiť: vlastný body.
-	str pripojiť: brk.
-	vlastný attachments každý: { :id :info
-		>> blob := info data.
-		str pripojiť: ['--'] + vlastný boundary + brk.
-		str pripojiť: ['Content-Type: '] + info mime + brk.
-		str pripojiť: ['Content-Transfer-Encoding: base64'] + brk.
-		str pripojiť: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str pripojiť: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str pripojiť: brk.
-		>> max := 76.
-		>> len := blob dĺžka.
-		>> chunks := (len / max) horná-celá-časť.
+	reťazec pripojiť: (seba hlavička: ['Subject: '] + vlastný predmet) + zalomenie.
+	reťazec pripojiť: ['MIME-Version: 1.0'] + zalomenie.
+	reťazec pripojiť: ['Content-Type: multipart/related; boundary="'] + vlastný hranica + ['"; type=text/html'] + zalomenie.
+	reťazec pripojiť: zalomenie.
+	reťazec pripojiť: ['--'] + vlastný hranica + zalomenie.
+	reťazec pripojiť: ['Content-Type: text/html; charset=UTF-8'] + zalomenie.
+	reťazec pripojiť: ['Content-Transfer-Encoding: 7bit'] + zalomenie.
+	reťazec pripojiť: zalomenie.
+	reťazec pripojiť: vlastný telo.
+	reťazec pripojiť: zalomenie.
+	vlastný prílohy každý: { :id :info
+		>> blob := info údaje.
+		reťazec pripojiť: ['--'] + vlastný hranica + zalomenie.
+		reťazec pripojiť: ['Content-Type: '] + info mime + zalomenie.
+		reťazec pripojiť: ['Content-Transfer-Encoding: base64'] + zalomenie.
+		reťazec pripojiť: ['Content-ID: <attachment'] + id + ['>'] + zalomenie.
+		reťazec pripojiť: ['Content-Disposition: inline; filename="'] + info súbor + ['"'] + zalomenie.
+		reťazec pripojiť: zalomenie.
+		>> najviac := 76.
+		>> dĺžka-textu := blob dĺžka.
+		>> kusy := (dĺžka-textu / najviac) horná-celá-časť.
 		{ :i
-			>> chunk := blob kopírovať od: i * max dĺžka: max.
-			str pripojiť: chunk + brk.
-		} * chunks.
-		str pripojiť: brk.
-		str pripojiť: brk.
+			>> kus := blob kopírovať od: i * najviac dĺžka: najviac.
+			reťazec pripojiť: kus + zalomenie.
+		} * kusy.
+		reťazec pripojiť: zalomenie.
+		reťazec pripojiť: zalomenie.
 	}.
-	str pripojiť: ['--'] + vlastný boundary + ['--'] + brk. <- str.
+	reťazec pripojiť: ['--'] + vlastný hranica + ['--'] + zalomenie. <- reťazec.
 }.

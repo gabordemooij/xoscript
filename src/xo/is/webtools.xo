@@ -1,302 +1,302 @@
-HTTP-Beiðni við: ['HTTP-header:'] gera: { :key <- Forrit stilling: key.
+HTTP-Beiðni við: ['HTTP-haus:'] gera: { :lykill <- Forrit stilling: lykill.
 }.
 
->> HTTP-Header := Hlutur nýtt.
+>> HTTP-Haus := Hlutur nýtt.
 
-HTTP-Header við: ['nýtt'] gera: { <- sjálfur nýtt init.
+HTTP-Haus við: ['nýtt'] gera: { <- sjálfur nýtt frumstilla.
 }.
 
-HTTP-Header við: ['init'] gera: {
-	eigin key := Ekkert.
-	eigin value := Ekkert.
+HTTP-Haus við: ['frumstilla'] gera: {
+	eigin lykill := Ekkert.
+	eigin gildið := Ekkert.
 }.
 
-HTTP-Header við: ['key:value:'] gera: { :key :value
-	eigin key := key.
-	eigin value := value.
+HTTP-Haus við: ['lykill:gildið:'] gera: { :lykill :gildið
+	eigin lykill := lykill.
+	eigin gildið := gildið.
 }.
 
-HTTP-Header við: ['key'] gera: { <- eigin key.
+HTTP-Haus við: ['lykill'] gera: { <- eigin lykill.
 }.
 
-HTTP-Header við: ['value'] gera: { <- eigin value.
+HTTP-Haus við: ['gildið'] gera: { <- eigin gildið.
 }.
 
 
-HTTP-Header við: ['texti'] gera: {
-	>> line := eigin key + [': '] + eigin value.
-	line skipta: ['\r'] fyrir: [''], skipta: ['\n'] fyrir: ['']. <- line + [' \r\n'].
+HTTP-Haus við: ['texti'] gera: {
+	>> lína := eigin lykill + [': '] + eigin gildið.
+	lína skipta: ['\r'] fyrir: [''], skipta: ['\n'] fyrir: ['']. <- lína + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Hlutur nýtt.
+>> Vefskjal := Hlutur nýtt.
 
-Web-Document við: ['nýtt'] gera: { <- sjálfur nýtt init.
+Vefskjal við: ['nýtt'] gera: { <- sjálfur nýtt frumstilla.
 }.
 
-Web-Document við: ['init'] gera: {
-	eigin headers := Listi nýtt.
-	eigin sess-id := Ekkert.
-	eigin session-manager := Tempfile-Session nýtt.
-	eigin sessdata := Ekkert.
-	eigin secure := Satt.
-	eigin same-site := ['Strict'].
-	eigin headers-out := Rangt.
-	eigin request := HTTP-Beiðni nýtt.
+Vefskjal við: ['frumstilla'] gera: {
+	eigin hausar := Listi nýtt.
+	eigin setu-auðkenni := Ekkert.
+	eigin setustjóri := Bráðabirgðaskrár-seta nýtt.
+	eigin setugögn := Ekkert.
+	eigin öruggt := Satt.
+	eigin sama-vefs := ['Strict'].
+	eigin hausar-sendir := Rangt.
+	eigin beiðni := HTTP-Beiðni nýtt.
 }.
 
-Web-Document við: ['request:'] gera: { :request
-	eigin request := request.
+Vefskjal við: ['beiðni:'] gera: { :beiðni
+	eigin beiðni := beiðni.
 }. 
 
-Web-Document við: ['secure-session-cookie:'] gera: { :secure
-	sjálfur check-headers.
-	eigin secure := secure.
+Vefskjal við: ['örugg-setukaka:'] gera: { :öruggt
+	sjálfur athuga-hausa.
+	eigin öruggt := öruggt.
 }.
 
-Web-Document við: ['same-site-session-cookie:'] gera: { :value
-	sjálfur check-headers.
-	>> options := Listi nýtt 
+Vefskjal við: ['sama-vefs-setukaka:'] gera: { :gildið
+	sjálfur athuga-hausa.
+	>> valkostir := Listi nýtt 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options inniheldur: value, rangt: {
+	valkostir hefur: gildið, rangt: {
 		þetta-verk villa: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	eigin same-site := value.
+	eigin sama-vefs := gildið.
 }.
 
-Web-Document við: ['header:'] gera: { :header
-	sjálfur check-headers.
-	eigin headers bæta-aftast: header.
+Vefskjal við: ['haus:'] gera: { :haus
+	sjálfur athuga-hausa.
+	eigin hausar bæta-aftast: haus.
 }.
 
-Web-Document við: ['clear-headers'] gera: {
-	sjálfur check-headers.
-	eigin headers := Listi nýtt.
+Vefskjal við: ['tæma-hausa'] gera: {
+	sjálfur athuga-hausa.
+	eigin hausar := Listi nýtt.
 }.
 
-Web-Document við: ['session-manager:'] gera: { :manager
-	sjálfur check-headers.
-	eigin session-manager := manager.
+Vefskjal við: ['setustjóri:'] gera: { :stjóri
+	sjálfur athuga-hausa.
+	eigin setustjóri := stjóri.
 }.
 
-Web-Document við: ['session-manager'] gera: { <- eigin session-manager.
+Vefskjal við: ['setustjóri'] gera: { <- eigin setustjóri.
 }.
 
-Web-Document við: ['check-headers'] gera: {
-	eigin headers-out satt: {
+Vefskjal við: ['athuga-hausa'] gera: {
+	eigin hausar-sendir satt: {
 		þetta-verk villa: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document við: ['session-start'] gera: {
-	sjálfur check-headers.
-	>> request := eigin request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Ekkert? rangt: {
-		(( Mynstur nýtt: ['^[A-Za-z0-9]+\\z'], samsvörun: sess-id ) = 0) satt: {
-			sess-id := Ekkert.
+Vefskjal við: ['hefja-setu'] gera: {
+	sjálfur athuga-hausa.
+	>> beiðni := eigin beiðni.
+	>> setu-auðkenni := beiðni cookie: ['xsid'].
+	setu-auðkenni Ekkert? rangt: {
+		(( Mynstur nýtt: ['^[A-Za-z0-9]+\\z'], samsvörun: setu-auðkenni ) = 0) satt: {
+			setu-auðkenni := Ekkert.
 		}.
 	}.
-	sess-id Ekkert? satt: {
-		sess-id := Hvelfing tóki: 30.
-		>> session-header := HTTP-Header nýtt
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (eigin secure annaðhvort: ['Secure'] eða: ['']),
-		SSITE: (eigin same-site),
-		XSID: sess-id
+	setu-auðkenni Ekkert? satt: {
+		setu-auðkenni := Hvelfing tóki: 30.
+		>> setuhaus := HTTP-Haus nýtt
+		lykill: ['Set-Cookie'] gildið: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (eigin öruggt annaðhvort: ['Secure'] eða: ['']),
+		SSITE: (eigin sama-vefs),
+		XSID: setu-auðkenni
 		).
-		eigin headers bæta-aftast: session-header.
+		eigin hausar bæta-aftast: setuhaus.
 	}.
-	eigin sessdata := eigin session-manager for: sess-id, load. <- eigin sessdata. # reference
+	eigin setugögn := eigin setustjóri fyrir: setu-auðkenni, hlaða. <- eigin setugögn. # reference
 }.
 
-Web-Document við: ['goto:'] gera: { :url
-	sjálfur check-headers.
-	sjálfur clear-headers.
-	eigin headers
+Vefskjal við: ['fara-á:'] gera: { :vefslóð
+	sjálfur athuga-hausa.
+	sjálfur tæma-hausa.
+	eigin hausar
 	bæta-aftast: (
-		HTTP-Header nýtt
-		key: ['Status'] value: ['303 See Other']
+		HTTP-Haus nýtt
+		lykill: ['Status'] gildið: ['303 See Other']
 	),
 	bæta-aftast: (
-		HTTP-Header nýtt
-		key: ['Location'] value: url
+		HTTP-Haus nýtt
+		lykill: ['Location'] gildið: vefslóð
 	).
-	sjálfur out: ['Redirect'].
+	sjálfur skrifa-út: ['Redirect'].
 }.
 
-Web-Document við: ['session-destroy'] gera: {
-	sjálfur check-headers.
-	>> request := eigin request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Ekkert? rangt: {
-		>> session-header := HTTP-Header nýtt.
-		>> when := Stund nýtt ár: 1970, snið: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Vefskjal við: ['eyða-setu'] gera: {
+	sjálfur athuga-hausa.
+	>> beiðni := eigin beiðni.
+	>> setu-auðkenni := beiðni cookie: ['xsid'].
+	setu-auðkenni Ekkert? rangt: {
+		>> setuhaus := HTTP-Haus nýtt.
+		>> tímasetning := Stund nýtt ár: 1970, snið: ['%a, %d %b %Y %H:%M:%S GMT'].
+		setuhaus lykill: ['Set-Cookie'] gildið: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (eigin secure annaðhvort: ['Secure'] eða: ['']),
-			SSITE: (eigin same-site),
-			XSID: sess-id
+			EXP: tímasetning,
+			SEC: (eigin öruggt annaðhvort: ['Secure'] eða: ['']),
+			SSITE: (eigin sama-vefs),
+			XSID: setu-auðkenni
 		).
-		eigin session-manager destroy.
-		eigin headers bæta-aftast: session-header.
+		eigin setustjóri tortíma.
+		eigin hausar bæta-aftast: setuhaus.
 	}.
 }.
 
 
-Web-Document við: ['template:'] gera: { :slóð <- Template nýtt: (Skrá nýtt: slóð, lesa).
+Vefskjal við: ['sniðmát:'] gera: { :slóð <- Sniðmát nýtt: (Skrá nýtt: slóð, lesa).
 }.
 
-Web-Document við: ['out:type:'] gera: { :output :gerð
-	eigin headers-out rangt: {
-		eigin sessdata Ekkert? rangt: {
-			eigin session-manager save: eigin sessdata.
+Vefskjal við: ['skrifa-út:gerð:'] gera: { :úttak :gerð
+	eigin hausar-sendir rangt: {
+		eigin setugögn Ekkert? rangt: {
+			eigin setustjóri vista: eigin setugögn.
 		}.
-		eigin headers bæta-aftast: (
-			HTTP-Header nýtt
-			key: ['Content-type'] value: gerð
+		eigin hausar bæta-aftast: (
+			HTTP-Haus nýtt
+			lykill: ['Content-type'] gildið: gerð
 		).
-		eigin headers hver: { :_ :header
-			Úttak skrifa: header.
+		eigin hausar hver: { :_ :haus
+			Úttak skrifa: haus.
 		}.
-		eigin headers-out := Satt.
+		eigin hausar-sendir := Satt.
 		Úttak skrifa: ['\r\n'].
 	}.
-	Úttak skrifa: output.
+	Úttak skrifa: úttak.
 }.
 
-Web-Document við: ['finish:type:'] gera: { :output :gerð
-	eigin headers-out rangt: {
-		eigin sessdata Ekkert? rangt: {
-			eigin session-manager save: eigin sessdata.
+Vefskjal við: ['ljúka:gerð:'] gera: { :úttak :gerð
+	eigin hausar-sendir rangt: {
+		eigin setugögn Ekkert? rangt: {
+			eigin setustjóri vista: eigin setugögn.
 		}.
-		eigin headers bæta-aftast: (
-			HTTP-Header nýtt
-			key: ['Content-type'] value: gerð
+		eigin hausar bæta-aftast: (
+			HTTP-Haus nýtt
+			lykill: ['Content-type'] gildið: gerð
 		).
-		eigin headers bæta-aftast: (
-			HTTP-Header nýtt
-			key: ['Content-Length'] value: output texti bytes
+		eigin hausar bæta-aftast: (
+			HTTP-Haus nýtt
+			lykill: ['Content-Length'] gildið: úttak texti bytes
 		).
-		eigin headers hver: { :_ :header
-			Úttak skrifa: header.
+		eigin hausar hver: { :_ :haus
+			Úttak skrifa: haus.
 		}.
-		eigin headers-out := Satt.
+		eigin hausar-sendir := Satt.
 		Úttak skrifa: ['\r\n'].
 	}.
-	Úttak skrifa: output.
+	Úttak skrifa: úttak.
 }.
 
-Web-Document við: ['out:'] gera: { :output
-	sjálfur out: output type: ['text/html; charset=utf-8'].
+Vefskjal við: ['skrifa-út:'] gera: { :úttak
+	sjálfur skrifa-út: úttak gerð: ['text/html; charset=utf-8'].
 }.
 
-Web-Document við: ['finish:'] gera: { :output
-	sjálfur finish: output type: ['text/html; charset=utf-8'].
+Vefskjal við: ['ljúka:'] gera: { :úttak
+	sjálfur ljúka: úttak gerð: ['text/html; charset=utf-8'].
 }.
 
-Web-Document við: ['json:'] gera: { :output
-	sjálfur out: ( JSON jsonify: output ) type: ['application/json'].
+Vefskjal við: ['json:'] gera: { :úttak
+	sjálfur skrifa-út: ( JSON jsonify: úttak ) gerð: ['application/json'].
 }.
 
-Web-Document við: ['not-found:'] gera: { :output
-	sjálfur clear-headers header: (
-		HTTP-Header nýtt key: ['Status'] value: ['404 Not Found']
+Vefskjal við: ['fannst-ekki:'] gera: { :úttak
+	sjálfur tæma-hausa haus: (
+		HTTP-Haus nýtt lykill: ['Status'] gildið: ['404 Not Found']
 	).
-	sjálfur out: output.
+	sjálfur skrifa-út: úttak.
 }.
 
 
 # Interface
 
->> Session := Hlutur nýtt.
+>> Seta := Hlutur nýtt.
 
-Session við: ['nýtt'] gera: { <- sjálfur nýtt init for: Ekkert.
+Seta við: ['nýtt'] gera: { <- sjálfur nýtt frumstilla fyrir: Ekkert.
 }.
 
-Session við: ['for:'] gera: { :id
+Seta við: ['fyrir:'] gera: { :id
 	eigin id := id.
 }.
 
-Session við: ['load'] gera: {
+Seta við: ['hlaða'] gera: {
 	þetta-verk villa: ['Not implemented.'].
 }.
 
-Session við: ['save:'] gera: {
+Seta við: ['vista:'] gera: {
 	þetta-verk villa: ['Not implemented.'].
 }.
 
-Session við: ['destroy'] gera: {
+Seta við: ['tortíma'] gera: {
 	þetta-verk villa: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session nýtt.
+>> Bráðabirgðaskrár-seta := Seta nýtt.
 
-Tempfile-Session við: ['init'] gera: {
-	eigin pathprefix := ['/tmp/sess-'].
+Bráðabirgðaskrár-seta við: ['frumstilla'] gera: {
+	eigin slóðarbyrjun := ['/tmp/sess-'].
 }.
 
-Tempfile-Session við: ['path-prefix:'] gera: { :str
-	eigin pathprefix := str.
+Bráðabirgðaskrár-seta við: ['slóðarforskeyti:'] gera: { :strengur
+	eigin slóðarbyrjun := strengur.
 }.
 
-Tempfile-Session við: ['file'] gera: { <- ( Skrá nýtt: ( eigin pathprefix + eigin id + ['.txt'] ) ).
+Bráðabirgðaskrár-seta við: ['skrá'] gera: { <- ( Skrá nýtt: ( eigin slóðarbyrjun + eigin id + ['.txt'] ) ).
 }.
 
-Tempfile-Session við: ['load'] gera: {
-	>> file := sjálfur file.
-	file er-til rangt: {
-		file skrifa: (Orðabók nýtt kóði).
-	}. <- file lesa hlutur.
+Bráðabirgðaskrár-seta við: ['hlaða'] gera: {
+	>> skrá := sjálfur skrá.
+	skrá er-til rangt: {
+		skrá skrifa: (Orðabók nýtt kóði).
+	}. <- skrá lesa hlutur.
 }.
 
-Tempfile-Session við: ['save:'] gera: { :data
-	>> file := sjálfur file.
-	file er-til satt: {
-		file skrifa: data kóði.
+Bráðabirgðaskrár-seta við: ['vista:'] gera: { :gögn
+	>> skrá := sjálfur skrá.
+	skrá er-til satt: {
+		skrá skrifa: gögn kóði.
 	}.
 }.
 
-Tempfile-Session við: ['destroy'] gera: {
-	>> file := sjálfur file.
-	file er-til satt: {
-		file eyða.
+Bráðabirgðaskrár-seta við: ['tortíma'] gera: {
+	>> skrá := sjálfur skrá.
+	skrá er-til satt: {
+		skrá eyða.
 	}.
 }.
 
 
 >> URL := Hlutur nýtt.
 
-URL við: ['init'] gera: {
-	eigin protocol := ['https://'].
+URL við: ['frumstilla'] gera: {
+	eigin samskiptaregla := ['https://'].
 	eigin hýsill := ['localhost'].
 	eigin slóð := [''].
-	eigin params := [''].
+	eigin url-færibreytur := [''].
 	eigin hash := [''].
 }.
 
-URL við: ['nýtt'] gera: { <- sjálfur nýtt init.
+URL við: ['nýtt'] gera: { <- sjálfur nýtt frumstilla.
 }.
 
 URL við: ['texti'] gera: { <- (
-	eigin protocol +
+	eigin samskiptaregla +
 	eigin hýsill +
 	eigin slóð +
-	eigin params +
+	eigin url-færibreytur +
 	eigin hash ).
 }.
 
-URL við: ['protocol:'] gera: { :protocol
-	((Listi nýtt: ['http'] ; ['https']) inniheldur: protocol) satt: {
-		eigin protocol := protocol + ['://'].
+URL við: ['samskiptaregla:'] gera: { :samskiptaregla
+	((Listi nýtt ; ['http'] ; ['https']) hefur: samskiptaregla) satt: {
+		eigin samskiptaregla := samskiptaregla + ['://'].
 	}, rangt: {
 		þetta-verk villa: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL við: ['hýsill:'] gera: { :hýsill
 	eigin hýsill := hýsill.
 }.
 
-URL við: ['path:'] gera: { :slóð
+URL við: ['slóð:'] gera: { :slóð
 	eigin slóð := ['/'] + slóð url-kóða.
 }.
 
-URL við: ['params:'] gera: { :map
-	>> params := Listi nýtt.
-	map hver: { :key :value
-		params bæta-aftast: key texti url-kóða + ['='] + value texti url-kóða.
+URL við: ['url-færibreytur:'] gera: { :vörpun
+	>> url-færibreytur := Listi nýtt.
+	vörpun hver: { :lykill :gildið
+		url-færibreytur bæta-aftast: lykill texti url-kóða + ['='] + gildið texti url-kóða.
 	}.
-	eigin params := ['?'] + ( params sameina: ['&'] ).
+	eigin url-færibreytur := ['?'] + ( url-færibreytur sameina: ['&'] ).
 }.
 
 URL við: ['tætigildi:'] gera: { :hash

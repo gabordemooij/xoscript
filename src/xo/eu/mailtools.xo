@@ -1,128 +1,128 @@
->> Email := Objektua berria.
+>> Posta := Objektua berria.
 
-Email noiz: ['init'] egin: {
-	berezko recipients := Zerrenda berria.
+Posta noiz: ['hasieratu'] egin: {
+	berezko hartzaileak := Zerrenda berria.
 	berezko cc := Zerrenda berria.
 	berezko bcc := Zerrenda berria.
-	berezko from := Ezer.
-	berezko from-name := Ezer.
-	berezko subject := Ezer.
-	berezko body := Ezer.
+	berezko igorlea := Ezer.
+	berezko igorlearen-izena := Ezer.
+	berezko gaia := Ezer.
+	berezko gorputza := Ezer.
 }.
 
-Email noiz: ['berria'] egin: { <- norbera berria init.
+Posta noiz: ['berria'] egin: { <- norbera berria hasieratu.
 }.
 
-Email noiz: ['to:'] egin: { :list
-	berezko recipients := list.
+Posta noiz: ['hartzailea:'] egin: { :zerrendatzea
+	berezko hartzaileak := zerrendatzea.
 }.
  
-Email noiz: ['cc:'] egin: { :list
-	berezko cc := list.
+Posta noiz: ['cc:'] egin: { :zerrendatzea
+	berezko cc := zerrendatzea.
 }.
 
-Email noiz: ['bcc:'] egin: { :list
-	berezko bcc := list.
+Posta noiz: ['bcc:'] egin: { :zerrendatzea
+	berezko bcc := zerrendatzea.
 }.
 
-Email noiz: ['subject:'] egin: { :subject
-	berezko subject := subject.
+Posta noiz: ['gaia:'] egin: { :gaia
+	berezko gaia := gaia.
 }.
 
-Email noiz: ['from:name:'] egin: { :from :izena
-	berezko from := from.
-	berezko from-name := izena.
+Posta noiz: ['igorlea:izena:'] egin: { :igorlea :izena
+	berezko igorlea := igorlea.
+	berezko igorlearen-izena := izena.
 }.
 
-Email noiz: ['body:'] egin: { :body
-	berezko body := body.
+Posta noiz: ['gorputza:'] egin: { :gorputza
+	berezko gorputza := gorputza.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email noiz: ['header:'] egin: { :line <- line ordeztu: ['\r'] honekin: [''], ordeztu: ['\n'] honekin: [''].
+Posta noiz: ['goiburua:'] egin: { :lerroa <- lerroa ordeztu: ['\r'] honekin: [''], ordeztu: ['\n'] honekin: [''].
 }.
 
-Email noiz: ['send'] egin: {
-	>> f := Fitxategia tempwrite: norbera generate.
+Posta noiz: ['bidali'] egin: {
+	>> f := Fitxategia tempwrite: norbera sortu.
 	Programa sistema: ['sendmail -t < '] + f bidea, lerro-jauzia.
 }.
 
-Email noiz: ['generate'] egin: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str erantsi: (norbera header: ['From: '] + berezko from-name + [' <'] + ( berezko from ) + ['>']) + brk.
-	str erantsi: (norbera header: ['To: '] + ( berezko recipients batu: [','] )) + brk.
+Posta noiz: ['sortu'] egin: {
+	>> crlf := ['\r\n'].
+	>> katea := [''].
+	katea erantsi: (norbera goiburua: ['From: '] + berezko igorlearen-izena + [' <'] + ( berezko igorlea ) + ['>']) + crlf.
+	katea erantsi: (norbera goiburua: ['To: '] + ( berezko hartzaileak batu: [','] )) + crlf.
 	berezko cc zenbatu egia: {
-		str erantsi: (norbera header: ['Cc: '] + ( berezko cc batu: [','] )) + brk.
+		katea erantsi: (norbera goiburua: ['Cc: '] + ( berezko cc batu: [','] )) + crlf.
 	}.
 	berezko bcc zenbatu egia: {
-		str erantsi: (norbera header: ['Bcc: '] + ( berezko bcc batu: [','] )) + brk.
+		katea erantsi: (norbera goiburua: ['Bcc: '] + ( berezko bcc batu: [','] )) + crlf.
 	}.
-	str erantsi: (norbera header: ['Subject: '] + berezko subject) + brk.
-	str erantsi: brk.
-	str erantsi: berezko body.
-	str erantsi: brk. <- str.
+	katea erantsi: (norbera goiburua: ['Subject: '] + berezko gaia) + crlf.
+	katea erantsi: crlf.
+	katea erantsi: berezko gorputza.
+	katea erantsi: crlf. <- katea.
 }.
 
->> HTML-Email := Email berria.
+>> HTML-Posta := Posta berria.
 
-HTML-Email noiz: ['init'] egin: {
-	norbera init.
-	berezko attachments := Zerrenda berria.
-	berezko boundary := Kutxa-gotorra token: 40.
+HTML-Posta noiz: ['hasieratu'] egin: {
+	norbera hasieratu.
+	berezko eranskinak := Zerrenda berria.
+	berezko muga := Kutxa-gotorra token: 40.
 }.
 
-HTML-Email noiz: ['attach:'] egin: { :file
-	>> id := berezko attachments zenbatu.
-	>> blob := file blob.
-	berezko attachments erantsi: (
+HTML-Posta noiz: ['erantsi-fitxategia:'] egin: { :fitxategia
+	>> id := berezko eranskinak zenbatu.
+	>> blob := fitxategia blob.
+	berezko eranskinak erantsi: (
 		Hiztegia berria
-			file: file bidea,
-			mime: ['image/'] + (Server mimetype: file bidea),
-			data: blob base64-kodetu
+			fitxategia: fitxategia bidea,
+			mime: ['image/'] + (Server mimetype: fitxategia bidea),
+			datuak: blob base64-kodetu
 	).
 	blob askatu. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email noiz: ['generate'] egin: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str erantsi: (norbera header: ['From: '] + berezko from-name + [' <'] + ( berezko from ) + ['>']) + brk.
-	str erantsi: (norbera header: ['To: '] + ( berezko recipients batu: [','] )) + brk.
+HTML-Posta noiz: ['sortu'] egin: {
+	>> crlf := ['\r\n'].
+	>> katea := [''].
+	katea erantsi: (norbera goiburua: ['From: '] + berezko igorlearen-izena + [' <'] + ( berezko igorlea ) + ['>']) + crlf.
+	katea erantsi: (norbera goiburua: ['To: '] + ( berezko hartzaileak batu: [','] )) + crlf.
 	berezko cc zenbatu egia: {
-		str erantsi: (norbera header: ['Cc: '] + ( berezko cc batu: [','] )) + brk.
+		katea erantsi: (norbera goiburua: ['Cc: '] + ( berezko cc batu: [','] )) + crlf.
 	}.
 	berezko bcc zenbatu egia: {
-		str erantsi: (norbera header: ['Bcc: '] + ( berezko bcc batu: [','] )) + brk.
+		katea erantsi: (norbera goiburua: ['Bcc: '] + ( berezko bcc batu: [','] )) + crlf.
 	}.
-	str erantsi: (norbera header: ['Subject: '] + berezko subject) + brk.
-	str erantsi: ['MIME-Version: 1.0'] + brk.
-	str erantsi: ['Content-Type: multipart/related; boundary="'] + berezko boundary + ['"; type=text/html'] + brk.
-	str erantsi: brk.
-	str erantsi: ['--'] + berezko boundary + brk.
-	str erantsi: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str erantsi: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str erantsi: brk.
-	str erantsi: berezko body.
-	str erantsi: brk.
-	berezko attachments bakoitza: { :id :info
-		>> blob := info data.
-		str erantsi: ['--'] + berezko boundary + brk.
-		str erantsi: ['Content-Type: '] + info mime + brk.
-		str erantsi: ['Content-Transfer-Encoding: base64'] + brk.
-		str erantsi: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str erantsi: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str erantsi: brk.
-		>> max := 76.
-		>> len := blob luzera.
-		>> chunks := (len / max) gora-biribildu.
+	katea erantsi: (norbera goiburua: ['Subject: '] + berezko gaia) + crlf.
+	katea erantsi: ['MIME-Version: 1.0'] + crlf.
+	katea erantsi: ['Content-Type: multipart/related; boundary="'] + berezko muga + ['"; type=text/html'] + crlf.
+	katea erantsi: crlf.
+	katea erantsi: ['--'] + berezko muga + crlf.
+	katea erantsi: ['Content-Type: text/html; charset=UTF-8'] + crlf.
+	katea erantsi: ['Content-Transfer-Encoding: 7bit'] + crlf.
+	katea erantsi: crlf.
+	katea erantsi: berezko gorputza.
+	katea erantsi: crlf.
+	berezko eranskinak bakoitza: { :id :info
+		>> blob := info datuak.
+		katea erantsi: ['--'] + berezko muga + crlf.
+		katea erantsi: ['Content-Type: '] + info mime + crlf.
+		katea erantsi: ['Content-Transfer-Encoding: base64'] + crlf.
+		katea erantsi: ['Content-ID: <attachment'] + id + ['>'] + crlf.
+		katea erantsi: ['Content-Disposition: inline; filename="'] + info fitxategia + ['"'] + crlf.
+		katea erantsi: crlf.
+		>> gehienez := 76.
+		>> testu-luzera := blob luzera.
+		>> puskak := (testu-luzera / gehienez) gora-biribildu.
 		{ :i
-			>> chunk := blob kopiatu nondik: i * max luzera: max.
-			str erantsi: chunk + brk.
-		} * chunks.
-		str erantsi: brk.
-		str erantsi: brk.
+			>> puska := blob kopiatu nondik: i * gehienez luzera: gehienez.
+			katea erantsi: puska + crlf.
+		} * puskak.
+		katea erantsi: crlf.
+		katea erantsi: crlf.
 	}.
-	str erantsi: ['--'] + berezko boundary + ['--'] + brk. <- str.
+	katea erantsi: ['--'] + berezko muga + ['--'] + crlf. <- katea.
 }.

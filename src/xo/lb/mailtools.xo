@@ -1,128 +1,128 @@
->> Email := Objet nei.
+>> E-Mail := Objet nei.
 
-Email bei: ['init'] maachen: {
-	eegen recipients := Lëscht nei.
+E-Mail bei: ['initialiséieren'] maachen: {
+	eegen empfänger := Lëscht nei.
 	eegen cc := Lëscht nei.
 	eegen bcc := Lëscht nei.
-	eegen from := Näischt.
-	eegen from-name := Näischt.
-	eegen subject := Näischt.
-	eegen body := Näischt.
+	eegen ofsender := Näischt.
+	eegen ofsendernumm := Näischt.
+	eegen sujet := Näischt.
+	eegen textkierper := Näischt.
 }.
 
-Email bei: ['nei'] maachen: { <- selwer nei init.
+E-Mail bei: ['nei'] maachen: { <- selwer nei initialiséieren.
 }.
 
-Email bei: ['to:'] maachen: { :list
-	eegen recipients := list.
+E-Mail bei: ['un:'] maachen: { :oplëschtung
+	eegen empfänger := oplëschtung.
 }.
  
-Email bei: ['cc:'] maachen: { :list
-	eegen cc := list.
+E-Mail bei: ['cc:'] maachen: { :oplëschtung
+	eegen cc := oplëschtung.
 }.
 
-Email bei: ['bcc:'] maachen: { :list
-	eegen bcc := list.
+E-Mail bei: ['bcc:'] maachen: { :oplëschtung
+	eegen bcc := oplëschtung.
 }.
 
-Email bei: ['subject:'] maachen: { :subject
-	eegen subject := subject.
+E-Mail bei: ['sujet:'] maachen: { :sujet
+	eegen sujet := sujet.
 }.
 
-Email bei: ['from:name:'] maachen: { :from :numm
-	eegen from := from.
-	eegen from-name := numm.
+E-Mail bei: ['ofsender:numm:'] maachen: { :ofsender :numm
+	eegen ofsender := ofsender.
+	eegen ofsendernumm := numm.
 }.
 
-Email bei: ['body:'] maachen: { :body
-	eegen body := body.
+E-Mail bei: ['textkierper:'] maachen: { :textkierper
+	eegen textkierper := textkierper.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email bei: ['header:'] maachen: { :line <- line ersetzen: ['\r'] mat: [''], ersetzen: ['\n'] mat: [''].
+E-Mail bei: ['kappzeil:'] maachen: { :zeil <- zeil ersetzen: ['\r'] mat: [''], ersetzen: ['\n'] mat: [''].
 }.
 
-Email bei: ['send'] maachen: {
-	>> f := Fichier tempwrite: selwer generate.
+E-Mail bei: ['schécken'] maachen: {
+	>> f := Fichier tempwrite: selwer erzeugen.
 	Programm system: ['sendmail -t < '] + f wee, nei-zeil.
 }.
 
-Email bei: ['generate'] maachen: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str drunhänken: (selwer header: ['From: '] + eegen from-name + [' <'] + ( eegen from ) + ['>']) + brk.
-	str drunhänken: (selwer header: ['To: '] + ( eegen recipients zesummesetzen: [','] )) + brk.
+E-Mail bei: ['erzeugen'] maachen: {
+	>> ëmbroch := ['\r\n'].
+	>> zeechekette := [''].
+	zeechekette drunhänken: (selwer kappzeil: ['From: '] + eegen ofsendernumm + [' <'] + ( eegen ofsender ) + ['>']) + ëmbroch.
+	zeechekette drunhänken: (selwer kappzeil: ['To: '] + ( eegen empfänger zesummesetzen: [','] )) + ëmbroch.
 	eegen cc zielen wouer: {
-		str drunhänken: (selwer header: ['Cc: '] + ( eegen cc zesummesetzen: [','] )) + brk.
+		zeechekette drunhänken: (selwer kappzeil: ['Cc: '] + ( eegen cc zesummesetzen: [','] )) + ëmbroch.
 	}.
 	eegen bcc zielen wouer: {
-		str drunhänken: (selwer header: ['Bcc: '] + ( eegen bcc zesummesetzen: [','] )) + brk.
+		zeechekette drunhänken: (selwer kappzeil: ['Bcc: '] + ( eegen bcc zesummesetzen: [','] )) + ëmbroch.
 	}.
-	str drunhänken: (selwer header: ['Subject: '] + eegen subject) + brk.
-	str drunhänken: brk.
-	str drunhänken: eegen body.
-	str drunhänken: brk. <- str.
+	zeechekette drunhänken: (selwer kappzeil: ['Subject: '] + eegen sujet) + ëmbroch.
+	zeechekette drunhänken: ëmbroch.
+	zeechekette drunhänken: eegen textkierper.
+	zeechekette drunhänken: ëmbroch. <- zeechekette.
 }.
 
->> HTML-Email := Email nei.
+>> HTML-E-Mail := E-Mail nei.
 
-HTML-Email bei: ['init'] maachen: {
-	selwer init.
-	eegen attachments := Lëscht nei.
-	eegen boundary := Tresor token: 40.
+HTML-E-Mail bei: ['initialiséieren'] maachen: {
+	selwer initialiséieren.
+	eegen unhäng := Lëscht nei.
+	eegen grenz := Tresor token: 40.
 }.
 
-HTML-Email bei: ['attach:'] maachen: { :file
-	>> id := eegen attachments zielen.
-	>> blob := file blob.
-	eegen attachments drunhänken: (
+HTML-E-Mail bei: ['uhänken:'] maachen: { :fichier
+	>> id := eegen unhäng zielen.
+	>> blob := fichier blob.
+	eegen unhäng drunhänken: (
 		Dictionnaire nei
-			file: file wee,
-			mime: ['image/'] + (Server mimetype: file wee),
-			data: blob base64-kodéieren
+			fichier: fichier wee,
+			mime: ['image/'] + (Server mimetype: fichier wee),
+			donnéeën: blob base64-kodéieren
 	).
 	blob fräiginn. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email bei: ['generate'] maachen: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str drunhänken: (selwer header: ['From: '] + eegen from-name + [' <'] + ( eegen from ) + ['>']) + brk.
-	str drunhänken: (selwer header: ['To: '] + ( eegen recipients zesummesetzen: [','] )) + brk.
+HTML-E-Mail bei: ['erzeugen'] maachen: {
+	>> ëmbroch := ['\r\n'].
+	>> zeechekette := [''].
+	zeechekette drunhänken: (selwer kappzeil: ['From: '] + eegen ofsendernumm + [' <'] + ( eegen ofsender ) + ['>']) + ëmbroch.
+	zeechekette drunhänken: (selwer kappzeil: ['To: '] + ( eegen empfänger zesummesetzen: [','] )) + ëmbroch.
 	eegen cc zielen wouer: {
-		str drunhänken: (selwer header: ['Cc: '] + ( eegen cc zesummesetzen: [','] )) + brk.
+		zeechekette drunhänken: (selwer kappzeil: ['Cc: '] + ( eegen cc zesummesetzen: [','] )) + ëmbroch.
 	}.
 	eegen bcc zielen wouer: {
-		str drunhänken: (selwer header: ['Bcc: '] + ( eegen bcc zesummesetzen: [','] )) + brk.
+		zeechekette drunhänken: (selwer kappzeil: ['Bcc: '] + ( eegen bcc zesummesetzen: [','] )) + ëmbroch.
 	}.
-	str drunhänken: (selwer header: ['Subject: '] + eegen subject) + brk.
-	str drunhänken: ['MIME-Version: 1.0'] + brk.
-	str drunhänken: ['Content-Type: multipart/related; boundary="'] + eegen boundary + ['"; type=text/html'] + brk.
-	str drunhänken: brk.
-	str drunhänken: ['--'] + eegen boundary + brk.
-	str drunhänken: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str drunhänken: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str drunhänken: brk.
-	str drunhänken: eegen body.
-	str drunhänken: brk.
-	eegen attachments all: { :id :info
-		>> blob := info data.
-		str drunhänken: ['--'] + eegen boundary + brk.
-		str drunhänken: ['Content-Type: '] + info mime + brk.
-		str drunhänken: ['Content-Transfer-Encoding: base64'] + brk.
-		str drunhänken: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str drunhänken: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str drunhänken: brk.
-		>> max := 76.
-		>> len := blob längt.
-		>> chunks := (len / max) opronnen.
+	zeechekette drunhänken: (selwer kappzeil: ['Subject: '] + eegen sujet) + ëmbroch.
+	zeechekette drunhänken: ['MIME-Version: 1.0'] + ëmbroch.
+	zeechekette drunhänken: ['Content-Type: multipart/related; boundary="'] + eegen grenz + ['"; type=text/html'] + ëmbroch.
+	zeechekette drunhänken: ëmbroch.
+	zeechekette drunhänken: ['--'] + eegen grenz + ëmbroch.
+	zeechekette drunhänken: ['Content-Type: text/html; charset=UTF-8'] + ëmbroch.
+	zeechekette drunhänken: ['Content-Transfer-Encoding: 7bit'] + ëmbroch.
+	zeechekette drunhänken: ëmbroch.
+	zeechekette drunhänken: eegen textkierper.
+	zeechekette drunhänken: ëmbroch.
+	eegen unhäng all: { :id :info
+		>> blob := info donnéeën.
+		zeechekette drunhänken: ['--'] + eegen grenz + ëmbroch.
+		zeechekette drunhänken: ['Content-Type: '] + info mime + ëmbroch.
+		zeechekette drunhänken: ['Content-Transfer-Encoding: base64'] + ëmbroch.
+		zeechekette drunhänken: ['Content-ID: <attachment'] + id + ['>'] + ëmbroch.
+		zeechekette drunhänken: ['Content-Disposition: inline; filename="'] + info fichier + ['"'] + ëmbroch.
+		zeechekette drunhänken: ëmbroch.
+		>> héichstwäert := 76.
+		>> textlängt := blob längt.
+		>> stécker := (textlängt / héichstwäert) opronnen.
 		{ :i
-			>> chunk := blob kopéieren vun: i * max längt: max.
-			str drunhänken: chunk + brk.
-		} * chunks.
-		str drunhänken: brk.
-		str drunhänken: brk.
+			>> stéck := blob kopéieren vun: i * héichstwäert längt: héichstwäert.
+			zeechekette drunhänken: stéck + ëmbroch.
+		} * stécker.
+		zeechekette drunhänken: ëmbroch.
+		zeechekette drunhänken: ëmbroch.
 	}.
-	str drunhänken: ['--'] + eegen boundary + ['--'] + brk. <- str.
+	zeechekette drunhänken: ['--'] + eegen grenz + ['--'] + ëmbroch. <- zeechekette.
 }.

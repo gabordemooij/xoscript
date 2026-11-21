@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Into okusha.
+>> Isifanekiso := Into okusha.
 
-Template uma-kufika: ['okusha'] yenza: { <- uqobo okusha content: [''].
+Isifanekiso uma-kufika: ['okusha'] yenza: { <- uqobo okusha okuqukethwe: [''].
 }.
 
-Template uma-kufika: ['content:'] yenza: { :content
-	okwakho content := content. 
+Isifanekiso uma-kufika: ['okuqukethwe:'] yenza: { :okuqukethwe
+	okwakho okuqukethwe := okuqukethwe. 
 }.
 
-Template uma-kufika: ['okusha:'] yenza: { :content <- uqobo okusha content: content.
+Isifanekiso uma-kufika: ['okusha:'] yenza: { :okuqukethwe <- uqobo okusha okuqukethwe: okuqukethwe.
 }.
 
-Template uma-kufika: ['cut:'] yenza: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := okwakho content hlukanisa: startmarker.
-	>> prefix := parts okokuqala.
-	>> parts2 := parts okokugcina hlukanisa: endmarker.
-	>> suffix := parts2 okokugcina.
-	>> part := parts2 okokuqala.
-	>> rest := prefix + suffix.
-	okwakho content := rest. <- Template okusha: part.
+Isifanekiso uma-kufika: ['sika:'] yenza: { :uphawu
+	>> uphawu-lokuqala := (['<!-- cut:%id% -->'] %id%: uphawu).
+	>> uphawu-lokugcina := (['<!-- /cut:%id% -->'] %id%: uphawu).
+	>> izingxenye := okwakho okuqukethwe hlukanisa: uphawu-lokuqala.
+	>> isiqalo := izingxenye okokuqala.
+	>> izingxenye2 := izingxenye okokugcina hlukanisa: uphawu-lokugcina.
+	>> isijobelelo := izingxenye2 okokugcina.
+	>> ingxenye := izingxenye2 okokuqala.
+	>> okusele := isiqalo + isijobelelo.
+	okwakho okuqukethwe := okusele. <- Isifanekiso okusha: ingxenye.
 	
 }.
 
-Template uma-kufika: ['kopisha'] yenza: { <- uqobo okusha: uqobo umbhalo kopisha.
+Isifanekiso uma-kufika: ['kopisha'] yenza: { <- uqobo okusha: uqobo umbhalo kopisha.
 }.
 	
-Template uma-kufika: ['paste:at:'] yenza: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	okwakho content buyisela: pastemarker nge: ( snippet umbhalo + pastemarker ).
+Isifanekiso uma-kufika: ['namathisela-ku:endaweni:'] yenza: { :isiqeshana :id
+	>> uphawu-lokunamathisela := (['<!-- paste:%id% -->'] %id%: id).
+	okwakho okuqukethwe buyisela: uphawu-lokunamathisela nge: ( isiqeshana umbhalo + uphawu-lokunamathisela ).
 }.
 
-Template uma-kufika: ['setha:inani:'] yenza: { :slot :value
-	okwakho content buyisela: ['<!-- slot:'] + slot + [' -->'] nge: ( Server html-faka-ikhodi: value ).
+Isifanekiso uma-kufika: ['setha:inani:'] yenza: { :isikhala-sokufaka :inani-elibekiwe
+	okwakho okuqukethwe buyisela: ['<!-- slot:'] + isikhala-sokufaka + [' -->'] nge: ( Server html-faka-ikhodi: inani-elibekiwe ).
 }.
 
-Template uma-kufika: ['set:html:'] yenza: { :slot :html
-	okwakho content buyisela: ['<!-- slot:'] + slot + [' -->'] nge: html.
+Isifanekiso uma-kufika: ['setha:html:'] yenza: { :isikhala-sokufaka :html
+	okwakho okuqukethwe buyisela: ['<!-- slot:'] + isikhala-sokufaka + [' -->'] nge: html.
 }.
 
-Template uma-kufika: ['phendula:futhi:'] yenza: { :slot :value
-	uqobo setha: (slot kusuka: 0 ubude: (slot ubude - 1)) inani: value.
+Isifanekiso uma-kufika: ['phendula:futhi:'] yenza: { :isikhala-sokufaka :inani-elibekiwe
+	uqobo setha: (isikhala-sokufaka kusuka: 0 ubude: (isikhala-sokufaka ubude - 1)) inani: inani-elibekiwe.
 }.
 
-Template uma-kufika: ['nl2br'] yenza: {
-	okwakho content buyisela: ['\n'] nge: ['<br>'].
+Isifanekiso uma-kufika: ['nl2br'] yenza: {
+	okwakho okuqukethwe buyisela: ['\n'] nge: ['<br>'].
 }.
 
-Template uma-kufika: ['clean'] yenza: {
-	okwakho content :=
+Isifanekiso uma-kufika: ['hlela'] yenza: {
+	okwakho okuqukethwe :=
 		Iphethini
 		okusha: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		ukufana: okwakho content
+		ukufana: okwakho okuqukethwe
 		yenza: { <- ['']. }.
 }.
 
-Template uma-kufika: ['clean-cuts'] yenza: {
-	>> items := Uhlu okusha.
+Isifanekiso uma-kufika: ['hlela-okusikiwe'] yenza: {
+	>> izinto := Uhlu okusha.
 	Iphethini
 	okusha: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	ukufana: okwakho content
-	yenza: { :_ :part
-		items engeza-ekugcineni: part ? 1.
+	ukufana: okwakho okuqukethwe
+	yenza: { :_ :ingxenye
+		izinto engeza-ekugcineni: ingxenye ? 1.
 	}.
-	items ngamunye: { :_ :id
-		okwakho content :=
+	izinto ngamunye: { :_ :id
+		okwakho okuqukethwe :=
 			Iphethini okusha: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			ukufana: okwakho content
+			ukufana: okwakho okuqukethwe
 			yenza: { <- ['']. }.
 	 }.
 }.
 
-Template uma-kufika: ['clean-space'] yenza: {
-	okwakho content :=
+Isifanekiso uma-kufika: ['hlela-izikhala'] yenza: {
+	okwakho okuqukethwe :=
 		Iphethini
 		okusha: ['\\s*\\n'],
-		ukufana: okwakho content
+		ukufana: okwakho okuqukethwe
 		yenza: { <- ['\n']. }.
-	okwakho content :=
+	okwakho okuqukethwe :=
 		Iphethini
 		okusha: ['\\n[\\s\\t]+'],
-		ukufana: okwakho content
+		ukufana: okwakho okuqukethwe
 		yenza: { <- ['\n']. }.
 }.
 
-Template uma-kufika: ['clean-all'] yenza: {
-	uqobo clean.
-	uqobo clean-cuts.
-	uqobo clean-space.
+Isifanekiso uma-kufika: ['hlela-konke'] yenza: {
+	uqobo hlela.
+	uqobo hlela-okusikiwe.
+	uqobo hlela-izikhala.
 }.
 
-Template uma-kufika: ['umbhalo'] yenza: { <- okwakho content.
+Isifanekiso uma-kufika: ['umbhalo'] yenza: { <- okwakho okuqukethwe.
 }.

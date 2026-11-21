@@ -1,302 +1,302 @@
-HTTP-Pyyntö kun: ['HTTP-header:'] tee: { :key <- Ohjelma asetus: key.
+HTTP-Pyyntö kun: ['HTTP-otsake:'] tee: { :avain <- Ohjelma asetus: avain.
 }.
 
->> HTTP-Header := Olio uusi.
+>> HTTP-Otsake := Olio uusi.
 
-HTTP-Header kun: ['uusi'] tee: { <- itse uusi init.
+HTTP-Otsake kun: ['uusi'] tee: { <- itse uusi valmistele.
 }.
 
-HTTP-Header kun: ['init'] tee: {
-	oma key := Tyhjä.
-	oma value := Tyhjä.
+HTTP-Otsake kun: ['valmistele'] tee: {
+	oma avain := Tyhjä.
+	oma arvo := Tyhjä.
 }.
 
-HTTP-Header kun: ['key:value:'] tee: { :key :value
-	oma key := key.
-	oma value := value.
+HTTP-Otsake kun: ['avain:arvo:'] tee: { :avain :arvo
+	oma avain := avain.
+	oma arvo := arvo.
 }.
 
-HTTP-Header kun: ['key'] tee: { <- oma key.
+HTTP-Otsake kun: ['avain'] tee: { <- oma avain.
 }.
 
-HTTP-Header kun: ['value'] tee: { <- oma value.
+HTTP-Otsake kun: ['arvo'] tee: { <- oma arvo.
 }.
 
 
-HTTP-Header kun: ['teksti'] tee: {
-	>> line := oma key + [': '] + oma value.
-	line korvaa: ['\r'] arvolla: [''], korvaa: ['\n'] arvolla: ['']. <- line + [' \r\n'].
+HTTP-Otsake kun: ['teksti'] tee: {
+	>> rivi := oma avain + [': '] + oma arvo.
+	rivi korvaa: ['\r'] arvolla: [''], korvaa: ['\n'] arvolla: ['']. <- rivi + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Olio uusi.
+>> Verkkodokumentti := Olio uusi.
 
-Web-Document kun: ['uusi'] tee: { <- itse uusi init.
+Verkkodokumentti kun: ['uusi'] tee: { <- itse uusi valmistele.
 }.
 
-Web-Document kun: ['init'] tee: {
-	oma headers := Lista uusi.
-	oma sess-id := Tyhjä.
-	oma session-manager := Tempfile-Session uusi.
-	oma sessdata := Tyhjä.
-	oma secure := Tosi.
-	oma same-site := ['Strict'].
-	oma headers-out := Epätosi.
-	oma request := HTTP-Pyyntö uusi.
+Verkkodokumentti kun: ['valmistele'] tee: {
+	oma otsakkeet := Lista uusi.
+	oma istunto-id := Tyhjä.
+	oma istunnonhallinta := Väliaikaistiedosto-istunto uusi.
+	oma istuntodata := Tyhjä.
+	oma turvallinen := Tosi.
+	oma sama-sivusto := ['Strict'].
+	oma otsakkeet-lähetetty := Epätosi.
+	oma pyyntö := HTTP-Pyyntö uusi.
 }.
 
-Web-Document kun: ['request:'] tee: { :request
-	oma request := request.
+Verkkodokumentti kun: ['pyyntö:'] tee: { :pyyntö
+	oma pyyntö := pyyntö.
 }. 
 
-Web-Document kun: ['secure-session-cookie:'] tee: { :secure
-	itse check-headers.
-	oma secure := secure.
+Verkkodokumentti kun: ['turvallinen-istuntoeväste:'] tee: { :turvallinen
+	itse tarkista-otsakkeet.
+	oma turvallinen := turvallinen.
 }.
 
-Web-Document kun: ['same-site-session-cookie:'] tee: { :value
-	itse check-headers.
-	>> options := Lista uusi 
+Verkkodokumentti kun: ['sama-sivusto-istuntoeväste:'] tee: { :arvo
+	itse tarkista-otsakkeet.
+	>> valinnat := Lista uusi 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options sisältyy: value, epätosi: {
+	valinnat sisältää: arvo, epätosi: {
 		tämä-tehtävä virhe: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	oma same-site := value.
+	oma sama-sivusto := arvo.
 }.
 
-Web-Document kun: ['header:'] tee: { :header
-	itse check-headers.
-	oma headers lisää-loppuun: header.
+Verkkodokumentti kun: ['otsake:'] tee: { :otsake
+	itse tarkista-otsakkeet.
+	oma otsakkeet lisää-loppuun: otsake.
 }.
 
-Web-Document kun: ['clear-headers'] tee: {
-	itse check-headers.
-	oma headers := Lista uusi.
+Verkkodokumentti kun: ['tyhjennä-otsakkeet'] tee: {
+	itse tarkista-otsakkeet.
+	oma otsakkeet := Lista uusi.
 }.
 
-Web-Document kun: ['session-manager:'] tee: { :manager
-	itse check-headers.
-	oma session-manager := manager.
+Verkkodokumentti kun: ['istunnonhallinta:'] tee: { :hallinta
+	itse tarkista-otsakkeet.
+	oma istunnonhallinta := hallinta.
 }.
 
-Web-Document kun: ['session-manager'] tee: { <- oma session-manager.
+Verkkodokumentti kun: ['istunnonhallinta'] tee: { <- oma istunnonhallinta.
 }.
 
-Web-Document kun: ['check-headers'] tee: {
-	oma headers-out tosi: {
+Verkkodokumentti kun: ['tarkista-otsakkeet'] tee: {
+	oma otsakkeet-lähetetty tosi: {
 		tämä-tehtävä virhe: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document kun: ['session-start'] tee: {
-	itse check-headers.
-	>> request := oma request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Tyhjä? epätosi: {
-		(( Malli uusi: ['^[A-Za-z0-9]+\\z'], täsmää: sess-id ) = 0) tosi: {
-			sess-id := Tyhjä.
+Verkkodokumentti kun: ['aloita-istunto'] tee: {
+	itse tarkista-otsakkeet.
+	>> pyyntö := oma pyyntö.
+	>> istunto-id := pyyntö cookie: ['xsid'].
+	istunto-id Tyhjä? epätosi: {
+		(( Malli uusi: ['^[A-Za-z0-9]+\\z'], täsmää: istunto-id ) = 0) tosi: {
+			istunto-id := Tyhjä.
 		}.
 	}.
-	sess-id Tyhjä? tosi: {
-		sess-id := Holvi tunniste: 30.
-		>> session-header := HTTP-Header uusi
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (oma secure joko: ['Secure'] tai: ['']),
-		SSITE: (oma same-site),
-		XSID: sess-id
+	istunto-id Tyhjä? tosi: {
+		istunto-id := Holvi tunniste: 30.
+		>> istunto-otsake := HTTP-Otsake uusi
+		avain: ['Set-Cookie'] arvo: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (oma turvallinen joko: ['Secure'] tai: ['']),
+		SSITE: (oma sama-sivusto),
+		XSID: istunto-id
 		).
-		oma headers lisää-loppuun: session-header.
+		oma otsakkeet lisää-loppuun: istunto-otsake.
 	}.
-	oma sessdata := oma session-manager for: sess-id, load. <- oma sessdata. # reference
+	oma istuntodata := oma istunnonhallinta kohteelle: istunto-id, lataa. <- oma istuntodata. # reference
 }.
 
-Web-Document kun: ['goto:'] tee: { :url
-	itse check-headers.
-	itse clear-headers.
-	oma headers
+Verkkodokumentti kun: ['siirry:'] tee: { :osoite
+	itse tarkista-otsakkeet.
+	itse tyhjennä-otsakkeet.
+	oma otsakkeet
 	lisää-loppuun: (
-		HTTP-Header uusi
-		key: ['Status'] value: ['303 See Other']
+		HTTP-Otsake uusi
+		avain: ['Status'] arvo: ['303 See Other']
 	),
 	lisää-loppuun: (
-		HTTP-Header uusi
-		key: ['Location'] value: url
+		HTTP-Otsake uusi
+		avain: ['Location'] arvo: osoite
 	).
-	itse out: ['Redirect'].
+	itse tulosta: ['Redirect'].
 }.
 
-Web-Document kun: ['session-destroy'] tee: {
-	itse check-headers.
-	>> request := oma request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Tyhjä? epätosi: {
-		>> session-header := HTTP-Header uusi.
-		>> when := Hetki uusi vuosi: 1970, muoto: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Verkkodokumentti kun: ['tuhoa-istunto'] tee: {
+	itse tarkista-otsakkeet.
+	>> pyyntö := oma pyyntö.
+	>> istunto-id := pyyntö cookie: ['xsid'].
+	istunto-id Tyhjä? epätosi: {
+		>> istunto-otsake := HTTP-Otsake uusi.
+		>> hetki := Hetki uusi vuosi: 1970, muoto: ['%a, %d %b %Y %H:%M:%S GMT'].
+		istunto-otsake avain: ['Set-Cookie'] arvo: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (oma secure joko: ['Secure'] tai: ['']),
-			SSITE: (oma same-site),
-			XSID: sess-id
+			EXP: hetki,
+			SEC: (oma turvallinen joko: ['Secure'] tai: ['']),
+			SSITE: (oma sama-sivusto),
+			XSID: istunto-id
 		).
-		oma session-manager destroy.
-		oma headers lisää-loppuun: session-header.
+		oma istunnonhallinta tuhoa.
+		oma otsakkeet lisää-loppuun: istunto-otsake.
 	}.
 }.
 
 
-Web-Document kun: ['template:'] tee: { :polku <- Template uusi: (Tiedosto uusi: polku, lue).
+Verkkodokumentti kun: ['mallipohja:'] tee: { :polku <- Mallipohja uusi: (Tiedosto uusi: polku, lue).
 }.
 
-Web-Document kun: ['out:type:'] tee: { :output :tyyppi
-	oma headers-out epätosi: {
-		oma sessdata Tyhjä? epätosi: {
-			oma session-manager save: oma sessdata.
+Verkkodokumentti kun: ['tulosta:tyyppi:'] tee: { :tuloste :tyyppi
+	oma otsakkeet-lähetetty epätosi: {
+		oma istuntodata Tyhjä? epätosi: {
+			oma istunnonhallinta tallenna: oma istuntodata.
 		}.
-		oma headers lisää-loppuun: (
-			HTTP-Header uusi
-			key: ['Content-type'] value: tyyppi
+		oma otsakkeet lisää-loppuun: (
+			HTTP-Otsake uusi
+			avain: ['Content-type'] arvo: tyyppi
 		).
-		oma headers jokainen: { :_ :header
-			Tuloste kirjoita: header.
+		oma otsakkeet jokainen: { :_ :otsake
+			Tuloste kirjoita: otsake.
 		}.
-		oma headers-out := Tosi.
+		oma otsakkeet-lähetetty := Tosi.
 		Tuloste kirjoita: ['\r\n'].
 	}.
-	Tuloste kirjoita: output.
+	Tuloste kirjoita: tuloste.
 }.
 
-Web-Document kun: ['finish:type:'] tee: { :output :tyyppi
-	oma headers-out epätosi: {
-		oma sessdata Tyhjä? epätosi: {
-			oma session-manager save: oma sessdata.
+Verkkodokumentti kun: ['viimeistele:tyyppi:'] tee: { :tuloste :tyyppi
+	oma otsakkeet-lähetetty epätosi: {
+		oma istuntodata Tyhjä? epätosi: {
+			oma istunnonhallinta tallenna: oma istuntodata.
 		}.
-		oma headers lisää-loppuun: (
-			HTTP-Header uusi
-			key: ['Content-type'] value: tyyppi
+		oma otsakkeet lisää-loppuun: (
+			HTTP-Otsake uusi
+			avain: ['Content-type'] arvo: tyyppi
 		).
-		oma headers lisää-loppuun: (
-			HTTP-Header uusi
-			key: ['Content-Length'] value: output teksti bytes
+		oma otsakkeet lisää-loppuun: (
+			HTTP-Otsake uusi
+			avain: ['Content-Length'] arvo: tuloste teksti bytes
 		).
-		oma headers jokainen: { :_ :header
-			Tuloste kirjoita: header.
+		oma otsakkeet jokainen: { :_ :otsake
+			Tuloste kirjoita: otsake.
 		}.
-		oma headers-out := Tosi.
+		oma otsakkeet-lähetetty := Tosi.
 		Tuloste kirjoita: ['\r\n'].
 	}.
-	Tuloste kirjoita: output.
+	Tuloste kirjoita: tuloste.
 }.
 
-Web-Document kun: ['out:'] tee: { :output
-	itse out: output type: ['text/html; charset=utf-8'].
+Verkkodokumentti kun: ['tulosta:'] tee: { :tuloste
+	itse tulosta: tuloste tyyppi: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kun: ['finish:'] tee: { :output
-	itse finish: output type: ['text/html; charset=utf-8'].
+Verkkodokumentti kun: ['viimeistele:'] tee: { :tuloste
+	itse viimeistele: tuloste tyyppi: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kun: ['json:'] tee: { :output
-	itse out: ( JSON jsonify: output ) type: ['application/json'].
+Verkkodokumentti kun: ['json:'] tee: { :tuloste
+	itse tulosta: ( JSON jsonify: tuloste ) tyyppi: ['application/json'].
 }.
 
-Web-Document kun: ['not-found:'] tee: { :output
-	itse clear-headers header: (
-		HTTP-Header uusi key: ['Status'] value: ['404 Not Found']
+Verkkodokumentti kun: ['ei-löydy:'] tee: { :tuloste
+	itse tyhjennä-otsakkeet otsake: (
+		HTTP-Otsake uusi avain: ['Status'] arvo: ['404 Not Found']
 	).
-	itse out: output.
+	itse tulosta: tuloste.
 }.
 
 
 # Interface
 
->> Session := Olio uusi.
+>> Istunto := Olio uusi.
 
-Session kun: ['uusi'] tee: { <- itse uusi init for: Tyhjä.
+Istunto kun: ['uusi'] tee: { <- itse uusi valmistele kohteelle: Tyhjä.
 }.
 
-Session kun: ['for:'] tee: { :id
+Istunto kun: ['kohteelle:'] tee: { :id
 	oma id := id.
 }.
 
-Session kun: ['load'] tee: {
+Istunto kun: ['lataa'] tee: {
 	tämä-tehtävä virhe: ['Not implemented.'].
 }.
 
-Session kun: ['save:'] tee: {
+Istunto kun: ['tallenna:'] tee: {
 	tämä-tehtävä virhe: ['Not implemented.'].
 }.
 
-Session kun: ['destroy'] tee: {
+Istunto kun: ['tuhoa'] tee: {
 	tämä-tehtävä virhe: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session uusi.
+>> Väliaikaistiedosto-istunto := Istunto uusi.
 
-Tempfile-Session kun: ['init'] tee: {
-	oma pathprefix := ['/tmp/sess-'].
+Väliaikaistiedosto-istunto kun: ['valmistele'] tee: {
+	oma polun-alku := ['/tmp/sess-'].
 }.
 
-Tempfile-Session kun: ['path-prefix:'] tee: { :str
-	oma pathprefix := str.
+Väliaikaistiedosto-istunto kun: ['polun-etuliite:'] tee: { :merkkijono
+	oma polun-alku := merkkijono.
 }.
 
-Tempfile-Session kun: ['file'] tee: { <- ( Tiedosto uusi: ( oma pathprefix + oma id + ['.txt'] ) ).
+Väliaikaistiedosto-istunto kun: ['tiedosto'] tee: { <- ( Tiedosto uusi: ( oma polun-alku + oma id + ['.txt'] ) ).
 }.
 
-Tempfile-Session kun: ['load'] tee: {
-	>> file := itse file.
-	file on-olemassa epätosi: {
-		file kirjoita: (Sanakirja uusi koodi).
-	}. <- file lue olio.
+Väliaikaistiedosto-istunto kun: ['lataa'] tee: {
+	>> tiedosto := itse tiedosto.
+	tiedosto on-olemassa epätosi: {
+		tiedosto kirjoita: (Sanakirja uusi koodi).
+	}. <- tiedosto lue olio.
 }.
 
-Tempfile-Session kun: ['save:'] tee: { :data
-	>> file := itse file.
-	file on-olemassa tosi: {
-		file kirjoita: data koodi.
+Väliaikaistiedosto-istunto kun: ['tallenna:'] tee: { :data
+	>> tiedosto := itse tiedosto.
+	tiedosto on-olemassa tosi: {
+		tiedosto kirjoita: data koodi.
 	}.
 }.
 
-Tempfile-Session kun: ['destroy'] tee: {
-	>> file := itse file.
-	file on-olemassa tosi: {
-		file poista.
+Väliaikaistiedosto-istunto kun: ['tuhoa'] tee: {
+	>> tiedosto := itse tiedosto.
+	tiedosto on-olemassa tosi: {
+		tiedosto poista.
 	}.
 }.
 
 
 >> URL := Olio uusi.
 
-URL kun: ['init'] tee: {
-	oma protocol := ['https://'].
+URL kun: ['valmistele'] tee: {
+	oma protokolla := ['https://'].
 	oma isäntä := ['localhost'].
 	oma polku := [''].
-	oma params := [''].
+	oma url-parametrit := [''].
 	oma hash := [''].
 }.
 
-URL kun: ['uusi'] tee: { <- itse uusi init.
+URL kun: ['uusi'] tee: { <- itse uusi valmistele.
 }.
 
 URL kun: ['teksti'] tee: { <- (
-	oma protocol +
+	oma protokolla +
 	oma isäntä +
 	oma polku +
-	oma params +
+	oma url-parametrit +
 	oma hash ).
 }.
 
-URL kun: ['protocol:'] tee: { :protocol
-	((Lista uusi: ['http'] ; ['https']) sisältyy: protocol) tosi: {
-		oma protocol := protocol + ['://'].
+URL kun: ['protokolla:'] tee: { :protokolla
+	((Lista uusi ; ['http'] ; ['https']) sisältää: protokolla) tosi: {
+		oma protokolla := protokolla + ['://'].
 	}, epätosi: {
 		tämä-tehtävä virhe: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL kun: ['isäntä:'] tee: { :isäntä
 	oma isäntä := isäntä.
 }.
 
-URL kun: ['path:'] tee: { :polku
+URL kun: ['polku:'] tee: { :polku
 	oma polku := ['/'] + polku url-koodaa.
 }.
 
-URL kun: ['params:'] tee: { :map
-	>> params := Lista uusi.
-	map jokainen: { :key :value
-		params lisää-loppuun: key teksti url-koodaa + ['='] + value teksti url-koodaa.
+URL kun: ['url-parametrit:'] tee: { :kuvaus
+	>> url-parametrit := Lista uusi.
+	kuvaus jokainen: { :avain :arvo
+		url-parametrit lisää-loppuun: avain teksti url-koodaa + ['='] + arvo teksti url-koodaa.
 	}.
-	oma params := ['?'] + ( params yhdistä: ['&'] ).
+	oma url-parametrit := ['?'] + ( url-parametrit yhdistä: ['&'] ).
 }.
 
 URL kun: ['tiiviste:'] tee: { :hash

@@ -1,301 +1,301 @@
-HTTP-Cais ar: ['HTTP-header:'] gwneud: { :key <- Rhaglen gosodiad: key.
+HTTP-Cais ar: ['HTTP-pennawd:'] gwneud: { :allwedd <- Rhaglen gosodiad: allwedd.
 }.
 
->> HTTP-Header := Gwrthrych newydd.
+>> Pennawd-HTTP := Gwrthrych newydd.
 
-HTTP-Header ar: ['newydd'] gwneud: { <- hun newydd init.
+Pennawd-HTTP ar: ['newydd'] gwneud: { <- hun newydd paratoi.
 }.
 
-HTTP-Header ar: ['init'] gwneud: {
-	eiddo key := Dim.
-	eiddo value := Dim.
+Pennawd-HTTP ar: ['paratoi'] gwneud: {
+	eiddo allwedd := Dim.
+	eiddo gwerth := Dim.
 }.
 
-HTTP-Header ar: ['key:value:'] gwneud: { :key :value
-	eiddo key := key.
-	eiddo value := value.
+Pennawd-HTTP ar: ['allwedd:gwerth:'] gwneud: { :allwedd :gwerth
+	eiddo allwedd := allwedd.
+	eiddo gwerth := gwerth.
 }.
 
-HTTP-Header ar: ['key'] gwneud: { <- eiddo key.
+Pennawd-HTTP ar: ['allwedd'] gwneud: { <- eiddo allwedd.
 }.
 
-HTTP-Header ar: ['value'] gwneud: { <- eiddo value.
+Pennawd-HTTP ar: ['gwerth'] gwneud: { <- eiddo gwerth.
 }.
 
 
-HTTP-Header ar: ['llinyn'] gwneud: {
-	>> line := eiddo key + [': '] + eiddo value.
-	line disodli: ['\r'] gyda: [''], disodli: ['\n'] gyda: ['']. <- line + [' \r\n'].
+Pennawd-HTTP ar: ['llinyn'] gwneud: {
+	>> llinell := eiddo allwedd + [': '] + eiddo gwerth.
+	llinell disodli: ['\r'] gyda: [''], disodli: ['\n'] gyda: ['']. <- llinell + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Gwrthrych newydd.
+>> Dogfen-We := Gwrthrych newydd.
 
-Web-Document ar: ['newydd'] gwneud: { <- hun newydd init.
+Dogfen-We ar: ['newydd'] gwneud: { <- hun newydd paratoi.
 }.
 
-Web-Document ar: ['init'] gwneud: {
-	eiddo headers := Rhestr newydd.
-	eiddo sess-id := Dim.
-	eiddo session-manager := Tempfile-Session newydd.
-	eiddo sessdata := Dim.
-	eiddo secure := Gwir.
-	eiddo same-site := ['Strict'].
-	eiddo headers-out := Gau.
-	eiddo request := HTTP-Cais newydd.
+Dogfen-We ar: ['paratoi'] gwneud: {
+	eiddo penawdau := Rhestr newydd.
+	eiddo id-sesiwn := Dim.
+	eiddo rheolwr-sesiynau := Sesiwn-ffeil-dros-dro newydd.
+	eiddo data-sesiwn := Dim.
+	eiddo diogel := Gwir.
+	eiddo yr-un-safle := ['Strict'].
+	eiddo penawdau-wedi-anfon := Gau.
+	eiddo cais := HTTP-Cais newydd.
 }.
 
-Web-Document ar: ['request:'] gwneud: { :request
-	eiddo request := request.
+Dogfen-We ar: ['cais:'] gwneud: { :cais
+	eiddo cais := cais.
 }. 
 
-Web-Document ar: ['secure-session-cookie:'] gwneud: { :secure
-	hun check-headers.
-	eiddo secure := secure.
+Dogfen-We ar: ['cwci-sesiwn-diogel:'] gwneud: { :diogel
+	hun gwirio-penawdau.
+	eiddo diogel := diogel.
 }.
 
-Web-Document ar: ['same-site-session-cookie:'] gwneud: { :value
-	hun check-headers.
-	>> options := Rhestr newydd 
+Dogfen-We ar: ['cwci-sesiwn-yr-un-safle:'] gwneud: { :gwerth
+	hun gwirio-penawdau.
+	>> opsiynau := Rhestr newydd 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options yn-cynnwys: value, gau: {
+	opsiynau mae-ganddo: gwerth, gau: {
 		y-dasg-hon gwall: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	eiddo same-site := value.
+	eiddo yr-un-safle := gwerth.
 }.
 
-Web-Document ar: ['header:'] gwneud: { :header
-	hun check-headers.
-	eiddo headers atodi: header.
+Dogfen-We ar: ['pennawd:'] gwneud: { :pennawd
+	hun gwirio-penawdau.
+	eiddo penawdau atodi: pennawd.
 }.
 
-Web-Document ar: ['clear-headers'] gwneud: {
-	hun check-headers.
-	eiddo headers := Rhestr newydd.
+Dogfen-We ar: ['clirio-penawdau'] gwneud: {
+	hun gwirio-penawdau.
+	eiddo penawdau := Rhestr newydd.
 }.
 
-Web-Document ar: ['session-manager:'] gwneud: { :manager
-	hun check-headers.
-	eiddo session-manager := manager.
+Dogfen-We ar: ['rheolwr-sesiynau:'] gwneud: { :rheolwr
+	hun gwirio-penawdau.
+	eiddo rheolwr-sesiynau := rheolwr.
 }.
 
-Web-Document ar: ['session-manager'] gwneud: { <- eiddo session-manager.
+Dogfen-We ar: ['rheolwr-sesiynau'] gwneud: { <- eiddo rheolwr-sesiynau.
 }.
 
-Web-Document ar: ['check-headers'] gwneud: {
-	eiddo headers-out gwir: {
+Dogfen-We ar: ['gwirio-penawdau'] gwneud: {
+	eiddo penawdau-wedi-anfon gwir: {
 		y-dasg-hon gwall: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document ar: ['session-start'] gwneud: {
-	hun check-headers.
-	>> request := eiddo request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Dim? gau: {
-		(( Patrwm newydd: ['^[A-Za-z0-9]+\\z'], cydweddu: sess-id ) = 0) gwir: {
-			sess-id := Dim.
+Dogfen-We ar: ['dechrau-sesiwn'] gwneud: {
+	hun gwirio-penawdau.
+	>> cais := eiddo cais.
+	>> id-sesiwn := cais cookie: ['xsid'].
+	id-sesiwn Dim? gau: {
+		(( Patrwm newydd: ['^[A-Za-z0-9]+\\z'], cydweddu: id-sesiwn ) = 0) gwir: {
+			id-sesiwn := Dim.
 		}.
 	}.
-	sess-id Dim? gwir: {
-		sess-id := Cromgell tocyn: 30.
-		>> session-header := HTTP-Header newydd
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (eiddo secure naill-ai: ['Secure'] neu: ['']),
-		SSITE: (eiddo same-site),
-		XSID: sess-id
+	id-sesiwn Dim? gwir: {
+		id-sesiwn := Cromgell tocyn: 30.
+		>> pennawd-sesiwn := Pennawd-HTTP newydd
+		allwedd: ['Set-Cookie'] gwerth: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (eiddo diogel naill-ai: ['Secure'] neu: ['']),
+		SSITE: (eiddo yr-un-safle),
+		XSID: id-sesiwn
 		).
-		eiddo headers atodi: session-header.
+		eiddo penawdau atodi: pennawd-sesiwn.
 	}.
-	eiddo sessdata := eiddo session-manager for: sess-id, load. <- eiddo sessdata. # reference
+	eiddo data-sesiwn := eiddo rheolwr-sesiynau ar-gyfer: id-sesiwn, llwytho. <- eiddo data-sesiwn. # reference
 }.
 
-Web-Document ar: ['goto:'] gwneud: { :url
-	hun check-headers.
-	hun clear-headers.
-	eiddo headers
+Dogfen-We ar: ['mynd-i:'] gwneud: { :cyfeiriad
+	hun gwirio-penawdau.
+	hun clirio-penawdau.
+	eiddo penawdau
 	atodi: (
-		HTTP-Header newydd
-		key: ['Status'] value: ['303 See Other']
+		Pennawd-HTTP newydd
+		allwedd: ['Status'] gwerth: ['303 See Other']
 	),
 	atodi: (
-		HTTP-Header newydd
-		key: ['Location'] value: url
+		Pennawd-HTTP newydd
+		allwedd: ['Location'] gwerth: cyfeiriad
 	).
-	hun out: ['Redirect'].
+	hun allbynnu: ['Redirect'].
 }.
 
-Web-Document ar: ['session-destroy'] gwneud: {
-	hun check-headers.
-	>> request := eiddo request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Dim? gau: {
-		>> session-header := HTTP-Header newydd.
-		>> when := Ennyd newydd blwyddyn: 1970, fformat: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Dogfen-We ar: ['dinistrio-sesiwn'] gwneud: {
+	hun gwirio-penawdau.
+	>> cais := eiddo cais.
+	>> id-sesiwn := cais cookie: ['xsid'].
+	id-sesiwn Dim? gau: {
+		>> pennawd-sesiwn := Pennawd-HTTP newydd.
+		>> adeg := Ennyd newydd blwyddyn: 1970, fformat: ['%a, %d %b %Y %H:%M:%S GMT'].
+		pennawd-sesiwn allwedd: ['Set-Cookie'] gwerth: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (eiddo secure naill-ai: ['Secure'] neu: ['']),
-			SSITE: (eiddo same-site),
-			XSID: sess-id
+			EXP: adeg,
+			SEC: (eiddo diogel naill-ai: ['Secure'] neu: ['']),
+			SSITE: (eiddo yr-un-safle),
+			XSID: id-sesiwn
 		).
-		eiddo session-manager destroy.
-		eiddo headers atodi: session-header.
+		eiddo rheolwr-sesiynau dinistrio.
+		eiddo penawdau atodi: pennawd-sesiwn.
 	}.
 }.
 
 
-Web-Document ar: ['template:'] gwneud: { :llwybr <- Template newydd: (Ffeil newydd: llwybr, darllen).
+Dogfen-We ar: ['templed:'] gwneud: { :llwybr <- Templed newydd: (Ffeil newydd: llwybr, darllen).
 }.
 
-Web-Document ar: ['out:type:'] gwneud: { :output :math
-	eiddo headers-out gau: {
-		eiddo sessdata Dim? gau: {
-			eiddo session-manager save: eiddo sessdata.
+Dogfen-We ar: ['allbynnu:math:'] gwneud: { :allbwn :math
+	eiddo penawdau-wedi-anfon gau: {
+		eiddo data-sesiwn Dim? gau: {
+			eiddo rheolwr-sesiynau cadw: eiddo data-sesiwn.
 		}.
-		eiddo headers atodi: (
-			HTTP-Header newydd
-			key: ['Content-type'] value: math
+		eiddo penawdau atodi: (
+			Pennawd-HTTP newydd
+			allwedd: ['Content-type'] gwerth: math
 		).
-		eiddo headers pob: { :_ :header
-			Allbwn ysgrifennu: header.
+		eiddo penawdau pob: { :_ :pennawd
+			Allbwn ysgrifennu: pennawd.
 		}.
-		eiddo headers-out := Gwir.
+		eiddo penawdau-wedi-anfon := Gwir.
 		Allbwn ysgrifennu: ['\r\n'].
 	}.
-	Allbwn ysgrifennu: output.
+	Allbwn ysgrifennu: allbwn.
 }.
 
-Web-Document ar: ['finish:type:'] gwneud: { :output :math
-	eiddo headers-out gau: {
-		eiddo sessdata Dim? gau: {
-			eiddo session-manager save: eiddo sessdata.
+Dogfen-We ar: ['gorffen:math:'] gwneud: { :allbwn :math
+	eiddo penawdau-wedi-anfon gau: {
+		eiddo data-sesiwn Dim? gau: {
+			eiddo rheolwr-sesiynau cadw: eiddo data-sesiwn.
 		}.
-		eiddo headers atodi: (
-			HTTP-Header newydd
-			key: ['Content-type'] value: math
+		eiddo penawdau atodi: (
+			Pennawd-HTTP newydd
+			allwedd: ['Content-type'] gwerth: math
 		).
-		eiddo headers atodi: (
-			HTTP-Header newydd
-			key: ['Content-Length'] value: output llinyn bytes
+		eiddo penawdau atodi: (
+			Pennawd-HTTP newydd
+			allwedd: ['Content-Length'] gwerth: allbwn llinyn bytes
 		).
-		eiddo headers pob: { :_ :header
-			Allbwn ysgrifennu: header.
+		eiddo penawdau pob: { :_ :pennawd
+			Allbwn ysgrifennu: pennawd.
 		}.
-		eiddo headers-out := Gwir.
+		eiddo penawdau-wedi-anfon := Gwir.
 		Allbwn ysgrifennu: ['\r\n'].
 	}.
-	Allbwn ysgrifennu: output.
+	Allbwn ysgrifennu: allbwn.
 }.
 
-Web-Document ar: ['out:'] gwneud: { :output
-	hun out: output type: ['text/html; charset=utf-8'].
+Dogfen-We ar: ['allbynnu:'] gwneud: { :allbwn
+	hun allbynnu: allbwn math: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ar: ['finish:'] gwneud: { :output
-	hun finish: output type: ['text/html; charset=utf-8'].
+Dogfen-We ar: ['gorffen:'] gwneud: { :allbwn
+	hun gorffen: allbwn math: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ar: ['json:'] gwneud: { :output
-	hun out: ( JSON jsonify: output ) type: ['application/json'].
+Dogfen-We ar: ['json:'] gwneud: { :allbwn
+	hun allbynnu: ( JSON jsonify: allbwn ) math: ['application/json'].
 }.
 
-Web-Document ar: ['not-found:'] gwneud: { :output
-	hun clear-headers header: (
-		HTTP-Header newydd key: ['Status'] value: ['404 Not Found']
+Dogfen-We ar: ['heb-ei-ganfod:'] gwneud: { :allbwn
+	hun clirio-penawdau pennawd: (
+		Pennawd-HTTP newydd allwedd: ['Status'] gwerth: ['404 Not Found']
 	).
-	hun out: output.
+	hun allbynnu: allbwn.
 }.
 
 
 # Interface
 
->> Session := Gwrthrych newydd.
+>> Sesiwn := Gwrthrych newydd.
 
-Session ar: ['newydd'] gwneud: { <- hun newydd init for: Dim.
+Sesiwn ar: ['newydd'] gwneud: { <- hun newydd paratoi ar-gyfer: Dim.
 }.
 
-Session ar: ['for:'] gwneud: { :id
+Sesiwn ar: ['ar-gyfer:'] gwneud: { :id
 	eiddo id := id.
 }.
 
-Session ar: ['load'] gwneud: {
+Sesiwn ar: ['llwytho'] gwneud: {
 	y-dasg-hon gwall: ['Not implemented.'].
 }.
 
-Session ar: ['save:'] gwneud: {
+Sesiwn ar: ['cadw:'] gwneud: {
 	y-dasg-hon gwall: ['Not implemented.'].
 }.
 
-Session ar: ['destroy'] gwneud: {
+Sesiwn ar: ['dinistrio'] gwneud: {
 	y-dasg-hon gwall: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session newydd.
+>> Sesiwn-ffeil-dros-dro := Sesiwn newydd.
 
-Tempfile-Session ar: ['init'] gwneud: {
-	eiddo pathprefix := ['/tmp/sess-'].
+Sesiwn-ffeil-dros-dro ar: ['paratoi'] gwneud: {
+	eiddo dechrau-llwybr := ['/tmp/sess-'].
 }.
 
-Tempfile-Session ar: ['path-prefix:'] gwneud: { :str
-	eiddo pathprefix := str.
+Sesiwn-ffeil-dros-dro ar: ['rhagddodiad-llwybr:'] gwneud: { :llinyn-testun
+	eiddo dechrau-llwybr := llinyn-testun.
 }.
 
-Tempfile-Session ar: ['file'] gwneud: { <- ( Ffeil newydd: ( eiddo pathprefix + eiddo id + ['.txt'] ) ).
+Sesiwn-ffeil-dros-dro ar: ['ffeil'] gwneud: { <- ( Ffeil newydd: ( eiddo dechrau-llwybr + eiddo id + ['.txt'] ) ).
 }.
 
-Tempfile-Session ar: ['load'] gwneud: {
-	>> file := hun file.
-	file yn-bodoli gau: {
-		file ysgrifennu: (Geiriadur newydd cod).
-	}. <- file darllen gwrthrych.
+Sesiwn-ffeil-dros-dro ar: ['llwytho'] gwneud: {
+	>> ffeil := hun ffeil.
+	ffeil yn-bodoli gau: {
+		ffeil ysgrifennu: (Geiriadur newydd cod).
+	}. <- ffeil darllen gwrthrych.
 }.
 
-Tempfile-Session ar: ['save:'] gwneud: { :data
-	>> file := hun file.
-	file yn-bodoli gwir: {
-		file ysgrifennu: data cod.
+Sesiwn-ffeil-dros-dro ar: ['cadw:'] gwneud: { :data
+	>> ffeil := hun ffeil.
+	ffeil yn-bodoli gwir: {
+		ffeil ysgrifennu: data cod.
 	}.
 }.
 
-Tempfile-Session ar: ['destroy'] gwneud: {
-	>> file := hun file.
-	file yn-bodoli gwir: {
-		file dileu.
+Sesiwn-ffeil-dros-dro ar: ['dinistrio'] gwneud: {
+	>> ffeil := hun ffeil.
+	ffeil yn-bodoli gwir: {
+		ffeil dileu.
 	}.
 }.
 
 
 >> URL := Gwrthrych newydd.
 
-URL ar: ['init'] gwneud: {
+URL ar: ['paratoi'] gwneud: {
 	eiddo protocol := ['https://'].
 	eiddo gwesteiwr := ['localhost'].
 	eiddo llwybr := [''].
-	eiddo params := [''].
+	eiddo paramedrau-url := [''].
 	eiddo hash := [''].
 }.
 
-URL ar: ['newydd'] gwneud: { <- hun newydd init.
+URL ar: ['newydd'] gwneud: { <- hun newydd paratoi.
 }.
 
 URL ar: ['llinyn'] gwneud: { <- (
 	eiddo protocol +
 	eiddo gwesteiwr +
 	eiddo llwybr +
-	eiddo params +
+	eiddo paramedrau-url +
 	eiddo hash ).
 }.
 
 URL ar: ['protocol:'] gwneud: { :protocol
-	((Rhestr newydd: ['http'] ; ['https']) yn-cynnwys: protocol) gwir: {
+	((Rhestr newydd ; ['http'] ; ['https']) mae-ganddo: protocol) gwir: {
 		eiddo protocol := protocol + ['://'].
 	}, gau: {
 		y-dasg-hon gwall: ['Invalid protocol'].
@@ -307,16 +307,16 @@ URL ar: ['gwesteiwr:'] gwneud: { :gwesteiwr
 	eiddo gwesteiwr := gwesteiwr.
 }.
 
-URL ar: ['path:'] gwneud: { :llwybr
+URL ar: ['llwybr:'] gwneud: { :llwybr
 	eiddo llwybr := ['/'] + llwybr url-amgodio.
 }.
 
-URL ar: ['params:'] gwneud: { :map
-	>> params := Rhestr newydd.
-	map pob: { :key :value
-		params atodi: key llinyn url-amgodio + ['='] + value llinyn url-amgodio.
+URL ar: ['paramedrau-url:'] gwneud: { :mapio
+	>> paramedrau-url := Rhestr newydd.
+	mapio pob: { :allwedd :gwerth
+		paramedrau-url atodi: allwedd llinyn url-amgodio + ['='] + gwerth llinyn url-amgodio.
 	}.
-	eiddo params := ['?'] + ( params cyfuno: ['&'] ).
+	eiddo paramedrau-url := ['?'] + ( paramedrau-url cyfuno: ['&'] ).
 }.
 
 URL ar: ['stwnsh:'] gwneud: { :hash

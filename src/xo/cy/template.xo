@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Gwrthrych newydd.
+>> Templed := Gwrthrych newydd.
 
-Template ar: ['newydd'] gwneud: { <- hun newydd content: [''].
+Templed ar: ['newydd'] gwneud: { <- hun newydd cynnwys: [''].
 }.
 
-Template ar: ['content:'] gwneud: { :content
-	eiddo content := content. 
+Templed ar: ['cynnwys:'] gwneud: { :cynnwys
+	eiddo cynnwys := cynnwys. 
 }.
 
-Template ar: ['newydd:'] gwneud: { :content <- hun newydd content: content.
+Templed ar: ['newydd:'] gwneud: { :cynnwys <- hun newydd cynnwys: cynnwys.
 }.
 
-Template ar: ['cut:'] gwneud: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := eiddo content hollti: startmarker.
-	>> prefix := parts cyntaf.
-	>> parts2 := parts olaf hollti: endmarker.
-	>> suffix := parts2 olaf.
-	>> part := parts2 cyntaf.
-	>> rest := prefix + suffix.
-	eiddo content := rest. <- Template newydd: part.
+Templed ar: ['torri:'] gwneud: { :nod
+	>> nod-dechrau := (['<!-- cut:%id% -->'] %id%: nod).
+	>> nod-diwedd := (['<!-- /cut:%id% -->'] %id%: nod).
+	>> rhannau := eiddo cynnwys hollti: nod-dechrau.
+	>> rhagddodiad := rhannau cyntaf.
+	>> rhannau2 := rhannau olaf hollti: nod-diwedd.
+	>> ôl-ddodiad := rhannau2 olaf.
+	>> rhan := rhannau2 cyntaf.
+	>> gweddill := rhagddodiad + ôl-ddodiad.
+	eiddo cynnwys := gweddill. <- Templed newydd: rhan.
 	
 }.
 
-Template ar: ['copïo'] gwneud: { <- hun newydd: hun llinyn copïo.
+Templed ar: ['copïo'] gwneud: { <- hun newydd: hun llinyn copïo.
 }.
 	
-Template ar: ['paste:at:'] gwneud: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	eiddo content disodli: pastemarker gyda: ( snippet llinyn + pastemarker ).
+Templed ar: ['gludo:yn:'] gwneud: { :pyt :id
+	>> nod-gludo := (['<!-- paste:%id% -->'] %id%: id).
+	eiddo cynnwys disodli: nod-gludo gyda: ( pyt llinyn + nod-gludo ).
 }.
 
-Template ar: ['gosod:gwerth:'] gwneud: { :slot :value
-	eiddo content disodli: ['<!-- slot:'] + slot + [' -->'] gyda: ( Server html-amgodio: value ).
+Templed ar: ['gosod:gwerth:'] gwneud: { :slot :gwerth
+	eiddo cynnwys disodli: ['<!-- slot:'] + slot + [' -->'] gyda: ( Server html-amgodio: gwerth ).
 }.
 
-Template ar: ['set:html:'] gwneud: { :slot :html
-	eiddo content disodli: ['<!-- slot:'] + slot + [' -->'] gyda: html.
+Templed ar: ['gosod:html:'] gwneud: { :slot :html
+	eiddo cynnwys disodli: ['<!-- slot:'] + slot + [' -->'] gyda: html.
 }.
 
-Template ar: ['ymateb:a:'] gwneud: { :slot :value
-	hun gosod: (slot o: 0 hyd: (slot hyd - 1)) gwerth: value.
+Templed ar: ['ymateb:a:'] gwneud: { :slot :gwerth
+	hun gosod: (slot o: 0 hyd: (slot hyd - 1)) gwerth: gwerth.
 }.
 
-Template ar: ['nl2br'] gwneud: {
-	eiddo content disodli: ['\n'] gyda: ['<br>'].
+Templed ar: ['nl2br'] gwneud: {
+	eiddo cynnwys disodli: ['\n'] gyda: ['<br>'].
 }.
 
-Template ar: ['clean'] gwneud: {
-	eiddo content :=
+Templed ar: ['glanhau'] gwneud: {
+	eiddo cynnwys :=
 		Patrwm
 		newydd: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		cydweddu: eiddo content
+		cydweddu: eiddo cynnwys
 		gwneud: { <- ['']. }.
 }.
 
-Template ar: ['clean-cuts'] gwneud: {
-	>> items := Rhestr newydd.
+Templed ar: ['glanhau-toriadau'] gwneud: {
+	>> eitemau := Rhestr newydd.
 	Patrwm
 	newydd: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	cydweddu: eiddo content
-	gwneud: { :_ :part
-		items atodi: part ? 1.
+	cydweddu: eiddo cynnwys
+	gwneud: { :_ :rhan
+		eitemau atodi: rhan ? 1.
 	}.
-	items pob: { :_ :id
-		eiddo content :=
+	eitemau pob: { :_ :id
+		eiddo cynnwys :=
 			Patrwm newydd: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			cydweddu: eiddo content
+			cydweddu: eiddo cynnwys
 			gwneud: { <- ['']. }.
 	 }.
 }.
 
-Template ar: ['clean-space'] gwneud: {
-	eiddo content :=
+Templed ar: ['glanhau-bylchau'] gwneud: {
+	eiddo cynnwys :=
 		Patrwm
 		newydd: ['\\s*\\n'],
-		cydweddu: eiddo content
+		cydweddu: eiddo cynnwys
 		gwneud: { <- ['\n']. }.
-	eiddo content :=
+	eiddo cynnwys :=
 		Patrwm
 		newydd: ['\\n[\\s\\t]+'],
-		cydweddu: eiddo content
+		cydweddu: eiddo cynnwys
 		gwneud: { <- ['\n']. }.
 }.
 
-Template ar: ['clean-all'] gwneud: {
-	hun clean.
-	hun clean-cuts.
-	hun clean-space.
+Templed ar: ['glanhau-popeth'] gwneud: {
+	hun glanhau.
+	hun glanhau-toriadau.
+	hun glanhau-bylchau.
 }.
 
-Template ar: ['llinyn'] gwneud: { <- eiddo content.
+Templed ar: ['llinyn'] gwneud: { <- eiddo cynnwys.
 }.

@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Obyekt yeni.
+>> Qəlib := Obyekt yeni.
 
-Template olanda: ['yeni'] et: { <- özü yeni content: [''].
+Qəlib olanda: ['yeni'] et: { <- özü yeni məzmun: [''].
 }.
 
-Template olanda: ['content:'] et: { :content
-	öz content := content. 
+Qəlib olanda: ['məzmun:'] et: { :məzmun
+	öz məzmun := məzmun. 
 }.
 
-Template olanda: ['yeni:'] et: { :content <- özü yeni content: content.
+Qəlib olanda: ['yeni:'] et: { :məzmun <- özü yeni məzmun: məzmun.
 }.
 
-Template olanda: ['cut:'] et: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := öz content böl: startmarker.
-	>> prefix := parts birinci.
-	>> parts2 := parts sonuncu böl: endmarker.
-	>> suffix := parts2 sonuncu.
-	>> part := parts2 birinci.
-	>> rest := prefix + suffix.
-	öz content := rest. <- Template yeni: part.
+Qəlib olanda: ['kəs:'] et: { :işarə
+	>> başlanğıc-işarəsi := (['<!-- cut:%id% -->'] %id%: işarə).
+	>> son-işarə := (['<!-- /cut:%id% -->'] %id%: işarə).
+	>> parçalar := öz məzmun böl: başlanğıc-işarəsi.
+	>> prefiks := parçalar birinci.
+	>> parçalar2 := parçalar sonuncu böl: son-işarə.
+	>> suffiks := parçalar2 sonuncu.
+	>> parça := parçalar2 birinci.
+	>> qalıq := prefiks + suffiks.
+	öz məzmun := qalıq. <- Qəlib yeni: parça.
 	
 }.
 
-Template olanda: ['surət'] et: { <- özü yeni: özü mətn surət.
+Qəlib olanda: ['surət'] et: { <- özü yeni: özü mətn surət.
 }.
 	
-Template olanda: ['paste:at:'] et: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	öz content əvəzlə: pastemarker ilə: ( snippet mətn + pastemarker ).
+Qəlib olanda: ['yapışdır:yerə:'] et: { :fraqment-html :id
+	>> yapışdırma-işarəsi := (['<!-- paste:%id% -->'] %id%: id).
+	öz məzmun əvəzlə: yapışdırma-işarəsi ilə: ( fraqment-html mətn + yapışdırma-işarəsi ).
 }.
 
-Template olanda: ['təyin-et:dəyər:'] et: { :slot :value
-	öz content əvəzlə: ['<!-- slot:'] + slot + [' -->'] ilə: ( Server html-kodla: value ).
+Qəlib olanda: ['təyin-et:dəyər:'] et: { :yer :dəyər
+	öz məzmun əvəzlə: ['<!-- slot:'] + yer + [' -->'] ilə: ( Server html-kodla: dəyər ).
 }.
 
-Template olanda: ['set:html:'] et: { :slot :html
-	öz content əvəzlə: ['<!-- slot:'] + slot + [' -->'] ilə: html.
+Qəlib olanda: ['təyin-et:html:'] et: { :yer :html
+	öz məzmun əvəzlə: ['<!-- slot:'] + yer + [' -->'] ilə: html.
 }.
 
-Template olanda: ['cavab-ver:və:'] et: { :slot :value
-	özü təyin-et: (slot başlanğıc: 0 uzunluq: (slot uzunluq - 1)) dəyər: value.
+Qəlib olanda: ['cavab-ver:və:'] et: { :yer :dəyər
+	özü təyin-et: (yer başlanğıc: 0 uzunluq: (yer uzunluq - 1)) dəyər: dəyər.
 }.
 
-Template olanda: ['nl2br'] et: {
-	öz content əvəzlə: ['\n'] ilə: ['<br>'].
+Qəlib olanda: ['nl2br'] et: {
+	öz məzmun əvəzlə: ['\n'] ilə: ['<br>'].
 }.
 
-Template olanda: ['clean'] et: {
-	öz content :=
+Qəlib olanda: ['səliqələ'] et: {
+	öz məzmun :=
 		Şablon
 		yeni: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		uyğunluq: öz content
+		uyğunluq: öz məzmun
 		et: { <- ['']. }.
 }.
 
-Template olanda: ['clean-cuts'] et: {
-	>> items := Siyahı yeni.
+Qəlib olanda: ['kəsikləri-səliqələ'] et: {
+	>> elementlər := Siyahı yeni.
 	Şablon
 	yeni: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	uyğunluq: öz content
-	et: { :_ :part
-		items sona-əlavə-et: part ? 1.
+	uyğunluq: öz məzmun
+	et: { :_ :parça
+		elementlər sona-əlavə-et: parça ? 1.
 	}.
-	items hər: { :_ :id
-		öz content :=
+	elementlər hər: { :_ :id
+		öz məzmun :=
 			Şablon yeni: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			uyğunluq: öz content
+			uyğunluq: öz məzmun
 			et: { <- ['']. }.
 	 }.
 }.
 
-Template olanda: ['clean-space'] et: {
-	öz content :=
+Qəlib olanda: ['boşluqları-səliqələ'] et: {
+	öz məzmun :=
 		Şablon
 		yeni: ['\\s*\\n'],
-		uyğunluq: öz content
+		uyğunluq: öz məzmun
 		et: { <- ['\n']. }.
-	öz content :=
+	öz məzmun :=
 		Şablon
 		yeni: ['\\n[\\s\\t]+'],
-		uyğunluq: öz content
+		uyğunluq: öz məzmun
 		et: { <- ['\n']. }.
 }.
 
-Template olanda: ['clean-all'] et: {
-	özü clean.
-	özü clean-cuts.
-	özü clean-space.
+Qəlib olanda: ['hamısını-səliqələ'] et: {
+	özü səliqələ.
+	özü kəsikləri-səliqələ.
+	özü boşluqları-səliqələ.
 }.
 
-Template olanda: ['mətn'] et: { <- öz content.
+Qəlib olanda: ['mətn'] et: { <- öz məzmun.
 }.

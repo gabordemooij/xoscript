@@ -1,128 +1,128 @@
->> Email := 객체 새로.
+>> 이메일 := 객체 새로.
 
-Email 받으면: ['init'] 실행: {
-	자기 recipients := 리스트 새로.
+이메일 받으면: ['초기화'] 실행: {
+	자기 받는사람목록 := 리스트 새로.
 	자기 cc := 리스트 새로.
 	자기 bcc := 리스트 새로.
-	자기 from := 없음.
-	자기 from-name := 없음.
-	자기 subject := 없음.
-	자기 body := 없음.
+	자기 보낸사람 := 없음.
+	자기 보낸사람이름 := 없음.
+	자기 제목 := 없음.
+	자기 본문 := 없음.
 }.
 
-Email 받으면: ['새로'] 실행: { <- 자신 새로 init.
+이메일 받으면: ['새로'] 실행: { <- 자신 새로 초기화.
 }.
 
-Email 받으면: ['to:'] 실행: { :list
-	자기 recipients := list.
+이메일 받으면: ['받는사람:'] 실행: { :나열
+	자기 받는사람목록 := 나열.
 }.
  
-Email 받으면: ['cc:'] 실행: { :list
-	자기 cc := list.
+이메일 받으면: ['cc:'] 실행: { :나열
+	자기 cc := 나열.
 }.
 
-Email 받으면: ['bcc:'] 실행: { :list
-	자기 bcc := list.
+이메일 받으면: ['bcc:'] 실행: { :나열
+	자기 bcc := 나열.
 }.
 
-Email 받으면: ['subject:'] 실행: { :subject
-	자기 subject := subject.
+이메일 받으면: ['제목:'] 실행: { :제목
+	자기 제목 := 제목.
 }.
 
-Email 받으면: ['from:name:'] 실행: { :from :이름
-	자기 from := from.
-	자기 from-name := 이름.
+이메일 받으면: ['보낸사람:이름:'] 실행: { :보낸사람 :이름
+	자기 보낸사람 := 보낸사람.
+	자기 보낸사람이름 := 이름.
 }.
 
-Email 받으면: ['body:'] 실행: { :body
-	자기 body := body.
+이메일 받으면: ['본문:'] 실행: { :본문
+	자기 본문 := 본문.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email 받으면: ['header:'] 실행: { :line <- line 바꾸기: ['\r'] 새값: [''], 바꾸기: ['\n'] 새값: [''].
+이메일 받으면: ['헤더:'] 실행: { :줄내용 <- 줄내용 바꾸기: ['\r'] 새값: [''], 바꾸기: ['\n'] 새값: [''].
 }.
 
-Email 받으면: ['send'] 실행: {
-	>> f := 파일 tempwrite: 자신 generate.
+이메일 받으면: ['보내기'] 실행: {
+	>> f := 파일 tempwrite: 자신 생성.
 	프로그램 시스템: ['sendmail -t < '] + f 파일경로, 줄바꿈.
 }.
 
-Email 받으면: ['generate'] 실행: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str 뒤에추가: (자신 header: ['From: '] + 자기 from-name + [' <'] + ( 자기 from ) + ['>']) + brk.
-	str 뒤에추가: (자신 header: ['To: '] + ( 자기 recipients 합치기: [','] )) + brk.
+이메일 받으면: ['생성'] 실행: {
+	>> 줄바꿈문자 := ['\r\n'].
+	>> 문자열값 := [''].
+	문자열값 뒤에추가: (자신 헤더: ['From: '] + 자기 보낸사람이름 + [' <'] + ( 자기 보낸사람 ) + ['>']) + 줄바꿈문자.
+	문자열값 뒤에추가: (자신 헤더: ['To: '] + ( 자기 받는사람목록 합치기: [','] )) + 줄바꿈문자.
 	자기 cc 개수 참이면: {
-		str 뒤에추가: (자신 header: ['Cc: '] + ( 자기 cc 합치기: [','] )) + brk.
+		문자열값 뒤에추가: (자신 헤더: ['Cc: '] + ( 자기 cc 합치기: [','] )) + 줄바꿈문자.
 	}.
 	자기 bcc 개수 참이면: {
-		str 뒤에추가: (자신 header: ['Bcc: '] + ( 자기 bcc 합치기: [','] )) + brk.
+		문자열값 뒤에추가: (자신 헤더: ['Bcc: '] + ( 자기 bcc 합치기: [','] )) + 줄바꿈문자.
 	}.
-	str 뒤에추가: (자신 header: ['Subject: '] + 자기 subject) + brk.
-	str 뒤에추가: brk.
-	str 뒤에추가: 자기 body.
-	str 뒤에추가: brk. <- str.
+	문자열값 뒤에추가: (자신 헤더: ['Subject: '] + 자기 제목) + 줄바꿈문자.
+	문자열값 뒤에추가: 줄바꿈문자.
+	문자열값 뒤에추가: 자기 본문.
+	문자열값 뒤에추가: 줄바꿈문자. <- 문자열값.
 }.
 
->> HTML-Email := Email 새로.
+>> HTML이메일 := 이메일 새로.
 
-HTML-Email 받으면: ['init'] 실행: {
-	자신 init.
-	자기 attachments := 리스트 새로.
-	자기 boundary := 금고 토큰: 40.
+HTML이메일 받으면: ['초기화'] 실행: {
+	자신 초기화.
+	자기 첨부목록 := 리스트 새로.
+	자기 경계 := 금고 토큰: 40.
 }.
 
-HTML-Email 받으면: ['attach:'] 실행: { :file
-	>> id := 자기 attachments 개수.
-	>> blob := file blob.
-	자기 attachments 뒤에추가: (
+HTML이메일 받으면: ['첨부:'] 실행: { :세션파일
+	>> id := 자기 첨부목록 개수.
+	>> blob := 세션파일 blob.
+	자기 첨부목록 뒤에추가: (
 		사전 새로
-			file: file 파일경로,
-			mime: ['image/'] + (Server mimetype: file 파일경로),
-			data: blob base64-인코딩
+			세션파일: 세션파일 파일경로,
+			mime: ['image/'] + (Server mimetype: 세션파일 파일경로),
+			데이터: blob base64-인코딩
 	).
 	blob 해제. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email 받으면: ['generate'] 실행: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str 뒤에추가: (자신 header: ['From: '] + 자기 from-name + [' <'] + ( 자기 from ) + ['>']) + brk.
-	str 뒤에추가: (자신 header: ['To: '] + ( 자기 recipients 합치기: [','] )) + brk.
+HTML이메일 받으면: ['생성'] 실행: {
+	>> 줄바꿈문자 := ['\r\n'].
+	>> 문자열값 := [''].
+	문자열값 뒤에추가: (자신 헤더: ['From: '] + 자기 보낸사람이름 + [' <'] + ( 자기 보낸사람 ) + ['>']) + 줄바꿈문자.
+	문자열값 뒤에추가: (자신 헤더: ['To: '] + ( 자기 받는사람목록 합치기: [','] )) + 줄바꿈문자.
 	자기 cc 개수 참이면: {
-		str 뒤에추가: (자신 header: ['Cc: '] + ( 자기 cc 합치기: [','] )) + brk.
+		문자열값 뒤에추가: (자신 헤더: ['Cc: '] + ( 자기 cc 합치기: [','] )) + 줄바꿈문자.
 	}.
 	자기 bcc 개수 참이면: {
-		str 뒤에추가: (자신 header: ['Bcc: '] + ( 자기 bcc 합치기: [','] )) + brk.
+		문자열값 뒤에추가: (자신 헤더: ['Bcc: '] + ( 자기 bcc 합치기: [','] )) + 줄바꿈문자.
 	}.
-	str 뒤에추가: (자신 header: ['Subject: '] + 자기 subject) + brk.
-	str 뒤에추가: ['MIME-Version: 1.0'] + brk.
-	str 뒤에추가: ['Content-Type: multipart/related; boundary="'] + 자기 boundary + ['"; type=text/html'] + brk.
-	str 뒤에추가: brk.
-	str 뒤에추가: ['--'] + 자기 boundary + brk.
-	str 뒤에추가: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str 뒤에추가: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str 뒤에추가: brk.
-	str 뒤에추가: 자기 body.
-	str 뒤에추가: brk.
-	자기 attachments 각각: { :id :info
-		>> blob := info data.
-		str 뒤에추가: ['--'] + 자기 boundary + brk.
-		str 뒤에추가: ['Content-Type: '] + info mime + brk.
-		str 뒤에추가: ['Content-Transfer-Encoding: base64'] + brk.
-		str 뒤에추가: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str 뒤에추가: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str 뒤에추가: brk.
-		>> max := 76.
-		>> len := blob 길이.
-		>> chunks := (len / max) 올림.
+	문자열값 뒤에추가: (자신 헤더: ['Subject: '] + 자기 제목) + 줄바꿈문자.
+	문자열값 뒤에추가: ['MIME-Version: 1.0'] + 줄바꿈문자.
+	문자열값 뒤에추가: ['Content-Type: multipart/related; boundary="'] + 자기 경계 + ['"; type=text/html'] + 줄바꿈문자.
+	문자열값 뒤에추가: 줄바꿈문자.
+	문자열값 뒤에추가: ['--'] + 자기 경계 + 줄바꿈문자.
+	문자열값 뒤에추가: ['Content-Type: text/html; charset=UTF-8'] + 줄바꿈문자.
+	문자열값 뒤에추가: ['Content-Transfer-Encoding: 7bit'] + 줄바꿈문자.
+	문자열값 뒤에추가: 줄바꿈문자.
+	문자열값 뒤에추가: 자기 본문.
+	문자열값 뒤에추가: 줄바꿈문자.
+	자기 첨부목록 각각: { :id :정보
+		>> blob := 정보 데이터.
+		문자열값 뒤에추가: ['--'] + 자기 경계 + 줄바꿈문자.
+		문자열값 뒤에추가: ['Content-Type: '] + 정보 mime + 줄바꿈문자.
+		문자열값 뒤에추가: ['Content-Transfer-Encoding: base64'] + 줄바꿈문자.
+		문자열값 뒤에추가: ['Content-ID: <attachment'] + id + ['>'] + 줄바꿈문자.
+		문자열값 뒤에추가: ['Content-Disposition: inline; filename="'] + 정보 세션파일 + ['"'] + 줄바꿈문자.
+		문자열값 뒤에추가: 줄바꿈문자.
+		>> 상한값 := 76.
+		>> 글자길이 := blob 길이.
+		>> 조각들 := (글자길이 / 상한값) 올림.
 		{ :i
-			>> chunk := blob 복사 시작: i * max 길이: max.
-			str 뒤에추가: chunk + brk.
-		} * chunks.
-		str 뒤에추가: brk.
-		str 뒤에추가: brk.
+			>> 조각 := blob 복사 시작: i * 상한값 길이: 상한값.
+			문자열값 뒤에추가: 조각 + 줄바꿈문자.
+		} * 조각들.
+		문자열값 뒤에추가: 줄바꿈문자.
+		문자열값 뒤에추가: 줄바꿈문자.
 	}.
-	str 뒤에추가: ['--'] + 자기 boundary + ['--'] + brk. <- str.
+	문자열값 뒤에추가: ['--'] + 자기 경계 + ['--'] + 줄바꿈문자. <- 문자열값.
 }.

@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Opheto nobo.
+>> Plantia := Opheto nobo.
 
-Template ora: ['nobo'] hasi: { <- mes nobo content: [''].
+Plantia ora: ['nobo'] hasi: { <- mes nobo kontenido: [''].
 }.
 
-Template ora: ['content:'] hasi: { :content
-	propio content := content. 
+Plantia ora: ['kontenido:'] hasi: { :kontenido
+	propio kontenido := kontenido. 
 }.
 
-Template ora: ['nobo:'] hasi: { :content <- mes nobo content: content.
+Plantia ora: ['nobo:'] hasi: { :kontenido <- mes nobo kontenido: kontenido.
 }.
 
-Template ora: ['cut:'] hasi: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := propio content parti: startmarker.
-	>> prefix := parts promé.
-	>> parts2 := parts último parti: endmarker.
-	>> suffix := parts2 último.
-	>> part := parts2 promé.
-	>> rest := prefix + suffix.
-	propio content := rest. <- Template nobo: part.
+Plantia ora: ['korta:'] hasi: { :marka
+	>> marka-di-kuminsamentu := (['<!-- cut:%id% -->'] %id%: marka).
+	>> marka-di-fin := (['<!-- /cut:%id% -->'] %id%: marka).
+	>> partinan := propio kontenido parti: marka-di-kuminsamentu.
+	>> prefiho := partinan promé.
+	>> partinan2 := partinan último parti: marka-di-fin.
+	>> sufiho := partinan2 último.
+	>> parti := partinan2 promé.
+	>> resto := prefiho + sufiho.
+	propio kontenido := resto. <- Plantia nobo: parti.
 	
 }.
 
-Template ora: ['kopia'] hasi: { <- mes nobo: mes teksto kopia.
+Plantia ora: ['kopia'] hasi: { <- mes nobo: mes teksto kopia.
 }.
 	
-Template ora: ['paste:at:'] hasi: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	propio content remplasá: pastemarker ku: ( snippet teksto + pastemarker ).
+Plantia ora: ['pega:na:'] hasi: { :fragmento-chiki :id
+	>> marka-di-pega := (['<!-- paste:%id% -->'] %id%: id).
+	propio kontenido remplasá: marka-di-pega ku: ( fragmento-chiki teksto + marka-di-pega ).
 }.
 
-Template ora: ['pone:balor:'] hasi: { :slot :value
-	propio content remplasá: ['<!-- slot:'] + slot + [' -->'] ku: ( Server html-kodifiká: value ).
+Plantia ora: ['pone:balor:'] hasi: { :lugá :balor
+	propio kontenido remplasá: ['<!-- slot:'] + lugá + [' -->'] ku: ( Server html-kodifiká: balor ).
 }.
 
-Template ora: ['set:html:'] hasi: { :slot :html
-	propio content remplasá: ['<!-- slot:'] + slot + [' -->'] ku: html.
+Plantia ora: ['pone:html:'] hasi: { :lugá :html
+	propio kontenido remplasá: ['<!-- slot:'] + lugá + [' -->'] ku: html.
 }.
 
-Template ora: ['kontestá:i:'] hasi: { :slot :value
-	mes pone: (slot kuminsá: 0 largura: (slot largura - 1)) balor: value.
+Plantia ora: ['kontestá:i:'] hasi: { :lugá :balor
+	mes pone: (lugá kuminsá: 0 largura: (lugá largura - 1)) balor: balor.
 }.
 
-Template ora: ['nl2br'] hasi: {
-	propio content remplasá: ['\n'] ku: ['<br>'].
+Plantia ora: ['nl2br'] hasi: {
+	propio kontenido remplasá: ['\n'] ku: ['<br>'].
 }.
 
-Template ora: ['clean'] hasi: {
-	propio content :=
+Plantia ora: ['drecha'] hasi: {
+	propio kontenido :=
 		Patronchi
 		nobo: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		kuadra: propio content
+		kuadra: propio kontenido
 		hasi: { <- ['']. }.
 }.
 
-Template ora: ['clean-cuts'] hasi: {
-	>> items := Lista nobo.
+Plantia ora: ['drecha-kortenan'] hasi: {
+	>> artíkulo := Lista nobo.
 	Patronchi
 	nobo: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	kuadra: propio content
-	hasi: { :_ :part
-		items agregá-na-fin: part ? 1.
+	kuadra: propio kontenido
+	hasi: { :_ :parti
+		artíkulo agregá-na-fin: parti ? 1.
 	}.
-	items kada: { :_ :id
-		propio content :=
+	artíkulo kada: { :_ :id
+		propio kontenido :=
 			Patronchi nobo: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			kuadra: propio content
+			kuadra: propio kontenido
 			hasi: { <- ['']. }.
 	 }.
 }.
 
-Template ora: ['clean-space'] hasi: {
-	propio content :=
+Plantia ora: ['drecha-espasionan'] hasi: {
+	propio kontenido :=
 		Patronchi
 		nobo: ['\\s*\\n'],
-		kuadra: propio content
+		kuadra: propio kontenido
 		hasi: { <- ['\n']. }.
-	propio content :=
+	propio kontenido :=
 		Patronchi
 		nobo: ['\\n[\\s\\t]+'],
-		kuadra: propio content
+		kuadra: propio kontenido
 		hasi: { <- ['\n']. }.
 }.
 
-Template ora: ['clean-all'] hasi: {
-	mes clean.
-	mes clean-cuts.
-	mes clean-space.
+Plantia ora: ['drecha-tur'] hasi: {
+	mes drecha.
+	mes drecha-kortenan.
+	mes drecha-espasionan.
 }.
 
-Template ora: ['teksto'] hasi: { <- propio content.
+Plantia ora: ['teksto'] hasi: { <- propio kontenido.
 }.

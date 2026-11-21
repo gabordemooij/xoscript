@@ -1,128 +1,128 @@
 >> Email := Bagay bago.
 
-Email kapag: ['init'] gawin: {
-	sarili-ko recipients := Listahan bago.
+Email kapag: ['ihanda'] gawin: {
+	sarili-ko mga-tatanggap := Listahan bago.
 	sarili-ko cc := Listahan bago.
 	sarili-ko bcc := Listahan bago.
-	sarili-ko from := Wala.
-	sarili-ko from-name := Wala.
-	sarili-ko subject := Wala.
-	sarili-ko body := Wala.
+	sarili-ko nagpadala := Wala.
+	sarili-ko pangalan-ng-nagpadala := Wala.
+	sarili-ko paksa := Wala.
+	sarili-ko katawan := Wala.
 }.
 
-Email kapag: ['bago'] gawin: { <- sarili bago init.
+Email kapag: ['bago'] gawin: { <- sarili bago ihanda.
 }.
 
-Email kapag: ['to:'] gawin: { :list
-	sarili-ko recipients := list.
+Email kapag: ['kay:'] gawin: { :pag-iisa-isa
+	sarili-ko mga-tatanggap := pag-iisa-isa.
 }.
  
-Email kapag: ['cc:'] gawin: { :list
-	sarili-ko cc := list.
+Email kapag: ['cc:'] gawin: { :pag-iisa-isa
+	sarili-ko cc := pag-iisa-isa.
 }.
 
-Email kapag: ['bcc:'] gawin: { :list
-	sarili-ko bcc := list.
+Email kapag: ['bcc:'] gawin: { :pag-iisa-isa
+	sarili-ko bcc := pag-iisa-isa.
 }.
 
-Email kapag: ['subject:'] gawin: { :subject
-	sarili-ko subject := subject.
+Email kapag: ['paksa:'] gawin: { :paksa
+	sarili-ko paksa := paksa.
 }.
 
-Email kapag: ['from:name:'] gawin: { :from :pangalan
-	sarili-ko from := from.
-	sarili-ko from-name := pangalan.
+Email kapag: ['nagpadala:pangalan:'] gawin: { :nagpadala :pangalan
+	sarili-ko nagpadala := nagpadala.
+	sarili-ko pangalan-ng-nagpadala := pangalan.
 }.
 
-Email kapag: ['body:'] gawin: { :body
-	sarili-ko body := body.
+Email kapag: ['katawan:'] gawin: { :katawan
+	sarili-ko katawan := katawan.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email kapag: ['header:'] gawin: { :line <- line palitan: ['\r'] ng: [''], palitan: ['\n'] ng: [''].
+Email kapag: ['header:'] gawin: { :linya <- linya palitan: ['\r'] ng: [''], palitan: ['\n'] ng: [''].
 }.
 
-Email kapag: ['send'] gawin: {
-	>> f := Talaksan tempwrite: sarili generate.
+Email kapag: ['ipadala'] gawin: {
+	>> f := Talaksan tempwrite: sarili bumuo.
 	Programa sistema: ['sendmail -t < '] + f landas-ng-file, bagong-linya.
 }.
 
-Email kapag: ['generate'] gawin: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str idagdag-sa-dulo: (sarili header: ['From: '] + sarili-ko from-name + [' <'] + ( sarili-ko from ) + ['>']) + brk.
-	str idagdag-sa-dulo: (sarili header: ['To: '] + ( sarili-ko recipients pagsamahin: [','] )) + brk.
+Email kapag: ['bumuo'] gawin: {
+	>> putol-linya := ['\r\n'].
+	>> string-ng-teksto := [''].
+	string-ng-teksto idagdag-sa-dulo: (sarili header: ['From: '] + sarili-ko pangalan-ng-nagpadala + [' <'] + ( sarili-ko nagpadala ) + ['>']) + putol-linya.
+	string-ng-teksto idagdag-sa-dulo: (sarili header: ['To: '] + ( sarili-ko mga-tatanggap pagsamahin: [','] )) + putol-linya.
 	sarili-ko cc bilangin totoo: {
-		str idagdag-sa-dulo: (sarili header: ['Cc: '] + ( sarili-ko cc pagsamahin: [','] )) + brk.
+		string-ng-teksto idagdag-sa-dulo: (sarili header: ['Cc: '] + ( sarili-ko cc pagsamahin: [','] )) + putol-linya.
 	}.
 	sarili-ko bcc bilangin totoo: {
-		str idagdag-sa-dulo: (sarili header: ['Bcc: '] + ( sarili-ko bcc pagsamahin: [','] )) + brk.
+		string-ng-teksto idagdag-sa-dulo: (sarili header: ['Bcc: '] + ( sarili-ko bcc pagsamahin: [','] )) + putol-linya.
 	}.
-	str idagdag-sa-dulo: (sarili header: ['Subject: '] + sarili-ko subject) + brk.
-	str idagdag-sa-dulo: brk.
-	str idagdag-sa-dulo: sarili-ko body.
-	str idagdag-sa-dulo: brk. <- str.
+	string-ng-teksto idagdag-sa-dulo: (sarili header: ['Subject: '] + sarili-ko paksa) + putol-linya.
+	string-ng-teksto idagdag-sa-dulo: putol-linya.
+	string-ng-teksto idagdag-sa-dulo: sarili-ko katawan.
+	string-ng-teksto idagdag-sa-dulo: putol-linya. <- string-ng-teksto.
 }.
 
 >> HTML-Email := Email bago.
 
-HTML-Email kapag: ['init'] gawin: {
-	sarili init.
-	sarili-ko attachments := Listahan bago.
-	sarili-ko boundary := Kaha token: 40.
+HTML-Email kapag: ['ihanda'] gawin: {
+	sarili ihanda.
+	sarili-ko mga-lakip := Listahan bago.
+	sarili-ko hangganan := Kaha token: 40.
 }.
 
-HTML-Email kapag: ['attach:'] gawin: { :file
-	>> id := sarili-ko attachments bilangin.
-	>> blob := file blob.
-	sarili-ko attachments idagdag-sa-dulo: (
+HTML-Email kapag: ['ilakip:'] gawin: { :file-ng-sesyon
+	>> id := sarili-ko mga-lakip bilangin.
+	>> blob := file-ng-sesyon blob.
+	sarili-ko mga-lakip idagdag-sa-dulo: (
 		Diksyunaryo bago
-			file: file landas-ng-file,
-			mime: ['image/'] + (Server mimetype: file landas-ng-file),
-			data: blob base64-i-encode
+			file-ng-sesyon: file-ng-sesyon landas-ng-file,
+			mime: ['image/'] + (Server mimetype: file-ng-sesyon landas-ng-file),
+			datos: blob base64-i-encode
 	).
 	blob palayain. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email kapag: ['generate'] gawin: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str idagdag-sa-dulo: (sarili header: ['From: '] + sarili-ko from-name + [' <'] + ( sarili-ko from ) + ['>']) + brk.
-	str idagdag-sa-dulo: (sarili header: ['To: '] + ( sarili-ko recipients pagsamahin: [','] )) + brk.
+HTML-Email kapag: ['bumuo'] gawin: {
+	>> putol-linya := ['\r\n'].
+	>> string-ng-teksto := [''].
+	string-ng-teksto idagdag-sa-dulo: (sarili header: ['From: '] + sarili-ko pangalan-ng-nagpadala + [' <'] + ( sarili-ko nagpadala ) + ['>']) + putol-linya.
+	string-ng-teksto idagdag-sa-dulo: (sarili header: ['To: '] + ( sarili-ko mga-tatanggap pagsamahin: [','] )) + putol-linya.
 	sarili-ko cc bilangin totoo: {
-		str idagdag-sa-dulo: (sarili header: ['Cc: '] + ( sarili-ko cc pagsamahin: [','] )) + brk.
+		string-ng-teksto idagdag-sa-dulo: (sarili header: ['Cc: '] + ( sarili-ko cc pagsamahin: [','] )) + putol-linya.
 	}.
 	sarili-ko bcc bilangin totoo: {
-		str idagdag-sa-dulo: (sarili header: ['Bcc: '] + ( sarili-ko bcc pagsamahin: [','] )) + brk.
+		string-ng-teksto idagdag-sa-dulo: (sarili header: ['Bcc: '] + ( sarili-ko bcc pagsamahin: [','] )) + putol-linya.
 	}.
-	str idagdag-sa-dulo: (sarili header: ['Subject: '] + sarili-ko subject) + brk.
-	str idagdag-sa-dulo: ['MIME-Version: 1.0'] + brk.
-	str idagdag-sa-dulo: ['Content-Type: multipart/related; boundary="'] + sarili-ko boundary + ['"; type=text/html'] + brk.
-	str idagdag-sa-dulo: brk.
-	str idagdag-sa-dulo: ['--'] + sarili-ko boundary + brk.
-	str idagdag-sa-dulo: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str idagdag-sa-dulo: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str idagdag-sa-dulo: brk.
-	str idagdag-sa-dulo: sarili-ko body.
-	str idagdag-sa-dulo: brk.
-	sarili-ko attachments bawat: { :id :info
-		>> blob := info data.
-		str idagdag-sa-dulo: ['--'] + sarili-ko boundary + brk.
-		str idagdag-sa-dulo: ['Content-Type: '] + info mime + brk.
-		str idagdag-sa-dulo: ['Content-Transfer-Encoding: base64'] + brk.
-		str idagdag-sa-dulo: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str idagdag-sa-dulo: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str idagdag-sa-dulo: brk.
-		>> max := 76.
-		>> len := blob haba.
-		>> chunks := (len / max) itaas-ang-bilog.
+	string-ng-teksto idagdag-sa-dulo: (sarili header: ['Subject: '] + sarili-ko paksa) + putol-linya.
+	string-ng-teksto idagdag-sa-dulo: ['MIME-Version: 1.0'] + putol-linya.
+	string-ng-teksto idagdag-sa-dulo: ['Content-Type: multipart/related; boundary="'] + sarili-ko hangganan + ['"; type=text/html'] + putol-linya.
+	string-ng-teksto idagdag-sa-dulo: putol-linya.
+	string-ng-teksto idagdag-sa-dulo: ['--'] + sarili-ko hangganan + putol-linya.
+	string-ng-teksto idagdag-sa-dulo: ['Content-Type: text/html; charset=UTF-8'] + putol-linya.
+	string-ng-teksto idagdag-sa-dulo: ['Content-Transfer-Encoding: 7bit'] + putol-linya.
+	string-ng-teksto idagdag-sa-dulo: putol-linya.
+	string-ng-teksto idagdag-sa-dulo: sarili-ko katawan.
+	string-ng-teksto idagdag-sa-dulo: putol-linya.
+	sarili-ko mga-lakip bawat: { :id :impormasyon
+		>> blob := impormasyon datos.
+		string-ng-teksto idagdag-sa-dulo: ['--'] + sarili-ko hangganan + putol-linya.
+		string-ng-teksto idagdag-sa-dulo: ['Content-Type: '] + impormasyon mime + putol-linya.
+		string-ng-teksto idagdag-sa-dulo: ['Content-Transfer-Encoding: base64'] + putol-linya.
+		string-ng-teksto idagdag-sa-dulo: ['Content-ID: <attachment'] + id + ['>'] + putol-linya.
+		string-ng-teksto idagdag-sa-dulo: ['Content-Disposition: inline; filename="'] + impormasyon file-ng-sesyon + ['"'] + putol-linya.
+		string-ng-teksto idagdag-sa-dulo: putol-linya.
+		>> pinakamarami := 76.
+		>> haba-ng-teksto := blob haba.
+		>> mga-piraso := (haba-ng-teksto / pinakamarami) itaas-ang-bilog.
 		{ :i
-			>> chunk := blob kopyahin mula-sa: i * max haba: max.
-			str idagdag-sa-dulo: chunk + brk.
-		} * chunks.
-		str idagdag-sa-dulo: brk.
-		str idagdag-sa-dulo: brk.
+			>> piraso := blob kopyahin mula-sa: i * pinakamarami haba: pinakamarami.
+			string-ng-teksto idagdag-sa-dulo: piraso + putol-linya.
+		} * mga-piraso.
+		string-ng-teksto idagdag-sa-dulo: putol-linya.
+		string-ng-teksto idagdag-sa-dulo: putol-linya.
 	}.
-	str idagdag-sa-dulo: ['--'] + sarili-ko boundary + ['--'] + brk. <- str.
+	string-ng-teksto idagdag-sa-dulo: ['--'] + sarili-ko hangganan + ['--'] + putol-linya. <- string-ng-teksto.
 }.

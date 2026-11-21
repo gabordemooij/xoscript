@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Object nieuw.
+>> Sjabloon := Object nieuw.
 
-Template bij: ['nieuw'] doen: { <- zelf nieuw content: [''].
+Sjabloon bij: ['nieuw'] doen: { <- zelf nieuw inhoud: [''].
 }.
 
-Template bij: ['content:'] doen: { :content
-	eigen content := content. 
+Sjabloon bij: ['inhoud:'] doen: { :inhoud
+	eigen inhoud := inhoud. 
 }.
 
-Template bij: ['nieuw:'] doen: { :content <- zelf nieuw content: content.
+Sjabloon bij: ['nieuw:'] doen: { :inhoud <- zelf nieuw inhoud: inhoud.
 }.
 
-Template bij: ['cut:'] doen: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := eigen content opsplitsen: startmarker.
-	>> prefix := parts eerste.
-	>> parts2 := parts laatste opsplitsen: endmarker.
-	>> suffix := parts2 laatste.
-	>> part := parts2 eerste.
-	>> rest := prefix + suffix.
-	eigen content := rest. <- Template nieuw: part.
+Sjabloon bij: ['knippen:'] doen: { :markering
+	>> startmarkering := (['<!-- cut:%id% -->'] %id%: markering).
+	>> eindmarkering := (['<!-- /cut:%id% -->'] %id%: markering).
+	>> delen := eigen inhoud opsplitsen: startmarkering.
+	>> voorvoegsel := delen eerste.
+	>> delen2 := delen laatste opsplitsen: eindmarkering.
+	>> achtervoegsel := delen2 laatste.
+	>> deel := delen2 eerste.
+	>> rest := voorvoegsel + achtervoegsel.
+	eigen inhoud := rest. <- Sjabloon nieuw: deel.
 	
 }.
 
-Template bij: ['kopieer'] doen: { <- zelf nieuw: zelf tekst kopieer.
+Sjabloon bij: ['kopieer'] doen: { <- zelf nieuw: zelf tekst kopieer.
 }.
 	
-Template bij: ['paste:at:'] doen: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	eigen content vervang: pastemarker door: ( snippet tekst + pastemarker ).
+Sjabloon bij: ['plakken:bij:'] doen: { :fragment :id
+	>> plakmarkering := (['<!-- paste:%id% -->'] %id%: id).
+	eigen inhoud vervang: plakmarkering door: ( fragment tekst + plakmarkering ).
 }.
 
-Template bij: ['gebruik:waarde:'] doen: { :slot :value
-	eigen content vervang: ['<!-- slot:'] + slot + [' -->'] door: ( Server html-coderen: value ).
+Sjabloon bij: ['gebruik:waarde:'] doen: { :plek :waarde
+	eigen inhoud vervang: ['<!-- slot:'] + plek + [' -->'] door: ( Server html-coderen: waarde ).
 }.
 
-Template bij: ['set:html:'] doen: { :slot :html
-	eigen content vervang: ['<!-- slot:'] + slot + [' -->'] door: html.
+Sjabloon bij: ['gebruik:html:'] doen: { :plek :html
+	eigen inhoud vervang: ['<!-- slot:'] + plek + [' -->'] door: html.
 }.
 
-Template bij: ['reactie:argument:'] doen: { :slot :value
-	zelf gebruik: (slot van: 0 lengte: (slot lengte - 1)) waarde: value.
+Sjabloon bij: ['reactie:argument:'] doen: { :plek :waarde
+	zelf gebruik: (plek van: 0 lengte: (plek lengte - 1)) waarde: waarde.
 }.
 
-Template bij: ['nl2br'] doen: {
-	eigen content vervang: ['\n'] door: ['<br>'].
+Sjabloon bij: ['nl2br'] doen: {
+	eigen inhoud vervang: ['\n'] door: ['<br>'].
 }.
 
-Template bij: ['clean'] doen: {
-	eigen content :=
+Sjabloon bij: ['opschonen'] doen: {
+	eigen inhoud :=
 		Patroon
 		nieuw: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		overeenkomst: eigen content
+		overeenkomst: eigen inhoud
 		doen: { <- ['']. }.
 }.
 
-Template bij: ['clean-cuts'] doen: {
-	>> items := Reeks nieuw.
+Sjabloon bij: ['knipsels-opschonen'] doen: {
+	>> elementen := Reeks nieuw.
 	Patroon
 	nieuw: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	overeenkomst: eigen content
-	doen: { :_ :part
-		items toevoegen: part ? 1.
+	overeenkomst: eigen inhoud
+	doen: { :_ :deel
+		elementen toevoegen: deel ? 1.
 	}.
-	items elk: { :_ :id
-		eigen content :=
+	elementen elk: { :_ :id
+		eigen inhoud :=
 			Patroon nieuw: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			overeenkomst: eigen content
+			overeenkomst: eigen inhoud
 			doen: { <- ['']. }.
 	 }.
 }.
 
-Template bij: ['clean-space'] doen: {
-	eigen content :=
+Sjabloon bij: ['witruimte-opschonen'] doen: {
+	eigen inhoud :=
 		Patroon
 		nieuw: ['\\s*\\n'],
-		overeenkomst: eigen content
+		overeenkomst: eigen inhoud
 		doen: { <- ['\n']. }.
-	eigen content :=
+	eigen inhoud :=
 		Patroon
 		nieuw: ['\\n[\\s\\t]+'],
-		overeenkomst: eigen content
+		overeenkomst: eigen inhoud
 		doen: { <- ['\n']. }.
 }.
 
-Template bij: ['clean-all'] doen: {
-	zelf clean.
-	zelf clean-cuts.
-	zelf clean-space.
+Sjabloon bij: ['alles-opschonen'] doen: {
+	zelf opschonen.
+	zelf knipsels-opschonen.
+	zelf witruimte-opschonen.
 }.
 
-Template bij: ['tekst'] doen: { <- eigen content.
+Sjabloon bij: ['tekst'] doen: { <- eigen inhoud.
 }.

@@ -1,301 +1,301 @@
-Petició-HTTP en: ['HTTP-header:'] fes: { :key <- Programa configuració: key.
+Petició-HTTP en: ['HTTP-capçalera:'] fes: { :clau <- Programa configuració: clau.
 }.
 
->> HTTP-Header := Objecte nou.
+>> Capçalera-HTTP := Objecte nou.
 
-HTTP-Header en: ['nou'] fes: { <- jo nou init.
+Capçalera-HTTP en: ['nou'] fes: { <- jo nou inicialitzar.
 }.
 
-HTTP-Header en: ['init'] fes: {
-	propi key := Res.
-	propi value := Res.
+Capçalera-HTTP en: ['inicialitzar'] fes: {
+	propi clau := Res.
+	propi valor := Res.
 }.
 
-HTTP-Header en: ['key:value:'] fes: { :key :value
-	propi key := key.
-	propi value := value.
+Capçalera-HTTP en: ['clau:valor:'] fes: { :clau :valor
+	propi clau := clau.
+	propi valor := valor.
 }.
 
-HTTP-Header en: ['key'] fes: { <- propi key.
+Capçalera-HTTP en: ['clau'] fes: { <- propi clau.
 }.
 
-HTTP-Header en: ['value'] fes: { <- propi value.
+Capçalera-HTTP en: ['valor'] fes: { <- propi valor.
 }.
 
 
-HTTP-Header en: ['text'] fes: {
-	>> line := propi key + [': '] + propi value.
-	line substitueix: ['\r'] per: [''], substitueix: ['\n'] per: ['']. <- line + [' \r\n'].
+Capçalera-HTTP en: ['text'] fes: {
+	>> línia := propi clau + [': '] + propi valor.
+	línia substitueix: ['\r'] per: [''], substitueix: ['\n'] per: ['']. <- línia + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Objecte nou.
+>> Document-Web := Objecte nou.
 
-Web-Document en: ['nou'] fes: { <- jo nou init.
+Document-Web en: ['nou'] fes: { <- jo nou inicialitzar.
 }.
 
-Web-Document en: ['init'] fes: {
-	propi headers := Llista nou.
-	propi sess-id := Res.
-	propi session-manager := Tempfile-Session nou.
-	propi sessdata := Res.
-	propi secure := Cert.
-	propi same-site := ['Strict'].
-	propi headers-out := Fals.
-	propi request := Petició-HTTP nou.
+Document-Web en: ['inicialitzar'] fes: {
+	propi capçaleres := Llista nou.
+	propi id-sessió := Res.
+	propi gestor-sessió := Sessió-fitxer-temporal nou.
+	propi dades-sessió := Res.
+	propi segur := Cert.
+	propi mateix-lloc := ['Strict'].
+	propi capçaleres-enviades := Fals.
+	propi petició := Petició-HTTP nou.
 }.
 
-Web-Document en: ['request:'] fes: { :request
-	propi request := request.
+Document-Web en: ['petició:'] fes: { :petició
+	propi petició := petició.
 }. 
 
-Web-Document en: ['secure-session-cookie:'] fes: { :secure
-	jo check-headers.
-	propi secure := secure.
+Document-Web en: ['galeta-sessió-segura:'] fes: { :segur
+	jo comprovar-capçaleres.
+	propi segur := segur.
 }.
 
-Web-Document en: ['same-site-session-cookie:'] fes: { :value
-	jo check-headers.
-	>> options := Llista nou 
+Document-Web en: ['galeta-sessió-mateix-lloc:'] fes: { :valor
+	jo comprovar-capçaleres.
+	>> opcions := Llista nou 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options conté: value, fals: {
+	opcions té: valor, fals: {
 		aquesta-tasca error: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	propi same-site := value.
+	propi mateix-lloc := valor.
 }.
 
-Web-Document en: ['header:'] fes: { :header
-	jo check-headers.
-	propi headers afegeix-al-final: header.
+Document-Web en: ['capçalera:'] fes: { :capçalera
+	jo comprovar-capçaleres.
+	propi capçaleres afegeix-al-final: capçalera.
 }.
 
-Web-Document en: ['clear-headers'] fes: {
-	jo check-headers.
-	propi headers := Llista nou.
+Document-Web en: ['buidar-capçaleres'] fes: {
+	jo comprovar-capçaleres.
+	propi capçaleres := Llista nou.
 }.
 
-Web-Document en: ['session-manager:'] fes: { :manager
-	jo check-headers.
-	propi session-manager := manager.
+Document-Web en: ['gestor-sessió:'] fes: { :gestor
+	jo comprovar-capçaleres.
+	propi gestor-sessió := gestor.
 }.
 
-Web-Document en: ['session-manager'] fes: { <- propi session-manager.
+Document-Web en: ['gestor-sessió'] fes: { <- propi gestor-sessió.
 }.
 
-Web-Document en: ['check-headers'] fes: {
-	propi headers-out cert: {
+Document-Web en: ['comprovar-capçaleres'] fes: {
+	propi capçaleres-enviades cert: {
 		aquesta-tasca error: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document en: ['session-start'] fes: {
-	jo check-headers.
-	>> request := propi request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Res? fals: {
-		(( Patró nou: ['^[A-Za-z0-9]+\\z'], coincidència: sess-id ) = 0) cert: {
-			sess-id := Res.
+Document-Web en: ['iniciar-sessió'] fes: {
+	jo comprovar-capçaleres.
+	>> petició := propi petició.
+	>> id-sessió := petició cookie: ['xsid'].
+	id-sessió Res? fals: {
+		(( Patró nou: ['^[A-Za-z0-9]+\\z'], coincidència: id-sessió ) = 0) cert: {
+			id-sessió := Res.
 		}.
 	}.
-	sess-id Res? cert: {
-		sess-id := Caixa-forta token: 30.
-		>> session-header := HTTP-Header nou
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (propi secure o-bé: ['Secure'] o: ['']),
-		SSITE: (propi same-site),
-		XSID: sess-id
+	id-sessió Res? cert: {
+		id-sessió := Caixa-forta token: 30.
+		>> capçalera-sessió := Capçalera-HTTP nou
+		clau: ['Set-Cookie'] valor: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (propi segur o-bé: ['Secure'] o: ['']),
+		SSITE: (propi mateix-lloc),
+		XSID: id-sessió
 		).
-		propi headers afegeix-al-final: session-header.
+		propi capçaleres afegeix-al-final: capçalera-sessió.
 	}.
-	propi sessdata := propi session-manager for: sess-id, load. <- propi sessdata. # reference
+	propi dades-sessió := propi gestor-sessió per-a: id-sessió, carregar. <- propi dades-sessió. # reference
 }.
 
-Web-Document en: ['goto:'] fes: { :url
-	jo check-headers.
-	jo clear-headers.
-	propi headers
+Document-Web en: ['anar-a:'] fes: { :adreça
+	jo comprovar-capçaleres.
+	jo buidar-capçaleres.
+	propi capçaleres
 	afegeix-al-final: (
-		HTTP-Header nou
-		key: ['Status'] value: ['303 See Other']
+		Capçalera-HTTP nou
+		clau: ['Status'] valor: ['303 See Other']
 	),
 	afegeix-al-final: (
-		HTTP-Header nou
-		key: ['Location'] value: url
+		Capçalera-HTTP nou
+		clau: ['Location'] valor: adreça
 	).
-	jo out: ['Redirect'].
+	jo emetre: ['Redirect'].
 }.
 
-Web-Document en: ['session-destroy'] fes: {
-	jo check-headers.
-	>> request := propi request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Res? fals: {
-		>> session-header := HTTP-Header nou.
-		>> when := Moment nou any: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Document-Web en: ['destruir-sessió'] fes: {
+	jo comprovar-capçaleres.
+	>> petició := propi petició.
+	>> id-sessió := petició cookie: ['xsid'].
+	id-sessió Res? fals: {
+		>> capçalera-sessió := Capçalera-HTTP nou.
+		>> moment := Moment nou any: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		capçalera-sessió clau: ['Set-Cookie'] valor: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (propi secure o-bé: ['Secure'] o: ['']),
-			SSITE: (propi same-site),
-			XSID: sess-id
+			EXP: moment,
+			SEC: (propi segur o-bé: ['Secure'] o: ['']),
+			SSITE: (propi mateix-lloc),
+			XSID: id-sessió
 		).
-		propi session-manager destroy.
-		propi headers afegeix-al-final: session-header.
+		propi gestor-sessió destruir.
+		propi capçaleres afegeix-al-final: capçalera-sessió.
 	}.
 }.
 
 
-Web-Document en: ['template:'] fes: { :camí <- Template nou: (Fitxer nou: camí, llegeix).
+Document-Web en: ['plantilla:'] fes: { :camí <- Plantilla nou: (Fitxer nou: camí, llegeix).
 }.
 
-Web-Document en: ['out:type:'] fes: { :output :tipus
-	propi headers-out fals: {
-		propi sessdata Res? fals: {
-			propi session-manager save: propi sessdata.
+Document-Web en: ['emetre:tipus:'] fes: { :sortida :tipus
+	propi capçaleres-enviades fals: {
+		propi dades-sessió Res? fals: {
+			propi gestor-sessió desar: propi dades-sessió.
 		}.
-		propi headers afegeix-al-final: (
-			HTTP-Header nou
-			key: ['Content-type'] value: tipus
+		propi capçaleres afegeix-al-final: (
+			Capçalera-HTTP nou
+			clau: ['Content-type'] valor: tipus
 		).
-		propi headers cada: { :_ :header
-			Sortida escriu: header.
+		propi capçaleres cada: { :_ :capçalera
+			Sortida escriu: capçalera.
 		}.
-		propi headers-out := Cert.
+		propi capçaleres-enviades := Cert.
 		Sortida escriu: ['\r\n'].
 	}.
-	Sortida escriu: output.
+	Sortida escriu: sortida.
 }.
 
-Web-Document en: ['finish:type:'] fes: { :output :tipus
-	propi headers-out fals: {
-		propi sessdata Res? fals: {
-			propi session-manager save: propi sessdata.
+Document-Web en: ['finalitzar:tipus:'] fes: { :sortida :tipus
+	propi capçaleres-enviades fals: {
+		propi dades-sessió Res? fals: {
+			propi gestor-sessió desar: propi dades-sessió.
 		}.
-		propi headers afegeix-al-final: (
-			HTTP-Header nou
-			key: ['Content-type'] value: tipus
+		propi capçaleres afegeix-al-final: (
+			Capçalera-HTTP nou
+			clau: ['Content-type'] valor: tipus
 		).
-		propi headers afegeix-al-final: (
-			HTTP-Header nou
-			key: ['Content-Length'] value: output text bytes
+		propi capçaleres afegeix-al-final: (
+			Capçalera-HTTP nou
+			clau: ['Content-Length'] valor: sortida text bytes
 		).
-		propi headers cada: { :_ :header
-			Sortida escriu: header.
+		propi capçaleres cada: { :_ :capçalera
+			Sortida escriu: capçalera.
 		}.
-		propi headers-out := Cert.
+		propi capçaleres-enviades := Cert.
 		Sortida escriu: ['\r\n'].
 	}.
-	Sortida escriu: output.
+	Sortida escriu: sortida.
 }.
 
-Web-Document en: ['out:'] fes: { :output
-	jo out: output type: ['text/html; charset=utf-8'].
+Document-Web en: ['emetre:'] fes: { :sortida
+	jo emetre: sortida tipus: ['text/html; charset=utf-8'].
 }.
 
-Web-Document en: ['finish:'] fes: { :output
-	jo finish: output type: ['text/html; charset=utf-8'].
+Document-Web en: ['finalitzar:'] fes: { :sortida
+	jo finalitzar: sortida tipus: ['text/html; charset=utf-8'].
 }.
 
-Web-Document en: ['json:'] fes: { :output
-	jo out: ( JSON jsonify: output ) type: ['application/json'].
+Document-Web en: ['json:'] fes: { :sortida
+	jo emetre: ( JSON jsonify: sortida ) tipus: ['application/json'].
 }.
 
-Web-Document en: ['not-found:'] fes: { :output
-	jo clear-headers header: (
-		HTTP-Header nou key: ['Status'] value: ['404 Not Found']
+Document-Web en: ['no-trobat:'] fes: { :sortida
+	jo buidar-capçaleres capçalera: (
+		Capçalera-HTTP nou clau: ['Status'] valor: ['404 Not Found']
 	).
-	jo out: output.
+	jo emetre: sortida.
 }.
 
 
 # Interface
 
->> Session := Objecte nou.
+>> Sessió := Objecte nou.
 
-Session en: ['nou'] fes: { <- jo nou init for: Res.
+Sessió en: ['nou'] fes: { <- jo nou inicialitzar per-a: Res.
 }.
 
-Session en: ['for:'] fes: { :id
+Sessió en: ['per-a:'] fes: { :id
 	propi id := id.
 }.
 
-Session en: ['load'] fes: {
+Sessió en: ['carregar'] fes: {
 	aquesta-tasca error: ['Not implemented.'].
 }.
 
-Session en: ['save:'] fes: {
+Sessió en: ['desar:'] fes: {
 	aquesta-tasca error: ['Not implemented.'].
 }.
 
-Session en: ['destroy'] fes: {
+Sessió en: ['destruir'] fes: {
 	aquesta-tasca error: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session nou.
+>> Sessió-fitxer-temporal := Sessió nou.
 
-Tempfile-Session en: ['init'] fes: {
-	propi pathprefix := ['/tmp/sess-'].
+Sessió-fitxer-temporal en: ['inicialitzar'] fes: {
+	propi prefixcamí := ['/tmp/sess-'].
 }.
 
-Tempfile-Session en: ['path-prefix:'] fes: { :str
-	propi pathprefix := str.
+Sessió-fitxer-temporal en: ['prefix-camí:'] fes: { :cadena
+	propi prefixcamí := cadena.
 }.
 
-Tempfile-Session en: ['file'] fes: { <- ( Fitxer nou: ( propi pathprefix + propi id + ['.txt'] ) ).
+Sessió-fitxer-temporal en: ['fitxer'] fes: { <- ( Fitxer nou: ( propi prefixcamí + propi id + ['.txt'] ) ).
 }.
 
-Tempfile-Session en: ['load'] fes: {
-	>> file := jo file.
-	file existeix fals: {
-		file escriu: (Diccionari nou codi).
-	}. <- file llegeix objecte.
+Sessió-fitxer-temporal en: ['carregar'] fes: {
+	>> fitxer := jo fitxer.
+	fitxer existeix fals: {
+		fitxer escriu: (Diccionari nou codi).
+	}. <- fitxer llegeix objecte.
 }.
 
-Tempfile-Session en: ['save:'] fes: { :data
-	>> file := jo file.
-	file existeix cert: {
-		file escriu: data codi.
+Sessió-fitxer-temporal en: ['desar:'] fes: { :dades
+	>> fitxer := jo fitxer.
+	fitxer existeix cert: {
+		fitxer escriu: dades codi.
 	}.
 }.
 
-Tempfile-Session en: ['destroy'] fes: {
-	>> file := jo file.
-	file existeix cert: {
-		file suprimeix.
+Sessió-fitxer-temporal en: ['destruir'] fes: {
+	>> fitxer := jo fitxer.
+	fitxer existeix cert: {
+		fitxer suprimeix.
 	}.
 }.
 
 
 >> URL := Objecte nou.
 
-URL en: ['init'] fes: {
+URL en: ['inicialitzar'] fes: {
 	propi protocol := ['https://'].
 	propi amfitrió := ['localhost'].
 	propi camí := [''].
-	propi params := [''].
+	propi paràmetres-url := [''].
 	propi hash := [''].
 }.
 
-URL en: ['nou'] fes: { <- jo nou init.
+URL en: ['nou'] fes: { <- jo nou inicialitzar.
 }.
 
 URL en: ['text'] fes: { <- (
 	propi protocol +
 	propi amfitrió +
 	propi camí +
-	propi params +
+	propi paràmetres-url +
 	propi hash ).
 }.
 
 URL en: ['protocol:'] fes: { :protocol
-	((Llista nou: ['http'] ; ['https']) conté: protocol) cert: {
+	((Llista nou ; ['http'] ; ['https']) té: protocol) cert: {
 		propi protocol := protocol + ['://'].
 	}, fals: {
 		aquesta-tasca error: ['Invalid protocol'].
@@ -307,16 +307,16 @@ URL en: ['amfitrió:'] fes: { :amfitrió
 	propi amfitrió := amfitrió.
 }.
 
-URL en: ['path:'] fes: { :camí
+URL en: ['camí:'] fes: { :camí
 	propi camí := ['/'] + camí url-codifica.
 }.
 
-URL en: ['params:'] fes: { :map
-	>> params := Llista nou.
-	map cada: { :key :value
-		params afegeix-al-final: key text url-codifica + ['='] + value text url-codifica.
+URL en: ['paràmetres-url:'] fes: { :mapa
+	>> paràmetres-url := Llista nou.
+	mapa cada: { :clau :valor
+		paràmetres-url afegeix-al-final: clau text url-codifica + ['='] + valor text url-codifica.
 	}.
-	propi params := ['?'] + ( params uneix: ['&'] ).
+	propi paràmetres-url := ['?'] + ( paràmetres-url uneix: ['&'] ).
 }.
 
 URL en: ['resum:'] fes: { :hash

@@ -1,302 +1,302 @@
-طلب-HTTP عند: ['HTTP-header:'] نفذ: { :key <- برنامج إعداد: key.
+طلب-HTTP عند: ['HTTP-ترويسة:'] نفذ: { :مفتاح <- برنامج إعداد: مفتاح.
 }.
 
->> HTTP-Header := كائن جديد.
+>> ترويسة-HTTP := كائن جديد.
 
-HTTP-Header عند: ['جديد'] نفذ: { <- ذات جديد init.
+ترويسة-HTTP عند: ['جديد'] نفذ: { <- ذات جديد هيئ.
 }.
 
-HTTP-Header عند: ['init'] نفذ: {
-	خاص key := لاشيء.
-	خاص value := لاشيء.
+ترويسة-HTTP عند: ['هيئ'] نفذ: {
+	خاص مفتاح := لاشيء.
+	خاص قيمة := لاشيء.
 }.
 
-HTTP-Header عند: ['key:value:'] نفذ: { :key :value
-	خاص key := key.
-	خاص value := value.
+ترويسة-HTTP عند: ['مفتاح:قيمة:'] نفذ: { :مفتاح :قيمة
+	خاص مفتاح := مفتاح.
+	خاص قيمة := قيمة.
 }.
 
-HTTP-Header عند: ['key'] نفذ: { <- خاص key.
+ترويسة-HTTP عند: ['مفتاح'] نفذ: { <- خاص مفتاح.
 }.
 
-HTTP-Header عند: ['value'] نفذ: { <- خاص value.
+ترويسة-HTTP عند: ['قيمة'] نفذ: { <- خاص قيمة.
 }.
 
 
-HTTP-Header عند: ['كنص'] نفذ: {
-	>> line := خاص key + [': '] + خاص value.
-	line استبدل: ['\r'] ببديل: [''], استبدل: ['\n'] ببديل: ['']. <- line + [' \r\n'].
+ترويسة-HTTP عند: ['كنص'] نفذ: {
+	>> سطر := خاص مفتاح + [': '] + خاص قيمة.
+	سطر استبدل: ['\r'] ببديل: [''], استبدل: ['\n'] ببديل: ['']. <- سطر + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := كائن جديد.
+>> مستند-ويب := كائن جديد.
 
-Web-Document عند: ['جديد'] نفذ: { <- ذات جديد init.
+مستند-ويب عند: ['جديد'] نفذ: { <- ذات جديد هيئ.
 }.
 
-Web-Document عند: ['init'] نفذ: {
-	خاص headers := قائمة جديد.
-	خاص sess-id := لاشيء.
-	خاص session-manager := Tempfile-Session جديد.
-	خاص sessdata := لاشيء.
-	خاص secure := صحيح.
-	خاص same-site := ['Strict'].
-	خاص headers-out := خطأ.
-	خاص request := طلب-HTTP جديد.
+مستند-ويب عند: ['هيئ'] نفذ: {
+	خاص ترويسات := قائمة جديد.
+	خاص معرف-الجلسة := لاشيء.
+	خاص مدير-الجلسات := جلسة-ملف-مؤقت جديد.
+	خاص بيانات-الجلسة := لاشيء.
+	خاص آمن := صحيح.
+	خاص نفس-الموقع := ['Strict'].
+	خاص ترويسات-مرسلة := خطأ.
+	خاص طلب-http := طلب-HTTP جديد.
 }.
 
-Web-Document عند: ['request:'] نفذ: { :request
-	خاص request := request.
+مستند-ويب عند: ['طلب-http:'] نفذ: { :طلب-http
+	خاص طلب-http := طلب-http.
 }. 
 
-Web-Document عند: ['secure-session-cookie:'] نفذ: { :secure
-	ذات check-headers.
-	خاص secure := secure.
+مستند-ويب عند: ['كعكة-جلسة-آمنة:'] نفذ: { :آمن
+	ذات افحص-الترويسات.
+	خاص آمن := آمن.
 }.
 
-Web-Document عند: ['same-site-session-cookie:'] نفذ: { :value
-	ذات check-headers.
-	>> options := قائمة جديد 
+مستند-ويب عند: ['كعكة-جلسة-نفس-الموقع:'] نفذ: { :قيمة
+	ذات افحص-الترويسات.
+	>> خيارات := قائمة جديد 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options يحتوي: value, إذا-خطأ: {
+	خيارات يملك: قيمة, إذا-خطأ: {
 		هذه-المهمة خطأ-مخرج: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	خاص same-site := value.
+	خاص نفس-الموقع := قيمة.
 }.
 
-Web-Document عند: ['header:'] نفذ: { :header
-	ذات check-headers.
-	خاص headers ألحق: header.
+مستند-ويب عند: ['ترويسة:'] نفذ: { :ترويسة
+	ذات افحص-الترويسات.
+	خاص ترويسات ألحق: ترويسة.
 }.
 
-Web-Document عند: ['clear-headers'] نفذ: {
-	ذات check-headers.
-	خاص headers := قائمة جديد.
+مستند-ويب عند: ['أفرغ-الترويسات'] نفذ: {
+	ذات افحص-الترويسات.
+	خاص ترويسات := قائمة جديد.
 }.
 
-Web-Document عند: ['session-manager:'] نفذ: { :manager
-	ذات check-headers.
-	خاص session-manager := manager.
+مستند-ويب عند: ['مدير-الجلسات:'] نفذ: { :مدير
+	ذات افحص-الترويسات.
+	خاص مدير-الجلسات := مدير.
 }.
 
-Web-Document عند: ['session-manager'] نفذ: { <- خاص session-manager.
+مستند-ويب عند: ['مدير-الجلسات'] نفذ: { <- خاص مدير-الجلسات.
 }.
 
-Web-Document عند: ['check-headers'] نفذ: {
-	خاص headers-out إذا-صحيح: {
+مستند-ويب عند: ['افحص-الترويسات'] نفذ: {
+	خاص ترويسات-مرسلة إذا-صحيح: {
 		هذه-المهمة خطأ-مخرج: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document عند: ['session-start'] نفذ: {
-	ذات check-headers.
-	>> request := خاص request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id لاشيء? إذا-خطأ: {
-		(( نمط جديد: ['^[A-Za-z0-9]+\\z'], طابق: sess-id ) = 0) إذا-صحيح: {
-			sess-id := لاشيء.
+مستند-ويب عند: ['ابدأ-الجلسة'] نفذ: {
+	ذات افحص-الترويسات.
+	>> طلب-http := خاص طلب-http.
+	>> معرف-الجلسة := طلب-http cookie: ['xsid'].
+	معرف-الجلسة لاشيء? إذا-خطأ: {
+		(( نمط جديد: ['^[A-Za-z0-9]+\\z'], طابق: معرف-الجلسة ) = 0) إذا-صحيح: {
+			معرف-الجلسة := لاشيء.
 		}.
 	}.
-	sess-id لاشيء? إذا-صحيح: {
-		sess-id := خزنة رمز-مميز: 30.
-		>> session-header := HTTP-Header جديد
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (خاص secure إما: ['Secure'] وإما: ['']),
-		SSITE: (خاص same-site),
-		XSID: sess-id
+	معرف-الجلسة لاشيء? إذا-صحيح: {
+		معرف-الجلسة := خزنة رمز-مميز: 30.
+		>> ترويسة-الجلسة := ترويسة-HTTP جديد
+		مفتاح: ['Set-Cookie'] قيمة: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (خاص آمن إما: ['Secure'] وإما: ['']),
+		SSITE: (خاص نفس-الموقع),
+		XSID: معرف-الجلسة
 		).
-		خاص headers ألحق: session-header.
+		خاص ترويسات ألحق: ترويسة-الجلسة.
 	}.
-	خاص sessdata := خاص session-manager for: sess-id, load. <- خاص sessdata. # reference
+	خاص بيانات-الجلسة := خاص مدير-الجلسات لأجل: معرف-الجلسة, حمل. <- خاص بيانات-الجلسة. # reference
 }.
 
-Web-Document عند: ['goto:'] نفذ: { :url
-	ذات check-headers.
-	ذات clear-headers.
-	خاص headers
+مستند-ويب عند: ['اذهب-إلى:'] نفذ: { :عنوان
+	ذات افحص-الترويسات.
+	ذات أفرغ-الترويسات.
+	خاص ترويسات
 	ألحق: (
-		HTTP-Header جديد
-		key: ['Status'] value: ['303 See Other']
+		ترويسة-HTTP جديد
+		مفتاح: ['Status'] قيمة: ['303 See Other']
 	),
 	ألحق: (
-		HTTP-Header جديد
-		key: ['Location'] value: url
+		ترويسة-HTTP جديد
+		مفتاح: ['Location'] قيمة: عنوان
 	).
-	ذات out: ['Redirect'].
+	ذات أخرج: ['Redirect'].
 }.
 
-Web-Document عند: ['session-destroy'] نفذ: {
-	ذات check-headers.
-	>> request := خاص request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id لاشيء? إذا-خطأ: {
-		>> session-header := HTTP-Header جديد.
-		>> when := لحظة جديد سنة: 1970, بتنسيق: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+مستند-ويب عند: ['دمر-الجلسة'] نفذ: {
+	ذات افحص-الترويسات.
+	>> طلب-http := خاص طلب-http.
+	>> معرف-الجلسة := طلب-http cookie: ['xsid'].
+	معرف-الجلسة لاشيء? إذا-خطأ: {
+		>> ترويسة-الجلسة := ترويسة-HTTP جديد.
+		>> وقت-انتهاء := لحظة جديد سنة: 1970, بتنسيق: ['%a, %d %b %Y %H:%M:%S GMT'].
+		ترويسة-الجلسة مفتاح: ['Set-Cookie'] قيمة: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (خاص secure إما: ['Secure'] وإما: ['']),
-			SSITE: (خاص same-site),
-			XSID: sess-id
+			EXP: وقت-انتهاء,
+			SEC: (خاص آمن إما: ['Secure'] وإما: ['']),
+			SSITE: (خاص نفس-الموقع),
+			XSID: معرف-الجلسة
 		).
-		خاص session-manager destroy.
-		خاص headers ألحق: session-header.
+		خاص مدير-الجلسات دمر.
+		خاص ترويسات ألحق: ترويسة-الجلسة.
 	}.
 }.
 
 
-Web-Document عند: ['template:'] نفذ: { :مسار-الملف <- Template جديد: (ملف جديد: مسار-الملف, اقرأ).
+مستند-ويب عند: ['قالب:'] نفذ: { :مسار-الملف <- قالب جديد: (ملف جديد: مسار-الملف, اقرأ).
 }.
 
-Web-Document عند: ['out:type:'] نفذ: { :output :نوع
-	خاص headers-out إذا-خطأ: {
-		خاص sessdata لاشيء? إذا-خطأ: {
-			خاص session-manager save: خاص sessdata.
+مستند-ويب عند: ['أخرج:نوع:'] نفذ: { :ناتج :نوع
+	خاص ترويسات-مرسلة إذا-خطأ: {
+		خاص بيانات-الجلسة لاشيء? إذا-خطأ: {
+			خاص مدير-الجلسات احفظ: خاص بيانات-الجلسة.
 		}.
-		خاص headers ألحق: (
-			HTTP-Header جديد
-			key: ['Content-type'] value: نوع
+		خاص ترويسات ألحق: (
+			ترويسة-HTTP جديد
+			مفتاح: ['Content-type'] قيمة: نوع
 		).
-		خاص headers لكل: { :_ :header
-			مخرج اكتب: header.
+		خاص ترويسات لكل: { :_ :ترويسة
+			مخرج اكتب: ترويسة.
 		}.
-		خاص headers-out := صحيح.
+		خاص ترويسات-مرسلة := صحيح.
 		مخرج اكتب: ['\r\n'].
 	}.
-	مخرج اكتب: output.
+	مخرج اكتب: ناتج.
 }.
 
-Web-Document عند: ['finish:type:'] نفذ: { :output :نوع
-	خاص headers-out إذا-خطأ: {
-		خاص sessdata لاشيء? إذا-خطأ: {
-			خاص session-manager save: خاص sessdata.
+مستند-ويب عند: ['أنه:نوع:'] نفذ: { :ناتج :نوع
+	خاص ترويسات-مرسلة إذا-خطأ: {
+		خاص بيانات-الجلسة لاشيء? إذا-خطأ: {
+			خاص مدير-الجلسات احفظ: خاص بيانات-الجلسة.
 		}.
-		خاص headers ألحق: (
-			HTTP-Header جديد
-			key: ['Content-type'] value: نوع
+		خاص ترويسات ألحق: (
+			ترويسة-HTTP جديد
+			مفتاح: ['Content-type'] قيمة: نوع
 		).
-		خاص headers ألحق: (
-			HTTP-Header جديد
-			key: ['Content-Length'] value: output كنص بايتات
+		خاص ترويسات ألحق: (
+			ترويسة-HTTP جديد
+			مفتاح: ['Content-Length'] قيمة: ناتج كنص بايتات
 		).
-		خاص headers لكل: { :_ :header
-			مخرج اكتب: header.
+		خاص ترويسات لكل: { :_ :ترويسة
+			مخرج اكتب: ترويسة.
 		}.
-		خاص headers-out := صحيح.
+		خاص ترويسات-مرسلة := صحيح.
 		مخرج اكتب: ['\r\n'].
 	}.
-	مخرج اكتب: output.
+	مخرج اكتب: ناتج.
 }.
 
-Web-Document عند: ['out:'] نفذ: { :output
-	ذات out: output type: ['text/html; charset=utf-8'].
+مستند-ويب عند: ['أخرج:'] نفذ: { :ناتج
+	ذات أخرج: ناتج نوع: ['text/html; charset=utf-8'].
 }.
 
-Web-Document عند: ['finish:'] نفذ: { :output
-	ذات finish: output type: ['text/html; charset=utf-8'].
+مستند-ويب عند: ['أنه:'] نفذ: { :ناتج
+	ذات أنه: ناتج نوع: ['text/html; charset=utf-8'].
 }.
 
-Web-Document عند: ['json:'] نفذ: { :output
-	ذات out: ( JSON jsonify: output ) type: ['application/json'].
+مستند-ويب عند: ['json:'] نفذ: { :ناتج
+	ذات أخرج: ( JSON jsonify: ناتج ) نوع: ['application/json'].
 }.
 
-Web-Document عند: ['not-found:'] نفذ: { :output
-	ذات clear-headers header: (
-		HTTP-Header جديد key: ['Status'] value: ['404 Not Found']
+مستند-ويب عند: ['غير-موجود:'] نفذ: { :ناتج
+	ذات أفرغ-الترويسات ترويسة: (
+		ترويسة-HTTP جديد مفتاح: ['Status'] قيمة: ['404 Not Found']
 	).
-	ذات out: output.
+	ذات أخرج: ناتج.
 }.
 
 
 # Interface
 
->> Session := كائن جديد.
+>> جلسة := كائن جديد.
 
-Session عند: ['جديد'] نفذ: { <- ذات جديد init for: لاشيء.
+جلسة عند: ['جديد'] نفذ: { <- ذات جديد هيئ لأجل: لاشيء.
 }.
 
-Session عند: ['for:'] نفذ: { :id
+جلسة عند: ['لأجل:'] نفذ: { :id
 	خاص id := id.
 }.
 
-Session عند: ['load'] نفذ: {
+جلسة عند: ['حمل'] نفذ: {
 	هذه-المهمة خطأ-مخرج: ['Not implemented.'].
 }.
 
-Session عند: ['save:'] نفذ: {
+جلسة عند: ['احفظ:'] نفذ: {
 	هذه-المهمة خطأ-مخرج: ['Not implemented.'].
 }.
 
-Session عند: ['destroy'] نفذ: {
+جلسة عند: ['دمر'] نفذ: {
 	هذه-المهمة خطأ-مخرج: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session جديد.
+>> جلسة-ملف-مؤقت := جلسة جديد.
 
-Tempfile-Session عند: ['init'] نفذ: {
-	خاص pathprefix := ['/tmp/sess-'].
+جلسة-ملف-مؤقت عند: ['هيئ'] نفذ: {
+	خاص بداية-المسار := ['/tmp/sess-'].
 }.
 
-Tempfile-Session عند: ['path-prefix:'] نفذ: { :str
-	خاص pathprefix := str.
+جلسة-ملف-مؤقت عند: ['بادئة-المسار:'] نفذ: { :سلسلة-نصية
+	خاص بداية-المسار := سلسلة-نصية.
 }.
 
-Tempfile-Session عند: ['file'] نفذ: { <- ( ملف جديد: ( خاص pathprefix + خاص id + ['.txt'] ) ).
+جلسة-ملف-مؤقت عند: ['ملف-الجلسة'] نفذ: { <- ( ملف جديد: ( خاص بداية-المسار + خاص id + ['.txt'] ) ).
 }.
 
-Tempfile-Session عند: ['load'] نفذ: {
-	>> file := ذات file.
-	file موجود إذا-خطأ: {
-		file اكتب: (قاموس جديد شفرة).
-	}. <- file اقرأ ككائن.
+جلسة-ملف-مؤقت عند: ['حمل'] نفذ: {
+	>> ملف-الجلسة := ذات ملف-الجلسة.
+	ملف-الجلسة موجود إذا-خطأ: {
+		ملف-الجلسة اكتب: (قاموس جديد شفرة).
+	}. <- ملف-الجلسة اقرأ ككائن.
 }.
 
-Tempfile-Session عند: ['save:'] نفذ: { :data
-	>> file := ذات file.
-	file موجود إذا-صحيح: {
-		file اكتب: data شفرة.
+جلسة-ملف-مؤقت عند: ['احفظ:'] نفذ: { :بيانات
+	>> ملف-الجلسة := ذات ملف-الجلسة.
+	ملف-الجلسة موجود إذا-صحيح: {
+		ملف-الجلسة اكتب: بيانات شفرة.
 	}.
 }.
 
-Tempfile-Session عند: ['destroy'] نفذ: {
-	>> file := ذات file.
-	file موجود إذا-صحيح: {
-		file احذف.
+جلسة-ملف-مؤقت عند: ['دمر'] نفذ: {
+	>> ملف-الجلسة := ذات ملف-الجلسة.
+	ملف-الجلسة موجود إذا-صحيح: {
+		ملف-الجلسة احذف.
 	}.
 }.
 
 
 >> URL := كائن جديد.
 
-URL عند: ['init'] نفذ: {
-	خاص protocol := ['https://'].
+URL عند: ['هيئ'] نفذ: {
+	خاص بروتوكول := ['https://'].
 	خاص مضيف := ['localhost'].
 	خاص مسار-الملف := [''].
-	خاص params := [''].
+	خاص معاملات-url := [''].
 	خاص hash := [''].
 }.
 
-URL عند: ['جديد'] نفذ: { <- ذات جديد init.
+URL عند: ['جديد'] نفذ: { <- ذات جديد هيئ.
 }.
 
 URL عند: ['كنص'] نفذ: { <- (
-	خاص protocol +
+	خاص بروتوكول +
 	خاص مضيف +
 	خاص مسار-الملف +
-	خاص params +
+	خاص معاملات-url +
 	خاص hash ).
 }.
 
-URL عند: ['protocol:'] نفذ: { :protocol
-	((قائمة جديد: ['http'] ; ['https']) يحتوي: protocol) إذا-صحيح: {
-		خاص protocol := protocol + ['://'].
+URL عند: ['بروتوكول:'] نفذ: { :بروتوكول
+	((قائمة جديد ; ['http'] ; ['https']) يملك: بروتوكول) إذا-صحيح: {
+		خاص بروتوكول := بروتوكول + ['://'].
 	}, إذا-خطأ: {
 		هذه-المهمة خطأ-مخرج: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL عند: ['مضيف:'] نفذ: { :مضيف
 	خاص مضيف := مضيف.
 }.
 
-URL عند: ['path:'] نفذ: { :مسار-الملف
+URL عند: ['مسار-الملف:'] نفذ: { :مسار-الملف
 	خاص مسار-الملف := ['/'] + مسار-الملف url-ترميز.
 }.
 
-URL عند: ['params:'] نفذ: { :map
-	>> params := قائمة جديد.
-	map لكل: { :key :value
-		params ألحق: key كنص url-ترميز + ['='] + value كنص url-ترميز.
+URL عند: ['معاملات-url:'] نفذ: { :مطابقة
+	>> معاملات-url := قائمة جديد.
+	مطابقة لكل: { :مفتاح :قيمة
+		معاملات-url ألحق: مفتاح كنص url-ترميز + ['='] + قيمة كنص url-ترميز.
 	}.
-	خاص params := ['?'] + ( params ادمج: ['&'] ).
+	خاص معاملات-url := ['?'] + ( معاملات-url ادمج: ['&'] ).
 }.
 
 URL عند: ['تجزئة:'] نفذ: { :hash

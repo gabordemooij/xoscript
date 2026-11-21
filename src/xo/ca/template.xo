@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objecte nou.
+>> Plantilla := Objecte nou.
 
-Template en: ['nou'] fes: { <- jo nou content: [''].
+Plantilla en: ['nou'] fes: { <- jo nou contingut: [''].
 }.
 
-Template en: ['content:'] fes: { :content
-	propi content := content. 
+Plantilla en: ['contingut:'] fes: { :contingut
+	propi contingut := contingut. 
 }.
 
-Template en: ['nou:'] fes: { :content <- jo nou content: content.
+Plantilla en: ['nou:'] fes: { :contingut <- jo nou contingut: contingut.
 }.
 
-Template en: ['cut:'] fes: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := propi content divideix: startmarker.
+Plantilla en: ['retallar:'] fes: { :marcador
+	>> marcador-inici := (['<!-- cut:%id% -->'] %id%: marcador).
+	>> marcador-final := (['<!-- /cut:%id% -->'] %id%: marcador).
+	>> parts := propi contingut divideix: marcador-inici.
 	>> prefix := parts primer.
-	>> parts2 := parts últim divideix: endmarker.
-	>> suffix := parts2 últim.
+	>> parts2 := parts últim divideix: marcador-final.
+	>> sufix := parts2 últim.
 	>> part := parts2 primer.
-	>> rest := prefix + suffix.
-	propi content := rest. <- Template nou: part.
+	>> resta := prefix + sufix.
+	propi contingut := resta. <- Plantilla nou: part.
 	
 }.
 
-Template en: ['copia'] fes: { <- jo nou: jo text copia.
+Plantilla en: ['copia'] fes: { <- jo nou: jo text copia.
 }.
 	
-Template en: ['paste:at:'] fes: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	propi content substitueix: pastemarker per: ( snippet text + pastemarker ).
+Plantilla en: ['enganxar:a:'] fes: { :retall :id
+	>> marcador-enganxar := (['<!-- paste:%id% -->'] %id%: id).
+	propi contingut substitueix: marcador-enganxar per: ( retall text + marcador-enganxar ).
 }.
 
-Template en: ['estableix:valor:'] fes: { :slot :value
-	propi content substitueix: ['<!-- slot:'] + slot + [' -->'] per: ( Server html-codifica: value ).
+Plantilla en: ['estableix:valor:'] fes: { :espai :valor
+	propi contingut substitueix: ['<!-- slot:'] + espai + [' -->'] per: ( Server html-codifica: valor ).
 }.
 
-Template en: ['set:html:'] fes: { :slot :html
-	propi content substitueix: ['<!-- slot:'] + slot + [' -->'] per: html.
+Plantilla en: ['estableix:html:'] fes: { :espai :html
+	propi contingut substitueix: ['<!-- slot:'] + espai + [' -->'] per: html.
 }.
 
-Template en: ['respon:i:'] fes: { :slot :value
-	jo estableix: (slot de: 0 longitud: (slot longitud - 1)) valor: value.
+Plantilla en: ['respon:i:'] fes: { :espai :valor
+	jo estableix: (espai de: 0 longitud: (espai longitud - 1)) valor: valor.
 }.
 
-Template en: ['nl2br'] fes: {
-	propi content substitueix: ['\n'] per: ['<br>'].
+Plantilla en: ['nl2br'] fes: {
+	propi contingut substitueix: ['\n'] per: ['<br>'].
 }.
 
-Template en: ['clean'] fes: {
-	propi content :=
+Plantilla en: ['netejar'] fes: {
+	propi contingut :=
 		Patró
 		nou: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		coincidència: propi content
+		coincidència: propi contingut
 		fes: { <- ['']. }.
 }.
 
-Template en: ['clean-cuts'] fes: {
-	>> items := Llista nou.
+Plantilla en: ['netejar-talls'] fes: {
+	>> elements := Llista nou.
 	Patró
 	nou: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	coincidència: propi content
+	coincidència: propi contingut
 	fes: { :_ :part
-		items afegeix-al-final: part ? 1.
+		elements afegeix-al-final: part ? 1.
 	}.
-	items cada: { :_ :id
-		propi content :=
+	elements cada: { :_ :id
+		propi contingut :=
 			Patró nou: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			coincidència: propi content
+			coincidència: propi contingut
 			fes: { <- ['']. }.
 	 }.
 }.
 
-Template en: ['clean-space'] fes: {
-	propi content :=
+Plantilla en: ['netejar-espais'] fes: {
+	propi contingut :=
 		Patró
 		nou: ['\\s*\\n'],
-		coincidència: propi content
+		coincidència: propi contingut
 		fes: { <- ['\n']. }.
-	propi content :=
+	propi contingut :=
 		Patró
 		nou: ['\\n[\\s\\t]+'],
-		coincidència: propi content
+		coincidència: propi contingut
 		fes: { <- ['\n']. }.
 }.
 
-Template en: ['clean-all'] fes: {
-	jo clean.
-	jo clean-cuts.
-	jo clean-space.
+Plantilla en: ['netejar-tot'] fes: {
+	jo netejar.
+	jo netejar-talls.
+	jo netejar-espais.
 }.
 
-Template en: ['text'] fes: { <- propi content.
+Plantilla en: ['text'] fes: { <- propi contingut.
 }.

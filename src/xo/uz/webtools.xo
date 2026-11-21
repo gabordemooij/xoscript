@@ -1,302 +1,302 @@
-HTTP-Soʻrov kelganda: ['HTTP-header:'] bajar: { :key <- Dastur sozlama: key.
+HTTP-Soʻrov kelganda: ['HTTP-sarlavha:'] bajar: { :kalit <- Dastur sozlama: kalit.
 }.
 
->> HTTP-Header := Obyekt yangi.
+>> HTTP-Sarlavha := Obyekt yangi.
 
-HTTP-Header kelganda: ['yangi'] bajar: { <- oʻzi yangi init.
+HTTP-Sarlavha kelganda: ['yangi'] bajar: { <- oʻzi yangi ishga-tushir.
 }.
 
-HTTP-Header kelganda: ['init'] bajar: {
-	oʻzining key := Hech.
-	oʻzining value := Hech.
+HTTP-Sarlavha kelganda: ['ishga-tushir'] bajar: {
+	oʻzining kalit := Hech.
+	oʻzining qiymat := Hech.
 }.
 
-HTTP-Header kelganda: ['key:value:'] bajar: { :key :value
-	oʻzining key := key.
-	oʻzining value := value.
+HTTP-Sarlavha kelganda: ['kalit:qiymat:'] bajar: { :kalit :qiymat
+	oʻzining kalit := kalit.
+	oʻzining qiymat := qiymat.
 }.
 
-HTTP-Header kelganda: ['key'] bajar: { <- oʻzining key.
+HTTP-Sarlavha kelganda: ['kalit'] bajar: { <- oʻzining kalit.
 }.
 
-HTTP-Header kelganda: ['value'] bajar: { <- oʻzining value.
+HTTP-Sarlavha kelganda: ['qiymat'] bajar: { <- oʻzining qiymat.
 }.
 
 
-HTTP-Header kelganda: ['matn'] bajar: {
-	>> line := oʻzining key + [': '] + oʻzining value.
-	line almashtirish: ['\r'] bunga: [''], almashtirish: ['\n'] bunga: ['']. <- line + [' \r\n'].
+HTTP-Sarlavha kelganda: ['matn'] bajar: {
+	>> qator := oʻzining kalit + [': '] + oʻzining qiymat.
+	qator almashtirish: ['\r'] bunga: [''], almashtirish: ['\n'] bunga: ['']. <- qator + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Obyekt yangi.
+>> Veb-hujjat := Obyekt yangi.
 
-Web-Document kelganda: ['yangi'] bajar: { <- oʻzi yangi init.
+Veb-hujjat kelganda: ['yangi'] bajar: { <- oʻzi yangi ishga-tushir.
 }.
 
-Web-Document kelganda: ['init'] bajar: {
-	oʻzining headers := Roʻyxat yangi.
-	oʻzining sess-id := Hech.
-	oʻzining session-manager := Tempfile-Session yangi.
-	oʻzining sessdata := Hech.
-	oʻzining secure := Rost.
-	oʻzining same-site := ['Strict'].
-	oʻzining headers-out := Yolgʻon.
-	oʻzining request := HTTP-Soʻrov yangi.
+Veb-hujjat kelganda: ['ishga-tushir'] bajar: {
+	oʻzining sarlavhalar := Roʻyxat yangi.
+	oʻzining seans-id := Hech.
+	oʻzining seans-boshqaruvchisi := Vaqtinchalik-fayl-seansi yangi.
+	oʻzining seans-maʼlumotlari := Hech.
+	oʻzining xavfsiz := Rost.
+	oʻzining bir-xil-sayt := ['Strict'].
+	oʻzining sarlavhalar-yuborildi := Yolgʻon.
+	oʻzining http-soʻrov := HTTP-Soʻrov yangi.
 }.
 
-Web-Document kelganda: ['request:'] bajar: { :request
-	oʻzining request := request.
+Veb-hujjat kelganda: ['http-soʻrov:'] bajar: { :http-soʻrov
+	oʻzining http-soʻrov := http-soʻrov.
 }. 
 
-Web-Document kelganda: ['secure-session-cookie:'] bajar: { :secure
-	oʻzi check-headers.
-	oʻzining secure := secure.
+Veb-hujjat kelganda: ['xavfsiz-seans-cookie:'] bajar: { :xavfsiz
+	oʻzi sarlavhalarni-tekshir.
+	oʻzining xavfsiz := xavfsiz.
 }.
 
-Web-Document kelganda: ['same-site-session-cookie:'] bajar: { :value
-	oʻzi check-headers.
-	>> options := Roʻyxat yangi 
+Veb-hujjat kelganda: ['bir-xil-sayt-seans-cookie:'] bajar: { :qiymat
+	oʻzi sarlavhalarni-tekshir.
+	>> variantlar := Roʻyxat yangi 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options ichida-bor: value, yolgʻon-boʻlsa: {
+	variantlar bormi: qiymat, yolgʻon-boʻlsa: {
 		shu-vazifa xato: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	oʻzining same-site := value.
+	oʻzining bir-xil-sayt := qiymat.
 }.
 
-Web-Document kelganda: ['header:'] bajar: { :header
-	oʻzi check-headers.
-	oʻzining headers oxiriga-qoʻshish: header.
+Veb-hujjat kelganda: ['sarlavha:'] bajar: { :sarlavha
+	oʻzi sarlavhalarni-tekshir.
+	oʻzining sarlavhalar oxiriga-qoʻshish: sarlavha.
 }.
 
-Web-Document kelganda: ['clear-headers'] bajar: {
-	oʻzi check-headers.
-	oʻzining headers := Roʻyxat yangi.
+Veb-hujjat kelganda: ['sarlavhalarni-boʻshat'] bajar: {
+	oʻzi sarlavhalarni-tekshir.
+	oʻzining sarlavhalar := Roʻyxat yangi.
 }.
 
-Web-Document kelganda: ['session-manager:'] bajar: { :manager
-	oʻzi check-headers.
-	oʻzining session-manager := manager.
+Veb-hujjat kelganda: ['seans-boshqaruvchisi:'] bajar: { :boshqaruvchi
+	oʻzi sarlavhalarni-tekshir.
+	oʻzining seans-boshqaruvchisi := boshqaruvchi.
 }.
 
-Web-Document kelganda: ['session-manager'] bajar: { <- oʻzining session-manager.
+Veb-hujjat kelganda: ['seans-boshqaruvchisi'] bajar: { <- oʻzining seans-boshqaruvchisi.
 }.
 
-Web-Document kelganda: ['check-headers'] bajar: {
-	oʻzining headers-out rost-boʻlsa: {
+Veb-hujjat kelganda: ['sarlavhalarni-tekshir'] bajar: {
+	oʻzining sarlavhalar-yuborildi rost-boʻlsa: {
 		shu-vazifa xato: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document kelganda: ['session-start'] bajar: {
-	oʻzi check-headers.
-	>> request := oʻzining request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Hech? yolgʻon-boʻlsa: {
-		(( Andoza yangi: ['^[A-Za-z0-9]+\\z'], moslik: sess-id ) = 0) rost-boʻlsa: {
-			sess-id := Hech.
+Veb-hujjat kelganda: ['seansni-boshla'] bajar: {
+	oʻzi sarlavhalarni-tekshir.
+	>> http-soʻrov := oʻzining http-soʻrov.
+	>> seans-id := http-soʻrov cookie: ['xsid'].
+	seans-id Hech? yolgʻon-boʻlsa: {
+		(( Andoza yangi: ['^[A-Za-z0-9]+\\z'], moslik: seans-id ) = 0) rost-boʻlsa: {
+			seans-id := Hech.
 		}.
 	}.
-	sess-id Hech? rost-boʻlsa: {
-		sess-id := Seyf token: 30.
-		>> session-header := HTTP-Header yangi
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (oʻzining secure bu: ['Secure'] yoki-u: ['']),
-		SSITE: (oʻzining same-site),
-		XSID: sess-id
+	seans-id Hech? rost-boʻlsa: {
+		seans-id := Seyf token: 30.
+		>> seans-sarlavhasi := HTTP-Sarlavha yangi
+		kalit: ['Set-Cookie'] qiymat: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (oʻzining xavfsiz bu: ['Secure'] yoki-u: ['']),
+		SSITE: (oʻzining bir-xil-sayt),
+		XSID: seans-id
 		).
-		oʻzining headers oxiriga-qoʻshish: session-header.
+		oʻzining sarlavhalar oxiriga-qoʻshish: seans-sarlavhasi.
 	}.
-	oʻzining sessdata := oʻzining session-manager for: sess-id, load. <- oʻzining sessdata. # reference
+	oʻzining seans-maʼlumotlari := oʻzining seans-boshqaruvchisi uchun: seans-id, yukla. <- oʻzining seans-maʼlumotlari. # reference
 }.
 
-Web-Document kelganda: ['goto:'] bajar: { :url
-	oʻzi check-headers.
-	oʻzi clear-headers.
-	oʻzining headers
+Veb-hujjat kelganda: ['oʻt:'] bajar: { :manzil
+	oʻzi sarlavhalarni-tekshir.
+	oʻzi sarlavhalarni-boʻshat.
+	oʻzining sarlavhalar
 	oxiriga-qoʻshish: (
-		HTTP-Header yangi
-		key: ['Status'] value: ['303 See Other']
+		HTTP-Sarlavha yangi
+		kalit: ['Status'] qiymat: ['303 See Other']
 	),
 	oxiriga-qoʻshish: (
-		HTTP-Header yangi
-		key: ['Location'] value: url
+		HTTP-Sarlavha yangi
+		kalit: ['Location'] qiymat: manzil
 	).
-	oʻzi out: ['Redirect'].
+	oʻzi chiqar: ['Redirect'].
 }.
 
-Web-Document kelganda: ['session-destroy'] bajar: {
-	oʻzi check-headers.
-	>> request := oʻzining request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Hech? yolgʻon-boʻlsa: {
-		>> session-header := HTTP-Header yangi.
-		>> when := Lahza yangi yil: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Veb-hujjat kelganda: ['seansni-yoʻq-qil'] bajar: {
+	oʻzi sarlavhalarni-tekshir.
+	>> http-soʻrov := oʻzining http-soʻrov.
+	>> seans-id := http-soʻrov cookie: ['xsid'].
+	seans-id Hech? yolgʻon-boʻlsa: {
+		>> seans-sarlavhasi := HTTP-Sarlavha yangi.
+		>> lahza := Lahza yangi yil: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		seans-sarlavhasi kalit: ['Set-Cookie'] qiymat: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (oʻzining secure bu: ['Secure'] yoki-u: ['']),
-			SSITE: (oʻzining same-site),
-			XSID: sess-id
+			EXP: lahza,
+			SEC: (oʻzining xavfsiz bu: ['Secure'] yoki-u: ['']),
+			SSITE: (oʻzining bir-xil-sayt),
+			XSID: seans-id
 		).
-		oʻzining session-manager destroy.
-		oʻzining headers oxiriga-qoʻshish: session-header.
+		oʻzining seans-boshqaruvchisi yoʻq-qil.
+		oʻzining sarlavhalar oxiriga-qoʻshish: seans-sarlavhasi.
 	}.
 }.
 
 
-Web-Document kelganda: ['template:'] bajar: { :yoʻl <- Template yangi: (Fayl yangi: yoʻl, oʻqish).
+Veb-hujjat kelganda: ['qolip:'] bajar: { :yoʻl <- Qolip yangi: (Fayl yangi: yoʻl, oʻqish).
 }.
 
-Web-Document kelganda: ['out:type:'] bajar: { :output :tur
-	oʻzining headers-out yolgʻon-boʻlsa: {
-		oʻzining sessdata Hech? yolgʻon-boʻlsa: {
-			oʻzining session-manager save: oʻzining sessdata.
+Veb-hujjat kelganda: ['chiqar:tur:'] bajar: { :natija :tur
+	oʻzining sarlavhalar-yuborildi yolgʻon-boʻlsa: {
+		oʻzining seans-maʼlumotlari Hech? yolgʻon-boʻlsa: {
+			oʻzining seans-boshqaruvchisi saqla: oʻzining seans-maʼlumotlari.
 		}.
-		oʻzining headers oxiriga-qoʻshish: (
-			HTTP-Header yangi
-			key: ['Content-type'] value: tur
+		oʻzining sarlavhalar oxiriga-qoʻshish: (
+			HTTP-Sarlavha yangi
+			kalit: ['Content-type'] qiymat: tur
 		).
-		oʻzining headers har-bir: { :_ :header
-			Chiqish yozish: header.
+		oʻzining sarlavhalar har-bir: { :_ :sarlavha
+			Chiqish yozish: sarlavha.
 		}.
-		oʻzining headers-out := Rost.
+		oʻzining sarlavhalar-yuborildi := Rost.
 		Chiqish yozish: ['\r\n'].
 	}.
-	Chiqish yozish: output.
+	Chiqish yozish: natija.
 }.
 
-Web-Document kelganda: ['finish:type:'] bajar: { :output :tur
-	oʻzining headers-out yolgʻon-boʻlsa: {
-		oʻzining sessdata Hech? yolgʻon-boʻlsa: {
-			oʻzining session-manager save: oʻzining sessdata.
+Veb-hujjat kelganda: ['yakunla:tur:'] bajar: { :natija :tur
+	oʻzining sarlavhalar-yuborildi yolgʻon-boʻlsa: {
+		oʻzining seans-maʼlumotlari Hech? yolgʻon-boʻlsa: {
+			oʻzining seans-boshqaruvchisi saqla: oʻzining seans-maʼlumotlari.
 		}.
-		oʻzining headers oxiriga-qoʻshish: (
-			HTTP-Header yangi
-			key: ['Content-type'] value: tur
+		oʻzining sarlavhalar oxiriga-qoʻshish: (
+			HTTP-Sarlavha yangi
+			kalit: ['Content-type'] qiymat: tur
 		).
-		oʻzining headers oxiriga-qoʻshish: (
-			HTTP-Header yangi
-			key: ['Content-Length'] value: output matn bytes
+		oʻzining sarlavhalar oxiriga-qoʻshish: (
+			HTTP-Sarlavha yangi
+			kalit: ['Content-Length'] qiymat: natija matn bytes
 		).
-		oʻzining headers har-bir: { :_ :header
-			Chiqish yozish: header.
+		oʻzining sarlavhalar har-bir: { :_ :sarlavha
+			Chiqish yozish: sarlavha.
 		}.
-		oʻzining headers-out := Rost.
+		oʻzining sarlavhalar-yuborildi := Rost.
 		Chiqish yozish: ['\r\n'].
 	}.
-	Chiqish yozish: output.
+	Chiqish yozish: natija.
 }.
 
-Web-Document kelganda: ['out:'] bajar: { :output
-	oʻzi out: output type: ['text/html; charset=utf-8'].
+Veb-hujjat kelganda: ['chiqar:'] bajar: { :natija
+	oʻzi chiqar: natija tur: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kelganda: ['finish:'] bajar: { :output
-	oʻzi finish: output type: ['text/html; charset=utf-8'].
+Veb-hujjat kelganda: ['yakunla:'] bajar: { :natija
+	oʻzi yakunla: natija tur: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kelganda: ['json:'] bajar: { :output
-	oʻzi out: ( JSON jsonify: output ) type: ['application/json'].
+Veb-hujjat kelganda: ['json:'] bajar: { :natija
+	oʻzi chiqar: ( JSON jsonify: natija ) tur: ['application/json'].
 }.
 
-Web-Document kelganda: ['not-found:'] bajar: { :output
-	oʻzi clear-headers header: (
-		HTTP-Header yangi key: ['Status'] value: ['404 Not Found']
+Veb-hujjat kelganda: ['topilmadi:'] bajar: { :natija
+	oʻzi sarlavhalarni-boʻshat sarlavha: (
+		HTTP-Sarlavha yangi kalit: ['Status'] qiymat: ['404 Not Found']
 	).
-	oʻzi out: output.
+	oʻzi chiqar: natija.
 }.
 
 
 # Interface
 
->> Session := Obyekt yangi.
+>> Seans := Obyekt yangi.
 
-Session kelganda: ['yangi'] bajar: { <- oʻzi yangi init for: Hech.
+Seans kelganda: ['yangi'] bajar: { <- oʻzi yangi ishga-tushir uchun: Hech.
 }.
 
-Session kelganda: ['for:'] bajar: { :id
+Seans kelganda: ['uchun:'] bajar: { :id
 	oʻzining id := id.
 }.
 
-Session kelganda: ['load'] bajar: {
+Seans kelganda: ['yukla'] bajar: {
 	shu-vazifa xato: ['Not implemented.'].
 }.
 
-Session kelganda: ['save:'] bajar: {
+Seans kelganda: ['saqla:'] bajar: {
 	shu-vazifa xato: ['Not implemented.'].
 }.
 
-Session kelganda: ['destroy'] bajar: {
+Seans kelganda: ['yoʻq-qil'] bajar: {
 	shu-vazifa xato: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session yangi.
+>> Vaqtinchalik-fayl-seansi := Seans yangi.
 
-Tempfile-Session kelganda: ['init'] bajar: {
-	oʻzining pathprefix := ['/tmp/sess-'].
+Vaqtinchalik-fayl-seansi kelganda: ['ishga-tushir'] bajar: {
+	oʻzining yoʻl-boshi := ['/tmp/sess-'].
 }.
 
-Tempfile-Session kelganda: ['path-prefix:'] bajar: { :str
-	oʻzining pathprefix := str.
+Vaqtinchalik-fayl-seansi kelganda: ['yoʻl-prefiksi:'] bajar: { :satr
+	oʻzining yoʻl-boshi := satr.
 }.
 
-Tempfile-Session kelganda: ['file'] bajar: { <- ( Fayl yangi: ( oʻzining pathprefix + oʻzining id + ['.txt'] ) ).
+Vaqtinchalik-fayl-seansi kelganda: ['fayl'] bajar: { <- ( Fayl yangi: ( oʻzining yoʻl-boshi + oʻzining id + ['.txt'] ) ).
 }.
 
-Tempfile-Session kelganda: ['load'] bajar: {
-	>> file := oʻzi file.
-	file mavjud yolgʻon-boʻlsa: {
-		file yozish: (Lugʻat yangi kod).
-	}. <- file oʻqish obyekt.
+Vaqtinchalik-fayl-seansi kelganda: ['yukla'] bajar: {
+	>> fayl := oʻzi fayl.
+	fayl mavjud yolgʻon-boʻlsa: {
+		fayl yozish: (Lugʻat yangi kod).
+	}. <- fayl oʻqish obyekt.
 }.
 
-Tempfile-Session kelganda: ['save:'] bajar: { :data
-	>> file := oʻzi file.
-	file mavjud rost-boʻlsa: {
-		file yozish: data kod.
+Vaqtinchalik-fayl-seansi kelganda: ['saqla:'] bajar: { :maʼlumotlar
+	>> fayl := oʻzi fayl.
+	fayl mavjud rost-boʻlsa: {
+		fayl yozish: maʼlumotlar kod.
 	}.
 }.
 
-Tempfile-Session kelganda: ['destroy'] bajar: {
-	>> file := oʻzi file.
-	file mavjud rost-boʻlsa: {
-		file oʻchirish.
+Vaqtinchalik-fayl-seansi kelganda: ['yoʻq-qil'] bajar: {
+	>> fayl := oʻzi fayl.
+	fayl mavjud rost-boʻlsa: {
+		fayl oʻchirish.
 	}.
 }.
 
 
 >> URL := Obyekt yangi.
 
-URL kelganda: ['init'] bajar: {
-	oʻzining protocol := ['https://'].
+URL kelganda: ['ishga-tushir'] bajar: {
+	oʻzining protokol := ['https://'].
 	oʻzining xost := ['localhost'].
 	oʻzining yoʻl := [''].
-	oʻzining params := [''].
+	oʻzining url-parametrlari := [''].
 	oʻzining hash := [''].
 }.
 
-URL kelganda: ['yangi'] bajar: { <- oʻzi yangi init.
+URL kelganda: ['yangi'] bajar: { <- oʻzi yangi ishga-tushir.
 }.
 
 URL kelganda: ['matn'] bajar: { <- (
-	oʻzining protocol +
+	oʻzining protokol +
 	oʻzining xost +
 	oʻzining yoʻl +
-	oʻzining params +
+	oʻzining url-parametrlari +
 	oʻzining hash ).
 }.
 
-URL kelganda: ['protocol:'] bajar: { :protocol
-	((Roʻyxat yangi: ['http'] ; ['https']) ichida-bor: protocol) rost-boʻlsa: {
-		oʻzining protocol := protocol + ['://'].
+URL kelganda: ['protokol:'] bajar: { :protokol
+	((Roʻyxat yangi ; ['http'] ; ['https']) bormi: protokol) rost-boʻlsa: {
+		oʻzining protokol := protokol + ['://'].
 	}, yolgʻon-boʻlsa: {
 		shu-vazifa xato: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL kelganda: ['xost:'] bajar: { :xost
 	oʻzining xost := xost.
 }.
 
-URL kelganda: ['path:'] bajar: { :yoʻl
+URL kelganda: ['yoʻl:'] bajar: { :yoʻl
 	oʻzining yoʻl := ['/'] + yoʻl url-kodlash.
 }.
 
-URL kelganda: ['params:'] bajar: { :map
-	>> params := Roʻyxat yangi.
-	map har-bir: { :key :value
-		params oxiriga-qoʻshish: key matn url-kodlash + ['='] + value matn url-kodlash.
+URL kelganda: ['url-parametrlari:'] bajar: { :moslashtirish
+	>> url-parametrlari := Roʻyxat yangi.
+	moslashtirish har-bir: { :kalit :qiymat
+		url-parametrlari oxiriga-qoʻshish: kalit matn url-kodlash + ['='] + qiymat matn url-kodlash.
 	}.
-	oʻzining params := ['?'] + ( params birlashtirish: ['&'] ).
+	oʻzining url-parametrlari := ['?'] + ( url-parametrlari birlashtirish: ['&'] ).
 }.
 
 URL kelganda: ['xesh:'] bajar: { :hash

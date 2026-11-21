@@ -1,302 +1,302 @@
-HTTP-Zahteva ob: ['HTTP-header:'] izvedi: { :key <- Program nastavitev: key.
+HTTP-Zahteva ob: ['HTTP-glava:'] izvedi: { :ključ <- Program nastavitev: ključ.
 }.
 
->> HTTP-Header := Objekt nov.
+>> Glava-HTTP := Objekt nov.
 
-HTTP-Header ob: ['nov'] izvedi: { <- sebe nov init.
+Glava-HTTP ob: ['nov'] izvedi: { <- sebe nov inicializiraj.
 }.
 
-HTTP-Header ob: ['init'] izvedi: {
-	svoj key := Nič.
-	svoj value := Nič.
+Glava-HTTP ob: ['inicializiraj'] izvedi: {
+	svoj ključ := Nič.
+	svoj vrednost := Nič.
 }.
 
-HTTP-Header ob: ['key:value:'] izvedi: { :key :value
-	svoj key := key.
-	svoj value := value.
+Glava-HTTP ob: ['ključ:vrednost:'] izvedi: { :ključ :vrednost
+	svoj ključ := ključ.
+	svoj vrednost := vrednost.
 }.
 
-HTTP-Header ob: ['key'] izvedi: { <- svoj key.
+Glava-HTTP ob: ['ključ'] izvedi: { <- svoj ključ.
 }.
 
-HTTP-Header ob: ['value'] izvedi: { <- svoj value.
+Glava-HTTP ob: ['vrednost'] izvedi: { <- svoj vrednost.
 }.
 
 
-HTTP-Header ob: ['besedilo'] izvedi: {
-	>> line := svoj key + [': '] + svoj value.
-	line zamenjaj: ['\r'] z: [''], zamenjaj: ['\n'] z: ['']. <- line + [' \r\n'].
+Glava-HTTP ob: ['besedilo'] izvedi: {
+	>> vrstica := svoj ključ + [': '] + svoj vrednost.
+	vrstica zamenjaj: ['\r'] z: [''], zamenjaj: ['\n'] z: ['']. <- vrstica + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Objekt nov.
+>> Spletni-dokument := Objekt nov.
 
-Web-Document ob: ['nov'] izvedi: { <- sebe nov init.
+Spletni-dokument ob: ['nov'] izvedi: { <- sebe nov inicializiraj.
 }.
 
-Web-Document ob: ['init'] izvedi: {
-	svoj headers := Seznam nov.
-	svoj sess-id := Nič.
-	svoj session-manager := Tempfile-Session nov.
-	svoj sessdata := Nič.
-	svoj secure := Resnično.
-	svoj same-site := ['Strict'].
-	svoj headers-out := Neresnično.
-	svoj request := HTTP-Zahteva nov.
+Spletni-dokument ob: ['inicializiraj'] izvedi: {
+	svoj glave := Seznam nov.
+	svoj id-seje := Nič.
+	svoj upravitelj-sej := Seja-začasna-datoteka nov.
+	svoj podatki-seje := Nič.
+	svoj varno := Resnično.
+	svoj isto-mesto := ['Strict'].
+	svoj glave-poslane := Neresnično.
+	svoj zahteva := HTTP-Zahteva nov.
 }.
 
-Web-Document ob: ['request:'] izvedi: { :request
-	svoj request := request.
+Spletni-dokument ob: ['zahteva:'] izvedi: { :zahteva
+	svoj zahteva := zahteva.
 }. 
 
-Web-Document ob: ['secure-session-cookie:'] izvedi: { :secure
-	sebe check-headers.
-	svoj secure := secure.
+Spletni-dokument ob: ['varen-piškotek-seje:'] izvedi: { :varno
+	sebe preveri-glave.
+	svoj varno := varno.
 }.
 
-Web-Document ob: ['same-site-session-cookie:'] izvedi: { :value
-	sebe check-headers.
-	>> options := Seznam nov 
+Spletni-dokument ob: ['piškotek-seje-isto-mesto:'] izvedi: { :vrednost
+	sebe preveri-glave.
+	>> možnosti := Seznam nov 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options vsebuje: value, neresnično: {
+	možnosti ima: vrednost, neresnično: {
 		ta-naloga napaka: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	svoj same-site := value.
+	svoj isto-mesto := vrednost.
 }.
 
-Web-Document ob: ['header:'] izvedi: { :header
-	sebe check-headers.
-	svoj headers dodaj-na-konec: header.
+Spletni-dokument ob: ['glava:'] izvedi: { :glava
+	sebe preveri-glave.
+	svoj glave dodaj-na-konec: glava.
 }.
 
-Web-Document ob: ['clear-headers'] izvedi: {
-	sebe check-headers.
-	svoj headers := Seznam nov.
+Spletni-dokument ob: ['izprazni-glave'] izvedi: {
+	sebe preveri-glave.
+	svoj glave := Seznam nov.
 }.
 
-Web-Document ob: ['session-manager:'] izvedi: { :manager
-	sebe check-headers.
-	svoj session-manager := manager.
+Spletni-dokument ob: ['upravitelj-sej:'] izvedi: { :upravitelj
+	sebe preveri-glave.
+	svoj upravitelj-sej := upravitelj.
 }.
 
-Web-Document ob: ['session-manager'] izvedi: { <- svoj session-manager.
+Spletni-dokument ob: ['upravitelj-sej'] izvedi: { <- svoj upravitelj-sej.
 }.
 
-Web-Document ob: ['check-headers'] izvedi: {
-	svoj headers-out resnično: {
+Spletni-dokument ob: ['preveri-glave'] izvedi: {
+	svoj glave-poslane resnično: {
 		ta-naloga napaka: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document ob: ['session-start'] izvedi: {
-	sebe check-headers.
-	>> request := svoj request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nič? neresnično: {
-		(( Vzorec nov: ['^[A-Za-z0-9]+\\z'], ujemanje: sess-id ) = 0) resnično: {
-			sess-id := Nič.
+Spletni-dokument ob: ['začni-sejo'] izvedi: {
+	sebe preveri-glave.
+	>> zahteva := svoj zahteva.
+	>> id-seje := zahteva cookie: ['xsid'].
+	id-seje Nič? neresnično: {
+		(( Vzorec nov: ['^[A-Za-z0-9]+\\z'], ujemanje: id-seje ) = 0) resnično: {
+			id-seje := Nič.
 		}.
 	}.
-	sess-id Nič? resnično: {
-		sess-id := Sef žeton: 30.
-		>> session-header := HTTP-Header nov
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (svoj secure ali: ['Secure'] ali: ['']),
-		SSITE: (svoj same-site),
-		XSID: sess-id
+	id-seje Nič? resnično: {
+		id-seje := Sef žeton: 30.
+		>> glava-seje := Glava-HTTP nov
+		ključ: ['Set-Cookie'] vrednost: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (svoj varno ali: ['Secure'] ali: ['']),
+		SSITE: (svoj isto-mesto),
+		XSID: id-seje
 		).
-		svoj headers dodaj-na-konec: session-header.
+		svoj glave dodaj-na-konec: glava-seje.
 	}.
-	svoj sessdata := svoj session-manager for: sess-id, load. <- svoj sessdata. # reference
+	svoj podatki-seje := svoj upravitelj-sej za: id-seje, naloži. <- svoj podatki-seje. # reference
 }.
 
-Web-Document ob: ['goto:'] izvedi: { :url
-	sebe check-headers.
-	sebe clear-headers.
-	svoj headers
+Spletni-dokument ob: ['pojdi-na:'] izvedi: { :naslov
+	sebe preveri-glave.
+	sebe izprazni-glave.
+	svoj glave
 	dodaj-na-konec: (
-		HTTP-Header nov
-		key: ['Status'] value: ['303 See Other']
+		Glava-HTTP nov
+		ključ: ['Status'] vrednost: ['303 See Other']
 	),
 	dodaj-na-konec: (
-		HTTP-Header nov
-		key: ['Location'] value: url
+		Glava-HTTP nov
+		ključ: ['Location'] vrednost: naslov
 	).
-	sebe out: ['Redirect'].
+	sebe izpiši: ['Redirect'].
 }.
 
-Web-Document ob: ['session-destroy'] izvedi: {
-	sebe check-headers.
-	>> request := svoj request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nič? neresnično: {
-		>> session-header := HTTP-Header nov.
-		>> when := Trenutek nov leto: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Spletni-dokument ob: ['uniči-sejo'] izvedi: {
+	sebe preveri-glave.
+	>> zahteva := svoj zahteva.
+	>> id-seje := zahteva cookie: ['xsid'].
+	id-seje Nič? neresnično: {
+		>> glava-seje := Glava-HTTP nov.
+		>> trenutek := Trenutek nov leto: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		glava-seje ključ: ['Set-Cookie'] vrednost: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (svoj secure ali: ['Secure'] ali: ['']),
-			SSITE: (svoj same-site),
-			XSID: sess-id
+			EXP: trenutek,
+			SEC: (svoj varno ali: ['Secure'] ali: ['']),
+			SSITE: (svoj isto-mesto),
+			XSID: id-seje
 		).
-		svoj session-manager destroy.
-		svoj headers dodaj-na-konec: session-header.
+		svoj upravitelj-sej uniči.
+		svoj glave dodaj-na-konec: glava-seje.
 	}.
 }.
 
 
-Web-Document ob: ['template:'] izvedi: { :pot <- Template nov: (Datoteka nov: pot, beri).
+Spletni-dokument ob: ['predloga:'] izvedi: { :pot <- Predloga nov: (Datoteka nov: pot, beri).
 }.
 
-Web-Document ob: ['out:type:'] izvedi: { :output :tip
-	svoj headers-out neresnično: {
-		svoj sessdata Nič? neresnično: {
-			svoj session-manager save: svoj sessdata.
+Spletni-dokument ob: ['izpiši:tip:'] izvedi: { :izhod :tip
+	svoj glave-poslane neresnično: {
+		svoj podatki-seje Nič? neresnično: {
+			svoj upravitelj-sej shrani: svoj podatki-seje.
 		}.
-		svoj headers dodaj-na-konec: (
-			HTTP-Header nov
-			key: ['Content-type'] value: tip
+		svoj glave dodaj-na-konec: (
+			Glava-HTTP nov
+			ključ: ['Content-type'] vrednost: tip
 		).
-		svoj headers vsak: { :_ :header
-			Izhod piši: header.
+		svoj glave vsak: { :_ :glava
+			Izhod piši: glava.
 		}.
-		svoj headers-out := Resnično.
+		svoj glave-poslane := Resnično.
 		Izhod piši: ['\r\n'].
 	}.
-	Izhod piši: output.
+	Izhod piši: izhod.
 }.
 
-Web-Document ob: ['finish:type:'] izvedi: { :output :tip
-	svoj headers-out neresnično: {
-		svoj sessdata Nič? neresnično: {
-			svoj session-manager save: svoj sessdata.
+Spletni-dokument ob: ['zaključi:tip:'] izvedi: { :izhod :tip
+	svoj glave-poslane neresnično: {
+		svoj podatki-seje Nič? neresnično: {
+			svoj upravitelj-sej shrani: svoj podatki-seje.
 		}.
-		svoj headers dodaj-na-konec: (
-			HTTP-Header nov
-			key: ['Content-type'] value: tip
+		svoj glave dodaj-na-konec: (
+			Glava-HTTP nov
+			ključ: ['Content-type'] vrednost: tip
 		).
-		svoj headers dodaj-na-konec: (
-			HTTP-Header nov
-			key: ['Content-Length'] value: output besedilo bytes
+		svoj glave dodaj-na-konec: (
+			Glava-HTTP nov
+			ključ: ['Content-Length'] vrednost: izhod besedilo bytes
 		).
-		svoj headers vsak: { :_ :header
-			Izhod piši: header.
+		svoj glave vsak: { :_ :glava
+			Izhod piši: glava.
 		}.
-		svoj headers-out := Resnično.
+		svoj glave-poslane := Resnično.
 		Izhod piši: ['\r\n'].
 	}.
-	Izhod piši: output.
+	Izhod piši: izhod.
 }.
 
-Web-Document ob: ['out:'] izvedi: { :output
-	sebe out: output type: ['text/html; charset=utf-8'].
+Spletni-dokument ob: ['izpiši:'] izvedi: { :izhod
+	sebe izpiši: izhod tip: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ob: ['finish:'] izvedi: { :output
-	sebe finish: output type: ['text/html; charset=utf-8'].
+Spletni-dokument ob: ['zaključi:'] izvedi: { :izhod
+	sebe zaključi: izhod tip: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ob: ['json:'] izvedi: { :output
-	sebe out: ( JSON jsonify: output ) type: ['application/json'].
+Spletni-dokument ob: ['json:'] izvedi: { :izhod
+	sebe izpiši: ( JSON jsonify: izhod ) tip: ['application/json'].
 }.
 
-Web-Document ob: ['not-found:'] izvedi: { :output
-	sebe clear-headers header: (
-		HTTP-Header nov key: ['Status'] value: ['404 Not Found']
+Spletni-dokument ob: ['ni-najdeno:'] izvedi: { :izhod
+	sebe izprazni-glave glava: (
+		Glava-HTTP nov ključ: ['Status'] vrednost: ['404 Not Found']
 	).
-	sebe out: output.
+	sebe izpiši: izhod.
 }.
 
 
 # Interface
 
->> Session := Objekt nov.
+>> Seja := Objekt nov.
 
-Session ob: ['nov'] izvedi: { <- sebe nov init for: Nič.
+Seja ob: ['nov'] izvedi: { <- sebe nov inicializiraj za: Nič.
 }.
 
-Session ob: ['for:'] izvedi: { :id
+Seja ob: ['za:'] izvedi: { :id
 	svoj id := id.
 }.
 
-Session ob: ['load'] izvedi: {
+Seja ob: ['naloži'] izvedi: {
 	ta-naloga napaka: ['Not implemented.'].
 }.
 
-Session ob: ['save:'] izvedi: {
+Seja ob: ['shrani:'] izvedi: {
 	ta-naloga napaka: ['Not implemented.'].
 }.
 
-Session ob: ['destroy'] izvedi: {
+Seja ob: ['uniči'] izvedi: {
 	ta-naloga napaka: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session nov.
+>> Seja-začasna-datoteka := Seja nov.
 
-Tempfile-Session ob: ['init'] izvedi: {
-	svoj pathprefix := ['/tmp/sess-'].
+Seja-začasna-datoteka ob: ['inicializiraj'] izvedi: {
+	svoj začetek-poti := ['/tmp/sess-'].
 }.
 
-Tempfile-Session ob: ['path-prefix:'] izvedi: { :str
-	svoj pathprefix := str.
+Seja-začasna-datoteka ob: ['predpona-poti:'] izvedi: { :niz
+	svoj začetek-poti := niz.
 }.
 
-Tempfile-Session ob: ['file'] izvedi: { <- ( Datoteka nov: ( svoj pathprefix + svoj id + ['.txt'] ) ).
+Seja-začasna-datoteka ob: ['datoteka'] izvedi: { <- ( Datoteka nov: ( svoj začetek-poti + svoj id + ['.txt'] ) ).
 }.
 
-Tempfile-Session ob: ['load'] izvedi: {
-	>> file := sebe file.
-	file obstaja neresnično: {
-		file piši: (Slovar nov koda).
-	}. <- file beri objekt.
+Seja-začasna-datoteka ob: ['naloži'] izvedi: {
+	>> datoteka := sebe datoteka.
+	datoteka obstaja neresnično: {
+		datoteka piši: (Slovar nov koda).
+	}. <- datoteka beri objekt.
 }.
 
-Tempfile-Session ob: ['save:'] izvedi: { :data
-	>> file := sebe file.
-	file obstaja resnično: {
-		file piši: data koda.
+Seja-začasna-datoteka ob: ['shrani:'] izvedi: { :podatki
+	>> datoteka := sebe datoteka.
+	datoteka obstaja resnično: {
+		datoteka piši: podatki koda.
 	}.
 }.
 
-Tempfile-Session ob: ['destroy'] izvedi: {
-	>> file := sebe file.
-	file obstaja resnično: {
-		file izbriši.
+Seja-začasna-datoteka ob: ['uniči'] izvedi: {
+	>> datoteka := sebe datoteka.
+	datoteka obstaja resnično: {
+		datoteka izbriši.
 	}.
 }.
 
 
 >> URL := Objekt nov.
 
-URL ob: ['init'] izvedi: {
-	svoj protocol := ['https://'].
+URL ob: ['inicializiraj'] izvedi: {
+	svoj protokol := ['https://'].
 	svoj gostitelj := ['localhost'].
 	svoj pot := [''].
-	svoj params := [''].
+	svoj parametri-url := [''].
 	svoj hash := [''].
 }.
 
-URL ob: ['nov'] izvedi: { <- sebe nov init.
+URL ob: ['nov'] izvedi: { <- sebe nov inicializiraj.
 }.
 
 URL ob: ['besedilo'] izvedi: { <- (
-	svoj protocol +
+	svoj protokol +
 	svoj gostitelj +
 	svoj pot +
-	svoj params +
+	svoj parametri-url +
 	svoj hash ).
 }.
 
-URL ob: ['protocol:'] izvedi: { :protocol
-	((Seznam nov: ['http'] ; ['https']) vsebuje: protocol) resnično: {
-		svoj protocol := protocol + ['://'].
+URL ob: ['protokol:'] izvedi: { :protokol
+	((Seznam nov ; ['http'] ; ['https']) ima: protokol) resnično: {
+		svoj protokol := protokol + ['://'].
 	}, neresnično: {
 		ta-naloga napaka: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL ob: ['gostitelj:'] izvedi: { :gostitelj
 	svoj gostitelj := gostitelj.
 }.
 
-URL ob: ['path:'] izvedi: { :pot
+URL ob: ['pot:'] izvedi: { :pot
 	svoj pot := ['/'] + pot url-kodiraj.
 }.
 
-URL ob: ['params:'] izvedi: { :map
-	>> params := Seznam nov.
-	map vsak: { :key :value
-		params dodaj-na-konec: key besedilo url-kodiraj + ['='] + value besedilo url-kodiraj.
+URL ob: ['parametri-url:'] izvedi: { :preslikava
+	>> parametri-url := Seznam nov.
+	preslikava vsak: { :ključ :vrednost
+		parametri-url dodaj-na-konec: ključ besedilo url-kodiraj + ['='] + vrednost besedilo url-kodiraj.
 	}.
-	svoj params := ['?'] + ( params združi: ['&'] ).
+	svoj parametri-url := ['?'] + ( parametri-url združi: ['&'] ).
 }.
 
 URL ob: ['zgoščena-vrednost:'] izvedi: { :hash

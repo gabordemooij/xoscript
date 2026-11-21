@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Obýekt täze.
+>> Şablon := Obýekt täze.
 
-Template gelende: ['täze'] et: { <- özi täze content: [''].
+Şablon gelende: ['täze'] et: { <- özi täze mazmun: [''].
 }.
 
-Template gelende: ['content:'] et: { :content
-	öz content := content. 
+Şablon gelende: ['mazmun:'] et: { :mazmun
+	öz mazmun := mazmun. 
 }.
 
-Template gelende: ['täze:'] et: { :content <- özi täze content: content.
+Şablon gelende: ['täze:'] et: { :mazmun <- özi täze mazmun: mazmun.
 }.
 
-Template gelende: ['cut:'] et: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := öz content böl: startmarker.
-	>> prefix := parts birinji.
-	>> parts2 := parts soňky böl: endmarker.
-	>> suffix := parts2 soňky.
-	>> part := parts2 birinji.
-	>> rest := prefix + suffix.
-	öz content := rest. <- Template täze: part.
+Şablon gelende: ['kes:'] et: { :bellik
+	>> başlangyç-bellik := (['<!-- cut:%id% -->'] %id%: bellik).
+	>> soňky-bellik := (['<!-- /cut:%id% -->'] %id%: bellik).
+	>> kesimler := öz mazmun böl: başlangyç-bellik.
+	>> prefiks := kesimler birinji.
+	>> kesimler2 := kesimler soňky böl: soňky-bellik.
+	>> goşulma := kesimler2 soňky.
+	>> kesim := kesimler2 birinji.
+	>> galyndy := prefiks + goşulma.
+	öz mazmun := galyndy. <- Şablon täze: kesim.
 	
 }.
 
-Template gelende: ['göçür'] et: { <- özi täze: özi tekst göçür.
+Şablon gelende: ['göçür'] et: { <- özi täze: özi tekst göçür.
 }.
 	
-Template gelende: ['paste:at:'] et: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	öz content çalyş: pastemarker bilen: ( snippet tekst + pastemarker ).
+Şablon gelende: ['ýapyşdyr:açar:'] et: { :bölejik :id
+	>> ýapyşdyrma-belligi := (['<!-- paste:%id% -->'] %id%: id).
+	öz mazmun çalyş: ýapyşdyrma-belligi bilen: ( bölejik tekst + ýapyşdyrma-belligi ).
 }.
 
-Template gelende: ['belle:baha:'] et: { :slot :value
-	öz content çalyş: ['<!-- slot:'] + slot + [' -->'] bilen: ( Server html-kodla: value ).
+Şablon gelende: ['belle:baha:'] et: { :orun :baha
+	öz mazmun çalyş: ['<!-- slot:'] + orun + [' -->'] bilen: ( Server html-kodla: baha ).
 }.
 
-Template gelende: ['set:html:'] et: { :slot :html
-	öz content çalyş: ['<!-- slot:'] + slot + [' -->'] bilen: html.
+Şablon gelende: ['belle:html:'] et: { :orun :html
+	öz mazmun çalyş: ['<!-- slot:'] + orun + [' -->'] bilen: html.
 }.
 
-Template gelende: ['jogap-ber:we:'] et: { :slot :value
-	özi belle: (slot başlap: 0 uzynlyk: (slot uzynlyk - 1)) baha: value.
+Şablon gelende: ['jogap-ber:we:'] et: { :orun :baha
+	özi belle: (orun başlap: 0 uzynlyk: (orun uzynlyk - 1)) baha: baha.
 }.
 
-Template gelende: ['nl2br'] et: {
-	öz content çalyş: ['\n'] bilen: ['<br>'].
+Şablon gelende: ['nl2br'] et: {
+	öz mazmun çalyş: ['\n'] bilen: ['<br>'].
 }.
 
-Template gelende: ['clean'] et: {
-	öz content :=
+Şablon gelende: ['tertiple'] et: {
+	öz mazmun :=
 		Nusga
 		täze: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		gabat-gelme: öz content
+		gabat-gelme: öz mazmun
 		et: { <- ['']. }.
 }.
 
-Template gelende: ['clean-cuts'] et: {
-	>> items := Sanaw täze.
+Şablon gelende: ['kesimleri-tertiple'] et: {
+	>> elementler := Sanaw täze.
 	Nusga
 	täze: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	gabat-gelme: öz content
-	et: { :_ :part
-		items soňuna-goş: part ? 1.
+	gabat-gelme: öz mazmun
+	et: { :_ :kesim
+		elementler soňuna-goş: kesim ? 1.
 	}.
-	items her: { :_ :id
-		öz content :=
+	elementler her: { :_ :id
+		öz mazmun :=
 			Nusga täze: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			gabat-gelme: öz content
+			gabat-gelme: öz mazmun
 			et: { <- ['']. }.
 	 }.
 }.
 
-Template gelende: ['clean-space'] et: {
-	öz content :=
+Şablon gelende: ['boşluklary-tertiple'] et: {
+	öz mazmun :=
 		Nusga
 		täze: ['\\s*\\n'],
-		gabat-gelme: öz content
+		gabat-gelme: öz mazmun
 		et: { <- ['\n']. }.
-	öz content :=
+	öz mazmun :=
 		Nusga
 		täze: ['\\n[\\s\\t]+'],
-		gabat-gelme: öz content
+		gabat-gelme: öz mazmun
 		et: { <- ['\n']. }.
 }.
 
-Template gelende: ['clean-all'] et: {
-	özi clean.
-	özi clean-cuts.
-	özi clean-space.
+Şablon gelende: ['hemmesini-tertiple'] et: {
+	özi tertiple.
+	özi kesimleri-tertiple.
+	özi boşluklary-tertiple.
 }.
 
-Template gelende: ['tekst'] et: { <- öz content.
+Şablon gelende: ['tekst'] et: { <- öz mazmun.
 }.

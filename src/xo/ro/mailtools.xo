@@ -1,128 +1,128 @@
 >> Email := Obiect nou.
 
-Email la: ['init'] execută: {
-	propriu recipients := Listă nou.
+Email la: ['inițializează'] execută: {
+	propriu destinatari := Listă nou.
 	propriu cc := Listă nou.
 	propriu bcc := Listă nou.
-	propriu from := Nimic.
-	propriu from-name := Nimic.
-	propriu subject := Nimic.
-	propriu body := Nimic.
+	propriu expeditor := Nimic.
+	propriu nume-expeditor := Nimic.
+	propriu subiect := Nimic.
+	propriu corp := Nimic.
 }.
 
-Email la: ['nou'] execută: { <- sine nou init.
+Email la: ['nou'] execută: { <- sine nou inițializează.
 }.
 
-Email la: ['to:'] execută: { :list
-	propriu recipients := list.
+Email la: ['către:'] execută: { :enumerare
+	propriu destinatari := enumerare.
 }.
  
-Email la: ['cc:'] execută: { :list
-	propriu cc := list.
+Email la: ['cc:'] execută: { :enumerare
+	propriu cc := enumerare.
 }.
 
-Email la: ['bcc:'] execută: { :list
-	propriu bcc := list.
+Email la: ['bcc:'] execută: { :enumerare
+	propriu bcc := enumerare.
 }.
 
-Email la: ['subject:'] execută: { :subject
-	propriu subject := subject.
+Email la: ['subiect:'] execută: { :subiect
+	propriu subiect := subiect.
 }.
 
-Email la: ['from:name:'] execută: { :from :nume
-	propriu from := from.
-	propriu from-name := nume.
+Email la: ['expeditor:nume:'] execută: { :expeditor :nume
+	propriu expeditor := expeditor.
+	propriu nume-expeditor := nume.
 }.
 
-Email la: ['body:'] execută: { :body
-	propriu body := body.
+Email la: ['corp:'] execută: { :corp
+	propriu corp := corp.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email la: ['header:'] execută: { :line <- line înlocuiește: ['\r'] cu: [''], înlocuiește: ['\n'] cu: [''].
+Email la: ['antet:'] execută: { :linie <- linie înlocuiește: ['\r'] cu: [''], înlocuiește: ['\n'] cu: [''].
 }.
 
-Email la: ['send'] execută: {
-	>> f := Fișier tempwrite: sine generate.
+Email la: ['trimite'] execută: {
+	>> f := Fișier tempwrite: sine generează.
 	Program sistem: ['sendmail -t < '] + f cale, rând-nou.
 }.
 
-Email la: ['generate'] execută: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str adaugă-la-sfârșit: (sine header: ['From: '] + propriu from-name + [' <'] + ( propriu from ) + ['>']) + brk.
-	str adaugă-la-sfârșit: (sine header: ['To: '] + ( propriu recipients unește: [','] )) + brk.
+Email la: ['generează'] execută: {
+	>> salt := ['\r\n'].
+	>> șir := [''].
+	șir adaugă-la-sfârșit: (sine antet: ['From: '] + propriu nume-expeditor + [' <'] + ( propriu expeditor ) + ['>']) + salt.
+	șir adaugă-la-sfârșit: (sine antet: ['To: '] + ( propriu destinatari unește: [','] )) + salt.
 	propriu cc numără adevărat: {
-		str adaugă-la-sfârșit: (sine header: ['Cc: '] + ( propriu cc unește: [','] )) + brk.
+		șir adaugă-la-sfârșit: (sine antet: ['Cc: '] + ( propriu cc unește: [','] )) + salt.
 	}.
 	propriu bcc numără adevărat: {
-		str adaugă-la-sfârșit: (sine header: ['Bcc: '] + ( propriu bcc unește: [','] )) + brk.
+		șir adaugă-la-sfârșit: (sine antet: ['Bcc: '] + ( propriu bcc unește: [','] )) + salt.
 	}.
-	str adaugă-la-sfârșit: (sine header: ['Subject: '] + propriu subject) + brk.
-	str adaugă-la-sfârșit: brk.
-	str adaugă-la-sfârșit: propriu body.
-	str adaugă-la-sfârșit: brk. <- str.
+	șir adaugă-la-sfârșit: (sine antet: ['Subject: '] + propriu subiect) + salt.
+	șir adaugă-la-sfârșit: salt.
+	șir adaugă-la-sfârșit: propriu corp.
+	șir adaugă-la-sfârșit: salt. <- șir.
 }.
 
->> HTML-Email := Email nou.
+>> Email-HTML := Email nou.
 
-HTML-Email la: ['init'] execută: {
-	sine init.
-	propriu attachments := Listă nou.
-	propriu boundary := Seif jeton: 40.
+Email-HTML la: ['inițializează'] execută: {
+	sine inițializează.
+	propriu atașamente := Listă nou.
+	propriu delimitator := Seif jeton: 40.
 }.
 
-HTML-Email la: ['attach:'] execută: { :file
-	>> id := propriu attachments numără.
-	>> blob := file blob.
-	propriu attachments adaugă-la-sfârșit: (
+Email-HTML la: ['atașează:'] execută: { :fișier
+	>> id := propriu atașamente numără.
+	>> blob := fișier blob.
+	propriu atașamente adaugă-la-sfârșit: (
 		Dicționar nou
-			file: file cale,
-			mime: ['image/'] + (Server mimetype: file cale),
-			data: blob base64-codifică
+			fișier: fișier cale,
+			mime: ['image/'] + (Server mimetype: fișier cale),
+			date: blob base64-codifică
 	).
 	blob eliberează. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email la: ['generate'] execută: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str adaugă-la-sfârșit: (sine header: ['From: '] + propriu from-name + [' <'] + ( propriu from ) + ['>']) + brk.
-	str adaugă-la-sfârșit: (sine header: ['To: '] + ( propriu recipients unește: [','] )) + brk.
+Email-HTML la: ['generează'] execută: {
+	>> salt := ['\r\n'].
+	>> șir := [''].
+	șir adaugă-la-sfârșit: (sine antet: ['From: '] + propriu nume-expeditor + [' <'] + ( propriu expeditor ) + ['>']) + salt.
+	șir adaugă-la-sfârșit: (sine antet: ['To: '] + ( propriu destinatari unește: [','] )) + salt.
 	propriu cc numără adevărat: {
-		str adaugă-la-sfârșit: (sine header: ['Cc: '] + ( propriu cc unește: [','] )) + brk.
+		șir adaugă-la-sfârșit: (sine antet: ['Cc: '] + ( propriu cc unește: [','] )) + salt.
 	}.
 	propriu bcc numără adevărat: {
-		str adaugă-la-sfârșit: (sine header: ['Bcc: '] + ( propriu bcc unește: [','] )) + brk.
+		șir adaugă-la-sfârșit: (sine antet: ['Bcc: '] + ( propriu bcc unește: [','] )) + salt.
 	}.
-	str adaugă-la-sfârșit: (sine header: ['Subject: '] + propriu subject) + brk.
-	str adaugă-la-sfârșit: ['MIME-Version: 1.0'] + brk.
-	str adaugă-la-sfârșit: ['Content-Type: multipart/related; boundary="'] + propriu boundary + ['"; type=text/html'] + brk.
-	str adaugă-la-sfârșit: brk.
-	str adaugă-la-sfârșit: ['--'] + propriu boundary + brk.
-	str adaugă-la-sfârșit: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str adaugă-la-sfârșit: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str adaugă-la-sfârșit: brk.
-	str adaugă-la-sfârșit: propriu body.
-	str adaugă-la-sfârșit: brk.
-	propriu attachments fiecare: { :id :info
-		>> blob := info data.
-		str adaugă-la-sfârșit: ['--'] + propriu boundary + brk.
-		str adaugă-la-sfârșit: ['Content-Type: '] + info mime + brk.
-		str adaugă-la-sfârșit: ['Content-Transfer-Encoding: base64'] + brk.
-		str adaugă-la-sfârșit: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str adaugă-la-sfârșit: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str adaugă-la-sfârșit: brk.
-		>> max := 76.
-		>> len := blob lungime.
-		>> chunks := (len / max) rotunjește-în-sus.
+	șir adaugă-la-sfârșit: (sine antet: ['Subject: '] + propriu subiect) + salt.
+	șir adaugă-la-sfârșit: ['MIME-Version: 1.0'] + salt.
+	șir adaugă-la-sfârșit: ['Content-Type: multipart/related; boundary="'] + propriu delimitator + ['"; type=text/html'] + salt.
+	șir adaugă-la-sfârșit: salt.
+	șir adaugă-la-sfârșit: ['--'] + propriu delimitator + salt.
+	șir adaugă-la-sfârșit: ['Content-Type: text/html; charset=UTF-8'] + salt.
+	șir adaugă-la-sfârșit: ['Content-Transfer-Encoding: 7bit'] + salt.
+	șir adaugă-la-sfârșit: salt.
+	șir adaugă-la-sfârșit: propriu corp.
+	șir adaugă-la-sfârșit: salt.
+	propriu atașamente fiecare: { :id :info
+		>> blob := info date.
+		șir adaugă-la-sfârșit: ['--'] + propriu delimitator + salt.
+		șir adaugă-la-sfârșit: ['Content-Type: '] + info mime + salt.
+		șir adaugă-la-sfârșit: ['Content-Transfer-Encoding: base64'] + salt.
+		șir adaugă-la-sfârșit: ['Content-ID: <attachment'] + id + ['>'] + salt.
+		șir adaugă-la-sfârșit: ['Content-Disposition: inline; filename="'] + info fișier + ['"'] + salt.
+		șir adaugă-la-sfârșit: salt.
+		>> plafon := 76.
+		>> lungime-text := blob lungime.
+		>> bucăți := (lungime-text / plafon) rotunjește-în-sus.
 		{ :i
-			>> chunk := blob copiază de-la: i * max lungime: max.
-			str adaugă-la-sfârșit: chunk + brk.
-		} * chunks.
-		str adaugă-la-sfârșit: brk.
-		str adaugă-la-sfârșit: brk.
+			>> bucată := blob copiază de-la: i * plafon lungime: plafon.
+			șir adaugă-la-sfârșit: bucată + salt.
+		} * bucăți.
+		șir adaugă-la-sfârșit: salt.
+		șir adaugă-la-sfârșit: salt.
 	}.
-	str adaugă-la-sfârșit: ['--'] + propriu boundary + ['--'] + brk. <- str.
+	șir adaugă-la-sfârșit: ['--'] + propriu delimitator + ['--'] + salt. <- șir.
 }.

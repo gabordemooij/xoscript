@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Zavatra vaovao.
+>> Modely-pejy := Zavatra vaovao.
 
-Template rehefa: ['vaovao'] ataovy: { <- tena vaovao content: [''].
+Modely-pejy rehefa: ['vaovao'] ataovy: { <- tena vaovao votoaty: [''].
 }.
 
-Template rehefa: ['content:'] ataovy: { :content
-	azy content := content. 
+Modely-pejy rehefa: ['votoaty:'] ataovy: { :votoaty
+	azy votoaty := votoaty. 
 }.
 
-Template rehefa: ['vaovao:'] ataovy: { :content <- tena vaovao content: content.
+Modely-pejy rehefa: ['vaovao:'] ataovy: { :votoaty <- tena vaovao votoaty: votoaty.
 }.
 
-Template rehefa: ['cut:'] ataovy: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := azy content zarao: startmarker.
-	>> prefix := parts voalohany.
-	>> parts2 := parts farany zarao: endmarker.
-	>> suffix := parts2 farany.
-	>> part := parts2 voalohany.
-	>> rest := prefix + suffix.
-	azy content := rest. <- Template vaovao: part.
+Modely-pejy rehefa: ['tapaho:'] ataovy: { :marika
+	>> marika-fanombohana := (['<!-- cut:%id% -->'] %id%: marika).
+	>> marika-farany := (['<!-- /cut:%id% -->'] %id%: marika).
+	>> ampahany-maro := azy votoaty zarao: marika-fanombohana.
+	>> tovona := ampahany-maro voalohany.
+	>> ampahany-maro2 := ampahany-maro farany zarao: marika-farany.
+	>> tovana := ampahany-maro2 farany.
+	>> ampahany := ampahany-maro2 voalohany.
+	>> sisa := tovona + tovana.
+	azy votoaty := sisa. <- Modely-pejy vaovao: ampahany.
 	
 }.
 
-Template rehefa: ['adikao'] ataovy: { <- tena vaovao: tena soratra adikao.
+Modely-pejy rehefa: ['adikao'] ataovy: { <- tena vaovao: tena soratra adikao.
 }.
 	
-Template rehefa: ['paste:at:'] ataovy: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	azy content soloy: pastemarker amin: ( snippet soratra + pastemarker ).
+Modely-pejy rehefa: ['apetaho:eo:'] ataovy: { :sombin-teny :id
+	>> marika-fametahana := (['<!-- paste:%id% -->'] %id%: id).
+	azy votoaty soloy: marika-fametahana amin: ( sombin-teny soratra + marika-fametahana ).
 }.
 
-Template rehefa: ['apetraho:sanda:'] ataovy: { :slot :value
-	azy content soloy: ['<!-- slot:'] + slot + [' -->'] amin: ( Server html-asio-kaody: value ).
+Modely-pejy rehefa: ['apetraho:sanda:'] ataovy: { :toerana :sanda
+	azy votoaty soloy: ['<!-- slot:'] + toerana + [' -->'] amin: ( Server html-asio-kaody: sanda ).
 }.
 
-Template rehefa: ['set:html:'] ataovy: { :slot :html
-	azy content soloy: ['<!-- slot:'] + slot + [' -->'] amin: html.
+Modely-pejy rehefa: ['apetraho:html:'] ataovy: { :toerana :html
+	azy votoaty soloy: ['<!-- slot:'] + toerana + [' -->'] amin: html.
 }.
 
-Template rehefa: ['valio:ary:'] ataovy: { :slot :value
-	tena apetraho: (slot manomboka: 0 halavany: (slot halavany - 1)) sanda: value.
+Modely-pejy rehefa: ['valio:ary:'] ataovy: { :toerana :sanda
+	tena apetraho: (toerana manomboka: 0 halavany: (toerana halavany - 1)) sanda: sanda.
 }.
 
-Template rehefa: ['nl2br'] ataovy: {
-	azy content soloy: ['\n'] amin: ['<br>'].
+Modely-pejy rehefa: ['nl2br'] ataovy: {
+	azy votoaty soloy: ['\n'] amin: ['<br>'].
 }.
 
-Template rehefa: ['clean'] ataovy: {
-	azy content :=
+Modely-pejy rehefa: ['alamino'] ataovy: {
+	azy votoaty :=
 		Lamina
 		vaovao: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		fifanarahana: azy content
+		fifanarahana: azy votoaty
 		ataovy: { <- ['']. }.
 }.
 
-Template rehefa: ['clean-cuts'] ataovy: {
-	>> items := Lisitra vaovao.
+Modely-pejy rehefa: ['alamino-tapaka'] ataovy: {
+	>> singa := Lisitra vaovao.
 	Lamina
 	vaovao: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	fifanarahana: azy content
-	ataovy: { :_ :part
-		items ampio-any-amin-ny-farany: part ? 1.
+	fifanarahana: azy votoaty
+	ataovy: { :_ :ampahany
+		singa ampio-any-amin-ny-farany: ampahany ? 1.
 	}.
-	items tsirairay: { :_ :id
-		azy content :=
+	singa tsirairay: { :_ :id
+		azy votoaty :=
 			Lamina vaovao: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			fifanarahana: azy content
+			fifanarahana: azy votoaty
 			ataovy: { <- ['']. }.
 	 }.
 }.
 
-Template rehefa: ['clean-space'] ataovy: {
-	azy content :=
+Modely-pejy rehefa: ['alamino-elanelana'] ataovy: {
+	azy votoaty :=
 		Lamina
 		vaovao: ['\\s*\\n'],
-		fifanarahana: azy content
+		fifanarahana: azy votoaty
 		ataovy: { <- ['\n']. }.
-	azy content :=
+	azy votoaty :=
 		Lamina
 		vaovao: ['\\n[\\s\\t]+'],
-		fifanarahana: azy content
+		fifanarahana: azy votoaty
 		ataovy: { <- ['\n']. }.
 }.
 
-Template rehefa: ['clean-all'] ataovy: {
-	tena clean.
-	tena clean-cuts.
-	tena clean-space.
+Modely-pejy rehefa: ['alamino-avokoa'] ataovy: {
+	tena alamino.
+	tena alamino-tapaka.
+	tena alamino-elanelana.
 }.
 
-Template rehefa: ['soratra'] ataovy: { <- azy content.
+Modely-pejy rehefa: ['soratra'] ataovy: { <- azy votoaty.
 }.

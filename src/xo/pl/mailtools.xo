@@ -1,128 +1,128 @@
 >> Email := Obiekt nowy.
 
-Email na: ['init'] wykonaj: {
-	własny recipients := Lista nowy.
+Email na: ['inicjuj'] wykonaj: {
+	własny odbiorcy := Lista nowy.
 	własny cc := Lista nowy.
 	własny bcc := Lista nowy.
-	własny from := Nic.
-	własny from-name := Nic.
-	własny subject := Nic.
-	własny body := Nic.
+	własny nadawca := Nic.
+	własny nazwa-nadawcy := Nic.
+	własny temat := Nic.
+	własny treść-wiadomości := Nic.
 }.
 
-Email na: ['nowy'] wykonaj: { <- sam nowy init.
+Email na: ['nowy'] wykonaj: { <- sam nowy inicjuj.
 }.
 
-Email na: ['to:'] wykonaj: { :list
-	własny recipients := list.
+Email na: ['adresat:'] wykonaj: { :wyliczenie
+	własny odbiorcy := wyliczenie.
 }.
  
-Email na: ['cc:'] wykonaj: { :list
-	własny cc := list.
+Email na: ['cc:'] wykonaj: { :wyliczenie
+	własny cc := wyliczenie.
 }.
 
-Email na: ['bcc:'] wykonaj: { :list
-	własny bcc := list.
+Email na: ['bcc:'] wykonaj: { :wyliczenie
+	własny bcc := wyliczenie.
 }.
 
-Email na: ['subject:'] wykonaj: { :subject
-	własny subject := subject.
+Email na: ['temat:'] wykonaj: { :temat
+	własny temat := temat.
 }.
 
-Email na: ['from:name:'] wykonaj: { :from :nazwa
-	własny from := from.
-	własny from-name := nazwa.
+Email na: ['nadawca:nazwa:'] wykonaj: { :nadawca :nazwa
+	własny nadawca := nadawca.
+	własny nazwa-nadawcy := nazwa.
 }.
 
-Email na: ['body:'] wykonaj: { :body
-	własny body := body.
+Email na: ['treść-wiadomości:'] wykonaj: { :treść-wiadomości
+	własny treść-wiadomości := treść-wiadomości.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email na: ['header:'] wykonaj: { :line <- line zamień: ['\r'] na: [''], zamień: ['\n'] na: [''].
+Email na: ['nagłówek:'] wykonaj: { :wiersz <- wiersz zamień: ['\r'] na: [''], zamień: ['\n'] na: [''].
 }.
 
-Email na: ['send'] wykonaj: {
-	>> f := Plik tempwrite: sam generate.
+Email na: ['wyślij'] wykonaj: {
+	>> f := Plik tempwrite: sam generuj.
 	Program system: ['sendmail -t < '] + f ścieżka, nowa-linia.
 }.
 
-Email na: ['generate'] wykonaj: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str dołącz: (sam header: ['From: '] + własny from-name + [' <'] + ( własny from ) + ['>']) + brk.
-	str dołącz: (sam header: ['To: '] + ( własny recipients połącz: [','] )) + brk.
+Email na: ['generuj'] wykonaj: {
+	>> łamanie := ['\r\n'].
+	>> łańcuch := [''].
+	łańcuch dołącz: (sam nagłówek: ['From: '] + własny nazwa-nadawcy + [' <'] + ( własny nadawca ) + ['>']) + łamanie.
+	łańcuch dołącz: (sam nagłówek: ['To: '] + ( własny odbiorcy połącz: [','] )) + łamanie.
 	własny cc liczność prawda: {
-		str dołącz: (sam header: ['Cc: '] + ( własny cc połącz: [','] )) + brk.
+		łańcuch dołącz: (sam nagłówek: ['Cc: '] + ( własny cc połącz: [','] )) + łamanie.
 	}.
 	własny bcc liczność prawda: {
-		str dołącz: (sam header: ['Bcc: '] + ( własny bcc połącz: [','] )) + brk.
+		łańcuch dołącz: (sam nagłówek: ['Bcc: '] + ( własny bcc połącz: [','] )) + łamanie.
 	}.
-	str dołącz: (sam header: ['Subject: '] + własny subject) + brk.
-	str dołącz: brk.
-	str dołącz: własny body.
-	str dołącz: brk. <- str.
+	łańcuch dołącz: (sam nagłówek: ['Subject: '] + własny temat) + łamanie.
+	łańcuch dołącz: łamanie.
+	łańcuch dołącz: własny treść-wiadomości.
+	łańcuch dołącz: łamanie. <- łańcuch.
 }.
 
 >> HTML-Email := Email nowy.
 
-HTML-Email na: ['init'] wykonaj: {
-	sam init.
-	własny attachments := Lista nowy.
-	własny boundary := Sejf token: 40.
+HTML-Email na: ['inicjuj'] wykonaj: {
+	sam inicjuj.
+	własny załączniki := Lista nowy.
+	własny granica := Sejf token: 40.
 }.
 
-HTML-Email na: ['attach:'] wykonaj: { :file
-	>> id := własny attachments liczność.
-	>> blob := file blob.
-	własny attachments dołącz: (
+HTML-Email na: ['załącz:'] wykonaj: { :plik
+	>> id := własny załączniki liczność.
+	>> blob := plik blob.
+	własny załączniki dołącz: (
 		Słownik nowy
-			file: file ścieżka,
-			mime: ['image/'] + (Server mimetype: file ścieżka),
-			data: blob base64-koduj
+			plik: plik ścieżka,
+			mime: ['image/'] + (Server mimetype: plik ścieżka),
+			dane: blob base64-koduj
 	).
 	blob zwolnij. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email na: ['generate'] wykonaj: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str dołącz: (sam header: ['From: '] + własny from-name + [' <'] + ( własny from ) + ['>']) + brk.
-	str dołącz: (sam header: ['To: '] + ( własny recipients połącz: [','] )) + brk.
+HTML-Email na: ['generuj'] wykonaj: {
+	>> łamanie := ['\r\n'].
+	>> łańcuch := [''].
+	łańcuch dołącz: (sam nagłówek: ['From: '] + własny nazwa-nadawcy + [' <'] + ( własny nadawca ) + ['>']) + łamanie.
+	łańcuch dołącz: (sam nagłówek: ['To: '] + ( własny odbiorcy połącz: [','] )) + łamanie.
 	własny cc liczność prawda: {
-		str dołącz: (sam header: ['Cc: '] + ( własny cc połącz: [','] )) + brk.
+		łańcuch dołącz: (sam nagłówek: ['Cc: '] + ( własny cc połącz: [','] )) + łamanie.
 	}.
 	własny bcc liczność prawda: {
-		str dołącz: (sam header: ['Bcc: '] + ( własny bcc połącz: [','] )) + brk.
+		łańcuch dołącz: (sam nagłówek: ['Bcc: '] + ( własny bcc połącz: [','] )) + łamanie.
 	}.
-	str dołącz: (sam header: ['Subject: '] + własny subject) + brk.
-	str dołącz: ['MIME-Version: 1.0'] + brk.
-	str dołącz: ['Content-Type: multipart/related; boundary="'] + własny boundary + ['"; type=text/html'] + brk.
-	str dołącz: brk.
-	str dołącz: ['--'] + własny boundary + brk.
-	str dołącz: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str dołącz: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str dołącz: brk.
-	str dołącz: własny body.
-	str dołącz: brk.
-	własny attachments każdy: { :id :info
-		>> blob := info data.
-		str dołącz: ['--'] + własny boundary + brk.
-		str dołącz: ['Content-Type: '] + info mime + brk.
-		str dołącz: ['Content-Transfer-Encoding: base64'] + brk.
-		str dołącz: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str dołącz: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str dołącz: brk.
-		>> max := 76.
-		>> len := blob długość.
-		>> chunks := (len / max) sufit.
+	łańcuch dołącz: (sam nagłówek: ['Subject: '] + własny temat) + łamanie.
+	łańcuch dołącz: ['MIME-Version: 1.0'] + łamanie.
+	łańcuch dołącz: ['Content-Type: multipart/related; boundary="'] + własny granica + ['"; type=text/html'] + łamanie.
+	łańcuch dołącz: łamanie.
+	łańcuch dołącz: ['--'] + własny granica + łamanie.
+	łańcuch dołącz: ['Content-Type: text/html; charset=UTF-8'] + łamanie.
+	łańcuch dołącz: ['Content-Transfer-Encoding: 7bit'] + łamanie.
+	łańcuch dołącz: łamanie.
+	łańcuch dołącz: własny treść-wiadomości.
+	łańcuch dołącz: łamanie.
+	własny załączniki każdy: { :id :info
+		>> blob := info dane.
+		łańcuch dołącz: ['--'] + własny granica + łamanie.
+		łańcuch dołącz: ['Content-Type: '] + info mime + łamanie.
+		łańcuch dołącz: ['Content-Transfer-Encoding: base64'] + łamanie.
+		łańcuch dołącz: ['Content-ID: <attachment'] + id + ['>'] + łamanie.
+		łańcuch dołącz: ['Content-Disposition: inline; filename="'] + info plik + ['"'] + łamanie.
+		łańcuch dołącz: łamanie.
+		>> najwyżej := 76.
+		>> długość-tekstu := blob długość.
+		>> kawałki := (długość-tekstu / najwyżej) sufit.
 		{ :i
-			>> chunk := blob kopiuj od: i * max długość: max.
-			str dołącz: chunk + brk.
-		} * chunks.
-		str dołącz: brk.
-		str dołącz: brk.
+			>> kawałek := blob kopiuj od: i * najwyżej długość: najwyżej.
+			łańcuch dołącz: kawałek + łamanie.
+		} * kawałki.
+		łańcuch dołącz: łamanie.
+		łańcuch dołącz: łamanie.
 	}.
-	str dołącz: ['--'] + własny boundary + ['--'] + brk. <- str.
+	łańcuch dołącz: ['--'] + własny granica + ['--'] + łamanie. <- łańcuch.
 }.

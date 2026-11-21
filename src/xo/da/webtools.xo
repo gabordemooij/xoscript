@@ -1,215 +1,215 @@
-HTTP-Forespørgsel ved: ['HTTP-header:'] gør: { :key <- Program indstilling: key.
+HTTP-Forespørgsel ved: ['HTTP-header:'] gør: { :nøgle <- Program indstilling: nøgle.
 }.
 
 >> HTTP-Header := Objekt ny.
 
-HTTP-Header ved: ['ny'] gør: { <- selv ny init.
+HTTP-Header ved: ['ny'] gør: { <- selv ny initialiser.
 }.
 
-HTTP-Header ved: ['init'] gør: {
-	egen key := Intet.
-	egen value := Intet.
+HTTP-Header ved: ['initialiser'] gør: {
+	egen nøgle := Intet.
+	egen værdi := Intet.
 }.
 
-HTTP-Header ved: ['key:value:'] gør: { :key :value
-	egen key := key.
-	egen value := value.
+HTTP-Header ved: ['nøgle:værdi:'] gør: { :nøgle :værdi
+	egen nøgle := nøgle.
+	egen værdi := værdi.
 }.
 
-HTTP-Header ved: ['key'] gør: { <- egen key.
+HTTP-Header ved: ['nøgle'] gør: { <- egen nøgle.
 }.
 
-HTTP-Header ved: ['value'] gør: { <- egen value.
+HTTP-Header ved: ['værdi'] gør: { <- egen værdi.
 }.
 
 
 HTTP-Header ved: ['tekst'] gør: {
-	>> line := egen key + [': '] + egen value.
-	line erstat: ['\r'] med: [''], erstat: ['\n'] med: ['']. <- line + [' \r\n'].
+	>> linje := egen nøgle + [': '] + egen værdi.
+	linje erstat: ['\r'] med: [''], erstat: ['\n'] med: ['']. <- linje + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Objekt ny.
+>> Webdokument := Objekt ny.
 
-Web-Document ved: ['ny'] gør: { <- selv ny init.
+Webdokument ved: ['ny'] gør: { <- selv ny initialiser.
 }.
 
-Web-Document ved: ['init'] gør: {
-	egen headers := Liste ny.
-	egen sess-id := Intet.
-	egen session-manager := Tempfile-Session ny.
-	egen sessdata := Intet.
-	egen secure := Sand.
-	egen same-site := ['Strict'].
-	egen headers-out := Falsk.
-	egen request := HTTP-Forespørgsel ny.
+Webdokument ved: ['initialiser'] gør: {
+	egen headere := Liste ny.
+	egen sessions-id := Intet.
+	egen sessionshåndtering := Midlertidig-fil-session ny.
+	egen sessionsdata := Intet.
+	egen sikker := Sand.
+	egen samme-site := ['Strict'].
+	egen headere-sendt := Falsk.
+	egen http-forespørgsel := HTTP-Forespørgsel ny.
 }.
 
-Web-Document ved: ['request:'] gør: { :request
-	egen request := request.
+Webdokument ved: ['http-forespørgsel:'] gør: { :http-forespørgsel
+	egen http-forespørgsel := http-forespørgsel.
 }. 
 
-Web-Document ved: ['secure-session-cookie:'] gør: { :secure
-	selv check-headers.
-	egen secure := secure.
+Webdokument ved: ['sikker-sessionscookie:'] gør: { :sikker
+	selv kontroller-headere.
+	egen sikker := sikker.
 }.
 
-Web-Document ved: ['same-site-session-cookie:'] gør: { :value
-	selv check-headers.
-	>> options := Liste ny 
+Webdokument ved: ['samme-site-sessionscookie:'] gør: { :værdi
+	selv kontroller-headere.
+	>> indstillinger := Liste ny 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options indeholder: value, falsk: {
+	indstillinger har: værdi, falsk: {
 		denne-opgave fejl: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	egen same-site := value.
+	egen samme-site := værdi.
 }.
 
-Web-Document ved: ['header:'] gør: { :header
-	selv check-headers.
-	egen headers tilføj: header.
+Webdokument ved: ['header:'] gør: { :header
+	selv kontroller-headere.
+	egen headere tilføj: header.
 }.
 
-Web-Document ved: ['clear-headers'] gør: {
-	selv check-headers.
-	egen headers := Liste ny.
+Webdokument ved: ['ryd-headere'] gør: {
+	selv kontroller-headere.
+	egen headere := Liste ny.
 }.
 
-Web-Document ved: ['session-manager:'] gør: { :manager
-	selv check-headers.
-	egen session-manager := manager.
+Webdokument ved: ['sessionshåndtering:'] gør: { :håndtering
+	selv kontroller-headere.
+	egen sessionshåndtering := håndtering.
 }.
 
-Web-Document ved: ['session-manager'] gør: { <- egen session-manager.
+Webdokument ved: ['sessionshåndtering'] gør: { <- egen sessionshåndtering.
 }.
 
-Web-Document ved: ['check-headers'] gør: {
-	egen headers-out sand: {
+Webdokument ved: ['kontroller-headere'] gør: {
+	egen headere-sendt sand: {
 		denne-opgave fejl: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document ved: ['session-start'] gør: {
-	selv check-headers.
-	>> request := egen request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Intet? falsk: {
-		(( Mønster ny: ['^[A-Za-z0-9]+\\z'], match: sess-id ) = 0) sand: {
-			sess-id := Intet.
+Webdokument ved: ['start-session'] gør: {
+	selv kontroller-headere.
+	>> http-forespørgsel := egen http-forespørgsel.
+	>> sessions-id := http-forespørgsel cookie: ['xsid'].
+	sessions-id Intet? falsk: {
+		(( Mønster ny: ['^[A-Za-z0-9]+\\z'], match: sessions-id ) = 0) sand: {
+			sessions-id := Intet.
 		}.
 	}.
-	sess-id Intet? sand: {
-		sess-id := Boks token: 30.
-		>> session-header := HTTP-Header ny
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (egen secure enten: ['Secure'] eller: ['']),
-		SSITE: (egen same-site),
-		XSID: sess-id
+	sessions-id Intet? sand: {
+		sessions-id := Boks token: 30.
+		>> sessionsheader := HTTP-Header ny
+		nøgle: ['Set-Cookie'] værdi: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (egen sikker enten: ['Secure'] eller: ['']),
+		SSITE: (egen samme-site),
+		XSID: sessions-id
 		).
-		egen headers tilføj: session-header.
+		egen headere tilføj: sessionsheader.
 	}.
-	egen sessdata := egen session-manager for: sess-id, load. <- egen sessdata. # reference
+	egen sessionsdata := egen sessionshåndtering for: sessions-id, indlæs. <- egen sessionsdata. # reference
 }.
 
-Web-Document ved: ['goto:'] gør: { :url
-	selv check-headers.
-	selv clear-headers.
-	egen headers
+Webdokument ved: ['gå-til:'] gør: { :adresse
+	selv kontroller-headere.
+	selv ryd-headere.
+	egen headere
 	tilføj: (
 		HTTP-Header ny
-		key: ['Status'] value: ['303 See Other']
+		nøgle: ['Status'] værdi: ['303 See Other']
 	),
 	tilføj: (
 		HTTP-Header ny
-		key: ['Location'] value: url
+		nøgle: ['Location'] værdi: adresse
 	).
-	selv out: ['Redirect'].
+	selv udskriv: ['Redirect'].
 }.
 
-Web-Document ved: ['session-destroy'] gør: {
-	selv check-headers.
-	>> request := egen request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Intet? falsk: {
-		>> session-header := HTTP-Header ny.
-		>> when := Øjeblik ny år: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Webdokument ved: ['ødelæg-session'] gør: {
+	selv kontroller-headere.
+	>> http-forespørgsel := egen http-forespørgsel.
+	>> sessions-id := http-forespørgsel cookie: ['xsid'].
+	sessions-id Intet? falsk: {
+		>> sessionsheader := HTTP-Header ny.
+		>> tidspunkt := Øjeblik ny år: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		sessionsheader nøgle: ['Set-Cookie'] værdi: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (egen secure enten: ['Secure'] eller: ['']),
-			SSITE: (egen same-site),
-			XSID: sess-id
+			EXP: tidspunkt,
+			SEC: (egen sikker enten: ['Secure'] eller: ['']),
+			SSITE: (egen samme-site),
+			XSID: sessions-id
 		).
-		egen session-manager destroy.
-		egen headers tilføj: session-header.
+		egen sessionshåndtering ødelæg.
+		egen headere tilføj: sessionsheader.
 	}.
 }.
 
 
-Web-Document ved: ['template:'] gør: { :sti <- Template ny: (Fil ny: sti, læs).
+Webdokument ved: ['skabelon:'] gør: { :sti <- Skabelon ny: (Fil ny: sti, læs).
 }.
 
-Web-Document ved: ['out:type:'] gør: { :output :type
-	egen headers-out falsk: {
-		egen sessdata Intet? falsk: {
-			egen session-manager save: egen sessdata.
+Webdokument ved: ['udskriv:type:'] gør: { :uddata :type
+	egen headere-sendt falsk: {
+		egen sessionsdata Intet? falsk: {
+			egen sessionshåndtering gem: egen sessionsdata.
 		}.
-		egen headers tilføj: (
+		egen headere tilføj: (
 			HTTP-Header ny
-			key: ['Content-type'] value: type
+			nøgle: ['Content-type'] værdi: type
 		).
-		egen headers hver: { :_ :header
+		egen headere hver: { :_ :header
 			Uddata skriv: header.
 		}.
-		egen headers-out := Sand.
+		egen headere-sendt := Sand.
 		Uddata skriv: ['\r\n'].
 	}.
-	Uddata skriv: output.
+	Uddata skriv: uddata.
 }.
 
-Web-Document ved: ['finish:type:'] gør: { :output :type
-	egen headers-out falsk: {
-		egen sessdata Intet? falsk: {
-			egen session-manager save: egen sessdata.
+Webdokument ved: ['afslut:type:'] gør: { :uddata :type
+	egen headere-sendt falsk: {
+		egen sessionsdata Intet? falsk: {
+			egen sessionshåndtering gem: egen sessionsdata.
 		}.
-		egen headers tilføj: (
+		egen headere tilføj: (
 			HTTP-Header ny
-			key: ['Content-type'] value: type
+			nøgle: ['Content-type'] værdi: type
 		).
-		egen headers tilføj: (
+		egen headere tilføj: (
 			HTTP-Header ny
-			key: ['Content-Length'] value: output tekst bytes
+			nøgle: ['Content-Length'] værdi: uddata tekst bytes
 		).
-		egen headers hver: { :_ :header
+		egen headere hver: { :_ :header
 			Uddata skriv: header.
 		}.
-		egen headers-out := Sand.
+		egen headere-sendt := Sand.
 		Uddata skriv: ['\r\n'].
 	}.
-	Uddata skriv: output.
+	Uddata skriv: uddata.
 }.
 
-Web-Document ved: ['out:'] gør: { :output
-	selv out: output type: ['text/html; charset=utf-8'].
+Webdokument ved: ['udskriv:'] gør: { :uddata
+	selv udskriv: uddata type: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ved: ['finish:'] gør: { :output
-	selv finish: output type: ['text/html; charset=utf-8'].
+Webdokument ved: ['afslut:'] gør: { :uddata
+	selv afslut: uddata type: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ved: ['json:'] gør: { :output
-	selv out: ( JSON jsonify: output ) type: ['application/json'].
+Webdokument ved: ['json:'] gør: { :uddata
+	selv udskriv: ( JSON jsonify: uddata ) type: ['application/json'].
 }.
 
-Web-Document ved: ['not-found:'] gør: { :output
-	selv clear-headers header: (
-		HTTP-Header ny key: ['Status'] value: ['404 Not Found']
+Webdokument ved: ['ikke-fundet:'] gør: { :uddata
+	selv ryd-headere header: (
+		HTTP-Header ny nøgle: ['Status'] værdi: ['404 Not Found']
 	).
-	selv out: output.
+	selv udskriv: uddata.
 }.
 
 
@@ -217,86 +217,86 @@ Web-Document ved: ['not-found:'] gør: { :output
 
 >> Session := Objekt ny.
 
-Session ved: ['ny'] gør: { <- selv ny init for: Intet.
+Session ved: ['ny'] gør: { <- selv ny initialiser for: Intet.
 }.
 
 Session ved: ['for:'] gør: { :id
 	egen id := id.
 }.
 
-Session ved: ['load'] gør: {
+Session ved: ['indlæs'] gør: {
 	denne-opgave fejl: ['Not implemented.'].
 }.
 
-Session ved: ['save:'] gør: {
+Session ved: ['gem:'] gør: {
 	denne-opgave fejl: ['Not implemented.'].
 }.
 
-Session ved: ['destroy'] gør: {
+Session ved: ['ødelæg'] gør: {
 	denne-opgave fejl: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session ny.
+>> Midlertidig-fil-session := Session ny.
 
-Tempfile-Session ved: ['init'] gør: {
-	egen pathprefix := ['/tmp/sess-'].
+Midlertidig-fil-session ved: ['initialiser'] gør: {
+	egen stibegyndelse := ['/tmp/sess-'].
 }.
 
-Tempfile-Session ved: ['path-prefix:'] gør: { :str
-	egen pathprefix := str.
+Midlertidig-fil-session ved: ['stipræfiks:'] gør: { :tegnstreng
+	egen stibegyndelse := tegnstreng.
 }.
 
-Tempfile-Session ved: ['file'] gør: { <- ( Fil ny: ( egen pathprefix + egen id + ['.txt'] ) ).
+Midlertidig-fil-session ved: ['fil'] gør: { <- ( Fil ny: ( egen stibegyndelse + egen id + ['.txt'] ) ).
 }.
 
-Tempfile-Session ved: ['load'] gør: {
-	>> file := selv file.
-	file findes falsk: {
-		file skriv: (Ordbog ny code).
-	}. <- file læs objekt.
+Midlertidig-fil-session ved: ['indlæs'] gør: {
+	>> fil := selv fil.
+	fil findes falsk: {
+		fil skriv: (Ordbog ny code).
+	}. <- fil læs objekt.
 }.
 
-Tempfile-Session ved: ['save:'] gør: { :data
-	>> file := selv file.
-	file findes sand: {
-		file skriv: data code.
+Midlertidig-fil-session ved: ['gem:'] gør: { :data
+	>> fil := selv fil.
+	fil findes sand: {
+		fil skriv: data code.
 	}.
 }.
 
-Tempfile-Session ved: ['destroy'] gør: {
-	>> file := selv file.
-	file findes sand: {
-		file slet.
+Midlertidig-fil-session ved: ['ødelæg'] gør: {
+	>> fil := selv fil.
+	fil findes sand: {
+		fil slet.
 	}.
 }.
 
 
 >> URL := Objekt ny.
 
-URL ved: ['init'] gør: {
-	egen protocol := ['https://'].
+URL ved: ['initialiser'] gør: {
+	egen protokol := ['https://'].
 	egen vært := ['localhost'].
 	egen sti := [''].
-	egen params := [''].
+	egen url-parametre := [''].
 	egen hash := [''].
 }.
 
-URL ved: ['ny'] gør: { <- selv ny init.
+URL ved: ['ny'] gør: { <- selv ny initialiser.
 }.
 
 URL ved: ['tekst'] gør: { <- (
-	egen protocol +
+	egen protokol +
 	egen vært +
 	egen sti +
-	egen params +
+	egen url-parametre +
 	egen hash ).
 }.
 
-URL ved: ['protocol:'] gør: { :protocol
-	((Liste ny: ['http'] ; ['https']) indeholder: protocol) sand: {
-		egen protocol := protocol + ['://'].
+URL ved: ['protokol:'] gør: { :protokol
+	((Liste ny ; ['http'] ; ['https']) har: protokol) sand: {
+		egen protokol := protokol + ['://'].
 	}, falsk: {
 		denne-opgave fejl: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL ved: ['vært:'] gør: { :vært
 	egen vært := vært.
 }.
 
-URL ved: ['path:'] gør: { :sti
+URL ved: ['sti:'] gør: { :sti
 	egen sti := ['/'] + sti url-kode.
 }.
 
-URL ved: ['params:'] gør: { :map
-	>> params := Liste ny.
-	map hver: { :key :value
-		params tilføj: key tekst url-kode + ['='] + value tekst url-kode.
+URL ved: ['url-parametre:'] gør: { :tilknytning
+	>> url-parametre := Liste ny.
+	tilknytning hver: { :nøgle :værdi
+		url-parametre tilføj: nøgle tekst url-kode + ['='] + værdi tekst url-kode.
 	}.
-	egen params := ['?'] + ( params saml: ['&'] ).
+	egen url-parametre := ['?'] + ( url-parametre saml: ['&'] ).
 }.
 
 URL ved: ['hash:'] gør: { :hash

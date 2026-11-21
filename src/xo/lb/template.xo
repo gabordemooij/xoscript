@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objet nei.
+>> Virlag := Objet nei.
 
-Template bei: ['nei'] maachen: { <- selwer nei content: [''].
+Virlag bei: ['nei'] maachen: { <- selwer nei inhalt: [''].
 }.
 
-Template bei: ['content:'] maachen: { :content
-	eegen content := content. 
+Virlag bei: ['inhalt:'] maachen: { :inhalt
+	eegen inhalt := inhalt. 
 }.
 
-Template bei: ['nei:'] maachen: { :content <- selwer nei content: content.
+Virlag bei: ['nei:'] maachen: { :inhalt <- selwer nei inhalt: inhalt.
 }.
 
-Template bei: ['cut:'] maachen: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := eegen content deelen: startmarker.
-	>> prefix := parts éischten.
-	>> parts2 := parts lescht deelen: endmarker.
-	>> suffix := parts2 lescht.
-	>> part := parts2 éischten.
-	>> rest := prefix + suffix.
-	eegen content := rest. <- Template nei: part.
+Virlag bei: ['ausschneiden:'] maachen: { :markéierung
+	>> startmarkéierung := (['<!-- cut:%id% -->'] %id%: markéierung).
+	>> ennmarkéierung := (['<!-- /cut:%id% -->'] %id%: markéierung).
+	>> deeler := eegen inhalt deelen: startmarkéierung.
+	>> präfix := deeler éischten.
+	>> deeler2 := deeler lescht deelen: ennmarkéierung.
+	>> suffix := deeler2 lescht.
+	>> deel := deeler2 éischten.
+	>> rescht := präfix + suffix.
+	eegen inhalt := rescht. <- Virlag nei: deel.
 	
 }.
 
-Template bei: ['kopéieren'] maachen: { <- selwer nei: selwer text kopéieren.
+Virlag bei: ['kopéieren'] maachen: { <- selwer nei: selwer text kopéieren.
 }.
 	
-Template bei: ['paste:at:'] maachen: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	eegen content ersetzen: pastemarker mat: ( snippet text + pastemarker ).
+Virlag bei: ['apechen:bei:'] maachen: { :schnëppel :id
+	>> apechmark := (['<!-- paste:%id% -->'] %id%: id).
+	eegen inhalt ersetzen: apechmark mat: ( schnëppel text + apechmark ).
 }.
 
-Template bei: ['setzen:wäert:'] maachen: { :slot :value
-	eegen content ersetzen: ['<!-- slot:'] + slot + [' -->'] mat: ( Server html-kodéieren: value ).
+Virlag bei: ['setzen:wäert:'] maachen: { :plaz :wäert
+	eegen inhalt ersetzen: ['<!-- slot:'] + plaz + [' -->'] mat: ( Server html-kodéieren: wäert ).
 }.
 
-Template bei: ['set:html:'] maachen: { :slot :html
-	eegen content ersetzen: ['<!-- slot:'] + slot + [' -->'] mat: html.
+Virlag bei: ['setzen:html:'] maachen: { :plaz :html
+	eegen inhalt ersetzen: ['<!-- slot:'] + plaz + [' -->'] mat: html.
 }.
 
-Template bei: ['äntweren:an:'] maachen: { :slot :value
-	selwer setzen: (slot vun: 0 längt: (slot längt - 1)) wäert: value.
+Virlag bei: ['äntweren:an:'] maachen: { :plaz :wäert
+	selwer setzen: (plaz vun: 0 längt: (plaz längt - 1)) wäert: wäert.
 }.
 
-Template bei: ['nl2br'] maachen: {
-	eegen content ersetzen: ['\n'] mat: ['<br>'].
+Virlag bei: ['nl2br'] maachen: {
+	eegen inhalt ersetzen: ['\n'] mat: ['<br>'].
 }.
 
-Template bei: ['clean'] maachen: {
-	eegen content :=
+Virlag bei: ['propper-maachen'] maachen: {
+	eegen inhalt :=
 		Muster
 		nei: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		treffer: eegen content
+		treffer: eegen inhalt
 		maachen: { <- ['']. }.
 }.
 
-Template bei: ['clean-cuts'] maachen: {
-	>> items := Lëscht nei.
+Virlag bei: ['schnëtt-propper-maachen'] maachen: {
+	>> elementer := Lëscht nei.
 	Muster
 	nei: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	treffer: eegen content
-	maachen: { :_ :part
-		items drunhänken: part ? 1.
+	treffer: eegen inhalt
+	maachen: { :_ :deel
+		elementer drunhänken: deel ? 1.
 	}.
-	items all: { :_ :id
-		eegen content :=
+	elementer all: { :_ :id
+		eegen inhalt :=
 			Muster nei: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			treffer: eegen content
+			treffer: eegen inhalt
 			maachen: { <- ['']. }.
 	 }.
 }.
 
-Template bei: ['clean-space'] maachen: {
-	eegen content :=
+Virlag bei: ['leerraum-propper-maachen'] maachen: {
+	eegen inhalt :=
 		Muster
 		nei: ['\\s*\\n'],
-		treffer: eegen content
+		treffer: eegen inhalt
 		maachen: { <- ['\n']. }.
-	eegen content :=
+	eegen inhalt :=
 		Muster
 		nei: ['\\n[\\s\\t]+'],
-		treffer: eegen content
+		treffer: eegen inhalt
 		maachen: { <- ['\n']. }.
 }.
 
-Template bei: ['clean-all'] maachen: {
-	selwer clean.
-	selwer clean-cuts.
-	selwer clean-space.
+Virlag bei: ['alles-propper-maachen'] maachen: {
+	selwer propper-maachen.
+	selwer schnëtt-propper-maachen.
+	selwer leerraum-propper-maachen.
 }.
 
-Template bei: ['text'] maachen: { <- eegen content.
+Virlag bei: ['text'] maachen: { <- eegen inhalt.
 }.

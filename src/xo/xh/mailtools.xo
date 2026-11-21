@@ -1,128 +1,128 @@
->> Email := Into entsha.
+>> I-imeyile := Into entsha.
 
-Email xa-kufika: ['init'] yenza: {
-	eyakho recipients := Uluhlu entsha.
+I-imeyile xa-kufika: ['lungiselela'] yenza: {
+	eyakho abamkeli := Uluhlu entsha.
 	eyakho cc := Uluhlu entsha.
 	eyakho bcc := Uluhlu entsha.
-	eyakho from := Engenanto.
-	eyakho from-name := Engenanto.
-	eyakho subject := Engenanto.
-	eyakho body := Engenanto.
+	eyakho umthumeli := Engenanto.
+	eyakho igama-lomthumeli := Engenanto.
+	eyakho umbandela := Engenanto.
+	eyakho umzimba := Engenanto.
 }.
 
-Email xa-kufika: ['entsha'] yenza: { <- ngokwakho entsha init.
+I-imeyile xa-kufika: ['entsha'] yenza: { <- ngokwakho entsha lungiselela.
 }.
 
-Email xa-kufika: ['to:'] yenza: { :list
-	eyakho recipients := list.
+I-imeyile xa-kufika: ['ku:'] yenza: { :uludwe-lwezinto
+	eyakho abamkeli := uludwe-lwezinto.
 }.
  
-Email xa-kufika: ['cc:'] yenza: { :list
-	eyakho cc := list.
+I-imeyile xa-kufika: ['cc:'] yenza: { :uludwe-lwezinto
+	eyakho cc := uludwe-lwezinto.
 }.
 
-Email xa-kufika: ['bcc:'] yenza: { :list
-	eyakho bcc := list.
+I-imeyile xa-kufika: ['bcc:'] yenza: { :uludwe-lwezinto
+	eyakho bcc := uludwe-lwezinto.
 }.
 
-Email xa-kufika: ['subject:'] yenza: { :subject
-	eyakho subject := subject.
+I-imeyile xa-kufika: ['umbandela:'] yenza: { :umbandela
+	eyakho umbandela := umbandela.
 }.
 
-Email xa-kufika: ['from:name:'] yenza: { :from :igama
-	eyakho from := from.
-	eyakho from-name := igama.
+I-imeyile xa-kufika: ['umthumeli:igama:'] yenza: { :umthumeli :igama
+	eyakho umthumeli := umthumeli.
+	eyakho igama-lomthumeli := igama.
 }.
 
-Email xa-kufika: ['body:'] yenza: { :body
-	eyakho body := body.
+I-imeyile xa-kufika: ['umzimba:'] yenza: { :umzimba
+	eyakho umzimba := umzimba.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email xa-kufika: ['header:'] yenza: { :line <- line buyisela: ['\r'] nge: [''], buyisela: ['\n'] nge: [''].
+I-imeyile xa-kufika: ['isihloko:'] yenza: { :umgca <- umgca buyisela: ['\r'] nge: [''], buyisela: ['\n'] nge: [''].
 }.
 
-Email xa-kufika: ['send'] yenza: {
-	>> f := Ifayile tempwrite: ngokwakho generate.
+I-imeyile xa-kufika: ['thumela'] yenza: {
+	>> f := Ifayile tempwrite: ngokwakho velisa.
 	Inkqubo isixokelelwano: ['sendmail -t < '] + f indlela-yefayile, umgca-omtsha.
 }.
 
-Email xa-kufika: ['generate'] yenza: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str yongeza-ekugqibeleni: (ngokwakho header: ['From: '] + eyakho from-name + [' <'] + ( eyakho from ) + ['>']) + brk.
-	str yongeza-ekugqibeleni: (ngokwakho header: ['To: '] + ( eyakho recipients dibanisa: [','] )) + brk.
+I-imeyile xa-kufika: ['velisa'] yenza: {
+	>> ukwaphula-umgca := ['\r\n'].
+	>> umtya-wombhalo := [''].
+	umtya-wombhalo yongeza-ekugqibeleni: (ngokwakho isihloko: ['From: '] + eyakho igama-lomthumeli + [' <'] + ( eyakho umthumeli ) + ['>']) + ukwaphula-umgca.
+	umtya-wombhalo yongeza-ekugqibeleni: (ngokwakho isihloko: ['To: '] + ( eyakho abamkeli dibanisa: [','] )) + ukwaphula-umgca.
 	eyakho cc inani-lezinto inyaniso: {
-		str yongeza-ekugqibeleni: (ngokwakho header: ['Cc: '] + ( eyakho cc dibanisa: [','] )) + brk.
+		umtya-wombhalo yongeza-ekugqibeleni: (ngokwakho isihloko: ['Cc: '] + ( eyakho cc dibanisa: [','] )) + ukwaphula-umgca.
 	}.
 	eyakho bcc inani-lezinto inyaniso: {
-		str yongeza-ekugqibeleni: (ngokwakho header: ['Bcc: '] + ( eyakho bcc dibanisa: [','] )) + brk.
+		umtya-wombhalo yongeza-ekugqibeleni: (ngokwakho isihloko: ['Bcc: '] + ( eyakho bcc dibanisa: [','] )) + ukwaphula-umgca.
 	}.
-	str yongeza-ekugqibeleni: (ngokwakho header: ['Subject: '] + eyakho subject) + brk.
-	str yongeza-ekugqibeleni: brk.
-	str yongeza-ekugqibeleni: eyakho body.
-	str yongeza-ekugqibeleni: brk. <- str.
+	umtya-wombhalo yongeza-ekugqibeleni: (ngokwakho isihloko: ['Subject: '] + eyakho umbandela) + ukwaphula-umgca.
+	umtya-wombhalo yongeza-ekugqibeleni: ukwaphula-umgca.
+	umtya-wombhalo yongeza-ekugqibeleni: eyakho umzimba.
+	umtya-wombhalo yongeza-ekugqibeleni: ukwaphula-umgca. <- umtya-wombhalo.
 }.
 
->> HTML-Email := Email entsha.
+>> I-imeyile-HTML := I-imeyile entsha.
 
-HTML-Email xa-kufika: ['init'] yenza: {
-	ngokwakho init.
-	eyakho attachments := Uluhlu entsha.
-	eyakho boundary := Isisefu ithokheni: 40.
+I-imeyile-HTML xa-kufika: ['lungiselela'] yenza: {
+	ngokwakho lungiselela.
+	eyakho izinto-eziqhotyoshelweyo := Uluhlu entsha.
+	eyakho umda := Isisefu ithokheni: 40.
 }.
 
-HTML-Email xa-kufika: ['attach:'] yenza: { :file
-	>> id := eyakho attachments inani-lezinto.
-	>> blob := file blob.
-	eyakho attachments yongeza-ekugqibeleni: (
+I-imeyile-HTML xa-kufika: ['qhoboshela:'] yenza: { :ifayile-yeseshoni
+	>> id := eyakho izinto-eziqhotyoshelweyo inani-lezinto.
+	>> blob := ifayile-yeseshoni blob.
+	eyakho izinto-eziqhotyoshelweyo yongeza-ekugqibeleni: (
 		Isichazimagama entsha
-			file: file indlela-yefayile,
-			mime: ['image/'] + (Server mimetype: file indlela-yefayile),
-			data: blob base64-faka-ikhowudi
+			ifayile-yeseshoni: ifayile-yeseshoni indlela-yefayile,
+			mime: ['image/'] + (Server mimetype: ifayile-yeseshoni indlela-yefayile),
+			idatha: blob base64-faka-ikhowudi
 	).
 	blob khulula. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email xa-kufika: ['generate'] yenza: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str yongeza-ekugqibeleni: (ngokwakho header: ['From: '] + eyakho from-name + [' <'] + ( eyakho from ) + ['>']) + brk.
-	str yongeza-ekugqibeleni: (ngokwakho header: ['To: '] + ( eyakho recipients dibanisa: [','] )) + brk.
+I-imeyile-HTML xa-kufika: ['velisa'] yenza: {
+	>> ukwaphula-umgca := ['\r\n'].
+	>> umtya-wombhalo := [''].
+	umtya-wombhalo yongeza-ekugqibeleni: (ngokwakho isihloko: ['From: '] + eyakho igama-lomthumeli + [' <'] + ( eyakho umthumeli ) + ['>']) + ukwaphula-umgca.
+	umtya-wombhalo yongeza-ekugqibeleni: (ngokwakho isihloko: ['To: '] + ( eyakho abamkeli dibanisa: [','] )) + ukwaphula-umgca.
 	eyakho cc inani-lezinto inyaniso: {
-		str yongeza-ekugqibeleni: (ngokwakho header: ['Cc: '] + ( eyakho cc dibanisa: [','] )) + brk.
+		umtya-wombhalo yongeza-ekugqibeleni: (ngokwakho isihloko: ['Cc: '] + ( eyakho cc dibanisa: [','] )) + ukwaphula-umgca.
 	}.
 	eyakho bcc inani-lezinto inyaniso: {
-		str yongeza-ekugqibeleni: (ngokwakho header: ['Bcc: '] + ( eyakho bcc dibanisa: [','] )) + brk.
+		umtya-wombhalo yongeza-ekugqibeleni: (ngokwakho isihloko: ['Bcc: '] + ( eyakho bcc dibanisa: [','] )) + ukwaphula-umgca.
 	}.
-	str yongeza-ekugqibeleni: (ngokwakho header: ['Subject: '] + eyakho subject) + brk.
-	str yongeza-ekugqibeleni: ['MIME-Version: 1.0'] + brk.
-	str yongeza-ekugqibeleni: ['Content-Type: multipart/related; boundary="'] + eyakho boundary + ['"; type=text/html'] + brk.
-	str yongeza-ekugqibeleni: brk.
-	str yongeza-ekugqibeleni: ['--'] + eyakho boundary + brk.
-	str yongeza-ekugqibeleni: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str yongeza-ekugqibeleni: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str yongeza-ekugqibeleni: brk.
-	str yongeza-ekugqibeleni: eyakho body.
-	str yongeza-ekugqibeleni: brk.
-	eyakho attachments nganye: { :id :info
-		>> blob := info data.
-		str yongeza-ekugqibeleni: ['--'] + eyakho boundary + brk.
-		str yongeza-ekugqibeleni: ['Content-Type: '] + info mime + brk.
-		str yongeza-ekugqibeleni: ['Content-Transfer-Encoding: base64'] + brk.
-		str yongeza-ekugqibeleni: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str yongeza-ekugqibeleni: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str yongeza-ekugqibeleni: brk.
-		>> max := 76.
-		>> len := blob ubude.
-		>> chunks := (len / max) nyusa-inani.
+	umtya-wombhalo yongeza-ekugqibeleni: (ngokwakho isihloko: ['Subject: '] + eyakho umbandela) + ukwaphula-umgca.
+	umtya-wombhalo yongeza-ekugqibeleni: ['MIME-Version: 1.0'] + ukwaphula-umgca.
+	umtya-wombhalo yongeza-ekugqibeleni: ['Content-Type: multipart/related; boundary="'] + eyakho umda + ['"; type=text/html'] + ukwaphula-umgca.
+	umtya-wombhalo yongeza-ekugqibeleni: ukwaphula-umgca.
+	umtya-wombhalo yongeza-ekugqibeleni: ['--'] + eyakho umda + ukwaphula-umgca.
+	umtya-wombhalo yongeza-ekugqibeleni: ['Content-Type: text/html; charset=UTF-8'] + ukwaphula-umgca.
+	umtya-wombhalo yongeza-ekugqibeleni: ['Content-Transfer-Encoding: 7bit'] + ukwaphula-umgca.
+	umtya-wombhalo yongeza-ekugqibeleni: ukwaphula-umgca.
+	umtya-wombhalo yongeza-ekugqibeleni: eyakho umzimba.
+	umtya-wombhalo yongeza-ekugqibeleni: ukwaphula-umgca.
+	eyakho izinto-eziqhotyoshelweyo nganye: { :id :ulwazi
+		>> blob := ulwazi idatha.
+		umtya-wombhalo yongeza-ekugqibeleni: ['--'] + eyakho umda + ukwaphula-umgca.
+		umtya-wombhalo yongeza-ekugqibeleni: ['Content-Type: '] + ulwazi mime + ukwaphula-umgca.
+		umtya-wombhalo yongeza-ekugqibeleni: ['Content-Transfer-Encoding: base64'] + ukwaphula-umgca.
+		umtya-wombhalo yongeza-ekugqibeleni: ['Content-ID: <attachment'] + id + ['>'] + ukwaphula-umgca.
+		umtya-wombhalo yongeza-ekugqibeleni: ['Content-Disposition: inline; filename="'] + ulwazi ifayile-yeseshoni + ['"'] + ukwaphula-umgca.
+		umtya-wombhalo yongeza-ekugqibeleni: ukwaphula-umgca.
+		>> eyona-ninzi := 76.
+		>> ubude-bombhalo := blob ubude.
+		>> iziqwenga := (ubude-bombhalo / eyona-ninzi) nyusa-inani.
 		{ :i
-			>> chunk := blob kopa ukusuka: i * max ubude: max.
-			str yongeza-ekugqibeleni: chunk + brk.
-		} * chunks.
-		str yongeza-ekugqibeleni: brk.
-		str yongeza-ekugqibeleni: brk.
+			>> isiqwenga := blob kopa ukusuka: i * eyona-ninzi ubude: eyona-ninzi.
+			umtya-wombhalo yongeza-ekugqibeleni: isiqwenga + ukwaphula-umgca.
+		} * iziqwenga.
+		umtya-wombhalo yongeza-ekugqibeleni: ukwaphula-umgca.
+		umtya-wombhalo yongeza-ekugqibeleni: ukwaphula-umgca.
 	}.
-	str yongeza-ekugqibeleni: ['--'] + eyakho boundary + ['--'] + brk. <- str.
+	umtya-wombhalo yongeza-ekugqibeleni: ['--'] + eyakho umda + ['--'] + ukwaphula-umgca. <- umtya-wombhalo.
 }.

@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Ughjettu novu.
+>> Sagoma := Ughjettu novu.
 
-Template quandu: ['novu'] fà: { <- sè novu content: [''].
+Sagoma quandu: ['novu'] fà: { <- sè novu cuntenutu: [''].
 }.
 
-Template quandu: ['content:'] fà: { :content
-	propiu content := content. 
+Sagoma quandu: ['cuntenutu:'] fà: { :cuntenutu
+	propiu cuntenutu := cuntenutu. 
 }.
 
-Template quandu: ['novu:'] fà: { :content <- sè novu content: content.
+Sagoma quandu: ['novu:'] fà: { :cuntenutu <- sè novu cuntenutu: cuntenutu.
 }.
 
-Template quandu: ['cut:'] fà: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := propiu content sparte: startmarker.
-	>> prefix := parts primu.
-	>> parts2 := parts ultimu sparte: endmarker.
-	>> suffix := parts2 ultimu.
-	>> part := parts2 primu.
-	>> rest := prefix + suffix.
-	propiu content := rest. <- Template novu: part.
+Sagoma quandu: ['taglià:'] fà: { :marcatore
+	>> marcatore-iniziu := (['<!-- cut:%id% -->'] %id%: marcatore).
+	>> marcatore-fine := (['<!-- /cut:%id% -->'] %id%: marcatore).
+	>> parti := propiu cuntenutu sparte: marcatore-iniziu.
+	>> prefissu := parti primu.
+	>> parti2 := parti ultimu sparte: marcatore-fine.
+	>> suffissu := parti2 ultimu.
+	>> parte := parti2 primu.
+	>> restu := prefissu + suffissu.
+	propiu cuntenutu := restu. <- Sagoma novu: parte.
 	
 }.
 
-Template quandu: ['cupià'] fà: { <- sè novu: sè testu cupià.
+Sagoma quandu: ['cupià'] fà: { <- sè novu: sè testu cupià.
 }.
 	
-Template quandu: ['paste:at:'] fà: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	propiu content rimpiazzà: pastemarker cù: ( snippet testu + pastemarker ).
+Sagoma quandu: ['incullà:à:'] fà: { :ritagliu :id
+	>> marcatore-incolla := (['<!-- paste:%id% -->'] %id%: id).
+	propiu cuntenutu rimpiazzà: marcatore-incolla cù: ( ritagliu testu + marcatore-incolla ).
 }.
 
-Template quandu: ['definisce:valore:'] fà: { :slot :value
-	propiu content rimpiazzà: ['<!-- slot:'] + slot + [' -->'] cù: ( Server html-cudificà: value ).
+Sagoma quandu: ['definisce:valore:'] fà: { :piazza :valore
+	propiu cuntenutu rimpiazzà: ['<!-- slot:'] + piazza + [' -->'] cù: ( Server html-cudificà: valore ).
 }.
 
-Template quandu: ['set:html:'] fà: { :slot :html
-	propiu content rimpiazzà: ['<!-- slot:'] + slot + [' -->'] cù: html.
+Sagoma quandu: ['definisce:html:'] fà: { :piazza :html
+	propiu cuntenutu rimpiazzà: ['<!-- slot:'] + piazza + [' -->'] cù: html.
 }.
 
-Template quandu: ['risponde:è:'] fà: { :slot :value
-	sè definisce: (slot da: 0 lunghezza: (slot lunghezza - 1)) valore: value.
+Sagoma quandu: ['risponde:è:'] fà: { :piazza :valore
+	sè definisce: (piazza da: 0 lunghezza: (piazza lunghezza - 1)) valore: valore.
 }.
 
-Template quandu: ['nl2br'] fà: {
-	propiu content rimpiazzà: ['\n'] cù: ['<br>'].
+Sagoma quandu: ['nl2br'] fà: {
+	propiu cuntenutu rimpiazzà: ['\n'] cù: ['<br>'].
 }.
 
-Template quandu: ['clean'] fà: {
-	propiu content :=
+Sagoma quandu: ['purificà'] fà: {
+	propiu cuntenutu :=
 		Mudellu
 		novu: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		currispundenza: propiu content
+		currispundenza: propiu cuntenutu
 		fà: { <- ['']. }.
 }.
 
-Template quandu: ['clean-cuts'] fà: {
-	>> items := Lista novu.
+Sagoma quandu: ['purificà-taglii'] fà: {
+	>> elementi := Lista novu.
 	Mudellu
 	novu: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	currispundenza: propiu content
-	fà: { :_ :part
-		items aghjunghje-à-a-fine: part ? 1.
+	currispundenza: propiu cuntenutu
+	fà: { :_ :parte
+		elementi aghjunghje-à-a-fine: parte ? 1.
 	}.
-	items ognunu: { :_ :id
-		propiu content :=
+	elementi ognunu: { :_ :id
+		propiu cuntenutu :=
 			Mudellu novu: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			currispundenza: propiu content
+			currispundenza: propiu cuntenutu
 			fà: { <- ['']. }.
 	 }.
 }.
 
-Template quandu: ['clean-space'] fà: {
-	propiu content :=
+Sagoma quandu: ['purificà-spazii'] fà: {
+	propiu cuntenutu :=
 		Mudellu
 		novu: ['\\s*\\n'],
-		currispundenza: propiu content
+		currispundenza: propiu cuntenutu
 		fà: { <- ['\n']. }.
-	propiu content :=
+	propiu cuntenutu :=
 		Mudellu
 		novu: ['\\n[\\s\\t]+'],
-		currispundenza: propiu content
+		currispundenza: propiu cuntenutu
 		fà: { <- ['\n']. }.
 }.
 
-Template quandu: ['clean-all'] fà: {
-	sè clean.
-	sè clean-cuts.
-	sè clean-space.
+Sagoma quandu: ['purificà-tuttu'] fà: {
+	sè purificà.
+	sè purificà-taglii.
+	sè purificà-spazii.
 }.
 
-Template quandu: ['testu'] fà: { <- propiu content.
+Sagoma quandu: ['testu'] fà: { <- propiu cuntenutu.
 }.

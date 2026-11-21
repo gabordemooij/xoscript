@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Obyek anyar.
+>> Cithakan := Obyek anyar.
 
-Template nalika: ['anyar'] tindakna: { <- dhiri anyar content: [''].
+Cithakan nalika: ['anyar'] tindakna: { <- dhiri anyar isi: [''].
 }.
 
-Template nalika: ['content:'] tindakna: { :content
-	duweke content := content. 
+Cithakan nalika: ['isi:'] tindakna: { :isi
+	duweke isi := isi. 
 }.
 
-Template nalika: ['anyar:'] tindakna: { :content <- dhiri anyar content: content.
+Cithakan nalika: ['anyar:'] tindakna: { :isi <- dhiri anyar isi: isi.
 }.
 
-Template nalika: ['cut:'] tindakna: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := duweke content pisah: startmarker.
-	>> prefix := parts pisanan.
-	>> parts2 := parts pungkasan pisah: endmarker.
-	>> suffix := parts2 pungkasan.
-	>> part := parts2 pisanan.
-	>> rest := prefix + suffix.
-	duweke content := rest. <- Template anyar: part.
+Cithakan nalika: ['potong:'] tindakna: { :tandha
+	>> tandha-wiwitan := (['<!-- cut:%id% -->'] %id%: tandha).
+	>> tandha-pungkasan := (['<!-- /cut:%id% -->'] %id%: tandha).
+	>> perangan-perangan := duweke isi pisah: tandha-wiwitan.
+	>> awalan := perangan-perangan pisanan.
+	>> perangan-perangan2 := perangan-perangan pungkasan pisah: tandha-pungkasan.
+	>> akhiran := perangan-perangan2 pungkasan.
+	>> perangan := perangan-perangan2 pisanan.
+	>> turahan := awalan + akhiran.
+	duweke isi := turahan. <- Cithakan anyar: perangan.
 	
 }.
 
-Template nalika: ['salin'] tindakna: { <- dhiri anyar: dhiri tèks salin.
+Cithakan nalika: ['salin'] tindakna: { <- dhiri anyar: dhiri tèks salin.
 }.
 	
-Template nalika: ['paste:at:'] tindakna: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	duweke content ganti: pastemarker nganggo: ( snippet tèks + pastemarker ).
+Cithakan nalika: ['tempel:ing:'] tindakna: { :cuplikan :id
+	>> tandha-tempel := (['<!-- paste:%id% -->'] %id%: id).
+	duweke isi ganti: tandha-tempel nganggo: ( cuplikan tèks + tandha-tempel ).
 }.
 
-Template nalika: ['atur:nilai:'] tindakna: { :slot :value
-	duweke content ganti: ['<!-- slot:'] + slot + [' -->'] nganggo: ( Server html-enkode: value ).
+Cithakan nalika: ['atur:nilai:'] tindakna: { :slot :nilai
+	duweke isi ganti: ['<!-- slot:'] + slot + [' -->'] nganggo: ( Server html-enkode: nilai ).
 }.
 
-Template nalika: ['set:html:'] tindakna: { :slot :html
-	duweke content ganti: ['<!-- slot:'] + slot + [' -->'] nganggo: html.
+Cithakan nalika: ['atur:html:'] tindakna: { :slot :html
+	duweke isi ganti: ['<!-- slot:'] + slot + [' -->'] nganggo: html.
 }.
 
-Template nalika: ['wangsuli:lan:'] tindakna: { :slot :value
-	dhiri atur: (slot saka: 0 dawa: (slot dawa - 1)) nilai: value.
+Cithakan nalika: ['wangsuli:lan:'] tindakna: { :slot :nilai
+	dhiri atur: (slot saka: 0 dawa: (slot dawa - 1)) nilai: nilai.
 }.
 
-Template nalika: ['nl2br'] tindakna: {
-	duweke content ganti: ['\n'] nganggo: ['<br>'].
+Cithakan nalika: ['nl2br'] tindakna: {
+	duweke isi ganti: ['\n'] nganggo: ['<br>'].
 }.
 
-Template nalika: ['clean'] tindakna: {
-	duweke content :=
+Cithakan nalika: ['tata'] tindakna: {
+	duweke isi :=
 		Pola
 		anyar: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		cocog: duweke content
+		cocog: duweke isi
 		tindakna: { <- ['']. }.
 }.
 
-Template nalika: ['clean-cuts'] tindakna: {
-	>> items := Dhaptar anyar.
+Cithakan nalika: ['tata-potongan'] tindakna: {
+	>> butir := Dhaptar anyar.
 	Pola
 	anyar: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	cocog: duweke content
-	tindakna: { :_ :part
-		items tambah-ing-mburi: part ? 1.
+	cocog: duweke isi
+	tindakna: { :_ :perangan
+		butir tambah-ing-mburi: perangan ? 1.
 	}.
-	items saben: { :_ :id
-		duweke content :=
+	butir saben: { :_ :id
+		duweke isi :=
 			Pola anyar: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			cocog: duweke content
+			cocog: duweke isi
 			tindakna: { <- ['']. }.
 	 }.
 }.
 
-Template nalika: ['clean-space'] tindakna: {
-	duweke content :=
+Cithakan nalika: ['tata-spasi'] tindakna: {
+	duweke isi :=
 		Pola
 		anyar: ['\\s*\\n'],
-		cocog: duweke content
+		cocog: duweke isi
 		tindakna: { <- ['\n']. }.
-	duweke content :=
+	duweke isi :=
 		Pola
 		anyar: ['\\n[\\s\\t]+'],
-		cocog: duweke content
+		cocog: duweke isi
 		tindakna: { <- ['\n']. }.
 }.
 
-Template nalika: ['clean-all'] tindakna: {
-	dhiri clean.
-	dhiri clean-cuts.
-	dhiri clean-space.
+Cithakan nalika: ['tata-kabeh'] tindakna: {
+	dhiri tata.
+	dhiri tata-potongan.
+	dhiri tata-spasi.
 }.
 
-Template nalika: ['tèks'] tindakna: { <- duweke content.
+Cithakan nalika: ['tèks'] tindakna: { <- duweke isi.
 }.

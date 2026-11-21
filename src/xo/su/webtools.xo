@@ -1,302 +1,302 @@
-Paménta-HTTP nalika: ['HTTP-header:'] lakukeun: { :key <- Program setélan: key.
+Paménta-HTTP nalika: ['HTTP-lulugu:'] lakukeun: { :konci-lulugu <- Program setélan: konci-lulugu.
 }.
 
->> HTTP-Header := Obyek anyar.
+>> Lulugu-HTTP := Obyek anyar.
 
-HTTP-Header nalika: ['anyar'] lakukeun: { <- diri anyar init.
+Lulugu-HTTP nalika: ['anyar'] lakukeun: { <- diri anyar siapkeun.
 }.
 
-HTTP-Header nalika: ['init'] lakukeun: {
-	milik key := Kosong.
-	milik value := Kosong.
+Lulugu-HTTP nalika: ['siapkeun'] lakukeun: {
+	milik konci-lulugu := Kosong.
+	milik nilai := Kosong.
 }.
 
-HTTP-Header nalika: ['key:value:'] lakukeun: { :key :value
-	milik key := key.
-	milik value := value.
+Lulugu-HTTP nalika: ['konci-lulugu:nilai:'] lakukeun: { :konci-lulugu :nilai
+	milik konci-lulugu := konci-lulugu.
+	milik nilai := nilai.
 }.
 
-HTTP-Header nalika: ['key'] lakukeun: { <- milik key.
+Lulugu-HTTP nalika: ['konci-lulugu'] lakukeun: { <- milik konci-lulugu.
 }.
 
-HTTP-Header nalika: ['value'] lakukeun: { <- milik value.
+Lulugu-HTTP nalika: ['nilai'] lakukeun: { <- milik nilai.
 }.
 
 
-HTTP-Header nalika: ['téks'] lakukeun: {
-	>> line := milik key + [': '] + milik value.
-	line ganti: ['\r'] ku: [''], ganti: ['\n'] ku: ['']. <- line + [' \r\n'].
+Lulugu-HTTP nalika: ['téks'] lakukeun: {
+	>> baris := milik konci-lulugu + [': '] + milik nilai.
+	baris ganti: ['\r'] ku: [''], ganti: ['\n'] ku: ['']. <- baris + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Obyek anyar.
+>> Dokumén-Wéb := Obyek anyar.
 
-Web-Document nalika: ['anyar'] lakukeun: { <- diri anyar init.
+Dokumén-Wéb nalika: ['anyar'] lakukeun: { <- diri anyar siapkeun.
 }.
 
-Web-Document nalika: ['init'] lakukeun: {
-	milik headers := Daptar anyar.
-	milik sess-id := Kosong.
-	milik session-manager := Tempfile-Session anyar.
-	milik sessdata := Kosong.
-	milik secure := Bener.
-	milik same-site := ['Strict'].
-	milik headers-out := Salah.
-	milik request := Paménta-HTTP anyar.
+Dokumén-Wéb nalika: ['siapkeun'] lakukeun: {
+	milik daptar-lulugu := Daptar anyar.
+	milik id-sési := Kosong.
+	milik pangatur-sési := Sési-berkas-samentawis anyar.
+	milik data-sési := Kosong.
+	milik aman := Bener.
+	milik situs-sami := ['Strict'].
+	milik lulugu-dikirim := Salah.
+	milik pamundut-http := Paménta-HTTP anyar.
 }.
 
-Web-Document nalika: ['request:'] lakukeun: { :request
-	milik request := request.
+Dokumén-Wéb nalika: ['pamundut-http:'] lakukeun: { :pamundut-http
+	milik pamundut-http := pamundut-http.
 }. 
 
-Web-Document nalika: ['secure-session-cookie:'] lakukeun: { :secure
-	diri check-headers.
-	milik secure := secure.
+Dokumén-Wéb nalika: ['kuki-sési-aman:'] lakukeun: { :aman
+	diri pariksa-lulugu.
+	milik aman := aman.
 }.
 
-Web-Document nalika: ['same-site-session-cookie:'] lakukeun: { :value
-	diri check-headers.
-	>> options := Daptar anyar 
+Dokumén-Wéb nalika: ['kuki-sési-situs-sami:'] lakukeun: { :nilai
+	diri pariksa-lulugu.
+	>> pilihan := Daptar anyar 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options ngandung: value, salah: {
+	pilihan miboga: nilai, salah: {
 		tugas-ieu kasalahan: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	milik same-site := value.
+	milik situs-sami := nilai.
 }.
 
-Web-Document nalika: ['header:'] lakukeun: { :header
-	diri check-headers.
-	milik headers tambah-di-tungtung: header.
+Dokumén-Wéb nalika: ['lulugu:'] lakukeun: { :lulugu
+	diri pariksa-lulugu.
+	milik daptar-lulugu tambah-di-tungtung: lulugu.
 }.
 
-Web-Document nalika: ['clear-headers'] lakukeun: {
-	diri check-headers.
-	milik headers := Daptar anyar.
+Dokumén-Wéb nalika: ['kosongkeun-lulugu'] lakukeun: {
+	diri pariksa-lulugu.
+	milik daptar-lulugu := Daptar anyar.
 }.
 
-Web-Document nalika: ['session-manager:'] lakukeun: { :manager
-	diri check-headers.
-	milik session-manager := manager.
+Dokumén-Wéb nalika: ['pangatur-sési:'] lakukeun: { :pangatur
+	diri pariksa-lulugu.
+	milik pangatur-sési := pangatur.
 }.
 
-Web-Document nalika: ['session-manager'] lakukeun: { <- milik session-manager.
+Dokumén-Wéb nalika: ['pangatur-sési'] lakukeun: { <- milik pangatur-sési.
 }.
 
-Web-Document nalika: ['check-headers'] lakukeun: {
-	milik headers-out bener: {
+Dokumén-Wéb nalika: ['pariksa-lulugu'] lakukeun: {
+	milik lulugu-dikirim bener: {
 		tugas-ieu kasalahan: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document nalika: ['session-start'] lakukeun: {
-	diri check-headers.
-	>> request := milik request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Kosong? salah: {
-		(( Pola anyar: ['^[A-Za-z0-9]+\\z'], cocog: sess-id ) = 0) bener: {
-			sess-id := Kosong.
+Dokumén-Wéb nalika: ['mimitian-sési'] lakukeun: {
+	diri pariksa-lulugu.
+	>> pamundut-http := milik pamundut-http.
+	>> id-sési := pamundut-http cookie: ['xsid'].
+	id-sési Kosong? salah: {
+		(( Pola anyar: ['^[A-Za-z0-9]+\\z'], cocog: id-sési ) = 0) bener: {
+			id-sési := Kosong.
 		}.
 	}.
-	sess-id Kosong? bener: {
-		sess-id := Brankas token: 30.
-		>> session-header := HTTP-Header anyar
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (milik secure pilih: ['Secure'] atawa: ['']),
-		SSITE: (milik same-site),
-		XSID: sess-id
+	id-sési Kosong? bener: {
+		id-sési := Brankas token: 30.
+		>> lulugu-sési := Lulugu-HTTP anyar
+		konci-lulugu: ['Set-Cookie'] nilai: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (milik aman pilih: ['Secure'] atawa: ['']),
+		SSITE: (milik situs-sami),
+		XSID: id-sési
 		).
-		milik headers tambah-di-tungtung: session-header.
+		milik daptar-lulugu tambah-di-tungtung: lulugu-sési.
 	}.
-	milik sessdata := milik session-manager for: sess-id, load. <- milik sessdata. # reference
+	milik data-sési := milik pangatur-sési pikeun: id-sési, muat. <- milik data-sési. # reference
 }.
 
-Web-Document nalika: ['goto:'] lakukeun: { :url
-	diri check-headers.
-	diri clear-headers.
-	milik headers
+Dokumén-Wéb nalika: ['angkat-ka:'] lakukeun: { :alamat
+	diri pariksa-lulugu.
+	diri kosongkeun-lulugu.
+	milik daptar-lulugu
 	tambah-di-tungtung: (
-		HTTP-Header anyar
-		key: ['Status'] value: ['303 See Other']
+		Lulugu-HTTP anyar
+		konci-lulugu: ['Status'] nilai: ['303 See Other']
 	),
 	tambah-di-tungtung: (
-		HTTP-Header anyar
-		key: ['Location'] value: url
+		Lulugu-HTTP anyar
+		konci-lulugu: ['Location'] nilai: alamat
 	).
-	diri out: ['Redirect'].
+	diri kaluarkeun: ['Redirect'].
 }.
 
-Web-Document nalika: ['session-destroy'] lakukeun: {
-	diri check-headers.
-	>> request := milik request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Kosong? salah: {
-		>> session-header := HTTP-Header anyar.
-		>> when := Waktu anyar taun: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Dokumén-Wéb nalika: ['ancurkeun-sési'] lakukeun: {
+	diri pariksa-lulugu.
+	>> pamundut-http := milik pamundut-http.
+	>> id-sési := pamundut-http cookie: ['xsid'].
+	id-sési Kosong? salah: {
+		>> lulugu-sési := Lulugu-HTTP anyar.
+		>> waktos-béak := Waktu anyar taun: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		lulugu-sési konci-lulugu: ['Set-Cookie'] nilai: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (milik secure pilih: ['Secure'] atawa: ['']),
-			SSITE: (milik same-site),
-			XSID: sess-id
+			EXP: waktos-béak,
+			SEC: (milik aman pilih: ['Secure'] atawa: ['']),
+			SSITE: (milik situs-sami),
+			XSID: id-sési
 		).
-		milik session-manager destroy.
-		milik headers tambah-di-tungtung: session-header.
+		milik pangatur-sési ancurkeun.
+		milik daptar-lulugu tambah-di-tungtung: lulugu-sési.
 	}.
 }.
 
 
-Web-Document nalika: ['template:'] lakukeun: { :jalur <- Template anyar: (Berkas anyar: jalur, baca).
+Dokumén-Wéb nalika: ['citakan:'] lakukeun: { :jalur <- Citakan anyar: (Berkas anyar: jalur, baca).
 }.
 
-Web-Document nalika: ['out:type:'] lakukeun: { :output :tipe
-	milik headers-out salah: {
-		milik sessdata Kosong? salah: {
-			milik session-manager save: milik sessdata.
+Dokumén-Wéb nalika: ['kaluarkeun:tipe:'] lakukeun: { :hasil :tipe
+	milik lulugu-dikirim salah: {
+		milik data-sési Kosong? salah: {
+			milik pangatur-sési simpen: milik data-sési.
 		}.
-		milik headers tambah-di-tungtung: (
-			HTTP-Header anyar
-			key: ['Content-type'] value: tipe
+		milik daptar-lulugu tambah-di-tungtung: (
+			Lulugu-HTTP anyar
+			konci-lulugu: ['Content-type'] nilai: tipe
 		).
-		milik headers unggal: { :_ :header
-			Kaluaran tulis: header.
+		milik daptar-lulugu unggal: { :_ :lulugu
+			Kaluaran tulis: lulugu.
 		}.
-		milik headers-out := Bener.
+		milik lulugu-dikirim := Bener.
 		Kaluaran tulis: ['\r\n'].
 	}.
-	Kaluaran tulis: output.
+	Kaluaran tulis: hasil.
 }.
 
-Web-Document nalika: ['finish:type:'] lakukeun: { :output :tipe
-	milik headers-out salah: {
-		milik sessdata Kosong? salah: {
-			milik session-manager save: milik sessdata.
+Dokumén-Wéb nalika: ['réngsékeun:tipe:'] lakukeun: { :hasil :tipe
+	milik lulugu-dikirim salah: {
+		milik data-sési Kosong? salah: {
+			milik pangatur-sési simpen: milik data-sési.
 		}.
-		milik headers tambah-di-tungtung: (
-			HTTP-Header anyar
-			key: ['Content-type'] value: tipe
+		milik daptar-lulugu tambah-di-tungtung: (
+			Lulugu-HTTP anyar
+			konci-lulugu: ['Content-type'] nilai: tipe
 		).
-		milik headers tambah-di-tungtung: (
-			HTTP-Header anyar
-			key: ['Content-Length'] value: output téks bytes
+		milik daptar-lulugu tambah-di-tungtung: (
+			Lulugu-HTTP anyar
+			konci-lulugu: ['Content-Length'] nilai: hasil téks bytes
 		).
-		milik headers unggal: { :_ :header
-			Kaluaran tulis: header.
+		milik daptar-lulugu unggal: { :_ :lulugu
+			Kaluaran tulis: lulugu.
 		}.
-		milik headers-out := Bener.
+		milik lulugu-dikirim := Bener.
 		Kaluaran tulis: ['\r\n'].
 	}.
-	Kaluaran tulis: output.
+	Kaluaran tulis: hasil.
 }.
 
-Web-Document nalika: ['out:'] lakukeun: { :output
-	diri out: output type: ['text/html; charset=utf-8'].
+Dokumén-Wéb nalika: ['kaluarkeun:'] lakukeun: { :hasil
+	diri kaluarkeun: hasil tipe: ['text/html; charset=utf-8'].
 }.
 
-Web-Document nalika: ['finish:'] lakukeun: { :output
-	diri finish: output type: ['text/html; charset=utf-8'].
+Dokumén-Wéb nalika: ['réngsékeun:'] lakukeun: { :hasil
+	diri réngsékeun: hasil tipe: ['text/html; charset=utf-8'].
 }.
 
-Web-Document nalika: ['json:'] lakukeun: { :output
-	diri out: ( JSON jsonify: output ) type: ['application/json'].
+Dokumén-Wéb nalika: ['json:'] lakukeun: { :hasil
+	diri kaluarkeun: ( JSON jsonify: hasil ) tipe: ['application/json'].
 }.
 
-Web-Document nalika: ['not-found:'] lakukeun: { :output
-	diri clear-headers header: (
-		HTTP-Header anyar key: ['Status'] value: ['404 Not Found']
+Dokumén-Wéb nalika: ['teu-kapendak:'] lakukeun: { :hasil
+	diri kosongkeun-lulugu lulugu: (
+		Lulugu-HTTP anyar konci-lulugu: ['Status'] nilai: ['404 Not Found']
 	).
-	diri out: output.
+	diri kaluarkeun: hasil.
 }.
 
 
 # Interface
 
->> Session := Obyek anyar.
+>> Sési := Obyek anyar.
 
-Session nalika: ['anyar'] lakukeun: { <- diri anyar init for: Kosong.
+Sési nalika: ['anyar'] lakukeun: { <- diri anyar siapkeun pikeun: Kosong.
 }.
 
-Session nalika: ['for:'] lakukeun: { :id
+Sési nalika: ['pikeun:'] lakukeun: { :id
 	milik id := id.
 }.
 
-Session nalika: ['load'] lakukeun: {
+Sési nalika: ['muat'] lakukeun: {
 	tugas-ieu kasalahan: ['Not implemented.'].
 }.
 
-Session nalika: ['save:'] lakukeun: {
+Sési nalika: ['simpen:'] lakukeun: {
 	tugas-ieu kasalahan: ['Not implemented.'].
 }.
 
-Session nalika: ['destroy'] lakukeun: {
+Sési nalika: ['ancurkeun'] lakukeun: {
 	tugas-ieu kasalahan: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session anyar.
+>> Sési-berkas-samentawis := Sési anyar.
 
-Tempfile-Session nalika: ['init'] lakukeun: {
-	milik pathprefix := ['/tmp/sess-'].
+Sési-berkas-samentawis nalika: ['siapkeun'] lakukeun: {
+	milik awal-jalur := ['/tmp/sess-'].
 }.
 
-Tempfile-Session nalika: ['path-prefix:'] lakukeun: { :str
-	milik pathprefix := str.
+Sési-berkas-samentawis nalika: ['awalan-jalur:'] lakukeun: { :untaian
+	milik awal-jalur := untaian.
 }.
 
-Tempfile-Session nalika: ['file'] lakukeun: { <- ( Berkas anyar: ( milik pathprefix + milik id + ['.txt'] ) ).
+Sési-berkas-samentawis nalika: ['berkas-sési'] lakukeun: { <- ( Berkas anyar: ( milik awal-jalur + milik id + ['.txt'] ) ).
 }.
 
-Tempfile-Session nalika: ['load'] lakukeun: {
-	>> file := diri file.
-	file aya salah: {
-		file tulis: (Kamus anyar kode).
-	}. <- file baca obyek.
+Sési-berkas-samentawis nalika: ['muat'] lakukeun: {
+	>> berkas-sési := diri berkas-sési.
+	berkas-sési aya salah: {
+		berkas-sési tulis: (Kamus anyar kode).
+	}. <- berkas-sési baca obyek.
 }.
 
-Tempfile-Session nalika: ['save:'] lakukeun: { :data
-	>> file := diri file.
-	file aya bener: {
-		file tulis: data kode.
+Sési-berkas-samentawis nalika: ['simpen:'] lakukeun: { :data
+	>> berkas-sési := diri berkas-sési.
+	berkas-sési aya bener: {
+		berkas-sési tulis: data kode.
 	}.
 }.
 
-Tempfile-Session nalika: ['destroy'] lakukeun: {
-	>> file := diri file.
-	file aya bener: {
-		file pupus.
+Sési-berkas-samentawis nalika: ['ancurkeun'] lakukeun: {
+	>> berkas-sési := diri berkas-sési.
+	berkas-sési aya bener: {
+		berkas-sési pupus.
 	}.
 }.
 
 
 >> URL := Obyek anyar.
 
-URL nalika: ['init'] lakukeun: {
-	milik protocol := ['https://'].
+URL nalika: ['siapkeun'] lakukeun: {
+	milik protokol := ['https://'].
 	milik hos := ['localhost'].
 	milik jalur := [''].
-	milik params := [''].
+	milik paraméter-url := [''].
 	milik hash := [''].
 }.
 
-URL nalika: ['anyar'] lakukeun: { <- diri anyar init.
+URL nalika: ['anyar'] lakukeun: { <- diri anyar siapkeun.
 }.
 
 URL nalika: ['téks'] lakukeun: { <- (
-	milik protocol +
+	milik protokol +
 	milik hos +
 	milik jalur +
-	milik params +
+	milik paraméter-url +
 	milik hash ).
 }.
 
-URL nalika: ['protocol:'] lakukeun: { :protocol
-	((Daptar anyar: ['http'] ; ['https']) ngandung: protocol) bener: {
-		milik protocol := protocol + ['://'].
+URL nalika: ['protokol:'] lakukeun: { :protokol
+	((Daptar anyar ; ['http'] ; ['https']) miboga: protokol) bener: {
+		milik protokol := protokol + ['://'].
 	}, salah: {
 		tugas-ieu kasalahan: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL nalika: ['hos:'] lakukeun: { :hos
 	milik hos := hos.
 }.
 
-URL nalika: ['path:'] lakukeun: { :jalur
+URL nalika: ['jalur:'] lakukeun: { :jalur
 	milik jalur := ['/'] + jalur url-énkode.
 }.
 
-URL nalika: ['params:'] lakukeun: { :map
-	>> params := Daptar anyar.
-	map unggal: { :key :value
-		params tambah-di-tungtung: key téks url-énkode + ['='] + value téks url-énkode.
+URL nalika: ['paraméter-url:'] lakukeun: { :pemetaan
+	>> paraméter-url := Daptar anyar.
+	pemetaan unggal: { :konci-lulugu :nilai
+		paraméter-url tambah-di-tungtung: konci-lulugu téks url-énkode + ['='] + nilai téks url-énkode.
 	}.
-	milik params := ['?'] + ( params gabungkeun: ['&'] ).
+	milik paraméter-url := ['?'] + ( paraméter-url gabungkeun: ['&'] ).
 }.
 
 URL nalika: ['hash:'] lakukeun: { :hash

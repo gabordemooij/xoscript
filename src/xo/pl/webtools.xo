@@ -1,302 +1,302 @@
-Żądanie-HTTP na: ['HTTP-header:'] wykonaj: { :key <- Program ustawienie: key.
+Żądanie-HTTP na: ['HTTP-nagłówek:'] wykonaj: { :klucz <- Program ustawienie: klucz.
 }.
 
->> HTTP-Header := Obiekt nowy.
+>> Nagłówek-HTTP := Obiekt nowy.
 
-HTTP-Header na: ['nowy'] wykonaj: { <- sam nowy init.
+Nagłówek-HTTP na: ['nowy'] wykonaj: { <- sam nowy inicjuj.
 }.
 
-HTTP-Header na: ['init'] wykonaj: {
-	własny key := Nic.
-	własny value := Nic.
+Nagłówek-HTTP na: ['inicjuj'] wykonaj: {
+	własny klucz := Nic.
+	własny wartość := Nic.
 }.
 
-HTTP-Header na: ['key:value:'] wykonaj: { :key :value
-	własny key := key.
-	własny value := value.
+Nagłówek-HTTP na: ['klucz:wartość:'] wykonaj: { :klucz :wartość
+	własny klucz := klucz.
+	własny wartość := wartość.
 }.
 
-HTTP-Header na: ['key'] wykonaj: { <- własny key.
+Nagłówek-HTTP na: ['klucz'] wykonaj: { <- własny klucz.
 }.
 
-HTTP-Header na: ['value'] wykonaj: { <- własny value.
+Nagłówek-HTTP na: ['wartość'] wykonaj: { <- własny wartość.
 }.
 
 
-HTTP-Header na: ['tekst'] wykonaj: {
-	>> line := własny key + [': '] + własny value.
-	line zamień: ['\r'] na: [''], zamień: ['\n'] na: ['']. <- line + [' \r\n'].
+Nagłówek-HTTP na: ['tekst'] wykonaj: {
+	>> wiersz := własny klucz + [': '] + własny wartość.
+	wiersz zamień: ['\r'] na: [''], zamień: ['\n'] na: ['']. <- wiersz + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Obiekt nowy.
+>> Dokument-Web := Obiekt nowy.
 
-Web-Document na: ['nowy'] wykonaj: { <- sam nowy init.
+Dokument-Web na: ['nowy'] wykonaj: { <- sam nowy inicjuj.
 }.
 
-Web-Document na: ['init'] wykonaj: {
-	własny headers := Lista nowy.
-	własny sess-id := Nic.
-	własny session-manager := Tempfile-Session nowy.
-	własny sessdata := Nic.
-	własny secure := Prawda.
-	własny same-site := ['Strict'].
-	własny headers-out := Fałsz.
-	własny request := Żądanie-HTTP nowy.
+Dokument-Web na: ['inicjuj'] wykonaj: {
+	własny nagłówki := Lista nowy.
+	własny id-sesji := Nic.
+	własny menedżer-sesji := Sesja-plik-tymczasowy nowy.
+	własny dane-sesji := Nic.
+	własny bezpieczne := Prawda.
+	własny ta-sama-witryna := ['Strict'].
+	własny nagłówki-wysłane := Fałsz.
+	własny żądanie := Żądanie-HTTP nowy.
 }.
 
-Web-Document na: ['request:'] wykonaj: { :request
-	własny request := request.
+Dokument-Web na: ['żądanie:'] wykonaj: { :żądanie
+	własny żądanie := żądanie.
 }. 
 
-Web-Document na: ['secure-session-cookie:'] wykonaj: { :secure
-	sam check-headers.
-	własny secure := secure.
+Dokument-Web na: ['bezpieczne-ciasteczko-sesji:'] wykonaj: { :bezpieczne
+	sam sprawdź-nagłówki.
+	własny bezpieczne := bezpieczne.
 }.
 
-Web-Document na: ['same-site-session-cookie:'] wykonaj: { :value
-	sam check-headers.
-	>> options := Lista nowy 
+Dokument-Web na: ['ciasteczko-sesji-ta-sama-witryna:'] wykonaj: { :wartość
+	sam sprawdź-nagłówki.
+	>> opcje := Lista nowy 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options zawiera: value, fałsz: {
+	opcje ma: wartość, fałsz: {
 		to-zadanie błąd: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	własny same-site := value.
+	własny ta-sama-witryna := wartość.
 }.
 
-Web-Document na: ['header:'] wykonaj: { :header
-	sam check-headers.
-	własny headers dołącz: header.
+Dokument-Web na: ['nagłówek:'] wykonaj: { :nagłówek
+	sam sprawdź-nagłówki.
+	własny nagłówki dołącz: nagłówek.
 }.
 
-Web-Document na: ['clear-headers'] wykonaj: {
-	sam check-headers.
-	własny headers := Lista nowy.
+Dokument-Web na: ['usuń-nagłówki'] wykonaj: {
+	sam sprawdź-nagłówki.
+	własny nagłówki := Lista nowy.
 }.
 
-Web-Document na: ['session-manager:'] wykonaj: { :manager
-	sam check-headers.
-	własny session-manager := manager.
+Dokument-Web na: ['menedżer-sesji:'] wykonaj: { :menedżer
+	sam sprawdź-nagłówki.
+	własny menedżer-sesji := menedżer.
 }.
 
-Web-Document na: ['session-manager'] wykonaj: { <- własny session-manager.
+Dokument-Web na: ['menedżer-sesji'] wykonaj: { <- własny menedżer-sesji.
 }.
 
-Web-Document na: ['check-headers'] wykonaj: {
-	własny headers-out prawda: {
+Dokument-Web na: ['sprawdź-nagłówki'] wykonaj: {
+	własny nagłówki-wysłane prawda: {
 		to-zadanie błąd: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document na: ['session-start'] wykonaj: {
-	sam check-headers.
-	>> request := własny request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nic? fałsz: {
-		(( Wzorzec nowy: ['^[A-Za-z0-9]+\\z'], dopasuj: sess-id ) = 0) prawda: {
-			sess-id := Nic.
+Dokument-Web na: ['rozpocznij-sesję'] wykonaj: {
+	sam sprawdź-nagłówki.
+	>> żądanie := własny żądanie.
+	>> id-sesji := żądanie cookie: ['xsid'].
+	id-sesji Nic? fałsz: {
+		(( Wzorzec nowy: ['^[A-Za-z0-9]+\\z'], dopasuj: id-sesji ) = 0) prawda: {
+			id-sesji := Nic.
 		}.
 	}.
-	sess-id Nic? prawda: {
-		sess-id := Sejf token: 30.
-		>> session-header := HTTP-Header nowy
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (własny secure albo: ['Secure'] albo: ['']),
-		SSITE: (własny same-site),
-		XSID: sess-id
+	id-sesji Nic? prawda: {
+		id-sesji := Sejf token: 30.
+		>> nagłówek-sesji := Nagłówek-HTTP nowy
+		klucz: ['Set-Cookie'] wartość: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (własny bezpieczne albo: ['Secure'] albo: ['']),
+		SSITE: (własny ta-sama-witryna),
+		XSID: id-sesji
 		).
-		własny headers dołącz: session-header.
+		własny nagłówki dołącz: nagłówek-sesji.
 	}.
-	własny sessdata := własny session-manager for: sess-id, load. <- własny sessdata. # reference
+	własny dane-sesji := własny menedżer-sesji dla: id-sesji, wczytaj. <- własny dane-sesji. # reference
 }.
 
-Web-Document na: ['goto:'] wykonaj: { :url
-	sam check-headers.
-	sam clear-headers.
-	własny headers
+Dokument-Web na: ['przejdź-do:'] wykonaj: { :adres
+	sam sprawdź-nagłówki.
+	sam usuń-nagłówki.
+	własny nagłówki
 	dołącz: (
-		HTTP-Header nowy
-		key: ['Status'] value: ['303 See Other']
+		Nagłówek-HTTP nowy
+		klucz: ['Status'] wartość: ['303 See Other']
 	),
 	dołącz: (
-		HTTP-Header nowy
-		key: ['Location'] value: url
+		Nagłówek-HTTP nowy
+		klucz: ['Location'] wartość: adres
 	).
-	sam out: ['Redirect'].
+	sam wypisz: ['Redirect'].
 }.
 
-Web-Document na: ['session-destroy'] wykonaj: {
-	sam check-headers.
-	>> request := własny request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nic? fałsz: {
-		>> session-header := HTTP-Header nowy.
-		>> when := Moment nowy rok: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Dokument-Web na: ['zniszcz-sesję'] wykonaj: {
+	sam sprawdź-nagłówki.
+	>> żądanie := własny żądanie.
+	>> id-sesji := żądanie cookie: ['xsid'].
+	id-sesji Nic? fałsz: {
+		>> nagłówek-sesji := Nagłówek-HTTP nowy.
+		>> chwila := Moment nowy rok: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		nagłówek-sesji klucz: ['Set-Cookie'] wartość: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (własny secure albo: ['Secure'] albo: ['']),
-			SSITE: (własny same-site),
-			XSID: sess-id
+			EXP: chwila,
+			SEC: (własny bezpieczne albo: ['Secure'] albo: ['']),
+			SSITE: (własny ta-sama-witryna),
+			XSID: id-sesji
 		).
-		własny session-manager destroy.
-		własny headers dołącz: session-header.
+		własny menedżer-sesji zniszcz.
+		własny nagłówki dołącz: nagłówek-sesji.
 	}.
 }.
 
 
-Web-Document na: ['template:'] wykonaj: { :ścieżka <- Template nowy: (Plik nowy: ścieżka, czytaj).
+Dokument-Web na: ['szablon:'] wykonaj: { :ścieżka <- Szablon nowy: (Plik nowy: ścieżka, czytaj).
 }.
 
-Web-Document na: ['out:type:'] wykonaj: { :output :typ
-	własny headers-out fałsz: {
-		własny sessdata Nic? fałsz: {
-			własny session-manager save: własny sessdata.
+Dokument-Web na: ['wypisz:typ:'] wykonaj: { :wyjście :typ
+	własny nagłówki-wysłane fałsz: {
+		własny dane-sesji Nic? fałsz: {
+			własny menedżer-sesji zapisz: własny dane-sesji.
 		}.
-		własny headers dołącz: (
-			HTTP-Header nowy
-			key: ['Content-type'] value: typ
+		własny nagłówki dołącz: (
+			Nagłówek-HTTP nowy
+			klucz: ['Content-type'] wartość: typ
 		).
-		własny headers każdy: { :_ :header
-			Wyjście pisz: header.
+		własny nagłówki każdy: { :_ :nagłówek
+			Wyjście pisz: nagłówek.
 		}.
-		własny headers-out := Prawda.
+		własny nagłówki-wysłane := Prawda.
 		Wyjście pisz: ['\r\n'].
 	}.
-	Wyjście pisz: output.
+	Wyjście pisz: wyjście.
 }.
 
-Web-Document na: ['finish:type:'] wykonaj: { :output :typ
-	własny headers-out fałsz: {
-		własny sessdata Nic? fałsz: {
-			własny session-manager save: własny sessdata.
+Dokument-Web na: ['zakończ:typ:'] wykonaj: { :wyjście :typ
+	własny nagłówki-wysłane fałsz: {
+		własny dane-sesji Nic? fałsz: {
+			własny menedżer-sesji zapisz: własny dane-sesji.
 		}.
-		własny headers dołącz: (
-			HTTP-Header nowy
-			key: ['Content-type'] value: typ
+		własny nagłówki dołącz: (
+			Nagłówek-HTTP nowy
+			klucz: ['Content-type'] wartość: typ
 		).
-		własny headers dołącz: (
-			HTTP-Header nowy
-			key: ['Content-Length'] value: output tekst bytes
+		własny nagłówki dołącz: (
+			Nagłówek-HTTP nowy
+			klucz: ['Content-Length'] wartość: wyjście tekst bytes
 		).
-		własny headers każdy: { :_ :header
-			Wyjście pisz: header.
+		własny nagłówki każdy: { :_ :nagłówek
+			Wyjście pisz: nagłówek.
 		}.
-		własny headers-out := Prawda.
+		własny nagłówki-wysłane := Prawda.
 		Wyjście pisz: ['\r\n'].
 	}.
-	Wyjście pisz: output.
+	Wyjście pisz: wyjście.
 }.
 
-Web-Document na: ['out:'] wykonaj: { :output
-	sam out: output type: ['text/html; charset=utf-8'].
+Dokument-Web na: ['wypisz:'] wykonaj: { :wyjście
+	sam wypisz: wyjście typ: ['text/html; charset=utf-8'].
 }.
 
-Web-Document na: ['finish:'] wykonaj: { :output
-	sam finish: output type: ['text/html; charset=utf-8'].
+Dokument-Web na: ['zakończ:'] wykonaj: { :wyjście
+	sam zakończ: wyjście typ: ['text/html; charset=utf-8'].
 }.
 
-Web-Document na: ['json:'] wykonaj: { :output
-	sam out: ( JSON jsonify: output ) type: ['application/json'].
+Dokument-Web na: ['json:'] wykonaj: { :wyjście
+	sam wypisz: ( JSON jsonify: wyjście ) typ: ['application/json'].
 }.
 
-Web-Document na: ['not-found:'] wykonaj: { :output
-	sam clear-headers header: (
-		HTTP-Header nowy key: ['Status'] value: ['404 Not Found']
+Dokument-Web na: ['nie-znaleziono:'] wykonaj: { :wyjście
+	sam usuń-nagłówki nagłówek: (
+		Nagłówek-HTTP nowy klucz: ['Status'] wartość: ['404 Not Found']
 	).
-	sam out: output.
+	sam wypisz: wyjście.
 }.
 
 
 # Interface
 
->> Session := Obiekt nowy.
+>> Sesja := Obiekt nowy.
 
-Session na: ['nowy'] wykonaj: { <- sam nowy init for: Nic.
+Sesja na: ['nowy'] wykonaj: { <- sam nowy inicjuj dla: Nic.
 }.
 
-Session na: ['for:'] wykonaj: { :id
+Sesja na: ['dla:'] wykonaj: { :id
 	własny id := id.
 }.
 
-Session na: ['load'] wykonaj: {
+Sesja na: ['wczytaj'] wykonaj: {
 	to-zadanie błąd: ['Not implemented.'].
 }.
 
-Session na: ['save:'] wykonaj: {
+Sesja na: ['zapisz:'] wykonaj: {
 	to-zadanie błąd: ['Not implemented.'].
 }.
 
-Session na: ['destroy'] wykonaj: {
+Sesja na: ['zniszcz'] wykonaj: {
 	to-zadanie błąd: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session nowy.
+>> Sesja-plik-tymczasowy := Sesja nowy.
 
-Tempfile-Session na: ['init'] wykonaj: {
-	własny pathprefix := ['/tmp/sess-'].
+Sesja-plik-tymczasowy na: ['inicjuj'] wykonaj: {
+	własny początek-ścieżki := ['/tmp/sess-'].
 }.
 
-Tempfile-Session na: ['path-prefix:'] wykonaj: { :str
-	własny pathprefix := str.
+Sesja-plik-tymczasowy na: ['prefiks-ścieżki:'] wykonaj: { :łańcuch
+	własny początek-ścieżki := łańcuch.
 }.
 
-Tempfile-Session na: ['file'] wykonaj: { <- ( Plik nowy: ( własny pathprefix + własny id + ['.txt'] ) ).
+Sesja-plik-tymczasowy na: ['plik'] wykonaj: { <- ( Plik nowy: ( własny początek-ścieżki + własny id + ['.txt'] ) ).
 }.
 
-Tempfile-Session na: ['load'] wykonaj: {
-	>> file := sam file.
-	file istnieje fałsz: {
-		file pisz: (Słownik nowy code).
-	}. <- file czytaj obiekt.
+Sesja-plik-tymczasowy na: ['wczytaj'] wykonaj: {
+	>> plik := sam plik.
+	plik istnieje fałsz: {
+		plik pisz: (Słownik nowy code).
+	}. <- plik czytaj obiekt.
 }.
 
-Tempfile-Session na: ['save:'] wykonaj: { :data
-	>> file := sam file.
-	file istnieje prawda: {
-		file pisz: data code.
+Sesja-plik-tymczasowy na: ['zapisz:'] wykonaj: { :dane
+	>> plik := sam plik.
+	plik istnieje prawda: {
+		plik pisz: dane code.
 	}.
 }.
 
-Tempfile-Session na: ['destroy'] wykonaj: {
-	>> file := sam file.
-	file istnieje prawda: {
-		file usuń.
+Sesja-plik-tymczasowy na: ['zniszcz'] wykonaj: {
+	>> plik := sam plik.
+	plik istnieje prawda: {
+		plik usuń.
 	}.
 }.
 
 
 >> URL := Obiekt nowy.
 
-URL na: ['init'] wykonaj: {
-	własny protocol := ['https://'].
+URL na: ['inicjuj'] wykonaj: {
+	własny protokół := ['https://'].
 	własny host := ['localhost'].
 	własny ścieżka := [''].
-	własny params := [''].
+	własny parametry-url := [''].
 	własny hash := [''].
 }.
 
-URL na: ['nowy'] wykonaj: { <- sam nowy init.
+URL na: ['nowy'] wykonaj: { <- sam nowy inicjuj.
 }.
 
 URL na: ['tekst'] wykonaj: { <- (
-	własny protocol +
+	własny protokół +
 	własny host +
 	własny ścieżka +
-	własny params +
+	własny parametry-url +
 	własny hash ).
 }.
 
-URL na: ['protocol:'] wykonaj: { :protocol
-	((Lista nowy: ['http'] ; ['https']) zawiera: protocol) prawda: {
-		własny protocol := protocol + ['://'].
+URL na: ['protokół:'] wykonaj: { :protokół
+	((Lista nowy ; ['http'] ; ['https']) ma: protokół) prawda: {
+		własny protokół := protokół + ['://'].
 	}, fałsz: {
 		to-zadanie błąd: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL na: ['host:'] wykonaj: { :host
 	własny host := host.
 }.
 
-URL na: ['path:'] wykonaj: { :ścieżka
+URL na: ['ścieżka:'] wykonaj: { :ścieżka
 	własny ścieżka := ['/'] + ścieżka url-koduj.
 }.
 
-URL na: ['params:'] wykonaj: { :map
-	>> params := Lista nowy.
-	map każdy: { :key :value
-		params dołącz: key tekst url-koduj + ['='] + value tekst url-koduj.
+URL na: ['parametry-url:'] wykonaj: { :mapowanie
+	>> parametry-url := Lista nowy.
+	mapowanie każdy: { :klucz :wartość
+		parametry-url dołącz: klucz tekst url-koduj + ['='] + wartość tekst url-koduj.
 	}.
-	własny params := ['?'] + ( params połącz: ['&'] ).
+	własny parametry-url := ['?'] + ( parametry-url połącz: ['&'] ).
 }.
 
 URL na: ['skrót:'] wykonaj: { :hash

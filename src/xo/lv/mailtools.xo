@@ -1,128 +1,128 @@
->> Email := Objekts jauns.
+>> E-pasts := Objekts jauns.
 
-Email kad: ['init'] darīt: {
-	savs recipients := Saraksts jauns.
+E-pasts kad: ['inicializēt'] darīt: {
+	savs saņēmēji := Saraksts jauns.
 	savs cc := Saraksts jauns.
 	savs bcc := Saraksts jauns.
-	savs from := Nekas.
-	savs from-name := Nekas.
-	savs subject := Nekas.
-	savs body := Nekas.
+	savs sūtītājs := Nekas.
+	savs sūtītāja-vārds := Nekas.
+	savs temats := Nekas.
+	savs vēstules-teksts := Nekas.
 }.
 
-Email kad: ['jauns'] darīt: { <- pats jauns init.
+E-pasts kad: ['jauns'] darīt: { <- pats jauns inicializēt.
 }.
 
-Email kad: ['to:'] darīt: { :list
-	savs recipients := list.
+E-pasts kad: ['kam:'] darīt: { :uzskaitījums
+	savs saņēmēji := uzskaitījums.
 }.
  
-Email kad: ['cc:'] darīt: { :list
-	savs cc := list.
+E-pasts kad: ['cc:'] darīt: { :uzskaitījums
+	savs cc := uzskaitījums.
 }.
 
-Email kad: ['bcc:'] darīt: { :list
-	savs bcc := list.
+E-pasts kad: ['bcc:'] darīt: { :uzskaitījums
+	savs bcc := uzskaitījums.
 }.
 
-Email kad: ['subject:'] darīt: { :subject
-	savs subject := subject.
+E-pasts kad: ['temats:'] darīt: { :temats
+	savs temats := temats.
 }.
 
-Email kad: ['from:name:'] darīt: { :from :nosaukums
-	savs from := from.
-	savs from-name := nosaukums.
+E-pasts kad: ['sūtītājs:nosaukums:'] darīt: { :sūtītājs :nosaukums
+	savs sūtītājs := sūtītājs.
+	savs sūtītāja-vārds := nosaukums.
 }.
 
-Email kad: ['body:'] darīt: { :body
-	savs body := body.
+E-pasts kad: ['vēstules-teksts:'] darīt: { :vēstules-teksts
+	savs vēstules-teksts := vēstules-teksts.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email kad: ['header:'] darīt: { :line <- line aizstāt: ['\r'] ar: [''], aizstāt: ['\n'] ar: [''].
+E-pasts kad: ['galvene:'] darīt: { :rinda <- rinda aizstāt: ['\r'] ar: [''], aizstāt: ['\n'] ar: [''].
 }.
 
-Email kad: ['send'] darīt: {
-	>> f := Fails tempwrite: pats generate.
+E-pasts kad: ['sūtīt'] darīt: {
+	>> f := Fails tempwrite: pats ģenerēt.
 	Programma sistēma: ['sendmail -t < '] + f ceļš, jauna-rinda.
 }.
 
-Email kad: ['generate'] darīt: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str pievienot-beigās: (pats header: ['From: '] + savs from-name + [' <'] + ( savs from ) + ['>']) + brk.
-	str pievienot-beigās: (pats header: ['To: '] + ( savs recipients apvienot: [','] )) + brk.
+E-pasts kad: ['ģenerēt'] darīt: {
+	>> rindas-pārtraukums := ['\r\n'].
+	>> virkne := [''].
+	virkne pievienot-beigās: (pats galvene: ['From: '] + savs sūtītāja-vārds + [' <'] + ( savs sūtītājs ) + ['>']) + rindas-pārtraukums.
+	virkne pievienot-beigās: (pats galvene: ['To: '] + ( savs saņēmēji apvienot: [','] )) + rindas-pārtraukums.
 	savs cc skaits patiess: {
-		str pievienot-beigās: (pats header: ['Cc: '] + ( savs cc apvienot: [','] )) + brk.
+		virkne pievienot-beigās: (pats galvene: ['Cc: '] + ( savs cc apvienot: [','] )) + rindas-pārtraukums.
 	}.
 	savs bcc skaits patiess: {
-		str pievienot-beigās: (pats header: ['Bcc: '] + ( savs bcc apvienot: [','] )) + brk.
+		virkne pievienot-beigās: (pats galvene: ['Bcc: '] + ( savs bcc apvienot: [','] )) + rindas-pārtraukums.
 	}.
-	str pievienot-beigās: (pats header: ['Subject: '] + savs subject) + brk.
-	str pievienot-beigās: brk.
-	str pievienot-beigās: savs body.
-	str pievienot-beigās: brk. <- str.
+	virkne pievienot-beigās: (pats galvene: ['Subject: '] + savs temats) + rindas-pārtraukums.
+	virkne pievienot-beigās: rindas-pārtraukums.
+	virkne pievienot-beigās: savs vēstules-teksts.
+	virkne pievienot-beigās: rindas-pārtraukums. <- virkne.
 }.
 
->> HTML-Email := Email jauns.
+>> HTML-E-pasts := E-pasts jauns.
 
-HTML-Email kad: ['init'] darīt: {
-	pats init.
-	savs attachments := Saraksts jauns.
-	savs boundary := Seifs marķieris: 40.
+HTML-E-pasts kad: ['inicializēt'] darīt: {
+	pats inicializēt.
+	savs pielikumi := Saraksts jauns.
+	savs robeža := Seifs marķieris: 40.
 }.
 
-HTML-Email kad: ['attach:'] darīt: { :file
-	>> id := savs attachments skaits.
-	>> blob := file blob.
-	savs attachments pievienot-beigās: (
+HTML-E-pasts kad: ['pievienot-pielikumu:'] darīt: { :fails
+	>> id := savs pielikumi skaits.
+	>> blob := fails blob.
+	savs pielikumi pievienot-beigās: (
 		Vārdnīca jauns
-			file: file ceļš,
-			mime: ['image/'] + (Server mimetype: file ceļš),
-			data: blob base64-kodēt
+			fails: fails ceļš,
+			mime: ['image/'] + (Server mimetype: fails ceļš),
+			dati: blob base64-kodēt
 	).
 	blob atbrīvot. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email kad: ['generate'] darīt: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str pievienot-beigās: (pats header: ['From: '] + savs from-name + [' <'] + ( savs from ) + ['>']) + brk.
-	str pievienot-beigās: (pats header: ['To: '] + ( savs recipients apvienot: [','] )) + brk.
+HTML-E-pasts kad: ['ģenerēt'] darīt: {
+	>> rindas-pārtraukums := ['\r\n'].
+	>> virkne := [''].
+	virkne pievienot-beigās: (pats galvene: ['From: '] + savs sūtītāja-vārds + [' <'] + ( savs sūtītājs ) + ['>']) + rindas-pārtraukums.
+	virkne pievienot-beigās: (pats galvene: ['To: '] + ( savs saņēmēji apvienot: [','] )) + rindas-pārtraukums.
 	savs cc skaits patiess: {
-		str pievienot-beigās: (pats header: ['Cc: '] + ( savs cc apvienot: [','] )) + brk.
+		virkne pievienot-beigās: (pats galvene: ['Cc: '] + ( savs cc apvienot: [','] )) + rindas-pārtraukums.
 	}.
 	savs bcc skaits patiess: {
-		str pievienot-beigās: (pats header: ['Bcc: '] + ( savs bcc apvienot: [','] )) + brk.
+		virkne pievienot-beigās: (pats galvene: ['Bcc: '] + ( savs bcc apvienot: [','] )) + rindas-pārtraukums.
 	}.
-	str pievienot-beigās: (pats header: ['Subject: '] + savs subject) + brk.
-	str pievienot-beigās: ['MIME-Version: 1.0'] + brk.
-	str pievienot-beigās: ['Content-Type: multipart/related; boundary="'] + savs boundary + ['"; type=text/html'] + brk.
-	str pievienot-beigās: brk.
-	str pievienot-beigās: ['--'] + savs boundary + brk.
-	str pievienot-beigās: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str pievienot-beigās: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str pievienot-beigās: brk.
-	str pievienot-beigās: savs body.
-	str pievienot-beigās: brk.
-	savs attachments katrs: { :id :info
-		>> blob := info data.
-		str pievienot-beigās: ['--'] + savs boundary + brk.
-		str pievienot-beigās: ['Content-Type: '] + info mime + brk.
-		str pievienot-beigās: ['Content-Transfer-Encoding: base64'] + brk.
-		str pievienot-beigās: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str pievienot-beigās: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str pievienot-beigās: brk.
-		>> max := 76.
-		>> len := blob garums.
-		>> chunks := (len / max) noapaļot-uz-augšu.
+	virkne pievienot-beigās: (pats galvene: ['Subject: '] + savs temats) + rindas-pārtraukums.
+	virkne pievienot-beigās: ['MIME-Version: 1.0'] + rindas-pārtraukums.
+	virkne pievienot-beigās: ['Content-Type: multipart/related; boundary="'] + savs robeža + ['"; type=text/html'] + rindas-pārtraukums.
+	virkne pievienot-beigās: rindas-pārtraukums.
+	virkne pievienot-beigās: ['--'] + savs robeža + rindas-pārtraukums.
+	virkne pievienot-beigās: ['Content-Type: text/html; charset=UTF-8'] + rindas-pārtraukums.
+	virkne pievienot-beigās: ['Content-Transfer-Encoding: 7bit'] + rindas-pārtraukums.
+	virkne pievienot-beigās: rindas-pārtraukums.
+	virkne pievienot-beigās: savs vēstules-teksts.
+	virkne pievienot-beigās: rindas-pārtraukums.
+	savs pielikumi katrs: { :id :info
+		>> blob := info dati.
+		virkne pievienot-beigās: ['--'] + savs robeža + rindas-pārtraukums.
+		virkne pievienot-beigās: ['Content-Type: '] + info mime + rindas-pārtraukums.
+		virkne pievienot-beigās: ['Content-Transfer-Encoding: base64'] + rindas-pārtraukums.
+		virkne pievienot-beigās: ['Content-ID: <attachment'] + id + ['>'] + rindas-pārtraukums.
+		virkne pievienot-beigās: ['Content-Disposition: inline; filename="'] + info fails + ['"'] + rindas-pārtraukums.
+		virkne pievienot-beigās: rindas-pārtraukums.
+		>> augstākais := 76.
+		>> teksta-garums := blob garums.
+		>> gabali := (teksta-garums / augstākais) noapaļot-uz-augšu.
 		{ :i
-			>> chunk := blob kopēt no: i * max garums: max.
-			str pievienot-beigās: chunk + brk.
-		} * chunks.
-		str pievienot-beigās: brk.
-		str pievienot-beigās: brk.
+			>> gabals := blob kopēt no: i * augstākais garums: augstākais.
+			virkne pievienot-beigās: gabals + rindas-pārtraukums.
+		} * gabali.
+		virkne pievienot-beigās: rindas-pārtraukums.
+		virkne pievienot-beigās: rindas-pārtraukums.
 	}.
-	str pievienot-beigās: ['--'] + savs boundary + ['--'] + brk. <- str.
+	virkne pievienot-beigās: ['--'] + savs robeža + ['--'] + rindas-pārtraukums. <- virkne.
 }.

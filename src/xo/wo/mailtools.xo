@@ -1,128 +1,128 @@
->> Email := Denc xees.
+>> Imeel := Denc xees.
 
-Email bu: ['init'] def: {
-	sama recipients := Jokkalante xees.
+Imeel bu: ['waajal'] def: {
+	sama jotkat-yi := Jokkalante xees.
 	sama cc := Jokkalante xees.
 	sama bcc := Jokkalante xees.
-	sama from := Dara.
-	sama from-name := Dara.
-	sama subject := Dara.
-	sama body := Dara.
+	sama yónnekat := Dara.
+	sama turu-yónnekat := Dara.
+	sama tëralin := Dara.
+	sama yaram := Dara.
 }.
 
-Email bu: ['xees'] def: { <- man xees init.
+Imeel bu: ['xees'] def: { <- man xees waajal.
 }.
 
-Email bu: ['to:'] def: { :list
-	sama recipients := list.
+Imeel bu: ['ci-jotkat:'] def: { :limmu
+	sama jotkat-yi := limmu.
 }.
  
-Email bu: ['cc:'] def: { :list
-	sama cc := list.
+Imeel bu: ['cc:'] def: { :limmu
+	sama cc := limmu.
 }.
 
-Email bu: ['bcc:'] def: { :list
-	sama bcc := list.
+Imeel bu: ['bcc:'] def: { :limmu
+	sama bcc := limmu.
 }.
 
-Email bu: ['subject:'] def: { :subject
-	sama subject := subject.
+Imeel bu: ['tëralin:'] def: { :tëralin
+	sama tëralin := tëralin.
 }.
 
-Email bu: ['from:name:'] def: { :from :tur
-	sama from := from.
-	sama from-name := tur.
+Imeel bu: ['yónnekat:tur:'] def: { :yónnekat :tur
+	sama yónnekat := yónnekat.
+	sama turu-yónnekat := tur.
 }.
 
-Email bu: ['body:'] def: { :body
-	sama body := body.
+Imeel bu: ['yaram:'] def: { :yaram
+	sama yaram := yaram.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email bu: ['header:'] def: { :line <- line wuutal: ['\r'] ci: [''], wuutal: ['\n'] ci: [''].
+Imeel bu: ['bopp:'] def: { :rëdd <- rëdd wuutal: ['\r'] ci: [''], wuutal: ['\n'] ci: [''].
 }.
 
-Email bu: ['send'] def: {
-	>> f := Dencukaayu tempwrite: man generate.
+Imeel bu: ['yónne'] def: {
+	>> f := Dencukaayu tempwrite: man sos.
 	Prograam oordinaatëer: ['sendmail -t < '] + f xoll, taxaw.
 }.
 
-Email bu: ['generate'] def: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str yokk-ci-mujj: (man header: ['From: '] + sama from-name + [' <'] + ( sama from ) + ['>']) + brk.
-	str yokk-ci-mujj: (man header: ['To: '] + ( sama recipients boole: [','] )) + brk.
+Imeel bu: ['sos'] def: {
+	>> dagg-rëdd := ['\r\n'].
+	>> buumu-mbind := [''].
+	buumu-mbind yokk-ci-mujj: (man bopp: ['From: '] + sama turu-yónnekat + [' <'] + ( sama yónnekat ) + ['>']) + dagg-rëdd.
+	buumu-mbind yokk-ci-mujj: (man bopp: ['To: '] + ( sama jotkat-yi boole: [','] )) + dagg-rëdd.
 	sama cc waññ dëgg: {
-		str yokk-ci-mujj: (man header: ['Cc: '] + ( sama cc boole: [','] )) + brk.
+		buumu-mbind yokk-ci-mujj: (man bopp: ['Cc: '] + ( sama cc boole: [','] )) + dagg-rëdd.
 	}.
 	sama bcc waññ dëgg: {
-		str yokk-ci-mujj: (man header: ['Bcc: '] + ( sama bcc boole: [','] )) + brk.
+		buumu-mbind yokk-ci-mujj: (man bopp: ['Bcc: '] + ( sama bcc boole: [','] )) + dagg-rëdd.
 	}.
-	str yokk-ci-mujj: (man header: ['Subject: '] + sama subject) + brk.
-	str yokk-ci-mujj: brk.
-	str yokk-ci-mujj: sama body.
-	str yokk-ci-mujj: brk. <- str.
+	buumu-mbind yokk-ci-mujj: (man bopp: ['Subject: '] + sama tëralin) + dagg-rëdd.
+	buumu-mbind yokk-ci-mujj: dagg-rëdd.
+	buumu-mbind yokk-ci-mujj: sama yaram.
+	buumu-mbind yokk-ci-mujj: dagg-rëdd. <- buumu-mbind.
 }.
 
->> HTML-Email := Email xees.
+>> Imeel-HTML := Imeel xees.
 
-HTML-Email bu: ['init'] def: {
-	man init.
-	sama attachments := Jokkalante xees.
-	sama boundary := Wàqu-kaaraange token: 40.
+Imeel-HTML bu: ['waajal'] def: {
+	man waajal.
+	sama takkukaay-yi := Jokkalante xees.
+	sama dig := Wàqu-kaaraange token: 40.
 }.
 
-HTML-Email bu: ['attach:'] def: { :file
-	>> id := sama attachments waññ.
-	>> blob := file blob.
-	sama attachments yokk-ci-mujj: (
+Imeel-HTML bu: ['takk:'] def: { :dencukaayu-ndaje
+	>> id := sama takkukaay-yi waññ.
+	>> blob := dencukaayu-ndaje blob.
+	sama takkukaay-yi yokk-ci-mujj: (
 		Listin xees
-			file: file xoll,
-			mime: ['image/'] + (Server mimetype: file xoll),
-			data: blob base64-koode
+			dencukaayu-ndaje: dencukaayu-ndaje xoll,
+			mime: ['image/'] + (Server mimetype: dencukaayu-ndaje xoll),
+			xibaar: blob base64-koode
 	).
 	blob bàyyi. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email bu: ['generate'] def: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str yokk-ci-mujj: (man header: ['From: '] + sama from-name + [' <'] + ( sama from ) + ['>']) + brk.
-	str yokk-ci-mujj: (man header: ['To: '] + ( sama recipients boole: [','] )) + brk.
+Imeel-HTML bu: ['sos'] def: {
+	>> dagg-rëdd := ['\r\n'].
+	>> buumu-mbind := [''].
+	buumu-mbind yokk-ci-mujj: (man bopp: ['From: '] + sama turu-yónnekat + [' <'] + ( sama yónnekat ) + ['>']) + dagg-rëdd.
+	buumu-mbind yokk-ci-mujj: (man bopp: ['To: '] + ( sama jotkat-yi boole: [','] )) + dagg-rëdd.
 	sama cc waññ dëgg: {
-		str yokk-ci-mujj: (man header: ['Cc: '] + ( sama cc boole: [','] )) + brk.
+		buumu-mbind yokk-ci-mujj: (man bopp: ['Cc: '] + ( sama cc boole: [','] )) + dagg-rëdd.
 	}.
 	sama bcc waññ dëgg: {
-		str yokk-ci-mujj: (man header: ['Bcc: '] + ( sama bcc boole: [','] )) + brk.
+		buumu-mbind yokk-ci-mujj: (man bopp: ['Bcc: '] + ( sama bcc boole: [','] )) + dagg-rëdd.
 	}.
-	str yokk-ci-mujj: (man header: ['Subject: '] + sama subject) + brk.
-	str yokk-ci-mujj: ['MIME-Version: 1.0'] + brk.
-	str yokk-ci-mujj: ['Content-Type: multipart/related; boundary="'] + sama boundary + ['"; type=text/html'] + brk.
-	str yokk-ci-mujj: brk.
-	str yokk-ci-mujj: ['--'] + sama boundary + brk.
-	str yokk-ci-mujj: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str yokk-ci-mujj: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str yokk-ci-mujj: brk.
-	str yokk-ci-mujj: sama body.
-	str yokk-ci-mujj: brk.
-	sama attachments kenn-ci-kenn: { :id :info
-		>> blob := info data.
-		str yokk-ci-mujj: ['--'] + sama boundary + brk.
-		str yokk-ci-mujj: ['Content-Type: '] + info mime + brk.
-		str yokk-ci-mujj: ['Content-Transfer-Encoding: base64'] + brk.
-		str yokk-ci-mujj: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str yokk-ci-mujj: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str yokk-ci-mujj: brk.
-		>> max := 76.
-		>> len := blob guddaay.
-		>> chunks := (len / max) kaw.
+	buumu-mbind yokk-ci-mujj: (man bopp: ['Subject: '] + sama tëralin) + dagg-rëdd.
+	buumu-mbind yokk-ci-mujj: ['MIME-Version: 1.0'] + dagg-rëdd.
+	buumu-mbind yokk-ci-mujj: ['Content-Type: multipart/related; boundary="'] + sama dig + ['"; type=text/html'] + dagg-rëdd.
+	buumu-mbind yokk-ci-mujj: dagg-rëdd.
+	buumu-mbind yokk-ci-mujj: ['--'] + sama dig + dagg-rëdd.
+	buumu-mbind yokk-ci-mujj: ['Content-Type: text/html; charset=UTF-8'] + dagg-rëdd.
+	buumu-mbind yokk-ci-mujj: ['Content-Transfer-Encoding: 7bit'] + dagg-rëdd.
+	buumu-mbind yokk-ci-mujj: dagg-rëdd.
+	buumu-mbind yokk-ci-mujj: sama yaram.
+	buumu-mbind yokk-ci-mujj: dagg-rëdd.
+	sama takkukaay-yi kenn-ci-kenn: { :id :xamxam
+		>> blob := xamxam xibaar.
+		buumu-mbind yokk-ci-mujj: ['--'] + sama dig + dagg-rëdd.
+		buumu-mbind yokk-ci-mujj: ['Content-Type: '] + xamxam mime + dagg-rëdd.
+		buumu-mbind yokk-ci-mujj: ['Content-Transfer-Encoding: base64'] + dagg-rëdd.
+		buumu-mbind yokk-ci-mujj: ['Content-ID: <attachment'] + id + ['>'] + dagg-rëdd.
+		buumu-mbind yokk-ci-mujj: ['Content-Disposition: inline; filename="'] + xamxam dencukaayu-ndaje + ['"'] + dagg-rëdd.
+		buumu-mbind yokk-ci-mujj: dagg-rëdd.
+		>> gën-a-bare := 76.
+		>> guddaay-mbind := blob guddaay.
+		>> cër-yi := (guddaay-mbind / gën-a-bare) kaw.
 		{ :i
-			>> chunk := blob duppitu dale: i * max guddaay: max.
-			str yokk-ci-mujj: chunk + brk.
-		} * chunks.
-		str yokk-ci-mujj: brk.
-		str yokk-ci-mujj: brk.
+			>> cër := blob duppitu dale: i * gën-a-bare guddaay: gën-a-bare.
+			buumu-mbind yokk-ci-mujj: cër + dagg-rëdd.
+		} * cër-yi.
+		buumu-mbind yokk-ci-mujj: dagg-rëdd.
+		buumu-mbind yokk-ci-mujj: dagg-rëdd.
 	}.
-	str yokk-ci-mujj: ['--'] + sama boundary + ['--'] + brk. <- str.
+	buumu-mbind yokk-ci-mujj: ['--'] + sama dig + ['--'] + dagg-rëdd. <- buumu-mbind.
 }.

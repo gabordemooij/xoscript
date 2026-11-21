@@ -1,302 +1,302 @@
-HTTP-Päring kui: ['HTTP-header:'] tee: { :key <- Programm seade: key.
+HTTP-Päring kui: ['HTTP-päis:'] tee: { :võti <- Programm seade: võti.
 }.
 
->> HTTP-Header := Objekt uus.
+>> HTTP-Päis := Objekt uus.
 
-HTTP-Header kui: ['uus'] tee: { <- ise uus init.
+HTTP-Päis kui: ['uus'] tee: { <- ise uus lähtesta.
 }.
 
-HTTP-Header kui: ['init'] tee: {
-	oma key := Tühi.
-	oma value := Tühi.
+HTTP-Päis kui: ['lähtesta'] tee: {
+	oma võti := Tühi.
+	oma väärtus := Tühi.
 }.
 
-HTTP-Header kui: ['key:value:'] tee: { :key :value
-	oma key := key.
-	oma value := value.
+HTTP-Päis kui: ['võti:väärtus:'] tee: { :võti :väärtus
+	oma võti := võti.
+	oma väärtus := väärtus.
 }.
 
-HTTP-Header kui: ['key'] tee: { <- oma key.
+HTTP-Päis kui: ['võti'] tee: { <- oma võti.
 }.
 
-HTTP-Header kui: ['value'] tee: { <- oma value.
+HTTP-Päis kui: ['väärtus'] tee: { <- oma väärtus.
 }.
 
 
-HTTP-Header kui: ['tekst'] tee: {
-	>> line := oma key + [': '] + oma value.
-	line asenda: ['\r'] väärtusega: [''], asenda: ['\n'] väärtusega: ['']. <- line + [' \r\n'].
+HTTP-Päis kui: ['tekst'] tee: {
+	>> rida := oma võti + [': '] + oma väärtus.
+	rida asenda: ['\r'] väärtusega: [''], asenda: ['\n'] väärtusega: ['']. <- rida + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Objekt uus.
+>> Veebidokument := Objekt uus.
 
-Web-Document kui: ['uus'] tee: { <- ise uus init.
+Veebidokument kui: ['uus'] tee: { <- ise uus lähtesta.
 }.
 
-Web-Document kui: ['init'] tee: {
-	oma headers := Loend uus.
-	oma sess-id := Tühi.
-	oma session-manager := Tempfile-Session uus.
-	oma sessdata := Tühi.
-	oma secure := Tõsi.
-	oma same-site := ['Strict'].
-	oma headers-out := Vale.
-	oma request := HTTP-Päring uus.
+Veebidokument kui: ['lähtesta'] tee: {
+	oma päised := Loend uus.
+	oma seansi-id := Tühi.
+	oma seansihaldur := Ajutise-faili-seanss uus.
+	oma seansiandmed := Tühi.
+	oma turvaline := Tõsi.
+	oma sama-sait := ['Strict'].
+	oma päised-saadetud := Vale.
+	oma http-päring := HTTP-Päring uus.
 }.
 
-Web-Document kui: ['request:'] tee: { :request
-	oma request := request.
+Veebidokument kui: ['http-päring:'] tee: { :http-päring
+	oma http-päring := http-päring.
 }. 
 
-Web-Document kui: ['secure-session-cookie:'] tee: { :secure
-	ise check-headers.
-	oma secure := secure.
+Veebidokument kui: ['turvaline-seansiküpsis:'] tee: { :turvaline
+	ise kontrolli-päiseid.
+	oma turvaline := turvaline.
 }.
 
-Web-Document kui: ['same-site-session-cookie:'] tee: { :value
-	ise check-headers.
-	>> options := Loend uus 
+Veebidokument kui: ['sama-saidi-seansiküpsis:'] tee: { :väärtus
+	ise kontrolli-päiseid.
+	>> valikud := Loend uus 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options hõlmab: value, vale: {
+	valikud sisaldab: väärtus, vale: {
 		see-ülesanne viga: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	oma same-site := value.
+	oma sama-sait := väärtus.
 }.
 
-Web-Document kui: ['header:'] tee: { :header
-	ise check-headers.
-	oma headers lisa-lõppu: header.
+Veebidokument kui: ['päis:'] tee: { :päis
+	ise kontrolli-päiseid.
+	oma päised lisa-lõppu: päis.
 }.
 
-Web-Document kui: ['clear-headers'] tee: {
-	ise check-headers.
-	oma headers := Loend uus.
+Veebidokument kui: ['tühjenda-päised'] tee: {
+	ise kontrolli-päiseid.
+	oma päised := Loend uus.
 }.
 
-Web-Document kui: ['session-manager:'] tee: { :manager
-	ise check-headers.
-	oma session-manager := manager.
+Veebidokument kui: ['seansihaldur:'] tee: { :haldur
+	ise kontrolli-päiseid.
+	oma seansihaldur := haldur.
 }.
 
-Web-Document kui: ['session-manager'] tee: { <- oma session-manager.
+Veebidokument kui: ['seansihaldur'] tee: { <- oma seansihaldur.
 }.
 
-Web-Document kui: ['check-headers'] tee: {
-	oma headers-out tõsi: {
+Veebidokument kui: ['kontrolli-päiseid'] tee: {
+	oma päised-saadetud tõsi: {
 		see-ülesanne viga: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document kui: ['session-start'] tee: {
-	ise check-headers.
-	>> request := oma request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Tühi? vale: {
-		(( Muster uus: ['^[A-Za-z0-9]+\\z'], vaste: sess-id ) = 0) tõsi: {
-			sess-id := Tühi.
+Veebidokument kui: ['alusta-seanssi'] tee: {
+	ise kontrolli-päiseid.
+	>> http-päring := oma http-päring.
+	>> seansi-id := http-päring cookie: ['xsid'].
+	seansi-id Tühi? vale: {
+		(( Muster uus: ['^[A-Za-z0-9]+\\z'], vaste: seansi-id ) = 0) tõsi: {
+			seansi-id := Tühi.
 		}.
 	}.
-	sess-id Tühi? tõsi: {
-		sess-id := Seif tunnus: 30.
-		>> session-header := HTTP-Header uus
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (oma secure kas: ['Secure'] või: ['']),
-		SSITE: (oma same-site),
-		XSID: sess-id
+	seansi-id Tühi? tõsi: {
+		seansi-id := Seif tunnus: 30.
+		>> seansipäis := HTTP-Päis uus
+		võti: ['Set-Cookie'] väärtus: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (oma turvaline kas: ['Secure'] või: ['']),
+		SSITE: (oma sama-sait),
+		XSID: seansi-id
 		).
-		oma headers lisa-lõppu: session-header.
+		oma päised lisa-lõppu: seansipäis.
 	}.
-	oma sessdata := oma session-manager for: sess-id, load. <- oma sessdata. # reference
+	oma seansiandmed := oma seansihaldur jaoks: seansi-id, laadi. <- oma seansiandmed. # reference
 }.
 
-Web-Document kui: ['goto:'] tee: { :url
-	ise check-headers.
-	ise clear-headers.
-	oma headers
+Veebidokument kui: ['mine:'] tee: { :aadress
+	ise kontrolli-päiseid.
+	ise tühjenda-päised.
+	oma päised
 	lisa-lõppu: (
-		HTTP-Header uus
-		key: ['Status'] value: ['303 See Other']
+		HTTP-Päis uus
+		võti: ['Status'] väärtus: ['303 See Other']
 	),
 	lisa-lõppu: (
-		HTTP-Header uus
-		key: ['Location'] value: url
+		HTTP-Päis uus
+		võti: ['Location'] väärtus: aadress
 	).
-	ise out: ['Redirect'].
+	ise väljasta: ['Redirect'].
 }.
 
-Web-Document kui: ['session-destroy'] tee: {
-	ise check-headers.
-	>> request := oma request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Tühi? vale: {
-		>> session-header := HTTP-Header uus.
-		>> when := Hetk uus aasta: 1970, vorming: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Veebidokument kui: ['hävita-seanss'] tee: {
+	ise kontrolli-päiseid.
+	>> http-päring := oma http-päring.
+	>> seansi-id := http-päring cookie: ['xsid'].
+	seansi-id Tühi? vale: {
+		>> seansipäis := HTTP-Päis uus.
+		>> hetk := Hetk uus aasta: 1970, vorming: ['%a, %d %b %Y %H:%M:%S GMT'].
+		seansipäis võti: ['Set-Cookie'] väärtus: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (oma secure kas: ['Secure'] või: ['']),
-			SSITE: (oma same-site),
-			XSID: sess-id
+			EXP: hetk,
+			SEC: (oma turvaline kas: ['Secure'] või: ['']),
+			SSITE: (oma sama-sait),
+			XSID: seansi-id
 		).
-		oma session-manager destroy.
-		oma headers lisa-lõppu: session-header.
+		oma seansihaldur hävita.
+		oma päised lisa-lõppu: seansipäis.
 	}.
 }.
 
 
-Web-Document kui: ['template:'] tee: { :rada <- Template uus: (Fail uus: rada, loe).
+Veebidokument kui: ['mall:'] tee: { :rada <- Mall uus: (Fail uus: rada, loe).
 }.
 
-Web-Document kui: ['out:type:'] tee: { :output :tüüp
-	oma headers-out vale: {
-		oma sessdata Tühi? vale: {
-			oma session-manager save: oma sessdata.
+Veebidokument kui: ['väljasta:tüüp:'] tee: { :väljund :tüüp
+	oma päised-saadetud vale: {
+		oma seansiandmed Tühi? vale: {
+			oma seansihaldur salvesta: oma seansiandmed.
 		}.
-		oma headers lisa-lõppu: (
-			HTTP-Header uus
-			key: ['Content-type'] value: tüüp
+		oma päised lisa-lõppu: (
+			HTTP-Päis uus
+			võti: ['Content-type'] väärtus: tüüp
 		).
-		oma headers iga: { :_ :header
-			Väljund kirjuta: header.
+		oma päised iga: { :_ :päis
+			Väljund kirjuta: päis.
 		}.
-		oma headers-out := Tõsi.
+		oma päised-saadetud := Tõsi.
 		Väljund kirjuta: ['\r\n'].
 	}.
-	Väljund kirjuta: output.
+	Väljund kirjuta: väljund.
 }.
 
-Web-Document kui: ['finish:type:'] tee: { :output :tüüp
-	oma headers-out vale: {
-		oma sessdata Tühi? vale: {
-			oma session-manager save: oma sessdata.
+Veebidokument kui: ['lõpeta:tüüp:'] tee: { :väljund :tüüp
+	oma päised-saadetud vale: {
+		oma seansiandmed Tühi? vale: {
+			oma seansihaldur salvesta: oma seansiandmed.
 		}.
-		oma headers lisa-lõppu: (
-			HTTP-Header uus
-			key: ['Content-type'] value: tüüp
+		oma päised lisa-lõppu: (
+			HTTP-Päis uus
+			võti: ['Content-type'] väärtus: tüüp
 		).
-		oma headers lisa-lõppu: (
-			HTTP-Header uus
-			key: ['Content-Length'] value: output tekst bytes
+		oma päised lisa-lõppu: (
+			HTTP-Päis uus
+			võti: ['Content-Length'] väärtus: väljund tekst bytes
 		).
-		oma headers iga: { :_ :header
-			Väljund kirjuta: header.
+		oma päised iga: { :_ :päis
+			Väljund kirjuta: päis.
 		}.
-		oma headers-out := Tõsi.
+		oma päised-saadetud := Tõsi.
 		Väljund kirjuta: ['\r\n'].
 	}.
-	Väljund kirjuta: output.
+	Väljund kirjuta: väljund.
 }.
 
-Web-Document kui: ['out:'] tee: { :output
-	ise out: output type: ['text/html; charset=utf-8'].
+Veebidokument kui: ['väljasta:'] tee: { :väljund
+	ise väljasta: väljund tüüp: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kui: ['finish:'] tee: { :output
-	ise finish: output type: ['text/html; charset=utf-8'].
+Veebidokument kui: ['lõpeta:'] tee: { :väljund
+	ise lõpeta: väljund tüüp: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kui: ['json:'] tee: { :output
-	ise out: ( JSON jsonify: output ) type: ['application/json'].
+Veebidokument kui: ['json:'] tee: { :väljund
+	ise väljasta: ( JSON jsonify: väljund ) tüüp: ['application/json'].
 }.
 
-Web-Document kui: ['not-found:'] tee: { :output
-	ise clear-headers header: (
-		HTTP-Header uus key: ['Status'] value: ['404 Not Found']
+Veebidokument kui: ['ei-leitud:'] tee: { :väljund
+	ise tühjenda-päised päis: (
+		HTTP-Päis uus võti: ['Status'] väärtus: ['404 Not Found']
 	).
-	ise out: output.
+	ise väljasta: väljund.
 }.
 
 
 # Interface
 
->> Session := Objekt uus.
+>> Seanss := Objekt uus.
 
-Session kui: ['uus'] tee: { <- ise uus init for: Tühi.
+Seanss kui: ['uus'] tee: { <- ise uus lähtesta jaoks: Tühi.
 }.
 
-Session kui: ['for:'] tee: { :id
+Seanss kui: ['jaoks:'] tee: { :id
 	oma id := id.
 }.
 
-Session kui: ['load'] tee: {
+Seanss kui: ['laadi'] tee: {
 	see-ülesanne viga: ['Not implemented.'].
 }.
 
-Session kui: ['save:'] tee: {
+Seanss kui: ['salvesta:'] tee: {
 	see-ülesanne viga: ['Not implemented.'].
 }.
 
-Session kui: ['destroy'] tee: {
+Seanss kui: ['hävita'] tee: {
 	see-ülesanne viga: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session uus.
+>> Ajutise-faili-seanss := Seanss uus.
 
-Tempfile-Session kui: ['init'] tee: {
-	oma pathprefix := ['/tmp/sess-'].
+Ajutise-faili-seanss kui: ['lähtesta'] tee: {
+	oma tee-algus := ['/tmp/sess-'].
 }.
 
-Tempfile-Session kui: ['path-prefix:'] tee: { :str
-	oma pathprefix := str.
+Ajutise-faili-seanss kui: ['tee-eesliide:'] tee: { :sõne
+	oma tee-algus := sõne.
 }.
 
-Tempfile-Session kui: ['file'] tee: { <- ( Fail uus: ( oma pathprefix + oma id + ['.txt'] ) ).
+Ajutise-faili-seanss kui: ['fail'] tee: { <- ( Fail uus: ( oma tee-algus + oma id + ['.txt'] ) ).
 }.
 
-Tempfile-Session kui: ['load'] tee: {
-	>> file := ise file.
-	file olemas vale: {
-		file kirjuta: (Sõnastik uus kood).
-	}. <- file loe objekt.
+Ajutise-faili-seanss kui: ['laadi'] tee: {
+	>> fail := ise fail.
+	fail olemas vale: {
+		fail kirjuta: (Sõnastik uus kood).
+	}. <- fail loe objekt.
 }.
 
-Tempfile-Session kui: ['save:'] tee: { :data
-	>> file := ise file.
-	file olemas tõsi: {
-		file kirjuta: data kood.
+Ajutise-faili-seanss kui: ['salvesta:'] tee: { :andmed
+	>> fail := ise fail.
+	fail olemas tõsi: {
+		fail kirjuta: andmed kood.
 	}.
 }.
 
-Tempfile-Session kui: ['destroy'] tee: {
-	>> file := ise file.
-	file olemas tõsi: {
-		file kustuta.
+Ajutise-faili-seanss kui: ['hävita'] tee: {
+	>> fail := ise fail.
+	fail olemas tõsi: {
+		fail kustuta.
 	}.
 }.
 
 
 >> URL := Objekt uus.
 
-URL kui: ['init'] tee: {
-	oma protocol := ['https://'].
+URL kui: ['lähtesta'] tee: {
+	oma protokoll := ['https://'].
 	oma host := ['localhost'].
 	oma rada := [''].
-	oma params := [''].
+	oma url-parameetrid := [''].
 	oma hash := [''].
 }.
 
-URL kui: ['uus'] tee: { <- ise uus init.
+URL kui: ['uus'] tee: { <- ise uus lähtesta.
 }.
 
 URL kui: ['tekst'] tee: { <- (
-	oma protocol +
+	oma protokoll +
 	oma host +
 	oma rada +
-	oma params +
+	oma url-parameetrid +
 	oma hash ).
 }.
 
-URL kui: ['protocol:'] tee: { :protocol
-	((Loend uus: ['http'] ; ['https']) hõlmab: protocol) tõsi: {
-		oma protocol := protocol + ['://'].
+URL kui: ['protokoll:'] tee: { :protokoll
+	((Loend uus ; ['http'] ; ['https']) sisaldab: protokoll) tõsi: {
+		oma protokoll := protokoll + ['://'].
 	}, vale: {
 		see-ülesanne viga: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL kui: ['host:'] tee: { :host
 	oma host := host.
 }.
 
-URL kui: ['path:'] tee: { :rada
+URL kui: ['rada:'] tee: { :rada
 	oma rada := ['/'] + rada url-kodeeri.
 }.
 
-URL kui: ['params:'] tee: { :map
-	>> params := Loend uus.
-	map iga: { :key :value
-		params lisa-lõppu: key tekst url-kodeeri + ['='] + value tekst url-kodeeri.
+URL kui: ['url-parameetrid:'] tee: { :vastendus
+	>> url-parameetrid := Loend uus.
+	vastendus iga: { :võti :väärtus
+		url-parameetrid lisa-lõppu: võti tekst url-kodeeri + ['='] + väärtus tekst url-kodeeri.
 	}.
-	oma params := ['?'] + ( params ühenda: ['&'] ).
+	oma url-parameetrid := ['?'] + ( url-parameetrid ühenda: ['&'] ).
 }.
 
 URL kui: ['räsi:'] tee: { :hash

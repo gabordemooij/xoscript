@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objekt neu.
+>> Vorlage := Objekt neu.
 
-Template wenn: ['neu'] tun: { <- selbst neu content: [''].
+Vorlage wenn: ['neu'] tun: { <- selbst neu inhalt: [''].
 }.
 
-Template wenn: ['content:'] tun: { :content
-	eigen content := content. 
+Vorlage wenn: ['inhalt:'] tun: { :inhalt
+	eigen inhalt := inhalt. 
 }.
 
-Template wenn: ['neu:'] tun: { :content <- selbst neu content: content.
+Vorlage wenn: ['neu:'] tun: { :inhalt <- selbst neu inhalt: inhalt.
 }.
 
-Template wenn: ['cut:'] tun: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := eigen content teilen: startmarker.
-	>> prefix := parts erstes.
-	>> parts2 := parts letztes teilen: endmarker.
-	>> suffix := parts2 letztes.
-	>> part := parts2 erstes.
-	>> rest := prefix + suffix.
-	eigen content := rest. <- Template neu: part.
+Vorlage wenn: ['ausschneiden:'] tun: { :markierung
+	>> startmarkierung := (['<!-- cut:%id% -->'] %id%: markierung).
+	>> endmarkierung := (['<!-- /cut:%id% -->'] %id%: markierung).
+	>> teile := eigen inhalt teilen: startmarkierung.
+	>> präfix := teile erstes.
+	>> teile2 := teile letztes teilen: endmarkierung.
+	>> suffix := teile2 letztes.
+	>> teil := teile2 erstes.
+	>> rest := präfix + suffix.
+	eigen inhalt := rest. <- Vorlage neu: teil.
 	
 }.
 
-Template wenn: ['kopieren'] tun: { <- selbst neu: selbst text kopieren.
+Vorlage wenn: ['kopieren'] tun: { <- selbst neu: selbst text kopieren.
 }.
 	
-Template wenn: ['paste:at:'] tun: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	eigen content ersetzen: pastemarker mit: ( snippet text + pastemarker ).
+Vorlage wenn: ['einfügen:auf:'] tun: { :schnipsel :id
+	>> einfügemarke := (['<!-- paste:%id% -->'] %id%: id).
+	eigen inhalt ersetzen: einfügemarke mit: ( schnipsel text + einfügemarke ).
 }.
 
-Template wenn: ['setzen:wert:'] tun: { :slot :value
-	eigen content ersetzen: ['<!-- slot:'] + slot + [' -->'] mit: ( Server html-kodieren: value ).
+Vorlage wenn: ['setzen:wert:'] tun: { :platz :wert
+	eigen inhalt ersetzen: ['<!-- slot:'] + platz + [' -->'] mit: ( Server html-kodieren: wert ).
 }.
 
-Template wenn: ['set:html:'] tun: { :slot :html
-	eigen content ersetzen: ['<!-- slot:'] + slot + [' -->'] mit: html.
+Vorlage wenn: ['setzen:html:'] tun: { :platz :html
+	eigen inhalt ersetzen: ['<!-- slot:'] + platz + [' -->'] mit: html.
 }.
 
-Template wenn: ['antworten:und:'] tun: { :slot :value
-	selbst setzen: (slot von: 0 länge: (slot länge - 1)) wert: value.
+Vorlage wenn: ['antworten:und:'] tun: { :platz :wert
+	selbst setzen: (platz von: 0 länge: (platz länge - 1)) wert: wert.
 }.
 
-Template wenn: ['nl2br'] tun: {
-	eigen content ersetzen: ['\n'] mit: ['<br>'].
+Vorlage wenn: ['nl2br'] tun: {
+	eigen inhalt ersetzen: ['\n'] mit: ['<br>'].
 }.
 
-Template wenn: ['clean'] tun: {
-	eigen content :=
+Vorlage wenn: ['säubern'] tun: {
+	eigen inhalt :=
 		Muster
 		neu: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		treffer: eigen content
+		treffer: eigen inhalt
 		tun: { <- ['']. }.
 }.
 
-Template wenn: ['clean-cuts'] tun: {
-	>> items := Liste neu.
+Vorlage wenn: ['schnitte-säubern'] tun: {
+	>> elemente := Liste neu.
 	Muster
 	neu: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	treffer: eigen content
-	tun: { :_ :part
-		items anhängen: part ? 1.
+	treffer: eigen inhalt
+	tun: { :_ :teil
+		elemente anhängen: teil ? 1.
 	}.
-	items jedes: { :_ :id
-		eigen content :=
+	elemente jedes: { :_ :id
+		eigen inhalt :=
 			Muster neu: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			treffer: eigen content
+			treffer: eigen inhalt
 			tun: { <- ['']. }.
 	 }.
 }.
 
-Template wenn: ['clean-space'] tun: {
-	eigen content :=
+Vorlage wenn: ['leerraum-säubern'] tun: {
+	eigen inhalt :=
 		Muster
 		neu: ['\\s*\\n'],
-		treffer: eigen content
+		treffer: eigen inhalt
 		tun: { <- ['\n']. }.
-	eigen content :=
+	eigen inhalt :=
 		Muster
 		neu: ['\\n[\\s\\t]+'],
-		treffer: eigen content
+		treffer: eigen inhalt
 		tun: { <- ['\n']. }.
 }.
 
-Template wenn: ['clean-all'] tun: {
-	selbst clean.
-	selbst clean-cuts.
-	selbst clean-space.
+Vorlage wenn: ['alles-säubern'] tun: {
+	selbst säubern.
+	selbst schnitte-säubern.
+	selbst leerraum-säubern.
 }.
 
-Template wenn: ['text'] tun: { <- eigen content.
+Vorlage wenn: ['text'] tun: { <- eigen inhalt.
 }.

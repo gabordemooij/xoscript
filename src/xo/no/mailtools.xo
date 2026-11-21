@@ -1,128 +1,128 @@
->> Email := Objekt ny.
+>> E-post := Objekt ny.
 
-Email ved: ['init'] gjør: {
-	egen recipients := Liste ny.
+E-post ved: ['initialiser'] gjør: {
+	egen mottakere := Liste ny.
 	egen cc := Liste ny.
 	egen bcc := Liste ny.
-	egen from := Ingenting.
-	egen from-name := Ingenting.
-	egen subject := Ingenting.
-	egen body := Ingenting.
+	egen avsender := Ingenting.
+	egen avsendernavn := Ingenting.
+	egen emne := Ingenting.
+	egen meldingstekst := Ingenting.
 }.
 
-Email ved: ['ny'] gjør: { <- selv ny init.
+E-post ved: ['ny'] gjør: { <- selv ny initialiser.
 }.
 
-Email ved: ['to:'] gjør: { :list
-	egen recipients := list.
+E-post ved: ['til:'] gjør: { :oppramsing
+	egen mottakere := oppramsing.
 }.
  
-Email ved: ['cc:'] gjør: { :list
-	egen cc := list.
+E-post ved: ['cc:'] gjør: { :oppramsing
+	egen cc := oppramsing.
 }.
 
-Email ved: ['bcc:'] gjør: { :list
-	egen bcc := list.
+E-post ved: ['bcc:'] gjør: { :oppramsing
+	egen bcc := oppramsing.
 }.
 
-Email ved: ['subject:'] gjør: { :subject
-	egen subject := subject.
+E-post ved: ['emne:'] gjør: { :emne
+	egen emne := emne.
 }.
 
-Email ved: ['from:name:'] gjør: { :from :navn
-	egen from := from.
-	egen from-name := navn.
+E-post ved: ['avsender:navn:'] gjør: { :avsender :navn
+	egen avsender := avsender.
+	egen avsendernavn := navn.
 }.
 
-Email ved: ['body:'] gjør: { :body
-	egen body := body.
+E-post ved: ['meldingstekst:'] gjør: { :meldingstekst
+	egen meldingstekst := meldingstekst.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email ved: ['header:'] gjør: { :line <- line erstatt: ['\r'] med: [''], erstatt: ['\n'] med: [''].
+E-post ved: ['hode:'] gjør: { :linje <- linje erstatt: ['\r'] med: [''], erstatt: ['\n'] med: [''].
 }.
 
-Email ved: ['send'] gjør: {
-	>> f := Fil tempwrite: selv generate.
+E-post ved: ['send'] gjør: {
+	>> f := Fil tempwrite: selv generer.
 	Program system: ['sendmail -t < '] + f sti, stop.
 }.
 
-Email ved: ['generate'] gjør: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str legg-til-sist: (selv header: ['From: '] + egen from-name + [' <'] + ( egen from ) + ['>']) + brk.
-	str legg-til-sist: (selv header: ['To: '] + ( egen recipients slå-sammen: [','] )) + brk.
+E-post ved: ['generer'] gjør: {
+	>> linjeskift := ['\r\n'].
+	>> tegnstreng := [''].
+	tegnstreng legg-til-sist: (selv hode: ['From: '] + egen avsendernavn + [' <'] + ( egen avsender ) + ['>']) + linjeskift.
+	tegnstreng legg-til-sist: (selv hode: ['To: '] + ( egen mottakere slå-sammen: [','] )) + linjeskift.
 	egen cc antall sann: {
-		str legg-til-sist: (selv header: ['Cc: '] + ( egen cc slå-sammen: [','] )) + brk.
+		tegnstreng legg-til-sist: (selv hode: ['Cc: '] + ( egen cc slå-sammen: [','] )) + linjeskift.
 	}.
 	egen bcc antall sann: {
-		str legg-til-sist: (selv header: ['Bcc: '] + ( egen bcc slå-sammen: [','] )) + brk.
+		tegnstreng legg-til-sist: (selv hode: ['Bcc: '] + ( egen bcc slå-sammen: [','] )) + linjeskift.
 	}.
-	str legg-til-sist: (selv header: ['Subject: '] + egen subject) + brk.
-	str legg-til-sist: brk.
-	str legg-til-sist: egen body.
-	str legg-til-sist: brk. <- str.
+	tegnstreng legg-til-sist: (selv hode: ['Subject: '] + egen emne) + linjeskift.
+	tegnstreng legg-til-sist: linjeskift.
+	tegnstreng legg-til-sist: egen meldingstekst.
+	tegnstreng legg-til-sist: linjeskift. <- tegnstreng.
 }.
 
->> HTML-Email := Email ny.
+>> HTML-E-post := E-post ny.
 
-HTML-Email ved: ['init'] gjør: {
-	selv init.
-	egen attachments := Liste ny.
-	egen boundary := Hvelv token: 40.
+HTML-E-post ved: ['initialiser'] gjør: {
+	selv initialiser.
+	egen vedlegg := Liste ny.
+	egen grense := Hvelv token: 40.
 }.
 
-HTML-Email ved: ['attach:'] gjør: { :file
-	>> id := egen attachments antall.
-	>> blob := file blob.
-	egen attachments legg-til-sist: (
+HTML-E-post ved: ['legg-ved:'] gjør: { :fil
+	>> id := egen vedlegg antall.
+	>> blob := fil blob.
+	egen vedlegg legg-til-sist: (
 		Ordbok ny
-			file: file sti,
-			mime: ['image/'] + (Server mimetype: file sti),
+			fil: fil sti,
+			mime: ['image/'] + (Server mimetype: fil sti),
 			data: blob base64-kode
 	).
 	blob frigjør. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email ved: ['generate'] gjør: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str legg-til-sist: (selv header: ['From: '] + egen from-name + [' <'] + ( egen from ) + ['>']) + brk.
-	str legg-til-sist: (selv header: ['To: '] + ( egen recipients slå-sammen: [','] )) + brk.
+HTML-E-post ved: ['generer'] gjør: {
+	>> linjeskift := ['\r\n'].
+	>> tegnstreng := [''].
+	tegnstreng legg-til-sist: (selv hode: ['From: '] + egen avsendernavn + [' <'] + ( egen avsender ) + ['>']) + linjeskift.
+	tegnstreng legg-til-sist: (selv hode: ['To: '] + ( egen mottakere slå-sammen: [','] )) + linjeskift.
 	egen cc antall sann: {
-		str legg-til-sist: (selv header: ['Cc: '] + ( egen cc slå-sammen: [','] )) + brk.
+		tegnstreng legg-til-sist: (selv hode: ['Cc: '] + ( egen cc slå-sammen: [','] )) + linjeskift.
 	}.
 	egen bcc antall sann: {
-		str legg-til-sist: (selv header: ['Bcc: '] + ( egen bcc slå-sammen: [','] )) + brk.
+		tegnstreng legg-til-sist: (selv hode: ['Bcc: '] + ( egen bcc slå-sammen: [','] )) + linjeskift.
 	}.
-	str legg-til-sist: (selv header: ['Subject: '] + egen subject) + brk.
-	str legg-til-sist: ['MIME-Version: 1.0'] + brk.
-	str legg-til-sist: ['Content-Type: multipart/related; boundary="'] + egen boundary + ['"; type=text/html'] + brk.
-	str legg-til-sist: brk.
-	str legg-til-sist: ['--'] + egen boundary + brk.
-	str legg-til-sist: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str legg-til-sist: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str legg-til-sist: brk.
-	str legg-til-sist: egen body.
-	str legg-til-sist: brk.
-	egen attachments hver: { :id :info
+	tegnstreng legg-til-sist: (selv hode: ['Subject: '] + egen emne) + linjeskift.
+	tegnstreng legg-til-sist: ['MIME-Version: 1.0'] + linjeskift.
+	tegnstreng legg-til-sist: ['Content-Type: multipart/related; boundary="'] + egen grense + ['"; type=text/html'] + linjeskift.
+	tegnstreng legg-til-sist: linjeskift.
+	tegnstreng legg-til-sist: ['--'] + egen grense + linjeskift.
+	tegnstreng legg-til-sist: ['Content-Type: text/html; charset=UTF-8'] + linjeskift.
+	tegnstreng legg-til-sist: ['Content-Transfer-Encoding: 7bit'] + linjeskift.
+	tegnstreng legg-til-sist: linjeskift.
+	tegnstreng legg-til-sist: egen meldingstekst.
+	tegnstreng legg-til-sist: linjeskift.
+	egen vedlegg hver: { :id :info
 		>> blob := info data.
-		str legg-til-sist: ['--'] + egen boundary + brk.
-		str legg-til-sist: ['Content-Type: '] + info mime + brk.
-		str legg-til-sist: ['Content-Transfer-Encoding: base64'] + brk.
-		str legg-til-sist: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str legg-til-sist: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str legg-til-sist: brk.
-		>> max := 76.
-		>> len := blob lengde.
-		>> chunks := (len / max) rund-opp.
+		tegnstreng legg-til-sist: ['--'] + egen grense + linjeskift.
+		tegnstreng legg-til-sist: ['Content-Type: '] + info mime + linjeskift.
+		tegnstreng legg-til-sist: ['Content-Transfer-Encoding: base64'] + linjeskift.
+		tegnstreng legg-til-sist: ['Content-ID: <attachment'] + id + ['>'] + linjeskift.
+		tegnstreng legg-til-sist: ['Content-Disposition: inline; filename="'] + info fil + ['"'] + linjeskift.
+		tegnstreng legg-til-sist: linjeskift.
+		>> høyeste := 76.
+		>> tekstlengde := blob lengde.
+		>> biter := (tekstlengde / høyeste) rund-opp.
 		{ :i
-			>> chunk := blob kopier fra: i * max lengde: max.
-			str legg-til-sist: chunk + brk.
-		} * chunks.
-		str legg-til-sist: brk.
-		str legg-til-sist: brk.
+			>> bit := blob kopier fra: i * høyeste lengde: høyeste.
+			tegnstreng legg-til-sist: bit + linjeskift.
+		} * biter.
+		tegnstreng legg-til-sist: linjeskift.
+		tegnstreng legg-til-sist: linjeskift.
 	}.
-	str legg-til-sist: ['--'] + egen boundary + ['--'] + brk. <- str.
+	tegnstreng legg-til-sist: ['--'] + egen grense + ['--'] + linjeskift. <- tegnstreng.
 }.

@@ -1,302 +1,302 @@
-Panjaluk-HTTP nalika: ['HTTP-header:'] tindakna: { :key <- Program setelan: key.
+Panjaluk-HTTP nalika: ['HTTP-sesirah:'] tindakna: { :kunci-sesirah <- Program setelan: kunci-sesirah.
 }.
 
->> HTTP-Header := Obyek anyar.
+>> Sesirah-HTTP := Obyek anyar.
 
-HTTP-Header nalika: ['anyar'] tindakna: { <- dhiri anyar init.
+Sesirah-HTTP nalika: ['anyar'] tindakna: { <- dhiri anyar siapake.
 }.
 
-HTTP-Header nalika: ['init'] tindakna: {
-	duweke key := Kosong.
-	duweke value := Kosong.
+Sesirah-HTTP nalika: ['siapake'] tindakna: {
+	duweke kunci-sesirah := Kosong.
+	duweke nilai := Kosong.
 }.
 
-HTTP-Header nalika: ['key:value:'] tindakna: { :key :value
-	duweke key := key.
-	duweke value := value.
+Sesirah-HTTP nalika: ['kunci-sesirah:nilai:'] tindakna: { :kunci-sesirah :nilai
+	duweke kunci-sesirah := kunci-sesirah.
+	duweke nilai := nilai.
 }.
 
-HTTP-Header nalika: ['key'] tindakna: { <- duweke key.
+Sesirah-HTTP nalika: ['kunci-sesirah'] tindakna: { <- duweke kunci-sesirah.
 }.
 
-HTTP-Header nalika: ['value'] tindakna: { <- duweke value.
+Sesirah-HTTP nalika: ['nilai'] tindakna: { <- duweke nilai.
 }.
 
 
-HTTP-Header nalika: ['tèks'] tindakna: {
-	>> line := duweke key + [': '] + duweke value.
-	line ganti: ['\r'] nganggo: [''], ganti: ['\n'] nganggo: ['']. <- line + [' \r\n'].
+Sesirah-HTTP nalika: ['tèks'] tindakna: {
+	>> baris := duweke kunci-sesirah + [': '] + duweke nilai.
+	baris ganti: ['\r'] nganggo: [''], ganti: ['\n'] nganggo: ['']. <- baris + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Obyek anyar.
+>> Dokumen-Web := Obyek anyar.
 
-Web-Document nalika: ['anyar'] tindakna: { <- dhiri anyar init.
+Dokumen-Web nalika: ['anyar'] tindakna: { <- dhiri anyar siapake.
 }.
 
-Web-Document nalika: ['init'] tindakna: {
-	duweke headers := Dhaptar anyar.
-	duweke sess-id := Kosong.
-	duweke session-manager := Tempfile-Session anyar.
-	duweke sessdata := Kosong.
-	duweke secure := Bener.
-	duweke same-site := ['Strict'].
-	duweke headers-out := Salah.
-	duweke request := Panjaluk-HTTP anyar.
+Dokumen-Web nalika: ['siapake'] tindakna: {
+	duweke dhaptar-sesirah := Dhaptar anyar.
+	duweke id-sesi := Kosong.
+	duweke pangatur-sesi := Sesi-berkas-sementara anyar.
+	duweke data-sesi := Kosong.
+	duweke aman := Bener.
+	duweke situs-padha := ['Strict'].
+	duweke sesirah-dikirim := Salah.
+	duweke panjaluk-http := Panjaluk-HTTP anyar.
 }.
 
-Web-Document nalika: ['request:'] tindakna: { :request
-	duweke request := request.
+Dokumen-Web nalika: ['panjaluk-http:'] tindakna: { :panjaluk-http
+	duweke panjaluk-http := panjaluk-http.
 }. 
 
-Web-Document nalika: ['secure-session-cookie:'] tindakna: { :secure
-	dhiri check-headers.
-	duweke secure := secure.
+Dokumen-Web nalika: ['kuki-sesi-aman:'] tindakna: { :aman
+	dhiri priksa-sesirah.
+	duweke aman := aman.
 }.
 
-Web-Document nalika: ['same-site-session-cookie:'] tindakna: { :value
-	dhiri check-headers.
-	>> options := Dhaptar anyar 
+Dokumen-Web nalika: ['kuki-sesi-situs-padha:'] tindakna: { :nilai
+	dhiri priksa-sesirah.
+	>> pilihan := Dhaptar anyar 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options ngemot: value, salah: {
+	pilihan nduweni: nilai, salah: {
 		tugas-iki kesalahan: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	duweke same-site := value.
+	duweke situs-padha := nilai.
 }.
 
-Web-Document nalika: ['header:'] tindakna: { :header
-	dhiri check-headers.
-	duweke headers tambah-ing-mburi: header.
+Dokumen-Web nalika: ['sesirah:'] tindakna: { :sesirah
+	dhiri priksa-sesirah.
+	duweke dhaptar-sesirah tambah-ing-mburi: sesirah.
 }.
 
-Web-Document nalika: ['clear-headers'] tindakna: {
-	dhiri check-headers.
-	duweke headers := Dhaptar anyar.
+Dokumen-Web nalika: ['kosongake-sesirah'] tindakna: {
+	dhiri priksa-sesirah.
+	duweke dhaptar-sesirah := Dhaptar anyar.
 }.
 
-Web-Document nalika: ['session-manager:'] tindakna: { :manager
-	dhiri check-headers.
-	duweke session-manager := manager.
+Dokumen-Web nalika: ['pangatur-sesi:'] tindakna: { :pangatur
+	dhiri priksa-sesirah.
+	duweke pangatur-sesi := pangatur.
 }.
 
-Web-Document nalika: ['session-manager'] tindakna: { <- duweke session-manager.
+Dokumen-Web nalika: ['pangatur-sesi'] tindakna: { <- duweke pangatur-sesi.
 }.
 
-Web-Document nalika: ['check-headers'] tindakna: {
-	duweke headers-out bener: {
+Dokumen-Web nalika: ['priksa-sesirah'] tindakna: {
+	duweke sesirah-dikirim bener: {
 		tugas-iki kesalahan: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document nalika: ['session-start'] tindakna: {
-	dhiri check-headers.
-	>> request := duweke request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Kosong? salah: {
-		(( Pola anyar: ['^[A-Za-z0-9]+\\z'], cocog: sess-id ) = 0) bener: {
-			sess-id := Kosong.
+Dokumen-Web nalika: ['wiwiti-sesi'] tindakna: {
+	dhiri priksa-sesirah.
+	>> panjaluk-http := duweke panjaluk-http.
+	>> id-sesi := panjaluk-http cookie: ['xsid'].
+	id-sesi Kosong? salah: {
+		(( Pola anyar: ['^[A-Za-z0-9]+\\z'], cocog: id-sesi ) = 0) bener: {
+			id-sesi := Kosong.
 		}.
 	}.
-	sess-id Kosong? bener: {
-		sess-id := Brankas token: 30.
-		>> session-header := HTTP-Header anyar
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (duweke secure pilih: ['Secure'] utawa: ['']),
-		SSITE: (duweke same-site),
-		XSID: sess-id
+	id-sesi Kosong? bener: {
+		id-sesi := Brankas token: 30.
+		>> sesirah-sesi := Sesirah-HTTP anyar
+		kunci-sesirah: ['Set-Cookie'] nilai: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (duweke aman pilih: ['Secure'] utawa: ['']),
+		SSITE: (duweke situs-padha),
+		XSID: id-sesi
 		).
-		duweke headers tambah-ing-mburi: session-header.
+		duweke dhaptar-sesirah tambah-ing-mburi: sesirah-sesi.
 	}.
-	duweke sessdata := duweke session-manager for: sess-id, load. <- duweke sessdata. # reference
+	duweke data-sesi := duweke pangatur-sesi kanggo: id-sesi, muat. <- duweke data-sesi. # reference
 }.
 
-Web-Document nalika: ['goto:'] tindakna: { :url
-	dhiri check-headers.
-	dhiri clear-headers.
-	duweke headers
+Dokumen-Web nalika: ['menyang:'] tindakna: { :alamat
+	dhiri priksa-sesirah.
+	dhiri kosongake-sesirah.
+	duweke dhaptar-sesirah
 	tambah-ing-mburi: (
-		HTTP-Header anyar
-		key: ['Status'] value: ['303 See Other']
+		Sesirah-HTTP anyar
+		kunci-sesirah: ['Status'] nilai: ['303 See Other']
 	),
 	tambah-ing-mburi: (
-		HTTP-Header anyar
-		key: ['Location'] value: url
+		Sesirah-HTTP anyar
+		kunci-sesirah: ['Location'] nilai: alamat
 	).
-	dhiri out: ['Redirect'].
+	dhiri wetokake: ['Redirect'].
 }.
 
-Web-Document nalika: ['session-destroy'] tindakna: {
-	dhiri check-headers.
-	>> request := duweke request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Kosong? salah: {
-		>> session-header := HTTP-Header anyar.
-		>> when := Wektu anyar taun: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Dokumen-Web nalika: ['rusak-sesi'] tindakna: {
+	dhiri priksa-sesirah.
+	>> panjaluk-http := duweke panjaluk-http.
+	>> id-sesi := panjaluk-http cookie: ['xsid'].
+	id-sesi Kosong? salah: {
+		>> sesirah-sesi := Sesirah-HTTP anyar.
+		>> wektu-entek := Wektu anyar taun: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		sesirah-sesi kunci-sesirah: ['Set-Cookie'] nilai: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (duweke secure pilih: ['Secure'] utawa: ['']),
-			SSITE: (duweke same-site),
-			XSID: sess-id
+			EXP: wektu-entek,
+			SEC: (duweke aman pilih: ['Secure'] utawa: ['']),
+			SSITE: (duweke situs-padha),
+			XSID: id-sesi
 		).
-		duweke session-manager destroy.
-		duweke headers tambah-ing-mburi: session-header.
+		duweke pangatur-sesi rusak.
+		duweke dhaptar-sesirah tambah-ing-mburi: sesirah-sesi.
 	}.
 }.
 
 
-Web-Document nalika: ['template:'] tindakna: { :dalan <- Template anyar: (Berkas anyar: dalan, waca).
+Dokumen-Web nalika: ['cithakan:'] tindakna: { :dalan <- Cithakan anyar: (Berkas anyar: dalan, waca).
 }.
 
-Web-Document nalika: ['out:type:'] tindakna: { :output :jinis
-	duweke headers-out salah: {
-		duweke sessdata Kosong? salah: {
-			duweke session-manager save: duweke sessdata.
+Dokumen-Web nalika: ['wetokake:jinis:'] tindakna: { :asil :jinis
+	duweke sesirah-dikirim salah: {
+		duweke data-sesi Kosong? salah: {
+			duweke pangatur-sesi simpen: duweke data-sesi.
 		}.
-		duweke headers tambah-ing-mburi: (
-			HTTP-Header anyar
-			key: ['Content-type'] value: jinis
+		duweke dhaptar-sesirah tambah-ing-mburi: (
+			Sesirah-HTTP anyar
+			kunci-sesirah: ['Content-type'] nilai: jinis
 		).
-		duweke headers saben: { :_ :header
-			Wetonan tulis: header.
+		duweke dhaptar-sesirah saben: { :_ :sesirah
+			Wetonan tulis: sesirah.
 		}.
-		duweke headers-out := Bener.
+		duweke sesirah-dikirim := Bener.
 		Wetonan tulis: ['\r\n'].
 	}.
-	Wetonan tulis: output.
+	Wetonan tulis: asil.
 }.
 
-Web-Document nalika: ['finish:type:'] tindakna: { :output :jinis
-	duweke headers-out salah: {
-		duweke sessdata Kosong? salah: {
-			duweke session-manager save: duweke sessdata.
+Dokumen-Web nalika: ['rampungake:jinis:'] tindakna: { :asil :jinis
+	duweke sesirah-dikirim salah: {
+		duweke data-sesi Kosong? salah: {
+			duweke pangatur-sesi simpen: duweke data-sesi.
 		}.
-		duweke headers tambah-ing-mburi: (
-			HTTP-Header anyar
-			key: ['Content-type'] value: jinis
+		duweke dhaptar-sesirah tambah-ing-mburi: (
+			Sesirah-HTTP anyar
+			kunci-sesirah: ['Content-type'] nilai: jinis
 		).
-		duweke headers tambah-ing-mburi: (
-			HTTP-Header anyar
-			key: ['Content-Length'] value: output tèks bytes
+		duweke dhaptar-sesirah tambah-ing-mburi: (
+			Sesirah-HTTP anyar
+			kunci-sesirah: ['Content-Length'] nilai: asil tèks bytes
 		).
-		duweke headers saben: { :_ :header
-			Wetonan tulis: header.
+		duweke dhaptar-sesirah saben: { :_ :sesirah
+			Wetonan tulis: sesirah.
 		}.
-		duweke headers-out := Bener.
+		duweke sesirah-dikirim := Bener.
 		Wetonan tulis: ['\r\n'].
 	}.
-	Wetonan tulis: output.
+	Wetonan tulis: asil.
 }.
 
-Web-Document nalika: ['out:'] tindakna: { :output
-	dhiri out: output type: ['text/html; charset=utf-8'].
+Dokumen-Web nalika: ['wetokake:'] tindakna: { :asil
+	dhiri wetokake: asil jinis: ['text/html; charset=utf-8'].
 }.
 
-Web-Document nalika: ['finish:'] tindakna: { :output
-	dhiri finish: output type: ['text/html; charset=utf-8'].
+Dokumen-Web nalika: ['rampungake:'] tindakna: { :asil
+	dhiri rampungake: asil jinis: ['text/html; charset=utf-8'].
 }.
 
-Web-Document nalika: ['json:'] tindakna: { :output
-	dhiri out: ( JSON jsonify: output ) type: ['application/json'].
+Dokumen-Web nalika: ['json:'] tindakna: { :asil
+	dhiri wetokake: ( JSON jsonify: asil ) jinis: ['application/json'].
 }.
 
-Web-Document nalika: ['not-found:'] tindakna: { :output
-	dhiri clear-headers header: (
-		HTTP-Header anyar key: ['Status'] value: ['404 Not Found']
+Dokumen-Web nalika: ['ora-ketemu:'] tindakna: { :asil
+	dhiri kosongake-sesirah sesirah: (
+		Sesirah-HTTP anyar kunci-sesirah: ['Status'] nilai: ['404 Not Found']
 	).
-	dhiri out: output.
+	dhiri wetokake: asil.
 }.
 
 
 # Interface
 
->> Session := Obyek anyar.
+>> Sesi := Obyek anyar.
 
-Session nalika: ['anyar'] tindakna: { <- dhiri anyar init for: Kosong.
+Sesi nalika: ['anyar'] tindakna: { <- dhiri anyar siapake kanggo: Kosong.
 }.
 
-Session nalika: ['for:'] tindakna: { :id
+Sesi nalika: ['kanggo:'] tindakna: { :id
 	duweke id := id.
 }.
 
-Session nalika: ['load'] tindakna: {
+Sesi nalika: ['muat'] tindakna: {
 	tugas-iki kesalahan: ['Not implemented.'].
 }.
 
-Session nalika: ['save:'] tindakna: {
+Sesi nalika: ['simpen:'] tindakna: {
 	tugas-iki kesalahan: ['Not implemented.'].
 }.
 
-Session nalika: ['destroy'] tindakna: {
+Sesi nalika: ['rusak'] tindakna: {
 	tugas-iki kesalahan: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session anyar.
+>> Sesi-berkas-sementara := Sesi anyar.
 
-Tempfile-Session nalika: ['init'] tindakna: {
-	duweke pathprefix := ['/tmp/sess-'].
+Sesi-berkas-sementara nalika: ['siapake'] tindakna: {
+	duweke wiwitan-dalan := ['/tmp/sess-'].
 }.
 
-Tempfile-Session nalika: ['path-prefix:'] tindakna: { :str
-	duweke pathprefix := str.
+Sesi-berkas-sementara nalika: ['awalan-dalan:'] tindakna: { :untaian
+	duweke wiwitan-dalan := untaian.
 }.
 
-Tempfile-Session nalika: ['file'] tindakna: { <- ( Berkas anyar: ( duweke pathprefix + duweke id + ['.txt'] ) ).
+Sesi-berkas-sementara nalika: ['berkas-sesi'] tindakna: { <- ( Berkas anyar: ( duweke wiwitan-dalan + duweke id + ['.txt'] ) ).
 }.
 
-Tempfile-Session nalika: ['load'] tindakna: {
-	>> file := dhiri file.
-	file ana salah: {
-		file tulis: (Kamus anyar kode).
-	}. <- file waca obyek.
+Sesi-berkas-sementara nalika: ['muat'] tindakna: {
+	>> berkas-sesi := dhiri berkas-sesi.
+	berkas-sesi ana salah: {
+		berkas-sesi tulis: (Kamus anyar kode).
+	}. <- berkas-sesi waca obyek.
 }.
 
-Tempfile-Session nalika: ['save:'] tindakna: { :data
-	>> file := dhiri file.
-	file ana bener: {
-		file tulis: data kode.
+Sesi-berkas-sementara nalika: ['simpen:'] tindakna: { :data
+	>> berkas-sesi := dhiri berkas-sesi.
+	berkas-sesi ana bener: {
+		berkas-sesi tulis: data kode.
 	}.
 }.
 
-Tempfile-Session nalika: ['destroy'] tindakna: {
-	>> file := dhiri file.
-	file ana bener: {
-		file busak.
+Sesi-berkas-sementara nalika: ['rusak'] tindakna: {
+	>> berkas-sesi := dhiri berkas-sesi.
+	berkas-sesi ana bener: {
+		berkas-sesi busak.
 	}.
 }.
 
 
 >> URL := Obyek anyar.
 
-URL nalika: ['init'] tindakna: {
-	duweke protocol := ['https://'].
+URL nalika: ['siapake'] tindakna: {
+	duweke protokol := ['https://'].
 	duweke hos := ['localhost'].
 	duweke dalan := [''].
-	duweke params := [''].
+	duweke parameter-url := [''].
 	duweke hash := [''].
 }.
 
-URL nalika: ['anyar'] tindakna: { <- dhiri anyar init.
+URL nalika: ['anyar'] tindakna: { <- dhiri anyar siapake.
 }.
 
 URL nalika: ['tèks'] tindakna: { <- (
-	duweke protocol +
+	duweke protokol +
 	duweke hos +
 	duweke dalan +
-	duweke params +
+	duweke parameter-url +
 	duweke hash ).
 }.
 
-URL nalika: ['protocol:'] tindakna: { :protocol
-	((Dhaptar anyar: ['http'] ; ['https']) ngemot: protocol) bener: {
-		duweke protocol := protocol + ['://'].
+URL nalika: ['protokol:'] tindakna: { :protokol
+	((Dhaptar anyar ; ['http'] ; ['https']) nduweni: protokol) bener: {
+		duweke protokol := protokol + ['://'].
 	}, salah: {
 		tugas-iki kesalahan: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL nalika: ['hos:'] tindakna: { :hos
 	duweke hos := hos.
 }.
 
-URL nalika: ['path:'] tindakna: { :dalan
+URL nalika: ['dalan:'] tindakna: { :dalan
 	duweke dalan := ['/'] + dalan url-enkode.
 }.
 
-URL nalika: ['params:'] tindakna: { :map
-	>> params := Dhaptar anyar.
-	map saben: { :key :value
-		params tambah-ing-mburi: key tèks url-enkode + ['='] + value tèks url-enkode.
+URL nalika: ['parameter-url:'] tindakna: { :pemetaan
+	>> parameter-url := Dhaptar anyar.
+	pemetaan saben: { :kunci-sesirah :nilai
+		parameter-url tambah-ing-mburi: kunci-sesirah tèks url-enkode + ['='] + nilai tèks url-enkode.
 	}.
-	duweke params := ['?'] + ( params gabung: ['&'] ).
+	duweke parameter-url := ['?'] + ( parameter-url gabung: ['&'] ).
 }.
 
 URL nalika: ['hash:'] tindakna: { :hash

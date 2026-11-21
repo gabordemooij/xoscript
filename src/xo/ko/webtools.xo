@@ -1,302 +1,302 @@
-HTTP-요청 받으면: ['HTTP-header:'] 실행: { :key <- 프로그램 설정값: key.
+HTTP-요청 받으면: ['HTTP-헤더:'] 실행: { :키값 <- 프로그램 설정값: 키값.
 }.
 
->> HTTP-Header := 객체 새로.
+>> HTTP헤더 := 객체 새로.
 
-HTTP-Header 받으면: ['새로'] 실행: { <- 자신 새로 init.
+HTTP헤더 받으면: ['새로'] 실행: { <- 자신 새로 초기화.
 }.
 
-HTTP-Header 받으면: ['init'] 실행: {
-	자기 key := 없음.
-	자기 value := 없음.
+HTTP헤더 받으면: ['초기화'] 실행: {
+	자기 키값 := 없음.
+	자기 설정값 := 없음.
 }.
 
-HTTP-Header 받으면: ['key:value:'] 실행: { :key :value
-	자기 key := key.
-	자기 value := value.
+HTTP헤더 받으면: ['키값:설정값:'] 실행: { :키값 :설정값
+	자기 키값 := 키값.
+	자기 설정값 := 설정값.
 }.
 
-HTTP-Header 받으면: ['key'] 실행: { <- 자기 key.
+HTTP헤더 받으면: ['키값'] 실행: { <- 자기 키값.
 }.
 
-HTTP-Header 받으면: ['value'] 실행: { <- 자기 value.
+HTTP헤더 받으면: ['설정값'] 실행: { <- 자기 설정값.
 }.
 
 
-HTTP-Header 받으면: ['문자열로'] 실행: {
-	>> line := 자기 key + [': '] + 자기 value.
-	line 바꾸기: ['\r'] 새값: [''], 바꾸기: ['\n'] 새값: ['']. <- line + [' \r\n'].
+HTTP헤더 받으면: ['문자열로'] 실행: {
+	>> 줄내용 := 자기 키값 + [': '] + 자기 설정값.
+	줄내용 바꾸기: ['\r'] 새값: [''], 바꾸기: ['\n'] 새값: ['']. <- 줄내용 + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := 객체 새로.
+>> 웹문서 := 객체 새로.
 
-Web-Document 받으면: ['새로'] 실행: { <- 자신 새로 init.
+웹문서 받으면: ['새로'] 실행: { <- 자신 새로 초기화.
 }.
 
-Web-Document 받으면: ['init'] 실행: {
-	자기 headers := 리스트 새로.
-	자기 sess-id := 없음.
-	자기 session-manager := Tempfile-Session 새로.
-	자기 sessdata := 없음.
-	자기 secure := 참.
-	자기 same-site := ['Strict'].
-	자기 headers-out := 거짓.
-	자기 request := HTTP-요청 새로.
+웹문서 받으면: ['초기화'] 실행: {
+	자기 헤더목록 := 리스트 새로.
+	자기 세션id := 없음.
+	자기 세션관리자 := 임시파일세션 새로.
+	자기 세션데이터 := 없음.
+	자기 보안 := 참.
+	자기 동일사이트 := ['Strict'].
+	자기 헤더전송됨 := 거짓.
+	자기 http요청 := HTTP-요청 새로.
 }.
 
-Web-Document 받으면: ['request:'] 실행: { :request
-	자기 request := request.
+웹문서 받으면: ['http요청:'] 실행: { :http요청
+	자기 http요청 := http요청.
 }. 
 
-Web-Document 받으면: ['secure-session-cookie:'] 실행: { :secure
-	자신 check-headers.
-	자기 secure := secure.
+웹문서 받으면: ['보안세션쿠키:'] 실행: { :보안
+	자신 헤더확인.
+	자기 보안 := 보안.
 }.
 
-Web-Document 받으면: ['same-site-session-cookie:'] 실행: { :value
-	자신 check-headers.
-	>> options := 리스트 새로 
+웹문서 받으면: ['동일사이트세션쿠키:'] 실행: { :설정값
+	자신 헤더확인.
+	>> 옵션 := 리스트 새로 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options 포함: value, 거짓이면: {
+	옵션 가짐: 설정값, 거짓이면: {
 		이작업 오류: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	자기 same-site := value.
+	자기 동일사이트 := 설정값.
 }.
 
-Web-Document 받으면: ['header:'] 실행: { :header
-	자신 check-headers.
-	자기 headers 뒤에추가: header.
+웹문서 받으면: ['헤더:'] 실행: { :헤더
+	자신 헤더확인.
+	자기 헤더목록 뒤에추가: 헤더.
 }.
 
-Web-Document 받으면: ['clear-headers'] 실행: {
-	자신 check-headers.
-	자기 headers := 리스트 새로.
+웹문서 받으면: ['헤더비우기'] 실행: {
+	자신 헤더확인.
+	자기 헤더목록 := 리스트 새로.
 }.
 
-Web-Document 받으면: ['session-manager:'] 실행: { :manager
-	자신 check-headers.
-	자기 session-manager := manager.
+웹문서 받으면: ['세션관리자:'] 실행: { :관리자
+	자신 헤더확인.
+	자기 세션관리자 := 관리자.
 }.
 
-Web-Document 받으면: ['session-manager'] 실행: { <- 자기 session-manager.
+웹문서 받으면: ['세션관리자'] 실행: { <- 자기 세션관리자.
 }.
 
-Web-Document 받으면: ['check-headers'] 실행: {
-	자기 headers-out 참이면: {
+웹문서 받으면: ['헤더확인'] 실행: {
+	자기 헤더전송됨 참이면: {
 		이작업 오류: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document 받으면: ['session-start'] 실행: {
-	자신 check-headers.
-	>> request := 자기 request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id 없음? 거짓이면: {
-		(( 패턴 새로: ['^[A-Za-z0-9]+\\z'], 일치: sess-id ) = 0) 참이면: {
-			sess-id := 없음.
+웹문서 받으면: ['세션시작'] 실행: {
+	자신 헤더확인.
+	>> http요청 := 자기 http요청.
+	>> 세션id := http요청 cookie: ['xsid'].
+	세션id 없음? 거짓이면: {
+		(( 패턴 새로: ['^[A-Za-z0-9]+\\z'], 일치: 세션id ) = 0) 참이면: {
+			세션id := 없음.
 		}.
 	}.
-	sess-id 없음? 참이면: {
-		sess-id := 금고 토큰: 30.
-		>> session-header := HTTP-Header 새로
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (자기 secure 둘중하나: ['Secure'] 또는: ['']),
-		SSITE: (자기 same-site),
-		XSID: sess-id
+	세션id 없음? 참이면: {
+		세션id := 금고 토큰: 30.
+		>> 세션헤더 := HTTP헤더 새로
+		키값: ['Set-Cookie'] 설정값: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (자기 보안 둘중하나: ['Secure'] 또는: ['']),
+		SSITE: (자기 동일사이트),
+		XSID: 세션id
 		).
-		자기 headers 뒤에추가: session-header.
+		자기 헤더목록 뒤에추가: 세션헤더.
 	}.
-	자기 sessdata := 자기 session-manager for: sess-id, load. <- 자기 sessdata. # reference
+	자기 세션데이터 := 자기 세션관리자 대상: 세션id, 불러오기. <- 자기 세션데이터. # reference
 }.
 
-Web-Document 받으면: ['goto:'] 실행: { :url
-	자신 check-headers.
-	자신 clear-headers.
-	자기 headers
+웹문서 받으면: ['이동:'] 실행: { :주소
+	자신 헤더확인.
+	자신 헤더비우기.
+	자기 헤더목록
 	뒤에추가: (
-		HTTP-Header 새로
-		key: ['Status'] value: ['303 See Other']
+		HTTP헤더 새로
+		키값: ['Status'] 설정값: ['303 See Other']
 	),
 	뒤에추가: (
-		HTTP-Header 새로
-		key: ['Location'] value: url
+		HTTP헤더 새로
+		키값: ['Location'] 설정값: 주소
 	).
-	자신 out: ['Redirect'].
+	자신 출력: ['Redirect'].
 }.
 
-Web-Document 받으면: ['session-destroy'] 실행: {
-	자신 check-headers.
-	>> request := 자기 request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id 없음? 거짓이면: {
-		>> session-header := HTTP-Header 새로.
-		>> when := 시점 새로 연도: 1970, 형식: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+웹문서 받으면: ['세션파기'] 실행: {
+	자신 헤더확인.
+	>> http요청 := 자기 http요청.
+	>> 세션id := http요청 cookie: ['xsid'].
+	세션id 없음? 거짓이면: {
+		>> 세션헤더 := HTTP헤더 새로.
+		>> 만료시점 := 시점 새로 연도: 1970, 형식: ['%a, %d %b %Y %H:%M:%S GMT'].
+		세션헤더 키값: ['Set-Cookie'] 설정값: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (자기 secure 둘중하나: ['Secure'] 또는: ['']),
-			SSITE: (자기 same-site),
-			XSID: sess-id
+			EXP: 만료시점,
+			SEC: (자기 보안 둘중하나: ['Secure'] 또는: ['']),
+			SSITE: (자기 동일사이트),
+			XSID: 세션id
 		).
-		자기 session-manager destroy.
-		자기 headers 뒤에추가: session-header.
+		자기 세션관리자 파기.
+		자기 헤더목록 뒤에추가: 세션헤더.
 	}.
 }.
 
 
-Web-Document 받으면: ['template:'] 실행: { :파일경로 <- Template 새로: (파일 새로: 파일경로, 읽기).
+웹문서 받으면: ['템플릿:'] 실행: { :파일경로 <- 템플릿 새로: (파일 새로: 파일경로, 읽기).
 }.
 
-Web-Document 받으면: ['out:type:'] 실행: { :output :유형
-	자기 headers-out 거짓이면: {
-		자기 sessdata 없음? 거짓이면: {
-			자기 session-manager save: 자기 sessdata.
+웹문서 받으면: ['출력:유형:'] 실행: { :출력결과 :유형
+	자기 헤더전송됨 거짓이면: {
+		자기 세션데이터 없음? 거짓이면: {
+			자기 세션관리자 저장: 자기 세션데이터.
 		}.
-		자기 headers 뒤에추가: (
-			HTTP-Header 새로
-			key: ['Content-type'] value: 유형
+		자기 헤더목록 뒤에추가: (
+			HTTP헤더 새로
+			키값: ['Content-type'] 설정값: 유형
 		).
-		자기 headers 각각: { :_ :header
-			출력 쓰기: header.
+		자기 헤더목록 각각: { :_ :헤더
+			출력 쓰기: 헤더.
 		}.
-		자기 headers-out := 참.
+		자기 헤더전송됨 := 참.
 		출력 쓰기: ['\r\n'].
 	}.
-	출력 쓰기: output.
+	출력 쓰기: 출력결과.
 }.
 
-Web-Document 받으면: ['finish:type:'] 실행: { :output :유형
-	자기 headers-out 거짓이면: {
-		자기 sessdata 없음? 거짓이면: {
-			자기 session-manager save: 자기 sessdata.
+웹문서 받으면: ['마무리:유형:'] 실행: { :출력결과 :유형
+	자기 헤더전송됨 거짓이면: {
+		자기 세션데이터 없음? 거짓이면: {
+			자기 세션관리자 저장: 자기 세션데이터.
 		}.
-		자기 headers 뒤에추가: (
-			HTTP-Header 새로
-			key: ['Content-type'] value: 유형
+		자기 헤더목록 뒤에추가: (
+			HTTP헤더 새로
+			키값: ['Content-type'] 설정값: 유형
 		).
-		자기 headers 뒤에추가: (
-			HTTP-Header 새로
-			key: ['Content-Length'] value: output 문자열로 bytes
+		자기 헤더목록 뒤에추가: (
+			HTTP헤더 새로
+			키값: ['Content-Length'] 설정값: 출력결과 문자열로 bytes
 		).
-		자기 headers 각각: { :_ :header
-			출력 쓰기: header.
+		자기 헤더목록 각각: { :_ :헤더
+			출력 쓰기: 헤더.
 		}.
-		자기 headers-out := 참.
+		자기 헤더전송됨 := 참.
 		출력 쓰기: ['\r\n'].
 	}.
-	출력 쓰기: output.
+	출력 쓰기: 출력결과.
 }.
 
-Web-Document 받으면: ['out:'] 실행: { :output
-	자신 out: output type: ['text/html; charset=utf-8'].
+웹문서 받으면: ['출력:'] 실행: { :출력결과
+	자신 출력: 출력결과 유형: ['text/html; charset=utf-8'].
 }.
 
-Web-Document 받으면: ['finish:'] 실행: { :output
-	자신 finish: output type: ['text/html; charset=utf-8'].
+웹문서 받으면: ['마무리:'] 실행: { :출력결과
+	자신 마무리: 출력결과 유형: ['text/html; charset=utf-8'].
 }.
 
-Web-Document 받으면: ['json:'] 실행: { :output
-	자신 out: ( JSON jsonify: output ) type: ['application/json'].
+웹문서 받으면: ['json:'] 실행: { :출력결과
+	자신 출력: ( JSON jsonify: 출력결과 ) 유형: ['application/json'].
 }.
 
-Web-Document 받으면: ['not-found:'] 실행: { :output
-	자신 clear-headers header: (
-		HTTP-Header 새로 key: ['Status'] value: ['404 Not Found']
+웹문서 받으면: ['찾을수없음:'] 실행: { :출력결과
+	자신 헤더비우기 헤더: (
+		HTTP헤더 새로 키값: ['Status'] 설정값: ['404 Not Found']
 	).
-	자신 out: output.
+	자신 출력: 출력결과.
 }.
 
 
 # Interface
 
->> Session := 객체 새로.
+>> 세션 := 객체 새로.
 
-Session 받으면: ['새로'] 실행: { <- 자신 새로 init for: 없음.
+세션 받으면: ['새로'] 실행: { <- 자신 새로 초기화 대상: 없음.
 }.
 
-Session 받으면: ['for:'] 실행: { :id
+세션 받으면: ['대상:'] 실행: { :id
 	자기 id := id.
 }.
 
-Session 받으면: ['load'] 실행: {
+세션 받으면: ['불러오기'] 실행: {
 	이작업 오류: ['Not implemented.'].
 }.
 
-Session 받으면: ['save:'] 실행: {
+세션 받으면: ['저장:'] 실행: {
 	이작업 오류: ['Not implemented.'].
 }.
 
-Session 받으면: ['destroy'] 실행: {
+세션 받으면: ['파기'] 실행: {
 	이작업 오류: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session 새로.
+>> 임시파일세션 := 세션 새로.
 
-Tempfile-Session 받으면: ['init'] 실행: {
-	자기 pathprefix := ['/tmp/sess-'].
+임시파일세션 받으면: ['초기화'] 실행: {
+	자기 경로시작 := ['/tmp/sess-'].
 }.
 
-Tempfile-Session 받으면: ['path-prefix:'] 실행: { :str
-	자기 pathprefix := str.
+임시파일세션 받으면: ['경로접두사:'] 실행: { :문자열값
+	자기 경로시작 := 문자열값.
 }.
 
-Tempfile-Session 받으면: ['file'] 실행: { <- ( 파일 새로: ( 자기 pathprefix + 자기 id + ['.txt'] ) ).
+임시파일세션 받으면: ['세션파일'] 실행: { <- ( 파일 새로: ( 자기 경로시작 + 자기 id + ['.txt'] ) ).
 }.
 
-Tempfile-Session 받으면: ['load'] 실행: {
-	>> file := 자신 file.
-	file 존재함 거짓이면: {
-		file 쓰기: (사전 새로 코드).
-	}. <- file 읽기 객체로.
+임시파일세션 받으면: ['불러오기'] 실행: {
+	>> 세션파일 := 자신 세션파일.
+	세션파일 존재함 거짓이면: {
+		세션파일 쓰기: (사전 새로 코드).
+	}. <- 세션파일 읽기 객체로.
 }.
 
-Tempfile-Session 받으면: ['save:'] 실행: { :data
-	>> file := 자신 file.
-	file 존재함 참이면: {
-		file 쓰기: data 코드.
+임시파일세션 받으면: ['저장:'] 실행: { :데이터
+	>> 세션파일 := 자신 세션파일.
+	세션파일 존재함 참이면: {
+		세션파일 쓰기: 데이터 코드.
 	}.
 }.
 
-Tempfile-Session 받으면: ['destroy'] 실행: {
-	>> file := 자신 file.
-	file 존재함 참이면: {
-		file 삭제.
+임시파일세션 받으면: ['파기'] 실행: {
+	>> 세션파일 := 자신 세션파일.
+	세션파일 존재함 참이면: {
+		세션파일 삭제.
 	}.
 }.
 
 
 >> URL := 객체 새로.
 
-URL 받으면: ['init'] 실행: {
-	자기 protocol := ['https://'].
+URL 받으면: ['초기화'] 실행: {
+	자기 프로토콜 := ['https://'].
 	자기 호스트 := ['localhost'].
 	자기 파일경로 := [''].
-	자기 params := [''].
+	자기 url매개변수 := [''].
 	자기 hash := [''].
 }.
 
-URL 받으면: ['새로'] 실행: { <- 자신 새로 init.
+URL 받으면: ['새로'] 실행: { <- 자신 새로 초기화.
 }.
 
 URL 받으면: ['문자열로'] 실행: { <- (
-	자기 protocol +
+	자기 프로토콜 +
 	자기 호스트 +
 	자기 파일경로 +
-	자기 params +
+	자기 url매개변수 +
 	자기 hash ).
 }.
 
-URL 받으면: ['protocol:'] 실행: { :protocol
-	((리스트 새로: ['http'] ; ['https']) 포함: protocol) 참이면: {
-		자기 protocol := protocol + ['://'].
+URL 받으면: ['프로토콜:'] 실행: { :프로토콜
+	((리스트 새로 ; ['http'] ; ['https']) 가짐: 프로토콜) 참이면: {
+		자기 프로토콜 := 프로토콜 + ['://'].
 	}, 거짓이면: {
 		이작업 오류: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL 받으면: ['호스트:'] 실행: { :호스트
 	자기 호스트 := 호스트.
 }.
 
-URL 받으면: ['path:'] 실행: { :파일경로
+URL 받으면: ['파일경로:'] 실행: { :파일경로
 	자기 파일경로 := ['/'] + 파일경로 url-인코딩.
 }.
 
-URL 받으면: ['params:'] 실행: { :map
-	>> params := 리스트 새로.
-	map 각각: { :key :value
-		params 뒤에추가: key 문자열로 url-인코딩 + ['='] + value 문자열로 url-인코딩.
+URL 받으면: ['url매개변수:'] 실행: { :대응표
+	>> url매개변수 := 리스트 새로.
+	대응표 각각: { :키값 :설정값
+		url매개변수 뒤에추가: 키값 문자열로 url-인코딩 + ['='] + 설정값 문자열로 url-인코딩.
 	}.
-	자기 params := ['?'] + ( params 합치기: ['&'] ).
+	자기 url매개변수 := ['?'] + ( url매개변수 합치기: ['&'] ).
 }.
 
 URL 받으면: ['해시:'] 실행: { :hash

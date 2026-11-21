@@ -1,128 +1,128 @@
 >> Email := Objeto novo.
 
-Email em: ['init'] fazer: {
-	prop recipients := Listar novo.
+Email em: ['inicializar'] fazer: {
+	prop destinatários := Listar novo.
 	prop cc := Listar novo.
 	prop bcc := Listar novo.
-	prop from := Nulo.
-	prop from-name := Nulo.
-	prop subject := Nulo.
-	prop body := Nulo.
+	prop remetente := Nulo.
+	prop nome-remetente := Nulo.
+	prop assunto := Nulo.
+	prop corpo := Nulo.
 }.
 
-Email em: ['novo'] fazer: { <- isto novo init.
+Email em: ['novo'] fazer: { <- isto novo inicializar.
 }.
 
-Email em: ['to:'] fazer: { :list
-	prop recipients := list.
+Email em: ['destinatário:'] fazer: { :lista
+	prop destinatários := lista.
 }.
  
-Email em: ['cc:'] fazer: { :list
-	prop cc := list.
+Email em: ['cc:'] fazer: { :lista
+	prop cc := lista.
 }.
 
-Email em: ['bcc:'] fazer: { :list
-	prop bcc := list.
+Email em: ['bcc:'] fazer: { :lista
+	prop bcc := lista.
 }.
 
-Email em: ['subject:'] fazer: { :subject
-	prop subject := subject.
+Email em: ['assunto:'] fazer: { :assunto
+	prop assunto := assunto.
 }.
 
-Email em: ['from:name:'] fazer: { :from :nome
-	prop from := from.
-	prop from-name := nome.
+Email em: ['remetente:nome:'] fazer: { :remetente :nome
+	prop remetente := remetente.
+	prop nome-remetente := nome.
 }.
 
-Email em: ['body:'] fazer: { :body
-	prop body := body.
+Email em: ['corpo:'] fazer: { :corpo
+	prop corpo := corpo.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email em: ['header:'] fazer: { :line <- line substituir: ['\r'] com: [''], substituir: ['\n'] com: [''].
+Email em: ['cabeçalho:'] fazer: { :linha <- linha substituir: ['\r'] com: [''], substituir: ['\n'] com: [''].
 }.
 
-Email em: ['send'] fazer: {
-	>> f := Arquivo tempwrite: isto generate.
+Email em: ['enviar'] fazer: {
+	>> f := Arquivo tempwrite: isto gerar.
 	Programa comando-do-sistema: ['sendmail -t < '] + f caminho, stop.
 }.
 
-Email em: ['generate'] fazer: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str acrescentar: (isto header: ['From: '] + prop from-name + [' <'] + ( prop from ) + ['>']) + brk.
-	str acrescentar: (isto header: ['To: '] + ( prop recipients juntar: [','] )) + brk.
+Email em: ['gerar'] fazer: {
+	>> quebra := ['\r\n'].
+	>> cadeia := [''].
+	cadeia acrescentar: (isto cabeçalho: ['From: '] + prop nome-remetente + [' <'] + ( prop remetente ) + ['>']) + quebra.
+	cadeia acrescentar: (isto cabeçalho: ['To: '] + ( prop destinatários juntar: [','] )) + quebra.
 	prop cc conta sim: {
-		str acrescentar: (isto header: ['Cc: '] + ( prop cc juntar: [','] )) + brk.
+		cadeia acrescentar: (isto cabeçalho: ['Cc: '] + ( prop cc juntar: [','] )) + quebra.
 	}.
 	prop bcc conta sim: {
-		str acrescentar: (isto header: ['Bcc: '] + ( prop bcc juntar: [','] )) + brk.
+		cadeia acrescentar: (isto cabeçalho: ['Bcc: '] + ( prop bcc juntar: [','] )) + quebra.
 	}.
-	str acrescentar: (isto header: ['Subject: '] + prop subject) + brk.
-	str acrescentar: brk.
-	str acrescentar: prop body.
-	str acrescentar: brk. <- str.
+	cadeia acrescentar: (isto cabeçalho: ['Subject: '] + prop assunto) + quebra.
+	cadeia acrescentar: quebra.
+	cadeia acrescentar: prop corpo.
+	cadeia acrescentar: quebra. <- cadeia.
 }.
 
->> HTML-Email := Email novo.
+>> Email-HTML := Email novo.
 
-HTML-Email em: ['init'] fazer: {
-	isto init.
-	prop attachments := Listar novo.
-	prop boundary := Cofre token: 40.
+Email-HTML em: ['inicializar'] fazer: {
+	isto inicializar.
+	prop anexos := Listar novo.
+	prop fronteira := Cofre token: 40.
 }.
 
-HTML-Email em: ['attach:'] fazer: { :file
-	>> id := prop attachments conta.
-	>> blob := file blob.
-	prop attachments acrescentar: (
+Email-HTML em: ['anexar:'] fazer: { :ficheiro
+	>> id := prop anexos conta.
+	>> blob := ficheiro blob.
+	prop anexos acrescentar: (
 		Mapa novo
-			file: file caminho,
-			mime: ['image/'] + (Server mimetype: file caminho),
-			data: blob base64-codificar
+			ficheiro: ficheiro caminho,
+			mime: ['image/'] + (Server mimetype: ficheiro caminho),
+			dados: blob base64-codificar
 	).
 	blob livre. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email em: ['generate'] fazer: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str acrescentar: (isto header: ['From: '] + prop from-name + [' <'] + ( prop from ) + ['>']) + brk.
-	str acrescentar: (isto header: ['To: '] + ( prop recipients juntar: [','] )) + brk.
+Email-HTML em: ['gerar'] fazer: {
+	>> quebra := ['\r\n'].
+	>> cadeia := [''].
+	cadeia acrescentar: (isto cabeçalho: ['From: '] + prop nome-remetente + [' <'] + ( prop remetente ) + ['>']) + quebra.
+	cadeia acrescentar: (isto cabeçalho: ['To: '] + ( prop destinatários juntar: [','] )) + quebra.
 	prop cc conta sim: {
-		str acrescentar: (isto header: ['Cc: '] + ( prop cc juntar: [','] )) + brk.
+		cadeia acrescentar: (isto cabeçalho: ['Cc: '] + ( prop cc juntar: [','] )) + quebra.
 	}.
 	prop bcc conta sim: {
-		str acrescentar: (isto header: ['Bcc: '] + ( prop bcc juntar: [','] )) + brk.
+		cadeia acrescentar: (isto cabeçalho: ['Bcc: '] + ( prop bcc juntar: [','] )) + quebra.
 	}.
-	str acrescentar: (isto header: ['Subject: '] + prop subject) + brk.
-	str acrescentar: ['MIME-Version: 1.0'] + brk.
-	str acrescentar: ['Content-Type: multipart/related; boundary="'] + prop boundary + ['"; type=text/html'] + brk.
-	str acrescentar: brk.
-	str acrescentar: ['--'] + prop boundary + brk.
-	str acrescentar: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str acrescentar: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str acrescentar: brk.
-	str acrescentar: prop body.
-	str acrescentar: brk.
-	prop attachments cada-um: { :id :info
-		>> blob := info data.
-		str acrescentar: ['--'] + prop boundary + brk.
-		str acrescentar: ['Content-Type: '] + info mime + brk.
-		str acrescentar: ['Content-Transfer-Encoding: base64'] + brk.
-		str acrescentar: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str acrescentar: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str acrescentar: brk.
-		>> max := 76.
-		>> len := blob comprimento.
-		>> chunks := (len / max) cima.
+	cadeia acrescentar: (isto cabeçalho: ['Subject: '] + prop assunto) + quebra.
+	cadeia acrescentar: ['MIME-Version: 1.0'] + quebra.
+	cadeia acrescentar: ['Content-Type: multipart/related; boundary="'] + prop fronteira + ['"; type=text/html'] + quebra.
+	cadeia acrescentar: quebra.
+	cadeia acrescentar: ['--'] + prop fronteira + quebra.
+	cadeia acrescentar: ['Content-Type: text/html; charset=UTF-8'] + quebra.
+	cadeia acrescentar: ['Content-Transfer-Encoding: 7bit'] + quebra.
+	cadeia acrescentar: quebra.
+	cadeia acrescentar: prop corpo.
+	cadeia acrescentar: quebra.
+	prop anexos cada-um: { :id :info
+		>> blob := info dados.
+		cadeia acrescentar: ['--'] + prop fronteira + quebra.
+		cadeia acrescentar: ['Content-Type: '] + info mime + quebra.
+		cadeia acrescentar: ['Content-Transfer-Encoding: base64'] + quebra.
+		cadeia acrescentar: ['Content-ID: <attachment'] + id + ['>'] + quebra.
+		cadeia acrescentar: ['Content-Disposition: inline; filename="'] + info ficheiro + ['"'] + quebra.
+		cadeia acrescentar: quebra.
+		>> máximo := 76.
+		>> comprimento-texto := blob comprimento.
+		>> pedaços := (comprimento-texto / máximo) cima.
 		{ :i
-			>> chunk := blob copiar de: i * max comprimento: max.
-			str acrescentar: chunk + brk.
-		} * chunks.
-		str acrescentar: brk.
-		str acrescentar: brk.
+			>> pedaço := blob copiar de: i * máximo comprimento: máximo.
+			cadeia acrescentar: pedaço + quebra.
+		} * pedaços.
+		cadeia acrescentar: quebra.
+		cadeia acrescentar: quebra.
 	}.
-	str acrescentar: ['--'] + prop boundary + ['--'] + brk. <- str.
+	cadeia acrescentar: ['--'] + prop fronteira + ['--'] + quebra. <- cadeia.
 }.

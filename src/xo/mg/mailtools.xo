@@ -1,128 +1,128 @@
->> Email := Zavatra vaovao.
+>> Mailaka := Zavatra vaovao.
 
-Email rehefa: ['init'] ataovy: {
-	azy recipients := Lisitra vaovao.
+Mailaka rehefa: ['omano'] ataovy: {
+	azy mpandray := Lisitra vaovao.
 	azy cc := Lisitra vaovao.
 	azy bcc := Lisitra vaovao.
-	azy from := Tsinontsinona.
-	azy from-name := Tsinontsinona.
-	azy subject := Tsinontsinona.
-	azy body := Tsinontsinona.
+	azy mpandefa := Tsinontsinona.
+	azy anaran-mpandefa := Tsinontsinona.
+	azy lohahevitra := Tsinontsinona.
+	azy vatana := Tsinontsinona.
 }.
 
-Email rehefa: ['vaovao'] ataovy: { <- tena vaovao init.
+Mailaka rehefa: ['vaovao'] ataovy: { <- tena vaovao omano.
 }.
 
-Email rehefa: ['to:'] ataovy: { :list
-	azy recipients := list.
+Mailaka rehefa: ['ho-an-i:'] ataovy: { :fanisana
+	azy mpandray := fanisana.
 }.
  
-Email rehefa: ['cc:'] ataovy: { :list
-	azy cc := list.
+Mailaka rehefa: ['cc:'] ataovy: { :fanisana
+	azy cc := fanisana.
 }.
 
-Email rehefa: ['bcc:'] ataovy: { :list
-	azy bcc := list.
+Mailaka rehefa: ['bcc:'] ataovy: { :fanisana
+	azy bcc := fanisana.
 }.
 
-Email rehefa: ['subject:'] ataovy: { :subject
-	azy subject := subject.
+Mailaka rehefa: ['lohahevitra:'] ataovy: { :lohahevitra
+	azy lohahevitra := lohahevitra.
 }.
 
-Email rehefa: ['from:name:'] ataovy: { :from :anarana
-	azy from := from.
-	azy from-name := anarana.
+Mailaka rehefa: ['mpandefa:anarana:'] ataovy: { :mpandefa :anarana
+	azy mpandefa := mpandefa.
+	azy anaran-mpandefa := anarana.
 }.
 
-Email rehefa: ['body:'] ataovy: { :body
-	azy body := body.
+Mailaka rehefa: ['vatana:'] ataovy: { :vatana
+	azy vatana := vatana.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email rehefa: ['header:'] ataovy: { :line <- line soloy: ['\r'] amin: [''], soloy: ['\n'] amin: [''].
+Mailaka rehefa: ['lohateny:'] ataovy: { :andalana <- andalana soloy: ['\r'] amin: [''], soloy: ['\n'] amin: [''].
 }.
 
-Email rehefa: ['send'] ataovy: {
-	>> f := Rakitra tempwrite: tena generate.
+Mailaka rehefa: ['alefaso'] ataovy: {
+	>> f := Rakitra tempwrite: tena mamorona.
 	Fandaharana rafitra: ['sendmail -t < '] + f lalan-drakitra, andalana-vaovao.
 }.
 
-Email rehefa: ['generate'] ataovy: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str ampio-any-amin-ny-farany: (tena header: ['From: '] + azy from-name + [' <'] + ( azy from ) + ['>']) + brk.
-	str ampio-any-amin-ny-farany: (tena header: ['To: '] + ( azy recipients atambaro: [','] )) + brk.
+Mailaka rehefa: ['mamorona'] ataovy: {
+	>> fiatoan-andalana := ['\r\n'].
+	>> tady-soratra := [''].
+	tady-soratra ampio-any-amin-ny-farany: (tena lohateny: ['From: '] + azy anaran-mpandefa + [' <'] + ( azy mpandefa ) + ['>']) + fiatoan-andalana.
+	tady-soratra ampio-any-amin-ny-farany: (tena lohateny: ['To: '] + ( azy mpandray atambaro: [','] )) + fiatoan-andalana.
 	azy cc isan-javatra marina: {
-		str ampio-any-amin-ny-farany: (tena header: ['Cc: '] + ( azy cc atambaro: [','] )) + brk.
+		tady-soratra ampio-any-amin-ny-farany: (tena lohateny: ['Cc: '] + ( azy cc atambaro: [','] )) + fiatoan-andalana.
 	}.
 	azy bcc isan-javatra marina: {
-		str ampio-any-amin-ny-farany: (tena header: ['Bcc: '] + ( azy bcc atambaro: [','] )) + brk.
+		tady-soratra ampio-any-amin-ny-farany: (tena lohateny: ['Bcc: '] + ( azy bcc atambaro: [','] )) + fiatoan-andalana.
 	}.
-	str ampio-any-amin-ny-farany: (tena header: ['Subject: '] + azy subject) + brk.
-	str ampio-any-amin-ny-farany: brk.
-	str ampio-any-amin-ny-farany: azy body.
-	str ampio-any-amin-ny-farany: brk. <- str.
+	tady-soratra ampio-any-amin-ny-farany: (tena lohateny: ['Subject: '] + azy lohahevitra) + fiatoan-andalana.
+	tady-soratra ampio-any-amin-ny-farany: fiatoan-andalana.
+	tady-soratra ampio-any-amin-ny-farany: azy vatana.
+	tady-soratra ampio-any-amin-ny-farany: fiatoan-andalana. <- tady-soratra.
 }.
 
->> HTML-Email := Email vaovao.
+>> Mailaka-HTML := Mailaka vaovao.
 
-HTML-Email rehefa: ['init'] ataovy: {
-	tena init.
-	azy attachments := Lisitra vaovao.
-	azy boundary := Vata-fiarovana token: 40.
+Mailaka-HTML rehefa: ['omano'] ataovy: {
+	tena omano.
+	azy raikitra := Lisitra vaovao.
+	azy fetra := Vata-fiarovana token: 40.
 }.
 
-HTML-Email rehefa: ['attach:'] ataovy: { :file
-	>> id := azy attachments isan-javatra.
-	>> blob := file blob.
-	azy attachments ampio-any-amin-ny-farany: (
+Mailaka-HTML rehefa: ['ampiraiketo:'] ataovy: { :rakitra-fivoriana
+	>> id := azy raikitra isan-javatra.
+	>> blob := rakitra-fivoriana blob.
+	azy raikitra ampio-any-amin-ny-farany: (
 		Rakibolana vaovao
-			file: file lalan-drakitra,
-			mime: ['image/'] + (Server mimetype: file lalan-drakitra),
-			data: blob base64-asio-kaody
+			rakitra-fivoriana: rakitra-fivoriana lalan-drakitra,
+			mime: ['image/'] + (Server mimetype: rakitra-fivoriana lalan-drakitra),
+			angona: blob base64-asio-kaody
 	).
 	blob afaho. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email rehefa: ['generate'] ataovy: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str ampio-any-amin-ny-farany: (tena header: ['From: '] + azy from-name + [' <'] + ( azy from ) + ['>']) + brk.
-	str ampio-any-amin-ny-farany: (tena header: ['To: '] + ( azy recipients atambaro: [','] )) + brk.
+Mailaka-HTML rehefa: ['mamorona'] ataovy: {
+	>> fiatoan-andalana := ['\r\n'].
+	>> tady-soratra := [''].
+	tady-soratra ampio-any-amin-ny-farany: (tena lohateny: ['From: '] + azy anaran-mpandefa + [' <'] + ( azy mpandefa ) + ['>']) + fiatoan-andalana.
+	tady-soratra ampio-any-amin-ny-farany: (tena lohateny: ['To: '] + ( azy mpandray atambaro: [','] )) + fiatoan-andalana.
 	azy cc isan-javatra marina: {
-		str ampio-any-amin-ny-farany: (tena header: ['Cc: '] + ( azy cc atambaro: [','] )) + brk.
+		tady-soratra ampio-any-amin-ny-farany: (tena lohateny: ['Cc: '] + ( azy cc atambaro: [','] )) + fiatoan-andalana.
 	}.
 	azy bcc isan-javatra marina: {
-		str ampio-any-amin-ny-farany: (tena header: ['Bcc: '] + ( azy bcc atambaro: [','] )) + brk.
+		tady-soratra ampio-any-amin-ny-farany: (tena lohateny: ['Bcc: '] + ( azy bcc atambaro: [','] )) + fiatoan-andalana.
 	}.
-	str ampio-any-amin-ny-farany: (tena header: ['Subject: '] + azy subject) + brk.
-	str ampio-any-amin-ny-farany: ['MIME-Version: 1.0'] + brk.
-	str ampio-any-amin-ny-farany: ['Content-Type: multipart/related; boundary="'] + azy boundary + ['"; type=text/html'] + brk.
-	str ampio-any-amin-ny-farany: brk.
-	str ampio-any-amin-ny-farany: ['--'] + azy boundary + brk.
-	str ampio-any-amin-ny-farany: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str ampio-any-amin-ny-farany: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str ampio-any-amin-ny-farany: brk.
-	str ampio-any-amin-ny-farany: azy body.
-	str ampio-any-amin-ny-farany: brk.
-	azy attachments tsirairay: { :id :info
-		>> blob := info data.
-		str ampio-any-amin-ny-farany: ['--'] + azy boundary + brk.
-		str ampio-any-amin-ny-farany: ['Content-Type: '] + info mime + brk.
-		str ampio-any-amin-ny-farany: ['Content-Transfer-Encoding: base64'] + brk.
-		str ampio-any-amin-ny-farany: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str ampio-any-amin-ny-farany: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str ampio-any-amin-ny-farany: brk.
-		>> max := 76.
-		>> len := blob halavany.
-		>> chunks := (len / max) ampiakarina-ho-isa-feno.
+	tady-soratra ampio-any-amin-ny-farany: (tena lohateny: ['Subject: '] + azy lohahevitra) + fiatoan-andalana.
+	tady-soratra ampio-any-amin-ny-farany: ['MIME-Version: 1.0'] + fiatoan-andalana.
+	tady-soratra ampio-any-amin-ny-farany: ['Content-Type: multipart/related; boundary="'] + azy fetra + ['"; type=text/html'] + fiatoan-andalana.
+	tady-soratra ampio-any-amin-ny-farany: fiatoan-andalana.
+	tady-soratra ampio-any-amin-ny-farany: ['--'] + azy fetra + fiatoan-andalana.
+	tady-soratra ampio-any-amin-ny-farany: ['Content-Type: text/html; charset=UTF-8'] + fiatoan-andalana.
+	tady-soratra ampio-any-amin-ny-farany: ['Content-Transfer-Encoding: 7bit'] + fiatoan-andalana.
+	tady-soratra ampio-any-amin-ny-farany: fiatoan-andalana.
+	tady-soratra ampio-any-amin-ny-farany: azy vatana.
+	tady-soratra ampio-any-amin-ny-farany: fiatoan-andalana.
+	azy raikitra tsirairay: { :id :fampahalalana
+		>> blob := fampahalalana angona.
+		tady-soratra ampio-any-amin-ny-farany: ['--'] + azy fetra + fiatoan-andalana.
+		tady-soratra ampio-any-amin-ny-farany: ['Content-Type: '] + fampahalalana mime + fiatoan-andalana.
+		tady-soratra ampio-any-amin-ny-farany: ['Content-Transfer-Encoding: base64'] + fiatoan-andalana.
+		tady-soratra ampio-any-amin-ny-farany: ['Content-ID: <attachment'] + id + ['>'] + fiatoan-andalana.
+		tady-soratra ampio-any-amin-ny-farany: ['Content-Disposition: inline; filename="'] + fampahalalana rakitra-fivoriana + ['"'] + fiatoan-andalana.
+		tady-soratra ampio-any-amin-ny-farany: fiatoan-andalana.
+		>> faratampony := 76.
+		>> halavan-dahatsoratra := blob halavany.
+		>> potipotika := (halavan-dahatsoratra / faratampony) ampiakarina-ho-isa-feno.
 		{ :i
-			>> chunk := blob adikao manomboka: i * max halavany: max.
-			str ampio-any-amin-ny-farany: chunk + brk.
-		} * chunks.
-		str ampio-any-amin-ny-farany: brk.
-		str ampio-any-amin-ny-farany: brk.
+			>> potika := blob adikao manomboka: i * faratampony halavany: faratampony.
+			tady-soratra ampio-any-amin-ny-farany: potika + fiatoan-andalana.
+		} * potipotika.
+		tady-soratra ampio-any-amin-ny-farany: fiatoan-andalana.
+		tady-soratra ampio-any-amin-ny-farany: fiatoan-andalana.
 	}.
-	str ampio-any-amin-ny-farany: ['--'] + azy boundary + ['--'] + brk. <- str.
+	tady-soratra ampio-any-amin-ny-farany: ['--'] + azy fetra + ['--'] + fiatoan-andalana. <- tady-soratra.
 }.

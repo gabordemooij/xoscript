@@ -1,302 +1,302 @@
-HTTP-İstek olunca: ['HTTP-header:'] yap: { :key <- Program ayar: key.
+HTTP-İstek olunca: ['HTTP-başlık:'] yap: { :anahtar <- Program ayar: anahtar.
 }.
 
->> HTTP-Header := Nesne yeni.
+>> HTTP-Başlığı := Nesne yeni.
 
-HTTP-Header olunca: ['yeni'] yap: { <- kendi yeni init.
+HTTP-Başlığı olunca: ['yeni'] yap: { <- kendi yeni hazırla.
 }.
 
-HTTP-Header olunca: ['init'] yap: {
-	öz key := Hiç.
-	öz value := Hiç.
+HTTP-Başlığı olunca: ['hazırla'] yap: {
+	öz anahtar := Hiç.
+	öz değer := Hiç.
 }.
 
-HTTP-Header olunca: ['key:value:'] yap: { :key :value
-	öz key := key.
-	öz value := value.
+HTTP-Başlığı olunca: ['anahtar:değer:'] yap: { :anahtar :değer
+	öz anahtar := anahtar.
+	öz değer := değer.
 }.
 
-HTTP-Header olunca: ['key'] yap: { <- öz key.
+HTTP-Başlığı olunca: ['anahtar'] yap: { <- öz anahtar.
 }.
 
-HTTP-Header olunca: ['value'] yap: { <- öz value.
+HTTP-Başlığı olunca: ['değer'] yap: { <- öz değer.
 }.
 
 
-HTTP-Header olunca: ['metin'] yap: {
-	>> line := öz key + [': '] + öz value.
-	line değiştir: ['\r'] yenisi: [''], değiştir: ['\n'] yenisi: ['']. <- line + [' \r\n'].
+HTTP-Başlığı olunca: ['metin'] yap: {
+	>> satır := öz anahtar + [': '] + öz değer.
+	satır değiştir: ['\r'] yenisi: [''], değiştir: ['\n'] yenisi: ['']. <- satır + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Nesne yeni.
+>> Web-Belgesi := Nesne yeni.
 
-Web-Document olunca: ['yeni'] yap: { <- kendi yeni init.
+Web-Belgesi olunca: ['yeni'] yap: { <- kendi yeni hazırla.
 }.
 
-Web-Document olunca: ['init'] yap: {
-	öz headers := Liste yeni.
-	öz sess-id := Hiç.
-	öz session-manager := Tempfile-Session yeni.
-	öz sessdata := Hiç.
-	öz secure := Doğru.
-	öz same-site := ['Strict'].
-	öz headers-out := Yanlış.
-	öz request := HTTP-İstek yeni.
+Web-Belgesi olunca: ['hazırla'] yap: {
+	öz başlıklar := Liste yeni.
+	öz oturum-kimliği := Hiç.
+	öz oturum-yöneticisi := Geçici-dosya-oturumu yeni.
+	öz oturum-verisi := Hiç.
+	öz güvenli := Doğru.
+	öz aynı-site := ['Strict'].
+	öz başlıklar-gönderildi := Yanlış.
+	öz istek := HTTP-İstek yeni.
 }.
 
-Web-Document olunca: ['request:'] yap: { :request
-	öz request := request.
+Web-Belgesi olunca: ['istek:'] yap: { :istek
+	öz istek := istek.
 }. 
 
-Web-Document olunca: ['secure-session-cookie:'] yap: { :secure
-	kendi check-headers.
-	öz secure := secure.
+Web-Belgesi olunca: ['güvenli-oturum-çerezi:'] yap: { :güvenli
+	kendi başlıkları-denetle.
+	öz güvenli := güvenli.
 }.
 
-Web-Document olunca: ['same-site-session-cookie:'] yap: { :value
-	kendi check-headers.
-	>> options := Liste yeni 
+Web-Belgesi olunca: ['aynı-site-oturum-çerezi:'] yap: { :değer
+	kendi başlıkları-denetle.
+	>> seçenekler := Liste yeni 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options kapsar: value, yanlış: {
+	seçenekler içerir: değer, yanlış: {
 		bu-görev hata: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	öz same-site := value.
+	öz aynı-site := değer.
 }.
 
-Web-Document olunca: ['header:'] yap: { :header
-	kendi check-headers.
-	öz headers sona-ekle: header.
+Web-Belgesi olunca: ['başlık:'] yap: { :başlık
+	kendi başlıkları-denetle.
+	öz başlıklar sona-ekle: başlık.
 }.
 
-Web-Document olunca: ['clear-headers'] yap: {
-	kendi check-headers.
-	öz headers := Liste yeni.
+Web-Belgesi olunca: ['başlıkları-boşalt'] yap: {
+	kendi başlıkları-denetle.
+	öz başlıklar := Liste yeni.
 }.
 
-Web-Document olunca: ['session-manager:'] yap: { :manager
-	kendi check-headers.
-	öz session-manager := manager.
+Web-Belgesi olunca: ['oturum-yöneticisi:'] yap: { :yönetici
+	kendi başlıkları-denetle.
+	öz oturum-yöneticisi := yönetici.
 }.
 
-Web-Document olunca: ['session-manager'] yap: { <- öz session-manager.
+Web-Belgesi olunca: ['oturum-yöneticisi'] yap: { <- öz oturum-yöneticisi.
 }.
 
-Web-Document olunca: ['check-headers'] yap: {
-	öz headers-out doğru: {
+Web-Belgesi olunca: ['başlıkları-denetle'] yap: {
+	öz başlıklar-gönderildi doğru: {
 		bu-görev hata: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document olunca: ['session-start'] yap: {
-	kendi check-headers.
-	>> request := öz request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Hiç? yanlış: {
-		(( Desen yeni: ['^[A-Za-z0-9]+\\z'], eşleş: sess-id ) = 0) doğru: {
-			sess-id := Hiç.
+Web-Belgesi olunca: ['oturumu-başlat'] yap: {
+	kendi başlıkları-denetle.
+	>> istek := öz istek.
+	>> oturum-kimliği := istek cookie: ['xsid'].
+	oturum-kimliği Hiç? yanlış: {
+		(( Desen yeni: ['^[A-Za-z0-9]+\\z'], eşleş: oturum-kimliği ) = 0) doğru: {
+			oturum-kimliği := Hiç.
 		}.
 	}.
-	sess-id Hiç? doğru: {
-		sess-id := Kasa jeton: 30.
-		>> session-header := HTTP-Header yeni
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (öz secure ya: ['Secure'] veya: ['']),
-		SSITE: (öz same-site),
-		XSID: sess-id
+	oturum-kimliği Hiç? doğru: {
+		oturum-kimliği := Kasa jeton: 30.
+		>> oturum-başlığı := HTTP-Başlığı yeni
+		anahtar: ['Set-Cookie'] değer: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (öz güvenli ya: ['Secure'] veya: ['']),
+		SSITE: (öz aynı-site),
+		XSID: oturum-kimliği
 		).
-		öz headers sona-ekle: session-header.
+		öz başlıklar sona-ekle: oturum-başlığı.
 	}.
-	öz sessdata := öz session-manager for: sess-id, load. <- öz sessdata. # reference
+	öz oturum-verisi := öz oturum-yöneticisi için: oturum-kimliği, yükle. <- öz oturum-verisi. # reference
 }.
 
-Web-Document olunca: ['goto:'] yap: { :url
-	kendi check-headers.
-	kendi clear-headers.
-	öz headers
+Web-Belgesi olunca: ['git:'] yap: { :adres
+	kendi başlıkları-denetle.
+	kendi başlıkları-boşalt.
+	öz başlıklar
 	sona-ekle: (
-		HTTP-Header yeni
-		key: ['Status'] value: ['303 See Other']
+		HTTP-Başlığı yeni
+		anahtar: ['Status'] değer: ['303 See Other']
 	),
 	sona-ekle: (
-		HTTP-Header yeni
-		key: ['Location'] value: url
+		HTTP-Başlığı yeni
+		anahtar: ['Location'] değer: adres
 	).
-	kendi out: ['Redirect'].
+	kendi çıktıla: ['Redirect'].
 }.
 
-Web-Document olunca: ['session-destroy'] yap: {
-	kendi check-headers.
-	>> request := öz request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Hiç? yanlış: {
-		>> session-header := HTTP-Header yeni.
-		>> when := An yeni yıl: 1970, biçim: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Web-Belgesi olunca: ['oturumu-yok-et'] yap: {
+	kendi başlıkları-denetle.
+	>> istek := öz istek.
+	>> oturum-kimliği := istek cookie: ['xsid'].
+	oturum-kimliği Hiç? yanlış: {
+		>> oturum-başlığı := HTTP-Başlığı yeni.
+		>> an := An yeni yıl: 1970, biçim: ['%a, %d %b %Y %H:%M:%S GMT'].
+		oturum-başlığı anahtar: ['Set-Cookie'] değer: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (öz secure ya: ['Secure'] veya: ['']),
-			SSITE: (öz same-site),
-			XSID: sess-id
+			EXP: an,
+			SEC: (öz güvenli ya: ['Secure'] veya: ['']),
+			SSITE: (öz aynı-site),
+			XSID: oturum-kimliği
 		).
-		öz session-manager destroy.
-		öz headers sona-ekle: session-header.
+		öz oturum-yöneticisi yok-et.
+		öz başlıklar sona-ekle: oturum-başlığı.
 	}.
 }.
 
 
-Web-Document olunca: ['template:'] yap: { :yol <- Template yeni: (Dosya yeni: yol, oku).
+Web-Belgesi olunca: ['şablon:'] yap: { :yol <- Şablon yeni: (Dosya yeni: yol, oku).
 }.
 
-Web-Document olunca: ['out:type:'] yap: { :output :tür
-	öz headers-out yanlış: {
-		öz sessdata Hiç? yanlış: {
-			öz session-manager save: öz sessdata.
+Web-Belgesi olunca: ['çıktıla:tür:'] yap: { :çıktı :tür
+	öz başlıklar-gönderildi yanlış: {
+		öz oturum-verisi Hiç? yanlış: {
+			öz oturum-yöneticisi kaydet: öz oturum-verisi.
 		}.
-		öz headers sona-ekle: (
-			HTTP-Header yeni
-			key: ['Content-type'] value: tür
+		öz başlıklar sona-ekle: (
+			HTTP-Başlığı yeni
+			anahtar: ['Content-type'] değer: tür
 		).
-		öz headers her: { :_ :header
-			Çıktı yaz: header.
+		öz başlıklar her: { :_ :başlık
+			Çıktı yaz: başlık.
 		}.
-		öz headers-out := Doğru.
+		öz başlıklar-gönderildi := Doğru.
 		Çıktı yaz: ['\r\n'].
 	}.
-	Çıktı yaz: output.
+	Çıktı yaz: çıktı.
 }.
 
-Web-Document olunca: ['finish:type:'] yap: { :output :tür
-	öz headers-out yanlış: {
-		öz sessdata Hiç? yanlış: {
-			öz session-manager save: öz sessdata.
+Web-Belgesi olunca: ['bitir:tür:'] yap: { :çıktı :tür
+	öz başlıklar-gönderildi yanlış: {
+		öz oturum-verisi Hiç? yanlış: {
+			öz oturum-yöneticisi kaydet: öz oturum-verisi.
 		}.
-		öz headers sona-ekle: (
-			HTTP-Header yeni
-			key: ['Content-type'] value: tür
+		öz başlıklar sona-ekle: (
+			HTTP-Başlığı yeni
+			anahtar: ['Content-type'] değer: tür
 		).
-		öz headers sona-ekle: (
-			HTTP-Header yeni
-			key: ['Content-Length'] value: output metin bytes
+		öz başlıklar sona-ekle: (
+			HTTP-Başlığı yeni
+			anahtar: ['Content-Length'] değer: çıktı metin bytes
 		).
-		öz headers her: { :_ :header
-			Çıktı yaz: header.
+		öz başlıklar her: { :_ :başlık
+			Çıktı yaz: başlık.
 		}.
-		öz headers-out := Doğru.
+		öz başlıklar-gönderildi := Doğru.
 		Çıktı yaz: ['\r\n'].
 	}.
-	Çıktı yaz: output.
+	Çıktı yaz: çıktı.
 }.
 
-Web-Document olunca: ['out:'] yap: { :output
-	kendi out: output type: ['text/html; charset=utf-8'].
+Web-Belgesi olunca: ['çıktıla:'] yap: { :çıktı
+	kendi çıktıla: çıktı tür: ['text/html; charset=utf-8'].
 }.
 
-Web-Document olunca: ['finish:'] yap: { :output
-	kendi finish: output type: ['text/html; charset=utf-8'].
+Web-Belgesi olunca: ['bitir:'] yap: { :çıktı
+	kendi bitir: çıktı tür: ['text/html; charset=utf-8'].
 }.
 
-Web-Document olunca: ['json:'] yap: { :output
-	kendi out: ( JSON jsonify: output ) type: ['application/json'].
+Web-Belgesi olunca: ['json:'] yap: { :çıktı
+	kendi çıktıla: ( JSON jsonify: çıktı ) tür: ['application/json'].
 }.
 
-Web-Document olunca: ['not-found:'] yap: { :output
-	kendi clear-headers header: (
-		HTTP-Header yeni key: ['Status'] value: ['404 Not Found']
+Web-Belgesi olunca: ['bulunamadı:'] yap: { :çıktı
+	kendi başlıkları-boşalt başlık: (
+		HTTP-Başlığı yeni anahtar: ['Status'] değer: ['404 Not Found']
 	).
-	kendi out: output.
+	kendi çıktıla: çıktı.
 }.
 
 
 # Interface
 
->> Session := Nesne yeni.
+>> Oturum := Nesne yeni.
 
-Session olunca: ['yeni'] yap: { <- kendi yeni init for: Hiç.
+Oturum olunca: ['yeni'] yap: { <- kendi yeni hazırla için: Hiç.
 }.
 
-Session olunca: ['for:'] yap: { :id
+Oturum olunca: ['için:'] yap: { :id
 	öz id := id.
 }.
 
-Session olunca: ['load'] yap: {
+Oturum olunca: ['yükle'] yap: {
 	bu-görev hata: ['Not implemented.'].
 }.
 
-Session olunca: ['save:'] yap: {
+Oturum olunca: ['kaydet:'] yap: {
 	bu-görev hata: ['Not implemented.'].
 }.
 
-Session olunca: ['destroy'] yap: {
+Oturum olunca: ['yok-et'] yap: {
 	bu-görev hata: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session yeni.
+>> Geçici-dosya-oturumu := Oturum yeni.
 
-Tempfile-Session olunca: ['init'] yap: {
-	öz pathprefix := ['/tmp/sess-'].
+Geçici-dosya-oturumu olunca: ['hazırla'] yap: {
+	öz yol-başı := ['/tmp/sess-'].
 }.
 
-Tempfile-Session olunca: ['path-prefix:'] yap: { :str
-	öz pathprefix := str.
+Geçici-dosya-oturumu olunca: ['yol-öneki:'] yap: { :dizgi
+	öz yol-başı := dizgi.
 }.
 
-Tempfile-Session olunca: ['file'] yap: { <- ( Dosya yeni: ( öz pathprefix + öz id + ['.txt'] ) ).
+Geçici-dosya-oturumu olunca: ['dosya'] yap: { <- ( Dosya yeni: ( öz yol-başı + öz id + ['.txt'] ) ).
 }.
 
-Tempfile-Session olunca: ['load'] yap: {
-	>> file := kendi file.
-	file var yanlış: {
-		file yaz: (Sözlük yeni kod).
-	}. <- file oku nesne.
+Geçici-dosya-oturumu olunca: ['yükle'] yap: {
+	>> dosya := kendi dosya.
+	dosya var yanlış: {
+		dosya yaz: (Sözlük yeni kod).
+	}. <- dosya oku nesne.
 }.
 
-Tempfile-Session olunca: ['save:'] yap: { :data
-	>> file := kendi file.
-	file var doğru: {
-		file yaz: data kod.
+Geçici-dosya-oturumu olunca: ['kaydet:'] yap: { :veri
+	>> dosya := kendi dosya.
+	dosya var doğru: {
+		dosya yaz: veri kod.
 	}.
 }.
 
-Tempfile-Session olunca: ['destroy'] yap: {
-	>> file := kendi file.
-	file var doğru: {
-		file sil.
+Geçici-dosya-oturumu olunca: ['yok-et'] yap: {
+	>> dosya := kendi dosya.
+	dosya var doğru: {
+		dosya sil.
 	}.
 }.
 
 
 >> URL := Nesne yeni.
 
-URL olunca: ['init'] yap: {
-	öz protocol := ['https://'].
+URL olunca: ['hazırla'] yap: {
+	öz protokol := ['https://'].
 	öz sunucu-adı := ['localhost'].
 	öz yol := [''].
-	öz params := [''].
+	öz url-parametreleri := [''].
 	öz hash := [''].
 }.
 
-URL olunca: ['yeni'] yap: { <- kendi yeni init.
+URL olunca: ['yeni'] yap: { <- kendi yeni hazırla.
 }.
 
 URL olunca: ['metin'] yap: { <- (
-	öz protocol +
+	öz protokol +
 	öz sunucu-adı +
 	öz yol +
-	öz params +
+	öz url-parametreleri +
 	öz hash ).
 }.
 
-URL olunca: ['protocol:'] yap: { :protocol
-	((Liste yeni: ['http'] ; ['https']) kapsar: protocol) doğru: {
-		öz protocol := protocol + ['://'].
+URL olunca: ['protokol:'] yap: { :protokol
+	((Liste yeni ; ['http'] ; ['https']) içerir: protokol) doğru: {
+		öz protokol := protokol + ['://'].
 	}, yanlış: {
 		bu-görev hata: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL olunca: ['sunucu-adı:'] yap: { :sunucu-adı
 	öz sunucu-adı := sunucu-adı.
 }.
 
-URL olunca: ['path:'] yap: { :yol
+URL olunca: ['yol:'] yap: { :yol
 	öz yol := ['/'] + yol url-kodla.
 }.
 
-URL olunca: ['params:'] yap: { :map
-	>> params := Liste yeni.
-	map her: { :key :value
-		params sona-ekle: key metin url-kodla + ['='] + value metin url-kodla.
+URL olunca: ['url-parametreleri:'] yap: { :eşleme
+	>> url-parametreleri := Liste yeni.
+	eşleme her: { :anahtar :değer
+		url-parametreleri sona-ekle: anahtar metin url-kodla + ['='] + değer metin url-kodla.
 	}.
-	öz params := ['?'] + ( params birleştir: ['&'] ).
+	öz url-parametreleri := ['?'] + ( url-parametreleri birleştir: ['&'] ).
 }.
 
 URL olunca: ['özet:'] yap: { :hash

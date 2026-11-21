@@ -1,128 +1,128 @@
->> Email := Mea fou.
+>> Imeli := Mea fou.
 
-Email pe-a-oo-mai: ['init'] fai: {
-	lana-lava recipients := Lisi fou.
+Imeli pe-a-oo-mai: ['sauni'] fai: {
+	lana-lava tagata-mauaina := Lisi fou.
 	lana-lava cc := Lisi fou.
 	lana-lava bcc := Lisi fou.
-	lana-lava from := Leai-se-mea.
-	lana-lava from-name := Leai-se-mea.
-	lana-lava subject := Leai-se-mea.
-	lana-lava body := Leai-se-mea.
+	lana-lava tagata-auina := Leai-se-mea.
+	lana-lava igoa-auina := Leai-se-mea.
+	lana-lava mataupu := Leai-se-mea.
+	lana-lava tino := Leai-se-mea.
 }.
 
-Email pe-a-oo-mai: ['fou'] fai: { <- ia-lava fou init.
+Imeli pe-a-oo-mai: ['fou'] fai: { <- ia-lava fou sauni.
 }.
 
-Email pe-a-oo-mai: ['to:'] fai: { :list
-	lana-lava recipients := list.
+Imeli pe-a-oo-mai: ['ia-te:'] fai: { :lisi-mea
+	lana-lava tagata-mauaina := lisi-mea.
 }.
  
-Email pe-a-oo-mai: ['cc:'] fai: { :list
-	lana-lava cc := list.
+Imeli pe-a-oo-mai: ['cc:'] fai: { :lisi-mea
+	lana-lava cc := lisi-mea.
 }.
 
-Email pe-a-oo-mai: ['bcc:'] fai: { :list
-	lana-lava bcc := list.
+Imeli pe-a-oo-mai: ['bcc:'] fai: { :lisi-mea
+	lana-lava bcc := lisi-mea.
 }.
 
-Email pe-a-oo-mai: ['subject:'] fai: { :subject
-	lana-lava subject := subject.
+Imeli pe-a-oo-mai: ['mataupu:'] fai: { :mataupu
+	lana-lava mataupu := mataupu.
 }.
 
-Email pe-a-oo-mai: ['from:name:'] fai: { :from :igoa
-	lana-lava from := from.
-	lana-lava from-name := igoa.
+Imeli pe-a-oo-mai: ['tagata-auina:igoa:'] fai: { :tagata-auina :igoa
+	lana-lava tagata-auina := tagata-auina.
+	lana-lava igoa-auina := igoa.
 }.
 
-Email pe-a-oo-mai: ['body:'] fai: { :body
-	lana-lava body := body.
+Imeli pe-a-oo-mai: ['tino:'] fai: { :tino
+	lana-lava tino := tino.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email pe-a-oo-mai: ['header:'] fai: { :line <- line sui: ['\r'] i-le: [''], sui: ['\n'] i-le: [''].
+Imeli pe-a-oo-mai: ['ulutala:'] fai: { :laina <- laina sui: ['\r'] i-le: [''], sui: ['\n'] i-le: [''].
 }.
 
-Email pe-a-oo-mai: ['send'] fai: {
-	>> f := Faila tempwrite: ia-lava generate.
+Imeli pe-a-oo-mai: ['auina'] fai: {
+	>> f := Faila tempwrite: ia-lava fatu.
 	Polokalama faiga-masini: ['sendmail -t < '] + f ala-faila, laina-fou.
 }.
 
-Email pe-a-oo-mai: ['generate'] fai: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str faaopoopo-i-le-iuga: (ia-lava header: ['From: '] + lana-lava from-name + [' <'] + ( lana-lava from ) + ['>']) + brk.
-	str faaopoopo-i-le-iuga: (ia-lava header: ['To: '] + ( lana-lava recipients tuufaatasi: [','] )) + brk.
+Imeli pe-a-oo-mai: ['fatu'] fai: {
+	>> motu-laina := ['\r\n'].
+	>> manoa-tusitusiga := [''].
+	manoa-tusitusiga faaopoopo-i-le-iuga: (ia-lava ulutala: ['From: '] + lana-lava igoa-auina + [' <'] + ( lana-lava tagata-auina ) + ['>']) + motu-laina.
+	manoa-tusitusiga faaopoopo-i-le-iuga: (ia-lava ulutala: ['To: '] + ( lana-lava tagata-mauaina tuufaatasi: [','] )) + motu-laina.
 	lana-lava cc aofaiga moni: {
-		str faaopoopo-i-le-iuga: (ia-lava header: ['Cc: '] + ( lana-lava cc tuufaatasi: [','] )) + brk.
+		manoa-tusitusiga faaopoopo-i-le-iuga: (ia-lava ulutala: ['Cc: '] + ( lana-lava cc tuufaatasi: [','] )) + motu-laina.
 	}.
 	lana-lava bcc aofaiga moni: {
-		str faaopoopo-i-le-iuga: (ia-lava header: ['Bcc: '] + ( lana-lava bcc tuufaatasi: [','] )) + brk.
+		manoa-tusitusiga faaopoopo-i-le-iuga: (ia-lava ulutala: ['Bcc: '] + ( lana-lava bcc tuufaatasi: [','] )) + motu-laina.
 	}.
-	str faaopoopo-i-le-iuga: (ia-lava header: ['Subject: '] + lana-lava subject) + brk.
-	str faaopoopo-i-le-iuga: brk.
-	str faaopoopo-i-le-iuga: lana-lava body.
-	str faaopoopo-i-le-iuga: brk. <- str.
+	manoa-tusitusiga faaopoopo-i-le-iuga: (ia-lava ulutala: ['Subject: '] + lana-lava mataupu) + motu-laina.
+	manoa-tusitusiga faaopoopo-i-le-iuga: motu-laina.
+	manoa-tusitusiga faaopoopo-i-le-iuga: lana-lava tino.
+	manoa-tusitusiga faaopoopo-i-le-iuga: motu-laina. <- manoa-tusitusiga.
 }.
 
->> HTML-Email := Email fou.
+>> Imeli-HTML := Imeli fou.
 
-HTML-Email pe-a-oo-mai: ['init'] fai: {
-	ia-lava init.
-	lana-lava attachments := Lisi fou.
-	lana-lava boundary := Pusa-malu token: 40.
+Imeli-HTML pe-a-oo-mai: ['sauni'] fai: {
+	ia-lava sauni.
+	lana-lava mea-faapipii := Lisi fou.
+	lana-lava tuaoi := Pusa-malu token: 40.
 }.
 
-HTML-Email pe-a-oo-mai: ['attach:'] fai: { :file
-	>> id := lana-lava attachments aofaiga.
-	>> blob := file blob.
-	lana-lava attachments faaopoopo-i-le-iuga: (
+Imeli-HTML pe-a-oo-mai: ['faapipii:'] fai: { :faila-sauniga
+	>> id := lana-lava mea-faapipii aofaiga.
+	>> blob := faila-sauniga blob.
+	lana-lava mea-faapipii faaopoopo-i-le-iuga: (
 		Lomifefiloi fou
-			file: file ala-faila,
-			mime: ['image/'] + (Server mimetype: file ala-faila),
-			data: blob base64-faʻailoga-numera
+			faila-sauniga: faila-sauniga ala-faila,
+			mime: ['image/'] + (Server mimetype: faila-sauniga ala-faila),
+			faamatalaga: blob base64-faʻailoga-numera
 	).
 	blob faasaoloto. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email pe-a-oo-mai: ['generate'] fai: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str faaopoopo-i-le-iuga: (ia-lava header: ['From: '] + lana-lava from-name + [' <'] + ( lana-lava from ) + ['>']) + brk.
-	str faaopoopo-i-le-iuga: (ia-lava header: ['To: '] + ( lana-lava recipients tuufaatasi: [','] )) + brk.
+Imeli-HTML pe-a-oo-mai: ['fatu'] fai: {
+	>> motu-laina := ['\r\n'].
+	>> manoa-tusitusiga := [''].
+	manoa-tusitusiga faaopoopo-i-le-iuga: (ia-lava ulutala: ['From: '] + lana-lava igoa-auina + [' <'] + ( lana-lava tagata-auina ) + ['>']) + motu-laina.
+	manoa-tusitusiga faaopoopo-i-le-iuga: (ia-lava ulutala: ['To: '] + ( lana-lava tagata-mauaina tuufaatasi: [','] )) + motu-laina.
 	lana-lava cc aofaiga moni: {
-		str faaopoopo-i-le-iuga: (ia-lava header: ['Cc: '] + ( lana-lava cc tuufaatasi: [','] )) + brk.
+		manoa-tusitusiga faaopoopo-i-le-iuga: (ia-lava ulutala: ['Cc: '] + ( lana-lava cc tuufaatasi: [','] )) + motu-laina.
 	}.
 	lana-lava bcc aofaiga moni: {
-		str faaopoopo-i-le-iuga: (ia-lava header: ['Bcc: '] + ( lana-lava bcc tuufaatasi: [','] )) + brk.
+		manoa-tusitusiga faaopoopo-i-le-iuga: (ia-lava ulutala: ['Bcc: '] + ( lana-lava bcc tuufaatasi: [','] )) + motu-laina.
 	}.
-	str faaopoopo-i-le-iuga: (ia-lava header: ['Subject: '] + lana-lava subject) + brk.
-	str faaopoopo-i-le-iuga: ['MIME-Version: 1.0'] + brk.
-	str faaopoopo-i-le-iuga: ['Content-Type: multipart/related; boundary="'] + lana-lava boundary + ['"; type=text/html'] + brk.
-	str faaopoopo-i-le-iuga: brk.
-	str faaopoopo-i-le-iuga: ['--'] + lana-lava boundary + brk.
-	str faaopoopo-i-le-iuga: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str faaopoopo-i-le-iuga: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str faaopoopo-i-le-iuga: brk.
-	str faaopoopo-i-le-iuga: lana-lava body.
-	str faaopoopo-i-le-iuga: brk.
-	lana-lava attachments taʻitasi: { :id :info
-		>> blob := info data.
-		str faaopoopo-i-le-iuga: ['--'] + lana-lava boundary + brk.
-		str faaopoopo-i-le-iuga: ['Content-Type: '] + info mime + brk.
-		str faaopoopo-i-le-iuga: ['Content-Transfer-Encoding: base64'] + brk.
-		str faaopoopo-i-le-iuga: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str faaopoopo-i-le-iuga: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str faaopoopo-i-le-iuga: brk.
-		>> max := 76.
-		>> len := blob umi.
-		>> chunks := (len / max) faʻasili-numera.
+	manoa-tusitusiga faaopoopo-i-le-iuga: (ia-lava ulutala: ['Subject: '] + lana-lava mataupu) + motu-laina.
+	manoa-tusitusiga faaopoopo-i-le-iuga: ['MIME-Version: 1.0'] + motu-laina.
+	manoa-tusitusiga faaopoopo-i-le-iuga: ['Content-Type: multipart/related; boundary="'] + lana-lava tuaoi + ['"; type=text/html'] + motu-laina.
+	manoa-tusitusiga faaopoopo-i-le-iuga: motu-laina.
+	manoa-tusitusiga faaopoopo-i-le-iuga: ['--'] + lana-lava tuaoi + motu-laina.
+	manoa-tusitusiga faaopoopo-i-le-iuga: ['Content-Type: text/html; charset=UTF-8'] + motu-laina.
+	manoa-tusitusiga faaopoopo-i-le-iuga: ['Content-Transfer-Encoding: 7bit'] + motu-laina.
+	manoa-tusitusiga faaopoopo-i-le-iuga: motu-laina.
+	manoa-tusitusiga faaopoopo-i-le-iuga: lana-lava tino.
+	manoa-tusitusiga faaopoopo-i-le-iuga: motu-laina.
+	lana-lava mea-faapipii taʻitasi: { :id :faamatalaga-puupuu
+		>> blob := faamatalaga-puupuu faamatalaga.
+		manoa-tusitusiga faaopoopo-i-le-iuga: ['--'] + lana-lava tuaoi + motu-laina.
+		manoa-tusitusiga faaopoopo-i-le-iuga: ['Content-Type: '] + faamatalaga-puupuu mime + motu-laina.
+		manoa-tusitusiga faaopoopo-i-le-iuga: ['Content-Transfer-Encoding: base64'] + motu-laina.
+		manoa-tusitusiga faaopoopo-i-le-iuga: ['Content-ID: <attachment'] + id + ['>'] + motu-laina.
+		manoa-tusitusiga faaopoopo-i-le-iuga: ['Content-Disposition: inline; filename="'] + faamatalaga-puupuu faila-sauniga + ['"'] + motu-laina.
+		manoa-tusitusiga faaopoopo-i-le-iuga: motu-laina.
+		>> aupito-tele := 76.
+		>> umi-tusitusiga := blob umi.
+		>> fasi-fasi := (umi-tusitusiga / aupito-tele) faʻasili-numera.
 		{ :i
-			>> chunk := blob kopi-mea amata: i * max umi: max.
-			str faaopoopo-i-le-iuga: chunk + brk.
-		} * chunks.
-		str faaopoopo-i-le-iuga: brk.
-		str faaopoopo-i-le-iuga: brk.
+			>> fasi := blob kopi-mea amata: i * aupito-tele umi: aupito-tele.
+			manoa-tusitusiga faaopoopo-i-le-iuga: fasi + motu-laina.
+		} * fasi-fasi.
+		manoa-tusitusiga faaopoopo-i-le-iuga: motu-laina.
+		manoa-tusitusiga faaopoopo-i-le-iuga: motu-laina.
 	}.
-	str faaopoopo-i-le-iuga: ['--'] + lana-lava boundary + ['--'] + brk. <- str.
+	manoa-tusitusiga faaopoopo-i-le-iuga: ['--'] + lana-lava tuaoi + ['--'] + motu-laina. <- manoa-tusitusiga.
 }.

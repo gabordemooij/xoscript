@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Chinthu chatsopano.
+>> Chitsanzo := Chinthu chatsopano.
 
-Template chikafika: ['chatsopano'] chitani: { <- wekha chatsopano content: [''].
+Chitsanzo chikafika: ['chatsopano'] chitani: { <- wekha chatsopano zomwe-zili-mkati: [''].
 }.
 
-Template chikafika: ['content:'] chitani: { :content
-	zake content := content. 
+Chitsanzo chikafika: ['zomwe-zili-mkati:'] chitani: { :zomwe-zili-mkati
+	zake zomwe-zili-mkati := zomwe-zili-mkati. 
 }.
 
-Template chikafika: ['chatsopano:'] chitani: { :content <- wekha chatsopano content: content.
+Chitsanzo chikafika: ['chatsopano:'] chitani: { :zomwe-zili-mkati <- wekha chatsopano zomwe-zili-mkati: zomwe-zili-mkati.
 }.
 
-Template chikafika: ['cut:'] chitani: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := zake content gawa: startmarker.
-	>> prefix := parts choyamba.
-	>> parts2 := parts chomaliza gawa: endmarker.
-	>> suffix := parts2 chomaliza.
-	>> part := parts2 choyamba.
-	>> rest := prefix + suffix.
-	zake content := rest. <- Template chatsopano: part.
+Chitsanzo chikafika: ['dula:'] chitani: { :chizindikiro
+	>> chizindikiro-choyamba := (['<!-- cut:%id% -->'] %id%: chizindikiro).
+	>> chizindikiro-chomaliza := (['<!-- /cut:%id% -->'] %id%: chizindikiro).
+	>> magawo := zake zomwe-zili-mkati gawa: chizindikiro-choyamba.
+	>> chiyambi := magawo choyamba.
+	>> magawo2 := magawo chomaliza gawa: chizindikiro-chomaliza.
+	>> mchira := magawo2 chomaliza.
+	>> gawo := magawo2 choyamba.
+	>> otsala := chiyambi + mchira.
+	zake zomwe-zili-mkati := otsala. <- Chitsanzo chatsopano: gawo.
 	
 }.
 
-Template chikafika: ['koperani'] chitani: { <- wekha chatsopano: wekha malemba-a-mawu koperani.
+Chitsanzo chikafika: ['koperani'] chitani: { <- wekha chatsopano: wekha malemba-a-mawu koperani.
 }.
 	
-Template chikafika: ['paste:at:'] chitani: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	zake content sinthani: pastemarker ndi: ( snippet malemba-a-mawu + pastemarker ).
+Chitsanzo chikafika: ['matira:pa:'] chitani: { :mawu-ochepa :id
+	>> chizindikiro-chomatira := (['<!-- paste:%id% -->'] %id%: id).
+	zake zomwe-zili-mkati sinthani: chizindikiro-chomatira ndi: ( mawu-ochepa malemba-a-mawu + chizindikiro-chomatira ).
 }.
 
-Template chikafika: ['khazikitsa:mtengo:'] chitani: { :slot :value
-	zake content sinthani: ['<!-- slot:'] + slot + [' -->'] ndi: ( Server html-ika-khodi: value ).
+Chitsanzo chikafika: ['khazikitsa:mtengo:'] chitani: { :malo :mtengo
+	zake zomwe-zili-mkati sinthani: ['<!-- slot:'] + malo + [' -->'] ndi: ( Server html-ika-khodi: mtengo ).
 }.
 
-Template chikafika: ['set:html:'] chitani: { :slot :html
-	zake content sinthani: ['<!-- slot:'] + slot + [' -->'] ndi: html.
+Chitsanzo chikafika: ['khazikitsa:html:'] chitani: { :malo :html
+	zake zomwe-zili-mkati sinthani: ['<!-- slot:'] + malo + [' -->'] ndi: html.
 }.
 
-Template chikafika: ['yankha:ndi:'] chitani: { :slot :value
-	wekha khazikitsa: (slot kuchokera: 0 kutalika: (slot kutalika - 1)) mtengo: value.
+Chitsanzo chikafika: ['yankha:ndi:'] chitani: { :malo :mtengo
+	wekha khazikitsa: (malo kuchokera: 0 kutalika: (malo kutalika - 1)) mtengo: mtengo.
 }.
 
-Template chikafika: ['nl2br'] chitani: {
-	zake content sinthani: ['\n'] ndi: ['<br>'].
+Chitsanzo chikafika: ['nl2br'] chitani: {
+	zake zomwe-zili-mkati sinthani: ['\n'] ndi: ['<br>'].
 }.
 
-Template chikafika: ['clean'] chitani: {
-	zake content :=
+Chitsanzo chikafika: ['konza'] chitani: {
+	zake zomwe-zili-mkati :=
 		Chitsanzo-chofufuzira
 		chatsopano: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		kufanana: zake content
+		kufanana: zake zomwe-zili-mkati
 		chitani: { <- ['']. }.
 }.
 
-Template chikafika: ['clean-cuts'] chitani: {
-	>> items := Mndandanda chatsopano.
+Chitsanzo chikafika: ['konza-zodulidwa'] chitani: {
+	>> zinthu := Mndandanda chatsopano.
 	Chitsanzo-chofufuzira
 	chatsopano: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	kufanana: zake content
-	chitani: { :_ :part
-		items onjeza-kumapeto: part ? 1.
+	kufanana: zake zomwe-zili-mkati
+	chitani: { :_ :gawo
+		zinthu onjeza-kumapeto: gawo ? 1.
 	}.
-	items chilichonse: { :_ :id
-		zake content :=
+	zinthu chilichonse: { :_ :id
+		zake zomwe-zili-mkati :=
 			Chitsanzo-chofufuzira chatsopano: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			kufanana: zake content
+			kufanana: zake zomwe-zili-mkati
 			chitani: { <- ['']. }.
 	 }.
 }.
 
-Template chikafika: ['clean-space'] chitani: {
-	zake content :=
+Chitsanzo chikafika: ['konza-mipata'] chitani: {
+	zake zomwe-zili-mkati :=
 		Chitsanzo-chofufuzira
 		chatsopano: ['\\s*\\n'],
-		kufanana: zake content
+		kufanana: zake zomwe-zili-mkati
 		chitani: { <- ['\n']. }.
-	zake content :=
+	zake zomwe-zili-mkati :=
 		Chitsanzo-chofufuzira
 		chatsopano: ['\\n[\\s\\t]+'],
-		kufanana: zake content
+		kufanana: zake zomwe-zili-mkati
 		chitani: { <- ['\n']. }.
 }.
 
-Template chikafika: ['clean-all'] chitani: {
-	wekha clean.
-	wekha clean-cuts.
-	wekha clean-space.
+Chitsanzo chikafika: ['konza-zonse'] chitani: {
+	wekha konza.
+	wekha konza-zodulidwa.
+	wekha konza-mipata.
 }.
 
-Template chikafika: ['malemba-a-mawu'] chitani: { <- zake content.
+Chitsanzo chikafika: ['malemba-a-mawu'] chitani: { <- zake zomwe-zili-mkati.
 }.

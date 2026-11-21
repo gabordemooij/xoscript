@@ -1,128 +1,128 @@
->> Email := オブジェクト 新規.
+>> メール := オブジェクト 新規.
 
-Email 受信時: ['init'] 実行: {
-	自分の recipients := リスト 新規.
+メール 受信時: ['初期化'] 実行: {
+	自分の 受信者 := リスト 新規.
 	自分の cc := リスト 新規.
 	自分の bcc := リスト 新規.
-	自分の from := 無.
-	自分の from-name := 無.
-	自分の subject := 無.
-	自分の body := 無.
+	自分の 差出人 := 無.
+	自分の 差出人名 := 無.
+	自分の 件名 := 無.
+	自分の 本文 := 無.
 }.
 
-Email 受信時: ['新規'] 実行: { <- 自身 新規 init.
+メール 受信時: ['新規'] 実行: { <- 自身 新規 初期化.
 }.
 
-Email 受信時: ['to:'] 実行: { :list
-	自分の recipients := list.
+メール 受信時: ['宛先:'] 実行: { :列挙
+	自分の 受信者 := 列挙.
 }.
  
-Email 受信時: ['cc:'] 実行: { :list
-	自分の cc := list.
+メール 受信時: ['cc:'] 実行: { :列挙
+	自分の cc := 列挙.
 }.
 
-Email 受信時: ['bcc:'] 実行: { :list
-	自分の bcc := list.
+メール 受信時: ['bcc:'] 実行: { :列挙
+	自分の bcc := 列挙.
 }.
 
-Email 受信時: ['subject:'] 実行: { :subject
-	自分の subject := subject.
+メール 受信時: ['件名:'] 実行: { :件名
+	自分の 件名 := 件名.
 }.
 
-Email 受信時: ['from:name:'] 実行: { :from :名前
-	自分の from := from.
-	自分の from-name := 名前.
+メール 受信時: ['差出人:名前:'] 実行: { :差出人 :名前
+	自分の 差出人 := 差出人.
+	自分の 差出人名 := 名前.
 }.
 
-Email 受信時: ['body:'] 実行: { :body
-	自分の body := body.
+メール 受信時: ['本文:'] 実行: { :本文
+	自分の 本文 := 本文.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email 受信時: ['header:'] 実行: { :line <- line 置換: ['\r'] 新: [''], 置換: ['\n'] 新: [''].
+メール 受信時: ['ヘッダー:'] 実行: { :行内容 <- 行内容 置換: ['\r'] 新: [''], 置換: ['\n'] 新: [''].
 }.
 
-Email 受信時: ['send'] 実行: {
-	>> f := ファイル tempwrite: 自身 generate.
+メール 受信時: ['送信'] 実行: {
+	>> f := ファイル tempwrite: 自身 生成.
 	プログラム システム: ['sendmail -t < '] + f 経路, 改行.
 }.
 
-Email 受信時: ['generate'] 実行: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str 末尾に追加: (自身 header: ['From: '] + 自分の from-name + [' <'] + ( 自分の from ) + ['>']) + brk.
-	str 末尾に追加: (自身 header: ['To: '] + ( 自分の recipients 結合: [','] )) + brk.
+メール 受信時: ['生成'] 実行: {
+	>> 改行コード := ['\r\n'].
+	>> テキスト列 := [''].
+	テキスト列 末尾に追加: (自身 ヘッダー: ['From: '] + 自分の 差出人名 + [' <'] + ( 自分の 差出人 ) + ['>']) + 改行コード.
+	テキスト列 末尾に追加: (自身 ヘッダー: ['To: '] + ( 自分の 受信者 結合: [','] )) + 改行コード.
 	自分の cc 個数 真なら: {
-		str 末尾に追加: (自身 header: ['Cc: '] + ( 自分の cc 結合: [','] )) + brk.
+		テキスト列 末尾に追加: (自身 ヘッダー: ['Cc: '] + ( 自分の cc 結合: [','] )) + 改行コード.
 	}.
 	自分の bcc 個数 真なら: {
-		str 末尾に追加: (自身 header: ['Bcc: '] + ( 自分の bcc 結合: [','] )) + brk.
+		テキスト列 末尾に追加: (自身 ヘッダー: ['Bcc: '] + ( 自分の bcc 結合: [','] )) + 改行コード.
 	}.
-	str 末尾に追加: (自身 header: ['Subject: '] + 自分の subject) + brk.
-	str 末尾に追加: brk.
-	str 末尾に追加: 自分の body.
-	str 末尾に追加: brk. <- str.
+	テキスト列 末尾に追加: (自身 ヘッダー: ['Subject: '] + 自分の 件名) + 改行コード.
+	テキスト列 末尾に追加: 改行コード.
+	テキスト列 末尾に追加: 自分の 本文.
+	テキスト列 末尾に追加: 改行コード. <- テキスト列.
 }.
 
->> HTML-Email := Email 新規.
+>> HTMLメール := メール 新規.
 
-HTML-Email 受信時: ['init'] 実行: {
-	自身 init.
-	自分の attachments := リスト 新規.
-	自分の boundary := 金庫 トークン: 40.
+HTMLメール 受信時: ['初期化'] 実行: {
+	自身 初期化.
+	自分の 添付一覧 := リスト 新規.
+	自分の 境界 := 金庫 トークン: 40.
 }.
 
-HTML-Email 受信時: ['attach:'] 実行: { :file
-	>> id := 自分の attachments 個数.
-	>> blob := file blob.
-	自分の attachments 末尾に追加: (
+HTMLメール 受信時: ['添付:'] 実行: { :セッションファイル
+	>> id := 自分の 添付一覧 個数.
+	>> blob := セッションファイル blob.
+	自分の 添付一覧 末尾に追加: (
 		辞書 新規
-			file: file 経路,
-			mime: ['image/'] + (Server mimetype: file 経路),
-			data: blob base64-エンコード
+			セッションファイル: セッションファイル 経路,
+			mime: ['image/'] + (Server mimetype: セッションファイル 経路),
+			データ: blob base64-エンコード
 	).
 	blob 解放. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email 受信時: ['generate'] 実行: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str 末尾に追加: (自身 header: ['From: '] + 自分の from-name + [' <'] + ( 自分の from ) + ['>']) + brk.
-	str 末尾に追加: (自身 header: ['To: '] + ( 自分の recipients 結合: [','] )) + brk.
+HTMLメール 受信時: ['生成'] 実行: {
+	>> 改行コード := ['\r\n'].
+	>> テキスト列 := [''].
+	テキスト列 末尾に追加: (自身 ヘッダー: ['From: '] + 自分の 差出人名 + [' <'] + ( 自分の 差出人 ) + ['>']) + 改行コード.
+	テキスト列 末尾に追加: (自身 ヘッダー: ['To: '] + ( 自分の 受信者 結合: [','] )) + 改行コード.
 	自分の cc 個数 真なら: {
-		str 末尾に追加: (自身 header: ['Cc: '] + ( 自分の cc 結合: [','] )) + brk.
+		テキスト列 末尾に追加: (自身 ヘッダー: ['Cc: '] + ( 自分の cc 結合: [','] )) + 改行コード.
 	}.
 	自分の bcc 個数 真なら: {
-		str 末尾に追加: (自身 header: ['Bcc: '] + ( 自分の bcc 結合: [','] )) + brk.
+		テキスト列 末尾に追加: (自身 ヘッダー: ['Bcc: '] + ( 自分の bcc 結合: [','] )) + 改行コード.
 	}.
-	str 末尾に追加: (自身 header: ['Subject: '] + 自分の subject) + brk.
-	str 末尾に追加: ['MIME-Version: 1.0'] + brk.
-	str 末尾に追加: ['Content-Type: multipart/related; boundary="'] + 自分の boundary + ['"; type=text/html'] + brk.
-	str 末尾に追加: brk.
-	str 末尾に追加: ['--'] + 自分の boundary + brk.
-	str 末尾に追加: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str 末尾に追加: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str 末尾に追加: brk.
-	str 末尾に追加: 自分の body.
-	str 末尾に追加: brk.
-	自分の attachments 各要素: { :id :info
-		>> blob := info data.
-		str 末尾に追加: ['--'] + 自分の boundary + brk.
-		str 末尾に追加: ['Content-Type: '] + info mime + brk.
-		str 末尾に追加: ['Content-Transfer-Encoding: base64'] + brk.
-		str 末尾に追加: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str 末尾に追加: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str 末尾に追加: brk.
-		>> max := 76.
-		>> len := blob 長さ.
-		>> chunks := (len / max) 切り上げ.
+	テキスト列 末尾に追加: (自身 ヘッダー: ['Subject: '] + 自分の 件名) + 改行コード.
+	テキスト列 末尾に追加: ['MIME-Version: 1.0'] + 改行コード.
+	テキスト列 末尾に追加: ['Content-Type: multipart/related; boundary="'] + 自分の 境界 + ['"; type=text/html'] + 改行コード.
+	テキスト列 末尾に追加: 改行コード.
+	テキスト列 末尾に追加: ['--'] + 自分の 境界 + 改行コード.
+	テキスト列 末尾に追加: ['Content-Type: text/html; charset=UTF-8'] + 改行コード.
+	テキスト列 末尾に追加: ['Content-Transfer-Encoding: 7bit'] + 改行コード.
+	テキスト列 末尾に追加: 改行コード.
+	テキスト列 末尾に追加: 自分の 本文.
+	テキスト列 末尾に追加: 改行コード.
+	自分の 添付一覧 各要素: { :id :情報
+		>> blob := 情報 データ.
+		テキスト列 末尾に追加: ['--'] + 自分の 境界 + 改行コード.
+		テキスト列 末尾に追加: ['Content-Type: '] + 情報 mime + 改行コード.
+		テキスト列 末尾に追加: ['Content-Transfer-Encoding: base64'] + 改行コード.
+		テキスト列 末尾に追加: ['Content-ID: <attachment'] + id + ['>'] + 改行コード.
+		テキスト列 末尾に追加: ['Content-Disposition: inline; filename="'] + 情報 セッションファイル + ['"'] + 改行コード.
+		テキスト列 末尾に追加: 改行コード.
+		>> 上限 := 76.
+		>> 文字長 := blob 長さ.
+		>> チャンク群 := (文字長 / 上限) 切り上げ.
 		{ :i
-			>> chunk := blob 複製 開始: i * max 長さ: max.
-			str 末尾に追加: chunk + brk.
-		} * chunks.
-		str 末尾に追加: brk.
-		str 末尾に追加: brk.
+			>> チャンク := blob 複製 開始: i * 上限 長さ: 上限.
+			テキスト列 末尾に追加: チャンク + 改行コード.
+		} * チャンク群.
+		テキスト列 末尾に追加: 改行コード.
+		テキスト列 末尾に追加: 改行コード.
 	}.
-	str 末尾に追加: ['--'] + 自分の boundary + ['--'] + brk. <- str.
+	テキスト列 末尾に追加: ['--'] + 自分の 境界 + ['--'] + 改行コード. <- テキスト列.
 }.

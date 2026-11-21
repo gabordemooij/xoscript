@@ -1,128 +1,128 @@
->> Email := Walax cusub.
+>> Iimayl := Walax cusub.
 
-Email marka: ['init'] samee: {
-	iska-leh recipients := Liis cusub.
+Iimayl marka: ['diyaari'] samee: {
+	iska-leh qaatayaasha := Liis cusub.
 	iska-leh cc := Liis cusub.
 	iska-leh bcc := Liis cusub.
-	iska-leh from := Waxba.
-	iska-leh from-name := Waxba.
-	iska-leh subject := Waxba.
-	iska-leh body := Waxba.
+	iska-leh diraha := Waxba.
+	iska-leh magaca-diraha := Waxba.
+	iska-leh mawduuc := Waxba.
+	iska-leh jirka := Waxba.
 }.
 
-Email marka: ['cusub'] samee: { <- naf cusub init.
+Iimayl marka: ['cusub'] samee: { <- naf cusub diyaari.
 }.
 
-Email marka: ['to:'] samee: { :list
-	iska-leh recipients := list.
+Iimayl marka: ['loo-diro:'] samee: { :liis-walxeed
+	iska-leh qaatayaasha := liis-walxeed.
 }.
  
-Email marka: ['cc:'] samee: { :list
-	iska-leh cc := list.
+Iimayl marka: ['cc:'] samee: { :liis-walxeed
+	iska-leh cc := liis-walxeed.
 }.
 
-Email marka: ['bcc:'] samee: { :list
-	iska-leh bcc := list.
+Iimayl marka: ['bcc:'] samee: { :liis-walxeed
+	iska-leh bcc := liis-walxeed.
 }.
 
-Email marka: ['subject:'] samee: { :subject
-	iska-leh subject := subject.
+Iimayl marka: ['mawduuc:'] samee: { :mawduuc
+	iska-leh mawduuc := mawduuc.
 }.
 
-Email marka: ['from:name:'] samee: { :from :magac
-	iska-leh from := from.
-	iska-leh from-name := magac.
+Iimayl marka: ['diraha:magac:'] samee: { :diraha :magac
+	iska-leh diraha := diraha.
+	iska-leh magaca-diraha := magac.
 }.
 
-Email marka: ['body:'] samee: { :body
-	iska-leh body := body.
+Iimayl marka: ['jirka:'] samee: { :jirka
+	iska-leh jirka := jirka.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email marka: ['header:'] samee: { :line <- line beddel: ['\r'] ku: [''], beddel: ['\n'] ku: [''].
+Iimayl marka: ['madax:'] samee: { :sadar <- sadar beddel: ['\r'] ku: [''], beddel: ['\n'] ku: [''].
 }.
 
-Email marka: ['send'] samee: {
-	>> f := Fayl tempwrite: naf generate.
+Iimayl marka: ['dir'] samee: {
+	>> f := Fayl tempwrite: naf abuur.
 	Barnaamij nidaam: ['sendmail -t < '] + f waddada-faylka, sadar-cusub.
 }.
 
-Email marka: ['generate'] samee: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str dhammaadka-ku-dar: (naf header: ['From: '] + iska-leh from-name + [' <'] + ( iska-leh from ) + ['>']) + brk.
-	str dhammaadka-ku-dar: (naf header: ['To: '] + ( iska-leh recipients isku-dar: [','] )) + brk.
+Iimayl marka: ['abuur'] samee: {
+	>> jebinta-sadarka := ['\r\n'].
+	>> xarig-qoraal := [''].
+	xarig-qoraal dhammaadka-ku-dar: (naf madax: ['From: '] + iska-leh magaca-diraha + [' <'] + ( iska-leh diraha ) + ['>']) + jebinta-sadarka.
+	xarig-qoraal dhammaadka-ku-dar: (naf madax: ['To: '] + ( iska-leh qaatayaasha isku-dar: [','] )) + jebinta-sadarka.
 	iska-leh cc tirada-guud run: {
-		str dhammaadka-ku-dar: (naf header: ['Cc: '] + ( iska-leh cc isku-dar: [','] )) + brk.
+		xarig-qoraal dhammaadka-ku-dar: (naf madax: ['Cc: '] + ( iska-leh cc isku-dar: [','] )) + jebinta-sadarka.
 	}.
 	iska-leh bcc tirada-guud run: {
-		str dhammaadka-ku-dar: (naf header: ['Bcc: '] + ( iska-leh bcc isku-dar: [','] )) + brk.
+		xarig-qoraal dhammaadka-ku-dar: (naf madax: ['Bcc: '] + ( iska-leh bcc isku-dar: [','] )) + jebinta-sadarka.
 	}.
-	str dhammaadka-ku-dar: (naf header: ['Subject: '] + iska-leh subject) + brk.
-	str dhammaadka-ku-dar: brk.
-	str dhammaadka-ku-dar: iska-leh body.
-	str dhammaadka-ku-dar: brk. <- str.
+	xarig-qoraal dhammaadka-ku-dar: (naf madax: ['Subject: '] + iska-leh mawduuc) + jebinta-sadarka.
+	xarig-qoraal dhammaadka-ku-dar: jebinta-sadarka.
+	xarig-qoraal dhammaadka-ku-dar: iska-leh jirka.
+	xarig-qoraal dhammaadka-ku-dar: jebinta-sadarka. <- xarig-qoraal.
 }.
 
->> HTML-Email := Email cusub.
+>> Iimayl-HTML := Iimayl cusub.
 
-HTML-Email marka: ['init'] samee: {
-	naf init.
-	iska-leh attachments := Liis cusub.
-	iska-leh boundary := Khasnad token: 40.
+Iimayl-HTML marka: ['diyaari'] samee: {
+	naf diyaari.
+	iska-leh lifaaqyo := Liis cusub.
+	iska-leh xad := Khasnad token: 40.
 }.
 
-HTML-Email marka: ['attach:'] samee: { :file
-	>> id := iska-leh attachments tirada-guud.
-	>> blob := file blob.
-	iska-leh attachments dhammaadka-ku-dar: (
+Iimayl-HTML marka: ['ku-lifaaq:'] samee: { :faylka-fadhiga
+	>> id := iska-leh lifaaqyo tirada-guud.
+	>> blob := faylka-fadhiga blob.
+	iska-leh lifaaqyo dhammaadka-ku-dar: (
 		Qaamuus cusub
-			file: file waddada-faylka,
-			mime: ['image/'] + (Server mimetype: file waddada-faylka),
-			data: blob base64-koodee
+			faylka-fadhiga: faylka-fadhiga waddada-faylka,
+			mime: ['image/'] + (Server mimetype: faylka-fadhiga waddada-faylka),
+			xog: blob base64-koodee
 	).
 	blob sii-daa. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email marka: ['generate'] samee: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str dhammaadka-ku-dar: (naf header: ['From: '] + iska-leh from-name + [' <'] + ( iska-leh from ) + ['>']) + brk.
-	str dhammaadka-ku-dar: (naf header: ['To: '] + ( iska-leh recipients isku-dar: [','] )) + brk.
+Iimayl-HTML marka: ['abuur'] samee: {
+	>> jebinta-sadarka := ['\r\n'].
+	>> xarig-qoraal := [''].
+	xarig-qoraal dhammaadka-ku-dar: (naf madax: ['From: '] + iska-leh magaca-diraha + [' <'] + ( iska-leh diraha ) + ['>']) + jebinta-sadarka.
+	xarig-qoraal dhammaadka-ku-dar: (naf madax: ['To: '] + ( iska-leh qaatayaasha isku-dar: [','] )) + jebinta-sadarka.
 	iska-leh cc tirada-guud run: {
-		str dhammaadka-ku-dar: (naf header: ['Cc: '] + ( iska-leh cc isku-dar: [','] )) + brk.
+		xarig-qoraal dhammaadka-ku-dar: (naf madax: ['Cc: '] + ( iska-leh cc isku-dar: [','] )) + jebinta-sadarka.
 	}.
 	iska-leh bcc tirada-guud run: {
-		str dhammaadka-ku-dar: (naf header: ['Bcc: '] + ( iska-leh bcc isku-dar: [','] )) + brk.
+		xarig-qoraal dhammaadka-ku-dar: (naf madax: ['Bcc: '] + ( iska-leh bcc isku-dar: [','] )) + jebinta-sadarka.
 	}.
-	str dhammaadka-ku-dar: (naf header: ['Subject: '] + iska-leh subject) + brk.
-	str dhammaadka-ku-dar: ['MIME-Version: 1.0'] + brk.
-	str dhammaadka-ku-dar: ['Content-Type: multipart/related; boundary="'] + iska-leh boundary + ['"; type=text/html'] + brk.
-	str dhammaadka-ku-dar: brk.
-	str dhammaadka-ku-dar: ['--'] + iska-leh boundary + brk.
-	str dhammaadka-ku-dar: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str dhammaadka-ku-dar: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str dhammaadka-ku-dar: brk.
-	str dhammaadka-ku-dar: iska-leh body.
-	str dhammaadka-ku-dar: brk.
-	iska-leh attachments mid-kasta: { :id :info
-		>> blob := info data.
-		str dhammaadka-ku-dar: ['--'] + iska-leh boundary + brk.
-		str dhammaadka-ku-dar: ['Content-Type: '] + info mime + brk.
-		str dhammaadka-ku-dar: ['Content-Transfer-Encoding: base64'] + brk.
-		str dhammaadka-ku-dar: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str dhammaadka-ku-dar: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str dhammaadka-ku-dar: brk.
-		>> max := 76.
-		>> len := blob dherer.
-		>> chunks := (len / max) kor-u-soo-koob.
+	xarig-qoraal dhammaadka-ku-dar: (naf madax: ['Subject: '] + iska-leh mawduuc) + jebinta-sadarka.
+	xarig-qoraal dhammaadka-ku-dar: ['MIME-Version: 1.0'] + jebinta-sadarka.
+	xarig-qoraal dhammaadka-ku-dar: ['Content-Type: multipart/related; boundary="'] + iska-leh xad + ['"; type=text/html'] + jebinta-sadarka.
+	xarig-qoraal dhammaadka-ku-dar: jebinta-sadarka.
+	xarig-qoraal dhammaadka-ku-dar: ['--'] + iska-leh xad + jebinta-sadarka.
+	xarig-qoraal dhammaadka-ku-dar: ['Content-Type: text/html; charset=UTF-8'] + jebinta-sadarka.
+	xarig-qoraal dhammaadka-ku-dar: ['Content-Transfer-Encoding: 7bit'] + jebinta-sadarka.
+	xarig-qoraal dhammaadka-ku-dar: jebinta-sadarka.
+	xarig-qoraal dhammaadka-ku-dar: iska-leh jirka.
+	xarig-qoraal dhammaadka-ku-dar: jebinta-sadarka.
+	iska-leh lifaaqyo mid-kasta: { :id :macluumaad
+		>> blob := macluumaad xog.
+		xarig-qoraal dhammaadka-ku-dar: ['--'] + iska-leh xad + jebinta-sadarka.
+		xarig-qoraal dhammaadka-ku-dar: ['Content-Type: '] + macluumaad mime + jebinta-sadarka.
+		xarig-qoraal dhammaadka-ku-dar: ['Content-Transfer-Encoding: base64'] + jebinta-sadarka.
+		xarig-qoraal dhammaadka-ku-dar: ['Content-ID: <attachment'] + id + ['>'] + jebinta-sadarka.
+		xarig-qoraal dhammaadka-ku-dar: ['Content-Disposition: inline; filename="'] + macluumaad faylka-fadhiga + ['"'] + jebinta-sadarka.
+		xarig-qoraal dhammaadka-ku-dar: jebinta-sadarka.
+		>> ugu-badnaan := 76.
+		>> dhererka-qoraalka := blob dherer.
+		>> gabalo := (dhererka-qoraalka / ugu-badnaan) kor-u-soo-koob.
 		{ :i
-			>> chunk := blob koobiyee ka: i * max dherer: max.
-			str dhammaadka-ku-dar: chunk + brk.
-		} * chunks.
-		str dhammaadka-ku-dar: brk.
-		str dhammaadka-ku-dar: brk.
+			>> gabal := blob koobiyee ka: i * ugu-badnaan dherer: ugu-badnaan.
+			xarig-qoraal dhammaadka-ku-dar: gabal + jebinta-sadarka.
+		} * gabalo.
+		xarig-qoraal dhammaadka-ku-dar: jebinta-sadarka.
+		xarig-qoraal dhammaadka-ku-dar: jebinta-sadarka.
 	}.
-	str dhammaadka-ku-dar: ['--'] + iska-leh boundary + ['--'] + brk. <- str.
+	xarig-qoraal dhammaadka-ku-dar: ['--'] + iska-leh xad + ['--'] + jebinta-sadarka. <- xarig-qoraal.
 }.

@@ -1,128 +1,128 @@
->> Email := Obyek anyar.
+>> Layang-e := Obyek anyar.
 
-Email nalika: ['init'] tindakna: {
-	duweke recipients := Dhaptar anyar.
+Layang-e nalika: ['siapake'] tindakna: {
+	duweke panampa := Dhaptar anyar.
 	duweke cc := Dhaptar anyar.
 	duweke bcc := Dhaptar anyar.
-	duweke from := Kosong.
-	duweke from-name := Kosong.
-	duweke subject := Kosong.
-	duweke body := Kosong.
+	duweke pangirim := Kosong.
+	duweke jeneng-pangirim := Kosong.
+	duweke subyek := Kosong.
+	duweke awak := Kosong.
 }.
 
-Email nalika: ['anyar'] tindakna: { <- dhiri anyar init.
+Layang-e nalika: ['anyar'] tindakna: { <- dhiri anyar siapake.
 }.
 
-Email nalika: ['to:'] tindakna: { :list
-	duweke recipients := list.
+Layang-e nalika: ['marang:'] tindakna: { :panyebutan
+	duweke panampa := panyebutan.
 }.
  
-Email nalika: ['cc:'] tindakna: { :list
-	duweke cc := list.
+Layang-e nalika: ['cc:'] tindakna: { :panyebutan
+	duweke cc := panyebutan.
 }.
 
-Email nalika: ['bcc:'] tindakna: { :list
-	duweke bcc := list.
+Layang-e nalika: ['bcc:'] tindakna: { :panyebutan
+	duweke bcc := panyebutan.
 }.
 
-Email nalika: ['subject:'] tindakna: { :subject
-	duweke subject := subject.
+Layang-e nalika: ['subyek:'] tindakna: { :subyek
+	duweke subyek := subyek.
 }.
 
-Email nalika: ['from:name:'] tindakna: { :from :jeneng
-	duweke from := from.
-	duweke from-name := jeneng.
+Layang-e nalika: ['pangirim:jeneng:'] tindakna: { :pangirim :jeneng
+	duweke pangirim := pangirim.
+	duweke jeneng-pangirim := jeneng.
 }.
 
-Email nalika: ['body:'] tindakna: { :body
-	duweke body := body.
+Layang-e nalika: ['awak:'] tindakna: { :awak
+	duweke awak := awak.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email nalika: ['header:'] tindakna: { :line <- line ganti: ['\r'] nganggo: [''], ganti: ['\n'] nganggo: [''].
+Layang-e nalika: ['sesirah:'] tindakna: { :baris <- baris ganti: ['\r'] nganggo: [''], ganti: ['\n'] nganggo: [''].
 }.
 
-Email nalika: ['send'] tindakna: {
-	>> f := Berkas tempwrite: dhiri generate.
+Layang-e nalika: ['kirim'] tindakna: {
+	>> f := Berkas tempwrite: dhiri gawe.
 	Program sistem: ['sendmail -t < '] + f dalan, baris-anyar.
 }.
 
-Email nalika: ['generate'] tindakna: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str tambah-ing-mburi: (dhiri header: ['From: '] + duweke from-name + [' <'] + ( duweke from ) + ['>']) + brk.
-	str tambah-ing-mburi: (dhiri header: ['To: '] + ( duweke recipients gabung: [','] )) + brk.
+Layang-e nalika: ['gawe'] tindakna: {
+	>> pamisah-baris := ['\r\n'].
+	>> untaian := [''].
+	untaian tambah-ing-mburi: (dhiri sesirah: ['From: '] + duweke jeneng-pangirim + [' <'] + ( duweke pangirim ) + ['>']) + pamisah-baris.
+	untaian tambah-ing-mburi: (dhiri sesirah: ['To: '] + ( duweke panampa gabung: [','] )) + pamisah-baris.
 	duweke cc cacah bener: {
-		str tambah-ing-mburi: (dhiri header: ['Cc: '] + ( duweke cc gabung: [','] )) + brk.
+		untaian tambah-ing-mburi: (dhiri sesirah: ['Cc: '] + ( duweke cc gabung: [','] )) + pamisah-baris.
 	}.
 	duweke bcc cacah bener: {
-		str tambah-ing-mburi: (dhiri header: ['Bcc: '] + ( duweke bcc gabung: [','] )) + brk.
+		untaian tambah-ing-mburi: (dhiri sesirah: ['Bcc: '] + ( duweke bcc gabung: [','] )) + pamisah-baris.
 	}.
-	str tambah-ing-mburi: (dhiri header: ['Subject: '] + duweke subject) + brk.
-	str tambah-ing-mburi: brk.
-	str tambah-ing-mburi: duweke body.
-	str tambah-ing-mburi: brk. <- str.
+	untaian tambah-ing-mburi: (dhiri sesirah: ['Subject: '] + duweke subyek) + pamisah-baris.
+	untaian tambah-ing-mburi: pamisah-baris.
+	untaian tambah-ing-mburi: duweke awak.
+	untaian tambah-ing-mburi: pamisah-baris. <- untaian.
 }.
 
->> HTML-Email := Email anyar.
+>> Layang-e-HTML := Layang-e anyar.
 
-HTML-Email nalika: ['init'] tindakna: {
-	dhiri init.
-	duweke attachments := Dhaptar anyar.
-	duweke boundary := Brankas token: 40.
+Layang-e-HTML nalika: ['siapake'] tindakna: {
+	dhiri siapake.
+	duweke lampiran := Dhaptar anyar.
+	duweke wates := Brankas token: 40.
 }.
 
-HTML-Email nalika: ['attach:'] tindakna: { :file
-	>> id := duweke attachments cacah.
-	>> blob := file blob.
-	duweke attachments tambah-ing-mburi: (
+Layang-e-HTML nalika: ['lampirake:'] tindakna: { :berkas-sesi
+	>> id := duweke lampiran cacah.
+	>> blob := berkas-sesi blob.
+	duweke lampiran tambah-ing-mburi: (
 		Kamus anyar
-			file: file dalan,
-			mime: ['image/'] + (Server mimetype: file dalan),
+			berkas-sesi: berkas-sesi dalan,
+			mime: ['image/'] + (Server mimetype: berkas-sesi dalan),
 			data: blob base64-enkode
 	).
 	blob bebasna. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email nalika: ['generate'] tindakna: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str tambah-ing-mburi: (dhiri header: ['From: '] + duweke from-name + [' <'] + ( duweke from ) + ['>']) + brk.
-	str tambah-ing-mburi: (dhiri header: ['To: '] + ( duweke recipients gabung: [','] )) + brk.
+Layang-e-HTML nalika: ['gawe'] tindakna: {
+	>> pamisah-baris := ['\r\n'].
+	>> untaian := [''].
+	untaian tambah-ing-mburi: (dhiri sesirah: ['From: '] + duweke jeneng-pangirim + [' <'] + ( duweke pangirim ) + ['>']) + pamisah-baris.
+	untaian tambah-ing-mburi: (dhiri sesirah: ['To: '] + ( duweke panampa gabung: [','] )) + pamisah-baris.
 	duweke cc cacah bener: {
-		str tambah-ing-mburi: (dhiri header: ['Cc: '] + ( duweke cc gabung: [','] )) + brk.
+		untaian tambah-ing-mburi: (dhiri sesirah: ['Cc: '] + ( duweke cc gabung: [','] )) + pamisah-baris.
 	}.
 	duweke bcc cacah bener: {
-		str tambah-ing-mburi: (dhiri header: ['Bcc: '] + ( duweke bcc gabung: [','] )) + brk.
+		untaian tambah-ing-mburi: (dhiri sesirah: ['Bcc: '] + ( duweke bcc gabung: [','] )) + pamisah-baris.
 	}.
-	str tambah-ing-mburi: (dhiri header: ['Subject: '] + duweke subject) + brk.
-	str tambah-ing-mburi: ['MIME-Version: 1.0'] + brk.
-	str tambah-ing-mburi: ['Content-Type: multipart/related; boundary="'] + duweke boundary + ['"; type=text/html'] + brk.
-	str tambah-ing-mburi: brk.
-	str tambah-ing-mburi: ['--'] + duweke boundary + brk.
-	str tambah-ing-mburi: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str tambah-ing-mburi: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str tambah-ing-mburi: brk.
-	str tambah-ing-mburi: duweke body.
-	str tambah-ing-mburi: brk.
-	duweke attachments saben: { :id :info
+	untaian tambah-ing-mburi: (dhiri sesirah: ['Subject: '] + duweke subyek) + pamisah-baris.
+	untaian tambah-ing-mburi: ['MIME-Version: 1.0'] + pamisah-baris.
+	untaian tambah-ing-mburi: ['Content-Type: multipart/related; boundary="'] + duweke wates + ['"; type=text/html'] + pamisah-baris.
+	untaian tambah-ing-mburi: pamisah-baris.
+	untaian tambah-ing-mburi: ['--'] + duweke wates + pamisah-baris.
+	untaian tambah-ing-mburi: ['Content-Type: text/html; charset=UTF-8'] + pamisah-baris.
+	untaian tambah-ing-mburi: ['Content-Transfer-Encoding: 7bit'] + pamisah-baris.
+	untaian tambah-ing-mburi: pamisah-baris.
+	untaian tambah-ing-mburi: duweke awak.
+	untaian tambah-ing-mburi: pamisah-baris.
+	duweke lampiran saben: { :id :info
 		>> blob := info data.
-		str tambah-ing-mburi: ['--'] + duweke boundary + brk.
-		str tambah-ing-mburi: ['Content-Type: '] + info mime + brk.
-		str tambah-ing-mburi: ['Content-Transfer-Encoding: base64'] + brk.
-		str tambah-ing-mburi: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str tambah-ing-mburi: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str tambah-ing-mburi: brk.
-		>> max := 76.
-		>> len := blob dawa.
-		>> chunks := (len / max) bunderake-munggah.
+		untaian tambah-ing-mburi: ['--'] + duweke wates + pamisah-baris.
+		untaian tambah-ing-mburi: ['Content-Type: '] + info mime + pamisah-baris.
+		untaian tambah-ing-mburi: ['Content-Transfer-Encoding: base64'] + pamisah-baris.
+		untaian tambah-ing-mburi: ['Content-ID: <attachment'] + id + ['>'] + pamisah-baris.
+		untaian tambah-ing-mburi: ['Content-Disposition: inline; filename="'] + info berkas-sesi + ['"'] + pamisah-baris.
+		untaian tambah-ing-mburi: pamisah-baris.
+		>> paling-akeh := 76.
+		>> dawa-teks := blob dawa.
+		>> gumpalan-gumpalan := (dawa-teks / paling-akeh) bunderake-munggah.
 		{ :i
-			>> chunk := blob salin saka: i * max dawa: max.
-			str tambah-ing-mburi: chunk + brk.
-		} * chunks.
-		str tambah-ing-mburi: brk.
-		str tambah-ing-mburi: brk.
+			>> gumpalan := blob salin saka: i * paling-akeh dawa: paling-akeh.
+			untaian tambah-ing-mburi: gumpalan + pamisah-baris.
+		} * gumpalan-gumpalan.
+		untaian tambah-ing-mburi: pamisah-baris.
+		untaian tambah-ing-mburi: pamisah-baris.
 	}.
-	str tambah-ing-mburi: ['--'] + duweke boundary + ['--'] + brk. <- str.
+	untaian tambah-ing-mburi: ['--'] + duweke wates + ['--'] + pamisah-baris. <- untaian.
 }.

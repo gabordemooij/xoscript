@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Abu sabo.
+>> Samfuri := Abu sabo.
 
-Template idan: ['sabo'] yi: { <- kai sabo content: [''].
+Samfuri idan: ['sabo'] yi: { <- kai sabo abun-ciki: [''].
 }.
 
-Template idan: ['content:'] yi: { :content
-	nasa content := content. 
+Samfuri idan: ['abun-ciki:'] yi: { :abun-ciki
+	nasa abun-ciki := abun-ciki. 
 }.
 
-Template idan: ['sabo:'] yi: { :content <- kai sabo content: content.
+Samfuri idan: ['sabo:'] yi: { :abun-ciki <- kai sabo abun-ciki: abun-ciki.
 }.
 
-Template idan: ['cut:'] yi: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := nasa content tsaga: startmarker.
-	>> prefix := parts na-farko.
-	>> parts2 := parts na-ƙarshe tsaga: endmarker.
-	>> suffix := parts2 na-ƙarshe.
-	>> part := parts2 na-farko.
-	>> rest := prefix + suffix.
-	nasa content := rest. <- Template sabo: part.
+Samfuri idan: ['yanke:'] yi: { :alama
+	>> alamar-farko := (['<!-- cut:%id% -->'] %id%: alama).
+	>> alamar-ƙarshe := (['<!-- /cut:%id% -->'] %id%: alama).
+	>> sassa := nasa abun-ciki tsaga: alamar-farko.
+	>> gaba := sassa na-farko.
+	>> sassa2 := sassa na-ƙarshe tsaga: alamar-ƙarshe.
+	>> bayanta := sassa2 na-ƙarshe.
+	>> sashi := sassa2 na-farko.
+	>> saura := gaba + bayanta.
+	nasa abun-ciki := saura. <- Samfuri sabo: sashi.
 	
 }.
 
-Template idan: ['kwafi'] yi: { <- kai sabo: kai rubutu kwafi.
+Samfuri idan: ['kwafi'] yi: { <- kai sabo: kai rubutu kwafi.
 }.
 	
-Template idan: ['paste:at:'] yi: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	nasa content musanya: pastemarker da: ( snippet rubutu + pastemarker ).
+Samfuri idan: ['liƙa:a:'] yi: { :ɗan-guntu :id
+	>> alamar-liƙawa := (['<!-- paste:%id% -->'] %id%: id).
+	nasa abun-ciki musanya: alamar-liƙawa da: ( ɗan-guntu rubutu + alamar-liƙawa ).
 }.
 
-Template idan: ['saita:ƙima:'] yi: { :slot :value
-	nasa content musanya: ['<!-- slot:'] + slot + [' -->'] da: ( Server html-ɓoye-lamba: value ).
+Samfuri idan: ['saita:ƙima:'] yi: { :wuri :ƙima
+	nasa abun-ciki musanya: ['<!-- slot:'] + wuri + [' -->'] da: ( Server html-ɓoye-lamba: ƙima ).
 }.
 
-Template idan: ['set:html:'] yi: { :slot :html
-	nasa content musanya: ['<!-- slot:'] + slot + [' -->'] da: html.
+Samfuri idan: ['saita:html:'] yi: { :wuri :html
+	nasa abun-ciki musanya: ['<!-- slot:'] + wuri + [' -->'] da: html.
 }.
 
-Template idan: ['amsa:da:'] yi: { :slot :value
-	kai saita: (slot daga: 0 tsawo: (slot tsawo - 1)) ƙima: value.
+Samfuri idan: ['amsa:da:'] yi: { :wuri :ƙima
+	kai saita: (wuri daga: 0 tsawo: (wuri tsawo - 1)) ƙima: ƙima.
 }.
 
-Template idan: ['nl2br'] yi: {
-	nasa content musanya: ['\n'] da: ['<br>'].
+Samfuri idan: ['nl2br'] yi: {
+	nasa abun-ciki musanya: ['\n'] da: ['<br>'].
 }.
 
-Template idan: ['clean'] yi: {
-	nasa content :=
+Samfuri idan: ['gyara'] yi: {
+	nasa abun-ciki :=
 		Salo
 		sabo: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		dacewa: nasa content
+		dacewa: nasa abun-ciki
 		yi: { <- ['']. }.
 }.
 
-Template idan: ['clean-cuts'] yi: {
-	>> items := Jeri sabo.
+Samfuri idan: ['gyara-yanke'] yi: {
+	>> abubuwa := Jeri sabo.
 	Salo
 	sabo: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	dacewa: nasa content
-	yi: { :_ :part
-		items ƙara-a-ƙarshe: part ? 1.
+	dacewa: nasa abun-ciki
+	yi: { :_ :sashi
+		abubuwa ƙara-a-ƙarshe: sashi ? 1.
 	}.
-	items kowane: { :_ :id
-		nasa content :=
+	abubuwa kowane: { :_ :id
+		nasa abun-ciki :=
 			Salo sabo: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			dacewa: nasa content
+			dacewa: nasa abun-ciki
 			yi: { <- ['']. }.
 	 }.
 }.
 
-Template idan: ['clean-space'] yi: {
-	nasa content :=
+Samfuri idan: ['gyara-sarari'] yi: {
+	nasa abun-ciki :=
 		Salo
 		sabo: ['\\s*\\n'],
-		dacewa: nasa content
+		dacewa: nasa abun-ciki
 		yi: { <- ['\n']. }.
-	nasa content :=
+	nasa abun-ciki :=
 		Salo
 		sabo: ['\\n[\\s\\t]+'],
-		dacewa: nasa content
+		dacewa: nasa abun-ciki
 		yi: { <- ['\n']. }.
 }.
 
-Template idan: ['clean-all'] yi: {
-	kai clean.
-	kai clean-cuts.
-	kai clean-space.
+Samfuri idan: ['gyara-duka'] yi: {
+	kai gyara.
+	kai gyara-yanke.
+	kai gyara-sarari.
 }.
 
-Template idan: ['rubutu'] yi: { <- nasa content.
+Samfuri idan: ['rubutu'] yi: { <- nasa abun-ciki.
 }.

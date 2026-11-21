@@ -1,302 +1,302 @@
-Laaj-HTTP bu: ['HTTP-header:'] def: { :key <- Prograam jamono: key.
+Laaj-HTTP bu: ['HTTP-bopp:'] def: { :caabi <- Prograam jamono: caabi.
 }.
 
->> HTTP-Header := Denc xees.
+>> Bopp-HTTP := Denc xees.
 
-HTTP-Header bu: ['xees'] def: { <- man xees init.
+Bopp-HTTP bu: ['xees'] def: { <- man xees waajal.
 }.
 
-HTTP-Header bu: ['init'] def: {
-	sama key := Dara.
-	sama value := Dara.
+Bopp-HTTP bu: ['waajal'] def: {
+	sama caabi := Dara.
+	sama njëg := Dara.
 }.
 
-HTTP-Header bu: ['key:value:'] def: { :key :value
-	sama key := key.
-	sama value := value.
+Bopp-HTTP bu: ['caabi:njëg:'] def: { :caabi :njëg
+	sama caabi := caabi.
+	sama njëg := njëg.
 }.
 
-HTTP-Header bu: ['key'] def: { <- sama key.
+Bopp-HTTP bu: ['caabi'] def: { <- sama caabi.
 }.
 
-HTTP-Header bu: ['value'] def: { <- sama value.
+Bopp-HTTP bu: ['njëg'] def: { <- sama njëg.
 }.
 
 
-HTTP-Header bu: ['mbind'] def: {
-	>> line := sama key + [': '] + sama value.
-	line wuutal: ['\r'] ci: [''], wuutal: ['\n'] ci: ['']. <- line + [' \r\n'].
+Bopp-HTTP bu: ['mbind'] def: {
+	>> rëdd := sama caabi + [': '] + sama njëg.
+	rëdd wuutal: ['\r'] ci: [''], wuutal: ['\n'] ci: ['']. <- rëdd + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Denc xees.
+>> Wérukaay-Web := Denc xees.
 
-Web-Document bu: ['xees'] def: { <- man xees init.
+Wérukaay-Web bu: ['xees'] def: { <- man xees waajal.
 }.
 
-Web-Document bu: ['init'] def: {
-	sama headers := Jokkalante xees.
-	sama sess-id := Dara.
-	sama session-manager := Tempfile-Session xees.
-	sama sessdata := Dara.
-	sama secure := Dëgg.
-	sama same-site := ['Strict'].
-	sama headers-out := Dëkkul.
-	sama request := Laaj-HTTP xees.
+Wérukaay-Web bu: ['waajal'] def: {
+	sama bopp-yi := Jokkalante xees.
+	sama id-ndaje := Dara.
+	sama saytukatu-ndaje := Ndaje-dencukaay-bu-gàtt xees.
+	sama xibaaru-ndaje := Dara.
+	sama wóor := Dëgg.
+	sama dalu-benn := ['Strict'].
+	sama bopp-yi-yónne-nañu := Dëkkul.
+	sama laaj-http := Laaj-HTTP xees.
 }.
 
-Web-Document bu: ['request:'] def: { :request
-	sama request := request.
+Wérukaay-Web bu: ['laaj-http:'] def: { :laaj-http
+	sama laaj-http := laaj-http.
 }. 
 
-Web-Document bu: ['secure-session-cookie:'] def: { :secure
-	man check-headers.
-	sama secure := secure.
+Wérukaay-Web bu: ['kuki-ndaje-bu-wóor:'] def: { :wóor
+	man seet-bopp-yi.
+	sama wóor := wóor.
 }.
 
-Web-Document bu: ['same-site-session-cookie:'] def: { :value
-	man check-headers.
-	>> options := Jokkalante xees 
+Wérukaay-Web bu: ['kuki-ndaje-dalu-benn:'] def: { :njëg
+	man seet-bopp-yi.
+	>> tànneef := Jokkalante xees 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options ëmb: value, dëkkul: {
+	tànneef am: njëg, dëkkul: {
 		liggéey-bi njuumte: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	sama same-site := value.
+	sama dalu-benn := njëg.
 }.
 
-Web-Document bu: ['header:'] def: { :header
-	man check-headers.
-	sama headers yokk-ci-mujj: header.
+Wérukaay-Web bu: ['bopp:'] def: { :bopp
+	man seet-bopp-yi.
+	sama bopp-yi yokk-ci-mujj: bopp.
 }.
 
-Web-Document bu: ['clear-headers'] def: {
-	man check-headers.
-	sama headers := Jokkalante xees.
+Wérukaay-Web bu: ['far-bopp-yi'] def: {
+	man seet-bopp-yi.
+	sama bopp-yi := Jokkalante xees.
 }.
 
-Web-Document bu: ['session-manager:'] def: { :manager
-	man check-headers.
-	sama session-manager := manager.
+Wérukaay-Web bu: ['saytukatu-ndaje:'] def: { :saytukat
+	man seet-bopp-yi.
+	sama saytukatu-ndaje := saytukat.
 }.
 
-Web-Document bu: ['session-manager'] def: { <- sama session-manager.
+Wérukaay-Web bu: ['saytukatu-ndaje'] def: { <- sama saytukatu-ndaje.
 }.
 
-Web-Document bu: ['check-headers'] def: {
-	sama headers-out dëgg: {
+Wérukaay-Web bu: ['seet-bopp-yi'] def: {
+	sama bopp-yi-yónne-nañu dëgg: {
 		liggéey-bi njuumte: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document bu: ['session-start'] def: {
-	man check-headers.
-	>> request := sama request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Dara? dëkkul: {
-		(( Nataal-seet xees: ['^[A-Za-z0-9]+\\z'], méngoo: sess-id ) = 0) dëgg: {
-			sess-id := Dara.
+Wérukaay-Web bu: ['tàmbali-ndaje'] def: {
+	man seet-bopp-yi.
+	>> laaj-http := sama laaj-http.
+	>> id-ndaje := laaj-http cookie: ['xsid'].
+	id-ndaje Dara? dëkkul: {
+		(( Nataal-seet xees: ['^[A-Za-z0-9]+\\z'], méngoo: id-ndaje ) = 0) dëgg: {
+			id-ndaje := Dara.
 		}.
 	}.
-	sess-id Dara? dëgg: {
-		sess-id := Wàqu-kaaraange token: 30.
-		>> session-header := HTTP-Header xees
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (sama secure mbaa: ['Secure'] mbaa: ['']),
-		SSITE: (sama same-site),
-		XSID: sess-id
+	id-ndaje Dara? dëgg: {
+		id-ndaje := Wàqu-kaaraange token: 30.
+		>> boppu-ndaje := Bopp-HTTP xees
+		caabi: ['Set-Cookie'] njëg: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (sama wóor mbaa: ['Secure'] mbaa: ['']),
+		SSITE: (sama dalu-benn),
+		XSID: id-ndaje
 		).
-		sama headers yokk-ci-mujj: session-header.
+		sama bopp-yi yokk-ci-mujj: boppu-ndaje.
 	}.
-	sama sessdata := sama session-manager for: sess-id, load. <- sama sessdata. # reference
+	sama xibaaru-ndaje := sama saytukatu-ndaje ngir: id-ndaje, yeb. <- sama xibaaru-ndaje. # reference
 }.
 
-Web-Document bu: ['goto:'] def: { :url
-	man check-headers.
-	man clear-headers.
-	sama headers
+Wérukaay-Web bu: ['dem-ci:'] def: { :dëkkuwaay
+	man seet-bopp-yi.
+	man far-bopp-yi.
+	sama bopp-yi
 	yokk-ci-mujj: (
-		HTTP-Header xees
-		key: ['Status'] value: ['303 See Other']
+		Bopp-HTTP xees
+		caabi: ['Status'] njëg: ['303 See Other']
 	),
 	yokk-ci-mujj: (
-		HTTP-Header xees
-		key: ['Location'] value: url
+		Bopp-HTTP xees
+		caabi: ['Location'] njëg: dëkkuwaay
 	).
-	man out: ['Redirect'].
+	man génne: ['Redirect'].
 }.
 
-Web-Document bu: ['session-destroy'] def: {
-	man check-headers.
-	>> request := sama request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Dara? dëkkul: {
-		>> session-header := HTTP-Header xees.
-		>> when := Waxtu xees at: 1970, melo: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Wérukaay-Web bu: ['yàq-ndaje'] def: {
+	man seet-bopp-yi.
+	>> laaj-http := sama laaj-http.
+	>> id-ndaje := laaj-http cookie: ['xsid'].
+	id-ndaje Dara? dëkkul: {
+		>> boppu-ndaje := Bopp-HTTP xees.
+		>> waxtu-jeex := Waxtu xees at: 1970, melo: ['%a, %d %b %Y %H:%M:%S GMT'].
+		boppu-ndaje caabi: ['Set-Cookie'] njëg: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (sama secure mbaa: ['Secure'] mbaa: ['']),
-			SSITE: (sama same-site),
-			XSID: sess-id
+			EXP: waxtu-jeex,
+			SEC: (sama wóor mbaa: ['Secure'] mbaa: ['']),
+			SSITE: (sama dalu-benn),
+			XSID: id-ndaje
 		).
-		sama session-manager destroy.
-		sama headers yokk-ci-mujj: session-header.
+		sama saytukatu-ndaje yàq.
+		sama bopp-yi yokk-ci-mujj: boppu-ndaje.
 	}.
 }.
 
 
-Web-Document bu: ['template:'] def: { :xoll <- Template xees: (Dencukaayu xees: xoll, jàng).
+Wérukaay-Web bu: ['royukaay:'] def: { :xoll <- Royukaay xees: (Dencukaayu xees: xoll, jàng).
 }.
 
-Web-Document bu: ['out:type:'] def: { :output :xeetu
-	sama headers-out dëkkul: {
-		sama sessdata Dara? dëkkul: {
-			sama session-manager save: sama sessdata.
+Wérukaay-Web bu: ['génne:xeetu:'] def: { :njeexit :xeetu
+	sama bopp-yi-yónne-nañu dëkkul: {
+		sama xibaaru-ndaje Dara? dëkkul: {
+			sama saytukatu-ndaje dencal: sama xibaaru-ndaje.
 		}.
-		sama headers yokk-ci-mujj: (
-			HTTP-Header xees
-			key: ['Content-type'] value: xeetu
+		sama bopp-yi yokk-ci-mujj: (
+			Bopp-HTTP xees
+			caabi: ['Content-type'] njëg: xeetu
 		).
-		sama headers kenn-ci-kenn: { :_ :header
-			Génn bind: header.
+		sama bopp-yi kenn-ci-kenn: { :_ :bopp
+			Génn bind: bopp.
 		}.
-		sama headers-out := Dëgg.
+		sama bopp-yi-yónne-nañu := Dëgg.
 		Génn bind: ['\r\n'].
 	}.
-	Génn bind: output.
+	Génn bind: njeexit.
 }.
 
-Web-Document bu: ['finish:type:'] def: { :output :xeetu
-	sama headers-out dëkkul: {
-		sama sessdata Dara? dëkkul: {
-			sama session-manager save: sama sessdata.
+Wérukaay-Web bu: ['jeexal:xeetu:'] def: { :njeexit :xeetu
+	sama bopp-yi-yónne-nañu dëkkul: {
+		sama xibaaru-ndaje Dara? dëkkul: {
+			sama saytukatu-ndaje dencal: sama xibaaru-ndaje.
 		}.
-		sama headers yokk-ci-mujj: (
-			HTTP-Header xees
-			key: ['Content-type'] value: xeetu
+		sama bopp-yi yokk-ci-mujj: (
+			Bopp-HTTP xees
+			caabi: ['Content-type'] njëg: xeetu
 		).
-		sama headers yokk-ci-mujj: (
-			HTTP-Header xees
-			key: ['Content-Length'] value: output mbind bytes
+		sama bopp-yi yokk-ci-mujj: (
+			Bopp-HTTP xees
+			caabi: ['Content-Length'] njëg: njeexit mbind bytes
 		).
-		sama headers kenn-ci-kenn: { :_ :header
-			Génn bind: header.
+		sama bopp-yi kenn-ci-kenn: { :_ :bopp
+			Génn bind: bopp.
 		}.
-		sama headers-out := Dëgg.
+		sama bopp-yi-yónne-nañu := Dëgg.
 		Génn bind: ['\r\n'].
 	}.
-	Génn bind: output.
+	Génn bind: njeexit.
 }.
 
-Web-Document bu: ['out:'] def: { :output
-	man out: output type: ['text/html; charset=utf-8'].
+Wérukaay-Web bu: ['génne:'] def: { :njeexit
+	man génne: njeexit xeetu: ['text/html; charset=utf-8'].
 }.
 
-Web-Document bu: ['finish:'] def: { :output
-	man finish: output type: ['text/html; charset=utf-8'].
+Wérukaay-Web bu: ['jeexal:'] def: { :njeexit
+	man jeexal: njeexit xeetu: ['text/html; charset=utf-8'].
 }.
 
-Web-Document bu: ['json:'] def: { :output
-	man out: ( JSON jsonify: output ) type: ['application/json'].
+Wérukaay-Web bu: ['json:'] def: { :njeexit
+	man génne: ( JSON jsonify: njeexit ) xeetu: ['application/json'].
 }.
 
-Web-Document bu: ['not-found:'] def: { :output
-	man clear-headers header: (
-		HTTP-Header xees key: ['Status'] value: ['404 Not Found']
+Wérukaay-Web bu: ['gisuñu-ko:'] def: { :njeexit
+	man far-bopp-yi bopp: (
+		Bopp-HTTP xees caabi: ['Status'] njëg: ['404 Not Found']
 	).
-	man out: output.
+	man génne: njeexit.
 }.
 
 
 # Interface
 
->> Session := Denc xees.
+>> Ndaje := Denc xees.
 
-Session bu: ['xees'] def: { <- man xees init for: Dara.
+Ndaje bu: ['xees'] def: { <- man xees waajal ngir: Dara.
 }.
 
-Session bu: ['for:'] def: { :id
+Ndaje bu: ['ngir:'] def: { :id
 	sama id := id.
 }.
 
-Session bu: ['load'] def: {
+Ndaje bu: ['yeb'] def: {
 	liggéey-bi njuumte: ['Not implemented.'].
 }.
 
-Session bu: ['save:'] def: {
+Ndaje bu: ['dencal:'] def: {
 	liggéey-bi njuumte: ['Not implemented.'].
 }.
 
-Session bu: ['destroy'] def: {
+Ndaje bu: ['yàq'] def: {
 	liggéey-bi njuumte: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session xees.
+>> Ndaje-dencukaay-bu-gàtt := Ndaje xees.
 
-Tempfile-Session bu: ['init'] def: {
-	sama pathprefix := ['/tmp/sess-'].
+Ndaje-dencukaay-bu-gàtt bu: ['waajal'] def: {
+	sama tàmbalikuy-yoon := ['/tmp/sess-'].
 }.
 
-Tempfile-Session bu: ['path-prefix:'] def: { :str
-	sama pathprefix := str.
+Ndaje-dencukaay-bu-gàtt bu: ['njëkk-yoon:'] def: { :buumu-mbind
+	sama tàmbalikuy-yoon := buumu-mbind.
 }.
 
-Tempfile-Session bu: ['file'] def: { <- ( Dencukaayu xees: ( sama pathprefix + sama id + ['.txt'] ) ).
+Ndaje-dencukaay-bu-gàtt bu: ['dencukaayu-ndaje'] def: { <- ( Dencukaayu xees: ( sama tàmbalikuy-yoon + sama id + ['.txt'] ) ).
 }.
 
-Tempfile-Session bu: ['load'] def: {
-	>> file := man file.
-	file nekk dëkkul: {
-		file bind: (Listin xees koodu).
-	}. <- file jàng denc.
+Ndaje-dencukaay-bu-gàtt bu: ['yeb'] def: {
+	>> dencukaayu-ndaje := man dencukaayu-ndaje.
+	dencukaayu-ndaje nekk dëkkul: {
+		dencukaayu-ndaje bind: (Listin xees koodu).
+	}. <- dencukaayu-ndaje jàng denc.
 }.
 
-Tempfile-Session bu: ['save:'] def: { :data
-	>> file := man file.
-	file nekk dëgg: {
-		file bind: data koodu.
+Ndaje-dencukaay-bu-gàtt bu: ['dencal:'] def: { :xibaar
+	>> dencukaayu-ndaje := man dencukaayu-ndaje.
+	dencukaayu-ndaje nekk dëgg: {
+		dencukaayu-ndaje bind: xibaar koodu.
 	}.
 }.
 
-Tempfile-Session bu: ['destroy'] def: {
-	>> file := man file.
-	file nekk dëgg: {
-		file far.
+Ndaje-dencukaay-bu-gàtt bu: ['yàq'] def: {
+	>> dencukaayu-ndaje := man dencukaayu-ndaje.
+	dencukaayu-ndaje nekk dëgg: {
+		dencukaayu-ndaje far.
 	}.
 }.
 
 
 >> URL := Denc xees.
 
-URL bu: ['init'] def: {
-	sama protocol := ['https://'].
+URL bu: ['waajal'] def: {
+	sama pàttali := ['https://'].
 	sama dalalkat := ['localhost'].
 	sama xoll := [''].
-	sama params := [''].
+	sama paramet-url := [''].
 	sama hash := [''].
 }.
 
-URL bu: ['xees'] def: { <- man xees init.
+URL bu: ['xees'] def: { <- man xees waajal.
 }.
 
 URL bu: ['mbind'] def: { <- (
-	sama protocol +
+	sama pàttali +
 	sama dalalkat +
 	sama xoll +
-	sama params +
+	sama paramet-url +
 	sama hash ).
 }.
 
-URL bu: ['protocol:'] def: { :protocol
-	((Jokkalante xees: ['http'] ; ['https']) ëmb: protocol) dëgg: {
-		sama protocol := protocol + ['://'].
+URL bu: ['pàttali:'] def: { :pàttali
+	((Jokkalante xees ; ['http'] ; ['https']) am: pàttali) dëgg: {
+		sama pàttali := pàttali + ['://'].
 	}, dëkkul: {
 		liggéey-bi njuumte: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL bu: ['dalalkat:'] def: { :dalalkat
 	sama dalalkat := dalalkat.
 }.
 
-URL bu: ['path:'] def: { :xoll
+URL bu: ['xoll:'] def: { :xoll
 	sama xoll := ['/'] + xoll url-koode.
 }.
 
-URL bu: ['params:'] def: { :map
-	>> params := Jokkalante xees.
-	map kenn-ci-kenn: { :key :value
-		params yokk-ci-mujj: key mbind url-koode + ['='] + value mbind url-koode.
+URL bu: ['paramet-url:'] def: { :natal
+	>> paramet-url := Jokkalante xees.
+	natal kenn-ci-kenn: { :caabi :njëg
+		paramet-url yokk-ci-mujj: caabi mbind url-koode + ['='] + njëg mbind url-koode.
 	}.
-	sama params := ['?'] + ( params boole: ['&'] ).
+	sama paramet-url := ['?'] + ( paramet-url boole: ['&'] ).
 }.
 
 URL bu: ['xaatim:'] def: { :hash

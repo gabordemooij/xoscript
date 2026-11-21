@@ -1,128 +1,128 @@
->> Email := Obxecto novo.
+>> Correo := Obxecto novo.
 
-Email en: ['init'] facer: {
-	propio recipients := Lista novo.
+Correo en: ['inicializar'] facer: {
+	propio destinatarios := Lista novo.
 	propio cc := Lista novo.
 	propio bcc := Lista novo.
-	propio from := Nada.
-	propio from-name := Nada.
-	propio subject := Nada.
-	propio body := Nada.
+	propio remitente := Nada.
+	propio nome-remitente := Nada.
+	propio asunto := Nada.
+	propio corpo := Nada.
 }.
 
-Email en: ['novo'] facer: { <- eu novo init.
+Correo en: ['novo'] facer: { <- eu novo inicializar.
 }.
 
-Email en: ['to:'] facer: { :list
-	propio recipients := list.
+Correo en: ['destinatario:'] facer: { :lista
+	propio destinatarios := lista.
 }.
  
-Email en: ['cc:'] facer: { :list
-	propio cc := list.
+Correo en: ['cc:'] facer: { :lista
+	propio cc := lista.
 }.
 
-Email en: ['bcc:'] facer: { :list
-	propio bcc := list.
+Correo en: ['bcc:'] facer: { :lista
+	propio bcc := lista.
 }.
 
-Email en: ['subject:'] facer: { :subject
-	propio subject := subject.
+Correo en: ['asunto:'] facer: { :asunto
+	propio asunto := asunto.
 }.
 
-Email en: ['from:name:'] facer: { :from :nome
-	propio from := from.
-	propio from-name := nome.
+Correo en: ['remitente:nome:'] facer: { :remitente :nome
+	propio remitente := remitente.
+	propio nome-remitente := nome.
 }.
 
-Email en: ['body:'] facer: { :body
-	propio body := body.
+Correo en: ['corpo:'] facer: { :corpo
+	propio corpo := corpo.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email en: ['header:'] facer: { :line <- line substituír: ['\r'] por: [''], substituír: ['\n'] por: [''].
+Correo en: ['cabeceira:'] facer: { :liña <- liña substituír: ['\r'] por: [''], substituír: ['\n'] por: [''].
 }.
 
-Email en: ['send'] facer: {
-	>> f := Ficheiro tempwrite: eu generate.
+Correo en: ['enviar'] facer: {
+	>> f := Ficheiro tempwrite: eu xerar.
 	Programa sistema: ['sendmail -t < '] + f camiño, salto-de-liña.
 }.
 
-Email en: ['generate'] facer: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str engadir-ao-final: (eu header: ['From: '] + propio from-name + [' <'] + ( propio from ) + ['>']) + brk.
-	str engadir-ao-final: (eu header: ['To: '] + ( propio recipients unir: [','] )) + brk.
+Correo en: ['xerar'] facer: {
+	>> salto := ['\r\n'].
+	>> cadea := [''].
+	cadea engadir-ao-final: (eu cabeceira: ['From: '] + propio nome-remitente + [' <'] + ( propio remitente ) + ['>']) + salto.
+	cadea engadir-ao-final: (eu cabeceira: ['To: '] + ( propio destinatarios unir: [','] )) + salto.
 	propio cc contar certo: {
-		str engadir-ao-final: (eu header: ['Cc: '] + ( propio cc unir: [','] )) + brk.
+		cadea engadir-ao-final: (eu cabeceira: ['Cc: '] + ( propio cc unir: [','] )) + salto.
 	}.
 	propio bcc contar certo: {
-		str engadir-ao-final: (eu header: ['Bcc: '] + ( propio bcc unir: [','] )) + brk.
+		cadea engadir-ao-final: (eu cabeceira: ['Bcc: '] + ( propio bcc unir: [','] )) + salto.
 	}.
-	str engadir-ao-final: (eu header: ['Subject: '] + propio subject) + brk.
-	str engadir-ao-final: brk.
-	str engadir-ao-final: propio body.
-	str engadir-ao-final: brk. <- str.
+	cadea engadir-ao-final: (eu cabeceira: ['Subject: '] + propio asunto) + salto.
+	cadea engadir-ao-final: salto.
+	cadea engadir-ao-final: propio corpo.
+	cadea engadir-ao-final: salto. <- cadea.
 }.
 
->> HTML-Email := Email novo.
+>> Correo-HTML := Correo novo.
 
-HTML-Email en: ['init'] facer: {
-	eu init.
-	propio attachments := Lista novo.
-	propio boundary := Caixa-forte token: 40.
+Correo-HTML en: ['inicializar'] facer: {
+	eu inicializar.
+	propio anexos := Lista novo.
+	propio fronteira := Caixa-forte token: 40.
 }.
 
-HTML-Email en: ['attach:'] facer: { :file
-	>> id := propio attachments contar.
-	>> blob := file blob.
-	propio attachments engadir-ao-final: (
+Correo-HTML en: ['anexar:'] facer: { :ficheiro
+	>> id := propio anexos contar.
+	>> blob := ficheiro blob.
+	propio anexos engadir-ao-final: (
 		Dicionario novo
-			file: file camiño,
-			mime: ['image/'] + (Server mimetype: file camiño),
-			data: blob base64-codificar
+			ficheiro: ficheiro camiño,
+			mime: ['image/'] + (Server mimetype: ficheiro camiño),
+			datos: blob base64-codificar
 	).
 	blob liberar. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email en: ['generate'] facer: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str engadir-ao-final: (eu header: ['From: '] + propio from-name + [' <'] + ( propio from ) + ['>']) + brk.
-	str engadir-ao-final: (eu header: ['To: '] + ( propio recipients unir: [','] )) + brk.
+Correo-HTML en: ['xerar'] facer: {
+	>> salto := ['\r\n'].
+	>> cadea := [''].
+	cadea engadir-ao-final: (eu cabeceira: ['From: '] + propio nome-remitente + [' <'] + ( propio remitente ) + ['>']) + salto.
+	cadea engadir-ao-final: (eu cabeceira: ['To: '] + ( propio destinatarios unir: [','] )) + salto.
 	propio cc contar certo: {
-		str engadir-ao-final: (eu header: ['Cc: '] + ( propio cc unir: [','] )) + brk.
+		cadea engadir-ao-final: (eu cabeceira: ['Cc: '] + ( propio cc unir: [','] )) + salto.
 	}.
 	propio bcc contar certo: {
-		str engadir-ao-final: (eu header: ['Bcc: '] + ( propio bcc unir: [','] )) + brk.
+		cadea engadir-ao-final: (eu cabeceira: ['Bcc: '] + ( propio bcc unir: [','] )) + salto.
 	}.
-	str engadir-ao-final: (eu header: ['Subject: '] + propio subject) + brk.
-	str engadir-ao-final: ['MIME-Version: 1.0'] + brk.
-	str engadir-ao-final: ['Content-Type: multipart/related; boundary="'] + propio boundary + ['"; type=text/html'] + brk.
-	str engadir-ao-final: brk.
-	str engadir-ao-final: ['--'] + propio boundary + brk.
-	str engadir-ao-final: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str engadir-ao-final: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str engadir-ao-final: brk.
-	str engadir-ao-final: propio body.
-	str engadir-ao-final: brk.
-	propio attachments cada: { :id :info
-		>> blob := info data.
-		str engadir-ao-final: ['--'] + propio boundary + brk.
-		str engadir-ao-final: ['Content-Type: '] + info mime + brk.
-		str engadir-ao-final: ['Content-Transfer-Encoding: base64'] + brk.
-		str engadir-ao-final: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str engadir-ao-final: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str engadir-ao-final: brk.
-		>> max := 76.
-		>> len := blob lonxitude.
-		>> chunks := (len / max) arredondar-arriba.
+	cadea engadir-ao-final: (eu cabeceira: ['Subject: '] + propio asunto) + salto.
+	cadea engadir-ao-final: ['MIME-Version: 1.0'] + salto.
+	cadea engadir-ao-final: ['Content-Type: multipart/related; boundary="'] + propio fronteira + ['"; type=text/html'] + salto.
+	cadea engadir-ao-final: salto.
+	cadea engadir-ao-final: ['--'] + propio fronteira + salto.
+	cadea engadir-ao-final: ['Content-Type: text/html; charset=UTF-8'] + salto.
+	cadea engadir-ao-final: ['Content-Transfer-Encoding: 7bit'] + salto.
+	cadea engadir-ao-final: salto.
+	cadea engadir-ao-final: propio corpo.
+	cadea engadir-ao-final: salto.
+	propio anexos cada: { :id :info
+		>> blob := info datos.
+		cadea engadir-ao-final: ['--'] + propio fronteira + salto.
+		cadea engadir-ao-final: ['Content-Type: '] + info mime + salto.
+		cadea engadir-ao-final: ['Content-Transfer-Encoding: base64'] + salto.
+		cadea engadir-ao-final: ['Content-ID: <attachment'] + id + ['>'] + salto.
+		cadea engadir-ao-final: ['Content-Disposition: inline; filename="'] + info ficheiro + ['"'] + salto.
+		cadea engadir-ao-final: salto.
+		>> teito := 76.
+		>> lonxitude-texto := blob lonxitude.
+		>> anacos := (lonxitude-texto / teito) arredondar-arriba.
 		{ :i
-			>> chunk := blob copiar de: i * max lonxitude: max.
-			str engadir-ao-final: chunk + brk.
-		} * chunks.
-		str engadir-ao-final: brk.
-		str engadir-ao-final: brk.
+			>> anaco := blob copiar de: i * teito lonxitude: teito.
+			cadea engadir-ao-final: anaco + salto.
+		} * anacos.
+		cadea engadir-ao-final: salto.
+		cadea engadir-ao-final: salto.
 	}.
-	str engadir-ao-final: ['--'] + propio boundary + ['--'] + brk. <- str.
+	cadea engadir-ao-final: ['--'] + propio fronteira + ['--'] + salto. <- cadea.
 }.

@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Oibseact ùr.
+>> Teamplaid := Oibseact ùr.
 
-Template air: ['ùr'] dèan: { <- fhèin ùr content: [''].
+Teamplaid air: ['ùr'] dèan: { <- fhèin ùr susbaint: [''].
 }.
 
-Template air: ['content:'] dèan: { :content
-	leis content := content. 
+Teamplaid air: ['susbaint:'] dèan: { :susbaint
+	leis susbaint := susbaint. 
 }.
 
-Template air: ['ùr:'] dèan: { :content <- fhèin ùr content: content.
+Teamplaid air: ['ùr:'] dèan: { :susbaint <- fhèin ùr susbaint: susbaint.
 }.
 
-Template air: ['cut:'] dèan: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := leis content sgoilt: startmarker.
-	>> prefix := parts ciad.
-	>> parts2 := parts deireannach sgoilt: endmarker.
-	>> suffix := parts2 deireannach.
-	>> part := parts2 ciad.
-	>> rest := prefix + suffix.
-	leis content := rest. <- Template ùr: part.
+Teamplaid air: ['gearr:'] dèan: { :comharra
+	>> comharra-tòiseachaidh := (['<!-- cut:%id% -->'] %id%: comharra).
+	>> comharra-crìche := (['<!-- /cut:%id% -->'] %id%: comharra).
+	>> pàirtean := leis susbaint sgoilt: comharra-tòiseachaidh.
+	>> ro-leasachan := pàirtean ciad.
+	>> pàirtean2 := pàirtean deireannach sgoilt: comharra-crìche.
+	>> iar-leasachan := pàirtean2 deireannach.
+	>> pàirt := pàirtean2 ciad.
+	>> an-còrr := ro-leasachan + iar-leasachan.
+	leis susbaint := an-còrr. <- Teamplaid ùr: pàirt.
 	
 }.
 
-Template air: ['dèan-lethbhreac'] dèan: { <- fhèin ùr: fhèin sreang dèan-lethbhreac.
+Teamplaid air: ['dèan-lethbhreac'] dèan: { <- fhèin ùr: fhèin sreang dèan-lethbhreac.
 }.
 	
-Template air: ['paste:at:'] dèan: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	leis content cuir-an-àite: pastemarker le: ( snippet sreang + pastemarker ).
+Teamplaid air: ['cuir-ann:aig:'] dèan: { :criomag :id
+	>> comharra-cuir-ann := (['<!-- paste:%id% -->'] %id%: id).
+	leis susbaint cuir-an-àite: comharra-cuir-ann le: ( criomag sreang + comharra-cuir-ann ).
 }.
 
-Template air: ['suidhich:luach:'] dèan: { :slot :value
-	leis content cuir-an-àite: ['<!-- slot:'] + slot + [' -->'] le: ( Server html-còdaich: value ).
+Teamplaid air: ['suidhich:luach:'] dèan: { :slot :luach
+	leis susbaint cuir-an-àite: ['<!-- slot:'] + slot + [' -->'] le: ( Server html-còdaich: luach ).
 }.
 
-Template air: ['set:html:'] dèan: { :slot :html
-	leis content cuir-an-àite: ['<!-- slot:'] + slot + [' -->'] le: html.
+Teamplaid air: ['suidhich:html:'] dèan: { :slot :html
+	leis susbaint cuir-an-àite: ['<!-- slot:'] + slot + [' -->'] le: html.
 }.
 
-Template air: ['freagair:agus:'] dèan: { :slot :value
-	fhèin suidhich: (slot bho: 0 faid: (slot faid - 1)) luach: value.
+Teamplaid air: ['freagair:agus:'] dèan: { :slot :luach
+	fhèin suidhich: (slot bho: 0 faid: (slot faid - 1)) luach: luach.
 }.
 
-Template air: ['nl2br'] dèan: {
-	leis content cuir-an-àite: ['\n'] le: ['<br>'].
+Teamplaid air: ['nl2br'] dèan: {
+	leis susbaint cuir-an-àite: ['\n'] le: ['<br>'].
 }.
 
-Template air: ['clean'] dèan: {
-	leis content :=
+Teamplaid air: ['glan'] dèan: {
+	leis susbaint :=
 		Pàtran
 		ùr: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		maids: leis content
+		maids: leis susbaint
 		dèan: { <- ['']. }.
 }.
 
-Template air: ['clean-cuts'] dèan: {
-	>> items := Liosta ùr.
+Teamplaid air: ['glan-gearraidhean'] dèan: {
+	>> nithean := Liosta ùr.
 	Pàtran
 	ùr: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	maids: leis content
-	dèan: { :_ :part
-		items cuir-ris: part ? 1.
+	maids: leis susbaint
+	dèan: { :_ :pàirt
+		nithean cuir-ris: pàirt ? 1.
 	}.
-	items gach: { :_ :id
-		leis content :=
+	nithean gach: { :_ :id
+		leis susbaint :=
 			Pàtran ùr: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			maids: leis content
+			maids: leis susbaint
 			dèan: { <- ['']. }.
 	 }.
 }.
 
-Template air: ['clean-space'] dèan: {
-	leis content :=
+Teamplaid air: ['glan-beàrnan'] dèan: {
+	leis susbaint :=
 		Pàtran
 		ùr: ['\\s*\\n'],
-		maids: leis content
+		maids: leis susbaint
 		dèan: { <- ['\n']. }.
-	leis content :=
+	leis susbaint :=
 		Pàtran
 		ùr: ['\\n[\\s\\t]+'],
-		maids: leis content
+		maids: leis susbaint
 		dèan: { <- ['\n']. }.
 }.
 
-Template air: ['clean-all'] dèan: {
-	fhèin clean.
-	fhèin clean-cuts.
-	fhèin clean-space.
+Teamplaid air: ['glan-uile'] dèan: {
+	fhèin glan.
+	fhèin glan-gearraidhean.
+	fhèin glan-beàrnan.
 }.
 
-Template air: ['sreang'] dèan: { <- leis content.
+Teamplaid air: ['sreang'] dèan: { <- leis susbaint.
 }.

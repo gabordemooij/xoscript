@@ -1,128 +1,128 @@
->> Email := Ntho ncha.
+>> Imeile := Ntho ncha.
 
-Email ha-ho-fihla: ['init'] etsa: {
-	ea-hao recipients := Lethathamo ncha.
+Imeile ha-ho-fihla: ['lokisa'] etsa: {
+	ea-hao baamoheli := Lethathamo ncha.
 	ea-hao cc := Lethathamo ncha.
 	ea-hao bcc := Lethathamo ncha.
-	ea-hao from := Letho.
-	ea-hao from-name := Letho.
-	ea-hao subject := Letho.
-	ea-hao body := Letho.
+	ea-hao moromeli := Letho.
+	ea-hao lebitso-la-moromeli := Letho.
+	ea-hao sehlooho := Letho.
+	ea-hao mmele := Letho.
 }.
 
-Email ha-ho-fihla: ['ncha'] etsa: { <- uena ncha init.
+Imeile ha-ho-fihla: ['ncha'] etsa: { <- uena ncha lokisa.
 }.
 
-Email ha-ho-fihla: ['to:'] etsa: { :list
-	ea-hao recipients := list.
+Imeile ha-ho-fihla: ['ho:'] etsa: { :lethathamo-la-lintho
+	ea-hao baamoheli := lethathamo-la-lintho.
 }.
  
-Email ha-ho-fihla: ['cc:'] etsa: { :list
-	ea-hao cc := list.
+Imeile ha-ho-fihla: ['cc:'] etsa: { :lethathamo-la-lintho
+	ea-hao cc := lethathamo-la-lintho.
 }.
 
-Email ha-ho-fihla: ['bcc:'] etsa: { :list
-	ea-hao bcc := list.
+Imeile ha-ho-fihla: ['bcc:'] etsa: { :lethathamo-la-lintho
+	ea-hao bcc := lethathamo-la-lintho.
 }.
 
-Email ha-ho-fihla: ['subject:'] etsa: { :subject
-	ea-hao subject := subject.
+Imeile ha-ho-fihla: ['sehlooho:'] etsa: { :sehlooho
+	ea-hao sehlooho := sehlooho.
 }.
 
-Email ha-ho-fihla: ['from:name:'] etsa: { :from :lebitso
-	ea-hao from := from.
-	ea-hao from-name := lebitso.
+Imeile ha-ho-fihla: ['moromeli:lebitso:'] etsa: { :moromeli :lebitso
+	ea-hao moromeli := moromeli.
+	ea-hao lebitso-la-moromeli := lebitso.
 }.
 
-Email ha-ho-fihla: ['body:'] etsa: { :body
-	ea-hao body := body.
+Imeile ha-ho-fihla: ['mmele:'] etsa: { :mmele
+	ea-hao mmele := mmele.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email ha-ho-fihla: ['header:'] etsa: { :line <- line nkela-sebaka: ['\r'] ka: [''], nkela-sebaka: ['\n'] ka: [''].
+Imeile ha-ho-fihla: ['hlooho:'] etsa: { :mola <- mola nkela-sebaka: ['\r'] ka: [''], nkela-sebaka: ['\n'] ka: [''].
 }.
 
-Email ha-ho-fihla: ['send'] etsa: {
-	>> f := Faele tempwrite: uena generate.
+Imeile ha-ho-fihla: ['romela'] etsa: {
+	>> f := Faele tempwrite: uena hlahisa.
 	Lenaneo sistimi: ['sendmail -t < '] + f tsela-ea-faele, mola-o-mocha.
 }.
 
-Email ha-ho-fihla: ['generate'] etsa: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str eketsa-qetellong: (uena header: ['From: '] + ea-hao from-name + [' <'] + ( ea-hao from ) + ['>']) + brk.
-	str eketsa-qetellong: (uena header: ['To: '] + ( ea-hao recipients kopanya: [','] )) + brk.
+Imeile ha-ho-fihla: ['hlahisa'] etsa: {
+	>> khefutso-ea-mola := ['\r\n'].
+	>> khoele-ea-mongolo := [''].
+	khoele-ea-mongolo eketsa-qetellong: (uena hlooho: ['From: '] + ea-hao lebitso-la-moromeli + [' <'] + ( ea-hao moromeli ) + ['>']) + khefutso-ea-mola.
+	khoele-ea-mongolo eketsa-qetellong: (uena hlooho: ['To: '] + ( ea-hao baamoheli kopanya: [','] )) + khefutso-ea-mola.
 	ea-hao cc palo-ea-lintho nnete: {
-		str eketsa-qetellong: (uena header: ['Cc: '] + ( ea-hao cc kopanya: [','] )) + brk.
+		khoele-ea-mongolo eketsa-qetellong: (uena hlooho: ['Cc: '] + ( ea-hao cc kopanya: [','] )) + khefutso-ea-mola.
 	}.
 	ea-hao bcc palo-ea-lintho nnete: {
-		str eketsa-qetellong: (uena header: ['Bcc: '] + ( ea-hao bcc kopanya: [','] )) + brk.
+		khoele-ea-mongolo eketsa-qetellong: (uena hlooho: ['Bcc: '] + ( ea-hao bcc kopanya: [','] )) + khefutso-ea-mola.
 	}.
-	str eketsa-qetellong: (uena header: ['Subject: '] + ea-hao subject) + brk.
-	str eketsa-qetellong: brk.
-	str eketsa-qetellong: ea-hao body.
-	str eketsa-qetellong: brk. <- str.
+	khoele-ea-mongolo eketsa-qetellong: (uena hlooho: ['Subject: '] + ea-hao sehlooho) + khefutso-ea-mola.
+	khoele-ea-mongolo eketsa-qetellong: khefutso-ea-mola.
+	khoele-ea-mongolo eketsa-qetellong: ea-hao mmele.
+	khoele-ea-mongolo eketsa-qetellong: khefutso-ea-mola. <- khoele-ea-mongolo.
 }.
 
->> HTML-Email := Email ncha.
+>> Imeile-HTML := Imeile ncha.
 
-HTML-Email ha-ho-fihla: ['init'] etsa: {
-	uena init.
-	ea-hao attachments := Lethathamo ncha.
-	ea-hao boundary := Polokelo-e-sireletsehileng token: 40.
+Imeile-HTML ha-ho-fihla: ['lokisa'] etsa: {
+	uena lokisa.
+	ea-hao lihokelo := Lethathamo ncha.
+	ea-hao moeli := Polokelo-e-sireletsehileng token: 40.
 }.
 
-HTML-Email ha-ho-fihla: ['attach:'] etsa: { :file
-	>> id := ea-hao attachments palo-ea-lintho.
-	>> blob := file blob.
-	ea-hao attachments eketsa-qetellong: (
+Imeile-HTML ha-ho-fihla: ['hokela:'] etsa: { :faele-ea-seboka
+	>> id := ea-hao lihokelo palo-ea-lintho.
+	>> blob := faele-ea-seboka blob.
+	ea-hao lihokelo eketsa-qetellong: (
 		Bukantswe ncha
-			file: file tsela-ea-faele,
-			mime: ['image/'] + (Server mimetype: file tsela-ea-faele),
+			faele-ea-seboka: faele-ea-seboka tsela-ea-faele,
+			mime: ['image/'] + (Server mimetype: faele-ea-seboka tsela-ea-faele),
 			data: blob base64-kenya-khoutu
 	).
 	blob lokolla. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email ha-ho-fihla: ['generate'] etsa: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str eketsa-qetellong: (uena header: ['From: '] + ea-hao from-name + [' <'] + ( ea-hao from ) + ['>']) + brk.
-	str eketsa-qetellong: (uena header: ['To: '] + ( ea-hao recipients kopanya: [','] )) + brk.
+Imeile-HTML ha-ho-fihla: ['hlahisa'] etsa: {
+	>> khefutso-ea-mola := ['\r\n'].
+	>> khoele-ea-mongolo := [''].
+	khoele-ea-mongolo eketsa-qetellong: (uena hlooho: ['From: '] + ea-hao lebitso-la-moromeli + [' <'] + ( ea-hao moromeli ) + ['>']) + khefutso-ea-mola.
+	khoele-ea-mongolo eketsa-qetellong: (uena hlooho: ['To: '] + ( ea-hao baamoheli kopanya: [','] )) + khefutso-ea-mola.
 	ea-hao cc palo-ea-lintho nnete: {
-		str eketsa-qetellong: (uena header: ['Cc: '] + ( ea-hao cc kopanya: [','] )) + brk.
+		khoele-ea-mongolo eketsa-qetellong: (uena hlooho: ['Cc: '] + ( ea-hao cc kopanya: [','] )) + khefutso-ea-mola.
 	}.
 	ea-hao bcc palo-ea-lintho nnete: {
-		str eketsa-qetellong: (uena header: ['Bcc: '] + ( ea-hao bcc kopanya: [','] )) + brk.
+		khoele-ea-mongolo eketsa-qetellong: (uena hlooho: ['Bcc: '] + ( ea-hao bcc kopanya: [','] )) + khefutso-ea-mola.
 	}.
-	str eketsa-qetellong: (uena header: ['Subject: '] + ea-hao subject) + brk.
-	str eketsa-qetellong: ['MIME-Version: 1.0'] + brk.
-	str eketsa-qetellong: ['Content-Type: multipart/related; boundary="'] + ea-hao boundary + ['"; type=text/html'] + brk.
-	str eketsa-qetellong: brk.
-	str eketsa-qetellong: ['--'] + ea-hao boundary + brk.
-	str eketsa-qetellong: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str eketsa-qetellong: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str eketsa-qetellong: brk.
-	str eketsa-qetellong: ea-hao body.
-	str eketsa-qetellong: brk.
-	ea-hao attachments e-ngoe-le-e-ngoe: { :id :info
-		>> blob := info data.
-		str eketsa-qetellong: ['--'] + ea-hao boundary + brk.
-		str eketsa-qetellong: ['Content-Type: '] + info mime + brk.
-		str eketsa-qetellong: ['Content-Transfer-Encoding: base64'] + brk.
-		str eketsa-qetellong: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str eketsa-qetellong: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str eketsa-qetellong: brk.
-		>> max := 76.
-		>> len := blob bolelele.
-		>> chunks := (len / max) nyolla-palo.
+	khoele-ea-mongolo eketsa-qetellong: (uena hlooho: ['Subject: '] + ea-hao sehlooho) + khefutso-ea-mola.
+	khoele-ea-mongolo eketsa-qetellong: ['MIME-Version: 1.0'] + khefutso-ea-mola.
+	khoele-ea-mongolo eketsa-qetellong: ['Content-Type: multipart/related; boundary="'] + ea-hao moeli + ['"; type=text/html'] + khefutso-ea-mola.
+	khoele-ea-mongolo eketsa-qetellong: khefutso-ea-mola.
+	khoele-ea-mongolo eketsa-qetellong: ['--'] + ea-hao moeli + khefutso-ea-mola.
+	khoele-ea-mongolo eketsa-qetellong: ['Content-Type: text/html; charset=UTF-8'] + khefutso-ea-mola.
+	khoele-ea-mongolo eketsa-qetellong: ['Content-Transfer-Encoding: 7bit'] + khefutso-ea-mola.
+	khoele-ea-mongolo eketsa-qetellong: khefutso-ea-mola.
+	khoele-ea-mongolo eketsa-qetellong: ea-hao mmele.
+	khoele-ea-mongolo eketsa-qetellong: khefutso-ea-mola.
+	ea-hao lihokelo e-ngoe-le-e-ngoe: { :id :tlhahisoleseling
+		>> blob := tlhahisoleseling data.
+		khoele-ea-mongolo eketsa-qetellong: ['--'] + ea-hao moeli + khefutso-ea-mola.
+		khoele-ea-mongolo eketsa-qetellong: ['Content-Type: '] + tlhahisoleseling mime + khefutso-ea-mola.
+		khoele-ea-mongolo eketsa-qetellong: ['Content-Transfer-Encoding: base64'] + khefutso-ea-mola.
+		khoele-ea-mongolo eketsa-qetellong: ['Content-ID: <attachment'] + id + ['>'] + khefutso-ea-mola.
+		khoele-ea-mongolo eketsa-qetellong: ['Content-Disposition: inline; filename="'] + tlhahisoleseling faele-ea-seboka + ['"'] + khefutso-ea-mola.
+		khoele-ea-mongolo eketsa-qetellong: khefutso-ea-mola.
+		>> boholo-ka-ho-fetisisa := 76.
+		>> bolelele-ba-mongolo := blob bolelele.
+		>> likarolo-nyane := (bolelele-ba-mongolo / boholo-ka-ho-fetisisa) nyolla-palo.
 		{ :i
-			>> chunk := blob kopitsa ho-tloha: i * max bolelele: max.
-			str eketsa-qetellong: chunk + brk.
-		} * chunks.
-		str eketsa-qetellong: brk.
-		str eketsa-qetellong: brk.
+			>> karolo-nyane := blob kopitsa ho-tloha: i * boholo-ka-ho-fetisisa bolelele: boholo-ka-ho-fetisisa.
+			khoele-ea-mongolo eketsa-qetellong: karolo-nyane + khefutso-ea-mola.
+		} * likarolo-nyane.
+		khoele-ea-mongolo eketsa-qetellong: khefutso-ea-mola.
+		khoele-ea-mongolo eketsa-qetellong: khefutso-ea-mola.
 	}.
-	str eketsa-qetellong: ['--'] + ea-hao boundary + ['--'] + brk. <- str.
+	khoele-ea-mongolo eketsa-qetellong: ['--'] + ea-hao moeli + ['--'] + khefutso-ea-mola. <- khoele-ea-mongolo.
 }.

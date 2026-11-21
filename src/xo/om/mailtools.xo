@@ -1,128 +1,128 @@
->> Email := Wanta haaraa.
+>> Imeelii := Wanta haaraa.
 
-Email irratti: ['init'] godhi: {
-	koo recipients := Tarree-wantootaa haaraa.
+Imeelii irratti: ['qopheessi'] godhi: {
+	koo fudhattoota := Tarree-wantootaa haaraa.
 	koo cc := Tarree-wantootaa haaraa.
 	koo bcc := Tarree-wantootaa haaraa.
-	koo from := Homaa.
-	koo from-name := Homaa.
-	koo subject := Homaa.
-	koo body := Homaa.
+	koo ergituu := Homaa.
+	koo maqaa-ergituu := Homaa.
+	koo mata-duree := Homaa.
+	koo qaama := Homaa.
 }.
 
-Email irratti: ['haaraa'] godhi: { <- ofii haaraa init.
+Imeelii irratti: ['haaraa'] godhi: { <- ofii haaraa qopheessi.
 }.
 
-Email irratti: ['to:'] godhi: { :list
-	koo recipients := list.
+Imeelii irratti: ['gara:'] godhi: { :tarreessuu
+	koo fudhattoota := tarreessuu.
 }.
  
-Email irratti: ['cc:'] godhi: { :list
-	koo cc := list.
+Imeelii irratti: ['cc:'] godhi: { :tarreessuu
+	koo cc := tarreessuu.
 }.
 
-Email irratti: ['bcc:'] godhi: { :list
-	koo bcc := list.
+Imeelii irratti: ['bcc:'] godhi: { :tarreessuu
+	koo bcc := tarreessuu.
 }.
 
-Email irratti: ['subject:'] godhi: { :subject
-	koo subject := subject.
+Imeelii irratti: ['mata-duree:'] godhi: { :mata-duree
+	koo mata-duree := mata-duree.
 }.
 
-Email irratti: ['from:name:'] godhi: { :from :maqaa
-	koo from := from.
-	koo from-name := maqaa.
+Imeelii irratti: ['ergituu:maqaa:'] godhi: { :ergituu :maqaa
+	koo ergituu := ergituu.
+	koo maqaa-ergituu := maqaa.
 }.
 
-Email irratti: ['body:'] godhi: { :body
-	koo body := body.
+Imeelii irratti: ['qaama:'] godhi: { :qaama
+	koo qaama := qaama.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email irratti: ['header:'] godhi: { :line <- line bakka-buusi: ['\r'] tiin: [''], bakka-buusi: ['\n'] tiin: [''].
+Imeelii irratti: ['mataa:'] godhi: { :sarara <- sarara bakka-buusi: ['\r'] tiin: [''], bakka-buusi: ['\n'] tiin: [''].
 }.
 
-Email irratti: ['send'] godhi: {
-	>> f := Faayila tempwrite: ofii generate.
+Imeelii irratti: ['ergi'] godhi: {
+	>> f := Faayila tempwrite: ofii uumi.
 	Sagantaa shelli: ['sendmail -t < '] + f karaa, dhaabi.
 }.
 
-Email irratti: ['generate'] godhi: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str dabaliboodatti: (ofii header: ['From: '] + koo from-name + [' <'] + ( koo from ) + ['>']) + brk.
-	str dabaliboodatti: (ofii header: ['To: '] + ( koo recipients waliingalchi: [','] )) + brk.
+Imeelii irratti: ['uumi'] godhi: {
+	>> cita-sararaa := ['\r\n'].
+	>> tarree-barreeffamaa := [''].
+	tarree-barreeffamaa dabaliboodatti: (ofii mataa: ['From: '] + koo maqaa-ergituu + [' <'] + ( koo ergituu ) + ['>']) + cita-sararaa.
+	tarree-barreeffamaa dabaliboodatti: (ofii mataa: ['To: '] + ( koo fudhattoota waliingalchi: [','] )) + cita-sararaa.
 	koo cc lakkaaʼi yoodhugaa: {
-		str dabaliboodatti: (ofii header: ['Cc: '] + ( koo cc waliingalchi: [','] )) + brk.
+		tarree-barreeffamaa dabaliboodatti: (ofii mataa: ['Cc: '] + ( koo cc waliingalchi: [','] )) + cita-sararaa.
 	}.
 	koo bcc lakkaaʼi yoodhugaa: {
-		str dabaliboodatti: (ofii header: ['Bcc: '] + ( koo bcc waliingalchi: [','] )) + brk.
+		tarree-barreeffamaa dabaliboodatti: (ofii mataa: ['Bcc: '] + ( koo bcc waliingalchi: [','] )) + cita-sararaa.
 	}.
-	str dabaliboodatti: (ofii header: ['Subject: '] + koo subject) + brk.
-	str dabaliboodatti: brk.
-	str dabaliboodatti: koo body.
-	str dabaliboodatti: brk. <- str.
+	tarree-barreeffamaa dabaliboodatti: (ofii mataa: ['Subject: '] + koo mata-duree) + cita-sararaa.
+	tarree-barreeffamaa dabaliboodatti: cita-sararaa.
+	tarree-barreeffamaa dabaliboodatti: koo qaama.
+	tarree-barreeffamaa dabaliboodatti: cita-sararaa. <- tarree-barreeffamaa.
 }.
 
->> HTML-Email := Email haaraa.
+>> Imeelii-HTML := Imeelii haaraa.
 
-HTML-Email irratti: ['init'] godhi: {
-	ofii init.
-	koo attachments := Tarree-wantootaa haaraa.
-	koo boundary := Kuusaa-nageenyaa token: 40.
+Imeelii-HTML irratti: ['qopheessi'] godhi: {
+	ofii qopheessi.
+	koo maxxansaalee := Tarree-wantootaa haaraa.
+	koo daangaa := Kuusaa-nageenyaa token: 40.
 }.
 
-HTML-Email irratti: ['attach:'] godhi: { :file
-	>> id := koo attachments lakkaaʼi.
-	>> blob := file blob.
-	koo attachments dabaliboodatti: (
+Imeelii-HTML irratti: ['maxxansi:'] godhi: { :faayilii-marii
+	>> id := koo maxxansaalee lakkaaʼi.
+	>> blob := faayilii-marii blob.
+	koo maxxansaalee dabaliboodatti: (
 		Galmee-jechootaa haaraa
-			file: file karaa,
-			mime: ['image/'] + (Server mimetype: file karaa),
-			data: blob base64-koodessi
+			faayilii-marii: faayilii-marii karaa,
+			mime: ['image/'] + (Server mimetype: faayilii-marii karaa),
+			daataa: blob base64-koodessi
 	).
 	blob gadi-lakkisi. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email irratti: ['generate'] godhi: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str dabaliboodatti: (ofii header: ['From: '] + koo from-name + [' <'] + ( koo from ) + ['>']) + brk.
-	str dabaliboodatti: (ofii header: ['To: '] + ( koo recipients waliingalchi: [','] )) + brk.
+Imeelii-HTML irratti: ['uumi'] godhi: {
+	>> cita-sararaa := ['\r\n'].
+	>> tarree-barreeffamaa := [''].
+	tarree-barreeffamaa dabaliboodatti: (ofii mataa: ['From: '] + koo maqaa-ergituu + [' <'] + ( koo ergituu ) + ['>']) + cita-sararaa.
+	tarree-barreeffamaa dabaliboodatti: (ofii mataa: ['To: '] + ( koo fudhattoota waliingalchi: [','] )) + cita-sararaa.
 	koo cc lakkaaʼi yoodhugaa: {
-		str dabaliboodatti: (ofii header: ['Cc: '] + ( koo cc waliingalchi: [','] )) + brk.
+		tarree-barreeffamaa dabaliboodatti: (ofii mataa: ['Cc: '] + ( koo cc waliingalchi: [','] )) + cita-sararaa.
 	}.
 	koo bcc lakkaaʼi yoodhugaa: {
-		str dabaliboodatti: (ofii header: ['Bcc: '] + ( koo bcc waliingalchi: [','] )) + brk.
+		tarree-barreeffamaa dabaliboodatti: (ofii mataa: ['Bcc: '] + ( koo bcc waliingalchi: [','] )) + cita-sararaa.
 	}.
-	str dabaliboodatti: (ofii header: ['Subject: '] + koo subject) + brk.
-	str dabaliboodatti: ['MIME-Version: 1.0'] + brk.
-	str dabaliboodatti: ['Content-Type: multipart/related; boundary="'] + koo boundary + ['"; type=text/html'] + brk.
-	str dabaliboodatti: brk.
-	str dabaliboodatti: ['--'] + koo boundary + brk.
-	str dabaliboodatti: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str dabaliboodatti: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str dabaliboodatti: brk.
-	str dabaliboodatti: koo body.
-	str dabaliboodatti: brk.
-	koo attachments hundaaf: { :id :info
-		>> blob := info data.
-		str dabaliboodatti: ['--'] + koo boundary + brk.
-		str dabaliboodatti: ['Content-Type: '] + info mime + brk.
-		str dabaliboodatti: ['Content-Transfer-Encoding: base64'] + brk.
-		str dabaliboodatti: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str dabaliboodatti: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str dabaliboodatti: brk.
-		>> max := 76.
-		>> len := blob dheerina.
-		>> chunks := (len / max) oli.
+	tarree-barreeffamaa dabaliboodatti: (ofii mataa: ['Subject: '] + koo mata-duree) + cita-sararaa.
+	tarree-barreeffamaa dabaliboodatti: ['MIME-Version: 1.0'] + cita-sararaa.
+	tarree-barreeffamaa dabaliboodatti: ['Content-Type: multipart/related; boundary="'] + koo daangaa + ['"; type=text/html'] + cita-sararaa.
+	tarree-barreeffamaa dabaliboodatti: cita-sararaa.
+	tarree-barreeffamaa dabaliboodatti: ['--'] + koo daangaa + cita-sararaa.
+	tarree-barreeffamaa dabaliboodatti: ['Content-Type: text/html; charset=UTF-8'] + cita-sararaa.
+	tarree-barreeffamaa dabaliboodatti: ['Content-Transfer-Encoding: 7bit'] + cita-sararaa.
+	tarree-barreeffamaa dabaliboodatti: cita-sararaa.
+	tarree-barreeffamaa dabaliboodatti: koo qaama.
+	tarree-barreeffamaa dabaliboodatti: cita-sararaa.
+	koo maxxansaalee hundaaf: { :id :odeeffannoo
+		>> blob := odeeffannoo daataa.
+		tarree-barreeffamaa dabaliboodatti: ['--'] + koo daangaa + cita-sararaa.
+		tarree-barreeffamaa dabaliboodatti: ['Content-Type: '] + odeeffannoo mime + cita-sararaa.
+		tarree-barreeffamaa dabaliboodatti: ['Content-Transfer-Encoding: base64'] + cita-sararaa.
+		tarree-barreeffamaa dabaliboodatti: ['Content-ID: <attachment'] + id + ['>'] + cita-sararaa.
+		tarree-barreeffamaa dabaliboodatti: ['Content-Disposition: inline; filename="'] + odeeffannoo faayilii-marii + ['"'] + cita-sararaa.
+		tarree-barreeffamaa dabaliboodatti: cita-sararaa.
+		>> olaanaa := 76.
+		>> dheerina-barreeffamaa := blob dheerina.
+		>> kutaalee-xiqqaa := (dheerina-barreeffamaa / olaanaa) oli.
 		{ :i
-			>> chunk := blob kopii irraa: i * max dheerina: max.
-			str dabaliboodatti: chunk + brk.
-		} * chunks.
-		str dabaliboodatti: brk.
-		str dabaliboodatti: brk.
+			>> kutaa-xiqqaa := blob kopii irraa: i * olaanaa dheerina: olaanaa.
+			tarree-barreeffamaa dabaliboodatti: kutaa-xiqqaa + cita-sararaa.
+		} * kutaalee-xiqqaa.
+		tarree-barreeffamaa dabaliboodatti: cita-sararaa.
+		tarree-barreeffamaa dabaliboodatti: cita-sararaa.
 	}.
-	str dabaliboodatti: ['--'] + koo boundary + ['--'] + brk. <- str.
+	tarree-barreeffamaa dabaliboodatti: ['--'] + koo daangaa + ['--'] + cita-sararaa. <- tarree-barreeffamaa.
 }.

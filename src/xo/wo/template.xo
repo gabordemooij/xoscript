@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Denc xees.
+>> Royukaay := Denc xees.
 
-Template bu: ['xees'] def: { <- man xees content: [''].
+Royukaay bu: ['xees'] def: { <- man xees li-ci-biir: [''].
 }.
 
-Template bu: ['content:'] def: { :content
-	sama content := content. 
+Royukaay bu: ['li-ci-biir:'] def: { :li-ci-biir
+	sama li-ci-biir := li-ci-biir. 
 }.
 
-Template bu: ['xees:'] def: { :content <- man xees content: content.
+Royukaay bu: ['xees:'] def: { :li-ci-biir <- man xees li-ci-biir: li-ci-biir.
 }.
 
-Template bu: ['cut:'] def: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := sama content xaaj: startmarker.
-	>> prefix := parts njëkk.
-	>> parts2 := parts mujj xaaj: endmarker.
-	>> suffix := parts2 mujj.
-	>> part := parts2 njëkk.
-	>> rest := prefix + suffix.
-	sama content := rest. <- Template xees: part.
+Royukaay bu: ['dog:'] def: { :màndarga
+	>> màndarga-tàmbali := (['<!-- cut:%id% -->'] %id%: màndarga).
+	>> màndarga-mujj := (['<!-- /cut:%id% -->'] %id%: màndarga).
+	>> pàcc-yi := sama li-ci-biir xaaj: màndarga-tàmbali.
+	>> njëkkaay := pàcc-yi njëkk.
+	>> pàcc-yi2 := pàcc-yi mujj xaaj: màndarga-mujj.
+	>> mujjaay := pàcc-yi2 mujj.
+	>> pàcc := pàcc-yi2 njëkk.
+	>> des := njëkkaay + mujjaay.
+	sama li-ci-biir := des. <- Royukaay xees: pàcc.
 	
 }.
 
-Template bu: ['duppitu'] def: { <- man xees: man mbind duppitu.
+Royukaay bu: ['duppitu'] def: { <- man xees: man mbind duppitu.
 }.
 	
-Template bu: ['paste:at:'] def: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	sama content wuutal: pastemarker ci: ( snippet mbind + pastemarker ).
+Royukaay bu: ['tapp:ci:'] def: { :tuuti-mbind :id
+	>> màndarga-tapp := (['<!-- paste:%id% -->'] %id%: id).
+	sama li-ci-biir wuutal: màndarga-tapp ci: ( tuuti-mbind mbind + màndarga-tapp ).
 }.
 
-Template bu: ['denc:njëg:'] def: { :slot :value
-	sama content wuutal: ['<!-- slot:'] + slot + [' -->'] ci: ( Server html-koode: value ).
+Royukaay bu: ['denc:njëg:'] def: { :barab :njëg
+	sama li-ci-biir wuutal: ['<!-- slot:'] + barab + [' -->'] ci: ( Server html-koode: njëg ).
 }.
 
-Template bu: ['set:html:'] def: { :slot :html
-	sama content wuutal: ['<!-- slot:'] + slot + [' -->'] ci: html.
+Royukaay bu: ['denc:html:'] def: { :barab :html
+	sama li-ci-biir wuutal: ['<!-- slot:'] + barab + [' -->'] ci: html.
 }.
 
-Template bu: ['tontu:ak:'] def: { :slot :value
-	man denc: (slot dale: 0 guddaay: (slot guddaay - 1)) njëg: value.
+Royukaay bu: ['tontu:ak:'] def: { :barab :njëg
+	man denc: (barab dale: 0 guddaay: (barab guddaay - 1)) njëg: njëg.
 }.
 
-Template bu: ['nl2br'] def: {
-	sama content wuutal: ['\n'] ci: ['<br>'].
+Royukaay bu: ['nl2br'] def: {
+	sama li-ci-biir wuutal: ['\n'] ci: ['<br>'].
 }.
 
-Template bu: ['clean'] def: {
-	sama content :=
+Royukaay bu: ['setal'] def: {
+	sama li-ci-biir :=
 		Nataal-seet
 		xees: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		méngoo: sama content
+		méngoo: sama li-ci-biir
 		def: { <- ['']. }.
 }.
 
-Template bu: ['clean-cuts'] def: {
-	>> items := Jokkalante xees.
+Royukaay bu: ['setal-dog-yi'] def: {
+	>> lëf-yi := Jokkalante xees.
 	Nataal-seet
 	xees: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	méngoo: sama content
-	def: { :_ :part
-		items yokk-ci-mujj: part ? 1.
+	méngoo: sama li-ci-biir
+	def: { :_ :pàcc
+		lëf-yi yokk-ci-mujj: pàcc ? 1.
 	}.
-	items kenn-ci-kenn: { :_ :id
-		sama content :=
+	lëf-yi kenn-ci-kenn: { :_ :id
+		sama li-ci-biir :=
 			Nataal-seet xees: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			méngoo: sama content
+			méngoo: sama li-ci-biir
 			def: { <- ['']. }.
 	 }.
 }.
 
-Template bu: ['clean-space'] def: {
-	sama content :=
+Royukaay bu: ['setal-barab-yu-wéer'] def: {
+	sama li-ci-biir :=
 		Nataal-seet
 		xees: ['\\s*\\n'],
-		méngoo: sama content
+		méngoo: sama li-ci-biir
 		def: { <- ['\n']. }.
-	sama content :=
+	sama li-ci-biir :=
 		Nataal-seet
 		xees: ['\\n[\\s\\t]+'],
-		méngoo: sama content
+		méngoo: sama li-ci-biir
 		def: { <- ['\n']. }.
 }.
 
-Template bu: ['clean-all'] def: {
-	man clean.
-	man clean-cuts.
-	man clean-space.
+Royukaay bu: ['setal-lépp'] def: {
+	man setal.
+	man setal-dog-yi.
+	man setal-barab-yu-wéer.
 }.
 
-Template bu: ['mbind'] def: { <- sama content.
+Royukaay bu: ['mbind'] def: { <- sama li-ci-biir.
 }.

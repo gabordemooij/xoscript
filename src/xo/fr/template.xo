@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objet nouveau.
+>> Modèle := Objet nouveau.
 
-Template quand: ['nouveau'] faire: { <- soi nouveau content: [''].
+Modèle quand: ['nouveau'] faire: { <- soi nouveau contenu: [''].
 }.
 
-Template quand: ['content:'] faire: { :content
-	propre content := content. 
+Modèle quand: ['contenu:'] faire: { :contenu
+	propre contenu := contenu. 
 }.
 
-Template quand: ['nouveau:'] faire: { :content <- soi nouveau content: content.
+Modèle quand: ['nouveau:'] faire: { :contenu <- soi nouveau contenu: contenu.
 }.
 
-Template quand: ['cut:'] faire: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := propre content diviser: startmarker.
-	>> prefix := parts premier.
-	>> parts2 := parts dernier diviser: endmarker.
-	>> suffix := parts2 dernier.
-	>> part := parts2 premier.
-	>> rest := prefix + suffix.
-	propre content := rest. <- Template nouveau: part.
+Modèle quand: ['couper:'] faire: { :marqueur
+	>> marqueur-début := (['<!-- cut:%id% -->'] %id%: marqueur).
+	>> marqueur-fin := (['<!-- /cut:%id% -->'] %id%: marqueur).
+	>> parties := propre contenu diviser: marqueur-début.
+	>> préfixe := parties premier.
+	>> parties2 := parties dernier diviser: marqueur-fin.
+	>> suffixe := parties2 dernier.
+	>> partie := parties2 premier.
+	>> reste := préfixe + suffixe.
+	propre contenu := reste. <- Modèle nouveau: partie.
 	
 }.
 
-Template quand: ['copier'] faire: { <- soi nouveau: soi texte copier.
+Modèle quand: ['copier'] faire: { <- soi nouveau: soi texte copier.
 }.
 	
-Template quand: ['paste:at:'] faire: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	propre content remplacer: pastemarker par: ( snippet texte + pastemarker ).
+Modèle quand: ['coller:à:'] faire: { :extrait :id
+	>> marqueur-collage := (['<!-- paste:%id% -->'] %id%: id).
+	propre contenu remplacer: marqueur-collage par: ( extrait texte + marqueur-collage ).
 }.
 
-Template quand: ['donner:valeur:'] faire: { :slot :value
-	propre content remplacer: ['<!-- slot:'] + slot + [' -->'] par: ( Server html-encoder: value ).
+Modèle quand: ['donner:valeur:'] faire: { :emplacement :valeur
+	propre contenu remplacer: ['<!-- slot:'] + emplacement + [' -->'] par: ( Server html-encoder: valeur ).
 }.
 
-Template quand: ['set:html:'] faire: { :slot :html
-	propre content remplacer: ['<!-- slot:'] + slot + [' -->'] par: html.
+Modèle quand: ['donner:html:'] faire: { :emplacement :html
+	propre contenu remplacer: ['<!-- slot:'] + emplacement + [' -->'] par: html.
 }.
 
-Template quand: ['répondre:et:'] faire: { :slot :value
-	soi donner: (slot de: 0 longueur: (slot longueur - 1)) valeur: value.
+Modèle quand: ['répondre:et:'] faire: { :emplacement :valeur
+	soi donner: (emplacement de: 0 longueur: (emplacement longueur - 1)) valeur: valeur.
 }.
 
-Template quand: ['nl2br'] faire: {
-	propre content remplacer: ['\n'] par: ['<br>'].
+Modèle quand: ['nl2br'] faire: {
+	propre contenu remplacer: ['\n'] par: ['<br>'].
 }.
 
-Template quand: ['clean'] faire: {
-	propre content :=
+Modèle quand: ['purger'] faire: {
+	propre contenu :=
 		Motif
 		nouveau: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		correspondance: propre content
+		correspondance: propre contenu
 		faire: { <- ['']. }.
 }.
 
-Template quand: ['clean-cuts'] faire: {
-	>> items := Liste nouveau.
+Modèle quand: ['purger-coupes'] faire: {
+	>> éléments := Liste nouveau.
 	Motif
 	nouveau: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	correspondance: propre content
-	faire: { :_ :part
-		items ajouter: part ? 1.
+	correspondance: propre contenu
+	faire: { :_ :partie
+		éléments ajouter: partie ? 1.
 	}.
-	items chaque: { :_ :id
-		propre content :=
+	éléments chaque: { :_ :id
+		propre contenu :=
 			Motif nouveau: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			correspondance: propre content
+			correspondance: propre contenu
 			faire: { <- ['']. }.
 	 }.
 }.
 
-Template quand: ['clean-space'] faire: {
-	propre content :=
+Modèle quand: ['purger-espaces'] faire: {
+	propre contenu :=
 		Motif
 		nouveau: ['\\s*\\n'],
-		correspondance: propre content
+		correspondance: propre contenu
 		faire: { <- ['\n']. }.
-	propre content :=
+	propre contenu :=
 		Motif
 		nouveau: ['\\n[\\s\\t]+'],
-		correspondance: propre content
+		correspondance: propre contenu
 		faire: { <- ['\n']. }.
 }.
 
-Template quand: ['clean-all'] faire: {
-	soi clean.
-	soi clean-cuts.
-	soi clean-space.
+Modèle quand: ['tout-purger'] faire: {
+	soi purger.
+	soi purger-coupes.
+	soi purger-espaces.
 }.
 
-Template quand: ['texte'] faire: { <- propre content.
+Modèle quand: ['texte'] faire: { <- propre contenu.
 }.

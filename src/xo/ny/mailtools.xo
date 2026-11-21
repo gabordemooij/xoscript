@@ -1,128 +1,128 @@
->> Email := Chinthu chatsopano.
+>> Imelo := Chinthu chatsopano.
 
-Email chikafika: ['init'] chitani: {
-	zake recipients := Mndandanda chatsopano.
+Imelo chikafika: ['konzekera'] chitani: {
+	zake olandira := Mndandanda chatsopano.
 	zake cc := Mndandanda chatsopano.
 	zake bcc := Mndandanda chatsopano.
-	zake from := Palibe.
-	zake from-name := Palibe.
-	zake subject := Palibe.
-	zake body := Palibe.
+	zake wotumiza := Palibe.
+	zake dzina-la-wotumiza := Palibe.
+	zake nkhani := Palibe.
+	zake thupi := Palibe.
 }.
 
-Email chikafika: ['chatsopano'] chitani: { <- wekha chatsopano init.
+Imelo chikafika: ['chatsopano'] chitani: { <- wekha chatsopano konzekera.
 }.
 
-Email chikafika: ['to:'] chitani: { :list
-	zake recipients := list.
+Imelo chikafika: ['kwa:'] chitani: { :kulemba-mndandanda
+	zake olandira := kulemba-mndandanda.
 }.
  
-Email chikafika: ['cc:'] chitani: { :list
-	zake cc := list.
+Imelo chikafika: ['cc:'] chitani: { :kulemba-mndandanda
+	zake cc := kulemba-mndandanda.
 }.
 
-Email chikafika: ['bcc:'] chitani: { :list
-	zake bcc := list.
+Imelo chikafika: ['bcc:'] chitani: { :kulemba-mndandanda
+	zake bcc := kulemba-mndandanda.
 }.
 
-Email chikafika: ['subject:'] chitani: { :subject
-	zake subject := subject.
+Imelo chikafika: ['nkhani:'] chitani: { :nkhani
+	zake nkhani := nkhani.
 }.
 
-Email chikafika: ['from:name:'] chitani: { :from :dzina
-	zake from := from.
-	zake from-name := dzina.
+Imelo chikafika: ['wotumiza:dzina:'] chitani: { :wotumiza :dzina
+	zake wotumiza := wotumiza.
+	zake dzina-la-wotumiza := dzina.
 }.
 
-Email chikafika: ['body:'] chitani: { :body
-	zake body := body.
+Imelo chikafika: ['thupi:'] chitani: { :thupi
+	zake thupi := thupi.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email chikafika: ['header:'] chitani: { :line <- line sinthani: ['\r'] ndi: [''], sinthani: ['\n'] ndi: [''].
+Imelo chikafika: ['mutu:'] chitani: { :mzere <- mzere sinthani: ['\r'] ndi: [''], sinthani: ['\n'] ndi: [''].
 }.
 
-Email chikafika: ['send'] chitani: {
-	>> f := Fayilo tempwrite: wekha generate.
+Imelo chikafika: ['tumiza'] chitani: {
+	>> f := Fayilo tempwrite: wekha pangani.
 	Pulogalamu dongosolo-la-makina: ['sendmail -t < '] + f njira-ya-fayilo, mzere-watsopano.
 }.
 
-Email chikafika: ['generate'] chitani: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str onjeza-kumapeto: (wekha header: ['From: '] + zake from-name + [' <'] + ( zake from ) + ['>']) + brk.
-	str onjeza-kumapeto: (wekha header: ['To: '] + ( zake recipients lumikiza: [','] )) + brk.
+Imelo chikafika: ['pangani'] chitani: {
+	>> kuswa-mzere := ['\r\n'].
+	>> mndandanda-wa-mawu := [''].
+	mndandanda-wa-mawu onjeza-kumapeto: (wekha mutu: ['From: '] + zake dzina-la-wotumiza + [' <'] + ( zake wotumiza ) + ['>']) + kuswa-mzere.
+	mndandanda-wa-mawu onjeza-kumapeto: (wekha mutu: ['To: '] + ( zake olandira lumikiza: [','] )) + kuswa-mzere.
 	zake cc chiwerengero-cha-zinthu zoona: {
-		str onjeza-kumapeto: (wekha header: ['Cc: '] + ( zake cc lumikiza: [','] )) + brk.
+		mndandanda-wa-mawu onjeza-kumapeto: (wekha mutu: ['Cc: '] + ( zake cc lumikiza: [','] )) + kuswa-mzere.
 	}.
 	zake bcc chiwerengero-cha-zinthu zoona: {
-		str onjeza-kumapeto: (wekha header: ['Bcc: '] + ( zake bcc lumikiza: [','] )) + brk.
+		mndandanda-wa-mawu onjeza-kumapeto: (wekha mutu: ['Bcc: '] + ( zake bcc lumikiza: [','] )) + kuswa-mzere.
 	}.
-	str onjeza-kumapeto: (wekha header: ['Subject: '] + zake subject) + brk.
-	str onjeza-kumapeto: brk.
-	str onjeza-kumapeto: zake body.
-	str onjeza-kumapeto: brk. <- str.
+	mndandanda-wa-mawu onjeza-kumapeto: (wekha mutu: ['Subject: '] + zake nkhani) + kuswa-mzere.
+	mndandanda-wa-mawu onjeza-kumapeto: kuswa-mzere.
+	mndandanda-wa-mawu onjeza-kumapeto: zake thupi.
+	mndandanda-wa-mawu onjeza-kumapeto: kuswa-mzere. <- mndandanda-wa-mawu.
 }.
 
->> HTML-Email := Email chatsopano.
+>> Imelo-HTML := Imelo chatsopano.
 
-HTML-Email chikafika: ['init'] chitani: {
-	wekha init.
-	zake attachments := Mndandanda chatsopano.
-	zake boundary := Nkhokwe-yotetezedwa token: 40.
+Imelo-HTML chikafika: ['konzekera'] chitani: {
+	wekha konzekera.
+	zake zolumikizidwa := Mndandanda chatsopano.
+	zake malire := Nkhokwe-yotetezedwa token: 40.
 }.
 
-HTML-Email chikafika: ['attach:'] chitani: { :file
-	>> id := zake attachments chiwerengero-cha-zinthu.
-	>> blob := file blob.
-	zake attachments onjeza-kumapeto: (
+Imelo-HTML chikafika: ['lumikiza-fayilo:'] chitani: { :fayilo-ya-gawo
+	>> id := zake zolumikizidwa chiwerengero-cha-zinthu.
+	>> blob := fayilo-ya-gawo blob.
+	zake zolumikizidwa onjeza-kumapeto: (
 		Mtanthauziramawu chatsopano
-			file: file njira-ya-fayilo,
-			mime: ['image/'] + (Server mimetype: file njira-ya-fayilo),
-			data: blob base64-ika-khodi
+			fayilo-ya-gawo: fayilo-ya-gawo njira-ya-fayilo,
+			mime: ['image/'] + (Server mimetype: fayilo-ya-gawo njira-ya-fayilo),
+			deta: blob base64-ika-khodi
 	).
 	blob masula. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email chikafika: ['generate'] chitani: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str onjeza-kumapeto: (wekha header: ['From: '] + zake from-name + [' <'] + ( zake from ) + ['>']) + brk.
-	str onjeza-kumapeto: (wekha header: ['To: '] + ( zake recipients lumikiza: [','] )) + brk.
+Imelo-HTML chikafika: ['pangani'] chitani: {
+	>> kuswa-mzere := ['\r\n'].
+	>> mndandanda-wa-mawu := [''].
+	mndandanda-wa-mawu onjeza-kumapeto: (wekha mutu: ['From: '] + zake dzina-la-wotumiza + [' <'] + ( zake wotumiza ) + ['>']) + kuswa-mzere.
+	mndandanda-wa-mawu onjeza-kumapeto: (wekha mutu: ['To: '] + ( zake olandira lumikiza: [','] )) + kuswa-mzere.
 	zake cc chiwerengero-cha-zinthu zoona: {
-		str onjeza-kumapeto: (wekha header: ['Cc: '] + ( zake cc lumikiza: [','] )) + brk.
+		mndandanda-wa-mawu onjeza-kumapeto: (wekha mutu: ['Cc: '] + ( zake cc lumikiza: [','] )) + kuswa-mzere.
 	}.
 	zake bcc chiwerengero-cha-zinthu zoona: {
-		str onjeza-kumapeto: (wekha header: ['Bcc: '] + ( zake bcc lumikiza: [','] )) + brk.
+		mndandanda-wa-mawu onjeza-kumapeto: (wekha mutu: ['Bcc: '] + ( zake bcc lumikiza: [','] )) + kuswa-mzere.
 	}.
-	str onjeza-kumapeto: (wekha header: ['Subject: '] + zake subject) + brk.
-	str onjeza-kumapeto: ['MIME-Version: 1.0'] + brk.
-	str onjeza-kumapeto: ['Content-Type: multipart/related; boundary="'] + zake boundary + ['"; type=text/html'] + brk.
-	str onjeza-kumapeto: brk.
-	str onjeza-kumapeto: ['--'] + zake boundary + brk.
-	str onjeza-kumapeto: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str onjeza-kumapeto: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str onjeza-kumapeto: brk.
-	str onjeza-kumapeto: zake body.
-	str onjeza-kumapeto: brk.
-	zake attachments chilichonse: { :id :info
-		>> blob := info data.
-		str onjeza-kumapeto: ['--'] + zake boundary + brk.
-		str onjeza-kumapeto: ['Content-Type: '] + info mime + brk.
-		str onjeza-kumapeto: ['Content-Transfer-Encoding: base64'] + brk.
-		str onjeza-kumapeto: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str onjeza-kumapeto: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str onjeza-kumapeto: brk.
-		>> max := 76.
-		>> len := blob kutalika.
-		>> chunks := (len / max) kweza-nambala.
+	mndandanda-wa-mawu onjeza-kumapeto: (wekha mutu: ['Subject: '] + zake nkhani) + kuswa-mzere.
+	mndandanda-wa-mawu onjeza-kumapeto: ['MIME-Version: 1.0'] + kuswa-mzere.
+	mndandanda-wa-mawu onjeza-kumapeto: ['Content-Type: multipart/related; boundary="'] + zake malire + ['"; type=text/html'] + kuswa-mzere.
+	mndandanda-wa-mawu onjeza-kumapeto: kuswa-mzere.
+	mndandanda-wa-mawu onjeza-kumapeto: ['--'] + zake malire + kuswa-mzere.
+	mndandanda-wa-mawu onjeza-kumapeto: ['Content-Type: text/html; charset=UTF-8'] + kuswa-mzere.
+	mndandanda-wa-mawu onjeza-kumapeto: ['Content-Transfer-Encoding: 7bit'] + kuswa-mzere.
+	mndandanda-wa-mawu onjeza-kumapeto: kuswa-mzere.
+	mndandanda-wa-mawu onjeza-kumapeto: zake thupi.
+	mndandanda-wa-mawu onjeza-kumapeto: kuswa-mzere.
+	zake zolumikizidwa chilichonse: { :id :zambiri
+		>> blob := zambiri deta.
+		mndandanda-wa-mawu onjeza-kumapeto: ['--'] + zake malire + kuswa-mzere.
+		mndandanda-wa-mawu onjeza-kumapeto: ['Content-Type: '] + zambiri mime + kuswa-mzere.
+		mndandanda-wa-mawu onjeza-kumapeto: ['Content-Transfer-Encoding: base64'] + kuswa-mzere.
+		mndandanda-wa-mawu onjeza-kumapeto: ['Content-ID: <attachment'] + id + ['>'] + kuswa-mzere.
+		mndandanda-wa-mawu onjeza-kumapeto: ['Content-Disposition: inline; filename="'] + zambiri fayilo-ya-gawo + ['"'] + kuswa-mzere.
+		mndandanda-wa-mawu onjeza-kumapeto: kuswa-mzere.
+		>> kwambiri := 76.
+		>> kutalika-kwa-mawu := blob kutalika.
+		>> tizidutswa := (kutalika-kwa-mawu / kwambiri) kweza-nambala.
 		{ :i
-			>> chunk := blob koperani kuchokera: i * max kutalika: max.
-			str onjeza-kumapeto: chunk + brk.
-		} * chunks.
-		str onjeza-kumapeto: brk.
-		str onjeza-kumapeto: brk.
+			>> kachidutswa := blob koperani kuchokera: i * kwambiri kutalika: kwambiri.
+			mndandanda-wa-mawu onjeza-kumapeto: kachidutswa + kuswa-mzere.
+		} * tizidutswa.
+		mndandanda-wa-mawu onjeza-kumapeto: kuswa-mzere.
+		mndandanda-wa-mawu onjeza-kumapeto: kuswa-mzere.
 	}.
-	str onjeza-kumapeto: ['--'] + zake boundary + ['--'] + brk. <- str.
+	mndandanda-wa-mawu onjeza-kumapeto: ['--'] + zake malire + ['--'] + kuswa-mzere. <- mndandanda-wa-mawu.
 }.

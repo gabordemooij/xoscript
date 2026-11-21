@@ -1,128 +1,128 @@
->> Email := Olio uusi.
+>> Sähköposti := Olio uusi.
 
-Email kun: ['init'] tee: {
-	oma recipients := Lista uusi.
+Sähköposti kun: ['valmistele'] tee: {
+	oma vastaanottajat := Lista uusi.
 	oma cc := Lista uusi.
 	oma bcc := Lista uusi.
-	oma from := Tyhjä.
-	oma from-name := Tyhjä.
-	oma subject := Tyhjä.
-	oma body := Tyhjä.
+	oma lähettäjä := Tyhjä.
+	oma lähettäjän-nimi := Tyhjä.
+	oma aihe := Tyhjä.
+	oma viestiteksti := Tyhjä.
 }.
 
-Email kun: ['uusi'] tee: { <- itse uusi init.
+Sähköposti kun: ['uusi'] tee: { <- itse uusi valmistele.
 }.
 
-Email kun: ['to:'] tee: { :list
-	oma recipients := list.
+Sähköposti kun: ['vastaanottaja:'] tee: { :luettelo
+	oma vastaanottajat := luettelo.
 }.
  
-Email kun: ['cc:'] tee: { :list
-	oma cc := list.
+Sähköposti kun: ['cc:'] tee: { :luettelo
+	oma cc := luettelo.
 }.
 
-Email kun: ['bcc:'] tee: { :list
-	oma bcc := list.
+Sähköposti kun: ['bcc:'] tee: { :luettelo
+	oma bcc := luettelo.
 }.
 
-Email kun: ['subject:'] tee: { :subject
-	oma subject := subject.
+Sähköposti kun: ['aihe:'] tee: { :aihe
+	oma aihe := aihe.
 }.
 
-Email kun: ['from:name:'] tee: { :from :nimi
-	oma from := from.
-	oma from-name := nimi.
+Sähköposti kun: ['lähettäjä:nimi:'] tee: { :lähettäjä :nimi
+	oma lähettäjä := lähettäjä.
+	oma lähettäjän-nimi := nimi.
 }.
 
-Email kun: ['body:'] tee: { :body
-	oma body := body.
+Sähköposti kun: ['viestiteksti:'] tee: { :viestiteksti
+	oma viestiteksti := viestiteksti.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email kun: ['header:'] tee: { :line <- line korvaa: ['\r'] arvolla: [''], korvaa: ['\n'] arvolla: [''].
+Sähköposti kun: ['otsake:'] tee: { :rivi <- rivi korvaa: ['\r'] arvolla: [''], korvaa: ['\n'] arvolla: [''].
 }.
 
-Email kun: ['send'] tee: {
-	>> f := Tiedosto tempwrite: itse generate.
+Sähköposti kun: ['lähetä'] tee: {
+	>> f := Tiedosto tempwrite: itse luo.
 	Ohjelma järjestelmä: ['sendmail -t < '] + f polku, rivinvaihto.
 }.
 
-Email kun: ['generate'] tee: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str lisää-loppuun: (itse header: ['From: '] + oma from-name + [' <'] + ( oma from ) + ['>']) + brk.
-	str lisää-loppuun: (itse header: ['To: '] + ( oma recipients yhdistä: [','] )) + brk.
+Sähköposti kun: ['luo'] tee: {
+	>> crlf := ['\r\n'].
+	>> merkkijono := [''].
+	merkkijono lisää-loppuun: (itse otsake: ['From: '] + oma lähettäjän-nimi + [' <'] + ( oma lähettäjä ) + ['>']) + crlf.
+	merkkijono lisää-loppuun: (itse otsake: ['To: '] + ( oma vastaanottajat yhdistä: [','] )) + crlf.
 	oma cc lukumäärä tosi: {
-		str lisää-loppuun: (itse header: ['Cc: '] + ( oma cc yhdistä: [','] )) + brk.
+		merkkijono lisää-loppuun: (itse otsake: ['Cc: '] + ( oma cc yhdistä: [','] )) + crlf.
 	}.
 	oma bcc lukumäärä tosi: {
-		str lisää-loppuun: (itse header: ['Bcc: '] + ( oma bcc yhdistä: [','] )) + brk.
+		merkkijono lisää-loppuun: (itse otsake: ['Bcc: '] + ( oma bcc yhdistä: [','] )) + crlf.
 	}.
-	str lisää-loppuun: (itse header: ['Subject: '] + oma subject) + brk.
-	str lisää-loppuun: brk.
-	str lisää-loppuun: oma body.
-	str lisää-loppuun: brk. <- str.
+	merkkijono lisää-loppuun: (itse otsake: ['Subject: '] + oma aihe) + crlf.
+	merkkijono lisää-loppuun: crlf.
+	merkkijono lisää-loppuun: oma viestiteksti.
+	merkkijono lisää-loppuun: crlf. <- merkkijono.
 }.
 
->> HTML-Email := Email uusi.
+>> HTML-Sähköposti := Sähköposti uusi.
 
-HTML-Email kun: ['init'] tee: {
-	itse init.
-	oma attachments := Lista uusi.
-	oma boundary := Holvi tunniste: 40.
+HTML-Sähköposti kun: ['valmistele'] tee: {
+	itse valmistele.
+	oma liitteet := Lista uusi.
+	oma raja := Holvi tunniste: 40.
 }.
 
-HTML-Email kun: ['attach:'] tee: { :file
-	>> id := oma attachments lukumäärä.
-	>> blob := file blob.
-	oma attachments lisää-loppuun: (
+HTML-Sähköposti kun: ['liitä:'] tee: { :tiedosto
+	>> id := oma liitteet lukumäärä.
+	>> blob := tiedosto blob.
+	oma liitteet lisää-loppuun: (
 		Sanakirja uusi
-			file: file polku,
-			mime: ['image/'] + (Server mimetype: file polku),
+			tiedosto: tiedosto polku,
+			mime: ['image/'] + (Server mimetype: tiedosto polku),
 			data: blob base64-koodaa
 	).
 	blob vapauta. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email kun: ['generate'] tee: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str lisää-loppuun: (itse header: ['From: '] + oma from-name + [' <'] + ( oma from ) + ['>']) + brk.
-	str lisää-loppuun: (itse header: ['To: '] + ( oma recipients yhdistä: [','] )) + brk.
+HTML-Sähköposti kun: ['luo'] tee: {
+	>> crlf := ['\r\n'].
+	>> merkkijono := [''].
+	merkkijono lisää-loppuun: (itse otsake: ['From: '] + oma lähettäjän-nimi + [' <'] + ( oma lähettäjä ) + ['>']) + crlf.
+	merkkijono lisää-loppuun: (itse otsake: ['To: '] + ( oma vastaanottajat yhdistä: [','] )) + crlf.
 	oma cc lukumäärä tosi: {
-		str lisää-loppuun: (itse header: ['Cc: '] + ( oma cc yhdistä: [','] )) + brk.
+		merkkijono lisää-loppuun: (itse otsake: ['Cc: '] + ( oma cc yhdistä: [','] )) + crlf.
 	}.
 	oma bcc lukumäärä tosi: {
-		str lisää-loppuun: (itse header: ['Bcc: '] + ( oma bcc yhdistä: [','] )) + brk.
+		merkkijono lisää-loppuun: (itse otsake: ['Bcc: '] + ( oma bcc yhdistä: [','] )) + crlf.
 	}.
-	str lisää-loppuun: (itse header: ['Subject: '] + oma subject) + brk.
-	str lisää-loppuun: ['MIME-Version: 1.0'] + brk.
-	str lisää-loppuun: ['Content-Type: multipart/related; boundary="'] + oma boundary + ['"; type=text/html'] + brk.
-	str lisää-loppuun: brk.
-	str lisää-loppuun: ['--'] + oma boundary + brk.
-	str lisää-loppuun: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str lisää-loppuun: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str lisää-loppuun: brk.
-	str lisää-loppuun: oma body.
-	str lisää-loppuun: brk.
-	oma attachments jokainen: { :id :info
+	merkkijono lisää-loppuun: (itse otsake: ['Subject: '] + oma aihe) + crlf.
+	merkkijono lisää-loppuun: ['MIME-Version: 1.0'] + crlf.
+	merkkijono lisää-loppuun: ['Content-Type: multipart/related; boundary="'] + oma raja + ['"; type=text/html'] + crlf.
+	merkkijono lisää-loppuun: crlf.
+	merkkijono lisää-loppuun: ['--'] + oma raja + crlf.
+	merkkijono lisää-loppuun: ['Content-Type: text/html; charset=UTF-8'] + crlf.
+	merkkijono lisää-loppuun: ['Content-Transfer-Encoding: 7bit'] + crlf.
+	merkkijono lisää-loppuun: crlf.
+	merkkijono lisää-loppuun: oma viestiteksti.
+	merkkijono lisää-loppuun: crlf.
+	oma liitteet jokainen: { :id :info
 		>> blob := info data.
-		str lisää-loppuun: ['--'] + oma boundary + brk.
-		str lisää-loppuun: ['Content-Type: '] + info mime + brk.
-		str lisää-loppuun: ['Content-Transfer-Encoding: base64'] + brk.
-		str lisää-loppuun: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str lisää-loppuun: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str lisää-loppuun: brk.
-		>> max := 76.
-		>> len := blob pituus.
-		>> chunks := (len / max) pyöristä-ylös.
+		merkkijono lisää-loppuun: ['--'] + oma raja + crlf.
+		merkkijono lisää-loppuun: ['Content-Type: '] + info mime + crlf.
+		merkkijono lisää-loppuun: ['Content-Transfer-Encoding: base64'] + crlf.
+		merkkijono lisää-loppuun: ['Content-ID: <attachment'] + id + ['>'] + crlf.
+		merkkijono lisää-loppuun: ['Content-Disposition: inline; filename="'] + info tiedosto + ['"'] + crlf.
+		merkkijono lisää-loppuun: crlf.
+		>> enimmäis := 76.
+		>> tekstin-pituus := blob pituus.
+		>> palat := (tekstin-pituus / enimmäis) pyöristä-ylös.
 		{ :i
-			>> chunk := blob kopioi alkaen: i * max pituus: max.
-			str lisää-loppuun: chunk + brk.
-		} * chunks.
-		str lisää-loppuun: brk.
-		str lisää-loppuun: brk.
+			>> pala := blob kopioi alkaen: i * enimmäis pituus: enimmäis.
+			merkkijono lisää-loppuun: pala + crlf.
+		} * palat.
+		merkkijono lisää-loppuun: crlf.
+		merkkijono lisää-loppuun: crlf.
 	}.
-	str lisää-loppuun: ['--'] + oma boundary + ['--'] + brk. <- str.
+	merkkijono lisää-loppuun: ['--'] + oma raja + ['--'] + crlf. <- merkkijono.
 }.

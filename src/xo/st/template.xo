@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Ntho ncha.
+>> Thempleite := Ntho ncha.
 
-Template ha-ho-fihla: ['ncha'] etsa: { <- uena ncha content: [''].
+Thempleite ha-ho-fihla: ['ncha'] etsa: { <- uena ncha litaba: [''].
 }.
 
-Template ha-ho-fihla: ['content:'] etsa: { :content
-	ea-hao content := content. 
+Thempleite ha-ho-fihla: ['litaba:'] etsa: { :litaba
+	ea-hao litaba := litaba. 
 }.
 
-Template ha-ho-fihla: ['ncha:'] etsa: { :content <- uena ncha content: content.
+Thempleite ha-ho-fihla: ['ncha:'] etsa: { :litaba <- uena ncha litaba: litaba.
 }.
 
-Template ha-ho-fihla: ['cut:'] etsa: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := ea-hao content arola: startmarker.
-	>> prefix := parts ea-pele.
-	>> parts2 := parts ea-ho-qetela arola: endmarker.
-	>> suffix := parts2 ea-ho-qetela.
-	>> part := parts2 ea-pele.
-	>> rest := prefix + suffix.
-	ea-hao content := rest. <- Template ncha: part.
+Thempleite ha-ho-fihla: ['khaola:'] etsa: { :letšoao
+	>> letšoao-la-qalo := (['<!-- cut:%id% -->'] %id%: letšoao).
+	>> letšoao-la-qetello := (['<!-- /cut:%id% -->'] %id%: letšoao).
+	>> likarolo := ea-hao litaba arola: letšoao-la-qalo.
+	>> selelekela := likarolo ea-pele.
+	>> likarolo2 := likarolo ea-ho-qetela arola: letšoao-la-qetello.
+	>> sehlomathiso := likarolo2 ea-ho-qetela.
+	>> karolo := likarolo2 ea-pele.
+	>> tse-setseng := selelekela + sehlomathiso.
+	ea-hao litaba := tse-setseng. <- Thempleite ncha: karolo.
 	
 }.
 
-Template ha-ho-fihla: ['kopitsa'] etsa: { <- uena ncha: uena mongolo kopitsa.
+Thempleite ha-ho-fihla: ['kopitsa'] etsa: { <- uena ncha: uena mongolo kopitsa.
 }.
 	
-Template ha-ho-fihla: ['paste:at:'] etsa: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	ea-hao content nkela-sebaka: pastemarker ka: ( snippet mongolo + pastemarker ).
+Thempleite ha-ho-fihla: ['manehela:sebakeng:'] etsa: { :qotso :id
+	>> letšoao-la-manehelo := (['<!-- paste:%id% -->'] %id%: id).
+	ea-hao litaba nkela-sebaka: letšoao-la-manehelo ka: ( qotso mongolo + letšoao-la-manehelo ).
 }.
 
-Template ha-ho-fihla: ['beha:boleng:'] etsa: { :slot :value
-	ea-hao content nkela-sebaka: ['<!-- slot:'] + slot + [' -->'] ka: ( Server html-kenya-khoutu: value ).
+Thempleite ha-ho-fihla: ['beha:boleng:'] etsa: { :sebaka :boleng
+	ea-hao litaba nkela-sebaka: ['<!-- slot:'] + sebaka + [' -->'] ka: ( Server html-kenya-khoutu: boleng ).
 }.
 
-Template ha-ho-fihla: ['set:html:'] etsa: { :slot :html
-	ea-hao content nkela-sebaka: ['<!-- slot:'] + slot + [' -->'] ka: html.
+Thempleite ha-ho-fihla: ['beha:html:'] etsa: { :sebaka :html
+	ea-hao litaba nkela-sebaka: ['<!-- slot:'] + sebaka + [' -->'] ka: html.
 }.
 
-Template ha-ho-fihla: ['araba:le:'] etsa: { :slot :value
-	uena beha: (slot ho-tloha: 0 bolelele: (slot bolelele - 1)) boleng: value.
+Thempleite ha-ho-fihla: ['araba:le:'] etsa: { :sebaka :boleng
+	uena beha: (sebaka ho-tloha: 0 bolelele: (sebaka bolelele - 1)) boleng: boleng.
 }.
 
-Template ha-ho-fihla: ['nl2br'] etsa: {
-	ea-hao content nkela-sebaka: ['\n'] ka: ['<br>'].
+Thempleite ha-ho-fihla: ['nl2br'] etsa: {
+	ea-hao litaba nkela-sebaka: ['\n'] ka: ['<br>'].
 }.
 
-Template ha-ho-fihla: ['clean'] etsa: {
-	ea-hao content :=
+Thempleite ha-ho-fihla: ['hlophisa'] etsa: {
+	ea-hao litaba :=
 		Paterone
 		ncha: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		tumellano: ea-hao content
+		tumellano: ea-hao litaba
 		etsa: { <- ['']. }.
 }.
 
-Template ha-ho-fihla: ['clean-cuts'] etsa: {
-	>> items := Lethathamo ncha.
+Thempleite ha-ho-fihla: ['hlophisa-tse-khaotsoeng'] etsa: {
+	>> lintho := Lethathamo ncha.
 	Paterone
 	ncha: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	tumellano: ea-hao content
-	etsa: { :_ :part
-		items eketsa-qetellong: part ? 1.
+	tumellano: ea-hao litaba
+	etsa: { :_ :karolo
+		lintho eketsa-qetellong: karolo ? 1.
 	}.
-	items e-ngoe-le-e-ngoe: { :_ :id
-		ea-hao content :=
+	lintho e-ngoe-le-e-ngoe: { :_ :id
+		ea-hao litaba :=
 			Paterone ncha: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			tumellano: ea-hao content
+			tumellano: ea-hao litaba
 			etsa: { <- ['']. }.
 	 }.
 }.
 
-Template ha-ho-fihla: ['clean-space'] etsa: {
-	ea-hao content :=
+Thempleite ha-ho-fihla: ['hlophisa-libaka'] etsa: {
+	ea-hao litaba :=
 		Paterone
 		ncha: ['\\s*\\n'],
-		tumellano: ea-hao content
+		tumellano: ea-hao litaba
 		etsa: { <- ['\n']. }.
-	ea-hao content :=
+	ea-hao litaba :=
 		Paterone
 		ncha: ['\\n[\\s\\t]+'],
-		tumellano: ea-hao content
+		tumellano: ea-hao litaba
 		etsa: { <- ['\n']. }.
 }.
 
-Template ha-ho-fihla: ['clean-all'] etsa: {
-	uena clean.
-	uena clean-cuts.
-	uena clean-space.
+Thempleite ha-ho-fihla: ['hlophisa-tsohle'] etsa: {
+	uena hlophisa.
+	uena hlophisa-tse-khaotsoeng.
+	uena hlophisa-libaka.
 }.
 
-Template ha-ho-fihla: ['mongolo'] etsa: { <- ea-hao content.
+Thempleite ha-ho-fihla: ['mongolo'] etsa: { <- ea-hao litaba.
 }.

@@ -1,302 +1,302 @@
-HTTP-Užklausa kai: ['HTTP-header:'] daryti: { :key <- Programa nustatymas: key.
+HTTP-Užklausa kai: ['HTTP-antraštė:'] daryti: { :raktas <- Programa nustatymas: raktas.
 }.
 
->> HTTP-Header := Objektas naujas.
+>> HTTP-Antraštė := Objektas naujas.
 
-HTTP-Header kai: ['naujas'] daryti: { <- pats naujas init.
+HTTP-Antraštė kai: ['naujas'] daryti: { <- pats naujas inicijuoti.
 }.
 
-HTTP-Header kai: ['init'] daryti: {
-	savas key := Niekas.
-	savas value := Niekas.
+HTTP-Antraštė kai: ['inicijuoti'] daryti: {
+	savas raktas := Niekas.
+	savas reikšmė := Niekas.
 }.
 
-HTTP-Header kai: ['key:value:'] daryti: { :key :value
-	savas key := key.
-	savas value := value.
+HTTP-Antraštė kai: ['raktas:reikšmė:'] daryti: { :raktas :reikšmė
+	savas raktas := raktas.
+	savas reikšmė := reikšmė.
 }.
 
-HTTP-Header kai: ['key'] daryti: { <- savas key.
+HTTP-Antraštė kai: ['raktas'] daryti: { <- savas raktas.
 }.
 
-HTTP-Header kai: ['value'] daryti: { <- savas value.
+HTTP-Antraštė kai: ['reikšmė'] daryti: { <- savas reikšmė.
 }.
 
 
-HTTP-Header kai: ['tekstas'] daryti: {
-	>> line := savas key + [': '] + savas value.
-	line pakeisti: ['\r'] į: [''], pakeisti: ['\n'] į: ['']. <- line + [' \r\n'].
+HTTP-Antraštė kai: ['tekstas'] daryti: {
+	>> eilutė := savas raktas + [': '] + savas reikšmė.
+	eilutė pakeisti: ['\r'] į: [''], pakeisti: ['\n'] į: ['']. <- eilutė + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Objektas naujas.
+>> Žiniatinklio-dokumentas := Objektas naujas.
 
-Web-Document kai: ['naujas'] daryti: { <- pats naujas init.
+Žiniatinklio-dokumentas kai: ['naujas'] daryti: { <- pats naujas inicijuoti.
 }.
 
-Web-Document kai: ['init'] daryti: {
-	savas headers := Sąrašas naujas.
-	savas sess-id := Niekas.
-	savas session-manager := Tempfile-Session naujas.
-	savas sessdata := Niekas.
-	savas secure := Tiesa.
-	savas same-site := ['Strict'].
-	savas headers-out := Netiesa.
-	savas request := HTTP-Užklausa naujas.
+Žiniatinklio-dokumentas kai: ['inicijuoti'] daryti: {
+	savas antraštės := Sąrašas naujas.
+	savas seanso-id := Niekas.
+	savas seansų-tvarkytuvas := Laikinojo-failo-seansas naujas.
+	savas seanso-duomenys := Niekas.
+	savas saugus := Tiesa.
+	savas ta-pati-svetainė := ['Strict'].
+	savas antraštės-išsiųstos := Netiesa.
+	savas http-užklausa := HTTP-Užklausa naujas.
 }.
 
-Web-Document kai: ['request:'] daryti: { :request
-	savas request := request.
+Žiniatinklio-dokumentas kai: ['http-užklausa:'] daryti: { :http-užklausa
+	savas http-užklausa := http-užklausa.
 }. 
 
-Web-Document kai: ['secure-session-cookie:'] daryti: { :secure
-	pats check-headers.
-	savas secure := secure.
+Žiniatinklio-dokumentas kai: ['saugus-seanso-slapukas:'] daryti: { :saugus
+	pats tikrinti-antraštes.
+	savas saugus := saugus.
 }.
 
-Web-Document kai: ['same-site-session-cookie:'] daryti: { :value
-	pats check-headers.
-	>> options := Sąrašas naujas 
+Žiniatinklio-dokumentas kai: ['seanso-slapukas-ta-pati-svetainė:'] daryti: { :reikšmė
+	pats tikrinti-antraštes.
+	>> parinktys := Sąrašas naujas 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options apima: value, netiesa: {
+	parinktys turi: reikšmė, netiesa: {
 		ši-užduotis klaida: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	savas same-site := value.
+	savas ta-pati-svetainė := reikšmė.
 }.
 
-Web-Document kai: ['header:'] daryti: { :header
-	pats check-headers.
-	savas headers pridėti: header.
+Žiniatinklio-dokumentas kai: ['antraštė:'] daryti: { :antraštė
+	pats tikrinti-antraštes.
+	savas antraštės pridėti: antraštė.
 }.
 
-Web-Document kai: ['clear-headers'] daryti: {
-	pats check-headers.
-	savas headers := Sąrašas naujas.
+Žiniatinklio-dokumentas kai: ['išvalyti-antraštes'] daryti: {
+	pats tikrinti-antraštes.
+	savas antraštės := Sąrašas naujas.
 }.
 
-Web-Document kai: ['session-manager:'] daryti: { :manager
-	pats check-headers.
-	savas session-manager := manager.
+Žiniatinklio-dokumentas kai: ['seansų-tvarkytuvas:'] daryti: { :tvarkytuvas
+	pats tikrinti-antraštes.
+	savas seansų-tvarkytuvas := tvarkytuvas.
 }.
 
-Web-Document kai: ['session-manager'] daryti: { <- savas session-manager.
+Žiniatinklio-dokumentas kai: ['seansų-tvarkytuvas'] daryti: { <- savas seansų-tvarkytuvas.
 }.
 
-Web-Document kai: ['check-headers'] daryti: {
-	savas headers-out tiesa: {
+Žiniatinklio-dokumentas kai: ['tikrinti-antraštes'] daryti: {
+	savas antraštės-išsiųstos tiesa: {
 		ši-užduotis klaida: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document kai: ['session-start'] daryti: {
-	pats check-headers.
-	>> request := savas request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Niekas? netiesa: {
-		(( Šablonas naujas: ['^[A-Za-z0-9]+\\z'], atitikmuo: sess-id ) = 0) tiesa: {
-			sess-id := Niekas.
+Žiniatinklio-dokumentas kai: ['pradėti-seansą'] daryti: {
+	pats tikrinti-antraštes.
+	>> http-užklausa := savas http-užklausa.
+	>> seanso-id := http-užklausa cookie: ['xsid'].
+	seanso-id Niekas? netiesa: {
+		(( Šablonas naujas: ['^[A-Za-z0-9]+\\z'], atitikmuo: seanso-id ) = 0) tiesa: {
+			seanso-id := Niekas.
 		}.
 	}.
-	sess-id Niekas? tiesa: {
-		sess-id := Seifas žetonas: 30.
-		>> session-header := HTTP-Header naujas
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (savas secure arba: ['Secure'] arba: ['']),
-		SSITE: (savas same-site),
-		XSID: sess-id
+	seanso-id Niekas? tiesa: {
+		seanso-id := Seifas žetonas: 30.
+		>> seanso-antraštė := HTTP-Antraštė naujas
+		raktas: ['Set-Cookie'] reikšmė: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (savas saugus arba: ['Secure'] arba: ['']),
+		SSITE: (savas ta-pati-svetainė),
+		XSID: seanso-id
 		).
-		savas headers pridėti: session-header.
+		savas antraštės pridėti: seanso-antraštė.
 	}.
-	savas sessdata := savas session-manager for: sess-id, load. <- savas sessdata. # reference
+	savas seanso-duomenys := savas seansų-tvarkytuvas skirta: seanso-id, įkelti. <- savas seanso-duomenys. # reference
 }.
 
-Web-Document kai: ['goto:'] daryti: { :url
-	pats check-headers.
-	pats clear-headers.
-	savas headers
+Žiniatinklio-dokumentas kai: ['eiti-į:'] daryti: { :adresas
+	pats tikrinti-antraštes.
+	pats išvalyti-antraštes.
+	savas antraštės
 	pridėti: (
-		HTTP-Header naujas
-		key: ['Status'] value: ['303 See Other']
+		HTTP-Antraštė naujas
+		raktas: ['Status'] reikšmė: ['303 See Other']
 	),
 	pridėti: (
-		HTTP-Header naujas
-		key: ['Location'] value: url
+		HTTP-Antraštė naujas
+		raktas: ['Location'] reikšmė: adresas
 	).
-	pats out: ['Redirect'].
+	pats išvesti: ['Redirect'].
 }.
 
-Web-Document kai: ['session-destroy'] daryti: {
-	pats check-headers.
-	>> request := savas request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Niekas? netiesa: {
-		>> session-header := HTTP-Header naujas.
-		>> when := Momentas naujas metai: 1970, formatas: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Žiniatinklio-dokumentas kai: ['sunaikinti-seansą'] daryti: {
+	pats tikrinti-antraštes.
+	>> http-užklausa := savas http-užklausa.
+	>> seanso-id := http-užklausa cookie: ['xsid'].
+	seanso-id Niekas? netiesa: {
+		>> seanso-antraštė := HTTP-Antraštė naujas.
+		>> momentas := Momentas naujas metai: 1970, formatas: ['%a, %d %b %Y %H:%M:%S GMT'].
+		seanso-antraštė raktas: ['Set-Cookie'] reikšmė: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (savas secure arba: ['Secure'] arba: ['']),
-			SSITE: (savas same-site),
-			XSID: sess-id
+			EXP: momentas,
+			SEC: (savas saugus arba: ['Secure'] arba: ['']),
+			SSITE: (savas ta-pati-svetainė),
+			XSID: seanso-id
 		).
-		savas session-manager destroy.
-		savas headers pridėti: session-header.
+		savas seansų-tvarkytuvas sunaikinti.
+		savas antraštės pridėti: seanso-antraštė.
 	}.
 }.
 
 
-Web-Document kai: ['template:'] daryti: { :kelias <- Template naujas: (Failas naujas: kelias, skaityti).
+Žiniatinklio-dokumentas kai: ['maketas:'] daryti: { :kelias <- Maketas naujas: (Failas naujas: kelias, skaityti).
 }.
 
-Web-Document kai: ['out:type:'] daryti: { :output :tipas
-	savas headers-out netiesa: {
-		savas sessdata Niekas? netiesa: {
-			savas session-manager save: savas sessdata.
+Žiniatinklio-dokumentas kai: ['išvesti:tipas:'] daryti: { :išvestis :tipas
+	savas antraštės-išsiųstos netiesa: {
+		savas seanso-duomenys Niekas? netiesa: {
+			savas seansų-tvarkytuvas išsaugoti: savas seanso-duomenys.
 		}.
-		savas headers pridėti: (
-			HTTP-Header naujas
-			key: ['Content-type'] value: tipas
+		savas antraštės pridėti: (
+			HTTP-Antraštė naujas
+			raktas: ['Content-type'] reikšmė: tipas
 		).
-		savas headers kiekvienas: { :_ :header
-			Išvestis rašyti: header.
+		savas antraštės kiekvienas: { :_ :antraštė
+			Išvestis rašyti: antraštė.
 		}.
-		savas headers-out := Tiesa.
+		savas antraštės-išsiųstos := Tiesa.
 		Išvestis rašyti: ['\r\n'].
 	}.
-	Išvestis rašyti: output.
+	Išvestis rašyti: išvestis.
 }.
 
-Web-Document kai: ['finish:type:'] daryti: { :output :tipas
-	savas headers-out netiesa: {
-		savas sessdata Niekas? netiesa: {
-			savas session-manager save: savas sessdata.
+Žiniatinklio-dokumentas kai: ['užbaigti:tipas:'] daryti: { :išvestis :tipas
+	savas antraštės-išsiųstos netiesa: {
+		savas seanso-duomenys Niekas? netiesa: {
+			savas seansų-tvarkytuvas išsaugoti: savas seanso-duomenys.
 		}.
-		savas headers pridėti: (
-			HTTP-Header naujas
-			key: ['Content-type'] value: tipas
+		savas antraštės pridėti: (
+			HTTP-Antraštė naujas
+			raktas: ['Content-type'] reikšmė: tipas
 		).
-		savas headers pridėti: (
-			HTTP-Header naujas
-			key: ['Content-Length'] value: output tekstas bytes
+		savas antraštės pridėti: (
+			HTTP-Antraštė naujas
+			raktas: ['Content-Length'] reikšmė: išvestis tekstas bytes
 		).
-		savas headers kiekvienas: { :_ :header
-			Išvestis rašyti: header.
+		savas antraštės kiekvienas: { :_ :antraštė
+			Išvestis rašyti: antraštė.
 		}.
-		savas headers-out := Tiesa.
+		savas antraštės-išsiųstos := Tiesa.
 		Išvestis rašyti: ['\r\n'].
 	}.
-	Išvestis rašyti: output.
+	Išvestis rašyti: išvestis.
 }.
 
-Web-Document kai: ['out:'] daryti: { :output
-	pats out: output type: ['text/html; charset=utf-8'].
+Žiniatinklio-dokumentas kai: ['išvesti:'] daryti: { :išvestis
+	pats išvesti: išvestis tipas: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kai: ['finish:'] daryti: { :output
-	pats finish: output type: ['text/html; charset=utf-8'].
+Žiniatinklio-dokumentas kai: ['užbaigti:'] daryti: { :išvestis
+	pats užbaigti: išvestis tipas: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kai: ['json:'] daryti: { :output
-	pats out: ( JSON jsonify: output ) type: ['application/json'].
+Žiniatinklio-dokumentas kai: ['json:'] daryti: { :išvestis
+	pats išvesti: ( JSON jsonify: išvestis ) tipas: ['application/json'].
 }.
 
-Web-Document kai: ['not-found:'] daryti: { :output
-	pats clear-headers header: (
-		HTTP-Header naujas key: ['Status'] value: ['404 Not Found']
+Žiniatinklio-dokumentas kai: ['nerasta:'] daryti: { :išvestis
+	pats išvalyti-antraštes antraštė: (
+		HTTP-Antraštė naujas raktas: ['Status'] reikšmė: ['404 Not Found']
 	).
-	pats out: output.
+	pats išvesti: išvestis.
 }.
 
 
 # Interface
 
->> Session := Objektas naujas.
+>> Seansas := Objektas naujas.
 
-Session kai: ['naujas'] daryti: { <- pats naujas init for: Niekas.
+Seansas kai: ['naujas'] daryti: { <- pats naujas inicijuoti skirta: Niekas.
 }.
 
-Session kai: ['for:'] daryti: { :id
+Seansas kai: ['skirta:'] daryti: { :id
 	savas id := id.
 }.
 
-Session kai: ['load'] daryti: {
+Seansas kai: ['įkelti'] daryti: {
 	ši-užduotis klaida: ['Not implemented.'].
 }.
 
-Session kai: ['save:'] daryti: {
+Seansas kai: ['išsaugoti:'] daryti: {
 	ši-užduotis klaida: ['Not implemented.'].
 }.
 
-Session kai: ['destroy'] daryti: {
+Seansas kai: ['sunaikinti'] daryti: {
 	ši-užduotis klaida: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session naujas.
+>> Laikinojo-failo-seansas := Seansas naujas.
 
-Tempfile-Session kai: ['init'] daryti: {
-	savas pathprefix := ['/tmp/sess-'].
+Laikinojo-failo-seansas kai: ['inicijuoti'] daryti: {
+	savas kelio-pradžia := ['/tmp/sess-'].
 }.
 
-Tempfile-Session kai: ['path-prefix:'] daryti: { :str
-	savas pathprefix := str.
+Laikinojo-failo-seansas kai: ['kelio-priešdėlis:'] daryti: { :simbolių-eilutė
+	savas kelio-pradžia := simbolių-eilutė.
 }.
 
-Tempfile-Session kai: ['file'] daryti: { <- ( Failas naujas: ( savas pathprefix + savas id + ['.txt'] ) ).
+Laikinojo-failo-seansas kai: ['failas'] daryti: { <- ( Failas naujas: ( savas kelio-pradžia + savas id + ['.txt'] ) ).
 }.
 
-Tempfile-Session kai: ['load'] daryti: {
-	>> file := pats file.
-	file egzistuoja netiesa: {
-		file rašyti: (Žodynas naujas kodas).
-	}. <- file skaityti objektas.
+Laikinojo-failo-seansas kai: ['įkelti'] daryti: {
+	>> failas := pats failas.
+	failas egzistuoja netiesa: {
+		failas rašyti: (Žodynas naujas kodas).
+	}. <- failas skaityti objektas.
 }.
 
-Tempfile-Session kai: ['save:'] daryti: { :data
-	>> file := pats file.
-	file egzistuoja tiesa: {
-		file rašyti: data kodas.
+Laikinojo-failo-seansas kai: ['išsaugoti:'] daryti: { :duomenys
+	>> failas := pats failas.
+	failas egzistuoja tiesa: {
+		failas rašyti: duomenys kodas.
 	}.
 }.
 
-Tempfile-Session kai: ['destroy'] daryti: {
-	>> file := pats file.
-	file egzistuoja tiesa: {
-		file ištrinti.
+Laikinojo-failo-seansas kai: ['sunaikinti'] daryti: {
+	>> failas := pats failas.
+	failas egzistuoja tiesa: {
+		failas ištrinti.
 	}.
 }.
 
 
 >> URL := Objektas naujas.
 
-URL kai: ['init'] daryti: {
-	savas protocol := ['https://'].
+URL kai: ['inicijuoti'] daryti: {
+	savas protokolas := ['https://'].
 	savas mazgas := ['localhost'].
 	savas kelias := [''].
-	savas params := [''].
+	savas url-parametrai := [''].
 	savas hash := [''].
 }.
 
-URL kai: ['naujas'] daryti: { <- pats naujas init.
+URL kai: ['naujas'] daryti: { <- pats naujas inicijuoti.
 }.
 
 URL kai: ['tekstas'] daryti: { <- (
-	savas protocol +
+	savas protokolas +
 	savas mazgas +
 	savas kelias +
-	savas params +
+	savas url-parametrai +
 	savas hash ).
 }.
 
-URL kai: ['protocol:'] daryti: { :protocol
-	((Sąrašas naujas: ['http'] ; ['https']) apima: protocol) tiesa: {
-		savas protocol := protocol + ['://'].
+URL kai: ['protokolas:'] daryti: { :protokolas
+	((Sąrašas naujas ; ['http'] ; ['https']) turi: protokolas) tiesa: {
+		savas protokolas := protokolas + ['://'].
 	}, netiesa: {
 		ši-užduotis klaida: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL kai: ['mazgas:'] daryti: { :mazgas
 	savas mazgas := mazgas.
 }.
 
-URL kai: ['path:'] daryti: { :kelias
+URL kai: ['kelias:'] daryti: { :kelias
 	savas kelias := ['/'] + kelias url-koduoti.
 }.
 
-URL kai: ['params:'] daryti: { :map
-	>> params := Sąrašas naujas.
-	map kiekvienas: { :key :value
-		params pridėti: key tekstas url-koduoti + ['='] + value tekstas url-koduoti.
+URL kai: ['url-parametrai:'] daryti: { :atvaizdis
+	>> url-parametrai := Sąrašas naujas.
+	atvaizdis kiekvienas: { :raktas :reikšmė
+		url-parametrai pridėti: raktas tekstas url-koduoti + ['='] + reikšmė tekstas url-koduoti.
 	}.
-	savas params := ['?'] + ( params sujungti: ['&'] ).
+	savas url-parametrai := ['?'] + ( url-parametrai sujungti: ['&'] ).
 }.
 
 URL kai: ['maiša:'] daryti: { :hash

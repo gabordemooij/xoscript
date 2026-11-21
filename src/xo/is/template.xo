@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Hlutur nýtt.
+>> Sniðmát := Hlutur nýtt.
 
-Template við: ['nýtt'] gera: { <- sjálfur nýtt content: [''].
+Sniðmát við: ['nýtt'] gera: { <- sjálfur nýtt innihald: [''].
 }.
 
-Template við: ['content:'] gera: { :content
-	eigin content := content. 
+Sniðmát við: ['innihald:'] gera: { :innihald
+	eigin innihald := innihald. 
 }.
 
-Template við: ['nýtt:'] gera: { :content <- sjálfur nýtt content: content.
+Sniðmát við: ['nýtt:'] gera: { :innihald <- sjálfur nýtt innihald: innihald.
 }.
 
-Template við: ['cut:'] gera: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := eigin content kljúfa: startmarker.
-	>> prefix := parts fyrsta.
-	>> parts2 := parts síðasta kljúfa: endmarker.
-	>> suffix := parts2 síðasta.
-	>> part := parts2 fyrsta.
-	>> rest := prefix + suffix.
-	eigin content := rest. <- Template nýtt: part.
+Sniðmát við: ['klippa:'] gera: { :merki
+	>> upphafsmerki := (['<!-- cut:%id% -->'] %id%: merki).
+	>> lokamerki := (['<!-- /cut:%id% -->'] %id%: merki).
+	>> hlutar := eigin innihald kljúfa: upphafsmerki.
+	>> forskeyti := hlutar fyrsta.
+	>> hlutar2 := hlutar síðasta kljúfa: lokamerki.
+	>> viðskeyti := hlutar2 síðasta.
+	>> hluti := hlutar2 fyrsta.
+	>> afgangur := forskeyti + viðskeyti.
+	eigin innihald := afgangur. <- Sniðmát nýtt: hluti.
 	
 }.
 
-Template við: ['afrita'] gera: { <- sjálfur nýtt: sjálfur texti afrita.
+Sniðmát við: ['afrita'] gera: { <- sjálfur nýtt: sjálfur texti afrita.
 }.
 	
-Template við: ['paste:at:'] gera: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	eigin content skipta: pastemarker fyrir: ( snippet texti + pastemarker ).
+Sniðmát við: ['líma:við:'] gera: { :bútur :id
+	>> límmerki := (['<!-- paste:%id% -->'] %id%: id).
+	eigin innihald skipta: límmerki fyrir: ( bútur texti + límmerki ).
 }.
 
-Template við: ['setja:gildi:'] gera: { :slot :value
-	eigin content skipta: ['<!-- slot:'] + slot + [' -->'] fyrir: ( Server html-kóða: value ).
+Sniðmát við: ['setja:gildi:'] gera: { :hólf :gildið
+	eigin innihald skipta: ['<!-- slot:'] + hólf + [' -->'] fyrir: ( Server html-kóða: gildið ).
 }.
 
-Template við: ['set:html:'] gera: { :slot :html
-	eigin content skipta: ['<!-- slot:'] + slot + [' -->'] fyrir: html.
+Sniðmát við: ['setja:html:'] gera: { :hólf :html
+	eigin innihald skipta: ['<!-- slot:'] + hólf + [' -->'] fyrir: html.
 }.
 
-Template við: ['svara:og:'] gera: { :slot :value
-	sjálfur setja: (slot frá: 0 lengd: (slot lengd - 1)) gildi: value.
+Sniðmát við: ['svara:og:'] gera: { :hólf :gildið
+	sjálfur setja: (hólf frá: 0 lengd: (hólf lengd - 1)) gildi: gildið.
 }.
 
-Template við: ['nl2br'] gera: {
-	eigin content skipta: ['\n'] fyrir: ['<br>'].
+Sniðmát við: ['nl2br'] gera: {
+	eigin innihald skipta: ['\n'] fyrir: ['<br>'].
 }.
 
-Template við: ['clean'] gera: {
-	eigin content :=
+Sniðmát við: ['fága'] gera: {
+	eigin innihald :=
 		Mynstur
 		nýtt: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		samsvörun: eigin content
+		samsvörun: eigin innihald
 		gera: { <- ['']. }.
 }.
 
-Template við: ['clean-cuts'] gera: {
-	>> items := Listi nýtt.
+Sniðmát við: ['fága-klippur'] gera: {
+	>> atriði := Listi nýtt.
 	Mynstur
 	nýtt: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	samsvörun: eigin content
-	gera: { :_ :part
-		items bæta-aftast: part ? 1.
+	samsvörun: eigin innihald
+	gera: { :_ :hluti
+		atriði bæta-aftast: hluti ? 1.
 	}.
-	items hver: { :_ :id
-		eigin content :=
+	atriði hver: { :_ :id
+		eigin innihald :=
 			Mynstur nýtt: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			samsvörun: eigin content
+			samsvörun: eigin innihald
 			gera: { <- ['']. }.
 	 }.
 }.
 
-Template við: ['clean-space'] gera: {
-	eigin content :=
+Sniðmát við: ['fága-bil'] gera: {
+	eigin innihald :=
 		Mynstur
 		nýtt: ['\\s*\\n'],
-		samsvörun: eigin content
+		samsvörun: eigin innihald
 		gera: { <- ['\n']. }.
-	eigin content :=
+	eigin innihald :=
 		Mynstur
 		nýtt: ['\\n[\\s\\t]+'],
-		samsvörun: eigin content
+		samsvörun: eigin innihald
 		gera: { <- ['\n']. }.
 }.
 
-Template við: ['clean-all'] gera: {
-	sjálfur clean.
-	sjálfur clean-cuts.
-	sjálfur clean-space.
+Sniðmát við: ['fága-allt'] gera: {
+	sjálfur fága.
+	sjálfur fága-klippur.
+	sjálfur fága-bil.
 }.
 
-Template við: ['texti'] gera: { <- eigin content.
+Sniðmát við: ['texti'] gera: { <- eigin innihald.
 }.

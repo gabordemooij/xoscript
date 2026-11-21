@@ -1,128 +1,128 @@
->> Email := Obýekt täze.
+>> E-poçta := Obýekt täze.
 
-Email gelende: ['init'] et: {
-	öz recipients := Sanaw täze.
+E-poçta gelende: ['başlat'] et: {
+	öz alyjylar := Sanaw täze.
 	öz cc := Sanaw täze.
 	öz bcc := Sanaw täze.
-	öz from := Boş.
-	öz from-name := Boş.
-	öz subject := Boş.
-	öz body := Boş.
+	öz iberiji := Boş.
+	öz iberijiniň-ady := Boş.
+	öz tema := Boş.
+	öz beden := Boş.
 }.
 
-Email gelende: ['täze'] et: { <- özi täze init.
+E-poçta gelende: ['täze'] et: { <- özi täze başlat.
 }.
 
-Email gelende: ['to:'] et: { :list
-	öz recipients := list.
+E-poçta gelende: ['alyja:'] et: { :sanaw-elementler
+	öz alyjylar := sanaw-elementler.
 }.
  
-Email gelende: ['cc:'] et: { :list
-	öz cc := list.
+E-poçta gelende: ['cc:'] et: { :sanaw-elementler
+	öz cc := sanaw-elementler.
 }.
 
-Email gelende: ['bcc:'] et: { :list
-	öz bcc := list.
+E-poçta gelende: ['bcc:'] et: { :sanaw-elementler
+	öz bcc := sanaw-elementler.
 }.
 
-Email gelende: ['subject:'] et: { :subject
-	öz subject := subject.
+E-poçta gelende: ['tema:'] et: { :tema
+	öz tema := tema.
 }.
 
-Email gelende: ['from:name:'] et: { :from :at
-	öz from := from.
-	öz from-name := at.
+E-poçta gelende: ['iberiji:at:'] et: { :iberiji :at
+	öz iberiji := iberiji.
+	öz iberijiniň-ady := at.
 }.
 
-Email gelende: ['body:'] et: { :body
-	öz body := body.
+E-poçta gelende: ['beden:'] et: { :beden
+	öz beden := beden.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email gelende: ['header:'] et: { :line <- line çalyş: ['\r'] bilen: [''], çalyş: ['\n'] bilen: [''].
+E-poçta gelende: ['sözbaşy:'] et: { :setir <- setir çalyş: ['\r'] bilen: [''], çalyş: ['\n'] bilen: [''].
 }.
 
-Email gelende: ['send'] et: {
-	>> f := Faýl tempwrite: özi generate.
+E-poçta gelende: ['iber'] et: {
+	>> f := Faýl tempwrite: özi döret.
 	Programma ulgam: ['sendmail -t < '] + f ýol, täze-setir.
 }.
 
-Email gelende: ['generate'] et: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str soňuna-goş: (özi header: ['From: '] + öz from-name + [' <'] + ( öz from ) + ['>']) + brk.
-	str soňuna-goş: (özi header: ['To: '] + ( öz recipients birleşdir: [','] )) + brk.
+E-poçta gelende: ['döret'] et: {
+	>> setir-arakesmesi := ['\r\n'].
+	>> setir-zynjyry := [''].
+	setir-zynjyry soňuna-goş: (özi sözbaşy: ['From: '] + öz iberijiniň-ady + [' <'] + ( öz iberiji ) + ['>']) + setir-arakesmesi.
+	setir-zynjyry soňuna-goş: (özi sözbaşy: ['To: '] + ( öz alyjylar birleşdir: [','] )) + setir-arakesmesi.
 	öz cc sany dogry: {
-		str soňuna-goş: (özi header: ['Cc: '] + ( öz cc birleşdir: [','] )) + brk.
+		setir-zynjyry soňuna-goş: (özi sözbaşy: ['Cc: '] + ( öz cc birleşdir: [','] )) + setir-arakesmesi.
 	}.
 	öz bcc sany dogry: {
-		str soňuna-goş: (özi header: ['Bcc: '] + ( öz bcc birleşdir: [','] )) + brk.
+		setir-zynjyry soňuna-goş: (özi sözbaşy: ['Bcc: '] + ( öz bcc birleşdir: [','] )) + setir-arakesmesi.
 	}.
-	str soňuna-goş: (özi header: ['Subject: '] + öz subject) + brk.
-	str soňuna-goş: brk.
-	str soňuna-goş: öz body.
-	str soňuna-goş: brk. <- str.
+	setir-zynjyry soňuna-goş: (özi sözbaşy: ['Subject: '] + öz tema) + setir-arakesmesi.
+	setir-zynjyry soňuna-goş: setir-arakesmesi.
+	setir-zynjyry soňuna-goş: öz beden.
+	setir-zynjyry soňuna-goş: setir-arakesmesi. <- setir-zynjyry.
 }.
 
->> HTML-Email := Email täze.
+>> HTML-E-poçta := E-poçta täze.
 
-HTML-Email gelende: ['init'] et: {
-	özi init.
-	öz attachments := Sanaw täze.
-	öz boundary := Seýf token: 40.
+HTML-E-poçta gelende: ['başlat'] et: {
+	özi başlat.
+	öz goşundylar := Sanaw täze.
+	öz serhet := Seýf token: 40.
 }.
 
-HTML-Email gelende: ['attach:'] et: { :file
-	>> id := öz attachments sany.
-	>> blob := file blob.
-	öz attachments soňuna-goş: (
+HTML-E-poçta gelende: ['goşundy-goş:'] et: { :faýl
+	>> id := öz goşundylar sany.
+	>> blob := faýl blob.
+	öz goşundylar soňuna-goş: (
 		Sözlük täze
-			file: file ýol,
-			mime: ['image/'] + (Server mimetype: file ýol),
-			data: blob base64-kodla
+			faýl: faýl ýol,
+			mime: ['image/'] + (Server mimetype: faýl ýol),
+			maglumatlar: blob base64-kodla
 	).
 	blob boşat. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email gelende: ['generate'] et: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str soňuna-goş: (özi header: ['From: '] + öz from-name + [' <'] + ( öz from ) + ['>']) + brk.
-	str soňuna-goş: (özi header: ['To: '] + ( öz recipients birleşdir: [','] )) + brk.
+HTML-E-poçta gelende: ['döret'] et: {
+	>> setir-arakesmesi := ['\r\n'].
+	>> setir-zynjyry := [''].
+	setir-zynjyry soňuna-goş: (özi sözbaşy: ['From: '] + öz iberijiniň-ady + [' <'] + ( öz iberiji ) + ['>']) + setir-arakesmesi.
+	setir-zynjyry soňuna-goş: (özi sözbaşy: ['To: '] + ( öz alyjylar birleşdir: [','] )) + setir-arakesmesi.
 	öz cc sany dogry: {
-		str soňuna-goş: (özi header: ['Cc: '] + ( öz cc birleşdir: [','] )) + brk.
+		setir-zynjyry soňuna-goş: (özi sözbaşy: ['Cc: '] + ( öz cc birleşdir: [','] )) + setir-arakesmesi.
 	}.
 	öz bcc sany dogry: {
-		str soňuna-goş: (özi header: ['Bcc: '] + ( öz bcc birleşdir: [','] )) + brk.
+		setir-zynjyry soňuna-goş: (özi sözbaşy: ['Bcc: '] + ( öz bcc birleşdir: [','] )) + setir-arakesmesi.
 	}.
-	str soňuna-goş: (özi header: ['Subject: '] + öz subject) + brk.
-	str soňuna-goş: ['MIME-Version: 1.0'] + brk.
-	str soňuna-goş: ['Content-Type: multipart/related; boundary="'] + öz boundary + ['"; type=text/html'] + brk.
-	str soňuna-goş: brk.
-	str soňuna-goş: ['--'] + öz boundary + brk.
-	str soňuna-goş: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str soňuna-goş: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str soňuna-goş: brk.
-	str soňuna-goş: öz body.
-	str soňuna-goş: brk.
-	öz attachments her: { :id :info
-		>> blob := info data.
-		str soňuna-goş: ['--'] + öz boundary + brk.
-		str soňuna-goş: ['Content-Type: '] + info mime + brk.
-		str soňuna-goş: ['Content-Transfer-Encoding: base64'] + brk.
-		str soňuna-goş: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str soňuna-goş: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str soňuna-goş: brk.
-		>> max := 76.
-		>> len := blob uzynlyk.
-		>> chunks := (len / max) ýokary-tegelekle.
+	setir-zynjyry soňuna-goş: (özi sözbaşy: ['Subject: '] + öz tema) + setir-arakesmesi.
+	setir-zynjyry soňuna-goş: ['MIME-Version: 1.0'] + setir-arakesmesi.
+	setir-zynjyry soňuna-goş: ['Content-Type: multipart/related; boundary="'] + öz serhet + ['"; type=text/html'] + setir-arakesmesi.
+	setir-zynjyry soňuna-goş: setir-arakesmesi.
+	setir-zynjyry soňuna-goş: ['--'] + öz serhet + setir-arakesmesi.
+	setir-zynjyry soňuna-goş: ['Content-Type: text/html; charset=UTF-8'] + setir-arakesmesi.
+	setir-zynjyry soňuna-goş: ['Content-Transfer-Encoding: 7bit'] + setir-arakesmesi.
+	setir-zynjyry soňuna-goş: setir-arakesmesi.
+	setir-zynjyry soňuna-goş: öz beden.
+	setir-zynjyry soňuna-goş: setir-arakesmesi.
+	öz goşundylar her: { :id :maglumat
+		>> blob := maglumat maglumatlar.
+		setir-zynjyry soňuna-goş: ['--'] + öz serhet + setir-arakesmesi.
+		setir-zynjyry soňuna-goş: ['Content-Type: '] + maglumat mime + setir-arakesmesi.
+		setir-zynjyry soňuna-goş: ['Content-Transfer-Encoding: base64'] + setir-arakesmesi.
+		setir-zynjyry soňuna-goş: ['Content-ID: <attachment'] + id + ['>'] + setir-arakesmesi.
+		setir-zynjyry soňuna-goş: ['Content-Disposition: inline; filename="'] + maglumat faýl + ['"'] + setir-arakesmesi.
+		setir-zynjyry soňuna-goş: setir-arakesmesi.
+		>> iň-köp := 76.
+		>> tekst-uzynlygy := blob uzynlyk.
+		>> döwümler := (tekst-uzynlygy / iň-köp) ýokary-tegelekle.
 		{ :i
-			>> chunk := blob göçür başlap: i * max uzynlyk: max.
-			str soňuna-goş: chunk + brk.
-		} * chunks.
-		str soňuna-goş: brk.
-		str soňuna-goş: brk.
+			>> döwüm := blob göçür başlap: i * iň-köp uzynlyk: iň-köp.
+			setir-zynjyry soňuna-goş: döwüm + setir-arakesmesi.
+		} * döwümler.
+		setir-zynjyry soňuna-goş: setir-arakesmesi.
+		setir-zynjyry soňuna-goş: setir-arakesmesi.
 	}.
-	str soňuna-goş: ['--'] + öz boundary + ['--'] + brk. <- str.
+	setir-zynjyry soňuna-goş: ['--'] + öz serhet + ['--'] + setir-arakesmesi. <- setir-zynjyry.
 }.

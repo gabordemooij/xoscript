@@ -1,301 +1,301 @@
-HTTP-Request bij: ['HTTP-header:'] doen: { :key <- Programma instelling: key.
+HTTP-Request bij: ['HTTP-kop:'] doen: { :sleutel <- Programma instelling: sleutel.
 }.
 
->> HTTP-Header := Object nieuw.
+>> HTTP-Kop := Object nieuw.
 
-HTTP-Header bij: ['nieuw'] doen: { <- zelf nieuw init.
+HTTP-Kop bij: ['nieuw'] doen: { <- zelf nieuw initialiseren.
 }.
 
-HTTP-Header bij: ['init'] doen: {
-	eigen key := Niets.
-	eigen value := Niets.
+HTTP-Kop bij: ['initialiseren'] doen: {
+	eigen sleutel := Niets.
+	eigen waarde := Niets.
 }.
 
-HTTP-Header bij: ['key:value:'] doen: { :key :value
-	eigen key := key.
-	eigen value := value.
+HTTP-Kop bij: ['sleutel:waarde:'] doen: { :sleutel :waarde
+	eigen sleutel := sleutel.
+	eigen waarde := waarde.
 }.
 
-HTTP-Header bij: ['key'] doen: { <- eigen key.
+HTTP-Kop bij: ['sleutel'] doen: { <- eigen sleutel.
 }.
 
-HTTP-Header bij: ['value'] doen: { <- eigen value.
+HTTP-Kop bij: ['waarde'] doen: { <- eigen waarde.
 }.
 
 
-HTTP-Header bij: ['tekst'] doen: {
-	>> line := eigen key + [': '] + eigen value.
-	line vervang: ['\r'] door: [''], vervang: ['\n'] door: ['']. <- line + [' \r\n'].
+HTTP-Kop bij: ['tekst'] doen: {
+	>> regel := eigen sleutel + [': '] + eigen waarde.
+	regel vervang: ['\r'] door: [''], vervang: ['\n'] door: ['']. <- regel + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Object nieuw.
+>> Webdocument := Object nieuw.
 
-Web-Document bij: ['nieuw'] doen: { <- zelf nieuw init.
+Webdocument bij: ['nieuw'] doen: { <- zelf nieuw initialiseren.
 }.
 
-Web-Document bij: ['init'] doen: {
-	eigen headers := Reeks nieuw.
-	eigen sess-id := Niets.
-	eigen session-manager := Tempfile-Session nieuw.
-	eigen sessdata := Niets.
-	eigen secure := Ja.
-	eigen same-site := ['Strict'].
-	eigen headers-out := Nee.
-	eigen request := HTTP-Request nieuw.
+Webdocument bij: ['initialiseren'] doen: {
+	eigen koppen := Reeks nieuw.
+	eigen sessie-id := Niets.
+	eigen sessiebeheerder := Tijdelijk-bestand-sessie nieuw.
+	eigen sessiegegevens := Niets.
+	eigen veilig := Ja.
+	eigen zelfde-site := ['Strict'].
+	eigen koppen-verzonden := Nee.
+	eigen verzoek := HTTP-Request nieuw.
 }.
 
-Web-Document bij: ['request:'] doen: { :request
-	eigen request := request.
+Webdocument bij: ['verzoek:'] doen: { :verzoek
+	eigen verzoek := verzoek.
 }. 
 
-Web-Document bij: ['secure-session-cookie:'] doen: { :secure
-	zelf check-headers.
-	eigen secure := secure.
+Webdocument bij: ['veilige-sessiecookie:'] doen: { :veilig
+	zelf koppen-controleren.
+	eigen veilig := veilig.
 }.
 
-Web-Document bij: ['same-site-session-cookie:'] doen: { :value
-	zelf check-headers.
-	>> options := Reeks nieuw 
+Webdocument bij: ['zelfde-site-sessiecookie:'] doen: { :waarde
+	zelf koppen-controleren.
+	>> opties := Reeks nieuw 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options bevat: value, nee: {
+	opties heeft: waarde, nee: {
 		deze-taak fout: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	eigen same-site := value.
+	eigen zelfde-site := waarde.
 }.
 
-Web-Document bij: ['header:'] doen: { :header
-	zelf check-headers.
-	eigen headers toevoegen: header.
+Webdocument bij: ['kop:'] doen: { :kop
+	zelf koppen-controleren.
+	eigen koppen toevoegen: kop.
 }.
 
-Web-Document bij: ['clear-headers'] doen: {
-	zelf check-headers.
-	eigen headers := Reeks nieuw.
+Webdocument bij: ['koppen-wissen'] doen: {
+	zelf koppen-controleren.
+	eigen koppen := Reeks nieuw.
 }.
 
-Web-Document bij: ['session-manager:'] doen: { :manager
-	zelf check-headers.
-	eigen session-manager := manager.
+Webdocument bij: ['sessiebeheerder:'] doen: { :beheerder
+	zelf koppen-controleren.
+	eigen sessiebeheerder := beheerder.
 }.
 
-Web-Document bij: ['session-manager'] doen: { <- eigen session-manager.
+Webdocument bij: ['sessiebeheerder'] doen: { <- eigen sessiebeheerder.
 }.
 
-Web-Document bij: ['check-headers'] doen: {
-	eigen headers-out ja: {
+Webdocument bij: ['koppen-controleren'] doen: {
+	eigen koppen-verzonden ja: {
 		deze-taak fout: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document bij: ['session-start'] doen: {
-	zelf check-headers.
-	>> request := eigen request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Niets? nee: {
-		(( Patroon nieuw: ['^[A-Za-z0-9]+\\z'], overeenkomst: sess-id ) = 0) ja: {
-			sess-id := Niets.
+Webdocument bij: ['sessie-starten'] doen: {
+	zelf koppen-controleren.
+	>> verzoek := eigen verzoek.
+	>> sessie-id := verzoek cookie: ['xsid'].
+	sessie-id Niets? nee: {
+		(( Patroon nieuw: ['^[A-Za-z0-9]+\\z'], overeenkomst: sessie-id ) = 0) ja: {
+			sessie-id := Niets.
 		}.
 	}.
-	sess-id Niets? ja: {
-		sess-id := Kluis token: 30.
-		>> session-header := HTTP-Header nieuw
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (eigen secure of: ['Secure'] of: ['']),
-		SSITE: (eigen same-site),
-		XSID: sess-id
+	sessie-id Niets? ja: {
+		sessie-id := Kluis token: 30.
+		>> sessiekop := HTTP-Kop nieuw
+		sleutel: ['Set-Cookie'] waarde: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (eigen veilig of: ['Secure'] of: ['']),
+		SSITE: (eigen zelfde-site),
+		XSID: sessie-id
 		).
-		eigen headers toevoegen: session-header.
+		eigen koppen toevoegen: sessiekop.
 	}.
-	eigen sessdata := eigen session-manager for: sess-id, load. <- eigen sessdata. # reference
+	eigen sessiegegevens := eigen sessiebeheerder voor: sessie-id, laden. <- eigen sessiegegevens. # reference
 }.
 
-Web-Document bij: ['goto:'] doen: { :url
-	zelf check-headers.
-	zelf clear-headers.
-	eigen headers
+Webdocument bij: ['ga-naar:'] doen: { :adres
+	zelf koppen-controleren.
+	zelf koppen-wissen.
+	eigen koppen
 	toevoegen: (
-		HTTP-Header nieuw
-		key: ['Status'] value: ['303 See Other']
+		HTTP-Kop nieuw
+		sleutel: ['Status'] waarde: ['303 See Other']
 	),
 	toevoegen: (
-		HTTP-Header nieuw
-		key: ['Location'] value: url
+		HTTP-Kop nieuw
+		sleutel: ['Location'] waarde: adres
 	).
-	zelf out: ['Redirect'].
+	zelf uitvoeren: ['Redirect'].
 }.
 
-Web-Document bij: ['session-destroy'] doen: {
-	zelf check-headers.
-	>> request := eigen request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Niets? nee: {
-		>> session-header := HTTP-Header nieuw.
-		>> when := Moment nieuw jaar: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Webdocument bij: ['sessie-vernietigen'] doen: {
+	zelf koppen-controleren.
+	>> verzoek := eigen verzoek.
+	>> sessie-id := verzoek cookie: ['xsid'].
+	sessie-id Niets? nee: {
+		>> sessiekop := HTTP-Kop nieuw.
+		>> tijdstip := Moment nieuw jaar: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		sessiekop sleutel: ['Set-Cookie'] waarde: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (eigen secure of: ['Secure'] of: ['']),
-			SSITE: (eigen same-site),
-			XSID: sess-id
+			EXP: tijdstip,
+			SEC: (eigen veilig of: ['Secure'] of: ['']),
+			SSITE: (eigen zelfde-site),
+			XSID: sessie-id
 		).
-		eigen session-manager destroy.
-		eigen headers toevoegen: session-header.
+		eigen sessiebeheerder vernietigen.
+		eigen koppen toevoegen: sessiekop.
 	}.
 }.
 
 
-Web-Document bij: ['template:'] doen: { :pad <- Template nieuw: (Bestand nieuw: pad, lezen).
+Webdocument bij: ['sjabloon:'] doen: { :pad <- Sjabloon nieuw: (Bestand nieuw: pad, lezen).
 }.
 
-Web-Document bij: ['out:type:'] doen: { :output :type
-	eigen headers-out nee: {
-		eigen sessdata Niets? nee: {
-			eigen session-manager save: eigen sessdata.
+Webdocument bij: ['uitvoeren:type:'] doen: { :uitvoer :type
+	eigen koppen-verzonden nee: {
+		eigen sessiegegevens Niets? nee: {
+			eigen sessiebeheerder opslaan: eigen sessiegegevens.
 		}.
-		eigen headers toevoegen: (
-			HTTP-Header nieuw
-			key: ['Content-type'] value: type
+		eigen koppen toevoegen: (
+			HTTP-Kop nieuw
+			sleutel: ['Content-type'] waarde: type
 		).
-		eigen headers elk: { :_ :header
-			Uit schrijf: header.
+		eigen koppen elk: { :_ :kop
+			Uit schrijf: kop.
 		}.
-		eigen headers-out := Ja.
+		eigen koppen-verzonden := Ja.
 		Uit schrijf: ['\r\n'].
 	}.
-	Uit schrijf: output.
+	Uit schrijf: uitvoer.
 }.
 
-Web-Document bij: ['finish:type:'] doen: { :output :type
-	eigen headers-out nee: {
-		eigen sessdata Niets? nee: {
-			eigen session-manager save: eigen sessdata.
+Webdocument bij: ['afronden:type:'] doen: { :uitvoer :type
+	eigen koppen-verzonden nee: {
+		eigen sessiegegevens Niets? nee: {
+			eigen sessiebeheerder opslaan: eigen sessiegegevens.
 		}.
-		eigen headers toevoegen: (
-			HTTP-Header nieuw
-			key: ['Content-type'] value: type
+		eigen koppen toevoegen: (
+			HTTP-Kop nieuw
+			sleutel: ['Content-type'] waarde: type
 		).
-		eigen headers toevoegen: (
-			HTTP-Header nieuw
-			key: ['Content-Length'] value: output tekst bytes
+		eigen koppen toevoegen: (
+			HTTP-Kop nieuw
+			sleutel: ['Content-Length'] waarde: uitvoer tekst bytes
 		).
-		eigen headers elk: { :_ :header
-			Uit schrijf: header.
+		eigen koppen elk: { :_ :kop
+			Uit schrijf: kop.
 		}.
-		eigen headers-out := Ja.
+		eigen koppen-verzonden := Ja.
 		Uit schrijf: ['\r\n'].
 	}.
-	Uit schrijf: output.
+	Uit schrijf: uitvoer.
 }.
 
-Web-Document bij: ['out:'] doen: { :output
-	zelf out: output type: ['text/html; charset=utf-8'].
+Webdocument bij: ['uitvoeren:'] doen: { :uitvoer
+	zelf uitvoeren: uitvoer type: ['text/html; charset=utf-8'].
 }.
 
-Web-Document bij: ['finish:'] doen: { :output
-	zelf finish: output type: ['text/html; charset=utf-8'].
+Webdocument bij: ['afronden:'] doen: { :uitvoer
+	zelf afronden: uitvoer type: ['text/html; charset=utf-8'].
 }.
 
-Web-Document bij: ['json:'] doen: { :output
-	zelf out: ( JSON jsonify: output ) type: ['application/json'].
+Webdocument bij: ['json:'] doen: { :uitvoer
+	zelf uitvoeren: ( JSON jsonify: uitvoer ) type: ['application/json'].
 }.
 
-Web-Document bij: ['not-found:'] doen: { :output
-	zelf clear-headers header: (
-		HTTP-Header nieuw key: ['Status'] value: ['404 Not Found']
+Webdocument bij: ['niet-gevonden:'] doen: { :uitvoer
+	zelf koppen-wissen kop: (
+		HTTP-Kop nieuw sleutel: ['Status'] waarde: ['404 Not Found']
 	).
-	zelf out: output.
+	zelf uitvoeren: uitvoer.
 }.
 
 
 # Interface
 
->> Session := Object nieuw.
+>> Sessie := Object nieuw.
 
-Session bij: ['nieuw'] doen: { <- zelf nieuw init for: Niets.
+Sessie bij: ['nieuw'] doen: { <- zelf nieuw initialiseren voor: Niets.
 }.
 
-Session bij: ['for:'] doen: { :id
+Sessie bij: ['voor:'] doen: { :id
 	eigen id := id.
 }.
 
-Session bij: ['load'] doen: {
+Sessie bij: ['laden'] doen: {
 	deze-taak fout: ['Not implemented.'].
 }.
 
-Session bij: ['save:'] doen: {
+Sessie bij: ['opslaan:'] doen: {
 	deze-taak fout: ['Not implemented.'].
 }.
 
-Session bij: ['destroy'] doen: {
+Sessie bij: ['vernietigen'] doen: {
 	deze-taak fout: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session nieuw.
+>> Tijdelijk-bestand-sessie := Sessie nieuw.
 
-Tempfile-Session bij: ['init'] doen: {
-	eigen pathprefix := ['/tmp/sess-'].
+Tijdelijk-bestand-sessie bij: ['initialiseren'] doen: {
+	eigen padbegin := ['/tmp/sess-'].
 }.
 
-Tempfile-Session bij: ['path-prefix:'] doen: { :str
-	eigen pathprefix := str.
+Tijdelijk-bestand-sessie bij: ['padvoorvoegsel:'] doen: { :tekenreeks
+	eigen padbegin := tekenreeks.
 }.
 
-Tempfile-Session bij: ['file'] doen: { <- ( Bestand nieuw: ( eigen pathprefix + eigen id + ['.txt'] ) ).
+Tijdelijk-bestand-sessie bij: ['bestand'] doen: { <- ( Bestand nieuw: ( eigen padbegin + eigen id + ['.txt'] ) ).
 }.
 
-Tempfile-Session bij: ['load'] doen: {
-	>> file := zelf file.
-	file bestaat nee: {
-		file schrijf: (Lijst nieuw code).
-	}. <- file lezen object.
+Tijdelijk-bestand-sessie bij: ['laden'] doen: {
+	>> bestand := zelf bestand.
+	bestand bestaat nee: {
+		bestand schrijf: (Lijst nieuw code).
+	}. <- bestand lezen object.
 }.
 
-Tempfile-Session bij: ['save:'] doen: { :data
-	>> file := zelf file.
-	file bestaat ja: {
-		file schrijf: data code.
+Tijdelijk-bestand-sessie bij: ['opslaan:'] doen: { :gegevens
+	>> bestand := zelf bestand.
+	bestand bestaat ja: {
+		bestand schrijf: gegevens code.
 	}.
 }.
 
-Tempfile-Session bij: ['destroy'] doen: {
-	>> file := zelf file.
-	file bestaat ja: {
-		file verwijderen.
+Tijdelijk-bestand-sessie bij: ['vernietigen'] doen: {
+	>> bestand := zelf bestand.
+	bestand bestaat ja: {
+		bestand verwijderen.
 	}.
 }.
 
 
 >> URL := Object nieuw.
 
-URL bij: ['init'] doen: {
+URL bij: ['initialiseren'] doen: {
 	eigen protocol := ['https://'].
 	eigen host := ['localhost'].
 	eigen pad := [''].
-	eigen params := [''].
+	eigen url-parameters := [''].
 	eigen hash := [''].
 }.
 
-URL bij: ['nieuw'] doen: { <- zelf nieuw init.
+URL bij: ['nieuw'] doen: { <- zelf nieuw initialiseren.
 }.
 
 URL bij: ['tekst'] doen: { <- (
 	eigen protocol +
 	eigen host +
 	eigen pad +
-	eigen params +
+	eigen url-parameters +
 	eigen hash ).
 }.
 
 URL bij: ['protocol:'] doen: { :protocol
-	((Reeks nieuw: ['http'] ; ['https']) bevat: protocol) ja: {
+	((Reeks nieuw ; ['http'] ; ['https']) heeft: protocol) ja: {
 		eigen protocol := protocol + ['://'].
 	}, nee: {
 		deze-taak fout: ['Invalid protocol'].
@@ -307,16 +307,16 @@ URL bij: ['host:'] doen: { :host
 	eigen host := host.
 }.
 
-URL bij: ['path:'] doen: { :pad
+URL bij: ['pad:'] doen: { :pad
 	eigen pad := ['/'] + pad url-coderen.
 }.
 
-URL bij: ['params:'] doen: { :map
-	>> params := Reeks nieuw.
-	map elk: { :key :value
-		params toevoegen: key tekst url-coderen + ['='] + value tekst url-coderen.
+URL bij: ['url-parameters:'] doen: { :koppeling
+	>> url-parameters := Reeks nieuw.
+	koppeling elk: { :sleutel :waarde
+		url-parameters toevoegen: sleutel tekst url-coderen + ['='] + waarde tekst url-coderen.
 	}.
-	eigen params := ['?'] + ( params samenvoegen: ['&'] ).
+	eigen url-parameters := ['?'] + ( url-parameters samenvoegen: ['&'] ).
 }.
 
 URL bij: ['kluts:'] doen: { :hash

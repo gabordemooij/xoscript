@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Yam-khoom tshiab.
+>> Qauv-nplooj := Yam-khoom tshiab.
 
-Template thaum-tuaj: ['tshiab'] ua: { <- tus-kheej tshiab content: [''].
+Qauv-nplooj thaum-tuaj: ['tshiab'] ua: { <- tus-kheej tshiab cov-ntsiab: [''].
 }.
 
-Template thaum-tuaj: ['content:'] ua: { :content
-	nws-li content := content. 
+Qauv-nplooj thaum-tuaj: ['cov-ntsiab:'] ua: { :cov-ntsiab
+	nws-li cov-ntsiab := cov-ntsiab. 
 }.
 
-Template thaum-tuaj: ['tshiab:'] ua: { :content <- tus-kheej tshiab content: content.
+Qauv-nplooj thaum-tuaj: ['tshiab:'] ua: { :cov-ntsiab <- tus-kheej tshiab cov-ntsiab: cov-ntsiab.
 }.
 
-Template thaum-tuaj: ['cut:'] ua: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := nws-li content phua: startmarker.
-	>> prefix := parts thawj-zaug.
-	>> parts2 := parts kawg phua: endmarker.
-	>> suffix := parts2 kawg.
-	>> part := parts2 thawj-zaug.
-	>> rest := prefix + suffix.
-	nws-li content := rest. <- Template tshiab: part.
+Qauv-nplooj thaum-tuaj: ['txiav:'] ua: { :cim
+	>> cim-pib := (['<!-- cut:%id% -->'] %id%: cim).
+	>> cim-kawg := (['<!-- /cut:%id% -->'] %id%: cim).
+	>> cov-feem := nws-li cov-ntsiab phua: cim-pib.
+	>> ua-ntej := cov-feem thawj-zaug.
+	>> cov-feem2 := cov-feem kawg phua: cim-kawg.
+	>> tom-qab := cov-feem2 kawg.
+	>> feem := cov-feem2 thawj-zaug.
+	>> seem := ua-ntej + tom-qab.
+	nws-li cov-ntsiab := seem. <- Qauv-nplooj tshiab: feem.
 	
 }.
 
-Template thaum-tuaj: ['luam'] ua: { <- tus-kheej tshiab: tus-kheej kab-ntawv luam.
+Qauv-nplooj thaum-tuaj: ['luam'] ua: { <- tus-kheej tshiab: tus-kheej kab-ntawv luam.
 }.
 	
-Template thaum-tuaj: ['paste:at:'] ua: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	nws-li content hloov: pastemarker nrog: ( snippet kab-ntawv + pastemarker ).
+Qauv-nplooj thaum-tuaj: ['lo:rau:'] ua: { :ib-nqe :id
+	>> cim-lo := (['<!-- paste:%id% -->'] %id%: id).
+	nws-li cov-ntsiab hloov: cim-lo nrog: ( ib-nqe kab-ntawv + cim-lo ).
 }.
 
-Template thaum-tuaj: ['teem:tus-nqi:'] ua: { :slot :value
-	nws-li content hloov: ['<!-- slot:'] + slot + [' -->'] nrog: ( Server html-ua-cim: value ).
+Qauv-nplooj thaum-tuaj: ['teem:tus-nqi:'] ua: { :qhov :nqi
+	nws-li cov-ntsiab hloov: ['<!-- slot:'] + qhov + [' -->'] nrog: ( Server html-ua-cim: nqi ).
 }.
 
-Template thaum-tuaj: ['set:html:'] ua: { :slot :html
-	nws-li content hloov: ['<!-- slot:'] + slot + [' -->'] nrog: html.
+Qauv-nplooj thaum-tuaj: ['teem:html:'] ua: { :qhov :html
+	nws-li cov-ntsiab hloov: ['<!-- slot:'] + qhov + [' -->'] nrog: html.
 }.
 
-Template thaum-tuaj: ['teb:thiab:'] ua: { :slot :value
-	tus-kheej teem: (slot los-ntawm: 0 ntev: (slot qhov-ntev - 1)) tus-nqi: value.
+Qauv-nplooj thaum-tuaj: ['teb:thiab:'] ua: { :qhov :nqi
+	tus-kheej teem: (qhov los-ntawm: 0 ntev: (qhov qhov-ntev - 1)) tus-nqi: nqi.
 }.
 
-Template thaum-tuaj: ['nl2br'] ua: {
-	nws-li content hloov: ['\n'] nrog: ['<br>'].
+Qauv-nplooj thaum-tuaj: ['nl2br'] ua: {
+	nws-li cov-ntsiab hloov: ['\n'] nrog: ['<br>'].
 }.
 
-Template thaum-tuaj: ['clean'] ua: {
-	nws-li content :=
+Qauv-nplooj thaum-tuaj: ['ntxuav'] ua: {
+	nws-li cov-ntsiab :=
 		Qauv-nrhiav
 		tshiab: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		sib-phim: nws-li content
+		sib-phim: nws-li cov-ntsiab
 		ua: { <- ['']. }.
 }.
 
-Template thaum-tuaj: ['clean-cuts'] ua: {
-	>> items := Daim-teev tshiab.
+Qauv-nplooj thaum-tuaj: ['ntxuav-cov-txiav'] ua: {
+	>> cov-khoom := Daim-teev tshiab.
 	Qauv-nrhiav
 	tshiab: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	sib-phim: nws-li content
-	ua: { :_ :part
-		items ntxiv-tom-kawg: part ? 1.
+	sib-phim: nws-li cov-ntsiab
+	ua: { :_ :feem
+		cov-khoom ntxiv-tom-kawg: feem ? 1.
 	}.
-	items txhua: { :_ :id
-		nws-li content :=
+	cov-khoom txhua: { :_ :id
+		nws-li cov-ntsiab :=
 			Qauv-nrhiav tshiab: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			sib-phim: nws-li content
+			sib-phim: nws-li cov-ntsiab
 			ua: { <- ['']. }.
 	 }.
 }.
 
-Template thaum-tuaj: ['clean-space'] ua: {
-	nws-li content :=
+Qauv-nplooj thaum-tuaj: ['ntxuav-qhov-chaw'] ua: {
+	nws-li cov-ntsiab :=
 		Qauv-nrhiav
 		tshiab: ['\\s*\\n'],
-		sib-phim: nws-li content
+		sib-phim: nws-li cov-ntsiab
 		ua: { <- ['\n']. }.
-	nws-li content :=
+	nws-li cov-ntsiab :=
 		Qauv-nrhiav
 		tshiab: ['\\n[\\s\\t]+'],
-		sib-phim: nws-li content
+		sib-phim: nws-li cov-ntsiab
 		ua: { <- ['\n']. }.
 }.
 
-Template thaum-tuaj: ['clean-all'] ua: {
-	tus-kheej clean.
-	tus-kheej clean-cuts.
-	tus-kheej clean-space.
+Qauv-nplooj thaum-tuaj: ['ntxuav-tag-nrho'] ua: {
+	tus-kheej ntxuav.
+	tus-kheej ntxuav-cov-txiav.
+	tus-kheej ntxuav-qhov-chaw.
 }.
 
-Template thaum-tuaj: ['kab-ntawv'] ua: { <- nws-li content.
+Qauv-nplooj thaum-tuaj: ['kab-ntawv'] ua: { <- nws-li cov-ntsiab.
 }.

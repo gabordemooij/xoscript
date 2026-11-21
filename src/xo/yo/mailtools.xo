@@ -1,128 +1,128 @@
->> Email := Nkan tuntun.
+>> Imeeli := Nkan tuntun.
 
-Email nigbati: ['init'] ṣe: {
-	tirẹ recipients := Akojọ tuntun.
+Imeeli nigbati: ['múra'] ṣe: {
+	tirẹ àwọn-olùgbà := Akojọ tuntun.
 	tirẹ cc := Akojọ tuntun.
 	tirẹ bcc := Akojọ tuntun.
-	tirẹ from := Ofo.
-	tirẹ from-name := Ofo.
-	tirẹ subject := Ofo.
-	tirẹ body := Ofo.
+	tirẹ olùfiránṣẹ́ := Ofo.
+	tirẹ orúkọ-olùfiránṣẹ́ := Ofo.
+	tirẹ kókó-ọ̀rọ̀ := Ofo.
+	tirẹ ara := Ofo.
 }.
 
-Email nigbati: ['tuntun'] ṣe: { <- ara-rẹ tuntun init.
+Imeeli nigbati: ['tuntun'] ṣe: { <- ara-rẹ tuntun múra.
 }.
 
-Email nigbati: ['to:'] ṣe: { :list
-	tirẹ recipients := list.
+Imeeli nigbati: ['sí:'] ṣe: { :ìkàsílẹ̀
+	tirẹ àwọn-olùgbà := ìkàsílẹ̀.
 }.
  
-Email nigbati: ['cc:'] ṣe: { :list
-	tirẹ cc := list.
+Imeeli nigbati: ['cc:'] ṣe: { :ìkàsílẹ̀
+	tirẹ cc := ìkàsílẹ̀.
 }.
 
-Email nigbati: ['bcc:'] ṣe: { :list
-	tirẹ bcc := list.
+Imeeli nigbati: ['bcc:'] ṣe: { :ìkàsílẹ̀
+	tirẹ bcc := ìkàsílẹ̀.
 }.
 
-Email nigbati: ['subject:'] ṣe: { :subject
-	tirẹ subject := subject.
+Imeeli nigbati: ['kókó-ọ̀rọ̀:'] ṣe: { :kókó-ọ̀rọ̀
+	tirẹ kókó-ọ̀rọ̀ := kókó-ọ̀rọ̀.
 }.
 
-Email nigbati: ['from:name:'] ṣe: { :from :orukọ
-	tirẹ from := from.
-	tirẹ from-name := orukọ.
+Imeeli nigbati: ['olùfiránṣẹ́:orukọ:'] ṣe: { :olùfiránṣẹ́ :orukọ
+	tirẹ olùfiránṣẹ́ := olùfiránṣẹ́.
+	tirẹ orúkọ-olùfiránṣẹ́ := orukọ.
 }.
 
-Email nigbati: ['body:'] ṣe: { :body
-	tirẹ body := body.
+Imeeli nigbati: ['ara:'] ṣe: { :ara
+	tirẹ ara := ara.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email nigbati: ['header:'] ṣe: { :line <- line rọpo: ['\r'] pẹlu: [''], rọpo: ['\n'] pẹlu: [''].
+Imeeli nigbati: ['akọle:'] ṣe: { :ìlà <- ìlà rọpo: ['\r'] pẹlu: [''], rọpo: ['\n'] pẹlu: [''].
 }.
 
-Email nigbati: ['send'] ṣe: {
-	>> f := Faili tempwrite: ara-rẹ generate.
+Imeeli nigbati: ['fi-ránṣẹ́'] ṣe: {
+	>> f := Faili tempwrite: ara-rẹ ṣẹ̀dá.
 	Eto eto-iṣẹ: ['sendmail -t < '] + f ọna-faili, ila-tuntun.
 }.
 
-Email nigbati: ['generate'] ṣe: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str fi-kun-opin: (ara-rẹ header: ['From: '] + tirẹ from-name + [' <'] + ( tirẹ from ) + ['>']) + brk.
-	str fi-kun-opin: (ara-rẹ header: ['To: '] + ( tirẹ recipients so-pọ: [','] )) + brk.
+Imeeli nigbati: ['ṣẹ̀dá'] ṣe: {
+	>> ìfọ́-ìlà := ['\r\n'].
+	>> okùn-ọ̀rọ̀ := [''].
+	okùn-ọ̀rọ̀ fi-kun-opin: (ara-rẹ akọle: ['From: '] + tirẹ orúkọ-olùfiránṣẹ́ + [' <'] + ( tirẹ olùfiránṣẹ́ ) + ['>']) + ìfọ́-ìlà.
+	okùn-ọ̀rọ̀ fi-kun-opin: (ara-rẹ akọle: ['To: '] + ( tirẹ àwọn-olùgbà so-pọ: [','] )) + ìfọ́-ìlà.
 	tirẹ cc iye-nọmba otitọ: {
-		str fi-kun-opin: (ara-rẹ header: ['Cc: '] + ( tirẹ cc so-pọ: [','] )) + brk.
+		okùn-ọ̀rọ̀ fi-kun-opin: (ara-rẹ akọle: ['Cc: '] + ( tirẹ cc so-pọ: [','] )) + ìfọ́-ìlà.
 	}.
 	tirẹ bcc iye-nọmba otitọ: {
-		str fi-kun-opin: (ara-rẹ header: ['Bcc: '] + ( tirẹ bcc so-pọ: [','] )) + brk.
+		okùn-ọ̀rọ̀ fi-kun-opin: (ara-rẹ akọle: ['Bcc: '] + ( tirẹ bcc so-pọ: [','] )) + ìfọ́-ìlà.
 	}.
-	str fi-kun-opin: (ara-rẹ header: ['Subject: '] + tirẹ subject) + brk.
-	str fi-kun-opin: brk.
-	str fi-kun-opin: tirẹ body.
-	str fi-kun-opin: brk. <- str.
+	okùn-ọ̀rọ̀ fi-kun-opin: (ara-rẹ akọle: ['Subject: '] + tirẹ kókó-ọ̀rọ̀) + ìfọ́-ìlà.
+	okùn-ọ̀rọ̀ fi-kun-opin: ìfọ́-ìlà.
+	okùn-ọ̀rọ̀ fi-kun-opin: tirẹ ara.
+	okùn-ọ̀rọ̀ fi-kun-opin: ìfọ́-ìlà. <- okùn-ọ̀rọ̀.
 }.
 
->> HTML-Email := Email tuntun.
+>> Imeeli-HTML := Imeeli tuntun.
 
-HTML-Email nigbati: ['init'] ṣe: {
-	ara-rẹ init.
-	tirẹ attachments := Akojọ tuntun.
-	tirẹ boundary := Apoti-aabo token: 40.
+Imeeli-HTML nigbati: ['múra'] ṣe: {
+	ara-rẹ múra.
+	tirẹ àwọn-àsomọ́ := Akojọ tuntun.
+	tirẹ ààlà := Apoti-aabo token: 40.
 }.
 
-HTML-Email nigbati: ['attach:'] ṣe: { :file
-	>> id := tirẹ attachments iye-nọmba.
-	>> blob := file blob.
-	tirẹ attachments fi-kun-opin: (
+Imeeli-HTML nigbati: ['so-mọ:'] ṣe: { :fáìlì-ìpàdé
+	>> id := tirẹ àwọn-àsomọ́ iye-nọmba.
+	>> blob := fáìlì-ìpàdé blob.
+	tirẹ àwọn-àsomọ́ fi-kun-opin: (
 		Atumọ-ede tuntun
-			file: file ọna-faili,
-			mime: ['image/'] + (Server mimetype: file ọna-faili),
-			data: blob base64-ṣe-koodu
+			fáìlì-ìpàdé: fáìlì-ìpàdé ọna-faili,
+			mime: ['image/'] + (Server mimetype: fáìlì-ìpàdé ọna-faili),
+			dátà: blob base64-ṣe-koodu
 	).
 	blob tu-silẹ. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email nigbati: ['generate'] ṣe: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str fi-kun-opin: (ara-rẹ header: ['From: '] + tirẹ from-name + [' <'] + ( tirẹ from ) + ['>']) + brk.
-	str fi-kun-opin: (ara-rẹ header: ['To: '] + ( tirẹ recipients so-pọ: [','] )) + brk.
+Imeeli-HTML nigbati: ['ṣẹ̀dá'] ṣe: {
+	>> ìfọ́-ìlà := ['\r\n'].
+	>> okùn-ọ̀rọ̀ := [''].
+	okùn-ọ̀rọ̀ fi-kun-opin: (ara-rẹ akọle: ['From: '] + tirẹ orúkọ-olùfiránṣẹ́ + [' <'] + ( tirẹ olùfiránṣẹ́ ) + ['>']) + ìfọ́-ìlà.
+	okùn-ọ̀rọ̀ fi-kun-opin: (ara-rẹ akọle: ['To: '] + ( tirẹ àwọn-olùgbà so-pọ: [','] )) + ìfọ́-ìlà.
 	tirẹ cc iye-nọmba otitọ: {
-		str fi-kun-opin: (ara-rẹ header: ['Cc: '] + ( tirẹ cc so-pọ: [','] )) + brk.
+		okùn-ọ̀rọ̀ fi-kun-opin: (ara-rẹ akọle: ['Cc: '] + ( tirẹ cc so-pọ: [','] )) + ìfọ́-ìlà.
 	}.
 	tirẹ bcc iye-nọmba otitọ: {
-		str fi-kun-opin: (ara-rẹ header: ['Bcc: '] + ( tirẹ bcc so-pọ: [','] )) + brk.
+		okùn-ọ̀rọ̀ fi-kun-opin: (ara-rẹ akọle: ['Bcc: '] + ( tirẹ bcc so-pọ: [','] )) + ìfọ́-ìlà.
 	}.
-	str fi-kun-opin: (ara-rẹ header: ['Subject: '] + tirẹ subject) + brk.
-	str fi-kun-opin: ['MIME-Version: 1.0'] + brk.
-	str fi-kun-opin: ['Content-Type: multipart/related; boundary="'] + tirẹ boundary + ['"; type=text/html'] + brk.
-	str fi-kun-opin: brk.
-	str fi-kun-opin: ['--'] + tirẹ boundary + brk.
-	str fi-kun-opin: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str fi-kun-opin: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str fi-kun-opin: brk.
-	str fi-kun-opin: tirẹ body.
-	str fi-kun-opin: brk.
-	tirẹ attachments kọọkan: { :id :info
-		>> blob := info data.
-		str fi-kun-opin: ['--'] + tirẹ boundary + brk.
-		str fi-kun-opin: ['Content-Type: '] + info mime + brk.
-		str fi-kun-opin: ['Content-Transfer-Encoding: base64'] + brk.
-		str fi-kun-opin: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str fi-kun-opin: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str fi-kun-opin: brk.
-		>> max := 76.
-		>> len := blob gigun.
-		>> chunks := (len / max) yika-soke.
+	okùn-ọ̀rọ̀ fi-kun-opin: (ara-rẹ akọle: ['Subject: '] + tirẹ kókó-ọ̀rọ̀) + ìfọ́-ìlà.
+	okùn-ọ̀rọ̀ fi-kun-opin: ['MIME-Version: 1.0'] + ìfọ́-ìlà.
+	okùn-ọ̀rọ̀ fi-kun-opin: ['Content-Type: multipart/related; boundary="'] + tirẹ ààlà + ['"; type=text/html'] + ìfọ́-ìlà.
+	okùn-ọ̀rọ̀ fi-kun-opin: ìfọ́-ìlà.
+	okùn-ọ̀rọ̀ fi-kun-opin: ['--'] + tirẹ ààlà + ìfọ́-ìlà.
+	okùn-ọ̀rọ̀ fi-kun-opin: ['Content-Type: text/html; charset=UTF-8'] + ìfọ́-ìlà.
+	okùn-ọ̀rọ̀ fi-kun-opin: ['Content-Transfer-Encoding: 7bit'] + ìfọ́-ìlà.
+	okùn-ọ̀rọ̀ fi-kun-opin: ìfọ́-ìlà.
+	okùn-ọ̀rọ̀ fi-kun-opin: tirẹ ara.
+	okùn-ọ̀rọ̀ fi-kun-opin: ìfọ́-ìlà.
+	tirẹ àwọn-àsomọ́ kọọkan: { :id :ìsọfúnni
+		>> blob := ìsọfúnni dátà.
+		okùn-ọ̀rọ̀ fi-kun-opin: ['--'] + tirẹ ààlà + ìfọ́-ìlà.
+		okùn-ọ̀rọ̀ fi-kun-opin: ['Content-Type: '] + ìsọfúnni mime + ìfọ́-ìlà.
+		okùn-ọ̀rọ̀ fi-kun-opin: ['Content-Transfer-Encoding: base64'] + ìfọ́-ìlà.
+		okùn-ọ̀rọ̀ fi-kun-opin: ['Content-ID: <attachment'] + id + ['>'] + ìfọ́-ìlà.
+		okùn-ọ̀rọ̀ fi-kun-opin: ['Content-Disposition: inline; filename="'] + ìsọfúnni fáìlì-ìpàdé + ['"'] + ìfọ́-ìlà.
+		okùn-ọ̀rọ̀ fi-kun-opin: ìfọ́-ìlà.
+		>> tó-pọ̀-jù := 76.
+		>> gígùn-ọ̀rọ̀ := blob gigun.
+		>> àwọn-ègé := (gígùn-ọ̀rọ̀ / tó-pọ̀-jù) yika-soke.
 		{ :i
-			>> chunk := blob ṣe-ẹda lati: i * max gigun: max.
-			str fi-kun-opin: chunk + brk.
-		} * chunks.
-		str fi-kun-opin: brk.
-		str fi-kun-opin: brk.
+			>> ègé := blob ṣe-ẹda lati: i * tó-pọ̀-jù gigun: tó-pọ̀-jù.
+			okùn-ọ̀rọ̀ fi-kun-opin: ègé + ìfọ́-ìlà.
+		} * àwọn-ègé.
+		okùn-ọ̀rọ̀ fi-kun-opin: ìfọ́-ìlà.
+		okùn-ọ̀rọ̀ fi-kun-opin: ìfọ́-ìlà.
 	}.
-	str fi-kun-opin: ['--'] + tirẹ boundary + ['--'] + brk. <- str.
+	okùn-ọ̀rọ̀ fi-kun-opin: ['--'] + tirẹ ààlà + ['--'] + ìfọ́-ìlà. <- okùn-ọ̀rọ̀.
 }.

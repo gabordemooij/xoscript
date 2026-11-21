@@ -1,302 +1,302 @@
-Buƙatar-HTTP idan: ['HTTP-header:'] yi: { :key <- Shiri saiti: key.
+Buƙatar-HTTP idan: ['HTTP-kanun-saƙo:'] yi: { :maɓalli <- Shiri saiti: maɓalli.
 }.
 
->> HTTP-Header := Abu sabo.
+>> Kan-HTTP := Abu sabo.
 
-HTTP-Header idan: ['sabo'] yi: { <- kai sabo init.
+Kan-HTTP idan: ['sabo'] yi: { <- kai sabo shirya.
 }.
 
-HTTP-Header idan: ['init'] yi: {
-	nasa key := Babu.
-	nasa value := Babu.
+Kan-HTTP idan: ['shirya'] yi: {
+	nasa maɓalli := Babu.
+	nasa ƙima := Babu.
 }.
 
-HTTP-Header idan: ['key:value:'] yi: { :key :value
-	nasa key := key.
-	nasa value := value.
+Kan-HTTP idan: ['maɓalli:ƙima:'] yi: { :maɓalli :ƙima
+	nasa maɓalli := maɓalli.
+	nasa ƙima := ƙima.
 }.
 
-HTTP-Header idan: ['key'] yi: { <- nasa key.
+Kan-HTTP idan: ['maɓalli'] yi: { <- nasa maɓalli.
 }.
 
-HTTP-Header idan: ['value'] yi: { <- nasa value.
+Kan-HTTP idan: ['ƙima'] yi: { <- nasa ƙima.
 }.
 
 
-HTTP-Header idan: ['rubutu'] yi: {
-	>> line := nasa key + [': '] + nasa value.
-	line musanya: ['\r'] da: [''], musanya: ['\n'] da: ['']. <- line + [' \r\n'].
+Kan-HTTP idan: ['rubutu'] yi: {
+	>> layi := nasa maɓalli + [': '] + nasa ƙima.
+	layi musanya: ['\r'] da: [''], musanya: ['\n'] da: ['']. <- layi + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Abu sabo.
+>> Takardar-Yanar-Gizo := Abu sabo.
 
-Web-Document idan: ['sabo'] yi: { <- kai sabo init.
+Takardar-Yanar-Gizo idan: ['sabo'] yi: { <- kai sabo shirya.
 }.
 
-Web-Document idan: ['init'] yi: {
-	nasa headers := Jeri sabo.
-	nasa sess-id := Babu.
-	nasa session-manager := Tempfile-Session sabo.
-	nasa sessdata := Babu.
-	nasa secure := Gaskiya.
-	nasa same-site := ['Strict'].
-	nasa headers-out := Ƙarya.
-	nasa request := Buƙatar-HTTP sabo.
+Takardar-Yanar-Gizo idan: ['shirya'] yi: {
+	nasa kanun-saƙonni := Jeri sabo.
+	nasa id-zama := Babu.
+	nasa manajan-zama := Zaman-fayil-na-wucin-gadi sabo.
+	nasa bayanan-zama := Babu.
+	nasa amintacce := Gaskiya.
+	nasa shafi-ɗaya := ['Strict'].
+	nasa an-aika-kanun := Ƙarya.
+	nasa buƙata-http := Buƙatar-HTTP sabo.
 }.
 
-Web-Document idan: ['request:'] yi: { :request
-	nasa request := request.
+Takardar-Yanar-Gizo idan: ['buƙata-http:'] yi: { :buƙata-http
+	nasa buƙata-http := buƙata-http.
 }. 
 
-Web-Document idan: ['secure-session-cookie:'] yi: { :secure
-	kai check-headers.
-	nasa secure := secure.
+Takardar-Yanar-Gizo idan: ['kuki-zama-amintacce:'] yi: { :amintacce
+	kai duba-kanun-saƙonni.
+	nasa amintacce := amintacce.
 }.
 
-Web-Document idan: ['same-site-session-cookie:'] yi: { :value
-	kai check-headers.
-	>> options := Jeri sabo 
+Takardar-Yanar-Gizo idan: ['kuki-zama-shafi-ɗaya:'] yi: { :ƙima
+	kai duba-kanun-saƙonni.
+	>> zaɓuɓɓuka := Jeri sabo 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options ya-ƙunshi: value, ƙarya: {
+	zaɓuɓɓuka yana-da: ƙima, ƙarya: {
 		wannan-aiki kuskure: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	nasa same-site := value.
+	nasa shafi-ɗaya := ƙima.
 }.
 
-Web-Document idan: ['header:'] yi: { :header
-	kai check-headers.
-	nasa headers ƙara-a-ƙarshe: header.
+Takardar-Yanar-Gizo idan: ['kanun-saƙo:'] yi: { :kanun-saƙo
+	kai duba-kanun-saƙonni.
+	nasa kanun-saƙonni ƙara-a-ƙarshe: kanun-saƙo.
 }.
 
-Web-Document idan: ['clear-headers'] yi: {
-	kai check-headers.
-	nasa headers := Jeri sabo.
+Takardar-Yanar-Gizo idan: ['share-kanun-saƙonni'] yi: {
+	kai duba-kanun-saƙonni.
+	nasa kanun-saƙonni := Jeri sabo.
 }.
 
-Web-Document idan: ['session-manager:'] yi: { :manager
-	kai check-headers.
-	nasa session-manager := manager.
+Takardar-Yanar-Gizo idan: ['manajan-zama:'] yi: { :manaja
+	kai duba-kanun-saƙonni.
+	nasa manajan-zama := manaja.
 }.
 
-Web-Document idan: ['session-manager'] yi: { <- nasa session-manager.
+Takardar-Yanar-Gizo idan: ['manajan-zama'] yi: { <- nasa manajan-zama.
 }.
 
-Web-Document idan: ['check-headers'] yi: {
-	nasa headers-out gaskiya: {
+Takardar-Yanar-Gizo idan: ['duba-kanun-saƙonni'] yi: {
+	nasa an-aika-kanun gaskiya: {
 		wannan-aiki kuskure: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document idan: ['session-start'] yi: {
-	kai check-headers.
-	>> request := nasa request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Babu? ƙarya: {
-		(( Salo sabo: ['^[A-Za-z0-9]+\\z'], dacewa: sess-id ) = 0) gaskiya: {
-			sess-id := Babu.
+Takardar-Yanar-Gizo idan: ['fara-zama'] yi: {
+	kai duba-kanun-saƙonni.
+	>> buƙata-http := nasa buƙata-http.
+	>> id-zama := buƙata-http cookie: ['xsid'].
+	id-zama Babu? ƙarya: {
+		(( Salo sabo: ['^[A-Za-z0-9]+\\z'], dacewa: id-zama ) = 0) gaskiya: {
+			id-zama := Babu.
 		}.
 	}.
-	sess-id Babu? gaskiya: {
-		sess-id := Asusu token: 30.
-		>> session-header := HTTP-Header sabo
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (nasa secure ko-dai: ['Secure'] ko: ['']),
-		SSITE: (nasa same-site),
-		XSID: sess-id
+	id-zama Babu? gaskiya: {
+		id-zama := Asusu token: 30.
+		>> kan-zama := Kan-HTTP sabo
+		maɓalli: ['Set-Cookie'] ƙima: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (nasa amintacce ko-dai: ['Secure'] ko: ['']),
+		SSITE: (nasa shafi-ɗaya),
+		XSID: id-zama
 		).
-		nasa headers ƙara-a-ƙarshe: session-header.
+		nasa kanun-saƙonni ƙara-a-ƙarshe: kan-zama.
 	}.
-	nasa sessdata := nasa session-manager for: sess-id, load. <- nasa sessdata. # reference
+	nasa bayanan-zama := nasa manajan-zama domin: id-zama, loda. <- nasa bayanan-zama. # reference
 }.
 
-Web-Document idan: ['goto:'] yi: { :url
-	kai check-headers.
-	kai clear-headers.
-	nasa headers
+Takardar-Yanar-Gizo idan: ['je-zuwa:'] yi: { :adireshi
+	kai duba-kanun-saƙonni.
+	kai share-kanun-saƙonni.
+	nasa kanun-saƙonni
 	ƙara-a-ƙarshe: (
-		HTTP-Header sabo
-		key: ['Status'] value: ['303 See Other']
+		Kan-HTTP sabo
+		maɓalli: ['Status'] ƙima: ['303 See Other']
 	),
 	ƙara-a-ƙarshe: (
-		HTTP-Header sabo
-		key: ['Location'] value: url
+		Kan-HTTP sabo
+		maɓalli: ['Location'] ƙima: adireshi
 	).
-	kai out: ['Redirect'].
+	kai fitar: ['Redirect'].
 }.
 
-Web-Document idan: ['session-destroy'] yi: {
-	kai check-headers.
-	>> request := nasa request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Babu? ƙarya: {
-		>> session-header := HTTP-Header sabo.
-		>> when := Lokaci sabo shekara: 1970, tsari: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Takardar-Yanar-Gizo idan: ['lalata-zama'] yi: {
+	kai duba-kanun-saƙonni.
+	>> buƙata-http := nasa buƙata-http.
+	>> id-zama := buƙata-http cookie: ['xsid'].
+	id-zama Babu? ƙarya: {
+		>> kan-zama := Kan-HTTP sabo.
+		>> lokacin-ƙarewa := Lokaci sabo shekara: 1970, tsari: ['%a, %d %b %Y %H:%M:%S GMT'].
+		kan-zama maɓalli: ['Set-Cookie'] ƙima: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (nasa secure ko-dai: ['Secure'] ko: ['']),
-			SSITE: (nasa same-site),
-			XSID: sess-id
+			EXP: lokacin-ƙarewa,
+			SEC: (nasa amintacce ko-dai: ['Secure'] ko: ['']),
+			SSITE: (nasa shafi-ɗaya),
+			XSID: id-zama
 		).
-		nasa session-manager destroy.
-		nasa headers ƙara-a-ƙarshe: session-header.
+		nasa manajan-zama lalata.
+		nasa kanun-saƙonni ƙara-a-ƙarshe: kan-zama.
 	}.
 }.
 
 
-Web-Document idan: ['template:'] yi: { :hanyar-fayil <- Template sabo: (Fayil sabo: hanyar-fayil, karanta).
+Takardar-Yanar-Gizo idan: ['samfuri:'] yi: { :hanyar-fayil <- Samfuri sabo: (Fayil sabo: hanyar-fayil, karanta).
 }.
 
-Web-Document idan: ['out:type:'] yi: { :output :nauʼi
-	nasa headers-out ƙarya: {
-		nasa sessdata Babu? ƙarya: {
-			nasa session-manager save: nasa sessdata.
+Takardar-Yanar-Gizo idan: ['fitar:nauʼi:'] yi: { :sakamako :nauʼi
+	nasa an-aika-kanun ƙarya: {
+		nasa bayanan-zama Babu? ƙarya: {
+			nasa manajan-zama ajiye: nasa bayanan-zama.
 		}.
-		nasa headers ƙara-a-ƙarshe: (
-			HTTP-Header sabo
-			key: ['Content-type'] value: nauʼi
+		nasa kanun-saƙonni ƙara-a-ƙarshe: (
+			Kan-HTTP sabo
+			maɓalli: ['Content-type'] ƙima: nauʼi
 		).
-		nasa headers kowane: { :_ :header
-			Fitarwa rubuta: header.
+		nasa kanun-saƙonni kowane: { :_ :kanun-saƙo
+			Fitarwa rubuta: kanun-saƙo.
 		}.
-		nasa headers-out := Gaskiya.
+		nasa an-aika-kanun := Gaskiya.
 		Fitarwa rubuta: ['\r\n'].
 	}.
-	Fitarwa rubuta: output.
+	Fitarwa rubuta: sakamako.
 }.
 
-Web-Document idan: ['finish:type:'] yi: { :output :nauʼi
-	nasa headers-out ƙarya: {
-		nasa sessdata Babu? ƙarya: {
-			nasa session-manager save: nasa sessdata.
+Takardar-Yanar-Gizo idan: ['kammala:nauʼi:'] yi: { :sakamako :nauʼi
+	nasa an-aika-kanun ƙarya: {
+		nasa bayanan-zama Babu? ƙarya: {
+			nasa manajan-zama ajiye: nasa bayanan-zama.
 		}.
-		nasa headers ƙara-a-ƙarshe: (
-			HTTP-Header sabo
-			key: ['Content-type'] value: nauʼi
+		nasa kanun-saƙonni ƙara-a-ƙarshe: (
+			Kan-HTTP sabo
+			maɓalli: ['Content-type'] ƙima: nauʼi
 		).
-		nasa headers ƙara-a-ƙarshe: (
-			HTTP-Header sabo
-			key: ['Content-Length'] value: output rubutu bytes
+		nasa kanun-saƙonni ƙara-a-ƙarshe: (
+			Kan-HTTP sabo
+			maɓalli: ['Content-Length'] ƙima: sakamako rubutu bytes
 		).
-		nasa headers kowane: { :_ :header
-			Fitarwa rubuta: header.
+		nasa kanun-saƙonni kowane: { :_ :kanun-saƙo
+			Fitarwa rubuta: kanun-saƙo.
 		}.
-		nasa headers-out := Gaskiya.
+		nasa an-aika-kanun := Gaskiya.
 		Fitarwa rubuta: ['\r\n'].
 	}.
-	Fitarwa rubuta: output.
+	Fitarwa rubuta: sakamako.
 }.
 
-Web-Document idan: ['out:'] yi: { :output
-	kai out: output type: ['text/html; charset=utf-8'].
+Takardar-Yanar-Gizo idan: ['fitar:'] yi: { :sakamako
+	kai fitar: sakamako nauʼi: ['text/html; charset=utf-8'].
 }.
 
-Web-Document idan: ['finish:'] yi: { :output
-	kai finish: output type: ['text/html; charset=utf-8'].
+Takardar-Yanar-Gizo idan: ['kammala:'] yi: { :sakamako
+	kai kammala: sakamako nauʼi: ['text/html; charset=utf-8'].
 }.
 
-Web-Document idan: ['json:'] yi: { :output
-	kai out: ( JSON jsonify: output ) type: ['application/json'].
+Takardar-Yanar-Gizo idan: ['json:'] yi: { :sakamako
+	kai fitar: ( JSON jsonify: sakamako ) nauʼi: ['application/json'].
 }.
 
-Web-Document idan: ['not-found:'] yi: { :output
-	kai clear-headers header: (
-		HTTP-Header sabo key: ['Status'] value: ['404 Not Found']
+Takardar-Yanar-Gizo idan: ['ba-a-samu-ba:'] yi: { :sakamako
+	kai share-kanun-saƙonni kanun-saƙo: (
+		Kan-HTTP sabo maɓalli: ['Status'] ƙima: ['404 Not Found']
 	).
-	kai out: output.
+	kai fitar: sakamako.
 }.
 
 
 # Interface
 
->> Session := Abu sabo.
+>> Zama := Abu sabo.
 
-Session idan: ['sabo'] yi: { <- kai sabo init for: Babu.
+Zama idan: ['sabo'] yi: { <- kai sabo shirya domin: Babu.
 }.
 
-Session idan: ['for:'] yi: { :id
+Zama idan: ['domin:'] yi: { :id
 	nasa id := id.
 }.
 
-Session idan: ['load'] yi: {
+Zama idan: ['loda'] yi: {
 	wannan-aiki kuskure: ['Not implemented.'].
 }.
 
-Session idan: ['save:'] yi: {
+Zama idan: ['ajiye:'] yi: {
 	wannan-aiki kuskure: ['Not implemented.'].
 }.
 
-Session idan: ['destroy'] yi: {
+Zama idan: ['lalata'] yi: {
 	wannan-aiki kuskure: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session sabo.
+>> Zaman-fayil-na-wucin-gadi := Zama sabo.
 
-Tempfile-Session idan: ['init'] yi: {
-	nasa pathprefix := ['/tmp/sess-'].
+Zaman-fayil-na-wucin-gadi idan: ['shirya'] yi: {
+	nasa farkon-hanya := ['/tmp/sess-'].
 }.
 
-Tempfile-Session idan: ['path-prefix:'] yi: { :str
-	nasa pathprefix := str.
+Zaman-fayil-na-wucin-gadi idan: ['gaban-hanya:'] yi: { :jerin-haruffa
+	nasa farkon-hanya := jerin-haruffa.
 }.
 
-Tempfile-Session idan: ['file'] yi: { <- ( Fayil sabo: ( nasa pathprefix + nasa id + ['.txt'] ) ).
+Zaman-fayil-na-wucin-gadi idan: ['fayil-zama'] yi: { <- ( Fayil sabo: ( nasa farkon-hanya + nasa id + ['.txt'] ) ).
 }.
 
-Tempfile-Session idan: ['load'] yi: {
-	>> file := kai file.
-	file akwai ƙarya: {
-		file rubuta: (Ƙamus sabo lamba-tsari).
-	}. <- file karanta abu.
+Zaman-fayil-na-wucin-gadi idan: ['loda'] yi: {
+	>> fayil-zama := kai fayil-zama.
+	fayil-zama akwai ƙarya: {
+		fayil-zama rubuta: (Ƙamus sabo lamba-tsari).
+	}. <- fayil-zama karanta abu.
 }.
 
-Tempfile-Session idan: ['save:'] yi: { :data
-	>> file := kai file.
-	file akwai gaskiya: {
-		file rubuta: data lamba-tsari.
+Zaman-fayil-na-wucin-gadi idan: ['ajiye:'] yi: { :bayanai
+	>> fayil-zama := kai fayil-zama.
+	fayil-zama akwai gaskiya: {
+		fayil-zama rubuta: bayanai lamba-tsari.
 	}.
 }.
 
-Tempfile-Session idan: ['destroy'] yi: {
-	>> file := kai file.
-	file akwai gaskiya: {
-		file goge.
+Zaman-fayil-na-wucin-gadi idan: ['lalata'] yi: {
+	>> fayil-zama := kai fayil-zama.
+	fayil-zama akwai gaskiya: {
+		fayil-zama goge.
 	}.
 }.
 
 
 >> URL := Abu sabo.
 
-URL idan: ['init'] yi: {
-	nasa protocol := ['https://'].
+URL idan: ['shirya'] yi: {
+	nasa yarjejeniya := ['https://'].
 	nasa mai-masauki := ['localhost'].
 	nasa hanyar-fayil := [''].
-	nasa params := [''].
+	nasa sigogin-url := [''].
 	nasa hash := [''].
 }.
 
-URL idan: ['sabo'] yi: { <- kai sabo init.
+URL idan: ['sabo'] yi: { <- kai sabo shirya.
 }.
 
 URL idan: ['rubutu'] yi: { <- (
-	nasa protocol +
+	nasa yarjejeniya +
 	nasa mai-masauki +
 	nasa hanyar-fayil +
-	nasa params +
+	nasa sigogin-url +
 	nasa hash ).
 }.
 
-URL idan: ['protocol:'] yi: { :protocol
-	((Jeri sabo: ['http'] ; ['https']) ya-ƙunshi: protocol) gaskiya: {
-		nasa protocol := protocol + ['://'].
+URL idan: ['yarjejeniya:'] yi: { :yarjejeniya
+	((Jeri sabo ; ['http'] ; ['https']) yana-da: yarjejeniya) gaskiya: {
+		nasa yarjejeniya := yarjejeniya + ['://'].
 	}, ƙarya: {
 		wannan-aiki kuskure: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL idan: ['mai-masauki:'] yi: { :mai-masauki
 	nasa mai-masauki := mai-masauki.
 }.
 
-URL idan: ['path:'] yi: { :hanyar-fayil
+URL idan: ['hanyar-fayil:'] yi: { :hanyar-fayil
 	nasa hanyar-fayil := ['/'] + hanyar-fayil url-ɓoye-lamba.
 }.
 
-URL idan: ['params:'] yi: { :map
-	>> params := Jeri sabo.
-	map kowane: { :key :value
-		params ƙara-a-ƙarshe: key rubutu url-ɓoye-lamba + ['='] + value rubutu url-ɓoye-lamba.
+URL idan: ['sigogin-url:'] yi: { :taswira
+	>> sigogin-url := Jeri sabo.
+	taswira kowane: { :maɓalli :ƙima
+		sigogin-url ƙara-a-ƙarshe: maɓalli rubutu url-ɓoye-lamba + ['='] + ƙima rubutu url-ɓoye-lamba.
 	}.
-	nasa params := ['?'] + ( params haɗa: ['&'] ).
+	nasa sigogin-url := ['?'] + ( sigogin-url haɗa: ['&'] ).
 }.
 
 URL idan: ['hash:'] yi: { :hash

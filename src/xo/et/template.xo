@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objekt uus.
+>> Mall := Objekt uus.
 
-Template kui: ['uus'] tee: { <- ise uus content: [''].
+Mall kui: ['uus'] tee: { <- ise uus sisu: [''].
 }.
 
-Template kui: ['content:'] tee: { :content
-	oma content := content. 
+Mall kui: ['sisu:'] tee: { :sisu
+	oma sisu := sisu. 
 }.
 
-Template kui: ['uus:'] tee: { :content <- ise uus content: content.
+Mall kui: ['uus:'] tee: { :sisu <- ise uus sisu: sisu.
 }.
 
-Template kui: ['cut:'] tee: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := oma content tükelda: startmarker.
-	>> prefix := parts esimene.
-	>> parts2 := parts viimane tükelda: endmarker.
-	>> suffix := parts2 viimane.
-	>> part := parts2 esimene.
-	>> rest := prefix + suffix.
-	oma content := rest. <- Template uus: part.
+Mall kui: ['lõika:'] tee: { :märk
+	>> algusmärk := (['<!-- cut:%id% -->'] %id%: märk).
+	>> lõpumärk := (['<!-- /cut:%id% -->'] %id%: märk).
+	>> osad := oma sisu tükelda: algusmärk.
+	>> eesliide := osad esimene.
+	>> osad2 := osad viimane tükelda: lõpumärk.
+	>> järelliide := osad2 viimane.
+	>> osa := osad2 esimene.
+	>> ülejääk := eesliide + järelliide.
+	oma sisu := ülejääk. <- Mall uus: osa.
 	
 }.
 
-Template kui: ['kopeeri'] tee: { <- ise uus: ise tekst kopeeri.
+Mall kui: ['kopeeri'] tee: { <- ise uus: ise tekst kopeeri.
 }.
 	
-Template kui: ['paste:at:'] tee: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	oma content asenda: pastemarker väärtusega: ( snippet tekst + pastemarker ).
+Mall kui: ['kleebi:kohale:'] tee: { :katkend :id
+	>> kleepimismärk := (['<!-- paste:%id% -->'] %id%: id).
+	oma sisu asenda: kleepimismärk väärtusega: ( katkend tekst + kleepimismärk ).
 }.
 
-Template kui: ['sea:väärtus:'] tee: { :slot :value
-	oma content asenda: ['<!-- slot:'] + slot + [' -->'] väärtusega: ( Server html-kodeeri: value ).
+Mall kui: ['sea:väärtus:'] tee: { :pesa :väärtus
+	oma sisu asenda: ['<!-- slot:'] + pesa + [' -->'] väärtusega: ( Server html-kodeeri: väärtus ).
 }.
 
-Template kui: ['set:html:'] tee: { :slot :html
-	oma content asenda: ['<!-- slot:'] + slot + [' -->'] väärtusega: html.
+Mall kui: ['sea:html:'] tee: { :pesa :html
+	oma sisu asenda: ['<!-- slot:'] + pesa + [' -->'] väärtusega: html.
 }.
 
-Template kui: ['vasta:ja:'] tee: { :slot :value
-	ise sea: (slot alates: 0 pikkus: (slot pikkus - 1)) väärtus: value.
+Mall kui: ['vasta:ja:'] tee: { :pesa :väärtus
+	ise sea: (pesa alates: 0 pikkus: (pesa pikkus - 1)) väärtus: väärtus.
 }.
 
-Template kui: ['nl2br'] tee: {
-	oma content asenda: ['\n'] väärtusega: ['<br>'].
+Mall kui: ['nl2br'] tee: {
+	oma sisu asenda: ['\n'] väärtusega: ['<br>'].
 }.
 
-Template kui: ['clean'] tee: {
-	oma content :=
+Mall kui: ['korrasta'] tee: {
+	oma sisu :=
 		Muster
 		uus: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		vaste: oma content
+		vaste: oma sisu
 		tee: { <- ['']. }.
 }.
 
-Template kui: ['clean-cuts'] tee: {
-	>> items := Loend uus.
+Mall kui: ['korrasta-lõiked'] tee: {
+	>> elemendid := Loend uus.
 	Muster
 	uus: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	vaste: oma content
-	tee: { :_ :part
-		items lisa-lõppu: part ? 1.
+	vaste: oma sisu
+	tee: { :_ :osa
+		elemendid lisa-lõppu: osa ? 1.
 	}.
-	items iga: { :_ :id
-		oma content :=
+	elemendid iga: { :_ :id
+		oma sisu :=
 			Muster uus: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			vaste: oma content
+			vaste: oma sisu
 			tee: { <- ['']. }.
 	 }.
 }.
 
-Template kui: ['clean-space'] tee: {
-	oma content :=
+Mall kui: ['korrasta-tühikud'] tee: {
+	oma sisu :=
 		Muster
 		uus: ['\\s*\\n'],
-		vaste: oma content
+		vaste: oma sisu
 		tee: { <- ['\n']. }.
-	oma content :=
+	oma sisu :=
 		Muster
 		uus: ['\\n[\\s\\t]+'],
-		vaste: oma content
+		vaste: oma sisu
 		tee: { <- ['\n']. }.
 }.
 
-Template kui: ['clean-all'] tee: {
-	ise clean.
-	ise clean-cuts.
-	ise clean-space.
+Mall kui: ['korrasta-kõik'] tee: {
+	ise korrasta.
+	ise korrasta-lõiked.
+	ise korrasta-tühikud.
 }.
 
-Template kui: ['tekst'] tee: { <- oma content.
+Mall kui: ['tekst'] tee: { <- oma sisu.
 }.

@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Oġġett ġdid.
+>> Forma := Oġġett ġdid.
 
-Template meta: ['ġdid'] agħmel: { <- innifsu ġdid content: [''].
+Forma meta: ['ġdid'] agħmel: { <- innifsu ġdid kontenut: [''].
 }.
 
-Template meta: ['content:'] agħmel: { :content
-	proprju content := content. 
+Forma meta: ['kontenut:'] agħmel: { :kontenut
+	proprju kontenut := kontenut. 
 }.
 
-Template meta: ['ġdid:'] agħmel: { :content <- innifsu ġdid content: content.
+Forma meta: ['ġdid:'] agħmel: { :kontenut <- innifsu ġdid kontenut: kontenut.
 }.
 
-Template meta: ['cut:'] agħmel: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := proprju content aqsam: startmarker.
-	>> prefix := parts ewwel.
-	>> parts2 := parts aħħar aqsam: endmarker.
-	>> suffix := parts2 aħħar.
-	>> part := parts2 ewwel.
-	>> rest := prefix + suffix.
-	proprju content := rest. <- Template ġdid: part.
+Forma meta: ['aqta:'] agħmel: { :marka
+	>> marka-tal-bidu := (['<!-- cut:%id% -->'] %id%: marka).
+	>> marka-tat-tmiem := (['<!-- /cut:%id% -->'] %id%: marka).
+	>> partijiet := proprju kontenut aqsam: marka-tal-bidu.
+	>> prefiss := partijiet ewwel.
+	>> partijiet2 := partijiet aħħar aqsam: marka-tat-tmiem.
+	>> suffiss := partijiet2 aħħar.
+	>> parti := partijiet2 ewwel.
+	>> bqija := prefiss + suffiss.
+	proprju kontenut := bqija. <- Forma ġdid: parti.
 	
 }.
 
-Template meta: ['ikkopja'] agħmel: { <- innifsu ġdid: innifsu test ikkopja.
+Forma meta: ['ikkopja'] agħmel: { <- innifsu ġdid: innifsu test ikkopja.
 }.
 	
-Template meta: ['paste:at:'] agħmel: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	proprju content ibdel: pastemarker bi: ( snippet test + pastemarker ).
+Forma meta: ['waħħal:fi:'] agħmel: { :silta :id
+	>> marka-tal-waħħal := (['<!-- paste:%id% -->'] %id%: id).
+	proprju kontenut ibdel: marka-tal-waħħal bi: ( silta test + marka-tal-waħħal ).
 }.
 
-Template meta: ['issettja:valur:'] agħmel: { :slot :value
-	proprju content ibdel: ['<!-- slot:'] + slot + [' -->'] bi: ( Server html-ikkodifika: value ).
+Forma meta: ['issettja:valur:'] agħmel: { :post :valur
+	proprju kontenut ibdel: ['<!-- slot:'] + post + [' -->'] bi: ( Server html-ikkodifika: valur ).
 }.
 
-Template meta: ['set:html:'] agħmel: { :slot :html
-	proprju content ibdel: ['<!-- slot:'] + slot + [' -->'] bi: html.
+Forma meta: ['issettja:html:'] agħmel: { :post :html
+	proprju kontenut ibdel: ['<!-- slot:'] + post + [' -->'] bi: html.
 }.
 
-Template meta: ['wieġeb:u:'] agħmel: { :slot :value
-	innifsu issettja: (slot minn: 0 tul: (slot tul - 1)) valur: value.
+Forma meta: ['wieġeb:u:'] agħmel: { :post :valur
+	innifsu issettja: (post minn: 0 tul: (post tul - 1)) valur: valur.
 }.
 
-Template meta: ['nl2br'] agħmel: {
-	proprju content ibdel: ['\n'] bi: ['<br>'].
+Forma meta: ['nl2br'] agħmel: {
+	proprju kontenut ibdel: ['\n'] bi: ['<br>'].
 }.
 
-Template meta: ['clean'] agħmel: {
-	proprju content :=
+Forma meta: ['irranġa'] agħmel: {
+	proprju kontenut :=
 		Mudell
 		ġdid: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		taqbila: proprju content
+		taqbila: proprju kontenut
 		agħmel: { <- ['']. }.
 }.
 
-Template meta: ['clean-cuts'] agħmel: {
-	>> items := Lista ġdid.
+Forma meta: ['irranġa-qtugħ'] agħmel: {
+	>> oġġetti := Lista ġdid.
 	Mudell
 	ġdid: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	taqbila: proprju content
-	agħmel: { :_ :part
-		items żid-fit-tmiem: part ? 1.
+	taqbila: proprju kontenut
+	agħmel: { :_ :parti
+		oġġetti żid-fit-tmiem: parti ? 1.
 	}.
-	items kull: { :_ :id
-		proprju content :=
+	oġġetti kull: { :_ :id
+		proprju kontenut :=
 			Mudell ġdid: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			taqbila: proprju content
+			taqbila: proprju kontenut
 			agħmel: { <- ['']. }.
 	 }.
 }.
 
-Template meta: ['clean-space'] agħmel: {
-	proprju content :=
+Forma meta: ['irranġa-spazji'] agħmel: {
+	proprju kontenut :=
 		Mudell
 		ġdid: ['\\s*\\n'],
-		taqbila: proprju content
+		taqbila: proprju kontenut
 		agħmel: { <- ['\n']. }.
-	proprju content :=
+	proprju kontenut :=
 		Mudell
 		ġdid: ['\\n[\\s\\t]+'],
-		taqbila: proprju content
+		taqbila: proprju kontenut
 		agħmel: { <- ['\n']. }.
 }.
 
-Template meta: ['clean-all'] agħmel: {
-	innifsu clean.
-	innifsu clean-cuts.
-	innifsu clean-space.
+Forma meta: ['irranġa-kollox'] agħmel: {
+	innifsu irranġa.
+	innifsu irranġa-qtugħ.
+	innifsu irranġa-spazji.
 }.
 
-Template meta: ['test'] agħmel: { <- proprju content.
+Forma meta: ['test'] agħmel: { <- proprju kontenut.
 }.

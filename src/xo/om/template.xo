@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Wanta haaraa.
+>> Bocaa := Wanta haaraa.
 
-Template irratti: ['haaraa'] godhi: { <- ofii haaraa content: [''].
+Bocaa irratti: ['haaraa'] godhi: { <- ofii haaraa qabiyyee: [''].
 }.
 
-Template irratti: ['content:'] godhi: { :content
-	koo content := content. 
+Bocaa irratti: ['qabiyyee:'] godhi: { :qabiyyee
+	koo qabiyyee := qabiyyee. 
 }.
 
-Template irratti: ['haaraa:'] godhi: { :content <- ofii haaraa content: content.
+Bocaa irratti: ['haaraa:'] godhi: { :qabiyyee <- ofii haaraa qabiyyee: qabiyyee.
 }.
 
-Template irratti: ['cut:'] godhi: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := koo content addaan-bahi: startmarker.
-	>> prefix := parts jalqabaa.
-	>> parts2 := parts dhumaa addaan-bahi: endmarker.
-	>> suffix := parts2 dhumaa.
-	>> part := parts2 jalqabaa.
-	>> rest := prefix + suffix.
-	koo content := rest. <- Template haaraa: part.
+Bocaa irratti: ['muri:'] godhi: { :mallattoo
+	>> mallattoo-jalqabaa := (['<!-- cut:%id% -->'] %id%: mallattoo).
+	>> mallattoo-dhumaa := (['<!-- /cut:%id% -->'] %id%: mallattoo).
+	>> kutaalee := koo qabiyyee addaan-bahi: mallattoo-jalqabaa.
+	>> durgale := kutaalee jalqabaa.
+	>> kutaalee2 := kutaalee dhumaa addaan-bahi: mallattoo-dhumaa.
+	>> dubaale := kutaalee2 dhumaa.
+	>> kutaa := kutaalee2 jalqabaa.
+	>> hafe := durgale + dubaale.
+	koo qabiyyee := hafe. <- Bocaa haaraa: kutaa.
 	
 }.
 
-Template irratti: ['kopii'] godhi: { <- ofii haaraa: ofii gara-barreeffamaatti kopii.
+Bocaa irratti: ['kopii'] godhi: { <- ofii haaraa: ofii gara-barreeffamaatti kopii.
 }.
 	
-Template irratti: ['paste:at:'] godhi: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	koo content bakka-buusi: pastemarker tiin: ( snippet gara-barreeffamaatti + pastemarker ).
+Bocaa irratti: ['qabsiisi:itti:'] godhi: { :cuunfaa :id
+	>> mallattoo-qabsiisuu := (['<!-- paste:%id% -->'] %id%: id).
+	koo qabiyyee bakka-buusi: mallattoo-qabsiisuu tiin: ( cuunfaa gara-barreeffamaatti + mallattoo-qabsiisuu ).
 }.
 
-Template irratti: ['kaaʼi:gatii:'] godhi: { :slot :value
-	koo content bakka-buusi: ['<!-- slot:'] + slot + [' -->'] tiin: ( Server html-koodessi: value ).
+Bocaa irratti: ['kaaʼi:gatii:'] godhi: { :iddoo :gatii
+	koo qabiyyee bakka-buusi: ['<!-- slot:'] + iddoo + [' -->'] tiin: ( Server html-koodessi: gatii ).
 }.
 
-Template irratti: ['set:html:'] godhi: { :slot :html
-	koo content bakka-buusi: ['<!-- slot:'] + slot + [' -->'] tiin: html.
+Bocaa irratti: ['kaaʼi:html:'] godhi: { :iddoo :html
+	koo qabiyyee bakka-buusi: ['<!-- slot:'] + iddoo + [' -->'] tiin: html.
 }.
 
-Template irratti: ['deebii-kenni:fi:'] godhi: { :slot :value
-	ofii kaaʼi: (slot irraa: 0 dheerina: (slot dheerina - 1)) gatii: value.
+Bocaa irratti: ['deebii-kenni:fi:'] godhi: { :iddoo :gatii
+	ofii kaaʼi: (iddoo irraa: 0 dheerina: (iddoo dheerina - 1)) gatii: gatii.
 }.
 
-Template irratti: ['nl2br'] godhi: {
-	koo content bakka-buusi: ['\n'] tiin: ['<br>'].
+Bocaa irratti: ['nl2br'] godhi: {
+	koo qabiyyee bakka-buusi: ['\n'] tiin: ['<br>'].
 }.
 
-Template irratti: ['clean'] godhi: {
-	koo content :=
+Bocaa irratti: ['qulqulleessi'] godhi: {
+	koo qabiyyee :=
 		Akkaataa
 		haaraa: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		walsimannaa: koo content
+		walsimannaa: koo qabiyyee
 		godhi: { <- ['']. }.
 }.
 
-Template irratti: ['clean-cuts'] godhi: {
-	>> items := Tarree-wantootaa haaraa.
+Bocaa irratti: ['kutaalee-qulqulleessi'] godhi: {
+	>> wantoota := Tarree-wantootaa haaraa.
 	Akkaataa
 	haaraa: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	walsimannaa: koo content
-	godhi: { :_ :part
-		items dabaliboodatti: part ? 1.
+	walsimannaa: koo qabiyyee
+	godhi: { :_ :kutaa
+		wantoota dabaliboodatti: kutaa ? 1.
 	}.
-	items hundaaf: { :_ :id
-		koo content :=
+	wantoota hundaaf: { :_ :id
+		koo qabiyyee :=
 			Akkaataa haaraa: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			walsimannaa: koo content
+			walsimannaa: koo qabiyyee
 			godhi: { <- ['']. }.
 	 }.
 }.
 
-Template irratti: ['clean-space'] godhi: {
-	koo content :=
+Bocaa irratti: ['iddoo-duwwaa-qulqulleessi'] godhi: {
+	koo qabiyyee :=
 		Akkaataa
 		haaraa: ['\\s*\\n'],
-		walsimannaa: koo content
+		walsimannaa: koo qabiyyee
 		godhi: { <- ['\n']. }.
-	koo content :=
+	koo qabiyyee :=
 		Akkaataa
 		haaraa: ['\\n[\\s\\t]+'],
-		walsimannaa: koo content
+		walsimannaa: koo qabiyyee
 		godhi: { <- ['\n']. }.
 }.
 
-Template irratti: ['clean-all'] godhi: {
-	ofii clean.
-	ofii clean-cuts.
-	ofii clean-space.
+Bocaa irratti: ['hunda-qulqulleessi'] godhi: {
+	ofii qulqulleessi.
+	ofii kutaalee-qulqulleessi.
+	ofii iddoo-duwwaa-qulqulleessi.
 }.
 
-Template irratti: ['gara-barreeffamaatti'] godhi: { <- koo content.
+Bocaa irratti: ['gara-barreeffamaatti'] godhi: { <- koo qabiyyee.
 }.

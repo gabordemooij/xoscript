@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objektas naujas.
+>> Maketas := Objektas naujas.
 
-Template kai: ['naujas'] daryti: { <- pats naujas content: [''].
+Maketas kai: ['naujas'] daryti: { <- pats naujas turinys: [''].
 }.
 
-Template kai: ['content:'] daryti: { :content
-	savas content := content. 
+Maketas kai: ['turinys:'] daryti: { :turinys
+	savas turinys := turinys. 
 }.
 
-Template kai: ['naujas:'] daryti: { :content <- pats naujas content: content.
+Maketas kai: ['naujas:'] daryti: { :turinys <- pats naujas turinys: turinys.
 }.
 
-Template kai: ['cut:'] daryti: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := savas content padalinti: startmarker.
-	>> prefix := parts pirmas.
-	>> parts2 := parts paskutinis padalinti: endmarker.
-	>> suffix := parts2 paskutinis.
-	>> part := parts2 pirmas.
-	>> rest := prefix + suffix.
-	savas content := rest. <- Template naujas: part.
+Maketas kai: ['iškirpti:'] daryti: { :žymė
+	>> pradžios-žymė := (['<!-- cut:%id% -->'] %id%: žymė).
+	>> pabaigos-žymė := (['<!-- /cut:%id% -->'] %id%: žymė).
+	>> dalys := savas turinys padalinti: pradžios-žymė.
+	>> priešdėlis := dalys pirmas.
+	>> dalys2 := dalys paskutinis padalinti: pabaigos-žymė.
+	>> priesaga := dalys2 paskutinis.
+	>> dalis := dalys2 pirmas.
+	>> likutis := priešdėlis + priesaga.
+	savas turinys := likutis. <- Maketas naujas: dalis.
 	
 }.
 
-Template kai: ['kopijuoti'] daryti: { <- pats naujas: pats tekstas kopijuoti.
+Maketas kai: ['kopijuoti'] daryti: { <- pats naujas: pats tekstas kopijuoti.
 }.
 	
-Template kai: ['paste:at:'] daryti: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	savas content pakeisti: pastemarker į: ( snippet tekstas + pastemarker ).
+Maketas kai: ['įklijuoti:į:'] daryti: { :ištrauka :id
+	>> įklijavimo-žymė := (['<!-- paste:%id% -->'] %id%: id).
+	savas turinys pakeisti: įklijavimo-žymė į: ( ištrauka tekstas + įklijavimo-žymė ).
 }.
 
-Template kai: ['nustatyti:reikšmė:'] daryti: { :slot :value
-	savas content pakeisti: ['<!-- slot:'] + slot + [' -->'] į: ( Server html-koduoti: value ).
+Maketas kai: ['nustatyti:reikšmė:'] daryti: { :vieta :reikšmė
+	savas turinys pakeisti: ['<!-- slot:'] + vieta + [' -->'] į: ( Server html-koduoti: reikšmė ).
 }.
 
-Template kai: ['set:html:'] daryti: { :slot :html
-	savas content pakeisti: ['<!-- slot:'] + slot + [' -->'] į: html.
+Maketas kai: ['nustatyti:html:'] daryti: { :vieta :html
+	savas turinys pakeisti: ['<!-- slot:'] + vieta + [' -->'] į: html.
 }.
 
-Template kai: ['atsakyti:ir:'] daryti: { :slot :value
-	pats nustatyti: (slot nuo: 0 ilgis: (slot ilgis - 1)) reikšmė: value.
+Maketas kai: ['atsakyti:ir:'] daryti: { :vieta :reikšmė
+	pats nustatyti: (vieta nuo: 0 ilgis: (vieta ilgis - 1)) reikšmė: reikšmė.
 }.
 
-Template kai: ['nl2br'] daryti: {
-	savas content pakeisti: ['\n'] į: ['<br>'].
+Maketas kai: ['nl2br'] daryti: {
+	savas turinys pakeisti: ['\n'] į: ['<br>'].
 }.
 
-Template kai: ['clean'] daryti: {
-	savas content :=
+Maketas kai: ['tvarkyti'] daryti: {
+	savas turinys :=
 		Šablonas
 		naujas: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		atitikmuo: savas content
+		atitikmuo: savas turinys
 		daryti: { <- ['']. }.
 }.
 
-Template kai: ['clean-cuts'] daryti: {
-	>> items := Sąrašas naujas.
+Maketas kai: ['tvarkyti-iškarpas'] daryti: {
+	>> elementai := Sąrašas naujas.
 	Šablonas
 	naujas: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	atitikmuo: savas content
-	daryti: { :_ :part
-		items pridėti: part ? 1.
+	atitikmuo: savas turinys
+	daryti: { :_ :dalis
+		elementai pridėti: dalis ? 1.
 	}.
-	items kiekvienas: { :_ :id
-		savas content :=
+	elementai kiekvienas: { :_ :id
+		savas turinys :=
 			Šablonas naujas: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			atitikmuo: savas content
+			atitikmuo: savas turinys
 			daryti: { <- ['']. }.
 	 }.
 }.
 
-Template kai: ['clean-space'] daryti: {
-	savas content :=
+Maketas kai: ['tvarkyti-tarpus'] daryti: {
+	savas turinys :=
 		Šablonas
 		naujas: ['\\s*\\n'],
-		atitikmuo: savas content
+		atitikmuo: savas turinys
 		daryti: { <- ['\n']. }.
-	savas content :=
+	savas turinys :=
 		Šablonas
 		naujas: ['\\n[\\s\\t]+'],
-		atitikmuo: savas content
+		atitikmuo: savas turinys
 		daryti: { <- ['\n']. }.
 }.
 
-Template kai: ['clean-all'] daryti: {
-	pats clean.
-	pats clean-cuts.
-	pats clean-space.
+Maketas kai: ['tvarkyti-viską'] daryti: {
+	pats tvarkyti.
+	pats tvarkyti-iškarpas.
+	pats tvarkyti-tarpus.
 }.
 
-Template kai: ['tekstas'] daryti: { <- savas content.
+Maketas kai: ['tekstas'] daryti: { <- savas turinys.
 }.

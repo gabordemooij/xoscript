@@ -1,128 +1,128 @@
->> Email := Réad nua.
+>> Ríomhphost := Réad nua.
 
-Email ar: ['init'] déan: {
-	dílis recipients := Liosta nua.
+Ríomhphost ar: ['túsaigh'] déan: {
+	dílis faighteoirí := Liosta nua.
 	dílis cc := Liosta nua.
 	dílis bcc := Liosta nua.
-	dílis from := Neamhní.
-	dílis from-name := Neamhní.
-	dílis subject := Neamhní.
-	dílis body := Neamhní.
+	dílis seoltóir := Neamhní.
+	dílis ainm-seoltóra := Neamhní.
+	dílis ábhar-teachtaireachta := Neamhní.
+	dílis corp := Neamhní.
 }.
 
-Email ar: ['nua'] déan: { <- féin nua init.
+Ríomhphost ar: ['nua'] déan: { <- féin nua túsaigh.
 }.
 
-Email ar: ['to:'] déan: { :list
-	dílis recipients := list.
+Ríomhphost ar: ['chuig:'] déan: { :liostáil
+	dílis faighteoirí := liostáil.
 }.
  
-Email ar: ['cc:'] déan: { :list
-	dílis cc := list.
+Ríomhphost ar: ['cc:'] déan: { :liostáil
+	dílis cc := liostáil.
 }.
 
-Email ar: ['bcc:'] déan: { :list
-	dílis bcc := list.
+Ríomhphost ar: ['bcc:'] déan: { :liostáil
+	dílis bcc := liostáil.
 }.
 
-Email ar: ['subject:'] déan: { :subject
-	dílis subject := subject.
+Ríomhphost ar: ['ábhar-teachtaireachta:'] déan: { :ábhar-teachtaireachta
+	dílis ábhar-teachtaireachta := ábhar-teachtaireachta.
 }.
 
-Email ar: ['from:name:'] déan: { :from :ainm
-	dílis from := from.
-	dílis from-name := ainm.
+Ríomhphost ar: ['seoltóir:ainm:'] déan: { :seoltóir :ainm
+	dílis seoltóir := seoltóir.
+	dílis ainm-seoltóra := ainm.
 }.
 
-Email ar: ['body:'] déan: { :body
-	dílis body := body.
+Ríomhphost ar: ['corp:'] déan: { :corp
+	dílis corp := corp.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email ar: ['header:'] déan: { :line <- line ionadaigh: ['\r'] le: [''], ionadaigh: ['\n'] le: [''].
+Ríomhphost ar: ['ceanntásc:'] déan: { :líne <- líne ionadaigh: ['\r'] le: [''], ionadaigh: ['\n'] le: [''].
 }.
 
-Email ar: ['send'] déan: {
-	>> f := Comhad tempwrite: féin generate.
+Ríomhphost ar: ['seol'] déan: {
+	>> f := Comhad tempwrite: féin gin.
 	Ríomhchlár córas: ['sendmail -t < '] + f conair, líne-nua.
 }.
 
-Email ar: ['generate'] déan: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str iarcheangail: (féin header: ['From: '] + dílis from-name + [' <'] + ( dílis from ) + ['>']) + brk.
-	str iarcheangail: (féin header: ['To: '] + ( dílis recipients ceangail: [','] )) + brk.
+Ríomhphost ar: ['gin'] déan: {
+	>> briseadh-líne := ['\r\n'].
+	>> teaghrán-téacs := [''].
+	teaghrán-téacs iarcheangail: (féin ceanntásc: ['From: '] + dílis ainm-seoltóra + [' <'] + ( dílis seoltóir ) + ['>']) + briseadh-líne.
+	teaghrán-téacs iarcheangail: (féin ceanntásc: ['To: '] + ( dílis faighteoirí ceangail: [','] )) + briseadh-líne.
 	dílis cc comhair fíor: {
-		str iarcheangail: (féin header: ['Cc: '] + ( dílis cc ceangail: [','] )) + brk.
+		teaghrán-téacs iarcheangail: (féin ceanntásc: ['Cc: '] + ( dílis cc ceangail: [','] )) + briseadh-líne.
 	}.
 	dílis bcc comhair fíor: {
-		str iarcheangail: (féin header: ['Bcc: '] + ( dílis bcc ceangail: [','] )) + brk.
+		teaghrán-téacs iarcheangail: (féin ceanntásc: ['Bcc: '] + ( dílis bcc ceangail: [','] )) + briseadh-líne.
 	}.
-	str iarcheangail: (féin header: ['Subject: '] + dílis subject) + brk.
-	str iarcheangail: brk.
-	str iarcheangail: dílis body.
-	str iarcheangail: brk. <- str.
+	teaghrán-téacs iarcheangail: (féin ceanntásc: ['Subject: '] + dílis ábhar-teachtaireachta) + briseadh-líne.
+	teaghrán-téacs iarcheangail: briseadh-líne.
+	teaghrán-téacs iarcheangail: dílis corp.
+	teaghrán-téacs iarcheangail: briseadh-líne. <- teaghrán-téacs.
 }.
 
->> HTML-Email := Email nua.
+>> Ríomhphost-HTML := Ríomhphost nua.
 
-HTML-Email ar: ['init'] déan: {
-	féin init.
-	dílis attachments := Liosta nua.
-	dílis boundary := Taisceadán ceadchomhartha: 40.
+Ríomhphost-HTML ar: ['túsaigh'] déan: {
+	féin túsaigh.
+	dílis ceangaltáin := Liosta nua.
+	dílis teorainn := Taisceadán ceadchomhartha: 40.
 }.
 
-HTML-Email ar: ['attach:'] déan: { :file
-	>> id := dílis attachments comhair.
-	>> blob := file blob.
-	dílis attachments iarcheangail: (
+Ríomhphost-HTML ar: ['iniaigh:'] déan: { :comhad
+	>> id := dílis ceangaltáin comhair.
+	>> blob := comhad blob.
+	dílis ceangaltáin iarcheangail: (
 		Foclóir nua
-			file: file conair,
-			mime: ['image/'] + (Server mimetype: file conair),
-			data: blob base64-ionchódaigh
+			comhad: comhad conair,
+			mime: ['image/'] + (Server mimetype: comhad conair),
+			sonraí: blob base64-ionchódaigh
 	).
 	blob saor. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email ar: ['generate'] déan: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str iarcheangail: (féin header: ['From: '] + dílis from-name + [' <'] + ( dílis from ) + ['>']) + brk.
-	str iarcheangail: (féin header: ['To: '] + ( dílis recipients ceangail: [','] )) + brk.
+Ríomhphost-HTML ar: ['gin'] déan: {
+	>> briseadh-líne := ['\r\n'].
+	>> teaghrán-téacs := [''].
+	teaghrán-téacs iarcheangail: (féin ceanntásc: ['From: '] + dílis ainm-seoltóra + [' <'] + ( dílis seoltóir ) + ['>']) + briseadh-líne.
+	teaghrán-téacs iarcheangail: (féin ceanntásc: ['To: '] + ( dílis faighteoirí ceangail: [','] )) + briseadh-líne.
 	dílis cc comhair fíor: {
-		str iarcheangail: (féin header: ['Cc: '] + ( dílis cc ceangail: [','] )) + brk.
+		teaghrán-téacs iarcheangail: (féin ceanntásc: ['Cc: '] + ( dílis cc ceangail: [','] )) + briseadh-líne.
 	}.
 	dílis bcc comhair fíor: {
-		str iarcheangail: (féin header: ['Bcc: '] + ( dílis bcc ceangail: [','] )) + brk.
+		teaghrán-téacs iarcheangail: (féin ceanntásc: ['Bcc: '] + ( dílis bcc ceangail: [','] )) + briseadh-líne.
 	}.
-	str iarcheangail: (féin header: ['Subject: '] + dílis subject) + brk.
-	str iarcheangail: ['MIME-Version: 1.0'] + brk.
-	str iarcheangail: ['Content-Type: multipart/related; boundary="'] + dílis boundary + ['"; type=text/html'] + brk.
-	str iarcheangail: brk.
-	str iarcheangail: ['--'] + dílis boundary + brk.
-	str iarcheangail: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str iarcheangail: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str iarcheangail: brk.
-	str iarcheangail: dílis body.
-	str iarcheangail: brk.
-	dílis attachments gach: { :id :info
-		>> blob := info data.
-		str iarcheangail: ['--'] + dílis boundary + brk.
-		str iarcheangail: ['Content-Type: '] + info mime + brk.
-		str iarcheangail: ['Content-Transfer-Encoding: base64'] + brk.
-		str iarcheangail: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str iarcheangail: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str iarcheangail: brk.
-		>> max := 76.
-		>> len := blob fad.
-		>> chunks := (len / max) slánaigh-suas.
+	teaghrán-téacs iarcheangail: (féin ceanntásc: ['Subject: '] + dílis ábhar-teachtaireachta) + briseadh-líne.
+	teaghrán-téacs iarcheangail: ['MIME-Version: 1.0'] + briseadh-líne.
+	teaghrán-téacs iarcheangail: ['Content-Type: multipart/related; boundary="'] + dílis teorainn + ['"; type=text/html'] + briseadh-líne.
+	teaghrán-téacs iarcheangail: briseadh-líne.
+	teaghrán-téacs iarcheangail: ['--'] + dílis teorainn + briseadh-líne.
+	teaghrán-téacs iarcheangail: ['Content-Type: text/html; charset=UTF-8'] + briseadh-líne.
+	teaghrán-téacs iarcheangail: ['Content-Transfer-Encoding: 7bit'] + briseadh-líne.
+	teaghrán-téacs iarcheangail: briseadh-líne.
+	teaghrán-téacs iarcheangail: dílis corp.
+	teaghrán-téacs iarcheangail: briseadh-líne.
+	dílis ceangaltáin gach: { :id :eolas
+		>> blob := eolas sonraí.
+		teaghrán-téacs iarcheangail: ['--'] + dílis teorainn + briseadh-líne.
+		teaghrán-téacs iarcheangail: ['Content-Type: '] + eolas mime + briseadh-líne.
+		teaghrán-téacs iarcheangail: ['Content-Transfer-Encoding: base64'] + briseadh-líne.
+		teaghrán-téacs iarcheangail: ['Content-ID: <attachment'] + id + ['>'] + briseadh-líne.
+		teaghrán-téacs iarcheangail: ['Content-Disposition: inline; filename="'] + eolas comhad + ['"'] + briseadh-líne.
+		teaghrán-téacs iarcheangail: briseadh-líne.
+		>> uasteorainn := 76.
+		>> fad-téacs := blob fad.
+		>> píosaí := (fad-téacs / uasteorainn) slánaigh-suas.
 		{ :i
-			>> chunk := blob cóipeáil ó: i * max fad: max.
-			str iarcheangail: chunk + brk.
-		} * chunks.
-		str iarcheangail: brk.
-		str iarcheangail: brk.
+			>> píosa := blob cóipeáil ó: i * uasteorainn fad: uasteorainn.
+			teaghrán-téacs iarcheangail: píosa + briseadh-líne.
+		} * píosaí.
+		teaghrán-téacs iarcheangail: briseadh-líne.
+		teaghrán-téacs iarcheangail: briseadh-líne.
 	}.
-	str iarcheangail: ['--'] + dílis boundary + ['--'] + brk. <- str.
+	teaghrán-téacs iarcheangail: ['--'] + dílis teorainn + ['--'] + briseadh-líne. <- teaghrán-téacs.
 }.

@@ -1,128 +1,128 @@
 >> Email := Objekt ri.
 
-Email kur: ['init'] bëj: {
-	vetjak recipients := Listë ri.
+Email kur: ['inicializo'] bëj: {
+	vetjak marrësit := Listë ri.
 	vetjak cc := Listë ri.
 	vetjak bcc := Listë ri.
-	vetjak from := Asgjë.
-	vetjak from-name := Asgjë.
-	vetjak subject := Asgjë.
-	vetjak body := Asgjë.
+	vetjak dërgues := Asgjë.
+	vetjak emër-dërguesi := Asgjë.
+	vetjak subjekt := Asgjë.
+	vetjak trup := Asgjë.
 }.
 
-Email kur: ['ri'] bëj: { <- vetja ri init.
+Email kur: ['ri'] bëj: { <- vetja ri inicializo.
 }.
 
-Email kur: ['to:'] bëj: { :list
-	vetjak recipients := list.
+Email kur: ['marrës:'] bëj: { :numërim
+	vetjak marrësit := numërim.
 }.
  
-Email kur: ['cc:'] bëj: { :list
-	vetjak cc := list.
+Email kur: ['cc:'] bëj: { :numërim
+	vetjak cc := numërim.
 }.
 
-Email kur: ['bcc:'] bëj: { :list
-	vetjak bcc := list.
+Email kur: ['bcc:'] bëj: { :numërim
+	vetjak bcc := numërim.
 }.
 
-Email kur: ['subject:'] bëj: { :subject
-	vetjak subject := subject.
+Email kur: ['subjekt:'] bëj: { :subjekt
+	vetjak subjekt := subjekt.
 }.
 
-Email kur: ['from:name:'] bëj: { :from :emër
-	vetjak from := from.
-	vetjak from-name := emër.
+Email kur: ['dërgues:emër:'] bëj: { :dërgues :emër
+	vetjak dërgues := dërgues.
+	vetjak emër-dërguesi := emër.
 }.
 
-Email kur: ['body:'] bëj: { :body
-	vetjak body := body.
+Email kur: ['trup:'] bëj: { :trup
+	vetjak trup := trup.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email kur: ['header:'] bëj: { :line <- line zëvendëso: ['\r'] me: [''], zëvendëso: ['\n'] me: [''].
+Email kur: ['kokë:'] bëj: { :rresht <- rresht zëvendëso: ['\r'] me: [''], zëvendëso: ['\n'] me: [''].
 }.
 
-Email kur: ['send'] bëj: {
-	>> f := Skedar tempwrite: vetja generate.
+Email kur: ['dërgo'] bëj: {
+	>> f := Skedar tempwrite: vetja gjenero.
 	Program sistem: ['sendmail -t < '] + f shteg, rresht-ri.
 }.
 
-Email kur: ['generate'] bëj: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str shto-në-fund: (vetja header: ['From: '] + vetjak from-name + [' <'] + ( vetjak from ) + ['>']) + brk.
-	str shto-në-fund: (vetja header: ['To: '] + ( vetjak recipients bashko: [','] )) + brk.
+Email kur: ['gjenero'] bëj: {
+	>> ndërprerje-rreshti := ['\r\n'].
+	>> varg := [''].
+	varg shto-në-fund: (vetja kokë: ['From: '] + vetjak emër-dërguesi + [' <'] + ( vetjak dërgues ) + ['>']) + ndërprerje-rreshti.
+	varg shto-në-fund: (vetja kokë: ['To: '] + ( vetjak marrësit bashko: [','] )) + ndërprerje-rreshti.
 	vetjak cc numëro vërtetë: {
-		str shto-në-fund: (vetja header: ['Cc: '] + ( vetjak cc bashko: [','] )) + brk.
+		varg shto-në-fund: (vetja kokë: ['Cc: '] + ( vetjak cc bashko: [','] )) + ndërprerje-rreshti.
 	}.
 	vetjak bcc numëro vërtetë: {
-		str shto-në-fund: (vetja header: ['Bcc: '] + ( vetjak bcc bashko: [','] )) + brk.
+		varg shto-në-fund: (vetja kokë: ['Bcc: '] + ( vetjak bcc bashko: [','] )) + ndërprerje-rreshti.
 	}.
-	str shto-në-fund: (vetja header: ['Subject: '] + vetjak subject) + brk.
-	str shto-në-fund: brk.
-	str shto-në-fund: vetjak body.
-	str shto-në-fund: brk. <- str.
+	varg shto-në-fund: (vetja kokë: ['Subject: '] + vetjak subjekt) + ndërprerje-rreshti.
+	varg shto-në-fund: ndërprerje-rreshti.
+	varg shto-në-fund: vetjak trup.
+	varg shto-në-fund: ndërprerje-rreshti. <- varg.
 }.
 
 >> HTML-Email := Email ri.
 
-HTML-Email kur: ['init'] bëj: {
-	vetja init.
-	vetjak attachments := Listë ri.
-	vetjak boundary := Kasafortë token: 40.
+HTML-Email kur: ['inicializo'] bëj: {
+	vetja inicializo.
+	vetjak bashkëngjitje := Listë ri.
+	vetjak kufi := Kasafortë token: 40.
 }.
 
-HTML-Email kur: ['attach:'] bëj: { :file
-	>> id := vetjak attachments numëro.
-	>> blob := file blob.
-	vetjak attachments shto-në-fund: (
+HTML-Email kur: ['bashkëngjit:'] bëj: { :skedar
+	>> id := vetjak bashkëngjitje numëro.
+	>> blob := skedar blob.
+	vetjak bashkëngjitje shto-në-fund: (
 		Fjalor ri
-			file: file shteg,
-			mime: ['image/'] + (Server mimetype: file shteg),
-			data: blob base64-kodo
+			skedar: skedar shteg,
+			mime: ['image/'] + (Server mimetype: skedar shteg),
+			të-dhëna: blob base64-kodo
 	).
 	blob liro. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email kur: ['generate'] bëj: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str shto-në-fund: (vetja header: ['From: '] + vetjak from-name + [' <'] + ( vetjak from ) + ['>']) + brk.
-	str shto-në-fund: (vetja header: ['To: '] + ( vetjak recipients bashko: [','] )) + brk.
+HTML-Email kur: ['gjenero'] bëj: {
+	>> ndërprerje-rreshti := ['\r\n'].
+	>> varg := [''].
+	varg shto-në-fund: (vetja kokë: ['From: '] + vetjak emër-dërguesi + [' <'] + ( vetjak dërgues ) + ['>']) + ndërprerje-rreshti.
+	varg shto-në-fund: (vetja kokë: ['To: '] + ( vetjak marrësit bashko: [','] )) + ndërprerje-rreshti.
 	vetjak cc numëro vërtetë: {
-		str shto-në-fund: (vetja header: ['Cc: '] + ( vetjak cc bashko: [','] )) + brk.
+		varg shto-në-fund: (vetja kokë: ['Cc: '] + ( vetjak cc bashko: [','] )) + ndërprerje-rreshti.
 	}.
 	vetjak bcc numëro vërtetë: {
-		str shto-në-fund: (vetja header: ['Bcc: '] + ( vetjak bcc bashko: [','] )) + brk.
+		varg shto-në-fund: (vetja kokë: ['Bcc: '] + ( vetjak bcc bashko: [','] )) + ndërprerje-rreshti.
 	}.
-	str shto-në-fund: (vetja header: ['Subject: '] + vetjak subject) + brk.
-	str shto-në-fund: ['MIME-Version: 1.0'] + brk.
-	str shto-në-fund: ['Content-Type: multipart/related; boundary="'] + vetjak boundary + ['"; type=text/html'] + brk.
-	str shto-në-fund: brk.
-	str shto-në-fund: ['--'] + vetjak boundary + brk.
-	str shto-në-fund: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str shto-në-fund: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str shto-në-fund: brk.
-	str shto-në-fund: vetjak body.
-	str shto-në-fund: brk.
-	vetjak attachments secili: { :id :info
-		>> blob := info data.
-		str shto-në-fund: ['--'] + vetjak boundary + brk.
-		str shto-në-fund: ['Content-Type: '] + info mime + brk.
-		str shto-në-fund: ['Content-Transfer-Encoding: base64'] + brk.
-		str shto-në-fund: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str shto-në-fund: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str shto-në-fund: brk.
-		>> max := 76.
-		>> len := blob gjatësi.
-		>> chunks := (len / max) rrumbullakos-lart.
+	varg shto-në-fund: (vetja kokë: ['Subject: '] + vetjak subjekt) + ndërprerje-rreshti.
+	varg shto-në-fund: ['MIME-Version: 1.0'] + ndërprerje-rreshti.
+	varg shto-në-fund: ['Content-Type: multipart/related; boundary="'] + vetjak kufi + ['"; type=text/html'] + ndërprerje-rreshti.
+	varg shto-në-fund: ndërprerje-rreshti.
+	varg shto-në-fund: ['--'] + vetjak kufi + ndërprerje-rreshti.
+	varg shto-në-fund: ['Content-Type: text/html; charset=UTF-8'] + ndërprerje-rreshti.
+	varg shto-në-fund: ['Content-Transfer-Encoding: 7bit'] + ndërprerje-rreshti.
+	varg shto-në-fund: ndërprerje-rreshti.
+	varg shto-në-fund: vetjak trup.
+	varg shto-në-fund: ndërprerje-rreshti.
+	vetjak bashkëngjitje secili: { :id :info
+		>> blob := info të-dhëna.
+		varg shto-në-fund: ['--'] + vetjak kufi + ndërprerje-rreshti.
+		varg shto-në-fund: ['Content-Type: '] + info mime + ndërprerje-rreshti.
+		varg shto-në-fund: ['Content-Transfer-Encoding: base64'] + ndërprerje-rreshti.
+		varg shto-në-fund: ['Content-ID: <attachment'] + id + ['>'] + ndërprerje-rreshti.
+		varg shto-në-fund: ['Content-Disposition: inline; filename="'] + info skedar + ['"'] + ndërprerje-rreshti.
+		varg shto-në-fund: ndërprerje-rreshti.
+		>> maksimumi := 76.
+		>> gjatësi-teksti := blob gjatësi.
+		>> copa := (gjatësi-teksti / maksimumi) rrumbullakos-lart.
 		{ :i
-			>> chunk := blob kopjo nga: i * max gjatësi: max.
-			str shto-në-fund: chunk + brk.
-		} * chunks.
-		str shto-në-fund: brk.
-		str shto-në-fund: brk.
+			>> copë := blob kopjo nga: i * maksimumi gjatësi: maksimumi.
+			varg shto-në-fund: copë + ndërprerje-rreshti.
+		} * copa.
+		varg shto-në-fund: ndërprerje-rreshti.
+		varg shto-në-fund: ndërprerje-rreshti.
 	}.
-	str shto-në-fund: ['--'] + vetjak boundary + ['--'] + brk. <- str.
+	varg shto-në-fund: ['--'] + vetjak kufi + ['--'] + ndërprerje-rreshti. <- varg.
 }.

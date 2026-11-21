@@ -1,128 +1,128 @@
->> Email := Objek nuut.
+>> E-pos := Objek nuut.
 
-Email by: ['init'] doen: {
-	eie recipients := Lys nuut.
+E-pos by: ['inisialiseer'] doen: {
+	eie ontvangers := Lys nuut.
 	eie cc := Lys nuut.
 	eie bcc := Lys nuut.
-	eie from := Niks.
-	eie from-name := Niks.
-	eie subject := Niks.
-	eie body := Niks.
+	eie afsender := Niks.
+	eie afsendernaam := Niks.
+	eie onderwerp := Niks.
+	eie boodskapteks := Niks.
 }.
 
-Email by: ['nuut'] doen: { <- self nuut init.
+E-pos by: ['nuut'] doen: { <- self nuut inisialiseer.
 }.
 
-Email by: ['to:'] doen: { :list
-	eie recipients := list.
+E-pos by: ['aan:'] doen: { :opsomming
+	eie ontvangers := opsomming.
 }.
  
-Email by: ['cc:'] doen: { :list
-	eie cc := list.
+E-pos by: ['cc:'] doen: { :opsomming
+	eie cc := opsomming.
 }.
 
-Email by: ['bcc:'] doen: { :list
-	eie bcc := list.
+E-pos by: ['bcc:'] doen: { :opsomming
+	eie bcc := opsomming.
 }.
 
-Email by: ['subject:'] doen: { :subject
-	eie subject := subject.
+E-pos by: ['onderwerp:'] doen: { :onderwerp
+	eie onderwerp := onderwerp.
 }.
 
-Email by: ['from:name:'] doen: { :from :naam
-	eie from := from.
-	eie from-name := naam.
+E-pos by: ['afsender:naam:'] doen: { :afsender :naam
+	eie afsender := afsender.
+	eie afsendernaam := naam.
 }.
 
-Email by: ['body:'] doen: { :body
-	eie body := body.
+E-pos by: ['boodskapteks:'] doen: { :boodskapteks
+	eie boodskapteks := boodskapteks.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email by: ['header:'] doen: { :line <- line vervang: ['\r'] met: [''], vervang: ['\n'] met: [''].
+E-pos by: ['kopstuk:'] doen: { :reël <- reël vervang: ['\r'] met: [''], vervang: ['\n'] met: [''].
 }.
 
-Email by: ['send'] doen: {
-	>> f := Lêer tempwrite: self generate.
+E-pos by: ['stuur'] doen: {
+	>> f := Lêer tempwrite: self genereer.
 	Program stelsel: ['sendmail -t < '] + f pad, nuwe-reël.
 }.
 
-Email by: ['generate'] doen: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str voeg-agter: (self header: ['From: '] + eie from-name + [' <'] + ( eie from ) + ['>']) + brk.
-	str voeg-agter: (self header: ['To: '] + ( eie recipients voeg-saam: [','] )) + brk.
+E-pos by: ['genereer'] doen: {
+	>> reëlbreuk := ['\r\n'].
+	>> teksstring := [''].
+	teksstring voeg-agter: (self kopstuk: ['From: '] + eie afsendernaam + [' <'] + ( eie afsender ) + ['>']) + reëlbreuk.
+	teksstring voeg-agter: (self kopstuk: ['To: '] + ( eie ontvangers voeg-saam: [','] )) + reëlbreuk.
 	eie cc tel ja: {
-		str voeg-agter: (self header: ['Cc: '] + ( eie cc voeg-saam: [','] )) + brk.
+		teksstring voeg-agter: (self kopstuk: ['Cc: '] + ( eie cc voeg-saam: [','] )) + reëlbreuk.
 	}.
 	eie bcc tel ja: {
-		str voeg-agter: (self header: ['Bcc: '] + ( eie bcc voeg-saam: [','] )) + brk.
+		teksstring voeg-agter: (self kopstuk: ['Bcc: '] + ( eie bcc voeg-saam: [','] )) + reëlbreuk.
 	}.
-	str voeg-agter: (self header: ['Subject: '] + eie subject) + brk.
-	str voeg-agter: brk.
-	str voeg-agter: eie body.
-	str voeg-agter: brk. <- str.
+	teksstring voeg-agter: (self kopstuk: ['Subject: '] + eie onderwerp) + reëlbreuk.
+	teksstring voeg-agter: reëlbreuk.
+	teksstring voeg-agter: eie boodskapteks.
+	teksstring voeg-agter: reëlbreuk. <- teksstring.
 }.
 
->> HTML-Email := Email nuut.
+>> HTML-E-pos := E-pos nuut.
 
-HTML-Email by: ['init'] doen: {
-	self init.
-	eie attachments := Lys nuut.
-	eie boundary := Kluis token: 40.
+HTML-E-pos by: ['inisialiseer'] doen: {
+	self inisialiseer.
+	eie aanhegsels := Lys nuut.
+	eie grens := Kluis token: 40.
 }.
 
-HTML-Email by: ['attach:'] doen: { :file
-	>> id := eie attachments tel.
-	>> blob := file blob.
-	eie attachments voeg-agter: (
+HTML-E-pos by: ['aanheg:'] doen: { :lêer
+	>> id := eie aanhegsels tel.
+	>> blob := lêer blob.
+	eie aanhegsels voeg-agter: (
 		Woordeboek nuut
-			file: file pad,
-			mime: ['image/'] + (Server mimetype: file pad),
+			lêer: lêer pad,
+			mime: ['image/'] + (Server mimetype: lêer pad),
 			data: blob base64-kodeer
 	).
 	blob stel-vry. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email by: ['generate'] doen: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str voeg-agter: (self header: ['From: '] + eie from-name + [' <'] + ( eie from ) + ['>']) + brk.
-	str voeg-agter: (self header: ['To: '] + ( eie recipients voeg-saam: [','] )) + brk.
+HTML-E-pos by: ['genereer'] doen: {
+	>> reëlbreuk := ['\r\n'].
+	>> teksstring := [''].
+	teksstring voeg-agter: (self kopstuk: ['From: '] + eie afsendernaam + [' <'] + ( eie afsender ) + ['>']) + reëlbreuk.
+	teksstring voeg-agter: (self kopstuk: ['To: '] + ( eie ontvangers voeg-saam: [','] )) + reëlbreuk.
 	eie cc tel ja: {
-		str voeg-agter: (self header: ['Cc: '] + ( eie cc voeg-saam: [','] )) + brk.
+		teksstring voeg-agter: (self kopstuk: ['Cc: '] + ( eie cc voeg-saam: [','] )) + reëlbreuk.
 	}.
 	eie bcc tel ja: {
-		str voeg-agter: (self header: ['Bcc: '] + ( eie bcc voeg-saam: [','] )) + brk.
+		teksstring voeg-agter: (self kopstuk: ['Bcc: '] + ( eie bcc voeg-saam: [','] )) + reëlbreuk.
 	}.
-	str voeg-agter: (self header: ['Subject: '] + eie subject) + brk.
-	str voeg-agter: ['MIME-Version: 1.0'] + brk.
-	str voeg-agter: ['Content-Type: multipart/related; boundary="'] + eie boundary + ['"; type=text/html'] + brk.
-	str voeg-agter: brk.
-	str voeg-agter: ['--'] + eie boundary + brk.
-	str voeg-agter: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str voeg-agter: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str voeg-agter: brk.
-	str voeg-agter: eie body.
-	str voeg-agter: brk.
-	eie attachments elk: { :id :info
+	teksstring voeg-agter: (self kopstuk: ['Subject: '] + eie onderwerp) + reëlbreuk.
+	teksstring voeg-agter: ['MIME-Version: 1.0'] + reëlbreuk.
+	teksstring voeg-agter: ['Content-Type: multipart/related; boundary="'] + eie grens + ['"; type=text/html'] + reëlbreuk.
+	teksstring voeg-agter: reëlbreuk.
+	teksstring voeg-agter: ['--'] + eie grens + reëlbreuk.
+	teksstring voeg-agter: ['Content-Type: text/html; charset=UTF-8'] + reëlbreuk.
+	teksstring voeg-agter: ['Content-Transfer-Encoding: 7bit'] + reëlbreuk.
+	teksstring voeg-agter: reëlbreuk.
+	teksstring voeg-agter: eie boodskapteks.
+	teksstring voeg-agter: reëlbreuk.
+	eie aanhegsels elk: { :id :info
 		>> blob := info data.
-		str voeg-agter: ['--'] + eie boundary + brk.
-		str voeg-agter: ['Content-Type: '] + info mime + brk.
-		str voeg-agter: ['Content-Transfer-Encoding: base64'] + brk.
-		str voeg-agter: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str voeg-agter: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str voeg-agter: brk.
-		>> max := 76.
-		>> len := blob lengte.
-		>> chunks := (len / max) rond-op.
+		teksstring voeg-agter: ['--'] + eie grens + reëlbreuk.
+		teksstring voeg-agter: ['Content-Type: '] + info mime + reëlbreuk.
+		teksstring voeg-agter: ['Content-Transfer-Encoding: base64'] + reëlbreuk.
+		teksstring voeg-agter: ['Content-ID: <attachment'] + id + ['>'] + reëlbreuk.
+		teksstring voeg-agter: ['Content-Disposition: inline; filename="'] + info lêer + ['"'] + reëlbreuk.
+		teksstring voeg-agter: reëlbreuk.
+		>> hoogste := 76.
+		>> tekslengte := blob lengte.
+		>> stukke := (tekslengte / hoogste) rond-op.
 		{ :i
-			>> chunk := blob kopieer vanaf: i * max lengte: max.
-			str voeg-agter: chunk + brk.
-		} * chunks.
-		str voeg-agter: brk.
-		str voeg-agter: brk.
+			>> stuk := blob kopieer vanaf: i * hoogste lengte: hoogste.
+			teksstring voeg-agter: stuk + reëlbreuk.
+		} * stukke.
+		teksstring voeg-agter: reëlbreuk.
+		teksstring voeg-agter: reëlbreuk.
 	}.
-	str voeg-agter: ['--'] + eie boundary + ['--'] + brk. <- str.
+	teksstring voeg-agter: ['--'] + eie grens + ['--'] + reëlbreuk. <- teksstring.
 }.

@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Ahanoa hou.
+>> Tauira-whārangi := Ahanoa hou.
 
-Template ina-tae: ['hou'] mahia: { <- whaiaro hou content: [''].
+Tauira-whārangi ina-tae: ['hou'] mahia: { <- whaiaro hou ihirangi: [''].
 }.
 
-Template ina-tae: ['content:'] mahia: { :content
-	ake content := content. 
+Tauira-whārangi ina-tae: ['ihirangi:'] mahia: { :ihirangi
+	ake ihirangi := ihirangi. 
 }.
 
-Template ina-tae: ['hou:'] mahia: { :content <- whaiaro hou content: content.
+Tauira-whārangi ina-tae: ['hou:'] mahia: { :ihirangi <- whaiaro hou ihirangi: ihirangi.
 }.
 
-Template ina-tae: ['cut:'] mahia: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := ake content wehewehe: startmarker.
-	>> prefix := parts tuatahi.
-	>> parts2 := parts whakamutunga wehewehe: endmarker.
-	>> suffix := parts2 whakamutunga.
-	>> part := parts2 tuatahi.
-	>> rest := prefix + suffix.
-	ake content := rest. <- Template hou: part.
+Tauira-whārangi ina-tae: ['tapahia:'] mahia: { :tohu
+	>> tohu-tīmatanga := (['<!-- cut:%id% -->'] %id%: tohu).
+	>> tohu-mutunga := (['<!-- /cut:%id% -->'] %id%: tohu).
+	>> ngā-wāhanga-iti := ake ihirangi wehewehe: tohu-tīmatanga.
+	>> kuhimua := ngā-wāhanga-iti tuatahi.
+	>> ngā-wāhanga-iti2 := ngā-wāhanga-iti whakamutunga wehewehe: tohu-mutunga.
+	>> kumuri := ngā-wāhanga-iti2 whakamutunga.
+	>> wāhanga-iti := ngā-wāhanga-iti2 tuatahi.
+	>> toenga := kuhimua + kumuri.
+	ake ihirangi := toenga. <- Tauira-whārangi hou: wāhanga-iti.
 	
 }.
 
-Template ina-tae: ['tārua'] mahia: { <- whaiaro hou: whaiaro aho tārua.
+Tauira-whārangi ina-tae: ['tārua'] mahia: { <- whaiaro hou: whaiaro aho tārua.
 }.
 	
-Template ina-tae: ['paste:at:'] mahia: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	ake content whakakapihia: pastemarker me: ( snippet aho + pastemarker ).
+Tauira-whārangi ina-tae: ['whakapiri:kei:'] mahia: { :kongakonga :id
+	>> tohu-whakapiri := (['<!-- paste:%id% -->'] %id%: id).
+	ake ihirangi whakakapihia: tohu-whakapiri me: ( kongakonga aho + tohu-whakapiri ).
 }.
 
-Template ina-tae: ['tautuhi:uara:'] mahia: { :slot :value
-	ake content whakakapihia: ['<!-- slot:'] + slot + [' -->'] me: ( Server html-whakawaehere: value ).
+Tauira-whārangi ina-tae: ['tautuhi:uara:'] mahia: { :tūranga :uara
+	ake ihirangi whakakapihia: ['<!-- slot:'] + tūranga + [' -->'] me: ( Server html-whakawaehere: uara ).
 }.
 
-Template ina-tae: ['set:html:'] mahia: { :slot :html
-	ake content whakakapihia: ['<!-- slot:'] + slot + [' -->'] me: html.
+Tauira-whārangi ina-tae: ['tautuhi:html:'] mahia: { :tūranga :html
+	ake ihirangi whakakapihia: ['<!-- slot:'] + tūranga + [' -->'] me: html.
 }.
 
-Template ina-tae: ['whakautu:a:'] mahia: { :slot :value
-	whaiaro tautuhi: (slot mai: 0 roa: (slot roa - 1)) uara: value.
+Tauira-whārangi ina-tae: ['whakautu:a:'] mahia: { :tūranga :uara
+	whaiaro tautuhi: (tūranga mai: 0 roa: (tūranga roa - 1)) uara: uara.
 }.
 
-Template ina-tae: ['nl2br'] mahia: {
-	ake content whakakapihia: ['\n'] me: ['<br>'].
+Tauira-whārangi ina-tae: ['nl2br'] mahia: {
+	ake ihirangi whakakapihia: ['\n'] me: ['<br>'].
 }.
 
-Template ina-tae: ['clean'] mahia: {
-	ake content :=
+Tauira-whārangi ina-tae: ['whakanikoniko'] mahia: {
+	ake ihirangi :=
 		Tauira-rapu
 		hou: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		ōritenga: ake content
+		ōritenga: ake ihirangi
 		mahia: { <- ['']. }.
 }.
 
-Template ina-tae: ['clean-cuts'] mahia: {
-	>> items := Rārangi hou.
+Tauira-whārangi ina-tae: ['whakanikoniko-tapahi'] mahia: {
+	>> ngā-tūemi := Rārangi hou.
 	Tauira-rapu
 	hou: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	ōritenga: ake content
-	mahia: { :_ :part
-		items tāpiri-muri: part ? 1.
+	ōritenga: ake ihirangi
+	mahia: { :_ :wāhanga-iti
+		ngā-tūemi tāpiri-muri: wāhanga-iti ? 1.
 	}.
-	items ia: { :_ :id
-		ake content :=
+	ngā-tūemi ia: { :_ :id
+		ake ihirangi :=
 			Tauira-rapu hou: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			ōritenga: ake content
+			ōritenga: ake ihirangi
 			mahia: { <- ['']. }.
 	 }.
 }.
 
-Template ina-tae: ['clean-space'] mahia: {
-	ake content :=
+Tauira-whārangi ina-tae: ['whakanikoniko-mokowā'] mahia: {
+	ake ihirangi :=
 		Tauira-rapu
 		hou: ['\\s*\\n'],
-		ōritenga: ake content
+		ōritenga: ake ihirangi
 		mahia: { <- ['\n']. }.
-	ake content :=
+	ake ihirangi :=
 		Tauira-rapu
 		hou: ['\\n[\\s\\t]+'],
-		ōritenga: ake content
+		ōritenga: ake ihirangi
 		mahia: { <- ['\n']. }.
 }.
 
-Template ina-tae: ['clean-all'] mahia: {
-	whaiaro clean.
-	whaiaro clean-cuts.
-	whaiaro clean-space.
+Tauira-whārangi ina-tae: ['whakanikoniko-katoa'] mahia: {
+	whaiaro whakanikoniko.
+	whaiaro whakanikoniko-tapahi.
+	whaiaro whakanikoniko-mokowā.
 }.
 
-Template ina-tae: ['aho'] mahia: { <- ake content.
+Tauira-whārangi ina-tae: ['aho'] mahia: { <- ake ihirangi.
 }.

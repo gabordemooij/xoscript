@@ -1,302 +1,302 @@
-HTTP-Pieprasījums kad: ['HTTP-header:'] darīt: { :key <- Programma iestatījums: key.
+HTTP-Pieprasījums kad: ['HTTP-galvene:'] darīt: { :atslēga <- Programma iestatījums: atslēga.
 }.
 
->> HTTP-Header := Objekts jauns.
+>> HTTP-Galvene := Objekts jauns.
 
-HTTP-Header kad: ['jauns'] darīt: { <- pats jauns init.
+HTTP-Galvene kad: ['jauns'] darīt: { <- pats jauns inicializēt.
 }.
 
-HTTP-Header kad: ['init'] darīt: {
-	savs key := Nekas.
-	savs value := Nekas.
+HTTP-Galvene kad: ['inicializēt'] darīt: {
+	savs atslēga := Nekas.
+	savs vērtība := Nekas.
 }.
 
-HTTP-Header kad: ['key:value:'] darīt: { :key :value
-	savs key := key.
-	savs value := value.
+HTTP-Galvene kad: ['atslēga:vērtība:'] darīt: { :atslēga :vērtība
+	savs atslēga := atslēga.
+	savs vērtība := vērtība.
 }.
 
-HTTP-Header kad: ['key'] darīt: { <- savs key.
+HTTP-Galvene kad: ['atslēga'] darīt: { <- savs atslēga.
 }.
 
-HTTP-Header kad: ['value'] darīt: { <- savs value.
+HTTP-Galvene kad: ['vērtība'] darīt: { <- savs vērtība.
 }.
 
 
-HTTP-Header kad: ['teksts'] darīt: {
-	>> line := savs key + [': '] + savs value.
-	line aizstāt: ['\r'] ar: [''], aizstāt: ['\n'] ar: ['']. <- line + [' \r\n'].
+HTTP-Galvene kad: ['teksts'] darīt: {
+	>> rinda := savs atslēga + [': '] + savs vērtība.
+	rinda aizstāt: ['\r'] ar: [''], aizstāt: ['\n'] ar: ['']. <- rinda + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Objekts jauns.
+>> Tīmekļa-dokuments := Objekts jauns.
 
-Web-Document kad: ['jauns'] darīt: { <- pats jauns init.
+Tīmekļa-dokuments kad: ['jauns'] darīt: { <- pats jauns inicializēt.
 }.
 
-Web-Document kad: ['init'] darīt: {
-	savs headers := Saraksts jauns.
-	savs sess-id := Nekas.
-	savs session-manager := Tempfile-Session jauns.
-	savs sessdata := Nekas.
-	savs secure := Patiess.
-	savs same-site := ['Strict'].
-	savs headers-out := Aplams.
-	savs request := HTTP-Pieprasījums jauns.
+Tīmekļa-dokuments kad: ['inicializēt'] darīt: {
+	savs galvenes := Saraksts jauns.
+	savs sesijas-id := Nekas.
+	savs sesiju-pārvaldnieks := Pagaidu-faila-sesija jauns.
+	savs sesijas-dati := Nekas.
+	savs droša := Patiess.
+	savs tā-pati-vietne := ['Strict'].
+	savs galvenes-nosūtītas := Aplams.
+	savs pieprasījums := HTTP-Pieprasījums jauns.
 }.
 
-Web-Document kad: ['request:'] darīt: { :request
-	savs request := request.
+Tīmekļa-dokuments kad: ['pieprasījums:'] darīt: { :pieprasījums
+	savs pieprasījums := pieprasījums.
 }. 
 
-Web-Document kad: ['secure-session-cookie:'] darīt: { :secure
-	pats check-headers.
-	savs secure := secure.
+Tīmekļa-dokuments kad: ['droša-sesijas-sīkdatne:'] darīt: { :droša
+	pats pārbaudīt-galvenes.
+	savs droša := droša.
 }.
 
-Web-Document kad: ['same-site-session-cookie:'] darīt: { :value
-	pats check-headers.
-	>> options := Saraksts jauns 
+Tīmekļa-dokuments kad: ['sesijas-sīkdatne-tā-pati-vietne:'] darīt: { :vērtība
+	pats pārbaudīt-galvenes.
+	>> opcijas := Saraksts jauns 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options satur: value, aplams: {
+	opcijas ietver: vērtība, aplams: {
 		šis-uzdevums kļūda: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	savs same-site := value.
+	savs tā-pati-vietne := vērtība.
 }.
 
-Web-Document kad: ['header:'] darīt: { :header
-	pats check-headers.
-	savs headers pievienot-beigās: header.
+Tīmekļa-dokuments kad: ['galvene:'] darīt: { :galvene
+	pats pārbaudīt-galvenes.
+	savs galvenes pievienot-beigās: galvene.
 }.
 
-Web-Document kad: ['clear-headers'] darīt: {
-	pats check-headers.
-	savs headers := Saraksts jauns.
+Tīmekļa-dokuments kad: ['notīrīt-galvenes'] darīt: {
+	pats pārbaudīt-galvenes.
+	savs galvenes := Saraksts jauns.
 }.
 
-Web-Document kad: ['session-manager:'] darīt: { :manager
-	pats check-headers.
-	savs session-manager := manager.
+Tīmekļa-dokuments kad: ['sesiju-pārvaldnieks:'] darīt: { :pārvaldnieks
+	pats pārbaudīt-galvenes.
+	savs sesiju-pārvaldnieks := pārvaldnieks.
 }.
 
-Web-Document kad: ['session-manager'] darīt: { <- savs session-manager.
+Tīmekļa-dokuments kad: ['sesiju-pārvaldnieks'] darīt: { <- savs sesiju-pārvaldnieks.
 }.
 
-Web-Document kad: ['check-headers'] darīt: {
-	savs headers-out patiess: {
+Tīmekļa-dokuments kad: ['pārbaudīt-galvenes'] darīt: {
+	savs galvenes-nosūtītas patiess: {
 		šis-uzdevums kļūda: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document kad: ['session-start'] darīt: {
-	pats check-headers.
-	>> request := savs request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nekas? aplams: {
-		(( Šablons jauns: ['^[A-Za-z0-9]+\\z'], atbilstība: sess-id ) = 0) patiess: {
-			sess-id := Nekas.
+Tīmekļa-dokuments kad: ['sākt-sesiju'] darīt: {
+	pats pārbaudīt-galvenes.
+	>> pieprasījums := savs pieprasījums.
+	>> sesijas-id := pieprasījums cookie: ['xsid'].
+	sesijas-id Nekas? aplams: {
+		(( Šablons jauns: ['^[A-Za-z0-9]+\\z'], atbilstība: sesijas-id ) = 0) patiess: {
+			sesijas-id := Nekas.
 		}.
 	}.
-	sess-id Nekas? patiess: {
-		sess-id := Seifs marķieris: 30.
-		>> session-header := HTTP-Header jauns
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (savs secure vai: ['Secure'] vai: ['']),
-		SSITE: (savs same-site),
-		XSID: sess-id
+	sesijas-id Nekas? patiess: {
+		sesijas-id := Seifs marķieris: 30.
+		>> sesijas-galvene := HTTP-Galvene jauns
+		atslēga: ['Set-Cookie'] vērtība: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (savs droša vai: ['Secure'] vai: ['']),
+		SSITE: (savs tā-pati-vietne),
+		XSID: sesijas-id
 		).
-		savs headers pievienot-beigās: session-header.
+		savs galvenes pievienot-beigās: sesijas-galvene.
 	}.
-	savs sessdata := savs session-manager for: sess-id, load. <- savs sessdata. # reference
+	savs sesijas-dati := savs sesiju-pārvaldnieks priekš: sesijas-id, ielādēt. <- savs sesijas-dati. # reference
 }.
 
-Web-Document kad: ['goto:'] darīt: { :url
-	pats check-headers.
-	pats clear-headers.
-	savs headers
+Tīmekļa-dokuments kad: ['doties-uz:'] darīt: { :adrese
+	pats pārbaudīt-galvenes.
+	pats notīrīt-galvenes.
+	savs galvenes
 	pievienot-beigās: (
-		HTTP-Header jauns
-		key: ['Status'] value: ['303 See Other']
+		HTTP-Galvene jauns
+		atslēga: ['Status'] vērtība: ['303 See Other']
 	),
 	pievienot-beigās: (
-		HTTP-Header jauns
-		key: ['Location'] value: url
+		HTTP-Galvene jauns
+		atslēga: ['Location'] vērtība: adrese
 	).
-	pats out: ['Redirect'].
+	pats izvadīt: ['Redirect'].
 }.
 
-Web-Document kad: ['session-destroy'] darīt: {
-	pats check-headers.
-	>> request := savs request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nekas? aplams: {
-		>> session-header := HTTP-Header jauns.
-		>> when := Brīdis jauns gads: 1970, formāts: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Tīmekļa-dokuments kad: ['iznīcināt-sesiju'] darīt: {
+	pats pārbaudīt-galvenes.
+	>> pieprasījums := savs pieprasījums.
+	>> sesijas-id := pieprasījums cookie: ['xsid'].
+	sesijas-id Nekas? aplams: {
+		>> sesijas-galvene := HTTP-Galvene jauns.
+		>> brīdis := Brīdis jauns gads: 1970, formāts: ['%a, %d %b %Y %H:%M:%S GMT'].
+		sesijas-galvene atslēga: ['Set-Cookie'] vērtība: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (savs secure vai: ['Secure'] vai: ['']),
-			SSITE: (savs same-site),
-			XSID: sess-id
+			EXP: brīdis,
+			SEC: (savs droša vai: ['Secure'] vai: ['']),
+			SSITE: (savs tā-pati-vietne),
+			XSID: sesijas-id
 		).
-		savs session-manager destroy.
-		savs headers pievienot-beigās: session-header.
+		savs sesiju-pārvaldnieks iznīcināt.
+		savs galvenes pievienot-beigās: sesijas-galvene.
 	}.
 }.
 
 
-Web-Document kad: ['template:'] darīt: { :ceļš <- Template jauns: (Fails jauns: ceļš, lasīt).
+Tīmekļa-dokuments kad: ['veidne:'] darīt: { :ceļš <- Veidne jauns: (Fails jauns: ceļš, lasīt).
 }.
 
-Web-Document kad: ['out:type:'] darīt: { :output :tips
-	savs headers-out aplams: {
-		savs sessdata Nekas? aplams: {
-			savs session-manager save: savs sessdata.
+Tīmekļa-dokuments kad: ['izvadīt:tips:'] darīt: { :izvade :tips
+	savs galvenes-nosūtītas aplams: {
+		savs sesijas-dati Nekas? aplams: {
+			savs sesiju-pārvaldnieks saglabāt: savs sesijas-dati.
 		}.
-		savs headers pievienot-beigās: (
-			HTTP-Header jauns
-			key: ['Content-type'] value: tips
+		savs galvenes pievienot-beigās: (
+			HTTP-Galvene jauns
+			atslēga: ['Content-type'] vērtība: tips
 		).
-		savs headers katrs: { :_ :header
-			Izvade rakstīt: header.
+		savs galvenes katrs: { :_ :galvene
+			Izvade rakstīt: galvene.
 		}.
-		savs headers-out := Patiess.
+		savs galvenes-nosūtītas := Patiess.
 		Izvade rakstīt: ['\r\n'].
 	}.
-	Izvade rakstīt: output.
+	Izvade rakstīt: izvade.
 }.
 
-Web-Document kad: ['finish:type:'] darīt: { :output :tips
-	savs headers-out aplams: {
-		savs sessdata Nekas? aplams: {
-			savs session-manager save: savs sessdata.
+Tīmekļa-dokuments kad: ['pabeigt:tips:'] darīt: { :izvade :tips
+	savs galvenes-nosūtītas aplams: {
+		savs sesijas-dati Nekas? aplams: {
+			savs sesiju-pārvaldnieks saglabāt: savs sesijas-dati.
 		}.
-		savs headers pievienot-beigās: (
-			HTTP-Header jauns
-			key: ['Content-type'] value: tips
+		savs galvenes pievienot-beigās: (
+			HTTP-Galvene jauns
+			atslēga: ['Content-type'] vērtība: tips
 		).
-		savs headers pievienot-beigās: (
-			HTTP-Header jauns
-			key: ['Content-Length'] value: output teksts bytes
+		savs galvenes pievienot-beigās: (
+			HTTP-Galvene jauns
+			atslēga: ['Content-Length'] vērtība: izvade teksts bytes
 		).
-		savs headers katrs: { :_ :header
-			Izvade rakstīt: header.
+		savs galvenes katrs: { :_ :galvene
+			Izvade rakstīt: galvene.
 		}.
-		savs headers-out := Patiess.
+		savs galvenes-nosūtītas := Patiess.
 		Izvade rakstīt: ['\r\n'].
 	}.
-	Izvade rakstīt: output.
+	Izvade rakstīt: izvade.
 }.
 
-Web-Document kad: ['out:'] darīt: { :output
-	pats out: output type: ['text/html; charset=utf-8'].
+Tīmekļa-dokuments kad: ['izvadīt:'] darīt: { :izvade
+	pats izvadīt: izvade tips: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kad: ['finish:'] darīt: { :output
-	pats finish: output type: ['text/html; charset=utf-8'].
+Tīmekļa-dokuments kad: ['pabeigt:'] darīt: { :izvade
+	pats pabeigt: izvade tips: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kad: ['json:'] darīt: { :output
-	pats out: ( JSON jsonify: output ) type: ['application/json'].
+Tīmekļa-dokuments kad: ['json:'] darīt: { :izvade
+	pats izvadīt: ( JSON jsonify: izvade ) tips: ['application/json'].
 }.
 
-Web-Document kad: ['not-found:'] darīt: { :output
-	pats clear-headers header: (
-		HTTP-Header jauns key: ['Status'] value: ['404 Not Found']
+Tīmekļa-dokuments kad: ['nav-atrasts:'] darīt: { :izvade
+	pats notīrīt-galvenes galvene: (
+		HTTP-Galvene jauns atslēga: ['Status'] vērtība: ['404 Not Found']
 	).
-	pats out: output.
+	pats izvadīt: izvade.
 }.
 
 
 # Interface
 
->> Session := Objekts jauns.
+>> Sesija := Objekts jauns.
 
-Session kad: ['jauns'] darīt: { <- pats jauns init for: Nekas.
+Sesija kad: ['jauns'] darīt: { <- pats jauns inicializēt priekš: Nekas.
 }.
 
-Session kad: ['for:'] darīt: { :id
+Sesija kad: ['priekš:'] darīt: { :id
 	savs id := id.
 }.
 
-Session kad: ['load'] darīt: {
+Sesija kad: ['ielādēt'] darīt: {
 	šis-uzdevums kļūda: ['Not implemented.'].
 }.
 
-Session kad: ['save:'] darīt: {
+Sesija kad: ['saglabāt:'] darīt: {
 	šis-uzdevums kļūda: ['Not implemented.'].
 }.
 
-Session kad: ['destroy'] darīt: {
+Sesija kad: ['iznīcināt'] darīt: {
 	šis-uzdevums kļūda: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session jauns.
+>> Pagaidu-faila-sesija := Sesija jauns.
 
-Tempfile-Session kad: ['init'] darīt: {
-	savs pathprefix := ['/tmp/sess-'].
+Pagaidu-faila-sesija kad: ['inicializēt'] darīt: {
+	savs ceļa-sākums := ['/tmp/sess-'].
 }.
 
-Tempfile-Session kad: ['path-prefix:'] darīt: { :str
-	savs pathprefix := str.
+Pagaidu-faila-sesija kad: ['ceļa-prefikss:'] darīt: { :virkne
+	savs ceļa-sākums := virkne.
 }.
 
-Tempfile-Session kad: ['file'] darīt: { <- ( Fails jauns: ( savs pathprefix + savs id + ['.txt'] ) ).
+Pagaidu-faila-sesija kad: ['fails'] darīt: { <- ( Fails jauns: ( savs ceļa-sākums + savs id + ['.txt'] ) ).
 }.
 
-Tempfile-Session kad: ['load'] darīt: {
-	>> file := pats file.
-	file pastāv aplams: {
-		file rakstīt: (Vārdnīca jauns kods).
-	}. <- file lasīt objekts.
+Pagaidu-faila-sesija kad: ['ielādēt'] darīt: {
+	>> fails := pats fails.
+	fails pastāv aplams: {
+		fails rakstīt: (Vārdnīca jauns kods).
+	}. <- fails lasīt objekts.
 }.
 
-Tempfile-Session kad: ['save:'] darīt: { :data
-	>> file := pats file.
-	file pastāv patiess: {
-		file rakstīt: data kods.
+Pagaidu-faila-sesija kad: ['saglabāt:'] darīt: { :dati
+	>> fails := pats fails.
+	fails pastāv patiess: {
+		fails rakstīt: dati kods.
 	}.
 }.
 
-Tempfile-Session kad: ['destroy'] darīt: {
-	>> file := pats file.
-	file pastāv patiess: {
-		file dzēst.
+Pagaidu-faila-sesija kad: ['iznīcināt'] darīt: {
+	>> fails := pats fails.
+	fails pastāv patiess: {
+		fails dzēst.
 	}.
 }.
 
 
 >> URL := Objekts jauns.
 
-URL kad: ['init'] darīt: {
-	savs protocol := ['https://'].
+URL kad: ['inicializēt'] darīt: {
+	savs protokols := ['https://'].
 	savs resursdators := ['localhost'].
 	savs ceļš := [''].
-	savs params := [''].
+	savs url-parametri := [''].
 	savs hash := [''].
 }.
 
-URL kad: ['jauns'] darīt: { <- pats jauns init.
+URL kad: ['jauns'] darīt: { <- pats jauns inicializēt.
 }.
 
 URL kad: ['teksts'] darīt: { <- (
-	savs protocol +
+	savs protokols +
 	savs resursdators +
 	savs ceļš +
-	savs params +
+	savs url-parametri +
 	savs hash ).
 }.
 
-URL kad: ['protocol:'] darīt: { :protocol
-	((Saraksts jauns: ['http'] ; ['https']) satur: protocol) patiess: {
-		savs protocol := protocol + ['://'].
+URL kad: ['protokols:'] darīt: { :protokols
+	((Saraksts jauns ; ['http'] ; ['https']) ietver: protokols) patiess: {
+		savs protokols := protokols + ['://'].
 	}, aplams: {
 		šis-uzdevums kļūda: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL kad: ['resursdators:'] darīt: { :resursdators
 	savs resursdators := resursdators.
 }.
 
-URL kad: ['path:'] darīt: { :ceļš
+URL kad: ['ceļš:'] darīt: { :ceļš
 	savs ceļš := ['/'] + ceļš url-kodēt.
 }.
 
-URL kad: ['params:'] darīt: { :map
-	>> params := Saraksts jauns.
-	map katrs: { :key :value
-		params pievienot-beigās: key teksts url-kodēt + ['='] + value teksts url-kodēt.
+URL kad: ['url-parametri:'] darīt: { :kartējums
+	>> url-parametri := Saraksts jauns.
+	kartējums katrs: { :atslēga :vērtība
+		url-parametri pievienot-beigās: atslēga teksts url-kodēt + ['='] + vērtība teksts url-kodēt.
 	}.
-	savs params := ['?'] + ( params apvienot: ['&'] ).
+	savs url-parametri := ['?'] + ( url-parametri apvienot: ['&'] ).
 }.
 
 URL kad: ['jaucējvērtība:'] darīt: { :hash

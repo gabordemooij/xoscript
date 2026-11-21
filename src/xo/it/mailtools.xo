@@ -1,128 +1,128 @@
 >> Email := Oggetto nuovo.
 
-Email on: ['init'] fare: {
-	mio recipients := Serie nuovo.
+Email on: ['inizializzare'] fare: {
+	mio destinatari := Serie nuovo.
 	mio cc := Serie nuovo.
 	mio bcc := Serie nuovo.
-	mio from := Nil.
-	mio from-name := Nil.
-	mio subject := Nil.
-	mio body := Nil.
+	mio mittente := Nil.
+	mio nome-mittente := Nil.
+	mio soggetto := Nil.
+	mio corpo := Nil.
 }.
 
-Email on: ['nuovo'] fare: { <- io nuovo init.
+Email on: ['nuovo'] fare: { <- io nuovo inizializzare.
 }.
 
-Email on: ['to:'] fare: { :list
-	mio recipients := list.
+Email on: ['destinatario:'] fare: { :elenco
+	mio destinatari := elenco.
 }.
  
-Email on: ['cc:'] fare: { :list
-	mio cc := list.
+Email on: ['cc:'] fare: { :elenco
+	mio cc := elenco.
 }.
 
-Email on: ['bcc:'] fare: { :list
-	mio bcc := list.
+Email on: ['bcc:'] fare: { :elenco
+	mio bcc := elenco.
 }.
 
-Email on: ['subject:'] fare: { :subject
-	mio subject := subject.
+Email on: ['soggetto:'] fare: { :soggetto
+	mio soggetto := soggetto.
 }.
 
-Email on: ['from:name:'] fare: { :from :nome
-	mio from := from.
-	mio from-name := nome.
+Email on: ['mittente:nome:'] fare: { :mittente :nome
+	mio mittente := mittente.
+	mio nome-mittente := nome.
 }.
 
-Email on: ['body:'] fare: { :body
-	mio body := body.
+Email on: ['corpo:'] fare: { :corpo
+	mio corpo := corpo.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email on: ['header:'] fare: { :line <- line sostituirlo: ['\r'] con: [''], sostituirlo: ['\n'] con: [''].
+Email on: ['intestazione:'] fare: { :riga <- riga sostituirlo: ['\r'] con: [''], sostituirlo: ['\n'] con: [''].
 }.
 
-Email on: ['send'] fare: {
-	>> f := File tempwrite: io generate.
+Email on: ['inviare'] fare: {
+	>> f := File tempwrite: io generare.
 	Programma sistema: ['sendmail -t < '] + f sentiero, stop.
 }.
 
-Email on: ['generate'] fare: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str aggiungere: (io header: ['From: '] + mio from-name + [' <'] + ( mio from ) + ['>']) + brk.
-	str aggiungere: (io header: ['To: '] + ( mio recipients aderire: [','] )) + brk.
+Email on: ['generare'] fare: {
+	>> acapo := ['\r\n'].
+	>> stringa := [''].
+	stringa aggiungere: (io intestazione: ['From: '] + mio nome-mittente + [' <'] + ( mio mittente ) + ['>']) + acapo.
+	stringa aggiungere: (io intestazione: ['To: '] + ( mio destinatari aderire: [','] )) + acapo.
 	mio cc contare vero: {
-		str aggiungere: (io header: ['Cc: '] + ( mio cc aderire: [','] )) + brk.
+		stringa aggiungere: (io intestazione: ['Cc: '] + ( mio cc aderire: [','] )) + acapo.
 	}.
 	mio bcc contare vero: {
-		str aggiungere: (io header: ['Bcc: '] + ( mio bcc aderire: [','] )) + brk.
+		stringa aggiungere: (io intestazione: ['Bcc: '] + ( mio bcc aderire: [','] )) + acapo.
 	}.
-	str aggiungere: (io header: ['Subject: '] + mio subject) + brk.
-	str aggiungere: brk.
-	str aggiungere: mio body.
-	str aggiungere: brk. <- str.
+	stringa aggiungere: (io intestazione: ['Subject: '] + mio soggetto) + acapo.
+	stringa aggiungere: acapo.
+	stringa aggiungere: mio corpo.
+	stringa aggiungere: acapo. <- stringa.
 }.
 
->> HTML-Email := Email nuovo.
+>> Email-HTML := Email nuovo.
 
-HTML-Email on: ['init'] fare: {
-	io init.
-	mio attachments := Serie nuovo.
-	mio boundary := Caveau token: 40.
+Email-HTML on: ['inizializzare'] fare: {
+	io inizializzare.
+	mio allegati := Serie nuovo.
+	mio confine := Caveau token: 40.
 }.
 
-HTML-Email on: ['attach:'] fare: { :file
-	>> id := mio attachments contare.
+Email-HTML on: ['allegare:'] fare: { :file
+	>> id := mio allegati contare.
 	>> blob := file blob.
-	mio attachments aggiungere: (
+	mio allegati aggiungere: (
 		Elenco nuovo
 			file: file sentiero,
 			mime: ['image/'] + (Server mimetype: file sentiero),
-			data: blob base64-codifica
+			dati: blob base64-codifica
 	).
 	blob libero. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email on: ['generate'] fare: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str aggiungere: (io header: ['From: '] + mio from-name + [' <'] + ( mio from ) + ['>']) + brk.
-	str aggiungere: (io header: ['To: '] + ( mio recipients aderire: [','] )) + brk.
+Email-HTML on: ['generare'] fare: {
+	>> acapo := ['\r\n'].
+	>> stringa := [''].
+	stringa aggiungere: (io intestazione: ['From: '] + mio nome-mittente + [' <'] + ( mio mittente ) + ['>']) + acapo.
+	stringa aggiungere: (io intestazione: ['To: '] + ( mio destinatari aderire: [','] )) + acapo.
 	mio cc contare vero: {
-		str aggiungere: (io header: ['Cc: '] + ( mio cc aderire: [','] )) + brk.
+		stringa aggiungere: (io intestazione: ['Cc: '] + ( mio cc aderire: [','] )) + acapo.
 	}.
 	mio bcc contare vero: {
-		str aggiungere: (io header: ['Bcc: '] + ( mio bcc aderire: [','] )) + brk.
+		stringa aggiungere: (io intestazione: ['Bcc: '] + ( mio bcc aderire: [','] )) + acapo.
 	}.
-	str aggiungere: (io header: ['Subject: '] + mio subject) + brk.
-	str aggiungere: ['MIME-Version: 1.0'] + brk.
-	str aggiungere: ['Content-Type: multipart/related; boundary="'] + mio boundary + ['"; type=text/html'] + brk.
-	str aggiungere: brk.
-	str aggiungere: ['--'] + mio boundary + brk.
-	str aggiungere: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str aggiungere: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str aggiungere: brk.
-	str aggiungere: mio body.
-	str aggiungere: brk.
-	mio attachments ogni: { :id :info
-		>> blob := info data.
-		str aggiungere: ['--'] + mio boundary + brk.
-		str aggiungere: ['Content-Type: '] + info mime + brk.
-		str aggiungere: ['Content-Transfer-Encoding: base64'] + brk.
-		str aggiungere: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str aggiungere: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str aggiungere: brk.
-		>> max := 76.
-		>> len := blob lunghezza.
-		>> chunks := (len / max) eccesso.
+	stringa aggiungere: (io intestazione: ['Subject: '] + mio soggetto) + acapo.
+	stringa aggiungere: ['MIME-Version: 1.0'] + acapo.
+	stringa aggiungere: ['Content-Type: multipart/related; boundary="'] + mio confine + ['"; type=text/html'] + acapo.
+	stringa aggiungere: acapo.
+	stringa aggiungere: ['--'] + mio confine + acapo.
+	stringa aggiungere: ['Content-Type: text/html; charset=UTF-8'] + acapo.
+	stringa aggiungere: ['Content-Transfer-Encoding: 7bit'] + acapo.
+	stringa aggiungere: acapo.
+	stringa aggiungere: mio corpo.
+	stringa aggiungere: acapo.
+	mio allegati ogni: { :id :info
+		>> blob := info dati.
+		stringa aggiungere: ['--'] + mio confine + acapo.
+		stringa aggiungere: ['Content-Type: '] + info mime + acapo.
+		stringa aggiungere: ['Content-Transfer-Encoding: base64'] + acapo.
+		stringa aggiungere: ['Content-ID: <attachment'] + id + ['>'] + acapo.
+		stringa aggiungere: ['Content-Disposition: inline; filename="'] + info file + ['"'] + acapo.
+		stringa aggiungere: acapo.
+		>> tetto := 76.
+		>> lunghezza-testo := blob lunghezza.
+		>> pezzi := (lunghezza-testo / tetto) eccesso.
 		{ :i
-			>> chunk := blob copia da: i * max lunghezza: max.
-			str aggiungere: chunk + brk.
-		} * chunks.
-		str aggiungere: brk.
-		str aggiungere: brk.
+			>> pezzo := blob copia da: i * tetto lunghezza: tetto.
+			stringa aggiungere: pezzo + acapo.
+		} * pezzi.
+		stringa aggiungere: acapo.
+		stringa aggiungere: acapo.
 	}.
-	str aggiungere: ['--'] + mio boundary + ['--'] + brk. <- str.
+	stringa aggiungere: ['--'] + mio confine + ['--'] + acapo. <- stringa.
 }.

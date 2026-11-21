@@ -1,302 +1,302 @@
-Hangyo-HTTP kon: ['HTTP-header:'] buhata: { :key <- Programa kahikayan: key.
+Hangyo-HTTP kon: ['HTTP-ulohan:'] buhata: { :yawe <- Programa kahikayan: yawe.
 }.
 
->> HTTP-Header := Butang bag-o.
+>> Ulohan-sa-HTTP := Butang bag-o.
 
-HTTP-Header kon: ['bag-o'] buhata: { <- kaugalingon bag-o init.
+Ulohan-sa-HTTP kon: ['bag-o'] buhata: { <- kaugalingon bag-o andama.
 }.
 
-HTTP-Header kon: ['init'] buhata: {
-	akoa key := Wala.
-	akoa value := Wala.
+Ulohan-sa-HTTP kon: ['andama'] buhata: {
+	akoa yawe := Wala.
+	akoa bili := Wala.
 }.
 
-HTTP-Header kon: ['key:value:'] buhata: { :key :value
-	akoa key := key.
-	akoa value := value.
+Ulohan-sa-HTTP kon: ['yawe:bili:'] buhata: { :yawe :bili
+	akoa yawe := yawe.
+	akoa bili := bili.
 }.
 
-HTTP-Header kon: ['key'] buhata: { <- akoa key.
+Ulohan-sa-HTTP kon: ['yawe'] buhata: { <- akoa yawe.
 }.
 
-HTTP-Header kon: ['value'] buhata: { <- akoa value.
+Ulohan-sa-HTTP kon: ['bili'] buhata: { <- akoa bili.
 }.
 
 
-HTTP-Header kon: ['teksto'] buhata: {
-	>> line := akoa key + [': '] + akoa value.
-	line ilisi: ['\r'] ug: [''], ilisi: ['\n'] ug: ['']. <- line + [' \r\n'].
+Ulohan-sa-HTTP kon: ['teksto'] buhata: {
+	>> linya := akoa yawe + [': '] + akoa bili.
+	linya ilisi: ['\r'] ug: [''], ilisi: ['\n'] ug: ['']. <- linya + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Butang bag-o.
+>> Dokumento-sa-Web := Butang bag-o.
 
-Web-Document kon: ['bag-o'] buhata: { <- kaugalingon bag-o init.
+Dokumento-sa-Web kon: ['bag-o'] buhata: { <- kaugalingon bag-o andama.
 }.
 
-Web-Document kon: ['init'] buhata: {
-	akoa headers := Lista bag-o.
-	akoa sess-id := Wala.
-	akoa session-manager := Tempfile-Session bag-o.
-	akoa sessdata := Wala.
-	akoa secure := Tinuod.
-	akoa same-site := ['Strict'].
-	akoa headers-out := Bakak.
-	akoa request := Hangyo-HTTP bag-o.
+Dokumento-sa-Web kon: ['andama'] buhata: {
+	akoa mga-ulohan := Lista bag-o.
+	akoa id-sa-sesyon := Wala.
+	akoa tigdumala-sa-sesyon := Sesyon-sa-temporaryong-file bag-o.
+	akoa datos-sa-sesyon := Wala.
+	akoa luwas := Tinuod.
+	akoa parehas-nga-site := ['Strict'].
+	akoa napadala-ang-ulohan := Bakak.
+	akoa hangyo-http := Hangyo-HTTP bag-o.
 }.
 
-Web-Document kon: ['request:'] buhata: { :request
-	akoa request := request.
+Dokumento-sa-Web kon: ['hangyo-http:'] buhata: { :hangyo-http
+	akoa hangyo-http := hangyo-http.
 }. 
 
-Web-Document kon: ['secure-session-cookie:'] buhata: { :secure
-	kaugalingon check-headers.
-	akoa secure := secure.
+Dokumento-sa-Web kon: ['luwas-nga-cookie-sa-sesyon:'] buhata: { :luwas
+	kaugalingon susiha-ang-ulohan.
+	akoa luwas := luwas.
 }.
 
-Web-Document kon: ['same-site-session-cookie:'] buhata: { :value
-	kaugalingon check-headers.
-	>> options := Lista bag-o 
+Dokumento-sa-Web kon: ['cookie-sa-sesyon-parehas-nga-site:'] buhata: { :bili
+	kaugalingon susiha-ang-ulohan.
+	>> mga-kapilian := Lista bag-o 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options naglangkob: value, bakak: {
+	mga-kapilian adunay: bili, bakak: {
 		kining-buluhaton sayup: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	akoa same-site := value.
+	akoa parehas-nga-site := bili.
 }.
 
-Web-Document kon: ['header:'] buhata: { :header
-	kaugalingon check-headers.
-	akoa headers idugang-sa-tumoy: header.
+Dokumento-sa-Web kon: ['ulohan:'] buhata: { :ulohan
+	kaugalingon susiha-ang-ulohan.
+	akoa mga-ulohan idugang-sa-tumoy: ulohan.
 }.
 
-Web-Document kon: ['clear-headers'] buhata: {
-	kaugalingon check-headers.
-	akoa headers := Lista bag-o.
+Dokumento-sa-Web kon: ['haw-ang-ulohan'] buhata: {
+	kaugalingon susiha-ang-ulohan.
+	akoa mga-ulohan := Lista bag-o.
 }.
 
-Web-Document kon: ['session-manager:'] buhata: { :manager
-	kaugalingon check-headers.
-	akoa session-manager := manager.
+Dokumento-sa-Web kon: ['tigdumala-sa-sesyon:'] buhata: { :tigdumala
+	kaugalingon susiha-ang-ulohan.
+	akoa tigdumala-sa-sesyon := tigdumala.
 }.
 
-Web-Document kon: ['session-manager'] buhata: { <- akoa session-manager.
+Dokumento-sa-Web kon: ['tigdumala-sa-sesyon'] buhata: { <- akoa tigdumala-sa-sesyon.
 }.
 
-Web-Document kon: ['check-headers'] buhata: {
-	akoa headers-out tinuod: {
+Dokumento-sa-Web kon: ['susiha-ang-ulohan'] buhata: {
+	akoa napadala-ang-ulohan tinuod: {
 		kining-buluhaton sayup: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document kon: ['session-start'] buhata: {
-	kaugalingon check-headers.
-	>> request := akoa request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Wala? bakak: {
-		(( Sumbanan bag-o: ['^[A-Za-z0-9]+\\z'], tukma: sess-id ) = 0) tinuod: {
-			sess-id := Wala.
+Dokumento-sa-Web kon: ['sugdi-ang-sesyon'] buhata: {
+	kaugalingon susiha-ang-ulohan.
+	>> hangyo-http := akoa hangyo-http.
+	>> id-sa-sesyon := hangyo-http cookie: ['xsid'].
+	id-sa-sesyon Wala? bakak: {
+		(( Sumbanan bag-o: ['^[A-Za-z0-9]+\\z'], tukma: id-sa-sesyon ) = 0) tinuod: {
+			id-sa-sesyon := Wala.
 		}.
 	}.
-	sess-id Wala? tinuod: {
-		sess-id := Kaha token: 30.
-		>> session-header := HTTP-Header bag-o
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (akoa secure kini: ['Secure'] o-kana: ['']),
-		SSITE: (akoa same-site),
-		XSID: sess-id
+	id-sa-sesyon Wala? tinuod: {
+		id-sa-sesyon := Kaha token: 30.
+		>> ulohan-sa-sesyon := Ulohan-sa-HTTP bag-o
+		yawe: ['Set-Cookie'] bili: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (akoa luwas kini: ['Secure'] o-kana: ['']),
+		SSITE: (akoa parehas-nga-site),
+		XSID: id-sa-sesyon
 		).
-		akoa headers idugang-sa-tumoy: session-header.
+		akoa mga-ulohan idugang-sa-tumoy: ulohan-sa-sesyon.
 	}.
-	akoa sessdata := akoa session-manager for: sess-id, load. <- akoa sessdata. # reference
+	akoa datos-sa-sesyon := akoa tigdumala-sa-sesyon alang-sa: id-sa-sesyon, karga. <- akoa datos-sa-sesyon. # reference
 }.
 
-Web-Document kon: ['goto:'] buhata: { :url
-	kaugalingon check-headers.
-	kaugalingon clear-headers.
-	akoa headers
+Dokumento-sa-Web kon: ['adto-sa:'] buhata: { :adres
+	kaugalingon susiha-ang-ulohan.
+	kaugalingon haw-ang-ulohan.
+	akoa mga-ulohan
 	idugang-sa-tumoy: (
-		HTTP-Header bag-o
-		key: ['Status'] value: ['303 See Other']
+		Ulohan-sa-HTTP bag-o
+		yawe: ['Status'] bili: ['303 See Other']
 	),
 	idugang-sa-tumoy: (
-		HTTP-Header bag-o
-		key: ['Location'] value: url
+		Ulohan-sa-HTTP bag-o
+		yawe: ['Location'] bili: adres
 	).
-	kaugalingon out: ['Redirect'].
+	kaugalingon ipagawas: ['Redirect'].
 }.
 
-Web-Document kon: ['session-destroy'] buhata: {
-	kaugalingon check-headers.
-	>> request := akoa request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Wala? bakak: {
-		>> session-header := HTTP-Header bag-o.
-		>> when := Gutlo bag-o tuig: 1970, porma: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Dokumento-sa-Web kon: ['gubaa-ang-sesyon'] buhata: {
+	kaugalingon susiha-ang-ulohan.
+	>> hangyo-http := akoa hangyo-http.
+	>> id-sa-sesyon := hangyo-http cookie: ['xsid'].
+	id-sa-sesyon Wala? bakak: {
+		>> ulohan-sa-sesyon := Ulohan-sa-HTTP bag-o.
+		>> higayon := Gutlo bag-o tuig: 1970, porma: ['%a, %d %b %Y %H:%M:%S GMT'].
+		ulohan-sa-sesyon yawe: ['Set-Cookie'] bili: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (akoa secure kini: ['Secure'] o-kana: ['']),
-			SSITE: (akoa same-site),
-			XSID: sess-id
+			EXP: higayon,
+			SEC: (akoa luwas kini: ['Secure'] o-kana: ['']),
+			SSITE: (akoa parehas-nga-site),
+			XSID: id-sa-sesyon
 		).
-		akoa session-manager destroy.
-		akoa headers idugang-sa-tumoy: session-header.
+		akoa tigdumala-sa-sesyon gubaa.
+		akoa mga-ulohan idugang-sa-tumoy: ulohan-sa-sesyon.
 	}.
 }.
 
 
-Web-Document kon: ['template:'] buhata: { :dalan-sa-payl <- Template bag-o: (Payl bag-o: dalan-sa-payl, basaha).
+Dokumento-sa-Web kon: ['plantilya:'] buhata: { :dalan-sa-payl <- Plantilya bag-o: (Payl bag-o: dalan-sa-payl, basaha).
 }.
 
-Web-Document kon: ['out:type:'] buhata: { :output :matang
-	akoa headers-out bakak: {
-		akoa sessdata Wala? bakak: {
-			akoa session-manager save: akoa sessdata.
+Dokumento-sa-Web kon: ['ipagawas:matang:'] buhata: { :resulta :matang
+	akoa napadala-ang-ulohan bakak: {
+		akoa datos-sa-sesyon Wala? bakak: {
+			akoa tigdumala-sa-sesyon tipigi: akoa datos-sa-sesyon.
 		}.
-		akoa headers idugang-sa-tumoy: (
-			HTTP-Header bag-o
-			key: ['Content-type'] value: matang
+		akoa mga-ulohan idugang-sa-tumoy: (
+			Ulohan-sa-HTTP bag-o
+			yawe: ['Content-type'] bili: matang
 		).
-		akoa headers matag: { :_ :header
-			Gawas isulat: header.
+		akoa mga-ulohan matag: { :_ :ulohan
+			Gawas isulat: ulohan.
 		}.
-		akoa headers-out := Tinuod.
+		akoa napadala-ang-ulohan := Tinuod.
 		Gawas isulat: ['\r\n'].
 	}.
-	Gawas isulat: output.
+	Gawas isulat: resulta.
 }.
 
-Web-Document kon: ['finish:type:'] buhata: { :output :matang
-	akoa headers-out bakak: {
-		akoa sessdata Wala? bakak: {
-			akoa session-manager save: akoa sessdata.
+Dokumento-sa-Web kon: ['humana:matang:'] buhata: { :resulta :matang
+	akoa napadala-ang-ulohan bakak: {
+		akoa datos-sa-sesyon Wala? bakak: {
+			akoa tigdumala-sa-sesyon tipigi: akoa datos-sa-sesyon.
 		}.
-		akoa headers idugang-sa-tumoy: (
-			HTTP-Header bag-o
-			key: ['Content-type'] value: matang
+		akoa mga-ulohan idugang-sa-tumoy: (
+			Ulohan-sa-HTTP bag-o
+			yawe: ['Content-type'] bili: matang
 		).
-		akoa headers idugang-sa-tumoy: (
-			HTTP-Header bag-o
-			key: ['Content-Length'] value: output teksto bytes
+		akoa mga-ulohan idugang-sa-tumoy: (
+			Ulohan-sa-HTTP bag-o
+			yawe: ['Content-Length'] bili: resulta teksto bytes
 		).
-		akoa headers matag: { :_ :header
-			Gawas isulat: header.
+		akoa mga-ulohan matag: { :_ :ulohan
+			Gawas isulat: ulohan.
 		}.
-		akoa headers-out := Tinuod.
+		akoa napadala-ang-ulohan := Tinuod.
 		Gawas isulat: ['\r\n'].
 	}.
-	Gawas isulat: output.
+	Gawas isulat: resulta.
 }.
 
-Web-Document kon: ['out:'] buhata: { :output
-	kaugalingon out: output type: ['text/html; charset=utf-8'].
+Dokumento-sa-Web kon: ['ipagawas:'] buhata: { :resulta
+	kaugalingon ipagawas: resulta matang: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kon: ['finish:'] buhata: { :output
-	kaugalingon finish: output type: ['text/html; charset=utf-8'].
+Dokumento-sa-Web kon: ['humana:'] buhata: { :resulta
+	kaugalingon humana: resulta matang: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kon: ['json:'] buhata: { :output
-	kaugalingon out: ( JSON jsonify: output ) type: ['application/json'].
+Dokumento-sa-Web kon: ['json:'] buhata: { :resulta
+	kaugalingon ipagawas: ( JSON jsonify: resulta ) matang: ['application/json'].
 }.
 
-Web-Document kon: ['not-found:'] buhata: { :output
-	kaugalingon clear-headers header: (
-		HTTP-Header bag-o key: ['Status'] value: ['404 Not Found']
+Dokumento-sa-Web kon: ['wala-makit-an:'] buhata: { :resulta
+	kaugalingon haw-ang-ulohan ulohan: (
+		Ulohan-sa-HTTP bag-o yawe: ['Status'] bili: ['404 Not Found']
 	).
-	kaugalingon out: output.
+	kaugalingon ipagawas: resulta.
 }.
 
 
 # Interface
 
->> Session := Butang bag-o.
+>> Sesyon := Butang bag-o.
 
-Session kon: ['bag-o'] buhata: { <- kaugalingon bag-o init for: Wala.
+Sesyon kon: ['bag-o'] buhata: { <- kaugalingon bag-o andama alang-sa: Wala.
 }.
 
-Session kon: ['for:'] buhata: { :id
+Sesyon kon: ['alang-sa:'] buhata: { :id
 	akoa id := id.
 }.
 
-Session kon: ['load'] buhata: {
+Sesyon kon: ['karga'] buhata: {
 	kining-buluhaton sayup: ['Not implemented.'].
 }.
 
-Session kon: ['save:'] buhata: {
+Sesyon kon: ['tipigi:'] buhata: {
 	kining-buluhaton sayup: ['Not implemented.'].
 }.
 
-Session kon: ['destroy'] buhata: {
+Sesyon kon: ['gubaa'] buhata: {
 	kining-buluhaton sayup: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session bag-o.
+>> Sesyon-sa-temporaryong-file := Sesyon bag-o.
 
-Tempfile-Session kon: ['init'] buhata: {
-	akoa pathprefix := ['/tmp/sess-'].
+Sesyon-sa-temporaryong-file kon: ['andama'] buhata: {
+	akoa sinugdan-sa-agianan := ['/tmp/sess-'].
 }.
 
-Tempfile-Session kon: ['path-prefix:'] buhata: { :str
-	akoa pathprefix := str.
+Sesyon-sa-temporaryong-file kon: ['unlapi-sa-agianan:'] buhata: { :kuwerdas-sa-teksto
+	akoa sinugdan-sa-agianan := kuwerdas-sa-teksto.
 }.
 
-Tempfile-Session kon: ['file'] buhata: { <- ( Payl bag-o: ( akoa pathprefix + akoa id + ['.txt'] ) ).
+Sesyon-sa-temporaryong-file kon: ['file-sa-sesyon'] buhata: { <- ( Payl bag-o: ( akoa sinugdan-sa-agianan + akoa id + ['.txt'] ) ).
 }.
 
-Tempfile-Session kon: ['load'] buhata: {
-	>> file := kaugalingon file.
-	file anaa bakak: {
-		file isulat: (Diksyonaryo bag-o kodigo).
-	}. <- file basaha butang.
+Sesyon-sa-temporaryong-file kon: ['karga'] buhata: {
+	>> file-sa-sesyon := kaugalingon file-sa-sesyon.
+	file-sa-sesyon anaa bakak: {
+		file-sa-sesyon isulat: (Diksyonaryo bag-o kodigo).
+	}. <- file-sa-sesyon basaha butang.
 }.
 
-Tempfile-Session kon: ['save:'] buhata: { :data
-	>> file := kaugalingon file.
-	file anaa tinuod: {
-		file isulat: data kodigo.
+Sesyon-sa-temporaryong-file kon: ['tipigi:'] buhata: { :datos
+	>> file-sa-sesyon := kaugalingon file-sa-sesyon.
+	file-sa-sesyon anaa tinuod: {
+		file-sa-sesyon isulat: datos kodigo.
 	}.
 }.
 
-Tempfile-Session kon: ['destroy'] buhata: {
-	>> file := kaugalingon file.
-	file anaa tinuod: {
-		file papasa.
+Sesyon-sa-temporaryong-file kon: ['gubaa'] buhata: {
+	>> file-sa-sesyon := kaugalingon file-sa-sesyon.
+	file-sa-sesyon anaa tinuod: {
+		file-sa-sesyon papasa.
 	}.
 }.
 
 
 >> URL := Butang bag-o.
 
-URL kon: ['init'] buhata: {
-	akoa protocol := ['https://'].
+URL kon: ['andama'] buhata: {
+	akoa protokol := ['https://'].
 	akoa host := ['localhost'].
 	akoa dalan-sa-payl := [''].
-	akoa params := [''].
+	akoa mga-parameter-sa-url := [''].
 	akoa hash := [''].
 }.
 
-URL kon: ['bag-o'] buhata: { <- kaugalingon bag-o init.
+URL kon: ['bag-o'] buhata: { <- kaugalingon bag-o andama.
 }.
 
 URL kon: ['teksto'] buhata: { <- (
-	akoa protocol +
+	akoa protokol +
 	akoa host +
 	akoa dalan-sa-payl +
-	akoa params +
+	akoa mga-parameter-sa-url +
 	akoa hash ).
 }.
 
-URL kon: ['protocol:'] buhata: { :protocol
-	((Lista bag-o: ['http'] ; ['https']) naglangkob: protocol) tinuod: {
-		akoa protocol := protocol + ['://'].
+URL kon: ['protokol:'] buhata: { :protokol
+	((Lista bag-o ; ['http'] ; ['https']) adunay: protokol) tinuod: {
+		akoa protokol := protokol + ['://'].
 	}, bakak: {
 		kining-buluhaton sayup: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL kon: ['host:'] buhata: { :host
 	akoa host := host.
 }.
 
-URL kon: ['path:'] buhata: { :dalan-sa-payl
+URL kon: ['dalan-sa-payl:'] buhata: { :dalan-sa-payl
 	akoa dalan-sa-payl := ['/'] + dalan-sa-payl url-i-encode.
 }.
 
-URL kon: ['params:'] buhata: { :map
-	>> params := Lista bag-o.
-	map matag: { :key :value
-		params idugang-sa-tumoy: key teksto url-i-encode + ['='] + value teksto url-i-encode.
+URL kon: ['mga-parameter-sa-url:'] buhata: { :pagmapa
+	>> mga-parameter-sa-url := Lista bag-o.
+	pagmapa matag: { :yawe :bili
+		mga-parameter-sa-url idugang-sa-tumoy: yawe teksto url-i-encode + ['='] + bili teksto url-i-encode.
 	}.
-	akoa params := ['?'] + ( params hiusaha: ['&'] ).
+	akoa mga-parameter-sa-url := ['?'] + ( mga-parameter-sa-url hiusaha: ['&'] ).
 }.
 
 URL kon: ['hash:'] buhata: { :hash

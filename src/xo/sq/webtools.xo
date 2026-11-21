@@ -1,302 +1,302 @@
-HTTP-Kërkesë kur: ['HTTP-header:'] bëj: { :key <- Program cilësim: key.
+HTTP-Kërkesë kur: ['HTTP-kokë:'] bëj: { :çelës <- Program cilësim: çelës.
 }.
 
->> HTTP-Header := Objekt ri.
+>> Kokë-HTTP := Objekt ri.
 
-HTTP-Header kur: ['ri'] bëj: { <- vetja ri init.
+Kokë-HTTP kur: ['ri'] bëj: { <- vetja ri inicializo.
 }.
 
-HTTP-Header kur: ['init'] bëj: {
-	vetjak key := Asgjë.
-	vetjak value := Asgjë.
+Kokë-HTTP kur: ['inicializo'] bëj: {
+	vetjak çelës := Asgjë.
+	vetjak vlerë := Asgjë.
 }.
 
-HTTP-Header kur: ['key:value:'] bëj: { :key :value
-	vetjak key := key.
-	vetjak value := value.
+Kokë-HTTP kur: ['çelës:vlerë:'] bëj: { :çelës :vlerë
+	vetjak çelës := çelës.
+	vetjak vlerë := vlerë.
 }.
 
-HTTP-Header kur: ['key'] bëj: { <- vetjak key.
+Kokë-HTTP kur: ['çelës'] bëj: { <- vetjak çelës.
 }.
 
-HTTP-Header kur: ['value'] bëj: { <- vetjak value.
+Kokë-HTTP kur: ['vlerë'] bëj: { <- vetjak vlerë.
 }.
 
 
-HTTP-Header kur: ['tekst'] bëj: {
-	>> line := vetjak key + [': '] + vetjak value.
-	line zëvendëso: ['\r'] me: [''], zëvendëso: ['\n'] me: ['']. <- line + [' \r\n'].
+Kokë-HTTP kur: ['tekst'] bëj: {
+	>> rresht := vetjak çelës + [': '] + vetjak vlerë.
+	rresht zëvendëso: ['\r'] me: [''], zëvendëso: ['\n'] me: ['']. <- rresht + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Objekt ri.
+>> Dokument-Web := Objekt ri.
 
-Web-Document kur: ['ri'] bëj: { <- vetja ri init.
+Dokument-Web kur: ['ri'] bëj: { <- vetja ri inicializo.
 }.
 
-Web-Document kur: ['init'] bëj: {
-	vetjak headers := Listë ri.
-	vetjak sess-id := Asgjë.
-	vetjak session-manager := Tempfile-Session ri.
-	vetjak sessdata := Asgjë.
-	vetjak secure := Vërtetë.
-	vetjak same-site := ['Strict'].
-	vetjak headers-out := Rreme.
-	vetjak request := HTTP-Kërkesë ri.
+Dokument-Web kur: ['inicializo'] bëj: {
+	vetjak kokat := Listë ri.
+	vetjak id-seance := Asgjë.
+	vetjak menaxher-seancash := Seancë-skedar-i-përkohshëm ri.
+	vetjak të-dhëna-seance := Asgjë.
+	vetjak e-sigurt := Vërtetë.
+	vetjak e-njëjta-faqe := ['Strict'].
+	vetjak kokat-dërguar := Rreme.
+	vetjak kërkesë := HTTP-Kërkesë ri.
 }.
 
-Web-Document kur: ['request:'] bëj: { :request
-	vetjak request := request.
+Dokument-Web kur: ['kërkesë:'] bëj: { :kërkesë
+	vetjak kërkesë := kërkesë.
 }. 
 
-Web-Document kur: ['secure-session-cookie:'] bëj: { :secure
-	vetja check-headers.
-	vetjak secure := secure.
+Dokument-Web kur: ['cookie-seance-e-sigurt:'] bëj: { :e-sigurt
+	vetja kontrollo-kokat.
+	vetjak e-sigurt := e-sigurt.
 }.
 
-Web-Document kur: ['same-site-session-cookie:'] bëj: { :value
-	vetja check-headers.
-	>> options := Listë ri 
+Dokument-Web kur: ['cookie-seance-e-njëjta-faqe:'] bëj: { :vlerë
+	vetja kontrollo-kokat.
+	>> opsione := Listë ri 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options përmban: value, rreme: {
+	opsione ka: vlerë, rreme: {
 		kjo-detyrë gabim: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	vetjak same-site := value.
+	vetjak e-njëjta-faqe := vlerë.
 }.
 
-Web-Document kur: ['header:'] bëj: { :header
-	vetja check-headers.
-	vetjak headers shto-në-fund: header.
+Dokument-Web kur: ['kokë:'] bëj: { :kokë
+	vetja kontrollo-kokat.
+	vetjak kokat shto-në-fund: kokë.
 }.
 
-Web-Document kur: ['clear-headers'] bëj: {
-	vetja check-headers.
-	vetjak headers := Listë ri.
+Dokument-Web kur: ['zbraz-kokat'] bëj: {
+	vetja kontrollo-kokat.
+	vetjak kokat := Listë ri.
 }.
 
-Web-Document kur: ['session-manager:'] bëj: { :manager
-	vetja check-headers.
-	vetjak session-manager := manager.
+Dokument-Web kur: ['menaxher-seancash:'] bëj: { :menaxher
+	vetja kontrollo-kokat.
+	vetjak menaxher-seancash := menaxher.
 }.
 
-Web-Document kur: ['session-manager'] bëj: { <- vetjak session-manager.
+Dokument-Web kur: ['menaxher-seancash'] bëj: { <- vetjak menaxher-seancash.
 }.
 
-Web-Document kur: ['check-headers'] bëj: {
-	vetjak headers-out vërtetë: {
+Dokument-Web kur: ['kontrollo-kokat'] bëj: {
+	vetjak kokat-dërguar vërtetë: {
 		kjo-detyrë gabim: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document kur: ['session-start'] bëj: {
-	vetja check-headers.
-	>> request := vetjak request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Asgjë? rreme: {
-		(( Model ri: ['^[A-Za-z0-9]+\\z'], përputhje: sess-id ) = 0) vërtetë: {
-			sess-id := Asgjë.
+Dokument-Web kur: ['nis-seancën'] bëj: {
+	vetja kontrollo-kokat.
+	>> kërkesë := vetjak kërkesë.
+	>> id-seance := kërkesë cookie: ['xsid'].
+	id-seance Asgjë? rreme: {
+		(( Model ri: ['^[A-Za-z0-9]+\\z'], përputhje: id-seance ) = 0) vërtetë: {
+			id-seance := Asgjë.
 		}.
 	}.
-	sess-id Asgjë? vërtetë: {
-		sess-id := Kasafortë token: 30.
-		>> session-header := HTTP-Header ri
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (vetjak secure ose: ['Secure'] ose: ['']),
-		SSITE: (vetjak same-site),
-		XSID: sess-id
+	id-seance Asgjë? vërtetë: {
+		id-seance := Kasafortë token: 30.
+		>> kokë-seance := Kokë-HTTP ri
+		çelës: ['Set-Cookie'] vlerë: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (vetjak e-sigurt ose: ['Secure'] ose: ['']),
+		SSITE: (vetjak e-njëjta-faqe),
+		XSID: id-seance
 		).
-		vetjak headers shto-në-fund: session-header.
+		vetjak kokat shto-në-fund: kokë-seance.
 	}.
-	vetjak sessdata := vetjak session-manager for: sess-id, load. <- vetjak sessdata. # reference
+	vetjak të-dhëna-seance := vetjak menaxher-seancash për: id-seance, ngarko. <- vetjak të-dhëna-seance. # reference
 }.
 
-Web-Document kur: ['goto:'] bëj: { :url
-	vetja check-headers.
-	vetja clear-headers.
-	vetjak headers
+Dokument-Web kur: ['shko-te:'] bëj: { :adresë
+	vetja kontrollo-kokat.
+	vetja zbraz-kokat.
+	vetjak kokat
 	shto-në-fund: (
-		HTTP-Header ri
-		key: ['Status'] value: ['303 See Other']
+		Kokë-HTTP ri
+		çelës: ['Status'] vlerë: ['303 See Other']
 	),
 	shto-në-fund: (
-		HTTP-Header ri
-		key: ['Location'] value: url
+		Kokë-HTTP ri
+		çelës: ['Location'] vlerë: adresë
 	).
-	vetja out: ['Redirect'].
+	vetja nxirr: ['Redirect'].
 }.
 
-Web-Document kur: ['session-destroy'] bëj: {
-	vetja check-headers.
-	>> request := vetjak request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Asgjë? rreme: {
-		>> session-header := HTTP-Header ri.
-		>> when := Moment ri vit: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Dokument-Web kur: ['shkatërro-seancën'] bëj: {
+	vetja kontrollo-kokat.
+	>> kërkesë := vetjak kërkesë.
+	>> id-seance := kërkesë cookie: ['xsid'].
+	id-seance Asgjë? rreme: {
+		>> kokë-seance := Kokë-HTTP ri.
+		>> çast := Moment ri vit: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		kokë-seance çelës: ['Set-Cookie'] vlerë: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (vetjak secure ose: ['Secure'] ose: ['']),
-			SSITE: (vetjak same-site),
-			XSID: sess-id
+			EXP: çast,
+			SEC: (vetjak e-sigurt ose: ['Secure'] ose: ['']),
+			SSITE: (vetjak e-njëjta-faqe),
+			XSID: id-seance
 		).
-		vetjak session-manager destroy.
-		vetjak headers shto-në-fund: session-header.
+		vetjak menaxher-seancash shkatërro.
+		vetjak kokat shto-në-fund: kokë-seance.
 	}.
 }.
 
 
-Web-Document kur: ['template:'] bëj: { :shteg <- Template ri: (Skedar ri: shteg, lexo).
+Dokument-Web kur: ['shabllon:'] bëj: { :shteg <- Shabllon ri: (Skedar ri: shteg, lexo).
 }.
 
-Web-Document kur: ['out:type:'] bëj: { :output :lloj
-	vetjak headers-out rreme: {
-		vetjak sessdata Asgjë? rreme: {
-			vetjak session-manager save: vetjak sessdata.
+Dokument-Web kur: ['nxirr:lloj:'] bëj: { :dalje :lloj
+	vetjak kokat-dërguar rreme: {
+		vetjak të-dhëna-seance Asgjë? rreme: {
+			vetjak menaxher-seancash ruaj: vetjak të-dhëna-seance.
 		}.
-		vetjak headers shto-në-fund: (
-			HTTP-Header ri
-			key: ['Content-type'] value: lloj
+		vetjak kokat shto-në-fund: (
+			Kokë-HTTP ri
+			çelës: ['Content-type'] vlerë: lloj
 		).
-		vetjak headers secili: { :_ :header
-			Dalje shkruaj: header.
+		vetjak kokat secili: { :_ :kokë
+			Dalje shkruaj: kokë.
 		}.
-		vetjak headers-out := Vërtetë.
+		vetjak kokat-dërguar := Vërtetë.
 		Dalje shkruaj: ['\r\n'].
 	}.
-	Dalje shkruaj: output.
+	Dalje shkruaj: dalje.
 }.
 
-Web-Document kur: ['finish:type:'] bëj: { :output :lloj
-	vetjak headers-out rreme: {
-		vetjak sessdata Asgjë? rreme: {
-			vetjak session-manager save: vetjak sessdata.
+Dokument-Web kur: ['përfundo:lloj:'] bëj: { :dalje :lloj
+	vetjak kokat-dërguar rreme: {
+		vetjak të-dhëna-seance Asgjë? rreme: {
+			vetjak menaxher-seancash ruaj: vetjak të-dhëna-seance.
 		}.
-		vetjak headers shto-në-fund: (
-			HTTP-Header ri
-			key: ['Content-type'] value: lloj
+		vetjak kokat shto-në-fund: (
+			Kokë-HTTP ri
+			çelës: ['Content-type'] vlerë: lloj
 		).
-		vetjak headers shto-në-fund: (
-			HTTP-Header ri
-			key: ['Content-Length'] value: output tekst bytes
+		vetjak kokat shto-në-fund: (
+			Kokë-HTTP ri
+			çelës: ['Content-Length'] vlerë: dalje tekst bytes
 		).
-		vetjak headers secili: { :_ :header
-			Dalje shkruaj: header.
+		vetjak kokat secili: { :_ :kokë
+			Dalje shkruaj: kokë.
 		}.
-		vetjak headers-out := Vërtetë.
+		vetjak kokat-dërguar := Vërtetë.
 		Dalje shkruaj: ['\r\n'].
 	}.
-	Dalje shkruaj: output.
+	Dalje shkruaj: dalje.
 }.
 
-Web-Document kur: ['out:'] bëj: { :output
-	vetja out: output type: ['text/html; charset=utf-8'].
+Dokument-Web kur: ['nxirr:'] bëj: { :dalje
+	vetja nxirr: dalje lloj: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kur: ['finish:'] bëj: { :output
-	vetja finish: output type: ['text/html; charset=utf-8'].
+Dokument-Web kur: ['përfundo:'] bëj: { :dalje
+	vetja përfundo: dalje lloj: ['text/html; charset=utf-8'].
 }.
 
-Web-Document kur: ['json:'] bëj: { :output
-	vetja out: ( JSON jsonify: output ) type: ['application/json'].
+Dokument-Web kur: ['json:'] bëj: { :dalje
+	vetja nxirr: ( JSON jsonify: dalje ) lloj: ['application/json'].
 }.
 
-Web-Document kur: ['not-found:'] bëj: { :output
-	vetja clear-headers header: (
-		HTTP-Header ri key: ['Status'] value: ['404 Not Found']
+Dokument-Web kur: ['nuk-u-gjet:'] bëj: { :dalje
+	vetja zbraz-kokat kokë: (
+		Kokë-HTTP ri çelës: ['Status'] vlerë: ['404 Not Found']
 	).
-	vetja out: output.
+	vetja nxirr: dalje.
 }.
 
 
 # Interface
 
->> Session := Objekt ri.
+>> Seancë := Objekt ri.
 
-Session kur: ['ri'] bëj: { <- vetja ri init for: Asgjë.
+Seancë kur: ['ri'] bëj: { <- vetja ri inicializo për: Asgjë.
 }.
 
-Session kur: ['for:'] bëj: { :id
+Seancë kur: ['për:'] bëj: { :id
 	vetjak id := id.
 }.
 
-Session kur: ['load'] bëj: {
+Seancë kur: ['ngarko'] bëj: {
 	kjo-detyrë gabim: ['Not implemented.'].
 }.
 
-Session kur: ['save:'] bëj: {
+Seancë kur: ['ruaj:'] bëj: {
 	kjo-detyrë gabim: ['Not implemented.'].
 }.
 
-Session kur: ['destroy'] bëj: {
+Seancë kur: ['shkatërro'] bëj: {
 	kjo-detyrë gabim: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session ri.
+>> Seancë-skedar-i-përkohshëm := Seancë ri.
 
-Tempfile-Session kur: ['init'] bëj: {
-	vetjak pathprefix := ['/tmp/sess-'].
+Seancë-skedar-i-përkohshëm kur: ['inicializo'] bëj: {
+	vetjak fillim-shtegu := ['/tmp/sess-'].
 }.
 
-Tempfile-Session kur: ['path-prefix:'] bëj: { :str
-	vetjak pathprefix := str.
+Seancë-skedar-i-përkohshëm kur: ['parashtesë-shtegu:'] bëj: { :varg
+	vetjak fillim-shtegu := varg.
 }.
 
-Tempfile-Session kur: ['file'] bëj: { <- ( Skedar ri: ( vetjak pathprefix + vetjak id + ['.txt'] ) ).
+Seancë-skedar-i-përkohshëm kur: ['skedar'] bëj: { <- ( Skedar ri: ( vetjak fillim-shtegu + vetjak id + ['.txt'] ) ).
 }.
 
-Tempfile-Session kur: ['load'] bëj: {
-	>> file := vetja file.
-	file ekziston rreme: {
-		file shkruaj: (Fjalor ri kod).
-	}. <- file lexo objekt.
+Seancë-skedar-i-përkohshëm kur: ['ngarko'] bëj: {
+	>> skedar := vetja skedar.
+	skedar ekziston rreme: {
+		skedar shkruaj: (Fjalor ri kod).
+	}. <- skedar lexo objekt.
 }.
 
-Tempfile-Session kur: ['save:'] bëj: { :data
-	>> file := vetja file.
-	file ekziston vërtetë: {
-		file shkruaj: data kod.
+Seancë-skedar-i-përkohshëm kur: ['ruaj:'] bëj: { :të-dhëna
+	>> skedar := vetja skedar.
+	skedar ekziston vërtetë: {
+		skedar shkruaj: të-dhëna kod.
 	}.
 }.
 
-Tempfile-Session kur: ['destroy'] bëj: {
-	>> file := vetja file.
-	file ekziston vërtetë: {
-		file fshi.
+Seancë-skedar-i-përkohshëm kur: ['shkatërro'] bëj: {
+	>> skedar := vetja skedar.
+	skedar ekziston vërtetë: {
+		skedar fshi.
 	}.
 }.
 
 
 >> URL := Objekt ri.
 
-URL kur: ['init'] bëj: {
-	vetjak protocol := ['https://'].
+URL kur: ['inicializo'] bëj: {
+	vetjak protokoll := ['https://'].
 	vetjak pritës := ['localhost'].
 	vetjak shteg := [''].
-	vetjak params := [''].
+	vetjak parametra-url := [''].
 	vetjak hash := [''].
 }.
 
-URL kur: ['ri'] bëj: { <- vetja ri init.
+URL kur: ['ri'] bëj: { <- vetja ri inicializo.
 }.
 
 URL kur: ['tekst'] bëj: { <- (
-	vetjak protocol +
+	vetjak protokoll +
 	vetjak pritës +
 	vetjak shteg +
-	vetjak params +
+	vetjak parametra-url +
 	vetjak hash ).
 }.
 
-URL kur: ['protocol:'] bëj: { :protocol
-	((Listë ri: ['http'] ; ['https']) përmban: protocol) vërtetë: {
-		vetjak protocol := protocol + ['://'].
+URL kur: ['protokoll:'] bëj: { :protokoll
+	((Listë ri ; ['http'] ; ['https']) ka: protokoll) vërtetë: {
+		vetjak protokoll := protokoll + ['://'].
 	}, rreme: {
 		kjo-detyrë gabim: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL kur: ['pritës:'] bëj: { :pritës
 	vetjak pritës := pritës.
 }.
 
-URL kur: ['path:'] bëj: { :shteg
+URL kur: ['shteg:'] bëj: { :shteg
 	vetjak shteg := ['/'] + shteg url-kodo.
 }.
 
-URL kur: ['params:'] bëj: { :map
-	>> params := Listë ri.
-	map secili: { :key :value
-		params shto-në-fund: key tekst url-kodo + ['='] + value tekst url-kodo.
+URL kur: ['parametra-url:'] bëj: { :hartëzim
+	>> parametra-url := Listë ri.
+	hartëzim secili: { :çelës :vlerë
+		parametra-url shto-në-fund: çelës tekst url-kodo + ['='] + vlerë tekst url-kodo.
 	}.
-	vetjak params := ['?'] + ( params bashko: ['&'] ).
+	vetjak parametra-url := ['?'] + ( parametra-url bashko: ['&'] ).
 }.
 
 URL kur: ['hash:'] bëj: { :hash

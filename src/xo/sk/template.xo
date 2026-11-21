@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objekt nový.
+>> Šablóna := Objekt nový.
 
-Template pri: ['nový'] urobiť: { <- seba nový content: [''].
+Šablóna pri: ['nový'] urobiť: { <- seba nový obsah: [''].
 }.
 
-Template pri: ['content:'] urobiť: { :content
-	vlastný content := content. 
+Šablóna pri: ['obsah:'] urobiť: { :obsah
+	vlastný obsah := obsah. 
 }.
 
-Template pri: ['nový:'] urobiť: { :content <- seba nový content: content.
+Šablóna pri: ['nový:'] urobiť: { :obsah <- seba nový obsah: obsah.
 }.
 
-Template pri: ['cut:'] urobiť: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := vlastný content rozdeliť: startmarker.
-	>> prefix := parts prvý.
-	>> parts2 := parts posledný rozdeliť: endmarker.
-	>> suffix := parts2 posledný.
-	>> part := parts2 prvý.
-	>> rest := prefix + suffix.
-	vlastný content := rest. <- Template nový: part.
+Šablóna pri: ['vystrihnúť:'] urobiť: { :značka
+	>> počiatočná-značka := (['<!-- cut:%id% -->'] %id%: značka).
+	>> koncová-značka := (['<!-- /cut:%id% -->'] %id%: značka).
+	>> časti := vlastný obsah rozdeliť: počiatočná-značka.
+	>> predpona := časti prvý.
+	>> časti2 := časti posledný rozdeliť: koncová-značka.
+	>> prípona := časti2 posledný.
+	>> časť := časti2 prvý.
+	>> zvyšok := predpona + prípona.
+	vlastný obsah := zvyšok. <- Šablóna nový: časť.
 	
 }.
 
-Template pri: ['kopírovať'] urobiť: { <- seba nový: seba text kopírovať.
+Šablóna pri: ['kopírovať'] urobiť: { <- seba nový: seba text kopírovať.
 }.
 	
-Template pri: ['paste:at:'] urobiť: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	vlastný content nahradiť: pastemarker za: ( snippet text + pastemarker ).
+Šablóna pri: ['vložiť:na:'] urobiť: { :úryvok :id
+	>> vkladacia-značka := (['<!-- paste:%id% -->'] %id%: id).
+	vlastný obsah nahradiť: vkladacia-značka za: ( úryvok text + vkladacia-značka ).
 }.
 
-Template pri: ['nastaviť:hodnota:'] urobiť: { :slot :value
-	vlastný content nahradiť: ['<!-- slot:'] + slot + [' -->'] za: ( Server html-kódovať: value ).
+Šablóna pri: ['nastaviť:hodnota:'] urobiť: { :slot :hodnota
+	vlastný obsah nahradiť: ['<!-- slot:'] + slot + [' -->'] za: ( Server html-kódovať: hodnota ).
 }.
 
-Template pri: ['set:html:'] urobiť: { :slot :html
-	vlastný content nahradiť: ['<!-- slot:'] + slot + [' -->'] za: html.
+Šablóna pri: ['nastaviť:html:'] urobiť: { :slot :html
+	vlastný obsah nahradiť: ['<!-- slot:'] + slot + [' -->'] za: html.
 }.
 
-Template pri: ['odpovedať:a:'] urobiť: { :slot :value
-	seba nastaviť: (slot od: 0 dĺžka: (slot dĺžka - 1)) hodnota: value.
+Šablóna pri: ['odpovedať:a:'] urobiť: { :slot :hodnota
+	seba nastaviť: (slot od: 0 dĺžka: (slot dĺžka - 1)) hodnota: hodnota.
 }.
 
-Template pri: ['nl2br'] urobiť: {
-	vlastný content nahradiť: ['\n'] za: ['<br>'].
+Šablóna pri: ['nl2br'] urobiť: {
+	vlastný obsah nahradiť: ['\n'] za: ['<br>'].
 }.
 
-Template pri: ['clean'] urobiť: {
-	vlastný content :=
+Šablóna pri: ['očistiť'] urobiť: {
+	vlastný obsah :=
 		Vzor
 		nový: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		zhoda: vlastný content
+		zhoda: vlastný obsah
 		urobiť: { <- ['']. }.
 }.
 
-Template pri: ['clean-cuts'] urobiť: {
-	>> items := Zoznam nový.
+Šablóna pri: ['očistiť-výrezy'] urobiť: {
+	>> položky := Zoznam nový.
 	Vzor
 	nový: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	zhoda: vlastný content
-	urobiť: { :_ :part
-		items pripojiť: part ? 1.
+	zhoda: vlastný obsah
+	urobiť: { :_ :časť
+		položky pripojiť: časť ? 1.
 	}.
-	items každý: { :_ :id
-		vlastný content :=
+	položky každý: { :_ :id
+		vlastný obsah :=
 			Vzor nový: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			zhoda: vlastný content
+			zhoda: vlastný obsah
 			urobiť: { <- ['']. }.
 	 }.
 }.
 
-Template pri: ['clean-space'] urobiť: {
-	vlastný content :=
+Šablóna pri: ['očistiť-medzery'] urobiť: {
+	vlastný obsah :=
 		Vzor
 		nový: ['\\s*\\n'],
-		zhoda: vlastný content
+		zhoda: vlastný obsah
 		urobiť: { <- ['\n']. }.
-	vlastný content :=
+	vlastný obsah :=
 		Vzor
 		nový: ['\\n[\\s\\t]+'],
-		zhoda: vlastný content
+		zhoda: vlastný obsah
 		urobiť: { <- ['\n']. }.
 }.
 
-Template pri: ['clean-all'] urobiť: {
-	seba clean.
-	seba clean-cuts.
-	seba clean-space.
+Šablóna pri: ['očistiť-všetko'] urobiť: {
+	seba očistiť.
+	seba očistiť-výrezy.
+	seba očistiť-medzery.
 }.
 
-Template pri: ['text'] urobiť: { <- vlastný content.
+Šablóna pri: ['text'] urobiť: { <- vlastný obsah.
 }.

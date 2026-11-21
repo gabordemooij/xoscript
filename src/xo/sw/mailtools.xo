@@ -1,128 +1,128 @@
->> Email := Kipengee mpya.
+>> Barua-pepe := Kipengee mpya.
 
-Email ikija: ['init'] fanya: {
-	yangu recipients := Orodha mpya.
+Barua-pepe ikija: ['andaa'] fanya: {
+	yangu wapokeaji := Orodha mpya.
 	yangu cc := Orodha mpya.
 	yangu bcc := Orodha mpya.
-	yangu from := Tupu.
-	yangu from-name := Tupu.
-	yangu subject := Tupu.
-	yangu body := Tupu.
+	yangu mtumaji := Tupu.
+	yangu jina-la-mtumaji := Tupu.
+	yangu mada := Tupu.
+	yangu mwili := Tupu.
 }.
 
-Email ikija: ['mpya'] fanya: { <- binafsi mpya init.
+Barua-pepe ikija: ['mpya'] fanya: { <- binafsi mpya andaa.
 }.
 
-Email ikija: ['to:'] fanya: { :list
-	yangu recipients := list.
+Barua-pepe ikija: ['kwa-mpokeaji:'] fanya: { :orodha-ya-vitu
+	yangu wapokeaji := orodha-ya-vitu.
 }.
  
-Email ikija: ['cc:'] fanya: { :list
-	yangu cc := list.
+Barua-pepe ikija: ['cc:'] fanya: { :orodha-ya-vitu
+	yangu cc := orodha-ya-vitu.
 }.
 
-Email ikija: ['bcc:'] fanya: { :list
-	yangu bcc := list.
+Barua-pepe ikija: ['bcc:'] fanya: { :orodha-ya-vitu
+	yangu bcc := orodha-ya-vitu.
 }.
 
-Email ikija: ['subject:'] fanya: { :subject
-	yangu subject := subject.
+Barua-pepe ikija: ['mada:'] fanya: { :mada
+	yangu mada := mada.
 }.
 
-Email ikija: ['from:name:'] fanya: { :from :jina
-	yangu from := from.
-	yangu from-name := jina.
+Barua-pepe ikija: ['mtumaji:jina:'] fanya: { :mtumaji :jina
+	yangu mtumaji := mtumaji.
+	yangu jina-la-mtumaji := jina.
 }.
 
-Email ikija: ['body:'] fanya: { :body
-	yangu body := body.
+Barua-pepe ikija: ['mwili:'] fanya: { :mwili
+	yangu mwili := mwili.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email ikija: ['header:'] fanya: { :line <- line badilisha: ['\r'] kwa: [''], badilisha: ['\n'] kwa: [''].
+Barua-pepe ikija: ['kichwa:'] fanya: { :mstari <- mstari badilisha: ['\r'] kwa: [''], badilisha: ['\n'] kwa: [''].
 }.
 
-Email ikija: ['send'] fanya: {
-	>> f := Faili tempwrite: binafsi generate.
+Barua-pepe ikija: ['tuma'] fanya: {
+	>> f := Faili tempwrite: binafsi zalisha.
 	Programu mfumo: ['sendmail -t < '] + f njia-ya-faili, mstari-mpya.
 }.
 
-Email ikija: ['generate'] fanya: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str ongeza-mwishoni: (binafsi header: ['From: '] + yangu from-name + [' <'] + ( yangu from ) + ['>']) + brk.
-	str ongeza-mwishoni: (binafsi header: ['To: '] + ( yangu recipients unganisha: [','] )) + brk.
+Barua-pepe ikija: ['zalisha'] fanya: {
+	>> kuvunja-mstari := ['\r\n'].
+	>> mfuatano := [''].
+	mfuatano ongeza-mwishoni: (binafsi kichwa: ['From: '] + yangu jina-la-mtumaji + [' <'] + ( yangu mtumaji ) + ['>']) + kuvunja-mstari.
+	mfuatano ongeza-mwishoni: (binafsi kichwa: ['To: '] + ( yangu wapokeaji unganisha: [','] )) + kuvunja-mstari.
 	yangu cc hesabu kweli: {
-		str ongeza-mwishoni: (binafsi header: ['Cc: '] + ( yangu cc unganisha: [','] )) + brk.
+		mfuatano ongeza-mwishoni: (binafsi kichwa: ['Cc: '] + ( yangu cc unganisha: [','] )) + kuvunja-mstari.
 	}.
 	yangu bcc hesabu kweli: {
-		str ongeza-mwishoni: (binafsi header: ['Bcc: '] + ( yangu bcc unganisha: [','] )) + brk.
+		mfuatano ongeza-mwishoni: (binafsi kichwa: ['Bcc: '] + ( yangu bcc unganisha: [','] )) + kuvunja-mstari.
 	}.
-	str ongeza-mwishoni: (binafsi header: ['Subject: '] + yangu subject) + brk.
-	str ongeza-mwishoni: brk.
-	str ongeza-mwishoni: yangu body.
-	str ongeza-mwishoni: brk. <- str.
+	mfuatano ongeza-mwishoni: (binafsi kichwa: ['Subject: '] + yangu mada) + kuvunja-mstari.
+	mfuatano ongeza-mwishoni: kuvunja-mstari.
+	mfuatano ongeza-mwishoni: yangu mwili.
+	mfuatano ongeza-mwishoni: kuvunja-mstari. <- mfuatano.
 }.
 
->> HTML-Email := Email mpya.
+>> Barua-pepe-HTML := Barua-pepe mpya.
 
-HTML-Email ikija: ['init'] fanya: {
-	binafsi init.
-	yangu attachments := Orodha mpya.
-	yangu boundary := Kasha tokeni: 40.
+Barua-pepe-HTML ikija: ['andaa'] fanya: {
+	binafsi andaa.
+	yangu viambatisho := Orodha mpya.
+	yangu mpaka := Kasha tokeni: 40.
 }.
 
-HTML-Email ikija: ['attach:'] fanya: { :file
-	>> id := yangu attachments hesabu.
-	>> blob := file blob.
-	yangu attachments ongeza-mwishoni: (
+Barua-pepe-HTML ikija: ['ambatisha:'] fanya: { :faili-la-kipindi
+	>> id := yangu viambatisho hesabu.
+	>> blob := faili-la-kipindi blob.
+	yangu viambatisho ongeza-mwishoni: (
 		Kamusi mpya
-			file: file njia-ya-faili,
-			mime: ['image/'] + (Server mimetype: file njia-ya-faili),
+			faili-la-kipindi: faili-la-kipindi njia-ya-faili,
+			mime: ['image/'] + (Server mimetype: faili-la-kipindi njia-ya-faili),
 			data: blob base64-simba
 	).
 	blob achilia. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email ikija: ['generate'] fanya: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str ongeza-mwishoni: (binafsi header: ['From: '] + yangu from-name + [' <'] + ( yangu from ) + ['>']) + brk.
-	str ongeza-mwishoni: (binafsi header: ['To: '] + ( yangu recipients unganisha: [','] )) + brk.
+Barua-pepe-HTML ikija: ['zalisha'] fanya: {
+	>> kuvunja-mstari := ['\r\n'].
+	>> mfuatano := [''].
+	mfuatano ongeza-mwishoni: (binafsi kichwa: ['From: '] + yangu jina-la-mtumaji + [' <'] + ( yangu mtumaji ) + ['>']) + kuvunja-mstari.
+	mfuatano ongeza-mwishoni: (binafsi kichwa: ['To: '] + ( yangu wapokeaji unganisha: [','] )) + kuvunja-mstari.
 	yangu cc hesabu kweli: {
-		str ongeza-mwishoni: (binafsi header: ['Cc: '] + ( yangu cc unganisha: [','] )) + brk.
+		mfuatano ongeza-mwishoni: (binafsi kichwa: ['Cc: '] + ( yangu cc unganisha: [','] )) + kuvunja-mstari.
 	}.
 	yangu bcc hesabu kweli: {
-		str ongeza-mwishoni: (binafsi header: ['Bcc: '] + ( yangu bcc unganisha: [','] )) + brk.
+		mfuatano ongeza-mwishoni: (binafsi kichwa: ['Bcc: '] + ( yangu bcc unganisha: [','] )) + kuvunja-mstari.
 	}.
-	str ongeza-mwishoni: (binafsi header: ['Subject: '] + yangu subject) + brk.
-	str ongeza-mwishoni: ['MIME-Version: 1.0'] + brk.
-	str ongeza-mwishoni: ['Content-Type: multipart/related; boundary="'] + yangu boundary + ['"; type=text/html'] + brk.
-	str ongeza-mwishoni: brk.
-	str ongeza-mwishoni: ['--'] + yangu boundary + brk.
-	str ongeza-mwishoni: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str ongeza-mwishoni: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str ongeza-mwishoni: brk.
-	str ongeza-mwishoni: yangu body.
-	str ongeza-mwishoni: brk.
-	yangu attachments kila: { :id :info
-		>> blob := info data.
-		str ongeza-mwishoni: ['--'] + yangu boundary + brk.
-		str ongeza-mwishoni: ['Content-Type: '] + info mime + brk.
-		str ongeza-mwishoni: ['Content-Transfer-Encoding: base64'] + brk.
-		str ongeza-mwishoni: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str ongeza-mwishoni: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str ongeza-mwishoni: brk.
-		>> max := 76.
-		>> len := blob urefu.
-		>> chunks := (len / max) kadiria-juu.
+	mfuatano ongeza-mwishoni: (binafsi kichwa: ['Subject: '] + yangu mada) + kuvunja-mstari.
+	mfuatano ongeza-mwishoni: ['MIME-Version: 1.0'] + kuvunja-mstari.
+	mfuatano ongeza-mwishoni: ['Content-Type: multipart/related; boundary="'] + yangu mpaka + ['"; type=text/html'] + kuvunja-mstari.
+	mfuatano ongeza-mwishoni: kuvunja-mstari.
+	mfuatano ongeza-mwishoni: ['--'] + yangu mpaka + kuvunja-mstari.
+	mfuatano ongeza-mwishoni: ['Content-Type: text/html; charset=UTF-8'] + kuvunja-mstari.
+	mfuatano ongeza-mwishoni: ['Content-Transfer-Encoding: 7bit'] + kuvunja-mstari.
+	mfuatano ongeza-mwishoni: kuvunja-mstari.
+	mfuatano ongeza-mwishoni: yangu mwili.
+	mfuatano ongeza-mwishoni: kuvunja-mstari.
+	yangu viambatisho kila: { :id :taarifa
+		>> blob := taarifa data.
+		mfuatano ongeza-mwishoni: ['--'] + yangu mpaka + kuvunja-mstari.
+		mfuatano ongeza-mwishoni: ['Content-Type: '] + taarifa mime + kuvunja-mstari.
+		mfuatano ongeza-mwishoni: ['Content-Transfer-Encoding: base64'] + kuvunja-mstari.
+		mfuatano ongeza-mwishoni: ['Content-ID: <attachment'] + id + ['>'] + kuvunja-mstari.
+		mfuatano ongeza-mwishoni: ['Content-Disposition: inline; filename="'] + taarifa faili-la-kipindi + ['"'] + kuvunja-mstari.
+		mfuatano ongeza-mwishoni: kuvunja-mstari.
+		>> upeo := 76.
+		>> urefu-wa-maandishi := blob urefu.
+		>> vipisi := (urefu-wa-maandishi / upeo) kadiria-juu.
 		{ :i
-			>> chunk := blob nakala kutoka: i * max urefu: max.
-			str ongeza-mwishoni: chunk + brk.
-		} * chunks.
-		str ongeza-mwishoni: brk.
-		str ongeza-mwishoni: brk.
+			>> kipisi := blob nakala kutoka: i * upeo urefu: upeo.
+			mfuatano ongeza-mwishoni: kipisi + kuvunja-mstari.
+		} * vipisi.
+		mfuatano ongeza-mwishoni: kuvunja-mstari.
+		mfuatano ongeza-mwishoni: kuvunja-mstari.
 	}.
-	str ongeza-mwishoni: ['--'] + yangu boundary + ['--'] + brk. <- str.
+	mfuatano ongeza-mwishoni: ['--'] + yangu mpaka + ['--'] + kuvunja-mstari. <- mfuatano.
 }.

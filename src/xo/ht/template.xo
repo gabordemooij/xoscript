@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objè nouvo.
+>> Gabari := Objè nouvo.
 
-Template lè: ['nouvo'] fè: { <- tèt-li nouvo content: [''].
+Gabari lè: ['nouvo'] fè: { <- tèt-li nouvo kontni: [''].
 }.
 
-Template lè: ['content:'] fè: { :content
-	pwòp content := content. 
+Gabari lè: ['kontni:'] fè: { :kontni
+	pwòp kontni := kontni. 
 }.
 
-Template lè: ['nouvo:'] fè: { :content <- tèt-li nouvo content: content.
+Gabari lè: ['nouvo:'] fè: { :kontni <- tèt-li nouvo kontni: kontni.
 }.
 
-Template lè: ['cut:'] fè: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := pwòp content divize: startmarker.
-	>> prefix := parts premye.
-	>> parts2 := parts dènye divize: endmarker.
-	>> suffix := parts2 dènye.
-	>> part := parts2 premye.
-	>> rest := prefix + suffix.
-	pwòp content := rest. <- Template nouvo: part.
+Gabari lè: ['koupe:'] fè: { :mak
+	>> mak-kòmansman := (['<!-- cut:%id% -->'] %id%: mak).
+	>> mak-fen := (['<!-- /cut:%id% -->'] %id%: mak).
+	>> pati-yo := pwòp kontni divize: mak-kòmansman.
+	>> prefiks := pati-yo premye.
+	>> pati-yo2 := pati-yo dènye divize: mak-fen.
+	>> sifiks := pati-yo2 dènye.
+	>> pati := pati-yo2 premye.
+	>> rès := prefiks + sifiks.
+	pwòp kontni := rès. <- Gabari nouvo: pati.
 	
 }.
 
-Template lè: ['kopye'] fè: { <- tèt-li nouvo: tèt-li tèks kopye.
+Gabari lè: ['kopye'] fè: { <- tèt-li nouvo: tèt-li tèks kopye.
 }.
 	
-Template lè: ['paste:at:'] fè: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	pwòp content ranplase: pastemarker ak: ( snippet tèks + pastemarker ).
+Gabari lè: ['kole:nan:'] fè: { :ekstrè :id
+	>> mak-kole := (['<!-- paste:%id% -->'] %id%: id).
+	pwòp kontni ranplase: mak-kole ak: ( ekstrè tèks + mak-kole ).
 }.
 
-Template lè: ['fikse:valè:'] fè: { :slot :value
-	pwòp content ranplase: ['<!-- slot:'] + slot + [' -->'] ak: ( Server html-kode: value ).
+Gabari lè: ['fikse:valè:'] fè: { :plas :valè
+	pwòp kontni ranplase: ['<!-- slot:'] + plas + [' -->'] ak: ( Server html-kode: valè ).
 }.
 
-Template lè: ['set:html:'] fè: { :slot :html
-	pwòp content ranplase: ['<!-- slot:'] + slot + [' -->'] ak: html.
+Gabari lè: ['fikse:html:'] fè: { :plas :html
+	pwòp kontni ranplase: ['<!-- slot:'] + plas + [' -->'] ak: html.
 }.
 
-Template lè: ['reponn:ak:'] fè: { :slot :value
-	tèt-li fikse: (slot soti-nan: 0 longè: (slot longè - 1)) valè: value.
+Gabari lè: ['reponn:ak:'] fè: { :plas :valè
+	tèt-li fikse: (plas soti-nan: 0 longè: (plas longè - 1)) valè: valè.
 }.
 
-Template lè: ['nl2br'] fè: {
-	pwòp content ranplase: ['\n'] ak: ['<br>'].
+Gabari lè: ['nl2br'] fè: {
+	pwòp kontni ranplase: ['\n'] ak: ['<br>'].
 }.
 
-Template lè: ['clean'] fè: {
-	pwòp content :=
+Gabari lè: ['ranje'] fè: {
+	pwòp kontni :=
 		Modèl
 		nouvo: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		koresponn: pwòp content
+		koresponn: pwòp kontni
 		fè: { <- ['']. }.
 }.
 
-Template lè: ['clean-cuts'] fè: {
-	>> items := Lis nouvo.
+Gabari lè: ['ranje-koupe-yo'] fè: {
+	>> atik := Lis nouvo.
 	Modèl
 	nouvo: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	koresponn: pwòp content
-	fè: { :_ :part
-		items ajoute-nan-fen: part ? 1.
+	koresponn: pwòp kontni
+	fè: { :_ :pati
+		atik ajoute-nan-fen: pati ? 1.
 	}.
-	items chak: { :_ :id
-		pwòp content :=
+	atik chak: { :_ :id
+		pwòp kontni :=
 			Modèl nouvo: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			koresponn: pwòp content
+			koresponn: pwòp kontni
 			fè: { <- ['']. }.
 	 }.
 }.
 
-Template lè: ['clean-space'] fè: {
-	pwòp content :=
+Gabari lè: ['ranje-espas-yo'] fè: {
+	pwòp kontni :=
 		Modèl
 		nouvo: ['\\s*\\n'],
-		koresponn: pwòp content
+		koresponn: pwòp kontni
 		fè: { <- ['\n']. }.
-	pwòp content :=
+	pwòp kontni :=
 		Modèl
 		nouvo: ['\\n[\\s\\t]+'],
-		koresponn: pwòp content
+		koresponn: pwòp kontni
 		fè: { <- ['\n']. }.
 }.
 
-Template lè: ['clean-all'] fè: {
-	tèt-li clean.
-	tèt-li clean-cuts.
-	tèt-li clean-space.
+Gabari lè: ['ranje-tout'] fè: {
+	tèt-li ranje.
+	tèt-li ranje-koupe-yo.
+	tèt-li ranje-espas-yo.
 }.
 
-Template lè: ['tèks'] fè: { <- pwòp content.
+Gabari lè: ['tèks'] fè: { <- pwòp kontni.
 }.

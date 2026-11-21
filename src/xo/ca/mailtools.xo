@@ -1,128 +1,128 @@
->> Email := Objecte nou.
+>> Correu := Objecte nou.
 
-Email en: ['init'] fes: {
-	propi recipients := Llista nou.
+Correu en: ['inicialitzar'] fes: {
+	propi destinataris := Llista nou.
 	propi cc := Llista nou.
 	propi bcc := Llista nou.
-	propi from := Res.
-	propi from-name := Res.
-	propi subject := Res.
-	propi body := Res.
+	propi remitent := Res.
+	propi nom-remitent := Res.
+	propi assumpte := Res.
+	propi cos-missatge := Res.
 }.
 
-Email en: ['nou'] fes: { <- jo nou init.
+Correu en: ['nou'] fes: { <- jo nou inicialitzar.
 }.
 
-Email en: ['to:'] fes: { :list
-	propi recipients := list.
+Correu en: ['destinatari:'] fes: { :llista
+	propi destinataris := llista.
 }.
  
-Email en: ['cc:'] fes: { :list
-	propi cc := list.
+Correu en: ['cc:'] fes: { :llista
+	propi cc := llista.
 }.
 
-Email en: ['bcc:'] fes: { :list
-	propi bcc := list.
+Correu en: ['bcc:'] fes: { :llista
+	propi bcc := llista.
 }.
 
-Email en: ['subject:'] fes: { :subject
-	propi subject := subject.
+Correu en: ['assumpte:'] fes: { :assumpte
+	propi assumpte := assumpte.
 }.
 
-Email en: ['from:name:'] fes: { :from :nom
-	propi from := from.
-	propi from-name := nom.
+Correu en: ['remitent:nom:'] fes: { :remitent :nom
+	propi remitent := remitent.
+	propi nom-remitent := nom.
 }.
 
-Email en: ['body:'] fes: { :body
-	propi body := body.
+Correu en: ['cos-missatge:'] fes: { :cos-missatge
+	propi cos-missatge := cos-missatge.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email en: ['header:'] fes: { :line <- line substitueix: ['\r'] per: [''], substitueix: ['\n'] per: [''].
+Correu en: ['capçalera:'] fes: { :línia <- línia substitueix: ['\r'] per: [''], substitueix: ['\n'] per: [''].
 }.
 
-Email en: ['send'] fes: {
-	>> f := Fitxer tempwrite: jo generate.
+Correu en: ['enviar'] fes: {
+	>> f := Fitxer tempwrite: jo generar.
 	Programa sistema: ['sendmail -t < '] + f camí, salt-de-línia.
 }.
 
-Email en: ['generate'] fes: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str afegeix-al-final: (jo header: ['From: '] + propi from-name + [' <'] + ( propi from ) + ['>']) + brk.
-	str afegeix-al-final: (jo header: ['To: '] + ( propi recipients uneix: [','] )) + brk.
+Correu en: ['generar'] fes: {
+	>> salt := ['\r\n'].
+	>> cadena := [''].
+	cadena afegeix-al-final: (jo capçalera: ['From: '] + propi nom-remitent + [' <'] + ( propi remitent ) + ['>']) + salt.
+	cadena afegeix-al-final: (jo capçalera: ['To: '] + ( propi destinataris uneix: [','] )) + salt.
 	propi cc compta cert: {
-		str afegeix-al-final: (jo header: ['Cc: '] + ( propi cc uneix: [','] )) + brk.
+		cadena afegeix-al-final: (jo capçalera: ['Cc: '] + ( propi cc uneix: [','] )) + salt.
 	}.
 	propi bcc compta cert: {
-		str afegeix-al-final: (jo header: ['Bcc: '] + ( propi bcc uneix: [','] )) + brk.
+		cadena afegeix-al-final: (jo capçalera: ['Bcc: '] + ( propi bcc uneix: [','] )) + salt.
 	}.
-	str afegeix-al-final: (jo header: ['Subject: '] + propi subject) + brk.
-	str afegeix-al-final: brk.
-	str afegeix-al-final: propi body.
-	str afegeix-al-final: brk. <- str.
+	cadena afegeix-al-final: (jo capçalera: ['Subject: '] + propi assumpte) + salt.
+	cadena afegeix-al-final: salt.
+	cadena afegeix-al-final: propi cos-missatge.
+	cadena afegeix-al-final: salt. <- cadena.
 }.
 
->> HTML-Email := Email nou.
+>> Correu-HTML := Correu nou.
 
-HTML-Email en: ['init'] fes: {
-	jo init.
-	propi attachments := Llista nou.
-	propi boundary := Caixa-forta token: 40.
+Correu-HTML en: ['inicialitzar'] fes: {
+	jo inicialitzar.
+	propi adjunts := Llista nou.
+	propi frontera := Caixa-forta token: 40.
 }.
 
-HTML-Email en: ['attach:'] fes: { :file
-	>> id := propi attachments compta.
-	>> blob := file blob.
-	propi attachments afegeix-al-final: (
+Correu-HTML en: ['adjuntar:'] fes: { :fitxer
+	>> id := propi adjunts compta.
+	>> blob := fitxer blob.
+	propi adjunts afegeix-al-final: (
 		Diccionari nou
-			file: file camí,
-			mime: ['image/'] + (Server mimetype: file camí),
-			data: blob base64-codifica
+			fitxer: fitxer camí,
+			mime: ['image/'] + (Server mimetype: fitxer camí),
+			dades: blob base64-codifica
 	).
 	blob allibera. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email en: ['generate'] fes: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str afegeix-al-final: (jo header: ['From: '] + propi from-name + [' <'] + ( propi from ) + ['>']) + brk.
-	str afegeix-al-final: (jo header: ['To: '] + ( propi recipients uneix: [','] )) + brk.
+Correu-HTML en: ['generar'] fes: {
+	>> salt := ['\r\n'].
+	>> cadena := [''].
+	cadena afegeix-al-final: (jo capçalera: ['From: '] + propi nom-remitent + [' <'] + ( propi remitent ) + ['>']) + salt.
+	cadena afegeix-al-final: (jo capçalera: ['To: '] + ( propi destinataris uneix: [','] )) + salt.
 	propi cc compta cert: {
-		str afegeix-al-final: (jo header: ['Cc: '] + ( propi cc uneix: [','] )) + brk.
+		cadena afegeix-al-final: (jo capçalera: ['Cc: '] + ( propi cc uneix: [','] )) + salt.
 	}.
 	propi bcc compta cert: {
-		str afegeix-al-final: (jo header: ['Bcc: '] + ( propi bcc uneix: [','] )) + brk.
+		cadena afegeix-al-final: (jo capçalera: ['Bcc: '] + ( propi bcc uneix: [','] )) + salt.
 	}.
-	str afegeix-al-final: (jo header: ['Subject: '] + propi subject) + brk.
-	str afegeix-al-final: ['MIME-Version: 1.0'] + brk.
-	str afegeix-al-final: ['Content-Type: multipart/related; boundary="'] + propi boundary + ['"; type=text/html'] + brk.
-	str afegeix-al-final: brk.
-	str afegeix-al-final: ['--'] + propi boundary + brk.
-	str afegeix-al-final: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str afegeix-al-final: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str afegeix-al-final: brk.
-	str afegeix-al-final: propi body.
-	str afegeix-al-final: brk.
-	propi attachments cada: { :id :info
-		>> blob := info data.
-		str afegeix-al-final: ['--'] + propi boundary + brk.
-		str afegeix-al-final: ['Content-Type: '] + info mime + brk.
-		str afegeix-al-final: ['Content-Transfer-Encoding: base64'] + brk.
-		str afegeix-al-final: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str afegeix-al-final: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str afegeix-al-final: brk.
-		>> max := 76.
-		>> len := blob longitud.
-		>> chunks := (len / max) arrodoneix-amunt.
+	cadena afegeix-al-final: (jo capçalera: ['Subject: '] + propi assumpte) + salt.
+	cadena afegeix-al-final: ['MIME-Version: 1.0'] + salt.
+	cadena afegeix-al-final: ['Content-Type: multipart/related; boundary="'] + propi frontera + ['"; type=text/html'] + salt.
+	cadena afegeix-al-final: salt.
+	cadena afegeix-al-final: ['--'] + propi frontera + salt.
+	cadena afegeix-al-final: ['Content-Type: text/html; charset=UTF-8'] + salt.
+	cadena afegeix-al-final: ['Content-Transfer-Encoding: 7bit'] + salt.
+	cadena afegeix-al-final: salt.
+	cadena afegeix-al-final: propi cos-missatge.
+	cadena afegeix-al-final: salt.
+	propi adjunts cada: { :id :info
+		>> blob := info dades.
+		cadena afegeix-al-final: ['--'] + propi frontera + salt.
+		cadena afegeix-al-final: ['Content-Type: '] + info mime + salt.
+		cadena afegeix-al-final: ['Content-Transfer-Encoding: base64'] + salt.
+		cadena afegeix-al-final: ['Content-ID: <attachment'] + id + ['>'] + salt.
+		cadena afegeix-al-final: ['Content-Disposition: inline; filename="'] + info fitxer + ['"'] + salt.
+		cadena afegeix-al-final: salt.
+		>> sostre := 76.
+		>> llargada-text := blob longitud.
+		>> trossos := (llargada-text / sostre) arrodoneix-amunt.
 		{ :i
-			>> chunk := blob copia de: i * max longitud: max.
-			str afegeix-al-final: chunk + brk.
-		} * chunks.
-		str afegeix-al-final: brk.
-		str afegeix-al-final: brk.
+			>> tros := blob copia de: i * sostre longitud: sostre.
+			cadena afegeix-al-final: tros + salt.
+		} * trossos.
+		cadena afegeix-al-final: salt.
+		cadena afegeix-al-final: salt.
 	}.
-	str afegeix-al-final: ['--'] + propi boundary + ['--'] + brk. <- str.
+	cadena afegeix-al-final: ['--'] + propi frontera + ['--'] + salt. <- cadena.
 }.

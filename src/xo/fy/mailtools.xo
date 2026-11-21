@@ -1,128 +1,128 @@
->> Email := Objekt nĳ.
+>> E-mail := Objekt nĳ.
 
-Email by: ['init'] dwaan: {
-	eigen recipients := Rige nĳ.
+E-mail by: ['inisjalisearje'] dwaan: {
+	eigen ûntfangers := Rige nĳ.
 	eigen cc := Rige nĳ.
 	eigen bcc := Rige nĳ.
-	eigen from := Neat.
-	eigen from-name := Neat.
-	eigen subject := Neat.
-	eigen body := Neat.
+	eigen ôfstjoerder := Neat.
+	eigen ôfstjoerdernamme := Neat.
+	eigen ûnderwerp := Neat.
+	eigen berjochttekst := Neat.
 }.
 
-Email by: ['nĳ'] dwaan: { <- sels nĳ init.
+E-mail by: ['nĳ'] dwaan: { <- sels nĳ inisjalisearje.
 }.
 
-Email by: ['to:'] dwaan: { :list
-	eigen recipients := list.
+E-mail by: ['oan:'] dwaan: { :opsomming
+	eigen ûntfangers := opsomming.
 }.
  
-Email by: ['cc:'] dwaan: { :list
-	eigen cc := list.
+E-mail by: ['cc:'] dwaan: { :opsomming
+	eigen cc := opsomming.
 }.
 
-Email by: ['bcc:'] dwaan: { :list
-	eigen bcc := list.
+E-mail by: ['bcc:'] dwaan: { :opsomming
+	eigen bcc := opsomming.
 }.
 
-Email by: ['subject:'] dwaan: { :subject
-	eigen subject := subject.
+E-mail by: ['ûnderwerp:'] dwaan: { :ûnderwerp
+	eigen ûnderwerp := ûnderwerp.
 }.
 
-Email by: ['from:name:'] dwaan: { :from :namme
-	eigen from := from.
-	eigen from-name := namme.
+E-mail by: ['ôfstjoerder:namme:'] dwaan: { :ôfstjoerder :namme
+	eigen ôfstjoerder := ôfstjoerder.
+	eigen ôfstjoerdernamme := namme.
 }.
 
-Email by: ['body:'] dwaan: { :body
-	eigen body := body.
+E-mail by: ['berjochttekst:'] dwaan: { :berjochttekst
+	eigen berjochttekst := berjochttekst.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email by: ['header:'] dwaan: { :line <- line ferfange: ['\r'] troch: [''], ferfange: ['\n'] troch: [''].
+E-mail by: ['kop:'] dwaan: { :rigel <- rigel ferfange: ['\r'] troch: [''], ferfange: ['\n'] troch: [''].
 }.
 
-Email by: ['send'] dwaan: {
-	>> f := Bestand tempwrite: sels generate.
+E-mail by: ['stjoere'] dwaan: {
+	>> f := Bestand tempwrite: sels generearje.
 	Programma systeem: ['sendmail -t < '] + f paad, nije-rigel.
 }.
 
-Email by: ['generate'] dwaan: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str tafoegje: (sels header: ['From: '] + eigen from-name + [' <'] + ( eigen from ) + ['>']) + brk.
-	str tafoegje: (sels header: ['To: '] + ( eigen recipients gearfoegje: [','] )) + brk.
+E-mail by: ['generearje'] dwaan: {
+	>> rigeleinde := ['\r\n'].
+	>> tekenrige := [''].
+	tekenrige tafoegje: (sels kop: ['From: '] + eigen ôfstjoerdernamme + [' <'] + ( eigen ôfstjoerder ) + ['>']) + rigeleinde.
+	tekenrige tafoegje: (sels kop: ['To: '] + ( eigen ûntfangers gearfoegje: [','] )) + rigeleinde.
 	eigen cc telle ja: {
-		str tafoegje: (sels header: ['Cc: '] + ( eigen cc gearfoegje: [','] )) + brk.
+		tekenrige tafoegje: (sels kop: ['Cc: '] + ( eigen cc gearfoegje: [','] )) + rigeleinde.
 	}.
 	eigen bcc telle ja: {
-		str tafoegje: (sels header: ['Bcc: '] + ( eigen bcc gearfoegje: [','] )) + brk.
+		tekenrige tafoegje: (sels kop: ['Bcc: '] + ( eigen bcc gearfoegje: [','] )) + rigeleinde.
 	}.
-	str tafoegje: (sels header: ['Subject: '] + eigen subject) + brk.
-	str tafoegje: brk.
-	str tafoegje: eigen body.
-	str tafoegje: brk. <- str.
+	tekenrige tafoegje: (sels kop: ['Subject: '] + eigen ûnderwerp) + rigeleinde.
+	tekenrige tafoegje: rigeleinde.
+	tekenrige tafoegje: eigen berjochttekst.
+	tekenrige tafoegje: rigeleinde. <- tekenrige.
 }.
 
->> HTML-Email := Email nĳ.
+>> HTML-E-mail := E-mail nĳ.
 
-HTML-Email by: ['init'] dwaan: {
-	sels init.
-	eigen attachments := Rige nĳ.
-	eigen boundary := Klûs token: 40.
+HTML-E-mail by: ['inisjalisearje'] dwaan: {
+	sels inisjalisearje.
+	eigen bylagen := Rige nĳ.
+	eigen grins := Klûs token: 40.
 }.
 
-HTML-Email by: ['attach:'] dwaan: { :file
-	>> id := eigen attachments telle.
-	>> blob := file blob.
-	eigen attachments tafoegje: (
+HTML-E-mail by: ['taheakje:'] dwaan: { :bestân
+	>> id := eigen bylagen telle.
+	>> blob := bestân blob.
+	eigen bylagen tafoegje: (
 		List nĳ
-			file: file paad,
-			mime: ['image/'] + (Server mimetype: file paad),
-			data: blob base64-kodearje
+			bestân: bestân paad,
+			mime: ['image/'] + (Server mimetype: bestân paad),
+			gegevens: blob base64-kodearje
 	).
 	blob frijjaan. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email by: ['generate'] dwaan: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str tafoegje: (sels header: ['From: '] + eigen from-name + [' <'] + ( eigen from ) + ['>']) + brk.
-	str tafoegje: (sels header: ['To: '] + ( eigen recipients gearfoegje: [','] )) + brk.
+HTML-E-mail by: ['generearje'] dwaan: {
+	>> rigeleinde := ['\r\n'].
+	>> tekenrige := [''].
+	tekenrige tafoegje: (sels kop: ['From: '] + eigen ôfstjoerdernamme + [' <'] + ( eigen ôfstjoerder ) + ['>']) + rigeleinde.
+	tekenrige tafoegje: (sels kop: ['To: '] + ( eigen ûntfangers gearfoegje: [','] )) + rigeleinde.
 	eigen cc telle ja: {
-		str tafoegje: (sels header: ['Cc: '] + ( eigen cc gearfoegje: [','] )) + brk.
+		tekenrige tafoegje: (sels kop: ['Cc: '] + ( eigen cc gearfoegje: [','] )) + rigeleinde.
 	}.
 	eigen bcc telle ja: {
-		str tafoegje: (sels header: ['Bcc: '] + ( eigen bcc gearfoegje: [','] )) + brk.
+		tekenrige tafoegje: (sels kop: ['Bcc: '] + ( eigen bcc gearfoegje: [','] )) + rigeleinde.
 	}.
-	str tafoegje: (sels header: ['Subject: '] + eigen subject) + brk.
-	str tafoegje: ['MIME-Version: 1.0'] + brk.
-	str tafoegje: ['Content-Type: multipart/related; boundary="'] + eigen boundary + ['"; type=text/html'] + brk.
-	str tafoegje: brk.
-	str tafoegje: ['--'] + eigen boundary + brk.
-	str tafoegje: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str tafoegje: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str tafoegje: brk.
-	str tafoegje: eigen body.
-	str tafoegje: brk.
-	eigen attachments elk: { :id :info
-		>> blob := info data.
-		str tafoegje: ['--'] + eigen boundary + brk.
-		str tafoegje: ['Content-Type: '] + info mime + brk.
-		str tafoegje: ['Content-Transfer-Encoding: base64'] + brk.
-		str tafoegje: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str tafoegje: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str tafoegje: brk.
-		>> max := 76.
-		>> len := blob lingte.
-		>> chunks := (len / max) ôfrûnje-op.
+	tekenrige tafoegje: (sels kop: ['Subject: '] + eigen ûnderwerp) + rigeleinde.
+	tekenrige tafoegje: ['MIME-Version: 1.0'] + rigeleinde.
+	tekenrige tafoegje: ['Content-Type: multipart/related; boundary="'] + eigen grins + ['"; type=text/html'] + rigeleinde.
+	tekenrige tafoegje: rigeleinde.
+	tekenrige tafoegje: ['--'] + eigen grins + rigeleinde.
+	tekenrige tafoegje: ['Content-Type: text/html; charset=UTF-8'] + rigeleinde.
+	tekenrige tafoegje: ['Content-Transfer-Encoding: 7bit'] + rigeleinde.
+	tekenrige tafoegje: rigeleinde.
+	tekenrige tafoegje: eigen berjochttekst.
+	tekenrige tafoegje: rigeleinde.
+	eigen bylagen elk: { :id :ynfo
+		>> blob := ynfo gegevens.
+		tekenrige tafoegje: ['--'] + eigen grins + rigeleinde.
+		tekenrige tafoegje: ['Content-Type: '] + ynfo mime + rigeleinde.
+		tekenrige tafoegje: ['Content-Transfer-Encoding: base64'] + rigeleinde.
+		tekenrige tafoegje: ['Content-ID: <attachment'] + id + ['>'] + rigeleinde.
+		tekenrige tafoegje: ['Content-Disposition: inline; filename="'] + ynfo bestân + ['"'] + rigeleinde.
+		tekenrige tafoegje: rigeleinde.
+		>> heechste := 76.
+		>> tekstlingte := blob lingte.
+		>> stikken := (tekstlingte / heechste) ôfrûnje-op.
 		{ :i
-			>> chunk := blob kopiearje fan: i * max lingte: max.
-			str tafoegje: chunk + brk.
-		} * chunks.
-		str tafoegje: brk.
-		str tafoegje: brk.
+			>> stik := blob kopiearje fan: i * heechste lingte: heechste.
+			tekenrige tafoegje: stik + rigeleinde.
+		} * stikken.
+		tekenrige tafoegje: rigeleinde.
+		tekenrige tafoegje: rigeleinde.
 	}.
-	str tafoegje: ['--'] + eigen boundary + ['--'] + brk. <- str.
+	tekenrige tafoegje: ['--'] + eigen grins + ['--'] + rigeleinde. <- tekenrige.
 }.

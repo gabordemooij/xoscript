@@ -1,302 +1,302 @@
-HTTP-Požiadavka pri: ['HTTP-header:'] urobiť: { :key <- Program nastavenie: key.
+HTTP-Požiadavka pri: ['HTTP-hlavička:'] urobiť: { :kľúč <- Program nastavenie: kľúč.
 }.
 
->> HTTP-Header := Objekt nový.
+>> HTTP-Hlavička := Objekt nový.
 
-HTTP-Header pri: ['nový'] urobiť: { <- seba nový init.
+HTTP-Hlavička pri: ['nový'] urobiť: { <- seba nový inicializovať.
 }.
 
-HTTP-Header pri: ['init'] urobiť: {
-	vlastný key := Nič.
-	vlastný value := Nič.
+HTTP-Hlavička pri: ['inicializovať'] urobiť: {
+	vlastný kľúč := Nič.
+	vlastný hodnota := Nič.
 }.
 
-HTTP-Header pri: ['key:value:'] urobiť: { :key :value
-	vlastný key := key.
-	vlastný value := value.
+HTTP-Hlavička pri: ['kľúč:hodnota:'] urobiť: { :kľúč :hodnota
+	vlastný kľúč := kľúč.
+	vlastný hodnota := hodnota.
 }.
 
-HTTP-Header pri: ['key'] urobiť: { <- vlastný key.
+HTTP-Hlavička pri: ['kľúč'] urobiť: { <- vlastný kľúč.
 }.
 
-HTTP-Header pri: ['value'] urobiť: { <- vlastný value.
+HTTP-Hlavička pri: ['hodnota'] urobiť: { <- vlastný hodnota.
 }.
 
 
-HTTP-Header pri: ['text'] urobiť: {
-	>> line := vlastný key + [': '] + vlastný value.
-	line nahradiť: ['\r'] za: [''], nahradiť: ['\n'] za: ['']. <- line + [' \r\n'].
+HTTP-Hlavička pri: ['text'] urobiť: {
+	>> riadok := vlastný kľúč + [': '] + vlastný hodnota.
+	riadok nahradiť: ['\r'] za: [''], nahradiť: ['\n'] za: ['']. <- riadok + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Objekt nový.
+>> Webový-dokument := Objekt nový.
 
-Web-Document pri: ['nový'] urobiť: { <- seba nový init.
+Webový-dokument pri: ['nový'] urobiť: { <- seba nový inicializovať.
 }.
 
-Web-Document pri: ['init'] urobiť: {
-	vlastný headers := Zoznam nový.
-	vlastný sess-id := Nič.
-	vlastný session-manager := Tempfile-Session nový.
-	vlastný sessdata := Nič.
-	vlastný secure := Pravda.
-	vlastný same-site := ['Strict'].
-	vlastný headers-out := Nepravda.
-	vlastný request := HTTP-Požiadavka nový.
+Webový-dokument pri: ['inicializovať'] urobiť: {
+	vlastný hlavičky := Zoznam nový.
+	vlastný id-relácie := Nič.
+	vlastný správca-relácií := Relácia-dočasný-súbor nový.
+	vlastný údaje-relácie := Nič.
+	vlastný zabezpečené := Pravda.
+	vlastný rovnaký-web := ['Strict'].
+	vlastný hlavičky-odoslané := Nepravda.
+	vlastný požiadavka := HTTP-Požiadavka nový.
 }.
 
-Web-Document pri: ['request:'] urobiť: { :request
-	vlastný request := request.
+Webový-dokument pri: ['požiadavka:'] urobiť: { :požiadavka
+	vlastný požiadavka := požiadavka.
 }. 
 
-Web-Document pri: ['secure-session-cookie:'] urobiť: { :secure
-	seba check-headers.
-	vlastný secure := secure.
+Webový-dokument pri: ['zabezpečená-reláčná-cookie:'] urobiť: { :zabezpečené
+	seba skontrolovať-hlavičky.
+	vlastný zabezpečené := zabezpečené.
 }.
 
-Web-Document pri: ['same-site-session-cookie:'] urobiť: { :value
-	seba check-headers.
-	>> options := Zoznam nový 
+Webový-dokument pri: ['reláčná-cookie-rovnaký-web:'] urobiť: { :hodnota
+	seba skontrolovať-hlavičky.
+	>> voľby := Zoznam nový 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options obsahuje: value, nepravda: {
+	voľby má: hodnota, nepravda: {
 		táto-úloha chyba: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	vlastný same-site := value.
+	vlastný rovnaký-web := hodnota.
 }.
 
-Web-Document pri: ['header:'] urobiť: { :header
-	seba check-headers.
-	vlastný headers pripojiť: header.
+Webový-dokument pri: ['hlavička:'] urobiť: { :hlavička
+	seba skontrolovať-hlavičky.
+	vlastný hlavičky pripojiť: hlavička.
 }.
 
-Web-Document pri: ['clear-headers'] urobiť: {
-	seba check-headers.
-	vlastný headers := Zoznam nový.
+Webový-dokument pri: ['vymazať-hlavičky'] urobiť: {
+	seba skontrolovať-hlavičky.
+	vlastný hlavičky := Zoznam nový.
 }.
 
-Web-Document pri: ['session-manager:'] urobiť: { :manager
-	seba check-headers.
-	vlastný session-manager := manager.
+Webový-dokument pri: ['správca-relácií:'] urobiť: { :správca
+	seba skontrolovať-hlavičky.
+	vlastný správca-relácií := správca.
 }.
 
-Web-Document pri: ['session-manager'] urobiť: { <- vlastný session-manager.
+Webový-dokument pri: ['správca-relácií'] urobiť: { <- vlastný správca-relácií.
 }.
 
-Web-Document pri: ['check-headers'] urobiť: {
-	vlastný headers-out pravda: {
+Webový-dokument pri: ['skontrolovať-hlavičky'] urobiť: {
+	vlastný hlavičky-odoslané pravda: {
 		táto-úloha chyba: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document pri: ['session-start'] urobiť: {
-	seba check-headers.
-	>> request := vlastný request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nič? nepravda: {
-		(( Vzor nový: ['^[A-Za-z0-9]+\\z'], zhoda: sess-id ) = 0) pravda: {
-			sess-id := Nič.
+Webový-dokument pri: ['začať-reláciu'] urobiť: {
+	seba skontrolovať-hlavičky.
+	>> požiadavka := vlastný požiadavka.
+	>> id-relácie := požiadavka cookie: ['xsid'].
+	id-relácie Nič? nepravda: {
+		(( Vzor nový: ['^[A-Za-z0-9]+\\z'], zhoda: id-relácie ) = 0) pravda: {
+			id-relácie := Nič.
 		}.
 	}.
-	sess-id Nič? pravda: {
-		sess-id := Trezor token: 30.
-		>> session-header := HTTP-Header nový
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (vlastný secure buď: ['Secure'] alebo: ['']),
-		SSITE: (vlastný same-site),
-		XSID: sess-id
+	id-relácie Nič? pravda: {
+		id-relácie := Trezor token: 30.
+		>> hlavička-relácie := HTTP-Hlavička nový
+		kľúč: ['Set-Cookie'] hodnota: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (vlastný zabezpečené buď: ['Secure'] alebo: ['']),
+		SSITE: (vlastný rovnaký-web),
+		XSID: id-relácie
 		).
-		vlastný headers pripojiť: session-header.
+		vlastný hlavičky pripojiť: hlavička-relácie.
 	}.
-	vlastný sessdata := vlastný session-manager for: sess-id, load. <- vlastný sessdata. # reference
+	vlastný údaje-relácie := vlastný správca-relácií pre: id-relácie, načítať. <- vlastný údaje-relácie. # reference
 }.
 
-Web-Document pri: ['goto:'] urobiť: { :url
-	seba check-headers.
-	seba clear-headers.
-	vlastný headers
+Webový-dokument pri: ['prejsť-na:'] urobiť: { :adresa
+	seba skontrolovať-hlavičky.
+	seba vymazať-hlavičky.
+	vlastný hlavičky
 	pripojiť: (
-		HTTP-Header nový
-		key: ['Status'] value: ['303 See Other']
+		HTTP-Hlavička nový
+		kľúč: ['Status'] hodnota: ['303 See Other']
 	),
 	pripojiť: (
-		HTTP-Header nový
-		key: ['Location'] value: url
+		HTTP-Hlavička nový
+		kľúč: ['Location'] hodnota: adresa
 	).
-	seba out: ['Redirect'].
+	seba vypísať: ['Redirect'].
 }.
 
-Web-Document pri: ['session-destroy'] urobiť: {
-	seba check-headers.
-	>> request := vlastný request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nič? nepravda: {
-		>> session-header := HTTP-Header nový.
-		>> when := Okamih nový rok: 1970, formát: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Webový-dokument pri: ['zničiť-reláciu'] urobiť: {
+	seba skontrolovať-hlavičky.
+	>> požiadavka := vlastný požiadavka.
+	>> id-relácie := požiadavka cookie: ['xsid'].
+	id-relácie Nič? nepravda: {
+		>> hlavička-relácie := HTTP-Hlavička nový.
+		>> okamih := Okamih nový rok: 1970, formát: ['%a, %d %b %Y %H:%M:%S GMT'].
+		hlavička-relácie kľúč: ['Set-Cookie'] hodnota: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (vlastný secure buď: ['Secure'] alebo: ['']),
-			SSITE: (vlastný same-site),
-			XSID: sess-id
+			EXP: okamih,
+			SEC: (vlastný zabezpečené buď: ['Secure'] alebo: ['']),
+			SSITE: (vlastný rovnaký-web),
+			XSID: id-relácie
 		).
-		vlastný session-manager destroy.
-		vlastný headers pripojiť: session-header.
+		vlastný správca-relácií zničiť.
+		vlastný hlavičky pripojiť: hlavička-relácie.
 	}.
 }.
 
 
-Web-Document pri: ['template:'] urobiť: { :cesta <- Template nový: (Súbor nový: cesta, čítať).
+Webový-dokument pri: ['šablóna:'] urobiť: { :cesta <- Šablóna nový: (Súbor nový: cesta, čítať).
 }.
 
-Web-Document pri: ['out:type:'] urobiť: { :output :typ
-	vlastný headers-out nepravda: {
-		vlastný sessdata Nič? nepravda: {
-			vlastný session-manager save: vlastný sessdata.
+Webový-dokument pri: ['vypísať:typ:'] urobiť: { :výstup :typ
+	vlastný hlavičky-odoslané nepravda: {
+		vlastný údaje-relácie Nič? nepravda: {
+			vlastný správca-relácií uložiť: vlastný údaje-relácie.
 		}.
-		vlastný headers pripojiť: (
-			HTTP-Header nový
-			key: ['Content-type'] value: typ
+		vlastný hlavičky pripojiť: (
+			HTTP-Hlavička nový
+			kľúč: ['Content-type'] hodnota: typ
 		).
-		vlastný headers každý: { :_ :header
-			Výstup písať: header.
+		vlastný hlavičky každý: { :_ :hlavička
+			Výstup písať: hlavička.
 		}.
-		vlastný headers-out := Pravda.
+		vlastný hlavičky-odoslané := Pravda.
 		Výstup písať: ['\r\n'].
 	}.
-	Výstup písať: output.
+	Výstup písať: výstup.
 }.
 
-Web-Document pri: ['finish:type:'] urobiť: { :output :typ
-	vlastný headers-out nepravda: {
-		vlastný sessdata Nič? nepravda: {
-			vlastný session-manager save: vlastný sessdata.
+Webový-dokument pri: ['dokončiť:typ:'] urobiť: { :výstup :typ
+	vlastný hlavičky-odoslané nepravda: {
+		vlastný údaje-relácie Nič? nepravda: {
+			vlastný správca-relácií uložiť: vlastný údaje-relácie.
 		}.
-		vlastný headers pripojiť: (
-			HTTP-Header nový
-			key: ['Content-type'] value: typ
+		vlastný hlavičky pripojiť: (
+			HTTP-Hlavička nový
+			kľúč: ['Content-type'] hodnota: typ
 		).
-		vlastný headers pripojiť: (
-			HTTP-Header nový
-			key: ['Content-Length'] value: output text bytes
+		vlastný hlavičky pripojiť: (
+			HTTP-Hlavička nový
+			kľúč: ['Content-Length'] hodnota: výstup text bytes
 		).
-		vlastný headers každý: { :_ :header
-			Výstup písať: header.
+		vlastný hlavičky každý: { :_ :hlavička
+			Výstup písať: hlavička.
 		}.
-		vlastný headers-out := Pravda.
+		vlastný hlavičky-odoslané := Pravda.
 		Výstup písať: ['\r\n'].
 	}.
-	Výstup písať: output.
+	Výstup písať: výstup.
 }.
 
-Web-Document pri: ['out:'] urobiť: { :output
-	seba out: output type: ['text/html; charset=utf-8'].
+Webový-dokument pri: ['vypísať:'] urobiť: { :výstup
+	seba vypísať: výstup typ: ['text/html; charset=utf-8'].
 }.
 
-Web-Document pri: ['finish:'] urobiť: { :output
-	seba finish: output type: ['text/html; charset=utf-8'].
+Webový-dokument pri: ['dokončiť:'] urobiť: { :výstup
+	seba dokončiť: výstup typ: ['text/html; charset=utf-8'].
 }.
 
-Web-Document pri: ['json:'] urobiť: { :output
-	seba out: ( JSON jsonify: output ) type: ['application/json'].
+Webový-dokument pri: ['json:'] urobiť: { :výstup
+	seba vypísať: ( JSON jsonify: výstup ) typ: ['application/json'].
 }.
 
-Web-Document pri: ['not-found:'] urobiť: { :output
-	seba clear-headers header: (
-		HTTP-Header nový key: ['Status'] value: ['404 Not Found']
+Webový-dokument pri: ['nenájdené:'] urobiť: { :výstup
+	seba vymazať-hlavičky hlavička: (
+		HTTP-Hlavička nový kľúč: ['Status'] hodnota: ['404 Not Found']
 	).
-	seba out: output.
+	seba vypísať: výstup.
 }.
 
 
 # Interface
 
->> Session := Objekt nový.
+>> Relácia := Objekt nový.
 
-Session pri: ['nový'] urobiť: { <- seba nový init for: Nič.
+Relácia pri: ['nový'] urobiť: { <- seba nový inicializovať pre: Nič.
 }.
 
-Session pri: ['for:'] urobiť: { :id
+Relácia pri: ['pre:'] urobiť: { :id
 	vlastný id := id.
 }.
 
-Session pri: ['load'] urobiť: {
+Relácia pri: ['načítať'] urobiť: {
 	táto-úloha chyba: ['Not implemented.'].
 }.
 
-Session pri: ['save:'] urobiť: {
+Relácia pri: ['uložiť:'] urobiť: {
 	táto-úloha chyba: ['Not implemented.'].
 }.
 
-Session pri: ['destroy'] urobiť: {
+Relácia pri: ['zničiť'] urobiť: {
 	táto-úloha chyba: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session nový.
+>> Relácia-dočasný-súbor := Relácia nový.
 
-Tempfile-Session pri: ['init'] urobiť: {
-	vlastný pathprefix := ['/tmp/sess-'].
+Relácia-dočasný-súbor pri: ['inicializovať'] urobiť: {
+	vlastný začiatok-cesty := ['/tmp/sess-'].
 }.
 
-Tempfile-Session pri: ['path-prefix:'] urobiť: { :str
-	vlastný pathprefix := str.
+Relácia-dočasný-súbor pri: ['predpona-cesty:'] urobiť: { :reťazec
+	vlastný začiatok-cesty := reťazec.
 }.
 
-Tempfile-Session pri: ['file'] urobiť: { <- ( Súbor nový: ( vlastný pathprefix + vlastný id + ['.txt'] ) ).
+Relácia-dočasný-súbor pri: ['súbor'] urobiť: { <- ( Súbor nový: ( vlastný začiatok-cesty + vlastný id + ['.txt'] ) ).
 }.
 
-Tempfile-Session pri: ['load'] urobiť: {
-	>> file := seba file.
-	file existuje nepravda: {
-		file písať: (Slovník nový kód).
-	}. <- file čítať objekt.
+Relácia-dočasný-súbor pri: ['načítať'] urobiť: {
+	>> súbor := seba súbor.
+	súbor existuje nepravda: {
+		súbor písať: (Slovník nový kód).
+	}. <- súbor čítať objekt.
 }.
 
-Tempfile-Session pri: ['save:'] urobiť: { :data
-	>> file := seba file.
-	file existuje pravda: {
-		file písať: data kód.
+Relácia-dočasný-súbor pri: ['uložiť:'] urobiť: { :údaje
+	>> súbor := seba súbor.
+	súbor existuje pravda: {
+		súbor písať: údaje kód.
 	}.
 }.
 
-Tempfile-Session pri: ['destroy'] urobiť: {
-	>> file := seba file.
-	file existuje pravda: {
-		file vymazať.
+Relácia-dočasný-súbor pri: ['zničiť'] urobiť: {
+	>> súbor := seba súbor.
+	súbor existuje pravda: {
+		súbor vymazať.
 	}.
 }.
 
 
 >> URL := Objekt nový.
 
-URL pri: ['init'] urobiť: {
-	vlastný protocol := ['https://'].
+URL pri: ['inicializovať'] urobiť: {
+	vlastný protokol := ['https://'].
 	vlastný hostiteľ := ['localhost'].
 	vlastný cesta := [''].
-	vlastný params := [''].
+	vlastný url-parametre := [''].
 	vlastný hash := [''].
 }.
 
-URL pri: ['nový'] urobiť: { <- seba nový init.
+URL pri: ['nový'] urobiť: { <- seba nový inicializovať.
 }.
 
 URL pri: ['text'] urobiť: { <- (
-	vlastný protocol +
+	vlastný protokol +
 	vlastný hostiteľ +
 	vlastný cesta +
-	vlastný params +
+	vlastný url-parametre +
 	vlastný hash ).
 }.
 
-URL pri: ['protocol:'] urobiť: { :protocol
-	((Zoznam nový: ['http'] ; ['https']) obsahuje: protocol) pravda: {
-		vlastný protocol := protocol + ['://'].
+URL pri: ['protokol:'] urobiť: { :protokol
+	((Zoznam nový ; ['http'] ; ['https']) má: protokol) pravda: {
+		vlastný protokol := protokol + ['://'].
 	}, nepravda: {
 		táto-úloha chyba: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL pri: ['hostiteľ:'] urobiť: { :hostiteľ
 	vlastný hostiteľ := hostiteľ.
 }.
 
-URL pri: ['path:'] urobiť: { :cesta
+URL pri: ['cesta:'] urobiť: { :cesta
 	vlastný cesta := ['/'] + cesta url-kódovať.
 }.
 
-URL pri: ['params:'] urobiť: { :map
-	>> params := Zoznam nový.
-	map každý: { :key :value
-		params pripojiť: key text url-kódovať + ['='] + value text url-kódovať.
+URL pri: ['url-parametre:'] urobiť: { :mapovanie
+	>> url-parametre := Zoznam nový.
+	mapovanie každý: { :kľúč :hodnota
+		url-parametre pripojiť: kľúč text url-kódovať + ['='] + hodnota text url-kódovať.
 	}.
-	vlastný params := ['?'] + ( params spojiť: ['&'] ).
+	vlastný url-parametre := ['?'] + ( url-parametre spojiť: ['&'] ).
 }.
 
 URL pri: ['heš:'] urobiť: { :hash

@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Olio uusi.
+>> Mallipohja := Olio uusi.
 
-Template kun: ['uusi'] tee: { <- itse uusi content: [''].
+Mallipohja kun: ['uusi'] tee: { <- itse uusi sisältö: [''].
 }.
 
-Template kun: ['content:'] tee: { :content
-	oma content := content. 
+Mallipohja kun: ['sisältö:'] tee: { :sisältö
+	oma sisältö := sisältö. 
 }.
 
-Template kun: ['uusi:'] tee: { :content <- itse uusi content: content.
+Mallipohja kun: ['uusi:'] tee: { :sisältö <- itse uusi sisältö: sisältö.
 }.
 
-Template kun: ['cut:'] tee: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := oma content jaa: startmarker.
-	>> prefix := parts ensimmäinen.
-	>> parts2 := parts viimeinen jaa: endmarker.
-	>> suffix := parts2 viimeinen.
-	>> part := parts2 ensimmäinen.
-	>> rest := prefix + suffix.
-	oma content := rest. <- Template uusi: part.
+Mallipohja kun: ['leikkaa:'] tee: { :merkki
+	>> alkumerkki := (['<!-- cut:%id% -->'] %id%: merkki).
+	>> loppumerkki := (['<!-- /cut:%id% -->'] %id%: merkki).
+	>> osat := oma sisältö jaa: alkumerkki.
+	>> etuliite := osat ensimmäinen.
+	>> osat2 := osat viimeinen jaa: loppumerkki.
+	>> jälkiliite := osat2 viimeinen.
+	>> osa := osat2 ensimmäinen.
+	>> loput := etuliite + jälkiliite.
+	oma sisältö := loput. <- Mallipohja uusi: osa.
 	
 }.
 
-Template kun: ['kopioi'] tee: { <- itse uusi: itse teksti kopioi.
+Mallipohja kun: ['kopioi'] tee: { <- itse uusi: itse teksti kopioi.
 }.
 	
-Template kun: ['paste:at:'] tee: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	oma content korvaa: pastemarker arvolla: ( snippet teksti + pastemarker ).
+Mallipohja kun: ['liimaa:kohtaan:'] tee: { :katkelma :id
+	>> liimausmerkki := (['<!-- paste:%id% -->'] %id%: id).
+	oma sisältö korvaa: liimausmerkki arvolla: ( katkelma teksti + liimausmerkki ).
 }.
 
-Template kun: ['aseta:arvo:'] tee: { :slot :value
-	oma content korvaa: ['<!-- slot:'] + slot + [' -->'] arvolla: ( Server html-koodaa: value ).
+Mallipohja kun: ['aseta:arvo:'] tee: { :paikka :arvo
+	oma sisältö korvaa: ['<!-- slot:'] + paikka + [' -->'] arvolla: ( Server html-koodaa: arvo ).
 }.
 
-Template kun: ['set:html:'] tee: { :slot :html
-	oma content korvaa: ['<!-- slot:'] + slot + [' -->'] arvolla: html.
+Mallipohja kun: ['aseta:html:'] tee: { :paikka :html
+	oma sisältö korvaa: ['<!-- slot:'] + paikka + [' -->'] arvolla: html.
 }.
 
-Template kun: ['vastaa:ja:'] tee: { :slot :value
-	itse aseta: (slot alkaen: 0 pituus: (slot pituus - 1)) arvo: value.
+Mallipohja kun: ['vastaa:ja:'] tee: { :paikka :arvo
+	itse aseta: (paikka alkaen: 0 pituus: (paikka pituus - 1)) arvo: arvo.
 }.
 
-Template kun: ['nl2br'] tee: {
-	oma content korvaa: ['\n'] arvolla: ['<br>'].
+Mallipohja kun: ['nl2br'] tee: {
+	oma sisältö korvaa: ['\n'] arvolla: ['<br>'].
 }.
 
-Template kun: ['clean'] tee: {
-	oma content :=
+Mallipohja kun: ['puhdista'] tee: {
+	oma sisältö :=
 		Malli
 		uusi: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		täsmää: oma content
+		täsmää: oma sisältö
 		tee: { <- ['']. }.
 }.
 
-Template kun: ['clean-cuts'] tee: {
-	>> items := Lista uusi.
+Mallipohja kun: ['puhdista-leikkeet'] tee: {
+	>> kohteet := Lista uusi.
 	Malli
 	uusi: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	täsmää: oma content
-	tee: { :_ :part
-		items lisää-loppuun: part ? 1.
+	täsmää: oma sisältö
+	tee: { :_ :osa
+		kohteet lisää-loppuun: osa ? 1.
 	}.
-	items jokainen: { :_ :id
-		oma content :=
+	kohteet jokainen: { :_ :id
+		oma sisältö :=
 			Malli uusi: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			täsmää: oma content
+			täsmää: oma sisältö
 			tee: { <- ['']. }.
 	 }.
 }.
 
-Template kun: ['clean-space'] tee: {
-	oma content :=
+Mallipohja kun: ['puhdista-välilyönnit'] tee: {
+	oma sisältö :=
 		Malli
 		uusi: ['\\s*\\n'],
-		täsmää: oma content
+		täsmää: oma sisältö
 		tee: { <- ['\n']. }.
-	oma content :=
+	oma sisältö :=
 		Malli
 		uusi: ['\\n[\\s\\t]+'],
-		täsmää: oma content
+		täsmää: oma sisältö
 		tee: { <- ['\n']. }.
 }.
 
-Template kun: ['clean-all'] tee: {
-	itse clean.
-	itse clean-cuts.
-	itse clean-space.
+Mallipohja kun: ['puhdista-kaikki'] tee: {
+	itse puhdista.
+	itse puhdista-leikkeet.
+	itse puhdista-välilyönnit.
 }.
 
-Template kun: ['teksti'] tee: { <- oma content.
+Mallipohja kun: ['teksti'] tee: { <- oma sisältö.
 }.

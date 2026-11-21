@@ -1,302 +1,302 @@
-Ombi-la-HTTP ikija: ['HTTP-header:'] fanya: { :key <- Programu mpangilio: key.
+Ombi-la-HTTP ikija: ['HTTP-kichwa:'] fanya: { :ufunguo <- Programu mpangilio: ufunguo.
 }.
 
->> HTTP-Header := Kipengee mpya.
+>> Kichwa-HTTP := Kipengee mpya.
 
-HTTP-Header ikija: ['mpya'] fanya: { <- binafsi mpya init.
+Kichwa-HTTP ikija: ['mpya'] fanya: { <- binafsi mpya andaa.
 }.
 
-HTTP-Header ikija: ['init'] fanya: {
-	yangu key := Tupu.
-	yangu value := Tupu.
+Kichwa-HTTP ikija: ['andaa'] fanya: {
+	yangu ufunguo := Tupu.
+	yangu thamani := Tupu.
 }.
 
-HTTP-Header ikija: ['key:value:'] fanya: { :key :value
-	yangu key := key.
-	yangu value := value.
+Kichwa-HTTP ikija: ['ufunguo:thamani:'] fanya: { :ufunguo :thamani
+	yangu ufunguo := ufunguo.
+	yangu thamani := thamani.
 }.
 
-HTTP-Header ikija: ['key'] fanya: { <- yangu key.
+Kichwa-HTTP ikija: ['ufunguo'] fanya: { <- yangu ufunguo.
 }.
 
-HTTP-Header ikija: ['value'] fanya: { <- yangu value.
+Kichwa-HTTP ikija: ['thamani'] fanya: { <- yangu thamani.
 }.
 
 
-HTTP-Header ikija: ['maandishi'] fanya: {
-	>> line := yangu key + [': '] + yangu value.
-	line badilisha: ['\r'] kwa: [''], badilisha: ['\n'] kwa: ['']. <- line + [' \r\n'].
+Kichwa-HTTP ikija: ['maandishi'] fanya: {
+	>> mstari := yangu ufunguo + [': '] + yangu thamani.
+	mstari badilisha: ['\r'] kwa: [''], badilisha: ['\n'] kwa: ['']. <- mstari + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Kipengee mpya.
+>> Hati-ya-Wavuti := Kipengee mpya.
 
-Web-Document ikija: ['mpya'] fanya: { <- binafsi mpya init.
+Hati-ya-Wavuti ikija: ['mpya'] fanya: { <- binafsi mpya andaa.
 }.
 
-Web-Document ikija: ['init'] fanya: {
-	yangu headers := Orodha mpya.
-	yangu sess-id := Tupu.
-	yangu session-manager := Tempfile-Session mpya.
-	yangu sessdata := Tupu.
-	yangu secure := Kweli.
-	yangu same-site := ['Strict'].
-	yangu headers-out := Uongo.
-	yangu request := Ombi-la-HTTP mpya.
+Hati-ya-Wavuti ikija: ['andaa'] fanya: {
+	yangu vichwa := Orodha mpya.
+	yangu kitambulisho-cha-kipindi := Tupu.
+	yangu msimamizi-wa-vipindi := Kipindi-faili-la-muda mpya.
+	yangu data-ya-kipindi := Tupu.
+	yangu salama := Kweli.
+	yangu tovuti-moja := ['Strict'].
+	yangu vichwa-vimetumwa := Uongo.
+	yangu ombi-http := Ombi-la-HTTP mpya.
 }.
 
-Web-Document ikija: ['request:'] fanya: { :request
-	yangu request := request.
+Hati-ya-Wavuti ikija: ['ombi-http:'] fanya: { :ombi-http
+	yangu ombi-http := ombi-http.
 }. 
 
-Web-Document ikija: ['secure-session-cookie:'] fanya: { :secure
-	binafsi check-headers.
-	yangu secure := secure.
+Hati-ya-Wavuti ikija: ['kidakuzi-kipindi-salama:'] fanya: { :salama
+	binafsi kagua-vichwa.
+	yangu salama := salama.
 }.
 
-Web-Document ikija: ['same-site-session-cookie:'] fanya: { :value
-	binafsi check-headers.
-	>> options := Orodha mpya 
+Hati-ya-Wavuti ikija: ['kidakuzi-kipindi-tovuti-moja:'] fanya: { :thamani
+	binafsi kagua-vichwa.
+	>> chaguo := Orodha mpya 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options inajumuisha: value, uongo: {
+	chaguo ina: thamani, uongo: {
 		jukumu-hili kosa: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	yangu same-site := value.
+	yangu tovuti-moja := thamani.
 }.
 
-Web-Document ikija: ['header:'] fanya: { :header
-	binafsi check-headers.
-	yangu headers ongeza-mwishoni: header.
+Hati-ya-Wavuti ikija: ['kichwa:'] fanya: { :kichwa
+	binafsi kagua-vichwa.
+	yangu vichwa ongeza-mwishoni: kichwa.
 }.
 
-Web-Document ikija: ['clear-headers'] fanya: {
-	binafsi check-headers.
-	yangu headers := Orodha mpya.
+Hati-ya-Wavuti ikija: ['futa-vichwa'] fanya: {
+	binafsi kagua-vichwa.
+	yangu vichwa := Orodha mpya.
 }.
 
-Web-Document ikija: ['session-manager:'] fanya: { :manager
-	binafsi check-headers.
-	yangu session-manager := manager.
+Hati-ya-Wavuti ikija: ['msimamizi-wa-vipindi:'] fanya: { :msimamizi
+	binafsi kagua-vichwa.
+	yangu msimamizi-wa-vipindi := msimamizi.
 }.
 
-Web-Document ikija: ['session-manager'] fanya: { <- yangu session-manager.
+Hati-ya-Wavuti ikija: ['msimamizi-wa-vipindi'] fanya: { <- yangu msimamizi-wa-vipindi.
 }.
 
-Web-Document ikija: ['check-headers'] fanya: {
-	yangu headers-out kweli: {
+Hati-ya-Wavuti ikija: ['kagua-vichwa'] fanya: {
+	yangu vichwa-vimetumwa kweli: {
 		jukumu-hili kosa: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document ikija: ['session-start'] fanya: {
-	binafsi check-headers.
-	>> request := yangu request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Tupu? uongo: {
-		(( Ruwaza mpya: ['^[A-Za-z0-9]+\\z'], linganifu: sess-id ) = 0) kweli: {
-			sess-id := Tupu.
+Hati-ya-Wavuti ikija: ['anza-kipindi'] fanya: {
+	binafsi kagua-vichwa.
+	>> ombi-http := yangu ombi-http.
+	>> kitambulisho-cha-kipindi := ombi-http cookie: ['xsid'].
+	kitambulisho-cha-kipindi Tupu? uongo: {
+		(( Ruwaza mpya: ['^[A-Za-z0-9]+\\z'], linganifu: kitambulisho-cha-kipindi ) = 0) kweli: {
+			kitambulisho-cha-kipindi := Tupu.
 		}.
 	}.
-	sess-id Tupu? kweli: {
-		sess-id := Kasha tokeni: 30.
-		>> session-header := HTTP-Header mpya
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (yangu secure ama: ['Secure'] au: ['']),
-		SSITE: (yangu same-site),
-		XSID: sess-id
+	kitambulisho-cha-kipindi Tupu? kweli: {
+		kitambulisho-cha-kipindi := Kasha tokeni: 30.
+		>> kichwa-cha-kipindi := Kichwa-HTTP mpya
+		ufunguo: ['Set-Cookie'] thamani: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (yangu salama ama: ['Secure'] au: ['']),
+		SSITE: (yangu tovuti-moja),
+		XSID: kitambulisho-cha-kipindi
 		).
-		yangu headers ongeza-mwishoni: session-header.
+		yangu vichwa ongeza-mwishoni: kichwa-cha-kipindi.
 	}.
-	yangu sessdata := yangu session-manager for: sess-id, load. <- yangu sessdata. # reference
+	yangu data-ya-kipindi := yangu msimamizi-wa-vipindi kwa-ajili-ya: kitambulisho-cha-kipindi, pakia. <- yangu data-ya-kipindi. # reference
 }.
 
-Web-Document ikija: ['goto:'] fanya: { :url
-	binafsi check-headers.
-	binafsi clear-headers.
-	yangu headers
+Hati-ya-Wavuti ikija: ['nenda-kwa:'] fanya: { :anwani
+	binafsi kagua-vichwa.
+	binafsi futa-vichwa.
+	yangu vichwa
 	ongeza-mwishoni: (
-		HTTP-Header mpya
-		key: ['Status'] value: ['303 See Other']
+		Kichwa-HTTP mpya
+		ufunguo: ['Status'] thamani: ['303 See Other']
 	),
 	ongeza-mwishoni: (
-		HTTP-Header mpya
-		key: ['Location'] value: url
+		Kichwa-HTTP mpya
+		ufunguo: ['Location'] thamani: anwani
 	).
-	binafsi out: ['Redirect'].
+	binafsi onyesha: ['Redirect'].
 }.
 
-Web-Document ikija: ['session-destroy'] fanya: {
-	binafsi check-headers.
-	>> request := yangu request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Tupu? uongo: {
-		>> session-header := HTTP-Header mpya.
-		>> when := Muda mpya mwaka: 1970, umbizo: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Hati-ya-Wavuti ikija: ['haribu-kipindi'] fanya: {
+	binafsi kagua-vichwa.
+	>> ombi-http := yangu ombi-http.
+	>> kitambulisho-cha-kipindi := ombi-http cookie: ['xsid'].
+	kitambulisho-cha-kipindi Tupu? uongo: {
+		>> kichwa-cha-kipindi := Kichwa-HTTP mpya.
+		>> muda-wa-kuisha := Muda mpya mwaka: 1970, umbizo: ['%a, %d %b %Y %H:%M:%S GMT'].
+		kichwa-cha-kipindi ufunguo: ['Set-Cookie'] thamani: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (yangu secure ama: ['Secure'] au: ['']),
-			SSITE: (yangu same-site),
-			XSID: sess-id
+			EXP: muda-wa-kuisha,
+			SEC: (yangu salama ama: ['Secure'] au: ['']),
+			SSITE: (yangu tovuti-moja),
+			XSID: kitambulisho-cha-kipindi
 		).
-		yangu session-manager destroy.
-		yangu headers ongeza-mwishoni: session-header.
+		yangu msimamizi-wa-vipindi haribu.
+		yangu vichwa ongeza-mwishoni: kichwa-cha-kipindi.
 	}.
 }.
 
 
-Web-Document ikija: ['template:'] fanya: { :njia-ya-faili <- Template mpya: (Faili mpya: njia-ya-faili, soma).
+Hati-ya-Wavuti ikija: ['kiolezo:'] fanya: { :njia-ya-faili <- Kiolezo mpya: (Faili mpya: njia-ya-faili, soma).
 }.
 
-Web-Document ikija: ['out:type:'] fanya: { :output :aina
-	yangu headers-out uongo: {
-		yangu sessdata Tupu? uongo: {
-			yangu session-manager save: yangu sessdata.
+Hati-ya-Wavuti ikija: ['onyesha:aina:'] fanya: { :tokeo :aina
+	yangu vichwa-vimetumwa uongo: {
+		yangu data-ya-kipindi Tupu? uongo: {
+			yangu msimamizi-wa-vipindi hifadhi: yangu data-ya-kipindi.
 		}.
-		yangu headers ongeza-mwishoni: (
-			HTTP-Header mpya
-			key: ['Content-type'] value: aina
+		yangu vichwa ongeza-mwishoni: (
+			Kichwa-HTTP mpya
+			ufunguo: ['Content-type'] thamani: aina
 		).
-		yangu headers kila: { :_ :header
-			Towe andika: header.
+		yangu vichwa kila: { :_ :kichwa
+			Towe andika: kichwa.
 		}.
-		yangu headers-out := Kweli.
+		yangu vichwa-vimetumwa := Kweli.
 		Towe andika: ['\r\n'].
 	}.
-	Towe andika: output.
+	Towe andika: tokeo.
 }.
 
-Web-Document ikija: ['finish:type:'] fanya: { :output :aina
-	yangu headers-out uongo: {
-		yangu sessdata Tupu? uongo: {
-			yangu session-manager save: yangu sessdata.
+Hati-ya-Wavuti ikija: ['maliza:aina:'] fanya: { :tokeo :aina
+	yangu vichwa-vimetumwa uongo: {
+		yangu data-ya-kipindi Tupu? uongo: {
+			yangu msimamizi-wa-vipindi hifadhi: yangu data-ya-kipindi.
 		}.
-		yangu headers ongeza-mwishoni: (
-			HTTP-Header mpya
-			key: ['Content-type'] value: aina
+		yangu vichwa ongeza-mwishoni: (
+			Kichwa-HTTP mpya
+			ufunguo: ['Content-type'] thamani: aina
 		).
-		yangu headers ongeza-mwishoni: (
-			HTTP-Header mpya
-			key: ['Content-Length'] value: output maandishi bytes
+		yangu vichwa ongeza-mwishoni: (
+			Kichwa-HTTP mpya
+			ufunguo: ['Content-Length'] thamani: tokeo maandishi bytes
 		).
-		yangu headers kila: { :_ :header
-			Towe andika: header.
+		yangu vichwa kila: { :_ :kichwa
+			Towe andika: kichwa.
 		}.
-		yangu headers-out := Kweli.
+		yangu vichwa-vimetumwa := Kweli.
 		Towe andika: ['\r\n'].
 	}.
-	Towe andika: output.
+	Towe andika: tokeo.
 }.
 
-Web-Document ikija: ['out:'] fanya: { :output
-	binafsi out: output type: ['text/html; charset=utf-8'].
+Hati-ya-Wavuti ikija: ['onyesha:'] fanya: { :tokeo
+	binafsi onyesha: tokeo aina: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ikija: ['finish:'] fanya: { :output
-	binafsi finish: output type: ['text/html; charset=utf-8'].
+Hati-ya-Wavuti ikija: ['maliza:'] fanya: { :tokeo
+	binafsi maliza: tokeo aina: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ikija: ['json:'] fanya: { :output
-	binafsi out: ( JSON jsonify: output ) type: ['application/json'].
+Hati-ya-Wavuti ikija: ['json:'] fanya: { :tokeo
+	binafsi onyesha: ( JSON jsonify: tokeo ) aina: ['application/json'].
 }.
 
-Web-Document ikija: ['not-found:'] fanya: { :output
-	binafsi clear-headers header: (
-		HTTP-Header mpya key: ['Status'] value: ['404 Not Found']
+Hati-ya-Wavuti ikija: ['haikupatikana:'] fanya: { :tokeo
+	binafsi futa-vichwa kichwa: (
+		Kichwa-HTTP mpya ufunguo: ['Status'] thamani: ['404 Not Found']
 	).
-	binafsi out: output.
+	binafsi onyesha: tokeo.
 }.
 
 
 # Interface
 
->> Session := Kipengee mpya.
+>> Kipindi := Kipengee mpya.
 
-Session ikija: ['mpya'] fanya: { <- binafsi mpya init for: Tupu.
+Kipindi ikija: ['mpya'] fanya: { <- binafsi mpya andaa kwa-ajili-ya: Tupu.
 }.
 
-Session ikija: ['for:'] fanya: { :id
+Kipindi ikija: ['kwa-ajili-ya:'] fanya: { :id
 	yangu id := id.
 }.
 
-Session ikija: ['load'] fanya: {
+Kipindi ikija: ['pakia'] fanya: {
 	jukumu-hili kosa: ['Not implemented.'].
 }.
 
-Session ikija: ['save:'] fanya: {
+Kipindi ikija: ['hifadhi:'] fanya: {
 	jukumu-hili kosa: ['Not implemented.'].
 }.
 
-Session ikija: ['destroy'] fanya: {
+Kipindi ikija: ['haribu'] fanya: {
 	jukumu-hili kosa: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session mpya.
+>> Kipindi-faili-la-muda := Kipindi mpya.
 
-Tempfile-Session ikija: ['init'] fanya: {
-	yangu pathprefix := ['/tmp/sess-'].
+Kipindi-faili-la-muda ikija: ['andaa'] fanya: {
+	yangu mwanzo-wa-njia := ['/tmp/sess-'].
 }.
 
-Tempfile-Session ikija: ['path-prefix:'] fanya: { :str
-	yangu pathprefix := str.
+Kipindi-faili-la-muda ikija: ['kiambishi-njia:'] fanya: { :mfuatano
+	yangu mwanzo-wa-njia := mfuatano.
 }.
 
-Tempfile-Session ikija: ['file'] fanya: { <- ( Faili mpya: ( yangu pathprefix + yangu id + ['.txt'] ) ).
+Kipindi-faili-la-muda ikija: ['faili-la-kipindi'] fanya: { <- ( Faili mpya: ( yangu mwanzo-wa-njia + yangu id + ['.txt'] ) ).
 }.
 
-Tempfile-Session ikija: ['load'] fanya: {
-	>> file := binafsi file.
-	file ipo uongo: {
-		file andika: (Kamusi mpya msimbo).
-	}. <- file soma kipengee.
+Kipindi-faili-la-muda ikija: ['pakia'] fanya: {
+	>> faili-la-kipindi := binafsi faili-la-kipindi.
+	faili-la-kipindi ipo uongo: {
+		faili-la-kipindi andika: (Kamusi mpya msimbo).
+	}. <- faili-la-kipindi soma kipengee.
 }.
 
-Tempfile-Session ikija: ['save:'] fanya: { :data
-	>> file := binafsi file.
-	file ipo kweli: {
-		file andika: data msimbo.
+Kipindi-faili-la-muda ikija: ['hifadhi:'] fanya: { :data
+	>> faili-la-kipindi := binafsi faili-la-kipindi.
+	faili-la-kipindi ipo kweli: {
+		faili-la-kipindi andika: data msimbo.
 	}.
 }.
 
-Tempfile-Session ikija: ['destroy'] fanya: {
-	>> file := binafsi file.
-	file ipo kweli: {
-		file futa.
+Kipindi-faili-la-muda ikija: ['haribu'] fanya: {
+	>> faili-la-kipindi := binafsi faili-la-kipindi.
+	faili-la-kipindi ipo kweli: {
+		faili-la-kipindi futa.
 	}.
 }.
 
 
 >> URL := Kipengee mpya.
 
-URL ikija: ['init'] fanya: {
-	yangu protocol := ['https://'].
+URL ikija: ['andaa'] fanya: {
+	yangu itifaki := ['https://'].
 	yangu mwenyeji := ['localhost'].
 	yangu njia-ya-faili := [''].
-	yangu params := [''].
+	yangu vigezo-vya-url := [''].
 	yangu hash := [''].
 }.
 
-URL ikija: ['mpya'] fanya: { <- binafsi mpya init.
+URL ikija: ['mpya'] fanya: { <- binafsi mpya andaa.
 }.
 
 URL ikija: ['maandishi'] fanya: { <- (
-	yangu protocol +
+	yangu itifaki +
 	yangu mwenyeji +
 	yangu njia-ya-faili +
-	yangu params +
+	yangu vigezo-vya-url +
 	yangu hash ).
 }.
 
-URL ikija: ['protocol:'] fanya: { :protocol
-	((Orodha mpya: ['http'] ; ['https']) inajumuisha: protocol) kweli: {
-		yangu protocol := protocol + ['://'].
+URL ikija: ['itifaki:'] fanya: { :itifaki
+	((Orodha mpya ; ['http'] ; ['https']) ina: itifaki) kweli: {
+		yangu itifaki := itifaki + ['://'].
 	}, uongo: {
 		jukumu-hili kosa: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL ikija: ['mwenyeji:'] fanya: { :mwenyeji
 	yangu mwenyeji := mwenyeji.
 }.
 
-URL ikija: ['path:'] fanya: { :njia-ya-faili
+URL ikija: ['njia-ya-faili:'] fanya: { :njia-ya-faili
 	yangu njia-ya-faili := ['/'] + njia-ya-faili url-simba.
 }.
 
-URL ikija: ['params:'] fanya: { :map
-	>> params := Orodha mpya.
-	map kila: { :key :value
-		params ongeza-mwishoni: key maandishi url-simba + ['='] + value maandishi url-simba.
+URL ikija: ['vigezo-vya-url:'] fanya: { :ramani
+	>> vigezo-vya-url := Orodha mpya.
+	ramani kila: { :ufunguo :thamani
+		vigezo-vya-url ongeza-mwishoni: ufunguo maandishi url-simba + ['='] + thamani maandishi url-simba.
 	}.
-	yangu params := ['?'] + ( params unganisha: ['&'] ).
+	yangu vigezo-vya-url := ['?'] + ( vigezo-vya-url unganisha: ['&'] ).
 }.
 
 URL ikija: ['hashi:'] fanya: { :hash

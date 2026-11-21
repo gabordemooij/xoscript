@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Ikintu gishya.
+>> Icyitegererezo := Ikintu gishya.
 
-Template bigeze: ['gishya'] kora: { <- ubwacyo gishya content: [''].
+Icyitegererezo bigeze: ['gishya'] kora: { <- ubwacyo gishya ibikubiyemo: [''].
 }.
 
-Template bigeze: ['content:'] kora: { :content
-	icyacyo content := content. 
+Icyitegererezo bigeze: ['ibikubiyemo:'] kora: { :ibikubiyemo
+	icyacyo ibikubiyemo := ibikubiyemo. 
 }.
 
-Template bigeze: ['gishya:'] kora: { :content <- ubwacyo gishya content: content.
+Icyitegererezo bigeze: ['gishya:'] kora: { :ibikubiyemo <- ubwacyo gishya ibikubiyemo: ibikubiyemo.
 }.
 
-Template bigeze: ['cut:'] kora: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := icyacyo content gabanya: startmarker.
-	>> prefix := parts icya-mbere.
-	>> parts2 := parts icya-nyuma gabanya: endmarker.
-	>> suffix := parts2 icya-nyuma.
-	>> part := parts2 icya-mbere.
-	>> rest := prefix + suffix.
-	icyacyo content := rest. <- Template gishya: part.
+Icyitegererezo bigeze: ['ca:'] kora: { :ikimenyetso
+	>> ikimenyetso-cy-intangiriro := (['<!-- cut:%id% -->'] %id%: ikimenyetso).
+	>> ikimenyetso-cy-iherezo := (['<!-- /cut:%id% -->'] %id%: ikimenyetso).
+	>> ingingo := icyacyo ibikubiyemo gabanya: ikimenyetso-cy-intangiriro.
+	>> imbanziriza := ingingo icya-mbere.
+	>> ingingo2 := ingingo icya-nyuma gabanya: ikimenyetso-cy-iherezo.
+	>> umugereka := ingingo2 icya-nyuma.
+	>> urugingo := ingingo2 icya-mbere.
+	>> ibisigaye := imbanziriza + umugereka.
+	icyacyo ibikubiyemo := ibisigaye. <- Icyitegererezo gishya: urugingo.
 	
 }.
 
-Template bigeze: ['koporora'] kora: { <- ubwacyo gishya: ubwacyo inyandiko koporora.
+Icyitegererezo bigeze: ['koporora'] kora: { <- ubwacyo gishya: ubwacyo inyandiko koporora.
 }.
 	
-Template bigeze: ['paste:at:'] kora: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	icyacyo content simbuza: pastemarker na: ( snippet inyandiko + pastemarker ).
+Icyitegererezo bigeze: ['komeka:kuri:'] kora: { :agace :id
+	>> ikimenyetso-cyo-komeka := (['<!-- paste:%id% -->'] %id%: id).
+	icyacyo ibikubiyemo simbuza: ikimenyetso-cyo-komeka na: ( agace inyandiko + ikimenyetso-cyo-komeka ).
 }.
 
-Template bigeze: ['shyiraho:agaciro:'] kora: { :slot :value
-	icyacyo content simbuza: ['<!-- slot:'] + slot + [' -->'] na: ( Server html-shyira-kode: value ).
+Icyitegererezo bigeze: ['shyiraho:agaciro:'] kora: { :umwanya :agaciro
+	icyacyo ibikubiyemo simbuza: ['<!-- slot:'] + umwanya + [' -->'] na: ( Server html-shyira-kode: agaciro ).
 }.
 
-Template bigeze: ['set:html:'] kora: { :slot :html
-	icyacyo content simbuza: ['<!-- slot:'] + slot + [' -->'] na: html.
+Icyitegererezo bigeze: ['shyiraho:html:'] kora: { :umwanya :html
+	icyacyo ibikubiyemo simbuza: ['<!-- slot:'] + umwanya + [' -->'] na: html.
 }.
 
-Template bigeze: ['subiza:na:'] kora: { :slot :value
-	ubwacyo shyiraho: (slot kuva: 0 uburebure: (slot uburebure - 1)) agaciro: value.
+Icyitegererezo bigeze: ['subiza:na:'] kora: { :umwanya :agaciro
+	ubwacyo shyiraho: (umwanya kuva: 0 uburebure: (umwanya uburebure - 1)) agaciro: agaciro.
 }.
 
-Template bigeze: ['nl2br'] kora: {
-	icyacyo content simbuza: ['\n'] na: ['<br>'].
+Icyitegererezo bigeze: ['nl2br'] kora: {
+	icyacyo ibikubiyemo simbuza: ['\n'] na: ['<br>'].
 }.
 
-Template bigeze: ['clean'] kora: {
-	icyacyo content :=
+Icyitegererezo bigeze: ['tunganya'] kora: {
+	icyacyo ibikubiyemo :=
 		Icyitegererezo-cyishakisha
 		gishya: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		guhura: icyacyo content
+		guhura: icyacyo ibikubiyemo
 		kora: { <- ['']. }.
 }.
 
-Template bigeze: ['clean-cuts'] kora: {
-	>> items := Urutonde gishya.
+Icyitegererezo bigeze: ['tunganya-ibyaciwe'] kora: {
+	>> ibintu := Urutonde gishya.
 	Icyitegererezo-cyishakisha
 	gishya: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	guhura: icyacyo content
-	kora: { :_ :part
-		items ongera-ku-mpera: part ? 1.
+	guhura: icyacyo ibikubiyemo
+	kora: { :_ :urugingo
+		ibintu ongera-ku-mpera: urugingo ? 1.
 	}.
-	items buri: { :_ :id
-		icyacyo content :=
+	ibintu buri: { :_ :id
+		icyacyo ibikubiyemo :=
 			Icyitegererezo-cyishakisha gishya: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			guhura: icyacyo content
+			guhura: icyacyo ibikubiyemo
 			kora: { <- ['']. }.
 	 }.
 }.
 
-Template bigeze: ['clean-space'] kora: {
-	icyacyo content :=
+Icyitegererezo bigeze: ['tunganya-imyanya'] kora: {
+	icyacyo ibikubiyemo :=
 		Icyitegererezo-cyishakisha
 		gishya: ['\\s*\\n'],
-		guhura: icyacyo content
+		guhura: icyacyo ibikubiyemo
 		kora: { <- ['\n']. }.
-	icyacyo content :=
+	icyacyo ibikubiyemo :=
 		Icyitegererezo-cyishakisha
 		gishya: ['\\n[\\s\\t]+'],
-		guhura: icyacyo content
+		guhura: icyacyo ibikubiyemo
 		kora: { <- ['\n']. }.
 }.
 
-Template bigeze: ['clean-all'] kora: {
-	ubwacyo clean.
-	ubwacyo clean-cuts.
-	ubwacyo clean-space.
+Icyitegererezo bigeze: ['tunganya-byose'] kora: {
+	ubwacyo tunganya.
+	ubwacyo tunganya-ibyaciwe.
+	ubwacyo tunganya-imyanya.
 }.
 
-Template bigeze: ['inyandiko'] kora: { <- icyacyo content.
+Icyitegererezo bigeze: ['inyandiko'] kora: { <- icyacyo ibikubiyemo.
 }.

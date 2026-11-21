@@ -1,215 +1,215 @@
-Requête-HTTP quand: ['HTTP-header:'] faire: { :key <- Programme paramètre: key.
+Requête-HTTP quand: ['HTTP-en-tête:'] faire: { :clé <- Programme paramètre: clé.
 }.
 
->> HTTP-Header := Objet nouveau.
+>> En-tête-HTTP := Objet nouveau.
 
-HTTP-Header quand: ['nouveau'] faire: { <- soi nouveau init.
+En-tête-HTTP quand: ['nouveau'] faire: { <- soi nouveau initialiser.
 }.
 
-HTTP-Header quand: ['init'] faire: {
-	propre key := Rien.
-	propre value := Rien.
+En-tête-HTTP quand: ['initialiser'] faire: {
+	propre clé := Rien.
+	propre valeur := Rien.
 }.
 
-HTTP-Header quand: ['key:value:'] faire: { :key :value
-	propre key := key.
-	propre value := value.
+En-tête-HTTP quand: ['clé:valeur:'] faire: { :clé :valeur
+	propre clé := clé.
+	propre valeur := valeur.
 }.
 
-HTTP-Header quand: ['key'] faire: { <- propre key.
+En-tête-HTTP quand: ['clé'] faire: { <- propre clé.
 }.
 
-HTTP-Header quand: ['value'] faire: { <- propre value.
+En-tête-HTTP quand: ['valeur'] faire: { <- propre valeur.
 }.
 
 
-HTTP-Header quand: ['texte'] faire: {
-	>> line := propre key + [': '] + propre value.
-	line remplacer: ['\r'] par: [''], remplacer: ['\n'] par: ['']. <- line + [' \r\n'].
+En-tête-HTTP quand: ['texte'] faire: {
+	>> ligne := propre clé + [': '] + propre valeur.
+	ligne remplacer: ['\r'] par: [''], remplacer: ['\n'] par: ['']. <- ligne + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Objet nouveau.
+>> Document-Web := Objet nouveau.
 
-Web-Document quand: ['nouveau'] faire: { <- soi nouveau init.
+Document-Web quand: ['nouveau'] faire: { <- soi nouveau initialiser.
 }.
 
-Web-Document quand: ['init'] faire: {
-	propre headers := Liste nouveau.
-	propre sess-id := Rien.
-	propre session-manager := Tempfile-Session nouveau.
-	propre sessdata := Rien.
-	propre secure := Oui.
-	propre same-site := ['Strict'].
-	propre headers-out := Non.
-	propre request := Requête-HTTP nouveau.
+Document-Web quand: ['initialiser'] faire: {
+	propre en-têtes := Liste nouveau.
+	propre id-session := Rien.
+	propre gestionnaire-session := Session-fichier-temporaire nouveau.
+	propre données-session := Rien.
+	propre sécurisé := Oui.
+	propre même-site := ['Strict'].
+	propre en-têtes-envoyés := Non.
+	propre demande := Requête-HTTP nouveau.
 }.
 
-Web-Document quand: ['request:'] faire: { :request
-	propre request := request.
+Document-Web quand: ['demande:'] faire: { :demande
+	propre demande := demande.
 }. 
 
-Web-Document quand: ['secure-session-cookie:'] faire: { :secure
-	soi check-headers.
-	propre secure := secure.
+Document-Web quand: ['cookie-session-sécurisé:'] faire: { :sécurisé
+	soi vérifier-en-têtes.
+	propre sécurisé := sécurisé.
 }.
 
-Web-Document quand: ['same-site-session-cookie:'] faire: { :value
-	soi check-headers.
+Document-Web quand: ['cookie-session-même-site:'] faire: { :valeur
+	soi vérifier-en-têtes.
 	>> options := Liste nouveau 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options contient: value, non: {
+	options possède: valeur, non: {
 		cette-tâche erreur: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	propre same-site := value.
+	propre même-site := valeur.
 }.
 
-Web-Document quand: ['header:'] faire: { :header
-	soi check-headers.
-	propre headers ajouter: header.
+Document-Web quand: ['en-tête:'] faire: { :en-tête
+	soi vérifier-en-têtes.
+	propre en-têtes ajouter: en-tête.
 }.
 
-Web-Document quand: ['clear-headers'] faire: {
-	soi check-headers.
-	propre headers := Liste nouveau.
+Document-Web quand: ['effacer-en-têtes'] faire: {
+	soi vérifier-en-têtes.
+	propre en-têtes := Liste nouveau.
 }.
 
-Web-Document quand: ['session-manager:'] faire: { :manager
-	soi check-headers.
-	propre session-manager := manager.
+Document-Web quand: ['gestionnaire-session:'] faire: { :gestionnaire
+	soi vérifier-en-têtes.
+	propre gestionnaire-session := gestionnaire.
 }.
 
-Web-Document quand: ['session-manager'] faire: { <- propre session-manager.
+Document-Web quand: ['gestionnaire-session'] faire: { <- propre gestionnaire-session.
 }.
 
-Web-Document quand: ['check-headers'] faire: {
-	propre headers-out oui: {
+Document-Web quand: ['vérifier-en-têtes'] faire: {
+	propre en-têtes-envoyés oui: {
 		cette-tâche erreur: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document quand: ['session-start'] faire: {
-	soi check-headers.
-	>> request := propre request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Rien? non: {
-		(( Motif nouveau: ['^[A-Za-z0-9]+\\z'], correspondance: sess-id ) = 0) oui: {
-			sess-id := Rien.
+Document-Web quand: ['démarrer-session'] faire: {
+	soi vérifier-en-têtes.
+	>> demande := propre demande.
+	>> id-session := demande cookie: ['xsid'].
+	id-session Rien? non: {
+		(( Motif nouveau: ['^[A-Za-z0-9]+\\z'], correspondance: id-session ) = 0) oui: {
+			id-session := Rien.
 		}.
 	}.
-	sess-id Rien? oui: {
-		sess-id := Coffre jeton: 30.
-		>> session-header := HTTP-Header nouveau
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (propre secure soit: ['Secure'] soit: ['']),
-		SSITE: (propre same-site),
-		XSID: sess-id
+	id-session Rien? oui: {
+		id-session := Coffre jeton: 30.
+		>> en-tête-session := En-tête-HTTP nouveau
+		clé: ['Set-Cookie'] valeur: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (propre sécurisé soit: ['Secure'] soit: ['']),
+		SSITE: (propre même-site),
+		XSID: id-session
 		).
-		propre headers ajouter: session-header.
+		propre en-têtes ajouter: en-tête-session.
 	}.
-	propre sessdata := propre session-manager for: sess-id, load. <- propre sessdata. # reference
+	propre données-session := propre gestionnaire-session pour: id-session, charger. <- propre données-session. # reference
 }.
 
-Web-Document quand: ['goto:'] faire: { :url
-	soi check-headers.
-	soi clear-headers.
-	propre headers
+Document-Web quand: ['aller-à:'] faire: { :adresse
+	soi vérifier-en-têtes.
+	soi effacer-en-têtes.
+	propre en-têtes
 	ajouter: (
-		HTTP-Header nouveau
-		key: ['Status'] value: ['303 See Other']
+		En-tête-HTTP nouveau
+		clé: ['Status'] valeur: ['303 See Other']
 	),
 	ajouter: (
-		HTTP-Header nouveau
-		key: ['Location'] value: url
+		En-tête-HTTP nouveau
+		clé: ['Location'] valeur: adresse
 	).
-	soi out: ['Redirect'].
+	soi sortir: ['Redirect'].
 }.
 
-Web-Document quand: ['session-destroy'] faire: {
-	soi check-headers.
-	>> request := propre request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Rien? non: {
-		>> session-header := HTTP-Header nouveau.
-		>> when := Moment nouveau année: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Document-Web quand: ['détruire-session'] faire: {
+	soi vérifier-en-têtes.
+	>> demande := propre demande.
+	>> id-session := demande cookie: ['xsid'].
+	id-session Rien? non: {
+		>> en-tête-session := En-tête-HTTP nouveau.
+		>> instant := Moment nouveau année: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		en-tête-session clé: ['Set-Cookie'] valeur: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (propre secure soit: ['Secure'] soit: ['']),
-			SSITE: (propre same-site),
-			XSID: sess-id
+			EXP: instant,
+			SEC: (propre sécurisé soit: ['Secure'] soit: ['']),
+			SSITE: (propre même-site),
+			XSID: id-session
 		).
-		propre session-manager destroy.
-		propre headers ajouter: session-header.
+		propre gestionnaire-session détruire.
+		propre en-têtes ajouter: en-tête-session.
 	}.
 }.
 
 
-Web-Document quand: ['template:'] faire: { :chemin <- Template nouveau: (Fichier nouveau: chemin, lire).
+Document-Web quand: ['modèle:'] faire: { :chemin <- Modèle nouveau: (Fichier nouveau: chemin, lire).
 }.
 
-Web-Document quand: ['out:type:'] faire: { :output :type
-	propre headers-out non: {
-		propre sessdata Rien? non: {
-			propre session-manager save: propre sessdata.
+Document-Web quand: ['sortir:type:'] faire: { :sortie :type
+	propre en-têtes-envoyés non: {
+		propre données-session Rien? non: {
+			propre gestionnaire-session enregistrer: propre données-session.
 		}.
-		propre headers ajouter: (
-			HTTP-Header nouveau
-			key: ['Content-type'] value: type
+		propre en-têtes ajouter: (
+			En-tête-HTTP nouveau
+			clé: ['Content-type'] valeur: type
 		).
-		propre headers chaque: { :_ :header
-			Sortie écrire: header.
+		propre en-têtes chaque: { :_ :en-tête
+			Sortie écrire: en-tête.
 		}.
-		propre headers-out := Oui.
+		propre en-têtes-envoyés := Oui.
 		Sortie écrire: ['\r\n'].
 	}.
-	Sortie écrire: output.
+	Sortie écrire: sortie.
 }.
 
-Web-Document quand: ['finish:type:'] faire: { :output :type
-	propre headers-out non: {
-		propre sessdata Rien? non: {
-			propre session-manager save: propre sessdata.
+Document-Web quand: ['terminer:type:'] faire: { :sortie :type
+	propre en-têtes-envoyés non: {
+		propre données-session Rien? non: {
+			propre gestionnaire-session enregistrer: propre données-session.
 		}.
-		propre headers ajouter: (
-			HTTP-Header nouveau
-			key: ['Content-type'] value: type
+		propre en-têtes ajouter: (
+			En-tête-HTTP nouveau
+			clé: ['Content-type'] valeur: type
 		).
-		propre headers ajouter: (
-			HTTP-Header nouveau
-			key: ['Content-Length'] value: output texte bytes
+		propre en-têtes ajouter: (
+			En-tête-HTTP nouveau
+			clé: ['Content-Length'] valeur: sortie texte bytes
 		).
-		propre headers chaque: { :_ :header
-			Sortie écrire: header.
+		propre en-têtes chaque: { :_ :en-tête
+			Sortie écrire: en-tête.
 		}.
-		propre headers-out := Oui.
+		propre en-têtes-envoyés := Oui.
 		Sortie écrire: ['\r\n'].
 	}.
-	Sortie écrire: output.
+	Sortie écrire: sortie.
 }.
 
-Web-Document quand: ['out:'] faire: { :output
-	soi out: output type: ['text/html; charset=utf-8'].
+Document-Web quand: ['sortir:'] faire: { :sortie
+	soi sortir: sortie type: ['text/html; charset=utf-8'].
 }.
 
-Web-Document quand: ['finish:'] faire: { :output
-	soi finish: output type: ['text/html; charset=utf-8'].
+Document-Web quand: ['terminer:'] faire: { :sortie
+	soi terminer: sortie type: ['text/html; charset=utf-8'].
 }.
 
-Web-Document quand: ['json:'] faire: { :output
-	soi out: ( JSON jsonify: output ) type: ['application/json'].
+Document-Web quand: ['json:'] faire: { :sortie
+	soi sortir: ( JSON jsonify: sortie ) type: ['application/json'].
 }.
 
-Web-Document quand: ['not-found:'] faire: { :output
-	soi clear-headers header: (
-		HTTP-Header nouveau key: ['Status'] value: ['404 Not Found']
+Document-Web quand: ['introuvable:'] faire: { :sortie
+	soi effacer-en-têtes en-tête: (
+		En-tête-HTTP nouveau clé: ['Status'] valeur: ['404 Not Found']
 	).
-	soi out: output.
+	soi sortir: sortie.
 }.
 
 
@@ -217,86 +217,86 @@ Web-Document quand: ['not-found:'] faire: { :output
 
 >> Session := Objet nouveau.
 
-Session quand: ['nouveau'] faire: { <- soi nouveau init for: Rien.
+Session quand: ['nouveau'] faire: { <- soi nouveau initialiser pour: Rien.
 }.
 
-Session quand: ['for:'] faire: { :id
+Session quand: ['pour:'] faire: { :id
 	propre id := id.
 }.
 
-Session quand: ['load'] faire: {
+Session quand: ['charger'] faire: {
 	cette-tâche erreur: ['Not implemented.'].
 }.
 
-Session quand: ['save:'] faire: {
+Session quand: ['enregistrer:'] faire: {
 	cette-tâche erreur: ['Not implemented.'].
 }.
 
-Session quand: ['destroy'] faire: {
+Session quand: ['détruire'] faire: {
 	cette-tâche erreur: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session nouveau.
+>> Session-fichier-temporaire := Session nouveau.
 
-Tempfile-Session quand: ['init'] faire: {
-	propre pathprefix := ['/tmp/sess-'].
+Session-fichier-temporaire quand: ['initialiser'] faire: {
+	propre préfixechemin := ['/tmp/sess-'].
 }.
 
-Tempfile-Session quand: ['path-prefix:'] faire: { :str
-	propre pathprefix := str.
+Session-fichier-temporaire quand: ['préfixe-chemin:'] faire: { :chaîne
+	propre préfixechemin := chaîne.
 }.
 
-Tempfile-Session quand: ['file'] faire: { <- ( Fichier nouveau: ( propre pathprefix + propre id + ['.txt'] ) ).
+Session-fichier-temporaire quand: ['fichier'] faire: { <- ( Fichier nouveau: ( propre préfixechemin + propre id + ['.txt'] ) ).
 }.
 
-Tempfile-Session quand: ['load'] faire: {
-	>> file := soi file.
-	file existe non: {
-		file écrire: (Dictionnaire nouveau code).
-	}. <- file lire objet.
+Session-fichier-temporaire quand: ['charger'] faire: {
+	>> fichier := soi fichier.
+	fichier existe non: {
+		fichier écrire: (Dictionnaire nouveau code).
+	}. <- fichier lire objet.
 }.
 
-Tempfile-Session quand: ['save:'] faire: { :data
-	>> file := soi file.
-	file existe oui: {
-		file écrire: data code.
+Session-fichier-temporaire quand: ['enregistrer:'] faire: { :données
+	>> fichier := soi fichier.
+	fichier existe oui: {
+		fichier écrire: données code.
 	}.
 }.
 
-Tempfile-Session quand: ['destroy'] faire: {
-	>> file := soi file.
-	file existe oui: {
-		file supprimer.
+Session-fichier-temporaire quand: ['détruire'] faire: {
+	>> fichier := soi fichier.
+	fichier existe oui: {
+		fichier supprimer.
 	}.
 }.
 
 
 >> URL := Objet nouveau.
 
-URL quand: ['init'] faire: {
-	propre protocol := ['https://'].
+URL quand: ['initialiser'] faire: {
+	propre protocole := ['https://'].
 	propre hôte := ['localhost'].
 	propre chemin := [''].
-	propre params := [''].
+	propre paramètres-url := [''].
 	propre hash := [''].
 }.
 
-URL quand: ['nouveau'] faire: { <- soi nouveau init.
+URL quand: ['nouveau'] faire: { <- soi nouveau initialiser.
 }.
 
 URL quand: ['texte'] faire: { <- (
-	propre protocol +
+	propre protocole +
 	propre hôte +
 	propre chemin +
-	propre params +
+	propre paramètres-url +
 	propre hash ).
 }.
 
-URL quand: ['protocol:'] faire: { :protocol
-	((Liste nouveau: ['http'] ; ['https']) contient: protocol) oui: {
-		propre protocol := protocol + ['://'].
+URL quand: ['protocole:'] faire: { :protocole
+	((Liste nouveau ; ['http'] ; ['https']) possède: protocole) oui: {
+		propre protocole := protocole + ['://'].
 	}, non: {
 		cette-tâche erreur: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL quand: ['hôte:'] faire: { :hôte
 	propre hôte := hôte.
 }.
 
-URL quand: ['path:'] faire: { :chemin
+URL quand: ['chemin:'] faire: { :chemin
 	propre chemin := ['/'] + chemin url-encoder.
 }.
 
-URL quand: ['params:'] faire: { :map
-	>> params := Liste nouveau.
-	map chaque: { :key :value
-		params ajouter: key texte url-encoder + ['='] + value texte url-encoder.
+URL quand: ['paramètres-url:'] faire: { :correspondance
+	>> paramètres-url := Liste nouveau.
+	correspondance chaque: { :clé :valeur
+		paramètres-url ajouter: clé texte url-encoder + ['='] + valeur texte url-encoder.
 	}.
-	propre params := ['?'] + ( params joindre: ['&'] ).
+	propre paramètres-url := ['?'] + ( paramètres-url joindre: ['&'] ).
 }.
 
 URL quand: ['hachage:'] faire: { :hash

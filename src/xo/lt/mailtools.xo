@@ -1,128 +1,128 @@
->> Email := Objektas naujas.
+>> El-laiškas := Objektas naujas.
 
-Email kai: ['init'] daryti: {
-	savas recipients := Sąrašas naujas.
+El-laiškas kai: ['inicijuoti'] daryti: {
+	savas gavėjai := Sąrašas naujas.
 	savas cc := Sąrašas naujas.
 	savas bcc := Sąrašas naujas.
-	savas from := Niekas.
-	savas from-name := Niekas.
-	savas subject := Niekas.
-	savas body := Niekas.
+	savas siuntėjas := Niekas.
+	savas siuntėjo-vardas := Niekas.
+	savas tema := Niekas.
+	savas laiško-tekstas := Niekas.
 }.
 
-Email kai: ['naujas'] daryti: { <- pats naujas init.
+El-laiškas kai: ['naujas'] daryti: { <- pats naujas inicijuoti.
 }.
 
-Email kai: ['to:'] daryti: { :list
-	savas recipients := list.
+El-laiškas kai: ['kam:'] daryti: { :išvardijimas
+	savas gavėjai := išvardijimas.
 }.
  
-Email kai: ['cc:'] daryti: { :list
-	savas cc := list.
+El-laiškas kai: ['cc:'] daryti: { :išvardijimas
+	savas cc := išvardijimas.
 }.
 
-Email kai: ['bcc:'] daryti: { :list
-	savas bcc := list.
+El-laiškas kai: ['bcc:'] daryti: { :išvardijimas
+	savas bcc := išvardijimas.
 }.
 
-Email kai: ['subject:'] daryti: { :subject
-	savas subject := subject.
+El-laiškas kai: ['tema:'] daryti: { :tema
+	savas tema := tema.
 }.
 
-Email kai: ['from:name:'] daryti: { :from :pavadinimas
-	savas from := from.
-	savas from-name := pavadinimas.
+El-laiškas kai: ['siuntėjas:pavadinimas:'] daryti: { :siuntėjas :pavadinimas
+	savas siuntėjas := siuntėjas.
+	savas siuntėjo-vardas := pavadinimas.
 }.
 
-Email kai: ['body:'] daryti: { :body
-	savas body := body.
+El-laiškas kai: ['laiško-tekstas:'] daryti: { :laiško-tekstas
+	savas laiško-tekstas := laiško-tekstas.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email kai: ['header:'] daryti: { :line <- line pakeisti: ['\r'] į: [''], pakeisti: ['\n'] į: [''].
+El-laiškas kai: ['antraštė:'] daryti: { :eilutė <- eilutė pakeisti: ['\r'] į: [''], pakeisti: ['\n'] į: [''].
 }.
 
-Email kai: ['send'] daryti: {
-	>> f := Failas tempwrite: pats generate.
+El-laiškas kai: ['siųsti'] daryti: {
+	>> f := Failas tempwrite: pats generuoti.
 	Programa sistema: ['sendmail -t < '] + f kelias, nauja-eilutė.
 }.
 
-Email kai: ['generate'] daryti: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str pridėti: (pats header: ['From: '] + savas from-name + [' <'] + ( savas from ) + ['>']) + brk.
-	str pridėti: (pats header: ['To: '] + ( savas recipients sujungti: [','] )) + brk.
+El-laiškas kai: ['generuoti'] daryti: {
+	>> eilutės-lūžis := ['\r\n'].
+	>> simbolių-eilutė := [''].
+	simbolių-eilutė pridėti: (pats antraštė: ['From: '] + savas siuntėjo-vardas + [' <'] + ( savas siuntėjas ) + ['>']) + eilutės-lūžis.
+	simbolių-eilutė pridėti: (pats antraštė: ['To: '] + ( savas gavėjai sujungti: [','] )) + eilutės-lūžis.
 	savas cc kiekis tiesa: {
-		str pridėti: (pats header: ['Cc: '] + ( savas cc sujungti: [','] )) + brk.
+		simbolių-eilutė pridėti: (pats antraštė: ['Cc: '] + ( savas cc sujungti: [','] )) + eilutės-lūžis.
 	}.
 	savas bcc kiekis tiesa: {
-		str pridėti: (pats header: ['Bcc: '] + ( savas bcc sujungti: [','] )) + brk.
+		simbolių-eilutė pridėti: (pats antraštė: ['Bcc: '] + ( savas bcc sujungti: [','] )) + eilutės-lūžis.
 	}.
-	str pridėti: (pats header: ['Subject: '] + savas subject) + brk.
-	str pridėti: brk.
-	str pridėti: savas body.
-	str pridėti: brk. <- str.
+	simbolių-eilutė pridėti: (pats antraštė: ['Subject: '] + savas tema) + eilutės-lūžis.
+	simbolių-eilutė pridėti: eilutės-lūžis.
+	simbolių-eilutė pridėti: savas laiško-tekstas.
+	simbolių-eilutė pridėti: eilutės-lūžis. <- simbolių-eilutė.
 }.
 
->> HTML-Email := Email naujas.
+>> HTML-El-laiškas := El-laiškas naujas.
 
-HTML-Email kai: ['init'] daryti: {
-	pats init.
-	savas attachments := Sąrašas naujas.
-	savas boundary := Seifas žetonas: 40.
+HTML-El-laiškas kai: ['inicijuoti'] daryti: {
+	pats inicijuoti.
+	savas priedai := Sąrašas naujas.
+	savas riba := Seifas žetonas: 40.
 }.
 
-HTML-Email kai: ['attach:'] daryti: { :file
-	>> id := savas attachments kiekis.
-	>> blob := file blob.
-	savas attachments pridėti: (
+HTML-El-laiškas kai: ['pridėti-priedą:'] daryti: { :failas
+	>> id := savas priedai kiekis.
+	>> blob := failas blob.
+	savas priedai pridėti: (
 		Žodynas naujas
-			file: file kelias,
-			mime: ['image/'] + (Server mimetype: file kelias),
-			data: blob base64-koduoti
+			failas: failas kelias,
+			mime: ['image/'] + (Server mimetype: failas kelias),
+			duomenys: blob base64-koduoti
 	).
 	blob atlaisvinti. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email kai: ['generate'] daryti: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str pridėti: (pats header: ['From: '] + savas from-name + [' <'] + ( savas from ) + ['>']) + brk.
-	str pridėti: (pats header: ['To: '] + ( savas recipients sujungti: [','] )) + brk.
+HTML-El-laiškas kai: ['generuoti'] daryti: {
+	>> eilutės-lūžis := ['\r\n'].
+	>> simbolių-eilutė := [''].
+	simbolių-eilutė pridėti: (pats antraštė: ['From: '] + savas siuntėjo-vardas + [' <'] + ( savas siuntėjas ) + ['>']) + eilutės-lūžis.
+	simbolių-eilutė pridėti: (pats antraštė: ['To: '] + ( savas gavėjai sujungti: [','] )) + eilutės-lūžis.
 	savas cc kiekis tiesa: {
-		str pridėti: (pats header: ['Cc: '] + ( savas cc sujungti: [','] )) + brk.
+		simbolių-eilutė pridėti: (pats antraštė: ['Cc: '] + ( savas cc sujungti: [','] )) + eilutės-lūžis.
 	}.
 	savas bcc kiekis tiesa: {
-		str pridėti: (pats header: ['Bcc: '] + ( savas bcc sujungti: [','] )) + brk.
+		simbolių-eilutė pridėti: (pats antraštė: ['Bcc: '] + ( savas bcc sujungti: [','] )) + eilutės-lūžis.
 	}.
-	str pridėti: (pats header: ['Subject: '] + savas subject) + brk.
-	str pridėti: ['MIME-Version: 1.0'] + brk.
-	str pridėti: ['Content-Type: multipart/related; boundary="'] + savas boundary + ['"; type=text/html'] + brk.
-	str pridėti: brk.
-	str pridėti: ['--'] + savas boundary + brk.
-	str pridėti: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str pridėti: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str pridėti: brk.
-	str pridėti: savas body.
-	str pridėti: brk.
-	savas attachments kiekvienas: { :id :info
-		>> blob := info data.
-		str pridėti: ['--'] + savas boundary + brk.
-		str pridėti: ['Content-Type: '] + info mime + brk.
-		str pridėti: ['Content-Transfer-Encoding: base64'] + brk.
-		str pridėti: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str pridėti: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str pridėti: brk.
-		>> max := 76.
-		>> len := blob ilgis.
-		>> chunks := (len / max) apvalinti-aukštyn.
+	simbolių-eilutė pridėti: (pats antraštė: ['Subject: '] + savas tema) + eilutės-lūžis.
+	simbolių-eilutė pridėti: ['MIME-Version: 1.0'] + eilutės-lūžis.
+	simbolių-eilutė pridėti: ['Content-Type: multipart/related; boundary="'] + savas riba + ['"; type=text/html'] + eilutės-lūžis.
+	simbolių-eilutė pridėti: eilutės-lūžis.
+	simbolių-eilutė pridėti: ['--'] + savas riba + eilutės-lūžis.
+	simbolių-eilutė pridėti: ['Content-Type: text/html; charset=UTF-8'] + eilutės-lūžis.
+	simbolių-eilutė pridėti: ['Content-Transfer-Encoding: 7bit'] + eilutės-lūžis.
+	simbolių-eilutė pridėti: eilutės-lūžis.
+	simbolių-eilutė pridėti: savas laiško-tekstas.
+	simbolių-eilutė pridėti: eilutės-lūžis.
+	savas priedai kiekvienas: { :id :info
+		>> blob := info duomenys.
+		simbolių-eilutė pridėti: ['--'] + savas riba + eilutės-lūžis.
+		simbolių-eilutė pridėti: ['Content-Type: '] + info mime + eilutės-lūžis.
+		simbolių-eilutė pridėti: ['Content-Transfer-Encoding: base64'] + eilutės-lūžis.
+		simbolių-eilutė pridėti: ['Content-ID: <attachment'] + id + ['>'] + eilutės-lūžis.
+		simbolių-eilutė pridėti: ['Content-Disposition: inline; filename="'] + info failas + ['"'] + eilutės-lūžis.
+		simbolių-eilutė pridėti: eilutės-lūžis.
+		>> daugiausia := 76.
+		>> teksto-ilgis := blob ilgis.
+		>> gabalai := (teksto-ilgis / daugiausia) apvalinti-aukštyn.
 		{ :i
-			>> chunk := blob kopijuoti nuo: i * max ilgis: max.
-			str pridėti: chunk + brk.
-		} * chunks.
-		str pridėti: brk.
-		str pridėti: brk.
+			>> gabalas := blob kopijuoti nuo: i * daugiausia ilgis: daugiausia.
+			simbolių-eilutė pridėti: gabalas + eilutės-lūžis.
+		} * gabalai.
+		simbolių-eilutė pridėti: eilutės-lūžis.
+		simbolių-eilutė pridėti: eilutės-lūžis.
 	}.
-	str pridėti: ['--'] + savas boundary + ['--'] + brk. <- str.
+	simbolių-eilutė pridėti: ['--'] + savas riba + ['--'] + eilutės-lūžis. <- simbolių-eilutė.
 }.

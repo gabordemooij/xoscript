@@ -1,128 +1,128 @@
->> Email := Abu sabo.
+>> Imel := Abu sabo.
 
-Email idan: ['init'] yi: {
-	nasa recipients := Jeri sabo.
+Imel idan: ['shirya'] yi: {
+	nasa masu-karɓa := Jeri sabo.
 	nasa cc := Jeri sabo.
 	nasa bcc := Jeri sabo.
-	nasa from := Babu.
-	nasa from-name := Babu.
-	nasa subject := Babu.
-	nasa body := Babu.
+	nasa mai-aikawa := Babu.
+	nasa sunan-mai-aikawa := Babu.
+	nasa batu := Babu.
+	nasa jiki := Babu.
 }.
 
-Email idan: ['sabo'] yi: { <- kai sabo init.
+Imel idan: ['sabo'] yi: { <- kai sabo shirya.
 }.
 
-Email idan: ['to:'] yi: { :list
-	nasa recipients := list.
+Imel idan: ['zuwa:'] yi: { :lissafawa
+	nasa masu-karɓa := lissafawa.
 }.
  
-Email idan: ['cc:'] yi: { :list
-	nasa cc := list.
+Imel idan: ['cc:'] yi: { :lissafawa
+	nasa cc := lissafawa.
 }.
 
-Email idan: ['bcc:'] yi: { :list
-	nasa bcc := list.
+Imel idan: ['bcc:'] yi: { :lissafawa
+	nasa bcc := lissafawa.
 }.
 
-Email idan: ['subject:'] yi: { :subject
-	nasa subject := subject.
+Imel idan: ['batu:'] yi: { :batu
+	nasa batu := batu.
 }.
 
-Email idan: ['from:name:'] yi: { :from :suna
-	nasa from := from.
-	nasa from-name := suna.
+Imel idan: ['mai-aikawa:suna:'] yi: { :mai-aikawa :suna
+	nasa mai-aikawa := mai-aikawa.
+	nasa sunan-mai-aikawa := suna.
 }.
 
-Email idan: ['body:'] yi: { :body
-	nasa body := body.
+Imel idan: ['jiki:'] yi: { :jiki
+	nasa jiki := jiki.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email idan: ['header:'] yi: { :line <- line musanya: ['\r'] da: [''], musanya: ['\n'] da: [''].
+Imel idan: ['kanun-saƙo:'] yi: { :layi <- layi musanya: ['\r'] da: [''], musanya: ['\n'] da: [''].
 }.
 
-Email idan: ['send'] yi: {
-	>> f := Fayil tempwrite: kai generate.
+Imel idan: ['aika'] yi: {
+	>> f := Fayil tempwrite: kai samar.
 	Shiri tsarin-aiki: ['sendmail -t < '] + f hanyar-fayil, sabon-layi.
 }.
 
-Email idan: ['generate'] yi: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str ƙara-a-ƙarshe: (kai header: ['From: '] + nasa from-name + [' <'] + ( nasa from ) + ['>']) + brk.
-	str ƙara-a-ƙarshe: (kai header: ['To: '] + ( nasa recipients haɗa: [','] )) + brk.
+Imel idan: ['samar'] yi: {
+	>> karya-layi := ['\r\n'].
+	>> jerin-haruffa := [''].
+	jerin-haruffa ƙara-a-ƙarshe: (kai kanun-saƙo: ['From: '] + nasa sunan-mai-aikawa + [' <'] + ( nasa mai-aikawa ) + ['>']) + karya-layi.
+	jerin-haruffa ƙara-a-ƙarshe: (kai kanun-saƙo: ['To: '] + ( nasa masu-karɓa haɗa: [','] )) + karya-layi.
 	nasa cc ƙidaya gaskiya: {
-		str ƙara-a-ƙarshe: (kai header: ['Cc: '] + ( nasa cc haɗa: [','] )) + brk.
+		jerin-haruffa ƙara-a-ƙarshe: (kai kanun-saƙo: ['Cc: '] + ( nasa cc haɗa: [','] )) + karya-layi.
 	}.
 	nasa bcc ƙidaya gaskiya: {
-		str ƙara-a-ƙarshe: (kai header: ['Bcc: '] + ( nasa bcc haɗa: [','] )) + brk.
+		jerin-haruffa ƙara-a-ƙarshe: (kai kanun-saƙo: ['Bcc: '] + ( nasa bcc haɗa: [','] )) + karya-layi.
 	}.
-	str ƙara-a-ƙarshe: (kai header: ['Subject: '] + nasa subject) + brk.
-	str ƙara-a-ƙarshe: brk.
-	str ƙara-a-ƙarshe: nasa body.
-	str ƙara-a-ƙarshe: brk. <- str.
+	jerin-haruffa ƙara-a-ƙarshe: (kai kanun-saƙo: ['Subject: '] + nasa batu) + karya-layi.
+	jerin-haruffa ƙara-a-ƙarshe: karya-layi.
+	jerin-haruffa ƙara-a-ƙarshe: nasa jiki.
+	jerin-haruffa ƙara-a-ƙarshe: karya-layi. <- jerin-haruffa.
 }.
 
->> HTML-Email := Email sabo.
+>> Imel-HTML := Imel sabo.
 
-HTML-Email idan: ['init'] yi: {
-	kai init.
-	nasa attachments := Jeri sabo.
-	nasa boundary := Asusu token: 40.
+Imel-HTML idan: ['shirya'] yi: {
+	kai shirya.
+	nasa haɗe-haɗe := Jeri sabo.
+	nasa iyaka := Asusu token: 40.
 }.
 
-HTML-Email idan: ['attach:'] yi: { :file
-	>> id := nasa attachments ƙidaya.
-	>> blob := file blob.
-	nasa attachments ƙara-a-ƙarshe: (
+Imel-HTML idan: ['haɗa-fayil:'] yi: { :fayil-zama
+	>> id := nasa haɗe-haɗe ƙidaya.
+	>> blob := fayil-zama blob.
+	nasa haɗe-haɗe ƙara-a-ƙarshe: (
 		Ƙamus sabo
-			file: file hanyar-fayil,
-			mime: ['image/'] + (Server mimetype: file hanyar-fayil),
-			data: blob base64-ɓoye-lamba
+			fayil-zama: fayil-zama hanyar-fayil,
+			mime: ['image/'] + (Server mimetype: fayil-zama hanyar-fayil),
+			bayanai: blob base64-ɓoye-lamba
 	).
 	blob saki. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email idan: ['generate'] yi: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str ƙara-a-ƙarshe: (kai header: ['From: '] + nasa from-name + [' <'] + ( nasa from ) + ['>']) + brk.
-	str ƙara-a-ƙarshe: (kai header: ['To: '] + ( nasa recipients haɗa: [','] )) + brk.
+Imel-HTML idan: ['samar'] yi: {
+	>> karya-layi := ['\r\n'].
+	>> jerin-haruffa := [''].
+	jerin-haruffa ƙara-a-ƙarshe: (kai kanun-saƙo: ['From: '] + nasa sunan-mai-aikawa + [' <'] + ( nasa mai-aikawa ) + ['>']) + karya-layi.
+	jerin-haruffa ƙara-a-ƙarshe: (kai kanun-saƙo: ['To: '] + ( nasa masu-karɓa haɗa: [','] )) + karya-layi.
 	nasa cc ƙidaya gaskiya: {
-		str ƙara-a-ƙarshe: (kai header: ['Cc: '] + ( nasa cc haɗa: [','] )) + brk.
+		jerin-haruffa ƙara-a-ƙarshe: (kai kanun-saƙo: ['Cc: '] + ( nasa cc haɗa: [','] )) + karya-layi.
 	}.
 	nasa bcc ƙidaya gaskiya: {
-		str ƙara-a-ƙarshe: (kai header: ['Bcc: '] + ( nasa bcc haɗa: [','] )) + brk.
+		jerin-haruffa ƙara-a-ƙarshe: (kai kanun-saƙo: ['Bcc: '] + ( nasa bcc haɗa: [','] )) + karya-layi.
 	}.
-	str ƙara-a-ƙarshe: (kai header: ['Subject: '] + nasa subject) + brk.
-	str ƙara-a-ƙarshe: ['MIME-Version: 1.0'] + brk.
-	str ƙara-a-ƙarshe: ['Content-Type: multipart/related; boundary="'] + nasa boundary + ['"; type=text/html'] + brk.
-	str ƙara-a-ƙarshe: brk.
-	str ƙara-a-ƙarshe: ['--'] + nasa boundary + brk.
-	str ƙara-a-ƙarshe: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str ƙara-a-ƙarshe: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str ƙara-a-ƙarshe: brk.
-	str ƙara-a-ƙarshe: nasa body.
-	str ƙara-a-ƙarshe: brk.
-	nasa attachments kowane: { :id :info
-		>> blob := info data.
-		str ƙara-a-ƙarshe: ['--'] + nasa boundary + brk.
-		str ƙara-a-ƙarshe: ['Content-Type: '] + info mime + brk.
-		str ƙara-a-ƙarshe: ['Content-Transfer-Encoding: base64'] + brk.
-		str ƙara-a-ƙarshe: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str ƙara-a-ƙarshe: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str ƙara-a-ƙarshe: brk.
-		>> max := 76.
-		>> len := blob tsawo.
-		>> chunks := (len / max) zagaye-sama.
+	jerin-haruffa ƙara-a-ƙarshe: (kai kanun-saƙo: ['Subject: '] + nasa batu) + karya-layi.
+	jerin-haruffa ƙara-a-ƙarshe: ['MIME-Version: 1.0'] + karya-layi.
+	jerin-haruffa ƙara-a-ƙarshe: ['Content-Type: multipart/related; boundary="'] + nasa iyaka + ['"; type=text/html'] + karya-layi.
+	jerin-haruffa ƙara-a-ƙarshe: karya-layi.
+	jerin-haruffa ƙara-a-ƙarshe: ['--'] + nasa iyaka + karya-layi.
+	jerin-haruffa ƙara-a-ƙarshe: ['Content-Type: text/html; charset=UTF-8'] + karya-layi.
+	jerin-haruffa ƙara-a-ƙarshe: ['Content-Transfer-Encoding: 7bit'] + karya-layi.
+	jerin-haruffa ƙara-a-ƙarshe: karya-layi.
+	jerin-haruffa ƙara-a-ƙarshe: nasa jiki.
+	jerin-haruffa ƙara-a-ƙarshe: karya-layi.
+	nasa haɗe-haɗe kowane: { :id :bayani
+		>> blob := bayani bayanai.
+		jerin-haruffa ƙara-a-ƙarshe: ['--'] + nasa iyaka + karya-layi.
+		jerin-haruffa ƙara-a-ƙarshe: ['Content-Type: '] + bayani mime + karya-layi.
+		jerin-haruffa ƙara-a-ƙarshe: ['Content-Transfer-Encoding: base64'] + karya-layi.
+		jerin-haruffa ƙara-a-ƙarshe: ['Content-ID: <attachment'] + id + ['>'] + karya-layi.
+		jerin-haruffa ƙara-a-ƙarshe: ['Content-Disposition: inline; filename="'] + bayani fayil-zama + ['"'] + karya-layi.
+		jerin-haruffa ƙara-a-ƙarshe: karya-layi.
+		>> mafi-yawa := 76.
+		>> tsawon-rubutu := blob tsawo.
+		>> gutsuttsura := (tsawon-rubutu / mafi-yawa) zagaye-sama.
 		{ :i
-			>> chunk := blob kwafi daga: i * max tsawo: max.
-			str ƙara-a-ƙarshe: chunk + brk.
-		} * chunks.
-		str ƙara-a-ƙarshe: brk.
-		str ƙara-a-ƙarshe: brk.
+			>> gutsure := blob kwafi daga: i * mafi-yawa tsawo: mafi-yawa.
+			jerin-haruffa ƙara-a-ƙarshe: gutsure + karya-layi.
+		} * gutsuttsura.
+		jerin-haruffa ƙara-a-ƙarshe: karya-layi.
+		jerin-haruffa ƙara-a-ƙarshe: karya-layi.
 	}.
-	str ƙara-a-ƙarshe: ['--'] + nasa boundary + ['--'] + brk. <- str.
+	jerin-haruffa ƙara-a-ƙarshe: ['--'] + nasa iyaka + ['--'] + karya-layi. <- jerin-haruffa.
 }.

@@ -1,302 +1,302 @@
-HTTP-Požadavek při: ['HTTP-header:'] udělat: { :key <- Program nastavení: key.
+HTTP-Požadavek při: ['HTTP-hlavička:'] udělat: { :klíč <- Program nastavení: klíč.
 }.
 
->> HTTP-Header := Objekt nový.
+>> HTTP-Hlavička := Objekt nový.
 
-HTTP-Header při: ['nový'] udělat: { <- sebe nový init.
+HTTP-Hlavička při: ['nový'] udělat: { <- sebe nový inicializovat.
 }.
 
-HTTP-Header při: ['init'] udělat: {
-	vlastní key := Nic.
-	vlastní value := Nic.
+HTTP-Hlavička při: ['inicializovat'] udělat: {
+	vlastní klíč := Nic.
+	vlastní hodnota := Nic.
 }.
 
-HTTP-Header při: ['key:value:'] udělat: { :key :value
-	vlastní key := key.
-	vlastní value := value.
+HTTP-Hlavička při: ['klíč:hodnota:'] udělat: { :klíč :hodnota
+	vlastní klíč := klíč.
+	vlastní hodnota := hodnota.
 }.
 
-HTTP-Header při: ['key'] udělat: { <- vlastní key.
+HTTP-Hlavička při: ['klíč'] udělat: { <- vlastní klíč.
 }.
 
-HTTP-Header při: ['value'] udělat: { <- vlastní value.
+HTTP-Hlavička při: ['hodnota'] udělat: { <- vlastní hodnota.
 }.
 
 
-HTTP-Header při: ['řetězec'] udělat: {
-	>> line := vlastní key + [': '] + vlastní value.
-	line nahradit: ['\r'] za: [''], nahradit: ['\n'] za: ['']. <- line + [' \r\n'].
+HTTP-Hlavička při: ['řetězec'] udělat: {
+	>> řádek := vlastní klíč + [': '] + vlastní hodnota.
+	řádek nahradit: ['\r'] za: [''], nahradit: ['\n'] za: ['']. <- řádek + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Objekt nový.
+>> Webový-dokument := Objekt nový.
 
-Web-Document při: ['nový'] udělat: { <- sebe nový init.
+Webový-dokument při: ['nový'] udělat: { <- sebe nový inicializovat.
 }.
 
-Web-Document při: ['init'] udělat: {
-	vlastní headers := Seznam nový.
-	vlastní sess-id := Nic.
-	vlastní session-manager := Tempfile-Session nový.
-	vlastní sessdata := Nic.
-	vlastní secure := Pravda.
-	vlastní same-site := ['Strict'].
-	vlastní headers-out := Nepravda.
-	vlastní request := HTTP-Požadavek nový.
+Webový-dokument při: ['inicializovat'] udělat: {
+	vlastní hlavičky := Seznam nový.
+	vlastní id-relace := Nic.
+	vlastní správce-relací := Relace-dočasný-soubor nový.
+	vlastní data-relace := Nic.
+	vlastní zabezpečeno := Pravda.
+	vlastní stejný-web := ['Strict'].
+	vlastní hlavičky-odeslány := Nepravda.
+	vlastní požadavek := HTTP-Požadavek nový.
 }.
 
-Web-Document při: ['request:'] udělat: { :request
-	vlastní request := request.
+Webový-dokument při: ['požadavek:'] udělat: { :požadavek
+	vlastní požadavek := požadavek.
 }. 
 
-Web-Document při: ['secure-session-cookie:'] udělat: { :secure
-	sebe check-headers.
-	vlastní secure := secure.
+Webový-dokument při: ['zabezpečená-relační-cookie:'] udělat: { :zabezpečeno
+	sebe zkontrolovat-hlavičky.
+	vlastní zabezpečeno := zabezpečeno.
 }.
 
-Web-Document při: ['same-site-session-cookie:'] udělat: { :value
-	sebe check-headers.
-	>> options := Seznam nový 
+Webový-dokument při: ['relační-cookie-stejný-web:'] udělat: { :hodnota
+	sebe zkontrolovat-hlavičky.
+	>> volby := Seznam nový 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options obsahuje: value, nepravda: {
+	volby má: hodnota, nepravda: {
 		tato-úloha chyba: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	vlastní same-site := value.
+	vlastní stejný-web := hodnota.
 }.
 
-Web-Document při: ['header:'] udělat: { :header
-	sebe check-headers.
-	vlastní headers připojit: header.
+Webový-dokument při: ['hlavička:'] udělat: { :hlavička
+	sebe zkontrolovat-hlavičky.
+	vlastní hlavičky připojit: hlavička.
 }.
 
-Web-Document při: ['clear-headers'] udělat: {
-	sebe check-headers.
-	vlastní headers := Seznam nový.
+Webový-dokument při: ['vymazat-hlavičky'] udělat: {
+	sebe zkontrolovat-hlavičky.
+	vlastní hlavičky := Seznam nový.
 }.
 
-Web-Document při: ['session-manager:'] udělat: { :manager
-	sebe check-headers.
-	vlastní session-manager := manager.
+Webový-dokument při: ['správce-relací:'] udělat: { :správce
+	sebe zkontrolovat-hlavičky.
+	vlastní správce-relací := správce.
 }.
 
-Web-Document při: ['session-manager'] udělat: { <- vlastní session-manager.
+Webový-dokument při: ['správce-relací'] udělat: { <- vlastní správce-relací.
 }.
 
-Web-Document při: ['check-headers'] udělat: {
-	vlastní headers-out pravda: {
+Webový-dokument při: ['zkontrolovat-hlavičky'] udělat: {
+	vlastní hlavičky-odeslány pravda: {
 		tato-úloha chyba: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document při: ['session-start'] udělat: {
-	sebe check-headers.
-	>> request := vlastní request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nic? nepravda: {
-		(( Vzor nový: ['^[A-Za-z0-9]+\\z'], shoda: sess-id ) = 0) pravda: {
-			sess-id := Nic.
+Webový-dokument při: ['zahájit-relaci'] udělat: {
+	sebe zkontrolovat-hlavičky.
+	>> požadavek := vlastní požadavek.
+	>> id-relace := požadavek cookie: ['xsid'].
+	id-relace Nic? nepravda: {
+		(( Vzor nový: ['^[A-Za-z0-9]+\\z'], shoda: id-relace ) = 0) pravda: {
+			id-relace := Nic.
 		}.
 	}.
-	sess-id Nic? pravda: {
-		sess-id := Trezor token: 30.
-		>> session-header := HTTP-Header nový
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (vlastní secure buď: ['Secure'] nebo: ['']),
-		SSITE: (vlastní same-site),
-		XSID: sess-id
+	id-relace Nic? pravda: {
+		id-relace := Trezor token: 30.
+		>> hlavička-relace := HTTP-Hlavička nový
+		klíč: ['Set-Cookie'] hodnota: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (vlastní zabezpečeno buď: ['Secure'] nebo: ['']),
+		SSITE: (vlastní stejný-web),
+		XSID: id-relace
 		).
-		vlastní headers připojit: session-header.
+		vlastní hlavičky připojit: hlavička-relace.
 	}.
-	vlastní sessdata := vlastní session-manager for: sess-id, load. <- vlastní sessdata. # reference
+	vlastní data-relace := vlastní správce-relací pro: id-relace, načíst. <- vlastní data-relace. # reference
 }.
 
-Web-Document při: ['goto:'] udělat: { :url
-	sebe check-headers.
-	sebe clear-headers.
-	vlastní headers
+Webový-dokument při: ['přejít-na:'] udělat: { :adresa
+	sebe zkontrolovat-hlavičky.
+	sebe vymazat-hlavičky.
+	vlastní hlavičky
 	připojit: (
-		HTTP-Header nový
-		key: ['Status'] value: ['303 See Other']
+		HTTP-Hlavička nový
+		klíč: ['Status'] hodnota: ['303 See Other']
 	),
 	připojit: (
-		HTTP-Header nový
-		key: ['Location'] value: url
+		HTTP-Hlavička nový
+		klíč: ['Location'] hodnota: adresa
 	).
-	sebe out: ['Redirect'].
+	sebe vypsat: ['Redirect'].
 }.
 
-Web-Document při: ['session-destroy'] udělat: {
-	sebe check-headers.
-	>> request := vlastní request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nic? nepravda: {
-		>> session-header := HTTP-Header nový.
-		>> when := Okamžik nový rok: 1970, formát: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Webový-dokument při: ['zničit-relaci'] udělat: {
+	sebe zkontrolovat-hlavičky.
+	>> požadavek := vlastní požadavek.
+	>> id-relace := požadavek cookie: ['xsid'].
+	id-relace Nic? nepravda: {
+		>> hlavička-relace := HTTP-Hlavička nový.
+		>> okamžik := Okamžik nový rok: 1970, formát: ['%a, %d %b %Y %H:%M:%S GMT'].
+		hlavička-relace klíč: ['Set-Cookie'] hodnota: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (vlastní secure buď: ['Secure'] nebo: ['']),
-			SSITE: (vlastní same-site),
-			XSID: sess-id
+			EXP: okamžik,
+			SEC: (vlastní zabezpečeno buď: ['Secure'] nebo: ['']),
+			SSITE: (vlastní stejný-web),
+			XSID: id-relace
 		).
-		vlastní session-manager destroy.
-		vlastní headers připojit: session-header.
+		vlastní správce-relací zničit.
+		vlastní hlavičky připojit: hlavička-relace.
 	}.
 }.
 
 
-Web-Document při: ['template:'] udělat: { :cesta <- Template nový: (Soubor nový: cesta, číst).
+Webový-dokument při: ['šablona:'] udělat: { :cesta <- Šablona nový: (Soubor nový: cesta, číst).
 }.
 
-Web-Document při: ['out:type:'] udělat: { :output :typ
-	vlastní headers-out nepravda: {
-		vlastní sessdata Nic? nepravda: {
-			vlastní session-manager save: vlastní sessdata.
+Webový-dokument při: ['vypsat:typ:'] udělat: { :výstup :typ
+	vlastní hlavičky-odeslány nepravda: {
+		vlastní data-relace Nic? nepravda: {
+			vlastní správce-relací uložit: vlastní data-relace.
 		}.
-		vlastní headers připojit: (
-			HTTP-Header nový
-			key: ['Content-type'] value: typ
+		vlastní hlavičky připojit: (
+			HTTP-Hlavička nový
+			klíč: ['Content-type'] hodnota: typ
 		).
-		vlastní headers každý: { :_ :header
-			Výstup psát: header.
+		vlastní hlavičky každý: { :_ :hlavička
+			Výstup psát: hlavička.
 		}.
-		vlastní headers-out := Pravda.
+		vlastní hlavičky-odeslány := Pravda.
 		Výstup psát: ['\r\n'].
 	}.
-	Výstup psát: output.
+	Výstup psát: výstup.
 }.
 
-Web-Document při: ['finish:type:'] udělat: { :output :typ
-	vlastní headers-out nepravda: {
-		vlastní sessdata Nic? nepravda: {
-			vlastní session-manager save: vlastní sessdata.
+Webový-dokument při: ['dokončit:typ:'] udělat: { :výstup :typ
+	vlastní hlavičky-odeslány nepravda: {
+		vlastní data-relace Nic? nepravda: {
+			vlastní správce-relací uložit: vlastní data-relace.
 		}.
-		vlastní headers připojit: (
-			HTTP-Header nový
-			key: ['Content-type'] value: typ
+		vlastní hlavičky připojit: (
+			HTTP-Hlavička nový
+			klíč: ['Content-type'] hodnota: typ
 		).
-		vlastní headers připojit: (
-			HTTP-Header nový
-			key: ['Content-Length'] value: output řetězec bytes
+		vlastní hlavičky připojit: (
+			HTTP-Hlavička nový
+			klíč: ['Content-Length'] hodnota: výstup řetězec bytes
 		).
-		vlastní headers každý: { :_ :header
-			Výstup psát: header.
+		vlastní hlavičky každý: { :_ :hlavička
+			Výstup psát: hlavička.
 		}.
-		vlastní headers-out := Pravda.
+		vlastní hlavičky-odeslány := Pravda.
 		Výstup psát: ['\r\n'].
 	}.
-	Výstup psát: output.
+	Výstup psát: výstup.
 }.
 
-Web-Document při: ['out:'] udělat: { :output
-	sebe out: output type: ['text/html; charset=utf-8'].
+Webový-dokument při: ['vypsat:'] udělat: { :výstup
+	sebe vypsat: výstup typ: ['text/html; charset=utf-8'].
 }.
 
-Web-Document při: ['finish:'] udělat: { :output
-	sebe finish: output type: ['text/html; charset=utf-8'].
+Webový-dokument při: ['dokončit:'] udělat: { :výstup
+	sebe dokončit: výstup typ: ['text/html; charset=utf-8'].
 }.
 
-Web-Document při: ['json:'] udělat: { :output
-	sebe out: ( JSON jsonify: output ) type: ['application/json'].
+Webový-dokument při: ['json:'] udělat: { :výstup
+	sebe vypsat: ( JSON jsonify: výstup ) typ: ['application/json'].
 }.
 
-Web-Document při: ['not-found:'] udělat: { :output
-	sebe clear-headers header: (
-		HTTP-Header nový key: ['Status'] value: ['404 Not Found']
+Webový-dokument při: ['nenalezeno:'] udělat: { :výstup
+	sebe vymazat-hlavičky hlavička: (
+		HTTP-Hlavička nový klíč: ['Status'] hodnota: ['404 Not Found']
 	).
-	sebe out: output.
+	sebe vypsat: výstup.
 }.
 
 
 # Interface
 
->> Session := Objekt nový.
+>> Relace := Objekt nový.
 
-Session při: ['nový'] udělat: { <- sebe nový init for: Nic.
+Relace při: ['nový'] udělat: { <- sebe nový inicializovat pro: Nic.
 }.
 
-Session při: ['for:'] udělat: { :id
+Relace při: ['pro:'] udělat: { :id
 	vlastní id := id.
 }.
 
-Session při: ['load'] udělat: {
+Relace při: ['načíst'] udělat: {
 	tato-úloha chyba: ['Not implemented.'].
 }.
 
-Session při: ['save:'] udělat: {
+Relace při: ['uložit:'] udělat: {
 	tato-úloha chyba: ['Not implemented.'].
 }.
 
-Session při: ['destroy'] udělat: {
+Relace při: ['zničit'] udělat: {
 	tato-úloha chyba: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session nový.
+>> Relace-dočasný-soubor := Relace nový.
 
-Tempfile-Session při: ['init'] udělat: {
-	vlastní pathprefix := ['/tmp/sess-'].
+Relace-dočasný-soubor při: ['inicializovat'] udělat: {
+	vlastní začátek-cesty := ['/tmp/sess-'].
 }.
 
-Tempfile-Session při: ['path-prefix:'] udělat: { :str
-	vlastní pathprefix := str.
+Relace-dočasný-soubor při: ['předpona-cesty:'] udělat: { :textový-řetězec
+	vlastní začátek-cesty := textový-řetězec.
 }.
 
-Tempfile-Session při: ['file'] udělat: { <- ( Soubor nový: ( vlastní pathprefix + vlastní id + ['.txt'] ) ).
+Relace-dočasný-soubor při: ['soubor'] udělat: { <- ( Soubor nový: ( vlastní začátek-cesty + vlastní id + ['.txt'] ) ).
 }.
 
-Tempfile-Session při: ['load'] udělat: {
-	>> file := sebe file.
-	file existuje nepravda: {
-		file psát: (Slovník nový kód).
-	}. <- file číst objekt.
+Relace-dočasný-soubor při: ['načíst'] udělat: {
+	>> soubor := sebe soubor.
+	soubor existuje nepravda: {
+		soubor psát: (Slovník nový kód).
+	}. <- soubor číst objekt.
 }.
 
-Tempfile-Session při: ['save:'] udělat: { :data
-	>> file := sebe file.
-	file existuje pravda: {
-		file psát: data kód.
+Relace-dočasný-soubor při: ['uložit:'] udělat: { :data
+	>> soubor := sebe soubor.
+	soubor existuje pravda: {
+		soubor psát: data kód.
 	}.
 }.
 
-Tempfile-Session při: ['destroy'] udělat: {
-	>> file := sebe file.
-	file existuje pravda: {
-		file smazat.
+Relace-dočasný-soubor při: ['zničit'] udělat: {
+	>> soubor := sebe soubor.
+	soubor existuje pravda: {
+		soubor smazat.
 	}.
 }.
 
 
 >> URL := Objekt nový.
 
-URL při: ['init'] udělat: {
-	vlastní protocol := ['https://'].
+URL při: ['inicializovat'] udělat: {
+	vlastní protokol := ['https://'].
 	vlastní hostitel := ['localhost'].
 	vlastní cesta := [''].
-	vlastní params := [''].
+	vlastní url-parametry := [''].
 	vlastní hash := [''].
 }.
 
-URL při: ['nový'] udělat: { <- sebe nový init.
+URL při: ['nový'] udělat: { <- sebe nový inicializovat.
 }.
 
 URL při: ['řetězec'] udělat: { <- (
-	vlastní protocol +
+	vlastní protokol +
 	vlastní hostitel +
 	vlastní cesta +
-	vlastní params +
+	vlastní url-parametry +
 	vlastní hash ).
 }.
 
-URL při: ['protocol:'] udělat: { :protocol
-	((Seznam nový: ['http'] ; ['https']) obsahuje: protocol) pravda: {
-		vlastní protocol := protocol + ['://'].
+URL při: ['protokol:'] udělat: { :protokol
+	((Seznam nový ; ['http'] ; ['https']) má: protokol) pravda: {
+		vlastní protokol := protokol + ['://'].
 	}, nepravda: {
 		tato-úloha chyba: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL při: ['hostitel:'] udělat: { :hostitel
 	vlastní hostitel := hostitel.
 }.
 
-URL při: ['path:'] udělat: { :cesta
+URL při: ['cesta:'] udělat: { :cesta
 	vlastní cesta := ['/'] + cesta url-kódovat.
 }.
 
-URL při: ['params:'] udělat: { :map
-	>> params := Seznam nový.
-	map každý: { :key :value
-		params připojit: key řetězec url-kódovat + ['='] + value řetězec url-kódovat.
+URL při: ['url-parametry:'] udělat: { :mapování
+	>> url-parametry := Seznam nový.
+	mapování každý: { :klíč :hodnota
+		url-parametry připojit: klíč řetězec url-kódovat + ['='] + hodnota řetězec url-kódovat.
 	}.
-	vlastní params := ['?'] + ( params spojit: ['&'] ).
+	vlastní url-parametry := ['?'] + ( url-parametry spojit: ['&'] ).
 }.
 
 URL při: ['heš:'] udělat: { :hash

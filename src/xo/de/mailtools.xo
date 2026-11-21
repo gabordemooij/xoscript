@@ -1,128 +1,128 @@
->> Email := Objekt neu.
+>> E-Mail := Objekt neu.
 
-Email wenn: ['init'] tun: {
-	eigen recipients := Liste neu.
+E-Mail wenn: ['initialisieren'] tun: {
+	eigen empfänger := Liste neu.
 	eigen cc := Liste neu.
 	eigen bcc := Liste neu.
-	eigen from := Nichts.
-	eigen from-name := Nichts.
-	eigen subject := Nichts.
-	eigen body := Nichts.
+	eigen absender := Nichts.
+	eigen absendername := Nichts.
+	eigen betreff := Nichts.
+	eigen textkörper := Nichts.
 }.
 
-Email wenn: ['neu'] tun: { <- selbst neu init.
+E-Mail wenn: ['neu'] tun: { <- selbst neu initialisieren.
 }.
 
-Email wenn: ['to:'] tun: { :list
-	eigen recipients := list.
+E-Mail wenn: ['an:'] tun: { :aufzählung
+	eigen empfänger := aufzählung.
 }.
  
-Email wenn: ['cc:'] tun: { :list
-	eigen cc := list.
+E-Mail wenn: ['cc:'] tun: { :aufzählung
+	eigen cc := aufzählung.
 }.
 
-Email wenn: ['bcc:'] tun: { :list
-	eigen bcc := list.
+E-Mail wenn: ['bcc:'] tun: { :aufzählung
+	eigen bcc := aufzählung.
 }.
 
-Email wenn: ['subject:'] tun: { :subject
-	eigen subject := subject.
+E-Mail wenn: ['betreff:'] tun: { :betreff
+	eigen betreff := betreff.
 }.
 
-Email wenn: ['from:name:'] tun: { :from :name
-	eigen from := from.
-	eigen from-name := name.
+E-Mail wenn: ['absender:name:'] tun: { :absender :name
+	eigen absender := absender.
+	eigen absendername := name.
 }.
 
-Email wenn: ['body:'] tun: { :body
-	eigen body := body.
+E-Mail wenn: ['textkörper:'] tun: { :textkörper
+	eigen textkörper := textkörper.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email wenn: ['header:'] tun: { :line <- line ersetzen: ['\r'] mit: [''], ersetzen: ['\n'] mit: [''].
+E-Mail wenn: ['kopfzeile:'] tun: { :zeile <- zeile ersetzen: ['\r'] mit: [''], ersetzen: ['\n'] mit: [''].
 }.
 
-Email wenn: ['send'] tun: {
-	>> f := Datei tempwrite: selbst generate.
+E-Mail wenn: ['senden'] tun: {
+	>> f := Datei tempwrite: selbst erzeugen.
 	Programm system: ['sendmail -t < '] + f pfad, stopp.
 }.
 
-Email wenn: ['generate'] tun: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str anhängen: (selbst header: ['From: '] + eigen from-name + [' <'] + ( eigen from ) + ['>']) + brk.
-	str anhängen: (selbst header: ['To: '] + ( eigen recipients zusammenfügen: [','] )) + brk.
+E-Mail wenn: ['erzeugen'] tun: {
+	>> umbruch := ['\r\n'].
+	>> zeichenkette := [''].
+	zeichenkette anhängen: (selbst kopfzeile: ['From: '] + eigen absendername + [' <'] + ( eigen absender ) + ['>']) + umbruch.
+	zeichenkette anhängen: (selbst kopfzeile: ['To: '] + ( eigen empfänger zusammenfügen: [','] )) + umbruch.
 	eigen cc anzahl ja: {
-		str anhängen: (selbst header: ['Cc: '] + ( eigen cc zusammenfügen: [','] )) + brk.
+		zeichenkette anhängen: (selbst kopfzeile: ['Cc: '] + ( eigen cc zusammenfügen: [','] )) + umbruch.
 	}.
 	eigen bcc anzahl ja: {
-		str anhängen: (selbst header: ['Bcc: '] + ( eigen bcc zusammenfügen: [','] )) + brk.
+		zeichenkette anhängen: (selbst kopfzeile: ['Bcc: '] + ( eigen bcc zusammenfügen: [','] )) + umbruch.
 	}.
-	str anhängen: (selbst header: ['Subject: '] + eigen subject) + brk.
-	str anhängen: brk.
-	str anhängen: eigen body.
-	str anhängen: brk. <- str.
+	zeichenkette anhängen: (selbst kopfzeile: ['Subject: '] + eigen betreff) + umbruch.
+	zeichenkette anhängen: umbruch.
+	zeichenkette anhängen: eigen textkörper.
+	zeichenkette anhängen: umbruch. <- zeichenkette.
 }.
 
->> HTML-Email := Email neu.
+>> HTML-E-Mail := E-Mail neu.
 
-HTML-Email wenn: ['init'] tun: {
-	selbst init.
-	eigen attachments := Liste neu.
-	eigen boundary := Tresor token: 40.
+HTML-E-Mail wenn: ['initialisieren'] tun: {
+	selbst initialisieren.
+	eigen anhänge := Liste neu.
+	eigen grenze := Tresor token: 40.
 }.
 
-HTML-Email wenn: ['attach:'] tun: { :file
-	>> id := eigen attachments anzahl.
-	>> blob := file blob.
-	eigen attachments anhängen: (
+HTML-E-Mail wenn: ['beifügen:'] tun: { :datei
+	>> id := eigen anhänge anzahl.
+	>> blob := datei blob.
+	eigen anhänge anhängen: (
 		Wörterbuch neu
-			file: file pfad,
-			mime: ['image/'] + (Server mimetype: file pfad),
-			data: blob base64-kodieren
+			datei: datei pfad,
+			mime: ['image/'] + (Server mimetype: datei pfad),
+			daten: blob base64-kodieren
 	).
 	blob freigeben. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email wenn: ['generate'] tun: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str anhängen: (selbst header: ['From: '] + eigen from-name + [' <'] + ( eigen from ) + ['>']) + brk.
-	str anhängen: (selbst header: ['To: '] + ( eigen recipients zusammenfügen: [','] )) + brk.
+HTML-E-Mail wenn: ['erzeugen'] tun: {
+	>> umbruch := ['\r\n'].
+	>> zeichenkette := [''].
+	zeichenkette anhängen: (selbst kopfzeile: ['From: '] + eigen absendername + [' <'] + ( eigen absender ) + ['>']) + umbruch.
+	zeichenkette anhängen: (selbst kopfzeile: ['To: '] + ( eigen empfänger zusammenfügen: [','] )) + umbruch.
 	eigen cc anzahl ja: {
-		str anhängen: (selbst header: ['Cc: '] + ( eigen cc zusammenfügen: [','] )) + brk.
+		zeichenkette anhängen: (selbst kopfzeile: ['Cc: '] + ( eigen cc zusammenfügen: [','] )) + umbruch.
 	}.
 	eigen bcc anzahl ja: {
-		str anhängen: (selbst header: ['Bcc: '] + ( eigen bcc zusammenfügen: [','] )) + brk.
+		zeichenkette anhängen: (selbst kopfzeile: ['Bcc: '] + ( eigen bcc zusammenfügen: [','] )) + umbruch.
 	}.
-	str anhängen: (selbst header: ['Subject: '] + eigen subject) + brk.
-	str anhängen: ['MIME-Version: 1.0'] + brk.
-	str anhängen: ['Content-Type: multipart/related; boundary="'] + eigen boundary + ['"; type=text/html'] + brk.
-	str anhängen: brk.
-	str anhängen: ['--'] + eigen boundary + brk.
-	str anhängen: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str anhängen: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str anhängen: brk.
-	str anhängen: eigen body.
-	str anhängen: brk.
-	eigen attachments jedes: { :id :info
-		>> blob := info data.
-		str anhängen: ['--'] + eigen boundary + brk.
-		str anhängen: ['Content-Type: '] + info mime + brk.
-		str anhängen: ['Content-Transfer-Encoding: base64'] + brk.
-		str anhängen: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str anhängen: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str anhängen: brk.
-		>> max := 76.
-		>> len := blob länge.
-		>> chunks := (len / max) aufgerundet.
+	zeichenkette anhängen: (selbst kopfzeile: ['Subject: '] + eigen betreff) + umbruch.
+	zeichenkette anhängen: ['MIME-Version: 1.0'] + umbruch.
+	zeichenkette anhängen: ['Content-Type: multipart/related; boundary="'] + eigen grenze + ['"; type=text/html'] + umbruch.
+	zeichenkette anhängen: umbruch.
+	zeichenkette anhängen: ['--'] + eigen grenze + umbruch.
+	zeichenkette anhängen: ['Content-Type: text/html; charset=UTF-8'] + umbruch.
+	zeichenkette anhängen: ['Content-Transfer-Encoding: 7bit'] + umbruch.
+	zeichenkette anhängen: umbruch.
+	zeichenkette anhängen: eigen textkörper.
+	zeichenkette anhängen: umbruch.
+	eigen anhänge jedes: { :id :info
+		>> blob := info daten.
+		zeichenkette anhängen: ['--'] + eigen grenze + umbruch.
+		zeichenkette anhängen: ['Content-Type: '] + info mime + umbruch.
+		zeichenkette anhängen: ['Content-Transfer-Encoding: base64'] + umbruch.
+		zeichenkette anhängen: ['Content-ID: <attachment'] + id + ['>'] + umbruch.
+		zeichenkette anhängen: ['Content-Disposition: inline; filename="'] + info datei + ['"'] + umbruch.
+		zeichenkette anhängen: umbruch.
+		>> höchstwert := 76.
+		>> textlänge := blob länge.
+		>> stücke := (textlänge / höchstwert) aufgerundet.
 		{ :i
-			>> chunk := blob kopieren von: i * max länge: max.
-			str anhängen: chunk + brk.
-		} * chunks.
-		str anhängen: brk.
-		str anhängen: brk.
+			>> stück := blob kopieren von: i * höchstwert länge: höchstwert.
+			zeichenkette anhängen: stück + umbruch.
+		} * stücke.
+		zeichenkette anhängen: umbruch.
+		zeichenkette anhängen: umbruch.
 	}.
-	str anhängen: ['--'] + eigen boundary + ['--'] + brk. <- str.
+	zeichenkette anhängen: ['--'] + eigen grenze + ['--'] + umbruch. <- zeichenkette.
 }.

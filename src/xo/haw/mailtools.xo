@@ -1,128 +1,128 @@
->> Email := Mea hou.
+>> Leka-uila := Mea hou.
 
-Email i: ['init'] hana: {
-	ponoʻī recipients := Papa hou.
+Leka-uila i: ['hoʻomākaukau'] hana: {
+	ponoʻī nā-mea-loaʻa := Papa hou.
 	ponoʻī cc := Papa hou.
 	ponoʻī bcc := Papa hou.
-	ponoʻī from := ʻOle.
-	ponoʻī from-name := ʻOle.
-	ponoʻī subject := ʻOle.
-	ponoʻī body := ʻOle.
+	ponoʻī mea-hoʻouna := ʻOle.
+	ponoʻī inoa-mea-hoʻouna := ʻOle.
+	ponoʻī kumuhana := ʻOle.
+	ponoʻī kino := ʻOle.
 }.
 
-Email i: ['hou'] hana: { <- iho hou init.
+Leka-uila i: ['hou'] hana: { <- iho hou hoʻomākaukau.
 }.
 
-Email i: ['to:'] hana: { :list
-	ponoʻī recipients := list.
+Leka-uila i: ['iā:'] hana: { :helu-papa
+	ponoʻī nā-mea-loaʻa := helu-papa.
 }.
  
-Email i: ['cc:'] hana: { :list
-	ponoʻī cc := list.
+Leka-uila i: ['cc:'] hana: { :helu-papa
+	ponoʻī cc := helu-papa.
 }.
 
-Email i: ['bcc:'] hana: { :list
-	ponoʻī bcc := list.
+Leka-uila i: ['bcc:'] hana: { :helu-papa
+	ponoʻī bcc := helu-papa.
 }.
 
-Email i: ['subject:'] hana: { :subject
-	ponoʻī subject := subject.
+Leka-uila i: ['kumuhana:'] hana: { :kumuhana
+	ponoʻī kumuhana := kumuhana.
 }.
 
-Email i: ['from:name:'] hana: { :from :inoa
-	ponoʻī from := from.
-	ponoʻī from-name := inoa.
+Leka-uila i: ['mea-hoʻouna:inoa:'] hana: { :mea-hoʻouna :inoa
+	ponoʻī mea-hoʻouna := mea-hoʻouna.
+	ponoʻī inoa-mea-hoʻouna := inoa.
 }.
 
-Email i: ['body:'] hana: { :body
-	ponoʻī body := body.
+Leka-uila i: ['kino:'] hana: { :kino
+	ponoʻī kino := kino.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email i: ['header:'] hana: { :line <- line pani: ['\r'] me: [''], pani: ['\n'] me: [''].
+Leka-uila i: ['poʻo:'] hana: { :lālani <- lālani pani: ['\r'] me: [''], pani: ['\n'] me: [''].
 }.
 
-Email i: ['send'] hana: {
-	>> f := Waihona tempwrite: iho generate.
+Leka-uila i: ['hoʻouna'] hana: {
+	>> f := Waihona tempwrite: iho hoʻopuka-hou.
 	Polokalamu ʻōnaehana: ['sendmail -t < '] + f ala-waihona, laina-hou.
 }.
 
-Email i: ['generate'] hana: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str pākuʻi-hope: (iho header: ['From: '] + ponoʻī from-name + [' <'] + ( ponoʻī from ) + ['>']) + brk.
-	str pākuʻi-hope: (iho header: ['To: '] + ( ponoʻī recipients hoʻohui: [','] )) + brk.
+Leka-uila i: ['hoʻopuka-hou'] hana: {
+	>> hoʻokaʻawale-lālani := ['\r\n'].
+	>> kaula-hua := [''].
+	kaula-hua pākuʻi-hope: (iho poʻo: ['From: '] + ponoʻī inoa-mea-hoʻouna + [' <'] + ( ponoʻī mea-hoʻouna ) + ['>']) + hoʻokaʻawale-lālani.
+	kaula-hua pākuʻi-hope: (iho poʻo: ['To: '] + ( ponoʻī nā-mea-loaʻa hoʻohui: [','] )) + hoʻokaʻawale-lālani.
 	ponoʻī cc heluna ʻoiaʻiʻo: {
-		str pākuʻi-hope: (iho header: ['Cc: '] + ( ponoʻī cc hoʻohui: [','] )) + brk.
+		kaula-hua pākuʻi-hope: (iho poʻo: ['Cc: '] + ( ponoʻī cc hoʻohui: [','] )) + hoʻokaʻawale-lālani.
 	}.
 	ponoʻī bcc heluna ʻoiaʻiʻo: {
-		str pākuʻi-hope: (iho header: ['Bcc: '] + ( ponoʻī bcc hoʻohui: [','] )) + brk.
+		kaula-hua pākuʻi-hope: (iho poʻo: ['Bcc: '] + ( ponoʻī bcc hoʻohui: [','] )) + hoʻokaʻawale-lālani.
 	}.
-	str pākuʻi-hope: (iho header: ['Subject: '] + ponoʻī subject) + brk.
-	str pākuʻi-hope: brk.
-	str pākuʻi-hope: ponoʻī body.
-	str pākuʻi-hope: brk. <- str.
+	kaula-hua pākuʻi-hope: (iho poʻo: ['Subject: '] + ponoʻī kumuhana) + hoʻokaʻawale-lālani.
+	kaula-hua pākuʻi-hope: hoʻokaʻawale-lālani.
+	kaula-hua pākuʻi-hope: ponoʻī kino.
+	kaula-hua pākuʻi-hope: hoʻokaʻawale-lālani. <- kaula-hua.
 }.
 
->> HTML-Email := Email hou.
+>> Leka-uila-HTML := Leka-uila hou.
 
-HTML-Email i: ['init'] hana: {
-	iho init.
-	ponoʻī attachments := Papa hou.
-	ponoʻī boundary := Pahu-kūʻono token: 40.
+Leka-uila-HTML i: ['hoʻomākaukau'] hana: {
+	iho hoʻomākaukau.
+	ponoʻī nā-pili := Papa hou.
+	ponoʻī palena := Pahu-kūʻono token: 40.
 }.
 
-HTML-Email i: ['attach:'] hana: { :file
-	>> id := ponoʻī attachments heluna.
-	>> blob := file blob.
-	ponoʻī attachments pākuʻi-hope: (
+Leka-uila-HTML i: ['hoʻopili-waihona:'] hana: { :waihona-kau
+	>> id := ponoʻī nā-pili heluna.
+	>> blob := waihona-kau blob.
+	ponoʻī nā-pili pākuʻi-hope: (
 		Puke-wehewehe hou
-			file: file ala-waihona,
-			mime: ['image/'] + (Server mimetype: file ala-waihona),
-			data: blob base64-hoʻopāʻālua
+			waihona-kau: waihona-kau ala-waihona,
+			mime: ['image/'] + (Server mimetype: waihona-kau ala-waihona),
+			ʻikepili: blob base64-hoʻopāʻālua
 	).
 	blob hoʻokuʻu. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email i: ['generate'] hana: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str pākuʻi-hope: (iho header: ['From: '] + ponoʻī from-name + [' <'] + ( ponoʻī from ) + ['>']) + brk.
-	str pākuʻi-hope: (iho header: ['To: '] + ( ponoʻī recipients hoʻohui: [','] )) + brk.
+Leka-uila-HTML i: ['hoʻopuka-hou'] hana: {
+	>> hoʻokaʻawale-lālani := ['\r\n'].
+	>> kaula-hua := [''].
+	kaula-hua pākuʻi-hope: (iho poʻo: ['From: '] + ponoʻī inoa-mea-hoʻouna + [' <'] + ( ponoʻī mea-hoʻouna ) + ['>']) + hoʻokaʻawale-lālani.
+	kaula-hua pākuʻi-hope: (iho poʻo: ['To: '] + ( ponoʻī nā-mea-loaʻa hoʻohui: [','] )) + hoʻokaʻawale-lālani.
 	ponoʻī cc heluna ʻoiaʻiʻo: {
-		str pākuʻi-hope: (iho header: ['Cc: '] + ( ponoʻī cc hoʻohui: [','] )) + brk.
+		kaula-hua pākuʻi-hope: (iho poʻo: ['Cc: '] + ( ponoʻī cc hoʻohui: [','] )) + hoʻokaʻawale-lālani.
 	}.
 	ponoʻī bcc heluna ʻoiaʻiʻo: {
-		str pākuʻi-hope: (iho header: ['Bcc: '] + ( ponoʻī bcc hoʻohui: [','] )) + brk.
+		kaula-hua pākuʻi-hope: (iho poʻo: ['Bcc: '] + ( ponoʻī bcc hoʻohui: [','] )) + hoʻokaʻawale-lālani.
 	}.
-	str pākuʻi-hope: (iho header: ['Subject: '] + ponoʻī subject) + brk.
-	str pākuʻi-hope: ['MIME-Version: 1.0'] + brk.
-	str pākuʻi-hope: ['Content-Type: multipart/related; boundary="'] + ponoʻī boundary + ['"; type=text/html'] + brk.
-	str pākuʻi-hope: brk.
-	str pākuʻi-hope: ['--'] + ponoʻī boundary + brk.
-	str pākuʻi-hope: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str pākuʻi-hope: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str pākuʻi-hope: brk.
-	str pākuʻi-hope: ponoʻī body.
-	str pākuʻi-hope: brk.
-	ponoʻī attachments pākahi: { :id :info
-		>> blob := info data.
-		str pākuʻi-hope: ['--'] + ponoʻī boundary + brk.
-		str pākuʻi-hope: ['Content-Type: '] + info mime + brk.
-		str pākuʻi-hope: ['Content-Transfer-Encoding: base64'] + brk.
-		str pākuʻi-hope: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str pākuʻi-hope: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str pākuʻi-hope: brk.
-		>> max := 76.
-		>> len := blob lōʻihi.
-		>> chunks := (len / max) hoʻopiʻi-helu.
+	kaula-hua pākuʻi-hope: (iho poʻo: ['Subject: '] + ponoʻī kumuhana) + hoʻokaʻawale-lālani.
+	kaula-hua pākuʻi-hope: ['MIME-Version: 1.0'] + hoʻokaʻawale-lālani.
+	kaula-hua pākuʻi-hope: ['Content-Type: multipart/related; boundary="'] + ponoʻī palena + ['"; type=text/html'] + hoʻokaʻawale-lālani.
+	kaula-hua pākuʻi-hope: hoʻokaʻawale-lālani.
+	kaula-hua pākuʻi-hope: ['--'] + ponoʻī palena + hoʻokaʻawale-lālani.
+	kaula-hua pākuʻi-hope: ['Content-Type: text/html; charset=UTF-8'] + hoʻokaʻawale-lālani.
+	kaula-hua pākuʻi-hope: ['Content-Transfer-Encoding: 7bit'] + hoʻokaʻawale-lālani.
+	kaula-hua pākuʻi-hope: hoʻokaʻawale-lālani.
+	kaula-hua pākuʻi-hope: ponoʻī kino.
+	kaula-hua pākuʻi-hope: hoʻokaʻawale-lālani.
+	ponoʻī nā-pili pākahi: { :id :ʻike
+		>> blob := ʻike ʻikepili.
+		kaula-hua pākuʻi-hope: ['--'] + ponoʻī palena + hoʻokaʻawale-lālani.
+		kaula-hua pākuʻi-hope: ['Content-Type: '] + ʻike mime + hoʻokaʻawale-lālani.
+		kaula-hua pākuʻi-hope: ['Content-Transfer-Encoding: base64'] + hoʻokaʻawale-lālani.
+		kaula-hua pākuʻi-hope: ['Content-ID: <attachment'] + id + ['>'] + hoʻokaʻawale-lālani.
+		kaula-hua pākuʻi-hope: ['Content-Disposition: inline; filename="'] + ʻike waihona-kau + ['"'] + hoʻokaʻawale-lālani.
+		kaula-hua pākuʻi-hope: hoʻokaʻawale-lālani.
+		>> ka-nui-loa := 76.
+		>> lōʻihi-kikokikona := blob lōʻihi.
+		>> nā-ʻāpana-ʻikepili := (lōʻihi-kikokikona / ka-nui-loa) hoʻopiʻi-helu.
 		{ :i
-			>> chunk := blob kope mai: i * max lōʻihi: max.
-			str pākuʻi-hope: chunk + brk.
-		} * chunks.
-		str pākuʻi-hope: brk.
-		str pākuʻi-hope: brk.
+			>> ʻāpana-ʻikepili := blob kope mai: i * ka-nui-loa lōʻihi: ka-nui-loa.
+			kaula-hua pākuʻi-hope: ʻāpana-ʻikepili + hoʻokaʻawale-lālani.
+		} * nā-ʻāpana-ʻikepili.
+		kaula-hua pākuʻi-hope: hoʻokaʻawale-lālani.
+		kaula-hua pākuʻi-hope: hoʻokaʻawale-lālani.
 	}.
-	str pākuʻi-hope: ['--'] + ponoʻī boundary + ['--'] + brk. <- str.
+	kaula-hua pākuʻi-hope: ['--'] + ponoʻī palena + ['--'] + hoʻokaʻawale-lālani. <- kaula-hua.
 }.

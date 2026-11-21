@@ -1,302 +1,302 @@
-Dumanda-HTTP quandu: ['HTTP-header:'] fà: { :key <- Prugramma parametru: key.
+Dumanda-HTTP quandu: ['HTTP-intestatura:'] fà: { :chjave <- Prugramma parametru: chjave.
 }.
 
->> HTTP-Header := Ughjettu novu.
+>> Intestatura-HTTP := Ughjettu novu.
 
-HTTP-Header quandu: ['novu'] fà: { <- sè novu init.
+Intestatura-HTTP quandu: ['novu'] fà: { <- sè novu inizializà.
 }.
 
-HTTP-Header quandu: ['init'] fà: {
-	propiu key := Nunda.
-	propiu value := Nunda.
+Intestatura-HTTP quandu: ['inizializà'] fà: {
+	propiu chjave := Nunda.
+	propiu valore := Nunda.
 }.
 
-HTTP-Header quandu: ['key:value:'] fà: { :key :value
-	propiu key := key.
-	propiu value := value.
+Intestatura-HTTP quandu: ['chjave:valore:'] fà: { :chjave :valore
+	propiu chjave := chjave.
+	propiu valore := valore.
 }.
 
-HTTP-Header quandu: ['key'] fà: { <- propiu key.
+Intestatura-HTTP quandu: ['chjave'] fà: { <- propiu chjave.
 }.
 
-HTTP-Header quandu: ['value'] fà: { <- propiu value.
+Intestatura-HTTP quandu: ['valore'] fà: { <- propiu valore.
 }.
 
 
-HTTP-Header quandu: ['testu'] fà: {
-	>> line := propiu key + [': '] + propiu value.
-	line rimpiazzà: ['\r'] cù: [''], rimpiazzà: ['\n'] cù: ['']. <- line + [' \r\n'].
+Intestatura-HTTP quandu: ['testu'] fà: {
+	>> linea := propiu chjave + [': '] + propiu valore.
+	linea rimpiazzà: ['\r'] cù: [''], rimpiazzà: ['\n'] cù: ['']. <- linea + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Ughjettu novu.
+>> Ducumentu-Web := Ughjettu novu.
 
-Web-Document quandu: ['novu'] fà: { <- sè novu init.
+Ducumentu-Web quandu: ['novu'] fà: { <- sè novu inizializà.
 }.
 
-Web-Document quandu: ['init'] fà: {
-	propiu headers := Lista novu.
-	propiu sess-id := Nunda.
-	propiu session-manager := Tempfile-Session novu.
-	propiu sessdata := Nunda.
-	propiu secure := Veru.
-	propiu same-site := ['Strict'].
-	propiu headers-out := Falsu.
-	propiu request := Dumanda-HTTP novu.
+Ducumentu-Web quandu: ['inizializà'] fà: {
+	propiu intestature := Lista novu.
+	propiu id-sessione := Nunda.
+	propiu gestore-sessione := Sessione-schedariu-tempurariu novu.
+	propiu dati-sessione := Nunda.
+	propiu sicuru := Veru.
+	propiu stessu-situ := ['Strict'].
+	propiu intestature-mandate := Falsu.
+	propiu dumanda := Dumanda-HTTP novu.
 }.
 
-Web-Document quandu: ['request:'] fà: { :request
-	propiu request := request.
+Ducumentu-Web quandu: ['dumanda:'] fà: { :dumanda
+	propiu dumanda := dumanda.
 }. 
 
-Web-Document quandu: ['secure-session-cookie:'] fà: { :secure
-	sè check-headers.
-	propiu secure := secure.
+Ducumentu-Web quandu: ['cookie-sessione-sicuru:'] fà: { :sicuru
+	sè verificà-intestature.
+	propiu sicuru := sicuru.
 }.
 
-Web-Document quandu: ['same-site-session-cookie:'] fà: { :value
-	sè check-headers.
-	>> options := Lista novu 
+Ducumentu-Web quandu: ['cookie-sessione-stessu-situ:'] fà: { :valore
+	sè verificà-intestature.
+	>> opzioni := Lista novu 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options cuntene: value, falsu: {
+	opzioni hà: valore, falsu: {
 		sta-faccenda errore: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	propiu same-site := value.
+	propiu stessu-situ := valore.
 }.
 
-Web-Document quandu: ['header:'] fà: { :header
-	sè check-headers.
-	propiu headers aghjunghje-à-a-fine: header.
+Ducumentu-Web quandu: ['intestatura:'] fà: { :intestatura
+	sè verificà-intestature.
+	propiu intestature aghjunghje-à-a-fine: intestatura.
 }.
 
-Web-Document quandu: ['clear-headers'] fà: {
-	sè check-headers.
-	propiu headers := Lista novu.
+Ducumentu-Web quandu: ['sviutà-intestature'] fà: {
+	sè verificà-intestature.
+	propiu intestature := Lista novu.
 }.
 
-Web-Document quandu: ['session-manager:'] fà: { :manager
-	sè check-headers.
-	propiu session-manager := manager.
+Ducumentu-Web quandu: ['gestore-sessione:'] fà: { :gestore
+	sè verificà-intestature.
+	propiu gestore-sessione := gestore.
 }.
 
-Web-Document quandu: ['session-manager'] fà: { <- propiu session-manager.
+Ducumentu-Web quandu: ['gestore-sessione'] fà: { <- propiu gestore-sessione.
 }.
 
-Web-Document quandu: ['check-headers'] fà: {
-	propiu headers-out veru: {
+Ducumentu-Web quandu: ['verificà-intestature'] fà: {
+	propiu intestature-mandate veru: {
 		sta-faccenda errore: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document quandu: ['session-start'] fà: {
-	sè check-headers.
-	>> request := propiu request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nunda? falsu: {
-		(( Mudellu novu: ['^[A-Za-z0-9]+\\z'], currispundenza: sess-id ) = 0) veru: {
-			sess-id := Nunda.
+Ducumentu-Web quandu: ['avvià-sessione'] fà: {
+	sè verificà-intestature.
+	>> dumanda := propiu dumanda.
+	>> id-sessione := dumanda cookie: ['xsid'].
+	id-sessione Nunda? falsu: {
+		(( Mudellu novu: ['^[A-Za-z0-9]+\\z'], currispundenza: id-sessione ) = 0) veru: {
+			id-sessione := Nunda.
 		}.
 	}.
-	sess-id Nunda? veru: {
-		sess-id := Cascia-forte gettone: 30.
-		>> session-header := HTTP-Header novu
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (propiu secure o: ['Secure'] o: ['']),
-		SSITE: (propiu same-site),
-		XSID: sess-id
+	id-sessione Nunda? veru: {
+		id-sessione := Cascia-forte gettone: 30.
+		>> intestatura-sessione := Intestatura-HTTP novu
+		chjave: ['Set-Cookie'] valore: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (propiu sicuru o: ['Secure'] o: ['']),
+		SSITE: (propiu stessu-situ),
+		XSID: id-sessione
 		).
-		propiu headers aghjunghje-à-a-fine: session-header.
+		propiu intestature aghjunghje-à-a-fine: intestatura-sessione.
 	}.
-	propiu sessdata := propiu session-manager for: sess-id, load. <- propiu sessdata. # reference
+	propiu dati-sessione := propiu gestore-sessione per: id-sessione, caricà. <- propiu dati-sessione. # reference
 }.
 
-Web-Document quandu: ['goto:'] fà: { :url
-	sè check-headers.
-	sè clear-headers.
-	propiu headers
+Ducumentu-Web quandu: ['andà-à:'] fà: { :indirizzu
+	sè verificà-intestature.
+	sè sviutà-intestature.
+	propiu intestature
 	aghjunghje-à-a-fine: (
-		HTTP-Header novu
-		key: ['Status'] value: ['303 See Other']
+		Intestatura-HTTP novu
+		chjave: ['Status'] valore: ['303 See Other']
 	),
 	aghjunghje-à-a-fine: (
-		HTTP-Header novu
-		key: ['Location'] value: url
+		Intestatura-HTTP novu
+		chjave: ['Location'] valore: indirizzu
 	).
-	sè out: ['Redirect'].
+	sè scrive-surtita: ['Redirect'].
 }.
 
-Web-Document quandu: ['session-destroy'] fà: {
-	sè check-headers.
-	>> request := propiu request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nunda? falsu: {
-		>> session-header := HTTP-Header novu.
-		>> when := Mumentu novu annu: 1970, furmatu: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Ducumentu-Web quandu: ['distrughje-sessione'] fà: {
+	sè verificà-intestature.
+	>> dumanda := propiu dumanda.
+	>> id-sessione := dumanda cookie: ['xsid'].
+	id-sessione Nunda? falsu: {
+		>> intestatura-sessione := Intestatura-HTTP novu.
+		>> mumentu := Mumentu novu annu: 1970, furmatu: ['%a, %d %b %Y %H:%M:%S GMT'].
+		intestatura-sessione chjave: ['Set-Cookie'] valore: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (propiu secure o: ['Secure'] o: ['']),
-			SSITE: (propiu same-site),
-			XSID: sess-id
+			EXP: mumentu,
+			SEC: (propiu sicuru o: ['Secure'] o: ['']),
+			SSITE: (propiu stessu-situ),
+			XSID: id-sessione
 		).
-		propiu session-manager destroy.
-		propiu headers aghjunghje-à-a-fine: session-header.
+		propiu gestore-sessione distrughje.
+		propiu intestature aghjunghje-à-a-fine: intestatura-sessione.
 	}.
 }.
 
 
-Web-Document quandu: ['template:'] fà: { :caminu-di-schedariu <- Template novu: (Schedariu novu: caminu-di-schedariu, leghje).
+Ducumentu-Web quandu: ['sagoma:'] fà: { :caminu-di-schedariu <- Sagoma novu: (Schedariu novu: caminu-di-schedariu, leghje).
 }.
 
-Web-Document quandu: ['out:type:'] fà: { :output :tipu
-	propiu headers-out falsu: {
-		propiu sessdata Nunda? falsu: {
-			propiu session-manager save: propiu sessdata.
+Ducumentu-Web quandu: ['scrive-surtita:tipu:'] fà: { :surtita :tipu
+	propiu intestature-mandate falsu: {
+		propiu dati-sessione Nunda? falsu: {
+			propiu gestore-sessione salvà: propiu dati-sessione.
 		}.
-		propiu headers aghjunghje-à-a-fine: (
-			HTTP-Header novu
-			key: ['Content-type'] value: tipu
+		propiu intestature aghjunghje-à-a-fine: (
+			Intestatura-HTTP novu
+			chjave: ['Content-type'] valore: tipu
 		).
-		propiu headers ognunu: { :_ :header
-			Esciuta scrive: header.
+		propiu intestature ognunu: { :_ :intestatura
+			Esciuta scrive: intestatura.
 		}.
-		propiu headers-out := Veru.
+		propiu intestature-mandate := Veru.
 		Esciuta scrive: ['\r\n'].
 	}.
-	Esciuta scrive: output.
+	Esciuta scrive: surtita.
 }.
 
-Web-Document quandu: ['finish:type:'] fà: { :output :tipu
-	propiu headers-out falsu: {
-		propiu sessdata Nunda? falsu: {
-			propiu session-manager save: propiu sessdata.
+Ducumentu-Web quandu: ['finisce:tipu:'] fà: { :surtita :tipu
+	propiu intestature-mandate falsu: {
+		propiu dati-sessione Nunda? falsu: {
+			propiu gestore-sessione salvà: propiu dati-sessione.
 		}.
-		propiu headers aghjunghje-à-a-fine: (
-			HTTP-Header novu
-			key: ['Content-type'] value: tipu
+		propiu intestature aghjunghje-à-a-fine: (
+			Intestatura-HTTP novu
+			chjave: ['Content-type'] valore: tipu
 		).
-		propiu headers aghjunghje-à-a-fine: (
-			HTTP-Header novu
-			key: ['Content-Length'] value: output testu bytes
+		propiu intestature aghjunghje-à-a-fine: (
+			Intestatura-HTTP novu
+			chjave: ['Content-Length'] valore: surtita testu bytes
 		).
-		propiu headers ognunu: { :_ :header
-			Esciuta scrive: header.
+		propiu intestature ognunu: { :_ :intestatura
+			Esciuta scrive: intestatura.
 		}.
-		propiu headers-out := Veru.
+		propiu intestature-mandate := Veru.
 		Esciuta scrive: ['\r\n'].
 	}.
-	Esciuta scrive: output.
+	Esciuta scrive: surtita.
 }.
 
-Web-Document quandu: ['out:'] fà: { :output
-	sè out: output type: ['text/html; charset=utf-8'].
+Ducumentu-Web quandu: ['scrive-surtita:'] fà: { :surtita
+	sè scrive-surtita: surtita tipu: ['text/html; charset=utf-8'].
 }.
 
-Web-Document quandu: ['finish:'] fà: { :output
-	sè finish: output type: ['text/html; charset=utf-8'].
+Ducumentu-Web quandu: ['finisce:'] fà: { :surtita
+	sè finisce: surtita tipu: ['text/html; charset=utf-8'].
 }.
 
-Web-Document quandu: ['json:'] fà: { :output
-	sè out: ( JSON jsonify: output ) type: ['application/json'].
+Ducumentu-Web quandu: ['json:'] fà: { :surtita
+	sè scrive-surtita: ( JSON jsonify: surtita ) tipu: ['application/json'].
 }.
 
-Web-Document quandu: ['not-found:'] fà: { :output
-	sè clear-headers header: (
-		HTTP-Header novu key: ['Status'] value: ['404 Not Found']
+Ducumentu-Web quandu: ['micca-trovu:'] fà: { :surtita
+	sè sviutà-intestature intestatura: (
+		Intestatura-HTTP novu chjave: ['Status'] valore: ['404 Not Found']
 	).
-	sè out: output.
+	sè scrive-surtita: surtita.
 }.
 
 
 # Interface
 
->> Session := Ughjettu novu.
+>> Sessione := Ughjettu novu.
 
-Session quandu: ['novu'] fà: { <- sè novu init for: Nunda.
+Sessione quandu: ['novu'] fà: { <- sè novu inizializà per: Nunda.
 }.
 
-Session quandu: ['for:'] fà: { :id
+Sessione quandu: ['per:'] fà: { :id
 	propiu id := id.
 }.
 
-Session quandu: ['load'] fà: {
+Sessione quandu: ['caricà'] fà: {
 	sta-faccenda errore: ['Not implemented.'].
 }.
 
-Session quandu: ['save:'] fà: {
+Sessione quandu: ['salvà:'] fà: {
 	sta-faccenda errore: ['Not implemented.'].
 }.
 
-Session quandu: ['destroy'] fà: {
+Sessione quandu: ['distrughje'] fà: {
 	sta-faccenda errore: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session novu.
+>> Sessione-schedariu-tempurariu := Sessione novu.
 
-Tempfile-Session quandu: ['init'] fà: {
-	propiu pathprefix := ['/tmp/sess-'].
+Sessione-schedariu-tempurariu quandu: ['inizializà'] fà: {
+	propiu prefissupercorsu := ['/tmp/sess-'].
 }.
 
-Tempfile-Session quandu: ['path-prefix:'] fà: { :str
-	propiu pathprefix := str.
+Sessione-schedariu-tempurariu quandu: ['prefissu-percorsu:'] fà: { :catena
+	propiu prefissupercorsu := catena.
 }.
 
-Tempfile-Session quandu: ['file'] fà: { <- ( Schedariu novu: ( propiu pathprefix + propiu id + ['.txt'] ) ).
+Sessione-schedariu-tempurariu quandu: ['schedariu'] fà: { <- ( Schedariu novu: ( propiu prefissupercorsu + propiu id + ['.txt'] ) ).
 }.
 
-Tempfile-Session quandu: ['load'] fà: {
-	>> file := sè file.
-	file esiste falsu: {
-		file scrive: (Dizziunariu novu codice).
-	}. <- file leghje ughjettu.
+Sessione-schedariu-tempurariu quandu: ['caricà'] fà: {
+	>> schedariu := sè schedariu.
+	schedariu esiste falsu: {
+		schedariu scrive: (Dizziunariu novu codice).
+	}. <- schedariu leghje ughjettu.
 }.
 
-Tempfile-Session quandu: ['save:'] fà: { :data
-	>> file := sè file.
-	file esiste veru: {
-		file scrive: data codice.
+Sessione-schedariu-tempurariu quandu: ['salvà:'] fà: { :dati
+	>> schedariu := sè schedariu.
+	schedariu esiste veru: {
+		schedariu scrive: dati codice.
 	}.
 }.
 
-Tempfile-Session quandu: ['destroy'] fà: {
-	>> file := sè file.
-	file esiste veru: {
-		file eliminà.
+Sessione-schedariu-tempurariu quandu: ['distrughje'] fà: {
+	>> schedariu := sè schedariu.
+	schedariu esiste veru: {
+		schedariu eliminà.
 	}.
 }.
 
 
 >> URL := Ughjettu novu.
 
-URL quandu: ['init'] fà: {
-	propiu protocol := ['https://'].
+URL quandu: ['inizializà'] fà: {
+	propiu protocollu := ['https://'].
 	propiu ospite := ['localhost'].
 	propiu caminu-di-schedariu := [''].
-	propiu params := [''].
+	propiu parametri-url := [''].
 	propiu hash := [''].
 }.
 
-URL quandu: ['novu'] fà: { <- sè novu init.
+URL quandu: ['novu'] fà: { <- sè novu inizializà.
 }.
 
 URL quandu: ['testu'] fà: { <- (
-	propiu protocol +
+	propiu protocollu +
 	propiu ospite +
 	propiu caminu-di-schedariu +
-	propiu params +
+	propiu parametri-url +
 	propiu hash ).
 }.
 
-URL quandu: ['protocol:'] fà: { :protocol
-	((Lista novu: ['http'] ; ['https']) cuntene: protocol) veru: {
-		propiu protocol := protocol + ['://'].
+URL quandu: ['protocollu:'] fà: { :protocollu
+	((Lista novu ; ['http'] ; ['https']) hà: protocollu) veru: {
+		propiu protocollu := protocollu + ['://'].
 	}, falsu: {
 		sta-faccenda errore: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL quandu: ['ospite:'] fà: { :ospite
 	propiu ospite := ospite.
 }.
 
-URL quandu: ['path:'] fà: { :caminu-di-schedariu
+URL quandu: ['caminu-di-schedariu:'] fà: { :caminu-di-schedariu
 	propiu caminu-di-schedariu := ['/'] + caminu-di-schedariu url-cudificà.
 }.
 
-URL quandu: ['params:'] fà: { :map
-	>> params := Lista novu.
-	map ognunu: { :key :value
-		params aghjunghje-à-a-fine: key testu url-cudificà + ['='] + value testu url-cudificà.
+URL quandu: ['parametri-url:'] fà: { :mappa
+	>> parametri-url := Lista novu.
+	mappa ognunu: { :chjave :valore
+		parametri-url aghjunghje-à-a-fine: chjave testu url-cudificà + ['='] + valore testu url-cudificà.
 	}.
-	propiu params := ['?'] + ( params unisce: ['&'] ).
+	propiu parametri-url := ['?'] + ( parametri-url unisce: ['&'] ).
 }.
 
 URL quandu: ['riassuntu:'] fà: { :hash

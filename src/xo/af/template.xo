@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objek nuut.
+>> Sjabloon := Objek nuut.
 
-Template by: ['nuut'] doen: { <- self nuut content: [''].
+Sjabloon by: ['nuut'] doen: { <- self nuut inhoud: [''].
 }.
 
-Template by: ['content:'] doen: { :content
-	eie content := content. 
+Sjabloon by: ['inhoud:'] doen: { :inhoud
+	eie inhoud := inhoud. 
 }.
 
-Template by: ['nuut:'] doen: { :content <- self nuut content: content.
+Sjabloon by: ['nuut:'] doen: { :inhoud <- self nuut inhoud: inhoud.
 }.
 
-Template by: ['cut:'] doen: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := eie content verdeel: startmarker.
-	>> prefix := parts eerste.
-	>> parts2 := parts laaste verdeel: endmarker.
-	>> suffix := parts2 laaste.
-	>> part := parts2 eerste.
-	>> rest := prefix + suffix.
-	eie content := rest. <- Template nuut: part.
+Sjabloon by: ['uitknip:'] doen: { :merker
+	>> beginmerker := (['<!-- cut:%id% -->'] %id%: merker).
+	>> eindmerker := (['<!-- /cut:%id% -->'] %id%: merker).
+	>> dele := eie inhoud verdeel: beginmerker.
+	>> voorvoegsel := dele eerste.
+	>> dele2 := dele laaste verdeel: eindmerker.
+	>> agtervoegsel := dele2 laaste.
+	>> deel := dele2 eerste.
+	>> res := voorvoegsel + agtervoegsel.
+	eie inhoud := res. <- Sjabloon nuut: deel.
 	
 }.
 
-Template by: ['kopieer'] doen: { <- self nuut: self teks kopieer.
+Sjabloon by: ['kopieer'] doen: { <- self nuut: self teks kopieer.
 }.
 	
-Template by: ['paste:at:'] doen: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	eie content vervang: pastemarker met: ( snippet teks + pastemarker ).
+Sjabloon by: ['plak:by:'] doen: { :brokkie :id
+	>> plakmerker := (['<!-- paste:%id% -->'] %id%: id).
+	eie inhoud vervang: plakmerker met: ( brokkie teks + plakmerker ).
 }.
 
-Template by: ['stel:waarde:'] doen: { :slot :value
-	eie content vervang: ['<!-- slot:'] + slot + [' -->'] met: ( Server html-kodeer: value ).
+Sjabloon by: ['stel:waarde:'] doen: { :gleuf :waarde
+	eie inhoud vervang: ['<!-- slot:'] + gleuf + [' -->'] met: ( Server html-kodeer: waarde ).
 }.
 
-Template by: ['set:html:'] doen: { :slot :html
-	eie content vervang: ['<!-- slot:'] + slot + [' -->'] met: html.
+Sjabloon by: ['stel:html:'] doen: { :gleuf :html
+	eie inhoud vervang: ['<!-- slot:'] + gleuf + [' -->'] met: html.
 }.
 
-Template by: ['reageer:en:'] doen: { :slot :value
-	self stel: (slot vanaf: 0 lengte: (slot lengte - 1)) waarde: value.
+Sjabloon by: ['reageer:en:'] doen: { :gleuf :waarde
+	self stel: (gleuf vanaf: 0 lengte: (gleuf lengte - 1)) waarde: waarde.
 }.
 
-Template by: ['nl2br'] doen: {
-	eie content vervang: ['\n'] met: ['<br>'].
+Sjabloon by: ['nl2br'] doen: {
+	eie inhoud vervang: ['\n'] met: ['<br>'].
 }.
 
-Template by: ['clean'] doen: {
-	eie content :=
+Sjabloon by: ['skoonmaak'] doen: {
+	eie inhoud :=
 		Patroon
 		nuut: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		passing: eie content
+		passing: eie inhoud
 		doen: { <- ['']. }.
 }.
 
-Template by: ['clean-cuts'] doen: {
+Sjabloon by: ['snitte-skoonmaak'] doen: {
 	>> items := Lys nuut.
 	Patroon
 	nuut: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	passing: eie content
-	doen: { :_ :part
-		items voeg-agter: part ? 1.
+	passing: eie inhoud
+	doen: { :_ :deel
+		items voeg-agter: deel ? 1.
 	}.
 	items elk: { :_ :id
-		eie content :=
+		eie inhoud :=
 			Patroon nuut: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			passing: eie content
+			passing: eie inhoud
 			doen: { <- ['']. }.
 	 }.
 }.
 
-Template by: ['clean-space'] doen: {
-	eie content :=
+Sjabloon by: ['spasies-skoonmaak'] doen: {
+	eie inhoud :=
 		Patroon
 		nuut: ['\\s*\\n'],
-		passing: eie content
+		passing: eie inhoud
 		doen: { <- ['\n']. }.
-	eie content :=
+	eie inhoud :=
 		Patroon
 		nuut: ['\\n[\\s\\t]+'],
-		passing: eie content
+		passing: eie inhoud
 		doen: { <- ['\n']. }.
 }.
 
-Template by: ['clean-all'] doen: {
-	self clean.
-	self clean-cuts.
-	self clean-space.
+Sjabloon by: ['alles-skoonmaak'] doen: {
+	self skoonmaak.
+	self snitte-skoonmaak.
+	self spasies-skoonmaak.
 }.
 
-Template by: ['teks'] doen: { <- eie content.
+Sjabloon by: ['teks'] doen: { <- eie inhoud.
 }.

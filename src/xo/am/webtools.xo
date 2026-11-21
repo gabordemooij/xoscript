@@ -1,302 +1,302 @@
-HTTP-ጥያቄ ሲደርስ: ['HTTP-header:'] አድርግ: { :key <- ፕሮግራም ቅንብር: key.
+HTTP-ጥያቄ ሲደርስ: ['HTTP-ራስጌ:'] አድርግ: { :ቁልፍ <- ፕሮግራም ቅንብር: ቁልፍ.
 }.
 
->> HTTP-Header := ነገር አዲስ.
+>> HTTP-ራስጌ := ነገር አዲስ.
 
-HTTP-Header ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ init.
+HTTP-ራስጌ ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ አዘጋጅ.
 }.
 
-HTTP-Header ሲደርስ: ['init'] አድርግ: {
-	የራሱ key := ባዶ.
-	የራሱ value := ባዶ.
+HTTP-ራስጌ ሲደርስ: ['አዘጋጅ'] አድርግ: {
+	የራሱ ቁልፍ := ባዶ.
+	የራሱ እሴት := ባዶ.
 }.
 
-HTTP-Header ሲደርስ: ['key:value:'] አድርግ: { :key :value
-	የራሱ key := key.
-	የራሱ value := value.
+HTTP-ራስጌ ሲደርስ: ['ቁልፍ:እሴት:'] አድርግ: { :ቁልፍ :እሴት
+	የራሱ ቁልፍ := ቁልፍ.
+	የራሱ እሴት := እሴት.
 }.
 
-HTTP-Header ሲደርስ: ['key'] አድርግ: { <- የራሱ key.
+HTTP-ራስጌ ሲደርስ: ['ቁልፍ'] አድርግ: { <- የራሱ ቁልፍ.
 }.
 
-HTTP-Header ሲደርስ: ['value'] አድርግ: { <- የራሱ value.
+HTTP-ራስጌ ሲደርስ: ['እሴት'] አድርግ: { <- የራሱ እሴት.
 }.
 
 
-HTTP-Header ሲደርስ: ['በጽሑፍ'] አድርግ: {
-	>> line := የራሱ key + [': '] + የራሱ value.
-	line ተካ: ['\r'] በዚህ: [''], ተካ: ['\n'] በዚህ: ['']. <- line + [' \r\n'].
+HTTP-ራስጌ ሲደርስ: ['በጽሑፍ'] አድርግ: {
+	>> መስመር := የራሱ ቁልፍ + [': '] + የራሱ እሴት.
+	መስመር ተካ: ['\r'] በዚህ: [''], ተካ: ['\n'] በዚህ: ['']. <- መስመር + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := ነገር አዲስ.
+>> የድር-ሰነድ := ነገር አዲስ.
 
-Web-Document ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ init.
+የድር-ሰነድ ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ አዘጋጅ.
 }.
 
-Web-Document ሲደርስ: ['init'] አድርግ: {
-	የራሱ headers := ሰልፍ አዲስ.
-	የራሱ sess-id := ባዶ.
-	የራሱ session-manager := Tempfile-Session አዲስ.
-	የራሱ sessdata := ባዶ.
-	የራሱ secure := እውነት.
-	የራሱ same-site := ['Strict'].
-	የራሱ headers-out := ሐሰት.
-	የራሱ request := HTTP-ጥያቄ አዲስ.
+የድር-ሰነድ ሲደርስ: ['አዘጋጅ'] አድርግ: {
+	የራሱ ራስጌዎች := ሰልፍ አዲስ.
+	የራሱ የክፍለ-ጊዜ-መለያ := ባዶ.
+	የራሱ የክፍለ-ጊዜ-አስተዳዳሪ := ጊዜያዊ-ፋይል-ክፍለ-ጊዜ አዲስ.
+	የራሱ የክፍለ-ጊዜ-ውሂብ := ባዶ.
+	የራሱ ደህንነቱ-የተጠበቀ := እውነት.
+	የራሱ ተመሳሳይ-ጣቢያ := ['Strict'].
+	የራሱ ራስጌዎች-ተልከዋል := ሐሰት.
+	የራሱ ጥያቄ-http := HTTP-ጥያቄ አዲስ.
 }.
 
-Web-Document ሲደርስ: ['request:'] አድርግ: { :request
-	የራሱ request := request.
+የድር-ሰነድ ሲደርስ: ['ጥያቄ-http:'] አድርግ: { :ጥያቄ-http
+	የራሱ ጥያቄ-http := ጥያቄ-http.
 }. 
 
-Web-Document ሲደርስ: ['secure-session-cookie:'] አድርግ: { :secure
-	ራሱ check-headers.
-	የራሱ secure := secure.
+የድር-ሰነድ ሲደርስ: ['ደህንነቱ-የተጠበቀ-ክፍለ-ጊዜ-ኩኪ:'] አድርግ: { :ደህንነቱ-የተጠበቀ
+	ራሱ ራስጌዎችን-ፈትሽ.
+	የራሱ ደህንነቱ-የተጠበቀ := ደህንነቱ-የተጠበቀ.
 }.
 
-Web-Document ሲደርስ: ['same-site-session-cookie:'] አድርግ: { :value
-	ራሱ check-headers.
-	>> options := ሰልፍ አዲስ 
+የድር-ሰነድ ሲደርስ: ['ተመሳሳይ-ጣቢያ-ክፍለ-ጊዜ-ኩኪ:'] አድርግ: { :እሴት
+	ራሱ ራስጌዎችን-ፈትሽ.
+	>> አማራጮች := ሰልፍ አዲስ 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options ይዟል: value, ሐሰት-ከሆነ: {
+	አማራጮች አለው: እሴት, ሐሰት-ከሆነ: {
 		ይህ-ሥራ ስህተት: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	የራሱ same-site := value.
+	የራሱ ተመሳሳይ-ጣቢያ := እሴት.
 }.
 
-Web-Document ሲደርስ: ['header:'] አድርግ: { :header
-	ራሱ check-headers.
-	የራሱ headers መጨረሻ-ላይ-ጨምር: header.
+የድር-ሰነድ ሲደርስ: ['ራስጌ:'] አድርግ: { :ራስጌ
+	ራሱ ራስጌዎችን-ፈትሽ.
+	የራሱ ራስጌዎች መጨረሻ-ላይ-ጨምር: ራስጌ.
 }.
 
-Web-Document ሲደርስ: ['clear-headers'] አድርግ: {
-	ራሱ check-headers.
-	የራሱ headers := ሰልፍ አዲስ.
+የድር-ሰነድ ሲደርስ: ['ራስጌዎችን-አጽዳ'] አድርግ: {
+	ራሱ ራስጌዎችን-ፈትሽ.
+	የራሱ ራስጌዎች := ሰልፍ አዲስ.
 }.
 
-Web-Document ሲደርስ: ['session-manager:'] አድርግ: { :manager
-	ራሱ check-headers.
-	የራሱ session-manager := manager.
+የድር-ሰነድ ሲደርስ: ['የክፍለ-ጊዜ-አስተዳዳሪ:'] አድርግ: { :አስተዳዳሪ
+	ራሱ ራስጌዎችን-ፈትሽ.
+	የራሱ የክፍለ-ጊዜ-አስተዳዳሪ := አስተዳዳሪ.
 }.
 
-Web-Document ሲደርስ: ['session-manager'] አድርግ: { <- የራሱ session-manager.
+የድር-ሰነድ ሲደርስ: ['የክፍለ-ጊዜ-አስተዳዳሪ'] አድርግ: { <- የራሱ የክፍለ-ጊዜ-አስተዳዳሪ.
 }.
 
-Web-Document ሲደርስ: ['check-headers'] አድርግ: {
-	የራሱ headers-out እውነት-ከሆነ: {
+የድር-ሰነድ ሲደርስ: ['ራስጌዎችን-ፈትሽ'] አድርግ: {
+	የራሱ ራስጌዎች-ተልከዋል እውነት-ከሆነ: {
 		ይህ-ሥራ ስህተት: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document ሲደርስ: ['session-start'] አድርግ: {
-	ራሱ check-headers.
-	>> request := የራሱ request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id ባዶ? ሐሰት-ከሆነ: {
-		(( ንድፍ አዲስ: ['^[A-Za-z0-9]+\\z'], ግጥሚያ: sess-id ) = 0) እውነት-ከሆነ: {
-			sess-id := ባዶ.
+የድር-ሰነድ ሲደርስ: ['ክፍለ-ጊዜ-ጀምር'] አድርግ: {
+	ራሱ ራስጌዎችን-ፈትሽ.
+	>> ጥያቄ-http := የራሱ ጥያቄ-http.
+	>> የክፍለ-ጊዜ-መለያ := ጥያቄ-http cookie: ['xsid'].
+	የክፍለ-ጊዜ-መለያ ባዶ? ሐሰት-ከሆነ: {
+		(( ንድፍ አዲስ: ['^[A-Za-z0-9]+\\z'], ግጥሚያ: የክፍለ-ጊዜ-መለያ ) = 0) እውነት-ከሆነ: {
+			የክፍለ-ጊዜ-መለያ := ባዶ.
 		}.
 	}.
-	sess-id ባዶ? እውነት-ከሆነ: {
-		sess-id := ካዝና ቶከን: 30.
-		>> session-header := HTTP-Header አዲስ
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (የራሱ secure ይህ: ['Secure'] ወይም-ያ: ['']),
-		SSITE: (የራሱ same-site),
-		XSID: sess-id
+	የክፍለ-ጊዜ-መለያ ባዶ? እውነት-ከሆነ: {
+		የክፍለ-ጊዜ-መለያ := ካዝና ቶከን: 30.
+		>> የክፍለ-ጊዜ-ራስጌ := HTTP-ራስጌ አዲስ
+		ቁልፍ: ['Set-Cookie'] እሴት: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (የራሱ ደህንነቱ-የተጠበቀ ይህ: ['Secure'] ወይም-ያ: ['']),
+		SSITE: (የራሱ ተመሳሳይ-ጣቢያ),
+		XSID: የክፍለ-ጊዜ-መለያ
 		).
-		የራሱ headers መጨረሻ-ላይ-ጨምር: session-header.
+		የራሱ ራስጌዎች መጨረሻ-ላይ-ጨምር: የክፍለ-ጊዜ-ራስጌ.
 	}.
-	የራሱ sessdata := የራሱ session-manager for: sess-id, load. <- የራሱ sessdata. # reference
+	የራሱ የክፍለ-ጊዜ-ውሂብ := የራሱ የክፍለ-ጊዜ-አስተዳዳሪ ለማን: የክፍለ-ጊዜ-መለያ, ጫን. <- የራሱ የክፍለ-ጊዜ-ውሂብ. # reference
 }.
 
-Web-Document ሲደርስ: ['goto:'] አድርግ: { :url
-	ራሱ check-headers.
-	ራሱ clear-headers.
-	የራሱ headers
+የድር-ሰነድ ሲደርስ: ['ሂድ-ወደ:'] አድርግ: { :አድራሻ
+	ራሱ ራስጌዎችን-ፈትሽ.
+	ራሱ ራስጌዎችን-አጽዳ.
+	የራሱ ራስጌዎች
 	መጨረሻ-ላይ-ጨምር: (
-		HTTP-Header አዲስ
-		key: ['Status'] value: ['303 See Other']
+		HTTP-ራስጌ አዲስ
+		ቁልፍ: ['Status'] እሴት: ['303 See Other']
 	),
 	መጨረሻ-ላይ-ጨምር: (
-		HTTP-Header አዲስ
-		key: ['Location'] value: url
+		HTTP-ራስጌ አዲስ
+		ቁልፍ: ['Location'] እሴት: አድራሻ
 	).
-	ራሱ out: ['Redirect'].
+	ራሱ አውጣ: ['Redirect'].
 }.
 
-Web-Document ሲደርስ: ['session-destroy'] አድርግ: {
-	ራሱ check-headers.
-	>> request := የራሱ request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id ባዶ? ሐሰት-ከሆነ: {
-		>> session-header := HTTP-Header አዲስ.
-		>> when := አፍታ አዲስ አመት: 1970, በቅርጸት: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+የድር-ሰነድ ሲደርስ: ['ክፍለ-ጊዜ-አጥፋ'] አድርግ: {
+	ራሱ ራስጌዎችን-ፈትሽ.
+	>> ጥያቄ-http := የራሱ ጥያቄ-http.
+	>> የክፍለ-ጊዜ-መለያ := ጥያቄ-http cookie: ['xsid'].
+	የክፍለ-ጊዜ-መለያ ባዶ? ሐሰት-ከሆነ: {
+		>> የክፍለ-ጊዜ-ራስጌ := HTTP-ራስጌ አዲስ.
+		>> የማብቂያ-ጊዜ := አፍታ አዲስ አመት: 1970, በቅርጸት: ['%a, %d %b %Y %H:%M:%S GMT'].
+		የክፍለ-ጊዜ-ራስጌ ቁልፍ: ['Set-Cookie'] እሴት: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (የራሱ secure ይህ: ['Secure'] ወይም-ያ: ['']),
-			SSITE: (የራሱ same-site),
-			XSID: sess-id
+			EXP: የማብቂያ-ጊዜ,
+			SEC: (የራሱ ደህንነቱ-የተጠበቀ ይህ: ['Secure'] ወይም-ያ: ['']),
+			SSITE: (የራሱ ተመሳሳይ-ጣቢያ),
+			XSID: የክፍለ-ጊዜ-መለያ
 		).
-		የራሱ session-manager destroy.
-		የራሱ headers መጨረሻ-ላይ-ጨምር: session-header.
+		የራሱ የክፍለ-ጊዜ-አስተዳዳሪ አጥፋ.
+		የራሱ ራስጌዎች መጨረሻ-ላይ-ጨምር: የክፍለ-ጊዜ-ራስጌ.
 	}.
 }.
 
 
-Web-Document ሲደርስ: ['template:'] አድርግ: { :የፋይል-መንገድ <- Template አዲስ: (ፋይል አዲስ: የፋይል-መንገድ, አንብብ).
+የድር-ሰነድ ሲደርስ: ['አብነት:'] አድርግ: { :የፋይል-መንገድ <- አብነት አዲስ: (ፋይል አዲስ: የፋይል-መንገድ, አንብብ).
 }.
 
-Web-Document ሲደርስ: ['out:type:'] አድርግ: { :output :ዓይነት
-	የራሱ headers-out ሐሰት-ከሆነ: {
-		የራሱ sessdata ባዶ? ሐሰት-ከሆነ: {
-			የራሱ session-manager save: የራሱ sessdata.
+የድር-ሰነድ ሲደርስ: ['አውጣ:ዓይነት:'] አድርግ: { :ውጤቱ :ዓይነት
+	የራሱ ራስጌዎች-ተልከዋል ሐሰት-ከሆነ: {
+		የራሱ የክፍለ-ጊዜ-ውሂብ ባዶ? ሐሰት-ከሆነ: {
+			የራሱ የክፍለ-ጊዜ-አስተዳዳሪ አስቀምጥ: የራሱ የክፍለ-ጊዜ-ውሂብ.
 		}.
-		የራሱ headers መጨረሻ-ላይ-ጨምር: (
-			HTTP-Header አዲስ
-			key: ['Content-type'] value: ዓይነት
+		የራሱ ራስጌዎች መጨረሻ-ላይ-ጨምር: (
+			HTTP-ራስጌ አዲስ
+			ቁልፍ: ['Content-type'] እሴት: ዓይነት
 		).
-		የራሱ headers እያንዳንዱ: { :_ :header
-			ውጤት ፃፍ: header.
+		የራሱ ራስጌዎች እያንዳንዱ: { :_ :ራስጌ
+			ውጤት ፃፍ: ራስጌ.
 		}.
-		የራሱ headers-out := እውነት.
+		የራሱ ራስጌዎች-ተልከዋል := እውነት.
 		ውጤት ፃፍ: ['\r\n'].
 	}.
-	ውጤት ፃፍ: output.
+	ውጤት ፃፍ: ውጤቱ.
 }.
 
-Web-Document ሲደርስ: ['finish:type:'] አድርግ: { :output :ዓይነት
-	የራሱ headers-out ሐሰት-ከሆነ: {
-		የራሱ sessdata ባዶ? ሐሰት-ከሆነ: {
-			የራሱ session-manager save: የራሱ sessdata.
+የድር-ሰነድ ሲደርስ: ['ጨርስ:ዓይነት:'] አድርግ: { :ውጤቱ :ዓይነት
+	የራሱ ራስጌዎች-ተልከዋል ሐሰት-ከሆነ: {
+		የራሱ የክፍለ-ጊዜ-ውሂብ ባዶ? ሐሰት-ከሆነ: {
+			የራሱ የክፍለ-ጊዜ-አስተዳዳሪ አስቀምጥ: የራሱ የክፍለ-ጊዜ-ውሂብ.
 		}.
-		የራሱ headers መጨረሻ-ላይ-ጨምር: (
-			HTTP-Header አዲስ
-			key: ['Content-type'] value: ዓይነት
+		የራሱ ራስጌዎች መጨረሻ-ላይ-ጨምር: (
+			HTTP-ራስጌ አዲስ
+			ቁልፍ: ['Content-type'] እሴት: ዓይነት
 		).
-		የራሱ headers መጨረሻ-ላይ-ጨምር: (
-			HTTP-Header አዲስ
-			key: ['Content-Length'] value: output በጽሑፍ bytes
+		የራሱ ራስጌዎች መጨረሻ-ላይ-ጨምር: (
+			HTTP-ራስጌ አዲስ
+			ቁልፍ: ['Content-Length'] እሴት: ውጤቱ በጽሑፍ bytes
 		).
-		የራሱ headers እያንዳንዱ: { :_ :header
-			ውጤት ፃፍ: header.
+		የራሱ ራስጌዎች እያንዳንዱ: { :_ :ራስጌ
+			ውጤት ፃፍ: ራስጌ.
 		}.
-		የራሱ headers-out := እውነት.
+		የራሱ ራስጌዎች-ተልከዋል := እውነት.
 		ውጤት ፃፍ: ['\r\n'].
 	}.
-	ውጤት ፃፍ: output.
+	ውጤት ፃፍ: ውጤቱ.
 }.
 
-Web-Document ሲደርስ: ['out:'] አድርግ: { :output
-	ራሱ out: output type: ['text/html; charset=utf-8'].
+የድር-ሰነድ ሲደርስ: ['አውጣ:'] አድርግ: { :ውጤቱ
+	ራሱ አውጣ: ውጤቱ ዓይነት: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ሲደርስ: ['finish:'] አድርግ: { :output
-	ራሱ finish: output type: ['text/html; charset=utf-8'].
+የድር-ሰነድ ሲደርስ: ['ጨርስ:'] አድርግ: { :ውጤቱ
+	ራሱ ጨርስ: ውጤቱ ዓይነት: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ሲደርስ: ['json:'] አድርግ: { :output
-	ራሱ out: ( JSON jsonify: output ) type: ['application/json'].
+የድር-ሰነድ ሲደርስ: ['json:'] አድርግ: { :ውጤቱ
+	ራሱ አውጣ: ( JSON jsonify: ውጤቱ ) ዓይነት: ['application/json'].
 }.
 
-Web-Document ሲደርስ: ['not-found:'] አድርግ: { :output
-	ራሱ clear-headers header: (
-		HTTP-Header አዲስ key: ['Status'] value: ['404 Not Found']
+የድር-ሰነድ ሲደርስ: ['አልተገኘም:'] አድርግ: { :ውጤቱ
+	ራሱ ራስጌዎችን-አጽዳ ራስጌ: (
+		HTTP-ራስጌ አዲስ ቁልፍ: ['Status'] እሴት: ['404 Not Found']
 	).
-	ራሱ out: output.
+	ራሱ አውጣ: ውጤቱ.
 }.
 
 
 # Interface
 
->> Session := ነገር አዲስ.
+>> ክፍለ-ጊዜ := ነገር አዲስ.
 
-Session ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ init for: ባዶ.
+ክፍለ-ጊዜ ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ አዘጋጅ ለማን: ባዶ.
 }.
 
-Session ሲደርስ: ['for:'] አድርግ: { :id
+ክፍለ-ጊዜ ሲደርስ: ['ለማን:'] አድርግ: { :id
 	የራሱ id := id.
 }.
 
-Session ሲደርስ: ['load'] አድርግ: {
+ክፍለ-ጊዜ ሲደርስ: ['ጫን'] አድርግ: {
 	ይህ-ሥራ ስህተት: ['Not implemented.'].
 }.
 
-Session ሲደርስ: ['save:'] አድርግ: {
+ክፍለ-ጊዜ ሲደርስ: ['አስቀምጥ:'] አድርግ: {
 	ይህ-ሥራ ስህተት: ['Not implemented.'].
 }.
 
-Session ሲደርስ: ['destroy'] አድርግ: {
+ክፍለ-ጊዜ ሲደርስ: ['አጥፋ'] አድርግ: {
 	ይህ-ሥራ ስህተት: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session አዲስ.
+>> ጊዜያዊ-ፋይል-ክፍለ-ጊዜ := ክፍለ-ጊዜ አዲስ.
 
-Tempfile-Session ሲደርስ: ['init'] አድርግ: {
-	የራሱ pathprefix := ['/tmp/sess-'].
+ጊዜያዊ-ፋይል-ክፍለ-ጊዜ ሲደርስ: ['አዘጋጅ'] አድርግ: {
+	የራሱ የመንገድ-መጀመሪያ := ['/tmp/sess-'].
 }.
 
-Tempfile-Session ሲደርስ: ['path-prefix:'] አድርግ: { :str
-	የራሱ pathprefix := str.
+ጊዜያዊ-ፋይል-ክፍለ-ጊዜ ሲደርስ: ['የመንገድ-ቅድመ-ቅጥያ:'] አድርግ: { :የፊደል-ሕብረቁምፊ
+	የራሱ የመንገድ-መጀመሪያ := የፊደል-ሕብረቁምፊ.
 }.
 
-Tempfile-Session ሲደርስ: ['file'] አድርግ: { <- ( ፋይል አዲስ: ( የራሱ pathprefix + የራሱ id + ['.txt'] ) ).
+ጊዜያዊ-ፋይል-ክፍለ-ጊዜ ሲደርስ: ['የክፍለ-ጊዜ-ፋይል'] አድርግ: { <- ( ፋይል አዲስ: ( የራሱ የመንገድ-መጀመሪያ + የራሱ id + ['.txt'] ) ).
 }.
 
-Tempfile-Session ሲደርስ: ['load'] አድርግ: {
-	>> file := ራሱ file.
-	file አለ ሐሰት-ከሆነ: {
-		file ፃፍ: (መዝገበ-ቃላት አዲስ ኮድ).
-	}. <- file አንብብ እንደ-ነገር.
+ጊዜያዊ-ፋይል-ክፍለ-ጊዜ ሲደርስ: ['ጫን'] አድርግ: {
+	>> የክፍለ-ጊዜ-ፋይል := ራሱ የክፍለ-ጊዜ-ፋይል.
+	የክፍለ-ጊዜ-ፋይል አለ ሐሰት-ከሆነ: {
+		የክፍለ-ጊዜ-ፋይል ፃፍ: (መዝገበ-ቃላት አዲስ ኮድ).
+	}. <- የክፍለ-ጊዜ-ፋይል አንብብ እንደ-ነገር.
 }.
 
-Tempfile-Session ሲደርስ: ['save:'] አድርግ: { :data
-	>> file := ራሱ file.
-	file አለ እውነት-ከሆነ: {
-		file ፃፍ: data ኮድ.
+ጊዜያዊ-ፋይል-ክፍለ-ጊዜ ሲደርስ: ['አስቀምጥ:'] አድርግ: { :ውሂብ
+	>> የክፍለ-ጊዜ-ፋይል := ራሱ የክፍለ-ጊዜ-ፋይል.
+	የክፍለ-ጊዜ-ፋይል አለ እውነት-ከሆነ: {
+		የክፍለ-ጊዜ-ፋይል ፃፍ: ውሂብ ኮድ.
 	}.
 }.
 
-Tempfile-Session ሲደርስ: ['destroy'] አድርግ: {
-	>> file := ራሱ file.
-	file አለ እውነት-ከሆነ: {
-		file ሰርዝ.
+ጊዜያዊ-ፋይል-ክፍለ-ጊዜ ሲደርስ: ['አጥፋ'] አድርግ: {
+	>> የክፍለ-ጊዜ-ፋይል := ራሱ የክፍለ-ጊዜ-ፋይል.
+	የክፍለ-ጊዜ-ፋይል አለ እውነት-ከሆነ: {
+		የክፍለ-ጊዜ-ፋይል ሰርዝ.
 	}.
 }.
 
 
 >> URL := ነገር አዲስ.
 
-URL ሲደርስ: ['init'] አድርግ: {
-	የራሱ protocol := ['https://'].
+URL ሲደርስ: ['አዘጋጅ'] አድርግ: {
+	የራሱ ፕሮቶኮል := ['https://'].
 	የራሱ አስተናጋጅ := ['localhost'].
 	የራሱ የፋይል-መንገድ := [''].
-	የራሱ params := [''].
+	የራሱ url-መለኪያዎች := [''].
 	የራሱ hash := [''].
 }.
 
-URL ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ init.
+URL ሲደርስ: ['አዲስ'] አድርግ: { <- ራሱ አዲስ አዘጋጅ.
 }.
 
 URL ሲደርስ: ['በጽሑፍ'] አድርግ: { <- (
-	የራሱ protocol +
+	የራሱ ፕሮቶኮል +
 	የራሱ አስተናጋጅ +
 	የራሱ የፋይል-መንገድ +
-	የራሱ params +
+	የራሱ url-መለኪያዎች +
 	የራሱ hash ).
 }.
 
-URL ሲደርስ: ['protocol:'] አድርግ: { :protocol
-	((ሰልፍ አዲስ: ['http'] ; ['https']) ይዟል: protocol) እውነት-ከሆነ: {
-		የራሱ protocol := protocol + ['://'].
+URL ሲደርስ: ['ፕሮቶኮል:'] አድርግ: { :ፕሮቶኮል
+	((ሰልፍ አዲስ ; ['http'] ; ['https']) አለው: ፕሮቶኮል) እውነት-ከሆነ: {
+		የራሱ ፕሮቶኮል := ፕሮቶኮል + ['://'].
 	}, ሐሰት-ከሆነ: {
 		ይህ-ሥራ ስህተት: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL ሲደርስ: ['አስተናጋጅ:'] አድርግ: { :አስተናጋጅ
 	የራሱ አስተናጋጅ := አስተናጋጅ.
 }.
 
-URL ሲደርስ: ['path:'] አድርግ: { :የፋይል-መንገድ
+URL ሲደርስ: ['የፋይል-መንገድ:'] አድርግ: { :የፋይል-መንገድ
 	የራሱ የፋይል-መንገድ := ['/'] + የፋይል-መንገድ url-ኮድ-አድርግ.
 }.
 
-URL ሲደርስ: ['params:'] አድርግ: { :map
-	>> params := ሰልፍ አዲስ.
-	map እያንዳንዱ: { :key :value
-		params መጨረሻ-ላይ-ጨምር: key በጽሑፍ url-ኮድ-አድርግ + ['='] + value በጽሑፍ url-ኮድ-አድርግ.
+URL ሲደርስ: ['url-መለኪያዎች:'] አድርግ: { :ካርታ-ማውጣት
+	>> url-መለኪያዎች := ሰልፍ አዲስ.
+	ካርታ-ማውጣት እያንዳንዱ: { :ቁልፍ :እሴት
+		url-መለኪያዎች መጨረሻ-ላይ-ጨምር: ቁልፍ በጽሑፍ url-ኮድ-አድርግ + ['='] + እሴት በጽሑፍ url-ኮድ-አድርግ.
 	}.
-	የራሱ params := ['?'] + ( params አገናኝ: ['&'] ).
+	የራሱ url-መለኪያዎች := ['?'] + ( url-መለኪያዎች አገናኝ: ['&'] ).
 }.
 
 URL ሲደርስ: ['ሃሽ:'] አድርግ: { :hash

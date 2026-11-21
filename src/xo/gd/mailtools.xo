@@ -1,128 +1,128 @@
->> Email := Oibseact ùr.
+>> Post-d := Oibseact ùr.
 
-Email air: ['init'] dèan: {
-	leis recipients := Liosta ùr.
+Post-d air: ['tòisich-suas'] dèan: {
+	leis faightearan := Liosta ùr.
 	leis cc := Liosta ùr.
 	leis bcc := Liosta ùr.
-	leis from := Neoni.
-	leis from-name := Neoni.
-	leis subject := Neoni.
-	leis body := Neoni.
+	leis neach-cuiridh := Neoni.
+	leis ainm-neach-cuiridh := Neoni.
+	leis cuspair := Neoni.
+	leis bodhaig := Neoni.
 }.
 
-Email air: ['ùr'] dèan: { <- fhèin ùr init.
+Post-d air: ['ùr'] dèan: { <- fhèin ùr tòisich-suas.
 }.
 
-Email air: ['to:'] dèan: { :list
-	leis recipients := list.
+Post-d air: ['gu:'] dèan: { :liosta-nithean
+	leis faightearan := liosta-nithean.
 }.
  
-Email air: ['cc:'] dèan: { :list
-	leis cc := list.
+Post-d air: ['cc:'] dèan: { :liosta-nithean
+	leis cc := liosta-nithean.
 }.
 
-Email air: ['bcc:'] dèan: { :list
-	leis bcc := list.
+Post-d air: ['bcc:'] dèan: { :liosta-nithean
+	leis bcc := liosta-nithean.
 }.
 
-Email air: ['subject:'] dèan: { :subject
-	leis subject := subject.
+Post-d air: ['cuspair:'] dèan: { :cuspair
+	leis cuspair := cuspair.
 }.
 
-Email air: ['from:name:'] dèan: { :from :ainm
-	leis from := from.
-	leis from-name := ainm.
+Post-d air: ['neach-cuiridh:ainm:'] dèan: { :neach-cuiridh :ainm
+	leis neach-cuiridh := neach-cuiridh.
+	leis ainm-neach-cuiridh := ainm.
 }.
 
-Email air: ['body:'] dèan: { :body
-	leis body := body.
+Post-d air: ['bodhaig:'] dèan: { :bodhaig
+	leis bodhaig := bodhaig.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email air: ['header:'] dèan: { :line <- line cuir-an-àite: ['\r'] le: [''], cuir-an-àite: ['\n'] le: [''].
+Post-d air: ['bann-cinn:'] dèan: { :loidhne <- loidhne cuir-an-àite: ['\r'] le: [''], cuir-an-àite: ['\n'] le: [''].
 }.
 
-Email air: ['send'] dèan: {
-	>> f := Faidhle tempwrite: fhèin generate.
+Post-d air: ['cuir'] dèan: {
+	>> f := Faidhle tempwrite: fhèin gin.
 	Prògram siostam: ['sendmail -t < '] + f slighe, loidhne-ùr.
 }.
 
-Email air: ['generate'] dèan: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str cuir-ris: (fhèin header: ['From: '] + leis from-name + [' <'] + ( leis from ) + ['>']) + brk.
-	str cuir-ris: (fhèin header: ['To: '] + ( leis recipients ceangail: [','] )) + brk.
+Post-d air: ['gin'] dèan: {
+	>> briseadh-loidhne := ['\r\n'].
+	>> sreang-teacsa := [''].
+	sreang-teacsa cuir-ris: (fhèin bann-cinn: ['From: '] + leis ainm-neach-cuiridh + [' <'] + ( leis neach-cuiridh ) + ['>']) + briseadh-loidhne.
+	sreang-teacsa cuir-ris: (fhèin bann-cinn: ['To: '] + ( leis faightearan ceangail: [','] )) + briseadh-loidhne.
 	leis cc cunnt fìor: {
-		str cuir-ris: (fhèin header: ['Cc: '] + ( leis cc ceangail: [','] )) + brk.
+		sreang-teacsa cuir-ris: (fhèin bann-cinn: ['Cc: '] + ( leis cc ceangail: [','] )) + briseadh-loidhne.
 	}.
 	leis bcc cunnt fìor: {
-		str cuir-ris: (fhèin header: ['Bcc: '] + ( leis bcc ceangail: [','] )) + brk.
+		sreang-teacsa cuir-ris: (fhèin bann-cinn: ['Bcc: '] + ( leis bcc ceangail: [','] )) + briseadh-loidhne.
 	}.
-	str cuir-ris: (fhèin header: ['Subject: '] + leis subject) + brk.
-	str cuir-ris: brk.
-	str cuir-ris: leis body.
-	str cuir-ris: brk. <- str.
+	sreang-teacsa cuir-ris: (fhèin bann-cinn: ['Subject: '] + leis cuspair) + briseadh-loidhne.
+	sreang-teacsa cuir-ris: briseadh-loidhne.
+	sreang-teacsa cuir-ris: leis bodhaig.
+	sreang-teacsa cuir-ris: briseadh-loidhne. <- sreang-teacsa.
 }.
 
->> HTML-Email := Email ùr.
+>> Post-d-HTML := Post-d ùr.
 
-HTML-Email air: ['init'] dèan: {
-	fhèin init.
-	leis attachments := Liosta ùr.
-	leis boundary := Tasgaidh tòcan: 40.
+Post-d-HTML air: ['tòisich-suas'] dèan: {
+	fhèin tòisich-suas.
+	leis ceanglachain := Liosta ùr.
+	leis crìoch := Tasgaidh tòcan: 40.
 }.
 
-HTML-Email air: ['attach:'] dèan: { :file
-	>> id := leis attachments cunnt.
-	>> blob := file blob.
-	leis attachments cuir-ris: (
+Post-d-HTML air: ['cuir-ri:'] dèan: { :faidhle
+	>> id := leis ceanglachain cunnt.
+	>> blob := faidhle blob.
+	leis ceanglachain cuir-ris: (
 		Faclair ùr
-			file: file slighe,
-			mime: ['image/'] + (Server mimetype: file slighe),
-			data: blob base64-còdaich
+			faidhle: faidhle slighe,
+			mime: ['image/'] + (Server mimetype: faidhle slighe),
+			dàta: blob base64-còdaich
 	).
 	blob saor. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email air: ['generate'] dèan: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str cuir-ris: (fhèin header: ['From: '] + leis from-name + [' <'] + ( leis from ) + ['>']) + brk.
-	str cuir-ris: (fhèin header: ['To: '] + ( leis recipients ceangail: [','] )) + brk.
+Post-d-HTML air: ['gin'] dèan: {
+	>> briseadh-loidhne := ['\r\n'].
+	>> sreang-teacsa := [''].
+	sreang-teacsa cuir-ris: (fhèin bann-cinn: ['From: '] + leis ainm-neach-cuiridh + [' <'] + ( leis neach-cuiridh ) + ['>']) + briseadh-loidhne.
+	sreang-teacsa cuir-ris: (fhèin bann-cinn: ['To: '] + ( leis faightearan ceangail: [','] )) + briseadh-loidhne.
 	leis cc cunnt fìor: {
-		str cuir-ris: (fhèin header: ['Cc: '] + ( leis cc ceangail: [','] )) + brk.
+		sreang-teacsa cuir-ris: (fhèin bann-cinn: ['Cc: '] + ( leis cc ceangail: [','] )) + briseadh-loidhne.
 	}.
 	leis bcc cunnt fìor: {
-		str cuir-ris: (fhèin header: ['Bcc: '] + ( leis bcc ceangail: [','] )) + brk.
+		sreang-teacsa cuir-ris: (fhèin bann-cinn: ['Bcc: '] + ( leis bcc ceangail: [','] )) + briseadh-loidhne.
 	}.
-	str cuir-ris: (fhèin header: ['Subject: '] + leis subject) + brk.
-	str cuir-ris: ['MIME-Version: 1.0'] + brk.
-	str cuir-ris: ['Content-Type: multipart/related; boundary="'] + leis boundary + ['"; type=text/html'] + brk.
-	str cuir-ris: brk.
-	str cuir-ris: ['--'] + leis boundary + brk.
-	str cuir-ris: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str cuir-ris: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str cuir-ris: brk.
-	str cuir-ris: leis body.
-	str cuir-ris: brk.
-	leis attachments gach: { :id :info
-		>> blob := info data.
-		str cuir-ris: ['--'] + leis boundary + brk.
-		str cuir-ris: ['Content-Type: '] + info mime + brk.
-		str cuir-ris: ['Content-Transfer-Encoding: base64'] + brk.
-		str cuir-ris: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str cuir-ris: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str cuir-ris: brk.
-		>> max := 76.
-		>> len := blob faid.
-		>> chunks := (len / max) cruinnich-suas.
+	sreang-teacsa cuir-ris: (fhèin bann-cinn: ['Subject: '] + leis cuspair) + briseadh-loidhne.
+	sreang-teacsa cuir-ris: ['MIME-Version: 1.0'] + briseadh-loidhne.
+	sreang-teacsa cuir-ris: ['Content-Type: multipart/related; boundary="'] + leis crìoch + ['"; type=text/html'] + briseadh-loidhne.
+	sreang-teacsa cuir-ris: briseadh-loidhne.
+	sreang-teacsa cuir-ris: ['--'] + leis crìoch + briseadh-loidhne.
+	sreang-teacsa cuir-ris: ['Content-Type: text/html; charset=UTF-8'] + briseadh-loidhne.
+	sreang-teacsa cuir-ris: ['Content-Transfer-Encoding: 7bit'] + briseadh-loidhne.
+	sreang-teacsa cuir-ris: briseadh-loidhne.
+	sreang-teacsa cuir-ris: leis bodhaig.
+	sreang-teacsa cuir-ris: briseadh-loidhne.
+	leis ceanglachain gach: { :id :fiosrachadh
+		>> blob := fiosrachadh dàta.
+		sreang-teacsa cuir-ris: ['--'] + leis crìoch + briseadh-loidhne.
+		sreang-teacsa cuir-ris: ['Content-Type: '] + fiosrachadh mime + briseadh-loidhne.
+		sreang-teacsa cuir-ris: ['Content-Transfer-Encoding: base64'] + briseadh-loidhne.
+		sreang-teacsa cuir-ris: ['Content-ID: <attachment'] + id + ['>'] + briseadh-loidhne.
+		sreang-teacsa cuir-ris: ['Content-Disposition: inline; filename="'] + fiosrachadh faidhle + ['"'] + briseadh-loidhne.
+		sreang-teacsa cuir-ris: briseadh-loidhne.
+		>> as-motha := 76.
+		>> faid-teacsa := blob faid.
+		>> pìosan := (faid-teacsa / as-motha) cruinnich-suas.
 		{ :i
-			>> chunk := blob dèan-lethbhreac bho: i * max faid: max.
-			str cuir-ris: chunk + brk.
-		} * chunks.
-		str cuir-ris: brk.
-		str cuir-ris: brk.
+			>> pìos := blob dèan-lethbhreac bho: i * as-motha faid: as-motha.
+			sreang-teacsa cuir-ris: pìos + briseadh-loidhne.
+		} * pìosan.
+		sreang-teacsa cuir-ris: briseadh-loidhne.
+		sreang-teacsa cuir-ris: briseadh-loidhne.
 	}.
-	str cuir-ris: ['--'] + leis boundary + ['--'] + brk. <- str.
+	sreang-teacsa cuir-ris: ['--'] + leis crìoch + ['--'] + briseadh-loidhne. <- sreang-teacsa.
 }.

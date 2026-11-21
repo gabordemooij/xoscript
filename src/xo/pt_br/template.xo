@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objeto novo.
+>> Modelo := Objeto novo.
 
-Template em: ['novo'] fazer: { <- isto novo content: [''].
+Modelo em: ['novo'] fazer: { <- isto novo conteúdo: [''].
 }.
 
-Template em: ['content:'] fazer: { :content
-	prop content := content. 
+Modelo em: ['conteúdo:'] fazer: { :conteúdo
+	prop conteúdo := conteúdo. 
 }.
 
-Template em: ['novo:'] fazer: { :content <- isto novo content: content.
+Modelo em: ['novo:'] fazer: { :conteúdo <- isto novo conteúdo: conteúdo.
 }.
 
-Template em: ['cut:'] fazer: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := prop content dividir: startmarker.
-	>> prefix := parts primeiro.
-	>> parts2 := parts último dividir: endmarker.
-	>> suffix := parts2 último.
-	>> part := parts2 primeiro.
-	>> rest := prefix + suffix.
-	prop content := rest. <- Template novo: part.
+Modelo em: ['cortar:'] fazer: { :marcador
+	>> marcador-início := (['<!-- cut:%id% -->'] %id%: marcador).
+	>> marcador-fim := (['<!-- /cut:%id% -->'] %id%: marcador).
+	>> partes := prop conteúdo dividir: marcador-início.
+	>> prefixo := partes primeiro.
+	>> partes2 := partes último dividir: marcador-fim.
+	>> sufixo := partes2 último.
+	>> parte := partes2 primeiro.
+	>> resto := prefixo + sufixo.
+	prop conteúdo := resto. <- Modelo novo: parte.
 	
 }.
 
-Template em: ['copiar'] fazer: { <- isto novo: isto string copiar.
+Modelo em: ['copiar'] fazer: { <- isto novo: isto string copiar.
 }.
 	
-Template em: ['paste:at:'] fazer: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	prop content substituir: pastemarker com: ( snippet string + pastemarker ).
+Modelo em: ['colar:em:'] fazer: { :trecho :id
+	>> marcador-colar := (['<!-- paste:%id% -->'] %id%: id).
+	prop conteúdo substituir: marcador-colar com: ( trecho string + marcador-colar ).
 }.
 
-Template em: ['setar:valor:'] fazer: { :slot :value
-	prop content substituir: ['<!-- slot:'] + slot + [' -->'] com: ( Server html-codificar: value ).
+Modelo em: ['setar:valor:'] fazer: { :espaço :valor
+	prop conteúdo substituir: ['<!-- slot:'] + espaço + [' -->'] com: ( Server html-codificar: valor ).
 }.
 
-Template em: ['set:html:'] fazer: { :slot :html
-	prop content substituir: ['<!-- slot:'] + slot + [' -->'] com: html.
+Modelo em: ['setar:html:'] fazer: { :espaço :html
+	prop conteúdo substituir: ['<!-- slot:'] + espaço + [' -->'] com: html.
 }.
 
-Template em: ['responder:e:'] fazer: { :slot :value
-	isto setar: (slot de: 0 comprimento: (slot comprimento - 1)) valor: value.
+Modelo em: ['responder:e:'] fazer: { :espaço :valor
+	isto setar: (espaço de: 0 comprimento: (espaço comprimento - 1)) valor: valor.
 }.
 
-Template em: ['nl2br'] fazer: {
-	prop content substituir: ['\n'] com: ['<br>'].
+Modelo em: ['nl2br'] fazer: {
+	prop conteúdo substituir: ['\n'] com: ['<br>'].
 }.
 
-Template em: ['clean'] fazer: {
-	prop content :=
+Modelo em: ['depurar'] fazer: {
+	prop conteúdo :=
 		Padrão
 		novo: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		corresponder: prop content
+		corresponder: prop conteúdo
 		fazer: { <- ['']. }.
 }.
 
-Template em: ['clean-cuts'] fazer: {
-	>> items := Listar novo.
+Modelo em: ['depurar-cortes'] fazer: {
+	>> itens := Listar novo.
 	Padrão
 	novo: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	corresponder: prop content
-	fazer: { :_ :part
-		items acrescentar: part ? 1.
+	corresponder: prop conteúdo
+	fazer: { :_ :parte
+		itens acrescentar: parte ? 1.
 	}.
-	items cada-um: { :_ :id
-		prop content :=
+	itens cada-um: { :_ :id
+		prop conteúdo :=
 			Padrão novo: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			corresponder: prop content
+			corresponder: prop conteúdo
 			fazer: { <- ['']. }.
 	 }.
 }.
 
-Template em: ['clean-space'] fazer: {
-	prop content :=
+Modelo em: ['depurar-espaços'] fazer: {
+	prop conteúdo :=
 		Padrão
 		novo: ['\\s*\\n'],
-		corresponder: prop content
+		corresponder: prop conteúdo
 		fazer: { <- ['\n']. }.
-	prop content :=
+	prop conteúdo :=
 		Padrão
 		novo: ['\\n[\\s\\t]+'],
-		corresponder: prop content
+		corresponder: prop conteúdo
 		fazer: { <- ['\n']. }.
 }.
 
-Template em: ['clean-all'] fazer: {
-	isto clean.
-	isto clean-cuts.
-	isto clean-space.
+Modelo em: ['depurar-tudo'] fazer: {
+	isto depurar.
+	isto depurar-cortes.
+	isto depurar-espaços.
 }.
 
-Template em: ['string'] fazer: { <- prop content.
+Modelo em: ['string'] fazer: { <- prop conteúdo.
 }.

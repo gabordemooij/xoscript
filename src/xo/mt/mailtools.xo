@@ -1,128 +1,128 @@
 >> Email := Oġġett ġdid.
 
-Email meta: ['init'] agħmel: {
-	proprju recipients := Lista ġdid.
+Email meta: ['inizjalizza'] agħmel: {
+	proprju riċevituri := Lista ġdid.
 	proprju cc := Lista ġdid.
 	proprju bcc := Lista ġdid.
-	proprju from := Xejn.
-	proprju from-name := Xejn.
-	proprju subject := Xejn.
-	proprju body := Xejn.
+	proprju mittent := Xejn.
+	proprju isem-mittent := Xejn.
+	proprju suġġett := Xejn.
+	proprju korp := Xejn.
 }.
 
-Email meta: ['ġdid'] agħmel: { <- innifsu ġdid init.
+Email meta: ['ġdid'] agħmel: { <- innifsu ġdid inizjalizza.
 }.
 
-Email meta: ['to:'] agħmel: { :list
-	proprju recipients := list.
+Email meta: ['lil:'] agħmel: { :elenku
+	proprju riċevituri := elenku.
 }.
  
-Email meta: ['cc:'] agħmel: { :list
-	proprju cc := list.
+Email meta: ['cc:'] agħmel: { :elenku
+	proprju cc := elenku.
 }.
 
-Email meta: ['bcc:'] agħmel: { :list
-	proprju bcc := list.
+Email meta: ['bcc:'] agħmel: { :elenku
+	proprju bcc := elenku.
 }.
 
-Email meta: ['subject:'] agħmel: { :subject
-	proprju subject := subject.
+Email meta: ['suġġett:'] agħmel: { :suġġett
+	proprju suġġett := suġġett.
 }.
 
-Email meta: ['from:name:'] agħmel: { :from :isem
-	proprju from := from.
-	proprju from-name := isem.
+Email meta: ['mittent:isem:'] agħmel: { :mittent :isem
+	proprju mittent := mittent.
+	proprju isem-mittent := isem.
 }.
 
-Email meta: ['body:'] agħmel: { :body
-	proprju body := body.
+Email meta: ['korp:'] agħmel: { :korp
+	proprju korp := korp.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email meta: ['header:'] agħmel: { :line <- line ibdel: ['\r'] bi: [''], ibdel: ['\n'] bi: [''].
+Email meta: ['intestatura:'] agħmel: { :linja <- linja ibdel: ['\r'] bi: [''], ibdel: ['\n'] bi: [''].
 }.
 
-Email meta: ['send'] agħmel: {
-	>> f := Fajl tempwrite: innifsu generate.
+Email meta: ['ibgħat'] agħmel: {
+	>> f := Fajl tempwrite: innifsu iġġenera.
 	Programm sistema: ['sendmail -t < '] + f mogħdija, linja-ġdida.
 }.
 
-Email meta: ['generate'] agħmel: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str żid-fit-tmiem: (innifsu header: ['From: '] + proprju from-name + [' <'] + ( proprju from ) + ['>']) + brk.
-	str żid-fit-tmiem: (innifsu header: ['To: '] + ( proprju recipients għaqqad: [','] )) + brk.
+Email meta: ['iġġenera'] agħmel: {
+	>> qsim-linja := ['\r\n'].
+	>> sekwenza := [''].
+	sekwenza żid-fit-tmiem: (innifsu intestatura: ['From: '] + proprju isem-mittent + [' <'] + ( proprju mittent ) + ['>']) + qsim-linja.
+	sekwenza żid-fit-tmiem: (innifsu intestatura: ['To: '] + ( proprju riċevituri għaqqad: [','] )) + qsim-linja.
 	proprju cc għodd veru: {
-		str żid-fit-tmiem: (innifsu header: ['Cc: '] + ( proprju cc għaqqad: [','] )) + brk.
+		sekwenza żid-fit-tmiem: (innifsu intestatura: ['Cc: '] + ( proprju cc għaqqad: [','] )) + qsim-linja.
 	}.
 	proprju bcc għodd veru: {
-		str żid-fit-tmiem: (innifsu header: ['Bcc: '] + ( proprju bcc għaqqad: [','] )) + brk.
+		sekwenza żid-fit-tmiem: (innifsu intestatura: ['Bcc: '] + ( proprju bcc għaqqad: [','] )) + qsim-linja.
 	}.
-	str żid-fit-tmiem: (innifsu header: ['Subject: '] + proprju subject) + brk.
-	str żid-fit-tmiem: brk.
-	str żid-fit-tmiem: proprju body.
-	str żid-fit-tmiem: brk. <- str.
+	sekwenza żid-fit-tmiem: (innifsu intestatura: ['Subject: '] + proprju suġġett) + qsim-linja.
+	sekwenza żid-fit-tmiem: qsim-linja.
+	sekwenza żid-fit-tmiem: proprju korp.
+	sekwenza żid-fit-tmiem: qsim-linja. <- sekwenza.
 }.
 
 >> HTML-Email := Email ġdid.
 
-HTML-Email meta: ['init'] agħmel: {
-	innifsu init.
-	proprju attachments := Lista ġdid.
-	proprju boundary := Kaxxaforti token: 40.
+HTML-Email meta: ['inizjalizza'] agħmel: {
+	innifsu inizjalizza.
+	proprju annessi := Lista ġdid.
+	proprju konfini := Kaxxaforti token: 40.
 }.
 
-HTML-Email meta: ['attach:'] agħmel: { :file
-	>> id := proprju attachments għodd.
-	>> blob := file blob.
-	proprju attachments żid-fit-tmiem: (
+HTML-Email meta: ['annetti:'] agħmel: { :fajl
+	>> id := proprju annessi għodd.
+	>> blob := fajl blob.
+	proprju annessi żid-fit-tmiem: (
 		Dizzjunarju ġdid
-			file: file mogħdija,
-			mime: ['image/'] + (Server mimetype: file mogħdija),
+			fajl: fajl mogħdija,
+			mime: ['image/'] + (Server mimetype: fajl mogħdija),
 			data: blob base64-ikkodifika
 	).
 	blob eħles. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email meta: ['generate'] agħmel: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str żid-fit-tmiem: (innifsu header: ['From: '] + proprju from-name + [' <'] + ( proprju from ) + ['>']) + brk.
-	str żid-fit-tmiem: (innifsu header: ['To: '] + ( proprju recipients għaqqad: [','] )) + brk.
+HTML-Email meta: ['iġġenera'] agħmel: {
+	>> qsim-linja := ['\r\n'].
+	>> sekwenza := [''].
+	sekwenza żid-fit-tmiem: (innifsu intestatura: ['From: '] + proprju isem-mittent + [' <'] + ( proprju mittent ) + ['>']) + qsim-linja.
+	sekwenza żid-fit-tmiem: (innifsu intestatura: ['To: '] + ( proprju riċevituri għaqqad: [','] )) + qsim-linja.
 	proprju cc għodd veru: {
-		str żid-fit-tmiem: (innifsu header: ['Cc: '] + ( proprju cc għaqqad: [','] )) + brk.
+		sekwenza żid-fit-tmiem: (innifsu intestatura: ['Cc: '] + ( proprju cc għaqqad: [','] )) + qsim-linja.
 	}.
 	proprju bcc għodd veru: {
-		str żid-fit-tmiem: (innifsu header: ['Bcc: '] + ( proprju bcc għaqqad: [','] )) + brk.
+		sekwenza żid-fit-tmiem: (innifsu intestatura: ['Bcc: '] + ( proprju bcc għaqqad: [','] )) + qsim-linja.
 	}.
-	str żid-fit-tmiem: (innifsu header: ['Subject: '] + proprju subject) + brk.
-	str żid-fit-tmiem: ['MIME-Version: 1.0'] + brk.
-	str żid-fit-tmiem: ['Content-Type: multipart/related; boundary="'] + proprju boundary + ['"; type=text/html'] + brk.
-	str żid-fit-tmiem: brk.
-	str żid-fit-tmiem: ['--'] + proprju boundary + brk.
-	str żid-fit-tmiem: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str żid-fit-tmiem: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str żid-fit-tmiem: brk.
-	str żid-fit-tmiem: proprju body.
-	str żid-fit-tmiem: brk.
-	proprju attachments kull: { :id :info
+	sekwenza żid-fit-tmiem: (innifsu intestatura: ['Subject: '] + proprju suġġett) + qsim-linja.
+	sekwenza żid-fit-tmiem: ['MIME-Version: 1.0'] + qsim-linja.
+	sekwenza żid-fit-tmiem: ['Content-Type: multipart/related; boundary="'] + proprju konfini + ['"; type=text/html'] + qsim-linja.
+	sekwenza żid-fit-tmiem: qsim-linja.
+	sekwenza żid-fit-tmiem: ['--'] + proprju konfini + qsim-linja.
+	sekwenza żid-fit-tmiem: ['Content-Type: text/html; charset=UTF-8'] + qsim-linja.
+	sekwenza żid-fit-tmiem: ['Content-Transfer-Encoding: 7bit'] + qsim-linja.
+	sekwenza żid-fit-tmiem: qsim-linja.
+	sekwenza żid-fit-tmiem: proprju korp.
+	sekwenza żid-fit-tmiem: qsim-linja.
+	proprju annessi kull: { :id :info
 		>> blob := info data.
-		str żid-fit-tmiem: ['--'] + proprju boundary + brk.
-		str żid-fit-tmiem: ['Content-Type: '] + info mime + brk.
-		str żid-fit-tmiem: ['Content-Transfer-Encoding: base64'] + brk.
-		str żid-fit-tmiem: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str żid-fit-tmiem: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str żid-fit-tmiem: brk.
-		>> max := 76.
-		>> len := blob tul.
-		>> chunks := (len / max) arrotonda-fuq.
+		sekwenza żid-fit-tmiem: ['--'] + proprju konfini + qsim-linja.
+		sekwenza żid-fit-tmiem: ['Content-Type: '] + info mime + qsim-linja.
+		sekwenza żid-fit-tmiem: ['Content-Transfer-Encoding: base64'] + qsim-linja.
+		sekwenza żid-fit-tmiem: ['Content-ID: <attachment'] + id + ['>'] + qsim-linja.
+		sekwenza żid-fit-tmiem: ['Content-Disposition: inline; filename="'] + info fajl + ['"'] + qsim-linja.
+		sekwenza żid-fit-tmiem: qsim-linja.
+		>> l-ogħla := 76.
+		>> tul-test := blob tul.
+		>> biċċiet := (tul-test / l-ogħla) arrotonda-fuq.
 		{ :i
-			>> chunk := blob ikkopja minn: i * max tul: max.
-			str żid-fit-tmiem: chunk + brk.
-		} * chunks.
-		str żid-fit-tmiem: brk.
-		str żid-fit-tmiem: brk.
+			>> biċċa := blob ikkopja minn: i * l-ogħla tul: l-ogħla.
+			sekwenza żid-fit-tmiem: biċċa + qsim-linja.
+		} * biċċiet.
+		sekwenza żid-fit-tmiem: qsim-linja.
+		sekwenza żid-fit-tmiem: qsim-linja.
 	}.
-	str żid-fit-tmiem: ['--'] + proprju boundary + ['--'] + brk. <- str.
+	sekwenza żid-fit-tmiem: ['--'] + proprju konfini + ['--'] + qsim-linja. <- sekwenza.
 }.

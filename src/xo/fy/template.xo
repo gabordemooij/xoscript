@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objekt nĳ.
+>> Sjabloan := Objekt nĳ.
 
-Template by: ['nĳ'] dwaan: { <- sels nĳ content: [''].
+Sjabloan by: ['nĳ'] dwaan: { <- sels nĳ ynhâld: [''].
 }.
 
-Template by: ['content:'] dwaan: { :content
-	eigen content := content. 
+Sjabloan by: ['ynhâld:'] dwaan: { :ynhâld
+	eigen ynhâld := ynhâld. 
 }.
 
-Template by: ['nĳ:'] dwaan: { :content <- sels nĳ content: content.
+Sjabloan by: ['nĳ:'] dwaan: { :ynhâld <- sels nĳ ynhâld: ynhâld.
 }.
 
-Template by: ['cut:'] dwaan: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := eigen content splitse: startmarker.
-	>> prefix := parts earste.
-	>> parts2 := parts lêste splitse: endmarker.
-	>> suffix := parts2 lêste.
-	>> part := parts2 earste.
-	>> rest := prefix + suffix.
-	eigen content := rest. <- Template nĳ: part.
+Sjabloan by: ['knippe:'] dwaan: { :markearring
+	>> startmarkearring := (['<!-- cut:%id% -->'] %id%: markearring).
+	>> einmarkearring := (['<!-- /cut:%id% -->'] %id%: markearring).
+	>> dielen := eigen ynhâld splitse: startmarkearring.
+	>> foarheaksel := dielen earste.
+	>> dielen2 := dielen lêste splitse: einmarkearring.
+	>> efterheaksel := dielen2 lêste.
+	>> diel := dielen2 earste.
+	>> rest := foarheaksel + efterheaksel.
+	eigen ynhâld := rest. <- Sjabloan nĳ: diel.
 	
 }.
 
-Template by: ['kopiearje'] dwaan: { <- sels nĳ: sels tekst kopiearje.
+Sjabloan by: ['kopiearje'] dwaan: { <- sels nĳ: sels tekst kopiearje.
 }.
 	
-Template by: ['paste:at:'] dwaan: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	eigen content ferfange: pastemarker troch: ( snippet tekst + pastemarker ).
+Sjabloan by: ['plakke:by:'] dwaan: { :fragmint :id
+	>> plakmarkearring := (['<!-- paste:%id% -->'] %id%: id).
+	eigen ynhâld ferfange: plakmarkearring troch: ( fragmint tekst + plakmarkearring ).
 }.
 
-Template by: ['ynstelle:wearde:'] dwaan: { :slot :value
-	eigen content ferfange: ['<!-- slot:'] + slot + [' -->'] troch: ( Server html-kodearje: value ).
+Sjabloan by: ['ynstelle:wearde:'] dwaan: { :plak :wearde
+	eigen ynhâld ferfange: ['<!-- slot:'] + plak + [' -->'] troch: ( Server html-kodearje: wearde ).
 }.
 
-Template by: ['set:html:'] dwaan: { :slot :html
-	eigen content ferfange: ['<!-- slot:'] + slot + [' -->'] troch: html.
+Sjabloan by: ['ynstelle:html:'] dwaan: { :plak :html
+	eigen ynhâld ferfange: ['<!-- slot:'] + plak + [' -->'] troch: html.
 }.
 
-Template by: ['reagearje:en:'] dwaan: { :slot :value
-	sels ynstelle: (slot fan: 0 lingte: (slot lingte - 1)) wearde: value.
+Sjabloan by: ['reagearje:en:'] dwaan: { :plak :wearde
+	sels ynstelle: (plak fan: 0 lingte: (plak lingte - 1)) wearde: wearde.
 }.
 
-Template by: ['nl2br'] dwaan: {
-	eigen content ferfange: ['\n'] troch: ['<br>'].
+Sjabloan by: ['nl2br'] dwaan: {
+	eigen ynhâld ferfange: ['\n'] troch: ['<br>'].
 }.
 
-Template by: ['clean'] dwaan: {
-	eigen content :=
+Sjabloan by: ['skjinje'] dwaan: {
+	eigen ynhâld :=
 		Patroan
 		nĳ: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		oerienkomst: eigen content
+		oerienkomst: eigen ynhâld
 		dwaan: { <- ['']. }.
 }.
 
-Template by: ['clean-cuts'] dwaan: {
-	>> items := Rige nĳ.
+Sjabloan by: ['knipsels-skjinje'] dwaan: {
+	>> eleminten := Rige nĳ.
 	Patroan
 	nĳ: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	oerienkomst: eigen content
-	dwaan: { :_ :part
-		items tafoegje: part ? 1.
+	oerienkomst: eigen ynhâld
+	dwaan: { :_ :diel
+		eleminten tafoegje: diel ? 1.
 	}.
-	items elk: { :_ :id
-		eigen content :=
+	eleminten elk: { :_ :id
+		eigen ynhâld :=
 			Patroan nĳ: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			oerienkomst: eigen content
+			oerienkomst: eigen ynhâld
 			dwaan: { <- ['']. }.
 	 }.
 }.
 
-Template by: ['clean-space'] dwaan: {
-	eigen content :=
+Sjabloan by: ['wytromte-skjinje'] dwaan: {
+	eigen ynhâld :=
 		Patroan
 		nĳ: ['\\s*\\n'],
-		oerienkomst: eigen content
+		oerienkomst: eigen ynhâld
 		dwaan: { <- ['\n']. }.
-	eigen content :=
+	eigen ynhâld :=
 		Patroan
 		nĳ: ['\\n[\\s\\t]+'],
-		oerienkomst: eigen content
+		oerienkomst: eigen ynhâld
 		dwaan: { <- ['\n']. }.
 }.
 
-Template by: ['clean-all'] dwaan: {
-	sels clean.
-	sels clean-cuts.
-	sels clean-space.
+Sjabloan by: ['alles-skjinje'] dwaan: {
+	sels skjinje.
+	sels knipsels-skjinje.
+	sels wytromte-skjinje.
 }.
 
-Template by: ['tekst'] dwaan: { <- eigen content.
+Sjabloan by: ['tekst'] dwaan: { <- eigen ynhâld.
 }.

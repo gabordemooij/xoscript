@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Nesne yeni.
+>> Şablon := Nesne yeni.
 
-Template olunca: ['yeni'] yap: { <- kendi yeni content: [''].
+Şablon olunca: ['yeni'] yap: { <- kendi yeni içerik: [''].
 }.
 
-Template olunca: ['content:'] yap: { :content
-	öz content := content. 
+Şablon olunca: ['içerik:'] yap: { :içerik
+	öz içerik := içerik. 
 }.
 
-Template olunca: ['yeni:'] yap: { :content <- kendi yeni content: content.
+Şablon olunca: ['yeni:'] yap: { :içerik <- kendi yeni içerik: içerik.
 }.
 
-Template olunca: ['cut:'] yap: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := öz content böl: startmarker.
-	>> prefix := parts ilk.
-	>> parts2 := parts sonuncu böl: endmarker.
-	>> suffix := parts2 sonuncu.
-	>> part := parts2 ilk.
-	>> rest := prefix + suffix.
-	öz content := rest. <- Template yeni: part.
+Şablon olunca: ['kes:'] yap: { :işaret
+	>> başlangıç-işareti := (['<!-- cut:%id% -->'] %id%: işaret).
+	>> bitiş-işareti := (['<!-- /cut:%id% -->'] %id%: işaret).
+	>> kısımlar := öz içerik böl: başlangıç-işareti.
+	>> önek := kısımlar ilk.
+	>> kısımlar2 := kısımlar sonuncu böl: bitiş-işareti.
+	>> sonek := kısımlar2 sonuncu.
+	>> kısım := kısımlar2 ilk.
+	>> kalan := önek + sonek.
+	öz içerik := kalan. <- Şablon yeni: kısım.
 	
 }.
 
-Template olunca: ['kopyala'] yap: { <- kendi yeni: kendi metin kopyala.
+Şablon olunca: ['kopyala'] yap: { <- kendi yeni: kendi metin kopyala.
 }.
 	
-Template olunca: ['paste:at:'] yap: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	öz content değiştir: pastemarker yenisi: ( snippet metin + pastemarker ).
+Şablon olunca: ['yapıştır:konum:'] yap: { :kesit :id
+	>> yapıştırma-işareti := (['<!-- paste:%id% -->'] %id%: id).
+	öz içerik değiştir: yapıştırma-işareti yenisi: ( kesit metin + yapıştırma-işareti ).
 }.
 
-Template olunca: ['ayarla:değer:'] yap: { :slot :value
-	öz content değiştir: ['<!-- slot:'] + slot + [' -->'] yenisi: ( Server html-kodla: value ).
+Şablon olunca: ['ayarla:değer:'] yap: { :yuva :değer
+	öz içerik değiştir: ['<!-- slot:'] + yuva + [' -->'] yenisi: ( Server html-kodla: değer ).
 }.
 
-Template olunca: ['set:html:'] yap: { :slot :html
-	öz content değiştir: ['<!-- slot:'] + slot + [' -->'] yenisi: html.
+Şablon olunca: ['ayarla:html:'] yap: { :yuva :html
+	öz içerik değiştir: ['<!-- slot:'] + yuva + [' -->'] yenisi: html.
 }.
 
-Template olunca: ['yanıtla:ve:'] yap: { :slot :value
-	kendi ayarla: (slot başlangıç: 0 uzunluk: (slot uzunluk - 1)) değer: value.
+Şablon olunca: ['yanıtla:ve:'] yap: { :yuva :değer
+	kendi ayarla: (yuva başlangıç: 0 uzunluk: (yuva uzunluk - 1)) değer: değer.
 }.
 
-Template olunca: ['nl2br'] yap: {
-	öz content değiştir: ['\n'] yenisi: ['<br>'].
+Şablon olunca: ['nl2br'] yap: {
+	öz içerik değiştir: ['\n'] yenisi: ['<br>'].
 }.
 
-Template olunca: ['clean'] yap: {
-	öz content :=
+Şablon olunca: ['arındır'] yap: {
+	öz içerik :=
 		Desen
 		yeni: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		eşleş: öz content
+		eşleş: öz içerik
 		yap: { <- ['']. }.
 }.
 
-Template olunca: ['clean-cuts'] yap: {
-	>> items := Liste yeni.
+Şablon olunca: ['kesimleri-arındır'] yap: {
+	>> öğeler := Liste yeni.
 	Desen
 	yeni: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	eşleş: öz content
-	yap: { :_ :part
-		items sona-ekle: part ? 1.
+	eşleş: öz içerik
+	yap: { :_ :kısım
+		öğeler sona-ekle: kısım ? 1.
 	}.
-	items her: { :_ :id
-		öz content :=
+	öğeler her: { :_ :id
+		öz içerik :=
 			Desen yeni: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			eşleş: öz content
+			eşleş: öz içerik
 			yap: { <- ['']. }.
 	 }.
 }.
 
-Template olunca: ['clean-space'] yap: {
-	öz content :=
+Şablon olunca: ['boşlukları-arındır'] yap: {
+	öz içerik :=
 		Desen
 		yeni: ['\\s*\\n'],
-		eşleş: öz content
+		eşleş: öz içerik
 		yap: { <- ['\n']. }.
-	öz content :=
+	öz içerik :=
 		Desen
 		yeni: ['\\n[\\s\\t]+'],
-		eşleş: öz content
+		eşleş: öz içerik
 		yap: { <- ['\n']. }.
 }.
 
-Template olunca: ['clean-all'] yap: {
-	kendi clean.
-	kendi clean-cuts.
-	kendi clean-space.
+Şablon olunca: ['tümünü-arındır'] yap: {
+	kendi arındır.
+	kendi kesimleri-arındır.
+	kendi boşlukları-arındır.
 }.
 
-Template olunca: ['metin'] yap: { <- öz content.
+Şablon olunca: ['metin'] yap: { <- öz içerik.
 }.

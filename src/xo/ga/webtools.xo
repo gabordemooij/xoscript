@@ -1,302 +1,302 @@
-HTTP-Iarratas ar: ['HTTP-header:'] déan: { :key <- Ríomhchlár socrú: key.
+HTTP-Iarratas ar: ['HTTP-ceanntásc:'] déan: { :eochair <- Ríomhchlár socrú: eochair.
 }.
 
->> HTTP-Header := Réad nua.
+>> Ceanntásc-HTTP := Réad nua.
 
-HTTP-Header ar: ['nua'] déan: { <- féin nua init.
+Ceanntásc-HTTP ar: ['nua'] déan: { <- féin nua túsaigh.
 }.
 
-HTTP-Header ar: ['init'] déan: {
-	dílis key := Neamhní.
-	dílis value := Neamhní.
+Ceanntásc-HTTP ar: ['túsaigh'] déan: {
+	dílis eochair := Neamhní.
+	dílis luach := Neamhní.
 }.
 
-HTTP-Header ar: ['key:value:'] déan: { :key :value
-	dílis key := key.
-	dílis value := value.
+Ceanntásc-HTTP ar: ['eochair:luach:'] déan: { :eochair :luach
+	dílis eochair := eochair.
+	dílis luach := luach.
 }.
 
-HTTP-Header ar: ['key'] déan: { <- dílis key.
+Ceanntásc-HTTP ar: ['eochair'] déan: { <- dílis eochair.
 }.
 
-HTTP-Header ar: ['value'] déan: { <- dílis value.
+Ceanntásc-HTTP ar: ['luach'] déan: { <- dílis luach.
 }.
 
 
-HTTP-Header ar: ['teaghrán'] déan: {
-	>> line := dílis key + [': '] + dílis value.
-	line ionadaigh: ['\r'] le: [''], ionadaigh: ['\n'] le: ['']. <- line + [' \r\n'].
+Ceanntásc-HTTP ar: ['teaghrán'] déan: {
+	>> líne := dílis eochair + [': '] + dílis luach.
+	líne ionadaigh: ['\r'] le: [''], ionadaigh: ['\n'] le: ['']. <- líne + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Réad nua.
+>> Doiciméad-Gréasáin := Réad nua.
 
-Web-Document ar: ['nua'] déan: { <- féin nua init.
+Doiciméad-Gréasáin ar: ['nua'] déan: { <- féin nua túsaigh.
 }.
 
-Web-Document ar: ['init'] déan: {
-	dílis headers := Liosta nua.
-	dílis sess-id := Neamhní.
-	dílis session-manager := Tempfile-Session nua.
-	dílis sessdata := Neamhní.
-	dílis secure := Fíor.
-	dílis same-site := ['Strict'].
-	dílis headers-out := Bréagach.
-	dílis request := HTTP-Iarratas nua.
+Doiciméad-Gréasáin ar: ['túsaigh'] déan: {
+	dílis ceanntáisc := Liosta nua.
+	dílis aitheantas-seisiúin := Neamhní.
+	dílis bainisteoir-seisiún := Seisiún-comhaid-shealadaigh nua.
+	dílis sonraí-seisiúin := Neamhní.
+	dílis slán := Fíor.
+	dílis an-láithreán-céanna := ['Strict'].
+	dílis ceanntáisc-seolta := Bréagach.
+	dílis iarratas-http := HTTP-Iarratas nua.
 }.
 
-Web-Document ar: ['request:'] déan: { :request
-	dílis request := request.
+Doiciméad-Gréasáin ar: ['iarratas-http:'] déan: { :iarratas-http
+	dílis iarratas-http := iarratas-http.
 }. 
 
-Web-Document ar: ['secure-session-cookie:'] déan: { :secure
-	féin check-headers.
-	dílis secure := secure.
+Doiciméad-Gréasáin ar: ['fianán-seisiúin-slán:'] déan: { :slán
+	féin seiceáil-ceanntáisc.
+	dílis slán := slán.
 }.
 
-Web-Document ar: ['same-site-session-cookie:'] déan: { :value
-	féin check-headers.
-	>> options := Liosta nua 
+Doiciméad-Gréasáin ar: ['fianán-seisiúin-an-láithreáin-chéanna:'] déan: { :luach
+	féin seiceáil-ceanntáisc.
+	>> roghanna := Liosta nua 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options cuimsíonn: value, bréagach: {
+	roghanna tá-aige: luach, bréagach: {
 		an-tasc-seo earráid: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	dílis same-site := value.
+	dílis an-láithreán-céanna := luach.
 }.
 
-Web-Document ar: ['header:'] déan: { :header
-	féin check-headers.
-	dílis headers iarcheangail: header.
+Doiciméad-Gréasáin ar: ['ceanntásc:'] déan: { :ceanntásc
+	féin seiceáil-ceanntáisc.
+	dílis ceanntáisc iarcheangail: ceanntásc.
 }.
 
-Web-Document ar: ['clear-headers'] déan: {
-	féin check-headers.
-	dílis headers := Liosta nua.
+Doiciméad-Gréasáin ar: ['folmhaigh-ceanntáisc'] déan: {
+	féin seiceáil-ceanntáisc.
+	dílis ceanntáisc := Liosta nua.
 }.
 
-Web-Document ar: ['session-manager:'] déan: { :manager
-	féin check-headers.
-	dílis session-manager := manager.
+Doiciméad-Gréasáin ar: ['bainisteoir-seisiún:'] déan: { :bainisteoir
+	féin seiceáil-ceanntáisc.
+	dílis bainisteoir-seisiún := bainisteoir.
 }.
 
-Web-Document ar: ['session-manager'] déan: { <- dílis session-manager.
+Doiciméad-Gréasáin ar: ['bainisteoir-seisiún'] déan: { <- dílis bainisteoir-seisiún.
 }.
 
-Web-Document ar: ['check-headers'] déan: {
-	dílis headers-out fíor: {
+Doiciméad-Gréasáin ar: ['seiceáil-ceanntáisc'] déan: {
+	dílis ceanntáisc-seolta fíor: {
 		an-tasc-seo earráid: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document ar: ['session-start'] déan: {
-	féin check-headers.
-	>> request := dílis request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Neamhní? bréagach: {
-		(( Patrún nua: ['^[A-Za-z0-9]+\\z'], meaitseáil: sess-id ) = 0) fíor: {
-			sess-id := Neamhní.
+Doiciméad-Gréasáin ar: ['tosaigh-seisiún'] déan: {
+	féin seiceáil-ceanntáisc.
+	>> iarratas-http := dílis iarratas-http.
+	>> aitheantas-seisiúin := iarratas-http cookie: ['xsid'].
+	aitheantas-seisiúin Neamhní? bréagach: {
+		(( Patrún nua: ['^[A-Za-z0-9]+\\z'], meaitseáil: aitheantas-seisiúin ) = 0) fíor: {
+			aitheantas-seisiúin := Neamhní.
 		}.
 	}.
-	sess-id Neamhní? fíor: {
-		sess-id := Taisceadán ceadchomhartha: 30.
-		>> session-header := HTTP-Header nua
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (dílis secure ceachtar: ['Secure'] nó: ['']),
-		SSITE: (dílis same-site),
-		XSID: sess-id
+	aitheantas-seisiúin Neamhní? fíor: {
+		aitheantas-seisiúin := Taisceadán ceadchomhartha: 30.
+		>> ceanntásc-seisiúin := Ceanntásc-HTTP nua
+		eochair: ['Set-Cookie'] luach: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (dílis slán ceachtar: ['Secure'] nó: ['']),
+		SSITE: (dílis an-láithreán-céanna),
+		XSID: aitheantas-seisiúin
 		).
-		dílis headers iarcheangail: session-header.
+		dílis ceanntáisc iarcheangail: ceanntásc-seisiúin.
 	}.
-	dílis sessdata := dílis session-manager for: sess-id, load. <- dílis sessdata. # reference
+	dílis sonraí-seisiúin := dílis bainisteoir-seisiún do: aitheantas-seisiúin, lódáil. <- dílis sonraí-seisiúin. # reference
 }.
 
-Web-Document ar: ['goto:'] déan: { :url
-	féin check-headers.
-	féin clear-headers.
-	dílis headers
+Doiciméad-Gréasáin ar: ['téigh-go:'] déan: { :seoladh
+	féin seiceáil-ceanntáisc.
+	féin folmhaigh-ceanntáisc.
+	dílis ceanntáisc
 	iarcheangail: (
-		HTTP-Header nua
-		key: ['Status'] value: ['303 See Other']
+		Ceanntásc-HTTP nua
+		eochair: ['Status'] luach: ['303 See Other']
 	),
 	iarcheangail: (
-		HTTP-Header nua
-		key: ['Location'] value: url
+		Ceanntásc-HTTP nua
+		eochair: ['Location'] luach: seoladh
 	).
-	féin out: ['Redirect'].
+	féin aschuir: ['Redirect'].
 }.
 
-Web-Document ar: ['session-destroy'] déan: {
-	féin check-headers.
-	>> request := dílis request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Neamhní? bréagach: {
-		>> session-header := HTTP-Header nua.
-		>> when := Tráth nua bliain: 1970, formáid: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Doiciméad-Gréasáin ar: ['scrios-seisiún'] déan: {
+	féin seiceáil-ceanntáisc.
+	>> iarratas-http := dílis iarratas-http.
+	>> aitheantas-seisiúin := iarratas-http cookie: ['xsid'].
+	aitheantas-seisiúin Neamhní? bréagach: {
+		>> ceanntásc-seisiúin := Ceanntásc-HTTP nua.
+		>> tráth := Tráth nua bliain: 1970, formáid: ['%a, %d %b %Y %H:%M:%S GMT'].
+		ceanntásc-seisiúin eochair: ['Set-Cookie'] luach: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (dílis secure ceachtar: ['Secure'] nó: ['']),
-			SSITE: (dílis same-site),
-			XSID: sess-id
+			EXP: tráth,
+			SEC: (dílis slán ceachtar: ['Secure'] nó: ['']),
+			SSITE: (dílis an-láithreán-céanna),
+			XSID: aitheantas-seisiúin
 		).
-		dílis session-manager destroy.
-		dílis headers iarcheangail: session-header.
+		dílis bainisteoir-seisiún díothaigh.
+		dílis ceanntáisc iarcheangail: ceanntásc-seisiúin.
 	}.
 }.
 
 
-Web-Document ar: ['template:'] déan: { :conair <- Template nua: (Comhad nua: conair, léigh).
+Doiciméad-Gréasáin ar: ['teimpléad:'] déan: { :conair <- Teimpléad nua: (Comhad nua: conair, léigh).
 }.
 
-Web-Document ar: ['out:type:'] déan: { :output :cineál
-	dílis headers-out bréagach: {
-		dílis sessdata Neamhní? bréagach: {
-			dílis session-manager save: dílis sessdata.
+Doiciméad-Gréasáin ar: ['aschuir:cineál:'] déan: { :aschur :cineál
+	dílis ceanntáisc-seolta bréagach: {
+		dílis sonraí-seisiúin Neamhní? bréagach: {
+			dílis bainisteoir-seisiún sábháil: dílis sonraí-seisiúin.
 		}.
-		dílis headers iarcheangail: (
-			HTTP-Header nua
-			key: ['Content-type'] value: cineál
+		dílis ceanntáisc iarcheangail: (
+			Ceanntásc-HTTP nua
+			eochair: ['Content-type'] luach: cineál
 		).
-		dílis headers gach: { :_ :header
-			Aschur scríobh: header.
+		dílis ceanntáisc gach: { :_ :ceanntásc
+			Aschur scríobh: ceanntásc.
 		}.
-		dílis headers-out := Fíor.
+		dílis ceanntáisc-seolta := Fíor.
 		Aschur scríobh: ['\r\n'].
 	}.
-	Aschur scríobh: output.
+	Aschur scríobh: aschur.
 }.
 
-Web-Document ar: ['finish:type:'] déan: { :output :cineál
-	dílis headers-out bréagach: {
-		dílis sessdata Neamhní? bréagach: {
-			dílis session-manager save: dílis sessdata.
+Doiciméad-Gréasáin ar: ['críochnaigh:cineál:'] déan: { :aschur :cineál
+	dílis ceanntáisc-seolta bréagach: {
+		dílis sonraí-seisiúin Neamhní? bréagach: {
+			dílis bainisteoir-seisiún sábháil: dílis sonraí-seisiúin.
 		}.
-		dílis headers iarcheangail: (
-			HTTP-Header nua
-			key: ['Content-type'] value: cineál
+		dílis ceanntáisc iarcheangail: (
+			Ceanntásc-HTTP nua
+			eochair: ['Content-type'] luach: cineál
 		).
-		dílis headers iarcheangail: (
-			HTTP-Header nua
-			key: ['Content-Length'] value: output teaghrán bytes
+		dílis ceanntáisc iarcheangail: (
+			Ceanntásc-HTTP nua
+			eochair: ['Content-Length'] luach: aschur teaghrán bytes
 		).
-		dílis headers gach: { :_ :header
-			Aschur scríobh: header.
+		dílis ceanntáisc gach: { :_ :ceanntásc
+			Aschur scríobh: ceanntásc.
 		}.
-		dílis headers-out := Fíor.
+		dílis ceanntáisc-seolta := Fíor.
 		Aschur scríobh: ['\r\n'].
 	}.
-	Aschur scríobh: output.
+	Aschur scríobh: aschur.
 }.
 
-Web-Document ar: ['out:'] déan: { :output
-	féin out: output type: ['text/html; charset=utf-8'].
+Doiciméad-Gréasáin ar: ['aschuir:'] déan: { :aschur
+	féin aschuir: aschur cineál: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ar: ['finish:'] déan: { :output
-	féin finish: output type: ['text/html; charset=utf-8'].
+Doiciméad-Gréasáin ar: ['críochnaigh:'] déan: { :aschur
+	féin críochnaigh: aschur cineál: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ar: ['json:'] déan: { :output
-	féin out: ( JSON jsonify: output ) type: ['application/json'].
+Doiciméad-Gréasáin ar: ['json:'] déan: { :aschur
+	féin aschuir: ( JSON jsonify: aschur ) cineál: ['application/json'].
 }.
 
-Web-Document ar: ['not-found:'] déan: { :output
-	féin clear-headers header: (
-		HTTP-Header nua key: ['Status'] value: ['404 Not Found']
+Doiciméad-Gréasáin ar: ['gan-aimsiú:'] déan: { :aschur
+	féin folmhaigh-ceanntáisc ceanntásc: (
+		Ceanntásc-HTTP nua eochair: ['Status'] luach: ['404 Not Found']
 	).
-	féin out: output.
+	féin aschuir: aschur.
 }.
 
 
 # Interface
 
->> Session := Réad nua.
+>> Seisiún := Réad nua.
 
-Session ar: ['nua'] déan: { <- féin nua init for: Neamhní.
+Seisiún ar: ['nua'] déan: { <- féin nua túsaigh do: Neamhní.
 }.
 
-Session ar: ['for:'] déan: { :id
+Seisiún ar: ['do:'] déan: { :id
 	dílis id := id.
 }.
 
-Session ar: ['load'] déan: {
+Seisiún ar: ['lódáil'] déan: {
 	an-tasc-seo earráid: ['Not implemented.'].
 }.
 
-Session ar: ['save:'] déan: {
+Seisiún ar: ['sábháil:'] déan: {
 	an-tasc-seo earráid: ['Not implemented.'].
 }.
 
-Session ar: ['destroy'] déan: {
+Seisiún ar: ['díothaigh'] déan: {
 	an-tasc-seo earráid: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session nua.
+>> Seisiún-comhaid-shealadaigh := Seisiún nua.
 
-Tempfile-Session ar: ['init'] déan: {
-	dílis pathprefix := ['/tmp/sess-'].
+Seisiún-comhaid-shealadaigh ar: ['túsaigh'] déan: {
+	dílis tús-cosáin := ['/tmp/sess-'].
 }.
 
-Tempfile-Session ar: ['path-prefix:'] déan: { :str
-	dílis pathprefix := str.
+Seisiún-comhaid-shealadaigh ar: ['réimír-chosáin:'] déan: { :teaghrán-téacs
+	dílis tús-cosáin := teaghrán-téacs.
 }.
 
-Tempfile-Session ar: ['file'] déan: { <- ( Comhad nua: ( dílis pathprefix + dílis id + ['.txt'] ) ).
+Seisiún-comhaid-shealadaigh ar: ['comhad'] déan: { <- ( Comhad nua: ( dílis tús-cosáin + dílis id + ['.txt'] ) ).
 }.
 
-Tempfile-Session ar: ['load'] déan: {
-	>> file := féin file.
-	file ann bréagach: {
-		file scríobh: (Foclóir nua cód).
-	}. <- file léigh réad.
+Seisiún-comhaid-shealadaigh ar: ['lódáil'] déan: {
+	>> comhad := féin comhad.
+	comhad ann bréagach: {
+		comhad scríobh: (Foclóir nua cód).
+	}. <- comhad léigh réad.
 }.
 
-Tempfile-Session ar: ['save:'] déan: { :data
-	>> file := féin file.
-	file ann fíor: {
-		file scríobh: data cód.
+Seisiún-comhaid-shealadaigh ar: ['sábháil:'] déan: { :sonraí
+	>> comhad := féin comhad.
+	comhad ann fíor: {
+		comhad scríobh: sonraí cód.
 	}.
 }.
 
-Tempfile-Session ar: ['destroy'] déan: {
-	>> file := féin file.
-	file ann fíor: {
-		file scrios.
+Seisiún-comhaid-shealadaigh ar: ['díothaigh'] déan: {
+	>> comhad := féin comhad.
+	comhad ann fíor: {
+		comhad scrios.
 	}.
 }.
 
 
 >> URL := Réad nua.
 
-URL ar: ['init'] déan: {
-	dílis protocol := ['https://'].
+URL ar: ['túsaigh'] déan: {
+	dílis prótacal := ['https://'].
 	dílis óstach := ['localhost'].
 	dílis conair := [''].
-	dílis params := [''].
+	dílis paraiméadair-url := [''].
 	dílis hash := [''].
 }.
 
-URL ar: ['nua'] déan: { <- féin nua init.
+URL ar: ['nua'] déan: { <- féin nua túsaigh.
 }.
 
 URL ar: ['teaghrán'] déan: { <- (
-	dílis protocol +
+	dílis prótacal +
 	dílis óstach +
 	dílis conair +
-	dílis params +
+	dílis paraiméadair-url +
 	dílis hash ).
 }.
 
-URL ar: ['protocol:'] déan: { :protocol
-	((Liosta nua: ['http'] ; ['https']) cuimsíonn: protocol) fíor: {
-		dílis protocol := protocol + ['://'].
+URL ar: ['prótacal:'] déan: { :prótacal
+	((Liosta nua ; ['http'] ; ['https']) tá-aige: prótacal) fíor: {
+		dílis prótacal := prótacal + ['://'].
 	}, bréagach: {
 		an-tasc-seo earráid: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL ar: ['óstach:'] déan: { :óstach
 	dílis óstach := óstach.
 }.
 
-URL ar: ['path:'] déan: { :conair
+URL ar: ['conair:'] déan: { :conair
 	dílis conair := ['/'] + conair url-ionchódaigh.
 }.
 
-URL ar: ['params:'] déan: { :map
-	>> params := Liosta nua.
-	map gach: { :key :value
-		params iarcheangail: key teaghrán url-ionchódaigh + ['='] + value teaghrán url-ionchódaigh.
+URL ar: ['paraiméadair-url:'] déan: { :mapáil
+	>> paraiméadair-url := Liosta nua.
+	mapáil gach: { :eochair :luach
+		paraiméadair-url iarcheangail: eochair teaghrán url-ionchódaigh + ['='] + luach teaghrán url-ionchódaigh.
 	}.
-	dílis params := ['?'] + ( params ceangail: ['&'] ).
+	dílis paraiméadair-url := ['?'] + ( paraiméadair-url ceangail: ['&'] ).
 }.
 
 URL ar: ['haiseáil:'] déan: { :hash

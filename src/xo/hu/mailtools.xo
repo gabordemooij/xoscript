@@ -1,128 +1,128 @@
 >> Email := Objektum új.
 
-Email ha: ['init'] tedd: {
-	saját recipients := Lista új.
+Email ha: ['inicializál'] tedd: {
+	saját címzettek := Lista új.
 	saját cc := Lista új.
 	saját bcc := Lista új.
-	saját from := Semmi.
-	saját from-name := Semmi.
-	saját subject := Semmi.
-	saját body := Semmi.
+	saját feladó := Semmi.
+	saját feladó-neve := Semmi.
+	saját tárgy := Semmi.
+	saját levéltörzs := Semmi.
 }.
 
-Email ha: ['új'] tedd: { <- maga új init.
+Email ha: ['új'] tedd: { <- maga új inicializál.
 }.
 
-Email ha: ['to:'] tedd: { :list
-	saját recipients := list.
+Email ha: ['címzett:'] tedd: { :felsorolás
+	saját címzettek := felsorolás.
 }.
  
-Email ha: ['cc:'] tedd: { :list
-	saját cc := list.
+Email ha: ['cc:'] tedd: { :felsorolás
+	saját cc := felsorolás.
 }.
 
-Email ha: ['bcc:'] tedd: { :list
-	saját bcc := list.
+Email ha: ['bcc:'] tedd: { :felsorolás
+	saját bcc := felsorolás.
 }.
 
-Email ha: ['subject:'] tedd: { :subject
-	saját subject := subject.
+Email ha: ['tárgy:'] tedd: { :tárgy
+	saját tárgy := tárgy.
 }.
 
-Email ha: ['from:name:'] tedd: { :from :név
-	saját from := from.
-	saját from-name := név.
+Email ha: ['feladó:név:'] tedd: { :feladó :név
+	saját feladó := feladó.
+	saját feladó-neve := név.
 }.
 
-Email ha: ['body:'] tedd: { :body
-	saját body := body.
+Email ha: ['levéltörzs:'] tedd: { :levéltörzs
+	saját levéltörzs := levéltörzs.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email ha: ['header:'] tedd: { :line <- line csere: ['\r'] erre: [''], csere: ['\n'] erre: [''].
+Email ha: ['fejléc:'] tedd: { :sor <- sor csere: ['\r'] erre: [''], csere: ['\n'] erre: [''].
 }.
 
-Email ha: ['send'] tedd: {
-	>> f := Fájl tempwrite: maga generate.
+Email ha: ['küld'] tedd: {
+	>> f := Fájl tempwrite: maga generál.
 	Program rendszer: ['sendmail -t < '] + f útvonal, újsor.
 }.
 
-Email ha: ['generate'] tedd: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str hozzáfűz: (maga header: ['From: '] + saját from-name + [' <'] + ( saját from ) + ['>']) + brk.
-	str hozzáfűz: (maga header: ['To: '] + ( saját recipients összefűz: [','] )) + brk.
+Email ha: ['generál'] tedd: {
+	>> sortörés := ['\r\n'].
+	>> karakterlánc := [''].
+	karakterlánc hozzáfűz: (maga fejléc: ['From: '] + saját feladó-neve + [' <'] + ( saját feladó ) + ['>']) + sortörés.
+	karakterlánc hozzáfűz: (maga fejléc: ['To: '] + ( saját címzettek összefűz: [','] )) + sortörés.
 	saját cc darabszám igaz: {
-		str hozzáfűz: (maga header: ['Cc: '] + ( saját cc összefűz: [','] )) + brk.
+		karakterlánc hozzáfűz: (maga fejléc: ['Cc: '] + ( saját cc összefűz: [','] )) + sortörés.
 	}.
 	saját bcc darabszám igaz: {
-		str hozzáfűz: (maga header: ['Bcc: '] + ( saját bcc összefűz: [','] )) + brk.
+		karakterlánc hozzáfűz: (maga fejléc: ['Bcc: '] + ( saját bcc összefűz: [','] )) + sortörés.
 	}.
-	str hozzáfűz: (maga header: ['Subject: '] + saját subject) + brk.
-	str hozzáfűz: brk.
-	str hozzáfűz: saját body.
-	str hozzáfűz: brk. <- str.
+	karakterlánc hozzáfűz: (maga fejléc: ['Subject: '] + saját tárgy) + sortörés.
+	karakterlánc hozzáfűz: sortörés.
+	karakterlánc hozzáfűz: saját levéltörzs.
+	karakterlánc hozzáfűz: sortörés. <- karakterlánc.
 }.
 
 >> HTML-Email := Email új.
 
-HTML-Email ha: ['init'] tedd: {
-	maga init.
-	saját attachments := Lista új.
-	saját boundary := Széf token: 40.
+HTML-Email ha: ['inicializál'] tedd: {
+	maga inicializál.
+	saját mellékletek := Lista új.
+	saját határ := Széf token: 40.
 }.
 
-HTML-Email ha: ['attach:'] tedd: { :file
-	>> id := saját attachments darabszám.
-	>> blob := file blob.
-	saját attachments hozzáfűz: (
+HTML-Email ha: ['csatol:'] tedd: { :fájl
+	>> id := saját mellékletek darabszám.
+	>> blob := fájl blob.
+	saját mellékletek hozzáfűz: (
 		Szótár új
-			file: file útvonal,
-			mime: ['image/'] + (Server mimetype: file útvonal),
-			data: blob base64-kódolás
+			fájl: fájl útvonal,
+			mime: ['image/'] + (Server mimetype: fájl útvonal),
+			adatok: blob base64-kódolás
 	).
 	blob felszabadít. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email ha: ['generate'] tedd: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str hozzáfűz: (maga header: ['From: '] + saját from-name + [' <'] + ( saját from ) + ['>']) + brk.
-	str hozzáfűz: (maga header: ['To: '] + ( saját recipients összefűz: [','] )) + brk.
+HTML-Email ha: ['generál'] tedd: {
+	>> sortörés := ['\r\n'].
+	>> karakterlánc := [''].
+	karakterlánc hozzáfűz: (maga fejléc: ['From: '] + saját feladó-neve + [' <'] + ( saját feladó ) + ['>']) + sortörés.
+	karakterlánc hozzáfűz: (maga fejléc: ['To: '] + ( saját címzettek összefűz: [','] )) + sortörés.
 	saját cc darabszám igaz: {
-		str hozzáfűz: (maga header: ['Cc: '] + ( saját cc összefűz: [','] )) + brk.
+		karakterlánc hozzáfűz: (maga fejléc: ['Cc: '] + ( saját cc összefűz: [','] )) + sortörés.
 	}.
 	saját bcc darabszám igaz: {
-		str hozzáfűz: (maga header: ['Bcc: '] + ( saját bcc összefűz: [','] )) + brk.
+		karakterlánc hozzáfűz: (maga fejléc: ['Bcc: '] + ( saját bcc összefűz: [','] )) + sortörés.
 	}.
-	str hozzáfűz: (maga header: ['Subject: '] + saját subject) + brk.
-	str hozzáfűz: ['MIME-Version: 1.0'] + brk.
-	str hozzáfűz: ['Content-Type: multipart/related; boundary="'] + saját boundary + ['"; type=text/html'] + brk.
-	str hozzáfűz: brk.
-	str hozzáfűz: ['--'] + saját boundary + brk.
-	str hozzáfűz: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str hozzáfűz: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str hozzáfűz: brk.
-	str hozzáfűz: saját body.
-	str hozzáfűz: brk.
-	saját attachments mindegyik: { :id :info
-		>> blob := info data.
-		str hozzáfűz: ['--'] + saját boundary + brk.
-		str hozzáfűz: ['Content-Type: '] + info mime + brk.
-		str hozzáfűz: ['Content-Transfer-Encoding: base64'] + brk.
-		str hozzáfűz: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str hozzáfűz: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str hozzáfűz: brk.
-		>> max := 76.
-		>> len := blob hossz.
-		>> chunks := (len / max) felfelé-kerekít.
+	karakterlánc hozzáfűz: (maga fejléc: ['Subject: '] + saját tárgy) + sortörés.
+	karakterlánc hozzáfűz: ['MIME-Version: 1.0'] + sortörés.
+	karakterlánc hozzáfűz: ['Content-Type: multipart/related; boundary="'] + saját határ + ['"; type=text/html'] + sortörés.
+	karakterlánc hozzáfűz: sortörés.
+	karakterlánc hozzáfűz: ['--'] + saját határ + sortörés.
+	karakterlánc hozzáfűz: ['Content-Type: text/html; charset=UTF-8'] + sortörés.
+	karakterlánc hozzáfűz: ['Content-Transfer-Encoding: 7bit'] + sortörés.
+	karakterlánc hozzáfűz: sortörés.
+	karakterlánc hozzáfűz: saját levéltörzs.
+	karakterlánc hozzáfűz: sortörés.
+	saját mellékletek mindegyik: { :id :info
+		>> blob := info adatok.
+		karakterlánc hozzáfűz: ['--'] + saját határ + sortörés.
+		karakterlánc hozzáfűz: ['Content-Type: '] + info mime + sortörés.
+		karakterlánc hozzáfűz: ['Content-Transfer-Encoding: base64'] + sortörés.
+		karakterlánc hozzáfűz: ['Content-ID: <attachment'] + id + ['>'] + sortörés.
+		karakterlánc hozzáfűz: ['Content-Disposition: inline; filename="'] + info fájl + ['"'] + sortörés.
+		karakterlánc hozzáfűz: sortörés.
+		>> legfeljebb := 76.
+		>> szöveghossz := blob hossz.
+		>> darabok := (szöveghossz / legfeljebb) felfelé-kerekít.
 		{ :i
-			>> chunk := blob másol ettől: i * max hossz: max.
-			str hozzáfűz: chunk + brk.
-		} * chunks.
-		str hozzáfűz: brk.
-		str hozzáfűz: brk.
+			>> darab := blob másol ettől: i * legfeljebb hossz: legfeljebb.
+			karakterlánc hozzáfűz: darab + sortörés.
+		} * darabok.
+		karakterlánc hozzáfűz: sortörés.
+		karakterlánc hozzáfűz: sortörés.
 	}.
-	str hozzáfűz: ['--'] + saját boundary + ['--'] + brk. <- str.
+	karakterlánc hozzáfűz: ['--'] + saját határ + ['--'] + sortörés. <- karakterlánc.
 }.

@@ -1,302 +1,302 @@
-Petishon-HTTP ora: ['HTTP-header:'] hasi: { :key <- Programa konfigurashon: key.
+Petishon-HTTP ora: ['HTTP-encabesamentu:'] hasi: { :yabi <- Programa konfigurashon: yabi.
 }.
 
->> HTTP-Header := Opheto nobo.
+>> Encabesamentu-HTTP := Opheto nobo.
 
-HTTP-Header ora: ['nobo'] hasi: { <- mes nobo init.
+Encabesamentu-HTTP ora: ['nobo'] hasi: { <- mes nobo prepará.
 }.
 
-HTTP-Header ora: ['init'] hasi: {
-	propio key := Nada.
-	propio value := Nada.
+Encabesamentu-HTTP ora: ['prepará'] hasi: {
+	propio yabi := Nada.
+	propio balor := Nada.
 }.
 
-HTTP-Header ora: ['key:value:'] hasi: { :key :value
-	propio key := key.
-	propio value := value.
+Encabesamentu-HTTP ora: ['yabi:balor:'] hasi: { :yabi :balor
+	propio yabi := yabi.
+	propio balor := balor.
 }.
 
-HTTP-Header ora: ['key'] hasi: { <- propio key.
+Encabesamentu-HTTP ora: ['yabi'] hasi: { <- propio yabi.
 }.
 
-HTTP-Header ora: ['value'] hasi: { <- propio value.
+Encabesamentu-HTTP ora: ['balor'] hasi: { <- propio balor.
 }.
 
 
-HTTP-Header ora: ['teksto'] hasi: {
-	>> line := propio key + [': '] + propio value.
-	line remplasá: ['\r'] ku: [''], remplasá: ['\n'] ku: ['']. <- line + [' \r\n'].
+Encabesamentu-HTTP ora: ['teksto'] hasi: {
+	>> liña := propio yabi + [': '] + propio balor.
+	liña remplasá: ['\r'] ku: [''], remplasá: ['\n'] ku: ['']. <- liña + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Opheto nobo.
+>> Dokumento-Web := Opheto nobo.
 
-Web-Document ora: ['nobo'] hasi: { <- mes nobo init.
+Dokumento-Web ora: ['nobo'] hasi: { <- mes nobo prepará.
 }.
 
-Web-Document ora: ['init'] hasi: {
-	propio headers := Lista nobo.
-	propio sess-id := Nada.
-	propio session-manager := Tempfile-Session nobo.
-	propio sessdata := Nada.
-	propio secure := Bèrdat.
-	propio same-site := ['Strict'].
-	propio headers-out := Falsu.
-	propio request := Petishon-HTTP nobo.
+Dokumento-Web ora: ['prepará'] hasi: {
+	propio encabesamentunan := Lista nobo.
+	propio id-di-seshon := Nada.
+	propio maneho-di-seshon := Seshon-di-archivo-temporal nobo.
+	propio dato-di-seshon := Nada.
+	propio sigur := Bèrdat.
+	propio mesun-sitio := ['Strict'].
+	propio encabesamentunan-mandá := Falsu.
+	propio petishon-http := Petishon-HTTP nobo.
 }.
 
-Web-Document ora: ['request:'] hasi: { :request
-	propio request := request.
+Dokumento-Web ora: ['petishon-http:'] hasi: { :petishon-http
+	propio petishon-http := petishon-http.
 }. 
 
-Web-Document ora: ['secure-session-cookie:'] hasi: { :secure
-	mes check-headers.
-	propio secure := secure.
+Dokumento-Web ora: ['cookie-di-seshon-sigur:'] hasi: { :sigur
+	mes chek-encabesamentunan.
+	propio sigur := sigur.
 }.
 
-Web-Document ora: ['same-site-session-cookie:'] hasi: { :value
-	mes check-headers.
-	>> options := Lista nobo 
+Dokumento-Web ora: ['cookie-di-seshon-mesun-sitio:'] hasi: { :balor
+	mes chek-encabesamentunan.
+	>> opshon := Lista nobo 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options ta-kontené: value, falsu: {
+	opshon tin: balor, falsu: {
 		e-tarea-aki eror: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	propio same-site := value.
+	propio mesun-sitio := balor.
 }.
 
-Web-Document ora: ['header:'] hasi: { :header
-	mes check-headers.
-	propio headers agregá-na-fin: header.
+Dokumento-Web ora: ['encabesamentu:'] hasi: { :encabesamentu
+	mes chek-encabesamentunan.
+	propio encabesamentunan agregá-na-fin: encabesamentu.
 }.
 
-Web-Document ora: ['clear-headers'] hasi: {
-	mes check-headers.
-	propio headers := Lista nobo.
+Dokumento-Web ora: ['kita-encabesamentunan'] hasi: {
+	mes chek-encabesamentunan.
+	propio encabesamentunan := Lista nobo.
 }.
 
-Web-Document ora: ['session-manager:'] hasi: { :manager
-	mes check-headers.
-	propio session-manager := manager.
+Dokumento-Web ora: ['maneho-di-seshon:'] hasi: { :manehadó
+	mes chek-encabesamentunan.
+	propio maneho-di-seshon := manehadó.
 }.
 
-Web-Document ora: ['session-manager'] hasi: { <- propio session-manager.
+Dokumento-Web ora: ['maneho-di-seshon'] hasi: { <- propio maneho-di-seshon.
 }.
 
-Web-Document ora: ['check-headers'] hasi: {
-	propio headers-out bèrdat: {
+Dokumento-Web ora: ['chek-encabesamentunan'] hasi: {
+	propio encabesamentunan-mandá bèrdat: {
 		e-tarea-aki eror: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document ora: ['session-start'] hasi: {
-	mes check-headers.
-	>> request := propio request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nada? falsu: {
-		(( Patronchi nobo: ['^[A-Za-z0-9]+\\z'], kuadra: sess-id ) = 0) bèrdat: {
-			sess-id := Nada.
+Dokumento-Web ora: ['kuminsá-seshon'] hasi: {
+	mes chek-encabesamentunan.
+	>> petishon-http := propio petishon-http.
+	>> id-di-seshon := petishon-http cookie: ['xsid'].
+	id-di-seshon Nada? falsu: {
+		(( Patronchi nobo: ['^[A-Za-z0-9]+\\z'], kuadra: id-di-seshon ) = 0) bèrdat: {
+			id-di-seshon := Nada.
 		}.
 	}.
-	sess-id Nada? bèrdat: {
-		sess-id := Kaha-fuerte token: 30.
-		>> session-header := HTTP-Header nobo
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (propio secure esaki: ['Secure'] òf-esei: ['']),
-		SSITE: (propio same-site),
-		XSID: sess-id
+	id-di-seshon Nada? bèrdat: {
+		id-di-seshon := Kaha-fuerte token: 30.
+		>> encabesamentu-di-seshon := Encabesamentu-HTTP nobo
+		yabi: ['Set-Cookie'] balor: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (propio sigur esaki: ['Secure'] òf-esei: ['']),
+		SSITE: (propio mesun-sitio),
+		XSID: id-di-seshon
 		).
-		propio headers agregá-na-fin: session-header.
+		propio encabesamentunan agregá-na-fin: encabesamentu-di-seshon.
 	}.
-	propio sessdata := propio session-manager for: sess-id, load. <- propio sessdata. # reference
+	propio dato-di-seshon := propio maneho-di-seshon pa: id-di-seshon, karga. <- propio dato-di-seshon. # reference
 }.
 
-Web-Document ora: ['goto:'] hasi: { :url
-	mes check-headers.
-	mes clear-headers.
-	propio headers
+Dokumento-Web ora: ['bai-na:'] hasi: { :adrès
+	mes chek-encabesamentunan.
+	mes kita-encabesamentunan.
+	propio encabesamentunan
 	agregá-na-fin: (
-		HTTP-Header nobo
-		key: ['Status'] value: ['303 See Other']
+		Encabesamentu-HTTP nobo
+		yabi: ['Status'] balor: ['303 See Other']
 	),
 	agregá-na-fin: (
-		HTTP-Header nobo
-		key: ['Location'] value: url
+		Encabesamentu-HTTP nobo
+		yabi: ['Location'] balor: adrès
 	).
-	mes out: ['Redirect'].
+	mes saka: ['Redirect'].
 }.
 
-Web-Document ora: ['session-destroy'] hasi: {
-	mes check-headers.
-	>> request := propio request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nada? falsu: {
-		>> session-header := HTTP-Header nobo.
-		>> when := Momento nobo aña: 1970, formato: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Dokumento-Web ora: ['destrui-seshon'] hasi: {
+	mes chek-encabesamentunan.
+	>> petishon-http := propio petishon-http.
+	>> id-di-seshon := petishon-http cookie: ['xsid'].
+	id-di-seshon Nada? falsu: {
+		>> encabesamentu-di-seshon := Encabesamentu-HTTP nobo.
+		>> tempu-di-fin := Momento nobo aña: 1970, formato: ['%a, %d %b %Y %H:%M:%S GMT'].
+		encabesamentu-di-seshon yabi: ['Set-Cookie'] balor: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (propio secure esaki: ['Secure'] òf-esei: ['']),
-			SSITE: (propio same-site),
-			XSID: sess-id
+			EXP: tempu-di-fin,
+			SEC: (propio sigur esaki: ['Secure'] òf-esei: ['']),
+			SSITE: (propio mesun-sitio),
+			XSID: id-di-seshon
 		).
-		propio session-manager destroy.
-		propio headers agregá-na-fin: session-header.
+		propio maneho-di-seshon destrui.
+		propio encabesamentunan agregá-na-fin: encabesamentu-di-seshon.
 	}.
 }.
 
 
-Web-Document ora: ['template:'] hasi: { :ruta <- Template nobo: (Archivo nobo: ruta, lesa).
+Dokumento-Web ora: ['plantia:'] hasi: { :ruta <- Plantia nobo: (Archivo nobo: ruta, lesa).
 }.
 
-Web-Document ora: ['out:type:'] hasi: { :output :tipo
-	propio headers-out falsu: {
-		propio sessdata Nada? falsu: {
-			propio session-manager save: propio sessdata.
+Dokumento-Web ora: ['saka:tipo:'] hasi: { :resultado :tipo
+	propio encabesamentunan-mandá falsu: {
+		propio dato-di-seshon Nada? falsu: {
+			propio maneho-di-seshon guarda: propio dato-di-seshon.
 		}.
-		propio headers agregá-na-fin: (
-			HTTP-Header nobo
-			key: ['Content-type'] value: tipo
+		propio encabesamentunan agregá-na-fin: (
+			Encabesamentu-HTTP nobo
+			yabi: ['Content-type'] balor: tipo
 		).
-		propio headers kada: { :_ :header
-			Salida skirbi: header.
+		propio encabesamentunan kada: { :_ :encabesamentu
+			Salida skirbi: encabesamentu.
 		}.
-		propio headers-out := Bèrdat.
+		propio encabesamentunan-mandá := Bèrdat.
 		Salida skirbi: ['\r\n'].
 	}.
-	Salida skirbi: output.
+	Salida skirbi: resultado.
 }.
 
-Web-Document ora: ['finish:type:'] hasi: { :output :tipo
-	propio headers-out falsu: {
-		propio sessdata Nada? falsu: {
-			propio session-manager save: propio sessdata.
+Dokumento-Web ora: ['kaba:tipo:'] hasi: { :resultado :tipo
+	propio encabesamentunan-mandá falsu: {
+		propio dato-di-seshon Nada? falsu: {
+			propio maneho-di-seshon guarda: propio dato-di-seshon.
 		}.
-		propio headers agregá-na-fin: (
-			HTTP-Header nobo
-			key: ['Content-type'] value: tipo
+		propio encabesamentunan agregá-na-fin: (
+			Encabesamentu-HTTP nobo
+			yabi: ['Content-type'] balor: tipo
 		).
-		propio headers agregá-na-fin: (
-			HTTP-Header nobo
-			key: ['Content-Length'] value: output teksto bytes
+		propio encabesamentunan agregá-na-fin: (
+			Encabesamentu-HTTP nobo
+			yabi: ['Content-Length'] balor: resultado teksto bytes
 		).
-		propio headers kada: { :_ :header
-			Salida skirbi: header.
+		propio encabesamentunan kada: { :_ :encabesamentu
+			Salida skirbi: encabesamentu.
 		}.
-		propio headers-out := Bèrdat.
+		propio encabesamentunan-mandá := Bèrdat.
 		Salida skirbi: ['\r\n'].
 	}.
-	Salida skirbi: output.
+	Salida skirbi: resultado.
 }.
 
-Web-Document ora: ['out:'] hasi: { :output
-	mes out: output type: ['text/html; charset=utf-8'].
+Dokumento-Web ora: ['saka:'] hasi: { :resultado
+	mes saka: resultado tipo: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ora: ['finish:'] hasi: { :output
-	mes finish: output type: ['text/html; charset=utf-8'].
+Dokumento-Web ora: ['kaba:'] hasi: { :resultado
+	mes kaba: resultado tipo: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ora: ['json:'] hasi: { :output
-	mes out: ( JSON jsonify: output ) type: ['application/json'].
+Dokumento-Web ora: ['json:'] hasi: { :resultado
+	mes saka: ( JSON jsonify: resultado ) tipo: ['application/json'].
 }.
 
-Web-Document ora: ['not-found:'] hasi: { :output
-	mes clear-headers header: (
-		HTTP-Header nobo key: ['Status'] value: ['404 Not Found']
+Dokumento-Web ora: ['no-a-haña:'] hasi: { :resultado
+	mes kita-encabesamentunan encabesamentu: (
+		Encabesamentu-HTTP nobo yabi: ['Status'] balor: ['404 Not Found']
 	).
-	mes out: output.
+	mes saka: resultado.
 }.
 
 
 # Interface
 
->> Session := Opheto nobo.
+>> Seshon := Opheto nobo.
 
-Session ora: ['nobo'] hasi: { <- mes nobo init for: Nada.
+Seshon ora: ['nobo'] hasi: { <- mes nobo prepará pa: Nada.
 }.
 
-Session ora: ['for:'] hasi: { :id
+Seshon ora: ['pa:'] hasi: { :id
 	propio id := id.
 }.
 
-Session ora: ['load'] hasi: {
+Seshon ora: ['karga'] hasi: {
 	e-tarea-aki eror: ['Not implemented.'].
 }.
 
-Session ora: ['save:'] hasi: {
+Seshon ora: ['guarda:'] hasi: {
 	e-tarea-aki eror: ['Not implemented.'].
 }.
 
-Session ora: ['destroy'] hasi: {
+Seshon ora: ['destrui'] hasi: {
 	e-tarea-aki eror: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session nobo.
+>> Seshon-di-archivo-temporal := Seshon nobo.
 
-Tempfile-Session ora: ['init'] hasi: {
-	propio pathprefix := ['/tmp/sess-'].
+Seshon-di-archivo-temporal ora: ['prepará'] hasi: {
+	propio kuminsamentu-di-kaminda := ['/tmp/sess-'].
 }.
 
-Tempfile-Session ora: ['path-prefix:'] hasi: { :str
-	propio pathprefix := str.
+Seshon-di-archivo-temporal ora: ['prefiho-di-kaminda:'] hasi: { :kadena-di-teksto
+	propio kuminsamentu-di-kaminda := kadena-di-teksto.
 }.
 
-Tempfile-Session ora: ['file'] hasi: { <- ( Archivo nobo: ( propio pathprefix + propio id + ['.txt'] ) ).
+Seshon-di-archivo-temporal ora: ['archivo-di-seshon'] hasi: { <- ( Archivo nobo: ( propio kuminsamentu-di-kaminda + propio id + ['.txt'] ) ).
 }.
 
-Tempfile-Session ora: ['load'] hasi: {
-	>> file := mes file.
-	file ta-eksistí falsu: {
-		file skirbi: (Dikshonario nobo kódigo).
-	}. <- file lesa opheto.
+Seshon-di-archivo-temporal ora: ['karga'] hasi: {
+	>> archivo-di-seshon := mes archivo-di-seshon.
+	archivo-di-seshon ta-eksistí falsu: {
+		archivo-di-seshon skirbi: (Dikshonario nobo kódigo).
+	}. <- archivo-di-seshon lesa opheto.
 }.
 
-Tempfile-Session ora: ['save:'] hasi: { :data
-	>> file := mes file.
-	file ta-eksistí bèrdat: {
-		file skirbi: data kódigo.
+Seshon-di-archivo-temporal ora: ['guarda:'] hasi: { :dato
+	>> archivo-di-seshon := mes archivo-di-seshon.
+	archivo-di-seshon ta-eksistí bèrdat: {
+		archivo-di-seshon skirbi: dato kódigo.
 	}.
 }.
 
-Tempfile-Session ora: ['destroy'] hasi: {
-	>> file := mes file.
-	file ta-eksistí bèrdat: {
-		file kita-for-di-disko.
+Seshon-di-archivo-temporal ora: ['destrui'] hasi: {
+	>> archivo-di-seshon := mes archivo-di-seshon.
+	archivo-di-seshon ta-eksistí bèrdat: {
+		archivo-di-seshon kita-for-di-disko.
 	}.
 }.
 
 
 >> URL := Opheto nobo.
 
-URL ora: ['init'] hasi: {
-	propio protocol := ['https://'].
+URL ora: ['prepará'] hasi: {
+	propio protokòl := ['https://'].
 	propio anfitrion := ['localhost'].
 	propio ruta := [''].
-	propio params := [''].
+	propio parameter-url := [''].
 	propio hash := [''].
 }.
 
-URL ora: ['nobo'] hasi: { <- mes nobo init.
+URL ora: ['nobo'] hasi: { <- mes nobo prepará.
 }.
 
 URL ora: ['teksto'] hasi: { <- (
-	propio protocol +
+	propio protokòl +
 	propio anfitrion +
 	propio ruta +
-	propio params +
+	propio parameter-url +
 	propio hash ).
 }.
 
-URL ora: ['protocol:'] hasi: { :protocol
-	((Lista nobo: ['http'] ; ['https']) ta-kontené: protocol) bèrdat: {
-		propio protocol := protocol + ['://'].
+URL ora: ['protokòl:'] hasi: { :protokòl
+	((Lista nobo ; ['http'] ; ['https']) tin: protokòl) bèrdat: {
+		propio protokòl := protokòl + ['://'].
 	}, falsu: {
 		e-tarea-aki eror: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL ora: ['anfitrion:'] hasi: { :anfitrion
 	propio anfitrion := anfitrion.
 }.
 
-URL ora: ['path:'] hasi: { :ruta
+URL ora: ['ruta:'] hasi: { :ruta
 	propio ruta := ['/'] + ruta url-kodifiká.
 }.
 
-URL ora: ['params:'] hasi: { :map
-	>> params := Lista nobo.
-	map kada: { :key :value
-		params agregá-na-fin: key teksto url-kodifiká + ['='] + value teksto url-kodifiká.
+URL ora: ['parameter-url:'] hasi: { :mapa
+	>> parameter-url := Lista nobo.
+	mapa kada: { :yabi :balor
+		parameter-url agregá-na-fin: yabi teksto url-kodifiká + ['='] + balor teksto url-kodifiká.
 	}.
-	propio params := ['?'] + ( params uni: ['&'] ).
+	propio parameter-url := ['?'] + ( parameter-url uni: ['&'] ).
 }.
 
 URL ora: ['hash:'] hasi: { :hash

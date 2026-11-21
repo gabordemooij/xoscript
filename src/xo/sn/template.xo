@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Chinhu nyowani.
+>> Tembiricha := Chinhu nyowani.
 
-Template kana-zvasvika: ['nyowani'] ita: { <- pachako nyowani content: [''].
+Tembiricha kana-zvasvika: ['nyowani'] ita: { <- pachako nyowani zviri-mukati: [''].
 }.
 
-Template kana-zvasvika: ['content:'] ita: { :content
-	zvako content := content. 
+Tembiricha kana-zvasvika: ['zviri-mukati:'] ita: { :zviri-mukati
+	zvako zviri-mukati := zviri-mukati. 
 }.
 
-Template kana-zvasvika: ['nyowani:'] ita: { :content <- pachako nyowani content: content.
+Tembiricha kana-zvasvika: ['nyowani:'] ita: { :zviri-mukati <- pachako nyowani zviri-mukati: zviri-mukati.
 }.
 
-Template kana-zvasvika: ['cut:'] ita: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := zvako content patsanura: startmarker.
-	>> prefix := parts chekutanga.
-	>> parts2 := parts chekupedzisira patsanura: endmarker.
-	>> suffix := parts2 chekupedzisira.
-	>> part := parts2 chekutanga.
-	>> rest := prefix + suffix.
-	zvako content := rest. <- Template nyowani: part.
+Tembiricha kana-zvasvika: ['cheka:'] ita: { :chiratidzo
+	>> chiratidzo-chekutanga := (['<!-- cut:%id% -->'] %id%: chiratidzo).
+	>> chiratidzo-chekupedzisira := (['<!-- /cut:%id% -->'] %id%: chiratidzo).
+	>> zvikamu-zvidiki := zvako zviri-mukati patsanura: chiratidzo-chekutanga.
+	>> chivambo := zvikamu-zvidiki chekutanga.
+	>> zvikamu-zvidiki2 := zvikamu-zvidiki chekupedzisira patsanura: chiratidzo-chekupedzisira.
+	>> chinoteverwa := zvikamu-zvidiki2 chekupedzisira.
+	>> chikamu-chidiki := zvikamu-zvidiki2 chekutanga.
+	>> zvasara := chivambo + chinoteverwa.
+	zvako zviri-mukati := zvasara. <- Tembiricha nyowani: chikamu-chidiki.
 	
 }.
 
-Template kana-zvasvika: ['kopa'] ita: { <- pachako nyowani: pachako mavara-emashoko kopa.
+Tembiricha kana-zvasvika: ['kopa'] ita: { <- pachako nyowani: pachako mavara-emashoko kopa.
 }.
 	
-Template kana-zvasvika: ['paste:at:'] ita: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	zvako content tsiva: pastemarker na: ( snippet mavara-emashoko + pastemarker ).
+Tembiricha kana-zvasvika: ['namatidza:pa:'] ita: { :chidimburo :id
+	>> chiratidzo-chekunamatidza := (['<!-- paste:%id% -->'] %id%: id).
+	zvako zviri-mukati tsiva: chiratidzo-chekunamatidza na: ( chidimburo mavara-emashoko + chiratidzo-chekunamatidza ).
 }.
 
-Template kana-zvasvika: ['gadza:kukosha:'] ita: { :slot :value
-	zvako content tsiva: ['<!-- slot:'] + slot + [' -->'] na: ( Server html-isa-kodhi: value ).
+Tembiricha kana-zvasvika: ['gadza:kukosha:'] ita: { :nzvimbo-yekuisa :kukosha
+	zvako zviri-mukati tsiva: ['<!-- slot:'] + nzvimbo-yekuisa + [' -->'] na: ( Server html-isa-kodhi: kukosha ).
 }.
 
-Template kana-zvasvika: ['set:html:'] ita: { :slot :html
-	zvako content tsiva: ['<!-- slot:'] + slot + [' -->'] na: html.
+Tembiricha kana-zvasvika: ['gadza:html:'] ita: { :nzvimbo-yekuisa :html
+	zvako zviri-mukati tsiva: ['<!-- slot:'] + nzvimbo-yekuisa + [' -->'] na: html.
 }.
 
-Template kana-zvasvika: ['pindura:uye:'] ita: { :slot :value
-	pachako gadza: (slot kubva: 0 kureba: (slot kureba - 1)) kukosha: value.
+Tembiricha kana-zvasvika: ['pindura:uye:'] ita: { :nzvimbo-yekuisa :kukosha
+	pachako gadza: (nzvimbo-yekuisa kubva: 0 kureba: (nzvimbo-yekuisa kureba - 1)) kukosha: kukosha.
 }.
 
-Template kana-zvasvika: ['nl2br'] ita: {
-	zvako content tsiva: ['\n'] na: ['<br>'].
+Tembiricha kana-zvasvika: ['nl2br'] ita: {
+	zvako zviri-mukati tsiva: ['\n'] na: ['<br>'].
 }.
 
-Template kana-zvasvika: ['clean'] ita: {
-	zvako content :=
+Tembiricha kana-zvasvika: ['ronga'] ita: {
+	zvako zviri-mukati :=
 		Pateni
 		nyowani: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		kuenderana: zvako content
+		kuenderana: zvako zviri-mukati
 		ita: { <- ['']. }.
 }.
 
-Template kana-zvasvika: ['clean-cuts'] ita: {
-	>> items := Rondedzero nyowani.
+Tembiricha kana-zvasvika: ['ronga-zvakachekwa'] ita: {
+	>> zvinhu := Rondedzero nyowani.
 	Pateni
 	nyowani: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	kuenderana: zvako content
-	ita: { :_ :part
-		items wedzera-kumagumo: part ? 1.
+	kuenderana: zvako zviri-mukati
+	ita: { :_ :chikamu-chidiki
+		zvinhu wedzera-kumagumo: chikamu-chidiki ? 1.
 	}.
-	items chimwe-nechimwe: { :_ :id
-		zvako content :=
+	zvinhu chimwe-nechimwe: { :_ :id
+		zvako zviri-mukati :=
 			Pateni nyowani: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			kuenderana: zvako content
+			kuenderana: zvako zviri-mukati
 			ita: { <- ['']. }.
 	 }.
 }.
 
-Template kana-zvasvika: ['clean-space'] ita: {
-	zvako content :=
+Tembiricha kana-zvasvika: ['ronga-nzvimbo'] ita: {
+	zvako zviri-mukati :=
 		Pateni
 		nyowani: ['\\s*\\n'],
-		kuenderana: zvako content
+		kuenderana: zvako zviri-mukati
 		ita: { <- ['\n']. }.
-	zvako content :=
+	zvako zviri-mukati :=
 		Pateni
 		nyowani: ['\\n[\\s\\t]+'],
-		kuenderana: zvako content
+		kuenderana: zvako zviri-mukati
 		ita: { <- ['\n']. }.
 }.
 
-Template kana-zvasvika: ['clean-all'] ita: {
-	pachako clean.
-	pachako clean-cuts.
-	pachako clean-space.
+Tembiricha kana-zvasvika: ['ronga-zvese'] ita: {
+	pachako ronga.
+	pachako ronga-zvakachekwa.
+	pachako ronga-nzvimbo.
 }.
 
-Template kana-zvasvika: ['mavara-emashoko'] ita: { <- zvako content.
+Tembiricha kana-zvasvika: ['mavara-emashoko'] ita: { <- zvako zviri-mukati.
 }.

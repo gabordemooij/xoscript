@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Réad nua.
+>> Teimpléad := Réad nua.
 
-Template ar: ['nua'] déan: { <- féin nua content: [''].
+Teimpléad ar: ['nua'] déan: { <- féin nua ábhar: [''].
 }.
 
-Template ar: ['content:'] déan: { :content
-	dílis content := content. 
+Teimpléad ar: ['ábhar:'] déan: { :ábhar
+	dílis ábhar := ábhar. 
 }.
 
-Template ar: ['nua:'] déan: { :content <- féin nua content: content.
+Teimpléad ar: ['nua:'] déan: { :ábhar <- féin nua ábhar: ábhar.
 }.
 
-Template ar: ['cut:'] déan: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := dílis content scoilt: startmarker.
-	>> prefix := parts céad.
-	>> parts2 := parts deireanach scoilt: endmarker.
-	>> suffix := parts2 deireanach.
-	>> part := parts2 céad.
-	>> rest := prefix + suffix.
-	dílis content := rest. <- Template nua: part.
+Teimpléad ar: ['gearr:'] déan: { :marcóir
+	>> marcóir-tosaigh := (['<!-- cut:%id% -->'] %id%: marcóir).
+	>> marcóir-deiridh := (['<!-- /cut:%id% -->'] %id%: marcóir).
+	>> codanna := dílis ábhar scoilt: marcóir-tosaigh.
+	>> réimír := codanna céad.
+	>> codanna2 := codanna deireanach scoilt: marcóir-deiridh.
+	>> iarmhír := codanna2 deireanach.
+	>> cuid := codanna2 céad.
+	>> fuílleach := réimír + iarmhír.
+	dílis ábhar := fuílleach. <- Teimpléad nua: cuid.
 	
 }.
 
-Template ar: ['cóipeáil'] déan: { <- féin nua: féin teaghrán cóipeáil.
+Teimpléad ar: ['cóipeáil'] déan: { <- féin nua: féin teaghrán cóipeáil.
 }.
 	
-Template ar: ['paste:at:'] déan: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	dílis content ionadaigh: pastemarker le: ( snippet teaghrán + pastemarker ).
+Teimpléad ar: ['greamaigh:ag:'] déan: { :sliocht :id
+	>> marcóir-greamaithe := (['<!-- paste:%id% -->'] %id%: id).
+	dílis ábhar ionadaigh: marcóir-greamaithe le: ( sliocht teaghrán + marcóir-greamaithe ).
 }.
 
-Template ar: ['socraigh:luach:'] déan: { :slot :value
-	dílis content ionadaigh: ['<!-- slot:'] + slot + [' -->'] le: ( Server html-ionchódaigh: value ).
+Teimpléad ar: ['socraigh:luach:'] déan: { :sliotán :luach
+	dílis ábhar ionadaigh: ['<!-- slot:'] + sliotán + [' -->'] le: ( Server html-ionchódaigh: luach ).
 }.
 
-Template ar: ['set:html:'] déan: { :slot :html
-	dílis content ionadaigh: ['<!-- slot:'] + slot + [' -->'] le: html.
+Teimpléad ar: ['socraigh:html:'] déan: { :sliotán :html
+	dílis ábhar ionadaigh: ['<!-- slot:'] + sliotán + [' -->'] le: html.
 }.
 
-Template ar: ['freagair:agus:'] déan: { :slot :value
-	féin socraigh: (slot ó: 0 fad: (slot fad - 1)) luach: value.
+Teimpléad ar: ['freagair:agus:'] déan: { :sliotán :luach
+	féin socraigh: (sliotán ó: 0 fad: (sliotán fad - 1)) luach: luach.
 }.
 
-Template ar: ['nl2br'] déan: {
-	dílis content ionadaigh: ['\n'] le: ['<br>'].
+Teimpléad ar: ['nl2br'] déan: {
+	dílis ábhar ionadaigh: ['\n'] le: ['<br>'].
 }.
 
-Template ar: ['clean'] déan: {
-	dílis content :=
+Teimpléad ar: ['slachtaigh'] déan: {
+	dílis ábhar :=
 		Patrún
 		nua: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		meaitseáil: dílis content
+		meaitseáil: dílis ábhar
 		déan: { <- ['']. }.
 }.
 
-Template ar: ['clean-cuts'] déan: {
-	>> items := Liosta nua.
+Teimpléad ar: ['slachtaigh-gearrthacha'] déan: {
+	>> míreanna := Liosta nua.
 	Patrún
 	nua: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	meaitseáil: dílis content
-	déan: { :_ :part
-		items iarcheangail: part ? 1.
+	meaitseáil: dílis ábhar
+	déan: { :_ :cuid
+		míreanna iarcheangail: cuid ? 1.
 	}.
-	items gach: { :_ :id
-		dílis content :=
+	míreanna gach: { :_ :id
+		dílis ábhar :=
 			Patrún nua: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			meaitseáil: dílis content
+			meaitseáil: dílis ábhar
 			déan: { <- ['']. }.
 	 }.
 }.
 
-Template ar: ['clean-space'] déan: {
-	dílis content :=
+Teimpléad ar: ['slachtaigh-spásanna'] déan: {
+	dílis ábhar :=
 		Patrún
 		nua: ['\\s*\\n'],
-		meaitseáil: dílis content
+		meaitseáil: dílis ábhar
 		déan: { <- ['\n']. }.
-	dílis content :=
+	dílis ábhar :=
 		Patrún
 		nua: ['\\n[\\s\\t]+'],
-		meaitseáil: dílis content
+		meaitseáil: dílis ábhar
 		déan: { <- ['\n']. }.
 }.
 
-Template ar: ['clean-all'] déan: {
-	féin clean.
-	féin clean-cuts.
-	féin clean-space.
+Teimpléad ar: ['slachtaigh-uile'] déan: {
+	féin slachtaigh.
+	féin slachtaigh-gearrthacha.
+	féin slachtaigh-spásanna.
 }.
 
-Template ar: ['teaghrán'] déan: { <- dílis content.
+Teimpléad ar: ['teaghrán'] déan: { <- dílis ábhar.
 }.

@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Butang bag-o.
+>> Plantilya := Butang bag-o.
 
-Template kon: ['bag-o'] buhata: { <- kaugalingon bag-o content: [''].
+Plantilya kon: ['bag-o'] buhata: { <- kaugalingon bag-o sulod: [''].
 }.
 
-Template kon: ['content:'] buhata: { :content
-	akoa content := content. 
+Plantilya kon: ['sulod:'] buhata: { :sulod
+	akoa sulod := sulod. 
 }.
 
-Template kon: ['bag-o:'] buhata: { :content <- kaugalingon bag-o content: content.
+Plantilya kon: ['bag-o:'] buhata: { :sulod <- kaugalingon bag-o sulod: sulod.
 }.
 
-Template kon: ['cut:'] buhata: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := akoa content bahina: startmarker.
-	>> prefix := parts una.
-	>> parts2 := parts katapusan bahina: endmarker.
-	>> suffix := parts2 katapusan.
-	>> part := parts2 una.
-	>> rest := prefix + suffix.
-	akoa content := rest. <- Template bag-o: part.
+Plantilya kon: ['putla:'] buhata: { :timaan
+	>> timaan-sa-sinugdan := (['<!-- cut:%id% -->'] %id%: timaan).
+	>> timaan-sa-katapusan := (['<!-- /cut:%id% -->'] %id%: timaan).
+	>> mga-bahin := akoa sulod bahina: timaan-sa-sinugdan.
+	>> unlapi := mga-bahin una.
+	>> mga-bahin2 := mga-bahin katapusan bahina: timaan-sa-katapusan.
+	>> hulapi := mga-bahin2 katapusan.
+	>> bahin := mga-bahin2 una.
+	>> nahabilin := unlapi + hulapi.
+	akoa sulod := nahabilin. <- Plantilya bag-o: bahin.
 	
 }.
 
-Template kon: ['kopyaha'] buhata: { <- kaugalingon bag-o: kaugalingon teksto kopyaha.
+Plantilya kon: ['kopyaha'] buhata: { <- kaugalingon bag-o: kaugalingon teksto kopyaha.
 }.
 	
-Template kon: ['paste:at:'] buhata: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	akoa content ilisi: pastemarker ug: ( snippet teksto + pastemarker ).
+Plantilya kon: ['idikit:sa:'] buhata: { :kinutlo :id
+	>> timaan-sa-pagdikit := (['<!-- paste:%id% -->'] %id%: id).
+	akoa sulod ilisi: timaan-sa-pagdikit ug: ( kinutlo teksto + timaan-sa-pagdikit ).
 }.
 
-Template kon: ['ibutang:bili:'] buhata: { :slot :value
-	akoa content ilisi: ['<!-- slot:'] + slot + [' -->'] ug: ( Server html-i-encode: value ).
+Plantilya kon: ['ibutang:bili:'] buhata: { :luna :bili
+	akoa sulod ilisi: ['<!-- slot:'] + luna + [' -->'] ug: ( Server html-i-encode: bili ).
 }.
 
-Template kon: ['set:html:'] buhata: { :slot :html
-	akoa content ilisi: ['<!-- slot:'] + slot + [' -->'] ug: html.
+Plantilya kon: ['ibutang:html:'] buhata: { :luna :html
+	akoa sulod ilisi: ['<!-- slot:'] + luna + [' -->'] ug: html.
 }.
 
-Template kon: ['tubag:ug:'] buhata: { :slot :value
-	kaugalingon ibutang: (slot gikan-sa: 0 gitas-on: (slot gitas-on - 1)) bili: value.
+Plantilya kon: ['tubag:ug:'] buhata: { :luna :bili
+	kaugalingon ibutang: (luna gikan-sa: 0 gitas-on: (luna gitas-on - 1)) bili: bili.
 }.
 
-Template kon: ['nl2br'] buhata: {
-	akoa content ilisi: ['\n'] ug: ['<br>'].
+Plantilya kon: ['nl2br'] buhata: {
+	akoa sulod ilisi: ['\n'] ug: ['<br>'].
 }.
 
-Template kon: ['clean'] buhata: {
-	akoa content :=
+Plantilya kon: ['hapsaya'] buhata: {
+	akoa sulod :=
 		Sumbanan
 		bag-o: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		tukma: akoa content
+		tukma: akoa sulod
 		buhata: { <- ['']. }.
 }.
 
-Template kon: ['clean-cuts'] buhata: {
-	>> items := Lista bag-o.
+Plantilya kon: ['hapsaya-ang-mga-giputol'] buhata: {
+	>> mga-butang := Lista bag-o.
 	Sumbanan
 	bag-o: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	tukma: akoa content
-	buhata: { :_ :part
-		items idugang-sa-tumoy: part ? 1.
+	tukma: akoa sulod
+	buhata: { :_ :bahin
+		mga-butang idugang-sa-tumoy: bahin ? 1.
 	}.
-	items matag: { :_ :id
-		akoa content :=
+	mga-butang matag: { :_ :id
+		akoa sulod :=
 			Sumbanan bag-o: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			tukma: akoa content
+			tukma: akoa sulod
 			buhata: { <- ['']. }.
 	 }.
 }.
 
-Template kon: ['clean-space'] buhata: {
-	akoa content :=
+Plantilya kon: ['hapsaya-ang-mga-luna'] buhata: {
+	akoa sulod :=
 		Sumbanan
 		bag-o: ['\\s*\\n'],
-		tukma: akoa content
+		tukma: akoa sulod
 		buhata: { <- ['\n']. }.
-	akoa content :=
+	akoa sulod :=
 		Sumbanan
 		bag-o: ['\\n[\\s\\t]+'],
-		tukma: akoa content
+		tukma: akoa sulod
 		buhata: { <- ['\n']. }.
 }.
 
-Template kon: ['clean-all'] buhata: {
-	kaugalingon clean.
-	kaugalingon clean-cuts.
-	kaugalingon clean-space.
+Plantilya kon: ['hapsaya-tanan'] buhata: {
+	kaugalingon hapsaya.
+	kaugalingon hapsaya-ang-mga-giputol.
+	kaugalingon hapsaya-ang-mga-luna.
 }.
 
-Template kon: ['teksto'] buhata: { <- akoa content.
+Plantilya kon: ['teksto'] buhata: { <- akoa sulod.
 }.

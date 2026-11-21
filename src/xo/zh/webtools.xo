@@ -1,302 +1,302 @@
-互联网请求 在: ['HTTP-header:'] 执行: { :key <- 程序 环境变量: key.
+互联网请求 在: ['HTTP-头部:'] 执行: { :键名 <- 程序 环境变量: 键名.
 }.
 
->> HTTP-Header := 对象 新建.
+>> HTTP头 := 对象 新建.
 
-HTTP-Header 在: ['新建'] 执行: { <- 自身 新建 init.
+HTTP头 在: ['新建'] 执行: { <- 自身 新建 初始化.
 }.
 
-HTTP-Header 在: ['init'] 执行: {
-	拥有 key := 空.
-	拥有 value := 空.
+HTTP头 在: ['初始化'] 执行: {
+	拥有 键名 := 空.
+	拥有 取值 := 空.
 }.
 
-HTTP-Header 在: ['key:value:'] 执行: { :key :value
-	拥有 key := key.
-	拥有 value := value.
+HTTP头 在: ['键名:取值:'] 执行: { :键名 :取值
+	拥有 键名 := 键名.
+	拥有 取值 := 取值.
 }.
 
-HTTP-Header 在: ['key'] 执行: { <- 拥有 key.
+HTTP头 在: ['键名'] 执行: { <- 拥有 键名.
 }.
 
-HTTP-Header 在: ['value'] 执行: { <- 拥有 value.
+HTTP头 在: ['取值'] 执行: { <- 拥有 取值.
 }.
 
 
-HTTP-Header 在: ['转文本'] 执行: {
-	>> line := 拥有 key + [': '] + 拥有 value.
-	line 替换: ['\r'] 为: [''], 替换: ['\n'] 为: ['']. <- line + [' \r\n'].
+HTTP头 在: ['转文本'] 执行: {
+	>> 行文本 := 拥有 键名 + [': '] + 拥有 取值.
+	行文本 替换: ['\r'] 为: [''], 替换: ['\n'] 为: ['']. <- 行文本 + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := 对象 新建.
+>> 网页文档 := 对象 新建.
 
-Web-Document 在: ['新建'] 执行: { <- 自身 新建 init.
+网页文档 在: ['新建'] 执行: { <- 自身 新建 初始化.
 }.
 
-Web-Document 在: ['init'] 执行: {
-	拥有 headers := 数组对象 新建.
-	拥有 sess-id := 空.
-	拥有 session-manager := Tempfile-Session 新建.
-	拥有 sessdata := 空.
-	拥有 secure := 是.
-	拥有 same-site := ['Strict'].
-	拥有 headers-out := 否.
-	拥有 request := 互联网请求 新建.
+网页文档 在: ['初始化'] 执行: {
+	拥有 头部列表 := 数组对象 新建.
+	拥有 会话标识 := 空.
+	拥有 会话管理器 := 临时文件会话 新建.
+	拥有 会话数据 := 空.
+	拥有 安全的 := 是.
+	拥有 同站 := ['Strict'].
+	拥有 头部已发送 := 否.
+	拥有 http请求 := 互联网请求 新建.
 }.
 
-Web-Document 在: ['request:'] 执行: { :request
-	拥有 request := request.
+网页文档 在: ['http请求:'] 执行: { :http请求
+	拥有 http请求 := http请求.
 }. 
 
-Web-Document 在: ['secure-session-cookie:'] 执行: { :secure
-	自身 check-headers.
-	拥有 secure := secure.
+网页文档 在: ['安全会话cookie:'] 执行: { :安全的
+	自身 检查头部.
+	拥有 安全的 := 安全的.
 }.
 
-Web-Document 在: ['same-site-session-cookie:'] 执行: { :value
-	自身 check-headers.
-	>> options := 数组对象 新建 
+网页文档 在: ['同站会话cookie:'] 执行: { :取值
+	自身 检查头部.
+	>> 选项 := 数组对象 新建 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options 包含: value, 否: {
+	选项 _包含: 取值, 否: {
 		当前任务 错误: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	拥有 same-site := value.
+	拥有 同站 := 取值.
 }.
 
-Web-Document 在: ['header:'] 执行: { :header
-	自身 check-headers.
-	拥有 headers 追加: header.
+网页文档 在: ['头部:'] 执行: { :头部
+	自身 检查头部.
+	拥有 头部列表 追加: 头部.
 }.
 
-Web-Document 在: ['clear-headers'] 执行: {
-	自身 check-headers.
-	拥有 headers := 数组对象 新建.
+网页文档 在: ['清空头部'] 执行: {
+	自身 检查头部.
+	拥有 头部列表 := 数组对象 新建.
 }.
 
-Web-Document 在: ['session-manager:'] 执行: { :manager
-	自身 check-headers.
-	拥有 session-manager := manager.
+网页文档 在: ['会话管理器:'] 执行: { :管理器
+	自身 检查头部.
+	拥有 会话管理器 := 管理器.
 }.
 
-Web-Document 在: ['session-manager'] 执行: { <- 拥有 session-manager.
+网页文档 在: ['会话管理器'] 执行: { <- 拥有 会话管理器.
 }.
 
-Web-Document 在: ['check-headers'] 执行: {
-	拥有 headers-out 是: {
+网页文档 在: ['检查头部'] 执行: {
+	拥有 头部已发送 是: {
 		当前任务 错误: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document 在: ['session-start'] 执行: {
-	自身 check-headers.
-	>> request := 拥有 request.
-	>> sess-id := request 曲奇饼: ['xsid'].
-	sess-id 为空? 否: {
-		(( 模式 新建: ['^[A-Za-z0-9]+\\z'], 匹配: sess-id ) = 0) 是: {
-			sess-id := 空.
+网页文档 在: ['开始会话'] 执行: {
+	自身 检查头部.
+	>> http请求 := 拥有 http请求.
+	>> 会话标识 := http请求 曲奇饼: ['xsid'].
+	会话标识 为空? 否: {
+		(( 模式 新建: ['^[A-Za-z0-9]+\\z'], 匹配: 会话标识 ) = 0) 是: {
+			会话标识 := 空.
 		}.
 	}.
-	sess-id 为空? 是: {
-		sess-id := 保险库 令牌: 30.
-		>> session-header := HTTP-Header 新建
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (拥有 secure 或: ['Secure'] 或: ['']),
-		SSITE: (拥有 same-site),
-		XSID: sess-id
+	会话标识 为空? 是: {
+		会话标识 := 保险库 令牌: 30.
+		>> 会话头部 := HTTP头 新建
+		键名: ['Set-Cookie'] 取值: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (拥有 安全的 或: ['Secure'] 或: ['']),
+		SSITE: (拥有 同站),
+		XSID: 会话标识
 		).
-		拥有 headers 追加: session-header.
+		拥有 头部列表 追加: 会话头部.
 	}.
-	拥有 sessdata := 拥有 session-manager for: sess-id, load. <- 拥有 sessdata. # reference
+	拥有 会话数据 := 拥有 会话管理器 针对: 会话标识, 加载. <- 拥有 会话数据. # reference
 }.
 
-Web-Document 在: ['goto:'] 执行: { :url
-	自身 check-headers.
-	自身 clear-headers.
-	拥有 headers
+网页文档 在: ['跳转:'] 执行: { :网址
+	自身 检查头部.
+	自身 清空头部.
+	拥有 头部列表
 	追加: (
-		HTTP-Header 新建
-		key: ['Status'] value: ['303 See Other']
+		HTTP头 新建
+		键名: ['Status'] 取值: ['303 See Other']
 	),
 	追加: (
-		HTTP-Header 新建
-		key: ['Location'] value: url
+		HTTP头 新建
+		键名: ['Location'] 取值: 网址
 	).
-	自身 out: ['Redirect'].
+	自身 输出: ['Redirect'].
 }.
 
-Web-Document 在: ['session-destroy'] 执行: {
-	自身 check-headers.
-	>> request := 拥有 request.
-	>> sess-id := request 曲奇饼: ['xsid'].
-	sess-id 为空? 否: {
-		>> session-header := HTTP-Header 新建.
-		>> when := 时间对象 新建 年: 1970, 格式: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+网页文档 在: ['销毁会话'] 执行: {
+	自身 检查头部.
+	>> http请求 := 拥有 http请求.
+	>> 会话标识 := http请求 曲奇饼: ['xsid'].
+	会话标识 为空? 否: {
+		>> 会话头部 := HTTP头 新建.
+		>> 时刻 := 时间对象 新建 年: 1970, 格式: ['%a, %d %b %Y %H:%M:%S GMT'].
+		会话头部 键名: ['Set-Cookie'] 取值: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (拥有 secure 或: ['Secure'] 或: ['']),
-			SSITE: (拥有 same-site),
-			XSID: sess-id
+			EXP: 时刻,
+			SEC: (拥有 安全的 或: ['Secure'] 或: ['']),
+			SSITE: (拥有 同站),
+			XSID: 会话标识
 		).
-		拥有 session-manager destroy.
-		拥有 headers 追加: session-header.
+		拥有 会话管理器 销毁.
+		拥有 头部列表 追加: 会话头部.
 	}.
 }.
 
 
-Web-Document 在: ['template:'] 执行: { :路径 <- Template 新建: (文件 新建: 路径, 读取).
+网页文档 在: ['模板:'] 执行: { :路径 <- 模板 新建: (文件 新建: 路径, 读取).
 }.
 
-Web-Document 在: ['out:type:'] 执行: { :output :类型
-	拥有 headers-out 否: {
-		拥有 sessdata 为空? 否: {
-			拥有 session-manager save: 拥有 sessdata.
+网页文档 在: ['输出:类型:'] 执行: { :输出结果 :类型
+	拥有 头部已发送 否: {
+		拥有 会话数据 为空? 否: {
+			拥有 会话管理器 保存: 拥有 会话数据.
 		}.
-		拥有 headers 追加: (
-			HTTP-Header 新建
-			key: ['Content-type'] value: 类型
+		拥有 头部列表 追加: (
+			HTTP头 新建
+			键名: ['Content-type'] 取值: 类型
 		).
-		拥有 headers 每个: { :_ :header
-			输出 写入: header.
+		拥有 头部列表 每个: { :_ :头部
+			输出 写入: 头部.
 		}.
-		拥有 headers-out := 是.
+		拥有 头部已发送 := 是.
 		输出 写入: ['\r\n'].
 	}.
-	输出 写入: output.
+	输出 写入: 输出结果.
 }.
 
-Web-Document 在: ['finish:type:'] 执行: { :output :类型
-	拥有 headers-out 否: {
-		拥有 sessdata 为空? 否: {
-			拥有 session-manager save: 拥有 sessdata.
+网页文档 在: ['完成:类型:'] 执行: { :输出结果 :类型
+	拥有 头部已发送 否: {
+		拥有 会话数据 为空? 否: {
+			拥有 会话管理器 保存: 拥有 会话数据.
 		}.
-		拥有 headers 追加: (
-			HTTP-Header 新建
-			key: ['Content-type'] value: 类型
+		拥有 头部列表 追加: (
+			HTTP头 新建
+			键名: ['Content-type'] 取值: 类型
 		).
-		拥有 headers 追加: (
-			HTTP-Header 新建
-			key: ['Content-Length'] value: output 转文本 字节范围
+		拥有 头部列表 追加: (
+			HTTP头 新建
+			键名: ['Content-Length'] 取值: 输出结果 转文本 字节范围
 		).
-		拥有 headers 每个: { :_ :header
-			输出 写入: header.
+		拥有 头部列表 每个: { :_ :头部
+			输出 写入: 头部.
 		}.
-		拥有 headers-out := 是.
+		拥有 头部已发送 := 是.
 		输出 写入: ['\r\n'].
 	}.
-	输出 写入: output.
+	输出 写入: 输出结果.
 }.
 
-Web-Document 在: ['out:'] 执行: { :output
-	自身 out: output type: ['text/html; charset=utf-8'].
+网页文档 在: ['输出:'] 执行: { :输出结果
+	自身 输出: 输出结果 类型: ['text/html; charset=utf-8'].
 }.
 
-Web-Document 在: ['finish:'] 执行: { :output
-	自身 finish: output type: ['text/html; charset=utf-8'].
+网页文档 在: ['完成:'] 执行: { :输出结果
+	自身 完成: 输出结果 类型: ['text/html; charset=utf-8'].
 }.
 
-Web-Document 在: ['json:'] 执行: { :output
-	自身 out: ( 杰森 杰森风格: output ) type: ['application/json'].
+网页文档 在: ['json:'] 执行: { :输出结果
+	自身 输出: ( 杰森 杰森风格: 输出结果 ) 类型: ['application/json'].
 }.
 
-Web-Document 在: ['not-found:'] 执行: { :output
-	自身 clear-headers header: (
-		HTTP-Header 新建 key: ['Status'] value: ['404 Not Found']
+网页文档 在: ['未找到:'] 执行: { :输出结果
+	自身 清空头部 头部: (
+		HTTP头 新建 键名: ['Status'] 取值: ['404 Not Found']
 	).
-	自身 out: output.
+	自身 输出: 输出结果.
 }.
 
 
 # Interface
 
->> Session := 对象 新建.
+>> 会话 := 对象 新建.
 
-Session 在: ['新建'] 执行: { <- 自身 新建 init for: 空.
+会话 在: ['新建'] 执行: { <- 自身 新建 初始化 针对: 空.
 }.
 
-Session 在: ['for:'] 执行: { :id
+会话 在: ['针对:'] 执行: { :id
 	拥有 id := id.
 }.
 
-Session 在: ['load'] 执行: {
+会话 在: ['加载'] 执行: {
 	当前任务 错误: ['Not implemented.'].
 }.
 
-Session 在: ['save:'] 执行: {
+会话 在: ['保存:'] 执行: {
 	当前任务 错误: ['Not implemented.'].
 }.
 
-Session 在: ['destroy'] 执行: {
+会话 在: ['销毁'] 执行: {
 	当前任务 错误: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session 新建.
+>> 临时文件会话 := 会话 新建.
 
-Tempfile-Session 在: ['init'] 执行: {
-	拥有 pathprefix := ['/tmp/sess-'].
+临时文件会话 在: ['初始化'] 执行: {
+	拥有 路径开头 := ['/tmp/sess-'].
 }.
 
-Tempfile-Session 在: ['path-prefix:'] 执行: { :str
-	拥有 pathprefix := str.
+临时文件会话 在: ['路径前缀:'] 执行: { :字符串文本
+	拥有 路径开头 := 字符串文本.
 }.
 
-Tempfile-Session 在: ['file'] 执行: { <- ( 文件 新建: ( 拥有 pathprefix + 拥有 id + ['.txt'] ) ).
+临时文件会话 在: ['会话文件'] 执行: { <- ( 文件 新建: ( 拥有 路径开头 + 拥有 id + ['.txt'] ) ).
 }.
 
-Tempfile-Session 在: ['load'] 执行: {
-	>> file := 自身 file.
-	file 存在 否: {
-		file 写入: (映射对象 新建 代码).
-	}. <- file 读取 转对象.
+临时文件会话 在: ['加载'] 执行: {
+	>> 会话文件 := 自身 会话文件.
+	会话文件 存在 否: {
+		会话文件 写入: (映射对象 新建 代码).
+	}. <- 会话文件 读取 转对象.
 }.
 
-Tempfile-Session 在: ['save:'] 执行: { :data
-	>> file := 自身 file.
-	file 存在 是: {
-		file 写入: data 代码.
+临时文件会话 在: ['保存:'] 执行: { :数据
+	>> 会话文件 := 自身 会话文件.
+	会话文件 存在 是: {
+		会话文件 写入: 数据 代码.
 	}.
 }.
 
-Tempfile-Session 在: ['destroy'] 执行: {
-	>> file := 自身 file.
-	file 存在 是: {
-		file 删除.
+临时文件会话 在: ['销毁'] 执行: {
+	>> 会话文件 := 自身 会话文件.
+	会话文件 存在 是: {
+		会话文件 删除.
 	}.
 }.
 
 
 >> URL := 对象 新建.
 
-URL 在: ['init'] 执行: {
-	拥有 protocol := ['https://'].
+URL 在: ['初始化'] 执行: {
+	拥有 协议名 := ['https://'].
 	拥有 主机 := ['localhost'].
 	拥有 路径 := [''].
-	拥有 params := [''].
+	拥有 url参数 := [''].
 	拥有 hash := [''].
 }.
 
-URL 在: ['新建'] 执行: { <- 自身 新建 init.
+URL 在: ['新建'] 执行: { <- 自身 新建 初始化.
 }.
 
 URL 在: ['转文本'] 执行: { <- (
-	拥有 protocol +
+	拥有 协议名 +
 	拥有 主机 +
 	拥有 路径 +
-	拥有 params +
+	拥有 url参数 +
 	拥有 hash ).
 }.
 
-URL 在: ['protocol:'] 执行: { :protocol
-	((数组对象 新建: ['http'] ; ['https']) 包含: protocol) 是: {
-		拥有 protocol := protocol + ['://'].
+URL 在: ['协议名:'] 执行: { :协议名
+	((数组对象 新建 ; ['http'] ; ['https']) _包含: 协议名) 是: {
+		拥有 协议名 := 协议名 + ['://'].
 	}, 否: {
 		当前任务 错误: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL 在: ['主机:'] 执行: { :主机
 	拥有 主机 := 主机.
 }.
 
-URL 在: ['path:'] 执行: { :路径
+URL 在: ['路径:'] 执行: { :路径
 	拥有 路径 := ['/'] + 路径 互联网地址编码.
 }.
 
-URL 在: ['params:'] 执行: { :map
-	>> params := 数组对象 新建.
-	map 每个: { :key :value
-		params 追加: key 转文本 互联网地址编码 + ['='] + value 转文本 互联网地址编码.
+URL 在: ['url参数:'] 执行: { :映射表
+	>> url参数 := 数组对象 新建.
+	映射表 每个: { :键名 :取值
+		url参数 追加: 键名 转文本 互联网地址编码 + ['='] + 取值 转文本 互联网地址编码.
 	}.
-	拥有 params := ['?'] + ( params 连接: ['&'] ).
+	拥有 url参数 := ['?'] + ( url参数 连接: ['&'] ).
 }.
 
 URL 在: ['哈希:'] 执行: { :hash

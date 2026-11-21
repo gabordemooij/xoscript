@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Obiect nou.
+>> Model := Obiect nou.
 
-Template la: ['nou'] execută: { <- sine nou content: [''].
+Model la: ['nou'] execută: { <- sine nou conținut: [''].
 }.
 
-Template la: ['content:'] execută: { :content
-	propriu content := content. 
+Model la: ['conținut:'] execută: { :conținut
+	propriu conținut := conținut. 
 }.
 
-Template la: ['nou:'] execută: { :content <- sine nou content: content.
+Model la: ['nou:'] execută: { :conținut <- sine nou conținut: conținut.
 }.
 
-Template la: ['cut:'] execută: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := propriu content împarte: startmarker.
-	>> prefix := parts primul.
-	>> parts2 := parts ultimul împarte: endmarker.
-	>> suffix := parts2 ultimul.
-	>> part := parts2 primul.
-	>> rest := prefix + suffix.
-	propriu content := rest. <- Template nou: part.
+Model la: ['taie:'] execută: { :marcaj
+	>> marcaj-început := (['<!-- cut:%id% -->'] %id%: marcaj).
+	>> marcaj-sfârșit := (['<!-- /cut:%id% -->'] %id%: marcaj).
+	>> părți := propriu conținut împarte: marcaj-început.
+	>> prefix := părți primul.
+	>> părți2 := părți ultimul împarte: marcaj-sfârșit.
+	>> sufix := părți2 ultimul.
+	>> parte := părți2 primul.
+	>> rest := prefix + sufix.
+	propriu conținut := rest. <- Model nou: parte.
 	
 }.
 
-Template la: ['copiază'] execută: { <- sine nou: sine text copiază.
+Model la: ['copiază'] execută: { <- sine nou: sine text copiază.
 }.
 	
-Template la: ['paste:at:'] execută: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	propriu content înlocuiește: pastemarker cu: ( snippet text + pastemarker ).
+Model la: ['lipește:la:'] execută: { :extras :id
+	>> marcaj-lipire := (['<!-- paste:%id% -->'] %id%: id).
+	propriu conținut înlocuiește: marcaj-lipire cu: ( extras text + marcaj-lipire ).
 }.
 
-Template la: ['setează:valoare:'] execută: { :slot :value
-	propriu content înlocuiește: ['<!-- slot:'] + slot + [' -->'] cu: ( Server html-codifică: value ).
+Model la: ['setează:valoare:'] execută: { :loc :valoare
+	propriu conținut înlocuiește: ['<!-- slot:'] + loc + [' -->'] cu: ( Server html-codifică: valoare ).
 }.
 
-Template la: ['set:html:'] execută: { :slot :html
-	propriu content înlocuiește: ['<!-- slot:'] + slot + [' -->'] cu: html.
+Model la: ['setează:html:'] execută: { :loc :html
+	propriu conținut înlocuiește: ['<!-- slot:'] + loc + [' -->'] cu: html.
 }.
 
-Template la: ['răspunde:și:'] execută: { :slot :value
-	sine setează: (slot de-la: 0 lungime: (slot lungime - 1)) valoare: value.
+Model la: ['răspunde:și:'] execută: { :loc :valoare
+	sine setează: (loc de-la: 0 lungime: (loc lungime - 1)) valoare: valoare.
 }.
 
-Template la: ['nl2br'] execută: {
-	propriu content înlocuiește: ['\n'] cu: ['<br>'].
+Model la: ['nl2br'] execută: {
+	propriu conținut înlocuiește: ['\n'] cu: ['<br>'].
 }.
 
-Template la: ['clean'] execută: {
-	propriu content :=
+Model la: ['epurează'] execută: {
+	propriu conținut :=
 		Șablon
 		nou: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		potrivire: propriu content
+		potrivire: propriu conținut
 		fă: { <- ['']. }.
 }.
 
-Template la: ['clean-cuts'] execută: {
-	>> items := Listă nou.
+Model la: ['epurează-tăieturi'] execută: {
+	>> elemente := Listă nou.
 	Șablon
 	nou: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	potrivire: propriu content
-	fă: { :_ :part
-		items adaugă-la-sfârșit: part ? 1.
+	potrivire: propriu conținut
+	fă: { :_ :parte
+		elemente adaugă-la-sfârșit: parte ? 1.
 	}.
-	items fiecare: { :_ :id
-		propriu content :=
+	elemente fiecare: { :_ :id
+		propriu conținut :=
 			Șablon nou: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			potrivire: propriu content
+			potrivire: propriu conținut
 			fă: { <- ['']. }.
 	 }.
 }.
 
-Template la: ['clean-space'] execută: {
-	propriu content :=
+Model la: ['epurează-spații'] execută: {
+	propriu conținut :=
 		Șablon
 		nou: ['\\s*\\n'],
-		potrivire: propriu content
+		potrivire: propriu conținut
 		fă: { <- ['\n']. }.
-	propriu content :=
+	propriu conținut :=
 		Șablon
 		nou: ['\\n[\\s\\t]+'],
-		potrivire: propriu content
+		potrivire: propriu conținut
 		fă: { <- ['\n']. }.
 }.
 
-Template la: ['clean-all'] execută: {
-	sine clean.
-	sine clean-cuts.
-	sine clean-space.
+Model la: ['epurează-tot'] execută: {
+	sine epurează.
+	sine epurează-tăieturi.
+	sine epurează-spații.
 }.
 
-Template la: ['text'] execută: { <- propriu content.
+Model la: ['text'] execută: { <- propriu conținut.
 }.

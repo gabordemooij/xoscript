@@ -1,128 +1,128 @@
->> Email := Ikintu gishya.
+>> Imeyili := Ikintu gishya.
 
-Email bigeze: ['init'] kora: {
-	icyacyo recipients := Urutonde gishya.
+Imeyili bigeze: ['tegura'] kora: {
+	icyacyo abakira := Urutonde gishya.
 	icyacyo cc := Urutonde gishya.
 	icyacyo bcc := Urutonde gishya.
-	icyacyo from := Ntacyo.
-	icyacyo from-name := Ntacyo.
-	icyacyo subject := Ntacyo.
-	icyacyo body := Ntacyo.
+	icyacyo uwohereje := Ntacyo.
+	icyacyo izina-ry-uwohereje := Ntacyo.
+	icyacyo insanganyamatsiko := Ntacyo.
+	icyacyo umubiri := Ntacyo.
 }.
 
-Email bigeze: ['gishya'] kora: { <- ubwacyo gishya init.
+Imeyili bigeze: ['gishya'] kora: { <- ubwacyo gishya tegura.
 }.
 
-Email bigeze: ['to:'] kora: { :list
-	icyacyo recipients := list.
+Imeyili bigeze: ['kuri:'] kora: { :urutonde-rw-ibintu
+	icyacyo abakira := urutonde-rw-ibintu.
 }.
  
-Email bigeze: ['cc:'] kora: { :list
-	icyacyo cc := list.
+Imeyili bigeze: ['cc:'] kora: { :urutonde-rw-ibintu
+	icyacyo cc := urutonde-rw-ibintu.
 }.
 
-Email bigeze: ['bcc:'] kora: { :list
-	icyacyo bcc := list.
+Imeyili bigeze: ['bcc:'] kora: { :urutonde-rw-ibintu
+	icyacyo bcc := urutonde-rw-ibintu.
 }.
 
-Email bigeze: ['subject:'] kora: { :subject
-	icyacyo subject := subject.
+Imeyili bigeze: ['insanganyamatsiko:'] kora: { :insanganyamatsiko
+	icyacyo insanganyamatsiko := insanganyamatsiko.
 }.
 
-Email bigeze: ['from:name:'] kora: { :from :izina
-	icyacyo from := from.
-	icyacyo from-name := izina.
+Imeyili bigeze: ['uwohereje:izina:'] kora: { :uwohereje :izina
+	icyacyo uwohereje := uwohereje.
+	icyacyo izina-ry-uwohereje := izina.
 }.
 
-Email bigeze: ['body:'] kora: { :body
-	icyacyo body := body.
+Imeyili bigeze: ['umubiri:'] kora: { :umubiri
+	icyacyo umubiri := umubiri.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email bigeze: ['header:'] kora: { :line <- line simbuza: ['\r'] na: [''], simbuza: ['\n'] na: [''].
+Imeyili bigeze: ['umutwe:'] kora: { :umurongo <- umurongo simbuza: ['\r'] na: [''], simbuza: ['\n'] na: [''].
 }.
 
-Email bigeze: ['send'] kora: {
-	>> f := Dosiye tempwrite: ubwacyo generate.
+Imeyili bigeze: ['ohereza'] kora: {
+	>> f := Dosiye tempwrite: ubwacyo hanga.
 	Gahunda sisitemu: ['sendmail -t < '] + f inzira-ya-dosiye, umurongo-mushya.
 }.
 
-Email bigeze: ['generate'] kora: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str ongera-ku-mpera: (ubwacyo header: ['From: '] + icyacyo from-name + [' <'] + ( icyacyo from ) + ['>']) + brk.
-	str ongera-ku-mpera: (ubwacyo header: ['To: '] + ( icyacyo recipients huza: [','] )) + brk.
+Imeyili bigeze: ['hanga'] kora: {
+	>> gucamo-umurongo := ['\r\n'].
+	>> umugozi-w-umwandiko := [''].
+	umugozi-w-umwandiko ongera-ku-mpera: (ubwacyo umutwe: ['From: '] + icyacyo izina-ry-uwohereje + [' <'] + ( icyacyo uwohereje ) + ['>']) + gucamo-umurongo.
+	umugozi-w-umwandiko ongera-ku-mpera: (ubwacyo umutwe: ['To: '] + ( icyacyo abakira huza: [','] )) + gucamo-umurongo.
 	icyacyo cc umubare-wibintu ukuri: {
-		str ongera-ku-mpera: (ubwacyo header: ['Cc: '] + ( icyacyo cc huza: [','] )) + brk.
+		umugozi-w-umwandiko ongera-ku-mpera: (ubwacyo umutwe: ['Cc: '] + ( icyacyo cc huza: [','] )) + gucamo-umurongo.
 	}.
 	icyacyo bcc umubare-wibintu ukuri: {
-		str ongera-ku-mpera: (ubwacyo header: ['Bcc: '] + ( icyacyo bcc huza: [','] )) + brk.
+		umugozi-w-umwandiko ongera-ku-mpera: (ubwacyo umutwe: ['Bcc: '] + ( icyacyo bcc huza: [','] )) + gucamo-umurongo.
 	}.
-	str ongera-ku-mpera: (ubwacyo header: ['Subject: '] + icyacyo subject) + brk.
-	str ongera-ku-mpera: brk.
-	str ongera-ku-mpera: icyacyo body.
-	str ongera-ku-mpera: brk. <- str.
+	umugozi-w-umwandiko ongera-ku-mpera: (ubwacyo umutwe: ['Subject: '] + icyacyo insanganyamatsiko) + gucamo-umurongo.
+	umugozi-w-umwandiko ongera-ku-mpera: gucamo-umurongo.
+	umugozi-w-umwandiko ongera-ku-mpera: icyacyo umubiri.
+	umugozi-w-umwandiko ongera-ku-mpera: gucamo-umurongo. <- umugozi-w-umwandiko.
 }.
 
->> HTML-Email := Email gishya.
+>> Imeyili-HTML := Imeyili gishya.
 
-HTML-Email bigeze: ['init'] kora: {
-	ubwacyo init.
-	icyacyo attachments := Urutonde gishya.
-	icyacyo boundary := Isanduku-yumutekano token: 40.
+Imeyili-HTML bigeze: ['tegura'] kora: {
+	ubwacyo tegura.
+	icyacyo imigereka := Urutonde gishya.
+	icyacyo imbibi := Isanduku-yumutekano token: 40.
 }.
 
-HTML-Email bigeze: ['attach:'] kora: { :file
-	>> id := icyacyo attachments umubare-wibintu.
-	>> blob := file blob.
-	icyacyo attachments ongera-ku-mpera: (
+Imeyili-HTML bigeze: ['fatanya:'] kora: { :dosiye-y-igihe
+	>> id := icyacyo imigereka umubare-wibintu.
+	>> blob := dosiye-y-igihe blob.
+	icyacyo imigereka ongera-ku-mpera: (
 		Inkoranyamagambo gishya
-			file: file inzira-ya-dosiye,
-			mime: ['image/'] + (Server mimetype: file inzira-ya-dosiye),
-			data: blob base64-shyira-kode
+			dosiye-y-igihe: dosiye-y-igihe inzira-ya-dosiye,
+			mime: ['image/'] + (Server mimetype: dosiye-y-igihe inzira-ya-dosiye),
+			amakuru: blob base64-shyira-kode
 	).
 	blob rekura. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email bigeze: ['generate'] kora: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str ongera-ku-mpera: (ubwacyo header: ['From: '] + icyacyo from-name + [' <'] + ( icyacyo from ) + ['>']) + brk.
-	str ongera-ku-mpera: (ubwacyo header: ['To: '] + ( icyacyo recipients huza: [','] )) + brk.
+Imeyili-HTML bigeze: ['hanga'] kora: {
+	>> gucamo-umurongo := ['\r\n'].
+	>> umugozi-w-umwandiko := [''].
+	umugozi-w-umwandiko ongera-ku-mpera: (ubwacyo umutwe: ['From: '] + icyacyo izina-ry-uwohereje + [' <'] + ( icyacyo uwohereje ) + ['>']) + gucamo-umurongo.
+	umugozi-w-umwandiko ongera-ku-mpera: (ubwacyo umutwe: ['To: '] + ( icyacyo abakira huza: [','] )) + gucamo-umurongo.
 	icyacyo cc umubare-wibintu ukuri: {
-		str ongera-ku-mpera: (ubwacyo header: ['Cc: '] + ( icyacyo cc huza: [','] )) + brk.
+		umugozi-w-umwandiko ongera-ku-mpera: (ubwacyo umutwe: ['Cc: '] + ( icyacyo cc huza: [','] )) + gucamo-umurongo.
 	}.
 	icyacyo bcc umubare-wibintu ukuri: {
-		str ongera-ku-mpera: (ubwacyo header: ['Bcc: '] + ( icyacyo bcc huza: [','] )) + brk.
+		umugozi-w-umwandiko ongera-ku-mpera: (ubwacyo umutwe: ['Bcc: '] + ( icyacyo bcc huza: [','] )) + gucamo-umurongo.
 	}.
-	str ongera-ku-mpera: (ubwacyo header: ['Subject: '] + icyacyo subject) + brk.
-	str ongera-ku-mpera: ['MIME-Version: 1.0'] + brk.
-	str ongera-ku-mpera: ['Content-Type: multipart/related; boundary="'] + icyacyo boundary + ['"; type=text/html'] + brk.
-	str ongera-ku-mpera: brk.
-	str ongera-ku-mpera: ['--'] + icyacyo boundary + brk.
-	str ongera-ku-mpera: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str ongera-ku-mpera: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str ongera-ku-mpera: brk.
-	str ongera-ku-mpera: icyacyo body.
-	str ongera-ku-mpera: brk.
-	icyacyo attachments buri: { :id :info
-		>> blob := info data.
-		str ongera-ku-mpera: ['--'] + icyacyo boundary + brk.
-		str ongera-ku-mpera: ['Content-Type: '] + info mime + brk.
-		str ongera-ku-mpera: ['Content-Transfer-Encoding: base64'] + brk.
-		str ongera-ku-mpera: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str ongera-ku-mpera: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str ongera-ku-mpera: brk.
-		>> max := 76.
-		>> len := blob uburebure.
-		>> chunks := (len / max) zamura-umubare.
+	umugozi-w-umwandiko ongera-ku-mpera: (ubwacyo umutwe: ['Subject: '] + icyacyo insanganyamatsiko) + gucamo-umurongo.
+	umugozi-w-umwandiko ongera-ku-mpera: ['MIME-Version: 1.0'] + gucamo-umurongo.
+	umugozi-w-umwandiko ongera-ku-mpera: ['Content-Type: multipart/related; boundary="'] + icyacyo imbibi + ['"; type=text/html'] + gucamo-umurongo.
+	umugozi-w-umwandiko ongera-ku-mpera: gucamo-umurongo.
+	umugozi-w-umwandiko ongera-ku-mpera: ['--'] + icyacyo imbibi + gucamo-umurongo.
+	umugozi-w-umwandiko ongera-ku-mpera: ['Content-Type: text/html; charset=UTF-8'] + gucamo-umurongo.
+	umugozi-w-umwandiko ongera-ku-mpera: ['Content-Transfer-Encoding: 7bit'] + gucamo-umurongo.
+	umugozi-w-umwandiko ongera-ku-mpera: gucamo-umurongo.
+	umugozi-w-umwandiko ongera-ku-mpera: icyacyo umubiri.
+	umugozi-w-umwandiko ongera-ku-mpera: gucamo-umurongo.
+	icyacyo imigereka buri: { :id :amakuru-make
+		>> blob := amakuru-make amakuru.
+		umugozi-w-umwandiko ongera-ku-mpera: ['--'] + icyacyo imbibi + gucamo-umurongo.
+		umugozi-w-umwandiko ongera-ku-mpera: ['Content-Type: '] + amakuru-make mime + gucamo-umurongo.
+		umugozi-w-umwandiko ongera-ku-mpera: ['Content-Transfer-Encoding: base64'] + gucamo-umurongo.
+		umugozi-w-umwandiko ongera-ku-mpera: ['Content-ID: <attachment'] + id + ['>'] + gucamo-umurongo.
+		umugozi-w-umwandiko ongera-ku-mpera: ['Content-Disposition: inline; filename="'] + amakuru-make dosiye-y-igihe + ['"'] + gucamo-umurongo.
+		umugozi-w-umwandiko ongera-ku-mpera: gucamo-umurongo.
+		>> ntarengwa := 76.
+		>> uburebure-bw-umwandiko := blob uburebure.
+		>> ibice-bito := (uburebure-bw-umwandiko / ntarengwa) zamura-umubare.
 		{ :i
-			>> chunk := blob koporora kuva: i * max uburebure: max.
-			str ongera-ku-mpera: chunk + brk.
-		} * chunks.
-		str ongera-ku-mpera: brk.
-		str ongera-ku-mpera: brk.
+			>> igice-gito := blob koporora kuva: i * ntarengwa uburebure: ntarengwa.
+			umugozi-w-umwandiko ongera-ku-mpera: igice-gito + gucamo-umurongo.
+		} * ibice-bito.
+		umugozi-w-umwandiko ongera-ku-mpera: gucamo-umurongo.
+		umugozi-w-umwandiko ongera-ku-mpera: gucamo-umurongo.
 	}.
-	str ongera-ku-mpera: ['--'] + icyacyo boundary + ['--'] + brk. <- str.
+	umugozi-w-umwandiko ongera-ku-mpera: ['--'] + icyacyo imbibi + ['--'] + gucamo-umurongo. <- umugozi-w-umwandiko.
 }.

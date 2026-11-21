@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Obiekt nowy.
+>> Szablon := Obiekt nowy.
 
-Template na: ['nowy'] wykonaj: { <- sam nowy content: [''].
+Szablon na: ['nowy'] wykonaj: { <- sam nowy treść: [''].
 }.
 
-Template na: ['content:'] wykonaj: { :content
-	własny content := content. 
+Szablon na: ['treść:'] wykonaj: { :treść
+	własny treść := treść. 
 }.
 
-Template na: ['nowy:'] wykonaj: { :content <- sam nowy content: content.
+Szablon na: ['nowy:'] wykonaj: { :treść <- sam nowy treść: treść.
 }.
 
-Template na: ['cut:'] wykonaj: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := własny content podziel: startmarker.
-	>> prefix := parts pierwszy.
-	>> parts2 := parts ostatni podziel: endmarker.
-	>> suffix := parts2 ostatni.
-	>> part := parts2 pierwszy.
-	>> rest := prefix + suffix.
-	własny content := rest. <- Template nowy: part.
+Szablon na: ['wytnij:'] wykonaj: { :znacznik
+	>> znacznik-początku := (['<!-- cut:%id% -->'] %id%: znacznik).
+	>> znacznik-końca := (['<!-- /cut:%id% -->'] %id%: znacznik).
+	>> części := własny treść podziel: znacznik-początku.
+	>> prefiks := części pierwszy.
+	>> części2 := części ostatni podziel: znacznik-końca.
+	>> sufiks := części2 ostatni.
+	>> część := części2 pierwszy.
+	>> reszta := prefiks + sufiks.
+	własny treść := reszta. <- Szablon nowy: część.
 	
 }.
 
-Template na: ['kopiuj'] wykonaj: { <- sam nowy: sam tekst kopiuj.
+Szablon na: ['kopiuj'] wykonaj: { <- sam nowy: sam tekst kopiuj.
 }.
 	
-Template na: ['paste:at:'] wykonaj: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	własny content zamień: pastemarker na: ( snippet tekst + pastemarker ).
+Szablon na: ['wklej:w:'] wykonaj: { :wycinek-html :id
+	>> znacznik-wklejenia := (['<!-- paste:%id% -->'] %id%: id).
+	własny treść zamień: znacznik-wklejenia na: ( wycinek-html tekst + znacznik-wklejenia ).
 }.
 
-Template na: ['ustaw:wartość:'] wykonaj: { :slot :value
-	własny content zamień: ['<!-- slot:'] + slot + [' -->'] na: ( Server html-koduj: value ).
+Szablon na: ['ustaw:wartość:'] wykonaj: { :miejsce :wartość
+	własny treść zamień: ['<!-- slot:'] + miejsce + [' -->'] na: ( Server html-koduj: wartość ).
 }.
 
-Template na: ['set:html:'] wykonaj: { :slot :html
-	własny content zamień: ['<!-- slot:'] + slot + [' -->'] na: html.
+Szablon na: ['ustaw:html:'] wykonaj: { :miejsce :html
+	własny treść zamień: ['<!-- slot:'] + miejsce + [' -->'] na: html.
 }.
 
-Template na: ['odpowiedz:i:'] wykonaj: { :slot :value
-	sam ustaw: (slot od: 0 długość: (slot długość - 1)) wartość: value.
+Szablon na: ['odpowiedz:i:'] wykonaj: { :miejsce :wartość
+	sam ustaw: (miejsce od: 0 długość: (miejsce długość - 1)) wartość: wartość.
 }.
 
-Template na: ['nl2br'] wykonaj: {
-	własny content zamień: ['\n'] na: ['<br>'].
+Szablon na: ['nl2br'] wykonaj: {
+	własny treść zamień: ['\n'] na: ['<br>'].
 }.
 
-Template na: ['clean'] wykonaj: {
-	własny content :=
+Szablon na: ['uporządkuj'] wykonaj: {
+	własny treść :=
 		Wzorzec
 		nowy: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		dopasuj: własny content
+		dopasuj: własny treść
 		wykonaj: { <- ['']. }.
 }.
 
-Template na: ['clean-cuts'] wykonaj: {
-	>> items := Lista nowy.
+Szablon na: ['uporządkuj-wycinki'] wykonaj: {
+	>> elementy := Lista nowy.
 	Wzorzec
 	nowy: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	dopasuj: własny content
-	wykonaj: { :_ :part
-		items dołącz: part ? 1.
+	dopasuj: własny treść
+	wykonaj: { :_ :część
+		elementy dołącz: część ? 1.
 	}.
-	items każdy: { :_ :id
-		własny content :=
+	elementy każdy: { :_ :id
+		własny treść :=
 			Wzorzec nowy: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			dopasuj: własny content
+			dopasuj: własny treść
 			wykonaj: { <- ['']. }.
 	 }.
 }.
 
-Template na: ['clean-space'] wykonaj: {
-	własny content :=
+Szablon na: ['uporządkuj-spacje'] wykonaj: {
+	własny treść :=
 		Wzorzec
 		nowy: ['\\s*\\n'],
-		dopasuj: własny content
+		dopasuj: własny treść
 		wykonaj: { <- ['\n']. }.
-	własny content :=
+	własny treść :=
 		Wzorzec
 		nowy: ['\\n[\\s\\t]+'],
-		dopasuj: własny content
+		dopasuj: własny treść
 		wykonaj: { <- ['\n']. }.
 }.
 
-Template na: ['clean-all'] wykonaj: {
-	sam clean.
-	sam clean-cuts.
-	sam clean-space.
+Szablon na: ['uporządkuj-wszystko'] wykonaj: {
+	sam uporządkuj.
+	sam uporządkuj-wycinki.
+	sam uporządkuj-spacje.
 }.
 
-Template na: ['tekst'] wykonaj: { <- własny content.
+Szablon na: ['tekst'] wykonaj: { <- własny treść.
 }.

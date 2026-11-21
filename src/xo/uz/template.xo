@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Obyekt yangi.
+>> Qolip := Obyekt yangi.
 
-Template kelganda: ['yangi'] bajar: { <- oʻzi yangi content: [''].
+Qolip kelganda: ['yangi'] bajar: { <- oʻzi yangi mazmun: [''].
 }.
 
-Template kelganda: ['content:'] bajar: { :content
-	oʻzining content := content. 
+Qolip kelganda: ['mazmun:'] bajar: { :mazmun
+	oʻzining mazmun := mazmun. 
 }.
 
-Template kelganda: ['yangi:'] bajar: { :content <- oʻzi yangi content: content.
+Qolip kelganda: ['yangi:'] bajar: { :mazmun <- oʻzi yangi mazmun: mazmun.
 }.
 
-Template kelganda: ['cut:'] bajar: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := oʻzining content boʻlish: startmarker.
-	>> prefix := parts birinchi.
-	>> parts2 := parts oxirgi boʻlish: endmarker.
-	>> suffix := parts2 oxirgi.
-	>> part := parts2 birinchi.
-	>> rest := prefix + suffix.
-	oʻzining content := rest. <- Template yangi: part.
+Qolip kelganda: ['kes:'] bajar: { :belgi
+	>> boshlanish-belgisi := (['<!-- cut:%id% -->'] %id%: belgi).
+	>> tugash-belgisi := (['<!-- /cut:%id% -->'] %id%: belgi).
+	>> qismlar := oʻzining mazmun boʻlish: boshlanish-belgisi.
+	>> prefiks := qismlar birinchi.
+	>> qismlar2 := qismlar oxirgi boʻlish: tugash-belgisi.
+	>> qoʻshimcha := qismlar2 oxirgi.
+	>> qism := qismlar2 birinchi.
+	>> qoldiq := prefiks + qoʻshimcha.
+	oʻzining mazmun := qoldiq. <- Qolip yangi: qism.
 	
 }.
 
-Template kelganda: ['nusxa'] bajar: { <- oʻzi yangi: oʻzi matn nusxa.
+Qolip kelganda: ['nusxa'] bajar: { <- oʻzi yangi: oʻzi matn nusxa.
 }.
 	
-Template kelganda: ['paste:at:'] bajar: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	oʻzining content almashtirish: pastemarker bunga: ( snippet matn + pastemarker ).
+Qolip kelganda: ['joylashtir:kalit:'] bajar: { :parcha :id
+	>> joylashtirish-belgisi := (['<!-- paste:%id% -->'] %id%: id).
+	oʻzining mazmun almashtirish: joylashtirish-belgisi bunga: ( parcha matn + joylashtirish-belgisi ).
 }.
 
-Template kelganda: ['oʻrnatish:qiymat:'] bajar: { :slot :value
-	oʻzining content almashtirish: ['<!-- slot:'] + slot + [' -->'] bunga: ( Server html-kodlash: value ).
+Qolip kelganda: ['oʻrnatish:qiymat:'] bajar: { :oʻrin :qiymat
+	oʻzining mazmun almashtirish: ['<!-- slot:'] + oʻrin + [' -->'] bunga: ( Server html-kodlash: qiymat ).
 }.
 
-Template kelganda: ['set:html:'] bajar: { :slot :html
-	oʻzining content almashtirish: ['<!-- slot:'] + slot + [' -->'] bunga: html.
+Qolip kelganda: ['oʻrnatish:html:'] bajar: { :oʻrin :html
+	oʻzining mazmun almashtirish: ['<!-- slot:'] + oʻrin + [' -->'] bunga: html.
 }.
 
-Template kelganda: ['javob:va:'] bajar: { :slot :value
-	oʻzi oʻrnatish: (slot boshlab: 0 uzunlik: (slot uzunlik - 1)) qiymat: value.
+Qolip kelganda: ['javob:va:'] bajar: { :oʻrin :qiymat
+	oʻzi oʻrnatish: (oʻrin boshlab: 0 uzunlik: (oʻrin uzunlik - 1)) qiymat: qiymat.
 }.
 
-Template kelganda: ['nl2br'] bajar: {
-	oʻzining content almashtirish: ['\n'] bunga: ['<br>'].
+Qolip kelganda: ['nl2br'] bajar: {
+	oʻzining mazmun almashtirish: ['\n'] bunga: ['<br>'].
 }.
 
-Template kelganda: ['clean'] bajar: {
-	oʻzining content :=
+Qolip kelganda: ['tartibla'] bajar: {
+	oʻzining mazmun :=
 		Andoza
 		yangi: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		moslik: oʻzining content
+		moslik: oʻzining mazmun
 		bajar: { <- ['']. }.
 }.
 
-Template kelganda: ['clean-cuts'] bajar: {
-	>> items := Roʻyxat yangi.
+Qolip kelganda: ['kesmalarni-tartibla'] bajar: {
+	>> elementlar := Roʻyxat yangi.
 	Andoza
 	yangi: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	moslik: oʻzining content
-	bajar: { :_ :part
-		items oxiriga-qoʻshish: part ? 1.
+	moslik: oʻzining mazmun
+	bajar: { :_ :qism
+		elementlar oxiriga-qoʻshish: qism ? 1.
 	}.
-	items har-bir: { :_ :id
-		oʻzining content :=
+	elementlar har-bir: { :_ :id
+		oʻzining mazmun :=
 			Andoza yangi: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			moslik: oʻzining content
+			moslik: oʻzining mazmun
 			bajar: { <- ['']. }.
 	 }.
 }.
 
-Template kelganda: ['clean-space'] bajar: {
-	oʻzining content :=
+Qolip kelganda: ['boʻshliqlarni-tartibla'] bajar: {
+	oʻzining mazmun :=
 		Andoza
 		yangi: ['\\s*\\n'],
-		moslik: oʻzining content
+		moslik: oʻzining mazmun
 		bajar: { <- ['\n']. }.
-	oʻzining content :=
+	oʻzining mazmun :=
 		Andoza
 		yangi: ['\\n[\\s\\t]+'],
-		moslik: oʻzining content
+		moslik: oʻzining mazmun
 		bajar: { <- ['\n']. }.
 }.
 
-Template kelganda: ['clean-all'] bajar: {
-	oʻzi clean.
-	oʻzi clean-cuts.
-	oʻzi clean-space.
+Qolip kelganda: ['hammasini-tartibla'] bajar: {
+	oʻzi tartibla.
+	oʻzi kesmalarni-tartibla.
+	oʻzi boʻshliqlarni-tartibla.
 }.
 
-Template kelganda: ['matn'] bajar: { <- oʻzining content.
+Qolip kelganda: ['matn'] bajar: { <- oʻzining mazmun.
 }.

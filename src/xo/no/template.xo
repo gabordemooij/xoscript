@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objekt ny.
+>> Mal := Objekt ny.
 
-Template ved: ['ny'] gjør: { <- selv ny content: [''].
+Mal ved: ['ny'] gjør: { <- selv ny innhold: [''].
 }.
 
-Template ved: ['content:'] gjør: { :content
-	egen content := content. 
+Mal ved: ['innhold:'] gjør: { :innhold
+	egen innhold := innhold. 
 }.
 
-Template ved: ['ny:'] gjør: { :content <- selv ny content: content.
+Mal ved: ['ny:'] gjør: { :innhold <- selv ny innhold: innhold.
 }.
 
-Template ved: ['cut:'] gjør: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := egen content del: startmarker.
-	>> prefix := parts første.
-	>> parts2 := parts siste del: endmarker.
-	>> suffix := parts2 siste.
-	>> part := parts2 første.
-	>> rest := prefix + suffix.
-	egen content := rest. <- Template ny: part.
+Mal ved: ['klipp:'] gjør: { :markør
+	>> startmarkør := (['<!-- cut:%id% -->'] %id%: markør).
+	>> sluttmarkør := (['<!-- /cut:%id% -->'] %id%: markør).
+	>> deler := egen innhold del: startmarkør.
+	>> prefiks := deler første.
+	>> deler2 := deler siste del: sluttmarkør.
+	>> suffiks := deler2 siste.
+	>> del := deler2 første.
+	>> rest := prefiks + suffiks.
+	egen innhold := rest. <- Mal ny: del.
 	
 }.
 
-Template ved: ['kopier'] gjør: { <- selv ny: selv tekst kopier.
+Mal ved: ['kopier'] gjør: { <- selv ny: selv tekst kopier.
 }.
 	
-Template ved: ['paste:at:'] gjør: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	egen content erstatt: pastemarker med: ( snippet tekst + pastemarker ).
+Mal ved: ['lim-inn:ved:'] gjør: { :utdrag :id
+	>> limmarkør := (['<!-- paste:%id% -->'] %id%: id).
+	egen innhold erstatt: limmarkør med: ( utdrag tekst + limmarkør ).
 }.
 
-Template ved: ['sett:verdi:'] gjør: { :slot :value
-	egen content erstatt: ['<!-- slot:'] + slot + [' -->'] med: ( Server html-kode: value ).
+Mal ved: ['sett:verdi:'] gjør: { :plass :verdi
+	egen innhold erstatt: ['<!-- slot:'] + plass + [' -->'] med: ( Server html-kode: verdi ).
 }.
 
-Template ved: ['set:html:'] gjør: { :slot :html
-	egen content erstatt: ['<!-- slot:'] + slot + [' -->'] med: html.
+Mal ved: ['sett:html:'] gjør: { :plass :html
+	egen innhold erstatt: ['<!-- slot:'] + plass + [' -->'] med: html.
 }.
 
-Template ved: ['svar:og:'] gjør: { :slot :value
-	selv sett: (slot fra: 0 lengde: (slot lengde - 1)) verdi: value.
+Mal ved: ['svar:og:'] gjør: { :plass :verdi
+	selv sett: (plass fra: 0 lengde: (plass lengde - 1)) verdi: verdi.
 }.
 
-Template ved: ['nl2br'] gjør: {
-	egen content erstatt: ['\n'] med: ['<br>'].
+Mal ved: ['nl2br'] gjør: {
+	egen innhold erstatt: ['\n'] med: ['<br>'].
 }.
 
-Template ved: ['clean'] gjør: {
-	egen content :=
+Mal ved: ['rens'] gjør: {
+	egen innhold :=
 		Mønster
 		ny: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		treff: egen content
+		treff: egen innhold
 		gjør: { <- ['']. }.
 }.
 
-Template ved: ['clean-cuts'] gjør: {
-	>> items := Liste ny.
+Mal ved: ['rens-klipp'] gjør: {
+	>> elementer := Liste ny.
 	Mønster
 	ny: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	treff: egen content
-	gjør: { :_ :part
-		items legg-til-sist: part ? 1.
+	treff: egen innhold
+	gjør: { :_ :del
+		elementer legg-til-sist: del ? 1.
 	}.
-	items hver: { :_ :id
-		egen content :=
+	elementer hver: { :_ :id
+		egen innhold :=
 			Mønster ny: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			treff: egen content
+			treff: egen innhold
 			gjør: { <- ['']. }.
 	 }.
 }.
 
-Template ved: ['clean-space'] gjør: {
-	egen content :=
+Mal ved: ['rens-mellomrom'] gjør: {
+	egen innhold :=
 		Mønster
 		ny: ['\\s*\\n'],
-		treff: egen content
+		treff: egen innhold
 		gjør: { <- ['\n']. }.
-	egen content :=
+	egen innhold :=
 		Mønster
 		ny: ['\\n[\\s\\t]+'],
-		treff: egen content
+		treff: egen innhold
 		gjør: { <- ['\n']. }.
 }.
 
-Template ved: ['clean-all'] gjør: {
-	selv clean.
-	selv clean-cuts.
-	selv clean-space.
+Mal ved: ['rens-alt'] gjør: {
+	selv rens.
+	selv rens-klipp.
+	selv rens-mellomrom.
 }.
 
-Template ved: ['tekst'] gjør: { <- egen content.
+Mal ved: ['tekst'] gjør: { <- egen innhold.
 }.

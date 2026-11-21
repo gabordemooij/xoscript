@@ -1,128 +1,128 @@
->> Email := Gwrthrych newydd.
+>> E-bost := Gwrthrych newydd.
 
-Email ar: ['init'] gwneud: {
-	eiddo recipients := Rhestr newydd.
+E-bost ar: ['paratoi'] gwneud: {
+	eiddo derbynwyr := Rhestr newydd.
 	eiddo cc := Rhestr newydd.
 	eiddo bcc := Rhestr newydd.
-	eiddo from := Dim.
-	eiddo from-name := Dim.
-	eiddo subject := Dim.
-	eiddo body := Dim.
+	eiddo anfonwr := Dim.
+	eiddo enw-anfonwr := Dim.
+	eiddo pwnc := Dim.
+	eiddo corff := Dim.
 }.
 
-Email ar: ['newydd'] gwneud: { <- hun newydd init.
+E-bost ar: ['newydd'] gwneud: { <- hun newydd paratoi.
 }.
 
-Email ar: ['to:'] gwneud: { :list
-	eiddo recipients := list.
+E-bost ar: ['at:'] gwneud: { :rhestriad
+	eiddo derbynwyr := rhestriad.
 }.
  
-Email ar: ['cc:'] gwneud: { :list
-	eiddo cc := list.
+E-bost ar: ['cc:'] gwneud: { :rhestriad
+	eiddo cc := rhestriad.
 }.
 
-Email ar: ['bcc:'] gwneud: { :list
-	eiddo bcc := list.
+E-bost ar: ['bcc:'] gwneud: { :rhestriad
+	eiddo bcc := rhestriad.
 }.
 
-Email ar: ['subject:'] gwneud: { :subject
-	eiddo subject := subject.
+E-bost ar: ['pwnc:'] gwneud: { :pwnc
+	eiddo pwnc := pwnc.
 }.
 
-Email ar: ['from:name:'] gwneud: { :from :enw
-	eiddo from := from.
-	eiddo from-name := enw.
+E-bost ar: ['anfonwr:enw:'] gwneud: { :anfonwr :enw
+	eiddo anfonwr := anfonwr.
+	eiddo enw-anfonwr := enw.
 }.
 
-Email ar: ['body:'] gwneud: { :body
-	eiddo body := body.
+E-bost ar: ['corff:'] gwneud: { :corff
+	eiddo corff := corff.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email ar: ['header:'] gwneud: { :line <- line disodli: ['\r'] gyda: [''], disodli: ['\n'] gyda: [''].
+E-bost ar: ['pennawd:'] gwneud: { :llinell <- llinell disodli: ['\r'] gyda: [''], disodli: ['\n'] gyda: [''].
 }.
 
-Email ar: ['send'] gwneud: {
-	>> f := Ffeil tempwrite: hun generate.
+E-bost ar: ['anfon'] gwneud: {
+	>> f := Ffeil tempwrite: hun cynhyrchu.
 	Rhaglen system: ['sendmail -t < '] + f llwybr, llinell-newydd.
 }.
 
-Email ar: ['generate'] gwneud: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str atodi: (hun header: ['From: '] + eiddo from-name + [' <'] + ( eiddo from ) + ['>']) + brk.
-	str atodi: (hun header: ['To: '] + ( eiddo recipients cyfuno: [','] )) + brk.
+E-bost ar: ['cynhyrchu'] gwneud: {
+	>> toriad-llinell := ['\r\n'].
+	>> llinyn-testun := [''].
+	llinyn-testun atodi: (hun pennawd: ['From: '] + eiddo enw-anfonwr + [' <'] + ( eiddo anfonwr ) + ['>']) + toriad-llinell.
+	llinyn-testun atodi: (hun pennawd: ['To: '] + ( eiddo derbynwyr cyfuno: [','] )) + toriad-llinell.
 	eiddo cc cyfrif gwir: {
-		str atodi: (hun header: ['Cc: '] + ( eiddo cc cyfuno: [','] )) + brk.
+		llinyn-testun atodi: (hun pennawd: ['Cc: '] + ( eiddo cc cyfuno: [','] )) + toriad-llinell.
 	}.
 	eiddo bcc cyfrif gwir: {
-		str atodi: (hun header: ['Bcc: '] + ( eiddo bcc cyfuno: [','] )) + brk.
+		llinyn-testun atodi: (hun pennawd: ['Bcc: '] + ( eiddo bcc cyfuno: [','] )) + toriad-llinell.
 	}.
-	str atodi: (hun header: ['Subject: '] + eiddo subject) + brk.
-	str atodi: brk.
-	str atodi: eiddo body.
-	str atodi: brk. <- str.
+	llinyn-testun atodi: (hun pennawd: ['Subject: '] + eiddo pwnc) + toriad-llinell.
+	llinyn-testun atodi: toriad-llinell.
+	llinyn-testun atodi: eiddo corff.
+	llinyn-testun atodi: toriad-llinell. <- llinyn-testun.
 }.
 
->> HTML-Email := Email newydd.
+>> E-bost-HTML := E-bost newydd.
 
-HTML-Email ar: ['init'] gwneud: {
-	hun init.
-	eiddo attachments := Rhestr newydd.
-	eiddo boundary := Cromgell tocyn: 40.
+E-bost-HTML ar: ['paratoi'] gwneud: {
+	hun paratoi.
+	eiddo atodiadau := Rhestr newydd.
+	eiddo ffin := Cromgell tocyn: 40.
 }.
 
-HTML-Email ar: ['attach:'] gwneud: { :file
-	>> id := eiddo attachments cyfrif.
-	>> blob := file blob.
-	eiddo attachments atodi: (
+E-bost-HTML ar: ['atodi-ffeil:'] gwneud: { :ffeil
+	>> id := eiddo atodiadau cyfrif.
+	>> blob := ffeil blob.
+	eiddo atodiadau atodi: (
 		Geiriadur newydd
-			file: file llwybr,
-			mime: ['image/'] + (Server mimetype: file llwybr),
+			ffeil: ffeil llwybr,
+			mime: ['image/'] + (Server mimetype: ffeil llwybr),
 			data: blob base64-amgodio
 	).
 	blob rhyddhau. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email ar: ['generate'] gwneud: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str atodi: (hun header: ['From: '] + eiddo from-name + [' <'] + ( eiddo from ) + ['>']) + brk.
-	str atodi: (hun header: ['To: '] + ( eiddo recipients cyfuno: [','] )) + brk.
+E-bost-HTML ar: ['cynhyrchu'] gwneud: {
+	>> toriad-llinell := ['\r\n'].
+	>> llinyn-testun := [''].
+	llinyn-testun atodi: (hun pennawd: ['From: '] + eiddo enw-anfonwr + [' <'] + ( eiddo anfonwr ) + ['>']) + toriad-llinell.
+	llinyn-testun atodi: (hun pennawd: ['To: '] + ( eiddo derbynwyr cyfuno: [','] )) + toriad-llinell.
 	eiddo cc cyfrif gwir: {
-		str atodi: (hun header: ['Cc: '] + ( eiddo cc cyfuno: [','] )) + brk.
+		llinyn-testun atodi: (hun pennawd: ['Cc: '] + ( eiddo cc cyfuno: [','] )) + toriad-llinell.
 	}.
 	eiddo bcc cyfrif gwir: {
-		str atodi: (hun header: ['Bcc: '] + ( eiddo bcc cyfuno: [','] )) + brk.
+		llinyn-testun atodi: (hun pennawd: ['Bcc: '] + ( eiddo bcc cyfuno: [','] )) + toriad-llinell.
 	}.
-	str atodi: (hun header: ['Subject: '] + eiddo subject) + brk.
-	str atodi: ['MIME-Version: 1.0'] + brk.
-	str atodi: ['Content-Type: multipart/related; boundary="'] + eiddo boundary + ['"; type=text/html'] + brk.
-	str atodi: brk.
-	str atodi: ['--'] + eiddo boundary + brk.
-	str atodi: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str atodi: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str atodi: brk.
-	str atodi: eiddo body.
-	str atodi: brk.
-	eiddo attachments pob: { :id :info
-		>> blob := info data.
-		str atodi: ['--'] + eiddo boundary + brk.
-		str atodi: ['Content-Type: '] + info mime + brk.
-		str atodi: ['Content-Transfer-Encoding: base64'] + brk.
-		str atodi: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str atodi: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str atodi: brk.
-		>> max := 76.
-		>> len := blob hyd.
-		>> chunks := (len / max) talgrynnu-i-fyny.
+	llinyn-testun atodi: (hun pennawd: ['Subject: '] + eiddo pwnc) + toriad-llinell.
+	llinyn-testun atodi: ['MIME-Version: 1.0'] + toriad-llinell.
+	llinyn-testun atodi: ['Content-Type: multipart/related; boundary="'] + eiddo ffin + ['"; type=text/html'] + toriad-llinell.
+	llinyn-testun atodi: toriad-llinell.
+	llinyn-testun atodi: ['--'] + eiddo ffin + toriad-llinell.
+	llinyn-testun atodi: ['Content-Type: text/html; charset=UTF-8'] + toriad-llinell.
+	llinyn-testun atodi: ['Content-Transfer-Encoding: 7bit'] + toriad-llinell.
+	llinyn-testun atodi: toriad-llinell.
+	llinyn-testun atodi: eiddo corff.
+	llinyn-testun atodi: toriad-llinell.
+	eiddo atodiadau pob: { :id :gwybodaeth
+		>> blob := gwybodaeth data.
+		llinyn-testun atodi: ['--'] + eiddo ffin + toriad-llinell.
+		llinyn-testun atodi: ['Content-Type: '] + gwybodaeth mime + toriad-llinell.
+		llinyn-testun atodi: ['Content-Transfer-Encoding: base64'] + toriad-llinell.
+		llinyn-testun atodi: ['Content-ID: <attachment'] + id + ['>'] + toriad-llinell.
+		llinyn-testun atodi: ['Content-Disposition: inline; filename="'] + gwybodaeth ffeil + ['"'] + toriad-llinell.
+		llinyn-testun atodi: toriad-llinell.
+		>> uchafswm := 76.
+		>> hyd-testun := blob hyd.
+		>> talpiau := (hyd-testun / uchafswm) talgrynnu-i-fyny.
 		{ :i
-			>> chunk := blob copïo o: i * max hyd: max.
-			str atodi: chunk + brk.
-		} * chunks.
-		str atodi: brk.
-		str atodi: brk.
+			>> talp := blob copïo o: i * uchafswm hyd: uchafswm.
+			llinyn-testun atodi: talp + toriad-llinell.
+		} * talpiau.
+		llinyn-testun atodi: toriad-llinell.
+		llinyn-testun atodi: toriad-llinell.
 	}.
-	str atodi: ['--'] + eiddo boundary + ['--'] + brk. <- str.
+	llinyn-testun atodi: ['--'] + eiddo ffin + ['--'] + toriad-llinell. <- llinyn-testun.
 }.

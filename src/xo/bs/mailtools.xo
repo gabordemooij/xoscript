@@ -1,128 +1,128 @@
 >> Email := Objekat novi.
 
-Email na: ['init'] uradi: {
-	svoj recipients := Lista novi.
+Email na: ['inicijaliziraj'] uradi: {
+	svoj primaoci := Lista novi.
 	svoj cc := Lista novi.
 	svoj bcc := Lista novi.
-	svoj from := Ništa.
-	svoj from-name := Ništa.
-	svoj subject := Ništa.
-	svoj body := Ništa.
+	svoj pošiljalac := Ništa.
+	svoj ime-pošiljaoca := Ništa.
+	svoj predmet := Ništa.
+	svoj tijelo := Ništa.
 }.
 
-Email na: ['novi'] uradi: { <- sebe novi init.
+Email na: ['novi'] uradi: { <- sebe novi inicijaliziraj.
 }.
 
-Email na: ['to:'] uradi: { :list
-	svoj recipients := list.
+Email na: ['prima:'] uradi: { :nabrajanje
+	svoj primaoci := nabrajanje.
 }.
  
-Email na: ['cc:'] uradi: { :list
-	svoj cc := list.
+Email na: ['cc:'] uradi: { :nabrajanje
+	svoj cc := nabrajanje.
 }.
 
-Email na: ['bcc:'] uradi: { :list
-	svoj bcc := list.
+Email na: ['bcc:'] uradi: { :nabrajanje
+	svoj bcc := nabrajanje.
 }.
 
-Email na: ['subject:'] uradi: { :subject
-	svoj subject := subject.
+Email na: ['predmet:'] uradi: { :predmet
+	svoj predmet := predmet.
 }.
 
-Email na: ['from:name:'] uradi: { :from :naziv
-	svoj from := from.
-	svoj from-name := naziv.
+Email na: ['pošiljalac:naziv:'] uradi: { :pošiljalac :naziv
+	svoj pošiljalac := pošiljalac.
+	svoj ime-pošiljaoca := naziv.
 }.
 
-Email na: ['body:'] uradi: { :body
-	svoj body := body.
+Email na: ['tijelo:'] uradi: { :tijelo
+	svoj tijelo := tijelo.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email na: ['header:'] uradi: { :line <- line zamijeni: ['\r'] sa: [''], zamijeni: ['\n'] sa: [''].
+Email na: ['zaglavlje:'] uradi: { :red <- red zamijeni: ['\r'] sa: [''], zamijeni: ['\n'] sa: [''].
 }.
 
-Email na: ['send'] uradi: {
-	>> f := Datoteka tempwrite: sebe generate.
+Email na: ['pošalji'] uradi: {
+	>> f := Datoteka tempwrite: sebe generiši.
 	Program sistem: ['sendmail -t < '] + f putanja, novi-red.
 }.
 
-Email na: ['generate'] uradi: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str dodaj-na-kraj: (sebe header: ['From: '] + svoj from-name + [' <'] + ( svoj from ) + ['>']) + brk.
-	str dodaj-na-kraj: (sebe header: ['To: '] + ( svoj recipients spoji: [','] )) + brk.
+Email na: ['generiši'] uradi: {
+	>> prelom := ['\r\n'].
+	>> niz := [''].
+	niz dodaj-na-kraj: (sebe zaglavlje: ['From: '] + svoj ime-pošiljaoca + [' <'] + ( svoj pošiljalac ) + ['>']) + prelom.
+	niz dodaj-na-kraj: (sebe zaglavlje: ['To: '] + ( svoj primaoci spoji: [','] )) + prelom.
 	svoj cc broj-elemenata tačno: {
-		str dodaj-na-kraj: (sebe header: ['Cc: '] + ( svoj cc spoji: [','] )) + brk.
+		niz dodaj-na-kraj: (sebe zaglavlje: ['Cc: '] + ( svoj cc spoji: [','] )) + prelom.
 	}.
 	svoj bcc broj-elemenata tačno: {
-		str dodaj-na-kraj: (sebe header: ['Bcc: '] + ( svoj bcc spoji: [','] )) + brk.
+		niz dodaj-na-kraj: (sebe zaglavlje: ['Bcc: '] + ( svoj bcc spoji: [','] )) + prelom.
 	}.
-	str dodaj-na-kraj: (sebe header: ['Subject: '] + svoj subject) + brk.
-	str dodaj-na-kraj: brk.
-	str dodaj-na-kraj: svoj body.
-	str dodaj-na-kraj: brk. <- str.
+	niz dodaj-na-kraj: (sebe zaglavlje: ['Subject: '] + svoj predmet) + prelom.
+	niz dodaj-na-kraj: prelom.
+	niz dodaj-na-kraj: svoj tijelo.
+	niz dodaj-na-kraj: prelom. <- niz.
 }.
 
 >> HTML-Email := Email novi.
 
-HTML-Email na: ['init'] uradi: {
-	sebe init.
-	svoj attachments := Lista novi.
-	svoj boundary := Sef token: 40.
+HTML-Email na: ['inicijaliziraj'] uradi: {
+	sebe inicijaliziraj.
+	svoj prilozi := Lista novi.
+	svoj granica := Sef token: 40.
 }.
 
-HTML-Email na: ['attach:'] uradi: { :file
-	>> id := svoj attachments broj-elemenata.
-	>> blob := file blob.
-	svoj attachments dodaj-na-kraj: (
+HTML-Email na: ['priloži:'] uradi: { :datoteka
+	>> id := svoj prilozi broj-elemenata.
+	>> blob := datoteka blob.
+	svoj prilozi dodaj-na-kraj: (
 		Rječnik novi
-			file: file putanja,
-			mime: ['image/'] + (Server mimetype: file putanja),
-			data: blob base64-kodiraj
+			datoteka: datoteka putanja,
+			mime: ['image/'] + (Server mimetype: datoteka putanja),
+			podaci: blob base64-kodiraj
 	).
 	blob oslobodi. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email na: ['generate'] uradi: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str dodaj-na-kraj: (sebe header: ['From: '] + svoj from-name + [' <'] + ( svoj from ) + ['>']) + brk.
-	str dodaj-na-kraj: (sebe header: ['To: '] + ( svoj recipients spoji: [','] )) + brk.
+HTML-Email na: ['generiši'] uradi: {
+	>> prelom := ['\r\n'].
+	>> niz := [''].
+	niz dodaj-na-kraj: (sebe zaglavlje: ['From: '] + svoj ime-pošiljaoca + [' <'] + ( svoj pošiljalac ) + ['>']) + prelom.
+	niz dodaj-na-kraj: (sebe zaglavlje: ['To: '] + ( svoj primaoci spoji: [','] )) + prelom.
 	svoj cc broj-elemenata tačno: {
-		str dodaj-na-kraj: (sebe header: ['Cc: '] + ( svoj cc spoji: [','] )) + brk.
+		niz dodaj-na-kraj: (sebe zaglavlje: ['Cc: '] + ( svoj cc spoji: [','] )) + prelom.
 	}.
 	svoj bcc broj-elemenata tačno: {
-		str dodaj-na-kraj: (sebe header: ['Bcc: '] + ( svoj bcc spoji: [','] )) + brk.
+		niz dodaj-na-kraj: (sebe zaglavlje: ['Bcc: '] + ( svoj bcc spoji: [','] )) + prelom.
 	}.
-	str dodaj-na-kraj: (sebe header: ['Subject: '] + svoj subject) + brk.
-	str dodaj-na-kraj: ['MIME-Version: 1.0'] + brk.
-	str dodaj-na-kraj: ['Content-Type: multipart/related; boundary="'] + svoj boundary + ['"; type=text/html'] + brk.
-	str dodaj-na-kraj: brk.
-	str dodaj-na-kraj: ['--'] + svoj boundary + brk.
-	str dodaj-na-kraj: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str dodaj-na-kraj: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str dodaj-na-kraj: brk.
-	str dodaj-na-kraj: svoj body.
-	str dodaj-na-kraj: brk.
-	svoj attachments svaki: { :id :info
-		>> blob := info data.
-		str dodaj-na-kraj: ['--'] + svoj boundary + brk.
-		str dodaj-na-kraj: ['Content-Type: '] + info mime + brk.
-		str dodaj-na-kraj: ['Content-Transfer-Encoding: base64'] + brk.
-		str dodaj-na-kraj: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str dodaj-na-kraj: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str dodaj-na-kraj: brk.
-		>> max := 76.
-		>> len := blob dužina.
-		>> chunks := (len / max) zaokruži-gore.
+	niz dodaj-na-kraj: (sebe zaglavlje: ['Subject: '] + svoj predmet) + prelom.
+	niz dodaj-na-kraj: ['MIME-Version: 1.0'] + prelom.
+	niz dodaj-na-kraj: ['Content-Type: multipart/related; boundary="'] + svoj granica + ['"; type=text/html'] + prelom.
+	niz dodaj-na-kraj: prelom.
+	niz dodaj-na-kraj: ['--'] + svoj granica + prelom.
+	niz dodaj-na-kraj: ['Content-Type: text/html; charset=UTF-8'] + prelom.
+	niz dodaj-na-kraj: ['Content-Transfer-Encoding: 7bit'] + prelom.
+	niz dodaj-na-kraj: prelom.
+	niz dodaj-na-kraj: svoj tijelo.
+	niz dodaj-na-kraj: prelom.
+	svoj prilozi svaki: { :id :info
+		>> blob := info podaci.
+		niz dodaj-na-kraj: ['--'] + svoj granica + prelom.
+		niz dodaj-na-kraj: ['Content-Type: '] + info mime + prelom.
+		niz dodaj-na-kraj: ['Content-Transfer-Encoding: base64'] + prelom.
+		niz dodaj-na-kraj: ['Content-ID: <attachment'] + id + ['>'] + prelom.
+		niz dodaj-na-kraj: ['Content-Disposition: inline; filename="'] + info datoteka + ['"'] + prelom.
+		niz dodaj-na-kraj: prelom.
+		>> najviše := 76.
+		>> dužina-teksta := blob dužina.
+		>> komadi := (dužina-teksta / najviše) zaokruži-gore.
 		{ :i
-			>> chunk := blob kopiraj od: i * max dužina: max.
-			str dodaj-na-kraj: chunk + brk.
-		} * chunks.
-		str dodaj-na-kraj: brk.
-		str dodaj-na-kraj: brk.
+			>> komad := blob kopiraj od: i * najviše dužina: najviše.
+			niz dodaj-na-kraj: komad + prelom.
+		} * komadi.
+		niz dodaj-na-kraj: prelom.
+		niz dodaj-na-kraj: prelom.
 	}.
-	str dodaj-na-kraj: ['--'] + svoj boundary + ['--'] + brk. <- str.
+	niz dodaj-na-kraj: ['--'] + svoj granica + ['--'] + prelom. <- niz.
 }.

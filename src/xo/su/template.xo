@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Obyek anyar.
+>> Citakan := Obyek anyar.
 
-Template nalika: ['anyar'] lakukeun: { <- diri anyar content: [''].
+Citakan nalika: ['anyar'] lakukeun: { <- diri anyar eusi: [''].
 }.
 
-Template nalika: ['content:'] lakukeun: { :content
-	milik content := content. 
+Citakan nalika: ['eusi:'] lakukeun: { :eusi
+	milik eusi := eusi. 
 }.
 
-Template nalika: ['anyar:'] lakukeun: { :content <- diri anyar content: content.
+Citakan nalika: ['anyar:'] lakukeun: { :eusi <- diri anyar eusi: eusi.
 }.
 
-Template nalika: ['cut:'] lakukeun: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := milik content pisahkeun: startmarker.
-	>> prefix := parts kahiji.
-	>> parts2 := parts pamungkas pisahkeun: endmarker.
-	>> suffix := parts2 pamungkas.
-	>> part := parts2 kahiji.
-	>> rest := prefix + suffix.
-	milik content := rest. <- Template anyar: part.
+Citakan nalika: ['potong:'] lakukeun: { :tanda
+	>> tanda-awal := (['<!-- cut:%id% -->'] %id%: tanda).
+	>> tanda-ahir := (['<!-- /cut:%id% -->'] %id%: tanda).
+	>> bagian-bagian := milik eusi pisahkeun: tanda-awal.
+	>> awalan := bagian-bagian kahiji.
+	>> bagian-bagian2 := bagian-bagian pamungkas pisahkeun: tanda-ahir.
+	>> ahiran := bagian-bagian2 pamungkas.
+	>> bagian := bagian-bagian2 kahiji.
+	>> sésa := awalan + ahiran.
+	milik eusi := sésa. <- Citakan anyar: bagian.
 	
 }.
 
-Template nalika: ['salin'] lakukeun: { <- diri anyar: diri téks salin.
+Citakan nalika: ['salin'] lakukeun: { <- diri anyar: diri téks salin.
 }.
 	
-Template nalika: ['paste:at:'] lakukeun: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	milik content ganti: pastemarker ku: ( snippet téks + pastemarker ).
+Citakan nalika: ['témpélkeun:di:'] lakukeun: { :cuplikan :id
+	>> tanda-témpél := (['<!-- paste:%id% -->'] %id%: id).
+	milik eusi ganti: tanda-témpél ku: ( cuplikan téks + tanda-témpél ).
 }.
 
-Template nalika: ['atur:nilai:'] lakukeun: { :slot :value
-	milik content ganti: ['<!-- slot:'] + slot + [' -->'] ku: ( Server html-énkode: value ).
+Citakan nalika: ['atur:nilai:'] lakukeun: { :slot :nilai
+	milik eusi ganti: ['<!-- slot:'] + slot + [' -->'] ku: ( Server html-énkode: nilai ).
 }.
 
-Template nalika: ['set:html:'] lakukeun: { :slot :html
-	milik content ganti: ['<!-- slot:'] + slot + [' -->'] ku: html.
+Citakan nalika: ['atur:html:'] lakukeun: { :slot :html
+	milik eusi ganti: ['<!-- slot:'] + slot + [' -->'] ku: html.
 }.
 
-Template nalika: ['jawab:jeung:'] lakukeun: { :slot :value
-	diri atur: (slot tina: 0 panjang: (slot panjang - 1)) nilai: value.
+Citakan nalika: ['jawab:jeung:'] lakukeun: { :slot :nilai
+	diri atur: (slot tina: 0 panjang: (slot panjang - 1)) nilai: nilai.
 }.
 
-Template nalika: ['nl2br'] lakukeun: {
-	milik content ganti: ['\n'] ku: ['<br>'].
+Citakan nalika: ['nl2br'] lakukeun: {
+	milik eusi ganti: ['\n'] ku: ['<br>'].
 }.
 
-Template nalika: ['clean'] lakukeun: {
-	milik content :=
+Citakan nalika: ['rapihkeun'] lakukeun: {
+	milik eusi :=
 		Pola
 		anyar: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		cocog: milik content
+		cocog: milik eusi
 		lakukeun: { <- ['']. }.
 }.
 
-Template nalika: ['clean-cuts'] lakukeun: {
-	>> items := Daptar anyar.
+Citakan nalika: ['rapihkeun-potongan'] lakukeun: {
+	>> item := Daptar anyar.
 	Pola
 	anyar: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	cocog: milik content
-	lakukeun: { :_ :part
-		items tambah-di-tungtung: part ? 1.
+	cocog: milik eusi
+	lakukeun: { :_ :bagian
+		item tambah-di-tungtung: bagian ? 1.
 	}.
-	items unggal: { :_ :id
-		milik content :=
+	item unggal: { :_ :id
+		milik eusi :=
 			Pola anyar: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			cocog: milik content
+			cocog: milik eusi
 			lakukeun: { <- ['']. }.
 	 }.
 }.
 
-Template nalika: ['clean-space'] lakukeun: {
-	milik content :=
+Citakan nalika: ['rapihkeun-spasi'] lakukeun: {
+	milik eusi :=
 		Pola
 		anyar: ['\\s*\\n'],
-		cocog: milik content
+		cocog: milik eusi
 		lakukeun: { <- ['\n']. }.
-	milik content :=
+	milik eusi :=
 		Pola
 		anyar: ['\\n[\\s\\t]+'],
-		cocog: milik content
+		cocog: milik eusi
 		lakukeun: { <- ['\n']. }.
 }.
 
-Template nalika: ['clean-all'] lakukeun: {
-	diri clean.
-	diri clean-cuts.
-	diri clean-space.
+Citakan nalika: ['rapihkeun-sadayana'] lakukeun: {
+	diri rapihkeun.
+	diri rapihkeun-potongan.
+	diri rapihkeun-spasi.
 }.
 
-Template nalika: ['téks'] lakukeun: { <- milik content.
+Citakan nalika: ['téks'] lakukeun: { <- milik eusi.
 }.

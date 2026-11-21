@@ -1,128 +1,128 @@
 >> Email := Ughjettu novu.
 
-Email quandu: ['init'] fà: {
-	propiu recipients := Lista novu.
+Email quandu: ['inizializà'] fà: {
+	propiu destinatarii := Lista novu.
 	propiu cc := Lista novu.
 	propiu bcc := Lista novu.
-	propiu from := Nunda.
-	propiu from-name := Nunda.
-	propiu subject := Nunda.
-	propiu body := Nunda.
+	propiu mittente := Nunda.
+	propiu nome-mittente := Nunda.
+	propiu oggettu := Nunda.
+	propiu corpu := Nunda.
 }.
 
-Email quandu: ['novu'] fà: { <- sè novu init.
+Email quandu: ['novu'] fà: { <- sè novu inizializà.
 }.
 
-Email quandu: ['to:'] fà: { :list
-	propiu recipients := list.
+Email quandu: ['destinatariu:'] fà: { :elencu
+	propiu destinatarii := elencu.
 }.
  
-Email quandu: ['cc:'] fà: { :list
-	propiu cc := list.
+Email quandu: ['cc:'] fà: { :elencu
+	propiu cc := elencu.
 }.
 
-Email quandu: ['bcc:'] fà: { :list
-	propiu bcc := list.
+Email quandu: ['bcc:'] fà: { :elencu
+	propiu bcc := elencu.
 }.
 
-Email quandu: ['subject:'] fà: { :subject
-	propiu subject := subject.
+Email quandu: ['oggettu:'] fà: { :oggettu
+	propiu oggettu := oggettu.
 }.
 
-Email quandu: ['from:name:'] fà: { :from :nome
-	propiu from := from.
-	propiu from-name := nome.
+Email quandu: ['mittente:nome:'] fà: { :mittente :nome
+	propiu mittente := mittente.
+	propiu nome-mittente := nome.
 }.
 
-Email quandu: ['body:'] fà: { :body
-	propiu body := body.
+Email quandu: ['corpu:'] fà: { :corpu
+	propiu corpu := corpu.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email quandu: ['header:'] fà: { :line <- line rimpiazzà: ['\r'] cù: [''], rimpiazzà: ['\n'] cù: [''].
+Email quandu: ['intestatura:'] fà: { :linea <- linea rimpiazzà: ['\r'] cù: [''], rimpiazzà: ['\n'] cù: [''].
 }.
 
-Email quandu: ['send'] fà: {
-	>> f := Schedariu tempwrite: sè generate.
+Email quandu: ['mandà'] fà: {
+	>> f := Schedariu tempwrite: sè generà.
 	Prugramma sistema: ['sendmail -t < '] + f caminu-di-schedariu, linea-nova.
 }.
 
-Email quandu: ['generate'] fà: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str aghjunghje-à-a-fine: (sè header: ['From: '] + propiu from-name + [' <'] + ( propiu from ) + ['>']) + brk.
-	str aghjunghje-à-a-fine: (sè header: ['To: '] + ( propiu recipients unisce: [','] )) + brk.
+Email quandu: ['generà'] fà: {
+	>> ritornu := ['\r\n'].
+	>> catena := [''].
+	catena aghjunghje-à-a-fine: (sè intestatura: ['From: '] + propiu nome-mittente + [' <'] + ( propiu mittente ) + ['>']) + ritornu.
+	catena aghjunghje-à-a-fine: (sè intestatura: ['To: '] + ( propiu destinatarii unisce: [','] )) + ritornu.
 	propiu cc cuntà veru: {
-		str aghjunghje-à-a-fine: (sè header: ['Cc: '] + ( propiu cc unisce: [','] )) + brk.
+		catena aghjunghje-à-a-fine: (sè intestatura: ['Cc: '] + ( propiu cc unisce: [','] )) + ritornu.
 	}.
 	propiu bcc cuntà veru: {
-		str aghjunghje-à-a-fine: (sè header: ['Bcc: '] + ( propiu bcc unisce: [','] )) + brk.
+		catena aghjunghje-à-a-fine: (sè intestatura: ['Bcc: '] + ( propiu bcc unisce: [','] )) + ritornu.
 	}.
-	str aghjunghje-à-a-fine: (sè header: ['Subject: '] + propiu subject) + brk.
-	str aghjunghje-à-a-fine: brk.
-	str aghjunghje-à-a-fine: propiu body.
-	str aghjunghje-à-a-fine: brk. <- str.
+	catena aghjunghje-à-a-fine: (sè intestatura: ['Subject: '] + propiu oggettu) + ritornu.
+	catena aghjunghje-à-a-fine: ritornu.
+	catena aghjunghje-à-a-fine: propiu corpu.
+	catena aghjunghje-à-a-fine: ritornu. <- catena.
 }.
 
->> HTML-Email := Email novu.
+>> Email-HTML := Email novu.
 
-HTML-Email quandu: ['init'] fà: {
-	sè init.
-	propiu attachments := Lista novu.
-	propiu boundary := Cascia-forte gettone: 40.
+Email-HTML quandu: ['inizializà'] fà: {
+	sè inizializà.
+	propiu aghjunte := Lista novu.
+	propiu cunfine := Cascia-forte gettone: 40.
 }.
 
-HTML-Email quandu: ['attach:'] fà: { :file
-	>> id := propiu attachments cuntà.
-	>> blob := file blob.
-	propiu attachments aghjunghje-à-a-fine: (
+Email-HTML quandu: ['attaccà:'] fà: { :schedariu
+	>> id := propiu aghjunte cuntà.
+	>> blob := schedariu blob.
+	propiu aghjunte aghjunghje-à-a-fine: (
 		Dizziunariu novu
-			file: file caminu-di-schedariu,
-			mime: ['image/'] + (Server mimetype: file caminu-di-schedariu),
-			data: blob base64-cudificà
+			schedariu: schedariu caminu-di-schedariu,
+			mime: ['image/'] + (Server mimetype: schedariu caminu-di-schedariu),
+			dati: blob base64-cudificà
 	).
 	blob liberà. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email quandu: ['generate'] fà: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str aghjunghje-à-a-fine: (sè header: ['From: '] + propiu from-name + [' <'] + ( propiu from ) + ['>']) + brk.
-	str aghjunghje-à-a-fine: (sè header: ['To: '] + ( propiu recipients unisce: [','] )) + brk.
+Email-HTML quandu: ['generà'] fà: {
+	>> ritornu := ['\r\n'].
+	>> catena := [''].
+	catena aghjunghje-à-a-fine: (sè intestatura: ['From: '] + propiu nome-mittente + [' <'] + ( propiu mittente ) + ['>']) + ritornu.
+	catena aghjunghje-à-a-fine: (sè intestatura: ['To: '] + ( propiu destinatarii unisce: [','] )) + ritornu.
 	propiu cc cuntà veru: {
-		str aghjunghje-à-a-fine: (sè header: ['Cc: '] + ( propiu cc unisce: [','] )) + brk.
+		catena aghjunghje-à-a-fine: (sè intestatura: ['Cc: '] + ( propiu cc unisce: [','] )) + ritornu.
 	}.
 	propiu bcc cuntà veru: {
-		str aghjunghje-à-a-fine: (sè header: ['Bcc: '] + ( propiu bcc unisce: [','] )) + brk.
+		catena aghjunghje-à-a-fine: (sè intestatura: ['Bcc: '] + ( propiu bcc unisce: [','] )) + ritornu.
 	}.
-	str aghjunghje-à-a-fine: (sè header: ['Subject: '] + propiu subject) + brk.
-	str aghjunghje-à-a-fine: ['MIME-Version: 1.0'] + brk.
-	str aghjunghje-à-a-fine: ['Content-Type: multipart/related; boundary="'] + propiu boundary + ['"; type=text/html'] + brk.
-	str aghjunghje-à-a-fine: brk.
-	str aghjunghje-à-a-fine: ['--'] + propiu boundary + brk.
-	str aghjunghje-à-a-fine: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str aghjunghje-à-a-fine: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str aghjunghje-à-a-fine: brk.
-	str aghjunghje-à-a-fine: propiu body.
-	str aghjunghje-à-a-fine: brk.
-	propiu attachments ognunu: { :id :info
-		>> blob := info data.
-		str aghjunghje-à-a-fine: ['--'] + propiu boundary + brk.
-		str aghjunghje-à-a-fine: ['Content-Type: '] + info mime + brk.
-		str aghjunghje-à-a-fine: ['Content-Transfer-Encoding: base64'] + brk.
-		str aghjunghje-à-a-fine: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str aghjunghje-à-a-fine: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str aghjunghje-à-a-fine: brk.
-		>> max := 76.
-		>> len := blob lunghezza.
-		>> chunks := (len / max) arrutundà-insù.
+	catena aghjunghje-à-a-fine: (sè intestatura: ['Subject: '] + propiu oggettu) + ritornu.
+	catena aghjunghje-à-a-fine: ['MIME-Version: 1.0'] + ritornu.
+	catena aghjunghje-à-a-fine: ['Content-Type: multipart/related; boundary="'] + propiu cunfine + ['"; type=text/html'] + ritornu.
+	catena aghjunghje-à-a-fine: ritornu.
+	catena aghjunghje-à-a-fine: ['--'] + propiu cunfine + ritornu.
+	catena aghjunghje-à-a-fine: ['Content-Type: text/html; charset=UTF-8'] + ritornu.
+	catena aghjunghje-à-a-fine: ['Content-Transfer-Encoding: 7bit'] + ritornu.
+	catena aghjunghje-à-a-fine: ritornu.
+	catena aghjunghje-à-a-fine: propiu corpu.
+	catena aghjunghje-à-a-fine: ritornu.
+	propiu aghjunte ognunu: { :id :info
+		>> blob := info dati.
+		catena aghjunghje-à-a-fine: ['--'] + propiu cunfine + ritornu.
+		catena aghjunghje-à-a-fine: ['Content-Type: '] + info mime + ritornu.
+		catena aghjunghje-à-a-fine: ['Content-Transfer-Encoding: base64'] + ritornu.
+		catena aghjunghje-à-a-fine: ['Content-ID: <attachment'] + id + ['>'] + ritornu.
+		catena aghjunghje-à-a-fine: ['Content-Disposition: inline; filename="'] + info schedariu + ['"'] + ritornu.
+		catena aghjunghje-à-a-fine: ritornu.
+		>> tettu := 76.
+		>> lunghezza-testu := blob lunghezza.
+		>> pezzi := (lunghezza-testu / tettu) arrutundà-insù.
 		{ :i
-			>> chunk := blob cupià da: i * max lunghezza: max.
-			str aghjunghje-à-a-fine: chunk + brk.
-		} * chunks.
-		str aghjunghje-à-a-fine: brk.
-		str aghjunghje-à-a-fine: brk.
+			>> pezzu := blob cupià da: i * tettu lunghezza: tettu.
+			catena aghjunghje-à-a-fine: pezzu + ritornu.
+		} * pezzi.
+		catena aghjunghje-à-a-fine: ritornu.
+		catena aghjunghje-à-a-fine: ritornu.
 	}.
-	str aghjunghje-à-a-fine: ['--'] + propiu boundary + ['--'] + brk. <- str.
+	catena aghjunghje-à-a-fine: ['--'] + propiu cunfine + ['--'] + ritornu. <- catena.
 }.

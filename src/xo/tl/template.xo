@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Bagay bago.
+>> Huwaran := Bagay bago.
 
-Template kapag: ['bago'] gawin: { <- sarili bago content: [''].
+Huwaran kapag: ['bago'] gawin: { <- sarili bago nilalaman: [''].
 }.
 
-Template kapag: ['content:'] gawin: { :content
-	sarili-ko content := content. 
+Huwaran kapag: ['nilalaman:'] gawin: { :nilalaman
+	sarili-ko nilalaman := nilalaman. 
 }.
 
-Template kapag: ['bago:'] gawin: { :content <- sarili bago content: content.
+Huwaran kapag: ['bago:'] gawin: { :nilalaman <- sarili bago nilalaman: nilalaman.
 }.
 
-Template kapag: ['cut:'] gawin: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := sarili-ko content hatiin: startmarker.
-	>> prefix := parts una.
-	>> parts2 := parts huli hatiin: endmarker.
-	>> suffix := parts2 huli.
-	>> part := parts2 una.
-	>> rest := prefix + suffix.
-	sarili-ko content := rest. <- Template bago: part.
+Huwaran kapag: ['gupitin:'] gawin: { :pananda
+	>> pananda-ng-simula := (['<!-- cut:%id% -->'] %id%: pananda).
+	>> pananda-ng-dulo := (['<!-- /cut:%id% -->'] %id%: pananda).
+	>> mga-parte := sarili-ko nilalaman hatiin: pananda-ng-simula.
+	>> unlapi := mga-parte una.
+	>> mga-parte2 := mga-parte huli hatiin: pananda-ng-dulo.
+	>> hulapi := mga-parte2 huli.
+	>> parte := mga-parte2 una.
+	>> natitira := unlapi + hulapi.
+	sarili-ko nilalaman := natitira. <- Huwaran bago: parte.
 	
 }.
 
-Template kapag: ['kopyahin'] gawin: { <- sarili bago: sarili teksto kopyahin.
+Huwaran kapag: ['kopyahin'] gawin: { <- sarili bago: sarili teksto kopyahin.
 }.
 	
-Template kapag: ['paste:at:'] gawin: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	sarili-ko content palitan: pastemarker ng: ( snippet teksto + pastemarker ).
+Huwaran kapag: ['idikit:sa:'] gawin: { :sipi :id
+	>> pananda-ng-pagdikit := (['<!-- paste:%id% -->'] %id%: id).
+	sarili-ko nilalaman palitan: pananda-ng-pagdikit ng: ( sipi teksto + pananda-ng-pagdikit ).
 }.
 
-Template kapag: ['itakda:halaga:'] gawin: { :slot :value
-	sarili-ko content palitan: ['<!-- slot:'] + slot + [' -->'] ng: ( Server html-i-encode: value ).
+Huwaran kapag: ['itakda:halaga:'] gawin: { :puwang :halaga
+	sarili-ko nilalaman palitan: ['<!-- slot:'] + puwang + [' -->'] ng: ( Server html-i-encode: halaga ).
 }.
 
-Template kapag: ['set:html:'] gawin: { :slot :html
-	sarili-ko content palitan: ['<!-- slot:'] + slot + [' -->'] ng: html.
+Huwaran kapag: ['itakda:html:'] gawin: { :puwang :html
+	sarili-ko nilalaman palitan: ['<!-- slot:'] + puwang + [' -->'] ng: html.
 }.
 
-Template kapag: ['tumugon:at:'] gawin: { :slot :value
-	sarili itakda: (slot mula-sa: 0 haba: (slot haba - 1)) halaga: value.
+Huwaran kapag: ['tumugon:at:'] gawin: { :puwang :halaga
+	sarili itakda: (puwang mula-sa: 0 haba: (puwang haba - 1)) halaga: halaga.
 }.
 
-Template kapag: ['nl2br'] gawin: {
-	sarili-ko content palitan: ['\n'] ng: ['<br>'].
+Huwaran kapag: ['nl2br'] gawin: {
+	sarili-ko nilalaman palitan: ['\n'] ng: ['<br>'].
 }.
 
-Template kapag: ['clean'] gawin: {
-	sarili-ko content :=
+Huwaran kapag: ['ayusin'] gawin: {
+	sarili-ko nilalaman :=
 		Padron
 		bago: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		tugma: sarili-ko content
+		tugma: sarili-ko nilalaman
 		gawin: { <- ['']. }.
 }.
 
-Template kapag: ['clean-cuts'] gawin: {
-	>> items := Listahan bago.
+Huwaran kapag: ['ayusin-ang-gupit'] gawin: {
+	>> mga-aytem := Listahan bago.
 	Padron
 	bago: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	tugma: sarili-ko content
-	gawin: { :_ :part
-		items idagdag-sa-dulo: part ? 1.
+	tugma: sarili-ko nilalaman
+	gawin: { :_ :parte
+		mga-aytem idagdag-sa-dulo: parte ? 1.
 	}.
-	items bawat: { :_ :id
-		sarili-ko content :=
+	mga-aytem bawat: { :_ :id
+		sarili-ko nilalaman :=
 			Padron bago: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			tugma: sarili-ko content
+			tugma: sarili-ko nilalaman
 			gawin: { <- ['']. }.
 	 }.
 }.
 
-Template kapag: ['clean-space'] gawin: {
-	sarili-ko content :=
+Huwaran kapag: ['ayusin-ang-espasyo'] gawin: {
+	sarili-ko nilalaman :=
 		Padron
 		bago: ['\\s*\\n'],
-		tugma: sarili-ko content
+		tugma: sarili-ko nilalaman
 		gawin: { <- ['\n']. }.
-	sarili-ko content :=
+	sarili-ko nilalaman :=
 		Padron
 		bago: ['\\n[\\s\\t]+'],
-		tugma: sarili-ko content
+		tugma: sarili-ko nilalaman
 		gawin: { <- ['\n']. }.
 }.
 
-Template kapag: ['clean-all'] gawin: {
-	sarili clean.
-	sarili clean-cuts.
-	sarili clean-space.
+Huwaran kapag: ['ayusin-lahat'] gawin: {
+	sarili ayusin.
+	sarili ayusin-ang-gupit.
+	sarili ayusin-ang-espasyo.
 }.
 
-Template kapag: ['teksto'] gawin: { <- sarili-ko content.
+Huwaran kapag: ['teksto'] gawin: { <- sarili-ko nilalaman.
 }.

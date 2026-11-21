@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := 对象 新建.
+>> 模板 := 对象 新建.
 
-Template 在: ['新建'] 执行: { <- 自身 新建 content: [''].
+模板 在: ['新建'] 执行: { <- 自身 新建 内容: [''].
 }.
 
-Template 在: ['content:'] 执行: { :content
-	拥有 content := content. 
+模板 在: ['内容:'] 执行: { :内容
+	拥有 内容 := 内容. 
 }.
 
-Template 在: ['新建:'] 执行: { :content <- 自身 新建 content: content.
+模板 在: ['新建:'] 执行: { :内容 <- 自身 新建 内容: 内容.
 }.
 
-Template 在: ['cut:'] 执行: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := 拥有 content 拆分: startmarker.
-	>> prefix := parts 第一个.
-	>> parts2 := parts 最后 拆分: endmarker.
-	>> suffix := parts2 最后.
-	>> part := parts2 第一个.
-	>> rest := prefix + suffix.
-	拥有 content := rest. <- Template 新建: part.
+模板 在: ['剪切:'] 执行: { :标记
+	>> 开始标记 := (['<!-- cut:%id% -->'] %id%: 标记).
+	>> 结束标记 := (['<!-- /cut:%id% -->'] %id%: 标记).
+	>> 部分列表 := 拥有 内容 拆分: 开始标记.
+	>> 前缀 := 部分列表 第一个.
+	>> 部分列表2 := 部分列表 最后 拆分: 结束标记.
+	>> 后缀 := 部分列表2 最后.
+	>> 部分 := 部分列表2 第一个.
+	>> 剩余 := 前缀 + 后缀.
+	拥有 内容 := 剩余. <- 模板 新建: 部分.
 	
 }.
 
-Template 在: ['复制'] 执行: { <- 自身 新建: 自身 转文本 复制.
+模板 在: ['复制'] 执行: { <- 自身 新建: 自身 转文本 复制.
 }.
 	
-Template 在: ['paste:at:'] 执行: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	拥有 content 替换: pastemarker 为: ( snippet 转文本 + pastemarker ).
+模板 在: ['粘贴:在:'] 执行: { :片段文本 :id
+	>> 粘贴标记 := (['<!-- paste:%id% -->'] %id%: id).
+	拥有 内容 替换: 粘贴标记 为: ( 片段文本 转文本 + 粘贴标记 ).
 }.
 
-Template 在: ['设:值:'] 执行: { :slot :value
-	拥有 content 替换: ['<!-- slot:'] + slot + [' -->'] 为: ( Server 互联网文档编码: value ).
+模板 在: ['设:值:'] 执行: { :插槽 :取值
+	拥有 内容 替换: ['<!-- slot:'] + 插槽 + [' -->'] 为: ( Server 互联网文档编码: 取值 ).
 }.
 
-Template 在: ['set:html:'] 执行: { :slot :互联网文档
-	拥有 content 替换: ['<!-- slot:'] + slot + [' -->'] 为: 互联网文档.
+模板 在: ['设:互联网文档:'] 执行: { :插槽 :互联网文档
+	拥有 内容 替换: ['<!-- slot:'] + 插槽 + [' -->'] 为: 互联网文档.
 }.
 
-Template 在: ['响应:参数:'] 执行: { :slot :value
-	自身 设: (slot 从: 0 长度: (slot 长度 - 1)) 值: value.
+模板 在: ['响应:参数:'] 执行: { :插槽 :取值
+	自身 设: (插槽 从: 0 长度: (插槽 长度 - 1)) 值: 取值.
 }.
 
-Template 在: ['nl2br'] 执行: {
-	拥有 content 替换: ['\n'] 为: ['<br>'].
+模板 在: ['nl2br'] 执行: {
+	拥有 内容 替换: ['\n'] 为: ['<br>'].
 }.
 
-Template 在: ['clean'] 执行: {
-	拥有 content :=
+模板 在: ['清理标记'] 执行: {
+	拥有 内容 :=
 		模式
 		新建: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		匹配: 拥有 content
+		匹配: 拥有 内容
 		执行: { <- ['']. }.
 }.
 
-Template 在: ['clean-cuts'] 执行: {
-	>> items := 数组对象 新建.
+模板 在: ['清理剪切'] 执行: {
+	>> 条目 := 数组对象 新建.
 	模式
 	新建: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	匹配: 拥有 content
-	执行: { :_ :part
-		items 追加: part ? 1.
+	匹配: 拥有 内容
+	执行: { :_ :部分
+		条目 追加: 部分 ? 1.
 	}.
-	items 每个: { :_ :id
-		拥有 content :=
+	条目 每个: { :_ :id
+		拥有 内容 :=
 			模式 新建: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			匹配: 拥有 content
+			匹配: 拥有 内容
 			执行: { <- ['']. }.
 	 }.
 }.
 
-Template 在: ['clean-space'] 执行: {
-	拥有 content :=
+模板 在: ['清理空白'] 执行: {
+	拥有 内容 :=
 		模式
 		新建: ['\\s*\\n'],
-		匹配: 拥有 content
+		匹配: 拥有 内容
 		执行: { <- ['\n']. }.
-	拥有 content :=
+	拥有 内容 :=
 		模式
 		新建: ['\\n[\\s\\t]+'],
-		匹配: 拥有 content
+		匹配: 拥有 内容
 		执行: { <- ['\n']. }.
 }.
 
-Template 在: ['clean-all'] 执行: {
-	自身 clean.
-	自身 clean-cuts.
-	自身 clean-space.
+模板 在: ['全部清理'] 执行: {
+	自身 清理标记.
+	自身 清理剪切.
+	自身 清理空白.
 }.
 
-Template 在: ['转文本'] 执行: { <- 拥有 content.
+模板 在: ['转文本'] 执行: { <- 拥有 内容.
 }.

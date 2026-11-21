@@ -1,128 +1,128 @@
->> Email := Objè nouvo.
+>> Imèl := Objè nouvo.
 
-Email lè: ['init'] fè: {
-	pwòp recipients := Lis nouvo.
+Imèl lè: ['prepare'] fè: {
+	pwòp moun-k-ap-resevwa := Lis nouvo.
 	pwòp cc := Lis nouvo.
 	pwòp bcc := Lis nouvo.
-	pwòp from := Anyen.
-	pwòp from-name := Anyen.
-	pwòp subject := Anyen.
-	pwòp body := Anyen.
+	pwòp moun-ki-voye := Anyen.
+	pwòp non-moun-ki-voye := Anyen.
+	pwòp sijè := Anyen.
+	pwòp kò := Anyen.
 }.
 
-Email lè: ['nouvo'] fè: { <- tèt-li nouvo init.
+Imèl lè: ['nouvo'] fè: { <- tèt-li nouvo prepare.
 }.
 
-Email lè: ['to:'] fè: { :list
-	pwòp recipients := list.
+Imèl lè: ['bay:'] fè: { :enimerasyon
+	pwòp moun-k-ap-resevwa := enimerasyon.
 }.
  
-Email lè: ['cc:'] fè: { :list
-	pwòp cc := list.
+Imèl lè: ['cc:'] fè: { :enimerasyon
+	pwòp cc := enimerasyon.
 }.
 
-Email lè: ['bcc:'] fè: { :list
-	pwòp bcc := list.
+Imèl lè: ['bcc:'] fè: { :enimerasyon
+	pwòp bcc := enimerasyon.
 }.
 
-Email lè: ['subject:'] fè: { :subject
-	pwòp subject := subject.
+Imèl lè: ['sijè:'] fè: { :sijè
+	pwòp sijè := sijè.
 }.
 
-Email lè: ['from:name:'] fè: { :from :non
-	pwòp from := from.
-	pwòp from-name := non.
+Imèl lè: ['moun-ki-voye:non:'] fè: { :moun-ki-voye :non
+	pwòp moun-ki-voye := moun-ki-voye.
+	pwòp non-moun-ki-voye := non.
 }.
 
-Email lè: ['body:'] fè: { :body
-	pwòp body := body.
+Imèl lè: ['kò:'] fè: { :kò
+	pwòp kò := kò.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email lè: ['header:'] fè: { :line <- line ranplase: ['\r'] ak: [''], ranplase: ['\n'] ak: [''].
+Imèl lè: ['antèt:'] fè: { :liy <- liy ranplase: ['\r'] ak: [''], ranplase: ['\n'] ak: [''].
 }.
 
-Email lè: ['send'] fè: {
-	>> f := Fichye tempwrite: tèt-li generate.
+Imèl lè: ['voye'] fè: {
+	>> f := Fichye tempwrite: tèt-li jenere.
 	Pwogram sistèm: ['sendmail -t < '] + f chemen-fichye, nouvo-liy.
 }.
 
-Email lè: ['generate'] fè: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str ajoute-nan-fen: (tèt-li header: ['From: '] + pwòp from-name + [' <'] + ( pwòp from ) + ['>']) + brk.
-	str ajoute-nan-fen: (tèt-li header: ['To: '] + ( pwòp recipients kole-ansanm: [','] )) + brk.
+Imèl lè: ['jenere'] fè: {
+	>> kase-liy := ['\r\n'].
+	>> chèn-tèks := [''].
+	chèn-tèks ajoute-nan-fen: (tèt-li antèt: ['From: '] + pwòp non-moun-ki-voye + [' <'] + ( pwòp moun-ki-voye ) + ['>']) + kase-liy.
+	chèn-tèks ajoute-nan-fen: (tèt-li antèt: ['To: '] + ( pwòp moun-k-ap-resevwa kole-ansanm: [','] )) + kase-liy.
 	pwòp cc konte vre: {
-		str ajoute-nan-fen: (tèt-li header: ['Cc: '] + ( pwòp cc kole-ansanm: [','] )) + brk.
+		chèn-tèks ajoute-nan-fen: (tèt-li antèt: ['Cc: '] + ( pwòp cc kole-ansanm: [','] )) + kase-liy.
 	}.
 	pwòp bcc konte vre: {
-		str ajoute-nan-fen: (tèt-li header: ['Bcc: '] + ( pwòp bcc kole-ansanm: [','] )) + brk.
+		chèn-tèks ajoute-nan-fen: (tèt-li antèt: ['Bcc: '] + ( pwòp bcc kole-ansanm: [','] )) + kase-liy.
 	}.
-	str ajoute-nan-fen: (tèt-li header: ['Subject: '] + pwòp subject) + brk.
-	str ajoute-nan-fen: brk.
-	str ajoute-nan-fen: pwòp body.
-	str ajoute-nan-fen: brk. <- str.
+	chèn-tèks ajoute-nan-fen: (tèt-li antèt: ['Subject: '] + pwòp sijè) + kase-liy.
+	chèn-tèks ajoute-nan-fen: kase-liy.
+	chèn-tèks ajoute-nan-fen: pwòp kò.
+	chèn-tèks ajoute-nan-fen: kase-liy. <- chèn-tèks.
 }.
 
->> HTML-Email := Email nouvo.
+>> Imèl-HTML := Imèl nouvo.
 
-HTML-Email lè: ['init'] fè: {
-	tèt-li init.
-	pwòp attachments := Lis nouvo.
-	pwòp boundary := Kòfrefò jeton: 40.
+Imèl-HTML lè: ['prepare'] fè: {
+	tèt-li prepare.
+	pwòp atachman := Lis nouvo.
+	pwòp limit := Kòfrefò jeton: 40.
 }.
 
-HTML-Email lè: ['attach:'] fè: { :file
-	>> id := pwòp attachments konte.
-	>> blob := file blob.
-	pwòp attachments ajoute-nan-fen: (
+Imèl-HTML lè: ['tache:'] fè: { :fichye-sesyon
+	>> id := pwòp atachman konte.
+	>> blob := fichye-sesyon blob.
+	pwòp atachman ajoute-nan-fen: (
 		Diksyonè nouvo
-			file: file chemen-fichye,
-			mime: ['image/'] + (Server mimetype: file chemen-fichye),
-			data: blob base64-kode
+			fichye-sesyon: fichye-sesyon chemen-fichye,
+			mime: ['image/'] + (Server mimetype: fichye-sesyon chemen-fichye),
+			done: blob base64-kode
 	).
 	blob libere. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email lè: ['generate'] fè: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str ajoute-nan-fen: (tèt-li header: ['From: '] + pwòp from-name + [' <'] + ( pwòp from ) + ['>']) + brk.
-	str ajoute-nan-fen: (tèt-li header: ['To: '] + ( pwòp recipients kole-ansanm: [','] )) + brk.
+Imèl-HTML lè: ['jenere'] fè: {
+	>> kase-liy := ['\r\n'].
+	>> chèn-tèks := [''].
+	chèn-tèks ajoute-nan-fen: (tèt-li antèt: ['From: '] + pwòp non-moun-ki-voye + [' <'] + ( pwòp moun-ki-voye ) + ['>']) + kase-liy.
+	chèn-tèks ajoute-nan-fen: (tèt-li antèt: ['To: '] + ( pwòp moun-k-ap-resevwa kole-ansanm: [','] )) + kase-liy.
 	pwòp cc konte vre: {
-		str ajoute-nan-fen: (tèt-li header: ['Cc: '] + ( pwòp cc kole-ansanm: [','] )) + brk.
+		chèn-tèks ajoute-nan-fen: (tèt-li antèt: ['Cc: '] + ( pwòp cc kole-ansanm: [','] )) + kase-liy.
 	}.
 	pwòp bcc konte vre: {
-		str ajoute-nan-fen: (tèt-li header: ['Bcc: '] + ( pwòp bcc kole-ansanm: [','] )) + brk.
+		chèn-tèks ajoute-nan-fen: (tèt-li antèt: ['Bcc: '] + ( pwòp bcc kole-ansanm: [','] )) + kase-liy.
 	}.
-	str ajoute-nan-fen: (tèt-li header: ['Subject: '] + pwòp subject) + brk.
-	str ajoute-nan-fen: ['MIME-Version: 1.0'] + brk.
-	str ajoute-nan-fen: ['Content-Type: multipart/related; boundary="'] + pwòp boundary + ['"; type=text/html'] + brk.
-	str ajoute-nan-fen: brk.
-	str ajoute-nan-fen: ['--'] + pwòp boundary + brk.
-	str ajoute-nan-fen: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str ajoute-nan-fen: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str ajoute-nan-fen: brk.
-	str ajoute-nan-fen: pwòp body.
-	str ajoute-nan-fen: brk.
-	pwòp attachments chak: { :id :info
-		>> blob := info data.
-		str ajoute-nan-fen: ['--'] + pwòp boundary + brk.
-		str ajoute-nan-fen: ['Content-Type: '] + info mime + brk.
-		str ajoute-nan-fen: ['Content-Transfer-Encoding: base64'] + brk.
-		str ajoute-nan-fen: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str ajoute-nan-fen: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str ajoute-nan-fen: brk.
-		>> max := 76.
-		>> len := blob longè.
-		>> chunks := (len / max) awondi-anwo.
+	chèn-tèks ajoute-nan-fen: (tèt-li antèt: ['Subject: '] + pwòp sijè) + kase-liy.
+	chèn-tèks ajoute-nan-fen: ['MIME-Version: 1.0'] + kase-liy.
+	chèn-tèks ajoute-nan-fen: ['Content-Type: multipart/related; boundary="'] + pwòp limit + ['"; type=text/html'] + kase-liy.
+	chèn-tèks ajoute-nan-fen: kase-liy.
+	chèn-tèks ajoute-nan-fen: ['--'] + pwòp limit + kase-liy.
+	chèn-tèks ajoute-nan-fen: ['Content-Type: text/html; charset=UTF-8'] + kase-liy.
+	chèn-tèks ajoute-nan-fen: ['Content-Transfer-Encoding: 7bit'] + kase-liy.
+	chèn-tèks ajoute-nan-fen: kase-liy.
+	chèn-tèks ajoute-nan-fen: pwòp kò.
+	chèn-tèks ajoute-nan-fen: kase-liy.
+	pwòp atachman chak: { :id :enfòmasyon
+		>> blob := enfòmasyon done.
+		chèn-tèks ajoute-nan-fen: ['--'] + pwòp limit + kase-liy.
+		chèn-tèks ajoute-nan-fen: ['Content-Type: '] + enfòmasyon mime + kase-liy.
+		chèn-tèks ajoute-nan-fen: ['Content-Transfer-Encoding: base64'] + kase-liy.
+		chèn-tèks ajoute-nan-fen: ['Content-ID: <attachment'] + id + ['>'] + kase-liy.
+		chèn-tèks ajoute-nan-fen: ['Content-Disposition: inline; filename="'] + enfòmasyon fichye-sesyon + ['"'] + kase-liy.
+		chèn-tèks ajoute-nan-fen: kase-liy.
+		>> pi-plis := 76.
+		>> longè-tèks := blob longè.
+		>> bout-yo := (longè-tèks / pi-plis) awondi-anwo.
 		{ :i
-			>> chunk := blob kopye soti-nan: i * max longè: max.
-			str ajoute-nan-fen: chunk + brk.
-		} * chunks.
-		str ajoute-nan-fen: brk.
-		str ajoute-nan-fen: brk.
+			>> bout := blob kopye soti-nan: i * pi-plis longè: pi-plis.
+			chèn-tèks ajoute-nan-fen: bout + kase-liy.
+		} * bout-yo.
+		chèn-tèks ajoute-nan-fen: kase-liy.
+		chèn-tèks ajoute-nan-fen: kase-liy.
 	}.
-	str ajoute-nan-fen: ['--'] + pwòp boundary + ['--'] + brk. <- str.
+	chèn-tèks ajoute-nan-fen: ['--'] + pwòp limit + ['--'] + kase-liy. <- chèn-tèks.
 }.

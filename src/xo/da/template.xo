@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objekt ny.
+>> Skabelon := Objekt ny.
 
-Template ved: ['ny'] gør: { <- selv ny content: [''].
+Skabelon ved: ['ny'] gør: { <- selv ny indhold: [''].
 }.
 
-Template ved: ['content:'] gør: { :content
-	egen content := content. 
+Skabelon ved: ['indhold:'] gør: { :indhold
+	egen indhold := indhold. 
 }.
 
-Template ved: ['ny:'] gør: { :content <- selv ny content: content.
+Skabelon ved: ['ny:'] gør: { :indhold <- selv ny indhold: indhold.
 }.
 
-Template ved: ['cut:'] gør: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := egen content opdel: startmarker.
-	>> prefix := parts første.
-	>> parts2 := parts sidste opdel: endmarker.
-	>> suffix := parts2 sidste.
-	>> part := parts2 første.
-	>> rest := prefix + suffix.
-	egen content := rest. <- Template ny: part.
+Skabelon ved: ['klip:'] gør: { :markør
+	>> startmarkør := (['<!-- cut:%id% -->'] %id%: markør).
+	>> slutmarkør := (['<!-- /cut:%id% -->'] %id%: markør).
+	>> dele := egen indhold opdel: startmarkør.
+	>> præfiks := dele første.
+	>> dele2 := dele sidste opdel: slutmarkør.
+	>> suffiks := dele2 sidste.
+	>> del := dele2 første.
+	>> rest := præfiks + suffiks.
+	egen indhold := rest. <- Skabelon ny: del.
 	
 }.
 
-Template ved: ['kopiér'] gør: { <- selv ny: selv tekst kopiér.
+Skabelon ved: ['kopiér'] gør: { <- selv ny: selv tekst kopiér.
 }.
 	
-Template ved: ['paste:at:'] gør: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	egen content erstat: pastemarker med: ( snippet tekst + pastemarker ).
+Skabelon ved: ['indsæt:ved:'] gør: { :uddrag :id
+	>> indsætmarkør := (['<!-- paste:%id% -->'] %id%: id).
+	egen indhold erstat: indsætmarkør med: ( uddrag tekst + indsætmarkør ).
 }.
 
-Template ved: ['sæt:værdi:'] gør: { :slot :value
-	egen content erstat: ['<!-- slot:'] + slot + [' -->'] med: ( Server html-kode: value ).
+Skabelon ved: ['sæt:værdi:'] gør: { :plads :værdi
+	egen indhold erstat: ['<!-- slot:'] + plads + [' -->'] med: ( Server html-kode: værdi ).
 }.
 
-Template ved: ['set:html:'] gør: { :slot :html
-	egen content erstat: ['<!-- slot:'] + slot + [' -->'] med: html.
+Skabelon ved: ['sæt:html:'] gør: { :plads :html
+	egen indhold erstat: ['<!-- slot:'] + plads + [' -->'] med: html.
 }.
 
-Template ved: ['svar:og:'] gør: { :slot :value
-	selv sæt: (slot fra: 0 længde: (slot længde - 1)) værdi: value.
+Skabelon ved: ['svar:og:'] gør: { :plads :værdi
+	selv sæt: (plads fra: 0 længde: (plads længde - 1)) værdi: værdi.
 }.
 
-Template ved: ['nl2br'] gør: {
-	egen content erstat: ['\n'] med: ['<br>'].
+Skabelon ved: ['nl2br'] gør: {
+	egen indhold erstat: ['\n'] med: ['<br>'].
 }.
 
-Template ved: ['clean'] gør: {
-	egen content :=
+Skabelon ved: ['rens'] gør: {
+	egen indhold :=
 		Mønster
 		ny: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		match: egen content
+		match: egen indhold
 		gør: { <- ['']. }.
 }.
 
-Template ved: ['clean-cuts'] gør: {
-	>> items := Liste ny.
+Skabelon ved: ['rens-klip'] gør: {
+	>> elementer := Liste ny.
 	Mønster
 	ny: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	match: egen content
-	gør: { :_ :part
-		items tilføj: part ? 1.
+	match: egen indhold
+	gør: { :_ :del
+		elementer tilføj: del ? 1.
 	}.
-	items hver: { :_ :id
-		egen content :=
+	elementer hver: { :_ :id
+		egen indhold :=
 			Mønster ny: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			match: egen content
+			match: egen indhold
 			gør: { <- ['']. }.
 	 }.
 }.
 
-Template ved: ['clean-space'] gør: {
-	egen content :=
+Skabelon ved: ['rens-mellemrum'] gør: {
+	egen indhold :=
 		Mønster
 		ny: ['\\s*\\n'],
-		match: egen content
+		match: egen indhold
 		gør: { <- ['\n']. }.
-	egen content :=
+	egen indhold :=
 		Mønster
 		ny: ['\\n[\\s\\t]+'],
-		match: egen content
+		match: egen indhold
 		gør: { <- ['\n']. }.
 }.
 
-Template ved: ['clean-all'] gør: {
-	selv clean.
-	selv clean-cuts.
-	selv clean-space.
+Skabelon ved: ['rens-alt'] gør: {
+	selv rens.
+	selv rens-klip.
+	selv rens-mellemrum.
 }.
 
-Template ved: ['tekst'] gør: { <- egen content.
+Skabelon ved: ['tekst'] gør: { <- egen indhold.
 }.

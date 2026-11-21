@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objekt ny.
+>> Mall := Objekt ny.
 
-Template vid: ['ny'] gör: { <- själv ny content: [''].
+Mall vid: ['ny'] gör: { <- själv ny innehåll: [''].
 }.
 
-Template vid: ['content:'] gör: { :content
-	egen content := content. 
+Mall vid: ['innehåll:'] gör: { :innehåll
+	egen innehåll := innehåll. 
 }.
 
-Template vid: ['ny:'] gör: { :content <- själv ny content: content.
+Mall vid: ['ny:'] gör: { :innehåll <- själv ny innehåll: innehåll.
 }.
 
-Template vid: ['cut:'] gör: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := egen content dela: startmarker.
-	>> prefix := parts första.
-	>> parts2 := parts sista dela: endmarker.
-	>> suffix := parts2 sista.
-	>> part := parts2 första.
+Mall vid: ['klipp:'] gör: { :markör
+	>> startmarkör := (['<!-- cut:%id% -->'] %id%: markör).
+	>> slutmarkör := (['<!-- /cut:%id% -->'] %id%: markör).
+	>> delar := egen innehåll dela: startmarkör.
+	>> prefix := delar första.
+	>> delar2 := delar sista dela: slutmarkör.
+	>> suffix := delar2 sista.
+	>> del := delar2 första.
 	>> rest := prefix + suffix.
-	egen content := rest. <- Template ny: part.
+	egen innehåll := rest. <- Mall ny: del.
 	
 }.
 
-Template vid: ['kopiera'] gör: { <- själv ny: själv text kopiera.
+Mall vid: ['kopiera'] gör: { <- själv ny: själv text kopiera.
 }.
 	
-Template vid: ['paste:at:'] gör: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	egen content ersätt: pastemarker med: ( snippet text + pastemarker ).
+Mall vid: ['klistra:vid:'] gör: { :utdrag :id
+	>> klistermarkör := (['<!-- paste:%id% -->'] %id%: id).
+	egen innehåll ersätt: klistermarkör med: ( utdrag text + klistermarkör ).
 }.
 
-Template vid: ['sätt:värde:'] gör: { :slot :value
-	egen content ersätt: ['<!-- slot:'] + slot + [' -->'] med: ( Server html-koda: value ).
+Mall vid: ['sätt:värde:'] gör: { :plats :värde
+	egen innehåll ersätt: ['<!-- slot:'] + plats + [' -->'] med: ( Server html-koda: värde ).
 }.
 
-Template vid: ['set:html:'] gör: { :slot :html
-	egen content ersätt: ['<!-- slot:'] + slot + [' -->'] med: html.
+Mall vid: ['sätt:html:'] gör: { :plats :html
+	egen innehåll ersätt: ['<!-- slot:'] + plats + [' -->'] med: html.
 }.
 
-Template vid: ['svara:och:'] gör: { :slot :value
-	själv sätt: (slot från: 0 längd: (slot längd - 1)) värde: value.
+Mall vid: ['svara:och:'] gör: { :plats :värde
+	själv sätt: (plats från: 0 längd: (plats längd - 1)) värde: värde.
 }.
 
-Template vid: ['nl2br'] gör: {
-	egen content ersätt: ['\n'] med: ['<br>'].
+Mall vid: ['nl2br'] gör: {
+	egen innehåll ersätt: ['\n'] med: ['<br>'].
 }.
 
-Template vid: ['clean'] gör: {
-	egen content :=
+Mall vid: ['putsa'] gör: {
+	egen innehåll :=
 		Mönster
 		ny: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		matcha: egen content
+		matcha: egen innehåll
 		gör: { <- ['']. }.
 }.
 
-Template vid: ['clean-cuts'] gör: {
-	>> items := Lista ny.
+Mall vid: ['putsa-klipp'] gör: {
+	>> element := Lista ny.
 	Mönster
 	ny: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	matcha: egen content
-	gör: { :_ :part
-		items lägg-till-sist: part ? 1.
+	matcha: egen innehåll
+	gör: { :_ :del
+		element lägg-till-sist: del ? 1.
 	}.
-	items varje: { :_ :id
-		egen content :=
+	element varje: { :_ :id
+		egen innehåll :=
 			Mönster ny: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			matcha: egen content
+			matcha: egen innehåll
 			gör: { <- ['']. }.
 	 }.
 }.
 
-Template vid: ['clean-space'] gör: {
-	egen content :=
+Mall vid: ['putsa-mellanrum'] gör: {
+	egen innehåll :=
 		Mönster
 		ny: ['\\s*\\n'],
-		matcha: egen content
+		matcha: egen innehåll
 		gör: { <- ['\n']. }.
-	egen content :=
+	egen innehåll :=
 		Mönster
 		ny: ['\\n[\\s\\t]+'],
-		matcha: egen content
+		matcha: egen innehåll
 		gör: { <- ['\n']. }.
 }.
 
-Template vid: ['clean-all'] gör: {
-	själv clean.
-	själv clean-cuts.
-	själv clean-space.
+Mall vid: ['putsa-allt'] gör: {
+	själv putsa.
+	själv putsa-klipp.
+	själv putsa-mellanrum.
 }.
 
-Template vid: ['text'] gör: { <- egen content.
+Mall vid: ['text'] gör: { <- egen innehåll.
 }.

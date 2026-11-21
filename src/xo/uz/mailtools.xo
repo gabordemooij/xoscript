@@ -1,128 +1,128 @@
->> Email := Obyekt yangi.
+>> Elektron-pochta := Obyekt yangi.
 
-Email kelganda: ['init'] bajar: {
-	oʻzining recipients := Roʻyxat yangi.
+Elektron-pochta kelganda: ['ishga-tushir'] bajar: {
+	oʻzining qabul-qiluvchilar := Roʻyxat yangi.
 	oʻzining cc := Roʻyxat yangi.
 	oʻzining bcc := Roʻyxat yangi.
-	oʻzining from := Hech.
-	oʻzining from-name := Hech.
-	oʻzining subject := Hech.
-	oʻzining body := Hech.
+	oʻzining yuboruvchi := Hech.
+	oʻzining yuboruvchi-nomi := Hech.
+	oʻzining mavzu := Hech.
+	oʻzining tana := Hech.
 }.
 
-Email kelganda: ['yangi'] bajar: { <- oʻzi yangi init.
+Elektron-pochta kelganda: ['yangi'] bajar: { <- oʻzi yangi ishga-tushir.
 }.
 
-Email kelganda: ['to:'] bajar: { :list
-	oʻzining recipients := list.
+Elektron-pochta kelganda: ['qabul-qiluvchiga:'] bajar: { :sanab-oʻtish
+	oʻzining qabul-qiluvchilar := sanab-oʻtish.
 }.
  
-Email kelganda: ['cc:'] bajar: { :list
-	oʻzining cc := list.
+Elektron-pochta kelganda: ['cc:'] bajar: { :sanab-oʻtish
+	oʻzining cc := sanab-oʻtish.
 }.
 
-Email kelganda: ['bcc:'] bajar: { :list
-	oʻzining bcc := list.
+Elektron-pochta kelganda: ['bcc:'] bajar: { :sanab-oʻtish
+	oʻzining bcc := sanab-oʻtish.
 }.
 
-Email kelganda: ['subject:'] bajar: { :subject
-	oʻzining subject := subject.
+Elektron-pochta kelganda: ['mavzu:'] bajar: { :mavzu
+	oʻzining mavzu := mavzu.
 }.
 
-Email kelganda: ['from:name:'] bajar: { :from :nom
-	oʻzining from := from.
-	oʻzining from-name := nom.
+Elektron-pochta kelganda: ['yuboruvchi:nom:'] bajar: { :yuboruvchi :nom
+	oʻzining yuboruvchi := yuboruvchi.
+	oʻzining yuboruvchi-nomi := nom.
 }.
 
-Email kelganda: ['body:'] bajar: { :body
-	oʻzining body := body.
+Elektron-pochta kelganda: ['tana:'] bajar: { :tana
+	oʻzining tana := tana.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email kelganda: ['header:'] bajar: { :line <- line almashtirish: ['\r'] bunga: [''], almashtirish: ['\n'] bunga: [''].
+Elektron-pochta kelganda: ['sarlavha:'] bajar: { :qator <- qator almashtirish: ['\r'] bunga: [''], almashtirish: ['\n'] bunga: [''].
 }.
 
-Email kelganda: ['send'] bajar: {
-	>> f := Fayl tempwrite: oʻzi generate.
+Elektron-pochta kelganda: ['yubor'] bajar: {
+	>> f := Fayl tempwrite: oʻzi yarat.
 	Dastur tizim: ['sendmail -t < '] + f yoʻl, yangi-qator.
 }.
 
-Email kelganda: ['generate'] bajar: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str oxiriga-qoʻshish: (oʻzi header: ['From: '] + oʻzining from-name + [' <'] + ( oʻzining from ) + ['>']) + brk.
-	str oxiriga-qoʻshish: (oʻzi header: ['To: '] + ( oʻzining recipients birlashtirish: [','] )) + brk.
+Elektron-pochta kelganda: ['yarat'] bajar: {
+	>> qator-uzilishi := ['\r\n'].
+	>> satr := [''].
+	satr oxiriga-qoʻshish: (oʻzi sarlavha: ['From: '] + oʻzining yuboruvchi-nomi + [' <'] + ( oʻzining yuboruvchi ) + ['>']) + qator-uzilishi.
+	satr oxiriga-qoʻshish: (oʻzi sarlavha: ['To: '] + ( oʻzining qabul-qiluvchilar birlashtirish: [','] )) + qator-uzilishi.
 	oʻzining cc soni rost-boʻlsa: {
-		str oxiriga-qoʻshish: (oʻzi header: ['Cc: '] + ( oʻzining cc birlashtirish: [','] )) + brk.
+		satr oxiriga-qoʻshish: (oʻzi sarlavha: ['Cc: '] + ( oʻzining cc birlashtirish: [','] )) + qator-uzilishi.
 	}.
 	oʻzining bcc soni rost-boʻlsa: {
-		str oxiriga-qoʻshish: (oʻzi header: ['Bcc: '] + ( oʻzining bcc birlashtirish: [','] )) + brk.
+		satr oxiriga-qoʻshish: (oʻzi sarlavha: ['Bcc: '] + ( oʻzining bcc birlashtirish: [','] )) + qator-uzilishi.
 	}.
-	str oxiriga-qoʻshish: (oʻzi header: ['Subject: '] + oʻzining subject) + brk.
-	str oxiriga-qoʻshish: brk.
-	str oxiriga-qoʻshish: oʻzining body.
-	str oxiriga-qoʻshish: brk. <- str.
+	satr oxiriga-qoʻshish: (oʻzi sarlavha: ['Subject: '] + oʻzining mavzu) + qator-uzilishi.
+	satr oxiriga-qoʻshish: qator-uzilishi.
+	satr oxiriga-qoʻshish: oʻzining tana.
+	satr oxiriga-qoʻshish: qator-uzilishi. <- satr.
 }.
 
->> HTML-Email := Email yangi.
+>> HTML-Elektron-pochta := Elektron-pochta yangi.
 
-HTML-Email kelganda: ['init'] bajar: {
-	oʻzi init.
-	oʻzining attachments := Roʻyxat yangi.
-	oʻzining boundary := Seyf token: 40.
+HTML-Elektron-pochta kelganda: ['ishga-tushir'] bajar: {
+	oʻzi ishga-tushir.
+	oʻzining ilovalar := Roʻyxat yangi.
+	oʻzining chegara := Seyf token: 40.
 }.
 
-HTML-Email kelganda: ['attach:'] bajar: { :file
-	>> id := oʻzining attachments soni.
-	>> blob := file blob.
-	oʻzining attachments oxiriga-qoʻshish: (
+HTML-Elektron-pochta kelganda: ['biriktir:'] bajar: { :fayl
+	>> id := oʻzining ilovalar soni.
+	>> blob := fayl blob.
+	oʻzining ilovalar oxiriga-qoʻshish: (
 		Lugʻat yangi
-			file: file yoʻl,
-			mime: ['image/'] + (Server mimetype: file yoʻl),
-			data: blob base64-kodlash
+			fayl: fayl yoʻl,
+			mime: ['image/'] + (Server mimetype: fayl yoʻl),
+			maʼlumotlar: blob base64-kodlash
 	).
 	blob boʻshatish. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email kelganda: ['generate'] bajar: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str oxiriga-qoʻshish: (oʻzi header: ['From: '] + oʻzining from-name + [' <'] + ( oʻzining from ) + ['>']) + brk.
-	str oxiriga-qoʻshish: (oʻzi header: ['To: '] + ( oʻzining recipients birlashtirish: [','] )) + brk.
+HTML-Elektron-pochta kelganda: ['yarat'] bajar: {
+	>> qator-uzilishi := ['\r\n'].
+	>> satr := [''].
+	satr oxiriga-qoʻshish: (oʻzi sarlavha: ['From: '] + oʻzining yuboruvchi-nomi + [' <'] + ( oʻzining yuboruvchi ) + ['>']) + qator-uzilishi.
+	satr oxiriga-qoʻshish: (oʻzi sarlavha: ['To: '] + ( oʻzining qabul-qiluvchilar birlashtirish: [','] )) + qator-uzilishi.
 	oʻzining cc soni rost-boʻlsa: {
-		str oxiriga-qoʻshish: (oʻzi header: ['Cc: '] + ( oʻzining cc birlashtirish: [','] )) + brk.
+		satr oxiriga-qoʻshish: (oʻzi sarlavha: ['Cc: '] + ( oʻzining cc birlashtirish: [','] )) + qator-uzilishi.
 	}.
 	oʻzining bcc soni rost-boʻlsa: {
-		str oxiriga-qoʻshish: (oʻzi header: ['Bcc: '] + ( oʻzining bcc birlashtirish: [','] )) + brk.
+		satr oxiriga-qoʻshish: (oʻzi sarlavha: ['Bcc: '] + ( oʻzining bcc birlashtirish: [','] )) + qator-uzilishi.
 	}.
-	str oxiriga-qoʻshish: (oʻzi header: ['Subject: '] + oʻzining subject) + brk.
-	str oxiriga-qoʻshish: ['MIME-Version: 1.0'] + brk.
-	str oxiriga-qoʻshish: ['Content-Type: multipart/related; boundary="'] + oʻzining boundary + ['"; type=text/html'] + brk.
-	str oxiriga-qoʻshish: brk.
-	str oxiriga-qoʻshish: ['--'] + oʻzining boundary + brk.
-	str oxiriga-qoʻshish: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str oxiriga-qoʻshish: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str oxiriga-qoʻshish: brk.
-	str oxiriga-qoʻshish: oʻzining body.
-	str oxiriga-qoʻshish: brk.
-	oʻzining attachments har-bir: { :id :info
-		>> blob := info data.
-		str oxiriga-qoʻshish: ['--'] + oʻzining boundary + brk.
-		str oxiriga-qoʻshish: ['Content-Type: '] + info mime + brk.
-		str oxiriga-qoʻshish: ['Content-Transfer-Encoding: base64'] + brk.
-		str oxiriga-qoʻshish: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str oxiriga-qoʻshish: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str oxiriga-qoʻshish: brk.
-		>> max := 76.
-		>> len := blob uzunlik.
-		>> chunks := (len / max) yuqoriga-yaxlitlash.
+	satr oxiriga-qoʻshish: (oʻzi sarlavha: ['Subject: '] + oʻzining mavzu) + qator-uzilishi.
+	satr oxiriga-qoʻshish: ['MIME-Version: 1.0'] + qator-uzilishi.
+	satr oxiriga-qoʻshish: ['Content-Type: multipart/related; boundary="'] + oʻzining chegara + ['"; type=text/html'] + qator-uzilishi.
+	satr oxiriga-qoʻshish: qator-uzilishi.
+	satr oxiriga-qoʻshish: ['--'] + oʻzining chegara + qator-uzilishi.
+	satr oxiriga-qoʻshish: ['Content-Type: text/html; charset=UTF-8'] + qator-uzilishi.
+	satr oxiriga-qoʻshish: ['Content-Transfer-Encoding: 7bit'] + qator-uzilishi.
+	satr oxiriga-qoʻshish: qator-uzilishi.
+	satr oxiriga-qoʻshish: oʻzining tana.
+	satr oxiriga-qoʻshish: qator-uzilishi.
+	oʻzining ilovalar har-bir: { :id :axborot
+		>> blob := axborot maʼlumotlar.
+		satr oxiriga-qoʻshish: ['--'] + oʻzining chegara + qator-uzilishi.
+		satr oxiriga-qoʻshish: ['Content-Type: '] + axborot mime + qator-uzilishi.
+		satr oxiriga-qoʻshish: ['Content-Transfer-Encoding: base64'] + qator-uzilishi.
+		satr oxiriga-qoʻshish: ['Content-ID: <attachment'] + id + ['>'] + qator-uzilishi.
+		satr oxiriga-qoʻshish: ['Content-Disposition: inline; filename="'] + axborot fayl + ['"'] + qator-uzilishi.
+		satr oxiriga-qoʻshish: qator-uzilishi.
+		>> eng-koʻp := 76.
+		>> matn-uzunligi := blob uzunlik.
+		>> boʻlaklar := (matn-uzunligi / eng-koʻp) yuqoriga-yaxlitlash.
 		{ :i
-			>> chunk := blob nusxa boshlab: i * max uzunlik: max.
-			str oxiriga-qoʻshish: chunk + brk.
-		} * chunks.
-		str oxiriga-qoʻshish: brk.
-		str oxiriga-qoʻshish: brk.
+			>> boʻlak := blob nusxa boshlab: i * eng-koʻp uzunlik: eng-koʻp.
+			satr oxiriga-qoʻshish: boʻlak + qator-uzilishi.
+		} * boʻlaklar.
+		satr oxiriga-qoʻshish: qator-uzilishi.
+		satr oxiriga-qoʻshish: qator-uzilishi.
 	}.
-	str oxiriga-qoʻshish: ['--'] + oʻzining boundary + ['--'] + brk. <- str.
+	satr oxiriga-qoʻshish: ['--'] + oʻzining chegara + ['--'] + qator-uzilishi. <- satr.
 }.

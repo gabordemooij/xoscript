@@ -1,302 +1,302 @@
-Requisição-HTTP em: ['HTTP-header:'] fazer: { :key <- Programa configurar: key.
+Requisição-HTTP em: ['HTTP-cabeçalho:'] fazer: { :chave <- Programa configurar: chave.
 }.
 
->> HTTP-Header := Objeto novo.
+>> Cabeçalho-HTTP := Objeto novo.
 
-HTTP-Header em: ['novo'] fazer: { <- isto novo init.
+Cabeçalho-HTTP em: ['novo'] fazer: { <- isto novo inicializar.
 }.
 
-HTTP-Header em: ['init'] fazer: {
-	prop key := Nulo.
-	prop value := Nulo.
+Cabeçalho-HTTP em: ['inicializar'] fazer: {
+	prop chave := Nulo.
+	prop valor := Nulo.
 }.
 
-HTTP-Header em: ['key:value:'] fazer: { :key :value
-	prop key := key.
-	prop value := value.
+Cabeçalho-HTTP em: ['chave:valor:'] fazer: { :chave :valor
+	prop chave := chave.
+	prop valor := valor.
 }.
 
-HTTP-Header em: ['key'] fazer: { <- prop key.
+Cabeçalho-HTTP em: ['chave'] fazer: { <- prop chave.
 }.
 
-HTTP-Header em: ['value'] fazer: { <- prop value.
+Cabeçalho-HTTP em: ['valor'] fazer: { <- prop valor.
 }.
 
 
-HTTP-Header em: ['string'] fazer: {
-	>> line := prop key + [': '] + prop value.
-	line substituir: ['\r'] com: [''], substituir: ['\n'] com: ['']. <- line + [' \r\n'].
+Cabeçalho-HTTP em: ['string'] fazer: {
+	>> linha := prop chave + [': '] + prop valor.
+	linha substituir: ['\r'] com: [''], substituir: ['\n'] com: ['']. <- linha + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Objeto novo.
+>> Documento-Web := Objeto novo.
 
-Web-Document em: ['novo'] fazer: { <- isto novo init.
+Documento-Web em: ['novo'] fazer: { <- isto novo inicializar.
 }.
 
-Web-Document em: ['init'] fazer: {
-	prop headers := Listar novo.
-	prop sess-id := Nulo.
-	prop session-manager := Tempfile-Session novo.
-	prop sessdata := Nulo.
-	prop secure := Sim.
-	prop same-site := ['Strict'].
-	prop headers-out := Não.
-	prop request := Requisição-HTTP novo.
+Documento-Web em: ['inicializar'] fazer: {
+	prop cabeçalhos := Listar novo.
+	prop id-sessão := Nulo.
+	prop gestor-sessão := Sessão-ficheiro-temporário novo.
+	prop dados-sessão := Nulo.
+	prop seguro := Sim.
+	prop mesmo-site := ['Strict'].
+	prop cabeçalhos-enviados := Não.
+	prop pedido := Requisição-HTTP novo.
 }.
 
-Web-Document em: ['request:'] fazer: { :request
-	prop request := request.
+Documento-Web em: ['pedido:'] fazer: { :pedido
+	prop pedido := pedido.
 }. 
 
-Web-Document em: ['secure-session-cookie:'] fazer: { :secure
-	isto check-headers.
-	prop secure := secure.
+Documento-Web em: ['cookie-sessão-seguro:'] fazer: { :seguro
+	isto verificar-cabeçalhos.
+	prop seguro := seguro.
 }.
 
-Web-Document em: ['same-site-session-cookie:'] fazer: { :value
-	isto check-headers.
-	>> options := Listar novo 
+Documento-Web em: ['cookie-sessão-mesmo-site:'] fazer: { :valor
+	isto verificar-cabeçalhos.
+	>> opções := Listar novo 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options contem: value, não: {
+	opções tem: valor, não: {
 		este-bloco-de-código erro: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	prop same-site := value.
+	prop mesmo-site := valor.
 }.
 
-Web-Document em: ['header:'] fazer: { :header
-	isto check-headers.
-	prop headers acrescentar: header.
+Documento-Web em: ['cabeçalho:'] fazer: { :cabeçalho
+	isto verificar-cabeçalhos.
+	prop cabeçalhos acrescentar: cabeçalho.
 }.
 
-Web-Document em: ['clear-headers'] fazer: {
-	isto check-headers.
-	prop headers := Listar novo.
+Documento-Web em: ['apagar-cabeçalhos'] fazer: {
+	isto verificar-cabeçalhos.
+	prop cabeçalhos := Listar novo.
 }.
 
-Web-Document em: ['session-manager:'] fazer: { :manager
-	isto check-headers.
-	prop session-manager := manager.
+Documento-Web em: ['gestor-sessão:'] fazer: { :gestor
+	isto verificar-cabeçalhos.
+	prop gestor-sessão := gestor.
 }.
 
-Web-Document em: ['session-manager'] fazer: { <- prop session-manager.
+Documento-Web em: ['gestor-sessão'] fazer: { <- prop gestor-sessão.
 }.
 
-Web-Document em: ['check-headers'] fazer: {
-	prop headers-out sim: {
+Documento-Web em: ['verificar-cabeçalhos'] fazer: {
+	prop cabeçalhos-enviados sim: {
 		este-bloco-de-código erro: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document em: ['session-start'] fazer: {
-	isto check-headers.
-	>> request := prop request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nulo? não: {
-		(( Padrão novo: ['^[A-Za-z0-9]+\\z'], corresponder: sess-id ) = 0) sim: {
-			sess-id := Nulo.
+Documento-Web em: ['iniciar-sessão'] fazer: {
+	isto verificar-cabeçalhos.
+	>> pedido := prop pedido.
+	>> id-sessão := pedido cookie: ['xsid'].
+	id-sessão Nulo? não: {
+		(( Padrão novo: ['^[A-Za-z0-9]+\\z'], corresponder: id-sessão ) = 0) sim: {
+			id-sessão := Nulo.
 		}.
 	}.
-	sess-id Nulo? sim: {
-		sess-id := Cofre token: 30.
-		>> session-header := HTTP-Header novo
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (prop secure outro: ['Secure'] ou: ['']),
-		SSITE: (prop same-site),
-		XSID: sess-id
+	id-sessão Nulo? sim: {
+		id-sessão := Cofre token: 30.
+		>> cabeçalho-sessão := Cabeçalho-HTTP novo
+		chave: ['Set-Cookie'] valor: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (prop seguro outro: ['Secure'] ou: ['']),
+		SSITE: (prop mesmo-site),
+		XSID: id-sessão
 		).
-		prop headers acrescentar: session-header.
+		prop cabeçalhos acrescentar: cabeçalho-sessão.
 	}.
-	prop sessdata := prop session-manager for: sess-id, load. <- prop sessdata. # reference
+	prop dados-sessão := prop gestor-sessão para: id-sessão, carregar. <- prop dados-sessão. # reference
 }.
 
-Web-Document em: ['goto:'] fazer: { :url
-	isto check-headers.
-	isto clear-headers.
-	prop headers
+Documento-Web em: ['ir-para:'] fazer: { :endereço
+	isto verificar-cabeçalhos.
+	isto apagar-cabeçalhos.
+	prop cabeçalhos
 	acrescentar: (
-		HTTP-Header novo
-		key: ['Status'] value: ['303 See Other']
+		Cabeçalho-HTTP novo
+		chave: ['Status'] valor: ['303 See Other']
 	),
 	acrescentar: (
-		HTTP-Header novo
-		key: ['Location'] value: url
+		Cabeçalho-HTTP novo
+		chave: ['Location'] valor: endereço
 	).
-	isto out: ['Redirect'].
+	isto emitir: ['Redirect'].
 }.
 
-Web-Document em: ['session-destroy'] fazer: {
-	isto check-headers.
-	>> request := prop request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Nulo? não: {
-		>> session-header := HTTP-Header novo.
-		>> when := Momento novo ano: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Documento-Web em: ['destruir-sessão'] fazer: {
+	isto verificar-cabeçalhos.
+	>> pedido := prop pedido.
+	>> id-sessão := pedido cookie: ['xsid'].
+	id-sessão Nulo? não: {
+		>> cabeçalho-sessão := Cabeçalho-HTTP novo.
+		>> momento := Momento novo ano: 1970, format: ['%a, %d %b %Y %H:%M:%S GMT'].
+		cabeçalho-sessão chave: ['Set-Cookie'] valor: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (prop secure outro: ['Secure'] ou: ['']),
-			SSITE: (prop same-site),
-			XSID: sess-id
+			EXP: momento,
+			SEC: (prop seguro outro: ['Secure'] ou: ['']),
+			SSITE: (prop mesmo-site),
+			XSID: id-sessão
 		).
-		prop session-manager destroy.
-		prop headers acrescentar: session-header.
+		prop gestor-sessão destruir.
+		prop cabeçalhos acrescentar: cabeçalho-sessão.
 	}.
 }.
 
 
-Web-Document em: ['template:'] fazer: { :caminho <- Template novo: (Arquivo novo: caminho, ler).
+Documento-Web em: ['modelo:'] fazer: { :caminho <- Modelo novo: (Arquivo novo: caminho, ler).
 }.
 
-Web-Document em: ['out:type:'] fazer: { :output :tipo
-	prop headers-out não: {
-		prop sessdata Nulo? não: {
-			prop session-manager save: prop sessdata.
+Documento-Web em: ['emitir:tipo:'] fazer: { :saída :tipo
+	prop cabeçalhos-enviados não: {
+		prop dados-sessão Nulo? não: {
+			prop gestor-sessão guardar: prop dados-sessão.
 		}.
-		prop headers acrescentar: (
-			HTTP-Header novo
-			key: ['Content-type'] value: tipo
+		prop cabeçalhos acrescentar: (
+			Cabeçalho-HTTP novo
+			chave: ['Content-type'] valor: tipo
 		).
-		prop headers cada-um: { :_ :header
-			Saída escrever: header.
+		prop cabeçalhos cada-um: { :_ :cabeçalho
+			Saída escrever: cabeçalho.
 		}.
-		prop headers-out := Sim.
+		prop cabeçalhos-enviados := Sim.
 		Saída escrever: ['\r\n'].
 	}.
-	Saída escrever: output.
+	Saída escrever: saída.
 }.
 
-Web-Document em: ['finish:type:'] fazer: { :output :tipo
-	prop headers-out não: {
-		prop sessdata Nulo? não: {
-			prop session-manager save: prop sessdata.
+Documento-Web em: ['finalizar:tipo:'] fazer: { :saída :tipo
+	prop cabeçalhos-enviados não: {
+		prop dados-sessão Nulo? não: {
+			prop gestor-sessão guardar: prop dados-sessão.
 		}.
-		prop headers acrescentar: (
-			HTTP-Header novo
-			key: ['Content-type'] value: tipo
+		prop cabeçalhos acrescentar: (
+			Cabeçalho-HTTP novo
+			chave: ['Content-type'] valor: tipo
 		).
-		prop headers acrescentar: (
-			HTTP-Header novo
-			key: ['Content-Length'] value: output string bytes
+		prop cabeçalhos acrescentar: (
+			Cabeçalho-HTTP novo
+			chave: ['Content-Length'] valor: saída string bytes
 		).
-		prop headers cada-um: { :_ :header
-			Saída escrever: header.
+		prop cabeçalhos cada-um: { :_ :cabeçalho
+			Saída escrever: cabeçalho.
 		}.
-		prop headers-out := Sim.
+		prop cabeçalhos-enviados := Sim.
 		Saída escrever: ['\r\n'].
 	}.
-	Saída escrever: output.
+	Saída escrever: saída.
 }.
 
-Web-Document em: ['out:'] fazer: { :output
-	isto out: output type: ['text/html; charset=utf-8'].
+Documento-Web em: ['emitir:'] fazer: { :saída
+	isto emitir: saída tipo: ['text/html; charset=utf-8'].
 }.
 
-Web-Document em: ['finish:'] fazer: { :output
-	isto finish: output type: ['text/html; charset=utf-8'].
+Documento-Web em: ['finalizar:'] fazer: { :saída
+	isto finalizar: saída tipo: ['text/html; charset=utf-8'].
 }.
 
-Web-Document em: ['json:'] fazer: { :output
-	isto out: ( JSON jsonificar: output ) type: ['application/json'].
+Documento-Web em: ['json:'] fazer: { :saída
+	isto emitir: ( JSON jsonificar: saída ) tipo: ['application/json'].
 }.
 
-Web-Document em: ['not-found:'] fazer: { :output
-	isto clear-headers header: (
-		HTTP-Header novo key: ['Status'] value: ['404 Not Found']
+Documento-Web em: ['não-encontrado:'] fazer: { :saída
+	isto apagar-cabeçalhos cabeçalho: (
+		Cabeçalho-HTTP novo chave: ['Status'] valor: ['404 Not Found']
 	).
-	isto out: output.
+	isto emitir: saída.
 }.
 
 
 # Interface
 
->> Session := Objeto novo.
+>> Sessão := Objeto novo.
 
-Session em: ['novo'] fazer: { <- isto novo init for: Nulo.
+Sessão em: ['novo'] fazer: { <- isto novo inicializar para: Nulo.
 }.
 
-Session em: ['for:'] fazer: { :id
+Sessão em: ['para:'] fazer: { :id
 	prop id := id.
 }.
 
-Session em: ['load'] fazer: {
+Sessão em: ['carregar'] fazer: {
 	este-bloco-de-código erro: ['Not implemented.'].
 }.
 
-Session em: ['save:'] fazer: {
+Sessão em: ['guardar:'] fazer: {
 	este-bloco-de-código erro: ['Not implemented.'].
 }.
 
-Session em: ['destroy'] fazer: {
+Sessão em: ['destruir'] fazer: {
 	este-bloco-de-código erro: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session novo.
+>> Sessão-ficheiro-temporário := Sessão novo.
 
-Tempfile-Session em: ['init'] fazer: {
-	prop pathprefix := ['/tmp/sess-'].
+Sessão-ficheiro-temporário em: ['inicializar'] fazer: {
+	prop prefixocaminho := ['/tmp/sess-'].
 }.
 
-Tempfile-Session em: ['path-prefix:'] fazer: { :str
-	prop pathprefix := str.
+Sessão-ficheiro-temporário em: ['prefixo-caminho:'] fazer: { :cadeia
+	prop prefixocaminho := cadeia.
 }.
 
-Tempfile-Session em: ['file'] fazer: { <- ( Arquivo novo: ( prop pathprefix + prop id + ['.txt'] ) ).
+Sessão-ficheiro-temporário em: ['ficheiro'] fazer: { <- ( Arquivo novo: ( prop prefixocaminho + prop id + ['.txt'] ) ).
 }.
 
-Tempfile-Session em: ['load'] fazer: {
-	>> file := isto file.
-	file existe não: {
-		file escrever: (Mapa novo code).
-	}. <- file ler objeto.
+Sessão-ficheiro-temporário em: ['carregar'] fazer: {
+	>> ficheiro := isto ficheiro.
+	ficheiro existe não: {
+		ficheiro escrever: (Mapa novo code).
+	}. <- ficheiro ler objeto.
 }.
 
-Tempfile-Session em: ['save:'] fazer: { :data
-	>> file := isto file.
-	file existe sim: {
-		file escrever: data code.
+Sessão-ficheiro-temporário em: ['guardar:'] fazer: { :dados
+	>> ficheiro := isto ficheiro.
+	ficheiro existe sim: {
+		ficheiro escrever: dados code.
 	}.
 }.
 
-Tempfile-Session em: ['destroy'] fazer: {
-	>> file := isto file.
-	file existe sim: {
-		file apagar.
+Sessão-ficheiro-temporário em: ['destruir'] fazer: {
+	>> ficheiro := isto ficheiro.
+	ficheiro existe sim: {
+		ficheiro apagar.
 	}.
 }.
 
 
 >> URL := Objeto novo.
 
-URL em: ['init'] fazer: {
-	prop protocol := ['https://'].
+URL em: ['inicializar'] fazer: {
+	prop protocolo := ['https://'].
 	prop host := ['localhost'].
 	prop caminho := [''].
-	prop params := [''].
+	prop parâmetros := [''].
 	prop hash := [''].
 }.
 
-URL em: ['novo'] fazer: { <- isto novo init.
+URL em: ['novo'] fazer: { <- isto novo inicializar.
 }.
 
 URL em: ['string'] fazer: { <- (
-	prop protocol +
+	prop protocolo +
 	prop host +
 	prop caminho +
-	prop params +
+	prop parâmetros +
 	prop hash ).
 }.
 
-URL em: ['protocol:'] fazer: { :protocol
-	((Listar novo: ['http'] ; ['https']) contem: protocol) sim: {
-		prop protocol := protocol + ['://'].
+URL em: ['protocolo:'] fazer: { :protocolo
+	((Listar novo ; ['http'] ; ['https']) tem: protocolo) sim: {
+		prop protocolo := protocolo + ['://'].
 	}, não: {
 		este-bloco-de-código erro: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL em: ['host:'] fazer: { :host
 	prop host := host.
 }.
 
-URL em: ['path:'] fazer: { :caminho
+URL em: ['caminho:'] fazer: { :caminho
 	prop caminho := ['/'] + caminho url-codificar.
 }.
 
-URL em: ['params:'] fazer: { :map
-	>> params := Listar novo.
-	map cada-um: { :key :value
-		params acrescentar: key string url-codificar + ['='] + value string url-codificar.
+URL em: ['parâmetros:'] fazer: { :mapa
+	>> parâmetros := Listar novo.
+	mapa cada-um: { :chave :valor
+		parâmetros acrescentar: chave string url-codificar + ['='] + valor string url-codificar.
 	}.
-	prop params := ['?'] + ( params juntar: ['&'] ).
+	prop parâmetros := ['?'] + ( parâmetros juntar: ['&'] ).
 }.
 
 URL em: ['hash:'] fazer: { :hash

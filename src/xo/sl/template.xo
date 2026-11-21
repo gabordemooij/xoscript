@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objekt nov.
+>> Predloga := Objekt nov.
 
-Template ob: ['nov'] izvedi: { <- sebe nov content: [''].
+Predloga ob: ['nov'] izvedi: { <- sebe nov vsebina: [''].
 }.
 
-Template ob: ['content:'] izvedi: { :content
-	svoj content := content. 
+Predloga ob: ['vsebina:'] izvedi: { :vsebina
+	svoj vsebina := vsebina. 
 }.
 
-Template ob: ['nov:'] izvedi: { :content <- sebe nov content: content.
+Predloga ob: ['nov:'] izvedi: { :vsebina <- sebe nov vsebina: vsebina.
 }.
 
-Template ob: ['cut:'] izvedi: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := svoj content razdeli: startmarker.
-	>> prefix := parts prvi.
-	>> parts2 := parts zadnji razdeli: endmarker.
-	>> suffix := parts2 zadnji.
-	>> part := parts2 prvi.
-	>> rest := prefix + suffix.
-	svoj content := rest. <- Template nov: part.
+Predloga ob: ['izreži:'] izvedi: { :oznaka
+	>> začetna-oznaka := (['<!-- cut:%id% -->'] %id%: oznaka).
+	>> končna-oznaka := (['<!-- /cut:%id% -->'] %id%: oznaka).
+	>> deli := svoj vsebina razdeli: začetna-oznaka.
+	>> predpona := deli prvi.
+	>> deli2 := deli zadnji razdeli: končna-oznaka.
+	>> pripona := deli2 zadnji.
+	>> del := deli2 prvi.
+	>> ostanek := predpona + pripona.
+	svoj vsebina := ostanek. <- Predloga nov: del.
 	
 }.
 
-Template ob: ['kopiraj'] izvedi: { <- sebe nov: sebe besedilo kopiraj.
+Predloga ob: ['kopiraj'] izvedi: { <- sebe nov: sebe besedilo kopiraj.
 }.
 	
-Template ob: ['paste:at:'] izvedi: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	svoj content zamenjaj: pastemarker z: ( snippet besedilo + pastemarker ).
+Predloga ob: ['prilepi:na:'] izvedi: { :odlomek :id
+	>> oznaka-lepljenja := (['<!-- paste:%id% -->'] %id%: id).
+	svoj vsebina zamenjaj: oznaka-lepljenja z: ( odlomek besedilo + oznaka-lepljenja ).
 }.
 
-Template ob: ['nastavi:vrednost:'] izvedi: { :slot :value
-	svoj content zamenjaj: ['<!-- slot:'] + slot + [' -->'] z: ( Server html-kodiraj: value ).
+Predloga ob: ['nastavi:vrednost:'] izvedi: { :reža :vrednost
+	svoj vsebina zamenjaj: ['<!-- slot:'] + reža + [' -->'] z: ( Server html-kodiraj: vrednost ).
 }.
 
-Template ob: ['set:html:'] izvedi: { :slot :html
-	svoj content zamenjaj: ['<!-- slot:'] + slot + [' -->'] z: html.
+Predloga ob: ['nastavi:html:'] izvedi: { :reža :html
+	svoj vsebina zamenjaj: ['<!-- slot:'] + reža + [' -->'] z: html.
 }.
 
-Template ob: ['odgovori:in:'] izvedi: { :slot :value
-	sebe nastavi: (slot od: 0 dolžina: (slot dolžina - 1)) vrednost: value.
+Predloga ob: ['odgovori:in:'] izvedi: { :reža :vrednost
+	sebe nastavi: (reža od: 0 dolžina: (reža dolžina - 1)) vrednost: vrednost.
 }.
 
-Template ob: ['nl2br'] izvedi: {
-	svoj content zamenjaj: ['\n'] z: ['<br>'].
+Predloga ob: ['nl2br'] izvedi: {
+	svoj vsebina zamenjaj: ['\n'] z: ['<br>'].
 }.
 
-Template ob: ['clean'] izvedi: {
-	svoj content :=
+Predloga ob: ['pospravi'] izvedi: {
+	svoj vsebina :=
 		Vzorec
 		nov: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		ujemanje: svoj content
+		ujemanje: svoj vsebina
 		izvedi: { <- ['']. }.
 }.
 
-Template ob: ['clean-cuts'] izvedi: {
-	>> items := Seznam nov.
+Predloga ob: ['pospravi-izreze'] izvedi: {
+	>> elementi := Seznam nov.
 	Vzorec
 	nov: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	ujemanje: svoj content
-	izvedi: { :_ :part
-		items dodaj-na-konec: part ? 1.
+	ujemanje: svoj vsebina
+	izvedi: { :_ :del
+		elementi dodaj-na-konec: del ? 1.
 	}.
-	items vsak: { :_ :id
-		svoj content :=
+	elementi vsak: { :_ :id
+		svoj vsebina :=
 			Vzorec nov: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			ujemanje: svoj content
+			ujemanje: svoj vsebina
 			izvedi: { <- ['']. }.
 	 }.
 }.
 
-Template ob: ['clean-space'] izvedi: {
-	svoj content :=
+Predloga ob: ['pospravi-presledke'] izvedi: {
+	svoj vsebina :=
 		Vzorec
 		nov: ['\\s*\\n'],
-		ujemanje: svoj content
+		ujemanje: svoj vsebina
 		izvedi: { <- ['\n']. }.
-	svoj content :=
+	svoj vsebina :=
 		Vzorec
 		nov: ['\\n[\\s\\t]+'],
-		ujemanje: svoj content
+		ujemanje: svoj vsebina
 		izvedi: { <- ['\n']. }.
 }.
 
-Template ob: ['clean-all'] izvedi: {
-	sebe clean.
-	sebe clean-cuts.
-	sebe clean-space.
+Predloga ob: ['pospravi-vse'] izvedi: {
+	sebe pospravi.
+	sebe pospravi-izreze.
+	sebe pospravi-presledke.
 }.
 
-Template ob: ['besedilo'] izvedi: { <- svoj content.
+Predloga ob: ['besedilo'] izvedi: { <- svoj vsebina.
 }.

@@ -1,128 +1,128 @@
 >> Email := Opheto nobo.
 
-Email ora: ['init'] hasi: {
-	propio recipients := Lista nobo.
+Email ora: ['prepará'] hasi: {
+	propio risibidónan := Lista nobo.
 	propio cc := Lista nobo.
 	propio bcc := Lista nobo.
-	propio from := Nada.
-	propio from-name := Nada.
-	propio subject := Nada.
-	propio body := Nada.
+	propio remitente := Nada.
+	propio nòmber-di-remitente := Nada.
+	propio asunto := Nada.
+	propio kurpa := Nada.
 }.
 
-Email ora: ['nobo'] hasi: { <- mes nobo init.
+Email ora: ['nobo'] hasi: { <- mes nobo prepará.
 }.
 
-Email ora: ['to:'] hasi: { :list
-	propio recipients := list.
+Email ora: ['pa-risibidó:'] hasi: { :enumerashon
+	propio risibidónan := enumerashon.
 }.
  
-Email ora: ['cc:'] hasi: { :list
-	propio cc := list.
+Email ora: ['cc:'] hasi: { :enumerashon
+	propio cc := enumerashon.
 }.
 
-Email ora: ['bcc:'] hasi: { :list
-	propio bcc := list.
+Email ora: ['bcc:'] hasi: { :enumerashon
+	propio bcc := enumerashon.
 }.
 
-Email ora: ['subject:'] hasi: { :subject
-	propio subject := subject.
+Email ora: ['asunto:'] hasi: { :asunto
+	propio asunto := asunto.
 }.
 
-Email ora: ['from:name:'] hasi: { :from :nòmber
-	propio from := from.
-	propio from-name := nòmber.
+Email ora: ['remitente:nòmber:'] hasi: { :remitente :nòmber
+	propio remitente := remitente.
+	propio nòmber-di-remitente := nòmber.
 }.
 
-Email ora: ['body:'] hasi: { :body
-	propio body := body.
+Email ora: ['kurpa:'] hasi: { :kurpa
+	propio kurpa := kurpa.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email ora: ['header:'] hasi: { :line <- line remplasá: ['\r'] ku: [''], remplasá: ['\n'] ku: [''].
+Email ora: ['encabesamentu:'] hasi: { :liña <- liña remplasá: ['\r'] ku: [''], remplasá: ['\n'] ku: [''].
 }.
 
-Email ora: ['send'] hasi: {
-	>> f := Archivo tempwrite: mes generate.
+Email ora: ['manda'] hasi: {
+	>> f := Archivo tempwrite: mes generá.
 	Programa sistema: ['sendmail -t < '] + f ruta, liña-nobo.
 }.
 
-Email ora: ['generate'] hasi: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str agregá-na-fin: (mes header: ['From: '] + propio from-name + [' <'] + ( propio from ) + ['>']) + brk.
-	str agregá-na-fin: (mes header: ['To: '] + ( propio recipients uni: [','] )) + brk.
+Email ora: ['generá'] hasi: {
+	>> kibra-liña := ['\r\n'].
+	>> kadena-di-teksto := [''].
+	kadena-di-teksto agregá-na-fin: (mes encabesamentu: ['From: '] + propio nòmber-di-remitente + [' <'] + ( propio remitente ) + ['>']) + kibra-liña.
+	kadena-di-teksto agregá-na-fin: (mes encabesamentu: ['To: '] + ( propio risibidónan uni: [','] )) + kibra-liña.
 	propio cc konta bèrdat: {
-		str agregá-na-fin: (mes header: ['Cc: '] + ( propio cc uni: [','] )) + brk.
+		kadena-di-teksto agregá-na-fin: (mes encabesamentu: ['Cc: '] + ( propio cc uni: [','] )) + kibra-liña.
 	}.
 	propio bcc konta bèrdat: {
-		str agregá-na-fin: (mes header: ['Bcc: '] + ( propio bcc uni: [','] )) + brk.
+		kadena-di-teksto agregá-na-fin: (mes encabesamentu: ['Bcc: '] + ( propio bcc uni: [','] )) + kibra-liña.
 	}.
-	str agregá-na-fin: (mes header: ['Subject: '] + propio subject) + brk.
-	str agregá-na-fin: brk.
-	str agregá-na-fin: propio body.
-	str agregá-na-fin: brk. <- str.
+	kadena-di-teksto agregá-na-fin: (mes encabesamentu: ['Subject: '] + propio asunto) + kibra-liña.
+	kadena-di-teksto agregá-na-fin: kibra-liña.
+	kadena-di-teksto agregá-na-fin: propio kurpa.
+	kadena-di-teksto agregá-na-fin: kibra-liña. <- kadena-di-teksto.
 }.
 
 >> HTML-Email := Email nobo.
 
-HTML-Email ora: ['init'] hasi: {
-	mes init.
-	propio attachments := Lista nobo.
-	propio boundary := Kaha-fuerte token: 40.
+HTML-Email ora: ['prepará'] hasi: {
+	mes prepará.
+	propio anekso := Lista nobo.
+	propio limite := Kaha-fuerte token: 40.
 }.
 
-HTML-Email ora: ['attach:'] hasi: { :file
-	>> id := propio attachments konta.
-	>> blob := file blob.
-	propio attachments agregá-na-fin: (
+HTML-Email ora: ['pega-aden:'] hasi: { :archivo-di-seshon
+	>> id := propio anekso konta.
+	>> blob := archivo-di-seshon blob.
+	propio anekso agregá-na-fin: (
 		Dikshonario nobo
-			file: file ruta,
-			mime: ['image/'] + (Server mimetype: file ruta),
-			data: blob base64-kodifiká
+			archivo-di-seshon: archivo-di-seshon ruta,
+			mime: ['image/'] + (Server mimetype: archivo-di-seshon ruta),
+			dato: blob base64-kodifiká
 	).
 	blob libra. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email ora: ['generate'] hasi: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str agregá-na-fin: (mes header: ['From: '] + propio from-name + [' <'] + ( propio from ) + ['>']) + brk.
-	str agregá-na-fin: (mes header: ['To: '] + ( propio recipients uni: [','] )) + brk.
+HTML-Email ora: ['generá'] hasi: {
+	>> kibra-liña := ['\r\n'].
+	>> kadena-di-teksto := [''].
+	kadena-di-teksto agregá-na-fin: (mes encabesamentu: ['From: '] + propio nòmber-di-remitente + [' <'] + ( propio remitente ) + ['>']) + kibra-liña.
+	kadena-di-teksto agregá-na-fin: (mes encabesamentu: ['To: '] + ( propio risibidónan uni: [','] )) + kibra-liña.
 	propio cc konta bèrdat: {
-		str agregá-na-fin: (mes header: ['Cc: '] + ( propio cc uni: [','] )) + brk.
+		kadena-di-teksto agregá-na-fin: (mes encabesamentu: ['Cc: '] + ( propio cc uni: [','] )) + kibra-liña.
 	}.
 	propio bcc konta bèrdat: {
-		str agregá-na-fin: (mes header: ['Bcc: '] + ( propio bcc uni: [','] )) + brk.
+		kadena-di-teksto agregá-na-fin: (mes encabesamentu: ['Bcc: '] + ( propio bcc uni: [','] )) + kibra-liña.
 	}.
-	str agregá-na-fin: (mes header: ['Subject: '] + propio subject) + brk.
-	str agregá-na-fin: ['MIME-Version: 1.0'] + brk.
-	str agregá-na-fin: ['Content-Type: multipart/related; boundary="'] + propio boundary + ['"; type=text/html'] + brk.
-	str agregá-na-fin: brk.
-	str agregá-na-fin: ['--'] + propio boundary + brk.
-	str agregá-na-fin: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str agregá-na-fin: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str agregá-na-fin: brk.
-	str agregá-na-fin: propio body.
-	str agregá-na-fin: brk.
-	propio attachments kada: { :id :info
-		>> blob := info data.
-		str agregá-na-fin: ['--'] + propio boundary + brk.
-		str agregá-na-fin: ['Content-Type: '] + info mime + brk.
-		str agregá-na-fin: ['Content-Transfer-Encoding: base64'] + brk.
-		str agregá-na-fin: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str agregá-na-fin: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str agregá-na-fin: brk.
-		>> max := 76.
-		>> len := blob largura.
-		>> chunks := (len / max) rondia-ariba.
+	kadena-di-teksto agregá-na-fin: (mes encabesamentu: ['Subject: '] + propio asunto) + kibra-liña.
+	kadena-di-teksto agregá-na-fin: ['MIME-Version: 1.0'] + kibra-liña.
+	kadena-di-teksto agregá-na-fin: ['Content-Type: multipart/related; boundary="'] + propio limite + ['"; type=text/html'] + kibra-liña.
+	kadena-di-teksto agregá-na-fin: kibra-liña.
+	kadena-di-teksto agregá-na-fin: ['--'] + propio limite + kibra-liña.
+	kadena-di-teksto agregá-na-fin: ['Content-Type: text/html; charset=UTF-8'] + kibra-liña.
+	kadena-di-teksto agregá-na-fin: ['Content-Transfer-Encoding: 7bit'] + kibra-liña.
+	kadena-di-teksto agregá-na-fin: kibra-liña.
+	kadena-di-teksto agregá-na-fin: propio kurpa.
+	kadena-di-teksto agregá-na-fin: kibra-liña.
+	propio anekso kada: { :id :informashon
+		>> blob := informashon dato.
+		kadena-di-teksto agregá-na-fin: ['--'] + propio limite + kibra-liña.
+		kadena-di-teksto agregá-na-fin: ['Content-Type: '] + informashon mime + kibra-liña.
+		kadena-di-teksto agregá-na-fin: ['Content-Transfer-Encoding: base64'] + kibra-liña.
+		kadena-di-teksto agregá-na-fin: ['Content-ID: <attachment'] + id + ['>'] + kibra-liña.
+		kadena-di-teksto agregá-na-fin: ['Content-Disposition: inline; filename="'] + informashon archivo-di-seshon + ['"'] + kibra-liña.
+		kadena-di-teksto agregá-na-fin: kibra-liña.
+		>> mas-haltu := 76.
+		>> largura-di-teksto := blob largura.
+		>> pedanan := (largura-di-teksto / mas-haltu) rondia-ariba.
 		{ :i
-			>> chunk := blob kopia kuminsá: i * max largura: max.
-			str agregá-na-fin: chunk + brk.
-		} * chunks.
-		str agregá-na-fin: brk.
-		str agregá-na-fin: brk.
+			>> peda := blob kopia kuminsá: i * mas-haltu largura: mas-haltu.
+			kadena-di-teksto agregá-na-fin: peda + kibra-liña.
+		} * pedanan.
+		kadena-di-teksto agregá-na-fin: kibra-liña.
+		kadena-di-teksto agregá-na-fin: kibra-liña.
 	}.
-	str agregá-na-fin: ['--'] + propio boundary + ['--'] + brk. <- str.
+	kadena-di-teksto agregá-na-fin: ['--'] + propio limite + ['--'] + kibra-liña. <- kadena-di-teksto.
 }.

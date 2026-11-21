@@ -1,302 +1,302 @@
-HTTP-リクエスト 受信時: ['HTTP-header:'] 実行: { :key <- プログラム 設定値: key.
+HTTP-リクエスト 受信時: ['HTTP-ヘッダー:'] 実行: { :キー <- プログラム 設定値: キー.
 }.
 
->> HTTP-Header := オブジェクト 新規.
+>> HTTPヘッダー := オブジェクト 新規.
 
-HTTP-Header 受信時: ['新規'] 実行: { <- 自身 新規 init.
+HTTPヘッダー 受信時: ['新規'] 実行: { <- 自身 新規 初期化.
 }.
 
-HTTP-Header 受信時: ['init'] 実行: {
-	自分の key := 無.
-	自分の value := 無.
+HTTPヘッダー 受信時: ['初期化'] 実行: {
+	自分の キー := 無.
+	自分の 設定値 := 無.
 }.
 
-HTTP-Header 受信時: ['key:value:'] 実行: { :key :value
-	自分の key := key.
-	自分の value := value.
+HTTPヘッダー 受信時: ['キー:設定値:'] 実行: { :キー :設定値
+	自分の キー := キー.
+	自分の 設定値 := 設定値.
 }.
 
-HTTP-Header 受信時: ['key'] 実行: { <- 自分の key.
+HTTPヘッダー 受信時: ['キー'] 実行: { <- 自分の キー.
 }.
 
-HTTP-Header 受信時: ['value'] 実行: { <- 自分の value.
+HTTPヘッダー 受信時: ['設定値'] 実行: { <- 自分の 設定値.
 }.
 
 
-HTTP-Header 受信時: ['文字列化'] 実行: {
-	>> line := 自分の key + [': '] + 自分の value.
-	line 置換: ['\r'] 新: [''], 置換: ['\n'] 新: ['']. <- line + [' \r\n'].
+HTTPヘッダー 受信時: ['文字列化'] 実行: {
+	>> 行内容 := 自分の キー + [': '] + 自分の 設定値.
+	行内容 置換: ['\r'] 新: [''], 置換: ['\n'] 新: ['']. <- 行内容 + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := オブジェクト 新規.
+>> ウェブ文書 := オブジェクト 新規.
 
-Web-Document 受信時: ['新規'] 実行: { <- 自身 新規 init.
+ウェブ文書 受信時: ['新規'] 実行: { <- 自身 新規 初期化.
 }.
 
-Web-Document 受信時: ['init'] 実行: {
-	自分の headers := リスト 新規.
-	自分の sess-id := 無.
-	自分の session-manager := Tempfile-Session 新規.
-	自分の sessdata := 無.
-	自分の secure := 真.
-	自分の same-site := ['Strict'].
-	自分の headers-out := 偽.
-	自分の request := HTTP-リクエスト 新規.
+ウェブ文書 受信時: ['初期化'] 実行: {
+	自分の ヘッダー一覧 := リスト 新規.
+	自分の セッションid := 無.
+	自分の セッション管理 := 一時ファイルセッション 新規.
+	自分の セッションデータ := 無.
+	自分の 安全 := 真.
+	自分の 同一サイト := ['Strict'].
+	自分の ヘッダー送信済み := 偽.
+	自分の http要求 := HTTP-リクエスト 新規.
 }.
 
-Web-Document 受信時: ['request:'] 実行: { :request
-	自分の request := request.
+ウェブ文書 受信時: ['http要求:'] 実行: { :http要求
+	自分の http要求 := http要求.
 }. 
 
-Web-Document 受信時: ['secure-session-cookie:'] 実行: { :secure
-	自身 check-headers.
-	自分の secure := secure.
+ウェブ文書 受信時: ['安全セッションクッキー:'] 実行: { :安全
+	自身 ヘッダー確認.
+	自分の 安全 := 安全.
 }.
 
-Web-Document 受信時: ['same-site-session-cookie:'] 実行: { :value
-	自身 check-headers.
-	>> options := リスト 新規 
+ウェブ文書 受信時: ['同一サイトセッションクッキー:'] 実行: { :設定値
+	自身 ヘッダー確認.
+	>> オプション := リスト 新規 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options 含む: value, 偽なら: {
+	オプション 持つ: 設定値, 偽なら: {
 		このタスク エラー: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	自分の same-site := value.
+	自分の 同一サイト := 設定値.
 }.
 
-Web-Document 受信時: ['header:'] 実行: { :header
-	自身 check-headers.
-	自分の headers 末尾に追加: header.
+ウェブ文書 受信時: ['ヘッダー:'] 実行: { :ヘッダー
+	自身 ヘッダー確認.
+	自分の ヘッダー一覧 末尾に追加: ヘッダー.
 }.
 
-Web-Document 受信時: ['clear-headers'] 実行: {
-	自身 check-headers.
-	自分の headers := リスト 新規.
+ウェブ文書 受信時: ['ヘッダー消去'] 実行: {
+	自身 ヘッダー確認.
+	自分の ヘッダー一覧 := リスト 新規.
 }.
 
-Web-Document 受信時: ['session-manager:'] 実行: { :manager
-	自身 check-headers.
-	自分の session-manager := manager.
+ウェブ文書 受信時: ['セッション管理:'] 実行: { :管理者
+	自身 ヘッダー確認.
+	自分の セッション管理 := 管理者.
 }.
 
-Web-Document 受信時: ['session-manager'] 実行: { <- 自分の session-manager.
+ウェブ文書 受信時: ['セッション管理'] 実行: { <- 自分の セッション管理.
 }.
 
-Web-Document 受信時: ['check-headers'] 実行: {
-	自分の headers-out 真なら: {
+ウェブ文書 受信時: ['ヘッダー確認'] 実行: {
+	自分の ヘッダー送信済み 真なら: {
 		このタスク エラー: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document 受信時: ['session-start'] 実行: {
-	自身 check-headers.
-	>> request := 自分の request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id 無か? 偽なら: {
-		(( パターン 新規: ['^[A-Za-z0-9]+\\z'], 一致: sess-id ) = 0) 真なら: {
-			sess-id := 無.
+ウェブ文書 受信時: ['セッション開始'] 実行: {
+	自身 ヘッダー確認.
+	>> http要求 := 自分の http要求.
+	>> セッションid := http要求 cookie: ['xsid'].
+	セッションid 無か? 偽なら: {
+		(( パターン 新規: ['^[A-Za-z0-9]+\\z'], 一致: セッションid ) = 0) 真なら: {
+			セッションid := 無.
 		}.
 	}.
-	sess-id 無か? 真なら: {
-		sess-id := 金庫 トークン: 30.
-		>> session-header := HTTP-Header 新規
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (自分の secure どちらか: ['Secure'] または: ['']),
-		SSITE: (自分の same-site),
-		XSID: sess-id
+	セッションid 無か? 真なら: {
+		セッションid := 金庫 トークン: 30.
+		>> セッションヘッダー := HTTPヘッダー 新規
+		キー: ['Set-Cookie'] 設定値: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (自分の 安全 どちらか: ['Secure'] または: ['']),
+		SSITE: (自分の 同一サイト),
+		XSID: セッションid
 		).
-		自分の headers 末尾に追加: session-header.
+		自分の ヘッダー一覧 末尾に追加: セッションヘッダー.
 	}.
-	自分の sessdata := 自分の session-manager for: sess-id, load. <- 自分の sessdata. # reference
+	自分の セッションデータ := 自分の セッション管理 対象: セッションid, 読み込み. <- 自分の セッションデータ. # reference
 }.
 
-Web-Document 受信時: ['goto:'] 実行: { :url
-	自身 check-headers.
-	自身 clear-headers.
-	自分の headers
+ウェブ文書 受信時: ['移動:'] 実行: { :アドレス
+	自身 ヘッダー確認.
+	自身 ヘッダー消去.
+	自分の ヘッダー一覧
 	末尾に追加: (
-		HTTP-Header 新規
-		key: ['Status'] value: ['303 See Other']
+		HTTPヘッダー 新規
+		キー: ['Status'] 設定値: ['303 See Other']
 	),
 	末尾に追加: (
-		HTTP-Header 新規
-		key: ['Location'] value: url
+		HTTPヘッダー 新規
+		キー: ['Location'] 設定値: アドレス
 	).
-	自身 out: ['Redirect'].
+	自身 出力: ['Redirect'].
 }.
 
-Web-Document 受信時: ['session-destroy'] 実行: {
-	自身 check-headers.
-	>> request := 自分の request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id 無か? 偽なら: {
-		>> session-header := HTTP-Header 新規.
-		>> when := 時点 新規 年値: 1970, 書式: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+ウェブ文書 受信時: ['セッション破棄'] 実行: {
+	自身 ヘッダー確認.
+	>> http要求 := 自分の http要求.
+	>> セッションid := http要求 cookie: ['xsid'].
+	セッションid 無か? 偽なら: {
+		>> セッションヘッダー := HTTPヘッダー 新規.
+		>> 有効期限 := 時点 新規 年値: 1970, 書式: ['%a, %d %b %Y %H:%M:%S GMT'].
+		セッションヘッダー キー: ['Set-Cookie'] 設定値: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (自分の secure どちらか: ['Secure'] または: ['']),
-			SSITE: (自分の same-site),
-			XSID: sess-id
+			EXP: 有効期限,
+			SEC: (自分の 安全 どちらか: ['Secure'] または: ['']),
+			SSITE: (自分の 同一サイト),
+			XSID: セッションid
 		).
-		自分の session-manager destroy.
-		自分の headers 末尾に追加: session-header.
+		自分の セッション管理 破棄.
+		自分の ヘッダー一覧 末尾に追加: セッションヘッダー.
 	}.
 }.
 
 
-Web-Document 受信時: ['template:'] 実行: { :経路 <- Template 新規: (ファイル 新規: 経路, 読む).
+ウェブ文書 受信時: ['テンプレート:'] 実行: { :経路 <- テンプレート 新規: (ファイル 新規: 経路, 読む).
 }.
 
-Web-Document 受信時: ['out:type:'] 実行: { :output :型名
-	自分の headers-out 偽なら: {
-		自分の sessdata 無か? 偽なら: {
-			自分の session-manager save: 自分の sessdata.
+ウェブ文書 受信時: ['出力:型名:'] 実行: { :出力結果 :型名
+	自分の ヘッダー送信済み 偽なら: {
+		自分の セッションデータ 無か? 偽なら: {
+			自分の セッション管理 保存: 自分の セッションデータ.
 		}.
-		自分の headers 末尾に追加: (
-			HTTP-Header 新規
-			key: ['Content-type'] value: 型名
+		自分の ヘッダー一覧 末尾に追加: (
+			HTTPヘッダー 新規
+			キー: ['Content-type'] 設定値: 型名
 		).
-		自分の headers 各要素: { :_ :header
-			出力 書く: header.
+		自分の ヘッダー一覧 各要素: { :_ :ヘッダー
+			出力 書く: ヘッダー.
 		}.
-		自分の headers-out := 真.
+		自分の ヘッダー送信済み := 真.
 		出力 書く: ['\r\n'].
 	}.
-	出力 書く: output.
+	出力 書く: 出力結果.
 }.
 
-Web-Document 受信時: ['finish:type:'] 実行: { :output :型名
-	自分の headers-out 偽なら: {
-		自分の sessdata 無か? 偽なら: {
-			自分の session-manager save: 自分の sessdata.
+ウェブ文書 受信時: ['仕上げ:型名:'] 実行: { :出力結果 :型名
+	自分の ヘッダー送信済み 偽なら: {
+		自分の セッションデータ 無か? 偽なら: {
+			自分の セッション管理 保存: 自分の セッションデータ.
 		}.
-		自分の headers 末尾に追加: (
-			HTTP-Header 新規
-			key: ['Content-type'] value: 型名
+		自分の ヘッダー一覧 末尾に追加: (
+			HTTPヘッダー 新規
+			キー: ['Content-type'] 設定値: 型名
 		).
-		自分の headers 末尾に追加: (
-			HTTP-Header 新規
-			key: ['Content-Length'] value: output 文字列化 bytes
+		自分の ヘッダー一覧 末尾に追加: (
+			HTTPヘッダー 新規
+			キー: ['Content-Length'] 設定値: 出力結果 文字列化 bytes
 		).
-		自分の headers 各要素: { :_ :header
-			出力 書く: header.
+		自分の ヘッダー一覧 各要素: { :_ :ヘッダー
+			出力 書く: ヘッダー.
 		}.
-		自分の headers-out := 真.
+		自分の ヘッダー送信済み := 真.
 		出力 書く: ['\r\n'].
 	}.
-	出力 書く: output.
+	出力 書く: 出力結果.
 }.
 
-Web-Document 受信時: ['out:'] 実行: { :output
-	自身 out: output type: ['text/html; charset=utf-8'].
+ウェブ文書 受信時: ['出力:'] 実行: { :出力結果
+	自身 出力: 出力結果 型名: ['text/html; charset=utf-8'].
 }.
 
-Web-Document 受信時: ['finish:'] 実行: { :output
-	自身 finish: output type: ['text/html; charset=utf-8'].
+ウェブ文書 受信時: ['仕上げ:'] 実行: { :出力結果
+	自身 仕上げ: 出力結果 型名: ['text/html; charset=utf-8'].
 }.
 
-Web-Document 受信時: ['json:'] 実行: { :output
-	自身 out: ( JSON jsonify: output ) type: ['application/json'].
+ウェブ文書 受信時: ['json:'] 実行: { :出力結果
+	自身 出力: ( JSON jsonify: 出力結果 ) 型名: ['application/json'].
 }.
 
-Web-Document 受信時: ['not-found:'] 実行: { :output
-	自身 clear-headers header: (
-		HTTP-Header 新規 key: ['Status'] value: ['404 Not Found']
+ウェブ文書 受信時: ['見つかりません:'] 実行: { :出力結果
+	自身 ヘッダー消去 ヘッダー: (
+		HTTPヘッダー 新規 キー: ['Status'] 設定値: ['404 Not Found']
 	).
-	自身 out: output.
+	自身 出力: 出力結果.
 }.
 
 
 # Interface
 
->> Session := オブジェクト 新規.
+>> セッション := オブジェクト 新規.
 
-Session 受信時: ['新規'] 実行: { <- 自身 新規 init for: 無.
+セッション 受信時: ['新規'] 実行: { <- 自身 新規 初期化 対象: 無.
 }.
 
-Session 受信時: ['for:'] 実行: { :id
+セッション 受信時: ['対象:'] 実行: { :id
 	自分の id := id.
 }.
 
-Session 受信時: ['load'] 実行: {
+セッション 受信時: ['読み込み'] 実行: {
 	このタスク エラー: ['Not implemented.'].
 }.
 
-Session 受信時: ['save:'] 実行: {
+セッション 受信時: ['保存:'] 実行: {
 	このタスク エラー: ['Not implemented.'].
 }.
 
-Session 受信時: ['destroy'] 実行: {
+セッション 受信時: ['破棄'] 実行: {
 	このタスク エラー: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session 新規.
+>> 一時ファイルセッション := セッション 新規.
 
-Tempfile-Session 受信時: ['init'] 実行: {
-	自分の pathprefix := ['/tmp/sess-'].
+一時ファイルセッション 受信時: ['初期化'] 実行: {
+	自分の パス先頭 := ['/tmp/sess-'].
 }.
 
-Tempfile-Session 受信時: ['path-prefix:'] 実行: { :str
-	自分の pathprefix := str.
+一時ファイルセッション 受信時: ['パス接頭辞:'] 実行: { :テキスト列
+	自分の パス先頭 := テキスト列.
 }.
 
-Tempfile-Session 受信時: ['file'] 実行: { <- ( ファイル 新規: ( 自分の pathprefix + 自分の id + ['.txt'] ) ).
+一時ファイルセッション 受信時: ['セッションファイル'] 実行: { <- ( ファイル 新規: ( 自分の パス先頭 + 自分の id + ['.txt'] ) ).
 }.
 
-Tempfile-Session 受信時: ['load'] 実行: {
-	>> file := 自身 file.
-	file 存在する 偽なら: {
-		file 書く: (辞書 新規 コード).
-	}. <- file 読む オブジェクト化.
+一時ファイルセッション 受信時: ['読み込み'] 実行: {
+	>> セッションファイル := 自身 セッションファイル.
+	セッションファイル 存在する 偽なら: {
+		セッションファイル 書く: (辞書 新規 コード).
+	}. <- セッションファイル 読む オブジェクト化.
 }.
 
-Tempfile-Session 受信時: ['save:'] 実行: { :data
-	>> file := 自身 file.
-	file 存在する 真なら: {
-		file 書く: data コード.
+一時ファイルセッション 受信時: ['保存:'] 実行: { :データ
+	>> セッションファイル := 自身 セッションファイル.
+	セッションファイル 存在する 真なら: {
+		セッションファイル 書く: データ コード.
 	}.
 }.
 
-Tempfile-Session 受信時: ['destroy'] 実行: {
-	>> file := 自身 file.
-	file 存在する 真なら: {
-		file 削除.
+一時ファイルセッション 受信時: ['破棄'] 実行: {
+	>> セッションファイル := 自身 セッションファイル.
+	セッションファイル 存在する 真なら: {
+		セッションファイル 削除.
 	}.
 }.
 
 
 >> URL := オブジェクト 新規.
 
-URL 受信時: ['init'] 実行: {
-	自分の protocol := ['https://'].
+URL 受信時: ['初期化'] 実行: {
+	自分の プロトコル := ['https://'].
 	自分の ホスト := ['localhost'].
 	自分の 経路 := [''].
-	自分の params := [''].
+	自分の url引数 := [''].
 	自分の hash := [''].
 }.
 
-URL 受信時: ['新規'] 実行: { <- 自身 新規 init.
+URL 受信時: ['新規'] 実行: { <- 自身 新規 初期化.
 }.
 
 URL 受信時: ['文字列化'] 実行: { <- (
-	自分の protocol +
+	自分の プロトコル +
 	自分の ホスト +
 	自分の 経路 +
-	自分の params +
+	自分の url引数 +
 	自分の hash ).
 }.
 
-URL 受信時: ['protocol:'] 実行: { :protocol
-	((リスト 新規: ['http'] ; ['https']) 含む: protocol) 真なら: {
-		自分の protocol := protocol + ['://'].
+URL 受信時: ['プロトコル:'] 実行: { :プロトコル
+	((リスト 新規 ; ['http'] ; ['https']) 持つ: プロトコル) 真なら: {
+		自分の プロトコル := プロトコル + ['://'].
 	}, 偽なら: {
 		このタスク エラー: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL 受信時: ['ホスト:'] 実行: { :ホスト
 	自分の ホスト := ホスト.
 }.
 
-URL 受信時: ['path:'] 実行: { :経路
+URL 受信時: ['経路:'] 実行: { :経路
 	自分の 経路 := ['/'] + 経路 url-エンコード.
 }.
 
-URL 受信時: ['params:'] 実行: { :map
-	>> params := リスト 新規.
-	map 各要素: { :key :value
-		params 末尾に追加: key 文字列化 url-エンコード + ['='] + value 文字列化 url-エンコード.
+URL 受信時: ['url引数:'] 実行: { :対応表
+	>> url引数 := リスト 新規.
+	対応表 各要素: { :キー :設定値
+		url引数 末尾に追加: キー 文字列化 url-エンコード + ['='] + 設定値 文字列化 url-エンコード.
 	}.
-	自分の params := ['?'] + ( params 結合: ['&'] ).
+	自分の url引数 := ['?'] + ( url引数 結合: ['&'] ).
 }.
 
 URL 受信時: ['ハッシュ:'] 実行: { :hash

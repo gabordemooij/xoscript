@@ -1,302 +1,302 @@
-Isicelo-HTTP uma-kufika: ['HTTP-header:'] yenza: { :key <- Uhlelo isilungiselelo: key.
+Isicelo-HTTP uma-kufika: ['HTTP-isihloko:'] yenza: { :ukhiye <- Uhlelo isilungiselelo: ukhiye.
 }.
 
->> HTTP-Header := Into okusha.
+>> Isihloko-se-HTTP := Into okusha.
 
-HTTP-Header uma-kufika: ['okusha'] yenza: { <- uqobo okusha init.
+Isihloko-se-HTTP uma-kufika: ['okusha'] yenza: { <- uqobo okusha lungiselela.
 }.
 
-HTTP-Header uma-kufika: ['init'] yenza: {
-	okwakho key := Lutho.
-	okwakho value := Lutho.
+Isihloko-se-HTTP uma-kufika: ['lungiselela'] yenza: {
+	okwakho ukhiye := Lutho.
+	okwakho inani-elibekiwe := Lutho.
 }.
 
-HTTP-Header uma-kufika: ['key:value:'] yenza: { :key :value
-	okwakho key := key.
-	okwakho value := value.
+Isihloko-se-HTTP uma-kufika: ['ukhiye:inani-elibekiwe:'] yenza: { :ukhiye :inani-elibekiwe
+	okwakho ukhiye := ukhiye.
+	okwakho inani-elibekiwe := inani-elibekiwe.
 }.
 
-HTTP-Header uma-kufika: ['key'] yenza: { <- okwakho key.
+Isihloko-se-HTTP uma-kufika: ['ukhiye'] yenza: { <- okwakho ukhiye.
 }.
 
-HTTP-Header uma-kufika: ['value'] yenza: { <- okwakho value.
+Isihloko-se-HTTP uma-kufika: ['inani-elibekiwe'] yenza: { <- okwakho inani-elibekiwe.
 }.
 
 
-HTTP-Header uma-kufika: ['umbhalo'] yenza: {
-	>> line := okwakho key + [': '] + okwakho value.
-	line buyisela: ['\r'] nge: [''], buyisela: ['\n'] nge: ['']. <- line + [' \r\n'].
+Isihloko-se-HTTP uma-kufika: ['umbhalo'] yenza: {
+	>> umugqa := okwakho ukhiye + [': '] + okwakho inani-elibekiwe.
+	umugqa buyisela: ['\r'] nge: [''], buyisela: ['\n'] nge: ['']. <- umugqa + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Into okusha.
+>> Idokhumenti-yewebhu := Into okusha.
 
-Web-Document uma-kufika: ['okusha'] yenza: { <- uqobo okusha init.
+Idokhumenti-yewebhu uma-kufika: ['okusha'] yenza: { <- uqobo okusha lungiselela.
 }.
 
-Web-Document uma-kufika: ['init'] yenza: {
-	okwakho headers := Uhlu okusha.
-	okwakho sess-id := Lutho.
-	okwakho session-manager := Tempfile-Session okusha.
-	okwakho sessdata := Lutho.
-	okwakho secure := Iqiniso.
-	okwakho same-site := ['Strict'].
-	okwakho headers-out := Amanga.
-	okwakho request := Isicelo-HTTP okusha.
+Idokhumenti-yewebhu uma-kufika: ['lungiselela'] yenza: {
+	okwakho izihloko := Uhlu okusha.
+	okwakho i-id-yeseshini := Lutho.
+	okwakho umphathi-weseshini := Iseshini-yefayela-lesikhashana okusha.
+	okwakho idatha-yeseshini := Lutho.
+	okwakho ephephile := Iqiniso.
+	okwakho isayithi-elifanayo := ['Strict'].
+	okwakho izihloko-zithunyelwe := Amanga.
+	okwakho isicelo-http := Isicelo-HTTP okusha.
 }.
 
-Web-Document uma-kufika: ['request:'] yenza: { :request
-	okwakho request := request.
+Idokhumenti-yewebhu uma-kufika: ['isicelo-http:'] yenza: { :isicelo-http
+	okwakho isicelo-http := isicelo-http.
 }. 
 
-Web-Document uma-kufika: ['secure-session-cookie:'] yenza: { :secure
-	uqobo check-headers.
-	okwakho secure := secure.
+Idokhumenti-yewebhu uma-kufika: ['ikhukhi-yeseshini-ephephile:'] yenza: { :ephephile
+	uqobo hlola-izihloko.
+	okwakho ephephile := ephephile.
 }.
 
-Web-Document uma-kufika: ['same-site-session-cookie:'] yenza: { :value
-	uqobo check-headers.
-	>> options := Uhlu okusha 
+Idokhumenti-yewebhu uma-kufika: ['ikhukhi-yeseshini-yesayithi-elifanayo:'] yenza: { :inani-elibekiwe
+	uqobo hlola-izihloko.
+	>> izinketho := Uhlu okusha 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options iqukethe: value, amanga: {
+	izinketho ine: inani-elibekiwe, amanga: {
 		lo-msebenzi iphutha: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	okwakho same-site := value.
+	okwakho isayithi-elifanayo := inani-elibekiwe.
 }.
 
-Web-Document uma-kufika: ['header:'] yenza: { :header
-	uqobo check-headers.
-	okwakho headers engeza-ekugcineni: header.
+Idokhumenti-yewebhu uma-kufika: ['isihloko:'] yenza: { :isihloko
+	uqobo hlola-izihloko.
+	okwakho izihloko engeza-ekugcineni: isihloko.
 }.
 
-Web-Document uma-kufika: ['clear-headers'] yenza: {
-	uqobo check-headers.
-	okwakho headers := Uhlu okusha.
+Idokhumenti-yewebhu uma-kufika: ['susa-izihloko'] yenza: {
+	uqobo hlola-izihloko.
+	okwakho izihloko := Uhlu okusha.
 }.
 
-Web-Document uma-kufika: ['session-manager:'] yenza: { :manager
-	uqobo check-headers.
-	okwakho session-manager := manager.
+Idokhumenti-yewebhu uma-kufika: ['umphathi-weseshini:'] yenza: { :umphathi
+	uqobo hlola-izihloko.
+	okwakho umphathi-weseshini := umphathi.
 }.
 
-Web-Document uma-kufika: ['session-manager'] yenza: { <- okwakho session-manager.
+Idokhumenti-yewebhu uma-kufika: ['umphathi-weseshini'] yenza: { <- okwakho umphathi-weseshini.
 }.
 
-Web-Document uma-kufika: ['check-headers'] yenza: {
-	okwakho headers-out iqiniso: {
+Idokhumenti-yewebhu uma-kufika: ['hlola-izihloko'] yenza: {
+	okwakho izihloko-zithunyelwe iqiniso: {
 		lo-msebenzi iphutha: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document uma-kufika: ['session-start'] yenza: {
-	uqobo check-headers.
-	>> request := okwakho request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Lutho? amanga: {
-		(( Iphethini okusha: ['^[A-Za-z0-9]+\\z'], ukufana: sess-id ) = 0) iqiniso: {
-			sess-id := Lutho.
+Idokhumenti-yewebhu uma-kufika: ['qala-iseshini'] yenza: {
+	uqobo hlola-izihloko.
+	>> isicelo-http := okwakho isicelo-http.
+	>> i-id-yeseshini := isicelo-http cookie: ['xsid'].
+	i-id-yeseshini Lutho? amanga: {
+		(( Iphethini okusha: ['^[A-Za-z0-9]+\\z'], ukufana: i-id-yeseshini ) = 0) iqiniso: {
+			i-id-yeseshini := Lutho.
 		}.
 	}.
-	sess-id Lutho? iqiniso: {
-		sess-id := Isisefo ithokheni: 30.
-		>> session-header := HTTP-Header okusha
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (okwakho secure lokhu: ['Secure'] noma-lokho: ['']),
-		SSITE: (okwakho same-site),
-		XSID: sess-id
+	i-id-yeseshini Lutho? iqiniso: {
+		i-id-yeseshini := Isisefo ithokheni: 30.
+		>> isihloko-seseshini := Isihloko-se-HTTP okusha
+		ukhiye: ['Set-Cookie'] inani-elibekiwe: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (okwakho ephephile lokhu: ['Secure'] noma-lokho: ['']),
+		SSITE: (okwakho isayithi-elifanayo),
+		XSID: i-id-yeseshini
 		).
-		okwakho headers engeza-ekugcineni: session-header.
+		okwakho izihloko engeza-ekugcineni: isihloko-seseshini.
 	}.
-	okwakho sessdata := okwakho session-manager for: sess-id, load. <- okwakho sessdata. # reference
+	okwakho idatha-yeseshini := okwakho umphathi-weseshini okwe: i-id-yeseshini, layisha. <- okwakho idatha-yeseshini. # reference
 }.
 
-Web-Document uma-kufika: ['goto:'] yenza: { :url
-	uqobo check-headers.
-	uqobo clear-headers.
-	okwakho headers
+Idokhumenti-yewebhu uma-kufika: ['iya-ku:'] yenza: { :ikheli
+	uqobo hlola-izihloko.
+	uqobo susa-izihloko.
+	okwakho izihloko
 	engeza-ekugcineni: (
-		HTTP-Header okusha
-		key: ['Status'] value: ['303 See Other']
+		Isihloko-se-HTTP okusha
+		ukhiye: ['Status'] inani-elibekiwe: ['303 See Other']
 	),
 	engeza-ekugcineni: (
-		HTTP-Header okusha
-		key: ['Location'] value: url
+		Isihloko-se-HTTP okusha
+		ukhiye: ['Location'] inani-elibekiwe: ikheli
 	).
-	uqobo out: ['Redirect'].
+	uqobo veza: ['Redirect'].
 }.
 
-Web-Document uma-kufika: ['session-destroy'] yenza: {
-	uqobo check-headers.
-	>> request := okwakho request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Lutho? amanga: {
-		>> session-header := HTTP-Header okusha.
-		>> when := Isikhathi okusha unyaka: 1970, ifomethi: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Idokhumenti-yewebhu uma-kufika: ['bhubhisa-iseshini'] yenza: {
+	uqobo hlola-izihloko.
+	>> isicelo-http := okwakho isicelo-http.
+	>> i-id-yeseshini := isicelo-http cookie: ['xsid'].
+	i-id-yeseshini Lutho? amanga: {
+		>> isihloko-seseshini := Isihloko-se-HTTP okusha.
+		>> isikhathi-sokuphela := Isikhathi okusha unyaka: 1970, ifomethi: ['%a, %d %b %Y %H:%M:%S GMT'].
+		isihloko-seseshini ukhiye: ['Set-Cookie'] inani-elibekiwe: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (okwakho secure lokhu: ['Secure'] noma-lokho: ['']),
-			SSITE: (okwakho same-site),
-			XSID: sess-id
+			EXP: isikhathi-sokuphela,
+			SEC: (okwakho ephephile lokhu: ['Secure'] noma-lokho: ['']),
+			SSITE: (okwakho isayithi-elifanayo),
+			XSID: i-id-yeseshini
 		).
-		okwakho session-manager destroy.
-		okwakho headers engeza-ekugcineni: session-header.
+		okwakho umphathi-weseshini bhubhisa.
+		okwakho izihloko engeza-ekugcineni: isihloko-seseshini.
 	}.
 }.
 
 
-Web-Document uma-kufika: ['template:'] yenza: { :indlela-yefayela <- Template okusha: (Ifayela okusha: indlela-yefayela, funda).
+Idokhumenti-yewebhu uma-kufika: ['isifanekiso:'] yenza: { :indlela-yefayela <- Isifanekiso okusha: (Ifayela okusha: indlela-yefayela, funda).
 }.
 
-Web-Document uma-kufika: ['out:type:'] yenza: { :output :uhlobo
-	okwakho headers-out amanga: {
-		okwakho sessdata Lutho? amanga: {
-			okwakho session-manager save: okwakho sessdata.
+Idokhumenti-yewebhu uma-kufika: ['veza:uhlobo:'] yenza: { :umphumela :uhlobo
+	okwakho izihloko-zithunyelwe amanga: {
+		okwakho idatha-yeseshini Lutho? amanga: {
+			okwakho umphathi-weseshini gcina: okwakho idatha-yeseshini.
 		}.
-		okwakho headers engeza-ekugcineni: (
-			HTTP-Header okusha
-			key: ['Content-type'] value: uhlobo
+		okwakho izihloko engeza-ekugcineni: (
+			Isihloko-se-HTTP okusha
+			ukhiye: ['Content-type'] inani-elibekiwe: uhlobo
 		).
-		okwakho headers ngamunye: { :_ :header
-			Okuphumayo bhala: header.
+		okwakho izihloko ngamunye: { :_ :isihloko
+			Okuphumayo bhala: isihloko.
 		}.
-		okwakho headers-out := Iqiniso.
+		okwakho izihloko-zithunyelwe := Iqiniso.
 		Okuphumayo bhala: ['\r\n'].
 	}.
-	Okuphumayo bhala: output.
+	Okuphumayo bhala: umphumela.
 }.
 
-Web-Document uma-kufika: ['finish:type:'] yenza: { :output :uhlobo
-	okwakho headers-out amanga: {
-		okwakho sessdata Lutho? amanga: {
-			okwakho session-manager save: okwakho sessdata.
+Idokhumenti-yewebhu uma-kufika: ['qeda:uhlobo:'] yenza: { :umphumela :uhlobo
+	okwakho izihloko-zithunyelwe amanga: {
+		okwakho idatha-yeseshini Lutho? amanga: {
+			okwakho umphathi-weseshini gcina: okwakho idatha-yeseshini.
 		}.
-		okwakho headers engeza-ekugcineni: (
-			HTTP-Header okusha
-			key: ['Content-type'] value: uhlobo
+		okwakho izihloko engeza-ekugcineni: (
+			Isihloko-se-HTTP okusha
+			ukhiye: ['Content-type'] inani-elibekiwe: uhlobo
 		).
-		okwakho headers engeza-ekugcineni: (
-			HTTP-Header okusha
-			key: ['Content-Length'] value: output umbhalo bytes
+		okwakho izihloko engeza-ekugcineni: (
+			Isihloko-se-HTTP okusha
+			ukhiye: ['Content-Length'] inani-elibekiwe: umphumela umbhalo bytes
 		).
-		okwakho headers ngamunye: { :_ :header
-			Okuphumayo bhala: header.
+		okwakho izihloko ngamunye: { :_ :isihloko
+			Okuphumayo bhala: isihloko.
 		}.
-		okwakho headers-out := Iqiniso.
+		okwakho izihloko-zithunyelwe := Iqiniso.
 		Okuphumayo bhala: ['\r\n'].
 	}.
-	Okuphumayo bhala: output.
+	Okuphumayo bhala: umphumela.
 }.
 
-Web-Document uma-kufika: ['out:'] yenza: { :output
-	uqobo out: output type: ['text/html; charset=utf-8'].
+Idokhumenti-yewebhu uma-kufika: ['veza:'] yenza: { :umphumela
+	uqobo veza: umphumela uhlobo: ['text/html; charset=utf-8'].
 }.
 
-Web-Document uma-kufika: ['finish:'] yenza: { :output
-	uqobo finish: output type: ['text/html; charset=utf-8'].
+Idokhumenti-yewebhu uma-kufika: ['qeda:'] yenza: { :umphumela
+	uqobo qeda: umphumela uhlobo: ['text/html; charset=utf-8'].
 }.
 
-Web-Document uma-kufika: ['json:'] yenza: { :output
-	uqobo out: ( JSON jsonify: output ) type: ['application/json'].
+Idokhumenti-yewebhu uma-kufika: ['json:'] yenza: { :umphumela
+	uqobo veza: ( JSON jsonify: umphumela ) uhlobo: ['application/json'].
 }.
 
-Web-Document uma-kufika: ['not-found:'] yenza: { :output
-	uqobo clear-headers header: (
-		HTTP-Header okusha key: ['Status'] value: ['404 Not Found']
+Idokhumenti-yewebhu uma-kufika: ['akutholakalanga:'] yenza: { :umphumela
+	uqobo susa-izihloko isihloko: (
+		Isihloko-se-HTTP okusha ukhiye: ['Status'] inani-elibekiwe: ['404 Not Found']
 	).
-	uqobo out: output.
+	uqobo veza: umphumela.
 }.
 
 
 # Interface
 
->> Session := Into okusha.
+>> Iseshini := Into okusha.
 
-Session uma-kufika: ['okusha'] yenza: { <- uqobo okusha init for: Lutho.
+Iseshini uma-kufika: ['okusha'] yenza: { <- uqobo okusha lungiselela okwe: Lutho.
 }.
 
-Session uma-kufika: ['for:'] yenza: { :id
+Iseshini uma-kufika: ['okwe:'] yenza: { :id
 	okwakho id := id.
 }.
 
-Session uma-kufika: ['load'] yenza: {
+Iseshini uma-kufika: ['layisha'] yenza: {
 	lo-msebenzi iphutha: ['Not implemented.'].
 }.
 
-Session uma-kufika: ['save:'] yenza: {
+Iseshini uma-kufika: ['gcina:'] yenza: {
 	lo-msebenzi iphutha: ['Not implemented.'].
 }.
 
-Session uma-kufika: ['destroy'] yenza: {
+Iseshini uma-kufika: ['bhubhisa'] yenza: {
 	lo-msebenzi iphutha: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session okusha.
+>> Iseshini-yefayela-lesikhashana := Iseshini okusha.
 
-Tempfile-Session uma-kufika: ['init'] yenza: {
-	okwakho pathprefix := ['/tmp/sess-'].
+Iseshini-yefayela-lesikhashana uma-kufika: ['lungiselela'] yenza: {
+	okwakho ukuqala-kwendlela := ['/tmp/sess-'].
 }.
 
-Tempfile-Session uma-kufika: ['path-prefix:'] yenza: { :str
-	okwakho pathprefix := str.
+Iseshini-yefayela-lesikhashana uma-kufika: ['isiqalo-sendlela:'] yenza: { :uchungechunge-lombhalo
+	okwakho ukuqala-kwendlela := uchungechunge-lombhalo.
 }.
 
-Tempfile-Session uma-kufika: ['file'] yenza: { <- ( Ifayela okusha: ( okwakho pathprefix + okwakho id + ['.txt'] ) ).
+Iseshini-yefayela-lesikhashana uma-kufika: ['ifayela-leseshini'] yenza: { <- ( Ifayela okusha: ( okwakho ukuqala-kwendlela + okwakho id + ['.txt'] ) ).
 }.
 
-Tempfile-Session uma-kufika: ['load'] yenza: {
-	>> file := uqobo file.
-	file ikhona amanga: {
-		file bhala: (Isichazamazwi okusha ikhodi).
-	}. <- file funda into.
+Iseshini-yefayela-lesikhashana uma-kufika: ['layisha'] yenza: {
+	>> ifayela-leseshini := uqobo ifayela-leseshini.
+	ifayela-leseshini ikhona amanga: {
+		ifayela-leseshini bhala: (Isichazamazwi okusha ikhodi).
+	}. <- ifayela-leseshini funda into.
 }.
 
-Tempfile-Session uma-kufika: ['save:'] yenza: { :data
-	>> file := uqobo file.
-	file ikhona iqiniso: {
-		file bhala: data ikhodi.
+Iseshini-yefayela-lesikhashana uma-kufika: ['gcina:'] yenza: { :idatha
+	>> ifayela-leseshini := uqobo ifayela-leseshini.
+	ifayela-leseshini ikhona iqiniso: {
+		ifayela-leseshini bhala: idatha ikhodi.
 	}.
 }.
 
-Tempfile-Session uma-kufika: ['destroy'] yenza: {
-	>> file := uqobo file.
-	file ikhona iqiniso: {
-		file susa.
+Iseshini-yefayela-lesikhashana uma-kufika: ['bhubhisa'] yenza: {
+	>> ifayela-leseshini := uqobo ifayela-leseshini.
+	ifayela-leseshini ikhona iqiniso: {
+		ifayela-leseshini susa.
 	}.
 }.
 
 
 >> URL := Into okusha.
 
-URL uma-kufika: ['init'] yenza: {
-	okwakho protocol := ['https://'].
+URL uma-kufika: ['lungiselela'] yenza: {
+	okwakho iphrothokholi := ['https://'].
 	okwakho umsingathi := ['localhost'].
 	okwakho indlela-yefayela := [''].
-	okwakho params := [''].
+	okwakho amapharamitha-url := [''].
 	okwakho hash := [''].
 }.
 
-URL uma-kufika: ['okusha'] yenza: { <- uqobo okusha init.
+URL uma-kufika: ['okusha'] yenza: { <- uqobo okusha lungiselela.
 }.
 
 URL uma-kufika: ['umbhalo'] yenza: { <- (
-	okwakho protocol +
+	okwakho iphrothokholi +
 	okwakho umsingathi +
 	okwakho indlela-yefayela +
-	okwakho params +
+	okwakho amapharamitha-url +
 	okwakho hash ).
 }.
 
-URL uma-kufika: ['protocol:'] yenza: { :protocol
-	((Uhlu okusha: ['http'] ; ['https']) iqukethe: protocol) iqiniso: {
-		okwakho protocol := protocol + ['://'].
+URL uma-kufika: ['iphrothokholi:'] yenza: { :iphrothokholi
+	((Uhlu okusha ; ['http'] ; ['https']) ine: iphrothokholi) iqiniso: {
+		okwakho iphrothokholi := iphrothokholi + ['://'].
 	}, amanga: {
 		lo-msebenzi iphutha: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL uma-kufika: ['umsingathi:'] yenza: { :umsingathi
 	okwakho umsingathi := umsingathi.
 }.
 
-URL uma-kufika: ['path:'] yenza: { :indlela-yefayela
+URL uma-kufika: ['indlela-yefayela:'] yenza: { :indlela-yefayela
 	okwakho indlela-yefayela := ['/'] + indlela-yefayela url-faka-ikhodi.
 }.
 
-URL uma-kufika: ['params:'] yenza: { :map
-	>> params := Uhlu okusha.
-	map ngamunye: { :key :value
-		params engeza-ekugcineni: key umbhalo url-faka-ikhodi + ['='] + value umbhalo url-faka-ikhodi.
+URL uma-kufika: ['amapharamitha-url:'] yenza: { :ukumepha
+	>> amapharamitha-url := Uhlu okusha.
+	ukumepha ngamunye: { :ukhiye :inani-elibekiwe
+		amapharamitha-url engeza-ekugcineni: ukhiye umbhalo url-faka-ikhodi + ['='] + inani-elibekiwe umbhalo url-faka-ikhodi.
 	}.
-	okwakho params := ['?'] + ( params hlanganisa: ['&'] ).
+	okwakho amapharamitha-url := ['?'] + ( amapharamitha-url hlanganisa: ['&'] ).
 }.
 
 URL uma-kufika: ['hashi:'] yenza: { :hash

@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Oggetto nuovo.
+>> Sagoma := Oggetto nuovo.
 
-Template on: ['nuovo'] fare: { <- io nuovo content: [''].
+Sagoma on: ['nuovo'] fare: { <- io nuovo contenuto: [''].
 }.
 
-Template on: ['content:'] fare: { :content
-	mio content := content. 
+Sagoma on: ['contenuto:'] fare: { :contenuto
+	mio contenuto := contenuto. 
 }.
 
-Template on: ['nuovo:'] fare: { :content <- io nuovo content: content.
+Sagoma on: ['nuovo:'] fare: { :contenuto <- io nuovo contenuto: contenuto.
 }.
 
-Template on: ['cut:'] fare: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := mio content diviso: startmarker.
-	>> prefix := parts primo.
-	>> parts2 := parts scorso diviso: endmarker.
-	>> suffix := parts2 scorso.
-	>> part := parts2 primo.
-	>> rest := prefix + suffix.
-	mio content := rest. <- Template nuovo: part.
+Sagoma on: ['tagliare:'] fare: { :marcatore
+	>> marcatore-inizio := (['<!-- cut:%id% -->'] %id%: marcatore).
+	>> marcatore-fine := (['<!-- /cut:%id% -->'] %id%: marcatore).
+	>> parti := mio contenuto diviso: marcatore-inizio.
+	>> prefisso := parti primo.
+	>> parti2 := parti scorso diviso: marcatore-fine.
+	>> suffisso := parti2 scorso.
+	>> parte := parti2 primo.
+	>> resto := prefisso + suffisso.
+	mio contenuto := resto. <- Sagoma nuovo: parte.
 	
 }.
 
-Template on: ['copia'] fare: { <- io nuovo: io testo copia.
+Sagoma on: ['copia'] fare: { <- io nuovo: io testo copia.
 }.
 	
-Template on: ['paste:at:'] fare: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	mio content sostituirlo: pastemarker con: ( snippet testo + pastemarker ).
+Sagoma on: ['incollare:a:'] fare: { :ritaglio :id
+	>> marcatore-incolla := (['<!-- paste:%id% -->'] %id%: id).
+	mio contenuto sostituirlo: marcatore-incolla con: ( ritaglio testo + marcatore-incolla ).
 }.
 
-Template on: ['valore:impostato:'] fare: { :slot :value
-	mio content sostituirlo: ['<!-- slot:'] + slot + [' -->'] con: ( Server html-codifica: value ).
+Sagoma on: ['valore:impostato:'] fare: { :segnaposto :valore
+	mio contenuto sostituirlo: ['<!-- slot:'] + segnaposto + [' -->'] con: ( Server html-codifica: valore ).
 }.
 
-Template on: ['set:html:'] fare: { :slot :html
-	mio content sostituirlo: ['<!-- slot:'] + slot + [' -->'] con: html.
+Sagoma on: ['valore:html:'] fare: { :segnaposto :html
+	mio contenuto sostituirlo: ['<!-- slot:'] + segnaposto + [' -->'] con: html.
 }.
 
-Template on: ['rispondere:e:'] fare: { :slot :value
-	io valore: (slot da: 0 lunghezza: (slot lunghezza - 1)) impostato: value.
+Sagoma on: ['rispondere:e:'] fare: { :segnaposto :valore
+	io valore: (segnaposto da: 0 lunghezza: (segnaposto lunghezza - 1)) impostato: valore.
 }.
 
-Template on: ['nl2br'] fare: {
-	mio content sostituirlo: ['\n'] con: ['<br>'].
+Sagoma on: ['nl2br'] fare: {
+	mio contenuto sostituirlo: ['\n'] con: ['<br>'].
 }.
 
-Template on: ['clean'] fare: {
-	mio content :=
+Sagoma on: ['pulire'] fare: {
+	mio contenuto :=
 		Modello
 		nuovo: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		corrispondenza: mio content
+		corrispondenza: mio contenuto
 		fai: { <- ['']. }.
 }.
 
-Template on: ['clean-cuts'] fare: {
-	>> items := Serie nuovo.
+Sagoma on: ['pulire-tagli'] fare: {
+	>> elementi := Serie nuovo.
 	Modello
 	nuovo: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	corrispondenza: mio content
-	fai: { :_ :part
-		items aggiungere: part ? 1.
+	corrispondenza: mio contenuto
+	fai: { :_ :parte
+		elementi aggiungere: parte ? 1.
 	}.
-	items ogni: { :_ :id
-		mio content :=
+	elementi ogni: { :_ :id
+		mio contenuto :=
 			Modello nuovo: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			corrispondenza: mio content
+			corrispondenza: mio contenuto
 			fai: { <- ['']. }.
 	 }.
 }.
 
-Template on: ['clean-space'] fare: {
-	mio content :=
+Sagoma on: ['pulire-spazi'] fare: {
+	mio contenuto :=
 		Modello
 		nuovo: ['\\s*\\n'],
-		corrispondenza: mio content
+		corrispondenza: mio contenuto
 		fai: { <- ['\n']. }.
-	mio content :=
+	mio contenuto :=
 		Modello
 		nuovo: ['\\n[\\s\\t]+'],
-		corrispondenza: mio content
+		corrispondenza: mio contenuto
 		fai: { <- ['\n']. }.
 }.
 
-Template on: ['clean-all'] fare: {
-	io clean.
-	io clean-cuts.
-	io clean-space.
+Sagoma on: ['pulire-tutto'] fare: {
+	io pulire.
+	io pulire-tagli.
+	io pulire-spazi.
 }.
 
-Template on: ['testo'] fare: { <- mio content.
+Sagoma on: ['testo'] fare: { <- mio contenuto.
 }.

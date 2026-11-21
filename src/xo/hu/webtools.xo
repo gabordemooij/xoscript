@@ -1,302 +1,302 @@
-HTTP-Kérés ha: ['HTTP-header:'] tedd: { :key <- Program beállítás: key.
+HTTP-Kérés ha: ['HTTP-fejléc:'] tedd: { :kulcs <- Program beállítás: kulcs.
 }.
 
->> HTTP-Header := Objektum új.
+>> HTTP-Fejléc := Objektum új.
 
-HTTP-Header ha: ['új'] tedd: { <- maga új init.
+HTTP-Fejléc ha: ['új'] tedd: { <- maga új inicializál.
 }.
 
-HTTP-Header ha: ['init'] tedd: {
-	saját key := Semmi.
-	saját value := Semmi.
+HTTP-Fejléc ha: ['inicializál'] tedd: {
+	saját kulcs := Semmi.
+	saját érték := Semmi.
 }.
 
-HTTP-Header ha: ['key:value:'] tedd: { :key :value
-	saját key := key.
-	saját value := value.
+HTTP-Fejléc ha: ['kulcs:érték:'] tedd: { :kulcs :érték
+	saját kulcs := kulcs.
+	saját érték := érték.
 }.
 
-HTTP-Header ha: ['key'] tedd: { <- saját key.
+HTTP-Fejléc ha: ['kulcs'] tedd: { <- saját kulcs.
 }.
 
-HTTP-Header ha: ['value'] tedd: { <- saját value.
+HTTP-Fejléc ha: ['érték'] tedd: { <- saját érték.
 }.
 
 
-HTTP-Header ha: ['szöveg'] tedd: {
-	>> line := saját key + [': '] + saját value.
-	line csere: ['\r'] erre: [''], csere: ['\n'] erre: ['']. <- line + [' \r\n'].
+HTTP-Fejléc ha: ['szöveg'] tedd: {
+	>> sor := saját kulcs + [': '] + saját érték.
+	sor csere: ['\r'] erre: [''], csere: ['\n'] erre: ['']. <- sor + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Objektum új.
+>> Webdokumentum := Objektum új.
 
-Web-Document ha: ['új'] tedd: { <- maga új init.
+Webdokumentum ha: ['új'] tedd: { <- maga új inicializál.
 }.
 
-Web-Document ha: ['init'] tedd: {
-	saját headers := Lista új.
-	saját sess-id := Semmi.
-	saját session-manager := Tempfile-Session új.
-	saját sessdata := Semmi.
-	saját secure := Igaz.
-	saját same-site := ['Strict'].
-	saját headers-out := Hamis.
-	saját request := HTTP-Kérés új.
+Webdokumentum ha: ['inicializál'] tedd: {
+	saját fejlécek := Lista új.
+	saját munkamenet-azonosító := Semmi.
+	saját munkamenet-kezelő := Ideiglenes-fájl-munkamenet új.
+	saját munkamenet-adatok := Semmi.
+	saját biztonságos := Igaz.
+	saját azonos-webhely := ['Strict'].
+	saját fejlécek-elküldve := Hamis.
+	saját kérés := HTTP-Kérés új.
 }.
 
-Web-Document ha: ['request:'] tedd: { :request
-	saját request := request.
+Webdokumentum ha: ['kérés:'] tedd: { :kérés
+	saját kérés := kérés.
 }. 
 
-Web-Document ha: ['secure-session-cookie:'] tedd: { :secure
-	maga check-headers.
-	saját secure := secure.
+Webdokumentum ha: ['biztonságos-munkamenet-süti:'] tedd: { :biztonságos
+	maga fejlécek-ellenőrzése.
+	saját biztonságos := biztonságos.
 }.
 
-Web-Document ha: ['same-site-session-cookie:'] tedd: { :value
-	maga check-headers.
-	>> options := Lista új 
+Webdokumentum ha: ['azonos-webhely-munkamenet-süti:'] tedd: { :érték
+	maga fejlécek-ellenőrzése.
+	>> beállítások := Lista új 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options tartalmazza: value, hamis: {
+	beállítások van-benne: érték, hamis: {
 		ez-a-feladat hiba: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	saját same-site := value.
+	saját azonos-webhely := érték.
 }.
 
-Web-Document ha: ['header:'] tedd: { :header
-	maga check-headers.
-	saját headers hozzáfűz: header.
+Webdokumentum ha: ['fejléc:'] tedd: { :fejléc
+	maga fejlécek-ellenőrzése.
+	saját fejlécek hozzáfűz: fejléc.
 }.
 
-Web-Document ha: ['clear-headers'] tedd: {
-	maga check-headers.
-	saját headers := Lista új.
+Webdokumentum ha: ['fejlécek-törlése'] tedd: {
+	maga fejlécek-ellenőrzése.
+	saját fejlécek := Lista új.
 }.
 
-Web-Document ha: ['session-manager:'] tedd: { :manager
-	maga check-headers.
-	saját session-manager := manager.
+Webdokumentum ha: ['munkamenet-kezelő:'] tedd: { :kezelő
+	maga fejlécek-ellenőrzése.
+	saját munkamenet-kezelő := kezelő.
 }.
 
-Web-Document ha: ['session-manager'] tedd: { <- saját session-manager.
+Webdokumentum ha: ['munkamenet-kezelő'] tedd: { <- saját munkamenet-kezelő.
 }.
 
-Web-Document ha: ['check-headers'] tedd: {
-	saját headers-out igaz: {
+Webdokumentum ha: ['fejlécek-ellenőrzése'] tedd: {
+	saját fejlécek-elküldve igaz: {
 		ez-a-feladat hiba: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document ha: ['session-start'] tedd: {
-	maga check-headers.
-	>> request := saját request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Semmi? hamis: {
-		(( Minta új: ['^[A-Za-z0-9]+\\z'], egyezés: sess-id ) = 0) igaz: {
-			sess-id := Semmi.
+Webdokumentum ha: ['munkamenet-indítása'] tedd: {
+	maga fejlécek-ellenőrzése.
+	>> kérés := saját kérés.
+	>> munkamenet-azonosító := kérés cookie: ['xsid'].
+	munkamenet-azonosító Semmi? hamis: {
+		(( Minta új: ['^[A-Za-z0-9]+\\z'], egyezés: munkamenet-azonosító ) = 0) igaz: {
+			munkamenet-azonosító := Semmi.
 		}.
 	}.
-	sess-id Semmi? igaz: {
-		sess-id := Széf token: 30.
-		>> session-header := HTTP-Header új
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (saját secure vagy: ['Secure'] vagy: ['']),
-		SSITE: (saját same-site),
-		XSID: sess-id
+	munkamenet-azonosító Semmi? igaz: {
+		munkamenet-azonosító := Széf token: 30.
+		>> munkamenet-fejléc := HTTP-Fejléc új
+		kulcs: ['Set-Cookie'] érték: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (saját biztonságos vagy: ['Secure'] vagy: ['']),
+		SSITE: (saját azonos-webhely),
+		XSID: munkamenet-azonosító
 		).
-		saját headers hozzáfűz: session-header.
+		saját fejlécek hozzáfűz: munkamenet-fejléc.
 	}.
-	saját sessdata := saját session-manager for: sess-id, load. <- saját sessdata. # reference
+	saját munkamenet-adatok := saját munkamenet-kezelő számára: munkamenet-azonosító, betölt. <- saját munkamenet-adatok. # reference
 }.
 
-Web-Document ha: ['goto:'] tedd: { :url
-	maga check-headers.
-	maga clear-headers.
-	saját headers
+Webdokumentum ha: ['ugrás:'] tedd: { :cím
+	maga fejlécek-ellenőrzése.
+	maga fejlécek-törlése.
+	saját fejlécek
 	hozzáfűz: (
-		HTTP-Header új
-		key: ['Status'] value: ['303 See Other']
+		HTTP-Fejléc új
+		kulcs: ['Status'] érték: ['303 See Other']
 	),
 	hozzáfűz: (
-		HTTP-Header új
-		key: ['Location'] value: url
+		HTTP-Fejléc új
+		kulcs: ['Location'] érték: cím
 	).
-	maga out: ['Redirect'].
+	maga kiír: ['Redirect'].
 }.
 
-Web-Document ha: ['session-destroy'] tedd: {
-	maga check-headers.
-	>> request := saját request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Semmi? hamis: {
-		>> session-header := HTTP-Header új.
-		>> when := Pillanat új év: 1970, formátum: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Webdokumentum ha: ['munkamenet-megszüntetése'] tedd: {
+	maga fejlécek-ellenőrzése.
+	>> kérés := saját kérés.
+	>> munkamenet-azonosító := kérés cookie: ['xsid'].
+	munkamenet-azonosító Semmi? hamis: {
+		>> munkamenet-fejléc := HTTP-Fejléc új.
+		>> időpont := Pillanat új év: 1970, formátum: ['%a, %d %b %Y %H:%M:%S GMT'].
+		munkamenet-fejléc kulcs: ['Set-Cookie'] érték: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (saját secure vagy: ['Secure'] vagy: ['']),
-			SSITE: (saját same-site),
-			XSID: sess-id
+			EXP: időpont,
+			SEC: (saját biztonságos vagy: ['Secure'] vagy: ['']),
+			SSITE: (saját azonos-webhely),
+			XSID: munkamenet-azonosító
 		).
-		saját session-manager destroy.
-		saját headers hozzáfűz: session-header.
+		saját munkamenet-kezelő megsemmisít.
+		saját fejlécek hozzáfűz: munkamenet-fejléc.
 	}.
 }.
 
 
-Web-Document ha: ['template:'] tedd: { :útvonal <- Template új: (Fájl új: útvonal, olvas).
+Webdokumentum ha: ['sablon:'] tedd: { :útvonal <- Sablon új: (Fájl új: útvonal, olvas).
 }.
 
-Web-Document ha: ['out:type:'] tedd: { :output :típus
-	saját headers-out hamis: {
-		saját sessdata Semmi? hamis: {
-			saját session-manager save: saját sessdata.
+Webdokumentum ha: ['kiír:típus:'] tedd: { :kimenet :típus
+	saját fejlécek-elküldve hamis: {
+		saját munkamenet-adatok Semmi? hamis: {
+			saját munkamenet-kezelő ment: saját munkamenet-adatok.
 		}.
-		saját headers hozzáfűz: (
-			HTTP-Header új
-			key: ['Content-type'] value: típus
+		saját fejlécek hozzáfűz: (
+			HTTP-Fejléc új
+			kulcs: ['Content-type'] érték: típus
 		).
-		saját headers mindegyik: { :_ :header
-			Kimenet ír: header.
+		saját fejlécek mindegyik: { :_ :fejléc
+			Kimenet ír: fejléc.
 		}.
-		saját headers-out := Igaz.
+		saját fejlécek-elküldve := Igaz.
 		Kimenet ír: ['\r\n'].
 	}.
-	Kimenet ír: output.
+	Kimenet ír: kimenet.
 }.
 
-Web-Document ha: ['finish:type:'] tedd: { :output :típus
-	saját headers-out hamis: {
-		saját sessdata Semmi? hamis: {
-			saját session-manager save: saját sessdata.
+Webdokumentum ha: ['befejez:típus:'] tedd: { :kimenet :típus
+	saját fejlécek-elküldve hamis: {
+		saját munkamenet-adatok Semmi? hamis: {
+			saját munkamenet-kezelő ment: saját munkamenet-adatok.
 		}.
-		saját headers hozzáfűz: (
-			HTTP-Header új
-			key: ['Content-type'] value: típus
+		saját fejlécek hozzáfűz: (
+			HTTP-Fejléc új
+			kulcs: ['Content-type'] érték: típus
 		).
-		saját headers hozzáfűz: (
-			HTTP-Header új
-			key: ['Content-Length'] value: output szöveg bytes
+		saját fejlécek hozzáfűz: (
+			HTTP-Fejléc új
+			kulcs: ['Content-Length'] érték: kimenet szöveg bytes
 		).
-		saját headers mindegyik: { :_ :header
-			Kimenet ír: header.
+		saját fejlécek mindegyik: { :_ :fejléc
+			Kimenet ír: fejléc.
 		}.
-		saját headers-out := Igaz.
+		saját fejlécek-elküldve := Igaz.
 		Kimenet ír: ['\r\n'].
 	}.
-	Kimenet ír: output.
+	Kimenet ír: kimenet.
 }.
 
-Web-Document ha: ['out:'] tedd: { :output
-	maga out: output type: ['text/html; charset=utf-8'].
+Webdokumentum ha: ['kiír:'] tedd: { :kimenet
+	maga kiír: kimenet típus: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ha: ['finish:'] tedd: { :output
-	maga finish: output type: ['text/html; charset=utf-8'].
+Webdokumentum ha: ['befejez:'] tedd: { :kimenet
+	maga befejez: kimenet típus: ['text/html; charset=utf-8'].
 }.
 
-Web-Document ha: ['json:'] tedd: { :output
-	maga out: ( JSON jsonify: output ) type: ['application/json'].
+Webdokumentum ha: ['json:'] tedd: { :kimenet
+	maga kiír: ( JSON jsonify: kimenet ) típus: ['application/json'].
 }.
 
-Web-Document ha: ['not-found:'] tedd: { :output
-	maga clear-headers header: (
-		HTTP-Header új key: ['Status'] value: ['404 Not Found']
+Webdokumentum ha: ['nem-található:'] tedd: { :kimenet
+	maga fejlécek-törlése fejléc: (
+		HTTP-Fejléc új kulcs: ['Status'] érték: ['404 Not Found']
 	).
-	maga out: output.
+	maga kiír: kimenet.
 }.
 
 
 # Interface
 
->> Session := Objektum új.
+>> Munkamenet := Objektum új.
 
-Session ha: ['új'] tedd: { <- maga új init for: Semmi.
+Munkamenet ha: ['új'] tedd: { <- maga új inicializál számára: Semmi.
 }.
 
-Session ha: ['for:'] tedd: { :id
+Munkamenet ha: ['számára:'] tedd: { :id
 	saját id := id.
 }.
 
-Session ha: ['load'] tedd: {
+Munkamenet ha: ['betölt'] tedd: {
 	ez-a-feladat hiba: ['Not implemented.'].
 }.
 
-Session ha: ['save:'] tedd: {
+Munkamenet ha: ['ment:'] tedd: {
 	ez-a-feladat hiba: ['Not implemented.'].
 }.
 
-Session ha: ['destroy'] tedd: {
+Munkamenet ha: ['megsemmisít'] tedd: {
 	ez-a-feladat hiba: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session új.
+>> Ideiglenes-fájl-munkamenet := Munkamenet új.
 
-Tempfile-Session ha: ['init'] tedd: {
-	saját pathprefix := ['/tmp/sess-'].
+Ideiglenes-fájl-munkamenet ha: ['inicializál'] tedd: {
+	saját útvonal-eleje := ['/tmp/sess-'].
 }.
 
-Tempfile-Session ha: ['path-prefix:'] tedd: { :str
-	saját pathprefix := str.
+Ideiglenes-fájl-munkamenet ha: ['útvonal-előtag:'] tedd: { :karakterlánc
+	saját útvonal-eleje := karakterlánc.
 }.
 
-Tempfile-Session ha: ['file'] tedd: { <- ( Fájl új: ( saját pathprefix + saját id + ['.txt'] ) ).
+Ideiglenes-fájl-munkamenet ha: ['fájl'] tedd: { <- ( Fájl új: ( saját útvonal-eleje + saját id + ['.txt'] ) ).
 }.
 
-Tempfile-Session ha: ['load'] tedd: {
-	>> file := maga file.
-	file létezik hamis: {
-		file ír: (Szótár új kód).
-	}. <- file olvas objektum.
+Ideiglenes-fájl-munkamenet ha: ['betölt'] tedd: {
+	>> fájl := maga fájl.
+	fájl létezik hamis: {
+		fájl ír: (Szótár új kód).
+	}. <- fájl olvas objektum.
 }.
 
-Tempfile-Session ha: ['save:'] tedd: { :data
-	>> file := maga file.
-	file létezik igaz: {
-		file ír: data kód.
+Ideiglenes-fájl-munkamenet ha: ['ment:'] tedd: { :adatok
+	>> fájl := maga fájl.
+	fájl létezik igaz: {
+		fájl ír: adatok kód.
 	}.
 }.
 
-Tempfile-Session ha: ['destroy'] tedd: {
-	>> file := maga file.
-	file létezik igaz: {
-		file töröl.
+Ideiglenes-fájl-munkamenet ha: ['megsemmisít'] tedd: {
+	>> fájl := maga fájl.
+	fájl létezik igaz: {
+		fájl töröl.
 	}.
 }.
 
 
 >> URL := Objektum új.
 
-URL ha: ['init'] tedd: {
-	saját protocol := ['https://'].
+URL ha: ['inicializál'] tedd: {
+	saját protokoll := ['https://'].
 	saját gazdagép := ['localhost'].
 	saját útvonal := [''].
-	saját params := [''].
+	saját url-paraméterek := [''].
 	saját hash := [''].
 }.
 
-URL ha: ['új'] tedd: { <- maga új init.
+URL ha: ['új'] tedd: { <- maga új inicializál.
 }.
 
 URL ha: ['szöveg'] tedd: { <- (
-	saját protocol +
+	saját protokoll +
 	saját gazdagép +
 	saját útvonal +
-	saját params +
+	saját url-paraméterek +
 	saját hash ).
 }.
 
-URL ha: ['protocol:'] tedd: { :protocol
-	((Lista új: ['http'] ; ['https']) tartalmazza: protocol) igaz: {
-		saját protocol := protocol + ['://'].
+URL ha: ['protokoll:'] tedd: { :protokoll
+	((Lista új ; ['http'] ; ['https']) van-benne: protokoll) igaz: {
+		saját protokoll := protokoll + ['://'].
 	}, hamis: {
 		ez-a-feladat hiba: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL ha: ['gazdagép:'] tedd: { :gazdagép
 	saját gazdagép := gazdagép.
 }.
 
-URL ha: ['path:'] tedd: { :útvonal
+URL ha: ['útvonal:'] tedd: { :útvonal
 	saját útvonal := ['/'] + útvonal url-kódolás.
 }.
 
-URL ha: ['params:'] tedd: { :map
-	>> params := Lista új.
-	map mindegyik: { :key :value
-		params hozzáfűz: key szöveg url-kódolás + ['='] + value szöveg url-kódolás.
+URL ha: ['url-paraméterek:'] tedd: { :leképezés
+	>> url-paraméterek := Lista új.
+	leképezés mindegyik: { :kulcs :érték
+		url-paraméterek hozzáfűz: kulcs szöveg url-kódolás + ['='] + érték szöveg url-kódolás.
 	}.
-	saját params := ['?'] + ( params összefűz: ['&'] ).
+	saját url-paraméterek := ['?'] + ( url-paraméterek összefűz: ['&'] ).
 }.
 
 URL ha: ['hasít:'] tedd: { :hash

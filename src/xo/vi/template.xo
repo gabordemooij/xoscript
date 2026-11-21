@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Đối-tượng mới.
+>> Mẫu-trang := Đối-tượng mới.
 
-Template khi: ['mới'] làm: { <- bản-thân mới content: [''].
+Mẫu-trang khi: ['mới'] làm: { <- bản-thân mới nội-dung: [''].
 }.
 
-Template khi: ['content:'] làm: { :content
-	riêng content := content. 
+Mẫu-trang khi: ['nội-dung:'] làm: { :nội-dung
+	riêng nội-dung := nội-dung. 
 }.
 
-Template khi: ['mới:'] làm: { :content <- bản-thân mới content: content.
+Mẫu-trang khi: ['mới:'] làm: { :nội-dung <- bản-thân mới nội-dung: nội-dung.
 }.
 
-Template khi: ['cut:'] làm: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := riêng content tách: startmarker.
-	>> prefix := parts đầu.
-	>> parts2 := parts cuối tách: endmarker.
-	>> suffix := parts2 cuối.
-	>> part := parts2 đầu.
-	>> rest := prefix + suffix.
-	riêng content := rest. <- Template mới: part.
+Mẫu-trang khi: ['cắt:'] làm: { :dấu
+	>> dấu-bắt-đầu := (['<!-- cut:%id% -->'] %id%: dấu).
+	>> dấu-kết-thúc := (['<!-- /cut:%id% -->'] %id%: dấu).
+	>> các-phần := riêng nội-dung tách: dấu-bắt-đầu.
+	>> tiền-tố := các-phần đầu.
+	>> các-phần2 := các-phần cuối tách: dấu-kết-thúc.
+	>> hậu-tố := các-phần2 cuối.
+	>> phần := các-phần2 đầu.
+	>> phần-còn-lại := tiền-tố + hậu-tố.
+	riêng nội-dung := phần-còn-lại. <- Mẫu-trang mới: phần.
 	
 }.
 
-Template khi: ['sao-chép'] làm: { <- bản-thân mới: bản-thân chuỗi sao-chép.
+Mẫu-trang khi: ['sao-chép'] làm: { <- bản-thân mới: bản-thân chuỗi sao-chép.
 }.
 	
-Template khi: ['paste:at:'] làm: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	riêng content thay: pastemarker bằng: ( snippet chuỗi + pastemarker ).
+Mẫu-trang khi: ['dán:tại:'] làm: { :trích-đoạn :id
+	>> dấu-dán := (['<!-- paste:%id% -->'] %id%: id).
+	riêng nội-dung thay: dấu-dán bằng: ( trích-đoạn chuỗi + dấu-dán ).
 }.
 
-Template khi: ['đặt:giá-trị:'] làm: { :slot :value
-	riêng content thay: ['<!-- slot:'] + slot + [' -->'] bằng: ( Server html-mã-hóa: value ).
+Mẫu-trang khi: ['đặt:giá-trị:'] làm: { :khe :giá-trị
+	riêng nội-dung thay: ['<!-- slot:'] + khe + [' -->'] bằng: ( Server html-mã-hóa: giá-trị ).
 }.
 
-Template khi: ['set:html:'] làm: { :slot :html
-	riêng content thay: ['<!-- slot:'] + slot + [' -->'] bằng: html.
+Mẫu-trang khi: ['đặt:html:'] làm: { :khe :html
+	riêng nội-dung thay: ['<!-- slot:'] + khe + [' -->'] bằng: html.
 }.
 
-Template khi: ['đáp:và:'] làm: { :slot :value
-	bản-thân đặt: (slot từ: 0 độ-dài: (slot độ-dài - 1)) giá-trị: value.
+Mẫu-trang khi: ['đáp:và:'] làm: { :khe :giá-trị
+	bản-thân đặt: (khe từ: 0 độ-dài: (khe độ-dài - 1)) giá-trị: giá-trị.
 }.
 
-Template khi: ['nl2br'] làm: {
-	riêng content thay: ['\n'] bằng: ['<br>'].
+Mẫu-trang khi: ['nl2br'] làm: {
+	riêng nội-dung thay: ['\n'] bằng: ['<br>'].
 }.
 
-Template khi: ['clean'] làm: {
-	riêng content :=
+Mẫu-trang khi: ['tinh-chỉnh'] làm: {
+	riêng nội-dung :=
 		Mẫu
 		mới: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		khớp: riêng content
+		khớp: riêng nội-dung
 		làm: { <- ['']. }.
 }.
 
-Template khi: ['clean-cuts'] làm: {
-	>> items := Danh-sách mới.
+Mẫu-trang khi: ['tinh-chỉnh-đoạn-cắt'] làm: {
+	>> các-mục := Danh-sách mới.
 	Mẫu
 	mới: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	khớp: riêng content
-	làm: { :_ :part
-		items thêm-cuối: part ? 1.
+	khớp: riêng nội-dung
+	làm: { :_ :phần
+		các-mục thêm-cuối: phần ? 1.
 	}.
-	items mỗi: { :_ :id
-		riêng content :=
+	các-mục mỗi: { :_ :id
+		riêng nội-dung :=
 			Mẫu mới: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			khớp: riêng content
+			khớp: riêng nội-dung
 			làm: { <- ['']. }.
 	 }.
 }.
 
-Template khi: ['clean-space'] làm: {
-	riêng content :=
+Mẫu-trang khi: ['tinh-chỉnh-khoảng-trắng'] làm: {
+	riêng nội-dung :=
 		Mẫu
 		mới: ['\\s*\\n'],
-		khớp: riêng content
+		khớp: riêng nội-dung
 		làm: { <- ['\n']. }.
-	riêng content :=
+	riêng nội-dung :=
 		Mẫu
 		mới: ['\\n[\\s\\t]+'],
-		khớp: riêng content
+		khớp: riêng nội-dung
 		làm: { <- ['\n']. }.
 }.
 
-Template khi: ['clean-all'] làm: {
-	bản-thân clean.
-	bản-thân clean-cuts.
-	bản-thân clean-space.
+Mẫu-trang khi: ['tinh-chỉnh-tất-cả'] làm: {
+	bản-thân tinh-chỉnh.
+	bản-thân tinh-chỉnh-đoạn-cắt.
+	bản-thân tinh-chỉnh-khoảng-trắng.
 }.
 
-Template khi: ['chuỗi'] làm: { <- riêng content.
+Mẫu-trang khi: ['chuỗi'] làm: { <- riêng nội-dung.
 }.

@@ -1,302 +1,302 @@
-Yêu-cầu-HTTP khi: ['HTTP-header:'] làm: { :key <- Chương-trình thiết-lập: key.
+Yêu-cầu-HTTP khi: ['HTTP-tiêu-đề:'] làm: { :khóa-tiêu-đề <- Chương-trình thiết-lập: khóa-tiêu-đề.
 }.
 
->> HTTP-Header := Đối-tượng mới.
+>> Tiêu-đề-HTTP := Đối-tượng mới.
 
-HTTP-Header khi: ['mới'] làm: { <- bản-thân mới init.
+Tiêu-đề-HTTP khi: ['mới'] làm: { <- bản-thân mới khởi-tạo.
 }.
 
-HTTP-Header khi: ['init'] làm: {
-	riêng key := Rỗng.
-	riêng value := Rỗng.
+Tiêu-đề-HTTP khi: ['khởi-tạo'] làm: {
+	riêng khóa-tiêu-đề := Rỗng.
+	riêng giá-trị := Rỗng.
 }.
 
-HTTP-Header khi: ['key:value:'] làm: { :key :value
-	riêng key := key.
-	riêng value := value.
+Tiêu-đề-HTTP khi: ['khóa-tiêu-đề:giá-trị:'] làm: { :khóa-tiêu-đề :giá-trị
+	riêng khóa-tiêu-đề := khóa-tiêu-đề.
+	riêng giá-trị := giá-trị.
 }.
 
-HTTP-Header khi: ['key'] làm: { <- riêng key.
+Tiêu-đề-HTTP khi: ['khóa-tiêu-đề'] làm: { <- riêng khóa-tiêu-đề.
 }.
 
-HTTP-Header khi: ['value'] làm: { <- riêng value.
+Tiêu-đề-HTTP khi: ['giá-trị'] làm: { <- riêng giá-trị.
 }.
 
 
-HTTP-Header khi: ['chuỗi'] làm: {
-	>> line := riêng key + [': '] + riêng value.
-	line thay: ['\r'] bằng: [''], thay: ['\n'] bằng: ['']. <- line + [' \r\n'].
+Tiêu-đề-HTTP khi: ['chuỗi'] làm: {
+	>> dòng := riêng khóa-tiêu-đề + [': '] + riêng giá-trị.
+	dòng thay: ['\r'] bằng: [''], thay: ['\n'] bằng: ['']. <- dòng + [' \r\n'].
 }.
 
 # Web document, ties together headers, HTML and session
 
->> Web-Document := Đối-tượng mới.
+>> Tài-liệu-Web := Đối-tượng mới.
 
-Web-Document khi: ['mới'] làm: { <- bản-thân mới init.
+Tài-liệu-Web khi: ['mới'] làm: { <- bản-thân mới khởi-tạo.
 }.
 
-Web-Document khi: ['init'] làm: {
-	riêng headers := Danh-sách mới.
-	riêng sess-id := Rỗng.
-	riêng session-manager := Tempfile-Session mới.
-	riêng sessdata := Rỗng.
-	riêng secure := Đúng.
-	riêng same-site := ['Strict'].
-	riêng headers-out := Sai.
-	riêng request := Yêu-cầu-HTTP mới.
+Tài-liệu-Web khi: ['khởi-tạo'] làm: {
+	riêng các-tiêu-đề := Danh-sách mới.
+	riêng mã-phiên := Rỗng.
+	riêng trình-quản-lý-phiên := Phiên-tệp-tạm mới.
+	riêng dữ-liệu-phiên := Rỗng.
+	riêng an-toàn := Đúng.
+	riêng cùng-trang := ['Strict'].
+	riêng đã-gửi-tiêu-đề := Sai.
+	riêng yêu-cầu-http := Yêu-cầu-HTTP mới.
 }.
 
-Web-Document khi: ['request:'] làm: { :request
-	riêng request := request.
+Tài-liệu-Web khi: ['yêu-cầu-http:'] làm: { :yêu-cầu-http
+	riêng yêu-cầu-http := yêu-cầu-http.
 }. 
 
-Web-Document khi: ['secure-session-cookie:'] làm: { :secure
-	bản-thân check-headers.
-	riêng secure := secure.
+Tài-liệu-Web khi: ['cookie-phiên-an-toàn:'] làm: { :an-toàn
+	bản-thân kiểm-tra-tiêu-đề.
+	riêng an-toàn := an-toàn.
 }.
 
-Web-Document khi: ['same-site-session-cookie:'] làm: { :value
-	bản-thân check-headers.
-	>> options := Danh-sách mới 
+Tài-liệu-Web khi: ['cookie-phiên-cùng-trang:'] làm: { :giá-trị
+	bản-thân kiểm-tra-tiêu-đề.
+	>> tùy-chọn := Danh-sách mới 
 		~ ['Strict']
 		~ ['Lax']
 		~ ['None'].
 	
-	options chứa: value, sai: {
+	tùy-chọn có: giá-trị, sai: {
 		tác-vụ-này lỗi: ['Invalid same-site-session-cookie value (Choose between Strict, Lax or None).'].
 	}.
 
-	riêng same-site := value.
+	riêng cùng-trang := giá-trị.
 }.
 
-Web-Document khi: ['header:'] làm: { :header
-	bản-thân check-headers.
-	riêng headers thêm-cuối: header.
+Tài-liệu-Web khi: ['tiêu-đề:'] làm: { :tiêu-đề
+	bản-thân kiểm-tra-tiêu-đề.
+	riêng các-tiêu-đề thêm-cuối: tiêu-đề.
 }.
 
-Web-Document khi: ['clear-headers'] làm: {
-	bản-thân check-headers.
-	riêng headers := Danh-sách mới.
+Tài-liệu-Web khi: ['xóa-tiêu-đề'] làm: {
+	bản-thân kiểm-tra-tiêu-đề.
+	riêng các-tiêu-đề := Danh-sách mới.
 }.
 
-Web-Document khi: ['session-manager:'] làm: { :manager
-	bản-thân check-headers.
-	riêng session-manager := manager.
+Tài-liệu-Web khi: ['trình-quản-lý-phiên:'] làm: { :trình-quản-lý
+	bản-thân kiểm-tra-tiêu-đề.
+	riêng trình-quản-lý-phiên := trình-quản-lý.
 }.
 
-Web-Document khi: ['session-manager'] làm: { <- riêng session-manager.
+Tài-liệu-Web khi: ['trình-quản-lý-phiên'] làm: { <- riêng trình-quản-lý-phiên.
 }.
 
-Web-Document khi: ['check-headers'] làm: {
-	riêng headers-out đúng: {
+Tài-liệu-Web khi: ['kiểm-tra-tiêu-đề'] làm: {
+	riêng đã-gửi-tiêu-đề đúng: {
 		tác-vụ-này lỗi: ['Headers already sent to client.'].
 	}.
 }.
 
-Web-Document khi: ['session-start'] làm: {
-	bản-thân check-headers.
-	>> request := riêng request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Rỗng? sai: {
-		(( Mẫu mới: ['^[A-Za-z0-9]+\\z'], khớp: sess-id ) = 0) đúng: {
-			sess-id := Rỗng.
+Tài-liệu-Web khi: ['bắt-đầu-phiên'] làm: {
+	bản-thân kiểm-tra-tiêu-đề.
+	>> yêu-cầu-http := riêng yêu-cầu-http.
+	>> mã-phiên := yêu-cầu-http cookie: ['xsid'].
+	mã-phiên Rỗng? sai: {
+		(( Mẫu mới: ['^[A-Za-z0-9]+\\z'], khớp: mã-phiên ) = 0) đúng: {
+			mã-phiên := Rỗng.
 		}.
 	}.
-	sess-id Rỗng? đúng: {
-		sess-id := Két mã-thông-báo: 30.
-		>> session-header := HTTP-Header mới
-		key: ['Set-Cookie'] value: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
-		SEC: (riêng secure hoặc-là: ['Secure'] hay: ['']),
-		SSITE: (riêng same-site),
-		XSID: sess-id
+	mã-phiên Rỗng? đúng: {
+		mã-phiên := Két mã-thông-báo: 30.
+		>> tiêu-đề-phiên := Tiêu-đề-HTTP mới
+		khóa-tiêu-đề: ['Set-Cookie'] giá-trị: ( ['xsid=XSID; Path=/; SEC; SameSite=SSITE; HttpOnly'] 
+		SEC: (riêng an-toàn hoặc-là: ['Secure'] hay: ['']),
+		SSITE: (riêng cùng-trang),
+		XSID: mã-phiên
 		).
-		riêng headers thêm-cuối: session-header.
+		riêng các-tiêu-đề thêm-cuối: tiêu-đề-phiên.
 	}.
-	riêng sessdata := riêng session-manager for: sess-id, load. <- riêng sessdata. # reference
+	riêng dữ-liệu-phiên := riêng trình-quản-lý-phiên cho: mã-phiên, tải. <- riêng dữ-liệu-phiên. # reference
 }.
 
-Web-Document khi: ['goto:'] làm: { :url
-	bản-thân check-headers.
-	bản-thân clear-headers.
-	riêng headers
+Tài-liệu-Web khi: ['đi-đến:'] làm: { :địa-chỉ
+	bản-thân kiểm-tra-tiêu-đề.
+	bản-thân xóa-tiêu-đề.
+	riêng các-tiêu-đề
 	thêm-cuối: (
-		HTTP-Header mới
-		key: ['Status'] value: ['303 See Other']
+		Tiêu-đề-HTTP mới
+		khóa-tiêu-đề: ['Status'] giá-trị: ['303 See Other']
 	),
 	thêm-cuối: (
-		HTTP-Header mới
-		key: ['Location'] value: url
+		Tiêu-đề-HTTP mới
+		khóa-tiêu-đề: ['Location'] giá-trị: địa-chỉ
 	).
-	bản-thân out: ['Redirect'].
+	bản-thân xuất: ['Redirect'].
 }.
 
-Web-Document khi: ['session-destroy'] làm: {
-	bản-thân check-headers.
-	>> request := riêng request.
-	>> sess-id := request cookie: ['xsid'].
-	sess-id Rỗng? sai: {
-		>> session-header := HTTP-Header mới.
-		>> when := Thời-điểm mới năm: 1970, định-dạng: ['%a, %d %b %Y %H:%M:%S GMT'].
-		session-header key: ['Set-Cookie'] value: ( 
+Tài-liệu-Web khi: ['hủy-phiên'] làm: {
+	bản-thân kiểm-tra-tiêu-đề.
+	>> yêu-cầu-http := riêng yêu-cầu-http.
+	>> mã-phiên := yêu-cầu-http cookie: ['xsid'].
+	mã-phiên Rỗng? sai: {
+		>> tiêu-đề-phiên := Tiêu-đề-HTTP mới.
+		>> thời-điểm := Thời-điểm mới năm: 1970, định-dạng: ['%a, %d %b %Y %H:%M:%S GMT'].
+		tiêu-đề-phiên khóa-tiêu-đề: ['Set-Cookie'] giá-trị: ( 
 			['xsid=XSID; Path=/; Expires=EXP; SEC; SameSite=SSITE; HttpOnly']
-			EXP: when,
-			SEC: (riêng secure hoặc-là: ['Secure'] hay: ['']),
-			SSITE: (riêng same-site),
-			XSID: sess-id
+			EXP: thời-điểm,
+			SEC: (riêng an-toàn hoặc-là: ['Secure'] hay: ['']),
+			SSITE: (riêng cùng-trang),
+			XSID: mã-phiên
 		).
-		riêng session-manager destroy.
-		riêng headers thêm-cuối: session-header.
+		riêng trình-quản-lý-phiên hủy.
+		riêng các-tiêu-đề thêm-cuối: tiêu-đề-phiên.
 	}.
 }.
 
 
-Web-Document khi: ['template:'] làm: { :đường-dẫn <- Template mới: (Tệp mới: đường-dẫn, đọc).
+Tài-liệu-Web khi: ['mẫu-trang:'] làm: { :đường-dẫn <- Mẫu-trang mới: (Tệp mới: đường-dẫn, đọc).
 }.
 
-Web-Document khi: ['out:type:'] làm: { :output :kiểu
-	riêng headers-out sai: {
-		riêng sessdata Rỗng? sai: {
-			riêng session-manager save: riêng sessdata.
+Tài-liệu-Web khi: ['xuất:kiểu:'] làm: { :kết-quả :kiểu
+	riêng đã-gửi-tiêu-đề sai: {
+		riêng dữ-liệu-phiên Rỗng? sai: {
+			riêng trình-quản-lý-phiên lưu: riêng dữ-liệu-phiên.
 		}.
-		riêng headers thêm-cuối: (
-			HTTP-Header mới
-			key: ['Content-type'] value: kiểu
+		riêng các-tiêu-đề thêm-cuối: (
+			Tiêu-đề-HTTP mới
+			khóa-tiêu-đề: ['Content-type'] giá-trị: kiểu
 		).
-		riêng headers mỗi: { :_ :header
-			Xuất ghi: header.
+		riêng các-tiêu-đề mỗi: { :_ :tiêu-đề
+			Xuất ghi: tiêu-đề.
 		}.
-		riêng headers-out := Đúng.
+		riêng đã-gửi-tiêu-đề := Đúng.
 		Xuất ghi: ['\r\n'].
 	}.
-	Xuất ghi: output.
+	Xuất ghi: kết-quả.
 }.
 
-Web-Document khi: ['finish:type:'] làm: { :output :kiểu
-	riêng headers-out sai: {
-		riêng sessdata Rỗng? sai: {
-			riêng session-manager save: riêng sessdata.
+Tài-liệu-Web khi: ['hoàn-tất:kiểu:'] làm: { :kết-quả :kiểu
+	riêng đã-gửi-tiêu-đề sai: {
+		riêng dữ-liệu-phiên Rỗng? sai: {
+			riêng trình-quản-lý-phiên lưu: riêng dữ-liệu-phiên.
 		}.
-		riêng headers thêm-cuối: (
-			HTTP-Header mới
-			key: ['Content-type'] value: kiểu
+		riêng các-tiêu-đề thêm-cuối: (
+			Tiêu-đề-HTTP mới
+			khóa-tiêu-đề: ['Content-type'] giá-trị: kiểu
 		).
-		riêng headers thêm-cuối: (
-			HTTP-Header mới
-			key: ['Content-Length'] value: output chuỗi bytes
+		riêng các-tiêu-đề thêm-cuối: (
+			Tiêu-đề-HTTP mới
+			khóa-tiêu-đề: ['Content-Length'] giá-trị: kết-quả chuỗi bytes
 		).
-		riêng headers mỗi: { :_ :header
-			Xuất ghi: header.
+		riêng các-tiêu-đề mỗi: { :_ :tiêu-đề
+			Xuất ghi: tiêu-đề.
 		}.
-		riêng headers-out := Đúng.
+		riêng đã-gửi-tiêu-đề := Đúng.
 		Xuất ghi: ['\r\n'].
 	}.
-	Xuất ghi: output.
+	Xuất ghi: kết-quả.
 }.
 
-Web-Document khi: ['out:'] làm: { :output
-	bản-thân out: output type: ['text/html; charset=utf-8'].
+Tài-liệu-Web khi: ['xuất:'] làm: { :kết-quả
+	bản-thân xuất: kết-quả kiểu: ['text/html; charset=utf-8'].
 }.
 
-Web-Document khi: ['finish:'] làm: { :output
-	bản-thân finish: output type: ['text/html; charset=utf-8'].
+Tài-liệu-Web khi: ['hoàn-tất:'] làm: { :kết-quả
+	bản-thân hoàn-tất: kết-quả kiểu: ['text/html; charset=utf-8'].
 }.
 
-Web-Document khi: ['json:'] làm: { :output
-	bản-thân out: ( JSON jsonify: output ) type: ['application/json'].
+Tài-liệu-Web khi: ['json:'] làm: { :kết-quả
+	bản-thân xuất: ( JSON jsonify: kết-quả ) kiểu: ['application/json'].
 }.
 
-Web-Document khi: ['not-found:'] làm: { :output
-	bản-thân clear-headers header: (
-		HTTP-Header mới key: ['Status'] value: ['404 Not Found']
+Tài-liệu-Web khi: ['không-tìm-thấy:'] làm: { :kết-quả
+	bản-thân xóa-tiêu-đề tiêu-đề: (
+		Tiêu-đề-HTTP mới khóa-tiêu-đề: ['Status'] giá-trị: ['404 Not Found']
 	).
-	bản-thân out: output.
+	bản-thân xuất: kết-quả.
 }.
 
 
 # Interface
 
->> Session := Đối-tượng mới.
+>> Phiên := Đối-tượng mới.
 
-Session khi: ['mới'] làm: { <- bản-thân mới init for: Rỗng.
+Phiên khi: ['mới'] làm: { <- bản-thân mới khởi-tạo cho: Rỗng.
 }.
 
-Session khi: ['for:'] làm: { :id
+Phiên khi: ['cho:'] làm: { :id
 	riêng id := id.
 }.
 
-Session khi: ['load'] làm: {
+Phiên khi: ['tải'] làm: {
 	tác-vụ-này lỗi: ['Not implemented.'].
 }.
 
-Session khi: ['save:'] làm: {
+Phiên khi: ['lưu:'] làm: {
 	tác-vụ-này lỗi: ['Not implemented.'].
 }.
 
-Session khi: ['destroy'] làm: {
+Phiên khi: ['hủy'] làm: {
 	tác-vụ-này lỗi: ['Not implemented.'].
 }.
 
 # Default Session implementation, uses tempfile
 
->> Tempfile-Session := Session mới.
+>> Phiên-tệp-tạm := Phiên mới.
 
-Tempfile-Session khi: ['init'] làm: {
-	riêng pathprefix := ['/tmp/sess-'].
+Phiên-tệp-tạm khi: ['khởi-tạo'] làm: {
+	riêng đầu-đường-dẫn := ['/tmp/sess-'].
 }.
 
-Tempfile-Session khi: ['path-prefix:'] làm: { :str
-	riêng pathprefix := str.
+Phiên-tệp-tạm khi: ['tiền-tố-đường-dẫn:'] làm: { :chuỗi-văn-bản
+	riêng đầu-đường-dẫn := chuỗi-văn-bản.
 }.
 
-Tempfile-Session khi: ['file'] làm: { <- ( Tệp mới: ( riêng pathprefix + riêng id + ['.txt'] ) ).
+Phiên-tệp-tạm khi: ['tệp-phiên'] làm: { <- ( Tệp mới: ( riêng đầu-đường-dẫn + riêng id + ['.txt'] ) ).
 }.
 
-Tempfile-Session khi: ['load'] làm: {
-	>> file := bản-thân file.
-	file tồn-tại sai: {
-		file ghi: (Từ-điển mới mã).
-	}. <- file đọc đối-tượng.
+Phiên-tệp-tạm khi: ['tải'] làm: {
+	>> tệp-phiên := bản-thân tệp-phiên.
+	tệp-phiên tồn-tại sai: {
+		tệp-phiên ghi: (Từ-điển mới mã).
+	}. <- tệp-phiên đọc đối-tượng.
 }.
 
-Tempfile-Session khi: ['save:'] làm: { :data
-	>> file := bản-thân file.
-	file tồn-tại đúng: {
-		file ghi: data mã.
+Phiên-tệp-tạm khi: ['lưu:'] làm: { :dữ-liệu
+	>> tệp-phiên := bản-thân tệp-phiên.
+	tệp-phiên tồn-tại đúng: {
+		tệp-phiên ghi: dữ-liệu mã.
 	}.
 }.
 
-Tempfile-Session khi: ['destroy'] làm: {
-	>> file := bản-thân file.
-	file tồn-tại đúng: {
-		file xóa.
+Phiên-tệp-tạm khi: ['hủy'] làm: {
+	>> tệp-phiên := bản-thân tệp-phiên.
+	tệp-phiên tồn-tại đúng: {
+		tệp-phiên xóa.
 	}.
 }.
 
 
 >> URL := Đối-tượng mới.
 
-URL khi: ['init'] làm: {
-	riêng protocol := ['https://'].
+URL khi: ['khởi-tạo'] làm: {
+	riêng tên-giao-thức := ['https://'].
 	riêng máy-trạm := ['localhost'].
 	riêng đường-dẫn := [''].
-	riêng params := [''].
+	riêng tham-số-url := [''].
 	riêng hash := [''].
 }.
 
-URL khi: ['mới'] làm: { <- bản-thân mới init.
+URL khi: ['mới'] làm: { <- bản-thân mới khởi-tạo.
 }.
 
 URL khi: ['chuỗi'] làm: { <- (
-	riêng protocol +
+	riêng tên-giao-thức +
 	riêng máy-trạm +
 	riêng đường-dẫn +
-	riêng params +
+	riêng tham-số-url +
 	riêng hash ).
 }.
 
-URL khi: ['protocol:'] làm: { :protocol
-	((Danh-sách mới: ['http'] ; ['https']) chứa: protocol) đúng: {
-		riêng protocol := protocol + ['://'].
+URL khi: ['tên-giao-thức:'] làm: { :tên-giao-thức
+	((Danh-sách mới ; ['http'] ; ['https']) có: tên-giao-thức) đúng: {
+		riêng tên-giao-thức := tên-giao-thức + ['://'].
 	}, sai: {
 		tác-vụ-này lỗi: ['Invalid protocol'].
 	}.
@@ -307,16 +307,16 @@ URL khi: ['máy-trạm:'] làm: { :máy-trạm
 	riêng máy-trạm := máy-trạm.
 }.
 
-URL khi: ['path:'] làm: { :đường-dẫn
+URL khi: ['đường-dẫn:'] làm: { :đường-dẫn
 	riêng đường-dẫn := ['/'] + đường-dẫn url-mã-hóa.
 }.
 
-URL khi: ['params:'] làm: { :map
-	>> params := Danh-sách mới.
-	map mỗi: { :key :value
-		params thêm-cuối: key chuỗi url-mã-hóa + ['='] + value chuỗi url-mã-hóa.
+URL khi: ['tham-số-url:'] làm: { :ánh-xạ
+	>> tham-số-url := Danh-sách mới.
+	ánh-xạ mỗi: { :khóa-tiêu-đề :giá-trị
+		tham-số-url thêm-cuối: khóa-tiêu-đề chuỗi url-mã-hóa + ['='] + giá-trị chuỗi url-mã-hóa.
 	}.
-	riêng params := ['?'] + ( params nối: ['&'] ).
+	riêng tham-số-url := ['?'] + ( tham-số-url nối: ['&'] ).
 }.
 
 URL khi: ['băm:'] làm: { :hash

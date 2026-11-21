@@ -1,128 +1,128 @@
->> Email := Objekt uus.
+>> E-kiri := Objekt uus.
 
-Email kui: ['init'] tee: {
-	oma recipients := Loend uus.
+E-kiri kui: ['lähtesta'] tee: {
+	oma saajad := Loend uus.
 	oma cc := Loend uus.
 	oma bcc := Loend uus.
-	oma from := Tühi.
-	oma from-name := Tühi.
-	oma subject := Tühi.
-	oma body := Tühi.
+	oma saatja := Tühi.
+	oma saatja-nimi := Tühi.
+	oma teema := Tühi.
+	oma kirja-sisu := Tühi.
 }.
 
-Email kui: ['uus'] tee: { <- ise uus init.
+E-kiri kui: ['uus'] tee: { <- ise uus lähtesta.
 }.
 
-Email kui: ['to:'] tee: { :list
-	oma recipients := list.
+E-kiri kui: ['kellele:'] tee: { :loetelu
+	oma saajad := loetelu.
 }.
  
-Email kui: ['cc:'] tee: { :list
-	oma cc := list.
+E-kiri kui: ['cc:'] tee: { :loetelu
+	oma cc := loetelu.
 }.
 
-Email kui: ['bcc:'] tee: { :list
-	oma bcc := list.
+E-kiri kui: ['bcc:'] tee: { :loetelu
+	oma bcc := loetelu.
 }.
 
-Email kui: ['subject:'] tee: { :subject
-	oma subject := subject.
+E-kiri kui: ['teema:'] tee: { :teema
+	oma teema := teema.
 }.
 
-Email kui: ['from:name:'] tee: { :from :nimi
-	oma from := from.
-	oma from-name := nimi.
+E-kiri kui: ['saatja:nimi:'] tee: { :saatja :nimi
+	oma saatja := saatja.
+	oma saatja-nimi := nimi.
 }.
 
-Email kui: ['body:'] tee: { :body
-	oma body := body.
+E-kiri kui: ['kirja-sisu:'] tee: { :kirja-sisu
+	oma kirja-sisu := kirja-sisu.
 }.
 
 # A line break ends a header, and sendmail -t reads the recipients from the
 # headers. Remove them, otherwise a value could add recipients to the mail.
-Email kui: ['header:'] tee: { :line <- line asenda: ['\r'] väärtusega: [''], asenda: ['\n'] väärtusega: [''].
+E-kiri kui: ['päis:'] tee: { :rida <- rida asenda: ['\r'] väärtusega: [''], asenda: ['\n'] väärtusega: [''].
 }.
 
-Email kui: ['send'] tee: {
-	>> f := Fail tempwrite: ise generate.
+E-kiri kui: ['saada'] tee: {
+	>> f := Fail tempwrite: ise genereeri.
 	Programm süsteem: ['sendmail -t < '] + f rada, reavahetus.
 }.
 
-Email kui: ['generate'] tee: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str lisa-lõppu: (ise header: ['From: '] + oma from-name + [' <'] + ( oma from ) + ['>']) + brk.
-	str lisa-lõppu: (ise header: ['To: '] + ( oma recipients ühenda: [','] )) + brk.
+E-kiri kui: ['genereeri'] tee: {
+	>> crlf := ['\r\n'].
+	>> sõne := [''].
+	sõne lisa-lõppu: (ise päis: ['From: '] + oma saatja-nimi + [' <'] + ( oma saatja ) + ['>']) + crlf.
+	sõne lisa-lõppu: (ise päis: ['To: '] + ( oma saajad ühenda: [','] )) + crlf.
 	oma cc arvuta tõsi: {
-		str lisa-lõppu: (ise header: ['Cc: '] + ( oma cc ühenda: [','] )) + brk.
+		sõne lisa-lõppu: (ise päis: ['Cc: '] + ( oma cc ühenda: [','] )) + crlf.
 	}.
 	oma bcc arvuta tõsi: {
-		str lisa-lõppu: (ise header: ['Bcc: '] + ( oma bcc ühenda: [','] )) + brk.
+		sõne lisa-lõppu: (ise päis: ['Bcc: '] + ( oma bcc ühenda: [','] )) + crlf.
 	}.
-	str lisa-lõppu: (ise header: ['Subject: '] + oma subject) + brk.
-	str lisa-lõppu: brk.
-	str lisa-lõppu: oma body.
-	str lisa-lõppu: brk. <- str.
+	sõne lisa-lõppu: (ise päis: ['Subject: '] + oma teema) + crlf.
+	sõne lisa-lõppu: crlf.
+	sõne lisa-lõppu: oma kirja-sisu.
+	sõne lisa-lõppu: crlf. <- sõne.
 }.
 
->> HTML-Email := Email uus.
+>> HTML-E-kiri := E-kiri uus.
 
-HTML-Email kui: ['init'] tee: {
-	ise init.
-	oma attachments := Loend uus.
-	oma boundary := Seif tunnus: 40.
+HTML-E-kiri kui: ['lähtesta'] tee: {
+	ise lähtesta.
+	oma manused := Loend uus.
+	oma piir := Seif tunnus: 40.
 }.
 
-HTML-Email kui: ['attach:'] tee: { :file
-	>> id := oma attachments arvuta.
-	>> blob := file blob.
-	oma attachments lisa-lõppu: (
+HTML-E-kiri kui: ['manusta:'] tee: { :fail
+	>> id := oma manused arvuta.
+	>> blob := fail blob.
+	oma manused lisa-lõppu: (
 		Sõnastik uus
-			file: file rada,
-			mime: ['image/'] + (Server mimetype: file rada),
-			data: blob base64-kodeeri
+			fail: fail rada,
+			mime: ['image/'] + (Server mimetype: fail rada),
+			andmed: blob base64-kodeeri
 	).
 	blob vabasta. <- ['cid:attachment'] + id.
 }.
 
-HTML-Email kui: ['generate'] tee: {
-	>> brk := ['\r\n'].
-	>> str := [''].
-	str lisa-lõppu: (ise header: ['From: '] + oma from-name + [' <'] + ( oma from ) + ['>']) + brk.
-	str lisa-lõppu: (ise header: ['To: '] + ( oma recipients ühenda: [','] )) + brk.
+HTML-E-kiri kui: ['genereeri'] tee: {
+	>> crlf := ['\r\n'].
+	>> sõne := [''].
+	sõne lisa-lõppu: (ise päis: ['From: '] + oma saatja-nimi + [' <'] + ( oma saatja ) + ['>']) + crlf.
+	sõne lisa-lõppu: (ise päis: ['To: '] + ( oma saajad ühenda: [','] )) + crlf.
 	oma cc arvuta tõsi: {
-		str lisa-lõppu: (ise header: ['Cc: '] + ( oma cc ühenda: [','] )) + brk.
+		sõne lisa-lõppu: (ise päis: ['Cc: '] + ( oma cc ühenda: [','] )) + crlf.
 	}.
 	oma bcc arvuta tõsi: {
-		str lisa-lõppu: (ise header: ['Bcc: '] + ( oma bcc ühenda: [','] )) + brk.
+		sõne lisa-lõppu: (ise päis: ['Bcc: '] + ( oma bcc ühenda: [','] )) + crlf.
 	}.
-	str lisa-lõppu: (ise header: ['Subject: '] + oma subject) + brk.
-	str lisa-lõppu: ['MIME-Version: 1.0'] + brk.
-	str lisa-lõppu: ['Content-Type: multipart/related; boundary="'] + oma boundary + ['"; type=text/html'] + brk.
-	str lisa-lõppu: brk.
-	str lisa-lõppu: ['--'] + oma boundary + brk.
-	str lisa-lõppu: ['Content-Type: text/html; charset=UTF-8'] + brk.
-	str lisa-lõppu: ['Content-Transfer-Encoding: 7bit'] + brk.
-	str lisa-lõppu: brk.
-	str lisa-lõppu: oma body.
-	str lisa-lõppu: brk.
-	oma attachments iga: { :id :info
-		>> blob := info data.
-		str lisa-lõppu: ['--'] + oma boundary + brk.
-		str lisa-lõppu: ['Content-Type: '] + info mime + brk.
-		str lisa-lõppu: ['Content-Transfer-Encoding: base64'] + brk.
-		str lisa-lõppu: ['Content-ID: <attachment'] + id + ['>'] + brk.
-		str lisa-lõppu: ['Content-Disposition: inline; filename="'] + info file + ['"'] + brk.
-		str lisa-lõppu: brk.
-		>> max := 76.
-		>> len := blob pikkus.
-		>> chunks := (len / max) ümarda-üles.
+	sõne lisa-lõppu: (ise päis: ['Subject: '] + oma teema) + crlf.
+	sõne lisa-lõppu: ['MIME-Version: 1.0'] + crlf.
+	sõne lisa-lõppu: ['Content-Type: multipart/related; boundary="'] + oma piir + ['"; type=text/html'] + crlf.
+	sõne lisa-lõppu: crlf.
+	sõne lisa-lõppu: ['--'] + oma piir + crlf.
+	sõne lisa-lõppu: ['Content-Type: text/html; charset=UTF-8'] + crlf.
+	sõne lisa-lõppu: ['Content-Transfer-Encoding: 7bit'] + crlf.
+	sõne lisa-lõppu: crlf.
+	sõne lisa-lõppu: oma kirja-sisu.
+	sõne lisa-lõppu: crlf.
+	oma manused iga: { :id :info
+		>> blob := info andmed.
+		sõne lisa-lõppu: ['--'] + oma piir + crlf.
+		sõne lisa-lõppu: ['Content-Type: '] + info mime + crlf.
+		sõne lisa-lõppu: ['Content-Transfer-Encoding: base64'] + crlf.
+		sõne lisa-lõppu: ['Content-ID: <attachment'] + id + ['>'] + crlf.
+		sõne lisa-lõppu: ['Content-Disposition: inline; filename="'] + info fail + ['"'] + crlf.
+		sõne lisa-lõppu: crlf.
+		>> suurim := 76.
+		>> teksti-pikkus := blob pikkus.
+		>> tükid := (teksti-pikkus / suurim) ümarda-üles.
 		{ :i
-			>> chunk := blob kopeeri alates: i * max pikkus: max.
-			str lisa-lõppu: chunk + brk.
-		} * chunks.
-		str lisa-lõppu: brk.
-		str lisa-lõppu: brk.
+			>> tükk := blob kopeeri alates: i * suurim pikkus: suurim.
+			sõne lisa-lõppu: tükk + crlf.
+		} * tükid.
+		sõne lisa-lõppu: crlf.
+		sõne lisa-lõppu: crlf.
 	}.
-	str lisa-lõppu: ['--'] + oma boundary + ['--'] + brk. <- str.
+	sõne lisa-lõppu: ['--'] + oma piir + ['--'] + crlf. <- sõne.
 }.

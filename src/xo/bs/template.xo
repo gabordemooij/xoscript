@@ -1,97 +1,97 @@
 
 # ~ Simple template engine ~
 
->> Template := Objekat novi.
+>> Šablon := Objekat novi.
 
-Template na: ['novi'] uradi: { <- sebe novi content: [''].
+Šablon na: ['novi'] uradi: { <- sebe novi sadržaj: [''].
 }.
 
-Template na: ['content:'] uradi: { :content
-	svoj content := content. 
+Šablon na: ['sadržaj:'] uradi: { :sadržaj
+	svoj sadržaj := sadržaj. 
 }.
 
-Template na: ['novi:'] uradi: { :content <- sebe novi content: content.
+Šablon na: ['novi:'] uradi: { :sadržaj <- sebe novi sadržaj: sadržaj.
 }.
 
-Template na: ['cut:'] uradi: { :marker
-	>> startmarker := (['<!-- cut:%id% -->'] %id%: marker).
-	>> endmarker := (['<!-- /cut:%id% -->'] %id%: marker).
-	>> parts := svoj content podijeli: startmarker.
-	>> prefix := parts prvi.
-	>> parts2 := parts zadnji podijeli: endmarker.
-	>> suffix := parts2 zadnji.
-	>> part := parts2 prvi.
-	>> rest := prefix + suffix.
-	svoj content := rest. <- Template novi: part.
+Šablon na: ['izreži:'] uradi: { :oznaka
+	>> početna-oznaka := (['<!-- cut:%id% -->'] %id%: oznaka).
+	>> završna-oznaka := (['<!-- /cut:%id% -->'] %id%: oznaka).
+	>> dijelovi := svoj sadržaj podijeli: početna-oznaka.
+	>> prefiks := dijelovi prvi.
+	>> dijelovi2 := dijelovi zadnji podijeli: završna-oznaka.
+	>> sufiks := dijelovi2 zadnji.
+	>> dio := dijelovi2 prvi.
+	>> ostatak := prefiks + sufiks.
+	svoj sadržaj := ostatak. <- Šablon novi: dio.
 	
 }.
 
-Template na: ['kopiraj'] uradi: { <- sebe novi: sebe tekst kopiraj.
+Šablon na: ['kopiraj'] uradi: { <- sebe novi: sebe tekst kopiraj.
 }.
 	
-Template na: ['paste:at:'] uradi: { :snippet :id
-	>> pastemarker := (['<!-- paste:%id% -->'] %id%: id).
-	svoj content zamijeni: pastemarker sa: ( snippet tekst + pastemarker ).
+Šablon na: ['zalijepi:na:'] uradi: { :isječak :id
+	>> oznaka-lijepljenja := (['<!-- paste:%id% -->'] %id%: id).
+	svoj sadržaj zamijeni: oznaka-lijepljenja sa: ( isječak tekst + oznaka-lijepljenja ).
 }.
 
-Template na: ['postavi:vrijednost:'] uradi: { :slot :value
-	svoj content zamijeni: ['<!-- slot:'] + slot + [' -->'] sa: ( Server html-kodiraj: value ).
+Šablon na: ['postavi:vrijednost:'] uradi: { :utor :vrijednost
+	svoj sadržaj zamijeni: ['<!-- slot:'] + utor + [' -->'] sa: ( Server html-kodiraj: vrijednost ).
 }.
 
-Template na: ['set:html:'] uradi: { :slot :html
-	svoj content zamijeni: ['<!-- slot:'] + slot + [' -->'] sa: html.
+Šablon na: ['postavi:html:'] uradi: { :utor :html
+	svoj sadržaj zamijeni: ['<!-- slot:'] + utor + [' -->'] sa: html.
 }.
 
-Template na: ['odgovori:i:'] uradi: { :slot :value
-	sebe postavi: (slot od: 0 dužina: (slot dužina - 1)) vrijednost: value.
+Šablon na: ['odgovori:i:'] uradi: { :utor :vrijednost
+	sebe postavi: (utor od: 0 dužina: (utor dužina - 1)) vrijednost: vrijednost.
 }.
 
-Template na: ['nl2br'] uradi: {
-	svoj content zamijeni: ['\n'] sa: ['<br>'].
+Šablon na: ['nl2br'] uradi: {
+	svoj sadržaj zamijeni: ['\n'] sa: ['<br>'].
 }.
 
-Template na: ['clean'] uradi: {
-	svoj content :=
+Šablon na: ['očisti'] uradi: {
+	svoj sadržaj :=
 		Uzorak
 		novi: ['\\<\\!\\-\\- (paste|slot)\\:\\S+ \\-\\-\\>'],
-		podudaranje: svoj content
+		podudaranje: svoj sadržaj
 		uradi: { <- ['']. }.
 }.
 
-Template na: ['clean-cuts'] uradi: {
-	>> items := Lista novi.
+Šablon na: ['očisti-izreze'] uradi: {
+	>> stavke := Lista novi.
 	Uzorak
 	novi: ['\\<\\!\\-\\- cut\\:(\\S+) \\-\\-\\>'],
-	podudaranje: svoj content
-	uradi: { :_ :part
-		items dodaj-na-kraj: part ? 1.
+	podudaranje: svoj sadržaj
+	uradi: { :_ :dio
+		stavke dodaj-na-kraj: dio ? 1.
 	}.
-	items svaki: { :_ :id
-		svoj content :=
+	stavke svaki: { :_ :id
+		svoj sadržaj :=
 			Uzorak novi: ( ['(?s)\\<\\!\\-\\- cut\\:'] + id + [' \\-\\-\\>.*\\<\\!\\-\\- \\/cut\\:'] + id + [' \\-\\-\\>']),
-			podudaranje: svoj content
+			podudaranje: svoj sadržaj
 			uradi: { <- ['']. }.
 	 }.
 }.
 
-Template na: ['clean-space'] uradi: {
-	svoj content :=
+Šablon na: ['očisti-razmake'] uradi: {
+	svoj sadržaj :=
 		Uzorak
 		novi: ['\\s*\\n'],
-		podudaranje: svoj content
+		podudaranje: svoj sadržaj
 		uradi: { <- ['\n']. }.
-	svoj content :=
+	svoj sadržaj :=
 		Uzorak
 		novi: ['\\n[\\s\\t]+'],
-		podudaranje: svoj content
+		podudaranje: svoj sadržaj
 		uradi: { <- ['\n']. }.
 }.
 
-Template na: ['clean-all'] uradi: {
-	sebe clean.
-	sebe clean-cuts.
-	sebe clean-space.
+Šablon na: ['očisti-sve'] uradi: {
+	sebe očisti.
+	sebe očisti-izreze.
+	sebe očisti-razmake.
 }.
 
-Template na: ['tekst'] uradi: { <- svoj content.
+Šablon na: ['tekst'] uradi: { <- svoj sadržaj.
 }.
