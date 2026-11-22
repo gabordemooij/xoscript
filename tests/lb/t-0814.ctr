@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server initialiséieren.
+Programm benotzen: ['../../../src/xo/lb/webtools.xo'].
+
+>> Fake-Request := Objet nei.
+Fake-Request bei: ['value:'] maachen: { :wäert
+	eegen wäert := wäert.
+}.
+Fake-Request bei: ['cookie:'] maachen: { :numm <- eegen wäert.
+}.
+
+>> Test-Session := Tempfichier-Sessioun nei.
+Test-Session bei: ['lueden'] maachen: { <- Dictionnaire nei.
+}.
+Test-Session bei: ['session-id'] maachen: { <- eegen id.
+}.
+
+>> cookies := Lëscht nei
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies all: { :i :cookie
+	>> http-ufro := Fake-Request nei.
+	http-ufro value: cookie.
+	>> verwalter := Test-Session nei.
+	>> web := Web-Dokument nei.
+	web http-ufro: http-ufro.
+	web sessiounsverwalter: verwalter.
+	web sessioun-starten.
+	Ausgab schreiwen: ( verwalter session-id = cookie ), nei-zeil.
+}.
+
+>> web := Web-Dokument nei.
+web json: (Dictionnaire nei setzen: ['b'] bei: ['a']).
+Ausgab schreiwen: ['\n'], nei-zeil.
+
+{ Netzwierk get: ['file:///etc/hostname']. } offänken: { :e
+	Ausgab schreiwen: e, nei-zeil.
+}, starten.
+
+>> svg := Fichier nei: ['/tmp/test0814.svg'].
+svg schreiwen: ['<svg xmlns="x"></svg>'].
+Ausgab nei-zeil.
+Server weiderginn: ['test0814.svg'] prefix: ['/tmp/'].
+svg läschen.

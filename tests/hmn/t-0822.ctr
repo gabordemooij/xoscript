@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB tshiab tus-tswv-tsev: ['localhost'],
+	npe-neeg-siv: ['xo'],
+	lo-lus-zais: ['pass123'],
+	npe-chaw-khaws-ntaub-ntawv: ['xobase'],
+	txuas-mus.
+
+>> cov-nqe-nrhiav := db lus-nug: ['SELECT ? AS a, ? AS b, ? AS c'].
+cov-nqe-nrhiav cov-nqe: (Daim-teev tshiab ; ['1']).
+{ cov-nqe-nrhiav mus-nqa: { :row Tawm sau-ntawv: row, kab-tshiab. }. } txhom: { :e Tawm sau-ntawv: e, kab-tshiab. }, pib.
+
+>> cov-nqe-nrhiav := db lus-nug: ['SELECT ? AS a'].
+{ cov-nqe-nrhiav mus-nqa: { :row Tawm sau-ntawv: row, kab-tshiab. }. } txhom: { :e Tawm sau-ntawv: e, kab-tshiab. }, pib.
+
+# the right number still works, more parameters are ignored as before
+>> cov-nqe-nrhiav := db lus-nug: ['SELECT ? AS a, ? AS b'].
+cov-nqe-nrhiav cov-nqe: (Daim-teev tshiab ; ['1'] ; ['2']).
+cov-nqe-nrhiav mus-nqa: { :row Tawm sau-ntawv: (row ntawm: ['a']), sau-ntawv: (row ntawm: ['b']), kab-tshiab. }.
+cov-nqe-nrhiav cov-nqe: (Daim-teev tshiab ; ['1'] ; ['2'] ; ['3']).
+cov-nqe-nrhiav mus-nqa: { :row Tawm sau-ntawv: (row ntawm: ['a']), sau-ntawv: (row ntawm: ['b']), kab-tshiab. }.

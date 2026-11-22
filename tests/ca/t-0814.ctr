@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inicialitzar.
+Programa utilitza: ['../../../src/xo/ca/webtools.xo'].
+
+>> Fake-Request := Objecte nou.
+Fake-Request en: ['value:'] fes: { :valor
+	propi valor := valor.
+}.
+Fake-Request en: ['cookie:'] fes: { :nom <- propi valor.
+}.
+
+>> Test-Session := Sessió-fitxer-temporal nou.
+Test-Session en: ['carregar'] fes: { <- Diccionari nou.
+}.
+Test-Session en: ['session-id'] fes: { <- propi id.
+}.
+
+>> cookies := Llista nou
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies cada: { :i :cookie
+	>> petició := Fake-Request nou.
+	petició value: cookie.
+	>> gestor := Test-Session nou.
+	>> web := Document-Web nou.
+	web petició: petició.
+	web gestor-sessió: gestor.
+	web iniciar-sessió.
+	Sortida escriu: ( gestor session-id = cookie ), salt-de-línia.
+}.
+
+>> web := Document-Web nou.
+web json: (Diccionari nou posa: ['b'] a: ['a']).
+Sortida escriu: ['\n'], salt-de-línia.
+
+{ Xarxa get: ['file:///etc/hostname']. } captura: { :e
+	Sortida escriu: e, salt-de-línia.
+}, inicia.
+
+>> svg := Fitxer nou: ['/tmp/test0814.svg'].
+svg escriu: ['<svg xmlns="x"></svg>'].
+Sortida salt-de-línia.
+Server transmet: ['test0814.svg'] prefix: ['/tmp/'].
+svg suprimeix.

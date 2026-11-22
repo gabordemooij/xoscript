@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Programa maneho-di-memoria: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Programa konfigurashon: ['FFITESTLIB'].
+
+
+
+Server konektá-ku: (
+ Lista nobo ;
+ libname ;
+ ['puts'] ;
+ ( Lista nobo ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s libra.
+
+# test with struct
+
+>> a := Blob nobo: 8.
+a bytes: (
+	Lista <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Lista <<: ['int'], ; ['int']).
+
+Server konektá-ku: (
+	Lista <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Lista <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Salida skirbi: ['Sum test:'] + (ffitest ffisum: a), liña-nobo.
+
+struct libra-struct.
+struct libra.
+a libra.

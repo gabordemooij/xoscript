@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server tòisich-suas.
+Prògram cleachd: ['../../../src/xo/gd/webtools.xo'].
+Prògram cleachd: ['../../../src/xo/gd/mailtools.xo'].
+
+>> bann-cinn := Bann-cinn-HTTP ùr iuchair: ['Location'] luach: ['/ok\r\nX-Injected: yes'].
+Às-chur sgrìobh: bann-cinn.
+
+>> web := Sgrìobhainn-lìn ùr.
+web rach-gu: ['/ok\r\nX-Injected: yes'].
+Às-chur sgrìobh: ['\n'], loidhne-ùr.
+
+>> mail := Post-d ùr.
+mail gu: (Liosta ùr ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Liosta ùr ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Liosta ùr ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail neach-cuiridh: ['d@example.invalid\r\nX-From: yes'] ainm: ['site\r\nX-Name: yes'].
+mail cuspair: ['hello\r\nX-Subject: yes'].
+mail bodhaig: ['line1\r\nline2'].
+Às-chur sgrìobh: mail gin.
+
+>> html := Post-d-HTML ùr.
+html gu: (Liosta ùr ; ['a@example.invalid\r\nX-To: yes']).
+html neach-cuiridh: ['d@example.invalid'] ainm: ['site'].
+html cuspair: ['hello\r\nX-Subject: yes'].
+html bodhaig: ['body'].
+Às-chur sgrìobh: ( html gin tha-ann: ['\nX-'] ), loidhne-ùr.
+Às-chur sgrìobh: ( html gin tha-ann: ['X-To: yes'] ), loidhne-ùr.

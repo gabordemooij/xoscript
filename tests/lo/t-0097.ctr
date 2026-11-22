@@ -1,0 +1,42 @@
+
+ຂໍ້ຄວາມ ເມື່ອ: ['html'] ເຮັດ: { <- (
+		ຕົນເອງ
+		ແທນທີ່: ['&'] ດ້ວຍ: ['&amp;'],
+		ແທນທີ່: ['<'] ດ້ວຍ: ['&lt;'],
+		ແທນທີ່: ['>'] ດ້ວຍ: ['&gt;'],
+		ແທນທີ່: ['"'] ດ້ວຍ: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := ວັດຖຸ ໃໝ່.
+
+HtmlBrush ເມື່ອ: ['ຕອບ:'] ເຮັດ: { :tag
+	ຜົນອອກ ຂຽນ: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush ເມື່ອ: ['ຕອບ:ແລະ:'] ເຮັດ: { :tag :content
+	tag := ( tag ເລີ່ມທີ່: 0 ຄວາມຍາວ: (tag ຄວາມຍາວ - 1) ).
+	ຜົນອອກ ຂຽນ: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush ເມື່ອ: ['content:'] ເຮັດ: { :text
+	ຜົນອອກ ຂຽນ: text html, ຂຶ້ນແຖວໃໝ່.
+}.
+
+HtmlBrush ເມື່ອ: ['attr:value:'] ເຮັດ: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush ໃໝ່.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

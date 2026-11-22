@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := সিন্দুক চাবি-তৈরি.
+>> sk := keys প্রথম.
+>> pk := keys শেষ-উপাদান.
+>> sig := সিন্দুক স্বাক্ষর: ['abc'] চাবি-দিয়ে: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ সিন্দুক স্বাক্ষর: ['abc'] চাবি-দিয়ে: long. } ধরো: { :e
+	আউটপুট লেখো: e, নতুন-লাইন.
+}, চালাও.
+
+{ সিন্দুক পরখ: ['abc'] স্বাক্ষর: long চাবি-দিয়ে: pk. } ধরো: { :e
+	আউটপুট লেখো: e, নতুন-লাইন.
+}, চালাও.
+
+{ সিন্দুক পরখ: ['abc'] স্বাক্ষর: sig চাবি-দিয়ে: short. } ধরো: { :e
+	আউটপুট লেখো: e, নতুন-লাইন.
+}, চালাও.

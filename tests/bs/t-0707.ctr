@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Program upravljanje-memorijom: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB novi domaćin: ['localhost'],
+	korisnik: ['xo'], lozinka: ['pass123'], naziv-baze: ['xobase'], poveži-se.
+
+>> TwoDigitFormat := Format novi: ['%02d'].
+
+# Datetime
+{
+	>> godina := Broj između: 1995 i: 2050, tekst.
+	>> mjesec := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 12), tekst.
+	>> dan := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 28), tekst.
+	>> sat := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 23), tekst.
+	>> minuta := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 59), tekst.
+	>> sekunda := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 59), tekst.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: godina,
+		MM: mjesec,
+		DD: dan,
+		HH: sat,
+		II: minuta,
+		SS: sekunda.
+	>> parametri-pretrage :=
+	db upit: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	dohvati: { :row
+		(row mydatetime = datetime) netačno: {
+			ovaj-zadatak greška: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter saberi: 1.
+} * 100.
+
+# Date
+{
+	>> godina := Broj između: 1995 i: 2050, tekst.
+	>> mjesec := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 12), tekst.
+	>> dan := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 28), tekst.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: godina,
+		MM: mjesec,
+		DD: dan.
+	>> parametri-pretrage :=
+	db upit: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	dohvati: { :row
+		(row mydate = date) netačno: {
+			ovaj-zadatak greška: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter saberi: 1.
+} * 100.
+
+
+# Time
+{
+	>> sat := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 23), tekst.
+	>> minuta := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 59), tekst.
+	>> sekunda := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 59), tekst.
+	>> vrijeme := ['HH:II:SS'].
+	vrijeme
+		HH: sat,
+		II: minuta,
+		SS: sekunda.
+	>> parametri-pretrage :=
+	db upit: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: vrijeme),
+	dohvati: { :row
+		(row mytime = vrijeme) netačno: {
+			ovaj-zadatak greška: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter saberi: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lista novi popuni: 100000 sa: ['x'], spoji: [''].
+{
+	>> str2 := Sef token: 40.
+	>> parametri-pretrage :=
+	db upit: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	dohvati: { :row
+		(row str1 = str1 i: row str2 = str2) netačno: {
+			ovaj-zadatak greška: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter saberi: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Broj između: 1 i: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 iz-teksta: ['9223372036854775807'] ) -
+		( Int64 iz-teksta: ['99999'] ) +
+		( Int64 iz-teksta: n1 tekst )
+	).
+	>> parametri-pretrage :=
+	db upit: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	dohvati: { :row
+		(row n1 = n1) netačno: {
+			ovaj-zadatak greška: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) netačno: {
+			ovaj-zadatak greška: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 zaokruži) netačno: {
+			ovaj-zadatak greška: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) netačno: {
+			ovaj-zadatak greška: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter saberi: 1.
+} * 100.
+
+
+Izlaz piši: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), novi-red.

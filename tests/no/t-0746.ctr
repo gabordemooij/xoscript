@@ -1,0 +1,28 @@
+Utdata skriv: ['Test object'], stop.
+>> a := Objekt ny. 
+
+a ved: ['item:'] gjør: { :dict
+	egen dict := dict. 
+}.
+
+a ved: ['item'] gjør: { <- egen dict.
+}.
+
+a item: (
+Ordbok ny
+	hello: ['world'],
+	world: (Ordbok ny sett: ['a'] ved: ['b'])).
+
+Utdata skriv: a item, stop.
+
+>> old-dict-address := a item prototype minneadresse.
+a save-as: ['/tmp/a.bin'].
+Utdata skriv: ['========== RELOADING SNAP:'], stop.
+
+>> b := Objekt load-from: ['/tmp/a.bin'].
+
+(b item prototype minneadresse = old-dict-address) sann: {
+	Utdata skriv: ['Object link re-attached.'], stop.
+}.
+
+Utdata skriv: b item, stop.

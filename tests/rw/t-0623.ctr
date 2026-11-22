@@ -1,0 +1,43 @@
+
+
+>> g := Server gishya.
+>> v := Isanduku-yumutekano gishya.
+>> ok := 0.
+
+>> secrets := Urutonde gishya ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets koporora.
+passwords buri: { :i :p
+	secrets buri: { :n :s
+		{
+			>> encrypted := v hisha: s urufunguzo: p.
+			>> decrypted := v hishura: encrypted urufunguzo: p.
+			(decrypted = s) ukuri: {
+				ok ongeraho: 1.
+			}, bitabaye-ibyo: {
+				Ibisohoka andika: ['failed encrypting/decrypting: '], umurongo-mushya.
+				Ibisohoka andika: s, umurongo-mushya.
+				Ibisohoka andika: ['encrypted: '] + encrypted, umurongo-mushya.
+				Ibisohoka andika: ['decrypted: '] + encrypted, umurongo-mushya.
+				Gahunda soza.
+			}.
+		} fata-ikosa: { :err
+			(s = [''] cyangwa: p = ['']) ukuri: {
+				ok ongeraho: 1.
+			}, bitabaye-ibyo: {
+				Ibisohoka andika: err, umurongo-mushya.
+				Gahunda soza.
+			}.
+		}, tangira.
+	}.
+}.
+
+Ibisohoka andika: ( ok + [' vault encryptions tested.'] ), umurongo-mushya.

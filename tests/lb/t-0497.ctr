@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := Fichier nei: ['/tmp/test.gif'].
+f schreiwen: ['GIF87a01234567810'].
+
+# serve the file
+Server weiderginn: ['test.gif'] prefix: ['/tmp/'].
+
+Ausgab nei-zeil.
+
+Ausgab schreiwen: ['Outside container (security):'], nei-zeil.
+{ Server weiderginn: ['../passwd'] prefix: ['/tmp/']. }
+offänken: { :e Ausgab schreiwen: e, nei-zeil. },
+starten.
+
+Ausgab schreiwen: ['Invalid prefix:'], nei-zeil.
+{ Server weiderginn: ['test.gif'] prefix: ['z:\\']. }
+offänken: { :e Ausgab schreiwen: e, nei-zeil. },
+starten.
+
+Ausgab schreiwen: ['Non-existant file:'], nei-zeil.
+{ Server weiderginn: ['xxx.xxx'] prefix: ['/tmp/']. }
+offänken: { :e Ausgab schreiwen: e, nei-zeil. },
+starten.

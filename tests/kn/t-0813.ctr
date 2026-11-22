@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server ಆರಂಭಿಸು.
+ಪ್ರೋಗ್ರಾಂ ಬಳಸು: ['../../../src/xo/kn/webtools.xo'].
+ಪ್ರೋಗ್ರಾಂ ಬಳಸು: ['../../../src/xo/kn/mailtools.xo'].
+
+>> ಹೆಡರ್ := HTTP-ಹೆಡರ್ ಹೊಸ ಕೀಲಿ: ['Location'] ಮೌಲ್ಯ: ['/ok\r\nX-Injected: yes'].
+ಔಟ್-ಪುಟ್ ಬರೆ: ಹೆಡರ್.
+
+>> web := ವೆಬ್-ದಸ್ತಾವೇಜು ಹೊಸ.
+web ಹೋಗು: ['/ok\r\nX-Injected: yes'].
+ಔಟ್-ಪುಟ್ ಬರೆ: ['\n'], ಹೊಸ-ಸಾಲು.
+
+>> mail := ಇಮೇಲ್ ಹೊಸ.
+mail ಸ್ವೀಕರಿಸುವವರಿಗೆ: (ಸರಣಿ ಹೊಸ ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (ಸರಣಿ ಹೊಸ ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (ಸರಣಿ ಹೊಸ ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail ಕಳುಹಿಸುವವರು: ['d@example.invalid\r\nX-From: yes'] ಹೆಸರು: ['site\r\nX-Name: yes'].
+mail ವಿಷಯ: ['hello\r\nX-Subject: yes'].
+mail ಮುಖ್ಯ-ಪಠ್ಯ: ['line1\r\nline2'].
+ಔಟ್-ಪುಟ್ ಬರೆ: mail ಉತ್ಪಾದಿಸು.
+
+>> html := HTML-ಇಮೇಲ್ ಹೊಸ.
+html ಸ್ವೀಕರಿಸುವವರಿಗೆ: (ಸರಣಿ ಹೊಸ ; ['a@example.invalid\r\nX-To: yes']).
+html ಕಳುಹಿಸುವವರು: ['d@example.invalid'] ಹೆಸರು: ['site'].
+html ವಿಷಯ: ['hello\r\nX-Subject: yes'].
+html ಮುಖ್ಯ-ಪಠ್ಯ: ['body'].
+ಔಟ್-ಪುಟ್ ಬರೆ: ( html ಉತ್ಪಾದಿಸು ಒಳಗೊಂಡಿದೆ: ['\nX-'] ), ಹೊಸ-ಸಾಲು.
+ಔಟ್-ಪುಟ್ ಬರೆ: ( html ಉತ್ಪಾದಿಸು ಒಳಗೊಂಡಿದೆ: ['X-To: yes'] ), ಹೊಸ-ಸಾಲು.

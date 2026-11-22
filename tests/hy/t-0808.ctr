@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Չհրկիզվող-պահարան ստեղծել-բանալիներ.
+>> sk := keys առաջին.
+>> pk := keys վերջին.
+>> sig := Չհրկիզվող-պահարան ստորագրել: ['abc'] բանալիով: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Չհրկիզվող-պահարան ստորագրել: ['abc'] բանալիով: long. } որսալ: { :e
+	Ելք գրել: e, նոր-տող.
+}, գործարկել.
+
+{ Չհրկիզվող-պահարան ստուգել: ['abc'] ստորագրություն: long բանալիով: pk. } որսալ: { :e
+	Ելք գրել: e, նոր-տող.
+}, գործարկել.
+
+{ Չհրկիզվող-պահարան ստուգել: ['abc'] ստորագրություն: sig բանալիով: short. } որսալ: { :e
+	Ելք գրել: e, նոր-տող.
+}, գործարկել.

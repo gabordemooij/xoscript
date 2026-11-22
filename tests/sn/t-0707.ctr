@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Chirongwa kutonga-ndangariro: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB nyowani mugamuchiri: ['localhost'],
+	zita-remushandisi: ['xo'], pasiwedhi: ['pass123'], zita-redhatabhesi: ['xobase'], batana.
+
+>> TwoDigitFormat := Chimiro nyowani: ['%02d'].
+
+# Datetime
+{
+	>> gore := Nhamba pakati: 1995 uye: 2050, mavara-emashoko.
+	>> mwedzi := TwoDigitFormat shandisa-nhamba-izere: (Nhamba pakati: 1 uye: 12), mavara-emashoko.
+	>> zuva := TwoDigitFormat shandisa-nhamba-izere: (Nhamba pakati: 1 uye: 28), mavara-emashoko.
+	>> awa := TwoDigitFormat shandisa-nhamba-izere: (Nhamba pakati: 1 uye: 23), mavara-emashoko.
+	>> mineti := TwoDigitFormat shandisa-nhamba-izere: (Nhamba pakati: 1 uye: 59), mavara-emashoko.
+	>> sekondi := TwoDigitFormat shandisa-nhamba-izere: (Nhamba pakati: 1 uye: 59), mavara-emashoko.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: gore,
+		MM: mwedzi,
+		DD: zuva,
+		HH: awa,
+		II: mineti,
+		SS: sekondi.
+	>> maparamita-ekutsvaga :=
+	db mubvunzo: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	tora: { :row
+		(row mydatetime = datetime) nhema: {
+			basa-iri chikanganiso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter wedzera: 1.
+} * 100.
+
+# Date
+{
+	>> gore := Nhamba pakati: 1995 uye: 2050, mavara-emashoko.
+	>> mwedzi := TwoDigitFormat shandisa-nhamba-izere: (Nhamba pakati: 1 uye: 12), mavara-emashoko.
+	>> zuva := TwoDigitFormat shandisa-nhamba-izere: (Nhamba pakati: 1 uye: 28), mavara-emashoko.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: gore,
+		MM: mwedzi,
+		DD: zuva.
+	>> maparamita-ekutsvaga :=
+	db mubvunzo: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	tora: { :row
+		(row mydate = date) nhema: {
+			basa-iri chikanganiso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter wedzera: 1.
+} * 100.
+
+
+# Time
+{
+	>> awa := TwoDigitFormat shandisa-nhamba-izere: (Nhamba pakati: 1 uye: 23), mavara-emashoko.
+	>> mineti := TwoDigitFormat shandisa-nhamba-izere: (Nhamba pakati: 1 uye: 59), mavara-emashoko.
+	>> sekondi := TwoDigitFormat shandisa-nhamba-izere: (Nhamba pakati: 1 uye: 59), mavara-emashoko.
+	>> nguva := ['HH:II:SS'].
+	nguva
+		HH: awa,
+		II: mineti,
+		SS: sekondi.
+	>> maparamita-ekutsvaga :=
+	db mubvunzo: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: nguva),
+	tora: { :row
+		(row mytime = nguva) nhema: {
+			basa-iri chikanganiso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter wedzera: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Rondedzero nyowani zadza: 100000 na: ['x'], batanidza: [''].
+{
+	>> str2 := Dura-rakachengeteka token: 40.
+	>> maparamita-ekutsvaga :=
+	db mubvunzo: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	tora: { :row
+		(row str1 = str1 uye: row str2 = str2) nhema: {
+			basa-iri chikanganiso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter wedzera: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Nhamba pakati: 1 uye: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 kubva-mumavara: ['9223372036854775807'] ) -
+		( Int64 kubva-mumavara: ['99999'] ) +
+		( Int64 kubva-mumavara: n1 mavara-emashoko )
+	).
+	>> maparamita-ekutsvaga :=
+	db mubvunzo: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	tora: { :row
+		(row n1 = n1) nhema: {
+			basa-iri chikanganiso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) nhema: {
+			basa-iri chikanganiso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 swededza-nhamba) nhema: {
+			basa-iri chikanganiso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) nhema: {
+			basa-iri chikanganiso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter wedzera: 1.
+} * 100.
+
+
+Zvabuda nyora: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), mutsara-mutsva.

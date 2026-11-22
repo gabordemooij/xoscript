@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server ishga-tushir.
+Dastur foydalanish: ['../../../src/xo/uz/webtools.xo'].
+
+>> Fake-Request := Obyekt yangi.
+Fake-Request kelganda: ['value:'] bajar: { :qiymat
+	oʻzining qiymat := qiymat.
+}.
+Fake-Request kelganda: ['cookie:'] bajar: { :nom <- oʻzining qiymat.
+}.
+
+>> Test-Session := Vaqtinchalik-fayl-seansi yangi.
+Test-Session kelganda: ['yukla'] bajar: { <- Lugʻat yangi.
+}.
+Test-Session kelganda: ['session-id'] bajar: { <- oʻzining id.
+}.
+
+>> cookies := Roʻyxat yangi
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies har-bir: { :i :cookie
+	>> http-soʻrov := Fake-Request yangi.
+	http-soʻrov value: cookie.
+	>> boshqaruvchi := Test-Session yangi.
+	>> web := Veb-hujjat yangi.
+	web http-soʻrov: http-soʻrov.
+	web seans-boshqaruvchisi: boshqaruvchi.
+	web seansni-boshla.
+	Chiqish yozish: ( boshqaruvchi session-id = cookie ), yangi-qator.
+}.
+
+>> web := Veb-hujjat yangi.
+web json: (Lugʻat yangi qoʻyish: ['b'] kalit: ['a']).
+Chiqish yozish: ['\n'], yangi-qator.
+
+{ Tarmoq get: ['file:///etc/hostname']. } ushlash: { :e
+	Chiqish yozish: e, yangi-qator.
+}, ishga-tushirish.
+
+>> svg := Fayl yangi: ['/tmp/test0814.svg'].
+svg yozish: ['<svg xmlns="x"></svg>'].
+Chiqish yangi-qator.
+Server oʻtkazish: ['test0814.svg'] prefiks: ['/tmp/'].
+svg oʻchirish.

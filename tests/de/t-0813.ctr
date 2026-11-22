@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server initialisieren.
+Programm verwenden: ['../../../src/xo/de/webtools.xo'].
+Programm verwenden: ['../../../src/xo/de/mailtools.xo'].
+
+>> kopfzeile := HTTP-Kopfzeile neu schlüssel: ['Location'] wert: ['/ok\r\nX-Injected: yes'].
+Ausgabe schreiben: kopfzeile.
+
+>> web := Web-Dokument neu.
+web gehe-zu: ['/ok\r\nX-Injected: yes'].
+Ausgabe schreiben: ['\n'], stopp.
+
+>> mail := E-Mail neu.
+mail an: (Liste neu ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Liste neu ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Liste neu ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail absender: ['d@example.invalid\r\nX-From: yes'] name: ['site\r\nX-Name: yes'].
+mail betreff: ['hello\r\nX-Subject: yes'].
+mail textkörper: ['line1\r\nline2'].
+Ausgabe schreiben: mail erzeugen.
+
+>> html := HTML-E-Mail neu.
+html an: (Liste neu ; ['a@example.invalid\r\nX-To: yes']).
+html absender: ['d@example.invalid'] name: ['site'].
+html betreff: ['hello\r\nX-Subject: yes'].
+html textkörper: ['body'].
+Ausgabe schreiben: ( html erzeugen enthält: ['\nX-'] ), stopp.
+Ausgabe schreiben: ( html erzeugen enthält: ['X-To: yes'] ), stopp.

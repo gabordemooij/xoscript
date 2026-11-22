@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Чыгыш яз: ['Database test'], яңа-юл.
+
+>> db := Maria-DB яңа хост: ['localhost'],
+	кулланучы-исеме: ['xo'], серсүз: ['pass123'], база-исеме: ['xobase'], тоташ.
+
+Чыгыш яз: ['Can we connect? '] + db тоташканмы?, яңа-юл.
+
+>> эзләү-параметрлары := db сорау: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], параметрлар: ( Тезмә яңа ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  эзләү-параметрлары башкар. db раслау. } тот: { :e db кире-кайтар.  }, җибәр.
+
+Чыгыш яз: ['Can we insert? '] + ( эзләү-параметрлары insert-id > 0 ), яңа-юл.
+
+>> x := 0.
+>> эзләү-параметрлары :=
+db сорау: ['SELECT * FROM book order by id desc limit 2'], 
+алып-кил: { :row 
+	x өстә: 1.
+	Дөрес өз. # must clean up, no 'Commands out of sync'
+}.
+
+>> эзләү-параметрлары :=
+db сорау: ['SELECT * FROM book order by id desc limit 2'], 
+алып-кил: { :row
+	x өстә: 1.
+	Дөрес өз.
+}.
+
+(x > 0) дөрес: {
+	Чыгыш яз: ['Can we break in the middle of a fetch? '].
+}.
+
+Чыгыш яз: Дөрес, яңа-юл.

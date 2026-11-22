@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB కొత్త హోస్ట్: ['localhost'],
+	వాడుకరి-పేరు: ['xo'],
+	పాస్-వర్డ్: ['pass123'],
+	డేటాబేస్-పేరు: ['xobase'],
+	అనుసంధానించు.
+
+>> conn2 := Maria-DB కొత్త హోస్ట్: ['localhost'],
+	వాడుకరి-పేరు: ['xo'],
+	పాస్-వర్డ్: ['pass123'],
+	డేటాబేస్-పేరు: ['xobase'],
+	అనుసంధానించు.
+#...
+>> del := conn1 క్వెరీ: ['DELETE FROM book WHERE id > 0'].
+{  del అమలు. conn1 నిర్ధారించు. } పట్టుకో: { :e conn1 వెనక్కి-తీసుకో.  }, నడుపు.
+
+>> insert := conn1 క్వెరీ: ['INSERT INTO book (id) VALUES(null)'].
+insert అమలు.
+
+>> లెక్క := conn1 క్వెరీ: ['SELECT COUNT(*) AS num FROM book'].
+లెక్క తెచ్చు: { :row అవుట్-పుట్ రాయి: row num, కొత్త-పంక్తి. }.
+
+# does not show up
+# insert not committed on connection 1
+>> లెక్క := conn2 క్వెరీ: ['SELECT COUNT(*) AS num FROM book'].
+లెక్క తెచ్చు: { :row అవుట్-పుట్ రాయి: row num, కొత్త-పంక్తి. }.

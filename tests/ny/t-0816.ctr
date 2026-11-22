@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> yesa := { :format :value
+	{ Zotuluka lembani: ( (Kapangidwe chatsopano: format) gwiritsa-pa: value ), mzere-watsopano. } gwira: { :e Zotuluka lembani: e, mzere-watsopano. }, yamba.
+}.
+>> try-int := { :format :value
+	{ Zotuluka lembani: ( (Kapangidwe chatsopano: format) gwiritsa-pa-nambala-yonse: value ), mzere-watsopano. } gwira: { :e Zotuluka lembani: e, mzere-watsopano. }, yamba.
+}.
+
+# fits
+yesa gwiritsa-pa: ['|%s|'] ndi: ['text'].
+yesa gwiritsa-pa: ['%06.2f'] ndi: 5.5.
+yesa gwiritsa-pa: ['100%% %s'] ndi: ['sure'].
+try-int gwiritsa-pa: ['%03d'] ndi: 7.
+try-int gwiritsa-pa: ['%x'] ndi: 255.
+yesa gwiritsa-pa: ['%d'] ndi: (Int64 chatsopano kuchokera-ku-malemba: ['12']).
+yesa gwiritsa-pa: ['%lld'] ndi: (Int64 chatsopano kuchokera-ku-malemba: ['12']).
+yesa gwiritsa-pa: ['%.1lf'] ndi: 5.5.
+try-int gwiritsa-pa: ['%hd'] ndi: 7.
+
+# does not fit
+yesa gwiritsa-pa: ['%s'] ndi: 12345.
+yesa gwiritsa-pa: ['%d'] ndi: 12345.
+yesa gwiritsa-pa: ['%f'] ndi: ['text'].
+try-int gwiritsa-pa: ['%d'] ndi: ['text'].
+try-int gwiritsa-pa: ['%s'] ndi: 5.
+yesa gwiritsa-pa: ['%s %s'] ndi: ['text'].
+yesa gwiritsa-pa: ['%n'] ndi: ['text'].
+yesa gwiritsa-pa: ['%*s'] ndi: ['text'].
+yesa gwiritsa-pa: ['%'] ndi: ['text'].
+
+# length modifier does not fit
+yesa gwiritsa-pa: ['%ls'] ndi: ['text'].
+yesa gwiritsa-pa: ['%Lf'] ndi: 5.5.
+try-int gwiritsa-pa: ['%ld'] ndi: 7.
+try-int gwiritsa-pa: ['%lld'] ndi: 7.
+yesa gwiritsa-pa: ['%Ld'] ndi: (Int64 chatsopano kuchokera-ku-malemba: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+yesa gwiritsa-pa: ['%99999999999s'] ndi: ['text'].

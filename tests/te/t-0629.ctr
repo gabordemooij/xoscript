@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+అవుట్-పుట్ రాయి: ['Database test'], కొత్త-పంక్తి.
+
+>> db := Maria-DB కొత్త హోస్ట్: ['localhost'],
+	వాడుకరి-పేరు: ['xo'], పాస్-వర్డ్: ['pass123'], డేటాబేస్-పేరు: ['xobase'], అనుసంధానించు.
+
+అవుట్-పుట్ రాయి: ['Can we connect? '] + db అనుసంధానమైందా?, కొత్త-పంక్తి.
+
+>> శోధన-పరామితులు := db క్వెరీ: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], పరామితులు: ( వరుస కొత్త ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  శోధన-పరామితులు అమలు. db నిర్ధారించు. } పట్టుకో: { :e db వెనక్కి-తీసుకో.  }, నడుపు.
+
+అవుట్-పుట్ రాయి: ['Can we insert? '] + ( శోధన-పరామితులు insert-id > 0 ), కొత్త-పంక్తి.
+
+>> Obj := వస్తువు కొత్త.
+Obj అందినప్పుడు: ['retrieve-rows'] చేయి: {
+	తన లెక్క := 0.
+	>> శోధన-పరామితులు :=
+	db క్వెరీ: ['SELECT * FROM book order by id desc limit 2'], 
+	తెచ్చు: { :row 
+		తన లెక్క కూడు: 1.
+		నిజం ఆపు.
+	}. <- తన లెక్క నకలు.
+}.
+
+అవుట్-పుట్ రాయి: ['Can we query? '] + ( Obj retrieve-rows > 0 ), కొత్త-పంక్తి.

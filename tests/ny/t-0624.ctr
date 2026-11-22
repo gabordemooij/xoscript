@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Chinthu chatsopano.
+
+Log chikafika: ['say:'] chitani: { :str
+	Zotuluka lembani: str, mzere-watsopano.
+}.
+
+>> Item := Chinthu chatsopano.
+
+Item chikafika: ['chatsopano:'] chitani: { :id <- wekha chatsopano id: id.
+}.
+
+Item chikafika: ['id:'] chitani: { :id
+	zake id := id.
+}.
+
+Item chikafika: ['id'] chitani: { <- zake id. }.
+
+
+Item chikafika: ['malemba-a-mawu'] chitani: {
+	>> str := ['Item#~no'].
+	str ~no: zake id. <- str.
+}.
+
+
+>> Print := Chinthu chatsopano.
+
+Print chikafika: ['items'] chitani: { 
+	
+	zake item := Item chatsopano: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: zake item
+	).
+	
+	
+}.
+
+Print items.

@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Soo-saar qor: ['Database test'], sadar-cusub.
+
+>> db := Maria-DB cusub martigeliye: ['localhost'],
+	magaca-isticmaalaha: ['xo'], furaha-sirta: ['pass123'], magaca-xogta: ['xobase'], ku-xirmo.
+
+Soo-saar qor: ['Can we connect? '] + db ku-xiran?, sadar-cusub.
+
+>> xuduudaha-raadinta := db weydiin: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], xuduudo: ( Liis cusub ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  xuduudaha-raadinta fuli. db xaqiiji. } qabo: { :e db dib-u-celi.  }, bilow.
+
+Soo-saar qor: ['Can we insert? '] + ( xuduudaha-raadinta insert-id > 0 ), sadar-cusub.
+
+>> Obj := Walax cusub.
+Obj marka: ['retrieve-rows'] samee: {
+	iska-leh tirada-guud := 0.
+	>> xuduudaha-raadinta :=
+	db weydiin: ['SELECT * FROM book order by id desc limit 2'], 
+	soo-qaad: { :row 
+		iska-leh tirada-guud ku-dar: 1.
+		Run jooji-wareegga.
+	}. <- iska-leh tirada-guud koobiyee.
+}.
+
+Soo-saar qor: ['Can we query? '] + ( Obj retrieve-rows > 0 ), sadar-cusub.

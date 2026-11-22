@@ -1,0 +1,42 @@
+
+Text wenn: ['html'] tun: { <- (
+		selbst
+		ersetzen: ['&'] mit: ['&amp;'],
+		ersetzen: ['<'] mit: ['&lt;'],
+		ersetzen: ['>'] mit: ['&gt;'],
+		ersetzen: ['"'] mit: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objekt neu.
+
+HtmlBrush wenn: ['antworten:'] tun: { :tag
+	Ausgabe schreiben: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush wenn: ['antworten:und:'] tun: { :tag :content
+	tag := ( tag von: 0 länge: (tag länge - 1) ).
+	Ausgabe schreiben: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush wenn: ['content:'] tun: { :text
+	Ausgabe schreiben: text html, stopp.
+}.
+
+HtmlBrush wenn: ['attr:value:'] tun: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush neu.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

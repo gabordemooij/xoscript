@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Lenaneo taolo-ea-mohopolo: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB ncha moamoheli: ['localhost'],
+	lebitso-la-mosebelisi: ['xo'], phasewete: ['pass123'], lebitso-la-database: ['xobase'], hokela.
+
+>> TwoDigitFormat := Sebopeho ncha: ['%02d'].
+
+# Datetime
+{
+	>> selemo := Palo pakeng-tsa: 1995 le: 2050, mongolo.
+	>> khoeli := TwoDigitFormat sebelisa-ho-palo-e-felletseng: (Palo pakeng-tsa: 1 le: 12), mongolo.
+	>> letsatsi := TwoDigitFormat sebelisa-ho-palo-e-felletseng: (Palo pakeng-tsa: 1 le: 28), mongolo.
+	>> hora := TwoDigitFormat sebelisa-ho-palo-e-felletseng: (Palo pakeng-tsa: 1 le: 23), mongolo.
+	>> motsotso := TwoDigitFormat sebelisa-ho-palo-e-felletseng: (Palo pakeng-tsa: 1 le: 59), mongolo.
+	>> motsotsoana := TwoDigitFormat sebelisa-ho-palo-e-felletseng: (Palo pakeng-tsa: 1 le: 59), mongolo.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: selemo,
+		MM: khoeli,
+		DD: letsatsi,
+		HH: hora,
+		II: motsotso,
+		SS: motsotsoana.
+	>> liparamente-tsa-patlo :=
+	db potso: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	lata: { :row
+		(row mydatetime = datetime) leshano: {
+			mosebetsi-ona phoso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter eketsa: 1.
+} * 100.
+
+# Date
+{
+	>> selemo := Palo pakeng-tsa: 1995 le: 2050, mongolo.
+	>> khoeli := TwoDigitFormat sebelisa-ho-palo-e-felletseng: (Palo pakeng-tsa: 1 le: 12), mongolo.
+	>> letsatsi := TwoDigitFormat sebelisa-ho-palo-e-felletseng: (Palo pakeng-tsa: 1 le: 28), mongolo.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: selemo,
+		MM: khoeli,
+		DD: letsatsi.
+	>> liparamente-tsa-patlo :=
+	db potso: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	lata: { :row
+		(row mydate = date) leshano: {
+			mosebetsi-ona phoso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter eketsa: 1.
+} * 100.
+
+
+# Time
+{
+	>> hora := TwoDigitFormat sebelisa-ho-palo-e-felletseng: (Palo pakeng-tsa: 1 le: 23), mongolo.
+	>> motsotso := TwoDigitFormat sebelisa-ho-palo-e-felletseng: (Palo pakeng-tsa: 1 le: 59), mongolo.
+	>> motsotsoana := TwoDigitFormat sebelisa-ho-palo-e-felletseng: (Palo pakeng-tsa: 1 le: 59), mongolo.
+	>> nako := ['HH:II:SS'].
+	nako
+		HH: hora,
+		II: motsotso,
+		SS: motsotsoana.
+	>> liparamente-tsa-patlo :=
+	db potso: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: nako),
+	lata: { :row
+		(row mytime = nako) leshano: {
+			mosebetsi-ona phoso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter eketsa: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lethathamo ncha tlatsa: 100000 ka: ['x'], kopanya: [''].
+{
+	>> str2 := Polokelo-e-sireletsehileng token: 40.
+	>> liparamente-tsa-patlo :=
+	db potso: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	lata: { :row
+		(row str1 = str1 le: row str2 = str2) leshano: {
+			mosebetsi-ona phoso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter eketsa: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Palo pakeng-tsa: 1 le: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 ho-tsoa-mongolong: ['9223372036854775807'] ) -
+		( Int64 ho-tsoa-mongolong: ['99999'] ) +
+		( Int64 ho-tsoa-mongolong: n1 mongolo )
+	).
+	>> liparamente-tsa-patlo :=
+	db potso: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	lata: { :row
+		(row n1 = n1) leshano: {
+			mosebetsi-ona phoso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) leshano: {
+			mosebetsi-ona phoso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 atametsa-palo) leshano: {
+			mosebetsi-ona phoso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) leshano: {
+			mosebetsi-ona phoso: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter eketsa: 1.
+} * 100.
+
+
+Sephetho ngola: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), mola-o-mocha.

@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> útvonal := ['/tmp/dat.csv'].
+>> csv := Fájl új: útvonal.
+csv ír: s.
+
+# accepts CRLF LF CR, varying row length
+csv elválasztó: [';'] idézőjel: ['"'] sorok: { :line
+	Program takarít.
+	Kimenet ír: line, újsor.
+	Program takarít.
+}.
+
+# unequal lines
+s hozzáfűz: ['\njustone'].
+csv ír: s.
+{
+	csv elválasztó: [';'] idézőjel: ['"'] sorok: { :line
+		Kimenet ír: line, újsor.
+	}.
+} elkap: { :e 
+	Kimenet ír: e, újsor.
+}, indít.
+
+# invalid format
+s := ['"he"llo";world'].
+csv ír: s.
+{
+	csv elválasztó: [';'] idézőjel: ['"'] sorok: { :line
+		Kimenet ír: line, újsor.
+	}.
+} elkap: { :e 
+	Kimenet ír: e, újsor.
+}, indít.

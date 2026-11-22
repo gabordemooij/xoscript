@@ -1,0 +1,43 @@
+
+
+>> g := Server nei.
+>> v := Tresor nei.
+>> ok := 0.
+
+>> secrets := Lëscht nei ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopéieren.
+passwords all: { :i :p
+	secrets all: { :n :s
+		{
+			>> encrypted := v verschlësselen: s schlëssel: p.
+			>> decrypted := v entschlësselen: encrypted schlëssel: p.
+			(decrypted = s) wouer: {
+				ok dobäisetzen: 1.
+			}, anescht: {
+				Ausgab schreiwen: ['failed encrypting/decrypting: '], nei-zeil.
+				Ausgab schreiwen: s, nei-zeil.
+				Ausgab schreiwen: ['encrypted: '] + encrypted, nei-zeil.
+				Ausgab schreiwen: ['decrypted: '] + encrypted, nei-zeil.
+				Programm enn.
+			}.
+		} offänken: { :err
+			(s = [''] oder: p = ['']) wouer: {
+				ok dobäisetzen: 1.
+			}, anescht: {
+				Ausgab schreiwen: err, nei-zeil.
+				Programm enn.
+			}.
+		}, starten.
+	}.
+}.
+
+Ausgab schreiwen: ( ok + [' vault encryptions tested.'] ), nei-zeil.

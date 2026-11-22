@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := תוכנית הגדרה: ⌝'FFITESTLIB'⌜.
+
+# link stdio functions from c for advances file operations
+Server קשר: ﴿ רשימה חדש ;
+ libname ; ⌝'fopen'⌜ ;
+ ﴿ רשימה חדש ; ⌝'pointer'⌜ ; ⌝'pointer'⌜﴾ ;
+ ⌝'pointer'⌜ ;
+ ⌝'Stream'⌜ ;
+ ⌝'path:mode:'⌜
+﴾,
+קשר: ﴿ רשימה חדש ;
+ כלום ; # means same lib
+ ⌝'fread'⌜ ;
+ ﴿ רשימה חדש ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ כלום ; # means same object (i.e. Stream)
+ ⌝'fread'⌜
+﴾,
+קשר: ﴿
+ רשימה חדש ;
+ כלום ; # means same lib
+ ⌝'fwrite'⌜ ;
+ ﴿ רשימה חדש ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ כלום ; # means same lib
+ ⌝'fwrite'⌜
+﴾,
+קשר: ﴿
+ רשימה חדש ;
+ כלום ; # means same lib
+ ⌝'rewind'⌜ ;
+ ﴿ רשימה חדש ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ כלום ; # means same lib
+ ⌝'rewind:'⌜
+﴾.
+
+>> str := Blob utf8: ⌝'abc123'⌜.
+>> נתיב-קובץ := Blob utf8: ⌝'/tmp/bla.txt'⌜.
+>> mode := Blob utf8: ⌝'w+'⌜.
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: נתיב-קובץ mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream הודעה: ⌝'fwrite'⌜ ארגומנטים: ﴿רשימה חדש ; str ; 1 ; 6 ; fd ﴾.
+פלט כתוב: bytes-written, שורה-חדשה.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob חדש: 20.
+
+# read from file
+>> bytes-read := Stream הודעה: ⌝'fread'⌜ ארגומנטים: ﴿רשימה חדש ; buf ; 1 ; 6 ; fd ﴾.
+פלט כתוב: bytes-read, שורה-חדשה.
+פלט כתוב: buf, שורה-חדשה.
+
+# free memory
+str  שחרר.
+נתיב-קובץ שחרר.
+mode שחרר.
+buf  שחרר.
+
+

@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+プログラム メモリ管理: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB 新規 ホスト: ['localhost'],
+	ユーザー名: ['xo'], パスワード: ['pass123'], データベース名: ['xobase'], 接続.
+
+>> TwoDigitFormat := 書式 新規: ['%02d'].
+
+# Datetime
+{
+	>> 年値 := 数値 範囲: 1995 から: 2050, 文字列化.
+	>> 月値 := TwoDigitFormat 整数に適用: (数値 範囲: 1 から: 12), 文字列化.
+	>> 日値 := TwoDigitFormat 整数に適用: (数値 範囲: 1 から: 28), 文字列化.
+	>> 時値 := TwoDigitFormat 整数に適用: (数値 範囲: 1 から: 23), 文字列化.
+	>> 分値 := TwoDigitFormat 整数に適用: (数値 範囲: 1 から: 59), 文字列化.
+	>> 秒値 := TwoDigitFormat 整数に適用: (数値 範囲: 1 から: 59), 文字列化.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: 年値,
+		MM: 月値,
+		DD: 日値,
+		HH: 時値,
+		II: 分値,
+		SS: 秒値.
+	>> 検索パラメータ :=
+	db クエリ: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	取得: { :row
+		(row mydatetime = datetime) 偽なら: {
+			このタスク エラー: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter 加算: 1.
+} * 100.
+
+# Date
+{
+	>> 年値 := 数値 範囲: 1995 から: 2050, 文字列化.
+	>> 月値 := TwoDigitFormat 整数に適用: (数値 範囲: 1 から: 12), 文字列化.
+	>> 日値 := TwoDigitFormat 整数に適用: (数値 範囲: 1 から: 28), 文字列化.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: 年値,
+		MM: 月値,
+		DD: 日値.
+	>> 検索パラメータ :=
+	db クエリ: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	取得: { :row
+		(row mydate = date) 偽なら: {
+			このタスク エラー: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter 加算: 1.
+} * 100.
+
+
+# Time
+{
+	>> 時値 := TwoDigitFormat 整数に適用: (数値 範囲: 1 から: 23), 文字列化.
+	>> 分値 := TwoDigitFormat 整数に適用: (数値 範囲: 1 から: 59), 文字列化.
+	>> 秒値 := TwoDigitFormat 整数に適用: (数値 範囲: 1 から: 59), 文字列化.
+	>> 時刻 := ['HH:II:SS'].
+	時刻
+		HH: 時値,
+		II: 分値,
+		SS: 秒値.
+	>> 検索パラメータ :=
+	db クエリ: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: 時刻),
+	取得: { :row
+		(row mytime = 時刻) 偽なら: {
+			このタスク エラー: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter 加算: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := リスト 新規 埋める: 100000 値: ['x'], 結合: [''].
+{
+	>> str2 := 金庫 トークン: 40.
+	>> 検索パラメータ :=
+	db クエリ: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	取得: { :row
+		(row str1 = str1 かつ: row str2 = str2) 偽なら: {
+			このタスク エラー: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter 加算: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := 数値 範囲: 1 から: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 文字列から: ['9223372036854775807'] ) -
+		( Int64 文字列から: ['99999'] ) +
+		( Int64 文字列から: n1 文字列化 )
+	).
+	>> 検索パラメータ :=
+	db クエリ: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	取得: { :row
+		(row n1 = n1) 偽なら: {
+			このタスク エラー: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) 偽なら: {
+			このタスク エラー: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 四捨五入) 偽なら: {
+			このタスク エラー: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) 偽なら: {
+			このタスク エラー: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter 加算: 1.
+} * 100.
+
+
+出力 書く: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), 改行.

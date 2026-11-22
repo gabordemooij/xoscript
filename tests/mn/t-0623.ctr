@@ -1,0 +1,43 @@
+
+
+>> g := Server шинэ.
+>> v := Сейф шинэ.
+>> ok := 0.
+
+>> secrets := Жагсаалт шинэ ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets хуулах.
+passwords бүр: { :i :p
+	secrets бүр: { :n :s
+		{
+			>> encrypted := v шифрлэх: s түлхүүр: p.
+			>> decrypted := v шифр-тайлах: encrypted түлхүүр: p.
+			(decrypted = s) үнэн-бол: {
+				ok нэмэх: 1.
+			}, үгүй-бол: {
+				Гаралт бичих: ['failed encrypting/decrypting: '], шинэ-мөр.
+				Гаралт бичих: s, шинэ-мөр.
+				Гаралт бичих: ['encrypted: '] + encrypted, шинэ-мөр.
+				Гаралт бичих: ['decrypted: '] + encrypted, шинэ-мөр.
+				Програм дуусгах.
+			}.
+		} барих: { :err
+			(s = [''] эсвэл: p = ['']) үнэн-бол: {
+				ok нэмэх: 1.
+			}, үгүй-бол: {
+				Гаралт бичих: err, шинэ-мөр.
+				Програм дуусгах.
+			}.
+		}, ажиллуулах.
+	}.
+}.
+
+Гаралт бичих: ( ok + [' vault encryptions tested.'] ), шинэ-мөр.

@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := നിലവറ താക്കോലുകൾ-നിർമ്മിക്കുക.
+>> sk := keys ആദ്യത്തേത്.
+>> pk := keys അവസാനത്തേത്.
+>> sig := നിലവറ ഒപ്പിടുക: ['abc'] താക്കോലാൽ: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ നിലവറ ഒപ്പിടുക: ['abc'] താക്കോലാൽ: long. } പിടിക്കുക: { :e
+	ഔട്ട്പുട്ട് എഴുതുക: e, പുതിയ-വരി.
+}, പ്രവർത്തിപ്പിക്കുക.
+
+{ നിലവറ പരിശോധിക്കുക: ['abc'] ഒപ്പ്: long താക്കോലാൽ: pk. } പിടിക്കുക: { :e
+	ഔട്ട്പുട്ട് എഴുതുക: e, പുതിയ-വരി.
+}, പ്രവർത്തിപ്പിക്കുക.
+
+{ നിലവറ പരിശോധിക്കുക: ['abc'] ഒപ്പ്: sig താക്കോലാൽ: short. } പിടിക്കുക: { :e
+	ഔട്ട്പുട്ട് എഴുതുക: e, പുതിയ-വരി.
+}, പ്രവർത്തിപ്പിക്കുക.

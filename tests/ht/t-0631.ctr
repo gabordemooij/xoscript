@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Pwogram jesyon-memwa: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Pwogram paramèt: ['FFITESTLIB'].
+
+
+
+Server konekte-ak: (
+ Lis nouvo ;
+ libname ;
+ ['puts'] ;
+ ( Lis nouvo ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s libere.
+
+# test with struct
+
+>> a := Blob nouvo: 8.
+a bytes: (
+	Lis <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Lis <<: ['int'], ; ['int']).
+
+Server konekte-ak: (
+	Lis <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Lis <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Sòti ekri: ['Sum test:'] + (ffitest ffisum: a), nouvo-liy.
+
+struct libere-struct.
+struct libere.
+a libere.

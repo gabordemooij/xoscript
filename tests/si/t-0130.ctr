@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := වැඩසටහන සැකසුම: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server සබැඳිය: ( ලේඛනය නව ;
+ libname ; ['fopen'] ;
+ ( ලේඛනය නව ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+සබැඳිය: ( ලේඛනය නව ;
+ හිස් ; # means same lib
+ ['fread'] ;
+ ( ලේඛනය නව ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ හිස් ; # means same object (i.e. Stream)
+ ['fread']
+),
+සබැඳිය: (
+ ලේඛනය නව ;
+ හිස් ; # means same lib
+ ['fwrite'] ;
+ ( ලේඛනය නව ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ හිස් ; # means same lib
+ ['fwrite']
+),
+සබැඳිය: (
+ ලේඛනය නව ;
+ හිස් ; # means same lib
+ ['rewind'] ;
+ ( ලේඛනය නව ; ['pointer'] ) ;
+ ['int'] ;
+ හිස් ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> ගොනු-මාර්ගය := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: ගොනු-මාර්ගය mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream පණිවිඩය: ['fwrite'] තර්ක: (ලේඛනය නව ; str ; 1 ; 6 ; fd ).
+නිමැවුම ලියන්න: bytes-written, නව-පේළිය.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob නව: 20.
+
+# read from file
+>> bytes-read := Stream පණිවිඩය: ['fread'] තර්ක: (ලේඛනය නව ; buf ; 1 ; 6 ; fd ).
+නිමැවුම ලියන්න: bytes-read, නව-පේළිය.
+නිමැවුම ලියන්න: buf, නව-පේළිය.
+
+# free memory
+str  නිදහස්-කරන්න.
+ගොනු-මාර්ගය නිදහස්-කරන්න.
+mode නිදහස්-කරන්න.
+buf  නිදහස්-කරන්න.
+
+

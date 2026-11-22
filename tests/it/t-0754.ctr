@@ -1,0 +1,30 @@
+Uscita scrivi: ['Test object'], stop.
+>> a := Oggetto nuovo. 
+
+a on: ['item:'] fare: { :out
+	mio out := out. 
+}.
+
+a on: ['item'] fare: { <- mio out.
+}.
+
+a on: ['greet'] fare: {
+	Uscita scrivi: ['hi from original out!'], stop.
+}.
+
+a item: Uscita.
+
+Uscita scrivi: a item, stop.
+
+>> old-out-address := a item prototipo indirizzo-di-memoria.
+a save-as: ['/tmp/a.bin'].
+Uscita scrivi: ['========== RELOADING SNAP:'], stop.
+
+>> b := Oggetto load-from: ['/tmp/a.bin'].
+
+(b item prototipo indirizzo-di-memoria = old-out-address) vero: {
+	Uscita scrivi: ['Object link re-attached.'], stop.
+}.
+
+b item scrivi: ['hello from loaded out!'], stop.
+b greet.

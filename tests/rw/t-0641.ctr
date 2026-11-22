@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Inkoranyamagambo gishya
+	# ASCII only
+	shyira: ( Urutonde gishya ; 65 ; 65 ; 65 ; 65 ; 0 ) kuri: ['AAAA'],
+	# valid 2 byte sequence
+	shyira: ( Urutonde gishya ; 194 ; 162 ; 0 ) kuri: ['¢'],
+	# Valid 3-byte UTF-8
+    shyira: ( Urutonde gishya ; 226 ; 130 ; 172 ; 0 ) kuri: ['€'],
+	# Valid 4-byte UTF-8
+    shyira: ( Urutonde gishya ; 240 ; 144 ; 141 ; 136 ; 0 ) kuri: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    shyira: ( Urutonde gishya ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) kuri: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    shyira: ( Urutonde gishya ; 65 ; 193 ; 129 ; 0 ) kuri: ['A?'],
+	# Invalid first byte (0xFF)
+    shyira: ( Urutonde gishya ; 255 ; 0 ) kuri: ['?'],
+	# Incomplete multi-byte sequence at end
+    shyira: ( Urutonde gishya ; 66 ; 226 ; 0 ) kuri: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    shyira: ( Urutonde gishya ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) kuri: ['A€?𐍈B'].
+	 
+utf8cases buri: { :key :value
+	>> blob := Blob gishya: value umubare-wibintu, bytes: value.
+	>> str := blob inyandiko.
+	(str = key) ukuri: {
+		Ibisohoka andika: ['OK'], umurongo-mushya.
+	}, bitabaye-ibyo: {
+		Ibisohoka andika: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, umurongo-mushya.
+	}.
+	blob rekura.
+}.

@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server paratoi.
+Rhaglen defnyddio: ['../../../src/xo/cy/webtools.xo'].
+
+>> Fake-Request := Gwrthrych newydd.
+Fake-Request ar: ['value:'] gwneud: { :gwerth
+	eiddo gwerth := gwerth.
+}.
+Fake-Request ar: ['cookie:'] gwneud: { :enw <- eiddo gwerth.
+}.
+
+>> Test-Session := Sesiwn-ffeil-dros-dro newydd.
+Test-Session ar: ['llwytho'] gwneud: { <- Geiriadur newydd.
+}.
+Test-Session ar: ['session-id'] gwneud: { <- eiddo id.
+}.
+
+>> cookies := Rhestr newydd
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies pob: { :i :cookie
+	>> cais := Fake-Request newydd.
+	cais value: cookie.
+	>> rheolwr := Test-Session newydd.
+	>> web := Dogfen-We newydd.
+	web cais: cais.
+	web rheolwr-sesiynau: rheolwr.
+	web dechrau-sesiwn.
+	Allbwn ysgrifennu: ( rheolwr session-id = cookie ), llinell-newydd.
+}.
+
+>> web := Dogfen-We newydd.
+web json: (Geiriadur newydd rhoi: ['b'] yn: ['a']).
+Allbwn ysgrifennu: ['\n'], llinell-newydd.
+
+{ Rhwydwaith get: ['file:///etc/hostname']. } dal: { :e
+	Allbwn ysgrifennu: e, llinell-newydd.
+}, cychwyn.
+
+>> svg := Ffeil newydd: ['/tmp/test0814.svg'].
+svg ysgrifennu: ['<svg xmlns="x"></svg>'].
+Allbwn llinell-newydd.
+Server trosglwyddo: ['test0814.svg'] rhagddodiad: ['/tmp/'].
+svg dileu.

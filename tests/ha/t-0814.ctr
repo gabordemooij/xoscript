@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server shirya.
+Shiri yi-amfani: ['../../../src/xo/ha/webtools.xo'].
+
+>> Fake-Request := Abu sabo.
+Fake-Request idan: ['value:'] yi: { :ƙima
+	nasa ƙima := ƙima.
+}.
+Fake-Request idan: ['cookie:'] yi: { :suna <- nasa ƙima.
+}.
+
+>> Test-Session := Zaman-fayil-na-wucin-gadi sabo.
+Test-Session idan: ['loda'] yi: { <- Ƙamus sabo.
+}.
+Test-Session idan: ['session-id'] yi: { <- nasa id.
+}.
+
+>> cookies := Jeri sabo
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies kowane: { :i :cookie
+	>> buƙata-http := Fake-Request sabo.
+	buƙata-http value: cookie.
+	>> manaja := Test-Session sabo.
+	>> web := Takardar-Yanar-Gizo sabo.
+	web buƙata-http: buƙata-http.
+	web manajan-zama: manaja.
+	web fara-zama.
+	Fitarwa rubuta: ( manaja session-id = cookie ), sabon-layi.
+}.
+
+>> web := Takardar-Yanar-Gizo sabo.
+web json: (Ƙamus sabo sanya: ['b'] a: ['a']).
+Fitarwa rubuta: ['\n'], sabon-layi.
+
+{ Hanyar-sadarwa get: ['file:///etc/hostname']. } kama: { :e
+	Fitarwa rubuta: e, sabon-layi.
+}, fara.
+
+>> svg := Fayil sabo: ['/tmp/test0814.svg'].
+svg rubuta: ['<svg xmlns="x"></svg>'].
+Fitarwa sabon-layi.
+Server wuce: ['test0814.svg'] karin-farko: ['/tmp/'].
+svg goge.

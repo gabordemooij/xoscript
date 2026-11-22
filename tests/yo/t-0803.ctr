@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB tuntun agbalejo: ['localhost'],
+	orukọ-olumulo: ['xo'],
+	ọrọ-igbaniwọle: ['pass123'],
+	orukọ-ibi-ipamọ: ['xobase'],
+	sopọ-mọ.
+
+>> conn2 := Maria-DB tuntun agbalejo: ['localhost'],
+	orukọ-olumulo: ['xo'],
+	ọrọ-igbaniwọle: ['pass123'],
+	orukọ-ibi-ipamọ: ['xobase'],
+	sopọ-mọ.
+#...
+>> del := conn1 ibeere: ['DELETE FROM book WHERE id > 0'].
+{  del ṣiṣẹ. conn1 fidi-mulẹ. } mu: { :e conn1 yi-pada-sẹhin.  }, bẹrẹ.
+
+>> insert := conn1 ibeere: ['INSERT INTO book (id) VALUES(null)'].
+insert ṣiṣẹ.
+
+>> iye-nọmba := conn1 ibeere: ['SELECT COUNT(*) AS num FROM book'].
+iye-nọmba mu-wa: { :row Ijade kọ: row num, ila-tuntun. }.
+
+# does not show up
+# insert not committed on connection 1
+>> iye-nọmba := conn2 ibeere: ['SELECT COUNT(*) AS num FROM book'].
+iye-nọmba mu-wa: { :row Ijade kọ: row num, ila-tuntun. }.

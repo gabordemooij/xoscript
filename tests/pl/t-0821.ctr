@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> ścieżka := ['/tmp/test0821.csv'].
+>> file := Plik nowy: ścieżka.
+
+file pisz: ['a,b\n"1,2\n'].
+{
+	file separator: [','] cudzysłów: ['"'] wiersze: { :line
+		Wyjście pisz: line, nowa-linia.
+	}.
+} przechwyć: { :e Wyjście pisz: e, nowa-linia. }, uruchom.
+
+# a closed quote still works
+file pisz: ['a,b\n"1,2",3'].
+file separator: [','] cudzysłów: ['"'] wiersze: { :line
+	Wyjście pisz: line, nowa-linia.
+}.
+file usuń.

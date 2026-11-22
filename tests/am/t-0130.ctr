@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := ፕሮግራም ቅንብር: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server አያይዝ: ( ሰልፍ አዲስ ;
+ libname ; ['fopen'] ;
+ ( ሰልፍ አዲስ ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+አያይዝ: ( ሰልፍ አዲስ ;
+ ባዶ ; # means same lib
+ ['fread'] ;
+ ( ሰልፍ አዲስ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ባዶ ; # means same object (i.e. Stream)
+ ['fread']
+),
+አያይዝ: (
+ ሰልፍ አዲስ ;
+ ባዶ ; # means same lib
+ ['fwrite'] ;
+ ( ሰልፍ አዲስ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ባዶ ; # means same lib
+ ['fwrite']
+),
+አያይዝ: (
+ ሰልፍ አዲስ ;
+ ባዶ ; # means same lib
+ ['rewind'] ;
+ ( ሰልፍ አዲስ ; ['pointer'] ) ;
+ ['int'] ;
+ ባዶ ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> የፋይል-መንገድ := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: የፋይል-መንገድ mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream መልእክት: ['fwrite'] ግቤቶች: (ሰልፍ አዲስ ; str ; 1 ; 6 ; fd ).
+ውጤት ፃፍ: bytes-written, አዲስ-መስመር.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob አዲስ: 20.
+
+# read from file
+>> bytes-read := Stream መልእክት: ['fread'] ግቤቶች: (ሰልፍ አዲስ ; buf ; 1 ; 6 ; fd ).
+ውጤት ፃፍ: bytes-read, አዲስ-መስመር.
+ውጤት ፃፍ: buf, አዲስ-መስመር.
+
+# free memory
+str  ልቀቅ.
+የፋይል-መንገድ ልቀቅ.
+mode ልቀቅ.
+buf  ልቀቅ.
+
+

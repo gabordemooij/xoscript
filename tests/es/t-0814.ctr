@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server iniciar.
+Programa utilizar: ['../../../src/xo/es/webtools.xo'].
+
+>> Fake-Request := Objeto crear.
+Fake-Request al: ['value:'] hacer: { :valor
+	mi valor := valor.
+}.
+Fake-Request al: ['cookie:'] hacer: { :nombre <- mi valor.
+}.
+
+>> Test-Session := Ficherotemporal-sesión crear.
+Test-Session al: ['cargar'] hacer: { <- Diccionario crear.
+}.
+Test-Session al: ['session-id'] hacer: { <- mi id.
+}.
+
+>> cookies := Lista crear
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies cada: { :i :cookie
+	>> solicitud := Fake-Request crear.
+	solicitud value: cookie.
+	>> gestor := Test-Session crear.
+	>> web := Documento-Web crear.
+	web solicitud: solicitud.
+	web controlador-sesión: gestor.
+	web empezar-sesión.
+	Salida escribir: ( gestor session-id = cookie ), detener.
+}.
+
+>> web := Documento-Web crear.
+web json: (Diccionario crear poner: ['b'] en: ['a']).
+Salida escribir: ['\n'], detener.
+
+{ Red obtener: ['file:///etc/hostname']. } capturar: { :e
+	Salida escribir: e, detener.
+}, empezar.
+
+>> svg := Archivo crear: ['/tmp/test0814.svg'].
+svg escribir: ['<svg xmlns="x"></svg>'].
+Salida detener.
+Server acceso-directo: ['test0814.svg'] prefijo: ['/tmp/'].
+svg eliminar.

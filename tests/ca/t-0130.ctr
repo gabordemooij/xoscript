@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Programa configuració: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server enllaça: ( Llista nou ;
+ libname ; ['fopen'] ;
+ ( Llista nou ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+enllaça: ( Llista nou ;
+ Res ; # means same lib
+ ['fread'] ;
+ ( Llista nou ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Res ; # means same object (i.e. Stream)
+ ['fread']
+),
+enllaça: (
+ Llista nou ;
+ Res ; # means same lib
+ ['fwrite'] ;
+ ( Llista nou ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Res ; # means same lib
+ ['fwrite']
+),
+enllaça: (
+ Llista nou ;
+ Res ; # means same lib
+ ['rewind'] ;
+ ( Llista nou ; ['pointer'] ) ;
+ ['int'] ;
+ Res ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> camí := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: camí mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream missatge: ['fwrite'] arguments: (Llista nou ; str ; 1 ; 6 ; fd ).
+Sortida escriu: bytes-written, salt-de-línia.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob nou: 20.
+
+# read from file
+>> bytes-read := Stream missatge: ['fread'] arguments: (Llista nou ; buf ; 1 ; 6 ; fd ).
+Sortida escriu: bytes-read, salt-de-línia.
+Sortida escriu: buf, salt-de-línia.
+
+# free memory
+str  allibera.
+camí allibera.
+mode allibera.
+buf  allibera.
+
+

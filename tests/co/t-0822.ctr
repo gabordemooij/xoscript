@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB novu ospite: ['localhost'],
+	nome-di-utilizatore: ['xo'],
+	parolla-secreta: ['pass123'],
+	nome-di-basa: ['xobase'],
+	cunnette.
+
+>> parametri-di-ricerca := db richiesta: ['SELECT ? AS a, ? AS b, ? AS c'].
+parametri-di-ricerca parametri: (Lista novu ; ['1']).
+{ parametri-di-ricerca ricuperà: { :row Esciuta scrive: row, linea-nova. }. } catturà: { :e Esciuta scrive: e, linea-nova. }, lancià.
+
+>> parametri-di-ricerca := db richiesta: ['SELECT ? AS a'].
+{ parametri-di-ricerca ricuperà: { :row Esciuta scrive: row, linea-nova. }. } catturà: { :e Esciuta scrive: e, linea-nova. }, lancià.
+
+# the right number still works, more parameters are ignored as before
+>> parametri-di-ricerca := db richiesta: ['SELECT ? AS a, ? AS b'].
+parametri-di-ricerca parametri: (Lista novu ; ['1'] ; ['2']).
+parametri-di-ricerca ricuperà: { :row Esciuta scrive: (row à: ['a']), scrive: (row à: ['b']), linea-nova. }.
+parametri-di-ricerca parametri: (Lista novu ; ['1'] ; ['2'] ; ['3']).
+parametri-di-ricerca ricuperà: { :row Esciuta scrive: (row à: ['a']), scrive: (row à: ['b']), linea-nova. }.

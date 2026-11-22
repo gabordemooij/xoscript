@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Listahan bago ;
+	# {"key":"normal"} normal ASCII
+	( Diksyunaryo bago ilagay: ['normal'] sa: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Diksyunaryo bago ilagay: ['hello world'] sa: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Diksyunaryo bago ilagay: ['"'] sa: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Diksyunaryo bago ilagay: ['backslash: \\'] sa: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Diksyunaryo bago ilagay: ['slash: /'] sa: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Diksyunaryo bago ilagay: ['backspace: \b'] sa: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Diksyunaryo bago ilagay: ['formfeed: \f'] sa: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Diksyunaryo bago ilagay: ['newline: \n'] sa: ['key'] ) ;
+	( Diksyunaryo bago ilagay: ['newline: ↵'] sa: ['key'] ) ;
+	( Diksyunaryo bago ilagay: ['newline: 
+	'] sa: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Diksyunaryo bago ilagay: ['carriage return: \r'] sa: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Diksyunaryo bago ilagay: ['tab \t'] sa: ['key'] ) ;
+	( Diksyunaryo bago ilagay: ['tab ⇿'] sa: ['key'] ) ;
+	( Diksyunaryo bago ilagay: ['tab  '] sa: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Diksyunaryo bago ilagay: ['NUL \u0000'] sa: ['key'] ) ;
+	( Diksyunaryo bago ilagay: ['NUL \0'] sa: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Diksyunaryo bago ilagay: ['control: \u0001'] sa: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Diksyunaryo bago ilagay: ['control: \u001F'] sa: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Diksyunaryo bago ilagay: ['unicode: é'] sa: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Diksyunaryo bago ilagay: ['unicode: €'] sa: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Diksyunaryo bago ilagay: ['unicode: 日本語'] sa: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Diksyunaryo bago ilagay: ['unicode: 😀'] sa: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Diksyunaryo bago ilagay: ['unicode: 🧑‍💻'] sa: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Diksyunaryo bago ilagay: ['combining: e\u0301'] sa: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Diksyunaryo bago ilagay: ['escaped unicode: \u00e9'] sa: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Diksyunaryo bago ilagay: ['escaped unicode: \u20ac'] sa: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Diksyunaryo bago ilagay: ['escaped unicode: \ud83d\ude00'] sa: ['key'] ) ;
+	# {"key":""} empty value
+	( Diksyunaryo bago ilagay: [''] sa: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Diksyunaryo bago ilagay: ['@ < > & = % + ? #'] sa: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Diksyunaryo bago ilagay: ['''] sa: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Diksyunaryo bago ilagay: ['multiple: \" \\ \n \r \t'] sa: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Diksyunaryo bago ilagay: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] sa: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Diksyunaryo bago ilagay: [' value'] sa: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Diksyunaryo bago ilagay: ['value '] sa: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Diksyunaryo bago ilagay: [' \t\n\r '] sa: ['key'] ).
+
+dicts bawat: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Diksyunaryo bago ilagay: d key sa: ['key']).
+	>> b := JSON jsonify: (Diksyunaryo bago ilagay: ['value'] sa: d key).
+	>> e := JSON bagay: a.
+	>> f := JSON bagay: b.
+	((e key = d key at: (f ? d key = ['value'])) o: (e key = ['NUL ?'])) totoo: {
+		Labas isulat: ['OK'], bagong-linya.
+	}, kung-hindi: {
+		Labas isulat: ['Unable to properly encode/decode: '] + d + j, bagong-linya.
+		Programa tapusin.
+	}.
+}.

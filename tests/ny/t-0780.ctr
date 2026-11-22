@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Mndandanda chatsopano ;
+	# {"key":"normal"} normal ASCII
+	( Mtanthauziramawu chatsopano ikani: ['normal'] pa: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Mtanthauziramawu chatsopano ikani: ['hello world'] pa: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Mtanthauziramawu chatsopano ikani: ['"'] pa: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Mtanthauziramawu chatsopano ikani: ['backslash: \\'] pa: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Mtanthauziramawu chatsopano ikani: ['slash: /'] pa: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Mtanthauziramawu chatsopano ikani: ['backspace: \b'] pa: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Mtanthauziramawu chatsopano ikani: ['formfeed: \f'] pa: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Mtanthauziramawu chatsopano ikani: ['newline: \n'] pa: ['key'] ) ;
+	( Mtanthauziramawu chatsopano ikani: ['newline: ↵'] pa: ['key'] ) ;
+	( Mtanthauziramawu chatsopano ikani: ['newline: 
+	'] pa: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Mtanthauziramawu chatsopano ikani: ['carriage return: \r'] pa: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Mtanthauziramawu chatsopano ikani: ['tab \t'] pa: ['key'] ) ;
+	( Mtanthauziramawu chatsopano ikani: ['tab ⇿'] pa: ['key'] ) ;
+	( Mtanthauziramawu chatsopano ikani: ['tab  '] pa: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Mtanthauziramawu chatsopano ikani: ['NUL \u0000'] pa: ['key'] ) ;
+	( Mtanthauziramawu chatsopano ikani: ['NUL \0'] pa: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Mtanthauziramawu chatsopano ikani: ['control: \u0001'] pa: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Mtanthauziramawu chatsopano ikani: ['control: \u001F'] pa: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Mtanthauziramawu chatsopano ikani: ['unicode: é'] pa: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Mtanthauziramawu chatsopano ikani: ['unicode: €'] pa: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Mtanthauziramawu chatsopano ikani: ['unicode: 日本語'] pa: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Mtanthauziramawu chatsopano ikani: ['unicode: 😀'] pa: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Mtanthauziramawu chatsopano ikani: ['unicode: 🧑‍💻'] pa: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Mtanthauziramawu chatsopano ikani: ['combining: e\u0301'] pa: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Mtanthauziramawu chatsopano ikani: ['escaped unicode: \u00e9'] pa: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Mtanthauziramawu chatsopano ikani: ['escaped unicode: \u20ac'] pa: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Mtanthauziramawu chatsopano ikani: ['escaped unicode: \ud83d\ude00'] pa: ['key'] ) ;
+	# {"key":""} empty value
+	( Mtanthauziramawu chatsopano ikani: [''] pa: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Mtanthauziramawu chatsopano ikani: ['@ < > & = % + ? #'] pa: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Mtanthauziramawu chatsopano ikani: ['''] pa: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Mtanthauziramawu chatsopano ikani: ['multiple: \" \\ \n \r \t'] pa: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Mtanthauziramawu chatsopano ikani: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] pa: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Mtanthauziramawu chatsopano ikani: [' value'] pa: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Mtanthauziramawu chatsopano ikani: ['value '] pa: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Mtanthauziramawu chatsopano ikani: [' \t\n\r '] pa: ['key'] ).
+
+dicts chilichonse: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Mtanthauziramawu chatsopano ikani: d key pa: ['key']).
+	>> b := JSON jsonify: (Mtanthauziramawu chatsopano ikani: ['value'] pa: d key).
+	>> e := JSON chinthu: a.
+	>> f := JSON chinthu: b.
+	((e key = d key ndi: (f ? d key = ['value'])) kapena: (e key = ['NUL ?'])) zoona: {
+		Zotuluka lembani: ['OK'], mzere-watsopano.
+	}, ngati-ayi: {
+		Zotuluka lembani: ['Unable to properly encode/decode: '] + d + j, mzere-watsopano.
+		Pulogalamu tsiriza.
+	}.
+}.

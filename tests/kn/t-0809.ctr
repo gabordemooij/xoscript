@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> ಮೌಲ್ಯಗಳು := ಸರಣಿ ಹೊಸ
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+ಮೌಲ್ಯಗಳು ಪ್ರತಿಯೊಂದು: { :i :value
+	>> d := ನಿಘಂಟು ಹೊಸ.
+	d ಇಡು: value ಕೀಲಿ: ['k'].
+	>> r := d ಕೋಡ್ ವಸ್ತುವಾಗಿ.
+	ಔಟ್-ಪುಟ್ ಬರೆ: r ಎಣಿಕೆ, ಹೊಸ-ಸಾಲು.
+	ಔಟ್-ಪುಟ್ ಬರೆ: ( (r ಅಲ್ಲಿ: ['k']) = value ), ಹೊಸ-ಸಾಲು.
+}.

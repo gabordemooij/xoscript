@@ -1,0 +1,43 @@
+
+
+>> g := Server nový.
+>> v := Trezor nový.
+>> ok := 0.
+
+>> secrets := Seznam nový ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopírovat.
+passwords každý: { :i :p
+	secrets každý: { :n :s
+		{
+			>> encrypted := v šifrovat: s klíč: p.
+			>> decrypted := v dešifrovat: encrypted klíč: p.
+			(decrypted = s) pravda: {
+				ok přičíst: 1.
+			}, jinak: {
+				Výstup psát: ['failed encrypting/decrypting: '], nový-řádek.
+				Výstup psát: s, nový-řádek.
+				Výstup psát: ['encrypted: '] + encrypted, nový-řádek.
+				Výstup psát: ['decrypted: '] + encrypted, nový-řádek.
+				Program konec.
+			}.
+		} chytit: { :err
+			(s = [''] nebo: p = ['']) pravda: {
+				ok přičíst: 1.
+			}, jinak: {
+				Výstup psát: err, nový-řádek.
+				Program konec.
+			}.
+		}, spustit.
+	}.
+}.
+
+Výstup psát: ( ok + [' vault encryptions tested.'] ), nový-řádek.

@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server រៀបចំ.
+កម្មវិធី ប្រើ: ['../../../src/xo/km/webtools.xo'].
+កម្មវិធី ប្រើ: ['../../../src/xo/km/mailtools.xo'].
+
+>> ក្បាល := ក្បាល-HTTP ថ្មី កូនសោ: ['Location'] តម្លៃ: ['/ok\r\nX-Injected: yes'].
+លទ្ធផល សរសេរ: ក្បាល.
+
+>> web := ឯកសារបណ្ដាញ ថ្មី.
+web ទៅកាន់: ['/ok\r\nX-Injected: yes'].
+លទ្ធផល សរសេរ: ['\n'], បន្ទាត់ថ្មី.
+
+>> mail := អ៊ីមែល ថ្មី.
+mail ទៅ: (ស៊េរី ថ្មី ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (ស៊េរី ថ្មី ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (ស៊េរី ថ្មី ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail អ្នកផ្ញើ: ['d@example.invalid\r\nX-From: yes'] ឈ្មោះ: ['site\r\nX-Name: yes'].
+mail ប្រធានបទ: ['hello\r\nX-Subject: yes'].
+mail តួអត្ថបទ: ['line1\r\nline2'].
+លទ្ធផល សរសេរ: mail បង្កើត.
+
+>> html := អ៊ីមែល-HTML ថ្មី.
+html ទៅ: (ស៊េរី ថ្មី ; ['a@example.invalid\r\nX-To: yes']).
+html អ្នកផ្ញើ: ['d@example.invalid'] ឈ្មោះ: ['site'].
+html ប្រធានបទ: ['hello\r\nX-Subject: yes'].
+html តួអត្ថបទ: ['body'].
+លទ្ធផល សរសេរ: ( html បង្កើត រួមមាន: ['\nX-'] ), បន្ទាត់ថ្មី.
+លទ្ធផល សរសេរ: ( html បង្កើត រួមមាន: ['X-To: yes'] ), បន្ទាត់ថ្មី.

@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Okuphumayo bhala: ['Database test'], umugqa-omusha.
+
+>> db := Maria-DB okusha umsingathi: ['localhost'],
+	igama-lomsebenzisi: ['xo'], iphasiwedi: ['pass123'], igama-lesizindalwazi: ['xobase'], xhumana.
+
+Okuphumayo bhala: ['Can we connect? '] + db kuxhunyiwe?, umugqa-omusha.
+
+>> amapharamitha-okusesha := db umbuzo: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], amapharamitha: ( Uhlu okusha ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  amapharamitha-okusesha enza-umyalo. db qinisekisa. } bamba: { :e db buyisela-emuva.  }, qala.
+
+Okuphumayo bhala: ['Can we insert? '] + ( amapharamitha-okusesha insert-id > 0 ), umugqa-omusha.
+
+>> x := 0.
+>> amapharamitha-okusesha :=
+db umbuzo: ['SELECT * FROM book order by id desc limit 2'], 
+landa: { :row 
+	x engeza: 1.
+	Iqiniso nqamula. # must clean up, no 'Commands out of sync'
+}.
+
+>> amapharamitha-okusesha :=
+db umbuzo: ['SELECT * FROM book order by id desc limit 2'], 
+landa: { :row
+	x engeza: 1.
+	Iqiniso nqamula.
+}.
+
+(x > 0) iqiniso: {
+	Okuphumayo bhala: ['Can we break in the middle of a fetch? '].
+}.
+
+Okuphumayo bhala: Iqiniso, umugqa-omusha.

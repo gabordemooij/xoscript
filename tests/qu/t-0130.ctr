@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Programa wakichina: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server tinkichiy: ( Katiray musuq ;
+ libname ; ['fopen'] ;
+ ( Katiray musuq ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+tinkichiy: ( Katiray musuq ;
+ Mana ; # means same lib
+ ['fread'] ;
+ ( Katiray musuq ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Mana ; # means same object (i.e. Stream)
+ ['fread']
+),
+tinkichiy: (
+ Katiray musuq ;
+ Mana ; # means same lib
+ ['fwrite'] ;
+ ( Katiray musuq ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Mana ; # means same lib
+ ['fwrite']
+),
+tinkichiy: (
+ Katiray musuq ;
+ Mana ; # means same lib
+ ['rewind'] ;
+ ( Katiray musuq ; ['pointer'] ) ;
+ ['int'] ;
+ Mana ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> ñan := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: ñan mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream willay: ['fwrite'] hapina: (Katiray musuq ; str ; 1 ; 6 ; fd ).
+Lluqsiy qillqay: bytes-written, sayay.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob musuq: 20.
+
+# read from file
+>> bytes-read := Stream willay: ['fread'] hapina: (Katiray musuq ; buf ; 1 ; 6 ; fd ).
+Lluqsiy qillqay: bytes-read, sayay.
+Lluqsiy qillqay: buf, sayay.
+
+# free memory
+str  kacharichiy.
+ñan kacharichiy.
+mode kacharichiy.
+buf  kacharichiy.
+
+

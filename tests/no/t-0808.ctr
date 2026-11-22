@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Hvelv generer-nøkler.
+>> sk := keys første.
+>> pk := keys siste.
+>> sig := Hvelv signer: ['abc'] med: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Hvelv signer: ['abc'] med: long. } fang: { :e
+	Utdata skriv: e, stop.
+}, start.
+
+{ Hvelv kontroller: ['abc'] signatur: long med: pk. } fang: { :e
+	Utdata skriv: e, stop.
+}, start.
+
+{ Hvelv kontroller: ['abc'] signatur: sig med: short. } fang: { :e
+	Utdata skriv: e, stop.
+}, start.

@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+程序 GC模式: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := 程序 环境变量: ['FFITESTLIB'].
+
+
+
+Server 链接: (
+ 数组对象 新建 ;
+ libname ;
+ ['puts'] ;
+ ( 数组对象 新建 ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := 二进制 可读的: ['Hello from FFI!\n'].
+
+Puts str: s.
+s 释放.
+
+# test with struct
+
+>> a := 二进制 新建: 8.
+a 字节: (
+	数组对象 <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := 二进制 结构: (数组对象 <<: ['int'], ; ['int']).
+
+Server 链接: (
+	数组对象 <<: ['@structtest'], ;
+	['@structtest'] ;
+	(数组对象 <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+输出 写入: ['Sum test:'] + (ffitest ffisum: a), 停止.
+
+struct 结构释放.
+struct 释放.
+a 释放.

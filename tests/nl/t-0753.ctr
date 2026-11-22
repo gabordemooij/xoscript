@@ -1,0 +1,25 @@
+Uit schrijf: ['Test object'], stop.
+>> a := Object nieuw. 
+
+a bij: ['item:'] doen: { :fmt
+	eigen fmt := fmt. 
+}.
+
+a bij: ['item'] doen: { <- eigen fmt.
+}.
+
+a item: ( Format nieuw: ['|%s|'] ).
+
+Uit schrijf: a item, stop.
+
+>> old-fmt-address := a item prototype geheugenadres.
+a save-as: ['/tmp/a.bin'].
+Uit schrijf: ['========== RELOADING SNAP:'], stop.
+
+>> b := Object load-from: ['/tmp/a.bin'].
+
+(b item prototype geheugenadres = old-fmt-address) ja: {
+	Uit schrijf: ['Object link re-attached.'], stop.
+}.
+
+Uit schrijf: ( b item toepassen: ['hello'] ), stop.

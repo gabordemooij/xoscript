@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Isanduku-yumutekano kora-imfunguzo.
+>> sk := keys icya-mbere.
+>> pk := keys icya-nyuma.
+>> sig := Isanduku-yumutekano sinya: ['abc'] na: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Isanduku-yumutekano sinya: ['abc'] na: long. } fata-ikosa: { :e
+	Ibisohoka andika: e, umurongo-mushya.
+}, tangira.
+
+{ Isanduku-yumutekano suzuma: ['abc'] umukono: long na: pk. } fata-ikosa: { :e
+	Ibisohoka andika: e, umurongo-mushya.
+}, tangira.
+
+{ Isanduku-yumutekano suzuma: ['abc'] umukono: sig na: short. } fata-ikosa: { :e
+	Ibisohoka andika: e, umurongo-mushya.
+}, tangira.

@@ -1,0 +1,43 @@
+
+
+>> g := Server нав.
+>> v := Сейф нав.
+>> ok := 0.
+
+>> secrets := Феҳрист нав ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets нусха.
+passwords ҳар-як: { :i :p
+	secrets ҳар-як: { :n :s
+		{
+			>> encrypted := v рамз-кардан: s калид: p.
+			>> decrypted := v рамз-кушодан: encrypted калид: p.
+			(decrypted = s) агар-рост: {
+				ok ҷамъ: 1.
+			}, вагарна: {
+				Баромад навис: ['failed encrypting/decrypting: '], сатри-нав.
+				Баромад навис: s, сатри-нав.
+				Баромад навис: ['encrypted: '] + encrypted, сатри-нав.
+				Баромад навис: ['decrypted: '] + encrypted, сатри-нав.
+				Барнома анҷом.
+			}.
+		} дошта-гир: { :err
+			(s = [''] ё: p = ['']) агар-рост: {
+				ok ҷамъ: 1.
+			}, вагарна: {
+				Баромад навис: err, сатри-нав.
+				Барнома анҷом.
+			}.
+		}, оғоз.
+	}.
+}.
+
+Баромад навис: ( ok + [' vault encryptions tested.'] ), сатри-нав.

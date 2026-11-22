@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server প্রস্তুত-করো.
+প্রোগ্রাম ব্যবহার: ['../../../src/xo/bn/webtools.xo'].
+
+>> Fake-Request := বস্তু নতুন.
+Fake-Request যখন: ['value:'] করো: { :মূল্য
+	নিজের মূল্য := মূল্য.
+}.
+Fake-Request যখন: ['cookie:'] করো: { :নাম <- নিজের মূল্য.
+}.
+
+>> Test-Session := অস্থায়ী-ফাইল-সেশন নতুন.
+Test-Session যখন: ['লোড-করো'] করো: { <- অভিধান নতুন.
+}.
+Test-Session যখন: ['session-id'] করো: { <- নিজের id.
+}.
+
+>> cookies := লিস্ট নতুন
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies প্রতিটি: { :i :cookie
+	>> অনুরোধ-http := Fake-Request নতুন.
+	অনুরোধ-http value: cookie.
+	>> ব্যবস্থাপক := Test-Session নতুন.
+	>> web := ওয়েব-নথি নতুন.
+	web অনুরোধ-http: অনুরোধ-http.
+	web সেশন-ব্যবস্থাপক: ব্যবস্থাপক.
+	web সেশন-শুরু-করো.
+	আউটপুট লেখো: ( ব্যবস্থাপক session-id = cookie ), নতুন-লাইন.
+}.
+
+>> web := ওয়েব-নথি নতুন.
+web json: (অভিধান নতুন রাখো: ['b'] চাবিতে: ['a']).
+আউটপুট লেখো: ['\n'], নতুন-লাইন.
+
+{ নেটওয়ার্ক get: ['file:///etc/hostname']. } ধরো: { :e
+	আউটপুট লেখো: e, নতুন-লাইন.
+}, চালাও.
+
+>> svg := ফাইল নতুন: ['/tmp/test0814.svg'].
+svg লেখো: ['<svg xmlns="x"></svg>'].
+আউটপুট নতুন-লাইন.
+Server পাঠিয়ে-দাও: ['test0814.svg'] উপসর্গ: ['/tmp/'].
+svg মুছো.

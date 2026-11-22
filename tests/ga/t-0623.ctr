@@ -1,0 +1,43 @@
+
+
+>> g := Server nua.
+>> v := Taisceadán nua.
+>> ok := 0.
+
+>> secrets := Liosta nua ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets cóipeáil.
+passwords gach: { :i :p
+	secrets gach: { :n :s
+		{
+			>> encrypted := v criptigh: s eochair: p.
+			>> decrypted := v díchriptigh: encrypted eochair: p.
+			(decrypted = s) fíor: {
+				ok suimigh: 1.
+			}, eile: {
+				Aschur scríobh: ['failed encrypting/decrypting: '], líne-nua.
+				Aschur scríobh: s, líne-nua.
+				Aschur scríobh: ['encrypted: '] + encrypted, líne-nua.
+				Aschur scríobh: ['decrypted: '] + encrypted, líne-nua.
+				Ríomhchlár deireadh.
+			}.
+		} gabh: { :err
+			(s = [''] nó: p = ['']) fíor: {
+				ok suimigh: 1.
+			}, eile: {
+				Aschur scríobh: err, líne-nua.
+				Ríomhchlár deireadh.
+			}.
+		}, tosaigh.
+	}.
+}.
+
+Aschur scríobh: ( ok + [' vault encryptions tested.'] ), líne-nua.

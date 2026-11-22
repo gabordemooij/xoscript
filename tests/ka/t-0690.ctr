@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+გამოტანა დაწერე: ['Database test'], ახალი-ხაზი.
+
+>> db := Maria-DB ახალი ჰოსტი: ['localhost'],
+	მომხმარებელი: ['xo'], პაროლი: ['pass123'], ბაზის-სახელი: ['xobase'], მიერთება.
+
+გამოტანა დაწერე: ['Can we connect? '] + db მიერთებულია?, ახალი-ხაზი.
+
+>> ძიების-პარამეტრები := db მოთხოვნა: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], პარამეტრები: ( სია ახალი ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  ძიების-პარამეტრები შესრულება. db დადასტურება. } დაჭერა: { :e db გაუქმება.  }, გაშვება.
+
+გამოტანა დაწერე: ['Can we insert? '] + ( ძიების-პარამეტრები insert-id > 0 ), ახალი-ხაზი.
+
+>> x := 0.
+>> ძიების-პარამეტრები :=
+db მოთხოვნა: ['SELECT * FROM book order by id desc limit 2'], 
+მიღება: { :row 
+	x დამატება: 1.
+	ჭეშმარიტი შეწყვეტა. # must clean up, no 'Commands out of sync'
+}.
+
+>> ძიების-პარამეტრები :=
+db მოთხოვნა: ['SELECT * FROM book order by id desc limit 2'], 
+მიღება: { :row
+	x დამატება: 1.
+	ჭეშმარიტი შეწყვეტა.
+}.
+
+(x > 0) ჭეშმარიტი: {
+	გამოტანა დაწერე: ['Can we break in the middle of a fetch? '].
+}.
+
+გამოტანა დაწერე: ჭეშმარიტი, ახალი-ხაზი.

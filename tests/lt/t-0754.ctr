@@ -1,0 +1,30 @@
+Išvestis rašyti: ['Test object'], nauja-eilutė.
+>> a := Objektas naujas. 
+
+a kai: ['item:'] daryti: { :out
+	savas out := out. 
+}.
+
+a kai: ['item'] daryti: { <- savas out.
+}.
+
+a kai: ['greet'] daryti: {
+	Išvestis rašyti: ['hi from original out!'], nauja-eilutė.
+}.
+
+a item: Išvestis.
+
+Išvestis rašyti: a item, nauja-eilutė.
+
+>> old-out-address := a item prototipas atminties-adresas.
+a save-as: ['/tmp/a.bin'].
+Išvestis rašyti: ['========== RELOADING SNAP:'], nauja-eilutė.
+
+>> b := Objektas load-from: ['/tmp/a.bin'].
+
+(b item prototipas atminties-adresas = old-out-address) tiesa: {
+	Išvestis rašyti: ['Object link re-attached.'], nauja-eilutė.
+}.
+
+b item rašyti: ['hello from loaded out!'], nauja-eilutė.
+b greet.

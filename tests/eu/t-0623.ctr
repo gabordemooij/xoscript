@@ -1,0 +1,43 @@
+
+
+>> g := Server berria.
+>> v := Kutxa-gotorra berria.
+>> ok := 0.
+
+>> secrets := Zerrenda berria ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopiatu.
+passwords bakoitza: { :i :p
+	secrets bakoitza: { :n :s
+		{
+			>> encrypted := v zifratu: s gakoa: p.
+			>> decrypted := v deszifratu: encrypted gakoa: p.
+			(decrypted = s) egia: {
+				ok gehitu: 1.
+			}, bestela: {
+				Irteera idatzi: ['failed encrypting/decrypting: '], lerro-jauzia.
+				Irteera idatzi: s, lerro-jauzia.
+				Irteera idatzi: ['encrypted: '] + encrypted, lerro-jauzia.
+				Irteera idatzi: ['decrypted: '] + encrypted, lerro-jauzia.
+				Programa amaitu.
+			}.
+		} harrapatu: { :err
+			(s = [''] edo: p = ['']) egia: {
+				ok gehitu: 1.
+			}, bestela: {
+				Irteera idatzi: err, lerro-jauzia.
+				Programa amaitu.
+			}.
+		}, hasi.
+	}.
+}.
+
+Irteera idatzi: ( ok + [' vault encryptions tested.'] ), lerro-jauzia.

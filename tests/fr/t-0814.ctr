@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server initialiser.
+Programme utiliser: ['../../../src/xo/fr/webtools.xo'].
+
+>> Fake-Request := Objet nouveau.
+Fake-Request quand: ['value:'] faire: { :valeur
+	propre valeur := valeur.
+}.
+Fake-Request quand: ['cookie:'] faire: { :nom <- propre valeur.
+}.
+
+>> Test-Session := Session-fichier-temporaire nouveau.
+Test-Session quand: ['charger'] faire: { <- Dictionnaire nouveau.
+}.
+Test-Session quand: ['session-id'] faire: { <- propre id.
+}.
+
+>> cookies := Liste nouveau
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies chaque: { :i :cookie
+	>> demande := Fake-Request nouveau.
+	demande value: cookie.
+	>> gestionnaire := Test-Session nouveau.
+	>> web := Document-Web nouveau.
+	web demande: demande.
+	web gestionnaire-session: gestionnaire.
+	web démarrer-session.
+	Sortie écrire: ( gestionnaire session-id = cookie ), stop.
+}.
+
+>> web := Document-Web nouveau.
+web json: (Dictionnaire nouveau mettre: ['b'] à: ['a']).
+Sortie écrire: ['\n'], stop.
+
+{ Réseau get: ['file:///etc/hostname']. } intercepter: { :e
+	Sortie écrire: e, stop.
+}, démarrer.
+
+>> svg := Fichier nouveau: ['/tmp/test0814.svg'].
+svg écrire: ['<svg xmlns="x"></svg>'].
+Sortie stop.
+Server transmettre: ['test0814.svg'] préfixe: ['/tmp/'].
+svg supprimer.

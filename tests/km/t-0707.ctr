@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+កម្មវិធី គ្រប់គ្រងអង្គចងចាំ: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB ថ្មី ម៉ាស៊ីនបង្ហោះ: ['localhost'],
+	ឈ្មោះអ្នកប្រើ: ['xo'], ពាក្យសម្ងាត់: ['pass123'], ឈ្មោះមូលដ្ឋានទិន្នន័យ: ['xobase'], ភ្ជាប់ទៅ.
+
+>> TwoDigitFormat := ទម្រង់ ថ្មី: ['%02d'].
+
+# Datetime
+{
+	>> ឆ្នាំ := ចំនួន រវាង: 1995 ដល់: 2050, ជាអត្ថបទ.
+	>> ខែ := TwoDigitFormat អនុវត្តចំនួនគត់: (ចំនួន រវាង: 1 ដល់: 12), ជាអត្ថបទ.
+	>> ថ្ងៃ := TwoDigitFormat អនុវត្តចំនួនគត់: (ចំនួន រវាង: 1 ដល់: 28), ជាអត្ថបទ.
+	>> ម៉ោង := TwoDigitFormat អនុវត្តចំនួនគត់: (ចំនួន រវាង: 1 ដល់: 23), ជាអត្ថបទ.
+	>> នាទី := TwoDigitFormat អនុវត្តចំនួនគត់: (ចំនួន រវាង: 1 ដល់: 59), ជាអត្ថបទ.
+	>> វិនាទី := TwoDigitFormat អនុវត្តចំនួនគត់: (ចំនួន រវាង: 1 ដល់: 59), ជាអត្ថបទ.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: ឆ្នាំ,
+		MM: ខែ,
+		DD: ថ្ងៃ,
+		HH: ម៉ោង,
+		II: នាទី,
+		SS: វិនាទី.
+	>> ប៉ារ៉ាម៉ែត្រស្វែងរក :=
+	db សំណួរ: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ទាញយក: { :row
+		(row mydatetime = datetime) បើមិនពិត: {
+			កិច្ចការនេះ កំហុស: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter បូក: 1.
+} * 100.
+
+# Date
+{
+	>> ឆ្នាំ := ចំនួន រវាង: 1995 ដល់: 2050, ជាអត្ថបទ.
+	>> ខែ := TwoDigitFormat អនុវត្តចំនួនគត់: (ចំនួន រវាង: 1 ដល់: 12), ជាអត្ថបទ.
+	>> ថ្ងៃ := TwoDigitFormat អនុវត្តចំនួនគត់: (ចំនួន រវាង: 1 ដល់: 28), ជាអត្ថបទ.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: ឆ្នាំ,
+		MM: ខែ,
+		DD: ថ្ងៃ.
+	>> ប៉ារ៉ាម៉ែត្រស្វែងរក :=
+	db សំណួរ: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ទាញយក: { :row
+		(row mydate = date) បើមិនពិត: {
+			កិច្ចការនេះ កំហុស: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter បូក: 1.
+} * 100.
+
+
+# Time
+{
+	>> ម៉ោង := TwoDigitFormat អនុវត្តចំនួនគត់: (ចំនួន រវាង: 1 ដល់: 23), ជាអត្ថបទ.
+	>> នាទី := TwoDigitFormat អនុវត្តចំនួនគត់: (ចំនួន រវាង: 1 ដល់: 59), ជាអត្ថបទ.
+	>> វិនាទី := TwoDigitFormat អនុវត្តចំនួនគត់: (ចំនួន រវាង: 1 ដល់: 59), ជាអត្ថបទ.
+	>> ពេលវេលា := ['HH:II:SS'].
+	ពេលវេលា
+		HH: ម៉ោង,
+		II: នាទី,
+		SS: វិនាទី.
+	>> ប៉ារ៉ាម៉ែត្រស្វែងរក :=
+	db សំណួរ: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: ពេលវេលា),
+	ទាញយក: { :row
+		(row mytime = ពេលវេលា) បើមិនពិត: {
+			កិច្ចការនេះ កំហុស: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter បូក: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := ស៊េរី ថ្មី បំពេញ: 100000 ដោយ: ['x'], ភ្ជាប់: [''].
+{
+	>> str2 := ទូដែក ថូខឹន: 40.
+	>> ប៉ារ៉ាម៉ែត្រស្វែងរក :=
+	db សំណួរ: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ទាញយក: { :row
+		(row str1 = str1 និង: row str2 = str2) បើមិនពិត: {
+			កិច្ចការនេះ កំហុស: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter បូក: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := ចំនួន រវាង: 1 ដល់: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 ពីអត្ថបទ: ['9223372036854775807'] ) -
+		( Int64 ពីអត្ថបទ: ['99999'] ) +
+		( Int64 ពីអត្ថបទ: n1 ជាអត្ថបទ )
+	).
+	>> ប៉ារ៉ាម៉ែត្រស្វែងរក :=
+	db សំណួរ: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ទាញយក: { :row
+		(row n1 = n1) បើមិនពិត: {
+			កិច្ចការនេះ កំហុស: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) បើមិនពិត: {
+			កិច្ចការនេះ កំហុស: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 បង្គត់) បើមិនពិត: {
+			កិច្ចការនេះ កំហុស: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) បើមិនពិត: {
+			កិច្ចការនេះ កំហុស: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter បូក: 1.
+} * 100.
+
+
+លទ្ធផល សរសេរ: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), បន្ទាត់ថ្មី.

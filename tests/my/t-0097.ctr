@@ -1,0 +1,42 @@
+
+စာသား ရလျှင်: ['html'] လုပ်: { <- (
+		မိမိ
+		အစားထိုး: ['&'] ဖြင့်: ['&amp;'],
+		အစားထိုး: ['<'] ဖြင့်: ['&lt;'],
+		အစားထိုး: ['>'] ဖြင့်: ['&gt;'],
+		အစားထိုး: ['"'] ဖြင့်: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := အရာဝတ္ထု အသစ်.
+
+HtmlBrush ရလျှင်: ['ဖြေ:'] လုပ်: { :tag
+	အထွက် ရေး: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush ရလျှင်: ['ဖြေ:နှင့်:'] လုပ်: { :tag :content
+	tag := ( tag အစ: 0 အရှည်: (tag အရှည် - 1) ).
+	အထွက် ရေး: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush ရလျှင်: ['content:'] လုပ်: { :text
+	အထွက် ရေး: text html, စာကြောင်းသစ်.
+}.
+
+HtmlBrush ရလျှင်: ['attr:value:'] လုပ်: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush အသစ်.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

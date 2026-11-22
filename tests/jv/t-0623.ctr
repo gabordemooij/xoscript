@@ -1,0 +1,43 @@
+
+
+>> g := Server anyar.
+>> v := Brankas anyar.
+>> ok := 0.
+
+>> secrets := Dhaptar anyar ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets salin.
+passwords saben: { :i :p
+	secrets saben: { :n :s
+		{
+			>> encrypted := v enkripsi: s kunci: p.
+			>> decrypted := v dekripsi: encrypted kunci: p.
+			(decrypted = s) bener: {
+				ok tambah: 1.
+			}, yen-ora: {
+				Wetonan tulis: ['failed encrypting/decrypting: '], baris-anyar.
+				Wetonan tulis: s, baris-anyar.
+				Wetonan tulis: ['encrypted: '] + encrypted, baris-anyar.
+				Wetonan tulis: ['decrypted: '] + encrypted, baris-anyar.
+				Program rampungna.
+			}.
+		} cekel: { :err
+			(s = [''] utawa: p = ['']) bener: {
+				ok tambah: 1.
+			}, yen-ora: {
+				Wetonan tulis: err, baris-anyar.
+				Program rampungna.
+			}.
+		}, wiwiti.
+	}.
+}.
+
+Wetonan tulis: ( ok + [' vault encryptions tested.'] ), baris-anyar.

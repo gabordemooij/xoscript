@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB yeni sunucu-adı: ['localhost'],
+	kullanıcı: ['xo'],
+	parola: ['pass123'],
+	veritabanı-adı: ['xobase'],
+	bağlan.
+
+>> conn2 := Maria-DB yeni sunucu-adı: ['localhost'],
+	kullanıcı: ['xo'],
+	parola: ['pass123'],
+	veritabanı-adı: ['xobase'],
+	bağlan.
+#...
+>> del := conn1 sorgu: ['DELETE FROM book WHERE id > 0'].
+{  del yürüt. conn1 onayla. } yakala: { :e conn1 geri-al.  }, başlat.
+
+>> insert := conn1 sorgu: ['INSERT INTO book (id) VALUES(null)'].
+insert yürüt.
+
+>> adet := conn1 sorgu: ['SELECT COUNT(*) AS num FROM book'].
+adet getir: { :row Çıktı yaz: row num, yeni-satır. }.
+
+# does not show up
+# insert not committed on connection 1
+>> adet := conn2 sorgu: ['SELECT COUNT(*) AS num FROM book'].
+adet getir: { :row Çıktı yaz: row num, yeni-satır. }.

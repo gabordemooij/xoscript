@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Rhestr newydd ;
+	# {"key":"normal"} normal ASCII
+	( Geiriadur newydd rhoi: ['normal'] yn: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Geiriadur newydd rhoi: ['hello world'] yn: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Geiriadur newydd rhoi: ['"'] yn: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Geiriadur newydd rhoi: ['backslash: \\'] yn: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Geiriadur newydd rhoi: ['slash: /'] yn: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Geiriadur newydd rhoi: ['backspace: \b'] yn: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Geiriadur newydd rhoi: ['formfeed: \f'] yn: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Geiriadur newydd rhoi: ['newline: \n'] yn: ['key'] ) ;
+	( Geiriadur newydd rhoi: ['newline: ↵'] yn: ['key'] ) ;
+	( Geiriadur newydd rhoi: ['newline: 
+	'] yn: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Geiriadur newydd rhoi: ['carriage return: \r'] yn: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Geiriadur newydd rhoi: ['tab \t'] yn: ['key'] ) ;
+	( Geiriadur newydd rhoi: ['tab ⇿'] yn: ['key'] ) ;
+	( Geiriadur newydd rhoi: ['tab  '] yn: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Geiriadur newydd rhoi: ['NUL \u0000'] yn: ['key'] ) ;
+	( Geiriadur newydd rhoi: ['NUL \0'] yn: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Geiriadur newydd rhoi: ['control: \u0001'] yn: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Geiriadur newydd rhoi: ['control: \u001F'] yn: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Geiriadur newydd rhoi: ['unicode: é'] yn: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Geiriadur newydd rhoi: ['unicode: €'] yn: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Geiriadur newydd rhoi: ['unicode: 日本語'] yn: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Geiriadur newydd rhoi: ['unicode: 😀'] yn: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Geiriadur newydd rhoi: ['unicode: 🧑‍💻'] yn: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Geiriadur newydd rhoi: ['combining: e\u0301'] yn: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Geiriadur newydd rhoi: ['escaped unicode: \u00e9'] yn: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Geiriadur newydd rhoi: ['escaped unicode: \u20ac'] yn: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Geiriadur newydd rhoi: ['escaped unicode: \ud83d\ude00'] yn: ['key'] ) ;
+	# {"key":""} empty value
+	( Geiriadur newydd rhoi: [''] yn: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Geiriadur newydd rhoi: ['@ < > & = % + ? #'] yn: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Geiriadur newydd rhoi: ['''] yn: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Geiriadur newydd rhoi: ['multiple: \" \\ \n \r \t'] yn: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Geiriadur newydd rhoi: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] yn: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Geiriadur newydd rhoi: [' value'] yn: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Geiriadur newydd rhoi: ['value '] yn: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Geiriadur newydd rhoi: [' \t\n\r '] yn: ['key'] ).
+
+dicts pob: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Geiriadur newydd rhoi: d key yn: ['key']).
+	>> b := JSON jsonify: (Geiriadur newydd rhoi: ['value'] yn: d key).
+	>> e := JSON gwrthrych: a.
+	>> f := JSON gwrthrych: b.
+	((e key = d key a: (f ? d key = ['value'])) neu: (e key = ['NUL ?'])) gwir: {
+		Allbwn ysgrifennu: ['OK'], llinell-newydd.
+	}, arall: {
+		Allbwn ysgrifennu: ['Unable to properly encode/decode: '] + d + j, llinell-newydd.
+		Rhaglen diwedd.
+	}.
+}.

@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+אויסגאָב שרײַב: ⌝'Database test'⌜, נײַע-שורה.
+
+>> db := Maria-DB ניי באַלעבאָס: ⌝'localhost'⌜,
+	באַניצער-נאָמען: ⌝'xo'⌜, פּאַראָל: ⌝'pass123'⌜, דאַטנבאַזע-נאָמען: ⌝'xobase'⌜, פֿאַרבינד-זיך.
+
+אויסגאָב שרײַב: ⌝'Can we connect? '⌜ + db פֿאַרבונדן?, נײַע-שורה.
+
+>> זוך-פּאַראַמעטערס := db פֿראַגע: ⌝'
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'⌜, פּאַראַמעטערס: ﴿ ליסטע ניי ; ⌝'abc'⌜ ; 12.35 ; 6 ﴾. # parameterized queries
+
+⎬  זוך-פּאַראַמעטערס פֿיר-אויס. db באַשטעטיק. ⎨ כאַפּ: ⎬ :e db צי-צוריק.  ⎨, לאָז-לויפֿן.
+
+אויסגאָב שרײַב: ⌝'Can we insert? '⌜ + ﴿ זוך-פּאַראַמעטערס insert-id > 0 ﴾, נײַע-שורה.
+
+>> Obj := אָביעקט ניי.
+Obj ווען: ⌝'retrieve-rows'⌜ טו: ⎬
+	אייגן צאָל-עלעמענטן := 0.
+	>> זוך-פּאַראַמעטערס :=
+	db פֿראַגע: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+	ברענג: ⎬ :row 
+		אייגן צאָל-עלעמענטן רעכן-צו: 1.
+		אמת איבעררײַס.
+	⎨. <- אייגן צאָל-עלעמענטן קאָפּיר.
+⎨.
+
+אויסגאָב שרײַב: ⌝'Can we query? '⌜ + ﴿ Obj retrieve-rows > 0 ﴾, נײַע-שורה.

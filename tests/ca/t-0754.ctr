@@ -1,0 +1,30 @@
+Sortida escriu: ['Test object'], salt-de-línia.
+>> a := Objecte nou. 
+
+a en: ['item:'] fes: { :out
+	propi out := out. 
+}.
+
+a en: ['item'] fes: { <- propi out.
+}.
+
+a en: ['greet'] fes: {
+	Sortida escriu: ['hi from original out!'], salt-de-línia.
+}.
+
+a item: Sortida.
+
+Sortida escriu: a item, salt-de-línia.
+
+>> old-out-address := a item prototip adreça-de-memòria.
+a save-as: ['/tmp/a.bin'].
+Sortida escriu: ['========== RELOADING SNAP:'], salt-de-línia.
+
+>> b := Objecte load-from: ['/tmp/a.bin'].
+
+(b item prototip adreça-de-memòria = old-out-address) cert: {
+	Sortida escriu: ['Object link re-attached.'], salt-de-línia.
+}.
+
+b item escriu: ['hello from loaded out!'], salt-de-línia.
+b greet.

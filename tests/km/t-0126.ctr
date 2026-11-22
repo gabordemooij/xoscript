@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := វត្ថុ ថ្មី.
+
+Slurp ពេលទទួល: ['ថ្មី'] ធ្វើ: {
+	ផ្ទាល់ str := [''].
+}.
+
+Slurp ពេលទទួល: ['nieuw'] ធ្វើ: {
+	ផ្ទាល់ str := [''].
+}.
+
+Slurp ពេលទទួល: ['ឆ្លើយតប:'] ធ្វើ: { :blah
+		ផ្ទាល់ str បន្ថែមខាងចុង: blah.
+}.
+
+Slurp ពេលទទួល: ['ឆ្លើយតប:និង:'] ធ្វើ: { :blah :blahah
+		ផ្ទាល់ str បន្ថែមខាងចុង: (blah ចាប់ពី: 0 ប្រវែង: (blah ប្រវែង - 1)).
+		ផ្ទាល់ str បន្ថែមខាងចុង: [' '].
+		ផ្ទាល់ str បន្ថែមខាងចុង: blahah.
+}.
+
+Slurp ពេលទទួល: ['obtain'] ធ្វើ: {
+	>> buffer := ផ្ទាល់ str.
+	ផ្ទាល់ str := ['']. <- buffer.
+}.
+
+
+លទ្ធផល សរសេរ: (កម្មវិធី ប្រព័ន្ធ: (Slurp ថ្មី echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ ឯកសារ ថ្មី: ['/tmp/from.txt'], លុប. } ចាប់: { ['Empty']. }, ដំណើរការ.
+{ ឯកសារ ថ្មី: ['/tmp/to.txt'], លុប. } ចាប់: { ['Empty']. }, ដំណើរការ.
+
+
+ឯកសារ ថ្មី: ['/tmp/to.txt'], មាន បើមិនពិត: {
+	លទ្ធផល សរសេរ: ['Confirmed. Target file does not exist.\
+'].
+}.
+ឯកសារ ថ្មី: ['/tmp/from.txt'], មាន បើមិនពិត: {
+	លទ្ធផល សរសេរ: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+កម្មវិធី ប្រព័ន្ធ: (Slurp ថ្មី touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+កម្មវិធី ប្រព័ន្ធ: (Slurp ថ្មី cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+ឯកសារ ថ្មី: ['/tmp/to.txt'], មាន បើពិត: {
+	លទ្ធផល សរសេរ: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+លទ្ធផល សរសេរ: ['Contents of file is:'] + (ឯកសារ ថ្មី: ['/tmp/to.txt'], អាន), បន្ទាត់ថ្មី.

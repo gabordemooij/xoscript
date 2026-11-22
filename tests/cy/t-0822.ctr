@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB newydd gwesteiwr: ['localhost'],
+	enw-defnyddiwr: ['xo'],
+	cyfrinair: ['pass123'],
+	enw-cronfa: ['xobase'],
+	cysylltu.
+
+>> paramedrau-chwilio := db ymholiad: ['SELECT ? AS a, ? AS b, ? AS c'].
+paramedrau-chwilio paramedrau: (Rhestr newydd ; ['1']).
+{ paramedrau-chwilio nôl: { :row Allbwn ysgrifennu: row, llinell-newydd. }. } dal: { :e Allbwn ysgrifennu: e, llinell-newydd. }, cychwyn.
+
+>> paramedrau-chwilio := db ymholiad: ['SELECT ? AS a'].
+{ paramedrau-chwilio nôl: { :row Allbwn ysgrifennu: row, llinell-newydd. }. } dal: { :e Allbwn ysgrifennu: e, llinell-newydd. }, cychwyn.
+
+# the right number still works, more parameters are ignored as before
+>> paramedrau-chwilio := db ymholiad: ['SELECT ? AS a, ? AS b'].
+paramedrau-chwilio paramedrau: (Rhestr newydd ; ['1'] ; ['2']).
+paramedrau-chwilio nôl: { :row Allbwn ysgrifennu: (row yn: ['a']), ysgrifennu: (row yn: ['b']), llinell-newydd. }.
+paramedrau-chwilio paramedrau: (Rhestr newydd ; ['1'] ; ['2'] ; ['3']).
+paramedrau-chwilio nôl: { :row Allbwn ysgrifennu: (row yn: ['a']), ysgrifennu: (row yn: ['b']), llinell-newydd. }.

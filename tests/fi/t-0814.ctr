@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server valmistele.
+Ohjelma käytä: ['../../../src/xo/fi/webtools.xo'].
+
+>> Fake-Request := Olio uusi.
+Fake-Request kun: ['value:'] tee: { :arvo
+	oma arvo := arvo.
+}.
+Fake-Request kun: ['cookie:'] tee: { :nimi <- oma arvo.
+}.
+
+>> Test-Session := Väliaikaistiedosto-istunto uusi.
+Test-Session kun: ['lataa'] tee: { <- Sanakirja uusi.
+}.
+Test-Session kun: ['session-id'] tee: { <- oma id.
+}.
+
+>> cookies := Lista uusi
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies jokainen: { :i :cookie
+	>> pyyntö := Fake-Request uusi.
+	pyyntö value: cookie.
+	>> hallinta := Test-Session uusi.
+	>> web := Verkkodokumentti uusi.
+	web pyyntö: pyyntö.
+	web istunnonhallinta: hallinta.
+	web aloita-istunto.
+	Tuloste kirjoita: ( hallinta session-id = cookie ), rivinvaihto.
+}.
+
+>> web := Verkkodokumentti uusi.
+web json: (Sanakirja uusi aseta: ['b'] kohtaan: ['a']).
+Tuloste kirjoita: ['\n'], rivinvaihto.
+
+{ Verkko get: ['file:///etc/hostname']. } sieppaa: { :e
+	Tuloste kirjoita: e, rivinvaihto.
+}, käynnistä.
+
+>> svg := Tiedosto uusi: ['/tmp/test0814.svg'].
+svg kirjoita: ['<svg xmlns="x"></svg>'].
+Tuloste rivinvaihto.
+Server välitä: ['test0814.svg'] etuliite: ['/tmp/'].
+svg poista.

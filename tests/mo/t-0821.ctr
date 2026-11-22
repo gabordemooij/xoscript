@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> cale := ['/tmp/test0821.csv'].
+>> file := Fișier nou: cale.
+
+file scrie: ['a,b\n"1,2\n'].
+{
+	file delimitator: [','] ghilimele: ['"'] linii: { :line
+		Ieșire scrie: line, rând-nou.
+	}.
+} prinde: { :e Ieșire scrie: e, rând-nou. }, pornește.
+
+# a closed quote still works
+file scrie: ['a,b\n"1,2",3'].
+file delimitator: [','] ghilimele: ['"'] linii: { :line
+	Ieșire scrie: line, rând-nou.
+}.
+file șterge.

@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Objet nei.
+
+Log bei: ['say:'] maachen: { :str
+	Ausgab schreiwen: str, nei-zeil.
+}.
+
+>> Item := Objet nei.
+
+Item bei: ['nei:'] maachen: { :id <- selwer nei id: id.
+}.
+
+Item bei: ['id:'] maachen: { :id
+	eegen id := id.
+}.
+
+Item bei: ['id'] maachen: { <- eegen id. }.
+
+
+Item bei: ['text'] maachen: {
+	>> str := ['Item#~no'].
+	str ~no: eegen id. <- str.
+}.
+
+
+>> Print := Objet nei.
+
+Print bei: ['items'] maachen: { 
+	
+	eegen item := Item nei: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: eegen item
+	).
+	
+	
+}.
+
+Print items.

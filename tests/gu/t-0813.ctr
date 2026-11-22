@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server તૈયાર-કરો.
+પ્રોગ્રામ વાપરો: ['../../../src/xo/gu/webtools.xo'].
+પ્રોગ્રામ વાપરો: ['../../../src/xo/gu/mailtools.xo'].
+
+>> હેડર := HTTP-હેડર નવું ચાવી: ['Location'] મૂલ્ય: ['/ok\r\nX-Injected: yes'].
+આઉટપુટ લખો: હેડર.
+
+>> web := વેબ-દસ્તાવેજ નવું.
+web જાઓ: ['/ok\r\nX-Injected: yes'].
+આઉટપુટ લખો: ['\n'], નવી-લીટી.
+
+>> mail := ઈમેલ નવું.
+mail પ્રાપ્તકર્તાને: (સૂચિ નવું ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (સૂચિ નવું ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (સૂચિ નવું ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail મોકલનાર: ['d@example.invalid\r\nX-From: yes'] નામ: ['site\r\nX-Name: yes'].
+mail વિષય: ['hello\r\nX-Subject: yes'].
+mail મુખ્ય-લખાણ: ['line1\r\nline2'].
+આઉટપુટ લખો: mail બનાવો.
+
+>> html := HTML-ઈમેલ નવું.
+html પ્રાપ્તકર્તાને: (સૂચિ નવું ; ['a@example.invalid\r\nX-To: yes']).
+html મોકલનાર: ['d@example.invalid'] નામ: ['site'].
+html વિષય: ['hello\r\nX-Subject: yes'].
+html મુખ્ય-લખાણ: ['body'].
+આઉટપુટ લખો: ( html બનાવો સમાવે-છે: ['\nX-'] ), નવી-લીટી.
+આઉટપુટ લખો: ( html બનાવો સમાવે-છે: ['X-To: yes'] ), નવી-લીટી.

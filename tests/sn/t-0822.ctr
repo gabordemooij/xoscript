@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB nyowani mugamuchiri: ['localhost'],
+	zita-remushandisi: ['xo'],
+	pasiwedhi: ['pass123'],
+	zita-redhatabhesi: ['xobase'],
+	batana.
+
+>> maparamita-ekutsvaga := db mubvunzo: ['SELECT ? AS a, ? AS b, ? AS c'].
+maparamita-ekutsvaga maparamita: (Rondedzero nyowani ; ['1']).
+{ maparamita-ekutsvaga tora: { :row Zvabuda nyora: row, mutsara-mutsva. }. } bata: { :e Zvabuda nyora: e, mutsara-mutsva. }, tanga.
+
+>> maparamita-ekutsvaga := db mubvunzo: ['SELECT ? AS a'].
+{ maparamita-ekutsvaga tora: { :row Zvabuda nyora: row, mutsara-mutsva. }. } bata: { :e Zvabuda nyora: e, mutsara-mutsva. }, tanga.
+
+# the right number still works, more parameters are ignored as before
+>> maparamita-ekutsvaga := db mubvunzo: ['SELECT ? AS a, ? AS b'].
+maparamita-ekutsvaga maparamita: (Rondedzero nyowani ; ['1'] ; ['2']).
+maparamita-ekutsvaga tora: { :row Zvabuda nyora: (row pa: ['a']), nyora: (row pa: ['b']), mutsara-mutsva. }.
+maparamita-ekutsvaga maparamita: (Rondedzero nyowani ; ['1'] ; ['2'] ; ['3']).
+maparamita-ekutsvaga tora: { :row Zvabuda nyora: (row pa: ['a']), nyora: (row pa: ['b']), mutsara-mutsva. }.

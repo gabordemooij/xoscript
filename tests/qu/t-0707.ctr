@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programa chʼuya: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB musuq samachiq: ['localhost'],
+	ruraqpa-sutin: ['xo'], pakasqa-simi: ['pass123'], willay-waqaychanap-sutin: ['xobase'], tinkiy.
+
+>> TwoDigitFormat := Formato musuq: ['%02d'].
+
+# Datetime
+{
+	>> wata := Yupay chawpi: 1995 wan: 2050, qillqaman.
+	>> killa := TwoDigitFormat rurachiy-yupay-huntasqa: (Yupay chawpi: 1 wan: 12), qillqaman.
+	>> pʼunchaw := TwoDigitFormat rurachiy-yupay-huntasqa: (Yupay chawpi: 1 wan: 28), qillqaman.
+	>> hora := TwoDigitFormat rurachiy-yupay-huntasqa: (Yupay chawpi: 1 wan: 23), qillqaman.
+	>> minuto := TwoDigitFormat rurachiy-yupay-huntasqa: (Yupay chawpi: 1 wan: 59), qillqaman.
+	>> segundo := TwoDigitFormat rurachiy-yupay-huntasqa: (Yupay chawpi: 1 wan: 59), qillqaman.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: wata,
+		MM: killa,
+		DD: pʼunchaw,
+		HH: hora,
+		II: minuto,
+		SS: segundo.
+	>> maskana-tupukuna :=
+	db tapuy: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	apamuy: { :row
+		(row mydatetime = datetime) llullaqtin: {
+			kay-ruway pantay: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter yapay: 1.
+} * 100.
+
+# Date
+{
+	>> wata := Yupay chawpi: 1995 wan: 2050, qillqaman.
+	>> killa := TwoDigitFormat rurachiy-yupay-huntasqa: (Yupay chawpi: 1 wan: 12), qillqaman.
+	>> pʼunchaw := TwoDigitFormat rurachiy-yupay-huntasqa: (Yupay chawpi: 1 wan: 28), qillqaman.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: wata,
+		MM: killa,
+		DD: pʼunchaw.
+	>> maskana-tupukuna :=
+	db tapuy: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	apamuy: { :row
+		(row mydate = date) llullaqtin: {
+			kay-ruway pantay: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter yapay: 1.
+} * 100.
+
+
+# Time
+{
+	>> hora := TwoDigitFormat rurachiy-yupay-huntasqa: (Yupay chawpi: 1 wan: 23), qillqaman.
+	>> minuto := TwoDigitFormat rurachiy-yupay-huntasqa: (Yupay chawpi: 1 wan: 59), qillqaman.
+	>> segundo := TwoDigitFormat rurachiy-yupay-huntasqa: (Yupay chawpi: 1 wan: 59), qillqaman.
+	>> pacha := ['HH:II:SS'].
+	pacha
+		HH: hora,
+		II: minuto,
+		SS: segundo.
+	>> maskana-tupukuna :=
+	db tapuy: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: pacha),
+	apamuy: { :row
+		(row mytime = pacha) llullaqtin: {
+			kay-ruway pantay: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter yapay: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Katiray musuq huntʼay: 100000 kaywan: ['x'], huñuy: [''].
+{
+	>> str2 := Waqaychana token: 40.
+	>> maskana-tupukuna :=
+	db tapuy: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	apamuy: { :row
+		(row str1 = str1 wan: row str2 = str2) llullaqtin: {
+			kay-ruway pantay: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter yapay: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Yupay chawpi: 1 wan: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 qillqamanta: ['9223372036854775807'] ) -
+		( Int64 qillqamanta: ['99999'] ) +
+		( Int64 qillqamanta: n1 qillqaman )
+	).
+	>> maskana-tupukuna :=
+	db tapuy: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	apamuy: { :row
+		(row n1 = n1) llullaqtin: {
+			kay-ruway pantay: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) llullaqtin: {
+			kay-ruway pantay: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 muyuriq) llullaqtin: {
+			kay-ruway pantay: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) llullaqtin: {
+			kay-ruway pantay: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter yapay: 1.
+} * 100.
+
+
+Lluqsiy qillqay: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), sayay.

@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Kasafortë gjenero-çelësa.
+>> sk := keys parë.
+>> pk := keys fundit.
+>> sig := Kasafortë nënshkruaj: ['abc'] me: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Kasafortë nënshkruaj: ['abc'] me: long. } kap: { :e
+	Dalje shkruaj: e, rresht-ri.
+}, nis.
+
+{ Kasafortë kontrollo: ['abc'] nënshkrim: long me: pk. } kap: { :e
+	Dalje shkruaj: e, rresht-ri.
+}, nis.
+
+{ Kasafortë kontrollo: ['abc'] nënshkrim: sig me: short. } kap: { :e
+	Dalje shkruaj: e, rresht-ri.
+}, nis.

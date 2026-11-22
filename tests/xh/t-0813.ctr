@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server lungiselela.
+Inkqubo sebenzisa: ['../../../src/xo/xh/webtools.xo'].
+Inkqubo sebenzisa: ['../../../src/xo/xh/mailtools.xo'].
+
+>> isihloko := Isihloko-se-HTTP entsha isitshixo: ['Location'] ixabiso: ['/ok\r\nX-Injected: yes'].
+Imveliso bhala: isihloko.
+
+>> web := Uxwebhu-lwewebhu entsha.
+web yiya-ku: ['/ok\r\nX-Injected: yes'].
+Imveliso bhala: ['\n'], umgca-omtsha.
+
+>> mail := I-imeyile entsha.
+mail ku: (Uluhlu entsha ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Uluhlu entsha ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Uluhlu entsha ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail umthumeli: ['d@example.invalid\r\nX-From: yes'] igama: ['site\r\nX-Name: yes'].
+mail umbandela: ['hello\r\nX-Subject: yes'].
+mail umzimba: ['line1\r\nline2'].
+Imveliso bhala: mail velisa.
+
+>> html := I-imeyile-HTML entsha.
+html ku: (Uluhlu entsha ; ['a@example.invalid\r\nX-To: yes']).
+html umthumeli: ['d@example.invalid'] igama: ['site'].
+html umbandela: ['hello\r\nX-Subject: yes'].
+html umzimba: ['body'].
+Imveliso bhala: ( html velisa iqulethe: ['\nX-'] ), umgca-omtsha.
+Imveliso bhala: ( html velisa iqulethe: ['X-To: yes'] ), umgca-omtsha.

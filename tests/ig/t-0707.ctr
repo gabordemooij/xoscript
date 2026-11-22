@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Mmemme njikwa-ebe-nchekwa: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB ohuru onye-nnabata: ['localhost'],
+	aha-onye-ọrụ: ['xo'], okwuntughe: ['pass123'], aha-nchekwa-data: ['xobase'], jikọta.
+
+>> TwoDigitFormat := Usoro-ọdịdị ohuru: ['%02d'].
+
+# Datetime
+{
+	>> afọ := Nọmba netiti: 1995 ruo: 2050, ederede.
+	>> ọnwa := TwoDigitFormat tinye-nọrụ-ọnụọgụ-zuru: (Nọmba netiti: 1 ruo: 12), ederede.
+	>> ụbọchị := TwoDigitFormat tinye-nọrụ-ọnụọgụ-zuru: (Nọmba netiti: 1 ruo: 28), ederede.
+	>> elekere := TwoDigitFormat tinye-nọrụ-ọnụọgụ-zuru: (Nọmba netiti: 1 ruo: 23), ederede.
+	>> nkeji := TwoDigitFormat tinye-nọrụ-ọnụọgụ-zuru: (Nọmba netiti: 1 ruo: 59), ederede.
+	>> sekọnd := TwoDigitFormat tinye-nọrụ-ọnụọgụ-zuru: (Nọmba netiti: 1 ruo: 59), ederede.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: afọ,
+		MM: ọnwa,
+		DD: ụbọchị,
+		HH: elekere,
+		II: nkeji,
+		SS: sekọnd.
+	>> ihe-ọchụchọ :=
+	db ajụjụ: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	weta: { :row
+		(row mydatetime = datetime) ụgha: {
+			ọrụ-a njehie: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter gbakwunye: 1.
+} * 100.
+
+# Date
+{
+	>> afọ := Nọmba netiti: 1995 ruo: 2050, ederede.
+	>> ọnwa := TwoDigitFormat tinye-nọrụ-ọnụọgụ-zuru: (Nọmba netiti: 1 ruo: 12), ederede.
+	>> ụbọchị := TwoDigitFormat tinye-nọrụ-ọnụọgụ-zuru: (Nọmba netiti: 1 ruo: 28), ederede.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: afọ,
+		MM: ọnwa,
+		DD: ụbọchị.
+	>> ihe-ọchụchọ :=
+	db ajụjụ: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	weta: { :row
+		(row mydate = date) ụgha: {
+			ọrụ-a njehie: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter gbakwunye: 1.
+} * 100.
+
+
+# Time
+{
+	>> elekere := TwoDigitFormat tinye-nọrụ-ọnụọgụ-zuru: (Nọmba netiti: 1 ruo: 23), ederede.
+	>> nkeji := TwoDigitFormat tinye-nọrụ-ọnụọgụ-zuru: (Nọmba netiti: 1 ruo: 59), ederede.
+	>> sekọnd := TwoDigitFormat tinye-nọrụ-ọnụọgụ-zuru: (Nọmba netiti: 1 ruo: 59), ederede.
+	>> oge := ['HH:II:SS'].
+	oge
+		HH: elekere,
+		II: nkeji,
+		SS: sekọnd.
+	>> ihe-ọchụchọ :=
+	db ajụjụ: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: oge),
+	weta: { :row
+		(row mytime = oge) ụgha: {
+			ọrụ-a njehie: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter gbakwunye: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Ndepụta ohuru mejupụta: 100000 na: ['x'], jikọọ: [''].
+{
+	>> str2 := Igbe-nchekwa token: 40.
+	>> ihe-ọchụchọ :=
+	db ajụjụ: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	weta: { :row
+		(row str1 = str1 na: row str2 = str2) ụgha: {
+			ọrụ-a njehie: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter gbakwunye: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Nọmba netiti: 1 ruo: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 site-na-ederede: ['9223372036854775807'] ) -
+		( Int64 site-na-ederede: ['99999'] ) +
+		( Int64 site-na-ederede: n1 ederede )
+	).
+	>> ihe-ọchụchọ :=
+	db ajụjụ: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	weta: { :row
+		(row n1 = n1) ụgha: {
+			ọrụ-a njehie: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) ụgha: {
+			ọrụ-a njehie: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 gbaa-gburugburu) ụgha: {
+			ọrụ-a njehie: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) ụgha: {
+			ọrụ-a njehie: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter gbakwunye: 1.
+} * 100.
+
+
+Mpụta dee: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), ahịrị-ọhụrụ.

@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server ihanda.
+Programa gamitin: ['../../../src/xo/tl/webtools.xo'].
+Programa gamitin: ['../../../src/xo/tl/mailtools.xo'].
+
+>> header := Header-ng-HTTP bago susi: ['Location'] halaga: ['/ok\r\nX-Injected: yes'].
+Labas isulat: header.
+
+>> web := Dokumentong-Web bago.
+web pumunta-sa: ['/ok\r\nX-Injected: yes'].
+Labas isulat: ['\n'], bagong-linya.
+
+>> mail := Email bago.
+mail kay: (Listahan bago ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Listahan bago ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Listahan bago ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail nagpadala: ['d@example.invalid\r\nX-From: yes'] pangalan: ['site\r\nX-Name: yes'].
+mail paksa: ['hello\r\nX-Subject: yes'].
+mail katawan: ['line1\r\nline2'].
+Labas isulat: mail bumuo.
+
+>> html := HTML-Email bago.
+html kay: (Listahan bago ; ['a@example.invalid\r\nX-To: yes']).
+html nagpadala: ['d@example.invalid'] pangalan: ['site'].
+html paksa: ['hello\r\nX-Subject: yes'].
+html katawan: ['body'].
+Labas isulat: ( html bumuo naglalaman: ['\nX-'] ), bagong-linya.
+Labas isulat: ( html bumuo naglalaman: ['X-To: yes'] ), bagong-linya.

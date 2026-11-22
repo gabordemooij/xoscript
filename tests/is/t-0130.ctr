@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Forrit stilling: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server tengja: ( Listi nýtt ;
+ libname ; ['fopen'] ;
+ ( Listi nýtt ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+tengja: ( Listi nýtt ;
+ Ekkert ; # means same lib
+ ['fread'] ;
+ ( Listi nýtt ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Ekkert ; # means same object (i.e. Stream)
+ ['fread']
+),
+tengja: (
+ Listi nýtt ;
+ Ekkert ; # means same lib
+ ['fwrite'] ;
+ ( Listi nýtt ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Ekkert ; # means same lib
+ ['fwrite']
+),
+tengja: (
+ Listi nýtt ;
+ Ekkert ; # means same lib
+ ['rewind'] ;
+ ( Listi nýtt ; ['pointer'] ) ;
+ ['int'] ;
+ Ekkert ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> slóð := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: slóð mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream skilaboð: ['fwrite'] viðföng: (Listi nýtt ; str ; 1 ; 6 ; fd ).
+Úttak skrifa: bytes-written, ný-lína.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob nýtt: 20.
+
+# read from file
+>> bytes-read := Stream skilaboð: ['fread'] viðföng: (Listi nýtt ; buf ; 1 ; 6 ; fd ).
+Úttak skrifa: bytes-read, ný-lína.
+Úttak skrifa: buf, ný-lína.
+
+# free memory
+str  losa.
+slóð losa.
+mode losa.
+buf  losa.
+
+

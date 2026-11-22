@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Wetonan tulis: ['Database test'], baris-anyar.
+
+>> db := Maria-DB anyar hos: ['localhost'],
+	jeneng-panganggo: ['xo'], sandhi: ['pass123'], jeneng-basis-data: ['xobase'], sambung.
+
+Wetonan tulis: ['Can we connect? '] + db kasambung?, baris-anyar.
+
+>> parameter-panggolekan := db kueri: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameter: ( Dhaptar anyar ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  parameter-panggolekan lakokna. db tetepna. } cekel: { :e db batalna.  }, wiwiti.
+
+Wetonan tulis: ['Can we insert? '] + ( parameter-panggolekan insert-id > 0 ), baris-anyar.
+
+>> Obj := Obyek anyar.
+Obj nalika: ['retrieve-rows'] tindakna: {
+	duweke cacah := 0.
+	>> parameter-panggolekan :=
+	db kueri: ['SELECT * FROM book order by id desc limit 2'], 
+	jupuk: { :row 
+		duweke cacah tambah: 1.
+		Bener pedhot.
+	}. <- duweke cacah salin.
+}.
+
+Wetonan tulis: ['Can we query? '] + ( Obj retrieve-rows > 0 ), baris-anyar.

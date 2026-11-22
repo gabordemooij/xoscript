@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB 새로 호스트: ['localhost'],
+	사용자이름: ['xo'],
+	비밀번호: ['pass123'],
+	데이터베이스이름: ['xobase'],
+	접속.
+
+>> 검색매개변수 := db 쿼리: ['SELECT ? AS a, ? AS b, ? AS c'].
+검색매개변수 매개변수: (리스트 새로 ; ['1']).
+{ 검색매개변수 가져오기: { :row 출력 쓰기: row, 줄바꿈. }. } 예외시: { :e 출력 쓰기: e, 줄바꿈. }, 시작.
+
+>> 검색매개변수 := db 쿼리: ['SELECT ? AS a'].
+{ 검색매개변수 가져오기: { :row 출력 쓰기: row, 줄바꿈. }. } 예외시: { :e 출력 쓰기: e, 줄바꿈. }, 시작.
+
+# the right number still works, more parameters are ignored as before
+>> 검색매개변수 := db 쿼리: ['SELECT ? AS a, ? AS b'].
+검색매개변수 매개변수: (리스트 새로 ; ['1'] ; ['2']).
+검색매개변수 가져오기: { :row 출력 쓰기: (row 위치에서: ['a']), 쓰기: (row 위치에서: ['b']), 줄바꿈. }.
+검색매개변수 매개변수: (리스트 새로 ; ['1'] ; ['2'] ; ['3']).
+검색매개변수 가져오기: { :row 출력 쓰기: (row 위치에서: ['a']), 쓰기: (row 위치에서: ['b']), 줄바꿈. }.

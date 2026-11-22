@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB nobo anfitrion: ['localhost'],
+	nòmber-di-usuario: ['xo'],
+	kontraseña: ['pass123'],
+	nòmber-di-base: ['xobase'],
+	konektá.
+
+>> parameternan-di-buskeda := db konsulta: ['SELECT ? AS a, ? AS b, ? AS c'].
+parameternan-di-buskeda parameternan: (Lista nobo ; ['1']).
+{ parameternan-di-buskeda trese: { :row Salida skirbi: row, liña-nobo. }. } kapta: { :e Salida skirbi: e, liña-nobo. }, kuminsá.
+
+>> parameternan-di-buskeda := db konsulta: ['SELECT ? AS a'].
+{ parameternan-di-buskeda trese: { :row Salida skirbi: row, liña-nobo. }. } kapta: { :e Salida skirbi: e, liña-nobo. }, kuminsá.
+
+# the right number still works, more parameters are ignored as before
+>> parameternan-di-buskeda := db konsulta: ['SELECT ? AS a, ? AS b'].
+parameternan-di-buskeda parameternan: (Lista nobo ; ['1'] ; ['2']).
+parameternan-di-buskeda trese: { :row Salida skirbi: (row na: ['a']), skirbi: (row na: ['b']), liña-nobo. }.
+parameternan-di-buskeda parameternan: (Lista nobo ; ['1'] ; ['2'] ; ['3']).
+parameternan-di-buskeda trese: { :row Salida skirbi: (row na: ['a']), skirbi: (row na: ['b']), liña-nobo. }.

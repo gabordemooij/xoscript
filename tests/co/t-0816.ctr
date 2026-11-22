@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> pruvà := { :format :value
+	{ Esciuta scrive: ( (Furmatu novu: format) applicà: value ), linea-nova. } catturà: { :e Esciuta scrive: e, linea-nova. }, lancià.
+}.
+>> try-int := { :format :value
+	{ Esciuta scrive: ( (Furmatu novu: format) applicà-interu: value ), linea-nova. } catturà: { :e Esciuta scrive: e, linea-nova. }, lancià.
+}.
+
+# fits
+pruvà applicà: ['|%s|'] è: ['text'].
+pruvà applicà: ['%06.2f'] è: 5.5.
+pruvà applicà: ['100%% %s'] è: ['sure'].
+try-int applicà: ['%03d'] è: 7.
+try-int applicà: ['%x'] è: 255.
+pruvà applicà: ['%d'] è: (Int64 novu da-testu: ['12']).
+pruvà applicà: ['%lld'] è: (Int64 novu da-testu: ['12']).
+pruvà applicà: ['%.1lf'] è: 5.5.
+try-int applicà: ['%hd'] è: 7.
+
+# does not fit
+pruvà applicà: ['%s'] è: 12345.
+pruvà applicà: ['%d'] è: 12345.
+pruvà applicà: ['%f'] è: ['text'].
+try-int applicà: ['%d'] è: ['text'].
+try-int applicà: ['%s'] è: 5.
+pruvà applicà: ['%s %s'] è: ['text'].
+pruvà applicà: ['%n'] è: ['text'].
+pruvà applicà: ['%*s'] è: ['text'].
+pruvà applicà: ['%'] è: ['text'].
+
+# length modifier does not fit
+pruvà applicà: ['%ls'] è: ['text'].
+pruvà applicà: ['%Lf'] è: 5.5.
+try-int applicà: ['%ld'] è: 7.
+try-int applicà: ['%lld'] è: 7.
+pruvà applicà: ['%Ld'] è: (Int64 novu da-testu: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+pruvà applicà: ['%99999999999s'] è: ['text'].

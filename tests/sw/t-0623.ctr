@@ -1,0 +1,43 @@
+
+
+>> g := Server mpya.
+>> v := Kasha mpya.
+>> ok := 0.
+
+>> secrets := Orodha mpya ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets nakala.
+passwords kila: { :i :p
+	secrets kila: { :n :s
+		{
+			>> encrypted := v simba-fiche: s ufunguo: p.
+			>> decrypted := v simbua-fiche: encrypted ufunguo: p.
+			(decrypted = s) kweli: {
+				ok ongeza: 1.
+			}, vinginevyo: {
+				Towe andika: ['failed encrypting/decrypting: '], mstari-mpya.
+				Towe andika: s, mstari-mpya.
+				Towe andika: ['encrypted: '] + encrypted, mstari-mpya.
+				Towe andika: ['decrypted: '] + encrypted, mstari-mpya.
+				Programu maliza.
+			}.
+		} nasa: { :err
+			(s = [''] au: p = ['']) kweli: {
+				ok ongeza: 1.
+			}, vinginevyo: {
+				Towe andika: err, mstari-mpya.
+				Programu maliza.
+			}.
+		}, anza.
+	}.
+}.
+
+Towe andika: ( ok + [' vault encryptions tested.'] ), mstari-mpya.

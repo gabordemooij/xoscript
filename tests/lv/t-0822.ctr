@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB jauns resursdators: ['localhost'],
+	lietotājs: ['xo'],
+	parole: ['pass123'],
+	datubāzes-nosaukums: ['xobase'],
+	savienot.
+
+>> meklēšanas-parametri := db vaicājums: ['SELECT ? AS a, ? AS b, ? AS c'].
+meklēšanas-parametri parametri: (Saraksts jauns ; ['1']).
+{ meklēšanas-parametri iegūt: { :row Izvade rakstīt: row, jauna-rinda. }. } tvert: { :e Izvade rakstīt: e, jauna-rinda. }, palaist.
+
+>> meklēšanas-parametri := db vaicājums: ['SELECT ? AS a'].
+{ meklēšanas-parametri iegūt: { :row Izvade rakstīt: row, jauna-rinda. }. } tvert: { :e Izvade rakstīt: e, jauna-rinda. }, palaist.
+
+# the right number still works, more parameters are ignored as before
+>> meklēšanas-parametri := db vaicājums: ['SELECT ? AS a, ? AS b'].
+meklēšanas-parametri parametri: (Saraksts jauns ; ['1'] ; ['2']).
+meklēšanas-parametri iegūt: { :row Izvade rakstīt: (row pie: ['a']), rakstīt: (row pie: ['b']), jauna-rinda. }.
+meklēšanas-parametri parametri: (Saraksts jauns ; ['1'] ; ['2'] ; ['3']).
+meklēšanas-parametri iegūt: { :row Izvade rakstīt: (row pie: ['a']), rakstīt: (row pie: ['b']), jauna-rinda. }.

@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := 객체 새로.
+
+Slurp 받으면: ['새로'] 실행: {
+	자기 str := [''].
+}.
+
+Slurp 받으면: ['nieuw'] 실행: {
+	자기 str := [''].
+}.
+
+Slurp 받으면: ['응답:'] 실행: { :blah
+		자기 str 뒤에추가: blah.
+}.
+
+Slurp 받으면: ['응답:그리고:'] 실행: { :blah :blahah
+		자기 str 뒤에추가: (blah 시작: 0 길이: (blah 길이 - 1)).
+		자기 str 뒤에추가: [' '].
+		자기 str 뒤에추가: blahah.
+}.
+
+Slurp 받으면: ['obtain'] 실행: {
+	>> buffer := 자기 str.
+	자기 str := ['']. <- buffer.
+}.
+
+
+출력 쓰기: (프로그램 시스템: (Slurp 새로 echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ 파일 새로: ['/tmp/from.txt'], 삭제. } 예외시: { ['Empty']. }, 시작.
+{ 파일 새로: ['/tmp/to.txt'], 삭제. } 예외시: { ['Empty']. }, 시작.
+
+
+파일 새로: ['/tmp/to.txt'], 존재함 거짓이면: {
+	출력 쓰기: ['Confirmed. Target file does not exist.\
+'].
+}.
+파일 새로: ['/tmp/from.txt'], 존재함 거짓이면: {
+	출력 쓰기: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+프로그램 시스템: (Slurp 새로 touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+프로그램 시스템: (Slurp 새로 cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+파일 새로: ['/tmp/to.txt'], 존재함 참이면: {
+	출력 쓰기: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+출력 쓰기: ['Contents of file is:'] + (파일 새로: ['/tmp/to.txt'], 읽기), 줄바꿈.

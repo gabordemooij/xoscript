@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Tuloste kirjoita: ['Database test'], rivinvaihto.
+
+>> db := Maria-DB uusi isäntä: ['localhost'],
+	käyttäjänimi: ['xo'], salasana: ['pass123'], tietokannan-nimi: ['xobase'], yhdistä.
+
+Tuloste kirjoita: ['Can we connect? '] + db yhdistetty?, rivinvaihto.
+
+>> hakuparametrit := db kysely: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametrit: ( Lista uusi ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  hakuparametrit suorita. db vahvista. } sieppaa: { :e db peru.  }, käynnistä.
+
+Tuloste kirjoita: ['Can we insert? '] + ( hakuparametrit insert-id > 0 ), rivinvaihto.
+
+>> x := 0.
+>> hakuparametrit :=
+db kysely: ['SELECT * FROM book order by id desc limit 2'], 
+hae: { :row 
+	x lisää: 1.
+	Tosi keskeytä. # must clean up, no 'Commands out of sync'
+}.
+
+>> hakuparametrit :=
+db kysely: ['SELECT * FROM book order by id desc limit 2'], 
+hae: { :row
+	x lisää: 1.
+	Tosi keskeytä.
+}.
+
+(x > 0) tosi: {
+	Tuloste kirjoita: ['Can we break in the middle of a fetch? '].
+}.
+
+Tuloste kirjoita: Tosi, rivinvaihto.

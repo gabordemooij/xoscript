@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+நிரல் நினைவக-மேலாண்மை: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := நிரல் அமைப்பு-மதிப்பு: ['FFITESTLIB'].
+
+
+
+Server இணைப்பு: (
+ வரிசை புதிய ;
+ libname ;
+ ['puts'] ;
+ ( வரிசை புதிய ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s விடுவி.
+
+# test with struct
+
+>> a := Blob புதிய: 8.
+a bytes: (
+	வரிசை <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (வரிசை <<: ['int'], ; ['int']).
+
+Server இணைப்பு: (
+	வரிசை <<: ['@structtest'], ;
+	['@structtest'] ;
+	(வரிசை <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+வெளியீடு எழுது: ['Sum test:'] + (ffitest ffisum: a), புதிய-வரி.
+
+struct struct-விடுவி.
+struct விடுவி.
+a விடுவி.

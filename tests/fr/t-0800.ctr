@@ -1,0 +1,16 @@
+Server init.
+
+>> db := Maria-DB nouveau hôte: ['localhost'],
+	utilisateur: ['xo'],
+	mot-de-passe: ['pass123'],
+	nom-base: ['xobase'],
+	connecter.
+
+>> paramètres-recherche := db requête: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], paramètres: ( Liste nouveau ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  paramètres-recherche exécuter. db valider. } intercepter: { :e db annuler.  }, démarrer.
+
+Sortie écrire: ['Can we insert? '] + ( paramètres-recherche insert-id > 0 ), stop.

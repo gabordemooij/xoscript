@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inițializează.
+Program folosește: ['../../../src/xo/mo/webtools.xo'].
+Program folosește: ['../../../src/xo/mo/mailtools.xo'].
+
+>> antet := Antet-HTTP nou cheie: ['Location'] valoare: ['/ok\r\nX-Injected: yes'].
+Ieșire scrie: antet.
+
+>> web := Document-Web nou.
+web mergi-la: ['/ok\r\nX-Injected: yes'].
+Ieșire scrie: ['\n'], rând-nou.
+
+>> mail := Email nou.
+mail către: (Listă nou ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Listă nou ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Listă nou ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail expeditor: ['d@example.invalid\r\nX-From: yes'] nume: ['site\r\nX-Name: yes'].
+mail subiect: ['hello\r\nX-Subject: yes'].
+mail corp: ['line1\r\nline2'].
+Ieșire scrie: mail generează.
+
+>> html := Email-HTML nou.
+html către: (Listă nou ; ['a@example.invalid\r\nX-To: yes']).
+html expeditor: ['d@example.invalid'] nume: ['site'].
+html subiect: ['hello\r\nX-Subject: yes'].
+html corp: ['body'].
+Ieșire scrie: ( html generează conține: ['\nX-'] ), rând-nou.
+Ieșire scrie: ( html generează conține: ['X-To: yes'] ), rând-nou.

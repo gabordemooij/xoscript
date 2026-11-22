@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inisjalisearje.
+Programma brûke: ['../../../src/xo/fy/webtools.xo'].
+Programma brûke: ['../../../src/xo/fy/mailtools.xo'].
+
+>> kop := HTTP-Kop nĳ kaai: ['Location'] wearde: ['/ok\r\nX-Injected: yes'].
+Utfier skriuwe: kop.
+
+>> web := Webdokumint nĳ.
+web gean-nei: ['/ok\r\nX-Injected: yes'].
+Utfier skriuwe: ['\n'], nije-rigel.
+
+>> mail := E-mail nĳ.
+mail oan: (Rige nĳ ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Rige nĳ ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Rige nĳ ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail ôfstjoerder: ['d@example.invalid\r\nX-From: yes'] namme: ['site\r\nX-Name: yes'].
+mail ûnderwerp: ['hello\r\nX-Subject: yes'].
+mail berjochttekst: ['line1\r\nline2'].
+Utfier skriuwe: mail generearje.
+
+>> html := HTML-E-mail nĳ.
+html oan: (Rige nĳ ; ['a@example.invalid\r\nX-To: yes']).
+html ôfstjoerder: ['d@example.invalid'] namme: ['site'].
+html ûnderwerp: ['hello\r\nX-Subject: yes'].
+html berjochttekst: ['body'].
+Utfier skriuwe: ( html generearje befettet: ['\nX-'] ), nije-rigel.
+Utfier skriuwe: ( html generearje befettet: ['X-To: yes'] ), nije-rigel.

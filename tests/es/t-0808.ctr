@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Contenedor-seguro claves-criptográficas.
+>> sk := keys primero.
+>> pk := keys último.
+>> sig := Contenedor-seguro firmar: ['abc'] con: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Contenedor-seguro firmar: ['abc'] con: long. } capturar: { :e
+	Salida escribir: e, detener.
+}, empezar.
+
+{ Contenedor-seguro verificar: ['abc'] firma: long con: pk. } capturar: { :e
+	Salida escribir: e, detener.
+}, empezar.
+
+{ Contenedor-seguro verificar: ['abc'] firma: sig con: short. } capturar: { :e
+	Salida escribir: e, detener.
+}, empezar.

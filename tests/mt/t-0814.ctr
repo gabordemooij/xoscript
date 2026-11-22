@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inizjalizza.
+Programm uża: ['../../../src/xo/mt/webtools.xo'].
+
+>> Fake-Request := Oġġett ġdid.
+Fake-Request meta: ['value:'] agħmel: { :valur
+	proprju valur := valur.
+}.
+Fake-Request meta: ['cookie:'] agħmel: { :isem <- proprju valur.
+}.
+
+>> Test-Session := Sessjoni-fajl-temporanju ġdid.
+Test-Session meta: ['tella'] agħmel: { <- Dizzjunarju ġdid.
+}.
+Test-Session meta: ['session-id'] agħmel: { <- proprju id.
+}.
+
+>> cookies := Lista ġdid
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies kull: { :i :cookie
+	>> talba := Fake-Request ġdid.
+	talba value: cookie.
+	>> maniġer := Test-Session ġdid.
+	>> web := Dokument-Web ġdid.
+	web talba: talba.
+	web maniġer-sessjonijiet: maniġer.
+	web ibda-sessjoni.
+	Ħruġ ikteb: ( maniġer session-id = cookie ), linja-ġdida.
+}.
+
+>> web := Dokument-Web ġdid.
+web json: (Dizzjunarju ġdid poġġi: ['b'] fi: ['a']).
+Ħruġ ikteb: ['\n'], linja-ġdida.
+
+{ Netwerk get: ['file:///etc/hostname']. } aqbad: { :e
+	Ħruġ ikteb: e, linja-ġdida.
+}, ibda.
+
+>> svg := Fajl ġdid: ['/tmp/test0814.svg'].
+svg ikteb: ['<svg xmlns="x"></svg>'].
+Ħruġ linja-ġdida.
+Server għaddi: ['test0814.svg'] prefiss: ['/tmp/'].
+svg ħassar.

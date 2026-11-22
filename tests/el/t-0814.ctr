@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server αρχικοποίησε.
+Πρόγραμμα χρήση: ['../../../src/xo/el/webtools.xo'].
+
+>> Fake-Request := Αντικείμενο νέο.
+Fake-Request όταν: ['value:'] κάνε: { :τιμή
+	δικό τιμή := τιμή.
+}.
+Fake-Request όταν: ['cookie:'] κάνε: { :όνομα <- δικό τιμή.
+}.
+
+>> Test-Session := Συνεδρία-προσωρινού-αρχείου νέο.
+Test-Session όταν: ['φόρτωσε'] κάνε: { <- Λεξικό νέο.
+}.
+Test-Session όταν: ['session-id'] κάνε: { <- δικό id.
+}.
+
+>> cookies := Λίστα νέο
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies κάθε: { :i :cookie
+	>> αίτημα := Fake-Request νέο.
+	αίτημα value: cookie.
+	>> διαχειριστής := Test-Session νέο.
+	>> web := Έγγραφο-Ιστού νέο.
+	web αίτημα: αίτημα.
+	web διαχειριστής-συνεδριών: διαχειριστής.
+	web ξεκίνα-συνεδρία.
+	Έξοδος γράψε: ( διαχειριστής session-id = cookie ), νέα-γραμμή.
+}.
+
+>> web := Έγγραφο-Ιστού νέο.
+web json: (Λεξικό νέο τοποθέτηση: ['b'] στο: ['a']).
+Έξοδος γράψε: ['\n'], νέα-γραμμή.
+
+{ Δίκτυο get: ['file:///etc/hostname']. } σύλληψη: { :e
+	Έξοδος γράψε: e, νέα-γραμμή.
+}, εκκίνηση.
+
+>> svg := Αρχείο νέο: ['/tmp/test0814.svg'].
+svg γράψε: ['<svg xmlns="x"></svg>'].
+Έξοδος νέα-γραμμή.
+Server προώθηση: ['test0814.svg'] πρόθεμα: ['/tmp/'].
+svg διαγραφή.

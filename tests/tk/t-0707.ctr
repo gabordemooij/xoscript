@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programma ýat-dolandyryş: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB täze host: ['localhost'],
+	ulanyjy-ady: ['xo'], parol: ['pass123'], binýat-ady: ['xobase'], birikdir.
+
+>> TwoDigitFormat := Format täze: ['%02d'].
+
+# Datetime
+{
+	>> ýyl := San arasynda: 1995 we: 2050, tekst.
+	>> aý := TwoDigitFormat ulan-bitin: (San arasynda: 1 we: 12), tekst.
+	>> gün := TwoDigitFormat ulan-bitin: (San arasynda: 1 we: 28), tekst.
+	>> sagat := TwoDigitFormat ulan-bitin: (San arasynda: 1 we: 23), tekst.
+	>> minut := TwoDigitFormat ulan-bitin: (San arasynda: 1 we: 59), tekst.
+	>> sekunt := TwoDigitFormat ulan-bitin: (San arasynda: 1 we: 59), tekst.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: ýyl,
+		MM: aý,
+		DD: gün,
+		HH: sagat,
+		II: minut,
+		SS: sekunt.
+	>> gözleg-parametrleri :=
+	db sorag: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	getir: { :row
+		(row mydatetime = datetime) ýalňyş: {
+			şu-wezipe ýalňyşlyk: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter goş: 1.
+} * 100.
+
+# Date
+{
+	>> ýyl := San arasynda: 1995 we: 2050, tekst.
+	>> aý := TwoDigitFormat ulan-bitin: (San arasynda: 1 we: 12), tekst.
+	>> gün := TwoDigitFormat ulan-bitin: (San arasynda: 1 we: 28), tekst.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: ýyl,
+		MM: aý,
+		DD: gün.
+	>> gözleg-parametrleri :=
+	db sorag: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	getir: { :row
+		(row mydate = date) ýalňyş: {
+			şu-wezipe ýalňyşlyk: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter goş: 1.
+} * 100.
+
+
+# Time
+{
+	>> sagat := TwoDigitFormat ulan-bitin: (San arasynda: 1 we: 23), tekst.
+	>> minut := TwoDigitFormat ulan-bitin: (San arasynda: 1 we: 59), tekst.
+	>> sekunt := TwoDigitFormat ulan-bitin: (San arasynda: 1 we: 59), tekst.
+	>> wagt := ['HH:II:SS'].
+	wagt
+		HH: sagat,
+		II: minut,
+		SS: sekunt.
+	>> gözleg-parametrleri :=
+	db sorag: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: wagt),
+	getir: { :row
+		(row mytime = wagt) ýalňyş: {
+			şu-wezipe ýalňyşlyk: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter goş: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Sanaw täze doldur: 100000 bilen: ['x'], birleşdir: [''].
+{
+	>> str2 := Seýf token: 40.
+	>> gözleg-parametrleri :=
+	db sorag: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	getir: { :row
+		(row str1 = str1 we: row str2 = str2) ýalňyş: {
+			şu-wezipe ýalňyşlyk: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter goş: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := San arasynda: 1 we: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 tekstden: ['9223372036854775807'] ) -
+		( Int64 tekstden: ['99999'] ) +
+		( Int64 tekstden: n1 tekst )
+	).
+	>> gözleg-parametrleri :=
+	db sorag: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	getir: { :row
+		(row n1 = n1) ýalňyş: {
+			şu-wezipe ýalňyşlyk: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) ýalňyş: {
+			şu-wezipe ýalňyşlyk: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 tegelekle) ýalňyş: {
+			şu-wezipe ýalňyşlyk: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) ýalňyş: {
+			şu-wezipe ýalňyşlyk: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter goş: 1.
+} * 100.
+
+
+Çykyş ýaz: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), täze-setir.

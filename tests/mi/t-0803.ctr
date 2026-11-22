@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB hou manaaki: ['localhost'],
+	ingoa-kaiwhakamahi: ['xo'],
+	kupuhipa: ['pass123'],
+	ingoa-pātengi-raraunga: ['xobase'],
+	tūhono.
+
+>> conn2 := Maria-DB hou manaaki: ['localhost'],
+	ingoa-kaiwhakamahi: ['xo'],
+	kupuhipa: ['pass123'],
+	ingoa-pātengi-raraunga: ['xobase'],
+	tūhono.
+#...
+>> del := conn1 uiui: ['DELETE FROM book WHERE id > 0'].
+{  del whakatutuki. conn1 whakaū. } hopu: { :e conn1 hoki-whakamuri.  }, tīmata.
+
+>> insert := conn1 uiui: ['INSERT INTO book (id) VALUES(null)'].
+insert whakatutuki.
+
+>> tatau := conn1 uiui: ['SELECT COUNT(*) AS num FROM book'].
+tatau tikina: { :row Huaputa tuhi: row num, rārangi-hou. }.
+
+# does not show up
+# insert not committed on connection 1
+>> tatau := conn2 uiui: ['SELECT COUNT(*) AS num FROM book'].
+tatau tikina: { :row Huaputa tuhi: row num, rārangi-hou. }.

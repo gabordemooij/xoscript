@@ -1,0 +1,43 @@
+
+
+>> g := Server nobo.
+>> v := Kaha-fuerte nobo.
+>> ok := 0.
+
+>> secrets := Lista nobo ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopia.
+passwords kada: { :i :p
+	secrets kada: { :n :s
+		{
+			>> encrypted := v enkriptá: s yabi: p.
+			>> decrypted := v dekriptá: encrypted yabi: p.
+			(decrypted = s) bèrdat: {
+				ok suma: 1.
+			}, sino: {
+				Salida skirbi: ['failed encrypting/decrypting: '], liña-nobo.
+				Salida skirbi: s, liña-nobo.
+				Salida skirbi: ['encrypted: '] + encrypted, liña-nobo.
+				Salida skirbi: ['decrypted: '] + encrypted, liña-nobo.
+				Programa terminá.
+			}.
+		} kapta: { :err
+			(s = [''] òf: p = ['']) bèrdat: {
+				ok suma: 1.
+			}, sino: {
+				Salida skirbi: err, liña-nobo.
+				Programa terminá.
+			}.
+		}, kuminsá.
+	}.
+}.
+
+Salida skirbi: ( ok + [' vault encryptions tested.'] ), liña-nobo.

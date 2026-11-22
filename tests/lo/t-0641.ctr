@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := ວັດຈະນານຸກົມ ໃໝ່
+	# ASCII only
+	ໃສ່: ( ລິສ ໃໝ່ ; 65 ; 65 ; 65 ; 65 ; 0 ) ທີ່ກະແຈ: ['AAAA'],
+	# valid 2 byte sequence
+	ໃສ່: ( ລິສ ໃໝ່ ; 194 ; 162 ; 0 ) ທີ່ກະແຈ: ['¢'],
+	# Valid 3-byte UTF-8
+    ໃສ່: ( ລິສ ໃໝ່ ; 226 ; 130 ; 172 ; 0 ) ທີ່ກະແຈ: ['€'],
+	# Valid 4-byte UTF-8
+    ໃສ່: ( ລິສ ໃໝ່ ; 240 ; 144 ; 141 ; 136 ; 0 ) ທີ່ກະແຈ: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    ໃສ່: ( ລິສ ໃໝ່ ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ທີ່ກະແຈ: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    ໃສ່: ( ລິສ ໃໝ່ ; 65 ; 193 ; 129 ; 0 ) ທີ່ກະແຈ: ['A?'],
+	# Invalid first byte (0xFF)
+    ໃສ່: ( ລິສ ໃໝ່ ; 255 ; 0 ) ທີ່ກະແຈ: ['?'],
+	# Incomplete multi-byte sequence at end
+    ໃສ່: ( ລິສ ໃໝ່ ; 66 ; 226 ; 0 ) ທີ່ກະແຈ: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    ໃສ່: ( ລິສ ໃໝ່ ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ທີ່ກະແຈ: ['A€?𐍈B'].
+	 
+utf8cases ແຕ່ລະຕົວ: { :key :value
+	>> blob := Blob ໃໝ່: value ຈຳນວນ, bytes: value.
+	>> str := blob ເປັນຂໍ້ຄວາມ.
+	(str = key) ຖ້າຈິງ: {
+		ຜົນອອກ ຂຽນ: ['OK'], ຂຶ້ນແຖວໃໝ່.
+	}, ຖ້າບໍ່ດັ່ງນັ້ນ: {
+		ຜົນອອກ ຂຽນ: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, ຂຶ້ນແຖວໃໝ່.
+	}.
+	blob ປ່ອຍໜ່ວຍຄວາມຈຳ.
+}.

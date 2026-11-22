@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Hvelfing búa-til-lykla.
+>> sk := keys fyrsta.
+>> pk := keys síðasta.
+>> sig := Hvelfing undirrita: ['abc'] með: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Hvelfing undirrita: ['abc'] með: long. } grípa: { :e
+	Úttak skrifa: e, ný-lína.
+}, ræsa.
+
+{ Hvelfing athuga: ['abc'] undirskrift: long með: pk. } grípa: { :e
+	Úttak skrifa: e, ný-lína.
+}, ræsa.
+
+{ Hvelfing athuga: ['abc'] undirskrift: sig með: short. } grípa: { :e
+	Úttak skrifa: e, ný-lína.
+}, ræsa.

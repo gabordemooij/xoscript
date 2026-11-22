@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programa xestión-memoria: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB novo anfitrión: ['localhost'],
+	usuario: ['xo'], contrasinal: ['pass123'], nome-base: ['xobase'], conectar.
+
+>> TwoDigitFormat := Formato novo: ['%02d'].
+
+# Datetime
+{
+	>> ano := Número entre: 1995 e: 2050, texto.
+	>> mes := TwoDigitFormat aplicar-enteiro: (Número entre: 1 e: 12), texto.
+	>> día := TwoDigitFormat aplicar-enteiro: (Número entre: 1 e: 28), texto.
+	>> hora := TwoDigitFormat aplicar-enteiro: (Número entre: 1 e: 23), texto.
+	>> minuto := TwoDigitFormat aplicar-enteiro: (Número entre: 1 e: 59), texto.
+	>> segundo := TwoDigitFormat aplicar-enteiro: (Número entre: 1 e: 59), texto.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: ano,
+		MM: mes,
+		DD: día,
+		HH: hora,
+		II: minuto,
+		SS: segundo.
+	>> parámetros-de-busca :=
+	db consulta: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	obter: { :row
+		(row mydatetime = datetime) falso: {
+			esta-tarefa erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter sumar: 1.
+} * 100.
+
+# Date
+{
+	>> ano := Número entre: 1995 e: 2050, texto.
+	>> mes := TwoDigitFormat aplicar-enteiro: (Número entre: 1 e: 12), texto.
+	>> día := TwoDigitFormat aplicar-enteiro: (Número entre: 1 e: 28), texto.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: ano,
+		MM: mes,
+		DD: día.
+	>> parámetros-de-busca :=
+	db consulta: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	obter: { :row
+		(row mydate = date) falso: {
+			esta-tarefa erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter sumar: 1.
+} * 100.
+
+
+# Time
+{
+	>> hora := TwoDigitFormat aplicar-enteiro: (Número entre: 1 e: 23), texto.
+	>> minuto := TwoDigitFormat aplicar-enteiro: (Número entre: 1 e: 59), texto.
+	>> segundo := TwoDigitFormat aplicar-enteiro: (Número entre: 1 e: 59), texto.
+	>> tempo := ['HH:II:SS'].
+	tempo
+		HH: hora,
+		II: minuto,
+		SS: segundo.
+	>> parámetros-de-busca :=
+	db consulta: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: tempo),
+	obter: { :row
+		(row mytime = tempo) falso: {
+			esta-tarefa erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter sumar: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lista novo encher: 100000 con: ['x'], unir: [''].
+{
+	>> str2 := Caixa-forte token: 40.
+	>> parámetros-de-busca :=
+	db consulta: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	obter: { :row
+		(row str1 = str1 e: row str2 = str2) falso: {
+			esta-tarefa erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter sumar: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Número entre: 1 e: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 desde-texto: ['9223372036854775807'] ) -
+		( Int64 desde-texto: ['99999'] ) +
+		( Int64 desde-texto: n1 texto )
+	).
+	>> parámetros-de-busca :=
+	db consulta: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	obter: { :row
+		(row n1 = n1) falso: {
+			esta-tarefa erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) falso: {
+			esta-tarefa erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 arredondar) falso: {
+			esta-tarefa erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) falso: {
+			esta-tarefa erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter sumar: 1.
+} * 100.
+
+
+Saída escribir: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), salto-de-liña.

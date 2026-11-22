@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inicializál.
+Program használ: ['../../../src/xo/hu/webtools.xo'].
+
+>> Fake-Request := Objektum új.
+Fake-Request ha: ['value:'] tedd: { :érték
+	saját érték := érték.
+}.
+Fake-Request ha: ['cookie:'] tedd: { :név <- saját érték.
+}.
+
+>> Test-Session := Ideiglenes-fájl-munkamenet új.
+Test-Session ha: ['betölt'] tedd: { <- Szótár új.
+}.
+Test-Session ha: ['session-id'] tedd: { <- saját id.
+}.
+
+>> cookies := Lista új
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies mindegyik: { :i :cookie
+	>> kérés := Fake-Request új.
+	kérés value: cookie.
+	>> kezelő := Test-Session új.
+	>> web := Webdokumentum új.
+	web kérés: kérés.
+	web munkamenet-kezelő: kezelő.
+	web munkamenet-indítása.
+	Kimenet ír: ( kezelő session-id = cookie ), újsor.
+}.
+
+>> web := Webdokumentum új.
+web json: (Szótár új tesz: ['b'] ide: ['a']).
+Kimenet ír: ['\n'], újsor.
+
+{ Hálózat get: ['file:///etc/hostname']. } elkap: { :e
+	Kimenet ír: e, újsor.
+}, indít.
+
+>> svg := Fájl új: ['/tmp/test0814.svg'].
+svg ír: ['<svg xmlns="x"></svg>'].
+Kimenet újsor.
+Server továbbít: ['test0814.svg'] előtag: ['/tmp/'].
+svg töröl.

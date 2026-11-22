@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB täze host: ['localhost'],
+	ulanyjy-ady: ['xo'],
+	parol: ['pass123'],
+	binýat-ady: ['xobase'],
+	birikdir.
+
+>> conn2 := Maria-DB täze host: ['localhost'],
+	ulanyjy-ady: ['xo'],
+	parol: ['pass123'],
+	binýat-ady: ['xobase'],
+	birikdir.
+#...
+>> del := conn1 sorag: ['DELETE FROM book WHERE id > 0'].
+{  del ýerine-ýetir. conn1 tassykla. } tut: { :e conn1 yzyna-gaýtar.  }, işlet.
+
+>> insert := conn1 sorag: ['INSERT INTO book (id) VALUES(null)'].
+insert ýerine-ýetir.
+
+>> sany := conn1 sorag: ['SELECT COUNT(*) AS num FROM book'].
+sany getir: { :row Çykyş ýaz: row num, täze-setir. }.
+
+# does not show up
+# insert not committed on connection 1
+>> sany := conn2 sorag: ['SELECT COUNT(*) AS num FROM book'].
+sany getir: { :row Çykyş ýaz: row num, täze-setir. }.

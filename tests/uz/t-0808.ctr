@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Seyf kalitlar-yaratish.
+>> sk := keys birinchi.
+>> pk := keys oxirgi.
+>> sig := Seyf imzolash: ['abc'] kalit-bilan: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Seyf imzolash: ['abc'] kalit-bilan: long. } ushlash: { :e
+	Chiqish yozish: e, yangi-qator.
+}, ishga-tushirish.
+
+{ Seyf tekshirish: ['abc'] imzo: long kalit-bilan: pk. } ushlash: { :e
+	Chiqish yozish: e, yangi-qator.
+}, ishga-tushirish.
+
+{ Seyf tekshirish: ['abc'] imzo: sig kalit-bilan: short. } ushlash: { :e
+	Chiqish yozish: e, yangi-qator.
+}, ishga-tushirish.

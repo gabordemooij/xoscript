@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Liosta nua ;
+	# {"key":"normal"} normal ASCII
+	( Foclóir nua cuir: ['normal'] ag: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Foclóir nua cuir: ['hello world'] ag: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Foclóir nua cuir: ['"'] ag: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Foclóir nua cuir: ['backslash: \\'] ag: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Foclóir nua cuir: ['slash: /'] ag: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Foclóir nua cuir: ['backspace: \b'] ag: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Foclóir nua cuir: ['formfeed: \f'] ag: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Foclóir nua cuir: ['newline: \n'] ag: ['key'] ) ;
+	( Foclóir nua cuir: ['newline: ↵'] ag: ['key'] ) ;
+	( Foclóir nua cuir: ['newline: 
+	'] ag: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Foclóir nua cuir: ['carriage return: \r'] ag: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Foclóir nua cuir: ['tab \t'] ag: ['key'] ) ;
+	( Foclóir nua cuir: ['tab ⇿'] ag: ['key'] ) ;
+	( Foclóir nua cuir: ['tab  '] ag: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Foclóir nua cuir: ['NUL \u0000'] ag: ['key'] ) ;
+	( Foclóir nua cuir: ['NUL \0'] ag: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Foclóir nua cuir: ['control: \u0001'] ag: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Foclóir nua cuir: ['control: \u001F'] ag: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Foclóir nua cuir: ['unicode: é'] ag: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Foclóir nua cuir: ['unicode: €'] ag: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Foclóir nua cuir: ['unicode: 日本語'] ag: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Foclóir nua cuir: ['unicode: 😀'] ag: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Foclóir nua cuir: ['unicode: 🧑‍💻'] ag: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Foclóir nua cuir: ['combining: e\u0301'] ag: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Foclóir nua cuir: ['escaped unicode: \u00e9'] ag: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Foclóir nua cuir: ['escaped unicode: \u20ac'] ag: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Foclóir nua cuir: ['escaped unicode: \ud83d\ude00'] ag: ['key'] ) ;
+	# {"key":""} empty value
+	( Foclóir nua cuir: [''] ag: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Foclóir nua cuir: ['@ < > & = % + ? #'] ag: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Foclóir nua cuir: ['''] ag: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Foclóir nua cuir: ['multiple: \" \\ \n \r \t'] ag: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Foclóir nua cuir: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] ag: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Foclóir nua cuir: [' value'] ag: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Foclóir nua cuir: ['value '] ag: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Foclóir nua cuir: [' \t\n\r '] ag: ['key'] ).
+
+dicts gach: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Foclóir nua cuir: d key ag: ['key']).
+	>> b := JSON jsonify: (Foclóir nua cuir: ['value'] ag: d key).
+	>> e := JSON réad: a.
+	>> f := JSON réad: b.
+	((e key = d key agus: (f ? d key = ['value'])) nó: (e key = ['NUL ?'])) fíor: {
+		Aschur scríobh: ['OK'], líne-nua.
+	}, eile: {
+		Aschur scríobh: ['Unable to properly encode/decode: '] + d + j, líne-nua.
+		Ríomhchlár deireadh.
+	}.
+}.

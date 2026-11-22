@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB hou hoʻokipa: ['localhost'],
+	inoa-mea-hoʻohana: ['xo'],
+	ʻōlelo-huna: ['pass123'],
+	inoa-waihona-ʻikepili: ['xobase'],
+	hoʻohui-pū.
+
+>> nā-koina-huli := db nīnau: ['SELECT ? AS a, ? AS b, ? AS c'].
+nā-koina-huli nā-koina: (Papa hou ; ['1']).
+{ nā-koina-huli kiʻi: { :row Huapuka kākau: row, laina-hou. }. } hopu: { :e Huapuka kākau: e, laina-hou. }, hoʻomaka.
+
+>> nā-koina-huli := db nīnau: ['SELECT ? AS a'].
+{ nā-koina-huli kiʻi: { :row Huapuka kākau: row, laina-hou. }. } hopu: { :e Huapuka kākau: e, laina-hou. }, hoʻomaka.
+
+# the right number still works, more parameters are ignored as before
+>> nā-koina-huli := db nīnau: ['SELECT ? AS a, ? AS b'].
+nā-koina-huli nā-koina: (Papa hou ; ['1'] ; ['2']).
+nā-koina-huli kiʻi: { :row Huapuka kākau: (row i: ['a']), kākau: (row i: ['b']), laina-hou. }.
+nā-koina-huli nā-koina: (Papa hou ; ['1'] ; ['2'] ; ['3']).
+nā-koina-huli kiʻi: { :row Huapuka kākau: (row i: ['a']), kākau: (row i: ['b']), laina-hou. }.

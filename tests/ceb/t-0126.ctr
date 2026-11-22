@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Butang bag-o.
+
+Slurp kon: ['bag-o'] buhata: {
+	akoa str := [''].
+}.
+
+Slurp kon: ['nieuw'] buhata: {
+	akoa str := [''].
+}.
+
+Slurp kon: ['tubag:'] buhata: { :blah
+		akoa str idugang-sa-tumoy: blah.
+}.
+
+Slurp kon: ['tubag:ug:'] buhata: { :blah :blahah
+		akoa str idugang-sa-tumoy: (blah gikan-sa: 0 gitas-on: (blah gitas-on - 1)).
+		akoa str idugang-sa-tumoy: [' '].
+		akoa str idugang-sa-tumoy: blahah.
+}.
+
+Slurp kon: ['obtain'] buhata: {
+	>> buffer := akoa str.
+	akoa str := ['']. <- buffer.
+}.
+
+
+Gawas isulat: (Programa sistema: (Slurp bag-o echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Payl bag-o: ['/tmp/from.txt'], papasa. } dakpon: { ['Empty']. }, padagana.
+{ Payl bag-o: ['/tmp/to.txt'], papasa. } dakpon: { ['Empty']. }, padagana.
+
+
+Payl bag-o: ['/tmp/to.txt'], anaa bakak: {
+	Gawas isulat: ['Confirmed. Target file does not exist.\
+'].
+}.
+Payl bag-o: ['/tmp/from.txt'], anaa bakak: {
+	Gawas isulat: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Programa sistema: (Slurp bag-o touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Programa sistema: (Slurp bag-o cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Payl bag-o: ['/tmp/to.txt'], anaa tinuod: {
+	Gawas isulat: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Gawas isulat: ['Contents of file is:'] + (Payl bag-o: ['/tmp/to.txt'], basaha), bag-ong-linya.

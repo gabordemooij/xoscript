@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Ausgab schreiwen: ['Database test'], nei-zeil.
+
+>> db := Maria-DB nei host: ['localhost'],
+	benotzernumm: ['xo'], passwuert: ['pass123'], datebanknumm: ['xobase'], verbannen.
+
+Ausgab schreiwen: ['Can we connect? '] + db verbonnen?, nei-zeil.
+
+>> sichparameter := db ufro: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameter: ( Lëscht nei ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  sichparameter ausféieren. db bestätegen. } offänken: { :e db zréckrullen.  }, starten.
+
+Ausgab schreiwen: ['Can we insert? '] + ( sichparameter insert-id > 0 ), nei-zeil.
+
+>> x := 0.
+>> sichparameter :=
+db ufro: ['SELECT * FROM book order by id desc limit 2'], 
+ofruffen: { :row 
+	x dobäisetzen: 1.
+	Wouer ofbriechen. # must clean up, no 'Commands out of sync'
+}.
+
+>> sichparameter :=
+db ufro: ['SELECT * FROM book order by id desc limit 2'], 
+ofruffen: { :row
+	x dobäisetzen: 1.
+	Wouer ofbriechen.
+}.
+
+(x > 0) wouer: {
+	Ausgab schreiwen: ['Can we break in the middle of a fetch? '].
+}.
+
+Ausgab schreiwen: Wouer, nei-zeil.

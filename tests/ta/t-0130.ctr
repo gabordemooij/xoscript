@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := நிரல் அமைப்பு-மதிப்பு: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server இணைப்பு: ( வரிசை புதிய ;
+ libname ; ['fopen'] ;
+ ( வரிசை புதிய ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+இணைப்பு: ( வரிசை புதிய ;
+ வெற்று ; # means same lib
+ ['fread'] ;
+ ( வரிசை புதிய ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ வெற்று ; # means same object (i.e. Stream)
+ ['fread']
+),
+இணைப்பு: (
+ வரிசை புதிய ;
+ வெற்று ; # means same lib
+ ['fwrite'] ;
+ ( வரிசை புதிய ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ வெற்று ; # means same lib
+ ['fwrite']
+),
+இணைப்பு: (
+ வரிசை புதிய ;
+ வெற்று ; # means same lib
+ ['rewind'] ;
+ ( வரிசை புதிய ; ['pointer'] ) ;
+ ['int'] ;
+ வெற்று ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> கோப்பு-பாதை := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: கோப்பு-பாதை mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream செய்தி: ['fwrite'] அளவுருக்கள்: (வரிசை புதிய ; str ; 1 ; 6 ; fd ).
+வெளியீடு எழுது: bytes-written, புதிய-வரி.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob புதிய: 20.
+
+# read from file
+>> bytes-read := Stream செய்தி: ['fread'] அளவுருக்கள்: (வரிசை புதிய ; buf ; 1 ; 6 ; fd ).
+வெளியீடு எழுது: bytes-read, புதிய-வரி.
+வெளியீடு எழுது: buf, புதிய-வரி.
+
+# free memory
+str  விடுவி.
+கோப்பு-பாதை விடுவி.
+mode விடுவி.
+buf  விடுவி.
+
+

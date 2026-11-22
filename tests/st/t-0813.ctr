@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server lokisa.
+Lenaneo sebelisa: ['../../../src/xo/st/webtools.xo'].
+Lenaneo sebelisa: ['../../../src/xo/st/mailtools.xo'].
+
+>> hlooho := Hlooho-ea-HTTP ncha senotlolo: ['Location'] boleng: ['/ok\r\nX-Injected: yes'].
+Sephetho ngola: hlooho.
+
+>> web := Tokomane-ea-Webo ncha.
+web eya-ho: ['/ok\r\nX-Injected: yes'].
+Sephetho ngola: ['\n'], mola-o-mocha.
+
+>> mail := Imeile ncha.
+mail ho: (Lethathamo ncha ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lethathamo ncha ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lethathamo ncha ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail moromeli: ['d@example.invalid\r\nX-From: yes'] lebitso: ['site\r\nX-Name: yes'].
+mail sehlooho: ['hello\r\nX-Subject: yes'].
+mail mmele: ['line1\r\nline2'].
+Sephetho ngola: mail hlahisa.
+
+>> html := Imeile-HTML ncha.
+html ho: (Lethathamo ncha ; ['a@example.invalid\r\nX-To: yes']).
+html moromeli: ['d@example.invalid'] lebitso: ['site'].
+html sehlooho: ['hello\r\nX-Subject: yes'].
+html mmele: ['body'].
+Sephetho ngola: ( html hlahisa e-kenyelletsa: ['\nX-'] ), mola-o-mocha.
+Sephetho ngola: ( html hlahisa e-kenyelletsa: ['X-To: yes'] ), mola-o-mocha.

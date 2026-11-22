@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Elenco nuovo
+	# ASCII only
+	met: ( Serie nuovo ; 65 ; 65 ; 65 ; 65 ; 0 ) a: ['AAAA'],
+	# valid 2 byte sequence
+	met: ( Serie nuovo ; 194 ; 162 ; 0 ) a: ['¢'],
+	# Valid 3-byte UTF-8
+    met: ( Serie nuovo ; 226 ; 130 ; 172 ; 0 ) a: ['€'],
+	# Valid 4-byte UTF-8
+    met: ( Serie nuovo ; 240 ; 144 ; 141 ; 136 ; 0 ) a: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    met: ( Serie nuovo ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) a: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    met: ( Serie nuovo ; 65 ; 193 ; 129 ; 0 ) a: ['A?'],
+	# Invalid first byte (0xFF)
+    met: ( Serie nuovo ; 255 ; 0 ) a: ['?'],
+	# Incomplete multi-byte sequence at end
+    met: ( Serie nuovo ; 66 ; 226 ; 0 ) a: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    met: ( Serie nuovo ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) a: ['A€?𐍈B'].
+	 
+utf8cases ogni: { :key :value
+	>> blob := Blob nuovo: value contare, bytes: value.
+	>> str := blob testo.
+	(str = key) vero: {
+		Uscita scrivi: ['OK'], stop.
+	}, altro: {
+		Uscita scrivi: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, stop.
+	}.
+	blob libero.
+}.

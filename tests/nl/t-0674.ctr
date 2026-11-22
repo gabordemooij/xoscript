@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> pad := ['/tmp/dat.csv'].
+>> csv := Bestand nieuw: pad.
+csv schrijf: s.
+
+# accepts CRLF LF CR, varying row length
+csv scheidingsteken: [';'] aanhalingsteken: ['"'] regels: { :line
+	Programma vegen.
+	Uit schrijf: line, stop.
+	Programma vegen.
+}.
+
+# unequal lines
+s toevoegen: ['\njustone'].
+csv schrijf: s.
+{
+	csv scheidingsteken: [';'] aanhalingsteken: ['"'] regels: { :line
+		Uit schrijf: line, stop.
+	}.
+} afhandelen: { :e 
+	Uit schrijf: e, stop.
+}, start.
+
+# invalid format
+s := ['"he"llo";world'].
+csv schrijf: s.
+{
+	csv scheidingsteken: [';'] aanhalingsteken: ['"'] regels: { :line
+		Uit schrijf: line, stop.
+	}.
+} afhandelen: { :e 
+	Uit schrijf: e, stop.
+}, start.

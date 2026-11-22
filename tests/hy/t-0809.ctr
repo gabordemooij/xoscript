@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> արժեքներ := Ցուցակ նոր
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+արժեքներ յուրաքանչյուր: { :i :value
+	>> d := Բառարան նոր.
+	d դնել: value բանալի: ['k'].
+	>> r := d կոդ օբյեկտ.
+	Ելք գրել: r քանակ, նոր-տող.
+	Ելք գրել: ( (r դիրքում: ['k']) = value ), նոր-տող.
+}.

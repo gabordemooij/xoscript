@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Uitvoer skryf: ['Database test'], nuwe-reël.
+
+>> db := Maria-DB nuut gasheer: ['localhost'],
+	gebruikersnaam: ['xo'], wagwoord: ['pass123'], databasisnaam: ['xobase'], verbind.
+
+Uitvoer skryf: ['Can we connect? '] + db verbind?, nuwe-reël.
+
+>> soekparameters := db navraag: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameters: ( Lys nuut ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  soekparameters voer-uit. db bevestig. } vang: { :e db rol-terug.  }, begin.
+
+Uitvoer skryf: ['Can we insert? '] + ( soekparameters insert-id > 0 ), nuwe-reël.
+
+>> Obj := Objek nuut.
+Obj by: ['retrieve-rows'] doen: {
+	eie tel := 0.
+	>> soekparameters :=
+	db navraag: ['SELECT * FROM book order by id desc limit 2'], 
+	haal: { :row 
+		eie tel tel-by: 1.
+		Ja onderbreek.
+	}. <- eie tel kopieer.
+}.
+
+Uitvoer skryf: ['Can we query? '] + ( Obj retrieve-rows > 0 ), nuwe-reël.

@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Imveliso bhala: ['Database test'], umgca-omtsha.
+
+>> db := Maria-DB entsha umamkeli: ['localhost'],
+	igama-lomsebenzisi: ['xo'], iphasiwedi: ['pass123'], igama-ledatabheyisi: ['xobase'], qhagamshelana.
+
+Imveliso bhala: ['Can we connect? '] + db kuqhagamshelwe?, umgca-omtsha.
+
+>> iiparamitha-zokukhangela := db umbuzo: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], iiparamitha: ( Uluhlu entsha ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  iiparamitha-zokukhangela phumeza. db qinisekisa. } bamba: { :e db buyisela-umva.  }, qala.
+
+Imveliso bhala: ['Can we insert? '] + ( iiparamitha-zokukhangela insert-id > 0 ), umgca-omtsha.
+
+>> x := 0.
+>> iiparamitha-zokukhangela :=
+db umbuzo: ['SELECT * FROM book order by id desc limit 2'], 
+landa: { :row 
+	x yongeza: 1.
+	Inyaniso yaphula. # must clean up, no 'Commands out of sync'
+}.
+
+>> iiparamitha-zokukhangela :=
+db umbuzo: ['SELECT * FROM book order by id desc limit 2'], 
+landa: { :row
+	x yongeza: 1.
+	Inyaniso yaphula.
+}.
+
+(x > 0) inyaniso: {
+	Imveliso bhala: ['Can we break in the middle of a fetch? '].
+}.
+
+Imveliso bhala: Inyaniso, umgca-omtsha.

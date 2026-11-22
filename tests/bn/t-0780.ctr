@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := লিস্ট নতুন ;
+	# {"key":"normal"} normal ASCII
+	( অভিধান নতুন রাখো: ['normal'] চাবিতে: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( অভিধান নতুন রাখো: ['hello world'] চাবিতে: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( অভিধান নতুন রাখো: ['"'] চাবিতে: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( অভিধান নতুন রাখো: ['backslash: \\'] চাবিতে: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( অভিধান নতুন রাখো: ['slash: /'] চাবিতে: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( অভিধান নতুন রাখো: ['backspace: \b'] চাবিতে: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( অভিধান নতুন রাখো: ['formfeed: \f'] চাবিতে: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( অভিধান নতুন রাখো: ['newline: \n'] চাবিতে: ['key'] ) ;
+	( অভিধান নতুন রাখো: ['newline: ↵'] চাবিতে: ['key'] ) ;
+	( অভিধান নতুন রাখো: ['newline: 
+	'] চাবিতে: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( অভিধান নতুন রাখো: ['carriage return: \r'] চাবিতে: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( অভিধান নতুন রাখো: ['tab \t'] চাবিতে: ['key'] ) ;
+	( অভিধান নতুন রাখো: ['tab ⇿'] চাবিতে: ['key'] ) ;
+	( অভিধান নতুন রাখো: ['tab  '] চাবিতে: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( অভিধান নতুন রাখো: ['NUL \u0000'] চাবিতে: ['key'] ) ;
+	( অভিধান নতুন রাখো: ['NUL \0'] চাবিতে: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( অভিধান নতুন রাখো: ['control: \u0001'] চাবিতে: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( অভিধান নতুন রাখো: ['control: \u001F'] চাবিতে: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( অভিধান নতুন রাখো: ['unicode: é'] চাবিতে: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( অভিধান নতুন রাখো: ['unicode: €'] চাবিতে: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( অভিধান নতুন রাখো: ['unicode: 日本語'] চাবিতে: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( অভিধান নতুন রাখো: ['unicode: 😀'] চাবিতে: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( অভিধান নতুন রাখো: ['unicode: 🧑‍💻'] চাবিতে: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( অভিধান নতুন রাখো: ['combining: e\u0301'] চাবিতে: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( অভিধান নতুন রাখো: ['escaped unicode: \u00e9'] চাবিতে: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( অভিধান নতুন রাখো: ['escaped unicode: \u20ac'] চাবিতে: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( অভিধান নতুন রাখো: ['escaped unicode: \ud83d\ude00'] চাবিতে: ['key'] ) ;
+	# {"key":""} empty value
+	( অভিধান নতুন রাখো: [''] চাবিতে: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( অভিধান নতুন রাখো: ['@ < > & = % + ? #'] চাবিতে: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( অভিধান নতুন রাখো: ['''] চাবিতে: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( অভিধান নতুন রাখো: ['multiple: \" \\ \n \r \t'] চাবিতে: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( অভিধান নতুন রাখো: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] চাবিতে: ['key'] ) ;
+	# {"key":" value"} leading space
+	( অভিধান নতুন রাখো: [' value'] চাবিতে: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( অভিধান নতুন রাখো: ['value '] চাবিতে: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( অভিধান নতুন রাখো: [' \t\n\r '] চাবিতে: ['key'] ).
+
+dicts প্রতিটি: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (অভিধান নতুন রাখো: d key চাবিতে: ['key']).
+	>> b := JSON jsonify: (অভিধান নতুন রাখো: ['value'] চাবিতে: d key).
+	>> e := JSON বস্তু: a.
+	>> f := JSON বস্তু: b.
+	((e key = d key এবং: (f ? d key = ['value'])) অথবা: (e key = ['NUL ?'])) সত্য-হলে: {
+		আউটপুট লেখো: ['OK'], নতুন-লাইন.
+	}, নতুবা: {
+		আউটপুট লেখো: ['Unable to properly encode/decode: '] + d + j, নতুন-লাইন.
+		প্রোগ্রাম শেষ.
+	}.
+}.

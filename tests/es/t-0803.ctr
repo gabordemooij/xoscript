@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB crear host: ['localhost'],
+	usuario: ['xo'],
+	contraseña: ['pass123'],
+	nombre-base-datos: ['xobase'],
+	conectar.
+
+>> conn2 := Maria-DB crear host: ['localhost'],
+	usuario: ['xo'],
+	contraseña: ['pass123'],
+	nombre-base-datos: ['xobase'],
+	conectar.
+#...
+>> del := conn1 consultar: ['DELETE FROM book WHERE id > 0'].
+{  del ejecutar. conn1 confirmar. } capturar: { :e conn1 revertir.  }, empezar.
+
+>> insert := conn1 consultar: ['INSERT INTO book (id) VALUES(null)'].
+insert ejecutar.
+
+>> contar := conn1 consultar: ['SELECT COUNT(*) AS num FROM book'].
+contar extraer: { :row Salida escribir: row num, detener. }.
+
+# does not show up
+# insert not committed on connection 1
+>> contar := conn2 consultar: ['SELECT COUNT(*) AS num FROM book'].
+contar extraer: { :row Salida escribir: row num, detener. }.

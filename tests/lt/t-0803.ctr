@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB naujas mazgas: ['localhost'],
+	naudotojas: ['xo'],
+	slaptažodis: ['pass123'],
+	duomenų-bazės-vardas: ['xobase'],
+	prisijungti.
+
+>> conn2 := Maria-DB naujas mazgas: ['localhost'],
+	naudotojas: ['xo'],
+	slaptažodis: ['pass123'],
+	duomenų-bazės-vardas: ['xobase'],
+	prisijungti.
+#...
+>> del := conn1 užklausa: ['DELETE FROM book WHERE id > 0'].
+{  del vykdyti. conn1 patvirtinti. } pagauti: { :e conn1 atšaukti.  }, paleisti.
+
+>> insert := conn1 užklausa: ['INSERT INTO book (id) VALUES(null)'].
+insert vykdyti.
+
+>> kiekis := conn1 užklausa: ['SELECT COUNT(*) AS num FROM book'].
+kiekis gauti: { :row Išvestis rašyti: row num, nauja-eilutė. }.
+
+# does not show up
+# insert not committed on connection 1
+>> kiekis := conn2 užklausa: ['SELECT COUNT(*) AS num FROM book'].
+kiekis gauti: { :row Išvestis rašyti: row num, nauja-eilutė. }.

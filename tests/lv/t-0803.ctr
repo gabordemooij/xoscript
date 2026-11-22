@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB jauns resursdators: ['localhost'],
+	lietotājs: ['xo'],
+	parole: ['pass123'],
+	datubāzes-nosaukums: ['xobase'],
+	savienot.
+
+>> conn2 := Maria-DB jauns resursdators: ['localhost'],
+	lietotājs: ['xo'],
+	parole: ['pass123'],
+	datubāzes-nosaukums: ['xobase'],
+	savienot.
+#...
+>> del := conn1 vaicājums: ['DELETE FROM book WHERE id > 0'].
+{  del izpildīt. conn1 apstiprināt. } tvert: { :e conn1 atcelt.  }, palaist.
+
+>> insert := conn1 vaicājums: ['INSERT INTO book (id) VALUES(null)'].
+insert izpildīt.
+
+>> skaits := conn1 vaicājums: ['SELECT COUNT(*) AS num FROM book'].
+skaits iegūt: { :row Izvade rakstīt: row num, jauna-rinda. }.
+
+# does not show up
+# insert not committed on connection 1
+>> skaits := conn2 vaicājums: ['SELECT COUNT(*) AS num FROM book'].
+skaits iegūt: { :row Izvade rakstīt: row num, jauna-rinda. }.

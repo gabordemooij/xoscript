@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Saída escribir: ['Database test'], salto-de-liña.
+
+>> db := Maria-DB novo anfitrión: ['localhost'],
+	usuario: ['xo'], contrasinal: ['pass123'], nome-base: ['xobase'], conectar.
+
+Saída escribir: ['Can we connect? '] + db conectado?, salto-de-liña.
+
+>> parámetros-de-busca := db consulta: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parámetros: ( Lista novo ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  parámetros-de-busca executar. db confirmar. } capturar: { :e db desfacer.  }, iniciar.
+
+Saída escribir: ['Can we insert? '] + ( parámetros-de-busca insert-id > 0 ), salto-de-liña.
+
+>> x := 0.
+>> parámetros-de-busca :=
+db consulta: ['SELECT * FROM book order by id desc limit 2'], 
+obter: { :row 
+	x sumar: 1.
+	Certo interromper. # must clean up, no 'Commands out of sync'
+}.
+
+>> parámetros-de-busca :=
+db consulta: ['SELECT * FROM book order by id desc limit 2'], 
+obter: { :row
+	x sumar: 1.
+	Certo interromper.
+}.
+
+(x > 0) certo: {
+	Saída escribir: ['Can we break in the middle of a fetch? '].
+}.
+
+Saída escribir: Certo, salto-de-liña.

@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+ಪ್ರೋಗ್ರಾಂ ಮೆಮೊರಿ-ನಿರ್ವಹಣೆ: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB ಹೊಸ ಹೋಸ್ಟ್: ['localhost'],
+	ಬಳಕೆದಾರ-ಹೆಸರು: ['xo'], ಗುಪ್ತಪದ: ['pass123'], ದತ್ತಸಂಚಯ-ಹೆಸರು: ['xobase'], ಸಂಪರ್ಕಿಸು.
+
+>> TwoDigitFormat := ಸ್ವರೂಪ ಹೊಸ: ['%02d'].
+
+# Datetime
+{
+	>> ವರ್ಷ := ಸಂಖ್ಯೆ ನಡುವೆ: 1995 ಇಂದ: 2050, ಪಠ್ಯವಾಗಿ.
+	>> ತಿಂಗಳು := TwoDigitFormat ಅನ್ವಯಿಸು-ಪೂರ್ಣಾಂಕ: (ಸಂಖ್ಯೆ ನಡುವೆ: 1 ಇಂದ: 12), ಪಠ್ಯವಾಗಿ.
+	>> ದಿನ := TwoDigitFormat ಅನ್ವಯಿಸು-ಪೂರ್ಣಾಂಕ: (ಸಂಖ್ಯೆ ನಡುವೆ: 1 ಇಂದ: 28), ಪಠ್ಯವಾಗಿ.
+	>> ಗಂಟೆ := TwoDigitFormat ಅನ್ವಯಿಸು-ಪೂರ್ಣಾಂಕ: (ಸಂಖ್ಯೆ ನಡುವೆ: 1 ಇಂದ: 23), ಪಠ್ಯವಾಗಿ.
+	>> ನಿಮಿಷ := TwoDigitFormat ಅನ್ವಯಿಸು-ಪೂರ್ಣಾಂಕ: (ಸಂಖ್ಯೆ ನಡುವೆ: 1 ಇಂದ: 59), ಪಠ್ಯವಾಗಿ.
+	>> ಸೆಕೆಂಡು := TwoDigitFormat ಅನ್ವಯಿಸು-ಪೂರ್ಣಾಂಕ: (ಸಂಖ್ಯೆ ನಡುವೆ: 1 ಇಂದ: 59), ಪಠ್ಯವಾಗಿ.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: ವರ್ಷ,
+		MM: ತಿಂಗಳು,
+		DD: ದಿನ,
+		HH: ಗಂಟೆ,
+		II: ನಿಮಿಷ,
+		SS: ಸೆಕೆಂಡು.
+	>> ಹುಡುಕಾಟ-ನಿಯತಾಂಕಗಳು :=
+	db ಪ್ರಶ್ನೆ: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ತರು: { :row
+		(row mydatetime = datetime) ಸುಳ್ಳಾದರೆ: {
+			ಈ-ಕಾರ್ಯ ದೋಷ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ಕೂಡಿಸು: 1.
+} * 100.
+
+# Date
+{
+	>> ವರ್ಷ := ಸಂಖ್ಯೆ ನಡುವೆ: 1995 ಇಂದ: 2050, ಪಠ್ಯವಾಗಿ.
+	>> ತಿಂಗಳು := TwoDigitFormat ಅನ್ವಯಿಸು-ಪೂರ್ಣಾಂಕ: (ಸಂಖ್ಯೆ ನಡುವೆ: 1 ಇಂದ: 12), ಪಠ್ಯವಾಗಿ.
+	>> ದಿನ := TwoDigitFormat ಅನ್ವಯಿಸು-ಪೂರ್ಣಾಂಕ: (ಸಂಖ್ಯೆ ನಡುವೆ: 1 ಇಂದ: 28), ಪಠ್ಯವಾಗಿ.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: ವರ್ಷ,
+		MM: ತಿಂಗಳು,
+		DD: ದಿನ.
+	>> ಹುಡುಕಾಟ-ನಿಯತಾಂಕಗಳು :=
+	db ಪ್ರಶ್ನೆ: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ತರು: { :row
+		(row mydate = date) ಸುಳ್ಳಾದರೆ: {
+			ಈ-ಕಾರ್ಯ ದೋಷ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ಕೂಡಿಸು: 1.
+} * 100.
+
+
+# Time
+{
+	>> ಗಂಟೆ := TwoDigitFormat ಅನ್ವಯಿಸು-ಪೂರ್ಣಾಂಕ: (ಸಂಖ್ಯೆ ನಡುವೆ: 1 ಇಂದ: 23), ಪಠ್ಯವಾಗಿ.
+	>> ನಿಮಿಷ := TwoDigitFormat ಅನ್ವಯಿಸು-ಪೂರ್ಣಾಂಕ: (ಸಂಖ್ಯೆ ನಡುವೆ: 1 ಇಂದ: 59), ಪಠ್ಯವಾಗಿ.
+	>> ಸೆಕೆಂಡು := TwoDigitFormat ಅನ್ವಯಿಸು-ಪೂರ್ಣಾಂಕ: (ಸಂಖ್ಯೆ ನಡುವೆ: 1 ಇಂದ: 59), ಪಠ್ಯವಾಗಿ.
+	>> ಸಮಯ := ['HH:II:SS'].
+	ಸಮಯ
+		HH: ಗಂಟೆ,
+		II: ನಿಮಿಷ,
+		SS: ಸೆಕೆಂಡು.
+	>> ಹುಡುಕಾಟ-ನಿಯತಾಂಕಗಳು :=
+	db ಪ್ರಶ್ನೆ: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: ಸಮಯ),
+	ತರು: { :row
+		(row mytime = ಸಮಯ) ಸುಳ್ಳಾದರೆ: {
+			ಈ-ಕಾರ್ಯ ದೋಷ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ಕೂಡಿಸು: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := ಸರಣಿ ಹೊಸ ತುಂಬು: 100000 ಮೌಲ್ಯದಿಂದ: ['x'], ಸೇರಿಸು: [''].
+{
+	>> str2 := ತಿಜೋರಿ ಟೋಕನ್: 40.
+	>> ಹುಡುಕಾಟ-ನಿಯತಾಂಕಗಳು :=
+	db ಪ್ರಶ್ನೆ: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ತರು: { :row
+		(row str1 = str1 ಮತ್ತು: row str2 = str2) ಸುಳ್ಳಾದರೆ: {
+			ಈ-ಕಾರ್ಯ ದೋಷ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ಕೂಡಿಸು: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := ಸಂಖ್ಯೆ ನಡುವೆ: 1 ಇಂದ: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 ಪಠ್ಯದಿಂದ: ['9223372036854775807'] ) -
+		( Int64 ಪಠ್ಯದಿಂದ: ['99999'] ) +
+		( Int64 ಪಠ್ಯದಿಂದ: n1 ಪಠ್ಯವಾಗಿ )
+	).
+	>> ಹುಡುಕಾಟ-ನಿಯತಾಂಕಗಳು :=
+	db ಪ್ರಶ್ನೆ: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ತರು: { :row
+		(row n1 = n1) ಸುಳ್ಳಾದರೆ: {
+			ಈ-ಕಾರ್ಯ ದೋಷ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) ಸುಳ್ಳಾದರೆ: {
+			ಈ-ಕಾರ್ಯ ದೋಷ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 ಪೂರ್ಣಾಂಕನ) ಸುಳ್ಳಾದರೆ: {
+			ಈ-ಕಾರ್ಯ ದೋಷ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) ಸುಳ್ಳಾದರೆ: {
+			ಈ-ಕಾರ್ಯ ದೋಷ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ಕೂಡಿಸು: 1.
+} * 100.
+
+
+ಔಟ್-ಪುಟ್ ಬರೆ: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), ಹೊಸ-ಸಾಲು.

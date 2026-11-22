@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server አዘጋጅ.
+ፕሮግራም ተጠቀም: ['../../../src/xo/am/webtools.xo'].
+
+>> Fake-Request := ነገር አዲስ.
+Fake-Request ሲደርስ: ['value:'] አድርግ: { :እሴት
+	የራሱ እሴት := እሴት.
+}.
+Fake-Request ሲደርስ: ['cookie:'] አድርግ: { :ስም <- የራሱ እሴት.
+}.
+
+>> Test-Session := ጊዜያዊ-ፋይል-ክፍለ-ጊዜ አዲስ.
+Test-Session ሲደርስ: ['ጫን'] አድርግ: { <- መዝገበ-ቃላት አዲስ.
+}.
+Test-Session ሲደርስ: ['session-id'] አድርግ: { <- የራሱ id.
+}.
+
+>> cookies := ሰልፍ አዲስ
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies እያንዳንዱ: { :i :cookie
+	>> ጥያቄ-http := Fake-Request አዲስ.
+	ጥያቄ-http value: cookie.
+	>> አስተዳዳሪ := Test-Session አዲስ.
+	>> web := የድር-ሰነድ አዲስ.
+	web ጥያቄ-http: ጥያቄ-http.
+	web የክፍለ-ጊዜ-አስተዳዳሪ: አስተዳዳሪ.
+	web ክፍለ-ጊዜ-ጀምር.
+	ውጤት ፃፍ: ( አስተዳዳሪ session-id = cookie ), አዲስ-መስመር.
+}.
+
+>> web := የድር-ሰነድ አዲስ.
+web json: (መዝገበ-ቃላት አዲስ አኑር: ['b'] ቁልፍ: ['a']).
+ውጤት ፃፍ: ['\n'], አዲስ-መስመር.
+
+{ መረብ get: ['file:///etc/hostname']. } ያዝ: { :e
+	ውጤት ፃፍ: e, አዲስ-መስመር.
+}, ጀምር.
+
+>> svg := ፋይል አዲስ: ['/tmp/test0814.svg'].
+svg ፃፍ: ['<svg xmlns="x"></svg>'].
+ውጤት አዲስ-መስመር.
+Server አስተላልፍ: ['test0814.svg'] ቅድመ-ቅጥያ: ['/tmp/'].
+svg ሰርዝ.

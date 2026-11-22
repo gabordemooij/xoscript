@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Chiqish yozish: ['Database test'], yangi-qator.
+
+>> db := Maria-DB yangi xost: ['localhost'],
+	foydalanuvchi-nomi: ['xo'], parol: ['pass123'], baza-nomi: ['xobase'], ulanish.
+
+Chiqish yozish: ['Can we connect? '] + db ulanganmi?, yangi-qator.
+
+>> qidiruv-parametrlari := db soʻrov: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametrlar: ( Roʻyxat yangi ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  qidiruv-parametrlari bajarish. db tasdiqlash. } ushlash: { :e db ortga-qaytarish.  }, ishga-tushirish.
+
+Chiqish yozish: ['Can we insert? '] + ( qidiruv-parametrlari insert-id > 0 ), yangi-qator.
+
+>> Obj := Obyekt yangi.
+Obj kelganda: ['retrieve-rows'] bajar: {
+	oʻzining soni := 0.
+	>> qidiruv-parametrlari :=
+	db soʻrov: ['SELECT * FROM book order by id desc limit 2'], 
+	olish: { :row 
+		oʻzining soni qoʻshish: 1.
+		Rost uzish.
+	}. <- oʻzining soni nusxa.
+}.
+
+Chiqish yozish: ['Can we query? '] + ( Obj retrieve-rows > 0 ), yangi-qator.

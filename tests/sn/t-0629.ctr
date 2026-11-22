@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Zvabuda nyora: ['Database test'], mutsara-mutsva.
+
+>> db := Maria-DB nyowani mugamuchiri: ['localhost'],
+	zita-remushandisi: ['xo'], pasiwedhi: ['pass123'], zita-redhatabhesi: ['xobase'], batana.
+
+Zvabuda nyora: ['Can we connect? '] + db zvabatana?, mutsara-mutsva.
+
+>> maparamita-ekutsvaga := db mubvunzo: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], maparamita: ( Rondedzero nyowani ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  maparamita-ekutsvaga ita-murairo. db simbisa. } bata: { :e db dzosera-shure.  }, tanga.
+
+Zvabuda nyora: ['Can we insert? '] + ( maparamita-ekutsvaga insert-id > 0 ), mutsara-mutsva.
+
+>> Obj := Chinhu nyowani.
+Obj kana-zvasvika: ['retrieve-rows'] ita: {
+	zvako huwandu := 0.
+	>> maparamita-ekutsvaga :=
+	db mubvunzo: ['SELECT * FROM book order by id desc limit 2'], 
+	tora: { :row 
+		zvako huwandu wedzera: 1.
+		Chokwadi gura.
+	}. <- zvako huwandu kopa.
+}.
+
+Zvabuda nyora: ['Can we query? '] + ( Obj retrieve-rows > 0 ), mutsara-mutsva.

@@ -1,0 +1,39 @@
+
+
+Téks nalika: ['evaluate'] lakukeun: {
+	>> kode := Berkas anyar: ['/tmp/eval.ctr'].
+	kode tulis: diri téks + ['.'].
+	Program paké: ['/tmp/eval.ctr'].
+}.
+
+>> a := (Daptar ← (
+	(Kamus anyar)
+		teundeun: ['domain'] di: ['mywebsite.com'],
+		teundeun: (Daptar ←
+			((Kamus anyar)
+				teundeun: ['home'] di: ['title'],
+				teundeun: ['<html></html>'] di: ['body'],
+				teundeun: ['2017-01-01'] di: ['created']
+			) ;
+			((Kamus anyar)
+				teundeun: ['aboutus(c)'] di: ['title'],
+				teundeun: ['<credits>Author Inc.</credits>'] di: ['body']
+			)
+		) di: ['pages']
+	)
+) téks.
+
+Kaluaran tulis: a tipe, baris-anyar.
+Kaluaran tulis: a, baris-anyar.
+
+>> b := Kosong.
+(['b := '] + a) evaluate.
+Kaluaran tulis: b ? 0 ? ['pages'] ? 1 ? ['body'], baris-anyar.
+
+>> c := b ? 0.
+>> d := c téks.
+Kaluaran tulis: d tipe, baris-anyar.
+
+>> e := Kosong.
+(['e := '] + d) evaluate.
+Kaluaran tulis: e ? ['pages'] ? 0, baris-anyar.

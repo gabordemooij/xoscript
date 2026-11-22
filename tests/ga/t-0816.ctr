@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> triail := { :format :value
+	{ Aschur scríobh: ( (Formáid nua: format) feidhmigh: value ), líne-nua. } gabh: { :e Aschur scríobh: e, líne-nua. }, tosaigh.
+}.
+>> try-int := { :format :value
+	{ Aschur scríobh: ( (Formáid nua: format) feidhmigh-slánuimhir: value ), líne-nua. } gabh: { :e Aschur scríobh: e, líne-nua. }, tosaigh.
+}.
+
+# fits
+triail feidhmigh: ['|%s|'] agus: ['text'].
+triail feidhmigh: ['%06.2f'] agus: 5.5.
+triail feidhmigh: ['100%% %s'] agus: ['sure'].
+try-int feidhmigh: ['%03d'] agus: 7.
+try-int feidhmigh: ['%x'] agus: 255.
+triail feidhmigh: ['%d'] agus: (Int64 nua as-teaghrán: ['12']).
+triail feidhmigh: ['%lld'] agus: (Int64 nua as-teaghrán: ['12']).
+triail feidhmigh: ['%.1lf'] agus: 5.5.
+try-int feidhmigh: ['%hd'] agus: 7.
+
+# does not fit
+triail feidhmigh: ['%s'] agus: 12345.
+triail feidhmigh: ['%d'] agus: 12345.
+triail feidhmigh: ['%f'] agus: ['text'].
+try-int feidhmigh: ['%d'] agus: ['text'].
+try-int feidhmigh: ['%s'] agus: 5.
+triail feidhmigh: ['%s %s'] agus: ['text'].
+triail feidhmigh: ['%n'] agus: ['text'].
+triail feidhmigh: ['%*s'] agus: ['text'].
+triail feidhmigh: ['%'] agus: ['text'].
+
+# length modifier does not fit
+triail feidhmigh: ['%ls'] agus: ['text'].
+triail feidhmigh: ['%Lf'] agus: 5.5.
+try-int feidhmigh: ['%ld'] agus: 7.
+try-int feidhmigh: ['%lld'] agus: 7.
+triail feidhmigh: ['%Ld'] agus: (Int64 nua as-teaghrán: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+triail feidhmigh: ['%99999999999s'] agus: ['text'].

@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> feuch := { :format :value
+	{ Às-chur sgrìobh: ( (Fòrmat ùr: format) cuir-an-gnìomh: value ), loidhne-ùr. } glac: { :e Às-chur sgrìobh: e, loidhne-ùr. }, tòisich.
+}.
+>> try-int := { :format :value
+	{ Às-chur sgrìobh: ( (Fòrmat ùr: format) cuir-an-gnìomh-slàn-àireamh: value ), loidhne-ùr. } glac: { :e Às-chur sgrìobh: e, loidhne-ùr. }, tòisich.
+}.
+
+# fits
+feuch cuir-an-gnìomh: ['|%s|'] agus: ['text'].
+feuch cuir-an-gnìomh: ['%06.2f'] agus: 5.5.
+feuch cuir-an-gnìomh: ['100%% %s'] agus: ['sure'].
+try-int cuir-an-gnìomh: ['%03d'] agus: 7.
+try-int cuir-an-gnìomh: ['%x'] agus: 255.
+feuch cuir-an-gnìomh: ['%d'] agus: (Int64 ùr bho-shreang: ['12']).
+feuch cuir-an-gnìomh: ['%lld'] agus: (Int64 ùr bho-shreang: ['12']).
+feuch cuir-an-gnìomh: ['%.1lf'] agus: 5.5.
+try-int cuir-an-gnìomh: ['%hd'] agus: 7.
+
+# does not fit
+feuch cuir-an-gnìomh: ['%s'] agus: 12345.
+feuch cuir-an-gnìomh: ['%d'] agus: 12345.
+feuch cuir-an-gnìomh: ['%f'] agus: ['text'].
+try-int cuir-an-gnìomh: ['%d'] agus: ['text'].
+try-int cuir-an-gnìomh: ['%s'] agus: 5.
+feuch cuir-an-gnìomh: ['%s %s'] agus: ['text'].
+feuch cuir-an-gnìomh: ['%n'] agus: ['text'].
+feuch cuir-an-gnìomh: ['%*s'] agus: ['text'].
+feuch cuir-an-gnìomh: ['%'] agus: ['text'].
+
+# length modifier does not fit
+feuch cuir-an-gnìomh: ['%ls'] agus: ['text'].
+feuch cuir-an-gnìomh: ['%Lf'] agus: 5.5.
+try-int cuir-an-gnìomh: ['%ld'] agus: 7.
+try-int cuir-an-gnìomh: ['%lld'] agus: 7.
+feuch cuir-an-gnìomh: ['%Ld'] agus: (Int64 ùr bho-shreang: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+feuch cuir-an-gnìomh: ['%99999999999s'] agus: ['text'].

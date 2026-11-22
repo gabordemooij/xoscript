@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := Fitxer nou: ['/tmp/test.gif'].
+f escriu: ['GIF87a01234567810'].
+
+# serve the file
+Server transmet: ['test.gif'] prefix: ['/tmp/'].
+
+Sortida salt-de-línia.
+
+Sortida escriu: ['Outside container (security):'], salt-de-línia.
+{ Server transmet: ['../passwd'] prefix: ['/tmp/']. }
+captura: { :e Sortida escriu: e, salt-de-línia. },
+inicia.
+
+Sortida escriu: ['Invalid prefix:'], salt-de-línia.
+{ Server transmet: ['test.gif'] prefix: ['z:\\']. }
+captura: { :e Sortida escriu: e, salt-de-línia. },
+inicia.
+
+Sortida escriu: ['Non-existant file:'], salt-de-línia.
+{ Server transmet: ['xxx.xxx'] prefix: ['/tmp/']. }
+captura: { :e Sortida escriu: e, salt-de-línia. },
+inicia.

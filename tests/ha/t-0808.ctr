@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Asusu ƙirƙiri-maɓallai.
+>> sk := keys na-farko.
+>> pk := keys na-ƙarshe.
+>> sig := Asusu sa-hannu: ['abc'] da: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Asusu sa-hannu: ['abc'] da: long. } kama: { :e
+	Fitarwa rubuta: e, sabon-layi.
+}, fara.
+
+{ Asusu duba: ['abc'] sa-hannu: long da: pk. } kama: { :e
+	Fitarwa rubuta: e, sabon-layi.
+}, fara.
+
+{ Asusu duba: ['abc'] sa-hannu: sig da: short. } kama: { :e
+	Fitarwa rubuta: e, sabon-layi.
+}, fara.

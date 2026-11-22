@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server оғоз-кун.
+Барнома истифода: ['../../../src/xo/tg/webtools.xo'].
+Барнома истифода: ['../../../src/xo/tg/mailtools.xo'].
+
+>> сарлавҳа := HTTP-Сарлавҳа нав калид: ['Location'] қимат: ['/ok\r\nX-Injected: yes'].
+Баромад навис: сарлавҳа.
+
+>> web := Ҳуҷҷати-веб нав.
+web гузар: ['/ok\r\nX-Injected: yes'].
+Баромад навис: ['\n'], сатри-нав.
+
+>> mail := Почтаи-электронӣ нав.
+mail ба-гиранда: (Феҳрист нав ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Феҳрист нав ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Феҳрист нав ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail фиристанда: ['d@example.invalid\r\nX-From: yes'] ном: ['site\r\nX-Name: yes'].
+mail мавзӯъ: ['hello\r\nX-Subject: yes'].
+mail матни-асосӣ: ['line1\r\nline2'].
+Баромад навис: mail эҷод-кун.
+
+>> html := HTML-Почтаи-электронӣ нав.
+html ба-гиранда: (Феҳрист нав ; ['a@example.invalid\r\nX-To: yes']).
+html фиристанда: ['d@example.invalid'] ном: ['site'].
+html мавзӯъ: ['hello\r\nX-Subject: yes'].
+html матни-асосӣ: ['body'].
+Баромад навис: ( html эҷод-кун дар-бар-дорад: ['\nX-'] ), сатри-нав.
+Баромад навис: ( html эҷод-кун дар-бар-дорад: ['X-To: yes'] ), сатри-нав.

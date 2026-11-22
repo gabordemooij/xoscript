@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Ahanoa hou.
+
+Slurp ina-tae: ['hou'] mahia: {
+	ake str := [''].
+}.
+
+Slurp ina-tae: ['nieuw'] mahia: {
+	ake str := [''].
+}.
+
+Slurp ina-tae: ['whakautu:'] mahia: { :blah
+		ake str tāpiri-muri: blah.
+}.
+
+Slurp ina-tae: ['whakautu:a:'] mahia: { :blah :blahah
+		ake str tāpiri-muri: (blah mai: 0 roa: (blah roa - 1)).
+		ake str tāpiri-muri: [' '].
+		ake str tāpiri-muri: blahah.
+}.
+
+Slurp ina-tae: ['obtain'] mahia: {
+	>> buffer := ake str.
+	ake str := ['']. <- buffer.
+}.
+
+
+Huaputa tuhi: (Papatono pūnaha: (Slurp hou echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Kōnae hou: ['/tmp/from.txt'], muku. } hopu: { ['Empty']. }, tīmata.
+{ Kōnae hou: ['/tmp/to.txt'], muku. } hopu: { ['Empty']. }, tīmata.
+
+
+Kōnae hou: ['/tmp/to.txt'], kei-te-noho teka: {
+	Huaputa tuhi: ['Confirmed. Target file does not exist.\
+'].
+}.
+Kōnae hou: ['/tmp/from.txt'], kei-te-noho teka: {
+	Huaputa tuhi: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Papatono pūnaha: (Slurp hou touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Papatono pūnaha: (Slurp hou cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Kōnae hou: ['/tmp/to.txt'], kei-te-noho pono: {
+	Huaputa tuhi: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Huaputa tuhi: ['Contents of file is:'] + (Kōnae hou: ['/tmp/to.txt'], pānui), rārangi-hou.

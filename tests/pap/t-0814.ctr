@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server prepará.
+Programa usa: ['../../../src/xo/pap/webtools.xo'].
+
+>> Fake-Request := Opheto nobo.
+Fake-Request ora: ['value:'] hasi: { :balor
+	propio balor := balor.
+}.
+Fake-Request ora: ['cookie:'] hasi: { :nòmber <- propio balor.
+}.
+
+>> Test-Session := Seshon-di-archivo-temporal nobo.
+Test-Session ora: ['karga'] hasi: { <- Dikshonario nobo.
+}.
+Test-Session ora: ['session-id'] hasi: { <- propio id.
+}.
+
+>> cookies := Lista nobo
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies kada: { :i :cookie
+	>> petishon-http := Fake-Request nobo.
+	petishon-http value: cookie.
+	>> manehadó := Test-Session nobo.
+	>> web := Dokumento-Web nobo.
+	web petishon-http: petishon-http.
+	web maneho-di-seshon: manehadó.
+	web kuminsá-seshon.
+	Salida skirbi: ( manehadó session-id = cookie ), liña-nobo.
+}.
+
+>> web := Dokumento-Web nobo.
+web json: (Dikshonario nobo pone: ['b'] na: ['a']).
+Salida skirbi: ['\n'], liña-nobo.
+
+{ Ret get: ['file:///etc/hostname']. } kapta: { :e
+	Salida skirbi: e, liña-nobo.
+}, kuminsá.
+
+>> svg := Archivo nobo: ['/tmp/test0814.svg'].
+svg skirbi: ['<svg xmlns="x"></svg>'].
+Salida liña-nobo.
+Server pasa: ['test0814.svg'] prefiho: ['/tmp/'].
+svg kita-for-di-disko.

@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server gadzirira.
+Chirongwa shandisa-chishandiso: ['../../../src/xo/sn/webtools.xo'].
+Chirongwa shandisa-chishandiso: ['../../../src/xo/sn/mailtools.xo'].
+
+>> musoro := Musoro-weHTTP nyowani kiyi: ['Location'] kukosha: ['/ok\r\nX-Injected: yes'].
+Zvabuda nyora: musoro.
+
+>> web := Gwaro-reWebhu nyowani.
+web enda-ku: ['/ok\r\nX-Injected: yes'].
+Zvabuda nyora: ['\n'], mutsara-mutsva.
+
+>> mail := Imeyili nyowani.
+mail ku: (Rondedzero nyowani ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Rondedzero nyowani ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Rondedzero nyowani ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail mutumiri: ['d@example.invalid\r\nX-From: yes'] zita: ['site\r\nX-Name: yes'].
+mail musoro-wenyaya: ['hello\r\nX-Subject: yes'].
+mail muviri: ['line1\r\nline2'].
+Zvabuda nyora: mail gadzira.
+
+>> html := Imeyili-HTML nyowani.
+html ku: (Rondedzero nyowani ; ['a@example.invalid\r\nX-To: yes']).
+html mutumiri: ['d@example.invalid'] zita: ['site'].
+html musoro-wenyaya: ['hello\r\nX-Subject: yes'].
+html muviri: ['body'].
+Zvabuda nyora: ( html gadzira rine: ['\nX-'] ), mutsara-mutsva.
+Zvabuda nyora: ( html gadzira rine: ['X-To: yes'] ), mutsara-mutsva.

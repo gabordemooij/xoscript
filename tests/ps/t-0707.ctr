@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+پروګرام د-حافظې-مدیریت: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB نوی کوربه: ⌝'localhost'⌜,
+	کارن-نوم: ⌝'xo'⌜, پټنوم: ⌝'pass123'⌜, د-ډیټابیس-نوم: ⌝'xobase'⌜, ونښله.
+
+>> TwoDigitFormat := بڼه نوی: ⌝'%02d'⌜.
+
+# Datetime
+⎬
+	>> کال := شمیره ترمنځ: 1995 او: 2050, په-متن.
+	>> میاشت := TwoDigitFormat پلي-کړه-صحیح: ﴿شمیره ترمنځ: 1 او: 12﴾, په-متن.
+	>> ورځ := TwoDigitFormat پلي-کړه-صحیح: ﴿شمیره ترمنځ: 1 او: 28﴾, په-متن.
+	>> ساعت := TwoDigitFormat پلي-کړه-صحیح: ﴿شمیره ترمنځ: 1 او: 23﴾, په-متن.
+	>> دقیقه := TwoDigitFormat پلي-کړه-صحیح: ﴿شمیره ترمنځ: 1 او: 59﴾, په-متن.
+	>> ثانیه := TwoDigitFormat پلي-کړه-صحیح: ﴿شمیره ترمنځ: 1 او: 59﴾, په-متن.
+	>> datetime := ⌝'YYYY-MM-DD HH:II:SS'⌜.	
+	datetime
+		YYYY: کال,
+		MM: میاشت,
+		DD: ورځ,
+		HH: ساعت,
+		II: دقیقه,
+		SS: ثانیه.
+	>> د-لټون-پارامترونه :=
+	db پوښتنه: ﴿⌝'
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'⌜ <datetime>: datetime﴾,
+	راوړه: ⎬ :row
+		﴿row mydatetime = datetime﴾ که-دروغ: ⎬
+			دا-دنده تېروتنه: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mydatetime
+			﴾.
+		⎨.
+	
+	⎨.
+	counter جمع: 1.
+⎨ * 100.
+
+# Date
+⎬
+	>> کال := شمیره ترمنځ: 1995 او: 2050, په-متن.
+	>> میاشت := TwoDigitFormat پلي-کړه-صحیح: ﴿شمیره ترمنځ: 1 او: 12﴾, په-متن.
+	>> ورځ := TwoDigitFormat پلي-کړه-صحیح: ﴿شمیره ترمنځ: 1 او: 28﴾, په-متن.
+	>> date := ⌝'YYYY-MM-DD'⌜.
+	date
+		YYYY: کال,
+		MM: میاشت,
+		DD: ورځ.
+	>> د-لټون-پارامترونه :=
+	db پوښتنه: ﴿⌝'
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'⌜ <date>: date﴾,
+	راوړه: ⎬ :row
+		﴿row mydate = date﴾ که-دروغ: ⎬
+			دا-دنده تېروتنه: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: date,
+				<observation>: row mydate
+			﴾.
+		⎨.
+	⎨.
+	counter جمع: 1.
+⎨ * 100.
+
+
+# Time
+⎬
+	>> ساعت := TwoDigitFormat پلي-کړه-صحیح: ﴿شمیره ترمنځ: 1 او: 23﴾, په-متن.
+	>> دقیقه := TwoDigitFormat پلي-کړه-صحیح: ﴿شمیره ترمنځ: 1 او: 59﴾, په-متن.
+	>> ثانیه := TwoDigitFormat پلي-کړه-صحیح: ﴿شمیره ترمنځ: 1 او: 59﴾, په-متن.
+	>> وخت := ⌝'HH:II:SS'⌜.
+	وخت
+		HH: ساعت,
+		II: دقیقه,
+		SS: ثانیه.
+	>> د-لټون-پارامترونه :=
+	db پوښتنه: ﴿⌝'
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'⌜ <time>: وخت﴾,
+	راوړه: ⎬ :row
+		﴿row mytime = وخت﴾ که-دروغ: ⎬
+			دا-دنده تېروتنه: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter جمع: 1.
+⎨ * 100.
+
+
+# Strings (varchar/text)
+>> str1 := لیست نوی ډک-کړه: 100000 په: ⌝'x'⌜, یوځای-کړه: ⌝''⌜.
+⎬
+	>> str2 := خزانه ټوکن: 40.
+	>> د-لټون-پارامترونه :=
+	db پوښتنه: ﴿⌝'
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'⌜ 
+	<str1>: str1,
+	<str2>: str2
+	﴾,
+	راوړه: ⎬ :row
+		﴿row str1 = str1 او: row str2 = str2﴾ که-دروغ: ⎬
+			دا-دنده تېروتنه: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter جمع: 1.
+⎨ * 100.
+
+
+# Numbers
+⎬
+	>> n1 := شمیره ترمنځ: 1 او: 99999.
+	>> n2 := n1 / 1000.
+	>> big := ﴿
+		﴿ Int64 له-متن: ⌝'9223372036854775807'⌜ ﴾ -
+		﴿ Int64 له-متن: ⌝'99999'⌜ ﴾ +
+		﴿ Int64 له-متن: n1 په-متن ﴾
+	﴾.
+	>> د-لټون-پارامترونه :=
+	db پوښتنه: ﴿⌝'
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	'⌜
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	﴾,
+	راوړه: ⎬ :row
+		﴿row n1 = n1﴾ که-دروغ: ⎬
+			دا-دنده تېروتنه: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n1
+			﴾.
+		⎨.
+		﴿row n2 = n2﴾ که-دروغ: ⎬
+			دا-دنده تېروتنه: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n2
+			﴾.
+		⎨.
+		﴿row n3 = n2 ګردول﴾ که-دروغ: ⎬
+			دا-دنده تېروتنه: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n3
+			﴾.
+		⎨.
+		﴿row big = big﴾ که-دروغ: ⎬
+			دا-دنده تېروتنه: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: big,
+				<observation>: row big
+			﴾.
+		⎨.
+		
+	⎨.
+	counter جمع: 1.
+⎨ * 100.
+
+
+وتنه ولیکه: ﴿
+	⌝'OK, <counter> fuzzy casts/conversions tested.'⌜
+	<counter>: counter
+﴾, نوې-کرښه.

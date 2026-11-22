@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Izlaz piši: ['Database test'], novi-red.
+
+>> db := Maria-DB novi domaćin: ['localhost'],
+	korisnik: ['xo'], lozinka: ['pass123'], naziv-baze: ['xobase'], poveži-se.
+
+Izlaz piši: ['Can we connect? '] + db povezano?, novi-red.
+
+>> parametri-pretrage := db upit: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametri: ( Popis novi ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  parametri-pretrage izvrši. db potvrdi. } uhvati: { :e db poništi.  }, pokreni.
+
+Izlaz piši: ['Can we insert? '] + ( parametri-pretrage insert-id > 0 ), novi-red.
+
+>> x := 0.
+>> parametri-pretrage :=
+db upit: ['SELECT * FROM book order by id desc limit 2'], 
+dohvati: { :row 
+	x dodaj: 1.
+	Istina prekini. # must clean up, no 'Commands out of sync'
+}.
+
+>> parametri-pretrage :=
+db upit: ['SELECT * FROM book order by id desc limit 2'], 
+dohvati: { :row
+	x dodaj: 1.
+	Istina prekini.
+}.
+
+(x > 0) istina: {
+	Izlaz piši: ['Can we break in the middle of a fetch? '].
+}.
+
+Izlaz piši: Istina, novi-red.

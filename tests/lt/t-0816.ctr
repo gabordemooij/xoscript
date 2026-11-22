@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> bandyti := { :format :value
+	{ Išvestis rašyti: ( (Formatas naujas: format) taikyti: value ), nauja-eilutė. } pagauti: { :e Išvestis rašyti: e, nauja-eilutė. }, paleisti.
+}.
+>> try-int := { :format :value
+	{ Išvestis rašyti: ( (Formatas naujas: format) taikyti-sveikajam: value ), nauja-eilutė. } pagauti: { :e Išvestis rašyti: e, nauja-eilutė. }, paleisti.
+}.
+
+# fits
+bandyti taikyti: ['|%s|'] ir: ['text'].
+bandyti taikyti: ['%06.2f'] ir: 5.5.
+bandyti taikyti: ['100%% %s'] ir: ['sure'].
+try-int taikyti: ['%03d'] ir: 7.
+try-int taikyti: ['%x'] ir: 255.
+bandyti taikyti: ['%d'] ir: (Int64 naujas iš-teksto: ['12']).
+bandyti taikyti: ['%lld'] ir: (Int64 naujas iš-teksto: ['12']).
+bandyti taikyti: ['%.1lf'] ir: 5.5.
+try-int taikyti: ['%hd'] ir: 7.
+
+# does not fit
+bandyti taikyti: ['%s'] ir: 12345.
+bandyti taikyti: ['%d'] ir: 12345.
+bandyti taikyti: ['%f'] ir: ['text'].
+try-int taikyti: ['%d'] ir: ['text'].
+try-int taikyti: ['%s'] ir: 5.
+bandyti taikyti: ['%s %s'] ir: ['text'].
+bandyti taikyti: ['%n'] ir: ['text'].
+bandyti taikyti: ['%*s'] ir: ['text'].
+bandyti taikyti: ['%'] ir: ['text'].
+
+# length modifier does not fit
+bandyti taikyti: ['%ls'] ir: ['text'].
+bandyti taikyti: ['%Lf'] ir: 5.5.
+try-int taikyti: ['%ld'] ir: 7.
+try-int taikyti: ['%lld'] ir: 7.
+bandyti taikyti: ['%Ld'] ir: (Int64 naujas iš-teksto: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+bandyti taikyti: ['%99999999999s'] ir: ['text'].

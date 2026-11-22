@@ -1,0 +1,43 @@
+
+
+>> g := Server entsha.
+>> v := Isisefu entsha.
+>> ok := 0.
+
+>> secrets := Uluhlu entsha ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopa.
+passwords nganye: { :i :p
+	secrets nganye: { :n :s
+		{
+			>> encrypted := v fihla: s isitshixo: p.
+			>> decrypted := v tyhila: encrypted isitshixo: p.
+			(decrypted = s) inyaniso: {
+				ok yongeza: 1.
+			}, kungenjalo: {
+				Imveliso bhala: ['failed encrypting/decrypting: '], umgca-omtsha.
+				Imveliso bhala: s, umgca-omtsha.
+				Imveliso bhala: ['encrypted: '] + encrypted, umgca-omtsha.
+				Imveliso bhala: ['decrypted: '] + encrypted, umgca-omtsha.
+				Inkqubo gqiba.
+			}.
+		} bamba: { :err
+			(s = [''] okanye: p = ['']) inyaniso: {
+				ok yongeza: 1.
+			}, kungenjalo: {
+				Imveliso bhala: err, umgca-omtsha.
+				Inkqubo gqiba.
+			}.
+		}, qala.
+	}.
+}.
+
+Imveliso bhala: ( ok + [' vault encryptions tested.'] ), umgca-omtsha.

@@ -1,0 +1,42 @@
+
+Text vid: ['html'] gör: { <- (
+		själv
+		ersätt: ['&'] med: ['&amp;'],
+		ersätt: ['<'] med: ['&lt;'],
+		ersätt: ['>'] med: ['&gt;'],
+		ersätt: ['"'] med: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objekt ny.
+
+HtmlBrush vid: ['svara:'] gör: { :tag
+	Utdata skriv: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush vid: ['svara:och:'] gör: { :tag :content
+	tag := ( tag från: 0 längd: (tag längd - 1) ).
+	Utdata skriv: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush vid: ['content:'] gör: { :text
+	Utdata skriv: text html, stop.
+}.
+
+HtmlBrush vid: ['attr:value:'] gör: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush ny.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

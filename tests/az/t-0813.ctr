@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server hazırla.
+Proqram istifadə-et: ['../../../src/xo/az/webtools.xo'].
+Proqram istifadə-et: ['../../../src/xo/az/mailtools.xo'].
+
+>> başlıq := HTTP-Başlığı yeni açar: ['Location'] dəyər: ['/ok\r\nX-Injected: yes'].
+Çıxış yaz: başlıq.
+
+>> web := Veb-sənəd yeni.
+web keç: ['/ok\r\nX-Injected: yes'].
+Çıxış yaz: ['\n'], yeni-sətir.
+
+>> mail := E-poçt yeni.
+mail alana: (Siyahı yeni ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Siyahı yeni ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Siyahı yeni ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail göndərən: ['d@example.invalid\r\nX-From: yes'] ad: ['site\r\nX-Name: yes'].
+mail mövzu: ['hello\r\nX-Subject: yes'].
+mail gövdə: ['line1\r\nline2'].
+Çıxış yaz: mail yarat.
+
+>> html := HTML-E-poçt yeni.
+html alana: (Siyahı yeni ; ['a@example.invalid\r\nX-To: yes']).
+html göndərən: ['d@example.invalid'] ad: ['site'].
+html mövzu: ['hello\r\nX-Subject: yes'].
+html gövdə: ['body'].
+Çıxış yaz: ( html yarat ehtiva-edir: ['\nX-'] ), yeni-sətir.
+Çıxış yaz: ( html yarat ehtiva-edir: ['X-To: yes'] ), yeni-sətir.

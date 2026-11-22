@@ -1,0 +1,39 @@
+
+
+Tekst ved: ['evaluate'] gjør: {
+	>> code := Fil ny: ['/tmp/eval.ctr'].
+	code skriv: selv tekst + ['.'].
+	Program benytt: ['/tmp/eval.ctr'].
+}.
+
+>> a := (Liste ← (
+	(Ordbok ny)
+		sett: ['domain'] ved: ['mywebsite.com'],
+		sett: (Liste ←
+			((Ordbok ny)
+				sett: ['home'] ved: ['title'],
+				sett: ['<html></html>'] ved: ['body'],
+				sett: ['2017-01-01'] ved: ['created']
+			) ;
+			((Ordbok ny)
+				sett: ['aboutus(c)'] ved: ['title'],
+				sett: ['<credits>Author Inc.</credits>'] ved: ['body']
+			)
+		) ved: ['pages']
+	)
+) tekst.
+
+Utdata skriv: a type, stop.
+Utdata skriv: a, stop.
+
+>> b := Ingenting.
+(['b := '] + a) evaluate.
+Utdata skriv: b ? 0 ? ['pages'] ? 1 ? ['body'], stop.
+
+>> c := b ? 0.
+>> d := c tekst.
+Utdata skriv: d type, stop.
+
+>> e := Ingenting.
+(['e := '] + d) evaluate.
+Utdata skriv: e ? ['pages'] ? 0, stop.

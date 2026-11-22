@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Излаз пиши: ['Database test'], нови-ред.
+
+>> db := Maria-DB нови домаћин: ['localhost'],
+	корисник: ['xo'], лозинка: ['pass123'], назив-базе: ['xobase'], повежи-се.
+
+Излаз пиши: ['Can we connect? '] + db повезано?, нови-ред.
+
+>> параметри-претраге := db упит: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], параметри: ( Листа нови ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  параметри-претраге изврши. db потврди. } ухвати: { :e db поништи.  }, покрени.
+
+Излаз пиши: ['Can we insert? '] + ( параметри-претраге insert-id > 0 ), нови-ред.
+
+>> x := 0.
+>> параметри-претраге :=
+db упит: ['SELECT * FROM book order by id desc limit 2'], 
+преузми: { :row 
+	x додај: 1.
+	Тачно прекини. # must clean up, no 'Commands out of sync'
+}.
+
+>> параметри-претраге :=
+db упит: ['SELECT * FROM book order by id desc limit 2'], 
+преузми: { :row
+	x додај: 1.
+	Тачно прекини.
+}.
+
+(x > 0) тачно: {
+	Излаз пиши: ['Can we break in the middle of a fetch? '].
+}.
+
+Излаз пиши: Тачно, нови-ред.

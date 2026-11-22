@@ -1,0 +1,23 @@
+Sortie écrire: ['Test object'], stop.
+>> a := Objet nouveau. 
+a quand: ['item:'] faire: { :lst
+	propre lst := lst. 
+}.
+a quand: ['item'] faire: { <- propre lst.
+}.
+a item: (
+	Liste nouveau ; 1 ; (
+		Liste nouveau ; ['a'] ; (
+			Liste nouveau ; ( Moment nouveau: 1 )
+		) ; ( Int64 depuis-texte: ['321'] )
+	)
+).
+Sortie écrire: a item, stop.
+>> old-lst-address := a item prototype adresse-mémoire.
+a save-as: ['/tmp/a.bin'].
+Sortie écrire: ['========== RELOADING SNAP:'], stop.
+>> b := Objet load-from: ['/tmp/a.bin'].
+(b item prototype adresse-mémoire = old-lst-address) oui: {
+	Sortie écrire: ['Object link re-attached.'], stop.
+}.
+Sortie écrire: ( b item ), stop.

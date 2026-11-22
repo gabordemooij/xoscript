@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server túsaigh.
+Ríomhchlár úsáid: ['../../../src/xo/ga/webtools.xo'].
+Ríomhchlár úsáid: ['../../../src/xo/ga/mailtools.xo'].
+
+>> ceanntásc := Ceanntásc-HTTP nua eochair: ['Location'] luach: ['/ok\r\nX-Injected: yes'].
+Aschur scríobh: ceanntásc.
+
+>> web := Doiciméad-Gréasáin nua.
+web téigh-go: ['/ok\r\nX-Injected: yes'].
+Aschur scríobh: ['\n'], líne-nua.
+
+>> mail := Ríomhphost nua.
+mail chuig: (Liosta nua ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Liosta nua ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Liosta nua ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail seoltóir: ['d@example.invalid\r\nX-From: yes'] ainm: ['site\r\nX-Name: yes'].
+mail ábhar-teachtaireachta: ['hello\r\nX-Subject: yes'].
+mail corp: ['line1\r\nline2'].
+Aschur scríobh: mail gin.
+
+>> html := Ríomhphost-HTML nua.
+html chuig: (Liosta nua ; ['a@example.invalid\r\nX-To: yes']).
+html seoltóir: ['d@example.invalid'] ainm: ['site'].
+html ábhar-teachtaireachta: ['hello\r\nX-Subject: yes'].
+html corp: ['body'].
+Aschur scríobh: ( html gin cuimsíonn: ['\nX-'] ), líne-nua.
+Aschur scríobh: ( html gin cuimsíonn: ['X-To: yes'] ), líne-nua.

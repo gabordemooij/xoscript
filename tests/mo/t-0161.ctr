@@ -1,0 +1,53 @@
+Program gestiune-memorie: 0.
+Listă la: ['sum'] execută: {
+	>> total := 0.
+	sine fiecare: { :index :element
+		total adaugă: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Fișier nou: ['/tmp/test.txt'].
+f scrie: ['Lorem Ipsum'].
+f închide.
+  
+
+f := Fișier nou: ['/tmp/test.txt'].
+>> text := f citește.
+f închide.
+
+
+
+Program curăță.
+usedMemory1 := (Program memorie ? 1).
+
+
+
+f := Fișier nou: ['/tmp/test.txt'].
+text := f citește.
+f închide.
+
+Program curăță.
+usedMemory2 := (Program memorie ? 1).
+
+
+f := Fișier nou: ['/tmp/test.txt'].
+text := f citește.
+f închide.
+
+Program curăță.
+usedMemory3 := (Program memorie ? 1).
+
+
+
+( usedMemory1 = usedMemory2 și: usedMemory1 = usedMemory3, și: usedMemory2 = usedMemory3 ) adevărat: {
+	Ieșire scrie: ['No memory leaks here'].
+}, fals: {
+	Ieșire scrie: ['Leaking memory...'].
+}.

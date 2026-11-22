@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Sąrašas naujas ;
+	# {"key":"normal"} normal ASCII
+	( Žodynas naujas įdėti: ['normal'] į: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Žodynas naujas įdėti: ['hello world'] į: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Žodynas naujas įdėti: ['"'] į: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Žodynas naujas įdėti: ['backslash: \\'] į: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Žodynas naujas įdėti: ['slash: /'] į: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Žodynas naujas įdėti: ['backspace: \b'] į: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Žodynas naujas įdėti: ['formfeed: \f'] į: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Žodynas naujas įdėti: ['newline: \n'] į: ['key'] ) ;
+	( Žodynas naujas įdėti: ['newline: ↵'] į: ['key'] ) ;
+	( Žodynas naujas įdėti: ['newline: 
+	'] į: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Žodynas naujas įdėti: ['carriage return: \r'] į: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Žodynas naujas įdėti: ['tab \t'] į: ['key'] ) ;
+	( Žodynas naujas įdėti: ['tab ⇿'] į: ['key'] ) ;
+	( Žodynas naujas įdėti: ['tab  '] į: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Žodynas naujas įdėti: ['NUL \u0000'] į: ['key'] ) ;
+	( Žodynas naujas įdėti: ['NUL \0'] į: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Žodynas naujas įdėti: ['control: \u0001'] į: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Žodynas naujas įdėti: ['control: \u001F'] į: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Žodynas naujas įdėti: ['unicode: é'] į: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Žodynas naujas įdėti: ['unicode: €'] į: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Žodynas naujas įdėti: ['unicode: 日本語'] į: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Žodynas naujas įdėti: ['unicode: 😀'] į: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Žodynas naujas įdėti: ['unicode: 🧑‍💻'] į: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Žodynas naujas įdėti: ['combining: e\u0301'] į: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Žodynas naujas įdėti: ['escaped unicode: \u00e9'] į: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Žodynas naujas įdėti: ['escaped unicode: \u20ac'] į: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Žodynas naujas įdėti: ['escaped unicode: \ud83d\ude00'] į: ['key'] ) ;
+	# {"key":""} empty value
+	( Žodynas naujas įdėti: [''] į: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Žodynas naujas įdėti: ['@ < > & = % + ? #'] į: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Žodynas naujas įdėti: ['''] į: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Žodynas naujas įdėti: ['multiple: \" \\ \n \r \t'] į: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Žodynas naujas įdėti: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] į: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Žodynas naujas įdėti: [' value'] į: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Žodynas naujas įdėti: ['value '] į: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Žodynas naujas įdėti: [' \t\n\r '] į: ['key'] ).
+
+dicts kiekvienas: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Žodynas naujas įdėti: d key į: ['key']).
+	>> b := JSON jsonify: (Žodynas naujas įdėti: ['value'] į: d key).
+	>> e := JSON objektas: a.
+	>> f := JSON objektas: b.
+	((e key = d key ir: (f ? d key = ['value'])) arba: (e key = ['NUL ?'])) tiesa: {
+		Išvestis rašyti: ['OK'], nauja-eilutė.
+	}, kitu-atveju: {
+		Išvestis rašyti: ['Unable to properly encode/decode: '] + d + j, nauja-eilutė.
+		Programa baigti.
+	}.
+}.

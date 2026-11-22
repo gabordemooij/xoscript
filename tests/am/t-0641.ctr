@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := መዝገበ-ቃላት አዲስ
+	# ASCII only
+	አኑር: ( ሰልፍ አዲስ ; 65 ; 65 ; 65 ; 65 ; 0 ) ቁልፍ: ['AAAA'],
+	# valid 2 byte sequence
+	አኑር: ( ሰልፍ አዲስ ; 194 ; 162 ; 0 ) ቁልፍ: ['¢'],
+	# Valid 3-byte UTF-8
+    አኑር: ( ሰልፍ አዲስ ; 226 ; 130 ; 172 ; 0 ) ቁልፍ: ['€'],
+	# Valid 4-byte UTF-8
+    አኑር: ( ሰልፍ አዲስ ; 240 ; 144 ; 141 ; 136 ; 0 ) ቁልፍ: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    አኑር: ( ሰልፍ አዲስ ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ቁልፍ: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    አኑር: ( ሰልፍ አዲስ ; 65 ; 193 ; 129 ; 0 ) ቁልፍ: ['A?'],
+	# Invalid first byte (0xFF)
+    አኑር: ( ሰልፍ አዲስ ; 255 ; 0 ) ቁልፍ: ['?'],
+	# Incomplete multi-byte sequence at end
+    አኑር: ( ሰልፍ አዲስ ; 66 ; 226 ; 0 ) ቁልፍ: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    አኑር: ( ሰልፍ አዲስ ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ቁልፍ: ['A€?𐍈B'].
+	 
+utf8cases እያንዳንዱ: { :key :value
+	>> blob := Blob አዲስ: value ብዛት, bytes: value.
+	>> str := blob በጽሑፍ.
+	(str = key) እውነት-ከሆነ: {
+		ውጤት ፃፍ: ['OK'], አዲስ-መስመር.
+	}, አለበለዚያ: {
+		ውጤት ፃፍ: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, አዲስ-መስመር.
+	}.
+	blob ልቀቅ.
+}.

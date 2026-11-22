@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Objekt nový.
+
+Log pri: ['say:'] urobiť: { :str
+	Výstup písať: str, nový-riadok.
+}.
+
+>> Item := Objekt nový.
+
+Item pri: ['nový:'] urobiť: { :id <- seba nový id: id.
+}.
+
+Item pri: ['id:'] urobiť: { :id
+	vlastný id := id.
+}.
+
+Item pri: ['id'] urobiť: { <- vlastný id. }.
+
+
+Item pri: ['text'] urobiť: {
+	>> str := ['Item#~no'].
+	str ~no: vlastný id. <- str.
+}.
+
+
+>> Print := Objekt nový.
+
+Print pri: ['items'] urobiť: { 
+	
+	vlastný item := Item nový: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: vlastný item
+	).
+	
+	
+}.
+
+Print items.

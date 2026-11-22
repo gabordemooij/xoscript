@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := پروگرامما تەڭشەك: ⌝'FFITESTLIB'⌜.
+
+# link stdio functions from c for advances file operations
+Server ئۇلا: ﴿ تىزىم يېڭى ;
+ libname ; ⌝'fopen'⌜ ;
+ ﴿ تىزىم يېڭى ; ⌝'pointer'⌜ ; ⌝'pointer'⌜﴾ ;
+ ⌝'pointer'⌜ ;
+ ⌝'Stream'⌜ ;
+ ⌝'path:mode:'⌜
+﴾,
+ئۇلا: ﴿ تىزىم يېڭى ;
+ قۇرۇق ; # means same lib
+ ⌝'fread'⌜ ;
+ ﴿ تىزىم يېڭى ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ قۇرۇق ; # means same object (i.e. Stream)
+ ⌝'fread'⌜
+﴾,
+ئۇلا: ﴿
+ تىزىم يېڭى ;
+ قۇرۇق ; # means same lib
+ ⌝'fwrite'⌜ ;
+ ﴿ تىزىم يېڭى ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ قۇرۇق ; # means same lib
+ ⌝'fwrite'⌜
+﴾,
+ئۇلا: ﴿
+ تىزىم يېڭى ;
+ قۇرۇق ; # means same lib
+ ⌝'rewind'⌜ ;
+ ﴿ تىزىم يېڭى ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ قۇرۇق ; # means same lib
+ ⌝'rewind:'⌜
+﴾.
+
+>> str := Blob utf8: ⌝'abc123'⌜.
+>> ھۆججەت-يولى := Blob utf8: ⌝'/tmp/bla.txt'⌜.
+>> mode := Blob utf8: ⌝'w+'⌜.
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: ھۆججەت-يولى mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream ئۇچۇر: ⌝'fwrite'⌜ پارامېتىرلار: ﴿تىزىم يېڭى ; str ; 1 ; 6 ; fd ﴾.
+چىقىرىش ياز: bytes-written, يېڭى-قۇر.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob يېڭى: 20.
+
+# read from file
+>> bytes-read := Stream ئۇچۇر: ⌝'fread'⌜ پارامېتىرلار: ﴿تىزىم يېڭى ; buf ; 1 ; 6 ; fd ﴾.
+چىقىرىش ياز: bytes-read, يېڭى-قۇر.
+چىقىرىش ياز: buf, يېڭى-قۇر.
+
+# free memory
+str  بوشات.
+ھۆججەت-يولى بوشات.
+mode بوشات.
+buf  بوشات.
+
+

@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Utdata skriv: ['Database test'], stop.
+
+>> db := Maria-DB ny vert: ['localhost'],
+	brukernavn: ['xo'], passord: ['pass123'], databasenavn: ['xobase'], koble-til.
+
+Utdata skriv: ['Can we connect? '] + db tilkoblet?, stop.
+
+>> søkeparametere := db spørring: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametere: ( Liste ny ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  søkeparametere utfør. db bekreft. } fang: { :e db rull-tilbake.  }, start.
+
+Utdata skriv: ['Can we insert? '] + ( søkeparametere insert-id > 0 ), stop.
+
+>> Obj := Objekt ny.
+Obj ved: ['retrieve-rows'] gjør: {
+	egen antall := 0.
+	>> søkeparametere :=
+	db spørring: ['SELECT * FROM book order by id desc limit 2'], 
+	hent: { :row 
+		egen antall legg-til: 1.
+		Sann avbryt.
+	}. <- egen antall kopier.
+}.
+
+Utdata skriv: ['Can we query? '] + ( Obj retrieve-rows > 0 ), stop.

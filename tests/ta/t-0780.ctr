@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := வரிசை புதிய ;
+	# {"key":"normal"} normal ASCII
+	( அகராதி புதிய வை: ['normal'] திறவுகோல்: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( அகராதி புதிய வை: ['hello world'] திறவுகோல்: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( அகராதி புதிய வை: ['"'] திறவுகோல்: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( அகராதி புதிய வை: ['backslash: \\'] திறவுகோல்: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( அகராதி புதிய வை: ['slash: /'] திறவுகோல்: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( அகராதி புதிய வை: ['backspace: \b'] திறவுகோல்: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( அகராதி புதிய வை: ['formfeed: \f'] திறவுகோல்: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( அகராதி புதிய வை: ['newline: \n'] திறவுகோல்: ['key'] ) ;
+	( அகராதி புதிய வை: ['newline: ↵'] திறவுகோல்: ['key'] ) ;
+	( அகராதி புதிய வை: ['newline: 
+	'] திறவுகோல்: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( அகராதி புதிய வை: ['carriage return: \r'] திறவுகோல்: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( அகராதி புதிய வை: ['tab \t'] திறவுகோல்: ['key'] ) ;
+	( அகராதி புதிய வை: ['tab ⇿'] திறவுகோல்: ['key'] ) ;
+	( அகராதி புதிய வை: ['tab  '] திறவுகோல்: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( அகராதி புதிய வை: ['NUL \u0000'] திறவுகோல்: ['key'] ) ;
+	( அகராதி புதிய வை: ['NUL \0'] திறவுகோல்: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( அகராதி புதிய வை: ['control: \u0001'] திறவுகோல்: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( அகராதி புதிய வை: ['control: \u001F'] திறவுகோல்: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( அகராதி புதிய வை: ['unicode: é'] திறவுகோல்: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( அகராதி புதிய வை: ['unicode: €'] திறவுகோல்: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( அகராதி புதிய வை: ['unicode: 日本語'] திறவுகோல்: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( அகராதி புதிய வை: ['unicode: 😀'] திறவுகோல்: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( அகராதி புதிய வை: ['unicode: 🧑‍💻'] திறவுகோல்: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( அகராதி புதிய வை: ['combining: e\u0301'] திறவுகோல்: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( அகராதி புதிய வை: ['escaped unicode: \u00e9'] திறவுகோல்: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( அகராதி புதிய வை: ['escaped unicode: \u20ac'] திறவுகோல்: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( அகராதி புதிய வை: ['escaped unicode: \ud83d\ude00'] திறவுகோல்: ['key'] ) ;
+	# {"key":""} empty value
+	( அகராதி புதிய வை: [''] திறவுகோல்: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( அகராதி புதிய வை: ['@ < > & = % + ? #'] திறவுகோல்: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( அகராதி புதிய வை: ['''] திறவுகோல்: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( அகராதி புதிய வை: ['multiple: \" \\ \n \r \t'] திறவுகோல்: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( அகராதி புதிய வை: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] திறவுகோல்: ['key'] ) ;
+	# {"key":" value"} leading space
+	( அகராதி புதிய வை: [' value'] திறவுகோல்: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( அகராதி புதிய வை: ['value '] திறவுகோல்: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( அகராதி புதிய வை: [' \t\n\r '] திறவுகோல்: ['key'] ).
+
+dicts ஒவ்வொன்றும்: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (அகராதி புதிய வை: d key திறவுகோல்: ['key']).
+	>> b := JSON jsonify: (அகராதி புதிய வை: ['value'] திறவுகோல்: d key).
+	>> e := JSON பொருள்: a.
+	>> f := JSON பொருள்: b.
+	((e key = d key மற்றும்: (f ? d key = ['value'])) அல்லது: (e key = ['NUL ?'])) உண்மையெனில்: {
+		வெளியீடு எழுது: ['OK'], புதிய-வரி.
+	}, இல்லையெனில்: {
+		வெளியீடு எழுது: ['Unable to properly encode/decode: '] + d + j, புதிய-வரி.
+		நிரல் முடி.
+	}.
+}.

@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Into okusha.
+
+Slurp uma-kufika: ['okusha'] yenza: {
+	okwakho str := [''].
+}.
+
+Slurp uma-kufika: ['nieuw'] yenza: {
+	okwakho str := [''].
+}.
+
+Slurp uma-kufika: ['phendula:'] yenza: { :blah
+		okwakho str engeza-ekugcineni: blah.
+}.
+
+Slurp uma-kufika: ['phendula:futhi:'] yenza: { :blah :blahah
+		okwakho str engeza-ekugcineni: (blah kusuka: 0 ubude: (blah ubude - 1)).
+		okwakho str engeza-ekugcineni: [' '].
+		okwakho str engeza-ekugcineni: blahah.
+}.
+
+Slurp uma-kufika: ['obtain'] yenza: {
+	>> buffer := okwakho str.
+	okwakho str := ['']. <- buffer.
+}.
+
+
+Okuphumayo bhala: (Uhlelo isistimu: (Slurp okusha echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Ifayela okusha: ['/tmp/from.txt'], susa. } bamba: { ['Empty']. }, qala.
+{ Ifayela okusha: ['/tmp/to.txt'], susa. } bamba: { ['Empty']. }, qala.
+
+
+Ifayela okusha: ['/tmp/to.txt'], ikhona amanga: {
+	Okuphumayo bhala: ['Confirmed. Target file does not exist.\
+'].
+}.
+Ifayela okusha: ['/tmp/from.txt'], ikhona amanga: {
+	Okuphumayo bhala: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Uhlelo isistimu: (Slurp okusha touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Uhlelo isistimu: (Slurp okusha cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Ifayela okusha: ['/tmp/to.txt'], ikhona iqiniso: {
+	Okuphumayo bhala: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Okuphumayo bhala: ['Contents of file is:'] + (Ifayela okusha: ['/tmp/to.txt'], funda), umugqa-omusha.

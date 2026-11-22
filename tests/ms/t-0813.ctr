@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server mulakan-awal.
+Atur-cara guna: ['../../../src/xo/ms/webtools.xo'].
+Atur-cara guna: ['../../../src/xo/ms/mailtools.xo'].
+
+>> pengepala := Pengepala-HTTP baharu kunci-pengepala: ['Location'] nilai: ['/ok\r\nX-Injected: yes'].
+Keluaran tulis: pengepala.
+
+>> web := Dokumen-Web baharu.
+web pergi-ke: ['/ok\r\nX-Injected: yes'].
+Keluaran tulis: ['\n'], baris-baharu.
+
+>> mail := E-mel baharu.
+mail kepada: (Senarai baharu ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Senarai baharu ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Senarai baharu ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail pengirim: ['d@example.invalid\r\nX-From: yes'] nama: ['site\r\nX-Name: yes'].
+mail subjek: ['hello\r\nX-Subject: yes'].
+mail badan: ['line1\r\nline2'].
+Keluaran tulis: mail jana.
+
+>> html := E-mel-HTML baharu.
+html kepada: (Senarai baharu ; ['a@example.invalid\r\nX-To: yes']).
+html pengirim: ['d@example.invalid'] nama: ['site'].
+html subjek: ['hello\r\nX-Subject: yes'].
+html badan: ['body'].
+Keluaran tulis: ( html jana mengandungi: ['\nX-'] ), baris-baharu.
+Keluaran tulis: ( html jana mengandungi: ['X-To: yes'] ), baris-baharu.

@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> purba := { :format :value
+	{ Salida skirbi: ( (Formato nobo: format) apliká: value ), liña-nobo. } kapta: { :e Salida skirbi: e, liña-nobo. }, kuminsá.
+}.
+>> try-int := { :format :value
+	{ Salida skirbi: ( (Formato nobo: format) apliká-number-entero: value ), liña-nobo. } kapta: { :e Salida skirbi: e, liña-nobo. }, kuminsá.
+}.
+
+# fits
+purba apliká: ['|%s|'] i: ['text'].
+purba apliká: ['%06.2f'] i: 5.5.
+purba apliká: ['100%% %s'] i: ['sure'].
+try-int apliká: ['%03d'] i: 7.
+try-int apliká: ['%x'] i: 255.
+purba apliká: ['%d'] i: (Int64 nobo for-di-teksto: ['12']).
+purba apliká: ['%lld'] i: (Int64 nobo for-di-teksto: ['12']).
+purba apliká: ['%.1lf'] i: 5.5.
+try-int apliká: ['%hd'] i: 7.
+
+# does not fit
+purba apliká: ['%s'] i: 12345.
+purba apliká: ['%d'] i: 12345.
+purba apliká: ['%f'] i: ['text'].
+try-int apliká: ['%d'] i: ['text'].
+try-int apliká: ['%s'] i: 5.
+purba apliká: ['%s %s'] i: ['text'].
+purba apliká: ['%n'] i: ['text'].
+purba apliká: ['%*s'] i: ['text'].
+purba apliká: ['%'] i: ['text'].
+
+# length modifier does not fit
+purba apliká: ['%ls'] i: ['text'].
+purba apliká: ['%Lf'] i: 5.5.
+try-int apliká: ['%ld'] i: 7.
+try-int apliká: ['%lld'] i: 7.
+purba apliká: ['%Ld'] i: (Int64 nobo for-di-teksto: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+purba apliká: ['%99999999999s'] i: ['text'].

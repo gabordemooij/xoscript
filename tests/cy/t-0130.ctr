@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Rhaglen gosodiad: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server cysylltu: ( Rhestr newydd ;
+ libname ; ['fopen'] ;
+ ( Rhestr newydd ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+cysylltu: ( Rhestr newydd ;
+ Dim ; # means same lib
+ ['fread'] ;
+ ( Rhestr newydd ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Dim ; # means same object (i.e. Stream)
+ ['fread']
+),
+cysylltu: (
+ Rhestr newydd ;
+ Dim ; # means same lib
+ ['fwrite'] ;
+ ( Rhestr newydd ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Dim ; # means same lib
+ ['fwrite']
+),
+cysylltu: (
+ Rhestr newydd ;
+ Dim ; # means same lib
+ ['rewind'] ;
+ ( Rhestr newydd ; ['pointer'] ) ;
+ ['int'] ;
+ Dim ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> llwybr := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: llwybr mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream neges: ['fwrite'] dadleuon: (Rhestr newydd ; str ; 1 ; 6 ; fd ).
+Allbwn ysgrifennu: bytes-written, llinell-newydd.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob newydd: 20.
+
+# read from file
+>> bytes-read := Stream neges: ['fread'] dadleuon: (Rhestr newydd ; buf ; 1 ; 6 ; fd ).
+Allbwn ysgrifennu: bytes-read, llinell-newydd.
+Allbwn ysgrifennu: buf, llinell-newydd.
+
+# free memory
+str  rhyddhau.
+llwybr rhyddhau.
+mode rhyddhau.
+buf  rhyddhau.
+
+

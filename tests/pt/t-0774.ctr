@@ -1,0 +1,23 @@
+Saída escrever: ['Test object'], stop.
+>> a := Objeto novo. 
+a em: ['item:'] fazer: { :lst
+	prop lst := lst. 
+}.
+a em: ['item'] fazer: { <- prop lst.
+}.
+a item: (
+	Listar novo ; 1 ; (
+		Listar novo ; ['a'] ; (
+			Listar novo ; ( Momento novo: 1 )
+		) ; ( Int64 de-string: ['321'] )
+	)
+).
+Saída escrever: a item, stop.
+>> old-lst-address := a item protótipo endereço-de-memória.
+a save-as: ['/tmp/a.bin'].
+Saída escrever: ['========== RELOADING SNAP:'], stop.
+>> b := Objeto load-from: ['/tmp/a.bin'].
+(b item protótipo endereço-de-memória = old-lst-address) sim: {
+	Saída escrever: ['Object link re-attached.'], stop.
+}.
+Saída escrever: ( b item ), stop.

@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB ny värd: ['localhost'],
+	användarnamn: ['xo'],
+	lösenord: ['pass123'],
+	databasnamn: ['xobase'],
+	anslut.
+
+>> conn2 := Maria-DB ny värd: ['localhost'],
+	användarnamn: ['xo'],
+	lösenord: ['pass123'],
+	databasnamn: ['xobase'],
+	anslut.
+#...
+>> del := conn1 fråga: ['DELETE FROM book WHERE id > 0'].
+{  del utför. conn1 bekräfta. } fånga: { :e conn1 återställ.  }, starta.
+
+>> insert := conn1 fråga: ['INSERT INTO book (id) VALUES(null)'].
+insert utför.
+
+>> antal := conn1 fråga: ['SELECT COUNT(*) AS num FROM book'].
+antal hämta: { :row Utdata skriv: row num, stop. }.
+
+# does not show up
+# insert not committed on connection 1
+>> antal := conn2 fråga: ['SELECT COUNT(*) AS num FROM book'].
+antal hämta: { :row Utdata skriv: row num, stop. }.

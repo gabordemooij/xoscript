@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Listar novo ;
+	# {"key":"normal"} normal ASCII
+	( Mapa novo colocar: ['normal'] em: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Mapa novo colocar: ['hello world'] em: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Mapa novo colocar: ['"'] em: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Mapa novo colocar: ['backslash: \\'] em: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Mapa novo colocar: ['slash: /'] em: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Mapa novo colocar: ['backspace: \b'] em: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Mapa novo colocar: ['formfeed: \f'] em: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Mapa novo colocar: ['newline: \n'] em: ['key'] ) ;
+	( Mapa novo colocar: ['newline: ↵'] em: ['key'] ) ;
+	( Mapa novo colocar: ['newline: 
+	'] em: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Mapa novo colocar: ['carriage return: \r'] em: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Mapa novo colocar: ['tab \t'] em: ['key'] ) ;
+	( Mapa novo colocar: ['tab ⇿'] em: ['key'] ) ;
+	( Mapa novo colocar: ['tab  '] em: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Mapa novo colocar: ['NUL \u0000'] em: ['key'] ) ;
+	( Mapa novo colocar: ['NUL \0'] em: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Mapa novo colocar: ['control: \u0001'] em: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Mapa novo colocar: ['control: \u001F'] em: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Mapa novo colocar: ['unicode: é'] em: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Mapa novo colocar: ['unicode: €'] em: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Mapa novo colocar: ['unicode: 日本語'] em: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Mapa novo colocar: ['unicode: 😀'] em: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Mapa novo colocar: ['unicode: 🧑‍💻'] em: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Mapa novo colocar: ['combining: e\u0301'] em: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Mapa novo colocar: ['escaped unicode: \u00e9'] em: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Mapa novo colocar: ['escaped unicode: \u20ac'] em: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Mapa novo colocar: ['escaped unicode: \ud83d\ude00'] em: ['key'] ) ;
+	# {"key":""} empty value
+	( Mapa novo colocar: [''] em: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Mapa novo colocar: ['@ < > & = % + ? #'] em: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Mapa novo colocar: ['''] em: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Mapa novo colocar: ['multiple: \" \\ \n \r \t'] em: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Mapa novo colocar: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] em: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Mapa novo colocar: [' value'] em: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Mapa novo colocar: ['value '] em: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Mapa novo colocar: [' \t\n\r '] em: ['key'] ).
+
+dicts cada-um: { :_ :d
+	>> j := JSON jsonificar: d.
+	>> a := JSON jsonificar: (Mapa novo colocar: d key em: ['key']).
+	>> b := JSON jsonificar: (Mapa novo colocar: ['value'] em: d key).
+	>> e := JSON objeto: a.
+	>> f := JSON objeto: b.
+	((e key = d key e: (f ? d key = ['value'])) ou: (e key = ['NUL ?'])) sim: {
+		Saída escrever: ['OK'], stop.
+	}, senão: {
+		Saída escrever: ['Unable to properly encode/decode: '] + d + j, stop.
+		Programa fim.
+	}.
+}.

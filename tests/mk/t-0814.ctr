@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server иницијализирај.
+Програма користи: ['../../../src/xo/mk/webtools.xo'].
+
+>> Fake-Request := Објект нов.
+Fake-Request при: ['value:'] направи: { :вредност
+	свој вредност := вредност.
+}.
+Fake-Request при: ['cookie:'] направи: { :име <- свој вредност.
+}.
+
+>> Test-Session := Сесија-привремена-датотека нов.
+Test-Session при: ['вчитај'] направи: { <- Речник нов.
+}.
+Test-Session при: ['session-id'] направи: { <- свој id.
+}.
+
+>> cookies := Листа нов
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies секој: { :i :cookie
+	>> http-барање := Fake-Request нов.
+	http-барање value: cookie.
+	>> управувач := Test-Session нов.
+	>> web := Веб-документ нов.
+	web http-барање: http-барање.
+	web управувач-сесии: управувач.
+	web започни-сесија.
+	Излез напиши: ( управувач session-id = cookie ), нов-ред.
+}.
+
+>> web := Веб-документ нов.
+web json: (Речник нов стави: ['b'] на: ['a']).
+Излез напиши: ['\n'], нов-ред.
+
+{ Мрежа get: ['file:///etc/hostname']. } фати: { :e
+	Излез напиши: e, нов-ред.
+}, стартувај.
+
+>> svg := Датотека нов: ['/tmp/test0814.svg'].
+svg напиши: ['<svg xmlns="x"></svg>'].
+Излез нов-ред.
+Server проследи: ['test0814.svg'] префикс: ['/tmp/'].
+svg избриши.

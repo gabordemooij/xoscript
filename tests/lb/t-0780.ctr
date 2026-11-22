@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lëscht nei ;
+	# {"key":"normal"} normal ASCII
+	( Dictionnaire nei setzen: ['normal'] bei: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Dictionnaire nei setzen: ['hello world'] bei: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Dictionnaire nei setzen: ['"'] bei: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Dictionnaire nei setzen: ['backslash: \\'] bei: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Dictionnaire nei setzen: ['slash: /'] bei: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Dictionnaire nei setzen: ['backspace: \b'] bei: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Dictionnaire nei setzen: ['formfeed: \f'] bei: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Dictionnaire nei setzen: ['newline: \n'] bei: ['key'] ) ;
+	( Dictionnaire nei setzen: ['newline: ↵'] bei: ['key'] ) ;
+	( Dictionnaire nei setzen: ['newline: 
+	'] bei: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Dictionnaire nei setzen: ['carriage return: \r'] bei: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Dictionnaire nei setzen: ['tab \t'] bei: ['key'] ) ;
+	( Dictionnaire nei setzen: ['tab ⇿'] bei: ['key'] ) ;
+	( Dictionnaire nei setzen: ['tab  '] bei: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Dictionnaire nei setzen: ['NUL \u0000'] bei: ['key'] ) ;
+	( Dictionnaire nei setzen: ['NUL \0'] bei: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Dictionnaire nei setzen: ['control: \u0001'] bei: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Dictionnaire nei setzen: ['control: \u001F'] bei: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Dictionnaire nei setzen: ['unicode: é'] bei: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Dictionnaire nei setzen: ['unicode: €'] bei: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Dictionnaire nei setzen: ['unicode: 日本語'] bei: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Dictionnaire nei setzen: ['unicode: 😀'] bei: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Dictionnaire nei setzen: ['unicode: 🧑‍💻'] bei: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Dictionnaire nei setzen: ['combining: e\u0301'] bei: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Dictionnaire nei setzen: ['escaped unicode: \u00e9'] bei: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Dictionnaire nei setzen: ['escaped unicode: \u20ac'] bei: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Dictionnaire nei setzen: ['escaped unicode: \ud83d\ude00'] bei: ['key'] ) ;
+	# {"key":""} empty value
+	( Dictionnaire nei setzen: [''] bei: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Dictionnaire nei setzen: ['@ < > & = % + ? #'] bei: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Dictionnaire nei setzen: ['''] bei: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Dictionnaire nei setzen: ['multiple: \" \\ \n \r \t'] bei: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Dictionnaire nei setzen: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] bei: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Dictionnaire nei setzen: [' value'] bei: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Dictionnaire nei setzen: ['value '] bei: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Dictionnaire nei setzen: [' \t\n\r '] bei: ['key'] ).
+
+dicts all: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Dictionnaire nei setzen: d key bei: ['key']).
+	>> b := JSON jsonify: (Dictionnaire nei setzen: ['value'] bei: d key).
+	>> e := JSON objet: a.
+	>> f := JSON objet: b.
+	((e key = d key an: (f ? d key = ['value'])) oder: (e key = ['NUL ?'])) wouer: {
+		Ausgab schreiwen: ['OK'], nei-zeil.
+	}, anescht: {
+		Ausgab schreiwen: ['Unable to properly encode/decode: '] + d + j, nei-zeil.
+		Programm enn.
+	}.
+}.

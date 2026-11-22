@@ -1,0 +1,43 @@
+
+
+>> g := Server ùr.
+>> v := Tasgaidh ùr.
+>> ok := 0.
+
+>> secrets := Liosta ùr ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets dèan-lethbhreac.
+passwords gach: { :i :p
+	secrets gach: { :n :s
+		{
+			>> encrypted := v crioptaich: s iuchair: p.
+			>> decrypted := v dì-chrioptaich: encrypted iuchair: p.
+			(decrypted = s) fìor: {
+				ok cuir-ris-àireamh: 1.
+			}, eile: {
+				Às-chur sgrìobh: ['failed encrypting/decrypting: '], loidhne-ùr.
+				Às-chur sgrìobh: s, loidhne-ùr.
+				Às-chur sgrìobh: ['encrypted: '] + encrypted, loidhne-ùr.
+				Às-chur sgrìobh: ['decrypted: '] + encrypted, loidhne-ùr.
+				Prògram deireadh.
+			}.
+		} glac: { :err
+			(s = [''] no: p = ['']) fìor: {
+				ok cuir-ris-àireamh: 1.
+			}, eile: {
+				Às-chur sgrìobh: err, loidhne-ùr.
+				Prògram deireadh.
+			}.
+		}, tòisich.
+	}.
+}.
+
+Às-chur sgrìobh: ( ok + [' vault encryptions tested.'] ), loidhne-ùr.

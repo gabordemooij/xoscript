@@ -1,0 +1,30 @@
+Kimenet ír: ['Test object'], újsor.
+>> a := Objektum új. 
+
+a ha: ['item:'] tedd: { :out
+	saját out := out. 
+}.
+
+a ha: ['item'] tedd: { <- saját out.
+}.
+
+a ha: ['greet'] tedd: {
+	Kimenet ír: ['hi from original out!'], újsor.
+}.
+
+a item: Kimenet.
+
+Kimenet ír: a item, újsor.
+
+>> old-out-address := a item prototípus memóriacím.
+a save-as: ['/tmp/a.bin'].
+Kimenet ír: ['========== RELOADING SNAP:'], újsor.
+
+>> b := Objektum load-from: ['/tmp/a.bin'].
+
+(b item prototípus memóriacím = old-out-address) igaz: {
+	Kimenet ír: ['Object link re-attached.'], újsor.
+}.
+
+b item ír: ['hello from loaded out!'], újsor.
+b greet.

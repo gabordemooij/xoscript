@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := Fișier nou: ['/tmp/test.gif'].
+f scrie: ['GIF87a01234567810'].
+
+# serve the file
+Server transmite: ['test.gif'] prefix: ['/tmp/'].
+
+Ieșire rând-nou.
+
+Ieșire scrie: ['Outside container (security):'], rând-nou.
+{ Server transmite: ['../passwd'] prefix: ['/tmp/']. }
+prinde: { :e Ieșire scrie: e, rând-nou. },
+pornește.
+
+Ieșire scrie: ['Invalid prefix:'], rând-nou.
+{ Server transmite: ['test.gif'] prefix: ['z:\\']. }
+prinde: { :e Ieșire scrie: e, rând-nou. },
+pornește.
+
+Ieșire scrie: ['Non-existant file:'], rând-nou.
+{ Server transmite: ['xxx.xxx'] prefix: ['/tmp/']. }
+prinde: { :e Ieșire scrie: e, rând-nou. },
+pornește.

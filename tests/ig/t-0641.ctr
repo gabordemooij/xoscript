@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Akwụkwọ-okwu ohuru
+	# ASCII only
+	tinye: ( Ndepụta ohuru ; 65 ; 65 ; 65 ; 65 ; 0 ) na: ['AAAA'],
+	# valid 2 byte sequence
+	tinye: ( Ndepụta ohuru ; 194 ; 162 ; 0 ) na: ['¢'],
+	# Valid 3-byte UTF-8
+    tinye: ( Ndepụta ohuru ; 226 ; 130 ; 172 ; 0 ) na: ['€'],
+	# Valid 4-byte UTF-8
+    tinye: ( Ndepụta ohuru ; 240 ; 144 ; 141 ; 136 ; 0 ) na: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    tinye: ( Ndepụta ohuru ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) na: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    tinye: ( Ndepụta ohuru ; 65 ; 193 ; 129 ; 0 ) na: ['A?'],
+	# Invalid first byte (0xFF)
+    tinye: ( Ndepụta ohuru ; 255 ; 0 ) na: ['?'],
+	# Incomplete multi-byte sequence at end
+    tinye: ( Ndepụta ohuru ; 66 ; 226 ; 0 ) na: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    tinye: ( Ndepụta ohuru ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) na: ['A€?𐍈B'].
+	 
+utf8cases nke-ọ-bụla: { :key :value
+	>> blob := Blob ohuru: value ọnụ-ọgụgụ, bytes: value.
+	>> str := blob ederede.
+	(str = key) eziokwu: {
+		Mpụta dee: ['OK'], ahịrị-ọhụrụ.
+	}, ma-ọ-bụghị-ya: {
+		Mpụta dee: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, ahịrị-ọhụrụ.
+	}.
+	blob hapụ.
+}.

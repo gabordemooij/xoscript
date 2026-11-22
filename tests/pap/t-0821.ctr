@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> ruta := ['/tmp/test0821.csv'].
+>> file := Archivo nobo: ruta.
+
+file skirbi: ['a,b\n"1,2\n'].
+{
+	file separadó: [','] komia: ['"'] liñanan: { :line
+		Salida skirbi: line, liña-nobo.
+	}.
+} kapta: { :e Salida skirbi: e, liña-nobo. }, kuminsá.
+
+# a closed quote still works
+file skirbi: ['a,b\n"1,2",3'].
+file separadó: [','] komia: ['"'] liñanan: { :line
+	Salida skirbi: line, liña-nobo.
+}.
+file kita-for-di-disko.

@@ -1,0 +1,43 @@
+
+
+>> g := Server жаңа.
+>> v := Сейф жаңа.
+>> ok := 0.
+
+>> secrets := Тізім жаңа ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets көшіру.
+passwords әрбір: { :i :p
+	secrets әрбір: { :n :s
+		{
+			>> encrypted := v шифрлау: s кілт: p.
+			>> decrypted := v шифрды-ашу: encrypted кілт: p.
+			(decrypted = s) ақиқат-болса: {
+				ok қосу: 1.
+			}, әйтпесе: {
+				Шығыс жазу: ['failed encrypting/decrypting: '], жаңа-жол.
+				Шығыс жазу: s, жаңа-жол.
+				Шығыс жазу: ['encrypted: '] + encrypted, жаңа-жол.
+				Шығыс жазу: ['decrypted: '] + encrypted, жаңа-жол.
+				Бағдарлама аяқтау.
+			}.
+		} ұстау: { :err
+			(s = [''] немесе: p = ['']) ақиқат-болса: {
+				ok қосу: 1.
+			}, әйтпесе: {
+				Шығыс жазу: err, жаңа-жол.
+				Бағдарлама аяқтау.
+			}.
+		}, іске-қосу.
+	}.
+}.
+
+Шығыс жазу: ( ok + [' vault encryptions tested.'] ), жаңа-жол.

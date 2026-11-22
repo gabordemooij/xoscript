@@ -1,0 +1,53 @@
+程序 GC模式: 0.
+数组对象 在: ['sum'] 执行: {
+	>> total := 0.
+	自身 每个: { :index :element
+		total 加: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := 文件 新建: ['/tmp/test.txt'].
+f 写入: ['Lorem Ipsum'].
+f 关闭.
+  
+
+f := 文件 新建: ['/tmp/test.txt'].
+>> text := f 读取.
+f 关闭.
+
+
+
+程序 清扫.
+usedMemory1 := (程序 内存 ? 1).
+
+
+
+f := 文件 新建: ['/tmp/test.txt'].
+text := f 读取.
+f 关闭.
+
+程序 清扫.
+usedMemory2 := (程序 内存 ? 1).
+
+
+f := 文件 新建: ['/tmp/test.txt'].
+text := f 读取.
+f 关闭.
+
+程序 清扫.
+usedMemory3 := (程序 内存 ? 1).
+
+
+
+( usedMemory1 = usedMemory2 且: usedMemory1 = usedMemory3, 且: usedMemory2 = usedMemory3 ) 是: {
+	输出 写入: ['No memory leaks here'].
+}, 否: {
+	输出 写入: ['Leaking memory...'].
+}.

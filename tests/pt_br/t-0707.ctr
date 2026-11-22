@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programa arranjo: 4.
+Server init.
+
+>> counter := 0.
+>> db := MariaDB novo host: ['localhost'],
+	usuário: ['xo'], senha: ['pass123'], nome-database: ['xobase'], conectar.
+
+>> TwoDigitFormat := Formato novo: ['%02d'].
+
+# Datetime
+{
+	>> ano := Número entre: 1995 e: 2050, string.
+	>> mês := TwoDigitFormat aplicar-int: (Número entre: 1 e: 12), string.
+	>> dia := TwoDigitFormat aplicar-int: (Número entre: 1 e: 28), string.
+	>> hora := TwoDigitFormat aplicar-int: (Número entre: 1 e: 23), string.
+	>> minuto := TwoDigitFormat aplicar-int: (Número entre: 1 e: 59), string.
+	>> segundo := TwoDigitFormat aplicar-int: (Número entre: 1 e: 59), string.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: ano,
+		MM: mês,
+		DD: dia,
+		HH: hora,
+		II: minuto,
+		SS: segundo.
+	>> parametros :=
+	db consulta: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	buscar: { :row
+		(row mydatetime = datetime) não: {
+			este-bloco-de-código erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter adicionar: 1.
+} * 100.
+
+# Date
+{
+	>> ano := Número entre: 1995 e: 2050, string.
+	>> mês := TwoDigitFormat aplicar-int: (Número entre: 1 e: 12), string.
+	>> dia := TwoDigitFormat aplicar-int: (Número entre: 1 e: 28), string.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: ano,
+		MM: mês,
+		DD: dia.
+	>> parametros :=
+	db consulta: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	buscar: { :row
+		(row mydate = date) não: {
+			este-bloco-de-código erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter adicionar: 1.
+} * 100.
+
+
+# Time
+{
+	>> hora := TwoDigitFormat aplicar-int: (Número entre: 1 e: 23), string.
+	>> minuto := TwoDigitFormat aplicar-int: (Número entre: 1 e: 59), string.
+	>> segundo := TwoDigitFormat aplicar-int: (Número entre: 1 e: 59), string.
+	>> tempo := ['HH:II:SS'].
+	tempo
+		HH: hora,
+		II: minuto,
+		SS: segundo.
+	>> parametros :=
+	db consulta: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: tempo),
+	buscar: { :row
+		(row mytime = tempo) não: {
+			este-bloco-de-código erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter adicionar: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Listar novo preencha: 100000 elementos-com: ['x'], juntar: [''].
+{
+	>> str2 := Cofre token: 40.
+	>> parametros :=
+	db consulta: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	buscar: { :row
+		(row str1 = str1 e: row str2 = str2) não: {
+			este-bloco-de-código erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter adicionar: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Número entre: 1 e: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 de-string: ['9223372036854775807'] ) -
+		( Int64 de-string: ['99999'] ) +
+		( Int64 de-string: n1 string )
+	).
+	>> parametros :=
+	db consulta: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	buscar: { :row
+		(row n1 = n1) não: {
+			este-bloco-de-código erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) não: {
+			este-bloco-de-código erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 arredondado) não: {
+			este-bloco-de-código erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) não: {
+			este-bloco-de-código erro: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter adicionar: 1.
+} * 100.
+
+
+Saída escrever: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), stop.

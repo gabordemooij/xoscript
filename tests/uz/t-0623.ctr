@@ -1,0 +1,43 @@
+
+
+>> g := Server yangi.
+>> v := Seyf yangi.
+>> ok := 0.
+
+>> secrets := Roʻyxat yangi ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets nusxa.
+passwords har-bir: { :i :p
+	secrets har-bir: { :n :s
+		{
+			>> encrypted := v shifrlash: s kalit: p.
+			>> decrypted := v shifrni-ochish: encrypted kalit: p.
+			(decrypted = s) rost-boʻlsa: {
+				ok qoʻshish: 1.
+			}, aks-holda: {
+				Chiqish yozish: ['failed encrypting/decrypting: '], yangi-qator.
+				Chiqish yozish: s, yangi-qator.
+				Chiqish yozish: ['encrypted: '] + encrypted, yangi-qator.
+				Chiqish yozish: ['decrypted: '] + encrypted, yangi-qator.
+				Dastur tugatish.
+			}.
+		} ushlash: { :err
+			(s = [''] yoki: p = ['']) rost-boʻlsa: {
+				ok qoʻshish: 1.
+			}, aks-holda: {
+				Chiqish yozish: err, yangi-qator.
+				Dastur tugatish.
+			}.
+		}, ishga-tushirish.
+	}.
+}.
+
+Chiqish yozish: ( ok + [' vault encryptions tested.'] ), yangi-qator.

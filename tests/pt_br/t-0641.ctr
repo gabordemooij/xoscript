@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Mapa novo
+	# ASCII only
+	colocar: ( Listar novo ; 65 ; 65 ; 65 ; 65 ; 0 ) em: ['AAAA'],
+	# valid 2 byte sequence
+	colocar: ( Listar novo ; 194 ; 162 ; 0 ) em: ['¢'],
+	# Valid 3-byte UTF-8
+    colocar: ( Listar novo ; 226 ; 130 ; 172 ; 0 ) em: ['€'],
+	# Valid 4-byte UTF-8
+    colocar: ( Listar novo ; 240 ; 144 ; 141 ; 136 ; 0 ) em: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    colocar: ( Listar novo ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) em: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    colocar: ( Listar novo ; 65 ; 193 ; 129 ; 0 ) em: ['A?'],
+	# Invalid first byte (0xFF)
+    colocar: ( Listar novo ; 255 ; 0 ) em: ['?'],
+	# Incomplete multi-byte sequence at end
+    colocar: ( Listar novo ; 66 ; 226 ; 0 ) em: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    colocar: ( Listar novo ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) em: ['A€?𐍈B'].
+	 
+utf8cases cada-um: { :key :value
+	>> blob := Blob novo: value conta, bytes: value.
+	>> str := blob string.
+	(str = key) sim: {
+		Saída escrever: ['OK'], stop.
+	}, senão: {
+		Saída escrever: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, stop.
+	}.
+	blob livre.
+}.

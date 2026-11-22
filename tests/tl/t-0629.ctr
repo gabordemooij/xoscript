@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Labas isulat: ['Database test'], bagong-linya.
+
+>> db := Maria-DB bago host: ['localhost'],
+	pangalan-ng-user: ['xo'], password: ['pass123'], pangalan-ng-database: ['xobase'], kumonekta.
+
+Labas isulat: ['Can we connect? '] + db nakakonekta?, bagong-linya.
+
+>> parametro-ng-paghahanap := db tanong: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], mga-parametro: ( Listahan bago ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  parametro-ng-paghahanap isagawa. db pagtibayin. } saluhin: { :e db ibalik.  }, patakbuhin.
+
+Labas isulat: ['Can we insert? '] + ( parametro-ng-paghahanap insert-id > 0 ), bagong-linya.
+
+>> Obj := Bagay bago.
+Obj kapag: ['retrieve-rows'] gawin: {
+	sarili-ko bilangin := 0.
+	>> parametro-ng-paghahanap :=
+	db tanong: ['SELECT * FROM book order by id desc limit 2'], 
+	kunin: { :row 
+		sarili-ko bilangin idagdag: 1.
+		Totoo itigil.
+	}. <- sarili-ko bilangin kopyahin.
+}.
+
+Labas isulat: ['Can we query? '] + ( Obj retrieve-rows > 0 ), bagong-linya.

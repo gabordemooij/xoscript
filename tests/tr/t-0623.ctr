@@ -1,0 +1,43 @@
+
+
+>> g := Server yeni.
+>> v := Kasa yeni.
+>> ok := 0.
+
+>> secrets := Liste yeni ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopyala.
+passwords her: { :i :p
+	secrets her: { :n :s
+		{
+			>> encrypted := v şifrele: s anahtar: p.
+			>> decrypted := v şifre-çöz: encrypted anahtar: p.
+			(decrypted = s) doğru: {
+				ok ekle: 1.
+			}, yoksa: {
+				Çıktı yaz: ['failed encrypting/decrypting: '], yeni-satır.
+				Çıktı yaz: s, yeni-satır.
+				Çıktı yaz: ['encrypted: '] + encrypted, yeni-satır.
+				Çıktı yaz: ['decrypted: '] + encrypted, yeni-satır.
+				Program bitir.
+			}.
+		} yakala: { :err
+			(s = [''] veya: p = ['']) doğru: {
+				ok ekle: 1.
+			}, yoksa: {
+				Çıktı yaz: err, yeni-satır.
+				Program bitir.
+			}.
+		}, başlat.
+	}.
+}.
+
+Çıktı yaz: ( ok + [' vault encryptions tested.'] ), yeni-satır.

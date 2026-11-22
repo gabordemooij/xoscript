@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Väljund kirjuta: ['Database test'], reavahetus.
+
+>> db := Maria-DB uus host: ['localhost'],
+	kasutajanimi: ['xo'], parool: ['pass123'], andmebaasi-nimi: ['xobase'], ühendu.
+
+Väljund kirjuta: ['Can we connect? '] + db ühendatud?, reavahetus.
+
+>> otsinguparameetrid := db päring: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameetrid: ( Loend uus ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  otsinguparameetrid täida. db kinnita. } püüa: { :e db tühista.  }, käivita.
+
+Väljund kirjuta: ['Can we insert? '] + ( otsinguparameetrid insert-id > 0 ), reavahetus.
+
+>> Obj := Objekt uus.
+Obj kui: ['retrieve-rows'] tee: {
+	oma arvuta := 0.
+	>> otsinguparameetrid :=
+	db päring: ['SELECT * FROM book order by id desc limit 2'], 
+	too: { :row 
+		oma arvuta liida: 1.
+		Tõsi katkesta.
+	}. <- oma arvuta kopeeri.
+}.
+
+Väljund kirjuta: ['Can we query? '] + ( Obj retrieve-rows > 0 ), reavahetus.

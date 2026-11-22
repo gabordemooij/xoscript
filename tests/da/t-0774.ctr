@@ -1,0 +1,23 @@
+Uddata skriv: ['Test object'], stop.
+>> a := Objekt ny. 
+a ved: ['item:'] gør: { :lst
+	egen lst := lst. 
+}.
+a ved: ['item'] gør: { <- egen lst.
+}.
+a item: (
+	Liste ny ; 1 ; (
+		Liste ny ; ['a'] ; (
+			Liste ny ; ( Øjeblik ny: 1 )
+		) ; ( Int64 fra-tekst: ['321'] )
+	)
+).
+Uddata skriv: a item, stop.
+>> old-lst-address := a item prototype hukommelsesadresse.
+a save-as: ['/tmp/a.bin'].
+Uddata skriv: ['========== RELOADING SNAP:'], stop.
+>> b := Objekt load-from: ['/tmp/a.bin'].
+(b item prototype hukommelsesadresse = old-lst-address) sand: {
+	Uddata skriv: ['Object link re-attached.'], stop.
+}.
+Uddata skriv: ( b item ), stop.

@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := તિજોરી ચાવીઓ-બનાવો.
+>> sk := keys પહેલું.
+>> pk := keys છેલ્લું.
+>> sig := તિજોરી સહી: ['abc'] ચાવીથી: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ તિજોરી સહી: ['abc'] ચાવીથી: long. } પકડો: { :e
+	આઉટપુટ લખો: e, નવી-લીટી.
+}, ચલાવો.
+
+{ તિજોરી તપાસો: ['abc'] સહી: long ચાવીથી: pk. } પકડો: { :e
+	આઉટપુટ લખો: e, નવી-લીટી.
+}, ચલાવો.
+
+{ તિજોરી તપાસો: ['abc'] સહી: sig ચાવીથી: short. } પકડો: { :e
+	આઉટપુટ લખો: e, નવી-લીટી.
+}, ચલાવો.

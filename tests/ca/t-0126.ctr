@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Objecte nou.
+
+Slurp en: ['nou'] fes: {
+	propi str := [''].
+}.
+
+Slurp en: ['nieuw'] fes: {
+	propi str := [''].
+}.
+
+Slurp en: ['respon:'] fes: { :blah
+		propi str afegeix-al-final: blah.
+}.
+
+Slurp en: ['respon:i:'] fes: { :blah :blahah
+		propi str afegeix-al-final: (blah de: 0 longitud: (blah longitud - 1)).
+		propi str afegeix-al-final: [' '].
+		propi str afegeix-al-final: blahah.
+}.
+
+Slurp en: ['obtain'] fes: {
+	>> buffer := propi str.
+	propi str := ['']. <- buffer.
+}.
+
+
+Sortida escriu: (Programa sistema: (Slurp nou echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Fitxer nou: ['/tmp/from.txt'], suprimeix. } captura: { ['Empty']. }, inicia.
+{ Fitxer nou: ['/tmp/to.txt'], suprimeix. } captura: { ['Empty']. }, inicia.
+
+
+Fitxer nou: ['/tmp/to.txt'], existeix fals: {
+	Sortida escriu: ['Confirmed. Target file does not exist.\
+'].
+}.
+Fitxer nou: ['/tmp/from.txt'], existeix fals: {
+	Sortida escriu: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Programa sistema: (Slurp nou touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Programa sistema: (Slurp nou cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Fitxer nou: ['/tmp/to.txt'], existeix cert: {
+	Sortida escriu: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Sortida escriu: ['Contents of file is:'] + (Fitxer nou: ['/tmp/to.txt'], llegeix), salt-de-línia.

@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := ਸ਼ਬਦਕੋਸ਼ ਨਵਾਂ
+	# ASCII only
+	ਰੱਖੋ: ( ਲਿਸਟ ਨਵਾਂ ; 65 ; 65 ; 65 ; 65 ; 0 ) ਕੁੰਜੀ: ['AAAA'],
+	# valid 2 byte sequence
+	ਰੱਖੋ: ( ਲਿਸਟ ਨਵਾਂ ; 194 ; 162 ; 0 ) ਕੁੰਜੀ: ['¢'],
+	# Valid 3-byte UTF-8
+    ਰੱਖੋ: ( ਲਿਸਟ ਨਵਾਂ ; 226 ; 130 ; 172 ; 0 ) ਕੁੰਜੀ: ['€'],
+	# Valid 4-byte UTF-8
+    ਰੱਖੋ: ( ਲਿਸਟ ਨਵਾਂ ; 240 ; 144 ; 141 ; 136 ; 0 ) ਕੁੰਜੀ: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    ਰੱਖੋ: ( ਲਿਸਟ ਨਵਾਂ ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ਕੁੰਜੀ: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    ਰੱਖੋ: ( ਲਿਸਟ ਨਵਾਂ ; 65 ; 193 ; 129 ; 0 ) ਕੁੰਜੀ: ['A?'],
+	# Invalid first byte (0xFF)
+    ਰੱਖੋ: ( ਲਿਸਟ ਨਵਾਂ ; 255 ; 0 ) ਕੁੰਜੀ: ['?'],
+	# Incomplete multi-byte sequence at end
+    ਰੱਖੋ: ( ਲਿਸਟ ਨਵਾਂ ; 66 ; 226 ; 0 ) ਕੁੰਜੀ: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    ਰੱਖੋ: ( ਲਿਸਟ ਨਵਾਂ ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ਕੁੰਜੀ: ['A€?𐍈B'].
+	 
+utf8cases ਹਰੇਕ: { :key :value
+	>> blob := Blob ਨਵਾਂ: value ਗਿਣਤੀ, bytes: value.
+	>> str := blob ਲਿਖਤ-ਵਿੱਚ.
+	(str = key) ਸੱਚ-ਹੋਵੇ-ਤਾਂ: {
+		ਆਉਟਪੁੱਟ ਲਿਖੋ: ['OK'], ਨਵੀਂ-ਲਾਈਨ.
+	}, ਨਹੀਂ-ਤਾਂ: {
+		ਆਉਟਪੁੱਟ ਲਿਖੋ: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, ਨਵੀਂ-ਲਾਈਨ.
+	}.
+	blob ਮੁਕਤ.
+}.

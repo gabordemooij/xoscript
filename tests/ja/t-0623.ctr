@@ -1,0 +1,43 @@
+
+
+>> g := Server 新規.
+>> v := 金庫 新規.
+>> ok := 0.
+
+>> secrets := リスト 新規 ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets 複製.
+passwords 各要素: { :i :p
+	secrets 各要素: { :n :s
+		{
+			>> encrypted := v 暗号化: s 鍵: p.
+			>> decrypted := v 復号: encrypted 鍵: p.
+			(decrypted = s) 真なら: {
+				ok 加算: 1.
+			}, さもなければ: {
+				出力 書く: ['failed encrypting/decrypting: '], 改行.
+				出力 書く: s, 改行.
+				出力 書く: ['encrypted: '] + encrypted, 改行.
+				出力 書く: ['decrypted: '] + encrypted, 改行.
+				プログラム 終了.
+			}.
+		} 例外時: { :err
+			(s = [''] または: p = ['']) 真なら: {
+				ok 加算: 1.
+			}, さもなければ: {
+				出力 書く: err, 改行.
+				プログラム 終了.
+			}.
+		}, 開始.
+	}.
+}.
+
+出力 書く: ( ok + [' vault encryptions tested.'] ), 改行.

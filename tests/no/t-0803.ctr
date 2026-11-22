@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB ny vert: ['localhost'],
+	brukernavn: ['xo'],
+	passord: ['pass123'],
+	databasenavn: ['xobase'],
+	koble-til.
+
+>> conn2 := Maria-DB ny vert: ['localhost'],
+	brukernavn: ['xo'],
+	passord: ['pass123'],
+	databasenavn: ['xobase'],
+	koble-til.
+#...
+>> del := conn1 spørring: ['DELETE FROM book WHERE id > 0'].
+{  del utfør. conn1 bekreft. } fang: { :e conn1 rull-tilbake.  }, start.
+
+>> insert := conn1 spørring: ['INSERT INTO book (id) VALUES(null)'].
+insert utfør.
+
+>> antall := conn1 spørring: ['SELECT COUNT(*) AS num FROM book'].
+antall hent: { :row Utdata skriv: row num, stop. }.
+
+# does not show up
+# insert not committed on connection 1
+>> antall := conn2 spørring: ['SELECT COUNT(*) AS num FROM book'].
+antall hent: { :row Utdata skriv: row num, stop. }.

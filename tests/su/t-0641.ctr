@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Kamus anyar
+	# ASCII only
+	teundeun: ( Daptar anyar ; 65 ; 65 ; 65 ; 65 ; 0 ) di: ['AAAA'],
+	# valid 2 byte sequence
+	teundeun: ( Daptar anyar ; 194 ; 162 ; 0 ) di: ['¢'],
+	# Valid 3-byte UTF-8
+    teundeun: ( Daptar anyar ; 226 ; 130 ; 172 ; 0 ) di: ['€'],
+	# Valid 4-byte UTF-8
+    teundeun: ( Daptar anyar ; 240 ; 144 ; 141 ; 136 ; 0 ) di: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    teundeun: ( Daptar anyar ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) di: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    teundeun: ( Daptar anyar ; 65 ; 193 ; 129 ; 0 ) di: ['A?'],
+	# Invalid first byte (0xFF)
+    teundeun: ( Daptar anyar ; 255 ; 0 ) di: ['?'],
+	# Incomplete multi-byte sequence at end
+    teundeun: ( Daptar anyar ; 66 ; 226 ; 0 ) di: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    teundeun: ( Daptar anyar ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) di: ['A€?𐍈B'].
+	 
+utf8cases unggal: { :key :value
+	>> blob := Blob anyar: value jumlah, bytes: value.
+	>> str := blob téks.
+	(str = key) bener: {
+		Kaluaran tulis: ['OK'], baris-anyar.
+	}, lamun-henteu: {
+		Kaluaran tulis: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, baris-anyar.
+	}.
+	blob bébaskeun.
+}.

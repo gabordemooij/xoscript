@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := ସିନ୍ଦୁକ ଚାବି-ତିଆରି.
+>> sk := keys ପ୍ରଥମ.
+>> pk := keys ଶେଷଟି.
+>> sig := ସିନ୍ଦୁକ ଦସ୍ତଖତ: ['abc'] ଚାବିରେ: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ ସିନ୍ଦୁକ ଦସ୍ତଖତ: ['abc'] ଚାବିରେ: long. } ଧର: { :e
+	ଆଉଟପୁଟ୍ ଲେଖ: e, ନୂଆ-ଧାଡ଼ି.
+}, ଚଲାଅ.
+
+{ ସିନ୍ଦୁକ ପରଖ: ['abc'] ଦସ୍ତଖତ: long ଚାବିରେ: pk. } ଧର: { :e
+	ଆଉଟପୁଟ୍ ଲେଖ: e, ନୂଆ-ଧାଡ଼ି.
+}, ଚଲାଅ.
+
+{ ସିନ୍ଦୁକ ପରଖ: ['abc'] ଦସ୍ତଖତ: sig ଚାବିରେ: short. } ଧର: { :e
+	ଆଉଟପୁଟ୍ ଲେଖ: e, ନୂଆ-ଧାଡ଼ି.
+}, ଚଲାଅ.

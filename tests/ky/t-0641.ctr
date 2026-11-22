@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Сөздүк жаңы
+	# ASCII only
+	салуу: ( Тизме жаңы ; 65 ; 65 ; 65 ; 65 ; 0 ) ачкыч: ['AAAA'],
+	# valid 2 byte sequence
+	салуу: ( Тизме жаңы ; 194 ; 162 ; 0 ) ачкыч: ['¢'],
+	# Valid 3-byte UTF-8
+    салуу: ( Тизме жаңы ; 226 ; 130 ; 172 ; 0 ) ачкыч: ['€'],
+	# Valid 4-byte UTF-8
+    салуу: ( Тизме жаңы ; 240 ; 144 ; 141 ; 136 ; 0 ) ачкыч: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    салуу: ( Тизме жаңы ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ачкыч: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    салуу: ( Тизме жаңы ; 65 ; 193 ; 129 ; 0 ) ачкыч: ['A?'],
+	# Invalid first byte (0xFF)
+    салуу: ( Тизме жаңы ; 255 ; 0 ) ачкыч: ['?'],
+	# Incomplete multi-byte sequence at end
+    салуу: ( Тизме жаңы ; 66 ; 226 ; 0 ) ачкыч: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    салуу: ( Тизме жаңы ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ачкыч: ['A€?𐍈B'].
+	 
+utf8cases ар-бир: { :key :value
+	>> blob := Blob жаңы: value саны, bytes: value.
+	>> str := blob текст.
+	(str = key) чын-болсо: {
+		Чыгаруу жазуу: ['OK'], жаңы-сап.
+	}, антпесе: {
+		Чыгаруу жазуу: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, жаңы-сап.
+	}.
+	blob бошотуу.
+}.

@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Polokalamu hoʻoponopono-waihona-hoʻomanaʻo: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB hou hoʻokipa: ['localhost'],
+	inoa-mea-hoʻohana: ['xo'], ʻōlelo-huna: ['pass123'], inoa-waihona-ʻikepili: ['xobase'], hoʻohui-pū.
+
+>> TwoDigitFormat := Hōʻano hou: ['%02d'].
+
+# Datetime
+{
+	>> makahiki := Helu mawaena: 1995 a: 2050, kaula.
+	>> mahina := TwoDigitFormat hoʻopili-helu-piha: (Helu mawaena: 1 a: 12), kaula.
+	>> lā := TwoDigitFormat hoʻopili-helu-piha: (Helu mawaena: 1 a: 28), kaula.
+	>> hola := TwoDigitFormat hoʻopili-helu-piha: (Helu mawaena: 1 a: 23), kaula.
+	>> minuke := TwoDigitFormat hoʻopili-helu-piha: (Helu mawaena: 1 a: 59), kaula.
+	>> kekona := TwoDigitFormat hoʻopili-helu-piha: (Helu mawaena: 1 a: 59), kaula.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: makahiki,
+		MM: mahina,
+		DD: lā,
+		HH: hola,
+		II: minuke,
+		SS: kekona.
+	>> nā-koina-huli :=
+	db nīnau: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	kiʻi: { :row
+		(row mydatetime = datetime) wahaheʻe: {
+			kēia-hana kuhi-hewa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter hoʻohui-helu: 1.
+} * 100.
+
+# Date
+{
+	>> makahiki := Helu mawaena: 1995 a: 2050, kaula.
+	>> mahina := TwoDigitFormat hoʻopili-helu-piha: (Helu mawaena: 1 a: 12), kaula.
+	>> lā := TwoDigitFormat hoʻopili-helu-piha: (Helu mawaena: 1 a: 28), kaula.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: makahiki,
+		MM: mahina,
+		DD: lā.
+	>> nā-koina-huli :=
+	db nīnau: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	kiʻi: { :row
+		(row mydate = date) wahaheʻe: {
+			kēia-hana kuhi-hewa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter hoʻohui-helu: 1.
+} * 100.
+
+
+# Time
+{
+	>> hola := TwoDigitFormat hoʻopili-helu-piha: (Helu mawaena: 1 a: 23), kaula.
+	>> minuke := TwoDigitFormat hoʻopili-helu-piha: (Helu mawaena: 1 a: 59), kaula.
+	>> kekona := TwoDigitFormat hoʻopili-helu-piha: (Helu mawaena: 1 a: 59), kaula.
+	>> manawa-kūʻē := ['HH:II:SS'].
+	manawa-kūʻē
+		HH: hola,
+		II: minuke,
+		SS: kekona.
+	>> nā-koina-huli :=
+	db nīnau: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: manawa-kūʻē),
+	kiʻi: { :row
+		(row mytime = manawa-kūʻē) wahaheʻe: {
+			kēia-hana kuhi-hewa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter hoʻohui-helu: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Papa hou hoʻopiha: 100000 me: ['x'], hoʻohui: [''].
+{
+	>> str2 := Pahu-kūʻono token: 40.
+	>> nā-koina-huli :=
+	db nīnau: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	kiʻi: { :row
+		(row str1 = str1 a: row str2 = str2) wahaheʻe: {
+			kēia-hana kuhi-hewa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter hoʻohui-helu: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Helu mawaena: 1 a: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 mai-ke-kaula: ['9223372036854775807'] ) -
+		( Int64 mai-ke-kaula: ['99999'] ) +
+		( Int64 mai-ke-kaula: n1 kaula )
+	).
+	>> nā-koina-huli :=
+	db nīnau: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	kiʻi: { :row
+		(row n1 = n1) wahaheʻe: {
+			kēia-hana kuhi-hewa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) wahaheʻe: {
+			kēia-hana kuhi-hewa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 hoʻokokoke-helu) wahaheʻe: {
+			kēia-hana kuhi-hewa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) wahaheʻe: {
+			kēia-hana kuhi-hewa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter hoʻohui-helu: 1.
+} * 100.
+
+
+Huapuka kākau: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), laina-hou.

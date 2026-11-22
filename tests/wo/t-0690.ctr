@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Génn bind: ['Database test'], taxaw.
+
+>> db := Maria-DB xees dalalkat: ['localhost'],
+	turu-jëfandikukat: ['xo'], baatu-jall: ['pass123'], turu-dencukaayu-njoxe: ['xobase'], lëkkaloo.
+
+Génn bind: ['Can we connect? '] + db lëkkaloo-na?, taxaw.
+
+>> tànneefi-seet := db laaj-njoxe: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], tànneef-yi: ( Jokkalante xees ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  tànneefi-seet jëfe. db dëggal. } jàpp: { :e db delloo-gannaaw.  }, dox.
+
+Génn bind: ['Can we insert? '] + ( tànneefi-seet insert-id > 0 ), taxaw.
+
+>> x := 0.
+>> tànneefi-seet :=
+db laaj-njoxe: ['SELECT * FROM book order by id desc limit 2'], 
+indi: { :row 
+	x yokk: 1.
+	Dëgg dog. # must clean up, no 'Commands out of sync'
+}.
+
+>> tànneefi-seet :=
+db laaj-njoxe: ['SELECT * FROM book order by id desc limit 2'], 
+indi: { :row
+	x yokk: 1.
+	Dëgg dog.
+}.
+
+(x > 0) dëgg: {
+	Génn bind: ['Can we break in the middle of a fetch? '].
+}.
+
+Génn bind: Dëgg, taxaw.

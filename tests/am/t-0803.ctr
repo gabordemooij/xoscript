@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB አዲስ አስተናጋጅ: ['localhost'],
+	የተጠቃሚ-ስም: ['xo'],
+	የይለፍ-ቃል: ['pass123'],
+	የውሂብ-ጎታ-ስም: ['xobase'],
+	ተገናኝ.
+
+>> conn2 := Maria-DB አዲስ አስተናጋጅ: ['localhost'],
+	የተጠቃሚ-ስም: ['xo'],
+	የይለፍ-ቃል: ['pass123'],
+	የውሂብ-ጎታ-ስም: ['xobase'],
+	ተገናኝ.
+#...
+>> del := conn1 መጠይቅ: ['DELETE FROM book WHERE id > 0'].
+{  del አስፈጽም. conn1 አጽድቅ. } ያዝ: { :e conn1 ወደኋላ-መልስ.  }, ጀምር.
+
+>> insert := conn1 መጠይቅ: ['INSERT INTO book (id) VALUES(null)'].
+insert አስፈጽም.
+
+>> ብዛት := conn1 መጠይቅ: ['SELECT COUNT(*) AS num FROM book'].
+ብዛት አምጣ: { :row ውጤት ፃፍ: row num, አዲስ-መስመር. }.
+
+# does not show up
+# insert not committed on connection 1
+>> ብዛት := conn2 መጠይቅ: ['SELECT COUNT(*) AS num FROM book'].
+ብዛት አምጣ: { :row ውጤት ፃፍ: row num, አዲስ-መስመር. }.

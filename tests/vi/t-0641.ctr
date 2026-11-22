@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Từ-điển mới
+	# ASCII only
+	đặt: ( Danh-sách mới ; 65 ; 65 ; 65 ; 65 ; 0 ) tại: ['AAAA'],
+	# valid 2 byte sequence
+	đặt: ( Danh-sách mới ; 194 ; 162 ; 0 ) tại: ['¢'],
+	# Valid 3-byte UTF-8
+    đặt: ( Danh-sách mới ; 226 ; 130 ; 172 ; 0 ) tại: ['€'],
+	# Valid 4-byte UTF-8
+    đặt: ( Danh-sách mới ; 240 ; 144 ; 141 ; 136 ; 0 ) tại: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    đặt: ( Danh-sách mới ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) tại: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    đặt: ( Danh-sách mới ; 65 ; 193 ; 129 ; 0 ) tại: ['A?'],
+	# Invalid first byte (0xFF)
+    đặt: ( Danh-sách mới ; 255 ; 0 ) tại: ['?'],
+	# Incomplete multi-byte sequence at end
+    đặt: ( Danh-sách mới ; 66 ; 226 ; 0 ) tại: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    đặt: ( Danh-sách mới ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) tại: ['A€?𐍈B'].
+	 
+utf8cases mỗi: { :key :value
+	>> blob := Blob mới: value đếm, bytes: value.
+	>> str := blob chuỗi.
+	(str = key) đúng: {
+		Xuất ghi: ['OK'], xuống-dòng.
+	}, ngược-lại: {
+		Xuất ghi: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, xuống-dòng.
+	}.
+	blob giải-phóng.
+}.

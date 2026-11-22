@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Chirongwa gadziriso: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server batanidza-ne: ( Rondedzero nyowani ;
+ libname ; ['fopen'] ;
+ ( Rondedzero nyowani ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+batanidza-ne: ( Rondedzero nyowani ;
+ Hapana ; # means same lib
+ ['fread'] ;
+ ( Rondedzero nyowani ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Hapana ; # means same object (i.e. Stream)
+ ['fread']
+),
+batanidza-ne: (
+ Rondedzero nyowani ;
+ Hapana ; # means same lib
+ ['fwrite'] ;
+ ( Rondedzero nyowani ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Hapana ; # means same lib
+ ['fwrite']
+),
+batanidza-ne: (
+ Rondedzero nyowani ;
+ Hapana ; # means same lib
+ ['rewind'] ;
+ ( Rondedzero nyowani ; ['pointer'] ) ;
+ ['int'] ;
+ Hapana ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> nzira-yefaira := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: nzira-yefaira mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream meseji: ['fwrite'] zvipinzwa: (Rondedzero nyowani ; str ; 1 ; 6 ; fd ).
+Zvabuda nyora: bytes-written, mutsara-mutsva.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob nyowani: 20.
+
+# read from file
+>> bytes-read := Stream meseji: ['fread'] zvipinzwa: (Rondedzero nyowani ; buf ; 1 ; 6 ; fd ).
+Zvabuda nyora: bytes-read, mutsara-mutsva.
+Zvabuda nyora: buf, mutsara-mutsva.
+
+# free memory
+str  sunungura.
+nzira-yefaira sunungura.
+mode sunungura.
+buf  sunungura.
+
+

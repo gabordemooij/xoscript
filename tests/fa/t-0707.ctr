@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+برنامه مدیریت-حافظه: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB جدید میزبان: ⌝'localhost'⌜,
+	نام-کاربری: ⌝'xo'⌜, گذرواژه: ⌝'pass123'⌜, نام-پایگاه: ⌝'xobase'⌜, وصل-شو.
+
+>> TwoDigitFormat := قالب جدید: ⌝'%02d'⌜.
+
+# Datetime
+⎬
+	>> سال := عدد بین: 1995 تا: 2050, به-رشته.
+	>> ماه := TwoDigitFormat اعمال-صحیح: ﴿عدد بین: 1 تا: 12﴾, به-رشته.
+	>> روز := TwoDigitFormat اعمال-صحیح: ﴿عدد بین: 1 تا: 28﴾, به-رشته.
+	>> ساعت := TwoDigitFormat اعمال-صحیح: ﴿عدد بین: 1 تا: 23﴾, به-رشته.
+	>> دقیقه := TwoDigitFormat اعمال-صحیح: ﴿عدد بین: 1 تا: 59﴾, به-رشته.
+	>> ثانیه := TwoDigitFormat اعمال-صحیح: ﴿عدد بین: 1 تا: 59﴾, به-رشته.
+	>> datetime := ⌝'YYYY-MM-DD HH:II:SS'⌜.	
+	datetime
+		YYYY: سال,
+		MM: ماه,
+		DD: روز,
+		HH: ساعت,
+		II: دقیقه,
+		SS: ثانیه.
+	>> پارامترهای-جستجو :=
+	db پرس-و-جو: ﴿⌝'
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'⌜ <datetime>: datetime﴾,
+	واکشی: ⎬ :row
+		﴿row mydatetime = datetime﴾ اگر-نادرست: ⎬
+			این-کار خطا: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mydatetime
+			﴾.
+		⎨.
+	
+	⎨.
+	counter بیفزا: 1.
+⎨ * 100.
+
+# Date
+⎬
+	>> سال := عدد بین: 1995 تا: 2050, به-رشته.
+	>> ماه := TwoDigitFormat اعمال-صحیح: ﴿عدد بین: 1 تا: 12﴾, به-رشته.
+	>> روز := TwoDigitFormat اعمال-صحیح: ﴿عدد بین: 1 تا: 28﴾, به-رشته.
+	>> date := ⌝'YYYY-MM-DD'⌜.
+	date
+		YYYY: سال,
+		MM: ماه,
+		DD: روز.
+	>> پارامترهای-جستجو :=
+	db پرس-و-جو: ﴿⌝'
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'⌜ <date>: date﴾,
+	واکشی: ⎬ :row
+		﴿row mydate = date﴾ اگر-نادرست: ⎬
+			این-کار خطا: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: date,
+				<observation>: row mydate
+			﴾.
+		⎨.
+	⎨.
+	counter بیفزا: 1.
+⎨ * 100.
+
+
+# Time
+⎬
+	>> ساعت := TwoDigitFormat اعمال-صحیح: ﴿عدد بین: 1 تا: 23﴾, به-رشته.
+	>> دقیقه := TwoDigitFormat اعمال-صحیح: ﴿عدد بین: 1 تا: 59﴾, به-رشته.
+	>> ثانیه := TwoDigitFormat اعمال-صحیح: ﴿عدد بین: 1 تا: 59﴾, به-رشته.
+	>> زمان := ⌝'HH:II:SS'⌜.
+	زمان
+		HH: ساعت,
+		II: دقیقه,
+		SS: ثانیه.
+	>> پارامترهای-جستجو :=
+	db پرس-و-جو: ﴿⌝'
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'⌜ <time>: زمان﴾,
+	واکشی: ⎬ :row
+		﴿row mytime = زمان﴾ اگر-نادرست: ⎬
+			این-کار خطا: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter بیفزا: 1.
+⎨ * 100.
+
+
+# Strings (varchar/text)
+>> str1 := لیست جدید پر-کن: 100000 با: ⌝'x'⌜, بپیوند: ⌝''⌜.
+⎬
+	>> str2 := گاوصندوق توکن: 40.
+	>> پارامترهای-جستجو :=
+	db پرس-و-جو: ﴿⌝'
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'⌜ 
+	<str1>: str1,
+	<str2>: str2
+	﴾,
+	واکشی: ⎬ :row
+		﴿row str1 = str1 و: row str2 = str2﴾ اگر-نادرست: ⎬
+			این-کار خطا: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter بیفزا: 1.
+⎨ * 100.
+
+
+# Numbers
+⎬
+	>> n1 := عدد بین: 1 تا: 99999.
+	>> n2 := n1 / 1000.
+	>> big := ﴿
+		﴿ Int64 از-رشته: ⌝'9223372036854775807'⌜ ﴾ -
+		﴿ Int64 از-رشته: ⌝'99999'⌜ ﴾ +
+		﴿ Int64 از-رشته: n1 به-رشته ﴾
+	﴾.
+	>> پارامترهای-جستجو :=
+	db پرس-و-جو: ﴿⌝'
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	'⌜
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	﴾,
+	واکشی: ⎬ :row
+		﴿row n1 = n1﴾ اگر-نادرست: ⎬
+			این-کار خطا: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n1
+			﴾.
+		⎨.
+		﴿row n2 = n2﴾ اگر-نادرست: ⎬
+			این-کار خطا: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n2
+			﴾.
+		⎨.
+		﴿row n3 = n2 گرد﴾ اگر-نادرست: ⎬
+			این-کار خطا: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n3
+			﴾.
+		⎨.
+		﴿row big = big﴾ اگر-نادرست: ⎬
+			این-کار خطا: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: big,
+				<observation>: row big
+			﴾.
+		⎨.
+		
+	⎨.
+	counter بیفزا: 1.
+⎨ * 100.
+
+
+خروجی بنویس: ﴿
+	⌝'OK, <counter> fuzzy casts/conversions tested.'⌜
+	<counter>: counter
+﴾, سطر-نو.

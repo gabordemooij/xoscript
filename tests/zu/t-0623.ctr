@@ -1,0 +1,43 @@
+
+
+>> g := Server okusha.
+>> v := Isisefo okusha.
+>> ok := 0.
+
+>> secrets := Uhlu okusha ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopisha.
+passwords ngamunye: { :i :p
+	secrets ngamunye: { :n :s
+		{
+			>> encrypted := v bethela: s ukhiye: p.
+			>> decrypted := v susa-ukubethela: encrypted ukhiye: p.
+			(decrypted = s) iqiniso: {
+				ok engeza: 1.
+			}, uma-kungenjalo: {
+				Okuphumayo bhala: ['failed encrypting/decrypting: '], umugqa-omusha.
+				Okuphumayo bhala: s, umugqa-omusha.
+				Okuphumayo bhala: ['encrypted: '] + encrypted, umugqa-omusha.
+				Okuphumayo bhala: ['decrypted: '] + encrypted, umugqa-omusha.
+				Uhlelo qeda.
+			}.
+		} bamba: { :err
+			(s = [''] noma: p = ['']) iqiniso: {
+				ok engeza: 1.
+			}, uma-kungenjalo: {
+				Okuphumayo bhala: err, umugqa-omusha.
+				Uhlelo qeda.
+			}.
+		}, qala.
+	}.
+}.
+
+Okuphumayo bhala: ( ok + [' vault encryptions tested.'] ), umugqa-omusha.

@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Dictionnaire nei
+	# ASCII only
+	setzen: ( Lëscht nei ; 65 ; 65 ; 65 ; 65 ; 0 ) bei: ['AAAA'],
+	# valid 2 byte sequence
+	setzen: ( Lëscht nei ; 194 ; 162 ; 0 ) bei: ['¢'],
+	# Valid 3-byte UTF-8
+    setzen: ( Lëscht nei ; 226 ; 130 ; 172 ; 0 ) bei: ['€'],
+	# Valid 4-byte UTF-8
+    setzen: ( Lëscht nei ; 240 ; 144 ; 141 ; 136 ; 0 ) bei: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    setzen: ( Lëscht nei ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) bei: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    setzen: ( Lëscht nei ; 65 ; 193 ; 129 ; 0 ) bei: ['A?'],
+	# Invalid first byte (0xFF)
+    setzen: ( Lëscht nei ; 255 ; 0 ) bei: ['?'],
+	# Incomplete multi-byte sequence at end
+    setzen: ( Lëscht nei ; 66 ; 226 ; 0 ) bei: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    setzen: ( Lëscht nei ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) bei: ['A€?𐍈B'].
+	 
+utf8cases all: { :key :value
+	>> blob := Blob nei: value zielen, bytes: value.
+	>> str := blob text.
+	(str = key) wouer: {
+		Ausgab schreiwen: ['OK'], nei-zeil.
+	}, anescht: {
+		Ausgab schreiwen: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, nei-zeil.
+	}.
+	blob fräiginn.
+}.

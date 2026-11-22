@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server आरम्भ-गर.
+प्रोग्राम प्रयोग: ['../../../src/xo/ne/webtools.xo'].
+
+>> Fake-Request := वस्तु नयाँ.
+Fake-Request जब: ['value:'] गर: { :मूल्य
+	आफ्नो मूल्य := मूल्य.
+}.
+Fake-Request जब: ['cookie:'] गर: { :नाम <- आफ्नो मूल्य.
+}.
+
+>> Test-Session := अस्थायी-फाइल-सत्र नयाँ.
+Test-Session जब: ['लोड-गर'] गर: { <- शब्दकोश नयाँ.
+}.
+Test-Session जब: ['session-id'] गर: { <- आफ्नो id.
+}.
+
+>> cookies := तालिका नयाँ
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies प्रत्येक: { :i :cookie
+	>> अनुरोध-http := Fake-Request नयाँ.
+	अनुरोध-http value: cookie.
+	>> व्यवस्थापक := Test-Session नयाँ.
+	>> web := वेब-कागजात नयाँ.
+	web अनुरोध-http: अनुरोध-http.
+	web सत्र-व्यवस्थापक: व्यवस्थापक.
+	web सत्र-सुरु-गर.
+	आउटपुट लेख: ( व्यवस्थापक session-id = cookie ), नयाँ-पङ्क्ति.
+}.
+
+>> web := वेब-कागजात नयाँ.
+web json: (शब्दकोश नयाँ राख: ['b'] साँचो: ['a']).
+आउटपुट लेख: ['\n'], नयाँ-पङ्क्ति.
+
+{ सञ्जाल get: ['file:///etc/hostname']. } समात: { :e
+	आउटपुट लेख: e, नयाँ-पङ्क्ति.
+}, चलाऊ.
+
+>> svg := फाइल नयाँ: ['/tmp/test0814.svg'].
+svg लेख: ['<svg xmlns="x"></svg>'].
+आउटपुट नयाँ-पङ्क्ति.
+Server अगाडि-पठाऊ: ['test0814.svg'] उपसर्ग: ['/tmp/'].
+svg मेट.

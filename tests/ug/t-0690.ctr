@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+چىقىرىش ياز: ⌝'Database test'⌜, يېڭى-قۇر.
+
+>> db := Maria-DB يېڭى باش-ماشىنا: ⌝'localhost'⌜,
+	ئىشلەتكۈچى-ئاتى: ⌝'xo'⌜, ئىم: ⌝'pass123'⌜, ساندان-ئاتى: ⌝'xobase'⌜, باغلان.
+
+چىقىرىش ياز: ⌝'Can we connect? '⌜ + db باغلاندى?, يېڭى-قۇر.
+
+>> ئىزدەش-پارامېتىرلىرى := db سۈرۈشتۈرۈش: ⌝'
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'⌜, پارامېتىرلار: ﴿ تىزىم يېڭى ; ⌝'abc'⌜ ; 12.35 ; 6 ﴾. # parameterized queries
+
+⎬  ئىزدەش-پارامېتىرلىرى ئىجرا-قىل. db جەزملە. ⎨ تۇت: ⎬ :e db قايتۇر.  ⎨, ئىجرا.
+
+چىقىرىش ياز: ⌝'Can we insert? '⌜ + ﴿ ئىزدەش-پارامېتىرلىرى insert-id > 0 ﴾, يېڭى-قۇر.
+
+>> x := 0.
+>> ئىزدەش-پارامېتىرلىرى :=
+db سۈرۈشتۈرۈش: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+ئېلىپ-كەل: ⎬ :row 
+	x قوش: 1.
+	راست ئۈز. # must clean up, no 'Commands out of sync'
+⎨.
+
+>> ئىزدەش-پارامېتىرلىرى :=
+db سۈرۈشتۈرۈش: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+ئېلىپ-كەل: ⎬ :row
+	x قوش: 1.
+	راست ئۈز.
+⎨.
+
+﴿x > 0﴾ راست-بولسا: ⎬
+	چىقىرىش ياز: ⌝'Can we break in the middle of a fetch? '⌜.
+⎨.
+
+چىقىرىش ياز: راست, يېڭى-قۇر.

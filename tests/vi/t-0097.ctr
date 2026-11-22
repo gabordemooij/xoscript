@@ -1,0 +1,42 @@
+
+Chuỗi khi: ['html'] làm: { <- (
+		bản-thân
+		thay: ['&'] bằng: ['&amp;'],
+		thay: ['<'] bằng: ['&lt;'],
+		thay: ['>'] bằng: ['&gt;'],
+		thay: ['"'] bằng: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Đối-tượng mới.
+
+HtmlBrush khi: ['đáp:'] làm: { :tag
+	Xuất ghi: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush khi: ['đáp:và:'] làm: { :tag :content
+	tag := ( tag từ: 0 độ-dài: (tag độ-dài - 1) ).
+	Xuất ghi: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush khi: ['content:'] làm: { :text
+	Xuất ghi: text html, xuống-dòng.
+}.
+
+HtmlBrush khi: ['attr:value:'] làm: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush mới.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

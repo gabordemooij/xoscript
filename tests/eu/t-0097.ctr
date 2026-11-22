@@ -1,0 +1,42 @@
+
+Testua noiz: ['html'] egin: { <- (
+		norbera
+		ordeztu: ['&'] honekin: ['&amp;'],
+		ordeztu: ['<'] honekin: ['&lt;'],
+		ordeztu: ['>'] honekin: ['&gt;'],
+		ordeztu: ['"'] honekin: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objektua berria.
+
+HtmlBrush noiz: ['erantzun:'] egin: { :tag
+	Irteera idatzi: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush noiz: ['erantzun:eta:'] egin: { :tag :content
+	tag := ( tag nondik: 0 luzera: (tag luzera - 1) ).
+	Irteera idatzi: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush noiz: ['content:'] egin: { :text
+	Irteera idatzi: text html, lerro-jauzia.
+}.
+
+HtmlBrush noiz: ['attr:value:'] egin: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush berria.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

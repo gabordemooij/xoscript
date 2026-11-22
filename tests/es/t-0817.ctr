@@ -1,0 +1,16 @@
+# a value ending in the first part of an opening quote must survive serialization
+>> valores := Lista crear
+	; ['abc\[']
+	; ['\[']
+	; ['\[\[']
+	; ['x\\\[']
+	; ['abc'].
+
+valores cada: { :i :value
+	>> d := Diccionario crear.
+	d poner: value en: ['k'].
+	d poner: ['second'] en: ['j'].
+	>> r := d código objeto.
+	Salida escribir: r contar, detener.
+	Salida escribir: ( (r en: ['k']) = value ), detener.
+}.

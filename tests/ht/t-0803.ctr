@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB nouvo lame: ['localhost'],
+	non-itilizatè: ['xo'],
+	modpas: ['pass123'],
+	non-baz: ['xobase'],
+	konekte.
+
+>> conn2 := Maria-DB nouvo lame: ['localhost'],
+	non-itilizatè: ['xo'],
+	modpas: ['pass123'],
+	non-baz: ['xobase'],
+	konekte.
+#...
+>> del := conn1 rekèt: ['DELETE FROM book WHERE id > 0'].
+{  del egzekite. conn1 konfime. } trape: { :e conn1 anile.  }, lanse.
+
+>> insert := conn1 rekèt: ['INSERT INTO book (id) VALUES(null)'].
+insert egzekite.
+
+>> konte := conn1 rekèt: ['SELECT COUNT(*) AS num FROM book'].
+konte chache: { :row Sòti ekri: row num, nouvo-liy. }.
+
+# does not show up
+# insert not committed on connection 1
+>> konte := conn2 rekèt: ['SELECT COUNT(*) AS num FROM book'].
+konte chache: { :row Sòti ekri: row num, nouvo-liy. }.

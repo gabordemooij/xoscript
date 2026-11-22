@@ -1,0 +1,43 @@
+
+
+>> g := Server nouvo.
+>> v := Kòfrefò nouvo.
+>> ok := 0.
+
+>> secrets := Lis nouvo ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopye.
+passwords chak: { :i :p
+	secrets chak: { :n :s
+		{
+			>> encrypted := v chifre: s kle: p.
+			>> decrypted := v dechifre: encrypted kle: p.
+			(decrypted = s) vre: {
+				ok ajoute: 1.
+			}, sinon: {
+				Sòti ekri: ['failed encrypting/decrypting: '], nouvo-liy.
+				Sòti ekri: s, nouvo-liy.
+				Sòti ekri: ['encrypted: '] + encrypted, nouvo-liy.
+				Sòti ekri: ['decrypted: '] + encrypted, nouvo-liy.
+				Pwogram fen.
+			}.
+		} trape: { :err
+			(s = [''] oswa: p = ['']) vre: {
+				ok ajoute: 1.
+			}, sinon: {
+				Sòti ekri: err, nouvo-liy.
+				Pwogram fen.
+			}.
+		}, lanse.
+	}.
+}.
+
+Sòti ekri: ( ok + [' vault encryptions tested.'] ), nouvo-liy.

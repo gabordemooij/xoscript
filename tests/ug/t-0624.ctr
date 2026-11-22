@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := ئوبيېكت يېڭى.
+
+Log كەلگەندە: ⌝'say:'⌜ قىل: ⎬ :str
+	چىقىرىش ياز: str, يېڭى-قۇر.
+⎨.
+
+>> Item := ئوبيېكت يېڭى.
+
+Item كەلگەندە: ⌝'يېڭى:'⌜ قىل: ⎬ :id <- ئۆزى يېڭى id: id.
+⎨.
+
+Item كەلگەندە: ⌝'id:'⌜ قىل: ⎬ :id
+	ئۆزىنىڭ id := id.
+⎨.
+
+Item كەلگەندە: ⌝'id'⌜ قىل: ⎬ <- ئۆزىنىڭ id. ⎨.
+
+
+Item كەلگەندە: ⌝'تېكىستكە'⌜ قىل: ⎬
+	>> str := ⌝'Item#~no'⌜.
+	str ~no: ئۆزىنىڭ id. <- str.
+⎨.
+
+
+>> Print := ئوبيېكت يېڭى.
+
+Print كەلگەندە: ⌝'items'⌜ قىل: ⎬ 
+	
+	ئۆزىنىڭ item := Item يېڭى: 1.
+	
+	# either segfault or wrong str here
+	Log say: ﴿
+		⌝'~item printed.'⌜ ~item: ئۆزىنىڭ item
+	﴾.
+	
+	
+⎨.
+
+Print items.

@@ -1,0 +1,43 @@
+
+
+>> g := Server nouveau.
+>> v := Coffre nouveau.
+>> ok := 0.
+
+>> secrets := Liste nouveau ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets copier.
+passwords chaque: { :i :p
+	secrets chaque: { :n :s
+		{
+			>> encrypted := v chiffrer: s clé: p.
+			>> decrypted := v déchiffrer: encrypted clé: p.
+			(decrypted = s) oui: {
+				ok additionner: 1.
+			}, sinon: {
+				Sortie écrire: ['failed encrypting/decrypting: '], stop.
+				Sortie écrire: s, stop.
+				Sortie écrire: ['encrypted: '] + encrypted, stop.
+				Sortie écrire: ['decrypted: '] + encrypted, stop.
+				Programme fin.
+			}.
+		} intercepter: { :err
+			(s = [''] ou: p = ['']) oui: {
+				ok additionner: 1.
+			}, sinon: {
+				Sortie écrire: err, stop.
+				Programme fin.
+			}.
+		}, démarrer.
+	}.
+}.
+
+Sortie écrire: ( ok + [' vault encryptions tested.'] ), stop.

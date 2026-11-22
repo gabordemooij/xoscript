@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Lluqsiy qillqay: ['Database test'], sayay.
+
+>> db := Maria-DB musuq samachiq: ['localhost'],
+	ruraqpa-sutin: ['xo'], pakasqa-simi: ['pass123'], willay-waqaychanap-sutin: ['xobase'], tinkiy.
+
+Lluqsiy qillqay: ['Can we connect? '] + db tinkisqachu?, sayay.
+
+>> maskana-tupukuna := db tapuy: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], tupukuna: ( Katiray musuq ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  maskana-tupukuna huntʼachiy. db takyachiy. } hapiy: { :e db kutichipuy.  }, kallpay.
+
+Lluqsiy qillqay: ['Can we insert? '] + ( maskana-tupukuna insert-id > 0 ), sayay.
+
+>> Obj := Ima musuq.
+Obj patapi: ['retrieve-rows'] ruway: {
+	ñuqap hayka? := 0.
+	>> maskana-tupukuna :=
+	db tapuy: ['SELECT * FROM book order by id desc limit 2'], 
+	apamuy: { :row 
+		ñuqap hayka? yapay: 1.
+		Chiqap kuchuy.
+	}. <- ñuqap hayka? kikinchasqa.
+}.
+
+Lluqsiy qillqay: ['Can we query? '] + ( Obj retrieve-rows > 0 ), sayay.

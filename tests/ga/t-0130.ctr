@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Ríomhchlár socrú: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server nasc: ( Liosta nua ;
+ libname ; ['fopen'] ;
+ ( Liosta nua ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+nasc: ( Liosta nua ;
+ Neamhní ; # means same lib
+ ['fread'] ;
+ ( Liosta nua ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Neamhní ; # means same object (i.e. Stream)
+ ['fread']
+),
+nasc: (
+ Liosta nua ;
+ Neamhní ; # means same lib
+ ['fwrite'] ;
+ ( Liosta nua ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Neamhní ; # means same lib
+ ['fwrite']
+),
+nasc: (
+ Liosta nua ;
+ Neamhní ; # means same lib
+ ['rewind'] ;
+ ( Liosta nua ; ['pointer'] ) ;
+ ['int'] ;
+ Neamhní ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> conair := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: conair mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream teachtaireacht: ['fwrite'] argóintí: (Liosta nua ; str ; 1 ; 6 ; fd ).
+Aschur scríobh: bytes-written, líne-nua.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob nua: 20.
+
+# read from file
+>> bytes-read := Stream teachtaireacht: ['fread'] argóintí: (Liosta nua ; buf ; 1 ; 6 ; fd ).
+Aschur scríobh: bytes-read, líne-nua.
+Aschur scríobh: buf, líne-nua.
+
+# free memory
+str  saor.
+conair saor.
+mode saor.
+buf  saor.
+
+

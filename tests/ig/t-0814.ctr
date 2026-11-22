@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server kwadebe.
+Mmemme jiri: ['../../../src/xo/ig/webtools.xo'].
+
+>> Fake-Request := Ihe ohuru.
+Fake-Request mgbe-ọbịara: ['value:'] mee: { :uru
+	nke-ya uru := uru.
+}.
+Fake-Request mgbe-ọbịara: ['cookie:'] mee: { :aha <- nke-ya uru.
+}.
+
+>> Test-Session := Nnọkọ-faịlụ-nwa-oge ohuru.
+Test-Session mgbe-ọbịara: ['bulite'] mee: { <- Akwụkwọ-okwu ohuru.
+}.
+Test-Session mgbe-ọbịara: ['session-id'] mee: { <- nke-ya id.
+}.
+
+>> cookies := Ndepụta ohuru
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies nke-ọ-bụla: { :i :cookie
+	>> arịrịọ-http := Fake-Request ohuru.
+	arịrịọ-http value: cookie.
+	>> onye-njikwa := Test-Session ohuru.
+	>> web := Akwụkwọ-Weebụ ohuru.
+	web arịrịọ-http: arịrịọ-http.
+	web onye-njikwa-nnọkọ: onye-njikwa.
+	web malite-nnọkọ.
+	Mpụta dee: ( onye-njikwa session-id = cookie ), ahịrị-ọhụrụ.
+}.
+
+>> web := Akwụkwọ-Weebụ ohuru.
+web json: (Akwụkwọ-okwu ohuru tinye: ['b'] na: ['a']).
+Mpụta dee: ['\n'], ahịrị-ọhụrụ.
+
+{ Netwọk get: ['file:///etc/hostname']. } jide: { :e
+	Mpụta dee: e, ahịrị-ọhụrụ.
+}, bido.
+
+>> svg := Faịlụ ohuru: ['/tmp/test0814.svg'].
+svg dee: ['<svg xmlns="x"></svg>'].
+Mpụta ahịrị-ọhụrụ.
+Server nyefee: ['test0814.svg'] mgbakwunye-mbụ: ['/tmp/'].
+svg hichapụ.

@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> sentiero := ['/tmp/test0821.csv'].
+>> file := File nuovo: sentiero.
+
+file scrivi: ['a,b\n"1,2\n'].
+{
+	file separatore: [','] virgolette: ['"'] linee: { :line
+		Uscita scrivi: line, stop.
+	}.
+} catturare: { :e Uscita scrivi: e, stop. }, correre.
+
+# a closed quote still works
+file scrivi: ['a,b\n"1,2",3'].
+file separatore: [','] virgolette: ['"'] linee: { :line
+	Uscita scrivi: line, stop.
+}.
+file elimina.

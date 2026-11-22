@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Таһаарыы суруй: ['Database test'], стоп.
+
+>> db := Maria-DB саҥа хост: ['localhost'],
+	туһааччы-аата: ['xo'], пароль: ['pass123'], база-аата: ['xobase'], холбон.
+
+Таһаарыы суруй: ['Can we connect? '] + db холбоммут?, стоп.
+
+>> көрдөөһүн-параметрдара := db запрос: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], параметрдар: ( Испииһэк саҥа ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  көрдөөһүн-параметрдара толор. db бигэргэт. } проблеманы-быһаарыы: { :e db төттөрү-төнүннэр.  }, саҕалаа.
+
+Таһаарыы суруй: ['Can we insert? '] + ( көрдөөһүн-параметрдара insert-id > 0 ), стоп.
+
+>> x := 0.
+>> көрдөөһүн-параметрдара :=
+db запрос: ['SELECT * FROM book order by id desc limit 2'], 
+аҕал: { :row 
+	x добавить: 1.
+	Даа тохтоо. # must clean up, no 'Commands out of sync'
+}.
+
+>> көрдөөһүн-параметрдара :=
+db запрос: ['SELECT * FROM book order by id desc limit 2'], 
+аҕал: { :row
+	x добавить: 1.
+	Даа тохтоо.
+}.
+
+(x > 0) даа: {
+	Таһаарыы суруй: ['Can we break in the middle of a fetch? '].
+}.
+
+Таһаарыы суруй: Даа, стоп.

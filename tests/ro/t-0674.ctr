@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> cale := ['/tmp/dat.csv'].
+>> csv := Fișier nou: cale.
+csv scrie: s.
+
+# accepts CRLF LF CR, varying row length
+csv delimitator: [';'] ghilimele: ['"'] linii: { :line
+	Program curăță.
+	Ieșire scrie: line, rând-nou.
+	Program curăță.
+}.
+
+# unequal lines
+s adaugă-la-sfârșit: ['\njustone'].
+csv scrie: s.
+{
+	csv delimitator: [';'] ghilimele: ['"'] linii: { :line
+		Ieșire scrie: line, rând-nou.
+	}.
+} prinde: { :e 
+	Ieșire scrie: e, rând-nou.
+}, pornește.
+
+# invalid format
+s := ['"he"llo";world'].
+csv scrie: s.
+{
+	csv delimitator: [';'] ghilimele: ['"'] linii: { :line
+		Ieșire scrie: line, rând-nou.
+	}.
+} prinde: { :e 
+	Ieșire scrie: e, rând-nou.
+}, pornește.

@@ -1,0 +1,39 @@
+
+
+Teksto ora: ['evaluate'] hasi: {
+	>> kódigo := Archivo nobo: ['/tmp/eval.ctr'].
+	kódigo skirbi: mes teksto + ['.'].
+	Programa usa: ['/tmp/eval.ctr'].
+}.
+
+>> a := (Lista ← (
+	(Dikshonario nobo)
+		pone: ['domain'] na: ['mywebsite.com'],
+		pone: (Lista ←
+			((Dikshonario nobo)
+				pone: ['home'] na: ['title'],
+				pone: ['<html></html>'] na: ['body'],
+				pone: ['2017-01-01'] na: ['created']
+			) ;
+			((Dikshonario nobo)
+				pone: ['aboutus(c)'] na: ['title'],
+				pone: ['<credits>Author Inc.</credits>'] na: ['body']
+			)
+		) na: ['pages']
+	)
+) teksto.
+
+Salida skirbi: a tipo, liña-nobo.
+Salida skirbi: a, liña-nobo.
+
+>> b := Nada.
+(['b := '] + a) evaluate.
+Salida skirbi: b ? 0 ? ['pages'] ? 1 ? ['body'], liña-nobo.
+
+>> c := b ? 0.
+>> d := c teksto.
+Salida skirbi: d tipo, liña-nobo.
+
+>> e := Nada.
+(['e := '] + d) evaluate.
+Salida skirbi: e ? ['pages'] ? 0, liña-nobo.

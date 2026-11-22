@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Pahu-kūʻono hana-kī.
+>> sk := keys mua.
+>> pk := keys hope.
+>> sig := Pahu-kūʻono kākau-inoa: ['abc'] me: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Pahu-kūʻono kākau-inoa: ['abc'] me: long. } hopu: { :e
+	Huapuka kākau: e, laina-hou.
+}, hoʻomaka.
+
+{ Pahu-kūʻono nānā: ['abc'] pūlima: long me: pk. } hopu: { :e
+	Huapuka kākau: e, laina-hou.
+}, hoʻomaka.
+
+{ Pahu-kūʻono nānā: ['abc'] pūlima: sig me: short. } hopu: { :e
+	Huapuka kākau: e, laina-hou.
+}, hoʻomaka.

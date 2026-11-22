@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Towe andika: ['Database test'], mstari-mpya.
+
+>> db := Maria-DB mpya mwenyeji: ['localhost'],
+	jina-la-mtumiaji: ['xo'], nywila: ['pass123'], jina-la-hifadhidata: ['xobase'], unganika.
+
+Towe andika: ['Can we connect? '] + db imeunganika?, mstari-mpya.
+
+>> vigezo-vya-utafutaji := db ulizo: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], vigezo: ( Orodha mpya ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  vigezo-vya-utafutaji endesha. db thibitisha. } nasa: { :e db rudisha-nyuma.  }, anza.
+
+Towe andika: ['Can we insert? '] + ( vigezo-vya-utafutaji insert-id > 0 ), mstari-mpya.
+
+>> Obj := Kipengee mpya.
+Obj ikija: ['retrieve-rows'] fanya: {
+	yangu hesabu := 0.
+	>> vigezo-vya-utafutaji :=
+	db ulizo: ['SELECT * FROM book order by id desc limit 2'], 
+	leta: { :row 
+		yangu hesabu ongeza: 1.
+		Kweli vunja.
+	}. <- yangu hesabu nakala.
+}.
+
+Towe andika: ['Can we query? '] + ( Obj retrieve-rows > 0 ), mstari-mpya.

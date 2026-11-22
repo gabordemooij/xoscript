@@ -1,0 +1,43 @@
+
+
+>> g := Server nû.
+>> v := Qasa nû.
+>> ok := 0.
+
+>> secrets := Lîste nû ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopî-bike.
+passwords her-yek: { :i :p
+	secrets her-yek: { :n :s
+		{
+			>> encrypted := v şîfre-bike: s mifte: p.
+			>> decrypted := v şîfreyê-veke: encrypted mifte: p.
+			(decrypted = s) rast: {
+				ok zêde-bike: 1.
+			}, wekî-din: {
+				Derketin binivîse: ['failed encrypting/decrypting: '], rêza-nû.
+				Derketin binivîse: s, rêza-nû.
+				Derketin binivîse: ['encrypted: '] + encrypted, rêza-nû.
+				Derketin binivîse: ['decrypted: '] + encrypted, rêza-nû.
+				Bername biqedîne.
+			}.
+		} bigire: { :err
+			(s = [''] an: p = ['']) rast: {
+				ok zêde-bike: 1.
+			}, wekî-din: {
+				Derketin binivîse: err, rêza-nû.
+				Bername biqedîne.
+			}.
+		}, bide-destpêkirin.
+	}.
+}.
+
+Derketin binivîse: ( ok + [' vault encryptions tested.'] ), rêza-nû.

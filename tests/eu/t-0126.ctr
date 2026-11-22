@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Objektua berria.
+
+Slurp noiz: ['berria'] egin: {
+	berezko str := [''].
+}.
+
+Slurp noiz: ['nieuw'] egin: {
+	berezko str := [''].
+}.
+
+Slurp noiz: ['erantzun:'] egin: { :blah
+		berezko str erantsi: blah.
+}.
+
+Slurp noiz: ['erantzun:eta:'] egin: { :blah :blahah
+		berezko str erantsi: (blah nondik: 0 luzera: (blah luzera - 1)).
+		berezko str erantsi: [' '].
+		berezko str erantsi: blahah.
+}.
+
+Slurp noiz: ['obtain'] egin: {
+	>> buffer := berezko str.
+	berezko str := ['']. <- buffer.
+}.
+
+
+Irteera idatzi: (Programa sistema: (Slurp berria echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Fitxategia berria: ['/tmp/from.txt'], ezabatu. } harrapatu: { ['Empty']. }, hasi.
+{ Fitxategia berria: ['/tmp/to.txt'], ezabatu. } harrapatu: { ['Empty']. }, hasi.
+
+
+Fitxategia berria: ['/tmp/to.txt'], badago faltsua: {
+	Irteera idatzi: ['Confirmed. Target file does not exist.\
+'].
+}.
+Fitxategia berria: ['/tmp/from.txt'], badago faltsua: {
+	Irteera idatzi: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Programa sistema: (Slurp berria touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Programa sistema: (Slurp berria cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Fitxategia berria: ['/tmp/to.txt'], badago egia: {
+	Irteera idatzi: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Irteera idatzi: ['Contents of file is:'] + (Fitxategia berria: ['/tmp/to.txt'], irakurri), lerro-jauzia.

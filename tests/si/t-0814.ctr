@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server ආරම්භ-කරන්න.
+වැඩසටහන භාවිතය: ['../../../src/xo/si/webtools.xo'].
+
+>> Fake-Request := වස්තුව නව.
+Fake-Request ලැබුණු-විට: ['value:'] කරන්න: { :අගය
+	තමාගේ අගය := අගය.
+}.
+Fake-Request ලැබුණු-විට: ['cookie:'] කරන්න: { :නම <- තමාගේ අගය.
+}.
+
+>> Test-Session := තාවකාලික-ගොනු-සැසිය නව.
+Test-Session ලැබුණු-විට: ['පූරණය-කරන්න'] කරන්න: { <- ශබ්දකෝෂය නව.
+}.
+Test-Session ලැබුණු-විට: ['session-id'] කරන්න: { <- තමාගේ id.
+}.
+
+>> cookies := ලේඛනය නව
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies එකිනෙක: { :i :cookie
+	>> ඉල්ලීම-http := Fake-Request නව.
+	ඉල්ලීම-http value: cookie.
+	>> කළමනාකරු := Test-Session නව.
+	>> web := වෙබ්-ලේඛනය නව.
+	web ඉල්ලීම-http: ඉල්ලීම-http.
+	web සැසි-කළමනාකරු: කළමනාකරු.
+	web සැසිය-අරඹන්න.
+	නිමැවුම ලියන්න: ( කළමනාකරු session-id = cookie ), නව-පේළිය.
+}.
+
+>> web := වෙබ්-ලේඛනය නව.
+web json: (ශබ්දකෝෂය නව තබන්න: ['b'] යතුර: ['a']).
+නිමැවුම ලියන්න: ['\n'], නව-පේළිය.
+
+{ ජාලය get: ['file:///etc/hostname']. } අල්ලන්න: { :e
+	නිමැවුම ලියන්න: e, නව-පේළිය.
+}, ධාවනය.
+
+>> svg := ගොනුව නව: ['/tmp/test0814.svg'].
+svg ලියන්න: ['<svg xmlns="x"></svg>'].
+නිමැවුම නව-පේළිය.
+Server යවන්න: ['test0814.svg'] උපසර්ගය: ['/tmp/'].
+svg මකන්න.

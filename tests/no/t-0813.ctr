@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server initialiser.
+Program benytt: ['../../../src/xo/no/webtools.xo'].
+Program benytt: ['../../../src/xo/no/mailtools.xo'].
+
+>> hode := HTTP-Hode ny nøkkel: ['Location'] verdi: ['/ok\r\nX-Injected: yes'].
+Utdata skriv: hode.
+
+>> web := Webdokument ny.
+web gå-til: ['/ok\r\nX-Injected: yes'].
+Utdata skriv: ['\n'], stop.
+
+>> mail := E-post ny.
+mail til: (Liste ny ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Liste ny ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Liste ny ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail avsender: ['d@example.invalid\r\nX-From: yes'] navn: ['site\r\nX-Name: yes'].
+mail emne: ['hello\r\nX-Subject: yes'].
+mail meldingstekst: ['line1\r\nline2'].
+Utdata skriv: mail generer.
+
+>> html := HTML-E-post ny.
+html til: (Liste ny ; ['a@example.invalid\r\nX-To: yes']).
+html avsender: ['d@example.invalid'] navn: ['site'].
+html emne: ['hello\r\nX-Subject: yes'].
+html meldingstekst: ['body'].
+Utdata skriv: ( html generer inneholder: ['\nX-'] ), stop.
+Utdata skriv: ( html generer inneholder: ['X-To: yes'] ), stop.

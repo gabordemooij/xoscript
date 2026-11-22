@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> landas-ng-file := ['/tmp/test0821.csv'].
+>> file := Talaksan bago: landas-ng-file.
+
+file isulat: ['a,b\n"1,2\n'].
+{
+	file panghati: [','] panipi: ['"'] mga-linya: { :line
+		Labas isulat: line, bagong-linya.
+	}.
+} saluhin: { :e Labas isulat: e, bagong-linya. }, patakbuhin.
+
+# a closed quote still works
+file isulat: ['a,b\n"1,2",3'].
+file panghati: [','] panipi: ['"'] mga-linya: { :line
+	Labas isulat: line, bagong-linya.
+}.
+file tanggalin.

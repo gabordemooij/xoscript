@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Seyf açar-yarat.
+>> sk := keys birinci.
+>> pk := keys sonuncu.
+>> sig := Seyf imzala: ['abc'] açar: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Seyf imzala: ['abc'] açar: long. } tut: { :e
+	Çıxış yaz: e, yeni-sətir.
+}, başlat.
+
+{ Seyf yoxla: ['abc'] imza: long açar: pk. } tut: { :e
+	Çıxış yaz: e, yeni-sətir.
+}, başlat.
+
+{ Seyf yoxla: ['abc'] imza: sig açar: short. } tut: { :e
+	Çıxış yaz: e, yeni-sətir.
+}, başlat.

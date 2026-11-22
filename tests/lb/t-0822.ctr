@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB nei host: ['localhost'],
+	benotzernumm: ['xo'],
+	passwuert: ['pass123'],
+	datebanknumm: ['xobase'],
+	verbannen.
+
+>> sichparameter := db ufro: ['SELECT ? AS a, ? AS b, ? AS c'].
+sichparameter parameter: (Lëscht nei ; ['1']).
+{ sichparameter ofruffen: { :row Ausgab schreiwen: row, nei-zeil. }. } offänken: { :e Ausgab schreiwen: e, nei-zeil. }, starten.
+
+>> sichparameter := db ufro: ['SELECT ? AS a'].
+{ sichparameter ofruffen: { :row Ausgab schreiwen: row, nei-zeil. }. } offänken: { :e Ausgab schreiwen: e, nei-zeil. }, starten.
+
+# the right number still works, more parameters are ignored as before
+>> sichparameter := db ufro: ['SELECT ? AS a, ? AS b'].
+sichparameter parameter: (Lëscht nei ; ['1'] ; ['2']).
+sichparameter ofruffen: { :row Ausgab schreiwen: (row bei: ['a']), schreiwen: (row bei: ['b']), nei-zeil. }.
+sichparameter parameter: (Lëscht nei ; ['1'] ; ['2'] ; ['3']).
+sichparameter ofruffen: { :row Ausgab schreiwen: (row bei: ['a']), schreiwen: (row bei: ['b']), nei-zeil. }.

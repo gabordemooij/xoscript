@@ -1,0 +1,43 @@
+
+
+>> g := Server ri.
+>> v := Kasafortë ri.
+>> ok := 0.
+
+>> secrets := Listë ri ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopjo.
+passwords secili: { :i :p
+	secrets secili: { :n :s
+		{
+			>> encrypted := v enkripto: s çelës: p.
+			>> decrypted := v dekripto: encrypted çelës: p.
+			(decrypted = s) vërtetë: {
+				ok shto: 1.
+			}, përndryshe: {
+				Dalje shkruaj: ['failed encrypting/decrypting: '], rresht-ri.
+				Dalje shkruaj: s, rresht-ri.
+				Dalje shkruaj: ['encrypted: '] + encrypted, rresht-ri.
+				Dalje shkruaj: ['decrypted: '] + encrypted, rresht-ri.
+				Program fund.
+			}.
+		} kap: { :err
+			(s = [''] ose: p = ['']) vërtetë: {
+				ok shto: 1.
+			}, përndryshe: {
+				Dalje shkruaj: err, rresht-ri.
+				Program fund.
+			}.
+		}, nis.
+	}.
+}.
+
+Dalje shkruaj: ( ok + [' vault encryptions tested.'] ), rresht-ri.

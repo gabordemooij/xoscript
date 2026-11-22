@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Program menaxhim-kujtese: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB ri pritës: ['localhost'],
+	përdorues: ['xo'], fjalëkalim: ['pass123'], emër-baze: ['xobase'], lidhu.
+
+>> TwoDigitFormat := Format ri: ['%02d'].
+
+# Datetime
+{
+	>> vit := Numër midis: 1995 dhe: 2050, tekst.
+	>> muaj := TwoDigitFormat zbato-plotë: (Numër midis: 1 dhe: 12), tekst.
+	>> ditë := TwoDigitFormat zbato-plotë: (Numër midis: 1 dhe: 28), tekst.
+	>> orë := TwoDigitFormat zbato-plotë: (Numër midis: 1 dhe: 23), tekst.
+	>> minutë := TwoDigitFormat zbato-plotë: (Numër midis: 1 dhe: 59), tekst.
+	>> sekondë := TwoDigitFormat zbato-plotë: (Numër midis: 1 dhe: 59), tekst.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: vit,
+		MM: muaj,
+		DD: ditë,
+		HH: orë,
+		II: minutë,
+		SS: sekondë.
+	>> parametra-kërkimi :=
+	db pyetësor: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	merr: { :row
+		(row mydatetime = datetime) rreme: {
+			kjo-detyrë gabim: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter shto: 1.
+} * 100.
+
+# Date
+{
+	>> vit := Numër midis: 1995 dhe: 2050, tekst.
+	>> muaj := TwoDigitFormat zbato-plotë: (Numër midis: 1 dhe: 12), tekst.
+	>> ditë := TwoDigitFormat zbato-plotë: (Numër midis: 1 dhe: 28), tekst.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: vit,
+		MM: muaj,
+		DD: ditë.
+	>> parametra-kërkimi :=
+	db pyetësor: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	merr: { :row
+		(row mydate = date) rreme: {
+			kjo-detyrë gabim: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter shto: 1.
+} * 100.
+
+
+# Time
+{
+	>> orë := TwoDigitFormat zbato-plotë: (Numër midis: 1 dhe: 23), tekst.
+	>> minutë := TwoDigitFormat zbato-plotë: (Numër midis: 1 dhe: 59), tekst.
+	>> sekondë := TwoDigitFormat zbato-plotë: (Numër midis: 1 dhe: 59), tekst.
+	>> kohë := ['HH:II:SS'].
+	kohë
+		HH: orë,
+		II: minutë,
+		SS: sekondë.
+	>> parametra-kërkimi :=
+	db pyetësor: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: kohë),
+	merr: { :row
+		(row mytime = kohë) rreme: {
+			kjo-detyrë gabim: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter shto: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Listë ri mbush: 100000 me: ['x'], bashko: [''].
+{
+	>> str2 := Kasafortë token: 40.
+	>> parametra-kërkimi :=
+	db pyetësor: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	merr: { :row
+		(row str1 = str1 dhe: row str2 = str2) rreme: {
+			kjo-detyrë gabim: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter shto: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Numër midis: 1 dhe: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 prej-teksti: ['9223372036854775807'] ) -
+		( Int64 prej-teksti: ['99999'] ) +
+		( Int64 prej-teksti: n1 tekst )
+	).
+	>> parametra-kërkimi :=
+	db pyetësor: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	merr: { :row
+		(row n1 = n1) rreme: {
+			kjo-detyrë gabim: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) rreme: {
+			kjo-detyrë gabim: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 rrumbullakos) rreme: {
+			kjo-detyrë gabim: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) rreme: {
+			kjo-detyrë gabim: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter shto: 1.
+} * 100.
+
+
+Dalje shkruaj: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), rresht-ri.

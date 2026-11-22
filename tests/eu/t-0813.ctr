@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server hasieratu.
+Programa erabili: ['../../../src/xo/eu/webtools.xo'].
+Programa erabili: ['../../../src/xo/eu/mailtools.xo'].
+
+>> goiburua := HTTP-Goiburua berria gakoa: ['Location'] balioa: ['/ok\r\nX-Injected: yes'].
+Irteera idatzi: goiburua.
+
+>> web := Web-dokumentua berria.
+web joan: ['/ok\r\nX-Injected: yes'].
+Irteera idatzi: ['\n'], lerro-jauzia.
+
+>> mail := Posta berria.
+mail hartzailea: (Zerrenda berria ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Zerrenda berria ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Zerrenda berria ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail igorlea: ['d@example.invalid\r\nX-From: yes'] izena: ['site\r\nX-Name: yes'].
+mail gaia: ['hello\r\nX-Subject: yes'].
+mail gorputza: ['line1\r\nline2'].
+Irteera idatzi: mail sortu.
+
+>> html := HTML-Posta berria.
+html hartzailea: (Zerrenda berria ; ['a@example.invalid\r\nX-To: yes']).
+html igorlea: ['d@example.invalid'] izena: ['site'].
+html gaia: ['hello\r\nX-Subject: yes'].
+html gorputza: ['body'].
+Irteera idatzi: ( html sortu barne-dauka: ['\nX-'] ), lerro-jauzia.
+Irteera idatzi: ( html sortu barne-dauka: ['X-To: yes'] ), lerro-jauzia.

@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server ініціалізувати.
+Програма використати: ['../../../src/xo/uk/webtools.xo'].
+
+>> Fake-Request := Обʼєкт новий.
+Fake-Request при: ['value:'] виконати: { :величина
+	свій величина := величина.
+}.
+Fake-Request при: ['cookie:'] виконати: { :імʼя <- свій величина.
+}.
+
+>> Test-Session := Сесія-тимчасовий-файл новий.
+Test-Session при: ['завантажити'] виконати: { <- Словник новий.
+}.
+Test-Session при: ['session-id'] виконати: { <- свій id.
+}.
+
+>> cookies := Список новий
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies кожен: { :i :cookie
+	>> http-запит := Fake-Request новий.
+	http-запит value: cookie.
+	>> менеджер := Test-Session новий.
+	>> web := Веб-документ новий.
+	web http-запит: http-запит.
+	web менеджер-сесій: менеджер.
+	web почати-сесію.
+	Вивід написати: ( менеджер session-id = cookie ), новий-рядок.
+}.
+
+>> web := Веб-документ новий.
+web json: (Словник новий поставити: ['b'] у: ['a']).
+Вивід написати: ['\n'], новий-рядок.
+
+{ Мережа get: ['file:///etc/hostname']. } перехопити: { :e
+	Вивід написати: e, новий-рядок.
+}, запустити.
+
+>> svg := Файл новий: ['/tmp/test0814.svg'].
+svg написати: ['<svg xmlns="x"></svg>'].
+Вивід новий-рядок.
+Server передати: ['test0814.svg'] префікс: ['/tmp/'].
+svg видалити.

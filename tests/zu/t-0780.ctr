@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Uhlu okusha ;
+	# {"key":"normal"} normal ASCII
+	( Isichazamazwi okusha beka: ['normal'] endaweni: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Isichazamazwi okusha beka: ['hello world'] endaweni: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Isichazamazwi okusha beka: ['"'] endaweni: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Isichazamazwi okusha beka: ['backslash: \\'] endaweni: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Isichazamazwi okusha beka: ['slash: /'] endaweni: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Isichazamazwi okusha beka: ['backspace: \b'] endaweni: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Isichazamazwi okusha beka: ['formfeed: \f'] endaweni: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Isichazamazwi okusha beka: ['newline: \n'] endaweni: ['key'] ) ;
+	( Isichazamazwi okusha beka: ['newline: ↵'] endaweni: ['key'] ) ;
+	( Isichazamazwi okusha beka: ['newline: 
+	'] endaweni: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Isichazamazwi okusha beka: ['carriage return: \r'] endaweni: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Isichazamazwi okusha beka: ['tab \t'] endaweni: ['key'] ) ;
+	( Isichazamazwi okusha beka: ['tab ⇿'] endaweni: ['key'] ) ;
+	( Isichazamazwi okusha beka: ['tab  '] endaweni: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Isichazamazwi okusha beka: ['NUL \u0000'] endaweni: ['key'] ) ;
+	( Isichazamazwi okusha beka: ['NUL \0'] endaweni: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Isichazamazwi okusha beka: ['control: \u0001'] endaweni: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Isichazamazwi okusha beka: ['control: \u001F'] endaweni: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Isichazamazwi okusha beka: ['unicode: é'] endaweni: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Isichazamazwi okusha beka: ['unicode: €'] endaweni: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Isichazamazwi okusha beka: ['unicode: 日本語'] endaweni: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Isichazamazwi okusha beka: ['unicode: 😀'] endaweni: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Isichazamazwi okusha beka: ['unicode: 🧑‍💻'] endaweni: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Isichazamazwi okusha beka: ['combining: e\u0301'] endaweni: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Isichazamazwi okusha beka: ['escaped unicode: \u00e9'] endaweni: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Isichazamazwi okusha beka: ['escaped unicode: \u20ac'] endaweni: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Isichazamazwi okusha beka: ['escaped unicode: \ud83d\ude00'] endaweni: ['key'] ) ;
+	# {"key":""} empty value
+	( Isichazamazwi okusha beka: [''] endaweni: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Isichazamazwi okusha beka: ['@ < > & = % + ? #'] endaweni: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Isichazamazwi okusha beka: ['''] endaweni: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Isichazamazwi okusha beka: ['multiple: \" \\ \n \r \t'] endaweni: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Isichazamazwi okusha beka: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] endaweni: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Isichazamazwi okusha beka: [' value'] endaweni: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Isichazamazwi okusha beka: ['value '] endaweni: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Isichazamazwi okusha beka: [' \t\n\r '] endaweni: ['key'] ).
+
+dicts ngamunye: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Isichazamazwi okusha beka: d key endaweni: ['key']).
+	>> b := JSON jsonify: (Isichazamazwi okusha beka: ['value'] endaweni: d key).
+	>> e := JSON into: a.
+	>> f := JSON into: b.
+	((e key = d key futhi: (f ? d key = ['value'])) noma: (e key = ['NUL ?'])) iqiniso: {
+		Okuphumayo bhala: ['OK'], umugqa-omusha.
+	}, uma-kungenjalo: {
+		Okuphumayo bhala: ['Unable to properly encode/decode: '] + d + j, umugqa-omusha.
+		Uhlelo qeda.
+	}.
+}.

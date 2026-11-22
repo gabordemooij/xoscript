@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+ప్రోగ్రామ్ మెమరీ-నిర్వహణ: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB కొత్త హోస్ట్: ['localhost'],
+	వాడుకరి-పేరు: ['xo'], పాస్-వర్డ్: ['pass123'], డేటాబేస్-పేరు: ['xobase'], అనుసంధానించు.
+
+>> TwoDigitFormat := ఆకృతి కొత్త: ['%02d'].
+
+# Datetime
+{
+	>> సంవత్సరం := సంఖ్య మధ్య: 1995 నుండి: 2050, పాఠ్యంగా.
+	>> నెల := TwoDigitFormat వర్తింపజేయి-పూర్ణాంకం: (సంఖ్య మధ్య: 1 నుండి: 12), పాఠ్యంగా.
+	>> రోజు := TwoDigitFormat వర్తింపజేయి-పూర్ణాంకం: (సంఖ్య మధ్య: 1 నుండి: 28), పాఠ్యంగా.
+	>> గంట := TwoDigitFormat వర్తింపజేయి-పూర్ణాంకం: (సంఖ్య మధ్య: 1 నుండి: 23), పాఠ్యంగా.
+	>> నిమిషం := TwoDigitFormat వర్తింపజేయి-పూర్ణాంకం: (సంఖ్య మధ్య: 1 నుండి: 59), పాఠ్యంగా.
+	>> సెకను := TwoDigitFormat వర్తింపజేయి-పూర్ణాంకం: (సంఖ్య మధ్య: 1 నుండి: 59), పాఠ్యంగా.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: సంవత్సరం,
+		MM: నెల,
+		DD: రోజు,
+		HH: గంట,
+		II: నిమిషం,
+		SS: సెకను.
+	>> శోధన-పరామితులు :=
+	db క్వెరీ: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	తెచ్చు: { :row
+		(row mydatetime = datetime) అబద్ధమైతే: {
+			ఈ-పని లోపం: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter కూడు: 1.
+} * 100.
+
+# Date
+{
+	>> సంవత్సరం := సంఖ్య మధ్య: 1995 నుండి: 2050, పాఠ్యంగా.
+	>> నెల := TwoDigitFormat వర్తింపజేయి-పూర్ణాంకం: (సంఖ్య మధ్య: 1 నుండి: 12), పాఠ్యంగా.
+	>> రోజు := TwoDigitFormat వర్తింపజేయి-పూర్ణాంకం: (సంఖ్య మధ్య: 1 నుండి: 28), పాఠ్యంగా.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: సంవత్సరం,
+		MM: నెల,
+		DD: రోజు.
+	>> శోధన-పరామితులు :=
+	db క్వెరీ: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	తెచ్చు: { :row
+		(row mydate = date) అబద్ధమైతే: {
+			ఈ-పని లోపం: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter కూడు: 1.
+} * 100.
+
+
+# Time
+{
+	>> గంట := TwoDigitFormat వర్తింపజేయి-పూర్ణాంకం: (సంఖ్య మధ్య: 1 నుండి: 23), పాఠ్యంగా.
+	>> నిమిషం := TwoDigitFormat వర్తింపజేయి-పూర్ణాంకం: (సంఖ్య మధ్య: 1 నుండి: 59), పాఠ్యంగా.
+	>> సెకను := TwoDigitFormat వర్తింపజేయి-పూర్ణాంకం: (సంఖ్య మధ్య: 1 నుండి: 59), పాఠ్యంగా.
+	>> సమయం := ['HH:II:SS'].
+	సమయం
+		HH: గంట,
+		II: నిమిషం,
+		SS: సెకను.
+	>> శోధన-పరామితులు :=
+	db క్వెరీ: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: సమయం),
+	తెచ్చు: { :row
+		(row mytime = సమయం) అబద్ధమైతే: {
+			ఈ-పని లోపం: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter కూడు: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := వరుస కొత్త నింపు: 100000 విలువతో: ['x'], కలుపు: [''].
+{
+	>> str2 := ఖజానా టోకెన్: 40.
+	>> శోధన-పరామితులు :=
+	db క్వెరీ: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	తెచ్చు: { :row
+		(row str1 = str1 మరియు: row str2 = str2) అబద్ధమైతే: {
+			ఈ-పని లోపం: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter కూడు: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := సంఖ్య మధ్య: 1 నుండి: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 పాఠ్యం-నుండి: ['9223372036854775807'] ) -
+		( Int64 పాఠ్యం-నుండి: ['99999'] ) +
+		( Int64 పాఠ్యం-నుండి: n1 పాఠ్యంగా )
+	).
+	>> శోధన-పరామితులు :=
+	db క్వెరీ: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	తెచ్చు: { :row
+		(row n1 = n1) అబద్ధమైతే: {
+			ఈ-పని లోపం: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) అబద్ధమైతే: {
+			ఈ-పని లోపం: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 పూర్ణాంకనం) అబద్ధమైతే: {
+			ఈ-పని లోపం: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) అబద్ధమైతే: {
+			ఈ-పని లోపం: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter కూడు: 1.
+} * 100.
+
+
+అవుట్-పుట్ రాయి: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), కొత్త-పంక్తి.

@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> urinish := { :format :value
+	{ Chiqish yozish: ( (Format yangi: format) qoʻllash: value ), yangi-qator. } ushlash: { :e Chiqish yozish: e, yangi-qator. }, ishga-tushirish.
+}.
+>> try-int := { :format :value
+	{ Chiqish yozish: ( (Format yangi: format) qoʻllash-butun: value ), yangi-qator. } ushlash: { :e Chiqish yozish: e, yangi-qator. }, ishga-tushirish.
+}.
+
+# fits
+urinish qoʻllash: ['|%s|'] va: ['text'].
+urinish qoʻllash: ['%06.2f'] va: 5.5.
+urinish qoʻllash: ['100%% %s'] va: ['sure'].
+try-int qoʻllash: ['%03d'] va: 7.
+try-int qoʻllash: ['%x'] va: 255.
+urinish qoʻllash: ['%d'] va: (Int64 yangi matndan: ['12']).
+urinish qoʻllash: ['%lld'] va: (Int64 yangi matndan: ['12']).
+urinish qoʻllash: ['%.1lf'] va: 5.5.
+try-int qoʻllash: ['%hd'] va: 7.
+
+# does not fit
+urinish qoʻllash: ['%s'] va: 12345.
+urinish qoʻllash: ['%d'] va: 12345.
+urinish qoʻllash: ['%f'] va: ['text'].
+try-int qoʻllash: ['%d'] va: ['text'].
+try-int qoʻllash: ['%s'] va: 5.
+urinish qoʻllash: ['%s %s'] va: ['text'].
+urinish qoʻllash: ['%n'] va: ['text'].
+urinish qoʻllash: ['%*s'] va: ['text'].
+urinish qoʻllash: ['%'] va: ['text'].
+
+# length modifier does not fit
+urinish qoʻllash: ['%ls'] va: ['text'].
+urinish qoʻllash: ['%Lf'] va: 5.5.
+try-int qoʻllash: ['%ld'] va: 7.
+try-int qoʻllash: ['%lld'] va: 7.
+urinish qoʻllash: ['%Ld'] va: (Int64 yangi matndan: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+urinish qoʻllash: ['%99999999999s'] va: ['text'].

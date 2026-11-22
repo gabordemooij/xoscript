@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> subukan := { :format :value
+	{ Labas isulat: ( (Anyo bago: format) ilapat: value ), bagong-linya. } saluhin: { :e Labas isulat: e, bagong-linya. }, patakbuhin.
+}.
+>> try-int := { :format :value
+	{ Labas isulat: ( (Anyo bago: format) ilapat-buumbilang: value ), bagong-linya. } saluhin: { :e Labas isulat: e, bagong-linya. }, patakbuhin.
+}.
+
+# fits
+subukan ilapat: ['|%s|'] at: ['text'].
+subukan ilapat: ['%06.2f'] at: 5.5.
+subukan ilapat: ['100%% %s'] at: ['sure'].
+try-int ilapat: ['%03d'] at: 7.
+try-int ilapat: ['%x'] at: 255.
+subukan ilapat: ['%d'] at: (Int64 bago mula-sa-teksto: ['12']).
+subukan ilapat: ['%lld'] at: (Int64 bago mula-sa-teksto: ['12']).
+subukan ilapat: ['%.1lf'] at: 5.5.
+try-int ilapat: ['%hd'] at: 7.
+
+# does not fit
+subukan ilapat: ['%s'] at: 12345.
+subukan ilapat: ['%d'] at: 12345.
+subukan ilapat: ['%f'] at: ['text'].
+try-int ilapat: ['%d'] at: ['text'].
+try-int ilapat: ['%s'] at: 5.
+subukan ilapat: ['%s %s'] at: ['text'].
+subukan ilapat: ['%n'] at: ['text'].
+subukan ilapat: ['%*s'] at: ['text'].
+subukan ilapat: ['%'] at: ['text'].
+
+# length modifier does not fit
+subukan ilapat: ['%ls'] at: ['text'].
+subukan ilapat: ['%Lf'] at: 5.5.
+try-int ilapat: ['%ld'] at: 7.
+try-int ilapat: ['%lld'] at: 7.
+subukan ilapat: ['%Ld'] at: (Int64 bago mula-sa-teksto: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+subukan ilapat: ['%99999999999s'] at: ['text'].

@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server هيئ.
+برنامج استخدم: ⌝'../../../src/xo/ar/webtools.xo'⌜.
+
+>> Fake-Request := كائن جديد.
+Fake-Request عند: ⌝'value:'⌜ نفذ: ⎬ :قيمة
+	خاص قيمة := قيمة.
+⎨.
+Fake-Request عند: ⌝'cookie:'⌜ نفذ: ⎬ :اسم <- خاص قيمة.
+⎨.
+
+>> Test-Session := جلسة-ملف-مؤقت جديد.
+Test-Session عند: ⌝'حمل'⌜ نفذ: ⎬ <- قاموس جديد.
+⎨.
+Test-Session عند: ⌝'session-id'⌜ نفذ: ⎬ <- خاص id.
+⎨.
+
+>> cookies := قائمة جديد
+	; ⌝'abc123'⌜
+	; ⌝'../outside'⌜
+	; ⌝''⌜
+	; ⌝'abc\n'⌜.
+
+cookies لكل: ⎬ :i :cookie
+	>> طلب-http := Fake-Request جديد.
+	طلب-http value: cookie.
+	>> مدير := Test-Session جديد.
+	>> web := مستند-ويب جديد.
+	web طلب-http: طلب-http.
+	web مدير-الجلسات: مدير.
+	web ابدأ-الجلسة.
+	مخرج اكتب: ﴿ مدير session-id = cookie ﴾, سطر-جديد.
+⎨.
+
+>> web := مستند-ويب جديد.
+web json: ﴿قاموس جديد ضع: ⌝'b'⌜ عند: ⌝'a'⌜﴾.
+مخرج اكتب: ⌝'\n'⌜, سطر-جديد.
+
+⎬ شبكة get: ⌝'file:///etc/hostname'⌜. ⎨ التقط: ⎬ :e
+	مخرج اكتب: e, سطر-جديد.
+⎨, شغل.
+
+>> svg := ملف جديد: ⌝'/tmp/test0814.svg'⌜.
+svg اكتب: ⌝'<svg xmlns="x"></svg>'⌜.
+مخرج سطر-جديد.
+Server مرر: ⌝'test0814.svg'⌜ بادئة: ⌝'/tmp/'⌜.
+svg احذف.

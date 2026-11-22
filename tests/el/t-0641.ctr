@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Λεξικό νέο
+	# ASCII only
+	τοποθέτηση: ( Λίστα νέο ; 65 ; 65 ; 65 ; 65 ; 0 ) στο: ['AAAA'],
+	# valid 2 byte sequence
+	τοποθέτηση: ( Λίστα νέο ; 194 ; 162 ; 0 ) στο: ['¢'],
+	# Valid 3-byte UTF-8
+    τοποθέτηση: ( Λίστα νέο ; 226 ; 130 ; 172 ; 0 ) στο: ['€'],
+	# Valid 4-byte UTF-8
+    τοποθέτηση: ( Λίστα νέο ; 240 ; 144 ; 141 ; 136 ; 0 ) στο: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    τοποθέτηση: ( Λίστα νέο ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) στο: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    τοποθέτηση: ( Λίστα νέο ; 65 ; 193 ; 129 ; 0 ) στο: ['A?'],
+	# Invalid first byte (0xFF)
+    τοποθέτηση: ( Λίστα νέο ; 255 ; 0 ) στο: ['?'],
+	# Incomplete multi-byte sequence at end
+    τοποθέτηση: ( Λίστα νέο ; 66 ; 226 ; 0 ) στο: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    τοποθέτηση: ( Λίστα νέο ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) στο: ['A€?𐍈B'].
+	 
+utf8cases κάθε: { :key :value
+	>> blob := Blob νέο: value πλήθος, bytes: value.
+	>> str := blob κείμενο.
+	(str = key) αληθές: {
+		Έξοδος γράψε: ['OK'], νέα-γραμμή.
+	}, αλλιώς: {
+		Έξοδος γράψε: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, νέα-γραμμή.
+	}.
+	blob αποδέσμευση.
+}.

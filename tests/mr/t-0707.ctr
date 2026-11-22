@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+प्रोग्राम मेमरी-व्यवस्थापन: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB नवीन होस्ट: ['localhost'],
+	वापरकर्ता-नाव: ['xo'], पासवर्ड: ['pass123'], डेटाबेस-नाव: ['xobase'], जोडणी.
+
+>> TwoDigitFormat := स्वरूप नवीन: ['%02d'].
+
+# Datetime
+{
+	>> वर्ष := संख्या दरम्यान: 1995 आणि: 2050, मजकुरात.
+	>> महिना := TwoDigitFormat लागू-पूर्णांक: (संख्या दरम्यान: 1 आणि: 12), मजकुरात.
+	>> दिवस := TwoDigitFormat लागू-पूर्णांक: (संख्या दरम्यान: 1 आणि: 28), मजकुरात.
+	>> तास := TwoDigitFormat लागू-पूर्णांक: (संख्या दरम्यान: 1 आणि: 23), मजकुरात.
+	>> मिनिट := TwoDigitFormat लागू-पूर्णांक: (संख्या दरम्यान: 1 आणि: 59), मजकुरात.
+	>> सेकंद := TwoDigitFormat लागू-पूर्णांक: (संख्या दरम्यान: 1 आणि: 59), मजकुरात.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: वर्ष,
+		MM: महिना,
+		DD: दिवस,
+		HH: तास,
+		II: मिनिट,
+		SS: सेकंद.
+	>> शोध-पॅरामीटर :=
+	db क्वेरी: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	आणा: { :row
+		(row mydatetime = datetime) खोटे-असल्यास: {
+			हे-कार्य त्रुटी: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter बेरीज: 1.
+} * 100.
+
+# Date
+{
+	>> वर्ष := संख्या दरम्यान: 1995 आणि: 2050, मजकुरात.
+	>> महिना := TwoDigitFormat लागू-पूर्णांक: (संख्या दरम्यान: 1 आणि: 12), मजकुरात.
+	>> दिवस := TwoDigitFormat लागू-पूर्णांक: (संख्या दरम्यान: 1 आणि: 28), मजकुरात.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: वर्ष,
+		MM: महिना,
+		DD: दिवस.
+	>> शोध-पॅरामीटर :=
+	db क्वेरी: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	आणा: { :row
+		(row mydate = date) खोटे-असल्यास: {
+			हे-कार्य त्रुटी: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter बेरीज: 1.
+} * 100.
+
+
+# Time
+{
+	>> तास := TwoDigitFormat लागू-पूर्णांक: (संख्या दरम्यान: 1 आणि: 23), मजकुरात.
+	>> मिनिट := TwoDigitFormat लागू-पूर्णांक: (संख्या दरम्यान: 1 आणि: 59), मजकुरात.
+	>> सेकंद := TwoDigitFormat लागू-पूर्णांक: (संख्या दरम्यान: 1 आणि: 59), मजकुरात.
+	>> वेळ := ['HH:II:SS'].
+	वेळ
+		HH: तास,
+		II: मिनिट,
+		SS: सेकंद.
+	>> शोध-पॅरामीटर :=
+	db क्वेरी: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: वेळ),
+	आणा: { :row
+		(row mytime = वेळ) खोटे-असल्यास: {
+			हे-कार्य त्रुटी: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter बेरीज: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := सूची नवीन भरा: 100000 मूल्याने: ['x'], जोडा: [''].
+{
+	>> str2 := तिजोरी टोकन: 40.
+	>> शोध-पॅरामीटर :=
+	db क्वेरी: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	आणा: { :row
+		(row str1 = str1 आणि: row str2 = str2) खोटे-असल्यास: {
+			हे-कार्य त्रुटी: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter बेरीज: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := संख्या दरम्यान: 1 आणि: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 मजकुरातून: ['9223372036854775807'] ) -
+		( Int64 मजकुरातून: ['99999'] ) +
+		( Int64 मजकुरातून: n1 मजकुरात )
+	).
+	>> शोध-पॅरामीटर :=
+	db क्वेरी: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	आणा: { :row
+		(row n1 = n1) खोटे-असल्यास: {
+			हे-कार्य त्रुटी: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) खोटे-असल्यास: {
+			हे-कार्य त्रुटी: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 पूर्णांकन) खोटे-असल्यास: {
+			हे-कार्य त्रुटी: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) खोटे-असल्यास: {
+			हे-कार्य त्रुटी: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter बेरीज: 1.
+} * 100.
+
+
+आउटपुट लिहा: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), नवी-ओळ.

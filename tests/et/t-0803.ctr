@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB uus host: ['localhost'],
+	kasutajanimi: ['xo'],
+	parool: ['pass123'],
+	andmebaasi-nimi: ['xobase'],
+	ühendu.
+
+>> conn2 := Maria-DB uus host: ['localhost'],
+	kasutajanimi: ['xo'],
+	parool: ['pass123'],
+	andmebaasi-nimi: ['xobase'],
+	ühendu.
+#...
+>> del := conn1 päring: ['DELETE FROM book WHERE id > 0'].
+{  del täida. conn1 kinnita. } püüa: { :e conn1 tühista.  }, käivita.
+
+>> insert := conn1 päring: ['INSERT INTO book (id) VALUES(null)'].
+insert täida.
+
+>> arvuta := conn1 päring: ['SELECT COUNT(*) AS num FROM book'].
+arvuta too: { :row Väljund kirjuta: row num, reavahetus. }.
+
+# does not show up
+# insert not committed on connection 1
+>> arvuta := conn2 päring: ['SELECT COUNT(*) AS num FROM book'].
+arvuta too: { :row Väljund kirjuta: row num, reavahetus. }.

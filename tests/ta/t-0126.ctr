@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := பொருள் புதிய.
+
+Slurp பெறும்போது: ['புதிய'] செய்: {
+	தனது str := [''].
+}.
+
+Slurp பெறும்போது: ['nieuw'] செய்: {
+	தனது str := [''].
+}.
+
+Slurp பெறும்போது: ['பதில்:'] செய்: { :blah
+		தனது str இறுதியில்-சேர்: blah.
+}.
+
+Slurp பெறும்போது: ['பதில்:மற்றும்:'] செய்: { :blah :blahah
+		தனது str இறுதியில்-சேர்: (blah தொடக்கம்: 0 நீளம்: (blah நீளம் - 1)).
+		தனது str இறுதியில்-சேர்: [' '].
+		தனது str இறுதியில்-சேர்: blahah.
+}.
+
+Slurp பெறும்போது: ['obtain'] செய்: {
+	>> buffer := தனது str.
+	தனது str := ['']. <- buffer.
+}.
+
+
+வெளியீடு எழுது: (நிரல் அமைப்பு: (Slurp புதிய echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ கோப்பு புதிய: ['/tmp/from.txt'], நீக்கு. } பிடி: { ['Empty']. }, இயக்கு.
+{ கோப்பு புதிய: ['/tmp/to.txt'], நீக்கு. } பிடி: { ['Empty']. }, இயக்கு.
+
+
+கோப்பு புதிய: ['/tmp/to.txt'], உள்ளது பொய்யெனில்: {
+	வெளியீடு எழுது: ['Confirmed. Target file does not exist.\
+'].
+}.
+கோப்பு புதிய: ['/tmp/from.txt'], உள்ளது பொய்யெனில்: {
+	வெளியீடு எழுது: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+நிரல் அமைப்பு: (Slurp புதிய touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+நிரல் அமைப்பு: (Slurp புதிய cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+கோப்பு புதிய: ['/tmp/to.txt'], உள்ளது உண்மையெனில்: {
+	வெளியீடு எழுது: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+வெளியீடு எழுது: ['Contents of file is:'] + (கோப்பு புதிய: ['/tmp/to.txt'], படி), புதிய-வரி.

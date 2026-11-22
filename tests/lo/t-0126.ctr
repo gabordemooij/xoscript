@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := ວັດຖຸ ໃໝ່.
+
+Slurp ເມື່ອ: ['ໃໝ່'] ເຮັດ: {
+	ຂອງຕົນ str := [''].
+}.
+
+Slurp ເມື່ອ: ['nieuw'] ເຮັດ: {
+	ຂອງຕົນ str := [''].
+}.
+
+Slurp ເມື່ອ: ['ຕອບ:'] ເຮັດ: { :blah
+		ຂອງຕົນ str ຕໍ່ທ້າຍ: blah.
+}.
+
+Slurp ເມື່ອ: ['ຕອບ:ແລະ:'] ເຮັດ: { :blah :blahah
+		ຂອງຕົນ str ຕໍ່ທ້າຍ: (blah ເລີ່ມທີ່: 0 ຄວາມຍາວ: (blah ຄວາມຍາວ - 1)).
+		ຂອງຕົນ str ຕໍ່ທ້າຍ: [' '].
+		ຂອງຕົນ str ຕໍ່ທ້າຍ: blahah.
+}.
+
+Slurp ເມື່ອ: ['obtain'] ເຮັດ: {
+	>> buffer := ຂອງຕົນ str.
+	ຂອງຕົນ str := ['']. <- buffer.
+}.
+
+
+ຜົນອອກ ຂຽນ: (ໂປຣແກຣມ ລະບົບ: (Slurp ໃໝ່ echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ ໄຟລ໌ ໃໝ່: ['/tmp/from.txt'], ລຶບ. } ຈັບ: { ['Empty']. }, ເລີ່ມ.
+{ ໄຟລ໌ ໃໝ່: ['/tmp/to.txt'], ລຶບ. } ຈັບ: { ['Empty']. }, ເລີ່ມ.
+
+
+ໄຟລ໌ ໃໝ່: ['/tmp/to.txt'], ມີຢູ່ ຖ້າເທັດ: {
+	ຜົນອອກ ຂຽນ: ['Confirmed. Target file does not exist.\
+'].
+}.
+ໄຟລ໌ ໃໝ່: ['/tmp/from.txt'], ມີຢູ່ ຖ້າເທັດ: {
+	ຜົນອອກ ຂຽນ: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+ໂປຣແກຣມ ລະບົບ: (Slurp ໃໝ່ touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+ໂປຣແກຣມ ລະບົບ: (Slurp ໃໝ່ cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+ໄຟລ໌ ໃໝ່: ['/tmp/to.txt'], ມີຢູ່ ຖ້າຈິງ: {
+	ຜົນອອກ ຂຽນ: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+ຜົນອອກ ຂຽນ: ['Contents of file is:'] + (ໄຟລ໌ ໃໝ່: ['/tmp/to.txt'], ອ່ານ), ຂຶ້ນແຖວໃໝ່.

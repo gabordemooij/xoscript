@@ -1,0 +1,53 @@
+Program bellek-yönetimi: 0.
+Liste olunca: ['sum'] yap: {
+	>> total := 0.
+	kendi her: { :index :element
+		total ekle: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Dosya yeni: ['/tmp/test.txt'].
+f yaz: ['Lorem Ipsum'].
+f kapat.
+  
+
+f := Dosya yeni: ['/tmp/test.txt'].
+>> text := f oku.
+f kapat.
+
+
+
+Program temizle.
+usedMemory1 := (Program bellek ? 1).
+
+
+
+f := Dosya yeni: ['/tmp/test.txt'].
+text := f oku.
+f kapat.
+
+Program temizle.
+usedMemory2 := (Program bellek ? 1).
+
+
+f := Dosya yeni: ['/tmp/test.txt'].
+text := f oku.
+f kapat.
+
+Program temizle.
+usedMemory3 := (Program bellek ? 1).
+
+
+
+( usedMemory1 = usedMemory2 ve: usedMemory1 = usedMemory3, ve: usedMemory2 = usedMemory3 ) doğru: {
+	Çıktı yaz: ['No memory leaks here'].
+}, yanlış: {
+	Çıktı yaz: ['Leaking memory...'].
+}.

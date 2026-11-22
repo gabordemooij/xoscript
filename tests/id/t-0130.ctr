@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Program pengaturan: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server tautkan: ( Daftar baru ;
+ libname ; ['fopen'] ;
+ ( Daftar baru ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+tautkan: ( Daftar baru ;
+ Kosong ; # means same lib
+ ['fread'] ;
+ ( Daftar baru ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Kosong ; # means same object (i.e. Stream)
+ ['fread']
+),
+tautkan: (
+ Daftar baru ;
+ Kosong ; # means same lib
+ ['fwrite'] ;
+ ( Daftar baru ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Kosong ; # means same lib
+ ['fwrite']
+),
+tautkan: (
+ Daftar baru ;
+ Kosong ; # means same lib
+ ['rewind'] ;
+ ( Daftar baru ; ['pointer'] ) ;
+ ['int'] ;
+ Kosong ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> jalur := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: jalur mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream pesan: ['fwrite'] argumen: (Daftar baru ; str ; 1 ; 6 ; fd ).
+Keluaran tulis: bytes-written, baris-baru.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob baru: 20.
+
+# read from file
+>> bytes-read := Stream pesan: ['fread'] argumen: (Daftar baru ; buf ; 1 ; 6 ; fd ).
+Keluaran tulis: bytes-read, baris-baru.
+Keluaran tulis: buf, baris-baru.
+
+# free memory
+str  bebaskan.
+jalur bebaskan.
+mode bebaskan.
+buf  bebaskan.
+
+

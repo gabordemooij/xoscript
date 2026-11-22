@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> synanyş := { :format :value
+	{ Çykyş ýaz: ( (Format täze: format) ulan: value ), täze-setir. } tut: { :e Çykyş ýaz: e, täze-setir. }, işlet.
+}.
+>> try-int := { :format :value
+	{ Çykyş ýaz: ( (Format täze: format) ulan-bitin: value ), täze-setir. } tut: { :e Çykyş ýaz: e, täze-setir. }, işlet.
+}.
+
+# fits
+synanyş ulan: ['|%s|'] we: ['text'].
+synanyş ulan: ['%06.2f'] we: 5.5.
+synanyş ulan: ['100%% %s'] we: ['sure'].
+try-int ulan: ['%03d'] we: 7.
+try-int ulan: ['%x'] we: 255.
+synanyş ulan: ['%d'] we: (Int64 täze tekstden: ['12']).
+synanyş ulan: ['%lld'] we: (Int64 täze tekstden: ['12']).
+synanyş ulan: ['%.1lf'] we: 5.5.
+try-int ulan: ['%hd'] we: 7.
+
+# does not fit
+synanyş ulan: ['%s'] we: 12345.
+synanyş ulan: ['%d'] we: 12345.
+synanyş ulan: ['%f'] we: ['text'].
+try-int ulan: ['%d'] we: ['text'].
+try-int ulan: ['%s'] we: 5.
+synanyş ulan: ['%s %s'] we: ['text'].
+synanyş ulan: ['%n'] we: ['text'].
+synanyş ulan: ['%*s'] we: ['text'].
+synanyş ulan: ['%'] we: ['text'].
+
+# length modifier does not fit
+synanyş ulan: ['%ls'] we: ['text'].
+synanyş ulan: ['%Lf'] we: 5.5.
+try-int ulan: ['%ld'] we: 7.
+try-int ulan: ['%lld'] we: 7.
+synanyş ulan: ['%Ld'] we: (Int64 täze tekstden: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+synanyş ulan: ['%99999999999s'] we: ['text'].

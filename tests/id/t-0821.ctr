@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> jalur := ['/tmp/test0821.csv'].
+>> file := Berkas baru: jalur.
+
+file tulis: ['a,b\n"1,2\n'].
+{
+	file pemisah: [','] tanda-kutip: ['"'] baris: { :line
+		Keluaran tulis: line, baris-baru.
+	}.
+} tangkap: { :e Keluaran tulis: e, baris-baru. }, mulai.
+
+# a closed quote still works
+file tulis: ['a,b\n"1,2",3'].
+file pemisah: [','] tanda-kutip: ['"'] baris: { :line
+	Keluaran tulis: line, baris-baru.
+}.
+file hapus.

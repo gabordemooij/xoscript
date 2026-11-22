@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Kev-pab-cuam-khoos-phis-tawj kev-teeb-tsa: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server txuas: ( Daim-teev tshiab ;
+ libname ; ['fopen'] ;
+ ( Daim-teev tshiab ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+txuas: ( Daim-teev tshiab ;
+ Tsis-muaj-dabtsi ; # means same lib
+ ['fread'] ;
+ ( Daim-teev tshiab ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Tsis-muaj-dabtsi ; # means same object (i.e. Stream)
+ ['fread']
+),
+txuas: (
+ Daim-teev tshiab ;
+ Tsis-muaj-dabtsi ; # means same lib
+ ['fwrite'] ;
+ ( Daim-teev tshiab ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Tsis-muaj-dabtsi ; # means same lib
+ ['fwrite']
+),
+txuas: (
+ Daim-teev tshiab ;
+ Tsis-muaj-dabtsi ; # means same lib
+ ['rewind'] ;
+ ( Daim-teev tshiab ; ['pointer'] ) ;
+ ['int'] ;
+ Tsis-muaj-dabtsi ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> txoj-kev-ntaub-ntawv := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: txoj-kev-ntaub-ntawv mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream lus: ['fwrite'] cov-nkag: (Daim-teev tshiab ; str ; 1 ; 6 ; fd ).
+Tawm sau-ntawv: bytes-written, kab-tshiab.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob tshiab: 20.
+
+# read from file
+>> bytes-read := Stream lus: ['fread'] cov-nkag: (Daim-teev tshiab ; buf ; 1 ; 6 ; fd ).
+Tawm sau-ntawv: bytes-read, kab-tshiab.
+Tawm sau-ntawv: buf, kab-tshiab.
+
+# free memory
+str  tso-tawm.
+txoj-kev-ntaub-ntawv tso-tawm.
+mode tso-tawm.
+buf  tso-tawm.
+
+

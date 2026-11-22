@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Okuphumayo bhala: ['Database test'], umugqa-omusha.
+
+>> db := Maria-DB okusha umsingathi: ['localhost'],
+	igama-lomsebenzisi: ['xo'], iphasiwedi: ['pass123'], igama-lesizindalwazi: ['xobase'], xhumana.
+
+Okuphumayo bhala: ['Can we connect? '] + db kuxhunyiwe?, umugqa-omusha.
+
+>> amapharamitha-okusesha := db umbuzo: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], amapharamitha: ( Uhlu okusha ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  amapharamitha-okusesha enza-umyalo. db qinisekisa. } bamba: { :e db buyisela-emuva.  }, qala.
+
+Okuphumayo bhala: ['Can we insert? '] + ( amapharamitha-okusesha insert-id > 0 ), umugqa-omusha.
+
+>> Obj := Into okusha.
+Obj uma-kufika: ['retrieve-rows'] yenza: {
+	okwakho inani := 0.
+	>> amapharamitha-okusesha :=
+	db umbuzo: ['SELECT * FROM book order by id desc limit 2'], 
+	landa: { :row 
+		okwakho inani engeza: 1.
+		Iqiniso nqamula.
+	}. <- okwakho inani kopisha.
+}.
+
+Okuphumayo bhala: ['Can we query? '] + ( Obj retrieve-rows > 0 ), umugqa-omusha.

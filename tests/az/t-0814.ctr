@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server hazırla.
+Proqram istifadə-et: ['../../../src/xo/az/webtools.xo'].
+
+>> Fake-Request := Obyekt yeni.
+Fake-Request olanda: ['value:'] et: { :dəyər
+	öz dəyər := dəyər.
+}.
+Fake-Request olanda: ['cookie:'] et: { :ad <- öz dəyər.
+}.
+
+>> Test-Session := Müvəqqəti-fayl-sessiyası yeni.
+Test-Session olanda: ['yüklə'] et: { <- Lüğət yeni.
+}.
+Test-Session olanda: ['session-id'] et: { <- öz id.
+}.
+
+>> cookies := Siyahı yeni
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies hər: { :i :cookie
+	>> http-sorğu := Fake-Request yeni.
+	http-sorğu value: cookie.
+	>> menecer := Test-Session yeni.
+	>> web := Veb-sənəd yeni.
+	web http-sorğu: http-sorğu.
+	web sessiya-meneceri: menecer.
+	web sessiyanı-başlat.
+	Çıxış yaz: ( menecer session-id = cookie ), yeni-sətir.
+}.
+
+>> web := Veb-sənəd yeni.
+web json: (Lüğət yeni qoy: ['b'] yerə: ['a']).
+Çıxış yaz: ['\n'], yeni-sətir.
+
+{ Şəbəkə get: ['file:///etc/hostname']. } tut: { :e
+	Çıxış yaz: e, yeni-sətir.
+}, başlat.
+
+>> svg := Fayl yeni: ['/tmp/test0814.svg'].
+svg yaz: ['<svg xmlns="x"></svg>'].
+Çıxış yeni-sətir.
+Server ötür: ['test0814.svg'] prefiks: ['/tmp/'].
+svg sil.

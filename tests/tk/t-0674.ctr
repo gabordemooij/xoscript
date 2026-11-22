@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> ýol := ['/tmp/dat.csv'].
+>> csv := Faýl täze: ýol.
+csv ýaz: s.
+
+# accepts CRLF LF CR, varying row length
+csv bölüji: [';'] goşa-dyrnak: ['"'] setirler: { :line
+	Programma arassala.
+	Çykyş ýaz: line, täze-setir.
+	Programma arassala.
+}.
+
+# unequal lines
+s soňuna-goş: ['\njustone'].
+csv ýaz: s.
+{
+	csv bölüji: [';'] goşa-dyrnak: ['"'] setirler: { :line
+		Çykyş ýaz: line, täze-setir.
+	}.
+} tut: { :e 
+	Çykyş ýaz: e, täze-setir.
+}, işlet.
+
+# invalid format
+s := ['"he"llo";world'].
+csv ýaz: s.
+{
+	csv bölüji: [';'] goşa-dyrnak: ['"'] setirler: { :line
+		Çykyş ýaz: line, täze-setir.
+	}.
+} tut: { :e 
+	Çykyş ýaz: e, täze-setir.
+}, işlet.

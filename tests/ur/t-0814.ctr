@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server ابتدا-کریں.
+پروگرام استعمال: ⌝'../../../src/xo/ur/webtools.xo'⌜.
+
+>> Fake-Request := آبجیکٹ نیا.
+Fake-Request جب: ⌝'value:'⌜ کرو: ⎬ :قدر
+	اپنا قدر := قدر.
+⎨.
+Fake-Request جب: ⌝'cookie:'⌜ کرو: ⎬ :نام <- اپنا قدر.
+⎨.
+
+>> Test-Session := عارضی-فائل-سیشن نیا.
+Test-Session جب: ⌝'لوڈ-کریں'⌜ کرو: ⎬ <- لغت نیا.
+⎨.
+Test-Session جب: ⌝'session-id'⌜ کرو: ⎬ <- اپنا id.
+⎨.
+
+>> cookies := لسٹ نیا
+	; ⌝'abc123'⌜
+	; ⌝'../outside'⌜
+	; ⌝''⌜
+	; ⌝'abc\n'⌜.
+
+cookies ہر-ایک: ⎬ :i :cookie
+	>> درخواست-http := Fake-Request نیا.
+	درخواست-http value: cookie.
+	>> منتظم := Test-Session نیا.
+	>> web := ویب-دستاویز نیا.
+	web درخواست-http: درخواست-http.
+	web سیشن-منتظم: منتظم.
+	web سیشن-شروع-کریں.
+	آؤٹ-پٹ لکھو: ﴿ منتظم session-id = cookie ﴾, نئی-سطر.
+⎨.
+
+>> web := ویب-دستاویز نیا.
+web json: ﴿لغت نیا رکھو: ⌝'b'⌜ کلید: ⌝'a'⌜﴾.
+آؤٹ-پٹ لکھو: ⌝'\n'⌜, نئی-سطر.
+
+⎬ نیٹ-ورک get: ⌝'file:///etc/hostname'⌜. ⎨ پکڑو: ⎬ :e
+	آؤٹ-پٹ لکھو: e, نئی-سطر.
+⎨, چلاؤ.
+
+>> svg := فائل نیا: ⌝'/tmp/test0814.svg'⌜.
+svg لکھو: ⌝'<svg xmlns="x"></svg>'⌜.
+آؤٹ-پٹ نئی-سطر.
+Server گزارو: ⌝'test0814.svg'⌜ سابقہ: ⌝'/tmp/'⌜.
+svg مٹاؤ.

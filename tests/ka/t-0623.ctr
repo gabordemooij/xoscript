@@ -1,0 +1,43 @@
+
+
+>> g := Server ახალი.
+>> v := სეიფი ახალი.
+>> ok := 0.
+
+>> secrets := სია ახალი ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets კოპირება.
+passwords თითოეული: { :i :p
+	secrets თითოეული: { :n :s
+		{
+			>> encrypted := v დაშიფვრა: s გასაღები: p.
+			>> decrypted := v გაშიფვრა: encrypted გასაღები: p.
+			(decrypted = s) ჭეშმარიტი: {
+				ok დამატება: 1.
+			}, თორემ: {
+				გამოტანა დაწერე: ['failed encrypting/decrypting: '], ახალი-ხაზი.
+				გამოტანა დაწერე: s, ახალი-ხაზი.
+				გამოტანა დაწერე: ['encrypted: '] + encrypted, ახალი-ხაზი.
+				გამოტანა დაწერე: ['decrypted: '] + encrypted, ახალი-ხაზი.
+				პროგრამა დასასრული.
+			}.
+		} დაჭერა: { :err
+			(s = [''] ან: p = ['']) ჭეშმარიტი: {
+				ok დამატება: 1.
+			}, თორემ: {
+				გამოტანა დაწერე: err, ახალი-ხაზი.
+				პროგრამა დასასრული.
+			}.
+		}, გაშვება.
+	}.
+}.
+
+გამოტანა დაწერე: ( ok + [' vault encryptions tested.'] ), ახალი-ხაზი.

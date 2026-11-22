@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := 金庫 鍵生成.
+>> sk := keys 最初.
+>> pk := keys 最後.
+>> sig := 金庫 署名: ['abc'] 鍵: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ 金庫 署名: ['abc'] 鍵: long. } 例外時: { :e
+	出力 書く: e, 改行.
+}, 開始.
+
+{ 金庫 確認: ['abc'] 署名: long 鍵: pk. } 例外時: { :e
+	出力 書く: e, 改行.
+}, 開始.
+
+{ 金庫 確認: ['abc'] 署名: sig 鍵: short. } 例外時: { :e
+	出力 書く: e, 改行.
+}, 開始.

@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Program hukommelsesstyring: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Program indstilling: ['FFITESTLIB'].
+
+
+
+Server forbind: (
+ Liste ny ;
+ libname ;
+ ['puts'] ;
+ ( Liste ny ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s frigiv.
+
+# test with struct
+
+>> a := Blob ny: 8.
+a bytes: (
+	Liste <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Liste <<: ['int'], ; ['int']).
+
+Server forbind: (
+	Liste <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Liste <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Uddata skriv: ['Sum test:'] + (ffitest ffisum: a), stop.
+
+struct frigiv-struct.
+struct frigiv.
+a frigiv.

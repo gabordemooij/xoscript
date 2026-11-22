@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Atur-cara pengurusan-ingatan: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Atur-cara tetapan: ['FFITESTLIB'].
+
+
+
+Server pautkan: (
+ Senarai baharu ;
+ libname ;
+ ['puts'] ;
+ ( Senarai baharu ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s bebaskan.
+
+# test with struct
+
+>> a := Blob baharu: 8.
+a bytes: (
+	Senarai <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Senarai <<: ['int'], ; ['int']).
+
+Server pautkan: (
+	Senarai <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Senarai <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Keluaran tulis: ['Sum test:'] + (ffitest ffisum: a), baris-baharu.
+
+struct bebaskan-struct.
+struct bebaskan.
+a bebaskan.

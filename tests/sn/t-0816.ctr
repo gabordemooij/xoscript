@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> edza := { :format :value
+	{ Zvabuda nyora: ( (Chimiro nyowani: format) shandisa: value ), mutsara-mutsva. } bata: { :e Zvabuda nyora: e, mutsara-mutsva. }, tanga.
+}.
+>> try-int := { :format :value
+	{ Zvabuda nyora: ( (Chimiro nyowani: format) shandisa-nhamba-izere: value ), mutsara-mutsva. } bata: { :e Zvabuda nyora: e, mutsara-mutsva. }, tanga.
+}.
+
+# fits
+edza shandisa: ['|%s|'] uye: ['text'].
+edza shandisa: ['%06.2f'] uye: 5.5.
+edza shandisa: ['100%% %s'] uye: ['sure'].
+try-int shandisa: ['%03d'] uye: 7.
+try-int shandisa: ['%x'] uye: 255.
+edza shandisa: ['%d'] uye: (Int64 nyowani kubva-mumavara: ['12']).
+edza shandisa: ['%lld'] uye: (Int64 nyowani kubva-mumavara: ['12']).
+edza shandisa: ['%.1lf'] uye: 5.5.
+try-int shandisa: ['%hd'] uye: 7.
+
+# does not fit
+edza shandisa: ['%s'] uye: 12345.
+edza shandisa: ['%d'] uye: 12345.
+edza shandisa: ['%f'] uye: ['text'].
+try-int shandisa: ['%d'] uye: ['text'].
+try-int shandisa: ['%s'] uye: 5.
+edza shandisa: ['%s %s'] uye: ['text'].
+edza shandisa: ['%n'] uye: ['text'].
+edza shandisa: ['%*s'] uye: ['text'].
+edza shandisa: ['%'] uye: ['text'].
+
+# length modifier does not fit
+edza shandisa: ['%ls'] uye: ['text'].
+edza shandisa: ['%Lf'] uye: 5.5.
+try-int shandisa: ['%ld'] uye: 7.
+try-int shandisa: ['%lld'] uye: 7.
+edza shandisa: ['%Ld'] uye: (Int64 nyowani kubva-mumavara: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+edza shandisa: ['%99999999999s'] uye: ['text'].

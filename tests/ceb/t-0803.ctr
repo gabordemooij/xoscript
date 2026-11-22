@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB bag-o host: ['localhost'],
+	ngalan-sa-user: ['xo'],
+	password: ['pass123'],
+	ngalan-sa-database: ['xobase'],
+	sumpay.
+
+>> conn2 := Maria-DB bag-o host: ['localhost'],
+	ngalan-sa-user: ['xo'],
+	password: ['pass123'],
+	ngalan-sa-database: ['xobase'],
+	sumpay.
+#...
+>> del := conn1 pangutana: ['DELETE FROM book WHERE id > 0'].
+{  del ipatuman. conn1 kumpirmaha. } dakpon: { :e conn1 ibalik.  }, padagana.
+
+>> insert := conn1 pangutana: ['INSERT INTO book (id) VALUES(null)'].
+insert ipatuman.
+
+>> ihap := conn1 pangutana: ['SELECT COUNT(*) AS num FROM book'].
+ihap kuhaa: { :row Gawas isulat: row num, bag-ong-linya. }.
+
+# does not show up
+# insert not committed on connection 1
+>> ihap := conn2 pangutana: ['SELECT COUNT(*) AS num FROM book'].
+ihap kuhaa: { :row Gawas isulat: row num, bag-ong-linya. }.

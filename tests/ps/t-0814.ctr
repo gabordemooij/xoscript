@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server پیل-کول.
+پروګرام وکاروه: ⌝'../../../src/xo/ps/webtools.xo'⌜.
+
+>> Fake-Request := څیز نوی.
+Fake-Request کله: ⌝'value:'⌜ وکړه: ⎬ :ارزښت
+	خپل ارزښت := ارزښت.
+⎨.
+Fake-Request کله: ⌝'cookie:'⌜ وکړه: ⎬ :نوم <- خپل ارزښت.
+⎨.
+
+>> Test-Session := لنډمهاله-دوتنه-ناسته نوی.
+Test-Session کله: ⌝'پورته-کړه'⌜ وکړه: ⎬ <- قاموس نوی.
+⎨.
+Test-Session کله: ⌝'session-id'⌜ وکړه: ⎬ <- خپل id.
+⎨.
+
+>> cookies := لیست نوی
+	; ⌝'abc123'⌜
+	; ⌝'../outside'⌜
+	; ⌝''⌜
+	; ⌝'abc\n'⌜.
+
+cookies هر-یو: ⎬ :i :cookie
+	>> غوښتنه-http := Fake-Request نوی.
+	غوښتنه-http value: cookie.
+	>> مدیر := Test-Session نوی.
+	>> web := ویب-سند نوی.
+	web غوښتنه-http: غوښتنه-http.
+	web د-ناستو-مدیر: مدیر.
+	web ناسته-پیل-کړه.
+	وتنه ولیکه: ﴿ مدیر session-id = cookie ﴾, نوې-کرښه.
+⎨.
+
+>> web := ویب-سند نوی.
+web json: ﴿قاموس نوی کېږده: ⌝'b'⌜ کیلي: ⌝'a'⌜﴾.
+وتنه ولیکه: ⌝'\n'⌜, نوې-کرښه.
+
+⎬ شبکه get: ⌝'file:///etc/hostname'⌜. ⎨ ونیسه: ⎬ :e
+	وتنه ولیکه: e, نوې-کرښه.
+⎨, چلول.
+
+>> svg := دوتنه نوی: ⌝'/tmp/test0814.svg'⌜.
+svg ولیکه: ⌝'<svg xmlns="x"></svg>'⌜.
+وتنه نوې-کرښه.
+Server تېر-کړه: ⌝'test0814.svg'⌜ مختاړی: ⌝'/tmp/'⌜.
+svg ړنګ-کړه.

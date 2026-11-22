@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> hanyar-fayil := ['/tmp/test0821.csv'].
+>> file := Fayil sabo: hanyar-fayil.
+
+file rubuta: ['a,b\n"1,2\n'].
+{
+	file mai-rabawa: [','] alamar-zance: ['"'] layuka: { :line
+		Fitarwa rubuta: line, sabon-layi.
+	}.
+} kama: { :e Fitarwa rubuta: e, sabon-layi. }, fara.
+
+# a closed quote still works
+file rubuta: ['a,b\n"1,2",3'].
+file mai-rabawa: [','] alamar-zance: ['"'] layuka: { :line
+	Fitarwa rubuta: line, sabon-layi.
+}.
+file goge.

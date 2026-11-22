@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server баштоо.
+Программа пайдалануу: ['../../../src/xo/ky/webtools.xo'].
+
+>> Fake-Request := Объект жаңы.
+Fake-Request келгенде: ['value:'] аткар: { :маани
+	өзүнүн маани := маани.
+}.
+Fake-Request келгенде: ['cookie:'] аткар: { :аталыш <- өзүнүн маани.
+}.
+
+>> Test-Session := Убактылуу-файл-сеансы жаңы.
+Test-Session келгенде: ['жүктөө'] аткар: { <- Сөздүк жаңы.
+}.
+Test-Session келгенде: ['session-id'] аткар: { <- өзүнүн id.
+}.
+
+>> cookies := Тизме жаңы
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies ар-бир: { :i :cookie
+	>> http-суроо := Fake-Request жаңы.
+	http-суроо value: cookie.
+	>> башкаргыч := Test-Session жаңы.
+	>> web := Веб-документ жаңы.
+	web http-суроо: http-суроо.
+	web сеанс-башкаргычы: башкаргыч.
+	web сеансты-баштоо.
+	Чыгаруу жазуу: ( башкаргыч session-id = cookie ), жаңы-сап.
+}.
+
+>> web := Веб-документ жаңы.
+web json: (Сөздүк жаңы салуу: ['b'] ачкыч: ['a']).
+Чыгаруу жазуу: ['\n'], жаңы-сап.
+
+{ Тармак get: ['file:///etc/hostname']. } кармоо: { :e
+	Чыгаруу жазуу: e, жаңы-сап.
+}, иштетүү.
+
+>> svg := Файл жаңы: ['/tmp/test0814.svg'].
+svg жазуу: ['<svg xmlns="x"></svg>'].
+Чыгаруу жаңы-сап.
+Server өткөрүү: ['test0814.svg'] префикс: ['/tmp/'].
+svg өчүрүү.

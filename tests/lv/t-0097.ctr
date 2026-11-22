@@ -1,0 +1,42 @@
+
+Teksts kad: ['html'] darīt: { <- (
+		pats
+		aizstāt: ['&'] ar: ['&amp;'],
+		aizstāt: ['<'] ar: ['&lt;'],
+		aizstāt: ['>'] ar: ['&gt;'],
+		aizstāt: ['"'] ar: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objekts jauns.
+
+HtmlBrush kad: ['atbildēt:'] darīt: { :tag
+	Izvade rakstīt: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush kad: ['atbildēt:un:'] darīt: { :tag :content
+	tag := ( tag no: 0 garums: (tag garums - 1) ).
+	Izvade rakstīt: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush kad: ['content:'] darīt: { :text
+	Izvade rakstīt: text html, jauna-rinda.
+}.
+
+HtmlBrush kad: ['attr:value:'] darīt: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush jauns.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

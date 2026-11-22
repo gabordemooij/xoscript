@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Pwogram paramèt: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server konekte-ak: ( Lis nouvo ;
+ libname ; ['fopen'] ;
+ ( Lis nouvo ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+konekte-ak: ( Lis nouvo ;
+ Anyen ; # means same lib
+ ['fread'] ;
+ ( Lis nouvo ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Anyen ; # means same object (i.e. Stream)
+ ['fread']
+),
+konekte-ak: (
+ Lis nouvo ;
+ Anyen ; # means same lib
+ ['fwrite'] ;
+ ( Lis nouvo ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Anyen ; # means same lib
+ ['fwrite']
+),
+konekte-ak: (
+ Lis nouvo ;
+ Anyen ; # means same lib
+ ['rewind'] ;
+ ( Lis nouvo ; ['pointer'] ) ;
+ ['int'] ;
+ Anyen ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> chemen-fichye := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: chemen-fichye mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream mesaj: ['fwrite'] agiman: (Lis nouvo ; str ; 1 ; 6 ; fd ).
+Sòti ekri: bytes-written, nouvo-liy.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob nouvo: 20.
+
+# read from file
+>> bytes-read := Stream mesaj: ['fread'] agiman: (Lis nouvo ; buf ; 1 ; 6 ; fd ).
+Sòti ekri: bytes-read, nouvo-liy.
+Sòti ekri: buf, nouvo-liy.
+
+# free memory
+str  libere.
+chemen-fichye libere.
+mode libere.
+buf  libere.
+
+

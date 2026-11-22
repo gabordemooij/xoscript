@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lis nouvo ;
+	# {"key":"normal"} normal ASCII
+	( Diksyonè nouvo mete: ['normal'] nan: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Diksyonè nouvo mete: ['hello world'] nan: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Diksyonè nouvo mete: ['"'] nan: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Diksyonè nouvo mete: ['backslash: \\'] nan: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Diksyonè nouvo mete: ['slash: /'] nan: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Diksyonè nouvo mete: ['backspace: \b'] nan: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Diksyonè nouvo mete: ['formfeed: \f'] nan: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Diksyonè nouvo mete: ['newline: \n'] nan: ['key'] ) ;
+	( Diksyonè nouvo mete: ['newline: ↵'] nan: ['key'] ) ;
+	( Diksyonè nouvo mete: ['newline: 
+	'] nan: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Diksyonè nouvo mete: ['carriage return: \r'] nan: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Diksyonè nouvo mete: ['tab \t'] nan: ['key'] ) ;
+	( Diksyonè nouvo mete: ['tab ⇿'] nan: ['key'] ) ;
+	( Diksyonè nouvo mete: ['tab  '] nan: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Diksyonè nouvo mete: ['NUL \u0000'] nan: ['key'] ) ;
+	( Diksyonè nouvo mete: ['NUL \0'] nan: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Diksyonè nouvo mete: ['control: \u0001'] nan: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Diksyonè nouvo mete: ['control: \u001F'] nan: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Diksyonè nouvo mete: ['unicode: é'] nan: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Diksyonè nouvo mete: ['unicode: €'] nan: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Diksyonè nouvo mete: ['unicode: 日本語'] nan: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Diksyonè nouvo mete: ['unicode: 😀'] nan: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Diksyonè nouvo mete: ['unicode: 🧑‍💻'] nan: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Diksyonè nouvo mete: ['combining: e\u0301'] nan: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Diksyonè nouvo mete: ['escaped unicode: \u00e9'] nan: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Diksyonè nouvo mete: ['escaped unicode: \u20ac'] nan: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Diksyonè nouvo mete: ['escaped unicode: \ud83d\ude00'] nan: ['key'] ) ;
+	# {"key":""} empty value
+	( Diksyonè nouvo mete: [''] nan: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Diksyonè nouvo mete: ['@ < > & = % + ? #'] nan: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Diksyonè nouvo mete: ['''] nan: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Diksyonè nouvo mete: ['multiple: \" \\ \n \r \t'] nan: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Diksyonè nouvo mete: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] nan: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Diksyonè nouvo mete: [' value'] nan: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Diksyonè nouvo mete: ['value '] nan: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Diksyonè nouvo mete: [' \t\n\r '] nan: ['key'] ).
+
+dicts chak: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Diksyonè nouvo mete: d key nan: ['key']).
+	>> b := JSON jsonify: (Diksyonè nouvo mete: ['value'] nan: d key).
+	>> e := JSON objè: a.
+	>> f := JSON objè: b.
+	((e key = d key ak: (f ? d key = ['value'])) oswa: (e key = ['NUL ?'])) vre: {
+		Sòti ekri: ['OK'], nouvo-liy.
+	}, sinon: {
+		Sòti ekri: ['Unable to properly encode/decode: '] + d + j, nouvo-liy.
+		Pwogram fen.
+	}.
+}.

@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB ନୂତନ ହୋଷ୍ଟ: ['localhost'],
+	ଉପଯୋଗକର୍ତ୍ତା-ନାମ: ['xo'],
+	ପାସୱାର୍ଡ: ['pass123'],
+	ଡାଟାବେସ୍-ନାମ: ['xobase'],
+	ସଂଯୋଗ.
+
+>> conn2 := Maria-DB ନୂତନ ହୋଷ୍ଟ: ['localhost'],
+	ଉପଯୋଗକର୍ତ୍ତା-ନାମ: ['xo'],
+	ପାସୱାର୍ଡ: ['pass123'],
+	ଡାଟାବେସ୍-ନାମ: ['xobase'],
+	ସଂଯୋଗ.
+#...
+>> del := conn1 କ୍ୱେରୀ: ['DELETE FROM book WHERE id > 0'].
+{  del ନିର୍ବାହ. conn1 ନିଶ୍ଚିତ. } ଧର: { :e conn1 ଫେରାଇ-ନିଅ.  }, ଚଲାଅ.
+
+>> insert := conn1 କ୍ୱେରୀ: ['INSERT INTO book (id) VALUES(null)'].
+insert ନିର୍ବାହ.
+
+>> ଗଣନା := conn1 କ୍ୱେରୀ: ['SELECT COUNT(*) AS num FROM book'].
+ଗଣନା ଆଣ: { :row ଆଉଟପୁଟ୍ ଲେଖ: row num, ନୂଆ-ଧାଡ଼ି. }.
+
+# does not show up
+# insert not committed on connection 1
+>> ଗଣନା := conn2 କ୍ୱେରୀ: ['SELECT COUNT(*) AS num FROM book'].
+ଗଣନା ଆଣ: { :row ଆଉଟପୁଟ୍ ଲେଖ: row num, ନୂଆ-ଧାଡ଼ି. }.

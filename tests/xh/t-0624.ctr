@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Into entsha.
+
+Log xa-kufika: ['say:'] yenza: { :str
+	Imveliso bhala: str, umgca-omtsha.
+}.
+
+>> Item := Into entsha.
+
+Item xa-kufika: ['entsha:'] yenza: { :id <- ngokwakho entsha id: id.
+}.
+
+Item xa-kufika: ['id:'] yenza: { :id
+	eyakho id := id.
+}.
+
+Item xa-kufika: ['id'] yenza: { <- eyakho id. }.
+
+
+Item xa-kufika: ['umbhalo'] yenza: {
+	>> str := ['Item#~no'].
+	str ~no: eyakho id. <- str.
+}.
+
+
+>> Print := Into entsha.
+
+Print xa-kufika: ['items'] yenza: { 
+	
+	eyakho item := Item entsha: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: eyakho item
+	).
+	
+	
+}.
+
+Print items.

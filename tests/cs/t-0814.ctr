@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inicializovat.
+Program použít: ['../../../src/xo/cs/webtools.xo'].
+
+>> Fake-Request := Objekt nový.
+Fake-Request při: ['value:'] udělat: { :hodnota
+	vlastní hodnota := hodnota.
+}.
+Fake-Request při: ['cookie:'] udělat: { :název <- vlastní hodnota.
+}.
+
+>> Test-Session := Relace-dočasný-soubor nový.
+Test-Session při: ['načíst'] udělat: { <- Slovník nový.
+}.
+Test-Session při: ['session-id'] udělat: { <- vlastní id.
+}.
+
+>> cookies := Seznam nový
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies každý: { :i :cookie
+	>> požadavek := Fake-Request nový.
+	požadavek value: cookie.
+	>> správce := Test-Session nový.
+	>> web := Webový-dokument nový.
+	web požadavek: požadavek.
+	web správce-relací: správce.
+	web zahájit-relaci.
+	Výstup psát: ( správce session-id = cookie ), nový-řádek.
+}.
+
+>> web := Webový-dokument nový.
+web json: (Slovník nový umístit: ['b'] na: ['a']).
+Výstup psát: ['\n'], nový-řádek.
+
+{ Síť get: ['file:///etc/hostname']. } chytit: { :e
+	Výstup psát: e, nový-řádek.
+}, spustit.
+
+>> svg := Soubor nový: ['/tmp/test0814.svg'].
+svg psát: ['<svg xmlns="x"></svg>'].
+Výstup nový-řádek.
+Server předat: ['test0814.svg'] prefix: ['/tmp/'].
+svg smazat.

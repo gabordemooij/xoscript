@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB nov gostitelj: ['localhost'],
+	uporabnik: ['xo'],
+	geslo: ['pass123'],
+	ime-baze: ['xobase'],
+	poveži-se.
+
+>> iskalni-parametri := db poizvedba: ['SELECT ? AS a, ? AS b, ? AS c'].
+iskalni-parametri parametri: (Seznam nov ; ['1']).
+{ iskalni-parametri pridobi: { :row Izhod piši: row, nova-vrstica. }. } ujemi: { :e Izhod piši: e, nova-vrstica. }, zaženi.
+
+>> iskalni-parametri := db poizvedba: ['SELECT ? AS a'].
+{ iskalni-parametri pridobi: { :row Izhod piši: row, nova-vrstica. }. } ujemi: { :e Izhod piši: e, nova-vrstica. }, zaženi.
+
+# the right number still works, more parameters are ignored as before
+>> iskalni-parametri := db poizvedba: ['SELECT ? AS a, ? AS b'].
+iskalni-parametri parametri: (Seznam nov ; ['1'] ; ['2']).
+iskalni-parametri pridobi: { :row Izhod piši: (row na: ['a']), piši: (row na: ['b']), nova-vrstica. }.
+iskalni-parametri parametri: (Seznam nov ; ['1'] ; ['2'] ; ['3']).
+iskalni-parametri pridobi: { :row Izhod piši: (row na: ['a']), piši: (row na: ['b']), nova-vrstica. }.

@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Bername mîheng: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server girêbide: ( Lîste nû ;
+ libname ; ['fopen'] ;
+ ( Lîste nû ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+girêbide: ( Lîste nû ;
+ Tune ; # means same lib
+ ['fread'] ;
+ ( Lîste nû ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Tune ; # means same object (i.e. Stream)
+ ['fread']
+),
+girêbide: (
+ Lîste nû ;
+ Tune ; # means same lib
+ ['fwrite'] ;
+ ( Lîste nû ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Tune ; # means same lib
+ ['fwrite']
+),
+girêbide: (
+ Lîste nû ;
+ Tune ; # means same lib
+ ['rewind'] ;
+ ( Lîste nû ; ['pointer'] ) ;
+ ['int'] ;
+ Tune ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> riya-pelê := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: riya-pelê mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream peyam: ['fwrite'] argûman: (Lîste nû ; str ; 1 ; 6 ; fd ).
+Derketin binivîse: bytes-written, rêza-nû.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob nû: 20.
+
+# read from file
+>> bytes-read := Stream peyam: ['fread'] argûman: (Lîste nû ; buf ; 1 ; 6 ; fd ).
+Derketin binivîse: bytes-read, rêza-nû.
+Derketin binivîse: buf, rêza-nû.
+
+# free memory
+str  azad-bike.
+riya-pelê azad-bike.
+mode azad-bike.
+buf  azad-bike.
+
+

@@ -1,0 +1,43 @@
+
+
+>> g := Server ny.
+>> v := Boks ny.
+>> ok := 0.
+
+>> secrets := Liste ny ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopiér.
+passwords hver: { :i :p
+	secrets hver: { :n :s
+		{
+			>> encrypted := v kryptér: s nøgle: p.
+			>> decrypted := v dekryptér: encrypted nøgle: p.
+			(decrypted = s) sand: {
+				ok læg-til: 1.
+			}, ellers: {
+				Uddata skriv: ['failed encrypting/decrypting: '], stop.
+				Uddata skriv: s, stop.
+				Uddata skriv: ['encrypted: '] + encrypted, stop.
+				Uddata skriv: ['decrypted: '] + encrypted, stop.
+				Program afslut.
+			}.
+		} fang: { :err
+			(s = [''] eller: p = ['']) sand: {
+				ok læg-til: 1.
+			}, ellers: {
+				Uddata skriv: err, stop.
+				Program afslut.
+			}.
+		}, start.
+	}.
+}.
+
+Uddata skriv: ( ok + [' vault encryptions tested.'] ), stop.

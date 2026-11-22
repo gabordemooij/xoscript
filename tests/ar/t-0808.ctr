@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := خزنة ولد-مفاتيح.
+>> sk := keys الأول.
+>> pk := keys الأخير.
+>> sig := خزنة وقع: ⌝'abc'⌜ بمفتاح: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+
+# 44 characters without padding decode to 33 bytes
+>> short := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+
+⎬ خزنة وقع: ⌝'abc'⌜ بمفتاح: long. ⎨ التقط: ⎬ :e
+	مخرج اكتب: e, سطر-جديد.
+⎨, شغل.
+
+⎬ خزنة افحص: ⌝'abc'⌜ توقيع: long بمفتاح: pk. ⎨ التقط: ⎬ :e
+	مخرج اكتب: e, سطر-جديد.
+⎨, شغل.
+
+⎬ خزنة افحص: ⌝'abc'⌜ توقيع: sig بمفتاح: short. ⎨ التقط: ⎬ :e
+	مخرج اكتب: e, سطر-جديد.
+⎨, شغل.

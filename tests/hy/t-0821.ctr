@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> ուղի := ['/tmp/test0821.csv'].
+>> file := Ֆայլ նոր: ուղի.
+
+file գրել: ['a,b\n"1,2\n'].
+{
+	file բաժանիչ: [','] չակերտ: ['"'] տողեր: { :line
+		Ելք գրել: line, նոր-տող.
+	}.
+} որսալ: { :e Ելք գրել: e, նոր-տող. }, գործարկել.
+
+# a closed quote still works
+file գրել: ['a,b\n"1,2",3'].
+file բաժանիչ: [','] չակերտ: ['"'] տողեր: { :line
+	Ելք գրել: line, նոր-տող.
+}.
+file ջնջել.

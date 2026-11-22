@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+გამოტანა დაწერე: ['Database test'], ახალი-ხაზი.
+
+>> db := Maria-DB ახალი ჰოსტი: ['localhost'],
+	მომხმარებელი: ['xo'], პაროლი: ['pass123'], ბაზის-სახელი: ['xobase'], მიერთება.
+
+გამოტანა დაწერე: ['Can we connect? '] + db მიერთებულია?, ახალი-ხაზი.
+
+>> ძიების-პარამეტრები := db მოთხოვნა: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], პარამეტრები: ( სია ახალი ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  ძიების-პარამეტრები შესრულება. db დადასტურება. } დაჭერა: { :e db გაუქმება.  }, გაშვება.
+
+გამოტანა დაწერე: ['Can we insert? '] + ( ძიების-პარამეტრები insert-id > 0 ), ახალი-ხაზი.
+
+>> Obj := ობიექტი ახალი.
+Obj როცა: ['retrieve-rows'] გააკეთე: {
+	საკუთარი რაოდენობა := 0.
+	>> ძიების-პარამეტრები :=
+	db მოთხოვნა: ['SELECT * FROM book order by id desc limit 2'], 
+	მიღება: { :row 
+		საკუთარი რაოდენობა დამატება: 1.
+		ჭეშმარიტი შეწყვეტა.
+	}. <- საკუთარი რაოდენობა კოპირება.
+}.
+
+გამოტანა დაწერე: ['Can we query? '] + ( Obj retrieve-rows > 0 ), ახალი-ხაზი.

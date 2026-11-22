@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := నిఘంటువు కొత్త
+	# ASCII only
+	ఉంచు: ( వరుస కొత్త ; 65 ; 65 ; 65 ; 65 ; 0 ) కీ: ['AAAA'],
+	# valid 2 byte sequence
+	ఉంచు: ( వరుస కొత్త ; 194 ; 162 ; 0 ) కీ: ['¢'],
+	# Valid 3-byte UTF-8
+    ఉంచు: ( వరుస కొత్త ; 226 ; 130 ; 172 ; 0 ) కీ: ['€'],
+	# Valid 4-byte UTF-8
+    ఉంచు: ( వరుస కొత్త ; 240 ; 144 ; 141 ; 136 ; 0 ) కీ: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    ఉంచు: ( వరుస కొత్త ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) కీ: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    ఉంచు: ( వరుస కొత్త ; 65 ; 193 ; 129 ; 0 ) కీ: ['A?'],
+	# Invalid first byte (0xFF)
+    ఉంచు: ( వరుస కొత్త ; 255 ; 0 ) కీ: ['?'],
+	# Incomplete multi-byte sequence at end
+    ఉంచు: ( వరుస కొత్త ; 66 ; 226 ; 0 ) కీ: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    ఉంచు: ( వరుస కొత్త ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) కీ: ['A€?𐍈B'].
+	 
+utf8cases ప్రతి: { :key :value
+	>> blob := Blob కొత్త: value లెక్క, bytes: value.
+	>> str := blob పాఠ్యంగా.
+	(str = key) నిజమైతే: {
+		అవుట్-పుట్ రాయి: ['OK'], కొత్త-పంక్తి.
+	}, లేకపోతే: {
+		అవుట్-పుట్ రాయి: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, కొత్త-పంక్తి.
+	}.
+	blob విడుదల.
+}.

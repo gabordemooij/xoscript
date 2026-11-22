@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server инициализациялау.
+Бағдарлама пайдалану: ['../../../src/xo/kk/webtools.xo'].
+Бағдарлама пайдалану: ['../../../src/xo/kk/mailtools.xo'].
+
+>> тақырыпша := HTTP-Тақырыпша жаңа кілт: ['Location'] мән: ['/ok\r\nX-Injected: yes'].
+Шығыс жазу: тақырыпша.
+
+>> web := Веб-құжат жаңа.
+web өту: ['/ok\r\nX-Injected: yes'].
+Шығыс жазу: ['\n'], жаңа-жол.
+
+>> mail := Электрондық-хат жаңа.
+mail алушыға: (Тізім жаңа ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Тізім жаңа ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Тізім жаңа ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail жіберуші: ['d@example.invalid\r\nX-From: yes'] атау: ['site\r\nX-Name: yes'].
+mail тақырып: ['hello\r\nX-Subject: yes'].
+mail мәтін-денесі: ['line1\r\nline2'].
+Шығыс жазу: mail құру.
+
+>> html := HTML-Электрондық-хат жаңа.
+html алушыға: (Тізім жаңа ; ['a@example.invalid\r\nX-To: yes']).
+html жіберуші: ['d@example.invalid'] атау: ['site'].
+html тақырып: ['hello\r\nX-Subject: yes'].
+html мәтін-денесі: ['body'].
+Шығыс жазу: ( html құру қамтиды: ['\nX-'] ), жаңа-жол.
+Шығыс жазу: ( html құру қамтиды: ['X-To: yes'] ), жаңа-жол.

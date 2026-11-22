@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programma geheugenbehear: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB nĳ host: ['localhost'],
+	brûkersnamme: ['xo'], wachtwurd: ['pass123'], databanknamme: ['xobase'], ferbine.
+
+>> TwoDigitFormat := Formaat nĳ: ['%02d'].
+
+# Datetime
+{
+	>> jier := Getal tusken: 1995 en: 2050, tekst.
+	>> moanne := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 12), tekst.
+	>> dei := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 28), tekst.
+	>> oere := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 23), tekst.
+	>> minút := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 59), tekst.
+	>> sekonde := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 59), tekst.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: jier,
+		MM: moanne,
+		DD: dei,
+		HH: oere,
+		II: minút,
+		SS: sekonde.
+	>> sykparameters :=
+	db fraach: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ophelje: { :row
+		(row mydatetime = datetime) nee: {
+			dizze-taak flater: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter optelle: 1.
+} * 100.
+
+# Date
+{
+	>> jier := Getal tusken: 1995 en: 2050, tekst.
+	>> moanne := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 12), tekst.
+	>> dei := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 28), tekst.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: jier,
+		MM: moanne,
+		DD: dei.
+	>> sykparameters :=
+	db fraach: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ophelje: { :row
+		(row mydate = date) nee: {
+			dizze-taak flater: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter optelle: 1.
+} * 100.
+
+
+# Time
+{
+	>> oere := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 23), tekst.
+	>> minút := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 59), tekst.
+	>> sekonde := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 59), tekst.
+	>> tiid := ['HH:II:SS'].
+	tiid
+		HH: oere,
+		II: minút,
+		SS: sekonde.
+	>> sykparameters :=
+	db fraach: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: tiid),
+	ophelje: { :row
+		(row mytime = tiid) nee: {
+			dizze-taak flater: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter optelle: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Rige nĳ folje: 100000 mei: ['x'], gearfoegje: [''].
+{
+	>> str2 := Klûs token: 40.
+	>> sykparameters :=
+	db fraach: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ophelje: { :row
+		(row str1 = str1 en: row str2 = str2) nee: {
+			dizze-taak flater: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter optelle: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Getal tusken: 1 en: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 út-tekst: ['9223372036854775807'] ) -
+		( Int64 út-tekst: ['99999'] ) +
+		( Int64 út-tekst: n1 tekst )
+	).
+	>> sykparameters :=
+	db fraach: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ophelje: { :row
+		(row n1 = n1) nee: {
+			dizze-taak flater: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) nee: {
+			dizze-taak flater: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 ôfrûne) nee: {
+			dizze-taak flater: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) nee: {
+			dizze-taak flater: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter optelle: 1.
+} * 100.
+
+
+Utfier skriuwe: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), nije-rigel.

@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Lüğət yeni
+	# ASCII only
+	qoy: ( Siyahı yeni ; 65 ; 65 ; 65 ; 65 ; 0 ) yerə: ['AAAA'],
+	# valid 2 byte sequence
+	qoy: ( Siyahı yeni ; 194 ; 162 ; 0 ) yerə: ['¢'],
+	# Valid 3-byte UTF-8
+    qoy: ( Siyahı yeni ; 226 ; 130 ; 172 ; 0 ) yerə: ['€'],
+	# Valid 4-byte UTF-8
+    qoy: ( Siyahı yeni ; 240 ; 144 ; 141 ; 136 ; 0 ) yerə: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    qoy: ( Siyahı yeni ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) yerə: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    qoy: ( Siyahı yeni ; 65 ; 193 ; 129 ; 0 ) yerə: ['A?'],
+	# Invalid first byte (0xFF)
+    qoy: ( Siyahı yeni ; 255 ; 0 ) yerə: ['?'],
+	# Incomplete multi-byte sequence at end
+    qoy: ( Siyahı yeni ; 66 ; 226 ; 0 ) yerə: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    qoy: ( Siyahı yeni ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) yerə: ['A€?𐍈B'].
+	 
+utf8cases hər: { :key :value
+	>> blob := Blob yeni: value say, bytes: value.
+	>> str := blob mətn.
+	(str = key) doğru: {
+		Çıxış yaz: ['OK'], yeni-sətir.
+	}, əks-halda: {
+		Çıxış yaz: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, yeni-sətir.
+	}.
+	blob azad-et.
+}.

@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Tresor schlësselen-generéieren.
+>> sk := keys éischten.
+>> pk := keys lescht.
+>> sig := Tresor ënnerschreiwen: ['abc'] mat: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Tresor ënnerschreiwen: ['abc'] mat: long. } offänken: { :e
+	Ausgab schreiwen: e, nei-zeil.
+}, starten.
+
+{ Tresor iwwerpréiwen: ['abc'] ënnerschrëft: long mat: pk. } offänken: { :e
+	Ausgab schreiwen: e, nei-zeil.
+}, starten.
+
+{ Tresor iwwerpréiwen: ['abc'] ënnerschrëft: sig mat: short. } offänken: { :e
+	Ausgab schreiwen: e, nei-zeil.
+}, starten.

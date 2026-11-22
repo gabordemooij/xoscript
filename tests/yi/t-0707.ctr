@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+פּראָגראַם זכּרון-פֿאַרוואַלטונג: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB ניי באַלעבאָס: ⌝'localhost'⌜,
+	באַניצער-נאָמען: ⌝'xo'⌜, פּאַראָל: ⌝'pass123'⌜, דאַטנבאַזע-נאָמען: ⌝'xobase'⌜, פֿאַרבינד-זיך.
+
+>> TwoDigitFormat := פֿאָרמאַט ניי: ⌝'%02d'⌜.
+
+# Datetime
+⎬
+	>> יאָר := צאָל צווישן: 1995 ביז: 2050, צו-טעקסט.
+	>> חודש := TwoDigitFormat ווענד-אָן-גאַנצצאָל: ﴿צאָל צווישן: 1 ביז: 12﴾, צו-טעקסט.
+	>> טאָג := TwoDigitFormat ווענד-אָן-גאַנצצאָל: ﴿צאָל צווישן: 1 ביז: 28﴾, צו-טעקסט.
+	>> שעה := TwoDigitFormat ווענד-אָן-גאַנצצאָל: ﴿צאָל צווישן: 1 ביז: 23﴾, צו-טעקסט.
+	>> מינוט := TwoDigitFormat ווענד-אָן-גאַנצצאָל: ﴿צאָל צווישן: 1 ביז: 59﴾, צו-טעקסט.
+	>> סעקונדע := TwoDigitFormat ווענד-אָן-גאַנצצאָל: ﴿צאָל צווישן: 1 ביז: 59﴾, צו-טעקסט.
+	>> datetime := ⌝'YYYY-MM-DD HH:II:SS'⌜.	
+	datetime
+		YYYY: יאָר,
+		MM: חודש,
+		DD: טאָג,
+		HH: שעה,
+		II: מינוט,
+		SS: סעקונדע.
+	>> זוך-פּאַראַמעטערס :=
+	db פֿראַגע: ﴿⌝'
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'⌜ <datetime>: datetime﴾,
+	ברענג: ⎬ :row
+		﴿row mydatetime = datetime﴾ אויב-פֿאַלש: ⎬
+			די-אויפֿגאַבע טעות: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mydatetime
+			﴾.
+		⎨.
+	
+	⎨.
+	counter רעכן-צו: 1.
+⎨ * 100.
+
+# Date
+⎬
+	>> יאָר := צאָל צווישן: 1995 ביז: 2050, צו-טעקסט.
+	>> חודש := TwoDigitFormat ווענד-אָן-גאַנצצאָל: ﴿צאָל צווישן: 1 ביז: 12﴾, צו-טעקסט.
+	>> טאָג := TwoDigitFormat ווענד-אָן-גאַנצצאָל: ﴿צאָל צווישן: 1 ביז: 28﴾, צו-טעקסט.
+	>> date := ⌝'YYYY-MM-DD'⌜.
+	date
+		YYYY: יאָר,
+		MM: חודש,
+		DD: טאָג.
+	>> זוך-פּאַראַמעטערס :=
+	db פֿראַגע: ﴿⌝'
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'⌜ <date>: date﴾,
+	ברענג: ⎬ :row
+		﴿row mydate = date﴾ אויב-פֿאַלש: ⎬
+			די-אויפֿגאַבע טעות: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: date,
+				<observation>: row mydate
+			﴾.
+		⎨.
+	⎨.
+	counter רעכן-צו: 1.
+⎨ * 100.
+
+
+# Time
+⎬
+	>> שעה := TwoDigitFormat ווענד-אָן-גאַנצצאָל: ﴿צאָל צווישן: 1 ביז: 23﴾, צו-טעקסט.
+	>> מינוט := TwoDigitFormat ווענד-אָן-גאַנצצאָל: ﴿צאָל צווישן: 1 ביז: 59﴾, צו-טעקסט.
+	>> סעקונדע := TwoDigitFormat ווענד-אָן-גאַנצצאָל: ﴿צאָל צווישן: 1 ביז: 59﴾, צו-טעקסט.
+	>> צײַט := ⌝'HH:II:SS'⌜.
+	צײַט
+		HH: שעה,
+		II: מינוט,
+		SS: סעקונדע.
+	>> זוך-פּאַראַמעטערס :=
+	db פֿראַגע: ﴿⌝'
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'⌜ <time>: צײַט﴾,
+	ברענג: ⎬ :row
+		﴿row mytime = צײַט﴾ אויב-פֿאַלש: ⎬
+			די-אויפֿגאַבע טעות: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter רעכן-צו: 1.
+⎨ * 100.
+
+
+# Strings (varchar/text)
+>> str1 := ליסטע ניי פֿיל: 100000 מיט: ⌝'x'⌜, פֿאַראייניק: ⌝''⌜.
+⎬
+	>> str2 := סייף צייכן: 40.
+	>> זוך-פּאַראַמעטערס :=
+	db פֿראַגע: ﴿⌝'
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'⌜ 
+	<str1>: str1,
+	<str2>: str2
+	﴾,
+	ברענג: ⎬ :row
+		﴿row str1 = str1 און: row str2 = str2﴾ אויב-פֿאַלש: ⎬
+			די-אויפֿגאַבע טעות: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter רעכן-צו: 1.
+⎨ * 100.
+
+
+# Numbers
+⎬
+	>> n1 := צאָל צווישן: 1 ביז: 99999.
+	>> n2 := n1 / 1000.
+	>> big := ﴿
+		﴿ Int64 פֿון-טעקסט: ⌝'9223372036854775807'⌜ ﴾ -
+		﴿ Int64 פֿון-טעקסט: ⌝'99999'⌜ ﴾ +
+		﴿ Int64 פֿון-טעקסט: n1 צו-טעקסט ﴾
+	﴾.
+	>> זוך-פּאַראַמעטערס :=
+	db פֿראַגע: ﴿⌝'
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	'⌜
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	﴾,
+	ברענג: ⎬ :row
+		﴿row n1 = n1﴾ אויב-פֿאַלש: ⎬
+			די-אויפֿגאַבע טעות: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n1
+			﴾.
+		⎨.
+		﴿row n2 = n2﴾ אויב-פֿאַלש: ⎬
+			די-אויפֿגאַבע טעות: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n2
+			﴾.
+		⎨.
+		﴿row n3 = n2 רונד﴾ אויב-פֿאַלש: ⎬
+			די-אויפֿגאַבע טעות: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n3
+			﴾.
+		⎨.
+		﴿row big = big﴾ אויב-פֿאַלש: ⎬
+			די-אויפֿגאַבע טעות: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: big,
+				<observation>: row big
+			﴾.
+		⎨.
+		
+	⎨.
+	counter רעכן-צו: 1.
+⎨ * 100.
+
+
+אויסגאָב שרײַב: ﴿
+	⌝'OK, <counter> fuzzy casts/conversions tested.'⌜
+	<counter>: counter
+﴾, נײַע-שורה.

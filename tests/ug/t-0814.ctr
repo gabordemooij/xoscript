@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server دەسلەپلەشتۈر.
+پروگرامما ئىشلەت: ⌝'../../../src/xo/ug/webtools.xo'⌜.
+
+>> Fake-Request := ئوبيېكت يېڭى.
+Fake-Request كەلگەندە: ⌝'value:'⌜ قىل: ⎬ :قىممەت
+	ئۆزىنىڭ قىممەت := قىممەت.
+⎨.
+Fake-Request كەلگەندە: ⌝'cookie:'⌜ قىل: ⎬ :ئات <- ئۆزىنىڭ قىممەت.
+⎨.
+
+>> Test-Session := ۋاقىتلىق-ھۆججەت-سۆھبىتى يېڭى.
+Test-Session كەلگەندە: ⌝'يۈكلە'⌜ قىل: ⎬ <- لۇغەت يېڭى.
+⎨.
+Test-Session كەلگەندە: ⌝'session-id'⌜ قىل: ⎬ <- ئۆزىنىڭ id.
+⎨.
+
+>> cookies := تىزىم يېڭى
+	; ⌝'abc123'⌜
+	; ⌝'../outside'⌜
+	; ⌝''⌜
+	; ⌝'abc\n'⌜.
+
+cookies ھەربىر: ⎬ :i :cookie
+	>> تەلەپ-http := Fake-Request يېڭى.
+	تەلەپ-http value: cookie.
+	>> باشقۇرغۇچى := Test-Session يېڭى.
+	>> web := تور-ھۆججىتى يېڭى.
+	web تەلەپ-http: تەلەپ-http.
+	web سۆھبەت-باشقۇرغۇچى: باشقۇرغۇچى.
+	web سۆھبەتنى-باشلا.
+	چىقىرىش ياز: ﴿ باشقۇرغۇچى session-id = cookie ﴾, يېڭى-قۇر.
+⎨.
+
+>> web := تور-ھۆججىتى يېڭى.
+web json: ﴿لۇغەت يېڭى قوي: ⌝'b'⌜ ئاچقۇچ: ⌝'a'⌜﴾.
+چىقىرىش ياز: ⌝'\n'⌜, يېڭى-قۇر.
+
+⎬ تور get: ⌝'file:///etc/hostname'⌜. ⎨ تۇت: ⎬ :e
+	چىقىرىش ياز: e, يېڭى-قۇر.
+⎨, ئىجرا.
+
+>> svg := ھۆججەت يېڭى: ⌝'/tmp/test0814.svg'⌜.
+svg ياز: ⌝'<svg xmlns="x"></svg>'⌜.
+چىقىرىش يېڭى-قۇر.
+Server ئۆتكۈز: ⌝'test0814.svg'⌜ ئالدى-قوشۇلغۇچى: ⌝'/tmp/'⌜.
+svg ئۆچۈر.

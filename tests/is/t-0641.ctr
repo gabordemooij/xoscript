@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Orðabók nýtt
+	# ASCII only
+	setja: ( Listi nýtt ; 65 ; 65 ; 65 ; 65 ; 0 ) við: ['AAAA'],
+	# valid 2 byte sequence
+	setja: ( Listi nýtt ; 194 ; 162 ; 0 ) við: ['¢'],
+	# Valid 3-byte UTF-8
+    setja: ( Listi nýtt ; 226 ; 130 ; 172 ; 0 ) við: ['€'],
+	# Valid 4-byte UTF-8
+    setja: ( Listi nýtt ; 240 ; 144 ; 141 ; 136 ; 0 ) við: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    setja: ( Listi nýtt ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) við: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    setja: ( Listi nýtt ; 65 ; 193 ; 129 ; 0 ) við: ['A?'],
+	# Invalid first byte (0xFF)
+    setja: ( Listi nýtt ; 255 ; 0 ) við: ['?'],
+	# Incomplete multi-byte sequence at end
+    setja: ( Listi nýtt ; 66 ; 226 ; 0 ) við: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    setja: ( Listi nýtt ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) við: ['A€?𐍈B'].
+	 
+utf8cases hver: { :key :value
+	>> blob := Blob nýtt: value fjöldi, bytes: value.
+	>> str := blob texti.
+	(str = key) satt: {
+		Úttak skrifa: ['OK'], ný-lína.
+	}, annars: {
+		Úttak skrifa: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, ný-lína.
+	}.
+	blob losa.
+}.

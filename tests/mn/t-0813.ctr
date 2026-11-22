@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server эхлүүлэх.
+Програм ашиглах: ['../../../src/xo/mn/webtools.xo'].
+Програм ашиглах: ['../../../src/xo/mn/mailtools.xo'].
+
+>> толгой := HTTP-Толгой шинэ түлхүүр: ['Location'] утга: ['/ok\r\nX-Injected: yes'].
+Гаралт бичих: толгой.
+
+>> web := Вэб-баримт шинэ.
+web шилжих: ['/ok\r\nX-Injected: yes'].
+Гаралт бичих: ['\n'], шинэ-мөр.
+
+>> mail := Имэйл шинэ.
+mail хүлээн-авагчид: (Жагсаалт шинэ ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Жагсаалт шинэ ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Жагсаалт шинэ ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail илгээгч: ['d@example.invalid\r\nX-From: yes'] нэр: ['site\r\nX-Name: yes'].
+mail сэдэв: ['hello\r\nX-Subject: yes'].
+mail үндсэн-текст: ['line1\r\nline2'].
+Гаралт бичих: mail үүсгэх.
+
+>> html := HTML-Имэйл шинэ.
+html хүлээн-авагчид: (Жагсаалт шинэ ; ['a@example.invalid\r\nX-To: yes']).
+html илгээгч: ['d@example.invalid'] нэр: ['site'].
+html сэдэв: ['hello\r\nX-Subject: yes'].
+html үндсэн-текст: ['body'].
+Гаралт бичих: ( html үүсгэх багтаасан: ['\nX-'] ), шинэ-мөр.
+Гаралт бичих: ( html үүсгэх багтаасан: ['X-To: yes'] ), шинэ-мөр.

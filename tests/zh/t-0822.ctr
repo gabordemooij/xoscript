@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := 数据库 新建 主机: ['localhost'],
+	用户名: ['xo'],
+	密码: ['pass123'],
+	数据库名: ['xobase'],
+	连接.
+
+>> 参数 := db 查询: ['SELECT ? AS a, ? AS b, ? AS c'].
+参数 参数: (数组对象 新建 ; ['1']).
+{ 参数 获取: { :row 输出 写入: row, 停止. }. } 捕获: { :e 输出 写入: e, 停止. }, 运行.
+
+>> 参数 := db 查询: ['SELECT ? AS a'].
+{ 参数 获取: { :row 输出 写入: row, 停止. }. } 捕获: { :e 输出 写入: e, 停止. }, 运行.
+
+# the right number still works, more parameters are ignored as before
+>> 参数 := db 查询: ['SELECT ? AS a, ? AS b'].
+参数 参数: (数组对象 新建 ; ['1'] ; ['2']).
+参数 获取: { :row 输出 写入: (row 在: ['a']), 写入: (row 在: ['b']), 停止. }.
+参数 参数: (数组对象 新建 ; ['1'] ; ['2'] ; ['3']).
+参数 获取: { :row 输出 写入: (row 在: ['a']), 写入: (row 在: ['b']), 停止. }.

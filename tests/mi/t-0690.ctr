@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Huaputa tuhi: ['Database test'], rārangi-hou.
+
+>> db := Maria-DB hou manaaki: ['localhost'],
+	ingoa-kaiwhakamahi: ['xo'], kupuhipa: ['pass123'], ingoa-pātengi-raraunga: ['xobase'], tūhono.
+
+Huaputa tuhi: ['Can we connect? '] + db kua-tūhono?, rārangi-hou.
+
+>> tawhā-rapu := db uiui: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], tawhā: ( Rārangi hou ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  tawhā-rapu whakatutuki. db whakaū. } hopu: { :e db hoki-whakamuri.  }, tīmata.
+
+Huaputa tuhi: ['Can we insert? '] + ( tawhā-rapu insert-id > 0 ), rārangi-hou.
+
+>> x := 0.
+>> tawhā-rapu :=
+db uiui: ['SELECT * FROM book order by id desc limit 2'], 
+tikina: { :row 
+	x tāpiri: 1.
+	Pono whati. # must clean up, no 'Commands out of sync'
+}.
+
+>> tawhā-rapu :=
+db uiui: ['SELECT * FROM book order by id desc limit 2'], 
+tikina: { :row
+	x tāpiri: 1.
+	Pono whati.
+}.
+
+(x > 0) pono: {
+	Huaputa tuhi: ['Can we break in the middle of a fetch? '].
+}.
+
+Huaputa tuhi: Pono, rārangi-hou.

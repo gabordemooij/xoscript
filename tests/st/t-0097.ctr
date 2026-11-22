@@ -1,0 +1,42 @@
+
+Mongolo ha-ho-fihla: ['html'] etsa: { <- (
+		uena
+		nkela-sebaka: ['&'] ka: ['&amp;'],
+		nkela-sebaka: ['<'] ka: ['&lt;'],
+		nkela-sebaka: ['>'] ka: ['&gt;'],
+		nkela-sebaka: ['"'] ka: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Ntho ncha.
+
+HtmlBrush ha-ho-fihla: ['araba:'] etsa: { :tag
+	Sephetho ngola: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush ha-ho-fihla: ['araba:le:'] etsa: { :tag :content
+	tag := ( tag ho-tloha: 0 bolelele: (tag bolelele - 1) ).
+	Sephetho ngola: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush ha-ho-fihla: ['content:'] etsa: { :text
+	Sephetho ngola: text html, mola-o-mocha.
+}.
+
+HtmlBrush ha-ho-fihla: ['attr:value:'] etsa: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush ncha.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

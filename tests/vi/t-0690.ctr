@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Xuất ghi: ['Database test'], xuống-dòng.
+
+>> db := Maria-DB mới máy-trạm: ['localhost'],
+	tên-người-dùng: ['xo'], mật-khẩu: ['pass123'], tên-cơ-sở-dữ-liệu: ['xobase'], kết-nối.
+
+Xuất ghi: ['Can we connect? '] + db đã-kết-nối?, xuống-dòng.
+
+>> tham-số-tìm-kiếm := db truy-vấn: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], tham-số: ( Danh-sách mới ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  tham-số-tìm-kiếm thực-thi. db xác-nhận. } bắt-lỗi: { :e db hoàn-tác.  }, chạy.
+
+Xuất ghi: ['Can we insert? '] + ( tham-số-tìm-kiếm insert-id > 0 ), xuống-dòng.
+
+>> x := 0.
+>> tham-số-tìm-kiếm :=
+db truy-vấn: ['SELECT * FROM book order by id desc limit 2'], 
+lấy: { :row 
+	x cộng: 1.
+	Đúng ngắt. # must clean up, no 'Commands out of sync'
+}.
+
+>> tham-số-tìm-kiếm :=
+db truy-vấn: ['SELECT * FROM book order by id desc limit 2'], 
+lấy: { :row
+	x cộng: 1.
+	Đúng ngắt.
+}.
+
+(x > 0) đúng: {
+	Xuất ghi: ['Can we break in the middle of a fetch? '].
+}.
+
+Xuất ghi: Đúng, xuống-dòng.

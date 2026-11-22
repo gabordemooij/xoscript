@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Obiect nou.
+
+Log la: ['say:'] execută: { :str
+	Ieșire scrie: str, rând-nou.
+}.
+
+>> Item := Obiect nou.
+
+Item la: ['nou:'] execută: { :id <- sine nou id: id.
+}.
+
+Item la: ['id:'] execută: { :id
+	propriu id := id.
+}.
+
+Item la: ['id'] execută: { <- propriu id. }.
+
+
+Item la: ['text'] execută: {
+	>> str := ['Item#~no'].
+	str ~no: propriu id. <- str.
+}.
+
+
+>> Print := Obiect nou.
+
+Print la: ['items'] execută: { 
+	
+	propriu item := Item nou: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: propriu item
+	).
+	
+	
+}.
+
+Print items.

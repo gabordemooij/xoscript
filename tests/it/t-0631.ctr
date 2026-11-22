@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Programma gcmode: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Programma instelling: ['FFITESTLIB'].
+
+
+
+Server collega: (
+ Serie nuovo ;
+ libname ;
+ ['puts'] ;
+ ( Serie nuovo ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s libero.
+
+# test with struct
+
+>> a := Blob nuovo: 8.
+a bytes: (
+	Serie <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struttura: (Serie <<: ['int'], ; ['int']).
+
+Server collega: (
+	Serie <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Serie <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Uscita scrivi: ['Sum test:'] + (ffitest ffisum: a), stop.
+
+struct strutturalibera.
+struct libero.
+a libero.

@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Kasha tengeneza-funguo.
+>> sk := keys wa-kwanza.
+>> pk := keys wa-mwisho.
+>> sig := Kasha tia-sahihi: ['abc'] kwa: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Kasha tia-sahihi: ['abc'] kwa: long. } nasa: { :e
+	Towe andika: e, mstari-mpya.
+}, anza.
+
+{ Kasha kagua: ['abc'] sahihi: long kwa: pk. } nasa: { :e
+	Towe andika: e, mstari-mpya.
+}, anza.
+
+{ Kasha kagua: ['abc'] sahihi: sig kwa: short. } nasa: { :e
+	Towe andika: e, mstari-mpya.
+}, anza.

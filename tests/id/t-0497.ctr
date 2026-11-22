@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := Berkas baru: ['/tmp/test.gif'].
+f tulis: ['GIF87a01234567810'].
+
+# serve the file
+Server teruskan: ['test.gif'] awalan: ['/tmp/'].
+
+Keluaran baris-baru.
+
+Keluaran tulis: ['Outside container (security):'], baris-baru.
+{ Server teruskan: ['../passwd'] awalan: ['/tmp/']. }
+tangkap: { :e Keluaran tulis: e, baris-baru. },
+mulai.
+
+Keluaran tulis: ['Invalid prefix:'], baris-baru.
+{ Server teruskan: ['test.gif'] awalan: ['z:\\']. }
+tangkap: { :e Keluaran tulis: e, baris-baru. },
+mulai.
+
+Keluaran tulis: ['Non-existant file:'], baris-baru.
+{ Server teruskan: ['xxx.xxx'] awalan: ['/tmp/']. }
+tangkap: { :e Keluaran tulis: e, baris-baru. },
+mulai.

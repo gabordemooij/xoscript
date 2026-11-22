@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB ថ្មី ម៉ាស៊ីនបង្ហោះ: ['localhost'],
+	ឈ្មោះអ្នកប្រើ: ['xo'],
+	ពាក្យសម្ងាត់: ['pass123'],
+	ឈ្មោះមូលដ្ឋានទិន្នន័យ: ['xobase'],
+	ភ្ជាប់ទៅ.
+
+>> conn2 := Maria-DB ថ្មី ម៉ាស៊ីនបង្ហោះ: ['localhost'],
+	ឈ្មោះអ្នកប្រើ: ['xo'],
+	ពាក្យសម្ងាត់: ['pass123'],
+	ឈ្មោះមូលដ្ឋានទិន្នន័យ: ['xobase'],
+	ភ្ជាប់ទៅ.
+#...
+>> del := conn1 សំណួរ: ['DELETE FROM book WHERE id > 0'].
+{  del ប្រតិបត្តិ. conn1 បញ្ជាក់. } ចាប់: { :e conn1 ត្រឡប់ក្រោយ.  }, ដំណើរការ.
+
+>> insert := conn1 សំណួរ: ['INSERT INTO book (id) VALUES(null)'].
+insert ប្រតិបត្តិ.
+
+>> ចំនួនធាតុ := conn1 សំណួរ: ['SELECT COUNT(*) AS num FROM book'].
+ចំនួនធាតុ ទាញយក: { :row លទ្ធផល សរសេរ: row num, បន្ទាត់ថ្មី. }.
+
+# does not show up
+# insert not committed on connection 1
+>> ចំនួនធាតុ := conn2 សំណួរ: ['SELECT COUNT(*) AS num FROM book'].
+ចំនួនធាតុ ទាញយក: { :row លទ្ធផល សរសេរ: row num, បន្ទាត់ថ្មី. }.

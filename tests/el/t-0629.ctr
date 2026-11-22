@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Έξοδος γράψε: ['Database test'], νέα-γραμμή.
+
+>> db := Maria-DB νέο κόμβος: ['localhost'],
+	χρήστης: ['xo'], κωδικός: ['pass123'], όνομα-βάσης: ['xobase'], συνδέσου.
+
+Έξοδος γράψε: ['Can we connect? '] + db συνδεδεμένο?, νέα-γραμμή.
+
+>> παράμετροι-αναζήτησης := db ερώτημα: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], παράμετροι: ( Λίστα νέο ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  παράμετροι-αναζήτησης εκτέλεση. db επικύρωση. } σύλληψη: { :e db αναίρεση.  }, εκκίνηση.
+
+Έξοδος γράψε: ['Can we insert? '] + ( παράμετροι-αναζήτησης insert-id > 0 ), νέα-γραμμή.
+
+>> Obj := Αντικείμενο νέο.
+Obj όταν: ['retrieve-rows'] κάνε: {
+	δικό πλήθος := 0.
+	>> παράμετροι-αναζήτησης :=
+	db ερώτημα: ['SELECT * FROM book order by id desc limit 2'], 
+	ανάκτηση: { :row 
+		δικό πλήθος πρόσθεση: 1.
+		Αληθές διακοπή.
+	}. <- δικό πλήθος αντιγραφή.
+}.
+
+Έξοδος γράψε: ['Can we query? '] + ( Obj retrieve-rows > 0 ), νέα-γραμμή.

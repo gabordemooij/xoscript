@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+ପ୍ରୋଗ୍ରାମ୍ ମେମୋରୀ-ପରିଚାଳନା: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB ନୂତନ ହୋଷ୍ଟ: ['localhost'],
+	ଉପଯୋଗକର୍ତ୍ତା-ନାମ: ['xo'], ପାସୱାର୍ଡ: ['pass123'], ଡାଟାବେସ୍-ନାମ: ['xobase'], ସଂଯୋଗ.
+
+>> TwoDigitFormat := ଫର୍ମାଟ୍ ନୂତନ: ['%02d'].
+
+# Datetime
+{
+	>> ବର୍ଷ := ସଂଖ୍ୟା ମଧ୍ୟରେ: 1995 ଏବଂ: 2050, ପାଠ୍ୟରେ.
+	>> ମାସ := TwoDigitFormat ପ୍ରୟୋଗ-ପୂର୍ଣ୍ଣସଂଖ୍ୟା: (ସଂଖ୍ୟା ମଧ୍ୟରେ: 1 ଏବଂ: 12), ପାଠ୍ୟରେ.
+	>> ଦିନ := TwoDigitFormat ପ୍ରୟୋଗ-ପୂର୍ଣ୍ଣସଂଖ୍ୟା: (ସଂଖ୍ୟା ମଧ୍ୟରେ: 1 ଏବଂ: 28), ପାଠ୍ୟରେ.
+	>> ଘଣ୍ଟା := TwoDigitFormat ପ୍ରୟୋଗ-ପୂର୍ଣ୍ଣସଂଖ୍ୟା: (ସଂଖ୍ୟା ମଧ୍ୟରେ: 1 ଏବଂ: 23), ପାଠ୍ୟରେ.
+	>> ମିନିଟ୍ := TwoDigitFormat ପ୍ରୟୋଗ-ପୂର୍ଣ୍ଣସଂଖ୍ୟା: (ସଂଖ୍ୟା ମଧ୍ୟରେ: 1 ଏବଂ: 59), ପାଠ୍ୟରେ.
+	>> ସେକେଣ୍ଡ := TwoDigitFormat ପ୍ରୟୋଗ-ପୂର୍ଣ୍ଣସଂଖ୍ୟା: (ସଂଖ୍ୟା ମଧ୍ୟରେ: 1 ଏବଂ: 59), ପାଠ୍ୟରେ.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: ବର୍ଷ,
+		MM: ମାସ,
+		DD: ଦିନ,
+		HH: ଘଣ୍ଟା,
+		II: ମିନିଟ୍,
+		SS: ସେକେଣ୍ଡ.
+	>> ସନ୍ଧାନ-ପାରାମିଟର :=
+	db କ୍ୱେରୀ: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ଆଣ: { :row
+		(row mydatetime = datetime) ମିଥ୍ୟା-ହେଲେ: {
+			ଏହି-କାର୍ଯ୍ୟ ତ୍ରୁଟି: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ମିଶାଅ: 1.
+} * 100.
+
+# Date
+{
+	>> ବର୍ଷ := ସଂଖ୍ୟା ମଧ୍ୟରେ: 1995 ଏବଂ: 2050, ପାଠ୍ୟରେ.
+	>> ମାସ := TwoDigitFormat ପ୍ରୟୋଗ-ପୂର୍ଣ୍ଣସଂଖ୍ୟା: (ସଂଖ୍ୟା ମଧ୍ୟରେ: 1 ଏବଂ: 12), ପାଠ୍ୟରେ.
+	>> ଦିନ := TwoDigitFormat ପ୍ରୟୋଗ-ପୂର୍ଣ୍ଣସଂଖ୍ୟା: (ସଂଖ୍ୟା ମଧ୍ୟରେ: 1 ଏବଂ: 28), ପାଠ୍ୟରେ.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: ବର୍ଷ,
+		MM: ମାସ,
+		DD: ଦିନ.
+	>> ସନ୍ଧାନ-ପାରାମିଟର :=
+	db କ୍ୱେରୀ: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ଆଣ: { :row
+		(row mydate = date) ମିଥ୍ୟା-ହେଲେ: {
+			ଏହି-କାର୍ଯ୍ୟ ତ୍ରୁଟି: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ମିଶାଅ: 1.
+} * 100.
+
+
+# Time
+{
+	>> ଘଣ୍ଟା := TwoDigitFormat ପ୍ରୟୋଗ-ପୂର୍ଣ୍ଣସଂଖ୍ୟା: (ସଂଖ୍ୟା ମଧ୍ୟରେ: 1 ଏବଂ: 23), ପାଠ୍ୟରେ.
+	>> ମିନିଟ୍ := TwoDigitFormat ପ୍ରୟୋଗ-ପୂର୍ଣ୍ଣସଂଖ୍ୟା: (ସଂଖ୍ୟା ମଧ୍ୟରେ: 1 ଏବଂ: 59), ପାଠ୍ୟରେ.
+	>> ସେକେଣ୍ଡ := TwoDigitFormat ପ୍ରୟୋଗ-ପୂର୍ଣ୍ଣସଂଖ୍ୟା: (ସଂଖ୍ୟା ମଧ୍ୟରେ: 1 ଏବଂ: 59), ପାଠ୍ୟରେ.
+	>> ସମୟ := ['HH:II:SS'].
+	ସମୟ
+		HH: ଘଣ୍ଟା,
+		II: ମିନିଟ୍,
+		SS: ସେକେଣ୍ଡ.
+	>> ସନ୍ଧାନ-ପାରାମିଟର :=
+	db କ୍ୱେରୀ: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: ସମୟ),
+	ଆଣ: { :row
+		(row mytime = ସମୟ) ମିଥ୍ୟା-ହେଲେ: {
+			ଏହି-କାର୍ଯ୍ୟ ତ୍ରୁଟି: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ମିଶାଅ: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := ସାରଣୀ ନୂତନ ପୂରଣ: 100000 ମୂଲ୍ୟରେ: ['x'], ଯୋଡ଼: [''].
+{
+	>> str2 := ସିନ୍ଦୁକ ଟୋକନ୍: 40.
+	>> ସନ୍ଧାନ-ପାରାମିଟର :=
+	db କ୍ୱେରୀ: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ଆଣ: { :row
+		(row str1 = str1 ଏବଂ: row str2 = str2) ମିଥ୍ୟା-ହେଲେ: {
+			ଏହି-କାର୍ଯ୍ୟ ତ୍ରୁଟି: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ମିଶାଅ: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := ସଂଖ୍ୟା ମଧ୍ୟରେ: 1 ଏବଂ: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 ପାଠ୍ୟରୁ: ['9223372036854775807'] ) -
+		( Int64 ପାଠ୍ୟରୁ: ['99999'] ) +
+		( Int64 ପାଠ୍ୟରୁ: n1 ପାଠ୍ୟରେ )
+	).
+	>> ସନ୍ଧାନ-ପାରାମିଟର :=
+	db କ୍ୱେରୀ: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ଆଣ: { :row
+		(row n1 = n1) ମିଥ୍ୟା-ହେଲେ: {
+			ଏହି-କାର୍ଯ୍ୟ ତ୍ରୁଟି: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) ମିଥ୍ୟା-ହେଲେ: {
+			ଏହି-କାର୍ଯ୍ୟ ତ୍ରୁଟି: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 ପୂର୍ଣ୍ଣାଙ୍କନ) ମିଥ୍ୟା-ହେଲେ: {
+			ଏହି-କାର୍ଯ୍ୟ ତ୍ରୁଟି: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) ମିଥ୍ୟା-ହେଲେ: {
+			ଏହି-କାର୍ଯ୍ୟ ତ୍ରୁଟି: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ମିଶାଅ: 1.
+} * 100.
+
+
+ଆଉଟପୁଟ୍ ଲେଖ: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), ନୂଆ-ଧାଡ଼ି.

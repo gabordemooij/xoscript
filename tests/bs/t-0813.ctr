@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inicijaliziraj.
+Program koristi: ['../../../src/xo/bs/webtools.xo'].
+Program koristi: ['../../../src/xo/bs/mailtools.xo'].
+
+>> zaglavlje := HTTP-Zaglavlje novi ključ: ['Location'] vrijednost: ['/ok\r\nX-Injected: yes'].
+Izlaz piši: zaglavlje.
+
+>> web := Web-dokument novi.
+web idi-na: ['/ok\r\nX-Injected: yes'].
+Izlaz piši: ['\n'], novi-red.
+
+>> mail := Email novi.
+mail prima: (Lista novi ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lista novi ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lista novi ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail pošiljalac: ['d@example.invalid\r\nX-From: yes'] naziv: ['site\r\nX-Name: yes'].
+mail predmet: ['hello\r\nX-Subject: yes'].
+mail tijelo: ['line1\r\nline2'].
+Izlaz piši: mail generiši.
+
+>> html := HTML-Email novi.
+html prima: (Lista novi ; ['a@example.invalid\r\nX-To: yes']).
+html pošiljalac: ['d@example.invalid'] naziv: ['site'].
+html predmet: ['hello\r\nX-Subject: yes'].
+html tijelo: ['body'].
+Izlaz piši: ( html generiši sadrži: ['\nX-'] ), novi-red.
+Izlaz piši: ( html generiši sadrži: ['X-To: yes'] ), novi-red.

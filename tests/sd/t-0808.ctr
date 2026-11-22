@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := ٽجوڙي ڪنجيون-ٺاهيو.
+>> sk := keys پهريون.
+>> pk := keys آخري.
+>> sig := ٽجوڙي صحيح: ⌝'abc'⌜ ڪنجي-سان: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+
+# 44 characters without padding decode to 33 bytes
+>> short := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+
+⎬ ٽجوڙي صحيح: ⌝'abc'⌜ ڪنجي-سان: long. ⎨ پڪڙيو: ⎬ :e
+	آئوٽ-پٽ لکو: e, نئين-سٽ.
+⎨, هلايو.
+
+⎬ ٽجوڙي جاچيو: ⌝'abc'⌜ صحيح: long ڪنجي-سان: pk. ⎨ پڪڙيو: ⎬ :e
+	آئوٽ-پٽ لکو: e, نئين-سٽ.
+⎨, هلايو.
+
+⎬ ٽجوڙي جاچيو: ⌝'abc'⌜ صحيح: sig ڪنجي-سان: short. ⎨ پڪڙيو: ⎬ :e
+	آئوٽ-پٽ لکو: e, نئين-سٽ.
+⎨, هلايو.

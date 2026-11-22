@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := ತಿಜೋರಿ ಕೀಲಿಗಳನ್ನು-ರಚಿಸು.
+>> sk := keys ಮೊದಲ.
+>> pk := keys ಕೊನೆಯ.
+>> sig := ತಿಜೋರಿ ಸಹಿ: ['abc'] ಕೀಲಿಯಿಂದ: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ ತಿಜೋರಿ ಸಹಿ: ['abc'] ಕೀಲಿಯಿಂದ: long. } ಹಿಡಿ: { :e
+	ಔಟ್-ಪುಟ್ ಬರೆ: e, ಹೊಸ-ಸಾಲು.
+}, ಚಲಾಯಿಸು.
+
+{ ತಿಜೋರಿ ಪರೀಕ್ಷಿಸು: ['abc'] ಸಹಿ: long ಕೀಲಿಯಿಂದ: pk. } ಹಿಡಿ: { :e
+	ಔಟ್-ಪುಟ್ ಬರೆ: e, ಹೊಸ-ಸಾಲು.
+}, ಚಲಾಯಿಸು.
+
+{ ತಿಜೋರಿ ಪರೀಕ್ಷಿಸು: ['abc'] ಸಹಿ: sig ಕೀಲಿಯಿಂದ: short. } ಹಿಡಿ: { :e
+	ಔಟ್-ಪುಟ್ ಬರೆ: e, ಹೊಸ-ಸಾಲು.
+}, ಚಲಾಯಿಸು.

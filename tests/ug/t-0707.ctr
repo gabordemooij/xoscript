@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+پروگرامما ئەسلەك-باشقۇرۇش: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB يېڭى باش-ماشىنا: ⌝'localhost'⌜,
+	ئىشلەتكۈچى-ئاتى: ⌝'xo'⌜, ئىم: ⌝'pass123'⌜, ساندان-ئاتى: ⌝'xobase'⌜, باغلان.
+
+>> TwoDigitFormat := فورمات يېڭى: ⌝'%02d'⌜.
+
+# Datetime
+⎬
+	>> يىل := سان ئارىسىدا: 1995 بىلەن: 2050, تېكىستكە.
+	>> ئاي := TwoDigitFormat قوللان-پۈتۈن-سان: ﴿سان ئارىسىدا: 1 بىلەن: 12﴾, تېكىستكە.
+	>> كۈن := TwoDigitFormat قوللان-پۈتۈن-سان: ﴿سان ئارىسىدا: 1 بىلەن: 28﴾, تېكىستكە.
+	>> سائەت := TwoDigitFormat قوللان-پۈتۈن-سان: ﴿سان ئارىسىدا: 1 بىلەن: 23﴾, تېكىستكە.
+	>> مىنۇت := TwoDigitFormat قوللان-پۈتۈن-سان: ﴿سان ئارىسىدا: 1 بىلەن: 59﴾, تېكىستكە.
+	>> سېكۇنت := TwoDigitFormat قوللان-پۈتۈن-سان: ﴿سان ئارىسىدا: 1 بىلەن: 59﴾, تېكىستكە.
+	>> datetime := ⌝'YYYY-MM-DD HH:II:SS'⌜.	
+	datetime
+		YYYY: يىل,
+		MM: ئاي,
+		DD: كۈن,
+		HH: سائەت,
+		II: مىنۇت,
+		SS: سېكۇنت.
+	>> ئىزدەش-پارامېتىرلىرى :=
+	db سۈرۈشتۈرۈش: ﴿⌝'
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'⌜ <datetime>: datetime﴾,
+	ئېلىپ-كەل: ⎬ :row
+		﴿row mydatetime = datetime﴾ يالغان-بولسا: ⎬
+			بۇ-ۋەزىپە خاتالىق: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mydatetime
+			﴾.
+		⎨.
+	
+	⎨.
+	counter قوش: 1.
+⎨ * 100.
+
+# Date
+⎬
+	>> يىل := سان ئارىسىدا: 1995 بىلەن: 2050, تېكىستكە.
+	>> ئاي := TwoDigitFormat قوللان-پۈتۈن-سان: ﴿سان ئارىسىدا: 1 بىلەن: 12﴾, تېكىستكە.
+	>> كۈن := TwoDigitFormat قوللان-پۈتۈن-سان: ﴿سان ئارىسىدا: 1 بىلەن: 28﴾, تېكىستكە.
+	>> date := ⌝'YYYY-MM-DD'⌜.
+	date
+		YYYY: يىل,
+		MM: ئاي,
+		DD: كۈن.
+	>> ئىزدەش-پارامېتىرلىرى :=
+	db سۈرۈشتۈرۈش: ﴿⌝'
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'⌜ <date>: date﴾,
+	ئېلىپ-كەل: ⎬ :row
+		﴿row mydate = date﴾ يالغان-بولسا: ⎬
+			بۇ-ۋەزىپە خاتالىق: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: date,
+				<observation>: row mydate
+			﴾.
+		⎨.
+	⎨.
+	counter قوش: 1.
+⎨ * 100.
+
+
+# Time
+⎬
+	>> سائەت := TwoDigitFormat قوللان-پۈتۈن-سان: ﴿سان ئارىسىدا: 1 بىلەن: 23﴾, تېكىستكە.
+	>> مىنۇت := TwoDigitFormat قوللان-پۈتۈن-سان: ﴿سان ئارىسىدا: 1 بىلەن: 59﴾, تېكىستكە.
+	>> سېكۇنت := TwoDigitFormat قوللان-پۈتۈن-سان: ﴿سان ئارىسىدا: 1 بىلەن: 59﴾, تېكىستكە.
+	>> ۋاقىت := ⌝'HH:II:SS'⌜.
+	ۋاقىت
+		HH: سائەت,
+		II: مىنۇت,
+		SS: سېكۇنت.
+	>> ئىزدەش-پارامېتىرلىرى :=
+	db سۈرۈشتۈرۈش: ﴿⌝'
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'⌜ <time>: ۋاقىت﴾,
+	ئېلىپ-كەل: ⎬ :row
+		﴿row mytime = ۋاقىت﴾ يالغان-بولسا: ⎬
+			بۇ-ۋەزىپە خاتالىق: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter قوش: 1.
+⎨ * 100.
+
+
+# Strings (varchar/text)
+>> str1 := تىزىم يېڭى تولدۇر: 100000 بىلەن: ⌝'x'⌜, بىرلەشتۈر: ⌝''⌜.
+⎬
+	>> str2 := ساندۇق بەلگە: 40.
+	>> ئىزدەش-پارامېتىرلىرى :=
+	db سۈرۈشتۈرۈش: ﴿⌝'
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'⌜ 
+	<str1>: str1,
+	<str2>: str2
+	﴾,
+	ئېلىپ-كەل: ⎬ :row
+		﴿row str1 = str1 ۋە: row str2 = str2﴾ يالغان-بولسا: ⎬
+			بۇ-ۋەزىپە خاتالىق: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter قوش: 1.
+⎨ * 100.
+
+
+# Numbers
+⎬
+	>> n1 := سان ئارىسىدا: 1 بىلەن: 99999.
+	>> n2 := n1 / 1000.
+	>> big := ﴿
+		﴿ Int64 تېكىستتىن: ⌝'9223372036854775807'⌜ ﴾ -
+		﴿ Int64 تېكىستتىن: ⌝'99999'⌜ ﴾ +
+		﴿ Int64 تېكىستتىن: n1 تېكىستكە ﴾
+	﴾.
+	>> ئىزدەش-پارامېتىرلىرى :=
+	db سۈرۈشتۈرۈش: ﴿⌝'
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	'⌜
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	﴾,
+	ئېلىپ-كەل: ⎬ :row
+		﴿row n1 = n1﴾ يالغان-بولسا: ⎬
+			بۇ-ۋەزىپە خاتالىق: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n1
+			﴾.
+		⎨.
+		﴿row n2 = n2﴾ يالغان-بولسا: ⎬
+			بۇ-ۋەزىپە خاتالىق: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n2
+			﴾.
+		⎨.
+		﴿row n3 = n2 پۈتۈنلە﴾ يالغان-بولسا: ⎬
+			بۇ-ۋەزىپە خاتالىق: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n3
+			﴾.
+		⎨.
+		﴿row big = big﴾ يالغان-بولسا: ⎬
+			بۇ-ۋەزىپە خاتالىق: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: big,
+				<observation>: row big
+			﴾.
+		⎨.
+		
+	⎨.
+	counter قوش: 1.
+⎨ * 100.
+
+
+چىقىرىش ياز: ﴿
+	⌝'OK, <counter> fuzzy casts/conversions tested.'⌜
+	<counter>: counter
+﴾, يېڭى-قۇر.

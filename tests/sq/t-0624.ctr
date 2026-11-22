@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Objekt ri.
+
+Log kur: ['say:'] bëj: { :str
+	Dalje shkruaj: str, rresht-ri.
+}.
+
+>> Item := Objekt ri.
+
+Item kur: ['ri:'] bëj: { :id <- vetja ri id: id.
+}.
+
+Item kur: ['id:'] bëj: { :id
+	vetjak id := id.
+}.
+
+Item kur: ['id'] bëj: { <- vetjak id. }.
+
+
+Item kur: ['tekst'] bëj: {
+	>> str := ['Item#~no'].
+	str ~no: vetjak id. <- str.
+}.
+
+
+>> Print := Objekt ri.
+
+Print kur: ['items'] bëj: { 
+	
+	vetjak item := Item ri: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: vetjak item
+	).
+	
+	
+}.
+
+Print items.

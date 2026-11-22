@@ -1,0 +1,30 @@
+Saída escrever: ['Test object'], stop.
+>> a := Objeto novo. 
+
+a em: ['item:'] fazer: { :out
+	prop out := out. 
+}.
+
+a em: ['item'] fazer: { <- prop out.
+}.
+
+a em: ['greet'] fazer: {
+	Saída escrever: ['hi from original out!'], stop.
+}.
+
+a item: Saída.
+
+Saída escrever: a item, stop.
+
+>> old-out-address := a item protótipo endereço-de-memória.
+a save-as: ['/tmp/a.bin'].
+Saída escrever: ['========== RELOADING SNAP:'], stop.
+
+>> b := Objeto load-from: ['/tmp/a.bin'].
+
+(b item protótipo endereço-de-memória = old-out-address) sim: {
+	Saída escrever: ['Object link re-attached.'], stop.
+}.
+
+b item escrever: ['hello from loaded out!'], stop.
+b greet.

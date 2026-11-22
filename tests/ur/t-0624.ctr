@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := آبجیکٹ نیا.
+
+Log جب: ⌝'say:'⌜ کرو: ⎬ :str
+	آؤٹ-پٹ لکھو: str, نئی-سطر.
+⎨.
+
+>> Item := آبجیکٹ نیا.
+
+Item جب: ⌝'نیا:'⌜ کرو: ⎬ :id <- خود نیا id: id.
+⎨.
+
+Item جب: ⌝'id:'⌜ کرو: ⎬ :id
+	اپنا id := id.
+⎨.
+
+Item جب: ⌝'id'⌜ کرو: ⎬ <- اپنا id. ⎨.
+
+
+Item جب: ⌝'بطور-متن'⌜ کرو: ⎬
+	>> str := ⌝'Item#~no'⌜.
+	str ~no: اپنا id. <- str.
+⎨.
+
+
+>> Print := آبجیکٹ نیا.
+
+Print جب: ⌝'items'⌜ کرو: ⎬ 
+	
+	اپنا item := Item نیا: 1.
+	
+	# either segfault or wrong str here
+	Log say: ﴿
+		⌝'~item printed.'⌜ ~item: اپنا item
+	﴾.
+	
+	
+⎨.
+
+Print items.

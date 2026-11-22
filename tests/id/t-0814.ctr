@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inisialisasi.
+Program gunakan: ['../../../src/xo/id/webtools.xo'].
+
+>> Fake-Request := Objek baru.
+Fake-Request saat: ['value:'] lakukan: { :nilai
+	milik nilai := nilai.
+}.
+Fake-Request saat: ['cookie:'] lakukan: { :nama <- milik nilai.
+}.
+
+>> Test-Session := Sesi-berkas-sementara baru.
+Test-Session saat: ['muat'] lakukan: { <- Kamus baru.
+}.
+Test-Session saat: ['session-id'] lakukan: { <- milik id.
+}.
+
+>> cookies := Daftar baru
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies setiap: { :i :cookie
+	>> permintaan-http := Fake-Request baru.
+	permintaan-http value: cookie.
+	>> pengelola := Test-Session baru.
+	>> web := Dokumen-Web baru.
+	web permintaan-http: permintaan-http.
+	web pengelola-sesi: pengelola.
+	web mulai-sesi.
+	Keluaran tulis: ( pengelola session-id = cookie ), baris-baru.
+}.
+
+>> web := Dokumen-Web baru.
+web json: (Kamus baru taruh: ['b'] di: ['a']).
+Keluaran tulis: ['\n'], baris-baru.
+
+{ Jaringan get: ['file:///etc/hostname']. } tangkap: { :e
+	Keluaran tulis: e, baris-baru.
+}, mulai.
+
+>> svg := Berkas baru: ['/tmp/test0814.svg'].
+svg tulis: ['<svg xmlns="x"></svg>'].
+Keluaran baris-baru.
+Server teruskan: ['test0814.svg'] awalan: ['/tmp/'].
+svg hapus.

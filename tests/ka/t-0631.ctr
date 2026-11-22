@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+პროგრამა მეხსიერების-მართვა: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := პროგრამა პარამეტრი: ['FFITESTLIB'].
+
+
+
+Server დაკავშირება: (
+ სია ახალი ;
+ libname ;
+ ['puts'] ;
+ ( სია ახალი ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s გათავისუფლება.
+
+# test with struct
+
+>> a := Blob ახალი: 8.
+a bytes: (
+	სია <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (სია <<: ['int'], ; ['int']).
+
+Server დაკავშირება: (
+	სია <<: ['@structtest'], ;
+	['@structtest'] ;
+	(სია <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+გამოტანა დაწერე: ['Sum test:'] + (ffitest ffisum: a), ახალი-ხაზი.
+
+struct struct-გათავისუფლება.
+struct გათავისუფლება.
+a გათავისუფლება.

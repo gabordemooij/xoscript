@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB naujas mazgas: ['localhost'],
+	naudotojas: ['xo'],
+	slaptažodis: ['pass123'],
+	duomenų-bazės-vardas: ['xobase'],
+	prisijungti.
+
+>> paieškos-parametrai := db užklausa: ['SELECT ? AS a, ? AS b, ? AS c'].
+paieškos-parametrai parametrai: (Sąrašas naujas ; ['1']).
+{ paieškos-parametrai gauti: { :row Išvestis rašyti: row, nauja-eilutė. }. } pagauti: { :e Išvestis rašyti: e, nauja-eilutė. }, paleisti.
+
+>> paieškos-parametrai := db užklausa: ['SELECT ? AS a'].
+{ paieškos-parametrai gauti: { :row Išvestis rašyti: row, nauja-eilutė. }. } pagauti: { :e Išvestis rašyti: e, nauja-eilutė. }, paleisti.
+
+# the right number still works, more parameters are ignored as before
+>> paieškos-parametrai := db užklausa: ['SELECT ? AS a, ? AS b'].
+paieškos-parametrai parametrai: (Sąrašas naujas ; ['1'] ; ['2']).
+paieškos-parametrai gauti: { :row Išvestis rašyti: (row vietoje: ['a']), rašyti: (row vietoje: ['b']), nauja-eilutė. }.
+paieškos-parametrai parametrai: (Sąrašas naujas ; ['1'] ; ['2'] ; ['3']).
+paieškos-parametrai gauti: { :row Išvestis rašyti: (row vietoje: ['a']), rašyti: (row vietoje: ['b']), nauja-eilutė. }.

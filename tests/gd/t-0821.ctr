@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> slighe := ['/tmp/test0821.csv'].
+>> file := Faidhle ùr: slighe.
+
+file sgrìobh: ['a,b\n"1,2\n'].
+{
+	file sgaradair: [','] comharra-labhairt: ['"'] loidhnichean: { :line
+		Às-chur sgrìobh: line, loidhne-ùr.
+	}.
+} glac: { :e Às-chur sgrìobh: e, loidhne-ùr. }, tòisich.
+
+# a closed quote still works
+file sgrìobh: ['a,b\n"1,2",3'].
+file sgaradair: [','] comharra-labhairt: ['"'] loidhnichean: { :line
+	Às-chur sgrìobh: line, loidhne-ùr.
+}.
+file cuir-às.

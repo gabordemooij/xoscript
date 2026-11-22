@@ -1,0 +1,53 @@
+Программа режим-памяти: 0.
+Список в: ['sum'] сделать: {
+	>> total := 0.
+	сам каждый: { :index :element
+		total добавить: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Файл новый: ['/tmp/test.txt'].
+f написать: ['Lorem Ipsum'].
+f закрыть.
+  
+
+f := Файл новый: ['/tmp/test.txt'].
+>> text := f прочитать.
+f закрыть.
+
+
+
+Программа уборка.
+usedMemory1 := (Программа лимит ? 1).
+
+
+
+f := Файл новый: ['/tmp/test.txt'].
+text := f прочитать.
+f закрыть.
+
+Программа уборка.
+usedMemory2 := (Программа лимит ? 1).
+
+
+f := Файл новый: ['/tmp/test.txt'].
+text := f прочитать.
+f закрыть.
+
+Программа уборка.
+usedMemory3 := (Программа лимит ? 1).
+
+
+
+( usedMemory1 = usedMemory2 и: usedMemory1 = usedMemory3, и: usedMemory2 = usedMemory3 ) истина: {
+	Выход написать: ['No memory leaks here'].
+}, ложь: {
+	Выход написать: ['Leaking memory...'].
+}.

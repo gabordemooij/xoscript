@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB ncha moamoheli: ['localhost'],
+	lebitso-la-mosebelisi: ['xo'],
+	phasewete: ['pass123'],
+	lebitso-la-database: ['xobase'],
+	hokela.
+
+>> conn2 := Maria-DB ncha moamoheli: ['localhost'],
+	lebitso-la-mosebelisi: ['xo'],
+	phasewete: ['pass123'],
+	lebitso-la-database: ['xobase'],
+	hokela.
+#...
+>> del := conn1 potso: ['DELETE FROM book WHERE id > 0'].
+{  del phetha. conn1 tiisa. } tšoasa: { :e conn1 khutlisetsa-morao.  }, qala.
+
+>> insert := conn1 potso: ['INSERT INTO book (id) VALUES(null)'].
+insert phetha.
+
+>> palo-ea-lintho := conn1 potso: ['SELECT COUNT(*) AS num FROM book'].
+palo-ea-lintho lata: { :row Sephetho ngola: row num, mola-o-mocha. }.
+
+# does not show up
+# insert not committed on connection 1
+>> palo-ea-lintho := conn2 potso: ['SELECT COUNT(*) AS num FROM book'].
+palo-ea-lintho lata: { :row Sephetho ngola: row num, mola-o-mocha. }.

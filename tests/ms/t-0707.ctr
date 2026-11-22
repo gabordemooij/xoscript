@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Atur-cara pengurusan-ingatan: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB baharu hos: ['localhost'],
+	nama-pengguna: ['xo'], kata-laluan: ['pass123'], nama-pangkalan-data: ['xobase'], sambung.
+
+>> TwoDigitFormat := Format baharu: ['%02d'].
+
+# Datetime
+{
+	>> tahun := Nombor antara: 1995 dan: 2050, teks.
+	>> bulan := TwoDigitFormat gunakan-pada-integer: (Nombor antara: 1 dan: 12), teks.
+	>> hari := TwoDigitFormat gunakan-pada-integer: (Nombor antara: 1 dan: 28), teks.
+	>> jam := TwoDigitFormat gunakan-pada-integer: (Nombor antara: 1 dan: 23), teks.
+	>> minit := TwoDigitFormat gunakan-pada-integer: (Nombor antara: 1 dan: 59), teks.
+	>> saat := TwoDigitFormat gunakan-pada-integer: (Nombor antara: 1 dan: 59), teks.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: tahun,
+		MM: bulan,
+		DD: hari,
+		HH: jam,
+		II: minit,
+		SS: saat.
+	>> parameter-carian :=
+	db pertanyaan: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	dapatkan: { :row
+		(row mydatetime = datetime) palsu: {
+			tugas-ini ralat: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter tambah: 1.
+} * 100.
+
+# Date
+{
+	>> tahun := Nombor antara: 1995 dan: 2050, teks.
+	>> bulan := TwoDigitFormat gunakan-pada-integer: (Nombor antara: 1 dan: 12), teks.
+	>> hari := TwoDigitFormat gunakan-pada-integer: (Nombor antara: 1 dan: 28), teks.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: tahun,
+		MM: bulan,
+		DD: hari.
+	>> parameter-carian :=
+	db pertanyaan: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	dapatkan: { :row
+		(row mydate = date) palsu: {
+			tugas-ini ralat: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter tambah: 1.
+} * 100.
+
+
+# Time
+{
+	>> jam := TwoDigitFormat gunakan-pada-integer: (Nombor antara: 1 dan: 23), teks.
+	>> minit := TwoDigitFormat gunakan-pada-integer: (Nombor antara: 1 dan: 59), teks.
+	>> saat := TwoDigitFormat gunakan-pada-integer: (Nombor antara: 1 dan: 59), teks.
+	>> masa := ['HH:II:SS'].
+	masa
+		HH: jam,
+		II: minit,
+		SS: saat.
+	>> parameter-carian :=
+	db pertanyaan: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: masa),
+	dapatkan: { :row
+		(row mytime = masa) palsu: {
+			tugas-ini ralat: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter tambah: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Senarai baharu isi: 100000 dengan: ['x'], gabungkan: [''].
+{
+	>> str2 := Peti-besi token: 40.
+	>> parameter-carian :=
+	db pertanyaan: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	dapatkan: { :row
+		(row str1 = str1 dan: row str2 = str2) palsu: {
+			tugas-ini ralat: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter tambah: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Nombor antara: 1 dan: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 daripada-teks: ['9223372036854775807'] ) -
+		( Int64 daripada-teks: ['99999'] ) +
+		( Int64 daripada-teks: n1 teks )
+	).
+	>> parameter-carian :=
+	db pertanyaan: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	dapatkan: { :row
+		(row n1 = n1) palsu: {
+			tugas-ini ralat: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) palsu: {
+			tugas-ini ralat: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 bundarkan) palsu: {
+			tugas-ini ralat: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) palsu: {
+			tugas-ini ralat: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter tambah: 1.
+} * 100.
+
+
+Keluaran tulis: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), baris-baharu.

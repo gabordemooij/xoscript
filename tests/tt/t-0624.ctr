@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Объект яңа.
+
+Log килгәндә: ['say:'] эшлә: { :str
+	Чыгыш яз: str, яңа-юл.
+}.
+
+>> Item := Объект яңа.
+
+Item килгәндә: ['яңа:'] эшлә: { :id <- үзе яңа id: id.
+}.
+
+Item килгәндә: ['id:'] эшлә: { :id
+	үзенең id := id.
+}.
+
+Item килгәндә: ['id'] эшлә: { <- үзенең id. }.
+
+
+Item килгәндә: ['текст'] эшлә: {
+	>> str := ['Item#~no'].
+	str ~no: үзенең id. <- str.
+}.
+
+
+>> Print := Объект яңа.
+
+Print килгәндә: ['items'] эшлә: { 
+	
+	үзенең item := Item яңа: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: үзенең item
+	).
+	
+	
+}.
+
+Print items.

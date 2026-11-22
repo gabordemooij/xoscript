@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server آماده-سازی.
+برنامه به-کار-ببر: ⌝'../../../src/xo/fa/webtools.xo'⌜.
+
+>> Fake-Request := شیء جدید.
+Fake-Request هنگام: ⌝'value:'⌜ انجام: ⎬ :مقدار
+	خودم مقدار := مقدار.
+⎨.
+Fake-Request هنگام: ⌝'cookie:'⌜ انجام: ⎬ :نام <- خودم مقدار.
+⎨.
+
+>> Test-Session := نشست-فایل-موقت جدید.
+Test-Session هنگام: ⌝'بارگذاری'⌜ انجام: ⎬ <- واژه-نامه جدید.
+⎨.
+Test-Session هنگام: ⌝'session-id'⌜ انجام: ⎬ <- خودم id.
+⎨.
+
+>> cookies := لیست جدید
+	; ⌝'abc123'⌜
+	; ⌝'../outside'⌜
+	; ⌝''⌜
+	; ⌝'abc\n'⌜.
+
+cookies هرکدام: ⎬ :i :cookie
+	>> درخواست-http := Fake-Request جدید.
+	درخواست-http value: cookie.
+	>> مدیر := Test-Session جدید.
+	>> web := سند-وب جدید.
+	web درخواست-http: درخواست-http.
+	web مدیر-نشست: مدیر.
+	web شروع-نشست.
+	خروجی بنویس: ﴿ مدیر session-id = cookie ﴾, سطر-نو.
+⎨.
+
+>> web := سند-وب جدید.
+web json: ﴿واژه-نامه جدید بگذار: ⌝'b'⌜ کلید: ⌝'a'⌜﴾.
+خروجی بنویس: ⌝'\n'⌜, سطر-نو.
+
+⎬ شبکه get: ⌝'file:///etc/hostname'⌜. ⎨ بگیر: ⎬ :e
+	خروجی بنویس: e, سطر-نو.
+⎨, اجرا.
+
+>> svg := پرونده جدید: ⌝'/tmp/test0814.svg'⌜.
+svg بنویس: ⌝'<svg xmlns="x"></svg>'⌜.
+خروجی سطر-نو.
+Server عبور-بده: ⌝'test0814.svg'⌜ پیشوند: ⌝'/tmp/'⌜.
+svg پاک-کن.

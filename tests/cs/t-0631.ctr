@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Program správa-paměti: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Program nastavení: ['FFITESTLIB'].
+
+
+
+Server propojit: (
+ Seznam nový ;
+ libname ;
+ ['puts'] ;
+ ( Seznam nový ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s uvolnit.
+
+# test with struct
+
+>> a := Blob nový: 8.
+a bytes: (
+	Seznam <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Seznam <<: ['int'], ; ['int']).
+
+Server propojit: (
+	Seznam <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Seznam <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Výstup psát: ['Sum test:'] + (ffitest ffisum: a), nový-řádek.
+
+struct uvolnit-struct.
+struct uvolnit.
+a uvolnit.

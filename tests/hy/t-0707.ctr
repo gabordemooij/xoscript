@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Ծրագիր հիշողության-կառավարում: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB նոր հոսթ: ['localhost'],
+	օգտանուն: ['xo'], գաղտնաբառ: ['pass123'], բազայի-անուն: ['xobase'], միանալ.
+
+>> TwoDigitFormat := Ձևաչափ նոր: ['%02d'].
+
+# Datetime
+{
+	>> տարի := Թիվ միջև: 1995 մինչև: 2050, տող.
+	>> ամիս := TwoDigitFormat կիրառել-ամբողջ: (Թիվ միջև: 1 մինչև: 12), տող.
+	>> օր := TwoDigitFormat կիրառել-ամբողջ: (Թիվ միջև: 1 մինչև: 28), տող.
+	>> ժամ := TwoDigitFormat կիրառել-ամբողջ: (Թիվ միջև: 1 մինչև: 23), տող.
+	>> րոպե := TwoDigitFormat կիրառել-ամբողջ: (Թիվ միջև: 1 մինչև: 59), տող.
+	>> վայրկյան := TwoDigitFormat կիրառել-ամբողջ: (Թիվ միջև: 1 մինչև: 59), տող.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: տարի,
+		MM: ամիս,
+		DD: օր,
+		HH: ժամ,
+		II: րոպե,
+		SS: վայրկյան.
+	>> որոնման-պարամետրեր :=
+	db հարցում: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ստանալ: { :row
+		(row mydatetime = datetime) եթե-սխալ: {
+			այս-առաջադրանքը սխալի-ելք: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter գումարել: 1.
+} * 100.
+
+# Date
+{
+	>> տարի := Թիվ միջև: 1995 մինչև: 2050, տող.
+	>> ամիս := TwoDigitFormat կիրառել-ամբողջ: (Թիվ միջև: 1 մինչև: 12), տող.
+	>> օր := TwoDigitFormat կիրառել-ամբողջ: (Թիվ միջև: 1 մինչև: 28), տող.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: տարի,
+		MM: ամիս,
+		DD: օր.
+	>> որոնման-պարամետրեր :=
+	db հարցում: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ստանալ: { :row
+		(row mydate = date) եթե-սխալ: {
+			այս-առաջադրանքը սխալի-ելք: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter գումարել: 1.
+} * 100.
+
+
+# Time
+{
+	>> ժամ := TwoDigitFormat կիրառել-ամբողջ: (Թիվ միջև: 1 մինչև: 23), տող.
+	>> րոպե := TwoDigitFormat կիրառել-ամբողջ: (Թիվ միջև: 1 մինչև: 59), տող.
+	>> վայրկյան := TwoDigitFormat կիրառել-ամբողջ: (Թիվ միջև: 1 մինչև: 59), տող.
+	>> ժամանակ := ['HH:II:SS'].
+	ժամանակ
+		HH: ժամ,
+		II: րոպե,
+		SS: վայրկյան.
+	>> որոնման-պարամետրեր :=
+	db հարցում: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: ժամանակ),
+	ստանալ: { :row
+		(row mytime = ժամանակ) եթե-սխալ: {
+			այս-առաջադրանքը սխալի-ելք: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter գումարել: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Ցուցակ նոր լրացնել: 100000 արժեքով: ['x'], միացնել: [''].
+{
+	>> str2 := Չհրկիզվող-պահարան թոքեն: 40.
+	>> որոնման-պարամետրեր :=
+	db հարցում: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ստանալ: { :row
+		(row str1 = str1 և: row str2 = str2) եթե-սխալ: {
+			այս-առաջադրանքը սխալի-ելք: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter գումարել: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Թիվ միջև: 1 մինչև: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 տողից: ['9223372036854775807'] ) -
+		( Int64 տողից: ['99999'] ) +
+		( Int64 տողից: n1 տող )
+	).
+	>> որոնման-պարամետրեր :=
+	db հարցում: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ստանալ: { :row
+		(row n1 = n1) եթե-սխալ: {
+			այս-առաջադրանքը սխալի-ելք: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) եթե-սխալ: {
+			այս-առաջադրանքը սխալի-ելք: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 կլորացնել) եթե-սխալ: {
+			այս-առաջադրանքը սխալի-ելք: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) եթե-սխալ: {
+			այս-առաջադրանքը սխալի-ելք: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter գումարել: 1.
+} * 100.
+
+
+Ելք գրել: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), նոր-տող.

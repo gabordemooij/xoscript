@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Papatono whakahaere-pūmahara: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB hou manaaki: ['localhost'],
+	ingoa-kaiwhakamahi: ['xo'], kupuhipa: ['pass123'], ingoa-pātengi-raraunga: ['xobase'], tūhono.
+
+>> TwoDigitFormat := Hōputu hou: ['%02d'].
+
+# Datetime
+{
+	>> tau-maramataka := Tau waenga: 1995 me: 2050, aho.
+	>> marama := TwoDigitFormat whakahaere-tau-tōpū: (Tau waenga: 1 me: 12), aho.
+	>> rā := TwoDigitFormat whakahaere-tau-tōpū: (Tau waenga: 1 me: 28), aho.
+	>> haora := TwoDigitFormat whakahaere-tau-tōpū: (Tau waenga: 1 me: 23), aho.
+	>> meneti := TwoDigitFormat whakahaere-tau-tōpū: (Tau waenga: 1 me: 59), aho.
+	>> hēkona := TwoDigitFormat whakahaere-tau-tōpū: (Tau waenga: 1 me: 59), aho.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: tau-maramataka,
+		MM: marama,
+		DD: rā,
+		HH: haora,
+		II: meneti,
+		SS: hēkona.
+	>> tawhā-rapu :=
+	db uiui: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	tikina: { :row
+		(row mydatetime = datetime) teka: {
+			tēnei-mahi hapa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter tāpiri: 1.
+} * 100.
+
+# Date
+{
+	>> tau-maramataka := Tau waenga: 1995 me: 2050, aho.
+	>> marama := TwoDigitFormat whakahaere-tau-tōpū: (Tau waenga: 1 me: 12), aho.
+	>> rā := TwoDigitFormat whakahaere-tau-tōpū: (Tau waenga: 1 me: 28), aho.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: tau-maramataka,
+		MM: marama,
+		DD: rā.
+	>> tawhā-rapu :=
+	db uiui: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	tikina: { :row
+		(row mydate = date) teka: {
+			tēnei-mahi hapa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter tāpiri: 1.
+} * 100.
+
+
+# Time
+{
+	>> haora := TwoDigitFormat whakahaere-tau-tōpū: (Tau waenga: 1 me: 23), aho.
+	>> meneti := TwoDigitFormat whakahaere-tau-tōpū: (Tau waenga: 1 me: 59), aho.
+	>> hēkona := TwoDigitFormat whakahaere-tau-tōpū: (Tau waenga: 1 me: 59), aho.
+	>> wā := ['HH:II:SS'].
+	wā
+		HH: haora,
+		II: meneti,
+		SS: hēkona.
+	>> tawhā-rapu :=
+	db uiui: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: wā),
+	tikina: { :row
+		(row mytime = wā) teka: {
+			tēnei-mahi hapa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter tāpiri: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Rārangi hou whakakī: 100000 me: ['x'], honoa: [''].
+{
+	>> str2 := Pākoro token: 40.
+	>> tawhā-rapu :=
+	db uiui: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	tikina: { :row
+		(row str1 = str1 a: row str2 = str2) teka: {
+			tēnei-mahi hapa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter tāpiri: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Tau waenga: 1 me: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 mai-i-te-aho: ['9223372036854775807'] ) -
+		( Int64 mai-i-te-aho: ['99999'] ) +
+		( Int64 mai-i-te-aho: n1 aho )
+	).
+	>> tawhā-rapu :=
+	db uiui: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	tikina: { :row
+		(row n1 = n1) teka: {
+			tēnei-mahi hapa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) teka: {
+			tēnei-mahi hapa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 whakaawhiwhi) teka: {
+			tēnei-mahi hapa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) teka: {
+			tēnei-mahi hapa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter tāpiri: 1.
+} * 100.
+
+
+Huaputa tuhi: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), rārangi-hou.

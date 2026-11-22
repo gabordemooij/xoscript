@@ -1,0 +1,43 @@
+
+
+>> g := Server нов.
+>> v := Сеф нов.
+>> ok := 0.
+
+>> secrets := Листа нов ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets копирај.
+passwords секој: { :i :p
+	secrets секој: { :n :s
+		{
+			>> encrypted := v шифрирај: s клуч: p.
+			>> decrypted := v дешифрирај: encrypted клуч: p.
+			(decrypted = s) точно: {
+				ok додај: 1.
+			}, инаку: {
+				Излез напиши: ['failed encrypting/decrypting: '], нов-ред.
+				Излез напиши: s, нов-ред.
+				Излез напиши: ['encrypted: '] + encrypted, нов-ред.
+				Излез напиши: ['decrypted: '] + encrypted, нов-ред.
+				Програма крај.
+			}.
+		} фати: { :err
+			(s = [''] или: p = ['']) точно: {
+				ok додај: 1.
+			}, инаку: {
+				Излез напиши: err, нов-ред.
+				Програма крај.
+			}.
+		}, стартувај.
+	}.
+}.
+
+Излез напиши: ( ok + [' vault encryptions tested.'] ), нов-ред.

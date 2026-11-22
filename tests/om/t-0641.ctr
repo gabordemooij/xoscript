@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Galmee-jechootaa haaraa
+	# ASCII only
+	kaaʼi: ( Tarree-wantootaa haaraa ; 65 ; 65 ; 65 ; 65 ; 0 ) itti: ['AAAA'],
+	# valid 2 byte sequence
+	kaaʼi: ( Tarree-wantootaa haaraa ; 194 ; 162 ; 0 ) itti: ['¢'],
+	# Valid 3-byte UTF-8
+    kaaʼi: ( Tarree-wantootaa haaraa ; 226 ; 130 ; 172 ; 0 ) itti: ['€'],
+	# Valid 4-byte UTF-8
+    kaaʼi: ( Tarree-wantootaa haaraa ; 240 ; 144 ; 141 ; 136 ; 0 ) itti: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    kaaʼi: ( Tarree-wantootaa haaraa ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) itti: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    kaaʼi: ( Tarree-wantootaa haaraa ; 65 ; 193 ; 129 ; 0 ) itti: ['A?'],
+	# Invalid first byte (0xFF)
+    kaaʼi: ( Tarree-wantootaa haaraa ; 255 ; 0 ) itti: ['?'],
+	# Incomplete multi-byte sequence at end
+    kaaʼi: ( Tarree-wantootaa haaraa ; 66 ; 226 ; 0 ) itti: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    kaaʼi: ( Tarree-wantootaa haaraa ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) itti: ['A€?𐍈B'].
+	 
+utf8cases hundaaf: { :key :value
+	>> blob := Blob haaraa: value lakkaaʼi, bytes: value.
+	>> str := blob gara-barreeffamaatti.
+	(str = key) yoodhugaa: {
+		Baʼii barreessi: ['OK'], dhaabi.
+	}, yoobaate: {
+		Baʼii barreessi: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, dhaabi.
+	}.
+	blob gadi-lakkisi.
+}.

@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Program instelling: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server koppel: ( Lys nuut ;
+ libname ; ['fopen'] ;
+ ( Lys nuut ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+koppel: ( Lys nuut ;
+ Niks ; # means same lib
+ ['fread'] ;
+ ( Lys nuut ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Niks ; # means same object (i.e. Stream)
+ ['fread']
+),
+koppel: (
+ Lys nuut ;
+ Niks ; # means same lib
+ ['fwrite'] ;
+ ( Lys nuut ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Niks ; # means same lib
+ ['fwrite']
+),
+koppel: (
+ Lys nuut ;
+ Niks ; # means same lib
+ ['rewind'] ;
+ ( Lys nuut ; ['pointer'] ) ;
+ ['int'] ;
+ Niks ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> pad := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: pad mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream boodskap: ['fwrite'] argumente: (Lys nuut ; str ; 1 ; 6 ; fd ).
+Uitvoer skryf: bytes-written, nuwe-reël.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob nuut: 20.
+
+# read from file
+>> bytes-read := Stream boodskap: ['fread'] argumente: (Lys nuut ; buf ; 1 ; 6 ; fd ).
+Uitvoer skryf: bytes-read, nuwe-reël.
+Uitvoer skryf: buf, nuwe-reël.
+
+# free memory
+str  stel-vry.
+pad stel-vry.
+mode stel-vry.
+buf  stel-vry.
+
+

@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB ġdid host: ['localhost'],
+	isem-utent: ['xo'],
+	password: ['pass123'],
+	isem-database: ['xobase'],
+	qabbad.
+
+>> parametri-tfittxija := db mistoqsija: ['SELECT ? AS a, ? AS b, ? AS c'].
+parametri-tfittxija parametri: (Lista ġdid ; ['1']).
+{ parametri-tfittxija ġib: { :row Ħruġ ikteb: row, linja-ġdida. }. } aqbad: { :e Ħruġ ikteb: e, linja-ġdida. }, ibda.
+
+>> parametri-tfittxija := db mistoqsija: ['SELECT ? AS a'].
+{ parametri-tfittxija ġib: { :row Ħruġ ikteb: row, linja-ġdida. }. } aqbad: { :e Ħruġ ikteb: e, linja-ġdida. }, ibda.
+
+# the right number still works, more parameters are ignored as before
+>> parametri-tfittxija := db mistoqsija: ['SELECT ? AS a, ? AS b'].
+parametri-tfittxija parametri: (Lista ġdid ; ['1'] ; ['2']).
+parametri-tfittxija ġib: { :row Ħruġ ikteb: (row fi: ['a']), ikteb: (row fi: ['b']), linja-ġdida. }.
+parametri-tfittxija parametri: (Lista ġdid ; ['1'] ; ['2'] ; ['3']).
+parametri-tfittxija ġib: { :row Ħruġ ikteb: (row fi: ['a']), ikteb: (row fi: ['b']), linja-ġdida. }.

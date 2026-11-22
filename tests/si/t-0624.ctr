@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := වස්තුව නව.
+
+Log ලැබුණු-විට: ['say:'] කරන්න: { :str
+	නිමැවුම ලියන්න: str, නව-පේළිය.
+}.
+
+>> Item := වස්තුව නව.
+
+Item ලැබුණු-විට: ['නව:'] කරන්න: { :id <- තමා නව id: id.
+}.
+
+Item ලැබුණු-විට: ['id:'] කරන්න: { :id
+	තමාගේ id := id.
+}.
+
+Item ලැබුණු-විට: ['id'] කරන්න: { <- තමාගේ id. }.
+
+
+Item ලැබුණු-විට: ['පෙළට'] කරන්න: {
+	>> str := ['Item#~no'].
+	str ~no: තමාගේ id. <- str.
+}.
+
+
+>> Print := වස්තුව නව.
+
+Print ලැබුණු-විට: ['items'] කරන්න: { 
+	
+	තමාගේ item := Item නව: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: තමාගේ item
+	).
+	
+	
+}.
+
+Print items.

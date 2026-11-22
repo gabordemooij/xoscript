@@ -1,0 +1,53 @@
+Program hukommelsesstyring: 0.
+Liste ved: ['sum'] gør: {
+	>> total := 0.
+	selv hver: { :index :element
+		total læg-til: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Fil ny: ['/tmp/test.txt'].
+f skriv: ['Lorem Ipsum'].
+f luk.
+  
+
+f := Fil ny: ['/tmp/test.txt'].
+>> text := f læs.
+f luk.
+
+
+
+Program ryd-op.
+usedMemory1 := (Program hukommelse ? 1).
+
+
+
+f := Fil ny: ['/tmp/test.txt'].
+text := f læs.
+f luk.
+
+Program ryd-op.
+usedMemory2 := (Program hukommelse ? 1).
+
+
+f := Fil ny: ['/tmp/test.txt'].
+text := f læs.
+f luk.
+
+Program ryd-op.
+usedMemory3 := (Program hukommelse ? 1).
+
+
+
+( usedMemory1 = usedMemory2 og: usedMemory1 = usedMemory3, og: usedMemory2 = usedMemory3 ) sand: {
+	Uddata skriv: ['No memory leaks here'].
+}, falsk: {
+	Uddata skriv: ['Leaking memory...'].
+}.

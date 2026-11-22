@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := برنامه پیکربندی: ⌝'FFITESTLIB'⌜.
+
+# link stdio functions from c for advances file operations
+Server پیوند: ﴿ لیست جدید ;
+ libname ; ⌝'fopen'⌜ ;
+ ﴿ لیست جدید ; ⌝'pointer'⌜ ; ⌝'pointer'⌜﴾ ;
+ ⌝'pointer'⌜ ;
+ ⌝'Stream'⌜ ;
+ ⌝'path:mode:'⌜
+﴾,
+پیوند: ﴿ لیست جدید ;
+ هیچ ; # means same lib
+ ⌝'fread'⌜ ;
+ ﴿ لیست جدید ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ هیچ ; # means same object (i.e. Stream)
+ ⌝'fread'⌜
+﴾,
+پیوند: ﴿
+ لیست جدید ;
+ هیچ ; # means same lib
+ ⌝'fwrite'⌜ ;
+ ﴿ لیست جدید ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ هیچ ; # means same lib
+ ⌝'fwrite'⌜
+﴾,
+پیوند: ﴿
+ لیست جدید ;
+ هیچ ; # means same lib
+ ⌝'rewind'⌜ ;
+ ﴿ لیست جدید ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ هیچ ; # means same lib
+ ⌝'rewind:'⌜
+﴾.
+
+>> str := Blob utf8: ⌝'abc123'⌜.
+>> مسیر-پرونده := Blob utf8: ⌝'/tmp/bla.txt'⌜.
+>> mode := Blob utf8: ⌝'w+'⌜.
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: مسیر-پرونده mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream پیام: ⌝'fwrite'⌜ آرگومان-ها: ﴿لیست جدید ; str ; 1 ; 6 ; fd ﴾.
+خروجی بنویس: bytes-written, سطر-نو.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob جدید: 20.
+
+# read from file
+>> bytes-read := Stream پیام: ⌝'fread'⌜ آرگومان-ها: ﴿لیست جدید ; buf ; 1 ; 6 ; fd ﴾.
+خروجی بنویس: bytes-read, سطر-نو.
+خروجی بنویس: buf, سطر-نو.
+
+# free memory
+str  آزاد-کن.
+مسیر-پرونده آزاد-کن.
+mode آزاد-کن.
+buf  آزاد-کن.
+
+

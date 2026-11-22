@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inicializar.
+Programa usar: ['../../../src/xo/gl/webtools.xo'].
+Programa usar: ['../../../src/xo/gl/mailtools.xo'].
+
+>> cabeceira := Cabeceira-HTTP novo chave: ['Location'] valor: ['/ok\r\nX-Injected: yes'].
+Saída escribir: cabeceira.
+
+>> web := Documento-Web novo.
+web ir-a: ['/ok\r\nX-Injected: yes'].
+Saída escribir: ['\n'], salto-de-liña.
+
+>> mail := Correo novo.
+mail destinatario: (Lista novo ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lista novo ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lista novo ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail remitente: ['d@example.invalid\r\nX-From: yes'] nome: ['site\r\nX-Name: yes'].
+mail asunto: ['hello\r\nX-Subject: yes'].
+mail corpo: ['line1\r\nline2'].
+Saída escribir: mail xerar.
+
+>> html := Correo-HTML novo.
+html destinatario: (Lista novo ; ['a@example.invalid\r\nX-To: yes']).
+html remitente: ['d@example.invalid'] nome: ['site'].
+html asunto: ['hello\r\nX-Subject: yes'].
+html corpo: ['body'].
+Saída escribir: ( html xerar contén: ['\nX-'] ), salto-de-liña.
+Saída escribir: ( html xerar contén: ['X-To: yes'] ), salto-de-liña.

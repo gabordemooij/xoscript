@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server پیل-کول.
+پروګرام وکاروه: ⌝'../../../src/xo/ps/webtools.xo'⌜.
+پروګرام وکاروه: ⌝'../../../src/xo/ps/mailtools.xo'⌜.
+
+>> سرلیک := سرلیک-HTTP نوی کیلي: ⌝'Location'⌜ ارزښت: ⌝'/ok\r\nX-Injected: yes'⌜.
+وتنه ولیکه: سرلیک.
+
+>> web := ویب-سند نوی.
+web ورشه: ⌝'/ok\r\nX-Injected: yes'⌜.
+وتنه ولیکه: ⌝'\n'⌜, نوې-کرښه.
+
+>> mail := بریښنالیک نوی.
+mail ته: ﴿لیست نوی ; ⌝'a@example.invalid\r\nX-To: yes'⌜﴾.
+mail cc: ﴿لیست نوی ; ⌝'b@example.invalid\r\nX-Cc: yes'⌜﴾.
+mail bcc: ﴿لیست نوی ; ⌝'c@example.invalid\r\nX-Bcc: yes'⌜﴾.
+mail لېږونکی: ⌝'d@example.invalid\r\nX-From: yes'⌜ نوم: ⌝'site\r\nX-Name: yes'⌜.
+mail موضوع: ⌝'hello\r\nX-Subject: yes'⌜.
+mail متن-لیک: ⌝'line1\r\nline2'⌜.
+وتنه ولیکه: mail جوړ-کړه.
+
+>> html := بریښنالیک-HTML نوی.
+html ته: ﴿لیست نوی ; ⌝'a@example.invalid\r\nX-To: yes'⌜﴾.
+html لېږونکی: ⌝'d@example.invalid'⌜ نوم: ⌝'site'⌜.
+html موضوع: ⌝'hello\r\nX-Subject: yes'⌜.
+html متن-لیک: ⌝'body'⌜.
+وتنه ولیکه: ﴿ html جوړ-کړه شامل-دی: ⌝'\nX-'⌜ ﴾, نوې-کرښه.
+وتنه ولیکه: ﴿ html جوړ-کړه شامل-دی: ⌝'X-To: yes'⌜ ﴾, نوې-کرښه.

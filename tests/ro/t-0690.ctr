@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Ieșire scrie: ['Database test'], rând-nou.
+
+>> db := Maria-DB nou gazdă: ['localhost'],
+	utilizator: ['xo'], parolă: ['pass123'], nume-bază: ['xobase'], conectează.
+
+Ieșire scrie: ['Can we connect? '] + db conectat?, rând-nou.
+
+>> parametri-căutare := db interogare: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametri: ( Listă nou ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  parametri-căutare execută-interogare. db confirmă. } prinde: { :e db anulează.  }, pornește.
+
+Ieșire scrie: ['Can we insert? '] + ( parametri-căutare insert-id > 0 ), rând-nou.
+
+>> x := 0.
+>> parametri-căutare :=
+db interogare: ['SELECT * FROM book order by id desc limit 2'], 
+preia: { :row 
+	x adaugă: 1.
+	Adevărat întrerupe. # must clean up, no 'Commands out of sync'
+}.
+
+>> parametri-căutare :=
+db interogare: ['SELECT * FROM book order by id desc limit 2'], 
+preia: { :row
+	x adaugă: 1.
+	Adevărat întrerupe.
+}.
+
+(x > 0) adevărat: {
+	Ieșire scrie: ['Can we break in the middle of a fetch? '].
+}.
+
+Ieșire scrie: Adevărat, rând-nou.

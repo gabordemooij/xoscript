@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> caminho := ['/tmp/test0821.csv'].
+>> file := Arquivo novo: caminho.
+
+file escrever: ['a,b\n"1,2\n'].
+{
+	file separador: [','] quotes: ['"'] linhas: { :line
+		Saída escrever: line, stop.
+	}.
+} pegar: { :e Saída escrever: e, stop. }, iniciar.
+
+# a closed quote still works
+file escrever: ['a,b\n"1,2",3'].
+file separador: [','] quotes: ['"'] linhas: { :line
+	Saída escrever: line, stop.
+}.
+file apagar.

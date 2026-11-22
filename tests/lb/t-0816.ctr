@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> probéieren := { :format :value
+	{ Ausgab schreiwen: ( (Format nei: format) uwenden: value ), nei-zeil. } offänken: { :e Ausgab schreiwen: e, nei-zeil. }, starten.
+}.
+>> try-int := { :format :value
+	{ Ausgab schreiwen: ( (Format nei: format) uwenden-int: value ), nei-zeil. } offänken: { :e Ausgab schreiwen: e, nei-zeil. }, starten.
+}.
+
+# fits
+probéieren uwenden: ['|%s|'] an: ['text'].
+probéieren uwenden: ['%06.2f'] an: 5.5.
+probéieren uwenden: ['100%% %s'] an: ['sure'].
+try-int uwenden: ['%03d'] an: 7.
+try-int uwenden: ['%x'] an: 255.
+probéieren uwenden: ['%d'] an: (Int64 nei aus-text: ['12']).
+probéieren uwenden: ['%lld'] an: (Int64 nei aus-text: ['12']).
+probéieren uwenden: ['%.1lf'] an: 5.5.
+try-int uwenden: ['%hd'] an: 7.
+
+# does not fit
+probéieren uwenden: ['%s'] an: 12345.
+probéieren uwenden: ['%d'] an: 12345.
+probéieren uwenden: ['%f'] an: ['text'].
+try-int uwenden: ['%d'] an: ['text'].
+try-int uwenden: ['%s'] an: 5.
+probéieren uwenden: ['%s %s'] an: ['text'].
+probéieren uwenden: ['%n'] an: ['text'].
+probéieren uwenden: ['%*s'] an: ['text'].
+probéieren uwenden: ['%'] an: ['text'].
+
+# length modifier does not fit
+probéieren uwenden: ['%ls'] an: ['text'].
+probéieren uwenden: ['%Lf'] an: 5.5.
+try-int uwenden: ['%ld'] an: 7.
+try-int uwenden: ['%lld'] an: 7.
+probéieren uwenden: ['%Ld'] an: (Int64 nei aus-text: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+probéieren uwenden: ['%99999999999s'] an: ['text'].

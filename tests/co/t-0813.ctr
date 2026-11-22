@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inizializà.
+Prugramma aduprà: ['../../../src/xo/co/webtools.xo'].
+Prugramma aduprà: ['../../../src/xo/co/mailtools.xo'].
+
+>> intestatura := Intestatura-HTTP novu chjave: ['Location'] valore: ['/ok\r\nX-Injected: yes'].
+Esciuta scrive: intestatura.
+
+>> web := Ducumentu-Web novu.
+web andà-à: ['/ok\r\nX-Injected: yes'].
+Esciuta scrive: ['\n'], linea-nova.
+
+>> mail := Email novu.
+mail destinatariu: (Lista novu ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lista novu ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lista novu ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail mittente: ['d@example.invalid\r\nX-From: yes'] nome: ['site\r\nX-Name: yes'].
+mail oggettu: ['hello\r\nX-Subject: yes'].
+mail corpu: ['line1\r\nline2'].
+Esciuta scrive: mail generà.
+
+>> html := Email-HTML novu.
+html destinatariu: (Lista novu ; ['a@example.invalid\r\nX-To: yes']).
+html mittente: ['d@example.invalid'] nome: ['site'].
+html oggettu: ['hello\r\nX-Subject: yes'].
+html corpu: ['body'].
+Esciuta scrive: ( html generà cuntene: ['\nX-'] ), linea-nova.
+Esciuta scrive: ( html generà cuntene: ['X-To: yes'] ), linea-nova.

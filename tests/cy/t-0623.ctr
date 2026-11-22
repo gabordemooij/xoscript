@@ -1,0 +1,43 @@
+
+
+>> g := Server newydd.
+>> v := Cromgell newydd.
+>> ok := 0.
+
+>> secrets := Rhestr newydd ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets copïo.
+passwords pob: { :i :p
+	secrets pob: { :n :s
+		{
+			>> encrypted := v amgryptio: s allwedd: p.
+			>> decrypted := v dadgryptio: encrypted allwedd: p.
+			(decrypted = s) gwir: {
+				ok ychwanegu: 1.
+			}, arall: {
+				Allbwn ysgrifennu: ['failed encrypting/decrypting: '], llinell-newydd.
+				Allbwn ysgrifennu: s, llinell-newydd.
+				Allbwn ysgrifennu: ['encrypted: '] + encrypted, llinell-newydd.
+				Allbwn ysgrifennu: ['decrypted: '] + encrypted, llinell-newydd.
+				Rhaglen diwedd.
+			}.
+		} dal: { :err
+			(s = [''] neu: p = ['']) gwir: {
+				ok ychwanegu: 1.
+			}, arall: {
+				Allbwn ysgrifennu: err, llinell-newydd.
+				Rhaglen diwedd.
+			}.
+		}, cychwyn.
+	}.
+}.
+
+Allbwn ysgrifennu: ( ok + [' vault encryptions tested.'] ), llinell-newydd.

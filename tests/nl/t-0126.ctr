@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Object nieuw.
+
+Slurp bij: ['nieuw'] doen: {
+	eigen str := [''].
+}.
+
+Slurp bij: ['nieuw'] doen: {
+	eigen str := [''].
+}.
+
+Slurp bij: ['reactie:'] doen: { :blah
+		eigen str toevoegen: blah.
+}.
+
+Slurp bij: ['reactie:argument:'] doen: { :blah :blahah
+		eigen str toevoegen: (blah van: 0 lengte: (blah lengte - 1)).
+		eigen str toevoegen: [' '].
+		eigen str toevoegen: blahah.
+}.
+
+Slurp bij: ['obtain'] doen: {
+	>> buffer := eigen str.
+	eigen str := ['']. <- buffer.
+}.
+
+
+Uit schrijf: (Programma opdrachtregel: (Slurp nieuw echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Bestand nieuw: ['/tmp/from.txt'], verwijderen. } afhandelen: { ['Empty']. }, start.
+{ Bestand nieuw: ['/tmp/to.txt'], verwijderen. } afhandelen: { ['Empty']. }, start.
+
+
+Bestand nieuw: ['/tmp/to.txt'], bestaat nee: {
+	Uit schrijf: ['Confirmed. Target file does not exist.\
+'].
+}.
+Bestand nieuw: ['/tmp/from.txt'], bestaat nee: {
+	Uit schrijf: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Programma opdrachtregel: (Slurp nieuw touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Programma opdrachtregel: (Slurp nieuw cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Bestand nieuw: ['/tmp/to.txt'], bestaat ja: {
+	Uit schrijf: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Uit schrijf: ['Contents of file is:'] + (Bestand nieuw: ['/tmp/to.txt'], lezen), stop.

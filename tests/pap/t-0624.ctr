@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Opheto nobo.
+
+Log ora: ['say:'] hasi: { :str
+	Salida skirbi: str, liña-nobo.
+}.
+
+>> Item := Opheto nobo.
+
+Item ora: ['nobo:'] hasi: { :id <- mes nobo id: id.
+}.
+
+Item ora: ['id:'] hasi: { :id
+	propio id := id.
+}.
+
+Item ora: ['id'] hasi: { <- propio id. }.
+
+
+Item ora: ['teksto'] hasi: {
+	>> str := ['Item#~no'].
+	str ~no: propio id. <- str.
+}.
+
+
+>> Print := Opheto nobo.
+
+Print ora: ['items'] hasi: { 
+	
+	propio item := Item nobo: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: propio item
+	).
+	
+	
+}.
+
+Print items.

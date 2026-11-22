@@ -1,0 +1,25 @@
+Salida escribir: ['Test object'], detener.
+>> a := Objeto crear. 
+
+a al: ['item:'] hacer: { :fmt
+	mi fmt := fmt. 
+}.
+
+a al: ['item'] hacer: { <- mi fmt.
+}.
+
+a item: ( Formato crear: ['|%s|'] ).
+
+Salida escribir: a item, detener.
+
+>> old-fmt-address := a item prototipo dirección-de-memoria.
+a save-as: ['/tmp/a.bin'].
+Salida escribir: ['========== RELOADING SNAP:'], detener.
+
+>> b := Objeto load-from: ['/tmp/a.bin'].
+
+(b item prototipo dirección-de-memoria = old-fmt-address) verdadero: {
+	Salida escribir: ['Object link re-attached.'], detener.
+}.
+
+Salida escribir: ( b item aplicar: ['hello'] ), detener.

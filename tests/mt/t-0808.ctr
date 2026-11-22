@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Kaxxaforti iġġenera-ċwievet.
+>> sk := keys ewwel.
+>> pk := keys aħħar.
+>> sig := Kaxxaforti iffirma: ['abc'] bi: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Kaxxaforti iffirma: ['abc'] bi: long. } aqbad: { :e
+	Ħruġ ikteb: e, linja-ġdida.
+}, ibda.
+
+{ Kaxxaforti iċċekkja: ['abc'] firma: long bi: pk. } aqbad: { :e
+	Ħruġ ikteb: e, linja-ġdida.
+}, ibda.
+
+{ Kaxxaforti iċċekkja: ['abc'] firma: sig bi: short. } aqbad: { :e
+	Ħruġ ikteb: e, linja-ġdida.
+}, ibda.

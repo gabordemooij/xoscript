@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := ଅଭିଧାନ ନୂତନ
+	# ASCII only
+	ରଖ: ( ସାରଣୀ ନୂତନ ; 65 ; 65 ; 65 ; 65 ; 0 ) ଚାବି: ['AAAA'],
+	# valid 2 byte sequence
+	ରଖ: ( ସାରଣୀ ନୂତନ ; 194 ; 162 ; 0 ) ଚାବି: ['¢'],
+	# Valid 3-byte UTF-8
+    ରଖ: ( ସାରଣୀ ନୂତନ ; 226 ; 130 ; 172 ; 0 ) ଚାବି: ['€'],
+	# Valid 4-byte UTF-8
+    ରଖ: ( ସାରଣୀ ନୂତନ ; 240 ; 144 ; 141 ; 136 ; 0 ) ଚାବି: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    ରଖ: ( ସାରଣୀ ନୂତନ ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ଚାବି: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    ରଖ: ( ସାରଣୀ ନୂତନ ; 65 ; 193 ; 129 ; 0 ) ଚାବି: ['A?'],
+	# Invalid first byte (0xFF)
+    ରଖ: ( ସାରଣୀ ନୂତନ ; 255 ; 0 ) ଚାବି: ['?'],
+	# Incomplete multi-byte sequence at end
+    ରଖ: ( ସାରଣୀ ନୂତନ ; 66 ; 226 ; 0 ) ଚାବି: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    ରଖ: ( ସାରଣୀ ନୂତନ ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ଚାବି: ['A€?𐍈B'].
+	 
+utf8cases ପ୍ରତ୍ୟେକ: { :key :value
+	>> blob := Blob ନୂତନ: value ଗଣନା, bytes: value.
+	>> str := blob ପାଠ୍ୟରେ.
+	(str = key) ସତ୍ୟ-ହେଲେ: {
+		ଆଉଟପୁଟ୍ ଲେଖ: ['OK'], ନୂଆ-ଧାଡ଼ି.
+	}, ନଚେତ୍: {
+		ଆଉଟପୁଟ୍ ଲେଖ: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, ନୂଆ-ଧାଡ଼ି.
+	}.
+	blob ମୁକ୍ତ.
+}.

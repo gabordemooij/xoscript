@@ -1,0 +1,53 @@
+Programm speicherverwaltung: 0.
+Liste wenn: ['sum'] tun: {
+	>> total := 0.
+	selbst jedes: { :index :element
+		total hinzufügen: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Datei neu: ['/tmp/test.txt'].
+f schreiben: ['Lorem Ipsum'].
+f schließen.
+  
+
+f := Datei neu: ['/tmp/test.txt'].
+>> text := f lesen.
+f schließen.
+
+
+
+Programm aufräumen.
+usedMemory1 := (Programm speicher ? 1).
+
+
+
+f := Datei neu: ['/tmp/test.txt'].
+text := f lesen.
+f schließen.
+
+Programm aufräumen.
+usedMemory2 := (Programm speicher ? 1).
+
+
+f := Datei neu: ['/tmp/test.txt'].
+text := f lesen.
+f schließen.
+
+Programm aufräumen.
+usedMemory3 := (Programm speicher ? 1).
+
+
+
+( usedMemory1 = usedMemory2 und: usedMemory1 = usedMemory3, und: usedMemory2 = usedMemory3 ) ja: {
+	Ausgabe schreiben: ['No memory leaks here'].
+}, nein: {
+	Ausgabe schreiben: ['Leaking memory...'].
+}.

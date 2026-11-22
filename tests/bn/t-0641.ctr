@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := অভিধান নতুন
+	# ASCII only
+	রাখো: ( লিস্ট নতুন ; 65 ; 65 ; 65 ; 65 ; 0 ) চাবিতে: ['AAAA'],
+	# valid 2 byte sequence
+	রাখো: ( লিস্ট নতুন ; 194 ; 162 ; 0 ) চাবিতে: ['¢'],
+	# Valid 3-byte UTF-8
+    রাখো: ( লিস্ট নতুন ; 226 ; 130 ; 172 ; 0 ) চাবিতে: ['€'],
+	# Valid 4-byte UTF-8
+    রাখো: ( লিস্ট নতুন ; 240 ; 144 ; 141 ; 136 ; 0 ) চাবিতে: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    রাখো: ( লিস্ট নতুন ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) চাবিতে: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    রাখো: ( লিস্ট নতুন ; 65 ; 193 ; 129 ; 0 ) চাবিতে: ['A?'],
+	# Invalid first byte (0xFF)
+    রাখো: ( লিস্ট নতুন ; 255 ; 0 ) চাবিতে: ['?'],
+	# Incomplete multi-byte sequence at end
+    রাখো: ( লিস্ট নতুন ; 66 ; 226 ; 0 ) চাবিতে: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    রাখো: ( লিস্ট নতুন ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) চাবিতে: ['A€?𐍈B'].
+	 
+utf8cases প্রতিটি: { :key :value
+	>> blob := Blob নতুন: value গণনা, bytes: value.
+	>> str := blob পাঠে.
+	(str = key) সত্য-হলে: {
+		আউটপুট লেখো: ['OK'], নতুন-লাইন.
+	}, নতুবা: {
+		আউটপুট লেখো: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, নতুন-লাইন.
+	}.
+	blob মুক্ত.
+}.

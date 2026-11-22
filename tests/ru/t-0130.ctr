@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Программа конфигурация: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server связать: ( Список новый ;
+ libname ; ['fopen'] ;
+ ( Список новый ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+связать: ( Список новый ;
+ Пустой ; # means same lib
+ ['fread'] ;
+ ( Список новый ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Пустой ; # means same object (i.e. Stream)
+ ['fread']
+),
+связать: (
+ Список новый ;
+ Пустой ; # means same lib
+ ['fwrite'] ;
+ ( Список новый ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Пустой ; # means same lib
+ ['fwrite']
+),
+связать: (
+ Список новый ;
+ Пустой ; # means same lib
+ ['rewind'] ;
+ ( Список новый ; ['pointer'] ) ;
+ ['int'] ;
+ Пустой ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> путь := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: путь mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream сообщение: ['fwrite'] аргументы: (Список новый ; str ; 1 ; 6 ; fd ).
+Выход написать: bytes-written, стоп.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob новый: 20.
+
+# read from file
+>> bytes-read := Stream сообщение: ['fread'] аргументы: (Список новый ; buf ; 1 ; 6 ; fd ).
+Выход написать: bytes-read, стоп.
+Выход написать: buf, стоп.
+
+# free memory
+str  свободно.
+путь свободно.
+mode свободно.
+buf  свободно.
+
+

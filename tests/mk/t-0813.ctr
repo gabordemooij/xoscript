@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server иницијализирај.
+Програма користи: ['../../../src/xo/mk/webtools.xo'].
+Програма користи: ['../../../src/xo/mk/mailtools.xo'].
+
+>> заглавие := HTTP-Заглавие нов клуч: ['Location'] вредност: ['/ok\r\nX-Injected: yes'].
+Излез напиши: заглавие.
+
+>> web := Веб-документ нов.
+web оди-на: ['/ok\r\nX-Injected: yes'].
+Излез напиши: ['\n'], нов-ред.
+
+>> mail := Е-пошта нов.
+mail примач: (Листа нов ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Листа нов ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Листа нов ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail испраќач: ['d@example.invalid\r\nX-From: yes'] име: ['site\r\nX-Name: yes'].
+mail тема: ['hello\r\nX-Subject: yes'].
+mail тело: ['line1\r\nline2'].
+Излез напиши: mail генерирај.
+
+>> html := HTML-Е-пошта нов.
+html примач: (Листа нов ; ['a@example.invalid\r\nX-To: yes']).
+html испраќач: ['d@example.invalid'] име: ['site'].
+html тема: ['hello\r\nX-Subject: yes'].
+html тело: ['body'].
+Излез напиши: ( html генерирај содржи: ['\nX-'] ), нов-ред.
+Излез напиши: ( html генерирај содржи: ['X-To: yes'] ), нов-ред.

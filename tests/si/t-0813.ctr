@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server ආරම්භ-කරන්න.
+වැඩසටහන භාවිතය: ['../../../src/xo/si/webtools.xo'].
+වැඩසටහන භාවිතය: ['../../../src/xo/si/mailtools.xo'].
+
+>> ශීර්ෂය := HTTP-ශීර්ෂය නව යතුර: ['Location'] අගය: ['/ok\r\nX-Injected: yes'].
+නිමැවුම ලියන්න: ශීර්ෂය.
+
+>> web := වෙබ්-ලේඛනය නව.
+web යන්න: ['/ok\r\nX-Injected: yes'].
+නිමැවුම ලියන්න: ['\n'], නව-පේළිය.
+
+>> mail := ඊමේල් නව.
+mail ලබන්නාට: (ලේඛනය නව ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (ලේඛනය නව ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (ලේඛනය නව ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail යවන්නා: ['d@example.invalid\r\nX-From: yes'] නම: ['site\r\nX-Name: yes'].
+mail මාතෘකාව: ['hello\r\nX-Subject: yes'].
+mail මූලික-පෙළ: ['line1\r\nline2'].
+නිමැවුම ලියන්න: mail ජනනය-කරන්න.
+
+>> html := HTML-ඊමේල් නව.
+html ලබන්නාට: (ලේඛනය නව ; ['a@example.invalid\r\nX-To: yes']).
+html යවන්නා: ['d@example.invalid'] නම: ['site'].
+html මාතෘකාව: ['hello\r\nX-Subject: yes'].
+html මූලික-පෙළ: ['body'].
+නිමැවුම ලියන්න: ( html ජනනය-කරන්න අඩංගුයි: ['\nX-'] ), නව-පේළිය.
+නිමැවුම ලියන්න: ( html ජනනය-කරන්න අඩංගුයි: ['X-To: yes'] ), නව-පේළිය.

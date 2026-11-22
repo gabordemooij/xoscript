@@ -1,0 +1,43 @@
+
+
+>> g := Server neu.
+>> v := Tresor neu.
+>> ok := 0.
+
+>> secrets := Liste neu ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopieren.
+passwords jedes: { :i :p
+	secrets jedes: { :n :s
+		{
+			>> encrypted := v verschlüsseln: s schlüssel: p.
+			>> decrypted := v entschlüsseln: encrypted schlüssel: p.
+			(decrypted = s) ja: {
+				ok hinzufügen: 1.
+			}, sonst: {
+				Ausgabe schreiben: ['failed encrypting/decrypting: '], stopp.
+				Ausgabe schreiben: s, stopp.
+				Ausgabe schreiben: ['encrypted: '] + encrypted, stopp.
+				Ausgabe schreiben: ['decrypted: '] + encrypted, stopp.
+				Programm ende.
+			}.
+		} abfangen: { :err
+			(s = [''] oder: p = ['']) ja: {
+				ok hinzufügen: 1.
+			}, sonst: {
+				Ausgabe schreiben: err, stopp.
+				Programm ende.
+			}.
+		}, starten.
+	}.
+}.
+
+Ausgabe schreiben: ( ok + [' vault encryptions tested.'] ), stopp.

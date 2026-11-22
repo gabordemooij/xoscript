@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Prograam jamono: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server lëkkale: ( Jokkalante xees ;
+ libname ; ['fopen'] ;
+ ( Jokkalante xees ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+lëkkale: ( Jokkalante xees ;
+ Dara ; # means same lib
+ ['fread'] ;
+ ( Jokkalante xees ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Dara ; # means same object (i.e. Stream)
+ ['fread']
+),
+lëkkale: (
+ Jokkalante xees ;
+ Dara ; # means same lib
+ ['fwrite'] ;
+ ( Jokkalante xees ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Dara ; # means same lib
+ ['fwrite']
+),
+lëkkale: (
+ Jokkalante xees ;
+ Dara ; # means same lib
+ ['rewind'] ;
+ ( Jokkalante xees ; ['pointer'] ) ;
+ ['int'] ;
+ Dara ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> xoll := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: xoll mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream bataaxal: ['fwrite'] laaj: (Jokkalante xees ; str ; 1 ; 6 ; fd ).
+Génn bind: bytes-written, taxaw.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob xees: 20.
+
+# read from file
+>> bytes-read := Stream bataaxal: ['fread'] laaj: (Jokkalante xees ; buf ; 1 ; 6 ; fd ).
+Génn bind: bytes-read, taxaw.
+Génn bind: buf, taxaw.
+
+# free memory
+str  bàyyi.
+xoll bàyyi.
+mode bàyyi.
+buf  bàyyi.
+
+

@@ -1,0 +1,30 @@
+Výstup psát: ['Test object'], nový-řádek.
+>> a := Objekt nový. 
+
+a při: ['item:'] udělat: { :out
+	vlastní out := out. 
+}.
+
+a při: ['item'] udělat: { <- vlastní out.
+}.
+
+a při: ['greet'] udělat: {
+	Výstup psát: ['hi from original out!'], nový-řádek.
+}.
+
+a item: Výstup.
+
+Výstup psát: a item, nový-řádek.
+
+>> old-out-address := a item prototyp adresa-paměti.
+a save-as: ['/tmp/a.bin'].
+Výstup psát: ['========== RELOADING SNAP:'], nový-řádek.
+
+>> b := Objekt load-from: ['/tmp/a.bin'].
+
+(b item prototyp adresa-paměti = old-out-address) pravda: {
+	Výstup psát: ['Object link re-attached.'], nový-řádek.
+}.
+
+b item psát: ['hello from loaded out!'], nový-řádek.
+b greet.

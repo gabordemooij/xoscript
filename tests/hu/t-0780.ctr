@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lista új ;
+	# {"key":"normal"} normal ASCII
+	( Szótár új tesz: ['normal'] ide: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Szótár új tesz: ['hello world'] ide: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Szótár új tesz: ['"'] ide: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Szótár új tesz: ['backslash: \\'] ide: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Szótár új tesz: ['slash: /'] ide: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Szótár új tesz: ['backspace: \b'] ide: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Szótár új tesz: ['formfeed: \f'] ide: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Szótár új tesz: ['newline: \n'] ide: ['key'] ) ;
+	( Szótár új tesz: ['newline: ↵'] ide: ['key'] ) ;
+	( Szótár új tesz: ['newline: 
+	'] ide: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Szótár új tesz: ['carriage return: \r'] ide: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Szótár új tesz: ['tab \t'] ide: ['key'] ) ;
+	( Szótár új tesz: ['tab ⇿'] ide: ['key'] ) ;
+	( Szótár új tesz: ['tab  '] ide: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Szótár új tesz: ['NUL \u0000'] ide: ['key'] ) ;
+	( Szótár új tesz: ['NUL \0'] ide: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Szótár új tesz: ['control: \u0001'] ide: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Szótár új tesz: ['control: \u001F'] ide: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Szótár új tesz: ['unicode: é'] ide: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Szótár új tesz: ['unicode: €'] ide: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Szótár új tesz: ['unicode: 日本語'] ide: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Szótár új tesz: ['unicode: 😀'] ide: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Szótár új tesz: ['unicode: 🧑‍💻'] ide: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Szótár új tesz: ['combining: e\u0301'] ide: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Szótár új tesz: ['escaped unicode: \u00e9'] ide: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Szótár új tesz: ['escaped unicode: \u20ac'] ide: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Szótár új tesz: ['escaped unicode: \ud83d\ude00'] ide: ['key'] ) ;
+	# {"key":""} empty value
+	( Szótár új tesz: [''] ide: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Szótár új tesz: ['@ < > & = % + ? #'] ide: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Szótár új tesz: ['''] ide: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Szótár új tesz: ['multiple: \" \\ \n \r \t'] ide: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Szótár új tesz: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] ide: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Szótár új tesz: [' value'] ide: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Szótár új tesz: ['value '] ide: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Szótár új tesz: [' \t\n\r '] ide: ['key'] ).
+
+dicts mindegyik: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Szótár új tesz: d key ide: ['key']).
+	>> b := JSON jsonify: (Szótár új tesz: ['value'] ide: d key).
+	>> e := JSON objektum: a.
+	>> f := JSON objektum: b.
+	((e key = d key és: (f ? d key = ['value'])) vagy: (e key = ['NUL ?'])) igaz: {
+		Kimenet ír: ['OK'], újsor.
+	}, különben: {
+		Kimenet ír: ['Unable to properly encode/decode: '] + d + j, újsor.
+		Program vége.
+	}.
+}.

@@ -1,0 +1,37 @@
+
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+Program manajemen-memori: 0.
+
+>> f := Berkas baru: ['/tmp/citrine_test_file.txt'].
+f exists: { f hapus. }.
+f tulis: ['hello'].
+f := Berkas baru: ['/tmp/citrine_test_file.txt'].
+f tambah-di-akhir: ['hello'].
+
+Program bersihkan.
+usedMemory1 := (Program memori ? 0).
+
+
+f := Berkas baru: ['/tmp/citrine_test_file.txt'].
+f tambah-di-akhir: ['hello'].
+Program bersihkan.
+usedMemory2 := (Program memori ? 0).
+
+
+f := Berkas baru: ['/tmp/citrine_test_file.txt'].
+f tambah-di-akhir: ['hello'].
+Program bersihkan.
+usedMemory3 := (Program memori ? 0).
+
+
+
+( usedMemory1 = usedMemory2 dan: usedMemory1 = usedMemory3, dan: usedMemory2 = usedMemory3 ) benar: {
+	Keluaran tulis: ['No memory leaks here'].
+}, salah: {
+	Keluaran tulis: ['Leaking memory...'].
+}.

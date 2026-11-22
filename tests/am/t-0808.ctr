@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := ካዝና ቁልፎች-ፍጠር.
+>> sk := keys የመጀመሪያ.
+>> pk := keys የመጨረሻ.
+>> sig := ካዝና ፈርም: ['abc'] በቁልፍ: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ ካዝና ፈርም: ['abc'] በቁልፍ: long. } ያዝ: { :e
+	ውጤት ፃፍ: e, አዲስ-መስመር.
+}, ጀምር.
+
+{ ካዝና መርምር: ['abc'] ፊርማ: long በቁልፍ: pk. } ያዝ: { :e
+	ውጤት ፃፍ: e, አዲስ-መስመር.
+}, ጀምር.
+
+{ ካዝና መርምር: ['abc'] ፊርማ: sig በቁልፍ: short. } ያዝ: { :e
+	ውጤት ፃፍ: e, አዲስ-መስመር.
+}, ጀምር.

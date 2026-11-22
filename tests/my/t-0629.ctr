@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+အထွက် ရေး: ['Database test'], စာကြောင်းသစ်.
+
+>> db := Maria-DB အသစ် ဟို့စ်: ['localhost'],
+	အသုံးပြုသူအမည်: ['xo'], စကားဝှက်: ['pass123'], ဒေတာဘေ့စ်အမည်: ['xobase'], ဆက်သွယ်.
+
+အထွက် ရေး: ['Can we connect? '] + db ဆက်သွယ်ပြီးလား?, စာကြောင်းသစ်.
+
+>> ရှာဖွေမှုပါရာမီတာ := db မေးမြန်းချက်: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], ပါရာမီတာများ: ( အစီအစဉ် အသစ် ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  ရှာဖွေမှုပါရာမီတာ ဆောင်ရွက်. db အတည်ပြု. } ဖမ်း: { :e db နောက်ပြန်ဆုတ်.  }, စတင်.
+
+အထွက် ရေး: ['Can we insert? '] + ( ရှာဖွေမှုပါရာမီတာ insert-id > 0 ), စာကြောင်းသစ်.
+
+>> Obj := အရာဝတ္ထု အသစ်.
+Obj ရလျှင်: ['retrieve-rows'] လုပ်: {
+	ကိုယ်ပိုင် အရေအတွက် := 0.
+	>> ရှာဖွေမှုပါရာမီတာ :=
+	db မေးမြန်းချက်: ['SELECT * FROM book order by id desc limit 2'], 
+	ယူဆောင်: { :row 
+		ကိုယ်ပိုင် အရေအတွက် ပေါင်း: 1.
+		မှန် ရပ်.
+	}. <- ကိုယ်ပိုင် အရေအတွက် ကူးယူ.
+}.
+
+အထွက် ရေး: ['Can we query? '] + ( Obj retrieve-rows > 0 ), စာကြောင်းသစ်.

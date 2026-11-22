@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> rada := ['/tmp/dat.csv'].
+>> csv := Fail uus: rada.
+csv kirjuta: s.
+
+# accepts CRLF LF CR, varying row length
+csv eraldaja: [';'] jutumärk: ['"'] read: { :line
+	Programm korista.
+	Väljund kirjuta: line, reavahetus.
+	Programm korista.
+}.
+
+# unequal lines
+s lisa-lõppu: ['\njustone'].
+csv kirjuta: s.
+{
+	csv eraldaja: [';'] jutumärk: ['"'] read: { :line
+		Väljund kirjuta: line, reavahetus.
+	}.
+} püüa: { :e 
+	Väljund kirjuta: e, reavahetus.
+}, käivita.
+
+# invalid format
+s := ['"he"llo";world'].
+csv kirjuta: s.
+{
+	csv eraldaja: [';'] jutumärk: ['"'] read: { :line
+		Väljund kirjuta: line, reavahetus.
+	}.
+} püüa: { :e 
+	Väljund kirjuta: e, reavahetus.
+}, käivita.

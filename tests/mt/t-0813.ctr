@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inizjalizza.
+Programm uża: ['../../../src/xo/mt/webtools.xo'].
+Programm uża: ['../../../src/xo/mt/mailtools.xo'].
+
+>> intestatura := Intestatura-HTTP ġdid ċavetta: ['Location'] valur: ['/ok\r\nX-Injected: yes'].
+Ħruġ ikteb: intestatura.
+
+>> web := Dokument-Web ġdid.
+web mur-għand: ['/ok\r\nX-Injected: yes'].
+Ħruġ ikteb: ['\n'], linja-ġdida.
+
+>> mail := Email ġdid.
+mail lil: (Lista ġdid ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lista ġdid ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lista ġdid ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail mittent: ['d@example.invalid\r\nX-From: yes'] isem: ['site\r\nX-Name: yes'].
+mail suġġett: ['hello\r\nX-Subject: yes'].
+mail korp: ['line1\r\nline2'].
+Ħruġ ikteb: mail iġġenera.
+
+>> html := HTML-Email ġdid.
+html lil: (Lista ġdid ; ['a@example.invalid\r\nX-To: yes']).
+html mittent: ['d@example.invalid'] isem: ['site'].
+html suġġett: ['hello\r\nX-Subject: yes'].
+html korp: ['body'].
+Ħruġ ikteb: ( html iġġenera fih: ['\nX-'] ), linja-ġdida.
+Ħruġ ikteb: ( html iġġenera fih: ['X-To: yes'] ), linja-ġdida.

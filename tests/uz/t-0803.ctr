@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB yangi xost: ['localhost'],
+	foydalanuvchi-nomi: ['xo'],
+	parol: ['pass123'],
+	baza-nomi: ['xobase'],
+	ulanish.
+
+>> conn2 := Maria-DB yangi xost: ['localhost'],
+	foydalanuvchi-nomi: ['xo'],
+	parol: ['pass123'],
+	baza-nomi: ['xobase'],
+	ulanish.
+#...
+>> del := conn1 soʻrov: ['DELETE FROM book WHERE id > 0'].
+{  del bajarish. conn1 tasdiqlash. } ushlash: { :e conn1 ortga-qaytarish.  }, ishga-tushirish.
+
+>> insert := conn1 soʻrov: ['INSERT INTO book (id) VALUES(null)'].
+insert bajarish.
+
+>> soni := conn1 soʻrov: ['SELECT COUNT(*) AS num FROM book'].
+soni olish: { :row Chiqish yozish: row num, yangi-qator. }.
+
+# does not show up
+# insert not committed on connection 1
+>> soni := conn2 soʻrov: ['SELECT COUNT(*) AS num FROM book'].
+soni olish: { :row Chiqish yozish: row num, yangi-qator. }.

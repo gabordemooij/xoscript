@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Çykyş ýaz: ['Database test'], täze-setir.
+
+>> db := Maria-DB täze host: ['localhost'],
+	ulanyjy-ady: ['xo'], parol: ['pass123'], binýat-ady: ['xobase'], birikdir.
+
+Çykyş ýaz: ['Can we connect? '] + db birikdimi?, täze-setir.
+
+>> gözleg-parametrleri := db sorag: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametrler: ( Sanaw täze ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  gözleg-parametrleri ýerine-ýetir. db tassykla. } tut: { :e db yzyna-gaýtar.  }, işlet.
+
+Çykyş ýaz: ['Can we insert? '] + ( gözleg-parametrleri insert-id > 0 ), täze-setir.
+
+>> Obj := Obýekt täze.
+Obj gelende: ['retrieve-rows'] et: {
+	öz sany := 0.
+	>> gözleg-parametrleri :=
+	db sorag: ['SELECT * FROM book order by id desc limit 2'], 
+	getir: { :row 
+		öz sany goş: 1.
+		Dogry kes.
+	}. <- öz sany göçür.
+}.
+
+Çykyş ýaz: ['Can we query? '] + ( Obj retrieve-rows > 0 ), täze-setir.

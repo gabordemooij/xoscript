@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := వరుస కొత్త ;
+	# {"key":"normal"} normal ASCII
+	( నిఘంటువు కొత్త ఉంచు: ['normal'] కీ: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( నిఘంటువు కొత్త ఉంచు: ['hello world'] కీ: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( నిఘంటువు కొత్త ఉంచు: ['"'] కీ: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( నిఘంటువు కొత్త ఉంచు: ['backslash: \\'] కీ: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( నిఘంటువు కొత్త ఉంచు: ['slash: /'] కీ: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( నిఘంటువు కొత్త ఉంచు: ['backspace: \b'] కీ: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( నిఘంటువు కొత్త ఉంచు: ['formfeed: \f'] కీ: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( నిఘంటువు కొత్త ఉంచు: ['newline: \n'] కీ: ['key'] ) ;
+	( నిఘంటువు కొత్త ఉంచు: ['newline: ↵'] కీ: ['key'] ) ;
+	( నిఘంటువు కొత్త ఉంచు: ['newline: 
+	'] కీ: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( నిఘంటువు కొత్త ఉంచు: ['carriage return: \r'] కీ: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( నిఘంటువు కొత్త ఉంచు: ['tab \t'] కీ: ['key'] ) ;
+	( నిఘంటువు కొత్త ఉంచు: ['tab ⇿'] కీ: ['key'] ) ;
+	( నిఘంటువు కొత్త ఉంచు: ['tab  '] కీ: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( నిఘంటువు కొత్త ఉంచు: ['NUL \u0000'] కీ: ['key'] ) ;
+	( నిఘంటువు కొత్త ఉంచు: ['NUL \0'] కీ: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( నిఘంటువు కొత్త ఉంచు: ['control: \u0001'] కీ: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( నిఘంటువు కొత్త ఉంచు: ['control: \u001F'] కీ: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( నిఘంటువు కొత్త ఉంచు: ['unicode: é'] కీ: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( నిఘంటువు కొత్త ఉంచు: ['unicode: €'] కీ: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( నిఘంటువు కొత్త ఉంచు: ['unicode: 日本語'] కీ: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( నిఘంటువు కొత్త ఉంచు: ['unicode: 😀'] కీ: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( నిఘంటువు కొత్త ఉంచు: ['unicode: 🧑‍💻'] కీ: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( నిఘంటువు కొత్త ఉంచు: ['combining: e\u0301'] కీ: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( నిఘంటువు కొత్త ఉంచు: ['escaped unicode: \u00e9'] కీ: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( నిఘంటువు కొత్త ఉంచు: ['escaped unicode: \u20ac'] కీ: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( నిఘంటువు కొత్త ఉంచు: ['escaped unicode: \ud83d\ude00'] కీ: ['key'] ) ;
+	# {"key":""} empty value
+	( నిఘంటువు కొత్త ఉంచు: [''] కీ: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( నిఘంటువు కొత్త ఉంచు: ['@ < > & = % + ? #'] కీ: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( నిఘంటువు కొత్త ఉంచు: ['''] కీ: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( నిఘంటువు కొత్త ఉంచు: ['multiple: \" \\ \n \r \t'] కీ: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( నిఘంటువు కొత్త ఉంచు: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] కీ: ['key'] ) ;
+	# {"key":" value"} leading space
+	( నిఘంటువు కొత్త ఉంచు: [' value'] కీ: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( నిఘంటువు కొత్త ఉంచు: ['value '] కీ: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( నిఘంటువు కొత్త ఉంచు: [' \t\n\r '] కీ: ['key'] ).
+
+dicts ప్రతి: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (నిఘంటువు కొత్త ఉంచు: d key కీ: ['key']).
+	>> b := JSON jsonify: (నిఘంటువు కొత్త ఉంచు: ['value'] కీ: d key).
+	>> e := JSON వస్తువు: a.
+	>> f := JSON వస్తువు: b.
+	((e key = d key మరియు: (f ? d key = ['value'])) లేదా: (e key = ['NUL ?'])) నిజమైతే: {
+		అవుట్-పుట్ రాయి: ['OK'], కొత్త-పంక్తి.
+	}, లేకపోతే: {
+		అవుట్-పుట్ రాయి: ['Unable to properly encode/decode: '] + d + j, కొత్త-పంక్తి.
+		ప్రోగ్రామ్ ముగించు.
+	}.
+}.

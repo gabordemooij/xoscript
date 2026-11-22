@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Жагсаалт шинэ ;
+	# {"key":"normal"} normal ASCII
+	( Толь шинэ хийх: ['normal'] түлхүүр: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Толь шинэ хийх: ['hello world'] түлхүүр: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Толь шинэ хийх: ['"'] түлхүүр: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Толь шинэ хийх: ['backslash: \\'] түлхүүр: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Толь шинэ хийх: ['slash: /'] түлхүүр: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Толь шинэ хийх: ['backspace: \b'] түлхүүр: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Толь шинэ хийх: ['formfeed: \f'] түлхүүр: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Толь шинэ хийх: ['newline: \n'] түлхүүр: ['key'] ) ;
+	( Толь шинэ хийх: ['newline: ↵'] түлхүүр: ['key'] ) ;
+	( Толь шинэ хийх: ['newline: 
+	'] түлхүүр: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Толь шинэ хийх: ['carriage return: \r'] түлхүүр: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Толь шинэ хийх: ['tab \t'] түлхүүр: ['key'] ) ;
+	( Толь шинэ хийх: ['tab ⇿'] түлхүүр: ['key'] ) ;
+	( Толь шинэ хийх: ['tab  '] түлхүүр: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Толь шинэ хийх: ['NUL \u0000'] түлхүүр: ['key'] ) ;
+	( Толь шинэ хийх: ['NUL \0'] түлхүүр: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Толь шинэ хийх: ['control: \u0001'] түлхүүр: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Толь шинэ хийх: ['control: \u001F'] түлхүүр: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Толь шинэ хийх: ['unicode: é'] түлхүүр: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Толь шинэ хийх: ['unicode: €'] түлхүүр: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Толь шинэ хийх: ['unicode: 日本語'] түлхүүр: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Толь шинэ хийх: ['unicode: 😀'] түлхүүр: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Толь шинэ хийх: ['unicode: 🧑‍💻'] түлхүүр: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Толь шинэ хийх: ['combining: e\u0301'] түлхүүр: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Толь шинэ хийх: ['escaped unicode: \u00e9'] түлхүүр: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Толь шинэ хийх: ['escaped unicode: \u20ac'] түлхүүр: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Толь шинэ хийх: ['escaped unicode: \ud83d\ude00'] түлхүүр: ['key'] ) ;
+	# {"key":""} empty value
+	( Толь шинэ хийх: [''] түлхүүр: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Толь шинэ хийх: ['@ < > & = % + ? #'] түлхүүр: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Толь шинэ хийх: ['''] түлхүүр: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Толь шинэ хийх: ['multiple: \" \\ \n \r \t'] түлхүүр: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Толь шинэ хийх: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] түлхүүр: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Толь шинэ хийх: [' value'] түлхүүр: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Толь шинэ хийх: ['value '] түлхүүр: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Толь шинэ хийх: [' \t\n\r '] түлхүүр: ['key'] ).
+
+dicts бүр: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Толь шинэ хийх: d key түлхүүр: ['key']).
+	>> b := JSON jsonify: (Толь шинэ хийх: ['value'] түлхүүр: d key).
+	>> e := JSON объект: a.
+	>> f := JSON объект: b.
+	((e key = d key ба: (f ? d key = ['value'])) эсвэл: (e key = ['NUL ?'])) үнэн-бол: {
+		Гаралт бичих: ['OK'], шинэ-мөр.
+	}, үгүй-бол: {
+		Гаралт бичих: ['Unable to properly encode/decode: '] + d + j, шинэ-мөр.
+		Програм дуусгах.
+	}.
+}.

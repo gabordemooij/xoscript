@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Программа жөндөө: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server байланыштыруу: ( Тизме жаңы ;
+ libname ; ['fopen'] ;
+ ( Тизме жаңы ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+байланыштыруу: ( Тизме жаңы ;
+ Бош ; # means same lib
+ ['fread'] ;
+ ( Тизме жаңы ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Бош ; # means same object (i.e. Stream)
+ ['fread']
+),
+байланыштыруу: (
+ Тизме жаңы ;
+ Бош ; # means same lib
+ ['fwrite'] ;
+ ( Тизме жаңы ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Бош ; # means same lib
+ ['fwrite']
+),
+байланыштыруу: (
+ Тизме жаңы ;
+ Бош ; # means same lib
+ ['rewind'] ;
+ ( Тизме жаңы ; ['pointer'] ) ;
+ ['int'] ;
+ Бош ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> жол := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: жол mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream кабар: ['fwrite'] аргументтер: (Тизме жаңы ; str ; 1 ; 6 ; fd ).
+Чыгаруу жазуу: bytes-written, жаңы-сап.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob жаңы: 20.
+
+# read from file
+>> bytes-read := Stream кабар: ['fread'] аргументтер: (Тизме жаңы ; buf ; 1 ; 6 ; fd ).
+Чыгаруу жазуу: bytes-read, жаңы-сап.
+Чыгаруу жазуу: buf, жаңы-сап.
+
+# free memory
+str  бошотуу.
+жол бошотуу.
+mode бошотуу.
+buf  бошотуу.
+
+

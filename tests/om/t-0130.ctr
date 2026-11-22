@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Sagantaa qindaaʼina: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server walqabsiisi: ( Tarree-wantootaa haaraa ;
+ libname ; ['fopen'] ;
+ ( Tarree-wantootaa haaraa ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+walqabsiisi: ( Tarree-wantootaa haaraa ;
+ Homaa ; # means same lib
+ ['fread'] ;
+ ( Tarree-wantootaa haaraa ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Homaa ; # means same object (i.e. Stream)
+ ['fread']
+),
+walqabsiisi: (
+ Tarree-wantootaa haaraa ;
+ Homaa ; # means same lib
+ ['fwrite'] ;
+ ( Tarree-wantootaa haaraa ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Homaa ; # means same lib
+ ['fwrite']
+),
+walqabsiisi: (
+ Tarree-wantootaa haaraa ;
+ Homaa ; # means same lib
+ ['rewind'] ;
+ ( Tarree-wantootaa haaraa ; ['pointer'] ) ;
+ ['int'] ;
+ Homaa ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> karaa := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: karaa mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream ergaa: ['fwrite'] falmee: (Tarree-wantootaa haaraa ; str ; 1 ; 6 ; fd ).
+Baʼii barreessi: bytes-written, dhaabi.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob haaraa: 20.
+
+# read from file
+>> bytes-read := Stream ergaa: ['fread'] falmee: (Tarree-wantootaa haaraa ; buf ; 1 ; 6 ; fd ).
+Baʼii barreessi: bytes-read, dhaabi.
+Baʼii barreessi: buf, dhaabi.
+
+# free memory
+str  gadi-lakkisi.
+karaa gadi-lakkisi.
+mode gadi-lakkisi.
+buf  gadi-lakkisi.
+
+

@@ -1,0 +1,36 @@
+出力 書く: ['1,2,3,4,5,6,7,8,9,A,'], 改行.
+>> Scope := オブジェクト 新規.
+Scope 受信時: ['initialize:'] 実行: { :x 自分の property := x. }.
+Scope 受信時: ['confirm'] 実行: { 出力 書く: [',']. }.
+Scope 受信時: ['テスト'] 実行: {
+	出力 書く: 自分の property.
+	自身 confirm.
+	( 1 = 1 ) 真なら: { 出力 書く: 自分の property. 自身 confirm. }.
+	( 1 = 0 ) 偽なら: { 出力 書く: 自分の property. 自身 confirm. }.
+	>> y := 2. { 出力 書く: 自分の property. 自身 confirm. } 繰り返す間: { y 減算: 1. <- (y > 0). }.
+	{ 出力 書く: 自分の property. 自身 confirm. } × 1.
+	(リスト ← 1) 各要素: {  出力 書く: 自分の property. 自身 confirm. }.
+	#(List ← 1 ; 2) sort: {  Out write: own property. self confirm. <- 0. }. @todo impl own sorting, this test fails because diff. num iterations per platform
+	(辞書 新規 one: ['item']) 各要素: { 出力 書く: 自分の property. 自身 confirm. }.
+	{ 1 ÷ 0. } 例外時: { 出力 書く: 自分の property. 自身 confirm. }, 開始.
+	出力 改行.
+}.
+>> scope1 := Scope 新規.
+scope1 initialize: ['X'].
+scope1 テスト.
+>> function := { 
+	自分の property := ['Y'].
+	出力 書く: 自分の property.
+	自身 confirm.
+	( 1 = 1 ) 真なら: { 出力 書く: 自分の property. 自身 confirm. }.
+	( 1 = 0 ) 偽なら: { 出力 書く: 自分の property. 自身 confirm. }.
+	>> y := 2. { 出力 書く: 自分の property. 自身 confirm. } 繰り返す間: { y 減算: 1. <- (y > 0). }.
+	{ 出力 書く: 自分の property. 自身 confirm. } × 1.
+	(リスト ← 1) 各要素: {  出力 書く: 自分の property. 自身 confirm. }.
+	#(List ← 1 ; 2) sort: {  Out write: own property. self confirm. <- 0. }.
+	(辞書 新規 one: ['item']) 各要素: { 出力 書く: 自分の property. 自身 confirm. }.
+	{ 1 ÷ 0. } 例外時: { 出力 書く: 自分の property. 自身 confirm. }, 開始.
+	出力 改行.
+}.
+function 受信時: ['confirm'] 実行: { 出力 書く: [',']. }.
+function 適用: 1 かつ: 2.

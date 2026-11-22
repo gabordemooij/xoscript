@@ -1,0 +1,42 @@
+
+Text la: ['html'] execută: { <- (
+		sine
+		înlocuiește: ['&'] cu: ['&amp;'],
+		înlocuiește: ['<'] cu: ['&lt;'],
+		înlocuiește: ['>'] cu: ['&gt;'],
+		înlocuiește: ['"'] cu: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Obiect nou.
+
+HtmlBrush la: ['răspunde:'] execută: { :tag
+	Ieșire scrie: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush la: ['răspunde:și:'] execută: { :tag :content
+	tag := ( tag de-la: 0 lungime: (tag lungime - 1) ).
+	Ieșire scrie: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush la: ['content:'] execută: { :text
+	Ieșire scrie: text html, rând-nou.
+}.
+
+HtmlBrush la: ['attr:value:'] execută: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush nou.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

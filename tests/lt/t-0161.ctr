@@ -1,0 +1,53 @@
+Programa atminties-valdymas: 0.
+Sąrašas kai: ['sum'] daryti: {
+	>> total := 0.
+	pats kiekvienas: { :index :element
+		total sudėti: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Failas naujas: ['/tmp/test.txt'].
+f rašyti: ['Lorem Ipsum'].
+f uždaryti.
+  
+
+f := Failas naujas: ['/tmp/test.txt'].
+>> text := f skaityti.
+f uždaryti.
+
+
+
+Programa išvalyti.
+usedMemory1 := (Programa atmintis ? 1).
+
+
+
+f := Failas naujas: ['/tmp/test.txt'].
+text := f skaityti.
+f uždaryti.
+
+Programa išvalyti.
+usedMemory2 := (Programa atmintis ? 1).
+
+
+f := Failas naujas: ['/tmp/test.txt'].
+text := f skaityti.
+f uždaryti.
+
+Programa išvalyti.
+usedMemory3 := (Programa atmintis ? 1).
+
+
+
+( usedMemory1 = usedMemory2 ir: usedMemory1 = usedMemory3, ir: usedMemory2 = usedMemory3 ) tiesa: {
+	Išvestis rašyti: ['No memory leaks here'].
+}, netiesa: {
+	Išvestis rašyti: ['Leaking memory...'].
+}.

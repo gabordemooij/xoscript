@@ -1,0 +1,53 @@
+Program minneshantering: 0.
+Lista vid: ['sum'] gör: {
+	>> total := 0.
+	själv varje: { :index :element
+		total lägg-till: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Fil ny: ['/tmp/test.txt'].
+f skriv: ['Lorem Ipsum'].
+f stäng.
+  
+
+f := Fil ny: ['/tmp/test.txt'].
+>> text := f läs.
+f stäng.
+
+
+
+Program städa.
+usedMemory1 := (Program minne ? 1).
+
+
+
+f := Fil ny: ['/tmp/test.txt'].
+text := f läs.
+f stäng.
+
+Program städa.
+usedMemory2 := (Program minne ? 1).
+
+
+f := Fil ny: ['/tmp/test.txt'].
+text := f läs.
+f stäng.
+
+Program städa.
+usedMemory3 := (Program minne ? 1).
+
+
+
+( usedMemory1 = usedMemory2 och: usedMemory1 = usedMemory3, och: usedMemory2 = usedMemory3 ) sann: {
+	Utdata skriv: ['No memory leaks here'].
+}, falsk: {
+	Utdata skriv: ['Leaking memory...'].
+}.

@@ -1,0 +1,43 @@
+#Linux
+>> OS := 程序 系统命令: (命令对象 uname -s), 修剪.
+
+>> Slurp := 对象 新建.
+Slurp 在: ['新建'] 执行: {
+	拥有 str := [''].
+}.
+Slurp 在: ['响应:'] 执行: { :blah
+		(拥有 str ≠ ['']) 是: {
+			拥有 str 追加: [' '].
+		}.
+		拥有 str 追加: blah.
+}.
+Slurp 在: ['响应:参数:'] 执行: { :blah :blahah
+		(拥有 str ≠ ['']) 是: {
+			拥有 str 追加: [' '].
+		}.
+		(blah 长度 > 1) 是: {
+			拥有 str 追加: (blah 从: 0 长度: (blah 长度 - 1)).
+		}, 否则: {
+			拥有 str 追加: blah.
+		}.
+		拥有 str 追加: [' '].
+		拥有 str 追加: blahah.
+}.
+Slurp 在: ['obtain'] 执行: {
+	>> buffer := 拥有 str.
+	拥有 str := ['']. <- buffer.
+}.
+>> large text := [''].
+{
+	large text 追加: ['hello'].
+} × 1000.
+
+
+输出 写入: (
+	程序 系统命令: (
+		Slurp 新建
+			echo: large text,
+			| (['./xo ../../../tests/assets/stdin_test.ctr'] OS: OS)
+		) obtain
+).
+

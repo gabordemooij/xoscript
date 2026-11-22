@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Dastur xotira-boshqaruvi: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB yangi xost: ['localhost'],
+	foydalanuvchi-nomi: ['xo'], parol: ['pass123'], baza-nomi: ['xobase'], ulanish.
+
+>> TwoDigitFormat := Format yangi: ['%02d'].
+
+# Datetime
+{
+	>> yil := Son orasida: 1995 bilan: 2050, matn.
+	>> oy := TwoDigitFormat qoʻllash-butun: (Son orasida: 1 bilan: 12), matn.
+	>> kun := TwoDigitFormat qoʻllash-butun: (Son orasida: 1 bilan: 28), matn.
+	>> soat := TwoDigitFormat qoʻllash-butun: (Son orasida: 1 bilan: 23), matn.
+	>> daqiqa := TwoDigitFormat qoʻllash-butun: (Son orasida: 1 bilan: 59), matn.
+	>> soniya := TwoDigitFormat qoʻllash-butun: (Son orasida: 1 bilan: 59), matn.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: yil,
+		MM: oy,
+		DD: kun,
+		HH: soat,
+		II: daqiqa,
+		SS: soniya.
+	>> qidiruv-parametrlari :=
+	db soʻrov: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	olish: { :row
+		(row mydatetime = datetime) yolgʻon-boʻlsa: {
+			shu-vazifa xato: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter qoʻshish: 1.
+} * 100.
+
+# Date
+{
+	>> yil := Son orasida: 1995 bilan: 2050, matn.
+	>> oy := TwoDigitFormat qoʻllash-butun: (Son orasida: 1 bilan: 12), matn.
+	>> kun := TwoDigitFormat qoʻllash-butun: (Son orasida: 1 bilan: 28), matn.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: yil,
+		MM: oy,
+		DD: kun.
+	>> qidiruv-parametrlari :=
+	db soʻrov: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	olish: { :row
+		(row mydate = date) yolgʻon-boʻlsa: {
+			shu-vazifa xato: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter qoʻshish: 1.
+} * 100.
+
+
+# Time
+{
+	>> soat := TwoDigitFormat qoʻllash-butun: (Son orasida: 1 bilan: 23), matn.
+	>> daqiqa := TwoDigitFormat qoʻllash-butun: (Son orasida: 1 bilan: 59), matn.
+	>> soniya := TwoDigitFormat qoʻllash-butun: (Son orasida: 1 bilan: 59), matn.
+	>> vaqt := ['HH:II:SS'].
+	vaqt
+		HH: soat,
+		II: daqiqa,
+		SS: soniya.
+	>> qidiruv-parametrlari :=
+	db soʻrov: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: vaqt),
+	olish: { :row
+		(row mytime = vaqt) yolgʻon-boʻlsa: {
+			shu-vazifa xato: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter qoʻshish: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Roʻyxat yangi toʻldirish: 100000 qiymat-bilan: ['x'], birlashtirish: [''].
+{
+	>> str2 := Seyf token: 40.
+	>> qidiruv-parametrlari :=
+	db soʻrov: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	olish: { :row
+		(row str1 = str1 va: row str2 = str2) yolgʻon-boʻlsa: {
+			shu-vazifa xato: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter qoʻshish: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Son orasida: 1 bilan: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 matndan: ['9223372036854775807'] ) -
+		( Int64 matndan: ['99999'] ) +
+		( Int64 matndan: n1 matn )
+	).
+	>> qidiruv-parametrlari :=
+	db soʻrov: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	olish: { :row
+		(row n1 = n1) yolgʻon-boʻlsa: {
+			shu-vazifa xato: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) yolgʻon-boʻlsa: {
+			shu-vazifa xato: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 yaxlitlash) yolgʻon-boʻlsa: {
+			shu-vazifa xato: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) yolgʻon-boʻlsa: {
+			shu-vazifa xato: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter qoʻshish: 1.
+} * 100.
+
+
+Chiqish yozish: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), yangi-qator.

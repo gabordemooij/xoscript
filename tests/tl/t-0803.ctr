@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB bago host: ['localhost'],
+	pangalan-ng-user: ['xo'],
+	password: ['pass123'],
+	pangalan-ng-database: ['xobase'],
+	kumonekta.
+
+>> conn2 := Maria-DB bago host: ['localhost'],
+	pangalan-ng-user: ['xo'],
+	password: ['pass123'],
+	pangalan-ng-database: ['xobase'],
+	kumonekta.
+#...
+>> del := conn1 tanong: ['DELETE FROM book WHERE id > 0'].
+{  del isagawa. conn1 pagtibayin. } saluhin: { :e conn1 ibalik.  }, patakbuhin.
+
+>> insert := conn1 tanong: ['INSERT INTO book (id) VALUES(null)'].
+insert isagawa.
+
+>> bilangin := conn1 tanong: ['SELECT COUNT(*) AS num FROM book'].
+bilangin kunin: { :row Labas isulat: row num, bagong-linya. }.
+
+# does not show up
+# insert not committed on connection 1
+>> bilangin := conn2 tanong: ['SELECT COUNT(*) AS num FROM book'].
+bilangin kunin: { :row Labas isulat: row num, bagong-linya. }.

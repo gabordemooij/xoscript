@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+වැඩසටහන මතක-කළමනාකරණය: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB නව සත්කාරකය: ['localhost'],
+	පරිශීලක-නම: ['xo'], මුරපදය: ['pass123'], දත්ත-සමුදා-නම: ['xobase'], සම්බන්ධ-වන්න.
+
+>> TwoDigitFormat := ආකෘතිය නව: ['%02d'].
+
+# Datetime
+{
+	>> වසර := අංකය අතර: 1995 සිට: 2050, පෙළට.
+	>> මාසය := TwoDigitFormat යොදන්න-නිඛිලය: (අංකය අතර: 1 සිට: 12), පෙළට.
+	>> දිනය := TwoDigitFormat යොදන්න-නිඛිලය: (අංකය අතර: 1 සිට: 28), පෙළට.
+	>> පැය := TwoDigitFormat යොදන්න-නිඛිලය: (අංකය අතර: 1 සිට: 23), පෙළට.
+	>> මිනිත්තුව := TwoDigitFormat යොදන්න-නිඛිලය: (අංකය අතර: 1 සිට: 59), පෙළට.
+	>> තත්පරය := TwoDigitFormat යොදන්න-නිඛිලය: (අංකය අතර: 1 සිට: 59), පෙළට.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: වසර,
+		MM: මාසය,
+		DD: දිනය,
+		HH: පැය,
+		II: මිනිත්තුව,
+		SS: තත්පරය.
+	>> සෙවුම්-පරාමිති :=
+	db විමසුම: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ගෙනෙන්න: { :row
+		(row mydatetime = datetime) බොරු-නම්: {
+			මෙම-කාර්යය දෝෂය: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter එකතුව: 1.
+} * 100.
+
+# Date
+{
+	>> වසර := අංකය අතර: 1995 සිට: 2050, පෙළට.
+	>> මාසය := TwoDigitFormat යොදන්න-නිඛිලය: (අංකය අතර: 1 සිට: 12), පෙළට.
+	>> දිනය := TwoDigitFormat යොදන්න-නිඛිලය: (අංකය අතර: 1 සිට: 28), පෙළට.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: වසර,
+		MM: මාසය,
+		DD: දිනය.
+	>> සෙවුම්-පරාමිති :=
+	db විමසුම: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ගෙනෙන්න: { :row
+		(row mydate = date) බොරු-නම්: {
+			මෙම-කාර්යය දෝෂය: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter එකතුව: 1.
+} * 100.
+
+
+# Time
+{
+	>> පැය := TwoDigitFormat යොදන්න-නිඛිලය: (අංකය අතර: 1 සිට: 23), පෙළට.
+	>> මිනිත්තුව := TwoDigitFormat යොදන්න-නිඛිලය: (අංකය අතර: 1 සිට: 59), පෙළට.
+	>> තත්පරය := TwoDigitFormat යොදන්න-නිඛිලය: (අංකය අතර: 1 සිට: 59), පෙළට.
+	>> වේලාව := ['HH:II:SS'].
+	වේලාව
+		HH: පැය,
+		II: මිනිත්තුව,
+		SS: තත්පරය.
+	>> සෙවුම්-පරාමිති :=
+	db විමසුම: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: වේලාව),
+	ගෙනෙන්න: { :row
+		(row mytime = වේලාව) බොරු-නම්: {
+			මෙම-කාර්යය දෝෂය: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter එකතුව: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := ලේඛනය නව පුරවන්න: 100000 අගයෙන්: ['x'], එක්කරන්න: [''].
+{
+	>> str2 := සුරක්ෂිතාගාරය ටෝකනය: 40.
+	>> සෙවුම්-පරාමිති :=
+	db විමසුම: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ගෙනෙන්න: { :row
+		(row str1 = str1 සහ: row str2 = str2) බොරු-නම්: {
+			මෙම-කාර්යය දෝෂය: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter එකතුව: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := අංකය අතර: 1 සිට: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 පෙළෙන්: ['9223372036854775807'] ) -
+		( Int64 පෙළෙන්: ['99999'] ) +
+		( Int64 පෙළෙන්: n1 පෙළට )
+	).
+	>> සෙවුම්-පරාමිති :=
+	db විමසුම: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ගෙනෙන්න: { :row
+		(row n1 = n1) බොරු-නම්: {
+			මෙම-කාර්යය දෝෂය: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) බොරු-නම්: {
+			මෙම-කාර්යය දෝෂය: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 වටයන්න) බොරු-නම්: {
+			මෙම-කාර්යය දෝෂය: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) බොරු-නම්: {
+			මෙම-කාර්යය දෝෂය: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter එකතුව: 1.
+} * 100.
+
+
+නිමැවුම ලියන්න: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), නව-පේළිය.

@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> conair := ['/tmp/test0821.csv'].
+>> file := Comhad nua: conair.
+
+file scríobh: ['a,b\n"1,2\n'].
+{
+	file teorantóir: [','] comhartha-athfhriotail: ['"'] línte: { :line
+		Aschur scríobh: line, líne-nua.
+	}.
+} gabh: { :e Aschur scríobh: e, líne-nua. }, tosaigh.
+
+# a closed quote still works
+file scríobh: ['a,b\n"1,2",3'].
+file teorantóir: [','] comhartha-athfhriotail: ['"'] línte: { :line
+	Aschur scríobh: line, líne-nua.
+}.
+file scrios.

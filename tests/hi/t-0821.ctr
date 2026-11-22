@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> फ़ाइल-पथ := ['/tmp/test0821.csv'].
+>> file := फ़ाइल नया: फ़ाइल-पथ.
+
+file लिखो: ['a,b\n"1,2\n'].
+{
+	file विभाजक: [','] उद्धरण: ['"'] पंक्तियाँ: { :line
+		निर्गम लिखो: line, नई-पंक्ति.
+	}.
+} पकड़ो: { :e निर्गम लिखो: e, नई-पंक्ति. }, चलाओ.
+
+# a closed quote still works
+file लिखो: ['a,b\n"1,2",3'].
+file विभाजक: [','] उद्धरण: ['"'] पंक्तियाँ: { :line
+	निर्गम लिखो: line, नई-पंक्ति.
+}.
+file मिटाओ.

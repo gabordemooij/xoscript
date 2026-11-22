@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Salida skirbi: ['Database test'], liña-nobo.
+
+>> db := Maria-DB nobo anfitrion: ['localhost'],
+	nòmber-di-usuario: ['xo'], kontraseña: ['pass123'], nòmber-di-base: ['xobase'], konektá.
+
+Salida skirbi: ['Can we connect? '] + db konektá-kaba?, liña-nobo.
+
+>> parameternan-di-buskeda := db konsulta: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameternan: ( Lista nobo ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  parameternan-di-buskeda ehekutá. db konfirmá. } kapta: { :e db bolbe-atras.  }, kuminsá.
+
+Salida skirbi: ['Can we insert? '] + ( parameternan-di-buskeda insert-id > 0 ), liña-nobo.
+
+>> Obj := Opheto nobo.
+Obj ora: ['retrieve-rows'] hasi: {
+	propio konta := 0.
+	>> parameternan-di-buskeda :=
+	db konsulta: ['SELECT * FROM book order by id desc limit 2'], 
+	trese: { :row 
+		propio konta suma: 1.
+		Bèrdat stòp-lus.
+	}. <- propio konta kopia.
+}.
+
+Salida skirbi: ['Can we query? '] + ( Obj retrieve-rows > 0 ), liña-nobo.

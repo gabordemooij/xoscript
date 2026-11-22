@@ -1,0 +1,42 @@
+
+Текст келгенде: ['html'] аткар: { <- (
+		өзү
+		алмаштыруу: ['&'] буга: ['&amp;'],
+		алмаштыруу: ['<'] буга: ['&lt;'],
+		алмаштыруу: ['>'] буга: ['&gt;'],
+		алмаштыруу: ['"'] буга: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Объект жаңы.
+
+HtmlBrush келгенде: ['жооп:'] аткар: { :tag
+	Чыгаруу жазуу: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush келгенде: ['жооп:жана:'] аткар: { :tag :content
+	tag := ( tag баштап: 0 узундук: (tag узундук - 1) ).
+	Чыгаруу жазуу: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush келгенде: ['content:'] аткар: { :text
+	Чыгаруу жазуу: text html, жаңы-сап.
+}.
+
+HtmlBrush келгенде: ['attr:value:'] аткар: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush жаңы.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> ụzọ-faịlụ := ['/tmp/dat.csv'].
+>> csv := Faịlụ ohuru: ụzọ-faịlụ.
+csv dee: s.
+
+# accepts CRLF LF CR, varying row length
+csv nkewa: [';'] akara-nhota: ['"'] ahịrị-niile: { :line
+	Mmemme hichaa.
+	Mpụta dee: line, ahịrị-ọhụrụ.
+	Mmemme hichaa.
+}.
+
+# unequal lines
+s tinye-na-njedebe: ['\njustone'].
+csv dee: s.
+{
+	csv nkewa: [';'] akara-nhota: ['"'] ahịrị-niile: { :line
+		Mpụta dee: line, ahịrị-ọhụrụ.
+	}.
+} jide: { :e 
+	Mpụta dee: e, ahịrị-ọhụrụ.
+}, bido.
+
+# invalid format
+s := ['"he"llo";world'].
+csv dee: s.
+{
+	csv nkewa: [';'] akara-nhota: ['"'] ahịrị-niile: { :line
+		Mpụta dee: line, ahịrị-ọhụrụ.
+	}.
+} jide: { :e 
+	Mpụta dee: e, ahịrị-ọhụrụ.
+}, bido.

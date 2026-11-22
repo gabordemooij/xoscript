@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Sef generiši-ključeve.
+>> sk := keys prvi.
+>> pk := keys zadnji.
+>> sig := Sef potpiši: ['abc'] ključem: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Sef potpiši: ['abc'] ključem: long. } uhvati: { :e
+	Izlaz piši: e, novi-red.
+}, pokreni.
+
+{ Sef provjeri: ['abc'] potpis: long ključem: pk. } uhvati: { :e
+	Izlaz piši: e, novi-red.
+}, pokreni.
+
+{ Sef provjeri: ['abc'] potpis: sig ključem: short. } uhvati: { :e
+	Izlaz piši: e, novi-red.
+}, pokreni.

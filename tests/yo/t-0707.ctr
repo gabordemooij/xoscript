@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Eto iṣakoso-iranti: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB tuntun agbalejo: ['localhost'],
+	orukọ-olumulo: ['xo'], ọrọ-igbaniwọle: ['pass123'], orukọ-ibi-ipamọ: ['xobase'], sopọ-mọ.
+
+>> TwoDigitFormat := Ọna-kika tuntun: ['%02d'].
+
+# Datetime
+{
+	>> ọdun := Nọmba laarin: 1995 ati: 2050, ọrọ.
+	>> osù := TwoDigitFormat mulo-odidi: (Nọmba laarin: 1 ati: 12), ọrọ.
+	>> ọjọ := TwoDigitFormat mulo-odidi: (Nọmba laarin: 1 ati: 28), ọrọ.
+	>> wakati := TwoDigitFormat mulo-odidi: (Nọmba laarin: 1 ati: 23), ọrọ.
+	>> iseju := TwoDigitFormat mulo-odidi: (Nọmba laarin: 1 ati: 59), ọrọ.
+	>> iṣẹju-aaya := TwoDigitFormat mulo-odidi: (Nọmba laarin: 1 ati: 59), ọrọ.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: ọdun,
+		MM: osù,
+		DD: ọjọ,
+		HH: wakati,
+		II: iseju,
+		SS: iṣẹju-aaya.
+	>> awọn-apa-iwadii :=
+	db ibeere: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	mu-wa: { :row
+		(row mydatetime = datetime) irọ: {
+			iṣẹ-ṣiṣe-yii aṣiṣe: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter fi-kun: 1.
+} * 100.
+
+# Date
+{
+	>> ọdun := Nọmba laarin: 1995 ati: 2050, ọrọ.
+	>> osù := TwoDigitFormat mulo-odidi: (Nọmba laarin: 1 ati: 12), ọrọ.
+	>> ọjọ := TwoDigitFormat mulo-odidi: (Nọmba laarin: 1 ati: 28), ọrọ.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: ọdun,
+		MM: osù,
+		DD: ọjọ.
+	>> awọn-apa-iwadii :=
+	db ibeere: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	mu-wa: { :row
+		(row mydate = date) irọ: {
+			iṣẹ-ṣiṣe-yii aṣiṣe: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter fi-kun: 1.
+} * 100.
+
+
+# Time
+{
+	>> wakati := TwoDigitFormat mulo-odidi: (Nọmba laarin: 1 ati: 23), ọrọ.
+	>> iseju := TwoDigitFormat mulo-odidi: (Nọmba laarin: 1 ati: 59), ọrọ.
+	>> iṣẹju-aaya := TwoDigitFormat mulo-odidi: (Nọmba laarin: 1 ati: 59), ọrọ.
+	>> asiko := ['HH:II:SS'].
+	asiko
+		HH: wakati,
+		II: iseju,
+		SS: iṣẹju-aaya.
+	>> awọn-apa-iwadii :=
+	db ibeere: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: asiko),
+	mu-wa: { :row
+		(row mytime = asiko) irọ: {
+			iṣẹ-ṣiṣe-yii aṣiṣe: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter fi-kun: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Akojọ tuntun fọwọsi: 100000 pẹlu: ['x'], so-pọ: [''].
+{
+	>> str2 := Apoti-aabo token: 40.
+	>> awọn-apa-iwadii :=
+	db ibeere: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	mu-wa: { :row
+		(row str1 = str1 ati: row str2 = str2) irọ: {
+			iṣẹ-ṣiṣe-yii aṣiṣe: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter fi-kun: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Nọmba laarin: 1 ati: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 lati-ọrọ: ['9223372036854775807'] ) -
+		( Int64 lati-ọrọ: ['99999'] ) +
+		( Int64 lati-ọrọ: n1 ọrọ )
+	).
+	>> awọn-apa-iwadii :=
+	db ibeere: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	mu-wa: { :row
+		(row n1 = n1) irọ: {
+			iṣẹ-ṣiṣe-yii aṣiṣe: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) irọ: {
+			iṣẹ-ṣiṣe-yii aṣiṣe: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 yika) irọ: {
+			iṣẹ-ṣiṣe-yii aṣiṣe: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) irọ: {
+			iṣẹ-ṣiṣe-yii aṣiṣe: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter fi-kun: 1.
+} * 100.
+
+
+Ijade kọ: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), ila-tuntun.

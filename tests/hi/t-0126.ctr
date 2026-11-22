@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := वस्तु नया.
+
+Slurp जब: ['नया'] करो: {
+	अपना str := [''].
+}.
+
+Slurp जब: ['nieuw'] करो: {
+	अपना str := [''].
+}.
+
+Slurp जब: ['उत्तर:'] करो: { :blah
+		अपना str अंत-में-जोड़ो: blah.
+}.
+
+Slurp जब: ['उत्तर:और:'] करो: { :blah :blahah
+		अपना str अंत-में-जोड़ो: (blah आरंभ: 0 लंबाई: (blah लंबाई - 1)).
+		अपना str अंत-में-जोड़ो: [' '].
+		अपना str अंत-में-जोड़ो: blahah.
+}.
+
+Slurp जब: ['obtain'] करो: {
+	>> buffer := अपना str.
+	अपना str := ['']. <- buffer.
+}.
+
+
+निर्गम लिखो: (प्रोग्राम सिस्टम: (Slurp नया echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ फ़ाइल नया: ['/tmp/from.txt'], मिटाओ. } पकड़ो: { ['Empty']. }, चलाओ.
+{ फ़ाइल नया: ['/tmp/to.txt'], मिटाओ. } पकड़ो: { ['Empty']. }, चलाओ.
+
+
+फ़ाइल नया: ['/tmp/to.txt'], मौजूद असत्य-हो-तो: {
+	निर्गम लिखो: ['Confirmed. Target file does not exist.\
+'].
+}.
+फ़ाइल नया: ['/tmp/from.txt'], मौजूद असत्य-हो-तो: {
+	निर्गम लिखो: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+प्रोग्राम सिस्टम: (Slurp नया touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+प्रोग्राम सिस्टम: (Slurp नया cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+फ़ाइल नया: ['/tmp/to.txt'], मौजूद सत्य-हो-तो: {
+	निर्गम लिखो: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+निर्गम लिखो: ['Contents of file is:'] + (फ़ाइल नया: ['/tmp/to.txt'], पढ़ो), नई-पंक्ति.

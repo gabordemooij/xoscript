@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB bago host: ['localhost'],
+	pangalan-ng-user: ['xo'],
+	password: ['pass123'],
+	pangalan-ng-database: ['xobase'],
+	kumonekta.
+
+>> parametro-ng-paghahanap := db tanong: ['SELECT ? AS a, ? AS b, ? AS c'].
+parametro-ng-paghahanap mga-parametro: (Listahan bago ; ['1']).
+{ parametro-ng-paghahanap kunin: { :row Labas isulat: row, bagong-linya. }. } saluhin: { :e Labas isulat: e, bagong-linya. }, patakbuhin.
+
+>> parametro-ng-paghahanap := db tanong: ['SELECT ? AS a'].
+{ parametro-ng-paghahanap kunin: { :row Labas isulat: row, bagong-linya. }. } saluhin: { :e Labas isulat: e, bagong-linya. }, patakbuhin.
+
+# the right number still works, more parameters are ignored as before
+>> parametro-ng-paghahanap := db tanong: ['SELECT ? AS a, ? AS b'].
+parametro-ng-paghahanap mga-parametro: (Listahan bago ; ['1'] ; ['2']).
+parametro-ng-paghahanap kunin: { :row Labas isulat: (row sa: ['a']), isulat: (row sa: ['b']), bagong-linya. }.
+parametro-ng-paghahanap mga-parametro: (Listahan bago ; ['1'] ; ['2'] ; ['3']).
+parametro-ng-paghahanap kunin: { :row Labas isulat: (row sa: ['a']), isulat: (row sa: ['b']), bagong-linya. }.

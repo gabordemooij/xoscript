@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server initialiséieren.
+Programm benotzen: ['../../../src/xo/lb/webtools.xo'].
+Programm benotzen: ['../../../src/xo/lb/mailtools.xo'].
+
+>> kappzeil := HTTP-Kappzeil nei schlëssel: ['Location'] wäert: ['/ok\r\nX-Injected: yes'].
+Ausgab schreiwen: kappzeil.
+
+>> web := Web-Dokument nei.
+web goen-op: ['/ok\r\nX-Injected: yes'].
+Ausgab schreiwen: ['\n'], nei-zeil.
+
+>> mail := E-Mail nei.
+mail un: (Lëscht nei ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lëscht nei ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lëscht nei ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail ofsender: ['d@example.invalid\r\nX-From: yes'] numm: ['site\r\nX-Name: yes'].
+mail sujet: ['hello\r\nX-Subject: yes'].
+mail textkierper: ['line1\r\nline2'].
+Ausgab schreiwen: mail erzeugen.
+
+>> html := HTML-E-Mail nei.
+html un: (Lëscht nei ; ['a@example.invalid\r\nX-To: yes']).
+html ofsender: ['d@example.invalid'] numm: ['site'].
+html sujet: ['hello\r\nX-Subject: yes'].
+html textkierper: ['body'].
+Ausgab schreiwen: ( html erzeugen enthält: ['\nX-'] ), nei-zeil.
+Ausgab schreiwen: ( html erzeugen enthält: ['X-To: yes'] ), nei-zeil.

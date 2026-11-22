@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Daftar baru ;
+	# {"key":"normal"} normal ASCII
+	( Kamus baru taruh: ['normal'] di: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Kamus baru taruh: ['hello world'] di: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Kamus baru taruh: ['"'] di: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Kamus baru taruh: ['backslash: \\'] di: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Kamus baru taruh: ['slash: /'] di: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Kamus baru taruh: ['backspace: \b'] di: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Kamus baru taruh: ['formfeed: \f'] di: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Kamus baru taruh: ['newline: \n'] di: ['key'] ) ;
+	( Kamus baru taruh: ['newline: ↵'] di: ['key'] ) ;
+	( Kamus baru taruh: ['newline: 
+	'] di: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Kamus baru taruh: ['carriage return: \r'] di: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Kamus baru taruh: ['tab \t'] di: ['key'] ) ;
+	( Kamus baru taruh: ['tab ⇿'] di: ['key'] ) ;
+	( Kamus baru taruh: ['tab  '] di: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Kamus baru taruh: ['NUL \u0000'] di: ['key'] ) ;
+	( Kamus baru taruh: ['NUL \0'] di: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Kamus baru taruh: ['control: \u0001'] di: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Kamus baru taruh: ['control: \u001F'] di: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Kamus baru taruh: ['unicode: é'] di: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Kamus baru taruh: ['unicode: €'] di: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Kamus baru taruh: ['unicode: 日本語'] di: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Kamus baru taruh: ['unicode: 😀'] di: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Kamus baru taruh: ['unicode: 🧑‍💻'] di: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Kamus baru taruh: ['combining: e\u0301'] di: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Kamus baru taruh: ['escaped unicode: \u00e9'] di: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Kamus baru taruh: ['escaped unicode: \u20ac'] di: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Kamus baru taruh: ['escaped unicode: \ud83d\ude00'] di: ['key'] ) ;
+	# {"key":""} empty value
+	( Kamus baru taruh: [''] di: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Kamus baru taruh: ['@ < > & = % + ? #'] di: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Kamus baru taruh: ['''] di: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Kamus baru taruh: ['multiple: \" \\ \n \r \t'] di: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Kamus baru taruh: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] di: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Kamus baru taruh: [' value'] di: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Kamus baru taruh: ['value '] di: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Kamus baru taruh: [' \t\n\r '] di: ['key'] ).
+
+dicts setiap: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Kamus baru taruh: d key di: ['key']).
+	>> b := JSON jsonify: (Kamus baru taruh: ['value'] di: d key).
+	>> e := JSON objek: a.
+	>> f := JSON objek: b.
+	((e key = d key dan: (f ? d key = ['value'])) atau: (e key = ['NUL ?'])) benar: {
+		Keluaran tulis: ['OK'], baris-baru.
+	}, selain-itu: {
+		Keluaran tulis: ['Unable to properly encode/decode: '] + d + j, baris-baru.
+		Program akhiri.
+	}.
+}.

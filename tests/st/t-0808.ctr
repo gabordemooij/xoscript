@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Polokelo-e-sireletsehileng etsa-linotlolo.
+>> sk := keys ea-pele.
+>> pk := keys ea-ho-qetela.
+>> sig := Polokelo-e-sireletsehileng saena: ['abc'] ka: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Polokelo-e-sireletsehileng saena: ['abc'] ka: long. } tšoasa: { :e
+	Sephetho ngola: e, mola-o-mocha.
+}, qala.
+
+{ Polokelo-e-sireletsehileng hlahloba: ['abc'] tshaeno: long ka: pk. } tšoasa: { :e
+	Sephetho ngola: e, mola-o-mocha.
+}, qala.
+
+{ Polokelo-e-sireletsehileng hlahloba: ['abc'] tshaeno: sig ka: short. } tšoasa: { :e
+	Sephetho ngola: e, mola-o-mocha.
+}, qala.

@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server túsaigh.
+Ríomhchlár úsáid: ['../../../src/xo/ga/webtools.xo'].
+
+>> Fake-Request := Réad nua.
+Fake-Request ar: ['value:'] déan: { :luach
+	dílis luach := luach.
+}.
+Fake-Request ar: ['cookie:'] déan: { :ainm <- dílis luach.
+}.
+
+>> Test-Session := Seisiún-comhaid-shealadaigh nua.
+Test-Session ar: ['lódáil'] déan: { <- Foclóir nua.
+}.
+Test-Session ar: ['session-id'] déan: { <- dílis id.
+}.
+
+>> cookies := Liosta nua
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies gach: { :i :cookie
+	>> iarratas-http := Fake-Request nua.
+	iarratas-http value: cookie.
+	>> bainisteoir := Test-Session nua.
+	>> web := Doiciméad-Gréasáin nua.
+	web iarratas-http: iarratas-http.
+	web bainisteoir-seisiún: bainisteoir.
+	web tosaigh-seisiún.
+	Aschur scríobh: ( bainisteoir session-id = cookie ), líne-nua.
+}.
+
+>> web := Doiciméad-Gréasáin nua.
+web json: (Foclóir nua cuir: ['b'] ag: ['a']).
+Aschur scríobh: ['\n'], líne-nua.
+
+{ Líonra get: ['file:///etc/hostname']. } gabh: { :e
+	Aschur scríobh: e, líne-nua.
+}, tosaigh.
+
+>> svg := Comhad nua: ['/tmp/test0814.svg'].
+svg scríobh: ['<svg xmlns="x"></svg>'].
+Aschur líne-nua.
+Server seol-ar-aghaidh: ['test0814.svg'] réimír: ['/tmp/'].
+svg scrios.

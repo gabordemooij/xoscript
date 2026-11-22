@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB neu host: ['localhost'],
+	benutzername: ['xo'],
+	passwort: ['pass123'],
+	datenbankname: ['xobase'],
+	verbinden.
+
+>> suchparameter := db abfrage: ['SELECT ? AS a, ? AS b, ? AS c'].
+suchparameter parameter: (Liste neu ; ['1']).
+{ suchparameter abrufen: { :row Ausgabe schreiben: row, stopp. }. } abfangen: { :e Ausgabe schreiben: e, stopp. }, starten.
+
+>> suchparameter := db abfrage: ['SELECT ? AS a'].
+{ suchparameter abrufen: { :row Ausgabe schreiben: row, stopp. }. } abfangen: { :e Ausgabe schreiben: e, stopp. }, starten.
+
+# the right number still works, more parameters are ignored as before
+>> suchparameter := db abfrage: ['SELECT ? AS a, ? AS b'].
+suchparameter parameter: (Liste neu ; ['1'] ; ['2']).
+suchparameter abrufen: { :row Ausgabe schreiben: (row bei: ['a']), schreiben: (row bei: ['b']), stopp. }.
+suchparameter parameter: (Liste neu ; ['1'] ; ['2'] ; ['3']).
+suchparameter abrufen: { :row Ausgabe schreiben: (row bei: ['a']), schreiben: (row bei: ['b']), stopp. }.

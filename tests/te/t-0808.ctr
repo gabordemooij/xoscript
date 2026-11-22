@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := ఖజానా కీలు-సృష్టించు.
+>> sk := keys మొదటి.
+>> pk := keys చివరి.
+>> sig := ఖజానా సంతకం: ['abc'] కీతో: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ ఖజానా సంతకం: ['abc'] కీతో: long. } పట్టుకో: { :e
+	అవుట్-పుట్ రాయి: e, కొత్త-పంక్తి.
+}, నడుపు.
+
+{ ఖజానా తనిఖీ: ['abc'] సంతకం: long కీతో: pk. } పట్టుకో: { :e
+	అవుట్-పుట్ రాయి: e, కొత్త-పంక్తి.
+}, నడుపు.
+
+{ ఖజానా తనిఖీ: ['abc'] సంతకం: sig కీతో: short. } పట్టుకో: { :e
+	అవుట్-పుట్ రాయి: e, కొత్త-పంక్తి.
+}, నడుపు.

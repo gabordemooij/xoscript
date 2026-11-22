@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Nkan tuntun.
+
+Log nigbati: ['say:'] ṣe: { :str
+	Ijade kọ: str, ila-tuntun.
+}.
+
+>> Item := Nkan tuntun.
+
+Item nigbati: ['tuntun:'] ṣe: { :id <- ara-rẹ tuntun id: id.
+}.
+
+Item nigbati: ['id:'] ṣe: { :id
+	tirẹ id := id.
+}.
+
+Item nigbati: ['id'] ṣe: { <- tirẹ id. }.
+
+
+Item nigbati: ['ọrọ'] ṣe: {
+	>> str := ['Item#~no'].
+	str ~no: tirẹ id. <- str.
+}.
+
+
+>> Print := Nkan tuntun.
+
+Print nigbati: ['items'] ṣe: { 
+	
+	tirẹ item := Item tuntun: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: tirẹ item
+	).
+	
+	
+}.
+
+Print items.

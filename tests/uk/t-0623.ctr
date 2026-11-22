@@ -1,0 +1,43 @@
+
+
+>> g := Server новий.
+>> v := Сховище новий.
+>> ok := 0.
+
+>> secrets := Список новий ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets копіювати.
+passwords кожен: { :i :p
+	secrets кожен: { :n :s
+		{
+			>> encrypted := v шифрувати: s ключ: p.
+			>> decrypted := v розшифрувати: encrypted ключ: p.
+			(decrypted = s) істина: {
+				ok додати: 1.
+			}, інакше: {
+				Вивід написати: ['failed encrypting/decrypting: '], новий-рядок.
+				Вивід написати: s, новий-рядок.
+				Вивід написати: ['encrypted: '] + encrypted, новий-рядок.
+				Вивід написати: ['decrypted: '] + encrypted, новий-рядок.
+				Програма кінець.
+			}.
+		} перехопити: { :err
+			(s = [''] або: p = ['']) істина: {
+				ok додати: 1.
+			}, інакше: {
+				Вивід написати: err, новий-рядок.
+				Програма кінець.
+			}.
+		}, запустити.
+	}.
+}.
+
+Вивід написати: ( ok + [' vault encryptions tested.'] ), новий-рядок.

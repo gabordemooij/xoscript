@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := MariaDB nuovo host: ['localhost'],
+	utente: ['xo'],
+	password: ['pass123'],
+	nome-database: ['xobase'],
+	connetti.
+
+>> conn2 := MariaDB nuovo host: ['localhost'],
+	utente: ['xo'],
+	password: ['pass123'],
+	nome-database: ['xobase'],
+	connetti.
+#...
+>> del := conn1 query: ['DELETE FROM book WHERE id > 0'].
+{  del esegui. conn1 commit. } catturare: { :e conn1 rollback.  }, correre.
+
+>> insert := conn1 query: ['INSERT INTO book (id) VALUES(null)'].
+insert esegui.
+
+>> contare := conn1 query: ['SELECT COUNT(*) AS num FROM book'].
+contare recupera: { :row Uscita scrivi: row num, stop. }.
+
+# does not show up
+# insert not committed on connection 1
+>> contare := conn2 query: ['SELECT COUNT(*) AS num FROM book'].
+contare recupera: { :row Uscita scrivi: row num, stop. }.

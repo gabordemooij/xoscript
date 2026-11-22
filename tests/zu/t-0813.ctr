@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server lungiselela.
+Uhlelo sebenzisa: ['../../../src/xo/zu/webtools.xo'].
+Uhlelo sebenzisa: ['../../../src/xo/zu/mailtools.xo'].
+
+>> isihloko := Isihloko-se-HTTP okusha ukhiye: ['Location'] inani-elibekiwe: ['/ok\r\nX-Injected: yes'].
+Okuphumayo bhala: isihloko.
+
+>> web := Idokhumenti-yewebhu okusha.
+web iya-ku: ['/ok\r\nX-Injected: yes'].
+Okuphumayo bhala: ['\n'], umugqa-omusha.
+
+>> mail := I-imeyili okusha.
+mail ku: (Uhlu okusha ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Uhlu okusha ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Uhlu okusha ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail umthumeli: ['d@example.invalid\r\nX-From: yes'] igama: ['site\r\nX-Name: yes'].
+mail isihloko-sendaba: ['hello\r\nX-Subject: yes'].
+mail umzimba: ['line1\r\nline2'].
+Okuphumayo bhala: mail khiqiza.
+
+>> html := I-imeyili-HTML okusha.
+html ku: (Uhlu okusha ; ['a@example.invalid\r\nX-To: yes']).
+html umthumeli: ['d@example.invalid'] igama: ['site'].
+html isihloko-sendaba: ['hello\r\nX-Subject: yes'].
+html umzimba: ['body'].
+Okuphumayo bhala: ( html khiqiza iqukethe: ['\nX-'] ), umugqa-omusha.
+Okuphumayo bhala: ( html khiqiza iqukethe: ['X-To: yes'] ), umugqa-omusha.

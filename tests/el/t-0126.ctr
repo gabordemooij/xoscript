@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Αντικείμενο νέο.
+
+Slurp όταν: ['νέο'] κάνε: {
+	δικό str := [''].
+}.
+
+Slurp όταν: ['nieuw'] κάνε: {
+	δικό str := [''].
+}.
+
+Slurp όταν: ['απάντηση:'] κάνε: { :blah
+		δικό str προσθήκη-στο-τέλος: blah.
+}.
+
+Slurp όταν: ['απάντηση:και:'] κάνε: { :blah :blahah
+		δικό str προσθήκη-στο-τέλος: (blah από: 0 μήκος: (blah μήκος - 1)).
+		δικό str προσθήκη-στο-τέλος: [' '].
+		δικό str προσθήκη-στο-τέλος: blahah.
+}.
+
+Slurp όταν: ['obtain'] κάνε: {
+	>> buffer := δικό str.
+	δικό str := ['']. <- buffer.
+}.
+
+
+Έξοδος γράψε: (Πρόγραμμα σύστημα: (Slurp νέο echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Αρχείο νέο: ['/tmp/from.txt'], διαγραφή. } σύλληψη: { ['Empty']. }, εκκίνηση.
+{ Αρχείο νέο: ['/tmp/to.txt'], διαγραφή. } σύλληψη: { ['Empty']. }, εκκίνηση.
+
+
+Αρχείο νέο: ['/tmp/to.txt'], υπάρχει ψευδές: {
+	Έξοδος γράψε: ['Confirmed. Target file does not exist.\
+'].
+}.
+Αρχείο νέο: ['/tmp/from.txt'], υπάρχει ψευδές: {
+	Έξοδος γράψε: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Πρόγραμμα σύστημα: (Slurp νέο touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Πρόγραμμα σύστημα: (Slurp νέο cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Αρχείο νέο: ['/tmp/to.txt'], υπάρχει αληθές: {
+	Έξοδος γράψε: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Έξοδος γράψε: ['Contents of file is:'] + (Αρχείο νέο: ['/tmp/to.txt'], διάβασε), νέα-γραμμή.

@@ -1,0 +1,42 @@
+
+Texti við: ['html'] gera: { <- (
+		sjálfur
+		skipta: ['&'] fyrir: ['&amp;'],
+		skipta: ['<'] fyrir: ['&lt;'],
+		skipta: ['>'] fyrir: ['&gt;'],
+		skipta: ['"'] fyrir: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Hlutur nýtt.
+
+HtmlBrush við: ['svara:'] gera: { :tag
+	Úttak skrifa: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush við: ['svara:og:'] gera: { :tag :content
+	tag := ( tag frá: 0 lengd: (tag lengd - 1) ).
+	Úttak skrifa: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush við: ['content:'] gera: { :text
+	Úttak skrifa: text html, ný-lína.
+}.
+
+HtmlBrush við: ['attr:value:'] gera: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush nýtt.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

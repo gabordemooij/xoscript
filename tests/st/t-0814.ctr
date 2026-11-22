@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server lokisa.
+Lenaneo sebelisa: ['../../../src/xo/st/webtools.xo'].
+
+>> Fake-Request := Ntho ncha.
+Fake-Request ha-ho-fihla: ['value:'] etsa: { :boleng
+	ea-hao boleng := boleng.
+}.
+Fake-Request ha-ho-fihla: ['cookie:'] etsa: { :lebitso <- ea-hao boleng.
+}.
+
+>> Test-Session := Seboka-sa-faele-ea-nakoana ncha.
+Test-Session ha-ho-fihla: ['kenya'] etsa: { <- Bukantswe ncha.
+}.
+Test-Session ha-ho-fihla: ['session-id'] etsa: { <- ea-hao id.
+}.
+
+>> cookies := Lethathamo ncha
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies e-ngoe-le-e-ngoe: { :i :cookie
+	>> kopo-http := Fake-Request ncha.
+	kopo-http value: cookie.
+	>> mookameli := Test-Session ncha.
+	>> web := Tokomane-ea-Webo ncha.
+	web kopo-http: kopo-http.
+	web mookameli-oa-liboka: mookameli.
+	web qala-seboka.
+	Sephetho ngola: ( mookameli session-id = cookie ), mola-o-mocha.
+}.
+
+>> web := Tokomane-ea-Webo ncha.
+web json: (Bukantswe ncha beha: ['b'] sebakeng: ['a']).
+Sephetho ngola: ['\n'], mola-o-mocha.
+
+{ Marang-rang get: ['file:///etc/hostname']. } tšoasa: { :e
+	Sephetho ngola: e, mola-o-mocha.
+}, qala.
+
+>> svg := Faele ncha: ['/tmp/test0814.svg'].
+svg ngola: ['<svg xmlns="x"></svg>'].
+Sephetho mola-o-mocha.
+Server fetisa: ['test0814.svg'] sehlongoapele: ['/tmp/'].
+svg hlakola.

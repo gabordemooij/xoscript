@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB ohuru onye-nnabata: ['localhost'],
+	aha-onye-ọrụ: ['xo'],
+	okwuntughe: ['pass123'],
+	aha-nchekwa-data: ['xobase'],
+	jikọta.
+
+>> ihe-ọchụchọ := db ajụjụ: ['SELECT ? AS a, ? AS b, ? AS c'].
+ihe-ọchụchọ ntinye-ajụjụ: (Ndepụta ohuru ; ['1']).
+{ ihe-ọchụchọ weta: { :row Mpụta dee: row, ahịrị-ọhụrụ. }. } jide: { :e Mpụta dee: e, ahịrị-ọhụrụ. }, bido.
+
+>> ihe-ọchụchọ := db ajụjụ: ['SELECT ? AS a'].
+{ ihe-ọchụchọ weta: { :row Mpụta dee: row, ahịrị-ọhụrụ. }. } jide: { :e Mpụta dee: e, ahịrị-ọhụrụ. }, bido.
+
+# the right number still works, more parameters are ignored as before
+>> ihe-ọchụchọ := db ajụjụ: ['SELECT ? AS a, ? AS b'].
+ihe-ọchụchọ ntinye-ajụjụ: (Ndepụta ohuru ; ['1'] ; ['2']).
+ihe-ọchụchọ weta: { :row Mpụta dee: (row ebe: ['a']), dee: (row ebe: ['b']), ahịrị-ọhụrụ. }.
+ihe-ọchụchọ ntinye-ajụjụ: (Ndepụta ohuru ; ['1'] ; ['2'] ; ['3']).
+ihe-ọchụchọ weta: { :row Mpụta dee: (row ebe: ['a']), dee: (row ebe: ['b']), ahịrị-ọhụrụ. }.

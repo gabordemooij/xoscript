@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB okusha umsingathi: ['localhost'],
+	igama-lomsebenzisi: ['xo'],
+	iphasiwedi: ['pass123'],
+	igama-lesizindalwazi: ['xobase'],
+	xhumana.
+
+>> amapharamitha-okusesha := db umbuzo: ['SELECT ? AS a, ? AS b, ? AS c'].
+amapharamitha-okusesha amapharamitha: (Uhlu okusha ; ['1']).
+{ amapharamitha-okusesha landa: { :row Okuphumayo bhala: row, umugqa-omusha. }. } bamba: { :e Okuphumayo bhala: e, umugqa-omusha. }, qala.
+
+>> amapharamitha-okusesha := db umbuzo: ['SELECT ? AS a'].
+{ amapharamitha-okusesha landa: { :row Okuphumayo bhala: row, umugqa-omusha. }. } bamba: { :e Okuphumayo bhala: e, umugqa-omusha. }, qala.
+
+# the right number still works, more parameters are ignored as before
+>> amapharamitha-okusesha := db umbuzo: ['SELECT ? AS a, ? AS b'].
+amapharamitha-okusesha amapharamitha: (Uhlu okusha ; ['1'] ; ['2']).
+amapharamitha-okusesha landa: { :row Okuphumayo bhala: (row endaweni: ['a']), bhala: (row endaweni: ['b']), umugqa-omusha. }.
+amapharamitha-okusesha amapharamitha: (Uhlu okusha ; ['1'] ; ['2'] ; ['3']).
+amapharamitha-okusesha landa: { :row Okuphumayo bhala: (row endaweni: ['a']), bhala: (row endaweni: ['b']), umugqa-omusha. }.

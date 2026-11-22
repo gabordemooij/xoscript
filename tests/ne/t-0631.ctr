@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+प्रोग्राम मेमोरी-व्यवस्थापन: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := प्रोग्राम सेटिङ: ['FFITESTLIB'].
+
+
+
+Server लिङ्क: (
+ तालिका नयाँ ;
+ libname ;
+ ['puts'] ;
+ ( तालिका नयाँ ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s मुक्त.
+
+# test with struct
+
+>> a := Blob नयाँ: 8.
+a bytes: (
+	तालिका <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (तालिका <<: ['int'], ; ['int']).
+
+Server लिङ्क: (
+	तालिका <<: ['@structtest'], ;
+	['@structtest'] ;
+	(तालिका <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+आउटपुट लेख: ['Sum test:'] + (ffitest ffisum: a), नयाँ-पङ्क्ति.
+
+struct struct-मुक्त.
+struct मुक्त.
+a मुक्त.

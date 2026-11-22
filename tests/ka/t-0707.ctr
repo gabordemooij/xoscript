@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+პროგრამა მეხსიერების-მართვა: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB ახალი ჰოსტი: ['localhost'],
+	მომხმარებელი: ['xo'], პაროლი: ['pass123'], ბაზის-სახელი: ['xobase'], მიერთება.
+
+>> TwoDigitFormat := ფორმატი ახალი: ['%02d'].
+
+# Datetime
+{
+	>> წელი := რიცხვი შორის: 1995 და: 2050, ტექსტად.
+	>> თვე := TwoDigitFormat გამოყენება-მთელზე: (რიცხვი შორის: 1 და: 12), ტექსტად.
+	>> დღე := TwoDigitFormat გამოყენება-მთელზე: (რიცხვი შორის: 1 და: 28), ტექსტად.
+	>> საათი := TwoDigitFormat გამოყენება-მთელზე: (რიცხვი შორის: 1 და: 23), ტექსტად.
+	>> წუთი := TwoDigitFormat გამოყენება-მთელზე: (რიცხვი შორის: 1 და: 59), ტექსტად.
+	>> წამი := TwoDigitFormat გამოყენება-მთელზე: (რიცხვი შორის: 1 და: 59), ტექსტად.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: წელი,
+		MM: თვე,
+		DD: დღე,
+		HH: საათი,
+		II: წუთი,
+		SS: წამი.
+	>> ძიების-პარამეტრები :=
+	db მოთხოვნა: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	მიღება: { :row
+		(row mydatetime = datetime) მცდარი: {
+			ეს-ამოცანა შეცდომა: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter დამატება: 1.
+} * 100.
+
+# Date
+{
+	>> წელი := რიცხვი შორის: 1995 და: 2050, ტექსტად.
+	>> თვე := TwoDigitFormat გამოყენება-მთელზე: (რიცხვი შორის: 1 და: 12), ტექსტად.
+	>> დღე := TwoDigitFormat გამოყენება-მთელზე: (რიცხვი შორის: 1 და: 28), ტექსტად.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: წელი,
+		MM: თვე,
+		DD: დღე.
+	>> ძიების-პარამეტრები :=
+	db მოთხოვნა: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	მიღება: { :row
+		(row mydate = date) მცდარი: {
+			ეს-ამოცანა შეცდომა: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter დამატება: 1.
+} * 100.
+
+
+# Time
+{
+	>> საათი := TwoDigitFormat გამოყენება-მთელზე: (რიცხვი შორის: 1 და: 23), ტექსტად.
+	>> წუთი := TwoDigitFormat გამოყენება-მთელზე: (რიცხვი შორის: 1 და: 59), ტექსტად.
+	>> წამი := TwoDigitFormat გამოყენება-მთელზე: (რიცხვი შორის: 1 და: 59), ტექსტად.
+	>> დრო := ['HH:II:SS'].
+	დრო
+		HH: საათი,
+		II: წუთი,
+		SS: წამი.
+	>> ძიების-პარამეტრები :=
+	db მოთხოვნა: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: დრო),
+	მიღება: { :row
+		(row mytime = დრო) მცდარი: {
+			ეს-ამოცანა შეცდომა: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter დამატება: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := სია ახალი შევსება: 100000 რით: ['x'], გაერთიანება: [''].
+{
+	>> str2 := სეიფი ტოკენი: 40.
+	>> ძიების-პარამეტრები :=
+	db მოთხოვნა: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	მიღება: { :row
+		(row str1 = str1 და: row str2 = str2) მცდარი: {
+			ეს-ამოცანა შეცდომა: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter დამატება: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := რიცხვი შორის: 1 და: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 ტექსტიდან: ['9223372036854775807'] ) -
+		( Int64 ტექსტიდან: ['99999'] ) +
+		( Int64 ტექსტიდან: n1 ტექსტად )
+	).
+	>> ძიების-პარამეტრები :=
+	db მოთხოვნა: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	მიღება: { :row
+		(row n1 = n1) მცდარი: {
+			ეს-ამოცანა შეცდომა: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) მცდარი: {
+			ეს-ამოცანა შეცდომა: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 დამრგვალება) მცდარი: {
+			ეს-ამოცანა შეცდომა: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) მცდარი: {
+			ეს-ამოცანა შეცდომა: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter დამატება: 1.
+} * 100.
+
+
+გამოტანა დაწერე: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), ახალი-ხაზი.

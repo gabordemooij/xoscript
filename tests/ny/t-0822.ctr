@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB chatsopano wolandira: ['localhost'],
+	dzina-la-wogwiritsa: ['xo'],
+	mawu-achinsinsi: ['pass123'],
+	dzina-la-nkhokwe-ya-deta: ['xobase'],
+	lumikizana.
+
+>> zofufuzira := db funso: ['SELECT ? AS a, ? AS b, ? AS c'].
+zofufuzira zolowetsa-za-funso: (Mndandanda chatsopano ; ['1']).
+{ zofufuzira tenga: { :row Zotuluka lembani: row, mzere-watsopano. }. } gwira: { :e Zotuluka lembani: e, mzere-watsopano. }, yamba.
+
+>> zofufuzira := db funso: ['SELECT ? AS a'].
+{ zofufuzira tenga: { :row Zotuluka lembani: row, mzere-watsopano. }. } gwira: { :e Zotuluka lembani: e, mzere-watsopano. }, yamba.
+
+# the right number still works, more parameters are ignored as before
+>> zofufuzira := db funso: ['SELECT ? AS a, ? AS b'].
+zofufuzira zolowetsa-za-funso: (Mndandanda chatsopano ; ['1'] ; ['2']).
+zofufuzira tenga: { :row Zotuluka lembani: (row pamalo: ['a']), lembani: (row pamalo: ['b']), mzere-watsopano. }.
+zofufuzira zolowetsa-za-funso: (Mndandanda chatsopano ; ['1'] ; ['2'] ; ['3']).
+zofufuzira tenga: { :row Zotuluka lembani: (row pamalo: ['a']), lembani: (row pamalo: ['b']), mzere-watsopano. }.

@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lista uusi ;
+	# {"key":"normal"} normal ASCII
+	( Sanakirja uusi aseta: ['normal'] kohtaan: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Sanakirja uusi aseta: ['hello world'] kohtaan: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Sanakirja uusi aseta: ['"'] kohtaan: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Sanakirja uusi aseta: ['backslash: \\'] kohtaan: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Sanakirja uusi aseta: ['slash: /'] kohtaan: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Sanakirja uusi aseta: ['backspace: \b'] kohtaan: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Sanakirja uusi aseta: ['formfeed: \f'] kohtaan: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Sanakirja uusi aseta: ['newline: \n'] kohtaan: ['key'] ) ;
+	( Sanakirja uusi aseta: ['newline: ↵'] kohtaan: ['key'] ) ;
+	( Sanakirja uusi aseta: ['newline: 
+	'] kohtaan: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Sanakirja uusi aseta: ['carriage return: \r'] kohtaan: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Sanakirja uusi aseta: ['tab \t'] kohtaan: ['key'] ) ;
+	( Sanakirja uusi aseta: ['tab ⇿'] kohtaan: ['key'] ) ;
+	( Sanakirja uusi aseta: ['tab  '] kohtaan: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Sanakirja uusi aseta: ['NUL \u0000'] kohtaan: ['key'] ) ;
+	( Sanakirja uusi aseta: ['NUL \0'] kohtaan: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Sanakirja uusi aseta: ['control: \u0001'] kohtaan: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Sanakirja uusi aseta: ['control: \u001F'] kohtaan: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Sanakirja uusi aseta: ['unicode: é'] kohtaan: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Sanakirja uusi aseta: ['unicode: €'] kohtaan: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Sanakirja uusi aseta: ['unicode: 日本語'] kohtaan: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Sanakirja uusi aseta: ['unicode: 😀'] kohtaan: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Sanakirja uusi aseta: ['unicode: 🧑‍💻'] kohtaan: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Sanakirja uusi aseta: ['combining: e\u0301'] kohtaan: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Sanakirja uusi aseta: ['escaped unicode: \u00e9'] kohtaan: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Sanakirja uusi aseta: ['escaped unicode: \u20ac'] kohtaan: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Sanakirja uusi aseta: ['escaped unicode: \ud83d\ude00'] kohtaan: ['key'] ) ;
+	# {"key":""} empty value
+	( Sanakirja uusi aseta: [''] kohtaan: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Sanakirja uusi aseta: ['@ < > & = % + ? #'] kohtaan: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Sanakirja uusi aseta: ['''] kohtaan: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Sanakirja uusi aseta: ['multiple: \" \\ \n \r \t'] kohtaan: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Sanakirja uusi aseta: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] kohtaan: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Sanakirja uusi aseta: [' value'] kohtaan: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Sanakirja uusi aseta: ['value '] kohtaan: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Sanakirja uusi aseta: [' \t\n\r '] kohtaan: ['key'] ).
+
+dicts jokainen: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Sanakirja uusi aseta: d key kohtaan: ['key']).
+	>> b := JSON jsonify: (Sanakirja uusi aseta: ['value'] kohtaan: d key).
+	>> e := JSON olio: a.
+	>> f := JSON olio: b.
+	((e key = d key ja: (f ? d key = ['value'])) tai: (e key = ['NUL ?'])) tosi: {
+		Tuloste kirjoita: ['OK'], rivinvaihto.
+	}, muuten: {
+		Tuloste kirjoita: ['Unable to properly encode/decode: '] + d + j, rivinvaihto.
+		Ohjelma lopeta.
+	}.
+}.

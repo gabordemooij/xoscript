@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server andaa.
+Programu tumia: ['../../../src/xo/sw/webtools.xo'].
+Programu tumia: ['../../../src/xo/sw/mailtools.xo'].
+
+>> kichwa := Kichwa-HTTP mpya ufunguo: ['Location'] thamani: ['/ok\r\nX-Injected: yes'].
+Towe andika: kichwa.
+
+>> web := Hati-ya-Wavuti mpya.
+web nenda-kwa: ['/ok\r\nX-Injected: yes'].
+Towe andika: ['\n'], mstari-mpya.
+
+>> mail := Barua-pepe mpya.
+mail kwa-mpokeaji: (Orodha mpya ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Orodha mpya ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Orodha mpya ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail mtumaji: ['d@example.invalid\r\nX-From: yes'] jina: ['site\r\nX-Name: yes'].
+mail mada: ['hello\r\nX-Subject: yes'].
+mail mwili: ['line1\r\nline2'].
+Towe andika: mail zalisha.
+
+>> html := Barua-pepe-HTML mpya.
+html kwa-mpokeaji: (Orodha mpya ; ['a@example.invalid\r\nX-To: yes']).
+html mtumaji: ['d@example.invalid'] jina: ['site'].
+html mada: ['hello\r\nX-Subject: yes'].
+html mwili: ['body'].
+Towe andika: ( html zalisha inajumuisha: ['\nX-'] ), mstari-mpya.
+Towe andika: ( html zalisha inajumuisha: ['X-To: yes'] ), mstari-mpya.

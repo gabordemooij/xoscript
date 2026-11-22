@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Butang bag-o.
+
+Log kon: ['say:'] buhata: { :str
+	Gawas isulat: str, bag-ong-linya.
+}.
+
+>> Item := Butang bag-o.
+
+Item kon: ['bag-o:'] buhata: { :id <- kaugalingon bag-o id: id.
+}.
+
+Item kon: ['id:'] buhata: { :id
+	akoa id := id.
+}.
+
+Item kon: ['id'] buhata: { <- akoa id. }.
+
+
+Item kon: ['teksto'] buhata: {
+	>> str := ['Item#~no'].
+	str ~no: akoa id. <- str.
+}.
+
+
+>> Print := Butang bag-o.
+
+Print kon: ['items'] buhata: { 
+	
+	akoa item := Item bag-o: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: akoa item
+	).
+	
+	
+}.
+
+Print items.

@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB nov gostitelj: ['localhost'],
+	uporabnik: ['xo'],
+	geslo: ['pass123'],
+	ime-baze: ['xobase'],
+	poveži-se.
+
+>> conn2 := Maria-DB nov gostitelj: ['localhost'],
+	uporabnik: ['xo'],
+	geslo: ['pass123'],
+	ime-baze: ['xobase'],
+	poveži-se.
+#...
+>> del := conn1 poizvedba: ['DELETE FROM book WHERE id > 0'].
+{  del izvedi. conn1 potrdi. } ujemi: { :e conn1 razveljavi.  }, zaženi.
+
+>> insert := conn1 poizvedba: ['INSERT INTO book (id) VALUES(null)'].
+insert izvedi.
+
+>> število-elementov := conn1 poizvedba: ['SELECT COUNT(*) AS num FROM book'].
+število-elementov pridobi: { :row Izhod piši: row num, nova-vrstica. }.
+
+# does not show up
+# insert not committed on connection 1
+>> število-elementov := conn2 poizvedba: ['SELECT COUNT(*) AS num FROM book'].
+število-elementov pridobi: { :row Izhod piši: row num, nova-vrstica. }.

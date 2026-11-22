@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB täze host: ['localhost'],
+	ulanyjy-ady: ['xo'],
+	parol: ['pass123'],
+	binýat-ady: ['xobase'],
+	birikdir.
+
+>> gözleg-parametrleri := db sorag: ['SELECT ? AS a, ? AS b, ? AS c'].
+gözleg-parametrleri parametrler: (Sanaw täze ; ['1']).
+{ gözleg-parametrleri getir: { :row Çykyş ýaz: row, täze-setir. }. } tut: { :e Çykyş ýaz: e, täze-setir. }, işlet.
+
+>> gözleg-parametrleri := db sorag: ['SELECT ? AS a'].
+{ gözleg-parametrleri getir: { :row Çykyş ýaz: row, täze-setir. }. } tut: { :e Çykyş ýaz: e, täze-setir. }, işlet.
+
+# the right number still works, more parameters are ignored as before
+>> gözleg-parametrleri := db sorag: ['SELECT ? AS a, ? AS b'].
+gözleg-parametrleri parametrler: (Sanaw täze ; ['1'] ; ['2']).
+gözleg-parametrleri getir: { :row Çykyş ýaz: (row ýerinde: ['a']), ýaz: (row ýerinde: ['b']), täze-setir. }.
+gözleg-parametrleri parametrler: (Sanaw täze ; ['1'] ; ['2'] ; ['3']).
+gözleg-parametrleri getir: { :row Çykyş ýaz: (row ýerinde: ['a']), ýaz: (row ýerinde: ['b']), täze-setir. }.

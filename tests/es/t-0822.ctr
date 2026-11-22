@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB crear host: ['localhost'],
+	usuario: ['xo'],
+	contraseña: ['pass123'],
+	nombre-base-datos: ['xobase'],
+	conectar.
+
+>> consulta := db consultar: ['SELECT ? AS a, ? AS b, ? AS c'].
+consulta parámetros: (Lista crear ; ['1']).
+{ consulta extraer: { :row Salida escribir: row, detener. }. } capturar: { :e Salida escribir: e, detener. }, empezar.
+
+>> consulta := db consultar: ['SELECT ? AS a'].
+{ consulta extraer: { :row Salida escribir: row, detener. }. } capturar: { :e Salida escribir: e, detener. }, empezar.
+
+# the right number still works, more parameters are ignored as before
+>> consulta := db consultar: ['SELECT ? AS a, ? AS b'].
+consulta parámetros: (Lista crear ; ['1'] ; ['2']).
+consulta extraer: { :row Salida escribir: (row en: ['a']), escribir: (row en: ['b']), detener. }.
+consulta parámetros: (Lista crear ; ['1'] ; ['2'] ; ['3']).
+consulta extraer: { :row Salida escribir: (row en: ['a']), escribir: (row en: ['b']), detener. }.

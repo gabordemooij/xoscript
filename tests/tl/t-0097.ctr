@@ -1,0 +1,42 @@
+
+Teksto kapag: ['html'] gawin: { <- (
+		sarili
+		palitan: ['&'] ng: ['&amp;'],
+		palitan: ['<'] ng: ['&lt;'],
+		palitan: ['>'] ng: ['&gt;'],
+		palitan: ['"'] ng: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Bagay bago.
+
+HtmlBrush kapag: ['tumugon:'] gawin: { :tag
+	Labas isulat: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush kapag: ['tumugon:at:'] gawin: { :tag :content
+	tag := ( tag mula-sa: 0 haba: (tag haba - 1) ).
+	Labas isulat: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush kapag: ['content:'] gawin: { :text
+	Labas isulat: text html, bagong-linya.
+}.
+
+HtmlBrush kapag: ['attr:value:'] gawin: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush bago.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

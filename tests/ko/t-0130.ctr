@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := 프로그램 설정값: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server 연결: ( 리스트 새로 ;
+ libname ; ['fopen'] ;
+ ( 리스트 새로 ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+연결: ( 리스트 새로 ;
+ 없음 ; # means same lib
+ ['fread'] ;
+ ( 리스트 새로 ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ 없음 ; # means same object (i.e. Stream)
+ ['fread']
+),
+연결: (
+ 리스트 새로 ;
+ 없음 ; # means same lib
+ ['fwrite'] ;
+ ( 리스트 새로 ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ 없음 ; # means same lib
+ ['fwrite']
+),
+연결: (
+ 리스트 새로 ;
+ 없음 ; # means same lib
+ ['rewind'] ;
+ ( 리스트 새로 ; ['pointer'] ) ;
+ ['int'] ;
+ 없음 ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> 파일경로 := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: 파일경로 mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream 메시지: ['fwrite'] 인수들: (리스트 새로 ; str ; 1 ; 6 ; fd ).
+출력 쓰기: bytes-written, 줄바꿈.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob 새로: 20.
+
+# read from file
+>> bytes-read := Stream 메시지: ['fread'] 인수들: (리스트 새로 ; buf ; 1 ; 6 ; fd ).
+출력 쓰기: bytes-read, 줄바꿈.
+출력 쓰기: buf, 줄바꿈.
+
+# free memory
+str  해제.
+파일경로 해제.
+mode 해제.
+buf  해제.
+
+

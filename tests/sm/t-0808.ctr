@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Pusa-malu fai-ki.
+>> sk := keys tulaga-tasi.
+>> pk := keys mulimuli.
+>> sig := Pusa-malu saini: ['abc'] i-le: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Pusa-malu saini: ['abc'] i-le: long. } puʻe: { :e
+	Tuuina-atu tusi: e, laina-fou.
+}, amata.
+
+{ Pusa-malu siaki: ['abc'] saini-lima: long i-le: pk. } puʻe: { :e
+	Tuuina-atu tusi: e, laina-fou.
+}, amata.
+
+{ Pusa-malu siaki: ['abc'] saini-lima: sig i-le: short. } puʻe: { :e
+	Tuuina-atu tusi: e, laina-fou.
+}, amata.

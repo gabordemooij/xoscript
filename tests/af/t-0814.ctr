@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inisialiseer.
+Program gebruik: ['../../../src/xo/af/webtools.xo'].
+
+>> Fake-Request := Objek nuut.
+Fake-Request by: ['value:'] doen: { :waarde
+	eie waarde := waarde.
+}.
+Fake-Request by: ['cookie:'] doen: { :naam <- eie waarde.
+}.
+
+>> Test-Session := Tydelike-lêer-sessie nuut.
+Test-Session by: ['laai'] doen: { <- Woordeboek nuut.
+}.
+Test-Session by: ['session-id'] doen: { <- eie id.
+}.
+
+>> cookies := Lys nuut
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies elk: { :i :cookie
+	>> versoek := Fake-Request nuut.
+	versoek value: cookie.
+	>> bestuurder := Test-Session nuut.
+	>> web := Webdokument nuut.
+	web versoek: versoek.
+	web sessiebestuurder: bestuurder.
+	web sessie-begin.
+	Uitvoer skryf: ( bestuurder session-id = cookie ), nuwe-reël.
+}.
+
+>> web := Webdokument nuut.
+web json: (Woordeboek nuut sit: ['b'] by: ['a']).
+Uitvoer skryf: ['\n'], nuwe-reël.
+
+{ Netwerk get: ['file:///etc/hostname']. } vang: { :e
+	Uitvoer skryf: e, nuwe-reël.
+}, begin.
+
+>> svg := Lêer nuut: ['/tmp/test0814.svg'].
+svg skryf: ['<svg xmlns="x"></svg>'].
+Uitvoer nuwe-reël.
+Server gee-deur: ['test0814.svg'] voorvoegsel: ['/tmp/'].
+svg verwyder.

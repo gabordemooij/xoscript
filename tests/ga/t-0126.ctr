@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Réad nua.
+
+Slurp ar: ['nua'] déan: {
+	dílis str := [''].
+}.
+
+Slurp ar: ['nieuw'] déan: {
+	dílis str := [''].
+}.
+
+Slurp ar: ['freagair:'] déan: { :blah
+		dílis str iarcheangail: blah.
+}.
+
+Slurp ar: ['freagair:agus:'] déan: { :blah :blahah
+		dílis str iarcheangail: (blah ó: 0 fad: (blah fad - 1)).
+		dílis str iarcheangail: [' '].
+		dílis str iarcheangail: blahah.
+}.
+
+Slurp ar: ['obtain'] déan: {
+	>> buffer := dílis str.
+	dílis str := ['']. <- buffer.
+}.
+
+
+Aschur scríobh: (Ríomhchlár córas: (Slurp nua echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Comhad nua: ['/tmp/from.txt'], scrios. } gabh: { ['Empty']. }, tosaigh.
+{ Comhad nua: ['/tmp/to.txt'], scrios. } gabh: { ['Empty']. }, tosaigh.
+
+
+Comhad nua: ['/tmp/to.txt'], ann bréagach: {
+	Aschur scríobh: ['Confirmed. Target file does not exist.\
+'].
+}.
+Comhad nua: ['/tmp/from.txt'], ann bréagach: {
+	Aschur scríobh: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Ríomhchlár córas: (Slurp nua touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Ríomhchlár córas: (Slurp nua cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Comhad nua: ['/tmp/to.txt'], ann fíor: {
+	Aschur scríobh: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Aschur scríobh: ['Contents of file is:'] + (Comhad nua: ['/tmp/to.txt'], léigh), líne-nua.

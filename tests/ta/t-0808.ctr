@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := பெட்டகம் திறவுகோல்-உருவாக்கு.
+>> sk := keys முதல்.
+>> pk := keys கடைசி.
+>> sig := பெட்டகம் கையொப்பமிடு: ['abc'] திறவுகோலால்: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ பெட்டகம் கையொப்பமிடு: ['abc'] திறவுகோலால்: long. } பிடி: { :e
+	வெளியீடு எழுது: e, புதிய-வரி.
+}, இயக்கு.
+
+{ பெட்டகம் சோதி: ['abc'] கையொப்பம்: long திறவுகோலால்: pk. } பிடி: { :e
+	வெளியீடு எழுது: e, புதிய-வரி.
+}, இயக்கு.
+
+{ பெட்டகம் சோதி: ['abc'] கையொப்பம்: sig திறவுகோலால்: short. } பிடி: { :e
+	வெளியீடு எழுது: e, புதிய-வரி.
+}, இயக்கு.

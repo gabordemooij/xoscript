@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> indlela-yefayile := ['/tmp/dat.csv'].
+>> csv := Ifayile entsha: indlela-yefayile.
+csv bhala: s.
+
+# accepts CRLF LF CR, varying row length
+csv isahluli: [';'] isicatshulwa: ['"'] imigca: { :line
+	Inkqubo coca.
+	Imveliso bhala: line, umgca-omtsha.
+	Inkqubo coca.
+}.
+
+# unequal lines
+s yongeza-ekugqibeleni: ['\njustone'].
+csv bhala: s.
+{
+	csv isahluli: [';'] isicatshulwa: ['"'] imigca: { :line
+		Imveliso bhala: line, umgca-omtsha.
+	}.
+} bamba: { :e 
+	Imveliso bhala: e, umgca-omtsha.
+}, qala.
+
+# invalid format
+s := ['"he"llo";world'].
+csv bhala: s.
+{
+	csv isahluli: [';'] isicatshulwa: ['"'] imigca: { :line
+		Imveliso bhala: line, umgca-omtsha.
+	}.
+} bamba: { :e 
+	Imveliso bhala: e, umgca-omtsha.
+}, qala.

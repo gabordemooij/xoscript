@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Listin xees
+	# ASCII only
+	teg: ( Jokkalante xees ; 65 ; 65 ; 65 ; 65 ; 0 ) ci: ['AAAA'],
+	# valid 2 byte sequence
+	teg: ( Jokkalante xees ; 194 ; 162 ; 0 ) ci: ['¢'],
+	# Valid 3-byte UTF-8
+    teg: ( Jokkalante xees ; 226 ; 130 ; 172 ; 0 ) ci: ['€'],
+	# Valid 4-byte UTF-8
+    teg: ( Jokkalante xees ; 240 ; 144 ; 141 ; 136 ; 0 ) ci: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    teg: ( Jokkalante xees ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ci: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    teg: ( Jokkalante xees ; 65 ; 193 ; 129 ; 0 ) ci: ['A?'],
+	# Invalid first byte (0xFF)
+    teg: ( Jokkalante xees ; 255 ; 0 ) ci: ['?'],
+	# Incomplete multi-byte sequence at end
+    teg: ( Jokkalante xees ; 66 ; 226 ; 0 ) ci: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    teg: ( Jokkalante xees ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ci: ['A€?𐍈B'].
+	 
+utf8cases kenn-ci-kenn: { :key :value
+	>> blob := Blob xees: value waññ, bytes: value.
+	>> str := blob mbind.
+	(str = key) dëgg: {
+		Génn bind: ['OK'], taxaw.
+	}, lu-dul: {
+		Génn bind: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, taxaw.
+	}.
+	blob bàyyi.
+}.

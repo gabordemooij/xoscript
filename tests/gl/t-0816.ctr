@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> intentar := { :format :value
+	{ Saída escribir: ( (Formato novo: format) aplicar: value ), salto-de-liña. } capturar: { :e Saída escribir: e, salto-de-liña. }, iniciar.
+}.
+>> try-int := { :format :value
+	{ Saída escribir: ( (Formato novo: format) aplicar-enteiro: value ), salto-de-liña. } capturar: { :e Saída escribir: e, salto-de-liña. }, iniciar.
+}.
+
+# fits
+intentar aplicar: ['|%s|'] e: ['text'].
+intentar aplicar: ['%06.2f'] e: 5.5.
+intentar aplicar: ['100%% %s'] e: ['sure'].
+try-int aplicar: ['%03d'] e: 7.
+try-int aplicar: ['%x'] e: 255.
+intentar aplicar: ['%d'] e: (Int64 novo desde-texto: ['12']).
+intentar aplicar: ['%lld'] e: (Int64 novo desde-texto: ['12']).
+intentar aplicar: ['%.1lf'] e: 5.5.
+try-int aplicar: ['%hd'] e: 7.
+
+# does not fit
+intentar aplicar: ['%s'] e: 12345.
+intentar aplicar: ['%d'] e: 12345.
+intentar aplicar: ['%f'] e: ['text'].
+try-int aplicar: ['%d'] e: ['text'].
+try-int aplicar: ['%s'] e: 5.
+intentar aplicar: ['%s %s'] e: ['text'].
+intentar aplicar: ['%n'] e: ['text'].
+intentar aplicar: ['%*s'] e: ['text'].
+intentar aplicar: ['%'] e: ['text'].
+
+# length modifier does not fit
+intentar aplicar: ['%ls'] e: ['text'].
+intentar aplicar: ['%Lf'] e: 5.5.
+try-int aplicar: ['%ld'] e: 7.
+try-int aplicar: ['%lld'] e: 7.
+intentar aplicar: ['%Ld'] e: (Int64 novo desde-texto: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+intentar aplicar: ['%99999999999s'] e: ['text'].

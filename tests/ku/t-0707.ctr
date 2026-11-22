@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Bername rêveberiya-bîrê: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB nû mêvandar: ['localhost'],
+	navê-bikarhêner: ['xo'], şîfre: ['pass123'], navê-danegehê: ['xobase'], girêbide-pê.
+
+>> TwoDigitFormat := Format nû: ['%02d'].
+
+# Datetime
+{
+	>> sal := Hejmar di-navbera: 1995 û: 2050, nivîs.
+	>> meh := TwoDigitFormat bisepîne-hejmara-tam: (Hejmar di-navbera: 1 û: 12), nivîs.
+	>> roj := TwoDigitFormat bisepîne-hejmara-tam: (Hejmar di-navbera: 1 û: 28), nivîs.
+	>> saet := TwoDigitFormat bisepîne-hejmara-tam: (Hejmar di-navbera: 1 û: 23), nivîs.
+	>> deqe := TwoDigitFormat bisepîne-hejmara-tam: (Hejmar di-navbera: 1 û: 59), nivîs.
+	>> çirke := TwoDigitFormat bisepîne-hejmara-tam: (Hejmar di-navbera: 1 û: 59), nivîs.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: sal,
+		MM: meh,
+		DD: roj,
+		HH: saet,
+		II: deqe,
+		SS: çirke.
+	>> parametreyên-lêgerînê :=
+	db lêpirsîn: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	bîne: { :row
+		(row mydatetime = datetime) şaş: {
+			ev-kar şaşî: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter zêde-bike: 1.
+} * 100.
+
+# Date
+{
+	>> sal := Hejmar di-navbera: 1995 û: 2050, nivîs.
+	>> meh := TwoDigitFormat bisepîne-hejmara-tam: (Hejmar di-navbera: 1 û: 12), nivîs.
+	>> roj := TwoDigitFormat bisepîne-hejmara-tam: (Hejmar di-navbera: 1 û: 28), nivîs.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: sal,
+		MM: meh,
+		DD: roj.
+	>> parametreyên-lêgerînê :=
+	db lêpirsîn: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	bîne: { :row
+		(row mydate = date) şaş: {
+			ev-kar şaşî: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter zêde-bike: 1.
+} * 100.
+
+
+# Time
+{
+	>> saet := TwoDigitFormat bisepîne-hejmara-tam: (Hejmar di-navbera: 1 û: 23), nivîs.
+	>> deqe := TwoDigitFormat bisepîne-hejmara-tam: (Hejmar di-navbera: 1 û: 59), nivîs.
+	>> çirke := TwoDigitFormat bisepîne-hejmara-tam: (Hejmar di-navbera: 1 û: 59), nivîs.
+	>> dem := ['HH:II:SS'].
+	dem
+		HH: saet,
+		II: deqe,
+		SS: çirke.
+	>> parametreyên-lêgerînê :=
+	db lêpirsîn: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: dem),
+	bîne: { :row
+		(row mytime = dem) şaş: {
+			ev-kar şaşî: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter zêde-bike: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lîste nû dagirtin: 100000 bi: ['x'], bigihîne-hev: [''].
+{
+	>> str2 := Qasa token: 40.
+	>> parametreyên-lêgerînê :=
+	db lêpirsîn: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	bîne: { :row
+		(row str1 = str1 û: row str2 = str2) şaş: {
+			ev-kar şaşî: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter zêde-bike: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Hejmar di-navbera: 1 û: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 ji-nivîsê: ['9223372036854775807'] ) -
+		( Int64 ji-nivîsê: ['99999'] ) +
+		( Int64 ji-nivîsê: n1 nivîs )
+	).
+	>> parametreyên-lêgerînê :=
+	db lêpirsîn: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	bîne: { :row
+		(row n1 = n1) şaş: {
+			ev-kar şaşî: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) şaş: {
+			ev-kar şaşî: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 gilover-bike) şaş: {
+			ev-kar şaşî: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) şaş: {
+			ev-kar şaşî: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter zêde-bike: 1.
+} * 100.
+
+
+Derketin binivîse: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), rêza-nû.

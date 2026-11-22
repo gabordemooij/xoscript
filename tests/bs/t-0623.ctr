@@ -1,0 +1,43 @@
+
+
+>> g := Server novi.
+>> v := Sef novi.
+>> ok := 0.
+
+>> secrets := Lista novi ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopiraj.
+passwords svaki: { :i :p
+	secrets svaki: { :n :s
+		{
+			>> encrypted := v šifriraj: s ključ: p.
+			>> decrypted := v dešifriraj: encrypted ključ: p.
+			(decrypted = s) tačno: {
+				ok saberi: 1.
+			}, inače: {
+				Izlaz piši: ['failed encrypting/decrypting: '], novi-red.
+				Izlaz piši: s, novi-red.
+				Izlaz piši: ['encrypted: '] + encrypted, novi-red.
+				Izlaz piši: ['decrypted: '] + encrypted, novi-red.
+				Program kraj.
+			}.
+		} uhvati: { :err
+			(s = [''] ili: p = ['']) tačno: {
+				ok saberi: 1.
+			}, inače: {
+				Izlaz piši: err, novi-red.
+				Program kraj.
+			}.
+		}, pokreni.
+	}.
+}.
+
+Izlaz piši: ( ok + [' vault encryptions tested.'] ), novi-red.

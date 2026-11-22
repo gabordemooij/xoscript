@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server саҕалааһын.
+Программа инструмент: ['../../../src/xo/yak/webtools.xo'].
+Программа инструмент: ['../../../src/xo/yak/mailtools.xo'].
+
+>> баһылааһын := HTTP-Баһылааһын саҥа күлүүс: ['Location'] суолта: ['/ok\r\nX-Injected: yes'].
+Таһаарыы суруй: баһылааһын.
+
+>> web := Веб-докумуон саҥа.
+web бар: ['/ok\r\nX-Injected: yes'].
+Таһаарыы суруй: ['\n'], стоп.
+
+>> mail := Электрон-сурук саҥа.
+mail ылааччыга: (Испииһэк саҥа ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Испииһэк саҥа ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Испииһэк саҥа ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail ыытааччы: ['d@example.invalid\r\nX-From: yes'] аат: ['site\r\nX-Name: yes'].
+mail тиэмэ: ['hello\r\nX-Subject: yes'].
+mail сүрүн-тиэкис: ['line1\r\nline2'].
+Таһаарыы суруй: mail айаа.
+
+>> html := HTML-Электрон-сурук саҥа.
+html ылааччыга: (Испииһэк саҥа ; ['a@example.invalid\r\nX-To: yes']).
+html ыытааччы: ['d@example.invalid'] аат: ['site'].
+html тиэмэ: ['hello\r\nX-Subject: yes'].
+html сүрүн-тиэкис: ['body'].
+Таһаарыы суруй: ( html айаа содержит: ['\nX-'] ), стоп.
+Таһаарыы суруй: ( html айаа содержит: ['X-To: yes'] ), стоп.

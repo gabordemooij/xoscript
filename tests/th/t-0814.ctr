@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server เตรียม.
+โปรแกรม ใช้: ['../../../src/xo/th/webtools.xo'].
+
+>> Fake-Request := ออบเจกต์ สร้างใหม่.
+Fake-Request เมื่อ: ['value:'] ทำ: { :ค่า
+	ของตน ค่า := ค่า.
+}.
+Fake-Request เมื่อ: ['cookie:'] ทำ: { :ชื่อ <- ของตน ค่า.
+}.
+
+>> Test-Session := เซสชันไฟล์ชั่วคราว สร้างใหม่.
+Test-Session เมื่อ: ['โหลด'] ทำ: { <- พจนานุกรม สร้างใหม่.
+}.
+Test-Session เมื่อ: ['session-id'] ทำ: { <- ของตน id.
+}.
+
+>> cookies := ลิสต์ สร้างใหม่
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies แต่ละตัว: { :i :cookie
+	>> คำขอ-http := Fake-Request สร้างใหม่.
+	คำขอ-http value: cookie.
+	>> ตัวจัดการ := Test-Session สร้างใหม่.
+	>> web := เอกสารเว็บ สร้างใหม่.
+	web คำขอ-http: คำขอ-http.
+	web ตัวจัดการเซสชัน: ตัวจัดการ.
+	web เริ่มเซสชัน.
+	แสดงผล เขียน: ( ตัวจัดการ session-id = cookie ), ขึ้นบรรทัดใหม่.
+}.
+
+>> web := เอกสารเว็บ สร้างใหม่.
+web json: (พจนานุกรม สร้างใหม่ ใส่: ['b'] ที่: ['a']).
+แสดงผล เขียน: ['\n'], ขึ้นบรรทัดใหม่.
+
+{ เครือข่าย get: ['file:///etc/hostname']. } ดักจับ: { :e
+	แสดงผล เขียน: e, ขึ้นบรรทัดใหม่.
+}, เริ่ม.
+
+>> svg := ไฟล์ สร้างใหม่: ['/tmp/test0814.svg'].
+svg เขียน: ['<svg xmlns="x"></svg>'].
+แสดงผล ขึ้นบรรทัดใหม่.
+Server ส่งผ่าน: ['test0814.svg'] คำนำหน้า: ['/tmp/'].
+svg ลบ.

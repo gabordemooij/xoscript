@@ -1,0 +1,53 @@
+Programma gcmode: 0.
+Serie on: ['sum'] fare: {
+	>> total := 0.
+	io ogni: { :index :element
+		total inserisci: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := File nuovo: ['/tmp/test.txt'].
+f scrivi: ['Lorem Ipsum'].
+f chiudi.
+  
+
+f := File nuovo: ['/tmp/test.txt'].
+>> text := f leggere.
+f chiudi.
+
+
+
+Programma spazzare.
+usedMemory1 := (Programma memoria ? 1).
+
+
+
+f := File nuovo: ['/tmp/test.txt'].
+text := f leggere.
+f chiudi.
+
+Programma spazzare.
+usedMemory2 := (Programma memoria ? 1).
+
+
+f := File nuovo: ['/tmp/test.txt'].
+text := f leggere.
+f chiudi.
+
+Programma spazzare.
+usedMemory3 := (Programma memoria ? 1).
+
+
+
+( usedMemory1 = usedMemory2 e: usedMemory1 = usedMemory3, e: usedMemory2 = usedMemory3 ) vero: {
+	Uscita scrivi: ['No memory leaks here'].
+}, falso: {
+	Uscita scrivi: ['Leaking memory...'].
+}.

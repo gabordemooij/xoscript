@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> vērtības := Saraksts jauns
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+vērtības katrs: { :i :value
+	>> d := Vārdnīca jauns.
+	d ielikt: value pie: ['k'].
+	>> r := d kods objekts.
+	Izvade rakstīt: r skaits, jauna-rinda.
+	Izvade rakstīt: ( (r pie: ['k']) = value ), jauna-rinda.
+}.

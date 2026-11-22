@@ -1,0 +1,39 @@
+
+
+Řetězec při: ['evaluate'] udělat: {
+	>> kód := Soubor nový: ['/tmp/eval.ctr'].
+	kód psát: sebe řetězec + ['.'].
+	Program použít: ['/tmp/eval.ctr'].
+}.
+
+>> a := (Seznam ← (
+	(Slovník nový)
+		umístit: ['domain'] na: ['mywebsite.com'],
+		umístit: (Seznam ←
+			((Slovník nový)
+				umístit: ['home'] na: ['title'],
+				umístit: ['<html></html>'] na: ['body'],
+				umístit: ['2017-01-01'] na: ['created']
+			) ;
+			((Slovník nový)
+				umístit: ['aboutus(c)'] na: ['title'],
+				umístit: ['<credits>Author Inc.</credits>'] na: ['body']
+			)
+		) na: ['pages']
+	)
+) řetězec.
+
+Výstup psát: a typ, nový-řádek.
+Výstup psát: a, nový-řádek.
+
+>> b := Nic.
+(['b := '] + a) evaluate.
+Výstup psát: b ? 0 ? ['pages'] ? 1 ? ['body'], nový-řádek.
+
+>> c := b ? 0.
+>> d := c řetězec.
+Výstup psát: d typ, nový-řádek.
+
+>> e := Nic.
+(['e := '] + d) evaluate.
+Výstup psát: e ? ['pages'] ? 0, nový-řádek.

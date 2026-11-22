@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Klûs kaaien-oanmeitsje.
+>> sk := keys earste.
+>> pk := keys lêste.
+>> sig := Klûs ûndertekenje: ['abc'] mei: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Klûs ûndertekenje: ['abc'] mei: long. } fange: { :e
+	Utfier skriuwe: e, nije-rigel.
+}, begjinne.
+
+{ Klûs kontrolearje: ['abc'] ûndertekening: long mei: pk. } fange: { :e
+	Utfier skriuwe: e, nije-rigel.
+}, begjinne.
+
+{ Klûs kontrolearje: ['abc'] ûndertekening: sig mei: short. } fange: { :e
+	Utfier skriuwe: e, nije-rigel.
+}, begjinne.

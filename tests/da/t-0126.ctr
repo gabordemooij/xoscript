@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Objekt ny.
+
+Slurp ved: ['ny'] gør: {
+	egen str := [''].
+}.
+
+Slurp ved: ['nieuw'] gør: {
+	egen str := [''].
+}.
+
+Slurp ved: ['svar:'] gør: { :blah
+		egen str tilføj: blah.
+}.
+
+Slurp ved: ['svar:og:'] gør: { :blah :blahah
+		egen str tilføj: (blah fra: 0 længde: (blah længde - 1)).
+		egen str tilføj: [' '].
+		egen str tilføj: blahah.
+}.
+
+Slurp ved: ['obtain'] gør: {
+	>> buffer := egen str.
+	egen str := ['']. <- buffer.
+}.
+
+
+Uddata skriv: (Program system: (Slurp ny echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Fil ny: ['/tmp/from.txt'], slet. } fang: { ['Empty']. }, start.
+{ Fil ny: ['/tmp/to.txt'], slet. } fang: { ['Empty']. }, start.
+
+
+Fil ny: ['/tmp/to.txt'], findes falsk: {
+	Uddata skriv: ['Confirmed. Target file does not exist.\
+'].
+}.
+Fil ny: ['/tmp/from.txt'], findes falsk: {
+	Uddata skriv: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Program system: (Slurp ny touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Program system: (Slurp ny cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Fil ny: ['/tmp/to.txt'], findes sand: {
+	Uddata skriv: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Uddata skriv: ['Contents of file is:'] + (Fil ny: ['/tmp/to.txt'], læs), stop.

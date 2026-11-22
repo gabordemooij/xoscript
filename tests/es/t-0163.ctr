@@ -1,0 +1,43 @@
+
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+Programa orden: 0.
+
+>> f := Archivo crear: ['/tmp/citrine_test_file.txt'].
+f exists: { f eliminar. }.
+f open: ['w'].
+f write bytes: ['hello'].
+f cerrar.
+
+Programa limpiar-memoria.
+usedMemory1 := (Programa memoria ? 0).
+
+
+f := Archivo crear: ['/tmp/citrine_test_file.txt'].
+f exists: {f eliminar. }.
+f open: ['w'].
+f write bytes: ['hello world'].
+f cerrar.
+Programa limpiar-memoria.
+usedMemory2 := (Programa memoria ? 0).
+
+
+f := Archivo crear: ['/tmp/citrine_test_file.txt'].
+f exists: { f eliminar. }.
+f open: ['w'].
+f write bytes: ['hello world'].
+f cerrar.
+Programa limpiar-memoria.
+usedMemory3 := (Programa memoria ? 0).
+
+
+
+( usedMemory1 = usedMemory2 y: usedMemory1 = usedMemory3, y: usedMemory2 = usedMemory3 ) verdadero: {
+	Salida escribir: ['No memory leaks here'].
+}, falso: {
+	Salida escribir: ['Leaking memory...'].
+}.

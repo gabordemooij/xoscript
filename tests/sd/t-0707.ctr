@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+پروگرام ميموري-انتظام: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB نئون ميزبان: ⌝'localhost'⌜,
+	يوزر-نالو: ⌝'xo'⌜, پاسورڊ: ⌝'pass123'⌜, ڊيٽابيس-نالو: ⌝'xobase'⌜, ڳنڍجو.
+
+>> TwoDigitFormat := فارميٽ نئون: ⌝'%02d'⌜.
+
+# Datetime
+⎬
+	>> سال := انگ وچ-۾: 1995 کان: 2050, متن-طور.
+	>> مهينو := TwoDigitFormat لاڳو-سڄو-انگ: ﴿انگ وچ-۾: 1 کان: 12﴾, متن-طور.
+	>> ڏينهن := TwoDigitFormat لاڳو-سڄو-انگ: ﴿انگ وچ-۾: 1 کان: 28﴾, متن-طور.
+	>> ڪلاڪ := TwoDigitFormat لاڳو-سڄو-انگ: ﴿انگ وچ-۾: 1 کان: 23﴾, متن-طور.
+	>> منٽ := TwoDigitFormat لاڳو-سڄو-انگ: ﴿انگ وچ-۾: 1 کان: 59﴾, متن-طور.
+	>> سيڪنڊ := TwoDigitFormat لاڳو-سڄو-انگ: ﴿انگ وچ-۾: 1 کان: 59﴾, متن-طور.
+	>> datetime := ⌝'YYYY-MM-DD HH:II:SS'⌜.	
+	datetime
+		YYYY: سال,
+		MM: مهينو,
+		DD: ڏينهن,
+		HH: ڪلاڪ,
+		II: منٽ,
+		SS: سيڪنڊ.
+	>> ڳولا-پيراميٽر :=
+	db سوال: ﴿⌝'
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'⌜ <datetime>: datetime﴾,
+	آڻيو: ⎬ :row
+		﴿row mydatetime = datetime﴾ جيڪڏهن-ڪوڙ: ⎬
+			هي-ڪم غلطي: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mydatetime
+			﴾.
+		⎨.
+	
+	⎨.
+	counter جوڙ: 1.
+⎨ * 100.
+
+# Date
+⎬
+	>> سال := انگ وچ-۾: 1995 کان: 2050, متن-طور.
+	>> مهينو := TwoDigitFormat لاڳو-سڄو-انگ: ﴿انگ وچ-۾: 1 کان: 12﴾, متن-طور.
+	>> ڏينهن := TwoDigitFormat لاڳو-سڄو-انگ: ﴿انگ وچ-۾: 1 کان: 28﴾, متن-طور.
+	>> date := ⌝'YYYY-MM-DD'⌜.
+	date
+		YYYY: سال,
+		MM: مهينو,
+		DD: ڏينهن.
+	>> ڳولا-پيراميٽر :=
+	db سوال: ﴿⌝'
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'⌜ <date>: date﴾,
+	آڻيو: ⎬ :row
+		﴿row mydate = date﴾ جيڪڏهن-ڪوڙ: ⎬
+			هي-ڪم غلطي: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: date,
+				<observation>: row mydate
+			﴾.
+		⎨.
+	⎨.
+	counter جوڙ: 1.
+⎨ * 100.
+
+
+# Time
+⎬
+	>> ڪلاڪ := TwoDigitFormat لاڳو-سڄو-انگ: ﴿انگ وچ-۾: 1 کان: 23﴾, متن-طور.
+	>> منٽ := TwoDigitFormat لاڳو-سڄو-انگ: ﴿انگ وچ-۾: 1 کان: 59﴾, متن-طور.
+	>> سيڪنڊ := TwoDigitFormat لاڳو-سڄو-انگ: ﴿انگ وچ-۾: 1 کان: 59﴾, متن-طور.
+	>> وقت := ⌝'HH:II:SS'⌜.
+	وقت
+		HH: ڪلاڪ,
+		II: منٽ,
+		SS: سيڪنڊ.
+	>> ڳولا-پيراميٽر :=
+	db سوال: ﴿⌝'
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'⌜ <time>: وقت﴾,
+	آڻيو: ⎬ :row
+		﴿row mytime = وقت﴾ جيڪڏهن-ڪوڙ: ⎬
+			هي-ڪم غلطي: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter جوڙ: 1.
+⎨ * 100.
+
+
+# Strings (varchar/text)
+>> str1 := لسٽ نئون ڀريو: 100000 سان: ⌝'x'⌜, ملايو: ⌝''⌜.
+⎬
+	>> str2 := ٽجوڙي ٽوڪن: 40.
+	>> ڳولا-پيراميٽر :=
+	db سوال: ﴿⌝'
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'⌜ 
+	<str1>: str1,
+	<str2>: str2
+	﴾,
+	آڻيو: ⎬ :row
+		﴿row str1 = str1 ۽: row str2 = str2﴾ جيڪڏهن-ڪوڙ: ⎬
+			هي-ڪم غلطي: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter جوڙ: 1.
+⎨ * 100.
+
+
+# Numbers
+⎬
+	>> n1 := انگ وچ-۾: 1 کان: 99999.
+	>> n2 := n1 / 1000.
+	>> big := ﴿
+		﴿ Int64 متن-مان: ⌝'9223372036854775807'⌜ ﴾ -
+		﴿ Int64 متن-مان: ⌝'99999'⌜ ﴾ +
+		﴿ Int64 متن-مان: n1 متن-طور ﴾
+	﴾.
+	>> ڳولا-پيراميٽر :=
+	db سوال: ﴿⌝'
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	'⌜
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	﴾,
+	آڻيو: ⎬ :row
+		﴿row n1 = n1﴾ جيڪڏهن-ڪوڙ: ⎬
+			هي-ڪم غلطي: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n1
+			﴾.
+		⎨.
+		﴿row n2 = n2﴾ جيڪڏهن-ڪوڙ: ⎬
+			هي-ڪم غلطي: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n2
+			﴾.
+		⎨.
+		﴿row n3 = n2 گول﴾ جيڪڏهن-ڪوڙ: ⎬
+			هي-ڪم غلطي: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n3
+			﴾.
+		⎨.
+		﴿row big = big﴾ جيڪڏهن-ڪوڙ: ⎬
+			هي-ڪم غلطي: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: big,
+				<observation>: row big
+			﴾.
+		⎨.
+		
+	⎨.
+	counter جوڙ: 1.
+⎨ * 100.
+
+
+آئوٽ-پٽ لکو: ﴿
+	⌝'OK, <counter> fuzzy casts/conversions tested.'⌜
+	<counter>: counter
+﴾, نئين-سٽ.

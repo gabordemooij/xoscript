@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> waddada-faylka := ['/tmp/dat.csv'].
+>> csv := Fayl cusub: waddada-faylka.
+csv qor: s.
+
+# accepts CRLF LF CR, varying row length
+csv kala-saare: [';'] calaamad-xigasho: ['"'] sadarro: { :line
+	Barnaamij nadiifi.
+	Soo-saar qor: line, sadar-cusub.
+	Barnaamij nadiifi.
+}.
+
+# unequal lines
+s dhammaadka-ku-dar: ['\njustone'].
+csv qor: s.
+{
+	csv kala-saare: [';'] calaamad-xigasho: ['"'] sadarro: { :line
+		Soo-saar qor: line, sadar-cusub.
+	}.
+} qabo: { :e 
+	Soo-saar qor: e, sadar-cusub.
+}, bilow.
+
+# invalid format
+s := ['"he"llo";world'].
+csv qor: s.
+{
+	csv kala-saare: [';'] calaamad-xigasho: ['"'] sadarro: { :line
+		Soo-saar qor: line, sadar-cusub.
+	}.
+} qabo: { :e 
+	Soo-saar qor: e, sadar-cusub.
+}, bilow.

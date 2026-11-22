@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Baʼii barreessi: ['Database test'], dhaabi.
+
+>> db := Maria-DB haaraa keessummeessaa: ['localhost'],
+	maqaa-fayyadamaa: ['xo'], jecha-icciitii: ['pass123'], maqaa-kuusaa-deetaa: ['xobase'], walqunnami.
+
+Baʼii barreessi: ['Can we connect? '] + db walqunnameera?, dhaabi.
+
+>> ulaagaalee-barbaacha := db iyyaafannoo: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], ulaagaalee: ( Tarree-wantootaa haaraa ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  ulaagaalee-barbaacha hojiirra-oolchi. db mirkaneessi. } qabi: { :e db duubatti-deebisi.  }, fiigi.
+
+Baʼii barreessi: ['Can we insert? '] + ( ulaagaalee-barbaacha insert-id > 0 ), dhaabi.
+
+>> x := 0.
+>> ulaagaalee-barbaacha :=
+db iyyaafannoo: ['SELECT * FROM book order by id desc limit 2'], 
+fidi: { :row 
+	x idaʼi: 1.
+	Dhugaa adda-kuti. # must clean up, no 'Commands out of sync'
+}.
+
+>> ulaagaalee-barbaacha :=
+db iyyaafannoo: ['SELECT * FROM book order by id desc limit 2'], 
+fidi: { :row
+	x idaʼi: 1.
+	Dhugaa adda-kuti.
+}.
+
+(x > 0) yoodhugaa: {
+	Baʼii barreessi: ['Can we break in the middle of a fetch? '].
+}.
+
+Baʼii barreessi: Dhugaa, dhaabi.

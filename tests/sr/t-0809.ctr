@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> вредности := Листа нови
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+вредности сваки: { :i :value
+	>> d := Речник нови.
+	d стави: value на: ['k'].
+	>> r := d код објекат.
+	Излаз пиши: r број-елемената, нови-ред.
+	Излаз пиши: ( (r на: ['k']) = value ), нови-ред.
+}.

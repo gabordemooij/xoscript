@@ -1,0 +1,43 @@
+#Linux
+>> OS := Program sustav: (Naredba uname -s), skrati.
+
+>> Slurp := Objekt novi.
+Slurp na: ['novi'] učini: {
+	svoj str := [''].
+}.
+Slurp na: ['odgovori:'] učini: { :blah
+		(svoj str ≠ ['']) istina: {
+			svoj str dodaj-na-kraj: [' '].
+		}.
+		svoj str dodaj-na-kraj: blah.
+}.
+Slurp na: ['odgovori:i:'] učini: { :blah :blahah
+		(svoj str ≠ ['']) istina: {
+			svoj str dodaj-na-kraj: [' '].
+		}.
+		(blah duljina > 1) istina: {
+			svoj str dodaj-na-kraj: (blah od: 0 duljina: (blah duljina - 1)).
+		}, inače: {
+			svoj str dodaj-na-kraj: blah.
+		}.
+		svoj str dodaj-na-kraj: [' '].
+		svoj str dodaj-na-kraj: blahah.
+}.
+Slurp na: ['obtain'] učini: {
+	>> buffer := svoj str.
+	svoj str := ['']. <- buffer.
+}.
+>> large text := [''].
+{
+	large text dodaj-na-kraj: ['hello'].
+} × 1000.
+
+
+Izlaz piši: (
+	Program sustav: (
+		Slurp novi
+			echo: large text,
+			| (['./xo ../../../tests/assets/stdin_test.ctr'] OS: OS)
+		) obtain
+).
+

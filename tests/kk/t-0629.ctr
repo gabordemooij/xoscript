@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Шығыс жазу: ['Database test'], жаңа-жол.
+
+>> db := Maria-DB жаңа хост: ['localhost'],
+	пайдаланушы-аты: ['xo'], құпиясөз: ['pass123'], дерекқор-атауы: ['xobase'], қосылу.
+
+Шығыс жазу: ['Can we connect? '] + db қосылған?, жаңа-жол.
+
+>> іздеу-параметрлері := db сұрау: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], параметрлер: ( Тізім жаңа ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  іздеу-параметрлері орындау. db бекіту. } ұстау: { :e db кері-қайтару.  }, іске-қосу.
+
+Шығыс жазу: ['Can we insert? '] + ( іздеу-параметрлері insert-id > 0 ), жаңа-жол.
+
+>> Obj := Нысан жаңа.
+Obj келгенде: ['retrieve-rows'] орында: {
+	өзінің саны := 0.
+	>> іздеу-параметрлері :=
+	db сұрау: ['SELECT * FROM book order by id desc limit 2'], 
+	алу: { :row 
+		өзінің саны қосу: 1.
+		Ақиқат үзу.
+	}. <- өзінің саны көшіру.
+}.
+
+Шығыс жазу: ['Can we query? '] + ( Obj retrieve-rows > 0 ), жаңа-жол.

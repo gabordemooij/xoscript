@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> зам := ['/tmp/test0821.csv'].
+>> file := Файл шинэ: зам.
+
+file бичих: ['a,b\n"1,2\n'].
+{
+	file тусгаарлагч: [','] хашилт: ['"'] мөрүүд: { :line
+		Гаралт бичих: line, шинэ-мөр.
+	}.
+} барих: { :e Гаралт бичих: e, шинэ-мөр. }, ажиллуулах.
+
+# a closed quote still works
+file бичих: ['a,b\n"1,2",3'].
+file тусгаарлагч: [','] хашилт: ['"'] мөрүүд: { :line
+	Гаралт бичих: line, шинэ-мөр.
+}.
+file устгах.

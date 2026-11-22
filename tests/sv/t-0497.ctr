@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := Fil ny: ['/tmp/test.gif'].
+f skriv: ['GIF87a01234567810'].
+
+# serve the file
+Server vidarebefordra: ['test.gif'] prefix: ['/tmp/'].
+
+Utdata stop.
+
+Utdata skriv: ['Outside container (security):'], stop.
+{ Server vidarebefordra: ['../passwd'] prefix: ['/tmp/']. }
+fånga: { :e Utdata skriv: e, stop. },
+starta.
+
+Utdata skriv: ['Invalid prefix:'], stop.
+{ Server vidarebefordra: ['test.gif'] prefix: ['z:\\']. }
+fånga: { :e Utdata skriv: e, stop. },
+starta.
+
+Utdata skriv: ['Non-existant file:'], stop.
+{ Server vidarebefordra: ['xxx.xxx'] prefix: ['/tmp/']. }
+fånga: { :e Utdata skriv: e, stop. },
+starta.

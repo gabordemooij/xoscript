@@ -1,0 +1,17 @@
+Utdata skriv: ['Test object'], stop.
+>> a := Objekt ny. 
+a ved: ['item:'] gjør: { :int64
+	egen int64 := int64. 
+}.
+a ved: ['item'] gjør: { <- egen int64.
+}.
+a item: ( Int64 fra-tekst: ['9999'] ).
+Utdata skriv: a item, stop.
+>> old-int64-address := a item prototype minneadresse.
+a save-as: ['/tmp/a.bin'].
+Utdata skriv: ['========== RELOADING SNAP:'], stop.
+>> b := Objekt load-from: ['/tmp/a.bin'].
+(b item prototype minneadresse = old-int64-address) sann: {
+	Utdata skriv: ['Object link re-attached.'], stop.
+}.
+Utdata skriv: ( b item ), stop.

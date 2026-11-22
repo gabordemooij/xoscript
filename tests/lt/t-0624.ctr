@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Objektas naujas.
+
+Log kai: ['say:'] daryti: { :str
+	Išvestis rašyti: str, nauja-eilutė.
+}.
+
+>> Item := Objektas naujas.
+
+Item kai: ['naujas:'] daryti: { :id <- pats naujas id: id.
+}.
+
+Item kai: ['id:'] daryti: { :id
+	savas id := id.
+}.
+
+Item kai: ['id'] daryti: { <- savas id. }.
+
+
+Item kai: ['tekstas'] daryti: {
+	>> str := ['Item#~no'].
+	str ~no: savas id. <- str.
+}.
+
+
+>> Print := Objektas naujas.
+
+Print kai: ['items'] daryti: { 
+	
+	savas item := Item naujas: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: savas item
+	).
+	
+	
+}.
+
+Print items.

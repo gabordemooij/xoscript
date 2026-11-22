@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Obýekt täze.
+
+Log gelende: ['say:'] et: { :str
+	Çykyş ýaz: str, täze-setir.
+}.
+
+>> Item := Obýekt täze.
+
+Item gelende: ['täze:'] et: { :id <- özi täze id: id.
+}.
+
+Item gelende: ['id:'] et: { :id
+	öz id := id.
+}.
+
+Item gelende: ['id'] et: { <- öz id. }.
+
+
+Item gelende: ['tekst'] et: {
+	>> str := ['Item#~no'].
+	str ~no: öz id. <- str.
+}.
+
+
+>> Print := Obýekt täze.
+
+Print gelende: ['items'] et: { 
+	
+	öz item := Item täze: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: öz item
+	).
+	
+	
+}.
+
+Print items.

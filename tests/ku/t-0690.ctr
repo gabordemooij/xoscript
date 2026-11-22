@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Derketin binivîse: ['Database test'], rêza-nû.
+
+>> db := Maria-DB nû mêvandar: ['localhost'],
+	navê-bikarhêner: ['xo'], şîfre: ['pass123'], navê-danegehê: ['xobase'], girêbide-pê.
+
+Derketin binivîse: ['Can we connect? '] + db girêdayî?, rêza-nû.
+
+>> parametreyên-lêgerînê := db lêpirsîn: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametre: ( Lîste nû ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  parametreyên-lêgerînê bixebitîne. db piştrast-bike. } bigire: { :e db vegerîne.  }, bide-destpêkirin.
+
+Derketin binivîse: ['Can we insert? '] + ( parametreyên-lêgerînê insert-id > 0 ), rêza-nû.
+
+>> x := 0.
+>> parametreyên-lêgerînê :=
+db lêpirsîn: ['SELECT * FROM book order by id desc limit 2'], 
+bîne: { :row 
+	x zêde-bike: 1.
+	Rast bibire. # must clean up, no 'Commands out of sync'
+}.
+
+>> parametreyên-lêgerînê :=
+db lêpirsîn: ['SELECT * FROM book order by id desc limit 2'], 
+bîne: { :row
+	x zêde-bike: 1.
+	Rast bibire.
+}.
+
+(x > 0) rast: {
+	Derketin binivîse: ['Can we break in the middle of a fetch? '].
+}.
+
+Derketin binivîse: Rast, rêza-nû.

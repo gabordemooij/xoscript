@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server tegura.
+Gahunda koresha: ['../../../src/xo/rw/webtools.xo'].
+
+>> Fake-Request := Ikintu gishya.
+Fake-Request bigeze: ['value:'] kora: { :agaciro
+	icyacyo agaciro := agaciro.
+}.
+Fake-Request bigeze: ['cookie:'] kora: { :izina <- icyacyo agaciro.
+}.
+
+>> Test-Session := Igihe-cya-dosiye-y-agateganyo gishya.
+Test-Session bigeze: ['zana'] kora: { <- Inkoranyamagambo gishya.
+}.
+Test-Session bigeze: ['session-id'] kora: { <- icyacyo id.
+}.
+
+>> cookies := Urutonde gishya
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies buri: { :i :cookie
+	>> icyifuzo-http := Fake-Request gishya.
+	icyifuzo-http value: cookie.
+	>> umuyobozi := Test-Session gishya.
+	>> web := Inyandiko-ya-Interineti gishya.
+	web icyifuzo-http: icyifuzo-http.
+	web umuyobozi-w-ibihe: umuyobozi.
+	web tangira-igihe.
+	Ibisohoka andika: ( umuyobozi session-id = cookie ), umurongo-mushya.
+}.
+
+>> web := Inyandiko-ya-Interineti gishya.
+web json: (Inkoranyamagambo gishya shyira: ['b'] kuri: ['a']).
+Ibisohoka andika: ['\n'], umurongo-mushya.
+
+{ Umuyoboro get: ['file:///etc/hostname']. } fata-ikosa: { :e
+	Ibisohoka andika: e, umurongo-mushya.
+}, tangira.
+
+>> svg := Dosiye gishya: ['/tmp/test0814.svg'].
+svg andika: ['<svg xmlns="x"></svg>'].
+Ibisohoka umurongo-mushya.
+Server hererekanya: ['test0814.svg'] imbanziriza: ['/tmp/'].
+svg siba.

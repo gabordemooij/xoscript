@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> cobanen := { :format :value
+	{ Wetonan tulis: ( (Format anyar: format) trapna: value ), baris-anyar. } cekel: { :e Wetonan tulis: e, baris-anyar. }, wiwiti.
+}.
+>> try-int := { :format :value
+	{ Wetonan tulis: ( (Format anyar: format) trapna-wilangan-wutuh: value ), baris-anyar. } cekel: { :e Wetonan tulis: e, baris-anyar. }, wiwiti.
+}.
+
+# fits
+cobanen trapna: ['|%s|'] lan: ['text'].
+cobanen trapna: ['%06.2f'] lan: 5.5.
+cobanen trapna: ['100%% %s'] lan: ['sure'].
+try-int trapna: ['%03d'] lan: 7.
+try-int trapna: ['%x'] lan: 255.
+cobanen trapna: ['%d'] lan: (Int64 anyar saka-teks: ['12']).
+cobanen trapna: ['%lld'] lan: (Int64 anyar saka-teks: ['12']).
+cobanen trapna: ['%.1lf'] lan: 5.5.
+try-int trapna: ['%hd'] lan: 7.
+
+# does not fit
+cobanen trapna: ['%s'] lan: 12345.
+cobanen trapna: ['%d'] lan: 12345.
+cobanen trapna: ['%f'] lan: ['text'].
+try-int trapna: ['%d'] lan: ['text'].
+try-int trapna: ['%s'] lan: 5.
+cobanen trapna: ['%s %s'] lan: ['text'].
+cobanen trapna: ['%n'] lan: ['text'].
+cobanen trapna: ['%*s'] lan: ['text'].
+cobanen trapna: ['%'] lan: ['text'].
+
+# length modifier does not fit
+cobanen trapna: ['%ls'] lan: ['text'].
+cobanen trapna: ['%Lf'] lan: 5.5.
+try-int trapna: ['%ld'] lan: 7.
+try-int trapna: ['%lld'] lan: 7.
+cobanen trapna: ['%Ld'] lan: (Int64 anyar saka-teks: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+cobanen trapna: ['%99999999999s'] lan: ['text'].

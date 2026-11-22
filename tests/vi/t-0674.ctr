@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> đường-dẫn := ['/tmp/dat.csv'].
+>> csv := Tệp mới: đường-dẫn.
+csv ghi: s.
+
+# accepts CRLF LF CR, varying row length
+csv dấu-phân-cách: [';'] dấu-nháy: ['"'] các-dòng: { :line
+	Chương-trình dọn-dẹp.
+	Xuất ghi: line, xuống-dòng.
+	Chương-trình dọn-dẹp.
+}.
+
+# unequal lines
+s thêm-cuối: ['\njustone'].
+csv ghi: s.
+{
+	csv dấu-phân-cách: [';'] dấu-nháy: ['"'] các-dòng: { :line
+		Xuất ghi: line, xuống-dòng.
+	}.
+} bắt-lỗi: { :e 
+	Xuất ghi: e, xuống-dòng.
+}, chạy.
+
+# invalid format
+s := ['"he"llo";world'].
+csv ghi: s.
+{
+	csv dấu-phân-cách: [';'] dấu-nháy: ['"'] các-dòng: { :line
+		Xuất ghi: line, xuống-dòng.
+	}.
+} bắt-lỗi: { :e 
+	Xuất ghi: e, xuống-dòng.
+}, chạy.

@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB نئون ميزبان: ⌝'localhost'⌜,
+	يوزر-نالو: ⌝'xo'⌜,
+	پاسورڊ: ⌝'pass123'⌜,
+	ڊيٽابيس-نالو: ⌝'xobase'⌜,
+	ڳنڍجو.
+
+>> conn2 := Maria-DB نئون ميزبان: ⌝'localhost'⌜,
+	يوزر-نالو: ⌝'xo'⌜,
+	پاسورڊ: ⌝'pass123'⌜,
+	ڊيٽابيس-نالو: ⌝'xobase'⌜,
+	ڳنڍجو.
+#...
+>> del := conn1 سوال: ⌝'DELETE FROM book WHERE id > 0'⌜.
+⎬  del عمل-ڪريو. conn1 پڪو-ڪريو. ⎨ پڪڙيو: ⎬ :e conn1 واپس-ورايو.  ⎨, هلايو.
+
+>> insert := conn1 سوال: ⌝'INSERT INTO book (id) VALUES(null)'⌜.
+insert عمل-ڪريو.
+
+>> ڳڻپ := conn1 سوال: ⌝'SELECT COUNT(*) AS num FROM book'⌜.
+ڳڻپ آڻيو: ⎬ :row آئوٽ-پٽ لکو: row num, نئين-سٽ. ⎨.
+
+# does not show up
+# insert not committed on connection 1
+>> ڳڻپ := conn2 سوال: ⌝'SELECT COUNT(*) AS num FROM book'⌜.
+ڳڻپ آڻيو: ⎬ :row آئوٽ-پٽ لکو: row num, نئين-سٽ. ⎨.

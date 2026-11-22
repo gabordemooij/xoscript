@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Caveau chiavi-crittografiche.
+>> sk := keys primo.
+>> pk := keys scorso.
+>> sig := Caveau firma: ['abc'] con: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Caveau firma: ['abc'] con: long. } catturare: { :e
+	Uscita scrivi: e, stop.
+}, correre.
+
+{ Caveau verifica: ['abc'] firma: long con: pk. } catturare: { :e
+	Uscita scrivi: e, stop.
+}, correre.
+
+{ Caveau verifica: ['abc'] firma: sig con: short. } catturare: { :e
+	Uscita scrivi: e, stop.
+}, correre.

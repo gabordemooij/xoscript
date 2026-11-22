@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Programa atminties-valdymas: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Programa nustatymas: ['FFITESTLIB'].
+
+
+
+Server susieti: (
+ Sąrašas naujas ;
+ libname ;
+ ['puts'] ;
+ ( Sąrašas naujas ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s atlaisvinti.
+
+# test with struct
+
+>> a := Blob naujas: 8.
+a bytes: (
+	Sąrašas <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Sąrašas <<: ['int'], ; ['int']).
+
+Server susieti: (
+	Sąrašas <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Sąrašas <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Išvestis rašyti: ['Sum test:'] + (ffitest ffisum: a), nauja-eilutė.
+
+struct atlaisvinti-struct.
+struct atlaisvinti.
+a atlaisvinti.

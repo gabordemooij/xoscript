@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Abu sabo.
+
+Log idan: ['say:'] yi: { :str
+	Fitarwa rubuta: str, sabon-layi.
+}.
+
+>> Item := Abu sabo.
+
+Item idan: ['sabo:'] yi: { :id <- kai sabo id: id.
+}.
+
+Item idan: ['id:'] yi: { :id
+	nasa id := id.
+}.
+
+Item idan: ['id'] yi: { <- nasa id. }.
+
+
+Item idan: ['rubutu'] yi: {
+	>> str := ['Item#~no'].
+	str ~no: nasa id. <- str.
+}.
+
+
+>> Print := Abu sabo.
+
+Print idan: ['items'] yi: { 
+	
+	nasa item := Item sabo: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: nasa item
+	).
+	
+	
+}.
+
+Print items.

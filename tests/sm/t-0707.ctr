@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Polokalama pulega-manatua: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB fou talimalo: ['localhost'],
+	igoa-tagata-faaaoga: ['xo'], upu-faataga: ['pass123'], igoa-faaputuga-faamatalaga: ['xobase'], fesootai-atu.
+
+>> TwoDigitFormat := Faatulagaga fou: ['%02d'].
+
+# Datetime
+{
+	>> tausaga := Numera i-le-va-o: 1995 ma: 2050, manoa.
+	>> masina := TwoDigitFormat faʻaaoga-numera-atoa: (Numera i-le-va-o: 1 ma: 12), manoa.
+	>> aso := TwoDigitFormat faʻaaoga-numera-atoa: (Numera i-le-va-o: 1 ma: 28), manoa.
+	>> itula := TwoDigitFormat faʻaaoga-numera-atoa: (Numera i-le-va-o: 1 ma: 23), manoa.
+	>> minute := TwoDigitFormat faʻaaoga-numera-atoa: (Numera i-le-va-o: 1 ma: 59), manoa.
+	>> sekone := TwoDigitFormat faʻaaoga-numera-atoa: (Numera i-le-va-o: 1 ma: 59), manoa.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: tausaga,
+		MM: masina,
+		DD: aso,
+		HH: itula,
+		II: minute,
+		SS: sekone.
+	>> mea-suesue :=
+	db fesili-faamatalaga: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	aumai: { :row
+		(row mydatetime = datetime) sese: {
+			lenei-galuega mea-sese: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter faʻaopoopo: 1.
+} * 100.
+
+# Date
+{
+	>> tausaga := Numera i-le-va-o: 1995 ma: 2050, manoa.
+	>> masina := TwoDigitFormat faʻaaoga-numera-atoa: (Numera i-le-va-o: 1 ma: 12), manoa.
+	>> aso := TwoDigitFormat faʻaaoga-numera-atoa: (Numera i-le-va-o: 1 ma: 28), manoa.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: tausaga,
+		MM: masina,
+		DD: aso.
+	>> mea-suesue :=
+	db fesili-faamatalaga: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	aumai: { :row
+		(row mydate = date) sese: {
+			lenei-galuega mea-sese: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter faʻaopoopo: 1.
+} * 100.
+
+
+# Time
+{
+	>> itula := TwoDigitFormat faʻaaoga-numera-atoa: (Numera i-le-va-o: 1 ma: 23), manoa.
+	>> minute := TwoDigitFormat faʻaaoga-numera-atoa: (Numera i-le-va-o: 1 ma: 59), manoa.
+	>> sekone := TwoDigitFormat faʻaaoga-numera-atoa: (Numera i-le-va-o: 1 ma: 59), manoa.
+	>> taimi := ['HH:II:SS'].
+	taimi
+		HH: itula,
+		II: minute,
+		SS: sekone.
+	>> mea-suesue :=
+	db fesili-faamatalaga: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: taimi),
+	aumai: { :row
+		(row mytime = taimi) sese: {
+			lenei-galuega mea-sese: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter faʻaopoopo: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lisi fou faatumu: 100000 i-le: ['x'], tuufaatasi: [''].
+{
+	>> str2 := Pusa-malu token: 40.
+	>> mea-suesue :=
+	db fesili-faamatalaga: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	aumai: { :row
+		(row str1 = str1 ma: row str2 = str2) sese: {
+			lenei-galuega mea-sese: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter faʻaopoopo: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Numera i-le-va-o: 1 ma: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 mai-le-manoa: ['9223372036854775807'] ) -
+		( Int64 mai-le-manoa: ['99999'] ) +
+		( Int64 mai-le-manoa: n1 manoa )
+	).
+	>> mea-suesue :=
+	db fesili-faamatalaga: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	aumai: { :row
+		(row n1 = n1) sese: {
+			lenei-galuega mea-sese: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) sese: {
+			lenei-galuega mea-sese: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 faʻalatalata-numera) sese: {
+			lenei-galuega mea-sese: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) sese: {
+			lenei-galuega mea-sese: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter faʻaopoopo: 1.
+} * 100.
+
+
+Tuuina-atu tusi: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), laina-fou.

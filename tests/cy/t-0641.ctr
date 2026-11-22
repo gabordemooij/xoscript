@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Geiriadur newydd
+	# ASCII only
+	rhoi: ( Rhestr newydd ; 65 ; 65 ; 65 ; 65 ; 0 ) yn: ['AAAA'],
+	# valid 2 byte sequence
+	rhoi: ( Rhestr newydd ; 194 ; 162 ; 0 ) yn: ['¢'],
+	# Valid 3-byte UTF-8
+    rhoi: ( Rhestr newydd ; 226 ; 130 ; 172 ; 0 ) yn: ['€'],
+	# Valid 4-byte UTF-8
+    rhoi: ( Rhestr newydd ; 240 ; 144 ; 141 ; 136 ; 0 ) yn: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    rhoi: ( Rhestr newydd ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) yn: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    rhoi: ( Rhestr newydd ; 65 ; 193 ; 129 ; 0 ) yn: ['A?'],
+	# Invalid first byte (0xFF)
+    rhoi: ( Rhestr newydd ; 255 ; 0 ) yn: ['?'],
+	# Incomplete multi-byte sequence at end
+    rhoi: ( Rhestr newydd ; 66 ; 226 ; 0 ) yn: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    rhoi: ( Rhestr newydd ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) yn: ['A€?𐍈B'].
+	 
+utf8cases pob: { :key :value
+	>> blob := Blob newydd: value cyfrif, bytes: value.
+	>> str := blob llinyn.
+	(str = key) gwir: {
+		Allbwn ysgrifennu: ['OK'], llinell-newydd.
+	}, arall: {
+		Allbwn ysgrifennu: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, llinell-newydd.
+	}.
+	blob rhyddhau.
+}.

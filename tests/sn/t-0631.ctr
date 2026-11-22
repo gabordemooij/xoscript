@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Chirongwa kutonga-ndangariro: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Chirongwa gadziriso: ['FFITESTLIB'].
+
+
+
+Server batanidza-ne: (
+ Rondedzero nyowani ;
+ libname ;
+ ['puts'] ;
+ ( Rondedzero nyowani ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s sunungura.
+
+# test with struct
+
+>> a := Blob nyowani: 8.
+a bytes: (
+	Rondedzero <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Rondedzero <<: ['int'], ; ['int']).
+
+Server batanidza-ne: (
+	Rondedzero <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Rondedzero <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Zvabuda nyora: ['Sum test:'] + (ffitest ffisum: a), mutsara-mutsva.
+
+struct sunungura-struct.
+struct sunungura.
+a sunungura.

@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Dizziunariu novu
+	# ASCII only
+	mette: ( Lista novu ; 65 ; 65 ; 65 ; 65 ; 0 ) à: ['AAAA'],
+	# valid 2 byte sequence
+	mette: ( Lista novu ; 194 ; 162 ; 0 ) à: ['¢'],
+	# Valid 3-byte UTF-8
+    mette: ( Lista novu ; 226 ; 130 ; 172 ; 0 ) à: ['€'],
+	# Valid 4-byte UTF-8
+    mette: ( Lista novu ; 240 ; 144 ; 141 ; 136 ; 0 ) à: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    mette: ( Lista novu ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) à: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    mette: ( Lista novu ; 65 ; 193 ; 129 ; 0 ) à: ['A?'],
+	# Invalid first byte (0xFF)
+    mette: ( Lista novu ; 255 ; 0 ) à: ['?'],
+	# Incomplete multi-byte sequence at end
+    mette: ( Lista novu ; 66 ; 226 ; 0 ) à: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    mette: ( Lista novu ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) à: ['A€?𐍈B'].
+	 
+utf8cases ognunu: { :key :value
+	>> blob := Blob novu: value cuntà, bytes: value.
+	>> str := blob testu.
+	(str = key) veru: {
+		Esciuta scrive: ['OK'], linea-nova.
+	}, altrimenti: {
+		Esciuta scrive: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, linea-nova.
+	}.
+	blob liberà.
+}.

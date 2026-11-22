@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Гаралт бичих: ['Database test'], шинэ-мөр.
+
+>> db := Maria-DB шинэ хост: ['localhost'],
+	хэрэглэгчийн-нэр: ['xo'], нууц-үг: ['pass123'], өгөгдлийн-сангийн-нэр: ['xobase'], холбогдох.
+
+Гаралт бичих: ['Can we connect? '] + db холбогдсон?, шинэ-мөр.
+
+>> хайлтын-параметрүүд := db асуулга: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], параметрүүд: ( Жагсаалт шинэ ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  хайлтын-параметрүүд гүйцэтгэх. db батлах. } барих: { :e db буцаах.  }, ажиллуулах.
+
+Гаралт бичих: ['Can we insert? '] + ( хайлтын-параметрүүд insert-id > 0 ), шинэ-мөр.
+
+>> x := 0.
+>> хайлтын-параметрүүд :=
+db асуулга: ['SELECT * FROM book order by id desc limit 2'], 
+татах: { :row 
+	x нэмэх: 1.
+	Үнэн таслах. # must clean up, no 'Commands out of sync'
+}.
+
+>> хайлтын-параметрүүд :=
+db асуулга: ['SELECT * FROM book order by id desc limit 2'], 
+татах: { :row
+	x нэмэх: 1.
+	Үнэн таслах.
+}.
+
+(x > 0) үнэн-бол: {
+	Гаралт бичих: ['Can we break in the middle of a fetch? '].
+}.
+
+Гаралт бичих: Үнэн, шинэ-мөр.

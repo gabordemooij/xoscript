@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server mulakan-awal.
+Atur-cara guna: ['../../../src/xo/ms/webtools.xo'].
+
+>> Fake-Request := Objek baharu.
+Fake-Request apabila: ['value:'] lakukan: { :nilai
+	milik nilai := nilai.
+}.
+Fake-Request apabila: ['cookie:'] lakukan: { :nama <- milik nilai.
+}.
+
+>> Test-Session := Sesi-fail-sementara baharu.
+Test-Session apabila: ['muatkan'] lakukan: { <- Kamus baharu.
+}.
+Test-Session apabila: ['session-id'] lakukan: { <- milik id.
+}.
+
+>> cookies := Senarai baharu
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies setiap: { :i :cookie
+	>> permintaan-http := Fake-Request baharu.
+	permintaan-http value: cookie.
+	>> pengurus := Test-Session baharu.
+	>> web := Dokumen-Web baharu.
+	web permintaan-http: permintaan-http.
+	web pengurus-sesi: pengurus.
+	web mulakan-sesi.
+	Keluaran tulis: ( pengurus session-id = cookie ), baris-baharu.
+}.
+
+>> web := Dokumen-Web baharu.
+web json: (Kamus baharu letak: ['b'] di: ['a']).
+Keluaran tulis: ['\n'], baris-baharu.
+
+{ Rangkaian get: ['file:///etc/hostname']. } tangkap: { :e
+	Keluaran tulis: e, baris-baharu.
+}, mula.
+
+>> svg := Fail baharu: ['/tmp/test0814.svg'].
+svg tulis: ['<svg xmlns="x"></svg>'].
+Keluaran baris-baharu.
+Server teruskan: ['test0814.svg'] awalan: ['/tmp/'].
+svg padam.

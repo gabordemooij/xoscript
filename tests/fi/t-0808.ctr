@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Holvi luo-avaimet.
+>> sk := keys ensimmäinen.
+>> pk := keys viimeinen.
+>> sig := Holvi allekirjoita: ['abc'] avaimella: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Holvi allekirjoita: ['abc'] avaimella: long. } sieppaa: { :e
+	Tuloste kirjoita: e, rivinvaihto.
+}, käynnistä.
+
+{ Holvi tarkista: ['abc'] allekirjoitus: long avaimella: pk. } sieppaa: { :e
+	Tuloste kirjoita: e, rivinvaihto.
+}, käynnistä.
+
+{ Holvi tarkista: ['abc'] allekirjoitus: sig avaimella: short. } sieppaa: { :e
+	Tuloste kirjoita: e, rivinvaihto.
+}, käynnistä.

@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB sabo mai-masauki: ['localhost'],
+	sunan-mai-amfani: ['xo'],
+	kalmar-sirri: ['pass123'],
+	sunan-rumbun-bayanai: ['xobase'],
+	haɗu.
+
+>> sigogin-nema := db tambaya: ['SELECT ? AS a, ? AS b, ? AS c'].
+sigogin-nema sigogi: (Jeri sabo ; ['1']).
+{ sigogin-nema ɗauko: { :row Fitarwa rubuta: row, sabon-layi. }. } kama: { :e Fitarwa rubuta: e, sabon-layi. }, fara.
+
+>> sigogin-nema := db tambaya: ['SELECT ? AS a'].
+{ sigogin-nema ɗauko: { :row Fitarwa rubuta: row, sabon-layi. }. } kama: { :e Fitarwa rubuta: e, sabon-layi. }, fara.
+
+# the right number still works, more parameters are ignored as before
+>> sigogin-nema := db tambaya: ['SELECT ? AS a, ? AS b'].
+sigogin-nema sigogi: (Jeri sabo ; ['1'] ; ['2']).
+sigogin-nema ɗauko: { :row Fitarwa rubuta: (row a: ['a']), rubuta: (row a: ['b']), sabon-layi. }.
+sigogin-nema sigogi: (Jeri sabo ; ['1'] ; ['2'] ; ['3']).
+sigogin-nema ɗauko: { :row Fitarwa rubuta: (row a: ['a']), rubuta: (row a: ['b']), sabon-layi. }.

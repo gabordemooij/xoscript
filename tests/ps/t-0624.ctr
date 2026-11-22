@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := څیز نوی.
+
+Log کله: ⌝'say:'⌜ وکړه: ⎬ :str
+	وتنه ولیکه: str, نوې-کرښه.
+⎨.
+
+>> Item := څیز نوی.
+
+Item کله: ⌝'نوی:'⌜ وکړه: ⎬ :id <- ځان نوی id: id.
+⎨.
+
+Item کله: ⌝'id:'⌜ وکړه: ⎬ :id
+	خپل id := id.
+⎨.
+
+Item کله: ⌝'id'⌜ وکړه: ⎬ <- خپل id. ⎨.
+
+
+Item کله: ⌝'په-متن'⌜ وکړه: ⎬
+	>> str := ⌝'Item#~no'⌜.
+	str ~no: خپل id. <- str.
+⎨.
+
+
+>> Print := څیز نوی.
+
+Print کله: ⌝'items'⌜ وکړه: ⎬ 
+	
+	خپل item := Item نوی: 1.
+	
+	# either segfault or wrong str here
+	Log say: ﴿
+		⌝'~item printed.'⌜ ~item: خپل item
+	﴾.
+	
+	
+⎨.
+
+Print items.

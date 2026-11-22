@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> yaali := { :format :value
+	{ Baʼii barreessi: ( (Bifa haaraa: format) raawwadhu: value ), dhaabi. } qabi: { :e Baʼii barreessi: e, dhaabi. }, fiigi.
+}.
+>> try-int := { :format :value
+	{ Baʼii barreessi: ( (Bifa haaraa: format) raawwadhu-lakkoofsa-guutuu: value ), dhaabi. } qabi: { :e Baʼii barreessi: e, dhaabi. }, fiigi.
+}.
+
+# fits
+yaali raawwadhu: ['|%s|'] fi: ['text'].
+yaali raawwadhu: ['%06.2f'] fi: 5.5.
+yaali raawwadhu: ['100%% %s'] fi: ['sure'].
+try-int raawwadhu: ['%03d'] fi: 7.
+try-int raawwadhu: ['%x'] fi: 255.
+yaali raawwadhu: ['%d'] fi: (Int64 haaraa barreeffama-irraa: ['12']).
+yaali raawwadhu: ['%lld'] fi: (Int64 haaraa barreeffama-irraa: ['12']).
+yaali raawwadhu: ['%.1lf'] fi: 5.5.
+try-int raawwadhu: ['%hd'] fi: 7.
+
+# does not fit
+yaali raawwadhu: ['%s'] fi: 12345.
+yaali raawwadhu: ['%d'] fi: 12345.
+yaali raawwadhu: ['%f'] fi: ['text'].
+try-int raawwadhu: ['%d'] fi: ['text'].
+try-int raawwadhu: ['%s'] fi: 5.
+yaali raawwadhu: ['%s %s'] fi: ['text'].
+yaali raawwadhu: ['%n'] fi: ['text'].
+yaali raawwadhu: ['%*s'] fi: ['text'].
+yaali raawwadhu: ['%'] fi: ['text'].
+
+# length modifier does not fit
+yaali raawwadhu: ['%ls'] fi: ['text'].
+yaali raawwadhu: ['%Lf'] fi: 5.5.
+try-int raawwadhu: ['%ld'] fi: 7.
+try-int raawwadhu: ['%lld'] fi: 7.
+yaali raawwadhu: ['%Ld'] fi: (Int64 haaraa barreeffama-irraa: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+yaali raawwadhu: ['%99999999999s'] fi: ['text'].

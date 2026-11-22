@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+آؤٹ-پٹ لکھو: ⌝'Database test'⌜, نئی-سطر.
+
+>> db := Maria-DB نیا میزبان: ⌝'localhost'⌜,
+	صارف-نام: ⌝'xo'⌜, پاسورڈ: ⌝'pass123'⌜, ڈیٹابیس-نام: ⌝'xobase'⌜, جڑو.
+
+آؤٹ-پٹ لکھو: ⌝'Can we connect? '⌜ + db جڑا-ہے?, نئی-سطر.
+
+>> تلاش-پیرامیٹر := db استفسار: ⌝'
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'⌜, پیرامیٹر: ﴿ لسٹ نیا ; ⌝'abc'⌜ ; 12.35 ; 6 ﴾. # parameterized queries
+
+⎬  تلاش-پیرامیٹر عمل-کرو. db توثیق. ⎨ پکڑو: ⎬ :e db واپس-لو.  ⎨, چلاؤ.
+
+آؤٹ-پٹ لکھو: ⌝'Can we insert? '⌜ + ﴿ تلاش-پیرامیٹر insert-id > 0 ﴾, نئی-سطر.
+
+>> x := 0.
+>> تلاش-پیرامیٹر :=
+db استفسار: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+حاصل: ⎬ :row 
+	x جمع: 1.
+	سچ توڑو. # must clean up, no 'Commands out of sync'
+⎨.
+
+>> تلاش-پیرامیٹر :=
+db استفسار: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+حاصل: ⎬ :row
+	x جمع: 1.
+	سچ توڑو.
+⎨.
+
+﴿x > 0﴾ اگر-سچ: ⎬
+	آؤٹ-پٹ لکھو: ⌝'Can we break in the middle of a fetch? '⌜.
+⎨.
+
+آؤٹ-پٹ لکھو: سچ, نئی-سطر.

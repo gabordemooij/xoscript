@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server эхлүүлэх.
+Програм ашиглах: ['../../../src/xo/mn/webtools.xo'].
+
+>> Fake-Request := Объект шинэ.
+Fake-Request ирэхэд: ['value:'] гүйцэтгэ: { :утга
+	өөрийн утга := утга.
+}.
+Fake-Request ирэхэд: ['cookie:'] гүйцэтгэ: { :нэр <- өөрийн утга.
+}.
+
+>> Test-Session := Түр-файлын-сесс шинэ.
+Test-Session ирэхэд: ['ачаалах'] гүйцэтгэ: { <- Толь шинэ.
+}.
+Test-Session ирэхэд: ['session-id'] гүйцэтгэ: { <- өөрийн id.
+}.
+
+>> cookies := Жагсаалт шинэ
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies бүр: { :i :cookie
+	>> хүсэлт := Fake-Request шинэ.
+	хүсэлт value: cookie.
+	>> менежер := Test-Session шинэ.
+	>> web := Вэб-баримт шинэ.
+	web хүсэлт: хүсэлт.
+	web сесс-менежер: менежер.
+	web сессийг-эхлүүлэх.
+	Гаралт бичих: ( менежер session-id = cookie ), шинэ-мөр.
+}.
+
+>> web := Вэб-баримт шинэ.
+web json: (Толь шинэ хийх: ['b'] түлхүүр: ['a']).
+Гаралт бичих: ['\n'], шинэ-мөр.
+
+{ Сүлжээ get: ['file:///etc/hostname']. } барих: { :e
+	Гаралт бичих: e, шинэ-мөр.
+}, ажиллуулах.
+
+>> svg := Файл шинэ: ['/tmp/test0814.svg'].
+svg бичих: ['<svg xmlns="x"></svg>'].
+Гаралт шинэ-мөр.
+Server дамжуулах: ['test0814.svg'] угтвар: ['/tmp/'].
+svg устгах.

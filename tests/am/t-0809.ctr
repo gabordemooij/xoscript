@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> ዋጋዎች := ሰልፍ አዲስ
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+ዋጋዎች እያንዳንዱ: { :i :value
+	>> d := መዝገበ-ቃላት አዲስ.
+	d አኑር: value ቁልፍ: ['k'].
+	>> r := d ኮድ እንደ-ነገር.
+	ውጤት ፃፍ: r ብዛት, አዲስ-መስመር.
+	ውጤት ፃፍ: ( (r በቦታ: ['k']) = value ), አዲስ-መስመር.
+}.

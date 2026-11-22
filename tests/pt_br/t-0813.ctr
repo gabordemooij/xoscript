@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inicializar.
+Programa usar: ['../../../src/xo/pt_br/webtools.xo'].
+Programa usar: ['../../../src/xo/pt_br/mailtools.xo'].
+
+>> cabeçalho := Cabeçalho-HTTP novo chave: ['Location'] valor: ['/ok\r\nX-Injected: yes'].
+Saída escrever: cabeçalho.
+
+>> web := Documento-Web novo.
+web ir-para: ['/ok\r\nX-Injected: yes'].
+Saída escrever: ['\n'], stop.
+
+>> mail := Email novo.
+mail destinatário: (Listar novo ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Listar novo ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Listar novo ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail remetente: ['d@example.invalid\r\nX-From: yes'] nome: ['site\r\nX-Name: yes'].
+mail assunto: ['hello\r\nX-Subject: yes'].
+mail corpo: ['line1\r\nline2'].
+Saída escrever: mail gerar.
+
+>> html := Email-HTML novo.
+html destinatário: (Listar novo ; ['a@example.invalid\r\nX-To: yes']).
+html remetente: ['d@example.invalid'] nome: ['site'].
+html assunto: ['hello\r\nX-Subject: yes'].
+html corpo: ['body'].
+Saída escrever: ( html gerar contem: ['\nX-'] ), stop.
+Saída escrever: ( html gerar contem: ['X-To: yes'] ), stop.

@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := 对象 新建.
+
+Log 在: ['say:'] 执行: { :str
+	输出 写入: str, 停止.
+}.
+
+>> Item := 对象 新建.
+
+Item 在: ['新建:'] 执行: { :id <- 自身 新建 id: id.
+}.
+
+Item 在: ['id:'] 执行: { :id
+	拥有 id := id.
+}.
+
+Item 在: ['id'] 执行: { <- 拥有 id. }.
+
+
+Item 在: ['转文本'] 执行: {
+	>> str := ['Item#~no'].
+	str ~no: 拥有 id. <- str.
+}.
+
+
+>> Print := 对象 新建.
+
+Print 在: ['items'] 执行: { 
+	
+	拥有 item := Item 新建: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: 拥有 item
+	).
+	
+	
+}.
+
+Print items.

@@ -1,0 +1,25 @@
+Uddata skriv: ['Test object'], stop.
+>> a := Objekt ny. 
+
+a ved: ['item:'] gør: { :nil
+	egen nil := nil. 
+}.
+
+a ved: ['item'] gør: { <- egen nil.
+}.
+
+a item: Intet.
+
+Uddata skriv: a item, stop.
+
+>> old-nil-address := a item prototype hukommelsesadresse.
+a save-as: ['/tmp/a.bin'].
+Uddata skriv: ['========== RELOADING SNAP:'], stop.
+
+>> b := Objekt load-from: ['/tmp/a.bin'].
+
+(b item prototype hukommelsesadresse = old-nil-address) sand: {
+	Uddata skriv: ['Object link re-attached.'], stop.
+}.
+
+Uddata skriv: b item, stop.

@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+പ്രോഗ്രാം മെമ്മറി-നിർവഹണം: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := പ്രോഗ്രാം ക്രമീകരണം: ['FFITESTLIB'].
+
+
+
+Server കണ്ണി: (
+ ശ്രേണി പുതിയ ;
+ libname ;
+ ['puts'] ;
+ ( ശ്രേണി പുതിയ ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s സ്വതന്ത്രമാക്കുക.
+
+# test with struct
+
+>> a := Blob പുതിയ: 8.
+a bytes: (
+	ശ്രേണി <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (ശ്രേണി <<: ['int'], ; ['int']).
+
+Server കണ്ണി: (
+	ശ്രേണി <<: ['@structtest'], ;
+	['@structtest'] ;
+	(ശ്രേണി <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+ഔട്ട്പുട്ട് എഴുതുക: ['Sum test:'] + (ffitest ffisum: a), പുതിയ-വരി.
+
+struct struct-സ്വതന്ത്രമാക്കുക.
+struct സ്വതന്ത്രമാക്കുക.
+a സ്വതന്ത്രമാക്കുക.

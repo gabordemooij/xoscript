@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server инициализировать.
+Программа импортировать: ['../../../src/xo/ru/webtools.xo'].
+
+>> Fake-Request := Объект новый.
+Fake-Request в: ['value:'] сделать: { :величина
+	мой величина := величина.
+}.
+Fake-Request в: ['cookie:'] сделать: { :имя <- мой величина.
+}.
+
+>> Test-Session := Сессия-временный-файл новый.
+Test-Session в: ['загрузить'] сделать: { <- Карта новый.
+}.
+Test-Session в: ['session-id'] сделать: { <- мой id.
+}.
+
+>> cookies := Список новый
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies каждый: { :i :cookie
+	>> http-запрос := Fake-Request новый.
+	http-запрос value: cookie.
+	>> менеджер := Test-Session новый.
+	>> web := Веб-документ новый.
+	web http-запрос: http-запрос.
+	web менеджер-сессий: менеджер.
+	web начать-сессию.
+	Выход написать: ( менеджер session-id = cookie ), стоп.
+}.
+
+>> web := Веб-документ новый.
+web json: (Карта новый разместить: ['b'] в: ['a']).
+Выход написать: ['\n'], стоп.
+
+{ Сеть get: ['file:///etc/hostname']. } впоймать: { :e
+	Выход написать: e, стоп.
+}, запуск.
+
+>> svg := Файл новый: ['/tmp/test0814.svg'].
+svg написать: ['<svg xmlns="x"></svg>'].
+Выход стоп.
+Server передача: ['test0814.svg'] префикс: ['/tmp/'].
+svg удалить.

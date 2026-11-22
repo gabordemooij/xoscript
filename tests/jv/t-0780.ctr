@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Dhaptar anyar ;
+	# {"key":"normal"} normal ASCII
+	( Kamus anyar seleh: ['normal'] ing: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Kamus anyar seleh: ['hello world'] ing: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Kamus anyar seleh: ['"'] ing: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Kamus anyar seleh: ['backslash: \\'] ing: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Kamus anyar seleh: ['slash: /'] ing: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Kamus anyar seleh: ['backspace: \b'] ing: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Kamus anyar seleh: ['formfeed: \f'] ing: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Kamus anyar seleh: ['newline: \n'] ing: ['key'] ) ;
+	( Kamus anyar seleh: ['newline: ↵'] ing: ['key'] ) ;
+	( Kamus anyar seleh: ['newline: 
+	'] ing: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Kamus anyar seleh: ['carriage return: \r'] ing: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Kamus anyar seleh: ['tab \t'] ing: ['key'] ) ;
+	( Kamus anyar seleh: ['tab ⇿'] ing: ['key'] ) ;
+	( Kamus anyar seleh: ['tab  '] ing: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Kamus anyar seleh: ['NUL \u0000'] ing: ['key'] ) ;
+	( Kamus anyar seleh: ['NUL \0'] ing: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Kamus anyar seleh: ['control: \u0001'] ing: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Kamus anyar seleh: ['control: \u001F'] ing: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Kamus anyar seleh: ['unicode: é'] ing: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Kamus anyar seleh: ['unicode: €'] ing: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Kamus anyar seleh: ['unicode: 日本語'] ing: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Kamus anyar seleh: ['unicode: 😀'] ing: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Kamus anyar seleh: ['unicode: 🧑‍💻'] ing: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Kamus anyar seleh: ['combining: e\u0301'] ing: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Kamus anyar seleh: ['escaped unicode: \u00e9'] ing: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Kamus anyar seleh: ['escaped unicode: \u20ac'] ing: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Kamus anyar seleh: ['escaped unicode: \ud83d\ude00'] ing: ['key'] ) ;
+	# {"key":""} empty value
+	( Kamus anyar seleh: [''] ing: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Kamus anyar seleh: ['@ < > & = % + ? #'] ing: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Kamus anyar seleh: ['''] ing: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Kamus anyar seleh: ['multiple: \" \\ \n \r \t'] ing: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Kamus anyar seleh: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] ing: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Kamus anyar seleh: [' value'] ing: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Kamus anyar seleh: ['value '] ing: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Kamus anyar seleh: [' \t\n\r '] ing: ['key'] ).
+
+dicts saben: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Kamus anyar seleh: d key ing: ['key']).
+	>> b := JSON jsonify: (Kamus anyar seleh: ['value'] ing: d key).
+	>> e := JSON obyek: a.
+	>> f := JSON obyek: b.
+	((e key = d key lan: (f ? d key = ['value'])) utawa: (e key = ['NUL ?'])) bener: {
+		Wetonan tulis: ['OK'], baris-anyar.
+	}, yen-ora: {
+		Wetonan tulis: ['Unable to properly encode/decode: '] + d + j, baris-anyar.
+		Program rampungna.
+	}.
+}.

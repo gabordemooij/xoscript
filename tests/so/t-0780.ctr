@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Liis cusub ;
+	# {"key":"normal"} normal ASCII
+	( Qaamuus cusub dhig: ['normal'] furaha: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Qaamuus cusub dhig: ['hello world'] furaha: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Qaamuus cusub dhig: ['"'] furaha: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Qaamuus cusub dhig: ['backslash: \\'] furaha: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Qaamuus cusub dhig: ['slash: /'] furaha: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Qaamuus cusub dhig: ['backspace: \b'] furaha: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Qaamuus cusub dhig: ['formfeed: \f'] furaha: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Qaamuus cusub dhig: ['newline: \n'] furaha: ['key'] ) ;
+	( Qaamuus cusub dhig: ['newline: ↵'] furaha: ['key'] ) ;
+	( Qaamuus cusub dhig: ['newline: 
+	'] furaha: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Qaamuus cusub dhig: ['carriage return: \r'] furaha: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Qaamuus cusub dhig: ['tab \t'] furaha: ['key'] ) ;
+	( Qaamuus cusub dhig: ['tab ⇿'] furaha: ['key'] ) ;
+	( Qaamuus cusub dhig: ['tab  '] furaha: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Qaamuus cusub dhig: ['NUL \u0000'] furaha: ['key'] ) ;
+	( Qaamuus cusub dhig: ['NUL \0'] furaha: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Qaamuus cusub dhig: ['control: \u0001'] furaha: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Qaamuus cusub dhig: ['control: \u001F'] furaha: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Qaamuus cusub dhig: ['unicode: é'] furaha: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Qaamuus cusub dhig: ['unicode: €'] furaha: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Qaamuus cusub dhig: ['unicode: 日本語'] furaha: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Qaamuus cusub dhig: ['unicode: 😀'] furaha: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Qaamuus cusub dhig: ['unicode: 🧑‍💻'] furaha: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Qaamuus cusub dhig: ['combining: e\u0301'] furaha: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Qaamuus cusub dhig: ['escaped unicode: \u00e9'] furaha: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Qaamuus cusub dhig: ['escaped unicode: \u20ac'] furaha: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Qaamuus cusub dhig: ['escaped unicode: \ud83d\ude00'] furaha: ['key'] ) ;
+	# {"key":""} empty value
+	( Qaamuus cusub dhig: [''] furaha: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Qaamuus cusub dhig: ['@ < > & = % + ? #'] furaha: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Qaamuus cusub dhig: ['''] furaha: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Qaamuus cusub dhig: ['multiple: \" \\ \n \r \t'] furaha: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Qaamuus cusub dhig: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] furaha: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Qaamuus cusub dhig: [' value'] furaha: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Qaamuus cusub dhig: ['value '] furaha: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Qaamuus cusub dhig: [' \t\n\r '] furaha: ['key'] ).
+
+dicts mid-kasta: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Qaamuus cusub dhig: d key furaha: ['key']).
+	>> b := JSON jsonify: (Qaamuus cusub dhig: ['value'] furaha: d key).
+	>> e := JSON walax: a.
+	>> f := JSON walax: b.
+	((e key = d key iyo: (f ? d key = ['value'])) ama: (e key = ['NUL ?'])) run: {
+		Soo-saar qor: ['OK'], sadar-cusub.
+	}, haddii-kale: {
+		Soo-saar qor: ['Unable to properly encode/decode: '] + d + j, sadar-cusub.
+		Barnaamij dhammee.
+	}.
+}.

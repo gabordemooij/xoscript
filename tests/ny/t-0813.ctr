@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server konzekera.
+Pulogalamu gwiritsa-chida: ['../../../src/xo/ny/webtools.xo'].
+Pulogalamu gwiritsa-chida: ['../../../src/xo/ny/mailtools.xo'].
+
+>> mutu := Mutu-wa-HTTP chatsopano kiyi: ['Location'] mtengo: ['/ok\r\nX-Injected: yes'].
+Zotuluka lembani: mutu.
+
+>> web := Chikalata-cha-Webusayiti chatsopano.
+web pita-ku: ['/ok\r\nX-Injected: yes'].
+Zotuluka lembani: ['\n'], mzere-watsopano.
+
+>> mail := Imelo chatsopano.
+mail kwa: (Mndandanda chatsopano ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Mndandanda chatsopano ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Mndandanda chatsopano ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail wotumiza: ['d@example.invalid\r\nX-From: yes'] dzina: ['site\r\nX-Name: yes'].
+mail nkhani: ['hello\r\nX-Subject: yes'].
+mail thupi: ['line1\r\nline2'].
+Zotuluka lembani: mail pangani.
+
+>> html := Imelo-HTML chatsopano.
+html kwa: (Mndandanda chatsopano ; ['a@example.invalid\r\nX-To: yes']).
+html wotumiza: ['d@example.invalid'] dzina: ['site'].
+html nkhani: ['hello\r\nX-Subject: yes'].
+html thupi: ['body'].
+Zotuluka lembani: ( html pangani muli: ['\nX-'] ), mzere-watsopano.
+Zotuluka lembani: ( html pangani muli: ['X-To: yes'] ), mzere-watsopano.

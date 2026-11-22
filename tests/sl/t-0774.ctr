@@ -1,0 +1,23 @@
+Izhod piši: ['Test object'], nova-vrstica.
+>> a := Objekt nov. 
+a ob: ['item:'] izvedi: { :lst
+	svoj lst := lst. 
+}.
+a ob: ['item'] izvedi: { <- svoj lst.
+}.
+a item: (
+	Seznam nov ; 1 ; (
+		Seznam nov ; ['a'] ; (
+			Seznam nov ; ( Trenutek nov: 1 )
+		) ; ( Int64 iz-besedila: ['321'] )
+	)
+).
+Izhod piši: a item, nova-vrstica.
+>> old-lst-address := a item prototip pomnilniški-naslov.
+a save-as: ['/tmp/a.bin'].
+Izhod piši: ['========== RELOADING SNAP:'], nova-vrstica.
+>> b := Objekt load-from: ['/tmp/a.bin'].
+(b item prototip pomnilniški-naslov = old-lst-address) resnično: {
+	Izhod piši: ['Object link re-attached.'], nova-vrstica.
+}.
+Izhod piši: ( b item ), nova-vrstica.

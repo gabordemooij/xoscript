@@ -1,0 +1,30 @@
+Utdata skriv: ['Test object'], stop.
+>> a := Objekt ny. 
+
+a vid: ['item:'] gör: { :out
+	egen out := out. 
+}.
+
+a vid: ['item'] gör: { <- egen out.
+}.
+
+a vid: ['greet'] gör: {
+	Utdata skriv: ['hi from original out!'], stop.
+}.
+
+a item: Utdata.
+
+Utdata skriv: a item, stop.
+
+>> old-out-address := a item prototyp minnesadress.
+a save-as: ['/tmp/a.bin'].
+Utdata skriv: ['========== RELOADING SNAP:'], stop.
+
+>> b := Objekt load-from: ['/tmp/a.bin'].
+
+(b item prototyp minnesadress = old-out-address) sann: {
+	Utdata skriv: ['Object link re-attached.'], stop.
+}.
+
+b item skriv: ['hello from loaded out!'], stop.
+b greet.

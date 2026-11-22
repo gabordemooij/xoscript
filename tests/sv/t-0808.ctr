@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Valv generera-nycklar.
+>> sk := keys första.
+>> pk := keys sista.
+>> sig := Valv signera: ['abc'] med: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Valv signera: ['abc'] med: long. } fånga: { :e
+	Utdata skriv: e, stop.
+}, starta.
+
+{ Valv kontrollera: ['abc'] signatur: long med: pk. } fånga: { :e
+	Utdata skriv: e, stop.
+}, starta.
+
+{ Valv kontrollera: ['abc'] signatur: sig med: short. } fånga: { :e
+	Utdata skriv: e, stop.
+}, starta.

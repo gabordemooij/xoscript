@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Program postavka: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server poveži: ( Popis novi ;
+ libname ; ['fopen'] ;
+ ( Popis novi ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+poveži: ( Popis novi ;
+ Ništa ; # means same lib
+ ['fread'] ;
+ ( Popis novi ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Ništa ; # means same object (i.e. Stream)
+ ['fread']
+),
+poveži: (
+ Popis novi ;
+ Ništa ; # means same lib
+ ['fwrite'] ;
+ ( Popis novi ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Ništa ; # means same lib
+ ['fwrite']
+),
+poveži: (
+ Popis novi ;
+ Ništa ; # means same lib
+ ['rewind'] ;
+ ( Popis novi ; ['pointer'] ) ;
+ ['int'] ;
+ Ništa ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> putanja := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: putanja mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream poruka: ['fwrite'] argumenti: (Popis novi ; str ; 1 ; 6 ; fd ).
+Izlaz piši: bytes-written, novi-red.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob novi: 20.
+
+# read from file
+>> bytes-read := Stream poruka: ['fread'] argumenti: (Popis novi ; buf ; 1 ; 6 ; fd ).
+Izlaz piši: bytes-read, novi-red.
+Izlaz piši: buf, novi-red.
+
+# free memory
+str  oslobodi.
+putanja oslobodi.
+mode oslobodi.
+buf  oslobodi.
+
+

@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+ໂປຣແກຣມ ຈັດການໜ່ວຍຄວາມຈຳ: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := ໂປຣແກຣມ ການຕັ້ງຄ່າ: ['FFITESTLIB'].
+
+
+
+Server ເຊື່ອມໂຍງ: (
+ ລິສ ໃໝ່ ;
+ libname ;
+ ['puts'] ;
+ ( ລິສ ໃໝ່ ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s ປ່ອຍໜ່ວຍຄວາມຈຳ.
+
+# test with struct
+
+>> a := Blob ໃໝ່: 8.
+a bytes: (
+	ລິສ <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (ລິສ <<: ['int'], ; ['int']).
+
+Server ເຊື່ອມໂຍງ: (
+	ລິສ <<: ['@structtest'], ;
+	['@structtest'] ;
+	(ລິສ <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+ຜົນອອກ ຂຽນ: ['Sum test:'] + (ffitest ffisum: a), ຂຶ້ນແຖວໃໝ່.
+
+struct struct-ປ່ອຍໜ່ວຍຄວາມຈຳ.
+struct ປ່ອຍໜ່ວຍຄວາມຈຳ.
+a ປ່ອຍໜ່ວຍຄວາມຈຳ.

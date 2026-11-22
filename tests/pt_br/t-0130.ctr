@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Programa configurar: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server ligar: ( Listar novo ;
+ libname ; ['fopen'] ;
+ ( Listar novo ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+ligar: ( Listar novo ;
+ Nulo ; # means same lib
+ ['fread'] ;
+ ( Listar novo ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Nulo ; # means same object (i.e. Stream)
+ ['fread']
+),
+ligar: (
+ Listar novo ;
+ Nulo ; # means same lib
+ ['fwrite'] ;
+ ( Listar novo ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Nulo ; # means same lib
+ ['fwrite']
+),
+ligar: (
+ Listar novo ;
+ Nulo ; # means same lib
+ ['rewind'] ;
+ ( Listar novo ; ['pointer'] ) ;
+ ['int'] ;
+ Nulo ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> caminho := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: caminho mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream menssagem: ['fwrite'] argumentos: (Listar novo ; str ; 1 ; 6 ; fd ).
+Saída escrever: bytes-written, stop.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob novo: 20.
+
+# read from file
+>> bytes-read := Stream menssagem: ['fread'] argumentos: (Listar novo ; buf ; 1 ; 6 ; fd ).
+Saída escrever: bytes-read, stop.
+Saída escrever: buf, stop.
+
+# free memory
+str  livre.
+caminho livre.
+mode livre.
+buf  livre.
+
+

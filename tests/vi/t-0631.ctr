@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Chương-trình quản-lý-bộ-nhớ: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Chương-trình thiết-lập: ['FFITESTLIB'].
+
+
+
+Server liên-kết: (
+ Danh-sách mới ;
+ libname ;
+ ['puts'] ;
+ ( Danh-sách mới ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s giải-phóng.
+
+# test with struct
+
+>> a := Blob mới: 8.
+a bytes: (
+	Danh-sách <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Danh-sách <<: ['int'], ; ['int']).
+
+Server liên-kết: (
+	Danh-sách <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Danh-sách <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Xuất ghi: ['Sum test:'] + (ffitest ffisum: a), xuống-dòng.
+
+struct giải-phóng-struct.
+struct giải-phóng.
+a giải-phóng.

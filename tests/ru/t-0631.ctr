@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Программа режим-памяти: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Программа конфигурация: ['FFITESTLIB'].
+
+
+
+Server связать: (
+ Список новый ;
+ libname ;
+ ['puts'] ;
+ ( Список новый ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s свободно.
+
+# test with struct
+
+>> a := Blob новый: 8.
+a байта: (
+	Список <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob структура: (Список <<: ['int'], ; ['int']).
+
+Server связать: (
+	Список <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Список <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Выход написать: ['Sum test:'] + (ffitest ffisum: a), стоп.
+
+struct структура-свободно.
+struct свободно.
+a свободно.

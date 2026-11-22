@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Програм санах-ойн-удирдлага: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB шинэ хост: ['localhost'],
+	хэрэглэгчийн-нэр: ['xo'], нууц-үг: ['pass123'], өгөгдлийн-сангийн-нэр: ['xobase'], холбогдох.
+
+>> TwoDigitFormat := Хэлбэр шинэ: ['%02d'].
+
+# Datetime
+{
+	>> жил := Тоо хооронд: 1995 хүртэл: 2050, тэмдэгт-мөр.
+	>> сар := TwoDigitFormat хэрэглэх-бүхэл: (Тоо хооронд: 1 хүртэл: 12), тэмдэгт-мөр.
+	>> өдөр := TwoDigitFormat хэрэглэх-бүхэл: (Тоо хооронд: 1 хүртэл: 28), тэмдэгт-мөр.
+	>> цаг-нэгж := TwoDigitFormat хэрэглэх-бүхэл: (Тоо хооронд: 1 хүртэл: 23), тэмдэгт-мөр.
+	>> минут := TwoDigitFormat хэрэглэх-бүхэл: (Тоо хооронд: 1 хүртэл: 59), тэмдэгт-мөр.
+	>> секунд := TwoDigitFormat хэрэглэх-бүхэл: (Тоо хооронд: 1 хүртэл: 59), тэмдэгт-мөр.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: жил,
+		MM: сар,
+		DD: өдөр,
+		HH: цаг-нэгж,
+		II: минут,
+		SS: секунд.
+	>> хайлтын-параметрүүд :=
+	db асуулга: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	татах: { :row
+		(row mydatetime = datetime) худал-бол: {
+			энэ-даалгавар алдаа: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter нэмэх: 1.
+} * 100.
+
+# Date
+{
+	>> жил := Тоо хооронд: 1995 хүртэл: 2050, тэмдэгт-мөр.
+	>> сар := TwoDigitFormat хэрэглэх-бүхэл: (Тоо хооронд: 1 хүртэл: 12), тэмдэгт-мөр.
+	>> өдөр := TwoDigitFormat хэрэглэх-бүхэл: (Тоо хооронд: 1 хүртэл: 28), тэмдэгт-мөр.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: жил,
+		MM: сар,
+		DD: өдөр.
+	>> хайлтын-параметрүүд :=
+	db асуулга: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	татах: { :row
+		(row mydate = date) худал-бол: {
+			энэ-даалгавар алдаа: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter нэмэх: 1.
+} * 100.
+
+
+# Time
+{
+	>> цаг-нэгж := TwoDigitFormat хэрэглэх-бүхэл: (Тоо хооронд: 1 хүртэл: 23), тэмдэгт-мөр.
+	>> минут := TwoDigitFormat хэрэглэх-бүхэл: (Тоо хооронд: 1 хүртэл: 59), тэмдэгт-мөр.
+	>> секунд := TwoDigitFormat хэрэглэх-бүхэл: (Тоо хооронд: 1 хүртэл: 59), тэмдэгт-мөр.
+	>> цаг := ['HH:II:SS'].
+	цаг
+		HH: цаг-нэгж,
+		II: минут,
+		SS: секунд.
+	>> хайлтын-параметрүүд :=
+	db асуулга: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: цаг),
+	татах: { :row
+		(row mytime = цаг) худал-бол: {
+			энэ-даалгавар алдаа: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter нэмэх: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Жагсаалт шинэ дүүргэх: 100000 утгаар: ['x'], нэгтгэх: [''].
+{
+	>> str2 := Сейф токен: 40.
+	>> хайлтын-параметрүүд :=
+	db асуулга: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	татах: { :row
+		(row str1 = str1 ба: row str2 = str2) худал-бол: {
+			энэ-даалгавар алдаа: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter нэмэх: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Тоо хооронд: 1 хүртэл: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 тэмдэгт-мөрөөс: ['9223372036854775807'] ) -
+		( Int64 тэмдэгт-мөрөөс: ['99999'] ) +
+		( Int64 тэмдэгт-мөрөөс: n1 тэмдэгт-мөр )
+	).
+	>> хайлтын-параметрүүд :=
+	db асуулга: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	татах: { :row
+		(row n1 = n1) худал-бол: {
+			энэ-даалгавар алдаа: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) худал-бол: {
+			энэ-даалгавар алдаа: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 бүхэлтгэх) худал-бол: {
+			энэ-даалгавар алдаа: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) худал-бол: {
+			энэ-даалгавар алдаа: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter нэмэх: 1.
+} * 100.
+
+
+Гаралт бичих: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), шинэ-мөр.

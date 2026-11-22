@@ -1,0 +1,43 @@
+
+
+>> g := Server အသစ်.
+>> v := မီးခံသေတ္တာ အသစ်.
+>> ok := 0.
+
+>> secrets := အစီအစဉ် အသစ် ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets ကူးယူ.
+passwords တစ်ခုစီ: { :i :p
+	secrets တစ်ခုစီ: { :n :s
+		{
+			>> encrypted := v ဝှက်စာပြု: s သော့: p.
+			>> decrypted := v ဝှက်စာဖြေ: encrypted သော့: p.
+			(decrypted = s) မှန်လျှင်: {
+				ok ပေါင်း: 1.
+			}, မဟုတ်လျှင်: {
+				အထွက် ရေး: ['failed encrypting/decrypting: '], စာကြောင်းသစ်.
+				အထွက် ရေး: s, စာကြောင်းသစ်.
+				အထွက် ရေး: ['encrypted: '] + encrypted, စာကြောင်းသစ်.
+				အထွက် ရေး: ['decrypted: '] + encrypted, စာကြောင်းသစ်.
+				ပရိုဂရမ် အဆုံးသတ်.
+			}.
+		} ဖမ်း: { :err
+			(s = [''] သို့မဟုတ်: p = ['']) မှန်လျှင်: {
+				ok ပေါင်း: 1.
+			}, မဟုတ်လျှင်: {
+				အထွက် ရေး: err, စာကြောင်းသစ်.
+				ပရိုဂရမ် အဆုံးသတ်.
+			}.
+		}, စတင်.
+	}.
+}.
+
+အထွက် ရေး: ( ok + [' vault encryptions tested.'] ), စာကြောင်းသစ်.

@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := शब्दकोश नया
+	# ASCII only
+	रखो: ( सूची नया ; 65 ; 65 ; 65 ; 65 ; 0 ) कुंजी: ['AAAA'],
+	# valid 2 byte sequence
+	रखो: ( सूची नया ; 194 ; 162 ; 0 ) कुंजी: ['¢'],
+	# Valid 3-byte UTF-8
+    रखो: ( सूची नया ; 226 ; 130 ; 172 ; 0 ) कुंजी: ['€'],
+	# Valid 4-byte UTF-8
+    रखो: ( सूची नया ; 240 ; 144 ; 141 ; 136 ; 0 ) कुंजी: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    रखो: ( सूची नया ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) कुंजी: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    रखो: ( सूची नया ; 65 ; 193 ; 129 ; 0 ) कुंजी: ['A?'],
+	# Invalid first byte (0xFF)
+    रखो: ( सूची नया ; 255 ; 0 ) कुंजी: ['?'],
+	# Incomplete multi-byte sequence at end
+    रखो: ( सूची नया ; 66 ; 226 ; 0 ) कुंजी: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    रखो: ( सूची नया ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) कुंजी: ['A€?𐍈B'].
+	 
+utf8cases प्रत्येक: { :key :value
+	>> blob := Blob नया: value गिनती, bytes: value.
+	>> str := blob पाठ-में.
+	(str = key) सत्य-हो-तो: {
+		निर्गम लिखो: ['OK'], नई-पंक्ति.
+	}, अन्यथा: {
+		निर्गम लिखो: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, नई-पंक्ति.
+	}.
+	blob मुक्त.
+}.

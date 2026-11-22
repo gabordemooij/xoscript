@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> werte := Liste neu
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+werte jedes: { :i :value
+	>> d := Wörterbuch neu.
+	d setzen: value auf: ['k'].
+	>> r := d code objekt.
+	Ausgabe schreiben: r anzahl, stopp.
+	Ausgabe schreiben: ( (r bei: ['k']) = value ), stopp.
+}.

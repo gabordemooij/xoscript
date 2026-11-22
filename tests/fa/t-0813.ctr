@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server آماده-سازی.
+برنامه به-کار-ببر: ⌝'../../../src/xo/fa/webtools.xo'⌜.
+برنامه به-کار-ببر: ⌝'../../../src/xo/fa/mailtools.xo'⌜.
+
+>> سرآیند := سرآیند-HTTP جدید کلید: ⌝'Location'⌜ مقدار: ⌝'/ok\r\nX-Injected: yes'⌜.
+خروجی بنویس: سرآیند.
+
+>> web := سند-وب جدید.
+web برو-به: ⌝'/ok\r\nX-Injected: yes'⌜.
+خروجی بنویس: ⌝'\n'⌜, سطر-نو.
+
+>> mail := ایمیل جدید.
+mail به: ﴿لیست جدید ; ⌝'a@example.invalid\r\nX-To: yes'⌜﴾.
+mail cc: ﴿لیست جدید ; ⌝'b@example.invalid\r\nX-Cc: yes'⌜﴾.
+mail bcc: ﴿لیست جدید ; ⌝'c@example.invalid\r\nX-Bcc: yes'⌜﴾.
+mail فرستنده: ⌝'d@example.invalid\r\nX-From: yes'⌜ نام: ⌝'site\r\nX-Name: yes'⌜.
+mail موضوع: ⌝'hello\r\nX-Subject: yes'⌜.
+mail بدنه: ⌝'line1\r\nline2'⌜.
+خروجی بنویس: mail تولید-کن.
+
+>> html := ایمیل-HTML جدید.
+html به: ﴿لیست جدید ; ⌝'a@example.invalid\r\nX-To: yes'⌜﴾.
+html فرستنده: ⌝'d@example.invalid'⌜ نام: ⌝'site'⌜.
+html موضوع: ⌝'hello\r\nX-Subject: yes'⌜.
+html بدنه: ⌝'body'⌜.
+خروجی بنویس: ﴿ html تولید-کن شامل: ⌝'\nX-'⌜ ﴾, سطر-نو.
+خروجی بنویس: ﴿ html تولید-کن شامل: ⌝'X-To: yes'⌜ ﴾, سطر-نو.

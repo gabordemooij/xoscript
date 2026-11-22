@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> camiño := ['/tmp/dat.csv'].
+>> csv := Ficheiro novo: camiño.
+csv escribir: s.
+
+# accepts CRLF LF CR, varying row length
+csv delimitador: [';'] comiña: ['"'] liñas: { :line
+	Programa limpar.
+	Saída escribir: line, salto-de-liña.
+	Programa limpar.
+}.
+
+# unequal lines
+s engadir-ao-final: ['\njustone'].
+csv escribir: s.
+{
+	csv delimitador: [';'] comiña: ['"'] liñas: { :line
+		Saída escribir: line, salto-de-liña.
+	}.
+} capturar: { :e 
+	Saída escribir: e, salto-de-liña.
+}, iniciar.
+
+# invalid format
+s := ['"he"llo";world'].
+csv escribir: s.
+{
+	csv delimitador: [';'] comiña: ['"'] liñas: { :line
+		Saída escribir: line, salto-de-liña.
+	}.
+} capturar: { :e 
+	Saída escribir: e, salto-de-liña.
+}, iniciar.

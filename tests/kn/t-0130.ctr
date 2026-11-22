@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := ಪ್ರೋಗ್ರಾಂ ಸಂಯೋಜನೆ: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server ಕೊಂಡಿ: ( ಸರಣಿ ಹೊಸ ;
+ libname ; ['fopen'] ;
+ ( ಸರಣಿ ಹೊಸ ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+ಕೊಂಡಿ: ( ಸರಣಿ ಹೊಸ ;
+ ಶೂನ್ಯ ; # means same lib
+ ['fread'] ;
+ ( ಸರಣಿ ಹೊಸ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ಶೂನ್ಯ ; # means same object (i.e. Stream)
+ ['fread']
+),
+ಕೊಂಡಿ: (
+ ಸರಣಿ ಹೊಸ ;
+ ಶೂನ್ಯ ; # means same lib
+ ['fwrite'] ;
+ ( ಸರಣಿ ಹೊಸ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ಶೂನ್ಯ ; # means same lib
+ ['fwrite']
+),
+ಕೊಂಡಿ: (
+ ಸರಣಿ ಹೊಸ ;
+ ಶೂನ್ಯ ; # means same lib
+ ['rewind'] ;
+ ( ಸರಣಿ ಹೊಸ ; ['pointer'] ) ;
+ ['int'] ;
+ ಶೂನ್ಯ ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> ಕಡತ-ಮಾರ್ಗ := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: ಕಡತ-ಮಾರ್ಗ mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream ಸಂದೇಶ: ['fwrite'] ವಾದಗಳು: (ಸರಣಿ ಹೊಸ ; str ; 1 ; 6 ; fd ).
+ಔಟ್-ಪುಟ್ ಬರೆ: bytes-written, ಹೊಸ-ಸಾಲು.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob ಹೊಸ: 20.
+
+# read from file
+>> bytes-read := Stream ಸಂದೇಶ: ['fread'] ವಾದಗಳು: (ಸರಣಿ ಹೊಸ ; buf ; 1 ; 6 ; fd ).
+ಔಟ್-ಪುಟ್ ಬರೆ: bytes-read, ಹೊಸ-ಸಾಲು.
+ಔಟ್-ಪುಟ್ ಬರೆ: buf, ಹೊಸ-ಸಾಲು.
+
+# free memory
+str  ಬಿಡುಗಡೆ.
+ಕಡತ-ಮಾರ್ಗ ಬಿಡುಗಡೆ.
+mode ಬಿಡುಗಡೆ.
+buf  ಬಿಡುಗಡೆ.
+
+

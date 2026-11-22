@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := ຕູ້ນິລະໄພ ສ້າງກະແຈ.
+>> sk := keys ຕົວທຳອິດ.
+>> pk := keys ຕົວສຸດທ້າຍ.
+>> sig := ຕູ້ນິລະໄພ ລົງລາຍເຊັນ: ['abc'] ດ້ວຍ: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ ຕູ້ນິລະໄພ ລົງລາຍເຊັນ: ['abc'] ດ້ວຍ: long. } ຈັບ: { :e
+	ຜົນອອກ ຂຽນ: e, ຂຶ້ນແຖວໃໝ່.
+}, ເລີ່ມ.
+
+{ ຕູ້ນິລະໄພ ກວດ: ['abc'] ລາຍເຊັນ: long ດ້ວຍ: pk. } ຈັບ: { :e
+	ຜົນອອກ ຂຽນ: e, ຂຶ້ນແຖວໃໝ່.
+}, ເລີ່ມ.
+
+{ ຕູ້ນິລະໄພ ກວດ: ['abc'] ລາຍເຊັນ: sig ດ້ວຍ: short. } ຈັບ: { :e
+	ຜົນອອກ ຂຽນ: e, ຂຶ້ນແຖວໃໝ່.
+}, ເລີ່ມ.

@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server wakichiy.
+Programa llamkʼachiy: ['../../../src/xo/qu/webtools.xo'].
+
+>> Fake-Request := Ima musuq.
+Fake-Request patapi: ['value:'] ruway: { :chani
+	ñuqap chani := chani.
+}.
+Fake-Request patapi: ['cookie:'] ruway: { :suti <- ñuqap chani.
+}.
+
+>> Test-Session := Pachallapaq-willañiqi-tantanakuy musuq.
+Test-Session patapi: ['apamuy'] ruway: { <- Simi-taqi musuq.
+}.
+Test-Session patapi: ['session-id'] ruway: { <- ñuqap id.
+}.
+
+>> cookies := Katiray musuq
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies sapallanpaq: { :i :cookie
+	>> mañakuy-http := Fake-Request musuq.
+	mañakuy-http value: cookie.
+	>> kamachiq := Test-Session musuq.
+	>> web := Llika-qillqa musuq.
+	web mañakuy-http: mañakuy-http.
+	web tantanakuy-kamachiq: kamachiq.
+	web tantanakuyta-qallariy.
+	Lluqsiy qillqay: ( kamachiq session-id = cookie ), sayay.
+}.
+
+>> web := Llika-qillqa musuq.
+web json: (Simi-taqi musuq churay: ['b'] maypi: ['a']).
+Lluqsiy qillqay: ['\n'], sayay.
+
+{ Llika get: ['file:///etc/hostname']. } hapiy: { :e
+	Lluqsiy qillqay: e, sayay.
+}, kallpay.
+
+>> svg := Khipu musuq: ['/tmp/test0814.svg'].
+svg qillqay: ['<svg xmlns="x"></svg>'].
+Lluqsiy sayay.
+Server pasachiy: ['test0814.svg'] ñawpaq-kʼaskaq: ['/tmp/'].
+svg pichay.

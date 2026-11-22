@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> jéem := { :format :value
+	{ Génn bind: ( (Melo xees: format) jëfandikoo: value ), taxaw. } jàpp: { :e Génn bind: e, taxaw. }, dox.
+}.
+>> try-int := { :format :value
+	{ Génn bind: ( (Melo xees: format) jëfandikoo-lim-bu-mat: value ), taxaw. } jàpp: { :e Génn bind: e, taxaw. }, dox.
+}.
+
+# fits
+jéem jëfandikoo: ['|%s|'] ak: ['text'].
+jéem jëfandikoo: ['%06.2f'] ak: 5.5.
+jéem jëfandikoo: ['100%% %s'] ak: ['sure'].
+try-int jëfandikoo: ['%03d'] ak: 7.
+try-int jëfandikoo: ['%x'] ak: 255.
+jéem jëfandikoo: ['%d'] ak: (Int64 xees bawoo-ci-mbind: ['12']).
+jéem jëfandikoo: ['%lld'] ak: (Int64 xees bawoo-ci-mbind: ['12']).
+jéem jëfandikoo: ['%.1lf'] ak: 5.5.
+try-int jëfandikoo: ['%hd'] ak: 7.
+
+# does not fit
+jéem jëfandikoo: ['%s'] ak: 12345.
+jéem jëfandikoo: ['%d'] ak: 12345.
+jéem jëfandikoo: ['%f'] ak: ['text'].
+try-int jëfandikoo: ['%d'] ak: ['text'].
+try-int jëfandikoo: ['%s'] ak: 5.
+jéem jëfandikoo: ['%s %s'] ak: ['text'].
+jéem jëfandikoo: ['%n'] ak: ['text'].
+jéem jëfandikoo: ['%*s'] ak: ['text'].
+jéem jëfandikoo: ['%'] ak: ['text'].
+
+# length modifier does not fit
+jéem jëfandikoo: ['%ls'] ak: ['text'].
+jéem jëfandikoo: ['%Lf'] ak: 5.5.
+try-int jëfandikoo: ['%ld'] ak: 7.
+try-int jëfandikoo: ['%lld'] ak: 7.
+jéem jëfandikoo: ['%Ld'] ak: (Int64 xees bawoo-ci-mbind: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+jéem jëfandikoo: ['%99999999999s'] ak: ['text'].

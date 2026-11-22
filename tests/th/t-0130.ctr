@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := โปรแกรม การตั้งค่า: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server เชื่อมโยง: ( ลิสต์ สร้างใหม่ ;
+ libname ; ['fopen'] ;
+ ( ลิสต์ สร้างใหม่ ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+เชื่อมโยง: ( ลิสต์ สร้างใหม่ ;
+ ว่าง ; # means same lib
+ ['fread'] ;
+ ( ลิสต์ สร้างใหม่ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ว่าง ; # means same object (i.e. Stream)
+ ['fread']
+),
+เชื่อมโยง: (
+ ลิสต์ สร้างใหม่ ;
+ ว่าง ; # means same lib
+ ['fwrite'] ;
+ ( ลิสต์ สร้างใหม่ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ว่าง ; # means same lib
+ ['fwrite']
+),
+เชื่อมโยง: (
+ ลิสต์ สร้างใหม่ ;
+ ว่าง ; # means same lib
+ ['rewind'] ;
+ ( ลิสต์ สร้างใหม่ ; ['pointer'] ) ;
+ ['int'] ;
+ ว่าง ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> เส้นทาง := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: เส้นทาง mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream ส่งข้อความ: ['fwrite'] อาร์กิวเมนต์: (ลิสต์ สร้างใหม่ ; str ; 1 ; 6 ; fd ).
+แสดงผล เขียน: bytes-written, ขึ้นบรรทัดใหม่.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob สร้างใหม่: 20.
+
+# read from file
+>> bytes-read := Stream ส่งข้อความ: ['fread'] อาร์กิวเมนต์: (ลิสต์ สร้างใหม่ ; buf ; 1 ; 6 ; fd ).
+แสดงผล เขียน: bytes-read, ขึ้นบรรทัดใหม่.
+แสดงผล เขียน: buf, ขึ้นบรรทัดใหม่.
+
+# free memory
+str  คืนหน่วยความจำ.
+เส้นทาง คืนหน่วยความจำ.
+mode คืนหน่วยความจำ.
+buf  คืนหน่วยความจำ.
+
+

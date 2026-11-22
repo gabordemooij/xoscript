@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Liste yeni ;
+	# {"key":"normal"} normal ASCII
+	( Sözlük yeni koy: ['normal'] konum: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Sözlük yeni koy: ['hello world'] konum: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Sözlük yeni koy: ['"'] konum: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Sözlük yeni koy: ['backslash: \\'] konum: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Sözlük yeni koy: ['slash: /'] konum: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Sözlük yeni koy: ['backspace: \b'] konum: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Sözlük yeni koy: ['formfeed: \f'] konum: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Sözlük yeni koy: ['newline: \n'] konum: ['key'] ) ;
+	( Sözlük yeni koy: ['newline: ↵'] konum: ['key'] ) ;
+	( Sözlük yeni koy: ['newline: 
+	'] konum: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Sözlük yeni koy: ['carriage return: \r'] konum: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Sözlük yeni koy: ['tab \t'] konum: ['key'] ) ;
+	( Sözlük yeni koy: ['tab ⇿'] konum: ['key'] ) ;
+	( Sözlük yeni koy: ['tab  '] konum: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Sözlük yeni koy: ['NUL \u0000'] konum: ['key'] ) ;
+	( Sözlük yeni koy: ['NUL \0'] konum: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Sözlük yeni koy: ['control: \u0001'] konum: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Sözlük yeni koy: ['control: \u001F'] konum: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Sözlük yeni koy: ['unicode: é'] konum: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Sözlük yeni koy: ['unicode: €'] konum: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Sözlük yeni koy: ['unicode: 日本語'] konum: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Sözlük yeni koy: ['unicode: 😀'] konum: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Sözlük yeni koy: ['unicode: 🧑‍💻'] konum: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Sözlük yeni koy: ['combining: e\u0301'] konum: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Sözlük yeni koy: ['escaped unicode: \u00e9'] konum: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Sözlük yeni koy: ['escaped unicode: \u20ac'] konum: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Sözlük yeni koy: ['escaped unicode: \ud83d\ude00'] konum: ['key'] ) ;
+	# {"key":""} empty value
+	( Sözlük yeni koy: [''] konum: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Sözlük yeni koy: ['@ < > & = % + ? #'] konum: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Sözlük yeni koy: ['''] konum: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Sözlük yeni koy: ['multiple: \" \\ \n \r \t'] konum: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Sözlük yeni koy: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] konum: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Sözlük yeni koy: [' value'] konum: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Sözlük yeni koy: ['value '] konum: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Sözlük yeni koy: [' \t\n\r '] konum: ['key'] ).
+
+dicts her: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Sözlük yeni koy: d key konum: ['key']).
+	>> b := JSON jsonify: (Sözlük yeni koy: ['value'] konum: d key).
+	>> e := JSON nesne: a.
+	>> f := JSON nesne: b.
+	((e key = d key ve: (f ? d key = ['value'])) veya: (e key = ['NUL ?'])) doğru: {
+		Çıktı yaz: ['OK'], yeni-satır.
+	}, yoksa: {
+		Çıktı yaz: ['Unable to properly encode/decode: '] + d + j, yeni-satır.
+		Program bitir.
+	}.
+}.

@@ -1,0 +1,43 @@
+
+
+>> g := Server sabo.
+>> v := Asusu sabo.
+>> ok := 0.
+
+>> secrets := Jeri sabo ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kwafi.
+passwords kowane: { :i :p
+	secrets kowane: { :n :s
+		{
+			>> encrypted := v ɓoye: s maɓalli: p.
+			>> decrypted := v buɗe-ɓoye: encrypted maɓalli: p.
+			(decrypted = s) gaskiya: {
+				ok ƙara: 1.
+			}, in-ba-haka-ba: {
+				Fitarwa rubuta: ['failed encrypting/decrypting: '], sabon-layi.
+				Fitarwa rubuta: s, sabon-layi.
+				Fitarwa rubuta: ['encrypted: '] + encrypted, sabon-layi.
+				Fitarwa rubuta: ['decrypted: '] + encrypted, sabon-layi.
+				Shiri ƙare.
+			}.
+		} kama: { :err
+			(s = [''] ko: p = ['']) gaskiya: {
+				ok ƙara: 1.
+			}, in-ba-haka-ba: {
+				Fitarwa rubuta: err, sabon-layi.
+				Shiri ƙare.
+			}.
+		}, fara.
+	}.
+}.
+
+Fitarwa rubuta: ( ok + [' vault encryptions tested.'] ), sabon-layi.

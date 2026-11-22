@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := မီးခံသေတ္တာ သော့များထုတ်.
+>> sk := keys ပထမ.
+>> pk := keys နောက်ဆုံး.
+>> sig := မီးခံသေတ္တာ လက်မှတ်ထိုး: ['abc'] သော့ဖြင့်: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ မီးခံသေတ္တာ လက်မှတ်ထိုး: ['abc'] သော့ဖြင့်: long. } ဖမ်း: { :e
+	အထွက် ရေး: e, စာကြောင်းသစ်.
+}, စတင်.
+
+{ မီးခံသေတ္တာ စစ်ဆေး: ['abc'] လက်မှတ်: long သော့ဖြင့်: pk. } ဖမ်း: { :e
+	အထွက် ရေး: e, စာကြောင်းသစ်.
+}, စတင်.
+
+{ မီးခံသေတ္တာ စစ်ဆေး: ['abc'] လက်မှတ်: sig သော့ဖြင့်: short. } ဖမ်း: { :e
+	အထွက် ရေး: e, စာကြောင်းသစ်.
+}, စတင်.

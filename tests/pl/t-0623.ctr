@@ -1,0 +1,43 @@
+
+
+>> g := Server nowy.
+>> v := Sejf nowy.
+>> ok := 0.
+
+>> secrets := Lista nowy ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopiuj.
+passwords każdy: { :i :p
+	secrets każdy: { :n :s
+		{
+			>> encrypted := v szyfruj: s klucz: p.
+			>> decrypted := v odszyfruj: encrypted klucz: p.
+			(decrypted = s) prawda: {
+				ok dodaj: 1.
+			}, inaczej: {
+				Wyjście pisz: ['failed encrypting/decrypting: '], nowa-linia.
+				Wyjście pisz: s, nowa-linia.
+				Wyjście pisz: ['encrypted: '] + encrypted, nowa-linia.
+				Wyjście pisz: ['decrypted: '] + encrypted, nowa-linia.
+				Program koniec.
+			}.
+		} przechwyć: { :err
+			(s = [''] lub: p = ['']) prawda: {
+				ok dodaj: 1.
+			}, inaczej: {
+				Wyjście pisz: err, nowa-linia.
+				Program koniec.
+			}.
+		}, uruchom.
+	}.
+}.
+
+Wyjście pisz: ( ok + [' vault encryptions tested.'] ), nowa-linia.

@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server ပြင်ဆင်.
+ပရိုဂရမ် သုံး: ['../../../src/xo/my/webtools.xo'].
+ပရိုဂရမ် သုံး: ['../../../src/xo/my/mailtools.xo'].
+
+>> ခေါင်းစီး := HTTP-ခေါင်းစီး အသစ် သော့: ['Location'] တန်ဖိုး: ['/ok\r\nX-Injected: yes'].
+အထွက် ရေး: ခေါင်းစီး.
+
+>> web := ဝဘ်စာရွက်စာတမ်း အသစ်.
+web သွား: ['/ok\r\nX-Injected: yes'].
+အထွက် ရေး: ['\n'], စာကြောင်းသစ်.
+
+>> mail := အီးမေးလ် အသစ်.
+mail သို့: (အစီအစဉ် အသစ် ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (အစီအစဉ် အသစ် ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (အစီအစဉ် အသစ် ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail ပို့သူ: ['d@example.invalid\r\nX-From: yes'] အမည်: ['site\r\nX-Name: yes'].
+mail ခေါင်းစဉ်: ['hello\r\nX-Subject: yes'].
+mail စာကိုယ်: ['line1\r\nline2'].
+အထွက် ရေး: mail ထုတ်လုပ်.
+
+>> html := အီးမေးလ်-HTML အသစ်.
+html သို့: (အစီအစဉ် အသစ် ; ['a@example.invalid\r\nX-To: yes']).
+html ပို့သူ: ['d@example.invalid'] အမည်: ['site'].
+html ခေါင်းစဉ်: ['hello\r\nX-Subject: yes'].
+html စာကိုယ်: ['body'].
+အထွက် ရေး: ( html ထုတ်လုပ် ပါဝင်: ['\nX-'] ), စာကြောင်းသစ်.
+အထွက် ရေး: ( html ထုတ်လုပ် ပါဝင်: ['X-To: yes'] ), စာကြောင်းသစ်.

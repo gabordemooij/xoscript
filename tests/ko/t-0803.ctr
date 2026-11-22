@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB 새로 호스트: ['localhost'],
+	사용자이름: ['xo'],
+	비밀번호: ['pass123'],
+	데이터베이스이름: ['xobase'],
+	접속.
+
+>> conn2 := Maria-DB 새로 호스트: ['localhost'],
+	사용자이름: ['xo'],
+	비밀번호: ['pass123'],
+	데이터베이스이름: ['xobase'],
+	접속.
+#...
+>> del := conn1 쿼리: ['DELETE FROM book WHERE id > 0'].
+{  del 실행. conn1 커밋. } 예외시: { :e conn1 롤백.  }, 시작.
+
+>> insert := conn1 쿼리: ['INSERT INTO book (id) VALUES(null)'].
+insert 실행.
+
+>> 개수 := conn1 쿼리: ['SELECT COUNT(*) AS num FROM book'].
+개수 가져오기: { :row 출력 쓰기: row num, 줄바꿈. }.
+
+# does not show up
+# insert not committed on connection 1
+>> 개수 := conn2 쿼리: ['SELECT COUNT(*) AS num FROM book'].
+개수 가져오기: { :row 출력 쓰기: row num, 줄바꿈. }.

@@ -1,0 +1,53 @@
+Programa orden: 0.
+Lista al: ['sum'] hacer: {
+	>> total := 0.
+	yo cada: { :index :element
+		total añadir: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Archivo crear: ['/tmp/test.txt'].
+f escribir: ['Lorem Ipsum'].
+f cerrar.
+  
+
+f := Archivo crear: ['/tmp/test.txt'].
+>> text := f leer.
+f cerrar.
+
+
+
+Programa limpiar-memoria.
+usedMemory1 := (Programa memoria ? 1).
+
+
+
+f := Archivo crear: ['/tmp/test.txt'].
+text := f leer.
+f cerrar.
+
+Programa limpiar-memoria.
+usedMemory2 := (Programa memoria ? 1).
+
+
+f := Archivo crear: ['/tmp/test.txt'].
+text := f leer.
+f cerrar.
+
+Programa limpiar-memoria.
+usedMemory3 := (Programa memoria ? 1).
+
+
+
+( usedMemory1 = usedMemory2 y: usedMemory1 = usedMemory3, y: usedMemory2 = usedMemory3 ) verdadero: {
+	Salida escribir: ['No memory leaks here'].
+}, falso: {
+	Salida escribir: ['Leaking memory...'].
+}.

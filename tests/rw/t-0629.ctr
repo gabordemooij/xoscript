@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Ibisohoka andika: ['Database test'], umurongo-mushya.
+
+>> db := Maria-DB gishya uwakira: ['localhost'],
+	izina-ryukoresha: ['xo'], ijambobanga: ['pass123'], izina-ryububikoshingiro: ['xobase'], ihuze.
+
+Ibisohoka andika: ['Can we connect? '] + db byahujwe?, umurongo-mushya.
+
+>> ibipimo-byishakisha := db ikibazo: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], ibipimo: ( Urutonde gishya ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  ibipimo-byishakisha shyira-mu-bikorwa. db emeza. } fata-ikosa: { :e db subiza-inyuma.  }, tangira.
+
+Ibisohoka andika: ['Can we insert? '] + ( ibipimo-byishakisha insert-id > 0 ), umurongo-mushya.
+
+>> Obj := Ikintu gishya.
+Obj bigeze: ['retrieve-rows'] kora: {
+	icyacyo umubare-wibintu := 0.
+	>> ibipimo-byishakisha :=
+	db ikibazo: ['SELECT * FROM book order by id desc limit 2'], 
+	zana: { :row 
+		icyacyo umubare-wibintu ongeraho: 1.
+		Ukuri hagarika-isubiramo.
+	}. <- icyacyo umubare-wibintu koporora.
+}.
+
+Ibisohoka andika: ['Can we query? '] + ( Obj retrieve-rows > 0 ), umurongo-mushya.

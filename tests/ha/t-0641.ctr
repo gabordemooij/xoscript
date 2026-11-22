@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Ƙamus sabo
+	# ASCII only
+	sanya: ( Jeri sabo ; 65 ; 65 ; 65 ; 65 ; 0 ) a: ['AAAA'],
+	# valid 2 byte sequence
+	sanya: ( Jeri sabo ; 194 ; 162 ; 0 ) a: ['¢'],
+	# Valid 3-byte UTF-8
+    sanya: ( Jeri sabo ; 226 ; 130 ; 172 ; 0 ) a: ['€'],
+	# Valid 4-byte UTF-8
+    sanya: ( Jeri sabo ; 240 ; 144 ; 141 ; 136 ; 0 ) a: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    sanya: ( Jeri sabo ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) a: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    sanya: ( Jeri sabo ; 65 ; 193 ; 129 ; 0 ) a: ['A?'],
+	# Invalid first byte (0xFF)
+    sanya: ( Jeri sabo ; 255 ; 0 ) a: ['?'],
+	# Incomplete multi-byte sequence at end
+    sanya: ( Jeri sabo ; 66 ; 226 ; 0 ) a: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    sanya: ( Jeri sabo ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) a: ['A€?𐍈B'].
+	 
+utf8cases kowane: { :key :value
+	>> blob := Blob sabo: value ƙidaya, bytes: value.
+	>> str := blob rubutu.
+	(str = key) gaskiya: {
+		Fitarwa rubuta: ['OK'], sabon-layi.
+	}, in-ba-haka-ba: {
+		Fitarwa rubuta: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, sabon-layi.
+	}.
+	blob saki.
+}.

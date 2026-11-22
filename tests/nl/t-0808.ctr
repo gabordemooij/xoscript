@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Kluis crypto-sleutels.
+>> sk := keys eerste.
+>> pk := keys laatste.
+>> sig := Kluis onderteken: ['abc'] met: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Kluis onderteken: ['abc'] met: long. } afhandelen: { :e
+	Uit schrijf: e, stop.
+}, start.
+
+{ Kluis controleer: ['abc'] ondertekening: long met: pk. } afhandelen: { :e
+	Uit schrijf: e, stop.
+}, start.
+
+{ Kluis controleer: ['abc'] ondertekening: sig met: short. } afhandelen: { :e
+	Uit schrijf: e, stop.
+}, start.

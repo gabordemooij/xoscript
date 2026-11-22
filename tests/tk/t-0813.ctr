@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server başlat.
+Programma peýdalan: ['../../../src/xo/tk/webtools.xo'].
+Programma peýdalan: ['../../../src/xo/tk/mailtools.xo'].
+
+>> sözbaşy := HTTP-Sözbaşy täze açar: ['Location'] baha: ['/ok\r\nX-Injected: yes'].
+Çykyş ýaz: sözbaşy.
+
+>> web := Web-resminama täze.
+web geç: ['/ok\r\nX-Injected: yes'].
+Çykyş ýaz: ['\n'], täze-setir.
+
+>> mail := E-poçta täze.
+mail alyja: (Sanaw täze ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Sanaw täze ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Sanaw täze ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail iberiji: ['d@example.invalid\r\nX-From: yes'] at: ['site\r\nX-Name: yes'].
+mail tema: ['hello\r\nX-Subject: yes'].
+mail beden: ['line1\r\nline2'].
+Çykyş ýaz: mail döret.
+
+>> html := HTML-E-poçta täze.
+html alyja: (Sanaw täze ; ['a@example.invalid\r\nX-To: yes']).
+html iberiji: ['d@example.invalid'] at: ['site'].
+html tema: ['hello\r\nX-Subject: yes'].
+html beden: ['body'].
+Çykyş ýaz: ( html döret öz-içine-alýar: ['\nX-'] ), täze-setir.
+Çykyş ýaz: ( html döret öz-içine-alýar: ['X-To: yes'] ), täze-setir.

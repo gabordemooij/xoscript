@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Prògram stiùireadh-cuimhne: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB ùr òstair: ['localhost'],
+	ainm-cleachdaiche: ['xo'], facal-faire: ['pass123'], ainm-stòir-dàta: ['xobase'], ceangail-ris.
+
+>> TwoDigitFormat := Fòrmat ùr: ['%02d'].
+
+# Datetime
+{
+	>> bliadhna := Àireamh eadar: 1995 agus: 2050, sreang.
+	>> mìos := TwoDigitFormat cuir-an-gnìomh-slàn-àireamh: (Àireamh eadar: 1 agus: 12), sreang.
+	>> latha := TwoDigitFormat cuir-an-gnìomh-slàn-àireamh: (Àireamh eadar: 1 agus: 28), sreang.
+	>> uair := TwoDigitFormat cuir-an-gnìomh-slàn-àireamh: (Àireamh eadar: 1 agus: 23), sreang.
+	>> mionaid := TwoDigitFormat cuir-an-gnìomh-slàn-àireamh: (Àireamh eadar: 1 agus: 59), sreang.
+	>> diog := TwoDigitFormat cuir-an-gnìomh-slàn-àireamh: (Àireamh eadar: 1 agus: 59), sreang.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: bliadhna,
+		MM: mìos,
+		DD: latha,
+		HH: uair,
+		II: mionaid,
+		SS: diog.
+	>> paramadairean-luirg :=
+	db ceist: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	faigh: { :row
+		(row mydatetime = datetime) breugach: {
+			an-obair-seo mearachd: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter cuir-ris-àireamh: 1.
+} * 100.
+
+# Date
+{
+	>> bliadhna := Àireamh eadar: 1995 agus: 2050, sreang.
+	>> mìos := TwoDigitFormat cuir-an-gnìomh-slàn-àireamh: (Àireamh eadar: 1 agus: 12), sreang.
+	>> latha := TwoDigitFormat cuir-an-gnìomh-slàn-àireamh: (Àireamh eadar: 1 agus: 28), sreang.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: bliadhna,
+		MM: mìos,
+		DD: latha.
+	>> paramadairean-luirg :=
+	db ceist: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	faigh: { :row
+		(row mydate = date) breugach: {
+			an-obair-seo mearachd: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter cuir-ris-àireamh: 1.
+} * 100.
+
+
+# Time
+{
+	>> uair := TwoDigitFormat cuir-an-gnìomh-slàn-àireamh: (Àireamh eadar: 1 agus: 23), sreang.
+	>> mionaid := TwoDigitFormat cuir-an-gnìomh-slàn-àireamh: (Àireamh eadar: 1 agus: 59), sreang.
+	>> diog := TwoDigitFormat cuir-an-gnìomh-slàn-àireamh: (Àireamh eadar: 1 agus: 59), sreang.
+	>> ùine := ['HH:II:SS'].
+	ùine
+		HH: uair,
+		II: mionaid,
+		SS: diog.
+	>> paramadairean-luirg :=
+	db ceist: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: ùine),
+	faigh: { :row
+		(row mytime = ùine) breugach: {
+			an-obair-seo mearachd: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter cuir-ris-àireamh: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Liosta ùr lìon: 100000 le: ['x'], ceangail: [''].
+{
+	>> str2 := Tasgaidh tòcan: 40.
+	>> paramadairean-luirg :=
+	db ceist: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	faigh: { :row
+		(row str1 = str1 agus: row str2 = str2) breugach: {
+			an-obair-seo mearachd: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter cuir-ris-àireamh: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Àireamh eadar: 1 agus: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 bho-shreang: ['9223372036854775807'] ) -
+		( Int64 bho-shreang: ['99999'] ) +
+		( Int64 bho-shreang: n1 sreang )
+	).
+	>> paramadairean-luirg :=
+	db ceist: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	faigh: { :row
+		(row n1 = n1) breugach: {
+			an-obair-seo mearachd: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) breugach: {
+			an-obair-seo mearachd: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 cruinnich) breugach: {
+			an-obair-seo mearachd: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) breugach: {
+			an-obair-seo mearachd: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter cuir-ris-àireamh: 1.
+} * 100.
+
+
+Às-chur sgrìobh: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), loidhne-ùr.

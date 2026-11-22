@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Речник нови
+	# ASCII only
+	стави: ( Листа нови ; 65 ; 65 ; 65 ; 65 ; 0 ) на: ['AAAA'],
+	# valid 2 byte sequence
+	стави: ( Листа нови ; 194 ; 162 ; 0 ) на: ['¢'],
+	# Valid 3-byte UTF-8
+    стави: ( Листа нови ; 226 ; 130 ; 172 ; 0 ) на: ['€'],
+	# Valid 4-byte UTF-8
+    стави: ( Листа нови ; 240 ; 144 ; 141 ; 136 ; 0 ) на: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    стави: ( Листа нови ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) на: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    стави: ( Листа нови ; 65 ; 193 ; 129 ; 0 ) на: ['A?'],
+	# Invalid first byte (0xFF)
+    стави: ( Листа нови ; 255 ; 0 ) на: ['?'],
+	# Incomplete multi-byte sequence at end
+    стави: ( Листа нови ; 66 ; 226 ; 0 ) на: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    стави: ( Листа нови ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) на: ['A€?𐍈B'].
+	 
+utf8cases сваки: { :key :value
+	>> blob := Blob нови: value број-елемената, bytes: value.
+	>> str := blob текст.
+	(str = key) тачно: {
+		Излаз пиши: ['OK'], нови-ред.
+	}, иначе: {
+		Излаз пиши: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, нови-ред.
+	}.
+	blob ослободи.
+}.

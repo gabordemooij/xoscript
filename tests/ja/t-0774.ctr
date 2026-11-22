@@ -1,0 +1,23 @@
+出力 書く: ['Test object'], 改行.
+>> a := オブジェクト 新規. 
+a 受信時: ['item:'] 実行: { :lst
+	自分の lst := lst. 
+}.
+a 受信時: ['item'] 実行: { <- 自分の lst.
+}.
+a item: (
+	リスト 新規 ; 1 ; (
+		リスト 新規 ; ['a'] ; (
+			リスト 新規 ; ( 時点 新規: 1 )
+		) ; ( Int64 文字列から: ['321'] )
+	)
+).
+出力 書く: a item, 改行.
+>> old-lst-address := a item プロトタイプ メモリアドレス.
+a save-as: ['/tmp/a.bin'].
+出力 書く: ['========== RELOADING SNAP:'], 改行.
+>> b := オブジェクト load-from: ['/tmp/a.bin'].
+(b item プロトタイプ メモリアドレス = old-lst-address) 真なら: {
+	出力 書く: ['Object link re-attached.'], 改行.
+}.
+出力 書く: ( b item ), 改行.

@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := 数据库 新建 主机: ['localhost'],
+	用户名: ['xo'],
+	密码: ['pass123'],
+	数据库名: ['xobase'],
+	连接.
+
+>> conn2 := 数据库 新建 主机: ['localhost'],
+	用户名: ['xo'],
+	密码: ['pass123'],
+	数据库名: ['xobase'],
+	连接.
+#...
+>> del := conn1 查询: ['DELETE FROM book WHERE id > 0'].
+{  del 突变. conn1 提交. } 捕获: { :e conn1 回滚.  }, 运行.
+
+>> insert := conn1 查询: ['INSERT INTO book (id) VALUES(null)'].
+insert 突变.
+
+>> 计数 := conn1 查询: ['SELECT COUNT(*) AS num FROM book'].
+计数 获取: { :row 输出 写入: row num, 停止. }.
+
+# does not show up
+# insert not committed on connection 1
+>> 计数 := conn2 查询: ['SELECT COUNT(*) AS num FROM book'].
+计数 获取: { :row 输出 写入: row num, 停止. }.

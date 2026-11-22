@@ -1,0 +1,42 @@
+
+Teksto kon: ['html'] buhata: { <- (
+		kaugalingon
+		ilisi: ['&'] ug: ['&amp;'],
+		ilisi: ['<'] ug: ['&lt;'],
+		ilisi: ['>'] ug: ['&gt;'],
+		ilisi: ['"'] ug: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Butang bag-o.
+
+HtmlBrush kon: ['tubag:'] buhata: { :tag
+	Gawas isulat: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush kon: ['tubag:ug:'] buhata: { :tag :content
+	tag := ( tag gikan-sa: 0 gitas-on: (tag gitas-on - 1) ).
+	Gawas isulat: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush kon: ['content:'] buhata: { :text
+	Gawas isulat: text html, bag-ong-linya.
+}.
+
+HtmlBrush kon: ['attr:value:'] buhata: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush bag-o.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

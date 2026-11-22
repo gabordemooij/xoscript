@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Seýf açar-döret.
+>> sk := keys birinji.
+>> pk := keys soňky.
+>> sig := Seýf gol-çek: ['abc'] açar-bilen: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Seýf gol-çek: ['abc'] açar-bilen: long. } tut: { :e
+	Çykyş ýaz: e, täze-setir.
+}, işlet.
+
+{ Seýf barla: ['abc'] gol: long açar-bilen: pk. } tut: { :e
+	Çykyş ýaz: e, täze-setir.
+}, işlet.
+
+{ Seýf barla: ['abc'] gol: sig açar-bilen: short. } tut: { :e
+	Çykyş ýaz: e, täze-setir.
+}, işlet.

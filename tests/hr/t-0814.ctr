@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inicijaliziraj.
+Program koristi: ['../../../src/xo/hr/webtools.xo'].
+
+>> Fake-Request := Objekt novi.
+Fake-Request na: ['value:'] učini: { :vrijednost
+	svoj vrijednost := vrijednost.
+}.
+Fake-Request na: ['cookie:'] učini: { :naziv <- svoj vrijednost.
+}.
+
+>> Test-Session := Sesija-privremena-datoteka novi.
+Test-Session na: ['učitaj'] učini: { <- Rječnik novi.
+}.
+Test-Session na: ['session-id'] učini: { <- svoj id.
+}.
+
+>> cookies := Popis novi
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies svaki: { :i :cookie
+	>> zahtjev := Fake-Request novi.
+	zahtjev value: cookie.
+	>> upravitelj := Test-Session novi.
+	>> web := Web-dokument novi.
+	web zahtjev: zahtjev.
+	web upravitelj-sesija: upravitelj.
+	web pokreni-sesiju.
+	Izlaz piši: ( upravitelj session-id = cookie ), novi-red.
+}.
+
+>> web := Web-dokument novi.
+web json: (Rječnik novi stavi: ['b'] na: ['a']).
+Izlaz piši: ['\n'], novi-red.
+
+{ Mreža get: ['file:///etc/hostname']. } uhvati: { :e
+	Izlaz piši: e, novi-red.
+}, pokreni.
+
+>> svg := Datoteka novi: ['/tmp/test0814.svg'].
+svg piši: ['<svg xmlns="x"></svg>'].
+Izlaz novi-red.
+Server proslijedi: ['test0814.svg'] prefiks: ['/tmp/'].
+svg izbriši.

@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Qaamuus cusub
+	# ASCII only
+	dhig: ( Liis cusub ; 65 ; 65 ; 65 ; 65 ; 0 ) furaha: ['AAAA'],
+	# valid 2 byte sequence
+	dhig: ( Liis cusub ; 194 ; 162 ; 0 ) furaha: ['¢'],
+	# Valid 3-byte UTF-8
+    dhig: ( Liis cusub ; 226 ; 130 ; 172 ; 0 ) furaha: ['€'],
+	# Valid 4-byte UTF-8
+    dhig: ( Liis cusub ; 240 ; 144 ; 141 ; 136 ; 0 ) furaha: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    dhig: ( Liis cusub ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) furaha: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    dhig: ( Liis cusub ; 65 ; 193 ; 129 ; 0 ) furaha: ['A?'],
+	# Invalid first byte (0xFF)
+    dhig: ( Liis cusub ; 255 ; 0 ) furaha: ['?'],
+	# Incomplete multi-byte sequence at end
+    dhig: ( Liis cusub ; 66 ; 226 ; 0 ) furaha: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    dhig: ( Liis cusub ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) furaha: ['A€?𐍈B'].
+	 
+utf8cases mid-kasta: { :key :value
+	>> blob := Blob cusub: value tirada-guud, bytes: value.
+	>> str := blob qoraal.
+	(str = key) run: {
+		Soo-saar qor: ['OK'], sadar-cusub.
+	}, haddii-kale: {
+		Soo-saar qor: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, sadar-cusub.
+	}.
+	blob sii-daa.
+}.

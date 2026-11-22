@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> sim := { :format :value
+	{ Tawm sau-ntawv: ( (Hom-ntawv tshiab: format) siv-rau: value ), kab-tshiab. } txhom: { :e Tawm sau-ntawv: e, kab-tshiab. }, pib.
+}.
+>> try-int := { :format :value
+	{ Tawm sau-ntawv: ( (Hom-ntawv tshiab: format) siv-rau-lej-tag-nrho: value ), kab-tshiab. } txhom: { :e Tawm sau-ntawv: e, kab-tshiab. }, pib.
+}.
+
+# fits
+sim siv-rau: ['|%s|'] thiab: ['text'].
+sim siv-rau: ['%06.2f'] thiab: 5.5.
+sim siv-rau: ['100%% %s'] thiab: ['sure'].
+try-int siv-rau: ['%03d'] thiab: 7.
+try-int siv-rau: ['%x'] thiab: 255.
+sim siv-rau: ['%d'] thiab: (Int64 tshiab los-ntawm-kab-ntawv: ['12']).
+sim siv-rau: ['%lld'] thiab: (Int64 tshiab los-ntawm-kab-ntawv: ['12']).
+sim siv-rau: ['%.1lf'] thiab: 5.5.
+try-int siv-rau: ['%hd'] thiab: 7.
+
+# does not fit
+sim siv-rau: ['%s'] thiab: 12345.
+sim siv-rau: ['%d'] thiab: 12345.
+sim siv-rau: ['%f'] thiab: ['text'].
+try-int siv-rau: ['%d'] thiab: ['text'].
+try-int siv-rau: ['%s'] thiab: 5.
+sim siv-rau: ['%s %s'] thiab: ['text'].
+sim siv-rau: ['%n'] thiab: ['text'].
+sim siv-rau: ['%*s'] thiab: ['text'].
+sim siv-rau: ['%'] thiab: ['text'].
+
+# length modifier does not fit
+sim siv-rau: ['%ls'] thiab: ['text'].
+sim siv-rau: ['%Lf'] thiab: 5.5.
+try-int siv-rau: ['%ld'] thiab: 7.
+try-int siv-rau: ['%lld'] thiab: 7.
+sim siv-rau: ['%Ld'] thiab: (Int64 tshiab los-ntawm-kab-ntawv: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+sim siv-rau: ['%99999999999s'] thiab: ['text'].

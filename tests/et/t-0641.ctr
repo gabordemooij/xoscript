@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Sõnastik uus
+	# ASCII only
+	pane: ( Loend uus ; 65 ; 65 ; 65 ; 65 ; 0 ) kohale: ['AAAA'],
+	# valid 2 byte sequence
+	pane: ( Loend uus ; 194 ; 162 ; 0 ) kohale: ['¢'],
+	# Valid 3-byte UTF-8
+    pane: ( Loend uus ; 226 ; 130 ; 172 ; 0 ) kohale: ['€'],
+	# Valid 4-byte UTF-8
+    pane: ( Loend uus ; 240 ; 144 ; 141 ; 136 ; 0 ) kohale: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    pane: ( Loend uus ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) kohale: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    pane: ( Loend uus ; 65 ; 193 ; 129 ; 0 ) kohale: ['A?'],
+	# Invalid first byte (0xFF)
+    pane: ( Loend uus ; 255 ; 0 ) kohale: ['?'],
+	# Incomplete multi-byte sequence at end
+    pane: ( Loend uus ; 66 ; 226 ; 0 ) kohale: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    pane: ( Loend uus ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) kohale: ['A€?𐍈B'].
+	 
+utf8cases iga: { :key :value
+	>> blob := Blob uus: value arvuta, bytes: value.
+	>> str := blob tekst.
+	(str = key) tõsi: {
+		Väljund kirjuta: ['OK'], reavahetus.
+	}, muidu: {
+		Väljund kirjuta: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, reavahetus.
+	}.
+	blob vabasta.
+}.

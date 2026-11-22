@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Vokatra soraty: ['Database test'], andalana-vaovao.
+
+>> db := Maria-DB vaovao mpampiantrano: ['localhost'],
+	anaran-mpampiasa: ['xo'], tenimiafina: ['pass123'], anaran-tahirin-kevitra: ['xobase'], mifandraisa.
+
+Vokatra soraty: ['Can we connect? '] + db mifandray?, andalana-vaovao.
+
+>> masontsivana-fikarohana := db fanontaniana: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], masontsivana: ( Lisitra vaovao ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  masontsivana-fikarohana tanteraho. db hamafiso. } sambory: { :e db avereno.  }, atombohy.
+
+Vokatra soraty: ['Can we insert? '] + ( masontsivana-fikarohana insert-id > 0 ), andalana-vaovao.
+
+>> x := 0.
+>> masontsivana-fikarohana :=
+db fanontaniana: ['SELECT * FROM book order by id desc limit 2'], 
+alaivo: { :row 
+	x ampio: 1.
+	Marina atsaharo. # must clean up, no 'Commands out of sync'
+}.
+
+>> masontsivana-fikarohana :=
+db fanontaniana: ['SELECT * FROM book order by id desc limit 2'], 
+alaivo: { :row
+	x ampio: 1.
+	Marina atsaharo.
+}.
+
+(x > 0) marina: {
+	Vokatra soraty: ['Can we break in the middle of a fetch? '].
+}.
+
+Vokatra soraty: Marina, andalana-vaovao.

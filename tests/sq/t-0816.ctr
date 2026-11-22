@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> provo := { :format :value
+	{ Dalje shkruaj: ( (Format ri: format) zbato: value ), rresht-ri. } kap: { :e Dalje shkruaj: e, rresht-ri. }, nis.
+}.
+>> try-int := { :format :value
+	{ Dalje shkruaj: ( (Format ri: format) zbato-plotë: value ), rresht-ri. } kap: { :e Dalje shkruaj: e, rresht-ri. }, nis.
+}.
+
+# fits
+provo zbato: ['|%s|'] dhe: ['text'].
+provo zbato: ['%06.2f'] dhe: 5.5.
+provo zbato: ['100%% %s'] dhe: ['sure'].
+try-int zbato: ['%03d'] dhe: 7.
+try-int zbato: ['%x'] dhe: 255.
+provo zbato: ['%d'] dhe: (Int64 ri prej-teksti: ['12']).
+provo zbato: ['%lld'] dhe: (Int64 ri prej-teksti: ['12']).
+provo zbato: ['%.1lf'] dhe: 5.5.
+try-int zbato: ['%hd'] dhe: 7.
+
+# does not fit
+provo zbato: ['%s'] dhe: 12345.
+provo zbato: ['%d'] dhe: 12345.
+provo zbato: ['%f'] dhe: ['text'].
+try-int zbato: ['%d'] dhe: ['text'].
+try-int zbato: ['%s'] dhe: 5.
+provo zbato: ['%s %s'] dhe: ['text'].
+provo zbato: ['%n'] dhe: ['text'].
+provo zbato: ['%*s'] dhe: ['text'].
+provo zbato: ['%'] dhe: ['text'].
+
+# length modifier does not fit
+provo zbato: ['%ls'] dhe: ['text'].
+provo zbato: ['%Lf'] dhe: 5.5.
+try-int zbato: ['%ld'] dhe: 7.
+try-int zbato: ['%lld'] dhe: 7.
+provo zbato: ['%Ld'] dhe: (Int64 ri prej-teksti: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+provo zbato: ['%99999999999s'] dhe: ['text'].

@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lista bag-o ;
+	# {"key":"normal"} normal ASCII
+	( Diksyonaryo bag-o ibutang: ['normal'] sa: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Diksyonaryo bag-o ibutang: ['hello world'] sa: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Diksyonaryo bag-o ibutang: ['"'] sa: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Diksyonaryo bag-o ibutang: ['backslash: \\'] sa: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Diksyonaryo bag-o ibutang: ['slash: /'] sa: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Diksyonaryo bag-o ibutang: ['backspace: \b'] sa: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Diksyonaryo bag-o ibutang: ['formfeed: \f'] sa: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Diksyonaryo bag-o ibutang: ['newline: \n'] sa: ['key'] ) ;
+	( Diksyonaryo bag-o ibutang: ['newline: ↵'] sa: ['key'] ) ;
+	( Diksyonaryo bag-o ibutang: ['newline: 
+	'] sa: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Diksyonaryo bag-o ibutang: ['carriage return: \r'] sa: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Diksyonaryo bag-o ibutang: ['tab \t'] sa: ['key'] ) ;
+	( Diksyonaryo bag-o ibutang: ['tab ⇿'] sa: ['key'] ) ;
+	( Diksyonaryo bag-o ibutang: ['tab  '] sa: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Diksyonaryo bag-o ibutang: ['NUL \u0000'] sa: ['key'] ) ;
+	( Diksyonaryo bag-o ibutang: ['NUL \0'] sa: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Diksyonaryo bag-o ibutang: ['control: \u0001'] sa: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Diksyonaryo bag-o ibutang: ['control: \u001F'] sa: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Diksyonaryo bag-o ibutang: ['unicode: é'] sa: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Diksyonaryo bag-o ibutang: ['unicode: €'] sa: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Diksyonaryo bag-o ibutang: ['unicode: 日本語'] sa: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Diksyonaryo bag-o ibutang: ['unicode: 😀'] sa: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Diksyonaryo bag-o ibutang: ['unicode: 🧑‍💻'] sa: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Diksyonaryo bag-o ibutang: ['combining: e\u0301'] sa: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Diksyonaryo bag-o ibutang: ['escaped unicode: \u00e9'] sa: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Diksyonaryo bag-o ibutang: ['escaped unicode: \u20ac'] sa: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Diksyonaryo bag-o ibutang: ['escaped unicode: \ud83d\ude00'] sa: ['key'] ) ;
+	# {"key":""} empty value
+	( Diksyonaryo bag-o ibutang: [''] sa: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Diksyonaryo bag-o ibutang: ['@ < > & = % + ? #'] sa: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Diksyonaryo bag-o ibutang: ['''] sa: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Diksyonaryo bag-o ibutang: ['multiple: \" \\ \n \r \t'] sa: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Diksyonaryo bag-o ibutang: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] sa: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Diksyonaryo bag-o ibutang: [' value'] sa: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Diksyonaryo bag-o ibutang: ['value '] sa: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Diksyonaryo bag-o ibutang: [' \t\n\r '] sa: ['key'] ).
+
+dicts matag: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Diksyonaryo bag-o ibutang: d key sa: ['key']).
+	>> b := JSON jsonify: (Diksyonaryo bag-o ibutang: ['value'] sa: d key).
+	>> e := JSON butang: a.
+	>> f := JSON butang: b.
+	((e key = d key ug: (f ? d key = ['value'])) o: (e key = ['NUL ?'])) tinuod: {
+		Gawas isulat: ['OK'], bag-ong-linya.
+	}, kon-dili: {
+		Gawas isulat: ['Unable to properly encode/decode: '] + d + j, bag-ong-linya.
+		Programa taposa.
+	}.
+}.

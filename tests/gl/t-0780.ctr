@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lista novo ;
+	# {"key":"normal"} normal ASCII
+	( Dicionario novo poñer: ['normal'] en: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Dicionario novo poñer: ['hello world'] en: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Dicionario novo poñer: ['"'] en: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Dicionario novo poñer: ['backslash: \\'] en: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Dicionario novo poñer: ['slash: /'] en: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Dicionario novo poñer: ['backspace: \b'] en: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Dicionario novo poñer: ['formfeed: \f'] en: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Dicionario novo poñer: ['newline: \n'] en: ['key'] ) ;
+	( Dicionario novo poñer: ['newline: ↵'] en: ['key'] ) ;
+	( Dicionario novo poñer: ['newline: 
+	'] en: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Dicionario novo poñer: ['carriage return: \r'] en: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Dicionario novo poñer: ['tab \t'] en: ['key'] ) ;
+	( Dicionario novo poñer: ['tab ⇿'] en: ['key'] ) ;
+	( Dicionario novo poñer: ['tab  '] en: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Dicionario novo poñer: ['NUL \u0000'] en: ['key'] ) ;
+	( Dicionario novo poñer: ['NUL \0'] en: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Dicionario novo poñer: ['control: \u0001'] en: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Dicionario novo poñer: ['control: \u001F'] en: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Dicionario novo poñer: ['unicode: é'] en: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Dicionario novo poñer: ['unicode: €'] en: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Dicionario novo poñer: ['unicode: 日本語'] en: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Dicionario novo poñer: ['unicode: 😀'] en: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Dicionario novo poñer: ['unicode: 🧑‍💻'] en: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Dicionario novo poñer: ['combining: e\u0301'] en: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Dicionario novo poñer: ['escaped unicode: \u00e9'] en: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Dicionario novo poñer: ['escaped unicode: \u20ac'] en: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Dicionario novo poñer: ['escaped unicode: \ud83d\ude00'] en: ['key'] ) ;
+	# {"key":""} empty value
+	( Dicionario novo poñer: [''] en: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Dicionario novo poñer: ['@ < > & = % + ? #'] en: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Dicionario novo poñer: ['''] en: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Dicionario novo poñer: ['multiple: \" \\ \n \r \t'] en: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Dicionario novo poñer: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] en: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Dicionario novo poñer: [' value'] en: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Dicionario novo poñer: ['value '] en: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Dicionario novo poñer: [' \t\n\r '] en: ['key'] ).
+
+dicts cada: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Dicionario novo poñer: d key en: ['key']).
+	>> b := JSON jsonify: (Dicionario novo poñer: ['value'] en: d key).
+	>> e := JSON obxecto: a.
+	>> f := JSON obxecto: b.
+	((e key = d key e: (f ? d key = ['value'])) ou: (e key = ['NUL ?'])) certo: {
+		Saída escribir: ['OK'], salto-de-liña.
+	}, senón: {
+		Saída escribir: ['Unable to properly encode/decode: '] + d + j, salto-de-liña.
+		Programa final.
+	}.
+}.

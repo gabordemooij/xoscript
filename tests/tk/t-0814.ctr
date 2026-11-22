@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server başlat.
+Programma peýdalan: ['../../../src/xo/tk/webtools.xo'].
+
+>> Fake-Request := Obýekt täze.
+Fake-Request gelende: ['value:'] et: { :baha
+	öz baha := baha.
+}.
+Fake-Request gelende: ['cookie:'] et: { :at <- öz baha.
+}.
+
+>> Test-Session := Wagtlaýyn-faýl-sessiýasy täze.
+Test-Session gelende: ['ýükle'] et: { <- Sözlük täze.
+}.
+Test-Session gelende: ['session-id'] et: { <- öz id.
+}.
+
+>> cookies := Sanaw täze
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies her: { :i :cookie
+	>> haýyş := Fake-Request täze.
+	haýyş value: cookie.
+	>> dolandyryjy := Test-Session täze.
+	>> web := Web-resminama täze.
+	web haýyş: haýyş.
+	web sessiýa-dolandyryjy: dolandyryjy.
+	web sessiýany-başla.
+	Çykyş ýaz: ( dolandyryjy session-id = cookie ), täze-setir.
+}.
+
+>> web := Web-resminama täze.
+web json: (Sözlük täze goý: ['b'] açar: ['a']).
+Çykyş ýaz: ['\n'], täze-setir.
+
+{ Tor get: ['file:///etc/hostname']. } tut: { :e
+	Çykyş ýaz: e, täze-setir.
+}, işlet.
+
+>> svg := Faýl täze: ['/tmp/test0814.svg'].
+svg ýaz: ['<svg xmlns="x"></svg>'].
+Çykyş täze-setir.
+Server geçir: ['test0814.svg'] prefiks: ['/tmp/'].
+svg poz.

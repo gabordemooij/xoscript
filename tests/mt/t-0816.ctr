@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> ipprova := { :format :value
+	{ Ħruġ ikteb: ( (Format ġdid: format) applika: value ), linja-ġdida. } aqbad: { :e Ħruġ ikteb: e, linja-ġdida. }, ibda.
+}.
+>> try-int := { :format :value
+	{ Ħruġ ikteb: ( (Format ġdid: format) applika-sħiħ: value ), linja-ġdida. } aqbad: { :e Ħruġ ikteb: e, linja-ġdida. }, ibda.
+}.
+
+# fits
+ipprova applika: ['|%s|'] u: ['text'].
+ipprova applika: ['%06.2f'] u: 5.5.
+ipprova applika: ['100%% %s'] u: ['sure'].
+try-int applika: ['%03d'] u: 7.
+try-int applika: ['%x'] u: 255.
+ipprova applika: ['%d'] u: (Int64 ġdid minn-test: ['12']).
+ipprova applika: ['%lld'] u: (Int64 ġdid minn-test: ['12']).
+ipprova applika: ['%.1lf'] u: 5.5.
+try-int applika: ['%hd'] u: 7.
+
+# does not fit
+ipprova applika: ['%s'] u: 12345.
+ipprova applika: ['%d'] u: 12345.
+ipprova applika: ['%f'] u: ['text'].
+try-int applika: ['%d'] u: ['text'].
+try-int applika: ['%s'] u: 5.
+ipprova applika: ['%s %s'] u: ['text'].
+ipprova applika: ['%n'] u: ['text'].
+ipprova applika: ['%*s'] u: ['text'].
+ipprova applika: ['%'] u: ['text'].
+
+# length modifier does not fit
+ipprova applika: ['%ls'] u: ['text'].
+ipprova applika: ['%Lf'] u: 5.5.
+try-int applika: ['%ld'] u: 7.
+try-int applika: ['%lld'] u: 7.
+ipprova applika: ['%Ld'] u: (Int64 ġdid minn-test: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+ipprova applika: ['%99999999999s'] u: ['text'].

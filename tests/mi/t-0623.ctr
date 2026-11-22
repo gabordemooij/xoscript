@@ -1,0 +1,43 @@
+
+
+>> g := Server hou.
+>> v := Pākoro hou.
+>> ok := 0.
+
+>> secrets := Rārangi hou ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets tārua.
+passwords ia: { :i :p
+	secrets ia: { :n :s
+		{
+			>> encrypted := v whakamuna: s kī: p.
+			>> decrypted := v wetemuna: encrypted kī: p.
+			(decrypted = s) pono: {
+				ok tāpiri: 1.
+			}, ki-te-kore: {
+				Huaputa tuhi: ['failed encrypting/decrypting: '], rārangi-hou.
+				Huaputa tuhi: s, rārangi-hou.
+				Huaputa tuhi: ['encrypted: '] + encrypted, rārangi-hou.
+				Huaputa tuhi: ['decrypted: '] + encrypted, rārangi-hou.
+				Papatono mutu.
+			}.
+		} hopu: { :err
+			(s = [''] ranei: p = ['']) pono: {
+				ok tāpiri: 1.
+			}, ki-te-kore: {
+				Huaputa tuhi: err, rārangi-hou.
+				Papatono mutu.
+			}.
+		}, tīmata.
+	}.
+}.
+
+Huaputa tuhi: ( ok + [' vault encryptions tested.'] ), rārangi-hou.

@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> reyna := { :format :value
+	{ Úttak skrifa: ( (Snið nýtt: format) beita: value ), ný-lína. } grípa: { :e Úttak skrifa: e, ný-lína. }, ræsa.
+}.
+>> try-int := { :format :value
+	{ Úttak skrifa: ( (Snið nýtt: format) beita-heiltölu: value ), ný-lína. } grípa: { :e Úttak skrifa: e, ný-lína. }, ræsa.
+}.
+
+# fits
+reyna beita: ['|%s|'] og: ['text'].
+reyna beita: ['%06.2f'] og: 5.5.
+reyna beita: ['100%% %s'] og: ['sure'].
+try-int beita: ['%03d'] og: 7.
+try-int beita: ['%x'] og: 255.
+reyna beita: ['%d'] og: (Int64 nýtt úr-texta: ['12']).
+reyna beita: ['%lld'] og: (Int64 nýtt úr-texta: ['12']).
+reyna beita: ['%.1lf'] og: 5.5.
+try-int beita: ['%hd'] og: 7.
+
+# does not fit
+reyna beita: ['%s'] og: 12345.
+reyna beita: ['%d'] og: 12345.
+reyna beita: ['%f'] og: ['text'].
+try-int beita: ['%d'] og: ['text'].
+try-int beita: ['%s'] og: 5.
+reyna beita: ['%s %s'] og: ['text'].
+reyna beita: ['%n'] og: ['text'].
+reyna beita: ['%*s'] og: ['text'].
+reyna beita: ['%'] og: ['text'].
+
+# length modifier does not fit
+reyna beita: ['%ls'] og: ['text'].
+reyna beita: ['%Lf'] og: 5.5.
+try-int beita: ['%ld'] og: 7.
+try-int beita: ['%lld'] og: 7.
+reyna beita: ['%Ld'] og: (Int64 nýtt úr-texta: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+reyna beita: ['%99999999999s'] og: ['text'].

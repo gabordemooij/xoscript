@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := 保险库 生成加密密钥.
+>> sk := keys 第一个.
+>> pk := keys 最后.
+>> sig := 保险库 签名: ['abc'] 用: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ 保险库 签名: ['abc'] 用: long. } 捕获: { :e
+	输出 写入: e, 停止.
+}, 运行.
+
+{ 保险库 验证: ['abc'] 签名: long 用: pk. } 捕获: { :e
+	输出 写入: e, 停止.
+}, 运行.
+
+{ 保险库 验证: ['abc'] 签名: sig 用: short. } 捕获: { :e
+	输出 写入: e, 停止.
+}, 运行.

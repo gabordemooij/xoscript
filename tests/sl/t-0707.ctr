@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Program upravljanje-pomnilnika: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB nov gostitelj: ['localhost'],
+	uporabnik: ['xo'], geslo: ['pass123'], ime-baze: ['xobase'], poveži-se.
+
+>> TwoDigitFormat := Format nov: ['%02d'].
+
+# Datetime
+{
+	>> leto := Število med: 1995 in: 2050, besedilo.
+	>> mesec := TwoDigitFormat uporabi-celo: (Število med: 1 in: 12), besedilo.
+	>> dan := TwoDigitFormat uporabi-celo: (Število med: 1 in: 28), besedilo.
+	>> ura := TwoDigitFormat uporabi-celo: (Število med: 1 in: 23), besedilo.
+	>> minuta := TwoDigitFormat uporabi-celo: (Število med: 1 in: 59), besedilo.
+	>> sekunda := TwoDigitFormat uporabi-celo: (Število med: 1 in: 59), besedilo.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: leto,
+		MM: mesec,
+		DD: dan,
+		HH: ura,
+		II: minuta,
+		SS: sekunda.
+	>> iskalni-parametri :=
+	db poizvedba: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	pridobi: { :row
+		(row mydatetime = datetime) neresnično: {
+			ta-naloga napaka: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter prištej: 1.
+} * 100.
+
+# Date
+{
+	>> leto := Število med: 1995 in: 2050, besedilo.
+	>> mesec := TwoDigitFormat uporabi-celo: (Število med: 1 in: 12), besedilo.
+	>> dan := TwoDigitFormat uporabi-celo: (Število med: 1 in: 28), besedilo.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: leto,
+		MM: mesec,
+		DD: dan.
+	>> iskalni-parametri :=
+	db poizvedba: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	pridobi: { :row
+		(row mydate = date) neresnično: {
+			ta-naloga napaka: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter prištej: 1.
+} * 100.
+
+
+# Time
+{
+	>> ura := TwoDigitFormat uporabi-celo: (Število med: 1 in: 23), besedilo.
+	>> minuta := TwoDigitFormat uporabi-celo: (Število med: 1 in: 59), besedilo.
+	>> sekunda := TwoDigitFormat uporabi-celo: (Število med: 1 in: 59), besedilo.
+	>> čas := ['HH:II:SS'].
+	čas
+		HH: ura,
+		II: minuta,
+		SS: sekunda.
+	>> iskalni-parametri :=
+	db poizvedba: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: čas),
+	pridobi: { :row
+		(row mytime = čas) neresnično: {
+			ta-naloga napaka: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter prištej: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Seznam nov napolni: 100000 z: ['x'], združi: [''].
+{
+	>> str2 := Sef žeton: 40.
+	>> iskalni-parametri :=
+	db poizvedba: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	pridobi: { :row
+		(row str1 = str1 in: row str2 = str2) neresnično: {
+			ta-naloga napaka: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter prištej: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Število med: 1 in: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 iz-besedila: ['9223372036854775807'] ) -
+		( Int64 iz-besedila: ['99999'] ) +
+		( Int64 iz-besedila: n1 besedilo )
+	).
+	>> iskalni-parametri :=
+	db poizvedba: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	pridobi: { :row
+		(row n1 = n1) neresnično: {
+			ta-naloga napaka: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) neresnično: {
+			ta-naloga napaka: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 zaokroži) neresnično: {
+			ta-naloga napaka: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) neresnično: {
+			ta-naloga napaka: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter prištej: 1.
+} * 100.
+
+
+Izhod piši: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), nova-vrstica.

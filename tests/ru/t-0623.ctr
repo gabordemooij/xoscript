@@ -1,0 +1,43 @@
+
+
+>> g := Server новый.
+>> v := Хранилище новый.
+>> ok := 0.
+
+>> secrets := Список новый ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets скопировать.
+passwords каждый: { :i :p
+	secrets каждый: { :n :s
+		{
+			>> encrypted := v шифровать: s ключ: p.
+			>> decrypted := v расшифровать: encrypted ключ: p.
+			(decrypted = s) истина: {
+				ok добавить: 1.
+			}, иначе: {
+				Выход написать: ['failed encrypting/decrypting: '], стоп.
+				Выход написать: s, стоп.
+				Выход написать: ['encrypted: '] + encrypted, стоп.
+				Выход написать: ['decrypted: '] + encrypted, стоп.
+				Программа конец.
+			}.
+		} впоймать: { :err
+			(s = [''] или: p = ['']) истина: {
+				ok добавить: 1.
+			}, иначе: {
+				Выход написать: err, стоп.
+				Программа конец.
+			}.
+		}, запуск.
+	}.
+}.
+
+Выход написать: ( ok + [' vault encryptions tested.'] ), стоп.

@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+ፕሮግራም የትውስታ-አስተዳደር: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB አዲስ አስተናጋጅ: ['localhost'],
+	የተጠቃሚ-ስም: ['xo'], የይለፍ-ቃል: ['pass123'], የውሂብ-ጎታ-ስም: ['xobase'], ተገናኝ.
+
+>> TwoDigitFormat := ቅርጸት አዲስ: ['%02d'].
+
+# Datetime
+{
+	>> አመት := ቁጥር መካከል: 1995 እስከ: 2050, በጽሑፍ.
+	>> ወር := TwoDigitFormat ተግብር-ሙሉ-ቁጥር: (ቁጥር መካከል: 1 እስከ: 12), በጽሑፍ.
+	>> ቀን := TwoDigitFormat ተግብር-ሙሉ-ቁጥር: (ቁጥር መካከል: 1 እስከ: 28), በጽሑፍ.
+	>> ሰአት := TwoDigitFormat ተግብር-ሙሉ-ቁጥር: (ቁጥር መካከል: 1 እስከ: 23), በጽሑፍ.
+	>> ደቂቃ := TwoDigitFormat ተግብር-ሙሉ-ቁጥር: (ቁጥር መካከል: 1 እስከ: 59), በጽሑፍ.
+	>> ሰከንድ := TwoDigitFormat ተግብር-ሙሉ-ቁጥር: (ቁጥር መካከል: 1 እስከ: 59), በጽሑፍ.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: አመት,
+		MM: ወር,
+		DD: ቀን,
+		HH: ሰአት,
+		II: ደቂቃ,
+		SS: ሰከንድ.
+	>> የፍለጋ-መለኪያዎች :=
+	db መጠይቅ: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	አምጣ: { :row
+		(row mydatetime = datetime) ሐሰት-ከሆነ: {
+			ይህ-ሥራ ስህተት: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ደምር: 1.
+} * 100.
+
+# Date
+{
+	>> አመት := ቁጥር መካከል: 1995 እስከ: 2050, በጽሑፍ.
+	>> ወር := TwoDigitFormat ተግብር-ሙሉ-ቁጥር: (ቁጥር መካከል: 1 እስከ: 12), በጽሑፍ.
+	>> ቀን := TwoDigitFormat ተግብር-ሙሉ-ቁጥር: (ቁጥር መካከል: 1 እስከ: 28), በጽሑፍ.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: አመት,
+		MM: ወር,
+		DD: ቀን.
+	>> የፍለጋ-መለኪያዎች :=
+	db መጠይቅ: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	አምጣ: { :row
+		(row mydate = date) ሐሰት-ከሆነ: {
+			ይህ-ሥራ ስህተት: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ደምር: 1.
+} * 100.
+
+
+# Time
+{
+	>> ሰአት := TwoDigitFormat ተግብር-ሙሉ-ቁጥር: (ቁጥር መካከል: 1 እስከ: 23), በጽሑፍ.
+	>> ደቂቃ := TwoDigitFormat ተግብር-ሙሉ-ቁጥር: (ቁጥር መካከል: 1 እስከ: 59), በጽሑፍ.
+	>> ሰከንድ := TwoDigitFormat ተግብር-ሙሉ-ቁጥር: (ቁጥር መካከል: 1 እስከ: 59), በጽሑፍ.
+	>> ጊዜ := ['HH:II:SS'].
+	ጊዜ
+		HH: ሰአት,
+		II: ደቂቃ,
+		SS: ሰከንድ.
+	>> የፍለጋ-መለኪያዎች :=
+	db መጠይቅ: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: ጊዜ),
+	አምጣ: { :row
+		(row mytime = ጊዜ) ሐሰት-ከሆነ: {
+			ይህ-ሥራ ስህተት: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ደምር: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := ሰልፍ አዲስ ሙላ: 100000 በዋጋ: ['x'], አገናኝ: [''].
+{
+	>> str2 := ካዝና ቶከን: 40.
+	>> የፍለጋ-መለኪያዎች :=
+	db መጠይቅ: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	አምጣ: { :row
+		(row str1 = str1 እና: row str2 = str2) ሐሰት-ከሆነ: {
+			ይህ-ሥራ ስህተት: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ደምር: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := ቁጥር መካከል: 1 እስከ: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 ከጽሑፍ: ['9223372036854775807'] ) -
+		( Int64 ከጽሑፍ: ['99999'] ) +
+		( Int64 ከጽሑፍ: n1 በጽሑፍ )
+	).
+	>> የፍለጋ-መለኪያዎች :=
+	db መጠይቅ: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	አምጣ: { :row
+		(row n1 = n1) ሐሰት-ከሆነ: {
+			ይህ-ሥራ ስህተት: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) ሐሰት-ከሆነ: {
+			ይህ-ሥራ ስህተት: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 አጠጋጋ) ሐሰት-ከሆነ: {
+			ይህ-ሥራ ስህተት: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) ሐሰት-ከሆነ: {
+			ይህ-ሥራ ስህተት: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ደምር: 1.
+} * 100.
+
+
+ውጤት ፃፍ: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), አዲስ-መስመር.

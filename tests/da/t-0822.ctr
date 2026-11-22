@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB ny vært: ['localhost'],
+	brugernavn: ['xo'],
+	adgangskode: ['pass123'],
+	databasenavn: ['xobase'],
+	tilslut.
+
+>> søgeparametre := db forespørgsel: ['SELECT ? AS a, ? AS b, ? AS c'].
+søgeparametre parametre: (Liste ny ; ['1']).
+{ søgeparametre hent: { :row Uddata skriv: row, stop. }. } fang: { :e Uddata skriv: e, stop. }, start.
+
+>> søgeparametre := db forespørgsel: ['SELECT ? AS a'].
+{ søgeparametre hent: { :row Uddata skriv: row, stop. }. } fang: { :e Uddata skriv: e, stop. }, start.
+
+# the right number still works, more parameters are ignored as before
+>> søgeparametre := db forespørgsel: ['SELECT ? AS a, ? AS b'].
+søgeparametre parametre: (Liste ny ; ['1'] ; ['2']).
+søgeparametre hent: { :row Uddata skriv: (row ved: ['a']), skriv: (row ved: ['b']), stop. }.
+søgeparametre parametre: (Liste ny ; ['1'] ; ['2'] ; ['3']).
+søgeparametre hent: { :row Uddata skriv: (row ved: ['a']), skriv: (row ved: ['b']), stop. }.

@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Úttak skrifa: ['Database test'], ný-lína.
+
+>> db := Maria-DB nýtt hýsill: ['localhost'],
+	notandanafn: ['xo'], lykilorð: ['pass123'], nafn-gagnagrunns: ['xobase'], tengjast.
+
+Úttak skrifa: ['Can we connect? '] + db tengt?, ný-lína.
+
+>> leitarfæribreytur := db fyrirspurn: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], færibreytur: ( Listi nýtt ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  leitarfæribreytur keyra. db staðfesta. } grípa: { :e db afturkalla.  }, ræsa.
+
+Úttak skrifa: ['Can we insert? '] + ( leitarfæribreytur insert-id > 0 ), ný-lína.
+
+>> x := 0.
+>> leitarfæribreytur :=
+db fyrirspurn: ['SELECT * FROM book order by id desc limit 2'], 
+sækja: { :row 
+	x leggja-við: 1.
+	Satt rjúfa. # must clean up, no 'Commands out of sync'
+}.
+
+>> leitarfæribreytur :=
+db fyrirspurn: ['SELECT * FROM book order by id desc limit 2'], 
+sækja: { :row
+	x leggja-við: 1.
+	Satt rjúfa.
+}.
+
+(x > 0) satt: {
+	Úttak skrifa: ['Can we break in the middle of a fetch? '].
+}.
+
+Úttak skrifa: Satt, ný-lína.

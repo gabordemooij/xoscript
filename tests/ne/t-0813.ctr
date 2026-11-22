@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server आरम्भ-गर.
+प्रोग्राम प्रयोग: ['../../../src/xo/ne/webtools.xo'].
+प्रोग्राम प्रयोग: ['../../../src/xo/ne/mailtools.xo'].
+
+>> हेडर := HTTP-हेडर नयाँ कुञ्जी: ['Location'] मूल्य: ['/ok\r\nX-Injected: yes'].
+आउटपुट लेख: हेडर.
+
+>> web := वेब-कागजात नयाँ.
+web जाऊ: ['/ok\r\nX-Injected: yes'].
+आउटपुट लेख: ['\n'], नयाँ-पङ्क्ति.
+
+>> mail := इमेल नयाँ.
+mail प्रापकलाई: (तालिका नयाँ ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (तालिका नयाँ ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (तालिका नयाँ ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail प्रेषक: ['d@example.invalid\r\nX-From: yes'] नाम: ['site\r\nX-Name: yes'].
+mail विषय: ['hello\r\nX-Subject: yes'].
+mail मुख्य-पाठ: ['line1\r\nline2'].
+आउटपुट लेख: mail उत्पन्न-गर.
+
+>> html := HTML-इमेल नयाँ.
+html प्रापकलाई: (तालिका नयाँ ; ['a@example.invalid\r\nX-To: yes']).
+html प्रेषक: ['d@example.invalid'] नाम: ['site'].
+html विषय: ['hello\r\nX-Subject: yes'].
+html मुख्य-पाठ: ['body'].
+आउटपुट लेख: ( html उत्पन्न-गर भित्र-छ: ['\nX-'] ), नयाँ-पङ्क्ति.
+आउटपुट लेख: ( html उत्पन्न-गर भित्र-छ: ['X-To: yes'] ), नयाँ-पङ्क्ति.

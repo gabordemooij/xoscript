@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Objekt ny.
+
+Log ved: ['say:'] gjør: { :str
+	Utdata skriv: str, stop.
+}.
+
+>> Item := Objekt ny.
+
+Item ved: ['ny:'] gjør: { :id <- selv ny id: id.
+}.
+
+Item ved: ['id:'] gjør: { :id
+	egen id := id.
+}.
+
+Item ved: ['id'] gjør: { <- egen id. }.
+
+
+Item ved: ['tekst'] gjør: {
+	>> str := ['Item#~no'].
+	str ~no: egen id. <- str.
+}.
+
+
+>> Print := Objekt ny.
+
+Print ved: ['items'] gjør: { 
+	
+	egen item := Item ny: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: egen item
+	).
+	
+	
+}.
+
+Print items.

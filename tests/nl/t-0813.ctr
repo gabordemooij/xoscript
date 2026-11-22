@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server initialiseren.
+Programma gebruik: ['../../../src/xo/nl/webtools.xo'].
+Programma gebruik: ['../../../src/xo/nl/mailtools.xo'].
+
+>> kop := HTTP-Kop nieuw sleutel: ['Location'] waarde: ['/ok\r\nX-Injected: yes'].
+Uit schrijf: kop.
+
+>> web := Webdocument nieuw.
+web ga-naar: ['/ok\r\nX-Injected: yes'].
+Uit schrijf: ['\n'], stop.
+
+>> mail := E-mail nieuw.
+mail aan: (Reeks nieuw ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Reeks nieuw ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Reeks nieuw ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail afzender: ['d@example.invalid\r\nX-From: yes'] naam: ['site\r\nX-Name: yes'].
+mail onderwerp: ['hello\r\nX-Subject: yes'].
+mail berichttekst: ['line1\r\nline2'].
+Uit schrijf: mail genereren.
+
+>> html := HTML-E-mail nieuw.
+html aan: (Reeks nieuw ; ['a@example.invalid\r\nX-To: yes']).
+html afzender: ['d@example.invalid'] naam: ['site'].
+html onderwerp: ['hello\r\nX-Subject: yes'].
+html berichttekst: ['body'].
+Uit schrijf: ( html genereren bevat: ['\nX-'] ), stop.
+Uit schrijf: ( html genereren bevat: ['X-To: yes'] ), stop.

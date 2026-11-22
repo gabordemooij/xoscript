@@ -1,0 +1,43 @@
+
+
+>> g := Server uus.
+>> v := Seif uus.
+>> ok := 0.
+
+>> secrets := Loend uus ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopeeri.
+passwords iga: { :i :p
+	secrets iga: { :n :s
+		{
+			>> encrypted := v krüpti: s võti: p.
+			>> decrypted := v dekrüpti: encrypted võti: p.
+			(decrypted = s) tõsi: {
+				ok liida: 1.
+			}, muidu: {
+				Väljund kirjuta: ['failed encrypting/decrypting: '], reavahetus.
+				Väljund kirjuta: s, reavahetus.
+				Väljund kirjuta: ['encrypted: '] + encrypted, reavahetus.
+				Väljund kirjuta: ['decrypted: '] + encrypted, reavahetus.
+				Programm lõpp.
+			}.
+		} püüa: { :err
+			(s = [''] või: p = ['']) tõsi: {
+				ok liida: 1.
+			}, muidu: {
+				Väljund kirjuta: err, reavahetus.
+				Programm lõpp.
+			}.
+		}, käivita.
+	}.
+}.
+
+Väljund kirjuta: ( ok + [' vault encryptions tested.'] ), reavahetus.

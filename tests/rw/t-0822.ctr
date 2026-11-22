@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB gishya uwakira: ['localhost'],
+	izina-ryukoresha: ['xo'],
+	ijambobanga: ['pass123'],
+	izina-ryububikoshingiro: ['xobase'],
+	ihuze.
+
+>> ibipimo-byishakisha := db ikibazo: ['SELECT ? AS a, ? AS b, ? AS c'].
+ibipimo-byishakisha ibipimo: (Urutonde gishya ; ['1']).
+{ ibipimo-byishakisha zana: { :row Ibisohoka andika: row, umurongo-mushya. }. } fata-ikosa: { :e Ibisohoka andika: e, umurongo-mushya. }, tangira.
+
+>> ibipimo-byishakisha := db ikibazo: ['SELECT ? AS a'].
+{ ibipimo-byishakisha zana: { :row Ibisohoka andika: row, umurongo-mushya. }. } fata-ikosa: { :e Ibisohoka andika: e, umurongo-mushya. }, tangira.
+
+# the right number still works, more parameters are ignored as before
+>> ibipimo-byishakisha := db ikibazo: ['SELECT ? AS a, ? AS b'].
+ibipimo-byishakisha ibipimo: (Urutonde gishya ; ['1'] ; ['2']).
+ibipimo-byishakisha zana: { :row Ibisohoka andika: (row ahantu: ['a']), andika: (row ahantu: ['b']), umurongo-mushya. }.
+ibipimo-byishakisha ibipimo: (Urutonde gishya ; ['1'] ; ['2'] ; ['3']).
+ibipimo-byishakisha zana: { :row Ibisohoka andika: (row ahantu: ['a']), andika: (row ahantu: ['b']), umurongo-mushya. }.

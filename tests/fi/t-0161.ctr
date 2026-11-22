@@ -1,0 +1,53 @@
+Ohjelma muistinhallinta: 0.
+Lista kun: ['sum'] tee: {
+	>> total := 0.
+	itse jokainen: { :index :element
+		total lisää: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Tiedosto uusi: ['/tmp/test.txt'].
+f kirjoita: ['Lorem Ipsum'].
+f sulje.
+  
+
+f := Tiedosto uusi: ['/tmp/test.txt'].
+>> text := f lue.
+f sulje.
+
+
+
+Ohjelma siivoa.
+usedMemory1 := (Ohjelma muisti ? 1).
+
+
+
+f := Tiedosto uusi: ['/tmp/test.txt'].
+text := f lue.
+f sulje.
+
+Ohjelma siivoa.
+usedMemory2 := (Ohjelma muisti ? 1).
+
+
+f := Tiedosto uusi: ['/tmp/test.txt'].
+text := f lue.
+f sulje.
+
+Ohjelma siivoa.
+usedMemory3 := (Ohjelma muisti ? 1).
+
+
+
+( usedMemory1 = usedMemory2 ja: usedMemory1 = usedMemory3, ja: usedMemory2 = usedMemory3 ) tosi: {
+	Tuloste kirjoita: ['No memory leaks here'].
+}, epätosi: {
+	Tuloste kirjoita: ['Leaking memory...'].
+}.

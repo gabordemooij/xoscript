@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Daim-teev tshiab ;
+	# {"key":"normal"} normal ASCII
+	( Phau-txhais-lus tshiab muab: ['normal'] rau: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Phau-txhais-lus tshiab muab: ['hello world'] rau: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Phau-txhais-lus tshiab muab: ['"'] rau: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Phau-txhais-lus tshiab muab: ['backslash: \\'] rau: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Phau-txhais-lus tshiab muab: ['slash: /'] rau: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Phau-txhais-lus tshiab muab: ['backspace: \b'] rau: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Phau-txhais-lus tshiab muab: ['formfeed: \f'] rau: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Phau-txhais-lus tshiab muab: ['newline: \n'] rau: ['key'] ) ;
+	( Phau-txhais-lus tshiab muab: ['newline: ↵'] rau: ['key'] ) ;
+	( Phau-txhais-lus tshiab muab: ['newline: 
+	'] rau: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Phau-txhais-lus tshiab muab: ['carriage return: \r'] rau: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Phau-txhais-lus tshiab muab: ['tab \t'] rau: ['key'] ) ;
+	( Phau-txhais-lus tshiab muab: ['tab ⇿'] rau: ['key'] ) ;
+	( Phau-txhais-lus tshiab muab: ['tab  '] rau: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Phau-txhais-lus tshiab muab: ['NUL \u0000'] rau: ['key'] ) ;
+	( Phau-txhais-lus tshiab muab: ['NUL \0'] rau: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Phau-txhais-lus tshiab muab: ['control: \u0001'] rau: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Phau-txhais-lus tshiab muab: ['control: \u001F'] rau: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Phau-txhais-lus tshiab muab: ['unicode: é'] rau: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Phau-txhais-lus tshiab muab: ['unicode: €'] rau: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Phau-txhais-lus tshiab muab: ['unicode: 日本語'] rau: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Phau-txhais-lus tshiab muab: ['unicode: 😀'] rau: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Phau-txhais-lus tshiab muab: ['unicode: 🧑‍💻'] rau: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Phau-txhais-lus tshiab muab: ['combining: e\u0301'] rau: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Phau-txhais-lus tshiab muab: ['escaped unicode: \u00e9'] rau: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Phau-txhais-lus tshiab muab: ['escaped unicode: \u20ac'] rau: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Phau-txhais-lus tshiab muab: ['escaped unicode: \ud83d\ude00'] rau: ['key'] ) ;
+	# {"key":""} empty value
+	( Phau-txhais-lus tshiab muab: [''] rau: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Phau-txhais-lus tshiab muab: ['@ < > & = % + ? #'] rau: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Phau-txhais-lus tshiab muab: ['''] rau: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Phau-txhais-lus tshiab muab: ['multiple: \" \\ \n \r \t'] rau: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Phau-txhais-lus tshiab muab: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] rau: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Phau-txhais-lus tshiab muab: [' value'] rau: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Phau-txhais-lus tshiab muab: ['value '] rau: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Phau-txhais-lus tshiab muab: [' \t\n\r '] rau: ['key'] ).
+
+dicts txhua: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Phau-txhais-lus tshiab muab: d key rau: ['key']).
+	>> b := JSON jsonify: (Phau-txhais-lus tshiab muab: ['value'] rau: d key).
+	>> e := JSON yam-khoom: a.
+	>> f := JSON yam-khoom: b.
+	((e key = d key thiab: (f ? d key = ['value'])) lossis: (e key = ['NUL ?'])) tseeb: {
+		Tawm sau-ntawv: ['OK'], kab-tshiab.
+	}, lwm-yam: {
+		Tawm sau-ntawv: ['Unable to properly encode/decode: '] + d + j, kab-tshiab.
+		Kev-pab-cuam-khoos-phis-tawj ua-tiav.
+	}.
+}.

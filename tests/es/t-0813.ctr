@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server iniciar.
+Programa utilizar: ['../../../src/xo/es/webtools.xo'].
+Programa utilizar: ['../../../src/xo/es/mailtools.xo'].
+
+>> cabezera := Cabezera-HTTP crear clave: ['Location'] valor: ['/ok\r\nX-Injected: yes'].
+Salida escribir: cabezera.
+
+>> web := Documento-Web crear.
+web ir-a: ['/ok\r\nX-Injected: yes'].
+Salida escribir: ['\n'], detener.
+
+>> mail := Email crear.
+mail destinatario: (Lista crear ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lista crear ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lista crear ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail remitente: ['d@example.invalid\r\nX-From: yes'] nombre: ['site\r\nX-Name: yes'].
+mail asunto: ['hello\r\nX-Subject: yes'].
+mail cuerpo: ['line1\r\nline2'].
+Salida escribir: mail generar.
+
+>> html := HTML-Email crear.
+html destinatario: (Lista crear ; ['a@example.invalid\r\nX-To: yes']).
+html remitente: ['d@example.invalid'] nombre: ['site'].
+html asunto: ['hello\r\nX-Subject: yes'].
+html cuerpo: ['body'].
+Salida escribir: ( html generar contiene: ['\nX-'] ), detener.
+Salida escribir: ( html generar contiene: ['X-To: yes'] ), detener.

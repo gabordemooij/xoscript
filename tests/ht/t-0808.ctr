@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Kòfrefò kreye-kle.
+>> sk := keys premye.
+>> pk := keys dènye.
+>> sig := Kòfrefò siyen: ['abc'] ak: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Kòfrefò siyen: ['abc'] ak: long. } trape: { :e
+	Sòti ekri: e, nouvo-liy.
+}, lanse.
+
+{ Kòfrefò tcheke: ['abc'] siyati: long ak: pk. } trape: { :e
+	Sòti ekri: e, nouvo-liy.
+}, lanse.
+
+{ Kòfrefò tcheke: ['abc'] siyati: sig ak: short. } trape: { :e
+	Sòti ekri: e, nouvo-liy.
+}, lanse.

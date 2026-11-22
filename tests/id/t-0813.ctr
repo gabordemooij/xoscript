@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inisialisasi.
+Program gunakan: ['../../../src/xo/id/webtools.xo'].
+Program gunakan: ['../../../src/xo/id/mailtools.xo'].
+
+>> tajuk := Tajuk-HTTP baru kunci-tajuk: ['Location'] nilai: ['/ok\r\nX-Injected: yes'].
+Keluaran tulis: tajuk.
+
+>> web := Dokumen-Web baru.
+web pergi-ke: ['/ok\r\nX-Injected: yes'].
+Keluaran tulis: ['\n'], baris-baru.
+
+>> mail := Surel baru.
+mail kepada: (Daftar baru ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Daftar baru ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Daftar baru ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail pengirim: ['d@example.invalid\r\nX-From: yes'] nama: ['site\r\nX-Name: yes'].
+mail subjek: ['hello\r\nX-Subject: yes'].
+mail badan: ['line1\r\nline2'].
+Keluaran tulis: mail hasilkan.
+
+>> html := Surel-HTML baru.
+html kepada: (Daftar baru ; ['a@example.invalid\r\nX-To: yes']).
+html pengirim: ['d@example.invalid'] nama: ['site'].
+html subjek: ['hello\r\nX-Subject: yes'].
+html badan: ['body'].
+Keluaran tulis: ( html hasilkan mengandung: ['\nX-'] ), baris-baru.
+Keluaran tulis: ( html hasilkan mengandung: ['X-To: yes'] ), baris-baru.

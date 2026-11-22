@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB bag-o host: ['localhost'],
+	ngalan-sa-user: ['xo'],
+	password: ['pass123'],
+	ngalan-sa-database: ['xobase'],
+	sumpay.
+
+>> parametro-sa-pagpangita := db pangutana: ['SELECT ? AS a, ? AS b, ? AS c'].
+parametro-sa-pagpangita mga-parametro: (Lista bag-o ; ['1']).
+{ parametro-sa-pagpangita kuhaa: { :row Gawas isulat: row, bag-ong-linya. }. } dakpon: { :e Gawas isulat: e, bag-ong-linya. }, padagana.
+
+>> parametro-sa-pagpangita := db pangutana: ['SELECT ? AS a'].
+{ parametro-sa-pagpangita kuhaa: { :row Gawas isulat: row, bag-ong-linya. }. } dakpon: { :e Gawas isulat: e, bag-ong-linya. }, padagana.
+
+# the right number still works, more parameters are ignored as before
+>> parametro-sa-pagpangita := db pangutana: ['SELECT ? AS a, ? AS b'].
+parametro-sa-pagpangita mga-parametro: (Lista bag-o ; ['1'] ; ['2']).
+parametro-sa-pagpangita kuhaa: { :row Gawas isulat: (row sa: ['a']), isulat: (row sa: ['b']), bag-ong-linya. }.
+parametro-sa-pagpangita mga-parametro: (Lista bag-o ; ['1'] ; ['2'] ; ['3']).
+parametro-sa-pagpangita kuhaa: { :row Gawas isulat: (row sa: ['a']), isulat: (row sa: ['b']), bag-ong-linya. }.

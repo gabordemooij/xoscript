@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Liste nouveau ;
+	# {"key":"normal"} normal ASCII
+	( Dictionnaire nouveau mettre: ['normal'] à: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Dictionnaire nouveau mettre: ['hello world'] à: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Dictionnaire nouveau mettre: ['"'] à: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Dictionnaire nouveau mettre: ['backslash: \\'] à: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Dictionnaire nouveau mettre: ['slash: /'] à: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Dictionnaire nouveau mettre: ['backspace: \b'] à: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Dictionnaire nouveau mettre: ['formfeed: \f'] à: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Dictionnaire nouveau mettre: ['newline: \n'] à: ['key'] ) ;
+	( Dictionnaire nouveau mettre: ['newline: ↵'] à: ['key'] ) ;
+	( Dictionnaire nouveau mettre: ['newline: 
+	'] à: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Dictionnaire nouveau mettre: ['carriage return: \r'] à: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Dictionnaire nouveau mettre: ['tab \t'] à: ['key'] ) ;
+	( Dictionnaire nouveau mettre: ['tab ⇿'] à: ['key'] ) ;
+	( Dictionnaire nouveau mettre: ['tab  '] à: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Dictionnaire nouveau mettre: ['NUL \u0000'] à: ['key'] ) ;
+	( Dictionnaire nouveau mettre: ['NUL \0'] à: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Dictionnaire nouveau mettre: ['control: \u0001'] à: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Dictionnaire nouveau mettre: ['control: \u001F'] à: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Dictionnaire nouveau mettre: ['unicode: é'] à: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Dictionnaire nouveau mettre: ['unicode: €'] à: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Dictionnaire nouveau mettre: ['unicode: 日本語'] à: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Dictionnaire nouveau mettre: ['unicode: 😀'] à: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Dictionnaire nouveau mettre: ['unicode: 🧑‍💻'] à: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Dictionnaire nouveau mettre: ['combining: e\u0301'] à: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Dictionnaire nouveau mettre: ['escaped unicode: \u00e9'] à: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Dictionnaire nouveau mettre: ['escaped unicode: \u20ac'] à: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Dictionnaire nouveau mettre: ['escaped unicode: \ud83d\ude00'] à: ['key'] ) ;
+	# {"key":""} empty value
+	( Dictionnaire nouveau mettre: [''] à: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Dictionnaire nouveau mettre: ['@ < > & = % + ? #'] à: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Dictionnaire nouveau mettre: ['''] à: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Dictionnaire nouveau mettre: ['multiple: \" \\ \n \r \t'] à: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Dictionnaire nouveau mettre: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] à: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Dictionnaire nouveau mettre: [' value'] à: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Dictionnaire nouveau mettre: ['value '] à: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Dictionnaire nouveau mettre: [' \t\n\r '] à: ['key'] ).
+
+dicts chaque: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Dictionnaire nouveau mettre: d key à: ['key']).
+	>> b := JSON jsonify: (Dictionnaire nouveau mettre: ['value'] à: d key).
+	>> e := JSON objet: a.
+	>> f := JSON objet: b.
+	((e key = d key et: (f ? d key = ['value'])) ou: (e key = ['NUL ?'])) oui: {
+		Sortie écrire: ['OK'], stop.
+	}, sinon: {
+		Sortie écrire: ['Unable to properly encode/decode: '] + d + j, stop.
+		Programme fin.
+	}.
+}.

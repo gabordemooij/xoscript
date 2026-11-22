@@ -1,0 +1,43 @@
+
+
+>> g := Server novo.
+>> v := Cofre novo.
+>> ok := 0.
+
+>> secrets := Listar novo ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets copiar.
+passwords cada-um: { :i :p
+	secrets cada-um: { :n :s
+		{
+			>> encrypted := v encriptar: s chave: p.
+			>> decrypted := v desencriptar: encrypted chave: p.
+			(decrypted = s) sim: {
+				ok adicionar: 1.
+			}, senão: {
+				Saída escrever: ['failed encrypting/decrypting: '], stop.
+				Saída escrever: s, stop.
+				Saída escrever: ['encrypted: '] + encrypted, stop.
+				Saída escrever: ['decrypted: '] + encrypted, stop.
+				Programa fim.
+			}.
+		} pegar: { :err
+			(s = [''] ou: p = ['']) sim: {
+				ok adicionar: 1.
+			}, senão: {
+				Saída escrever: err, stop.
+				Programa fim.
+			}.
+		}, iniciar.
+	}.
+}.
+
+Saída escrever: ( ok + [' vault encryptions tested.'] ), stop.

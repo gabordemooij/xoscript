@@ -1,0 +1,16 @@
+# a value ending in the first part of an opening quote must survive serialization
+>> mga-halaga := Listahan bago
+	; ['abc\[']
+	; ['\[']
+	; ['\[\[']
+	; ['x\\\[']
+	; ['abc'].
+
+mga-halaga bawat: { :i :value
+	>> d := Diksyunaryo bago.
+	d ilagay: value sa: ['k'].
+	d ilagay: ['second'] sa: ['j'].
+	>> r := d kodigo bagay.
+	Labas isulat: r bilangin, bagong-linya.
+	Labas isulat: ( (r sa: ['k']) = value ), bagong-linya.
+}.

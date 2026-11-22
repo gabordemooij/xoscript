@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB entsha umamkeli: ['localhost'],
+	igama-lomsebenzisi: ['xo'],
+	iphasiwedi: ['pass123'],
+	igama-ledatabheyisi: ['xobase'],
+	qhagamshelana.
+
+>> iiparamitha-zokukhangela := db umbuzo: ['SELECT ? AS a, ? AS b, ? AS c'].
+iiparamitha-zokukhangela iiparamitha: (Uluhlu entsha ; ['1']).
+{ iiparamitha-zokukhangela landa: { :row Imveliso bhala: row, umgca-omtsha. }. } bamba: { :e Imveliso bhala: e, umgca-omtsha. }, qala.
+
+>> iiparamitha-zokukhangela := db umbuzo: ['SELECT ? AS a'].
+{ iiparamitha-zokukhangela landa: { :row Imveliso bhala: row, umgca-omtsha. }. } bamba: { :e Imveliso bhala: e, umgca-omtsha. }, qala.
+
+# the right number still works, more parameters are ignored as before
+>> iiparamitha-zokukhangela := db umbuzo: ['SELECT ? AS a, ? AS b'].
+iiparamitha-zokukhangela iiparamitha: (Uluhlu entsha ; ['1'] ; ['2']).
+iiparamitha-zokukhangela landa: { :row Imveliso bhala: (row kwindawo: ['a']), bhala: (row kwindawo: ['b']), umgca-omtsha. }.
+iiparamitha-zokukhangela iiparamitha: (Uluhlu entsha ; ['1'] ; ['2'] ; ['3']).
+iiparamitha-zokukhangela landa: { :row Imveliso bhala: (row kwindawo: ['a']), bhala: (row kwindawo: ['b']), umgca-omtsha. }.

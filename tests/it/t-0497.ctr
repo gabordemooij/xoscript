@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := File nuovo: ['/tmp/test.gif'].
+f scrivi: ['GIF87a01234567810'].
+
+# serve the file
+Server passaggio: ['test.gif'] prefisso: ['/tmp/'].
+
+Uscita stop.
+
+Uscita scrivi: ['Outside container (security):'], stop.
+{ Server passaggio: ['../passwd'] prefisso: ['/tmp/']. }
+catturare: { :e Uscita scrivi: e, stop. },
+correre.
+
+Uscita scrivi: ['Invalid prefix:'], stop.
+{ Server passaggio: ['test.gif'] prefisso: ['z:\\']. }
+catturare: { :e Uscita scrivi: e, stop. },
+correre.
+
+Uscita scrivi: ['Non-existant file:'], stop.
+{ Server passaggio: ['xxx.xxx'] prefisso: ['/tmp/']. }
+catturare: { :e Uscita scrivi: e, stop. },
+correre.

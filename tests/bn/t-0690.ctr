@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+আউটপুট লেখো: ['Database test'], নতুন-লাইন.
+
+>> db := Maria-DB নতুন হোস্ট: ['localhost'],
+	ব্যবহারকারী-নাম: ['xo'], পাসওয়ার্ড: ['pass123'], ডেটাবেস-নাম: ['xobase'], যুক্ত-হও.
+
+আউটপুট লেখো: ['Can we connect? '] + db যুক্ত?, নতুন-লাইন.
+
+>> অনুসন্ধান-প্যারামিটার := db কোয়েরি: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], প্যারামিটার: ( লিস্ট নতুন ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  অনুসন্ধান-প্যারামিটার নির্বাহ. db নিশ্চিত. } ধরো: { :e db ফিরিয়ে-নাও.  }, চালাও.
+
+আউটপুট লেখো: ['Can we insert? '] + ( অনুসন্ধান-প্যারামিটার insert-id > 0 ), নতুন-লাইন.
+
+>> x := 0.
+>> অনুসন্ধান-প্যারামিটার :=
+db কোয়েরি: ['SELECT * FROM book order by id desc limit 2'], 
+আনো: { :row 
+	x যোগ: 1.
+	সত্য থামাও. # must clean up, no 'Commands out of sync'
+}.
+
+>> অনুসন্ধান-প্যারামিটার :=
+db কোয়েরি: ['SELECT * FROM book order by id desc limit 2'], 
+আনো: { :row
+	x যোগ: 1.
+	সত্য থামাও.
+}.
+
+(x > 0) সত্য-হলে: {
+	আউটপুট লেখো: ['Can we break in the middle of a fetch? '].
+}.
+
+আউটপুট লেখো: সত্য, নতুন-লাইন.

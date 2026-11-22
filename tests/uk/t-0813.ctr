@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server ініціалізувати.
+Програма використати: ['../../../src/xo/uk/webtools.xo'].
+Програма використати: ['../../../src/xo/uk/mailtools.xo'].
+
+>> заголовок := HTTP-Заголовок новий ключ: ['Location'] величина: ['/ok\r\nX-Injected: yes'].
+Вивід написати: заголовок.
+
+>> web := Веб-документ новий.
+web перейти-до: ['/ok\r\nX-Injected: yes'].
+Вивід написати: ['\n'], новий-рядок.
+
+>> mail := Імейл новий.
+mail кому: (Список новий ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Список новий ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Список новий ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail відправник: ['d@example.invalid\r\nX-From: yes'] імʼя: ['site\r\nX-Name: yes'].
+mail тема: ['hello\r\nX-Subject: yes'].
+mail тіло: ['line1\r\nline2'].
+Вивід написати: mail згенерувати.
+
+>> html := HTML-Імейл новий.
+html кому: (Список новий ; ['a@example.invalid\r\nX-To: yes']).
+html відправник: ['d@example.invalid'] імʼя: ['site'].
+html тема: ['hello\r\nX-Subject: yes'].
+html тіло: ['body'].
+Вивід написати: ( html згенерувати містить: ['\nX-'] ), новий-рядок.
+Вивід написати: ( html згенерувати містить: ['X-To: yes'] ), новий-рядок.

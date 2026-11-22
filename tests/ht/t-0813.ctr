@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server prepare.
+Pwogram itilize: ['../../../src/xo/ht/webtools.xo'].
+Pwogram itilize: ['../../../src/xo/ht/mailtools.xo'].
+
+>> antèt := Antèt-HTTP nouvo kle: ['Location'] valè: ['/ok\r\nX-Injected: yes'].
+Sòti ekri: antèt.
+
+>> web := Dokiman-Wèb nouvo.
+web ale-nan: ['/ok\r\nX-Injected: yes'].
+Sòti ekri: ['\n'], nouvo-liy.
+
+>> mail := Imèl nouvo.
+mail bay: (Lis nouvo ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lis nouvo ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lis nouvo ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail moun-ki-voye: ['d@example.invalid\r\nX-From: yes'] non: ['site\r\nX-Name: yes'].
+mail sijè: ['hello\r\nX-Subject: yes'].
+mail kò: ['line1\r\nline2'].
+Sòti ekri: mail jenere.
+
+>> html := Imèl-HTML nouvo.
+html bay: (Lis nouvo ; ['a@example.invalid\r\nX-To: yes']).
+html moun-ki-voye: ['d@example.invalid'] non: ['site'].
+html sijè: ['hello\r\nX-Subject: yes'].
+html kò: ['body'].
+Sòti ekri: ( html jenere gen-ladan: ['\nX-'] ), nouvo-liy.
+Sòti ekri: ( html jenere gen-ladan: ['X-To: yes'] ), nouvo-liy.

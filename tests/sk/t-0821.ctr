@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> cesta := ['/tmp/test0821.csv'].
+>> file := Súbor nový: cesta.
+
+file písať: ['a,b\n"1,2\n'].
+{
+	file oddeľovač: [','] úvodzovka: ['"'] riadky: { :line
+		Výstup písať: line, nový-riadok.
+	}.
+} zachytiť: { :e Výstup písať: e, nový-riadok. }, spustiť.
+
+# a closed quote still works
+file písať: ['a,b\n"1,2",3'].
+file oddeľovač: [','] úvodzovka: ['"'] riadky: { :line
+	Výstup písať: line, nový-riadok.
+}.
+file vymazať.

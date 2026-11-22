@@ -1,0 +1,39 @@
+
+
+Szöveg ha: ['evaluate'] tedd: {
+	>> kód := Fájl új: ['/tmp/eval.ctr'].
+	kód ír: maga szöveg + ['.'].
+	Program használ: ['/tmp/eval.ctr'].
+}.
+
+>> a := (Lista ← (
+	(Szótár új)
+		tesz: ['domain'] ide: ['mywebsite.com'],
+		tesz: (Lista ←
+			((Szótár új)
+				tesz: ['home'] ide: ['title'],
+				tesz: ['<html></html>'] ide: ['body'],
+				tesz: ['2017-01-01'] ide: ['created']
+			) ;
+			((Szótár új)
+				tesz: ['aboutus(c)'] ide: ['title'],
+				tesz: ['<credits>Author Inc.</credits>'] ide: ['body']
+			)
+		) ide: ['pages']
+	)
+) szöveg.
+
+Kimenet ír: a típus, újsor.
+Kimenet ír: a, újsor.
+
+>> b := Semmi.
+(['b := '] + a) evaluate.
+Kimenet ír: b ? 0 ? ['pages'] ? 1 ? ['body'], újsor.
+
+>> c := b ? 0.
+>> d := c szöveg.
+Kimenet ír: d típus, újsor.
+
+>> e := Semmi.
+(['e := '] + d) evaluate.
+Kimenet ír: e ? ['pages'] ? 0, újsor.

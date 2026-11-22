@@ -1,0 +1,43 @@
+
+
+>> g := Server ಹೊಸ.
+>> v := ತಿಜೋರಿ ಹೊಸ.
+>> ok := 0.
+
+>> secrets := ಸರಣಿ ಹೊಸ ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets ನಕಲು.
+passwords ಪ್ರತಿಯೊಂದು: { :i :p
+	secrets ಪ್ರತಿಯೊಂದು: { :n :s
+		{
+			>> encrypted := v ಗೂಢಲಿಪೀಕರಿಸು: s ಕೀಲಿ: p.
+			>> decrypted := v ಗೂಢಲಿಪಿ-ಬಿಡಿಸು: encrypted ಕೀಲಿ: p.
+			(decrypted = s) ಸತ್ಯವಾದರೆ: {
+				ok ಕೂಡಿಸು: 1.
+			}, ಇಲ್ಲದಿದ್ದರೆ: {
+				ಔಟ್-ಪುಟ್ ಬರೆ: ['failed encrypting/decrypting: '], ಹೊಸ-ಸಾಲು.
+				ಔಟ್-ಪುಟ್ ಬರೆ: s, ಹೊಸ-ಸಾಲು.
+				ಔಟ್-ಪುಟ್ ಬರೆ: ['encrypted: '] + encrypted, ಹೊಸ-ಸಾಲು.
+				ಔಟ್-ಪುಟ್ ಬರೆ: ['decrypted: '] + encrypted, ಹೊಸ-ಸಾಲು.
+				ಪ್ರೋಗ್ರಾಂ ಮುಗಿಸು.
+			}.
+		} ಹಿಡಿ: { :err
+			(s = [''] ಅಥವಾ: p = ['']) ಸತ್ಯವಾದರೆ: {
+				ok ಕೂಡಿಸು: 1.
+			}, ಇಲ್ಲದಿದ್ದರೆ: {
+				ಔಟ್-ಪುಟ್ ಬರೆ: err, ಹೊಸ-ಸಾಲು.
+				ಪ್ರೋಗ್ರಾಂ ಮುಗಿಸು.
+			}.
+		}, ಚಲಾಯಿಸು.
+	}.
+}.
+
+ಔಟ್-ಪುಟ್ ಬರೆ: ( ok + [' vault encryptions tested.'] ), ಹೊಸ-ಸಾಲು.

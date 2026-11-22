@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB חדש מארח: ⌝'localhost'⌜,
+	שם-משתמש: ⌝'xo'⌜,
+	סיסמה: ⌝'pass123'⌜,
+	שם-מסד: ⌝'xobase'⌜,
+	התחבר.
+
+>> conn2 := Maria-DB חדש מארח: ⌝'localhost'⌜,
+	שם-משתמש: ⌝'xo'⌜,
+	סיסמה: ⌝'pass123'⌜,
+	שם-מסד: ⌝'xobase'⌜,
+	התחבר.
+#...
+>> del := conn1 שאילתה: ⌝'DELETE FROM book WHERE id > 0'⌜.
+⎬  del בצע. conn1 אשר. ⎨ תפוס: ⎬ :e conn1 בטל-שינויים.  ⎨, הפעל.
+
+>> insert := conn1 שאילתה: ⌝'INSERT INTO book (id) VALUES(null)'⌜.
+insert בצע.
+
+>> כמות := conn1 שאילתה: ⌝'SELECT COUNT(*) AS num FROM book'⌜.
+כמות שלוף: ⎬ :row פלט כתוב: row num, שורה-חדשה. ⎨.
+
+# does not show up
+# insert not committed on connection 1
+>> כמות := conn2 שאילתה: ⌝'SELECT COUNT(*) AS num FROM book'⌜.
+כמות שלוף: ⎬ :row פלט כתוב: row num, שורה-חדשה. ⎨.

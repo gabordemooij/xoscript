@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Irteera idatzi: ['Database test'], lerro-jauzia.
+
+>> db := Maria-DB berria ostalaria: ['localhost'],
+	erabiltzailea: ['xo'], pasahitza: ['pass123'], datu-base-izena: ['xobase'], konektatu.
+
+Irteera idatzi: ['Can we connect? '] + db konektatuta?, lerro-jauzia.
+
+>> bilaketa-parametroak := db kontsulta: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametroak: ( Zerrenda berria ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  bilaketa-parametroak exekutatu. db berretsi. } harrapatu: { :e db desegin.  }, hasi.
+
+Irteera idatzi: ['Can we insert? '] + ( bilaketa-parametroak insert-id > 0 ), lerro-jauzia.
+
+>> Obj := Objektua berria.
+Obj noiz: ['retrieve-rows'] egin: {
+	berezko zenbatu := 0.
+	>> bilaketa-parametroak :=
+	db kontsulta: ['SELECT * FROM book order by id desc limit 2'], 
+	eskuratu: { :row 
+		berezko zenbatu gehitu: 1.
+		Egia eten.
+	}. <- berezko zenbatu kopiatu.
+}.
+
+Irteera idatzi: ['Can we query? '] + ( Obj retrieve-rows > 0 ), lerro-jauzia.

@@ -1,0 +1,43 @@
+
+
+>> g := Server νέο.
+>> v := Θησαυροφυλάκιο νέο.
+>> ok := 0.
+
+>> secrets := Λίστα νέο ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets αντιγραφή.
+passwords κάθε: { :i :p
+	secrets κάθε: { :n :s
+		{
+			>> encrypted := v κρυπτογράφηση: s κλειδί: p.
+			>> decrypted := v αποκρυπτογράφηση: encrypted κλειδί: p.
+			(decrypted = s) αληθές: {
+				ok πρόσθεση: 1.
+			}, αλλιώς: {
+				Έξοδος γράψε: ['failed encrypting/decrypting: '], νέα-γραμμή.
+				Έξοδος γράψε: s, νέα-γραμμή.
+				Έξοδος γράψε: ['encrypted: '] + encrypted, νέα-γραμμή.
+				Έξοδος γράψε: ['decrypted: '] + encrypted, νέα-γραμμή.
+				Πρόγραμμα τέλος.
+			}.
+		} σύλληψη: { :err
+			(s = [''] ή: p = ['']) αληθές: {
+				ok πρόσθεση: 1.
+			}, αλλιώς: {
+				Έξοδος γράψε: err, νέα-γραμμή.
+				Πρόγραμμα τέλος.
+			}.
+		}, εκκίνηση.
+	}.
+}.
+
+Έξοδος γράψε: ( ok + [' vault encryptions tested.'] ), νέα-γραμμή.

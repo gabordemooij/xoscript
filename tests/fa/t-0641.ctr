@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := واژه-نامه جدید
+	# ASCII only
+	بگذار: ﴿ لیست جدید ; 65 ; 65 ; 65 ; 65 ; 0 ﴾ کلید: ⌝'AAAA'⌜,
+	# valid 2 byte sequence
+	بگذار: ﴿ لیست جدید ; 194 ; 162 ; 0 ﴾ کلید: ⌝'¢'⌜,
+	# Valid 3-byte UTF-8
+    بگذار: ﴿ لیست جدید ; 226 ; 130 ; 172 ; 0 ﴾ کلید: ⌝'€'⌜,
+	# Valid 4-byte UTF-8
+    بگذار: ﴿ لیست جدید ; 240 ; 144 ; 141 ; 136 ; 0 ﴾ کلید: ⌝'𐍈'⌜,
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    بگذار: ﴿ لیست جدید ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ﴾ کلید: ⌝'A?A'⌜,
+	# Overlong encoding of ASCII 'A' (should become ?),
+    بگذار: ﴿ لیست جدید ; 65 ; 193 ; 129 ; 0 ﴾ کلید: ⌝'A?'⌜,
+	# Invalid first byte (0xFF)
+    بگذار: ﴿ لیست جدید ; 255 ; 0 ﴾ کلید: ⌝'?'⌜,
+	# Incomplete multi-byte sequence at end
+    بگذار: ﴿ لیست جدید ; 66 ; 226 ; 0 ﴾ کلید: ⌝'B?'⌜,
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    بگذار: ﴿ لیست جدید ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ﴾ کلید: ⌝'A€?𐍈B'⌜.
+	 
+utf8cases هرکدام: ⎬ :key :value
+	>> blob := Blob جدید: value تعداد, بایت-ها: value.
+	>> str := blob به-رشته.
+	﴿str = key﴾ اگر-درست: ⎬
+		خروجی بنویس: ⌝'OK'⌜, سطر-نو.
+	⎨, وگرنه: ⎬
+		خروجی بنویس: ⌝'UTF8 sanitizer failed on: '⌜ + key + ⌝' got: '⌜ + str, سطر-نو.
+	⎨.
+	blob آزاد-کن.
+⎨.

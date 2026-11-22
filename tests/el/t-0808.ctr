@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Θησαυροφυλάκιο δημιουργία-κλειδιών.
+>> sk := keys πρώτο.
+>> pk := keys τελευταίο.
+>> sig := Θησαυροφυλάκιο υπογραφή: ['abc'] με: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Θησαυροφυλάκιο υπογραφή: ['abc'] με: long. } σύλληψη: { :e
+	Έξοδος γράψε: e, νέα-γραμμή.
+}, εκκίνηση.
+
+{ Θησαυροφυλάκιο έλεγχος: ['abc'] υπογραφή: long με: pk. } σύλληψη: { :e
+	Έξοδος γράψε: e, νέα-γραμμή.
+}, εκκίνηση.
+
+{ Θησαυροφυλάκιο έλεγχος: ['abc'] υπογραφή: sig με: short. } σύλληψη: { :e
+	Έξοδος γράψε: e, νέα-γραμμή.
+}, εκκίνηση.

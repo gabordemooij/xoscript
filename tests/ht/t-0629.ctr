@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Sòti ekri: ['Database test'], nouvo-liy.
+
+>> db := Maria-DB nouvo lame: ['localhost'],
+	non-itilizatè: ['xo'], modpas: ['pass123'], non-baz: ['xobase'], konekte.
+
+Sòti ekri: ['Can we connect? '] + db konekte?, nouvo-liy.
+
+>> paramèt-rechèch := db rekèt: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], paramèt-yo: ( Lis nouvo ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  paramèt-rechèch egzekite. db konfime. } trape: { :e db anile.  }, lanse.
+
+Sòti ekri: ['Can we insert? '] + ( paramèt-rechèch insert-id > 0 ), nouvo-liy.
+
+>> Obj := Objè nouvo.
+Obj lè: ['retrieve-rows'] fè: {
+	pwòp konte := 0.
+	>> paramèt-rechèch :=
+	db rekèt: ['SELECT * FROM book order by id desc limit 2'], 
+	chache: { :row 
+		pwòp konte ajoute: 1.
+		Vre kanpe-bouk.
+	}. <- pwòp konte kopye.
+}.
+
+Sòti ekri: ['Can we query? '] + ( Obj retrieve-rows > 0 ), nouvo-liy.

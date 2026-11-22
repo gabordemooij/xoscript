@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> essayer := { :format :value
+	{ Sortie écrire: ( (Format nouveau: format) appliquer: value ), stop. } intercepter: { :e Sortie écrire: e, stop. }, démarrer.
+}.
+>> try-int := { :format :value
+	{ Sortie écrire: ( (Format nouveau: format) appliquer-entier: value ), stop. } intercepter: { :e Sortie écrire: e, stop. }, démarrer.
+}.
+
+# fits
+essayer appliquer: ['|%s|'] et: ['text'].
+essayer appliquer: ['%06.2f'] et: 5.5.
+essayer appliquer: ['100%% %s'] et: ['sure'].
+try-int appliquer: ['%03d'] et: 7.
+try-int appliquer: ['%x'] et: 255.
+essayer appliquer: ['%d'] et: (Int64 nouveau depuis-texte: ['12']).
+essayer appliquer: ['%lld'] et: (Int64 nouveau depuis-texte: ['12']).
+essayer appliquer: ['%.1lf'] et: 5.5.
+try-int appliquer: ['%hd'] et: 7.
+
+# does not fit
+essayer appliquer: ['%s'] et: 12345.
+essayer appliquer: ['%d'] et: 12345.
+essayer appliquer: ['%f'] et: ['text'].
+try-int appliquer: ['%d'] et: ['text'].
+try-int appliquer: ['%s'] et: 5.
+essayer appliquer: ['%s %s'] et: ['text'].
+essayer appliquer: ['%n'] et: ['text'].
+essayer appliquer: ['%*s'] et: ['text'].
+essayer appliquer: ['%'] et: ['text'].
+
+# length modifier does not fit
+essayer appliquer: ['%ls'] et: ['text'].
+essayer appliquer: ['%Lf'] et: 5.5.
+try-int appliquer: ['%ld'] et: 7.
+try-int appliquer: ['%lld'] et: 7.
+essayer appliquer: ['%Ld'] et: (Int64 nouveau depuis-texte: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+essayer appliquer: ['%99999999999s'] et: ['text'].

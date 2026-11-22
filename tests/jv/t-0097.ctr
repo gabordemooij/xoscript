@@ -1,0 +1,42 @@
+
+Tèks nalika: ['html'] tindakna: { <- (
+		dhiri
+		ganti: ['&'] nganggo: ['&amp;'],
+		ganti: ['<'] nganggo: ['&lt;'],
+		ganti: ['>'] nganggo: ['&gt;'],
+		ganti: ['"'] nganggo: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Obyek anyar.
+
+HtmlBrush nalika: ['wangsuli:'] tindakna: { :tag
+	Wetonan tulis: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush nalika: ['wangsuli:lan:'] tindakna: { :tag :content
+	tag := ( tag saka: 0 dawa: (tag dawa - 1) ).
+	Wetonan tulis: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush nalika: ['content:'] tindakna: { :text
+	Wetonan tulis: text html, baris-anyar.
+}.
+
+HtmlBrush nalika: ['attr:value:'] tindakna: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush anyar.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Boks generér-nøgler.
+>> sk := keys første.
+>> pk := keys sidste.
+>> sig := Boks signér: ['abc'] med: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Boks signér: ['abc'] med: long. } fang: { :e
+	Uddata skriv: e, stop.
+}, start.
+
+{ Boks kontrollér: ['abc'] signatur: long med: pk. } fang: { :e
+	Uddata skriv: e, stop.
+}, start.
+
+{ Boks kontrollér: ['abc'] signatur: sig med: short. } fang: { :e
+	Uddata skriv: e, stop.
+}, start.

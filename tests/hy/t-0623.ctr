@@ -1,0 +1,43 @@
+
+
+>> g := Server նոր.
+>> v := Չհրկիզվող-պահարան նոր.
+>> ok := 0.
+
+>> secrets := Ցուցակ նոր ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets պատճենել.
+passwords յուրաքանչյուր: { :i :p
+	secrets յուրաքանչյուր: { :n :s
+		{
+			>> encrypted := v գաղտնագրել: s բանալի: p.
+			>> decrypted := v վերծանել: encrypted բանալի: p.
+			(decrypted = s) եթե-ճիշտ: {
+				ok գումարել: 1.
+			}, այլապես: {
+				Ելք գրել: ['failed encrypting/decrypting: '], նոր-տող.
+				Ելք գրել: s, նոր-տող.
+				Ելք գրել: ['encrypted: '] + encrypted, նոր-տող.
+				Ելք գրել: ['decrypted: '] + encrypted, նոր-տող.
+				Ծրագիր ավարտել.
+			}.
+		} որսալ: { :err
+			(s = [''] կամ: p = ['']) եթե-ճիշտ: {
+				ok գումարել: 1.
+			}, այլապես: {
+				Ելք գրել: err, նոր-տող.
+				Ծրագիր ավարտել.
+			}.
+		}, գործարկել.
+	}.
+}.
+
+Ելք գրել: ( ok + [' vault encryptions tested.'] ), նոր-տող.

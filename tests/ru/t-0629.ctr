@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Выход написать: ['Database test'], стоп.
+
+>> db := MariaDB новый хост: ['localhost'],
+	пользователь: ['xo'], пароль: ['pass123'], имя-базы: ['xobase'], подключить.
+
+Выход написать: ['Can we connect? '] + db подключено?, стоп.
+
+>> параметры := db запрос: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], параметры: ( Список новый ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  параметры мутация. db commit. } впоймать: { :e db rollback.  }, запуск.
+
+Выход написать: ['Can we insert? '] + ( параметры insert-id > 0 ), стоп.
+
+>> Obj := Объект новый.
+Obj в: ['retrieve-rows'] сделать: {
+	мой счетчик := 0.
+	>> параметры :=
+	db запрос: ['SELECT * FROM book order by id desc limit 2'], 
+	получить: { :row 
+		мой счетчик добавить: 1.
+		Истина разрыв.
+	}. <- мой счетчик скопировать.
+}.
+
+Выход написать: ['Can we query? '] + ( Obj retrieve-rows > 0 ), стоп.

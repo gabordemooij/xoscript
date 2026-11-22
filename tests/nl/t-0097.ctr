@@ -1,0 +1,42 @@
+
+Tekst bij: ['html'] doen: { <- (
+		zelf
+		vervang: ['&'] door: ['&amp;'],
+		vervang: ['<'] door: ['&lt;'],
+		vervang: ['>'] door: ['&gt;'],
+		vervang: ['"'] door: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Object nieuw.
+
+HtmlBrush bij: ['reactie:'] doen: { :tag
+	Uit schrijf: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush bij: ['reactie:argument:'] doen: { :tag :content
+	tag := ( tag van: 0 lengte: (tag lengte - 1) ).
+	Uit schrijf: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush bij: ['content:'] doen: { :text
+	Uit schrijf: text html, stop.
+}.
+
+HtmlBrush bij: ['attr:value:'] doen: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush nieuw.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

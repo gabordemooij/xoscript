@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Список новий ;
+	# {"key":"normal"} normal ASCII
+	( Словник новий поставити: ['normal'] у: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Словник новий поставити: ['hello world'] у: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Словник новий поставити: ['"'] у: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Словник новий поставити: ['backslash: \\'] у: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Словник новий поставити: ['slash: /'] у: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Словник новий поставити: ['backspace: \b'] у: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Словник новий поставити: ['formfeed: \f'] у: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Словник новий поставити: ['newline: \n'] у: ['key'] ) ;
+	( Словник новий поставити: ['newline: ↵'] у: ['key'] ) ;
+	( Словник новий поставити: ['newline: 
+	'] у: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Словник новий поставити: ['carriage return: \r'] у: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Словник новий поставити: ['tab \t'] у: ['key'] ) ;
+	( Словник новий поставити: ['tab ⇿'] у: ['key'] ) ;
+	( Словник новий поставити: ['tab  '] у: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Словник новий поставити: ['NUL \u0000'] у: ['key'] ) ;
+	( Словник новий поставити: ['NUL \0'] у: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Словник новий поставити: ['control: \u0001'] у: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Словник новий поставити: ['control: \u001F'] у: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Словник новий поставити: ['unicode: é'] у: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Словник новий поставити: ['unicode: €'] у: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Словник новий поставити: ['unicode: 日本語'] у: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Словник новий поставити: ['unicode: 😀'] у: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Словник новий поставити: ['unicode: 🧑‍💻'] у: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Словник новий поставити: ['combining: e\u0301'] у: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Словник новий поставити: ['escaped unicode: \u00e9'] у: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Словник новий поставити: ['escaped unicode: \u20ac'] у: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Словник новий поставити: ['escaped unicode: \ud83d\ude00'] у: ['key'] ) ;
+	# {"key":""} empty value
+	( Словник новий поставити: [''] у: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Словник новий поставити: ['@ < > & = % + ? #'] у: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Словник новий поставити: ['''] у: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Словник новий поставити: ['multiple: \" \\ \n \r \t'] у: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Словник новий поставити: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] у: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Словник новий поставити: [' value'] у: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Словник новий поставити: ['value '] у: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Словник новий поставити: [' \t\n\r '] у: ['key'] ).
+
+dicts кожен: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Словник новий поставити: d key у: ['key']).
+	>> b := JSON jsonify: (Словник новий поставити: ['value'] у: d key).
+	>> e := JSON обʼєкт: a.
+	>> f := JSON обʼєкт: b.
+	((e key = d key і: (f ? d key = ['value'])) або: (e key = ['NUL ?'])) істина: {
+		Вивід написати: ['OK'], новий-рядок.
+	}, інакше: {
+		Вивід написати: ['Unable to properly encode/decode: '] + d + j, новий-рядок.
+		Програма кінець.
+	}.
+}.

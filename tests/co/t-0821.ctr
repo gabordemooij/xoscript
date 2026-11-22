@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> caminu-di-schedariu := ['/tmp/test0821.csv'].
+>> file := Schedariu novu: caminu-di-schedariu.
+
+file scrive: ['a,b\n"1,2\n'].
+{
+	file separatore: [','] virgulette: ['"'] linee: { :line
+		Esciuta scrive: line, linea-nova.
+	}.
+} catturà: { :e Esciuta scrive: e, linea-nova. }, lancià.
+
+# a closed quote still works
+file scrive: ['a,b\n"1,2",3'].
+file separatore: [','] virgulette: ['"'] linee: { :line
+	Esciuta scrive: line, linea-nova.
+}.
+file eliminà.

@@ -1,0 +1,43 @@
+
+
+>> g := Server uusi.
+>> v := Holvi uusi.
+>> ok := 0.
+
+>> secrets := Lista uusi ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopioi.
+passwords jokainen: { :i :p
+	secrets jokainen: { :n :s
+		{
+			>> encrypted := v salaa: s avain: p.
+			>> decrypted := v pura-salaus: encrypted avain: p.
+			(decrypted = s) tosi: {
+				ok lisää: 1.
+			}, muuten: {
+				Tuloste kirjoita: ['failed encrypting/decrypting: '], rivinvaihto.
+				Tuloste kirjoita: s, rivinvaihto.
+				Tuloste kirjoita: ['encrypted: '] + encrypted, rivinvaihto.
+				Tuloste kirjoita: ['decrypted: '] + encrypted, rivinvaihto.
+				Ohjelma lopeta.
+			}.
+		} sieppaa: { :err
+			(s = [''] tai: p = ['']) tosi: {
+				ok lisää: 1.
+			}, muuten: {
+				Tuloste kirjoita: err, rivinvaihto.
+				Ohjelma lopeta.
+			}.
+		}, käynnistä.
+	}.
+}.
+
+Tuloste kirjoita: ( ok + [' vault encryptions tested.'] ), rivinvaihto.

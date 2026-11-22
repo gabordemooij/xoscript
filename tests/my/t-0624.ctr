@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := အရာဝတ္ထု အသစ်.
+
+Log ရလျှင်: ['say:'] လုပ်: { :str
+	အထွက် ရေး: str, စာကြောင်းသစ်.
+}.
+
+>> Item := အရာဝတ္ထု အသစ်.
+
+Item ရလျှင်: ['အသစ်:'] လုပ်: { :id <- မိမိ အသစ် id: id.
+}.
+
+Item ရလျှင်: ['id:'] လုပ်: { :id
+	ကိုယ်ပိုင် id := id.
+}.
+
+Item ရလျှင်: ['id'] လုပ်: { <- ကိုယ်ပိုင် id. }.
+
+
+Item ရလျှင်: ['စာသားသို့'] လုပ်: {
+	>> str := ['Item#~no'].
+	str ~no: ကိုယ်ပိုင် id. <- str.
+}.
+
+
+>> Print := အရာဝတ္ထု အသစ်.
+
+Print ရလျှင်: ['items'] လုပ်: { 
+	
+	ကိုယ်ပိုင် item := Item အသစ်: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: ကိုယ်ပိုင် item
+	).
+	
+	
+}.
+
+Print items.

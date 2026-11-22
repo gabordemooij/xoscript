@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB νέο κόμβος: ['localhost'],
+	χρήστης: ['xo'],
+	κωδικός: ['pass123'],
+	όνομα-βάσης: ['xobase'],
+	συνδέσου.
+
+>> conn2 := Maria-DB νέο κόμβος: ['localhost'],
+	χρήστης: ['xo'],
+	κωδικός: ['pass123'],
+	όνομα-βάσης: ['xobase'],
+	συνδέσου.
+#...
+>> del := conn1 ερώτημα: ['DELETE FROM book WHERE id > 0'].
+{  del εκτέλεση. conn1 επικύρωση. } σύλληψη: { :e conn1 αναίρεση.  }, εκκίνηση.
+
+>> insert := conn1 ερώτημα: ['INSERT INTO book (id) VALUES(null)'].
+insert εκτέλεση.
+
+>> πλήθος := conn1 ερώτημα: ['SELECT COUNT(*) AS num FROM book'].
+πλήθος ανάκτηση: { :row Έξοδος γράψε: row num, νέα-γραμμή. }.
+
+# does not show up
+# insert not committed on connection 1
+>> πλήθος := conn2 ερώτημα: ['SELECT COUNT(*) AS num FROM book'].
+πλήθος ανάκτηση: { :row Έξοδος γράψε: row num, νέα-γραμμή. }.

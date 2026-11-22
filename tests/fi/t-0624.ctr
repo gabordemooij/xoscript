@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Olio uusi.
+
+Log kun: ['say:'] tee: { :str
+	Tuloste kirjoita: str, rivinvaihto.
+}.
+
+>> Item := Olio uusi.
+
+Item kun: ['uusi:'] tee: { :id <- itse uusi id: id.
+}.
+
+Item kun: ['id:'] tee: { :id
+	oma id := id.
+}.
+
+Item kun: ['id'] tee: { <- oma id. }.
+
+
+Item kun: ['teksti'] tee: {
+	>> str := ['Item#~no'].
+	str ~no: oma id. <- str.
+}.
+
+
+>> Print := Olio uusi.
+
+Print kun: ['items'] tee: { 
+	
+	oma item := Item uusi: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: oma item
+	).
+	
+	
+}.
+
+Print items.

@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> biceribîne := { :format :value
+	{ Derketin binivîse: ( (Format nû: format) bisepîne: value ), rêza-nû. } bigire: { :e Derketin binivîse: e, rêza-nû. }, bide-destpêkirin.
+}.
+>> try-int := { :format :value
+	{ Derketin binivîse: ( (Format nû: format) bisepîne-hejmara-tam: value ), rêza-nû. } bigire: { :e Derketin binivîse: e, rêza-nû. }, bide-destpêkirin.
+}.
+
+# fits
+biceribîne bisepîne: ['|%s|'] û: ['text'].
+biceribîne bisepîne: ['%06.2f'] û: 5.5.
+biceribîne bisepîne: ['100%% %s'] û: ['sure'].
+try-int bisepîne: ['%03d'] û: 7.
+try-int bisepîne: ['%x'] û: 255.
+biceribîne bisepîne: ['%d'] û: (Int64 nû ji-nivîsê: ['12']).
+biceribîne bisepîne: ['%lld'] û: (Int64 nû ji-nivîsê: ['12']).
+biceribîne bisepîne: ['%.1lf'] û: 5.5.
+try-int bisepîne: ['%hd'] û: 7.
+
+# does not fit
+biceribîne bisepîne: ['%s'] û: 12345.
+biceribîne bisepîne: ['%d'] û: 12345.
+biceribîne bisepîne: ['%f'] û: ['text'].
+try-int bisepîne: ['%d'] û: ['text'].
+try-int bisepîne: ['%s'] û: 5.
+biceribîne bisepîne: ['%s %s'] û: ['text'].
+biceribîne bisepîne: ['%n'] û: ['text'].
+biceribîne bisepîne: ['%*s'] û: ['text'].
+biceribîne bisepîne: ['%'] û: ['text'].
+
+# length modifier does not fit
+biceribîne bisepîne: ['%ls'] û: ['text'].
+biceribîne bisepîne: ['%Lf'] û: 5.5.
+try-int bisepîne: ['%ld'] û: 7.
+try-int bisepîne: ['%lld'] û: 7.
+biceribîne bisepîne: ['%Ld'] û: (Int64 nû ji-nivîsê: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+biceribîne bisepîne: ['%99999999999s'] û: ['text'].

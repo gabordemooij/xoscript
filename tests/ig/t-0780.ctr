@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Ndepụta ohuru ;
+	# {"key":"normal"} normal ASCII
+	( Akwụkwọ-okwu ohuru tinye: ['normal'] na: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Akwụkwọ-okwu ohuru tinye: ['hello world'] na: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Akwụkwọ-okwu ohuru tinye: ['"'] na: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Akwụkwọ-okwu ohuru tinye: ['backslash: \\'] na: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Akwụkwọ-okwu ohuru tinye: ['slash: /'] na: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Akwụkwọ-okwu ohuru tinye: ['backspace: \b'] na: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Akwụkwọ-okwu ohuru tinye: ['formfeed: \f'] na: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Akwụkwọ-okwu ohuru tinye: ['newline: \n'] na: ['key'] ) ;
+	( Akwụkwọ-okwu ohuru tinye: ['newline: ↵'] na: ['key'] ) ;
+	( Akwụkwọ-okwu ohuru tinye: ['newline: 
+	'] na: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Akwụkwọ-okwu ohuru tinye: ['carriage return: \r'] na: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Akwụkwọ-okwu ohuru tinye: ['tab \t'] na: ['key'] ) ;
+	( Akwụkwọ-okwu ohuru tinye: ['tab ⇿'] na: ['key'] ) ;
+	( Akwụkwọ-okwu ohuru tinye: ['tab  '] na: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Akwụkwọ-okwu ohuru tinye: ['NUL \u0000'] na: ['key'] ) ;
+	( Akwụkwọ-okwu ohuru tinye: ['NUL \0'] na: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Akwụkwọ-okwu ohuru tinye: ['control: \u0001'] na: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Akwụkwọ-okwu ohuru tinye: ['control: \u001F'] na: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Akwụkwọ-okwu ohuru tinye: ['unicode: é'] na: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Akwụkwọ-okwu ohuru tinye: ['unicode: €'] na: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Akwụkwọ-okwu ohuru tinye: ['unicode: 日本語'] na: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Akwụkwọ-okwu ohuru tinye: ['unicode: 😀'] na: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Akwụkwọ-okwu ohuru tinye: ['unicode: 🧑‍💻'] na: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Akwụkwọ-okwu ohuru tinye: ['combining: e\u0301'] na: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Akwụkwọ-okwu ohuru tinye: ['escaped unicode: \u00e9'] na: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Akwụkwọ-okwu ohuru tinye: ['escaped unicode: \u20ac'] na: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Akwụkwọ-okwu ohuru tinye: ['escaped unicode: \ud83d\ude00'] na: ['key'] ) ;
+	# {"key":""} empty value
+	( Akwụkwọ-okwu ohuru tinye: [''] na: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Akwụkwọ-okwu ohuru tinye: ['@ < > & = % + ? #'] na: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Akwụkwọ-okwu ohuru tinye: ['''] na: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Akwụkwọ-okwu ohuru tinye: ['multiple: \" \\ \n \r \t'] na: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Akwụkwọ-okwu ohuru tinye: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] na: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Akwụkwọ-okwu ohuru tinye: [' value'] na: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Akwụkwọ-okwu ohuru tinye: ['value '] na: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Akwụkwọ-okwu ohuru tinye: [' \t\n\r '] na: ['key'] ).
+
+dicts nke-ọ-bụla: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Akwụkwọ-okwu ohuru tinye: d key na: ['key']).
+	>> b := JSON jsonify: (Akwụkwọ-okwu ohuru tinye: ['value'] na: d key).
+	>> e := JSON ihe: a.
+	>> f := JSON ihe: b.
+	((e key = d key na: (f ? d key = ['value'])) ma-ọ-bụ: (e key = ['NUL ?'])) eziokwu: {
+		Mpụta dee: ['OK'], ahịrị-ọhụrụ.
+	}, ma-ọ-bụghị-ya: {
+		Mpụta dee: ['Unable to properly encode/decode: '] + d + j, ahịrị-ọhụrụ.
+		Mmemme njedebe.
+	}.
+}.

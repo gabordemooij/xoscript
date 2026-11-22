@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Seznam nov ;
+	# {"key":"normal"} normal ASCII
+	( Slovar nov postavi: ['normal'] na: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Slovar nov postavi: ['hello world'] na: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Slovar nov postavi: ['"'] na: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Slovar nov postavi: ['backslash: \\'] na: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Slovar nov postavi: ['slash: /'] na: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Slovar nov postavi: ['backspace: \b'] na: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Slovar nov postavi: ['formfeed: \f'] na: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Slovar nov postavi: ['newline: \n'] na: ['key'] ) ;
+	( Slovar nov postavi: ['newline: ↵'] na: ['key'] ) ;
+	( Slovar nov postavi: ['newline: 
+	'] na: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Slovar nov postavi: ['carriage return: \r'] na: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Slovar nov postavi: ['tab \t'] na: ['key'] ) ;
+	( Slovar nov postavi: ['tab ⇿'] na: ['key'] ) ;
+	( Slovar nov postavi: ['tab  '] na: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Slovar nov postavi: ['NUL \u0000'] na: ['key'] ) ;
+	( Slovar nov postavi: ['NUL \0'] na: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Slovar nov postavi: ['control: \u0001'] na: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Slovar nov postavi: ['control: \u001F'] na: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Slovar nov postavi: ['unicode: é'] na: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Slovar nov postavi: ['unicode: €'] na: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Slovar nov postavi: ['unicode: 日本語'] na: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Slovar nov postavi: ['unicode: 😀'] na: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Slovar nov postavi: ['unicode: 🧑‍💻'] na: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Slovar nov postavi: ['combining: e\u0301'] na: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Slovar nov postavi: ['escaped unicode: \u00e9'] na: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Slovar nov postavi: ['escaped unicode: \u20ac'] na: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Slovar nov postavi: ['escaped unicode: \ud83d\ude00'] na: ['key'] ) ;
+	# {"key":""} empty value
+	( Slovar nov postavi: [''] na: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Slovar nov postavi: ['@ < > & = % + ? #'] na: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Slovar nov postavi: ['''] na: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Slovar nov postavi: ['multiple: \" \\ \n \r \t'] na: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Slovar nov postavi: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] na: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Slovar nov postavi: [' value'] na: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Slovar nov postavi: ['value '] na: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Slovar nov postavi: [' \t\n\r '] na: ['key'] ).
+
+dicts vsak: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Slovar nov postavi: d key na: ['key']).
+	>> b := JSON jsonify: (Slovar nov postavi: ['value'] na: d key).
+	>> e := JSON objekt: a.
+	>> f := JSON objekt: b.
+	((e key = d key in: (f ? d key = ['value'])) ali: (e key = ['NUL ?'])) resnično: {
+		Izhod piši: ['OK'], nova-vrstica.
+	}, sicer: {
+		Izhod piši: ['Unable to properly encode/decode: '] + d + j, nova-vrstica.
+		Program konec.
+	}.
+}.

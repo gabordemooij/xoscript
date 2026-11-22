@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := ነገር አዲስ.
+
+Slurp ሲደርስ: ['አዲስ'] አድርግ: {
+	የራሱ str := [''].
+}.
+
+Slurp ሲደርስ: ['nieuw'] አድርግ: {
+	የራሱ str := [''].
+}.
+
+Slurp ሲደርስ: ['መልስ:'] አድርግ: { :blah
+		የራሱ str መጨረሻ-ላይ-ጨምር: blah.
+}.
+
+Slurp ሲደርስ: ['መልስ:እና:'] አድርግ: { :blah :blahah
+		የራሱ str መጨረሻ-ላይ-ጨምር: (blah መነሻ: 0 ርዝመት: (blah ርዝመት - 1)).
+		የራሱ str መጨረሻ-ላይ-ጨምር: [' '].
+		የራሱ str መጨረሻ-ላይ-ጨምር: blahah.
+}.
+
+Slurp ሲደርስ: ['obtain'] አድርግ: {
+	>> buffer := የራሱ str.
+	የራሱ str := ['']. <- buffer.
+}.
+
+
+ውጤት ፃፍ: (ፕሮግራም ሥርዓት: (Slurp አዲስ echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ ፋይል አዲስ: ['/tmp/from.txt'], ሰርዝ. } ያዝ: { ['Empty']. }, ጀምር.
+{ ፋይል አዲስ: ['/tmp/to.txt'], ሰርዝ. } ያዝ: { ['Empty']. }, ጀምር.
+
+
+ፋይል አዲስ: ['/tmp/to.txt'], አለ ሐሰት-ከሆነ: {
+	ውጤት ፃፍ: ['Confirmed. Target file does not exist.\
+'].
+}.
+ፋይል አዲስ: ['/tmp/from.txt'], አለ ሐሰት-ከሆነ: {
+	ውጤት ፃፍ: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+ፕሮግራም ሥርዓት: (Slurp አዲስ touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+ፕሮግራም ሥርዓት: (Slurp አዲስ cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+ፋይል አዲስ: ['/tmp/to.txt'], አለ እውነት-ከሆነ: {
+	ውጤት ፃፍ: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+ውጤት ፃፍ: ['Contents of file is:'] + (ፋይል አዲስ: ['/tmp/to.txt'], አንብብ), አዲስ-መስመር.

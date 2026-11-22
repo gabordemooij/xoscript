@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB yangi xost: ['localhost'],
+	foydalanuvchi-nomi: ['xo'],
+	parol: ['pass123'],
+	baza-nomi: ['xobase'],
+	ulanish.
+
+>> qidiruv-parametrlari := db soʻrov: ['SELECT ? AS a, ? AS b, ? AS c'].
+qidiruv-parametrlari parametrlar: (Roʻyxat yangi ; ['1']).
+{ qidiruv-parametrlari olish: { :row Chiqish yozish: row, yangi-qator. }. } ushlash: { :e Chiqish yozish: e, yangi-qator. }, ishga-tushirish.
+
+>> qidiruv-parametrlari := db soʻrov: ['SELECT ? AS a'].
+{ qidiruv-parametrlari olish: { :row Chiqish yozish: row, yangi-qator. }. } ushlash: { :e Chiqish yozish: e, yangi-qator. }, ishga-tushirish.
+
+# the right number still works, more parameters are ignored as before
+>> qidiruv-parametrlari := db soʻrov: ['SELECT ? AS a, ? AS b'].
+qidiruv-parametrlari parametrlar: (Roʻyxat yangi ; ['1'] ; ['2']).
+qidiruv-parametrlari olish: { :row Chiqish yozish: (row oʻrnida: ['a']), yozish: (row oʻrnida: ['b']), yangi-qator. }.
+qidiruv-parametrlari parametrlar: (Roʻyxat yangi ; ['1'] ; ['2'] ; ['3']).
+qidiruv-parametrlari olish: { :row Chiqish yozish: (row oʻrnida: ['a']), yozish: (row oʻrnida: ['b']), yangi-qator. }.

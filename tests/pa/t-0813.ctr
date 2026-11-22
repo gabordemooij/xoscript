@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server ਸ਼ੁਰੂਆਤ-ਕਰੋ.
+ਪ੍ਰੋਗਰਾਮ ਵਰਤੋ: ['../../../src/xo/pa/webtools.xo'].
+ਪ੍ਰੋਗਰਾਮ ਵਰਤੋ: ['../../../src/xo/pa/mailtools.xo'].
+
+>> ਹੈਡਰ := HTTP-ਹੈਡਰ ਨਵਾਂ ਕੁੰਜੀ: ['Location'] ਮੁੱਲ: ['/ok\r\nX-Injected: yes'].
+ਆਉਟਪੁੱਟ ਲਿਖੋ: ਹੈਡਰ.
+
+>> web := ਵੈੱਬ-ਦਸਤਾਵੇਜ਼ ਨਵਾਂ.
+web ਜਾਓ: ['/ok\r\nX-Injected: yes'].
+ਆਉਟਪੁੱਟ ਲਿਖੋ: ['\n'], ਨਵੀਂ-ਲਾਈਨ.
+
+>> mail := ਈਮੇਲ ਨਵਾਂ.
+mail ਪ੍ਰਾਪਤਕਰਤਾ-ਨੂੰ: (ਲਿਸਟ ਨਵਾਂ ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (ਲਿਸਟ ਨਵਾਂ ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (ਲਿਸਟ ਨਵਾਂ ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail ਭੇਜਣ-ਵਾਲਾ: ['d@example.invalid\r\nX-From: yes'] ਨਾਮ: ['site\r\nX-Name: yes'].
+mail ਵਿਸ਼ਾ: ['hello\r\nX-Subject: yes'].
+mail ਮੁੱਖ-ਲਿਖਤ: ['line1\r\nline2'].
+ਆਉਟਪੁੱਟ ਲਿਖੋ: mail ਤਿਆਰ-ਕਰੋ.
+
+>> html := HTML-ਈਮੇਲ ਨਵਾਂ.
+html ਪ੍ਰਾਪਤਕਰਤਾ-ਨੂੰ: (ਲਿਸਟ ਨਵਾਂ ; ['a@example.invalid\r\nX-To: yes']).
+html ਭੇਜਣ-ਵਾਲਾ: ['d@example.invalid'] ਨਾਮ: ['site'].
+html ਵਿਸ਼ਾ: ['hello\r\nX-Subject: yes'].
+html ਮੁੱਖ-ਲਿਖਤ: ['body'].
+ਆਉਟਪੁੱਟ ਲਿਖੋ: ( html ਤਿਆਰ-ਕਰੋ ਸ਼ਾਮਲ-ਹੈ: ['\nX-'] ), ਨਵੀਂ-ਲਾਈਨ.
+ਆਉਟਪੁੱਟ ਲਿਖੋ: ( html ਤਿਆਰ-ਕਰੋ ਸ਼ਾਮਲ-ਹੈ: ['X-To: yes'] ), ਨਵੀਂ-ਲਾਈਨ.

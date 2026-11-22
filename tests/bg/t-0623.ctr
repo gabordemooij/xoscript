@@ -1,0 +1,43 @@
+
+
+>> g := Server нов.
+>> v := Трезор нов.
+>> ok := 0.
+
+>> secrets := Списък нов ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets копирай.
+passwords всеки: { :i :p
+	secrets всеки: { :n :s
+		{
+			>> encrypted := v шифровай: s ключ: p.
+			>> decrypted := v дешифровай: encrypted ключ: p.
+			(decrypted = s) вярно: {
+				ok добави: 1.
+			}, иначе: {
+				Изход пиши: ['failed encrypting/decrypting: '], нов-ред.
+				Изход пиши: s, нов-ред.
+				Изход пиши: ['encrypted: '] + encrypted, нов-ред.
+				Изход пиши: ['decrypted: '] + encrypted, нов-ред.
+				Програма край.
+			}.
+		} прихвани: { :err
+			(s = [''] или: p = ['']) вярно: {
+				ok добави: 1.
+			}, иначе: {
+				Изход пиши: err, нов-ред.
+				Програма край.
+			}.
+		}, стартирай.
+	}.
+}.
+
+Изход пиши: ( ok + [' vault encryptions tested.'] ), нов-ред.

@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programm ġestjoni-memorja: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB ġdid host: ['localhost'],
+	isem-utent: ['xo'], password: ['pass123'], isem-database: ['xobase'], qabbad.
+
+>> TwoDigitFormat := Format ġdid: ['%02d'].
+
+# Datetime
+{
+	>> sena := Numru bejn: 1995 u: 2050, test.
+	>> xahar := TwoDigitFormat applika-sħiħ: (Numru bejn: 1 u: 12), test.
+	>> jum := TwoDigitFormat applika-sħiħ: (Numru bejn: 1 u: 28), test.
+	>> siegħa := TwoDigitFormat applika-sħiħ: (Numru bejn: 1 u: 23), test.
+	>> minuta := TwoDigitFormat applika-sħiħ: (Numru bejn: 1 u: 59), test.
+	>> sekonda := TwoDigitFormat applika-sħiħ: (Numru bejn: 1 u: 59), test.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: sena,
+		MM: xahar,
+		DD: jum,
+		HH: siegħa,
+		II: minuta,
+		SS: sekonda.
+	>> parametri-tfittxija :=
+	db mistoqsija: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ġib: { :row
+		(row mydatetime = datetime) falz: {
+			dan-il-kompitu żball: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter żid: 1.
+} * 100.
+
+# Date
+{
+	>> sena := Numru bejn: 1995 u: 2050, test.
+	>> xahar := TwoDigitFormat applika-sħiħ: (Numru bejn: 1 u: 12), test.
+	>> jum := TwoDigitFormat applika-sħiħ: (Numru bejn: 1 u: 28), test.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: sena,
+		MM: xahar,
+		DD: jum.
+	>> parametri-tfittxija :=
+	db mistoqsija: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ġib: { :row
+		(row mydate = date) falz: {
+			dan-il-kompitu żball: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter żid: 1.
+} * 100.
+
+
+# Time
+{
+	>> siegħa := TwoDigitFormat applika-sħiħ: (Numru bejn: 1 u: 23), test.
+	>> minuta := TwoDigitFormat applika-sħiħ: (Numru bejn: 1 u: 59), test.
+	>> sekonda := TwoDigitFormat applika-sħiħ: (Numru bejn: 1 u: 59), test.
+	>> ħin := ['HH:II:SS'].
+	ħin
+		HH: siegħa,
+		II: minuta,
+		SS: sekonda.
+	>> parametri-tfittxija :=
+	db mistoqsija: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: ħin),
+	ġib: { :row
+		(row mytime = ħin) falz: {
+			dan-il-kompitu żball: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter żid: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lista ġdid imla: 100000 bi: ['x'], għaqqad: [''].
+{
+	>> str2 := Kaxxaforti token: 40.
+	>> parametri-tfittxija :=
+	db mistoqsija: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ġib: { :row
+		(row str1 = str1 u: row str2 = str2) falz: {
+			dan-il-kompitu żball: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter żid: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Numru bejn: 1 u: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 minn-test: ['9223372036854775807'] ) -
+		( Int64 minn-test: ['99999'] ) +
+		( Int64 minn-test: n1 test )
+	).
+	>> parametri-tfittxija :=
+	db mistoqsija: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ġib: { :row
+		(row n1 = n1) falz: {
+			dan-il-kompitu żball: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) falz: {
+			dan-il-kompitu żball: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 arrotonda) falz: {
+			dan-il-kompitu żball: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) falz: {
+			dan-il-kompitu żball: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter żid: 1.
+} * 100.
+
+
+Ħruġ ikteb: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), linja-ġdida.

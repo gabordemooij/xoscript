@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+תוכנית ניהול-זיכרון: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB חדש מארח: ⌝'localhost'⌜,
+	שם-משתמש: ⌝'xo'⌜, סיסמה: ⌝'pass123'⌜, שם-מסד: ⌝'xobase'⌜, התחבר.
+
+>> TwoDigitFormat := תבנית חדש: ⌝'%02d'⌜.
+
+# Datetime
+⎬
+	>> שנה := מספר בין: 1995 לבין: 2050, למחרוזת.
+	>> חודש := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 12﴾, למחרוזת.
+	>> יום := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 28﴾, למחרוזת.
+	>> שעה := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 23﴾, למחרוזת.
+	>> דקה := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 59﴾, למחרוזת.
+	>> שנייה := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 59﴾, למחרוזת.
+	>> datetime := ⌝'YYYY-MM-DD HH:II:SS'⌜.	
+	datetime
+		YYYY: שנה,
+		MM: חודש,
+		DD: יום,
+		HH: שעה,
+		II: דקה,
+		SS: שנייה.
+	>> פרמטרי-חיפוש :=
+	db שאילתה: ﴿⌝'
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'⌜ <datetime>: datetime﴾,
+	שלוף: ⎬ :row
+		﴿row mydatetime = datetime﴾ אם-שקר: ⎬
+			משימה-זו שגיאה: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mydatetime
+			﴾.
+		⎨.
+	
+	⎨.
+	counter חבר: 1.
+⎨ * 100.
+
+# Date
+⎬
+	>> שנה := מספר בין: 1995 לבין: 2050, למחרוזת.
+	>> חודש := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 12﴾, למחרוזת.
+	>> יום := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 28﴾, למחרוזת.
+	>> date := ⌝'YYYY-MM-DD'⌜.
+	date
+		YYYY: שנה,
+		MM: חודש,
+		DD: יום.
+	>> פרמטרי-חיפוש :=
+	db שאילתה: ﴿⌝'
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'⌜ <date>: date﴾,
+	שלוף: ⎬ :row
+		﴿row mydate = date﴾ אם-שקר: ⎬
+			משימה-זו שגיאה: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: date,
+				<observation>: row mydate
+			﴾.
+		⎨.
+	⎨.
+	counter חבר: 1.
+⎨ * 100.
+
+
+# Time
+⎬
+	>> שעה := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 23﴾, למחרוזת.
+	>> דקה := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 59﴾, למחרוזת.
+	>> שנייה := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 59﴾, למחרוזת.
+	>> זמן := ⌝'HH:II:SS'⌜.
+	זמן
+		HH: שעה,
+		II: דקה,
+		SS: שנייה.
+	>> פרמטרי-חיפוש :=
+	db שאילתה: ﴿⌝'
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'⌜ <time>: זמן﴾,
+	שלוף: ⎬ :row
+		﴿row mytime = זמן﴾ אם-שקר: ⎬
+			משימה-זו שגיאה: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter חבר: 1.
+⎨ * 100.
+
+
+# Strings (varchar/text)
+>> str1 := רשימה חדש מלא: 100000 בערך: ⌝'x'⌜, אחד: ⌝''⌜.
+⎬
+	>> str2 := כספת אסימון: 40.
+	>> פרמטרי-חיפוש :=
+	db שאילתה: ﴿⌝'
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'⌜ 
+	<str1>: str1,
+	<str2>: str2
+	﴾,
+	שלוף: ⎬ :row
+		﴿row str1 = str1 וגם: row str2 = str2﴾ אם-שקר: ⎬
+			משימה-זו שגיאה: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter חבר: 1.
+⎨ * 100.
+
+
+# Numbers
+⎬
+	>> n1 := מספר בין: 1 לבין: 99999.
+	>> n2 := n1 / 1000.
+	>> big := ﴿
+		﴿ Int64 ממחרוזת: ⌝'9223372036854775807'⌜ ﴾ -
+		﴿ Int64 ממחרוזת: ⌝'99999'⌜ ﴾ +
+		﴿ Int64 ממחרוזת: n1 למחרוזת ﴾
+	﴾.
+	>> פרמטרי-חיפוש :=
+	db שאילתה: ﴿⌝'
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	'⌜
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	﴾,
+	שלוף: ⎬ :row
+		﴿row n1 = n1﴾ אם-שקר: ⎬
+			משימה-זו שגיאה: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n1
+			﴾.
+		⎨.
+		﴿row n2 = n2﴾ אם-שקר: ⎬
+			משימה-זו שגיאה: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n2
+			﴾.
+		⎨.
+		﴿row n3 = n2 עיגול﴾ אם-שקר: ⎬
+			משימה-זו שגיאה: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n3
+			﴾.
+		⎨.
+		﴿row big = big﴾ אם-שקר: ⎬
+			משימה-זו שגיאה: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: big,
+				<observation>: row big
+			﴾.
+		⎨.
+		
+	⎨.
+	counter חבר: 1.
+⎨ * 100.
+
+
+פלט כתוב: ﴿
+	⌝'OK, <counter> fuzzy casts/conversions tested.'⌜
+	<counter>: counter
+﴾, שורה-חדשה.

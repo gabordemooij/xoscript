@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := 数组对象 新建 ;
+	# {"key":"normal"} normal ASCII
+	( 映射对象 新建 放: ['normal'] 在: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( 映射对象 新建 放: ['hello world'] 在: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( 映射对象 新建 放: ['"'] 在: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( 映射对象 新建 放: ['backslash: \\'] 在: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( 映射对象 新建 放: ['slash: /'] 在: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( 映射对象 新建 放: ['backspace: \b'] 在: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( 映射对象 新建 放: ['formfeed: \f'] 在: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( 映射对象 新建 放: ['newline: \n'] 在: ['key'] ) ;
+	( 映射对象 新建 放: ['newline: ↵'] 在: ['key'] ) ;
+	( 映射对象 新建 放: ['newline: 
+	'] 在: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( 映射对象 新建 放: ['carriage return: \r'] 在: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( 映射对象 新建 放: ['tab \t'] 在: ['key'] ) ;
+	( 映射对象 新建 放: ['tab ⇿'] 在: ['key'] ) ;
+	( 映射对象 新建 放: ['tab  '] 在: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( 映射对象 新建 放: ['NUL \u0000'] 在: ['key'] ) ;
+	( 映射对象 新建 放: ['NUL \0'] 在: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( 映射对象 新建 放: ['control: \u0001'] 在: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( 映射对象 新建 放: ['control: \u001F'] 在: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( 映射对象 新建 放: ['unicode: é'] 在: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( 映射对象 新建 放: ['unicode: €'] 在: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( 映射对象 新建 放: ['unicode: 日本語'] 在: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( 映射对象 新建 放: ['unicode: 😀'] 在: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( 映射对象 新建 放: ['unicode: 🧑‍💻'] 在: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( 映射对象 新建 放: ['combining: e\u0301'] 在: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( 映射对象 新建 放: ['escaped unicode: \u00e9'] 在: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( 映射对象 新建 放: ['escaped unicode: \u20ac'] 在: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( 映射对象 新建 放: ['escaped unicode: \ud83d\ude00'] 在: ['key'] ) ;
+	# {"key":""} empty value
+	( 映射对象 新建 放: [''] 在: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( 映射对象 新建 放: ['@ < > & = % + ? #'] 在: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( 映射对象 新建 放: ['''] 在: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( 映射对象 新建 放: ['multiple: \" \\ \n \r \t'] 在: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( 映射对象 新建 放: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] 在: ['key'] ) ;
+	# {"key":" value"} leading space
+	( 映射对象 新建 放: [' value'] 在: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( 映射对象 新建 放: ['value '] 在: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( 映射对象 新建 放: [' \t\n\r '] 在: ['key'] ).
+
+dicts 每个: { :_ :d
+	>> j := 杰森 杰森风格: d.
+	>> a := 杰森 杰森风格: (映射对象 新建 放: d key 在: ['key']).
+	>> b := 杰森 杰森风格: (映射对象 新建 放: ['value'] 在: d key).
+	>> e := 杰森 对象: a.
+	>> f := 杰森 对象: b.
+	((e key = d key 且: (f ? d key = ['value'])) 或: (e key = ['NUL ?'])) 是: {
+		输出 写入: ['OK'], 停止.
+	}, 否则: {
+		输出 写入: ['Unable to properly encode/decode: '] + d + j, 停止.
+		程序 结束.
+	}.
+}.

@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server initiera.
+Program använd: ['../../../src/xo/sv/webtools.xo'].
+
+>> Fake-Request := Objekt ny.
+Fake-Request vid: ['value:'] gör: { :värde
+	egen värde := värde.
+}.
+Fake-Request vid: ['cookie:'] gör: { :namn <- egen värde.
+}.
+
+>> Test-Session := Tillfällig-fil-session ny.
+Test-Session vid: ['läs-in'] gör: { <- Ordbok ny.
+}.
+Test-Session vid: ['session-id'] gör: { <- egen id.
+}.
+
+>> cookies := Lista ny
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies varje: { :i :cookie
+	>> begäran := Fake-Request ny.
+	begäran value: cookie.
+	>> hanterare := Test-Session ny.
+	>> web := Webbdokument ny.
+	web begäran: begäran.
+	web sessionshanterare: hanterare.
+	web starta-session.
+	Utdata skriv: ( hanterare session-id = cookie ), stop.
+}.
+
+>> web := Webbdokument ny.
+web json: (Ordbok ny sätt: ['b'] vid: ['a']).
+Utdata skriv: ['\n'], stop.
+
+{ Nätverk get: ['file:///etc/hostname']. } fånga: { :e
+	Utdata skriv: e, stop.
+}, starta.
+
+>> svg := Fil ny: ['/tmp/test0814.svg'].
+svg skriv: ['<svg xmlns="x"></svg>'].
+Utdata stop.
+Server vidarebefordra: ['test0814.svg'] prefix: ['/tmp/'].
+svg radera.

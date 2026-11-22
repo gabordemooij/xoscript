@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> கோப்பு-பாதை := ['/tmp/test0821.csv'].
+>> file := கோப்பு புதிய: கோப்பு-பாதை.
+
+file எழுது: ['a,b\n"1,2\n'].
+{
+	file பிரிப்பான்: [','] மேற்கோள்: ['"'] வரிகள்: { :line
+		வெளியீடு எழுது: line, புதிய-வரி.
+	}.
+} பிடி: { :e வெளியீடு எழுது: e, புதிய-வரி. }, இயக்கு.
+
+# a closed quote still works
+file எழுது: ['a,b\n"1,2",3'].
+file பிரிப்பான்: [','] மேற்கோள்: ['"'] வரிகள்: { :line
+	வெளியீடு எழுது: line, புதிய-வரி.
+}.
+file நீக்கு.

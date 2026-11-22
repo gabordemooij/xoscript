@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Tresor schlüssel-erzeugen.
+>> sk := keys erstes.
+>> pk := keys letztes.
+>> sig := Tresor signieren: ['abc'] mit: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Tresor signieren: ['abc'] mit: long. } abfangen: { :e
+	Ausgabe schreiben: e, stopp.
+}, starten.
+
+{ Tresor prüfen: ['abc'] signatur: long mit: pk. } abfangen: { :e
+	Ausgabe schreiben: e, stopp.
+}, starten.
+
+{ Tresor prüfen: ['abc'] signatur: sig mit: short. } abfangen: { :e
+	Ausgabe schreiben: e, stopp.
+}, starten.

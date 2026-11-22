@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB uus host: ['localhost'],
+	kasutajanimi: ['xo'],
+	parool: ['pass123'],
+	andmebaasi-nimi: ['xobase'],
+	ühendu.
+
+>> otsinguparameetrid := db päring: ['SELECT ? AS a, ? AS b, ? AS c'].
+otsinguparameetrid parameetrid: (Loend uus ; ['1']).
+{ otsinguparameetrid too: { :row Väljund kirjuta: row, reavahetus. }. } püüa: { :e Väljund kirjuta: e, reavahetus. }, käivita.
+
+>> otsinguparameetrid := db päring: ['SELECT ? AS a'].
+{ otsinguparameetrid too: { :row Väljund kirjuta: row, reavahetus. }. } püüa: { :e Väljund kirjuta: e, reavahetus. }, käivita.
+
+# the right number still works, more parameters are ignored as before
+>> otsinguparameetrid := db päring: ['SELECT ? AS a, ? AS b'].
+otsinguparameetrid parameetrid: (Loend uus ; ['1'] ; ['2']).
+otsinguparameetrid too: { :row Väljund kirjuta: (row kohal: ['a']), kirjuta: (row kohal: ['b']), reavahetus. }.
+otsinguparameetrid parameetrid: (Loend uus ; ['1'] ; ['2'] ; ['3']).
+otsinguparameetrid too: { :row Väljund kirjuta: (row kohal: ['a']), kirjuta: (row kohal: ['b']), reavahetus. }.

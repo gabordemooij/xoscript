@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB ri pritës: ['localhost'],
+	përdorues: ['xo'],
+	fjalëkalim: ['pass123'],
+	emër-baze: ['xobase'],
+	lidhu.
+
+>> parametra-kërkimi := db pyetësor: ['SELECT ? AS a, ? AS b, ? AS c'].
+parametra-kërkimi parametra: (Listë ri ; ['1']).
+{ parametra-kërkimi merr: { :row Dalje shkruaj: row, rresht-ri. }. } kap: { :e Dalje shkruaj: e, rresht-ri. }, nis.
+
+>> parametra-kërkimi := db pyetësor: ['SELECT ? AS a'].
+{ parametra-kërkimi merr: { :row Dalje shkruaj: row, rresht-ri. }. } kap: { :e Dalje shkruaj: e, rresht-ri. }, nis.
+
+# the right number still works, more parameters are ignored as before
+>> parametra-kërkimi := db pyetësor: ['SELECT ? AS a, ? AS b'].
+parametra-kërkimi parametra: (Listë ri ; ['1'] ; ['2']).
+parametra-kërkimi merr: { :row Dalje shkruaj: (row në: ['a']), shkruaj: (row në: ['b']), rresht-ri. }.
+parametra-kërkimi parametra: (Listë ri ; ['1'] ; ['2'] ; ['3']).
+parametra-kërkimi merr: { :row Dalje shkruaj: (row në: ['a']), shkruaj: (row në: ['b']), rresht-ri. }.

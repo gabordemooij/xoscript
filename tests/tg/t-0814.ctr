@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server оғоз-кун.
+Барнома истифода: ['../../../src/xo/tg/webtools.xo'].
+
+>> Fake-Request := Объект нав.
+Fake-Request ҳангоми: ['value:'] иҷро: { :қимат
+	худӣ қимат := қимат.
+}.
+Fake-Request ҳангоми: ['cookie:'] иҷро: { :ном <- худӣ қимат.
+}.
+
+>> Test-Session := Сеанси-файли-муваққатӣ нав.
+Test-Session ҳангоми: ['бор-кун'] иҷро: { <- Луғат нав.
+}.
+Test-Session ҳангоми: ['session-id'] иҷро: { <- худӣ id.
+}.
+
+>> cookies := Феҳрист нав
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies ҳар-як: { :i :cookie
+	>> http-дархост := Fake-Request нав.
+	http-дархост value: cookie.
+	>> мудир := Test-Session нав.
+	>> web := Ҳуҷҷати-веб нав.
+	web http-дархост: http-дархост.
+	web мудири-сеансҳо: мудир.
+	web сеансро-оғоз-кун.
+	Баромад навис: ( мудир session-id = cookie ), сатри-нав.
+}.
+
+>> web := Ҳуҷҷати-веб нав.
+web json: (Луғат нав гузор: ['b'] калид: ['a']).
+Баромад навис: ['\n'], сатри-нав.
+
+{ Шабака get: ['file:///etc/hostname']. } дошта-гир: { :e
+	Баромад навис: e, сатри-нав.
+}, оғоз.
+
+>> svg := Файл нав: ['/tmp/test0814.svg'].
+svg навис: ['<svg xmlns="x"></svg>'].
+Баромад сатри-нав.
+Server гузарон: ['test0814.svg'] префикс: ['/tmp/'].
+svg ҳазф.

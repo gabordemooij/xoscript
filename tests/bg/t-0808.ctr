@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Трезор генерирай-ключове.
+>> sk := keys първи.
+>> pk := keys последен.
+>> sig := Трезор подпиши: ['abc'] с: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Трезор подпиши: ['abc'] с: long. } прихвани: { :e
+	Изход пиши: e, нов-ред.
+}, стартирай.
+
+{ Трезор провери: ['abc'] подпис: long с: pk. } прихвани: { :e
+	Изход пиши: e, нов-ред.
+}, стартирай.
+
+{ Трезор провери: ['abc'] подпис: sig с: short. } прихвани: { :e
+	Изход пиши: e, нов-ред.
+}, стартирай.

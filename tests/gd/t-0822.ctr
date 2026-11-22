@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB ùr òstair: ['localhost'],
+	ainm-cleachdaiche: ['xo'],
+	facal-faire: ['pass123'],
+	ainm-stòir-dàta: ['xobase'],
+	ceangail-ris.
+
+>> paramadairean-luirg := db ceist: ['SELECT ? AS a, ? AS b, ? AS c'].
+paramadairean-luirg paramadairean: (Liosta ùr ; ['1']).
+{ paramadairean-luirg faigh: { :row Às-chur sgrìobh: row, loidhne-ùr. }. } glac: { :e Às-chur sgrìobh: e, loidhne-ùr. }, tòisich.
+
+>> paramadairean-luirg := db ceist: ['SELECT ? AS a'].
+{ paramadairean-luirg faigh: { :row Às-chur sgrìobh: row, loidhne-ùr. }. } glac: { :e Às-chur sgrìobh: e, loidhne-ùr. }, tòisich.
+
+# the right number still works, more parameters are ignored as before
+>> paramadairean-luirg := db ceist: ['SELECT ? AS a, ? AS b'].
+paramadairean-luirg paramadairean: (Liosta ùr ; ['1'] ; ['2']).
+paramadairean-luirg faigh: { :row Às-chur sgrìobh: (row aig: ['a']), sgrìobh: (row aig: ['b']), loidhne-ùr. }.
+paramadairean-luirg paramadairean: (Liosta ùr ; ['1'] ; ['2'] ; ['3']).
+paramadairean-luirg faigh: { :row Às-chur sgrìobh: (row aig: ['a']), sgrìobh: (row aig: ['b']), loidhne-ùr. }.

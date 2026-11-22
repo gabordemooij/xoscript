@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB berria ostalaria: ['localhost'],
+	erabiltzailea: ['xo'],
+	pasahitza: ['pass123'],
+	datu-base-izena: ['xobase'],
+	konektatu.
+
+>> conn2 := Maria-DB berria ostalaria: ['localhost'],
+	erabiltzailea: ['xo'],
+	pasahitza: ['pass123'],
+	datu-base-izena: ['xobase'],
+	konektatu.
+#...
+>> del := conn1 kontsulta: ['DELETE FROM book WHERE id > 0'].
+{  del exekutatu. conn1 berretsi. } harrapatu: { :e conn1 desegin.  }, hasi.
+
+>> insert := conn1 kontsulta: ['INSERT INTO book (id) VALUES(null)'].
+insert exekutatu.
+
+>> zenbatu := conn1 kontsulta: ['SELECT COUNT(*) AS num FROM book'].
+zenbatu eskuratu: { :row Irteera idatzi: row num, lerro-jauzia. }.
+
+# does not show up
+# insert not committed on connection 1
+>> zenbatu := conn2 kontsulta: ['SELECT COUNT(*) AS num FROM book'].
+zenbatu eskuratu: { :row Irteera idatzi: row num, lerro-jauzia. }.

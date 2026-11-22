@@ -1,0 +1,43 @@
+
+
+>> g := Server nýtt.
+>> v := Hvelfing nýtt.
+>> ok := 0.
+
+>> secrets := Listi nýtt ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets afrita.
+passwords hver: { :i :p
+	secrets hver: { :n :s
+		{
+			>> encrypted := v dulkóða: s lykill: p.
+			>> decrypted := v afkóða-dulmál: encrypted lykill: p.
+			(decrypted = s) satt: {
+				ok leggja-við: 1.
+			}, annars: {
+				Úttak skrifa: ['failed encrypting/decrypting: '], ný-lína.
+				Úttak skrifa: s, ný-lína.
+				Úttak skrifa: ['encrypted: '] + encrypted, ný-lína.
+				Úttak skrifa: ['decrypted: '] + encrypted, ný-lína.
+				Forrit enda.
+			}.
+		} grípa: { :err
+			(s = [''] eða: p = ['']) satt: {
+				ok leggja-við: 1.
+			}, annars: {
+				Úttak skrifa: err, ný-lína.
+				Forrit enda.
+			}.
+		}, ræsa.
+	}.
+}.
+
+Úttak skrifa: ( ok + [' vault encryptions tested.'] ), ný-lína.

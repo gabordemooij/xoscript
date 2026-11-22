@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server sauni.
+Polokalama faʻaoga: ['../../../src/xo/sm/webtools.xo'].
+Polokalama faʻaoga: ['../../../src/xo/sm/mailtools.xo'].
+
+>> ulutala := Ulutala-HTTP fou ki-tatala: ['Location'] tau: ['/ok\r\nX-Injected: yes'].
+Tuuina-atu tusi: ulutala.
+
+>> web := Pepa-Upega fou.
+web alu-i: ['/ok\r\nX-Injected: yes'].
+Tuuina-atu tusi: ['\n'], laina-fou.
+
+>> mail := Imeli fou.
+mail ia-te: (Lisi fou ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lisi fou ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lisi fou ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail tagata-auina: ['d@example.invalid\r\nX-From: yes'] igoa: ['site\r\nX-Name: yes'].
+mail mataupu: ['hello\r\nX-Subject: yes'].
+mail tino: ['line1\r\nline2'].
+Tuuina-atu tusi: mail fatu.
+
+>> html := Imeli-HTML fou.
+html ia-te: (Lisi fou ; ['a@example.invalid\r\nX-To: yes']).
+html tagata-auina: ['d@example.invalid'] igoa: ['site'].
+html mataupu: ['hello\r\nX-Subject: yes'].
+html tino: ['body'].
+Tuuina-atu tusi: ( html fatu aofia-ai: ['\nX-'] ), laina-fou.
+Tuuina-atu tusi: ( html fatu aofia-ai: ['X-To: yes'] ), laina-fou.

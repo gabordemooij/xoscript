@@ -1,0 +1,23 @@
+Uit schrijf: ['Test object'], stop.
+>> a := Object nieuw. 
+a bij: ['item:'] doen: { :lst
+	eigen lst := lst. 
+}.
+a bij: ['item'] doen: { <- eigen lst.
+}.
+a item: (
+	Reeks nieuw ; 1 ; (
+		Reeks nieuw ; ['a'] ; (
+			Reeks nieuw ; ( Moment nieuw: 1 )
+		) ; ( Int64 van-string: ['321'] )
+	)
+).
+Uit schrijf: a item, stop.
+>> old-lst-address := a item prototype geheugenadres.
+a save-as: ['/tmp/a.bin'].
+Uit schrijf: ['========== RELOADING SNAP:'], stop.
+>> b := Object load-from: ['/tmp/a.bin'].
+(b item prototype geheugenadres = old-lst-address) ja: {
+	Uit schrijf: ['Object link re-attached.'], stop.
+}.
+Uit schrijf: ( b item ), stop.

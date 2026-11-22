@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> جرب := ⎬ :format :value
+	⎬ مخرج اكتب: ﴿ ﴿تنسيق جديد: format﴾ طبق: value ﴾, سطر-جديد. ⎨ التقط: ⎬ :e مخرج اكتب: e, سطر-جديد. ⎨, شغل.
+⎨.
+>> try-int := ⎬ :format :value
+	⎬ مخرج اكتب: ﴿ ﴿تنسيق جديد: format﴾ طبق-صحيح: value ﴾, سطر-جديد. ⎨ التقط: ⎬ :e مخرج اكتب: e, سطر-جديد. ⎨, شغل.
+⎨.
+
+# fits
+جرب طبق: ⌝'|%s|'⌜ و: ⌝'text'⌜.
+جرب طبق: ⌝'%06.2f'⌜ و: 5.5.
+جرب طبق: ⌝'100%% %s'⌜ و: ⌝'sure'⌜.
+try-int طبق: ⌝'%03d'⌜ و: 7.
+try-int طبق: ⌝'%x'⌜ و: 255.
+جرب طبق: ⌝'%d'⌜ و: ﴿Int64 جديد من-نص: ⌝'12'⌜﴾.
+جرب طبق: ⌝'%lld'⌜ و: ﴿Int64 جديد من-نص: ⌝'12'⌜﴾.
+جرب طبق: ⌝'%.1lf'⌜ و: 5.5.
+try-int طبق: ⌝'%hd'⌜ و: 7.
+
+# does not fit
+جرب طبق: ⌝'%s'⌜ و: 12345.
+جرب طبق: ⌝'%d'⌜ و: 12345.
+جرب طبق: ⌝'%f'⌜ و: ⌝'text'⌜.
+try-int طبق: ⌝'%d'⌜ و: ⌝'text'⌜.
+try-int طبق: ⌝'%s'⌜ و: 5.
+جرب طبق: ⌝'%s %s'⌜ و: ⌝'text'⌜.
+جرب طبق: ⌝'%n'⌜ و: ⌝'text'⌜.
+جرب طبق: ⌝'%*s'⌜ و: ⌝'text'⌜.
+جرب طبق: ⌝'%'⌜ و: ⌝'text'⌜.
+
+# length modifier does not fit
+جرب طبق: ⌝'%ls'⌜ و: ⌝'text'⌜.
+جرب طبق: ⌝'%Lf'⌜ و: 5.5.
+try-int طبق: ⌝'%ld'⌜ و: 7.
+try-int طبق: ⌝'%lld'⌜ و: 7.
+جرب طبق: ⌝'%Ld'⌜ و: ﴿Int64 جديد من-نص: ⌝'12'⌜﴾.
+
+# a width that does not fit printf must give an error, not a crash
+جرب طبق: ⌝'%99999999999s'⌜ و: ⌝'text'⌜.

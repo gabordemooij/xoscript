@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Праграма налада: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server звязаць: ( Спіс новы ;
+ libname ; ['fopen'] ;
+ ( Спіс новы ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+звязаць: ( Спіс новы ;
+ Нішто ; # means same lib
+ ['fread'] ;
+ ( Спіс новы ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Нішто ; # means same object (i.e. Stream)
+ ['fread']
+),
+звязаць: (
+ Спіс новы ;
+ Нішто ; # means same lib
+ ['fwrite'] ;
+ ( Спіс новы ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Нішто ; # means same lib
+ ['fwrite']
+),
+звязаць: (
+ Спіс новы ;
+ Нішто ; # means same lib
+ ['rewind'] ;
+ ( Спіс новы ; ['pointer'] ) ;
+ ['int'] ;
+ Нішто ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> шлях := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: шлях mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream паведамленне: ['fwrite'] аргументы: (Спіс новы ; str ; 1 ; 6 ; fd ).
+Вывад пісаць: bytes-written, новы-радок.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob новы: 20.
+
+# read from file
+>> bytes-read := Stream паведамленне: ['fread'] аргументы: (Спіс новы ; buf ; 1 ; 6 ; fd ).
+Вывад пісаць: bytes-read, новы-радок.
+Вывад пісаць: buf, новы-радок.
+
+# free memory
+str  вызваліць.
+шлях вызваліць.
+mode вызваліць.
+buf  вызваліць.
+
+

@@ -1,0 +1,25 @@
+Ausgabe schreiben: ['Test object'], stopp.
+>> a := Objekt neu. 
+
+a wenn: ['item:'] tun: { :fmt
+	eigen fmt := fmt. 
+}.
+
+a wenn: ['item'] tun: { <- eigen fmt.
+}.
+
+a item: ( Format neu: ['|%s|'] ).
+
+Ausgabe schreiben: a item, stopp.
+
+>> old-fmt-address := a item prototyp speicheradresse.
+a save-as: ['/tmp/a.bin'].
+Ausgabe schreiben: ['========== RELOADING SNAP:'], stopp.
+
+>> b := Objekt load-from: ['/tmp/a.bin'].
+
+(b item prototyp speicheradresse = old-fmt-address) ja: {
+	Ausgabe schreiben: ['Object link re-attached.'], stopp.
+}.
+
+Ausgabe schreiben: ( b item anwenden: ['hello'] ), stopp.

@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+چىقىرىش ياز: ⌝'Database test'⌜, يېڭى-قۇر.
+
+>> db := Maria-DB يېڭى باش-ماشىنا: ⌝'localhost'⌜,
+	ئىشلەتكۈچى-ئاتى: ⌝'xo'⌜, ئىم: ⌝'pass123'⌜, ساندان-ئاتى: ⌝'xobase'⌜, باغلان.
+
+چىقىرىش ياز: ⌝'Can we connect? '⌜ + db باغلاندى?, يېڭى-قۇر.
+
+>> ئىزدەش-پارامېتىرلىرى := db سۈرۈشتۈرۈش: ⌝'
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'⌜, پارامېتىرلار: ﴿ تىزىم يېڭى ; ⌝'abc'⌜ ; 12.35 ; 6 ﴾. # parameterized queries
+
+⎬  ئىزدەش-پارامېتىرلىرى ئىجرا-قىل. db جەزملە. ⎨ تۇت: ⎬ :e db قايتۇر.  ⎨, ئىجرا.
+
+چىقىرىش ياز: ⌝'Can we insert? '⌜ + ﴿ ئىزدەش-پارامېتىرلىرى insert-id > 0 ﴾, يېڭى-قۇر.
+
+>> Obj := ئوبيېكت يېڭى.
+Obj كەلگەندە: ⌝'retrieve-rows'⌜ قىل: ⎬
+	ئۆزىنىڭ سانى := 0.
+	>> ئىزدەش-پارامېتىرلىرى :=
+	db سۈرۈشتۈرۈش: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+	ئېلىپ-كەل: ⎬ :row 
+		ئۆزىنىڭ سانى قوش: 1.
+		راست ئۈز.
+	⎨. <- ئۆزىنىڭ سانى كۆچۈر.
+⎨.
+
+چىقىرىش ياز: ⌝'Can we query? '⌜ + ﴿ Obj retrieve-rows > 0 ﴾, يېڭى-قۇر.

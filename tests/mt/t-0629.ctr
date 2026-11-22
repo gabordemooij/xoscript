@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Ħruġ ikteb: ['Database test'], linja-ġdida.
+
+>> db := Maria-DB ġdid host: ['localhost'],
+	isem-utent: ['xo'], password: ['pass123'], isem-database: ['xobase'], qabbad.
+
+Ħruġ ikteb: ['Can we connect? '] + db imqabbad?, linja-ġdida.
+
+>> parametri-tfittxija := db mistoqsija: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametri: ( Lista ġdid ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  parametri-tfittxija esegwixxi. db ikkonferma. } aqbad: { :e db reġġa-lura.  }, ibda.
+
+Ħruġ ikteb: ['Can we insert? '] + ( parametri-tfittxija insert-id > 0 ), linja-ġdida.
+
+>> Obj := Oġġett ġdid.
+Obj meta: ['retrieve-rows'] agħmel: {
+	proprju għodd := 0.
+	>> parametri-tfittxija :=
+	db mistoqsija: ['SELECT * FROM book order by id desc limit 2'], 
+	ġib: { :row 
+		proprju għodd żid: 1.
+		Veru waqqaf.
+	}. <- proprju għodd ikkopja.
+}.
+
+Ħruġ ikteb: ['Can we query? '] + ( Obj retrieve-rows > 0 ), linja-ġdida.

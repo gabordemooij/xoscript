@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Papakupu hou
+	# ASCII only
+	tuku: ( Rārangi hou ; 65 ; 65 ; 65 ; 65 ; 0 ) kei: ['AAAA'],
+	# valid 2 byte sequence
+	tuku: ( Rārangi hou ; 194 ; 162 ; 0 ) kei: ['¢'],
+	# Valid 3-byte UTF-8
+    tuku: ( Rārangi hou ; 226 ; 130 ; 172 ; 0 ) kei: ['€'],
+	# Valid 4-byte UTF-8
+    tuku: ( Rārangi hou ; 240 ; 144 ; 141 ; 136 ; 0 ) kei: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    tuku: ( Rārangi hou ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) kei: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    tuku: ( Rārangi hou ; 65 ; 193 ; 129 ; 0 ) kei: ['A?'],
+	# Invalid first byte (0xFF)
+    tuku: ( Rārangi hou ; 255 ; 0 ) kei: ['?'],
+	# Incomplete multi-byte sequence at end
+    tuku: ( Rārangi hou ; 66 ; 226 ; 0 ) kei: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    tuku: ( Rārangi hou ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) kei: ['A€?𐍈B'].
+	 
+utf8cases ia: { :key :value
+	>> blob := Blob hou: value tatau, bytes: value.
+	>> str := blob aho.
+	(str = key) pono: {
+		Huaputa tuhi: ['OK'], rārangi-hou.
+	}, ki-te-kore: {
+		Huaputa tuhi: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, rārangi-hou.
+	}.
+	blob wewete.
+}.

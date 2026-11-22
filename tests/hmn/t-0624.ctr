@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Yam-khoom tshiab.
+
+Log thaum-tuaj: ['say:'] ua: { :str
+	Tawm sau-ntawv: str, kab-tshiab.
+}.
+
+>> Item := Yam-khoom tshiab.
+
+Item thaum-tuaj: ['tshiab:'] ua: { :id <- tus-kheej tshiab id: id.
+}.
+
+Item thaum-tuaj: ['id:'] ua: { :id
+	nws-li id := id.
+}.
+
+Item thaum-tuaj: ['id'] ua: { <- nws-li id. }.
+
+
+Item thaum-tuaj: ['kab-ntawv'] ua: {
+	>> str := ['Item#~no'].
+	str ~no: nws-li id. <- str.
+}.
+
+
+>> Print := Yam-khoom tshiab.
+
+Print thaum-tuaj: ['items'] ua: { 
+	
+	nws-li item := Item tshiab: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: nws-li item
+	).
+	
+	
+}.
+
+Print items.

@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+កម្មវិធី គ្រប់គ្រងអង្គចងចាំ: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := កម្មវិធី ការកំណត់: ['FFITESTLIB'].
+
+
+
+Server តភ្ជាប់: (
+ ស៊េរី ថ្មី ;
+ libname ;
+ ['puts'] ;
+ ( ស៊េរី ថ្មី ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s ដោះលែង.
+
+# test with struct
+
+>> a := Blob ថ្មី: 8.
+a bytes: (
+	ស៊េរី <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (ស៊េរី <<: ['int'], ; ['int']).
+
+Server តភ្ជាប់: (
+	ស៊េរី <<: ['@structtest'], ;
+	['@structtest'] ;
+	(ស៊េរី <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+លទ្ធផល សរសេរ: ['Sum test:'] + (ffitest ffisum: a), បន្ទាត់ថ្មី.
+
+struct struct-ដោះលែង.
+struct ដោះលែង.
+a ដោះលែង.

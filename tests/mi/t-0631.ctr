@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Papatono whakahaere-pūmahara: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Papatono tautuhinga: ['FFITESTLIB'].
+
+
+
+Server hono: (
+ Rārangi hou ;
+ libname ;
+ ['puts'] ;
+ ( Rārangi hou ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s wewete.
+
+# test with struct
+
+>> a := Blob hou: 8.
+a bytes: (
+	Rārangi <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Rārangi <<: ['int'], ; ['int']).
+
+Server hono: (
+	Rārangi <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Rārangi <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Huaputa tuhi: ['Sum test:'] + (ffitest ffisum: a), rārangi-hou.
+
+struct wewete-struct.
+struct wewete.
+a wewete.

@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Qasa mifteyan-çêke.
+>> sk := keys yekem.
+>> pk := keys ya-dawî.
+>> sig := Qasa îmze-bike: ['abc'] bi: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Qasa îmze-bike: ['abc'] bi: long. } bigire: { :e
+	Derketin binivîse: e, rêza-nû.
+}, bide-destpêkirin.
+
+{ Qasa kontrol-bike: ['abc'] îmze: long bi: pk. } bigire: { :e
+	Derketin binivîse: e, rêza-nû.
+}, bide-destpêkirin.
+
+{ Qasa kontrol-bike: ['abc'] îmze: sig bi: short. } bigire: { :e
+	Derketin binivîse: e, rêza-nû.
+}, bide-destpêkirin.

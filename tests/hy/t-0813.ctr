@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server նախաձեռնել.
+Ծրագիր օգտագործել: ['../../../src/xo/hy/webtools.xo'].
+Ծրագիր օգտագործել: ['../../../src/xo/hy/mailtools.xo'].
+
+>> վերնագիր := HTTP-Վերնագիր նոր բանալի: ['Location'] արժեք: ['/ok\r\nX-Injected: yes'].
+Ելք գրել: վերնագիր.
+
+>> web := Վեբ-փաստաթուղթ նոր.
+web անցնել: ['/ok\r\nX-Injected: yes'].
+Ելք գրել: ['\n'], նոր-տող.
+
+>> mail := Էլնամակ նոր.
+mail ստացողին: (Ցուցակ նոր ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Ցուցակ նոր ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Ցուցակ նոր ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail ուղարկող: ['d@example.invalid\r\nX-From: yes'] անուն: ['site\r\nX-Name: yes'].
+mail թեմա: ['hello\r\nX-Subject: yes'].
+mail մարմին: ['line1\r\nline2'].
+Ելք գրել: mail ստեղծել.
+
+>> html := HTML-Էլնամակ նոր.
+html ստացողին: (Ցուցակ նոր ; ['a@example.invalid\r\nX-To: yes']).
+html ուղարկող: ['d@example.invalid'] անուն: ['site'].
+html թեմա: ['hello\r\nX-Subject: yes'].
+html մարմին: ['body'].
+Ելք գրել: ( html ստեղծել պարունակում-է: ['\nX-'] ), նոր-տող.
+Ելք գրել: ( html ստեղծել պարունակում-է: ['X-To: yes'] ), նոր-տող.

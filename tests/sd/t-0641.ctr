@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := لغت نئون
+	# ASCII only
+	رکو: ﴿ لسٽ نئون ; 65 ; 65 ; 65 ; 65 ; 0 ﴾ ڪنجي: ⌝'AAAA'⌜,
+	# valid 2 byte sequence
+	رکو: ﴿ لسٽ نئون ; 194 ; 162 ; 0 ﴾ ڪنجي: ⌝'¢'⌜,
+	# Valid 3-byte UTF-8
+    رکو: ﴿ لسٽ نئون ; 226 ; 130 ; 172 ; 0 ﴾ ڪنجي: ⌝'€'⌜,
+	# Valid 4-byte UTF-8
+    رکو: ﴿ لسٽ نئون ; 240 ; 144 ; 141 ; 136 ; 0 ﴾ ڪنجي: ⌝'𐍈'⌜,
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    رکو: ﴿ لسٽ نئون ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ﴾ ڪنجي: ⌝'A?A'⌜,
+	# Overlong encoding of ASCII 'A' (should become ?),
+    رکو: ﴿ لسٽ نئون ; 65 ; 193 ; 129 ; 0 ﴾ ڪنجي: ⌝'A?'⌜,
+	# Invalid first byte (0xFF)
+    رکو: ﴿ لسٽ نئون ; 255 ; 0 ﴾ ڪنجي: ⌝'?'⌜,
+	# Incomplete multi-byte sequence at end
+    رکو: ﴿ لسٽ نئون ; 66 ; 226 ; 0 ﴾ ڪنجي: ⌝'B?'⌜,
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    رکو: ﴿ لسٽ نئون ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ﴾ ڪنجي: ⌝'A€?𐍈B'⌜.
+	 
+utf8cases هر-هڪ: ⎬ :key :value
+	>> blob := Blob نئون: value ڳڻپ, بائيٽس: value.
+	>> str := blob متن-طور.
+	﴿str = key﴾ جيڪڏهن-سچ: ⎬
+		آئوٽ-پٽ لکو: ⌝'OK'⌜, نئين-سٽ.
+	⎨, نه-ته: ⎬
+		آئوٽ-پٽ لکو: ⌝'UTF8 sanitizer failed on: '⌜ + key + ⌝' got: '⌜ + str, نئين-سٽ.
+	⎨.
+	blob آزاد-ڪريو.
+⎨.

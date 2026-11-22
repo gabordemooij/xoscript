@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+程序 GC模式: 4.
+Server init.
+
+>> counter := 0.
+>> db := 数据库 新建 主机: ['localhost'],
+	用户名: ['xo'], 密码: ['pass123'], 数据库名: ['xobase'], 连接.
+
+>> TwoDigitFormat := 格式 新建: ['%02d'].
+
+# Datetime
+{
+	>> 年份 := 数值 在: 1995 和: 2050, 转文本.
+	>> 月份 := TwoDigitFormat 应用-整数: (数值 在: 1 和: 12), 转文本.
+	>> 日数 := TwoDigitFormat 应用-整数: (数值 在: 1 和: 28), 转文本.
+	>> 小时 := TwoDigitFormat 应用-整数: (数值 在: 1 和: 23), 转文本.
+	>> 分钟 := TwoDigitFormat 应用-整数: (数值 在: 1 和: 59), 转文本.
+	>> 秒数 := TwoDigitFormat 应用-整数: (数值 在: 1 和: 59), 转文本.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: 年份,
+		MM: 月份,
+		DD: 日数,
+		HH: 小时,
+		II: 分钟,
+		SS: 秒数.
+	>> 参数 :=
+	db 查询: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	获取: { :row
+		(row mydatetime = datetime) 否: {
+			当前任务 错误: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter 加: 1.
+} * 100.
+
+# Date
+{
+	>> 年份 := 数值 在: 1995 和: 2050, 转文本.
+	>> 月份 := TwoDigitFormat 应用-整数: (数值 在: 1 和: 12), 转文本.
+	>> 日数 := TwoDigitFormat 应用-整数: (数值 在: 1 和: 28), 转文本.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: 年份,
+		MM: 月份,
+		DD: 日数.
+	>> 参数 :=
+	db 查询: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	获取: { :row
+		(row mydate = date) 否: {
+			当前任务 错误: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter 加: 1.
+} * 100.
+
+
+# Time
+{
+	>> 小时 := TwoDigitFormat 应用-整数: (数值 在: 1 和: 23), 转文本.
+	>> 分钟 := TwoDigitFormat 应用-整数: (数值 在: 1 和: 59), 转文本.
+	>> 秒数 := TwoDigitFormat 应用-整数: (数值 在: 1 和: 59), 转文本.
+	>> 时间 := ['HH:II:SS'].
+	时间
+		HH: 小时,
+		II: 分钟,
+		SS: 秒数.
+	>> 参数 :=
+	db 查询: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: 时间),
+	获取: { :row
+		(row mytime = 时间) 否: {
+			当前任务 错误: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter 加: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := 数组对象 新建 填: 100000 充: ['x'], 连接: [''].
+{
+	>> str2 := 保险库 令牌: 40.
+	>> 参数 :=
+	db 查询: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	获取: { :row
+		(row str1 = str1 且: row str2 = str2) 否: {
+			当前任务 错误: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter 加: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := 数值 在: 1 和: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 从字符串: ['9223372036854775807'] ) -
+		( Int64 从字符串: ['99999'] ) +
+		( Int64 从字符串: n1 转文本 )
+	).
+	>> 参数 :=
+	db 查询: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	获取: { :row
+		(row n1 = n1) 否: {
+			当前任务 错误: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) 否: {
+			当前任务 错误: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 四舍五入) 否: {
+			当前任务 错误: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) 否: {
+			当前任务 错误: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter 加: 1.
+} * 100.
+
+
+输出 写入: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), 停止.

@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB baharu hos: ['localhost'],
+	nama-pengguna: ['xo'],
+	kata-laluan: ['pass123'],
+	nama-pangkalan-data: ['xobase'],
+	sambung.
+
+>> parameter-carian := db pertanyaan: ['SELECT ? AS a, ? AS b, ? AS c'].
+parameter-carian parameter: (Senarai baharu ; ['1']).
+{ parameter-carian dapatkan: { :row Keluaran tulis: row, baris-baharu. }. } tangkap: { :e Keluaran tulis: e, baris-baharu. }, mula.
+
+>> parameter-carian := db pertanyaan: ['SELECT ? AS a'].
+{ parameter-carian dapatkan: { :row Keluaran tulis: row, baris-baharu. }. } tangkap: { :e Keluaran tulis: e, baris-baharu. }, mula.
+
+# the right number still works, more parameters are ignored as before
+>> parameter-carian := db pertanyaan: ['SELECT ? AS a, ? AS b'].
+parameter-carian parameter: (Senarai baharu ; ['1'] ; ['2']).
+parameter-carian dapatkan: { :row Keluaran tulis: (row di: ['a']), tulis: (row di: ['b']), baris-baharu. }.
+parameter-carian parameter: (Senarai baharu ; ['1'] ; ['2'] ; ['3']).
+parameter-carian dapatkan: { :row Keluaran tulis: (row di: ['a']), tulis: (row di: ['b']), baris-baharu. }.

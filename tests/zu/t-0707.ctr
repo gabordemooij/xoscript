@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Uhlelo ukuphathwa-kwenkumbulo: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB okusha umsingathi: ['localhost'],
+	igama-lomsebenzisi: ['xo'], iphasiwedi: ['pass123'], igama-lesizindalwazi: ['xobase'], xhumana.
+
+>> TwoDigitFormat := Ifomethi okusha: ['%02d'].
+
+# Datetime
+{
+	>> unyaka := Inombolo phakathi: 1995 no: 2050, umbhalo.
+	>> inyanga := TwoDigitFormat sebenzisa-kunombolo-ephelele: (Inombolo phakathi: 1 no: 12), umbhalo.
+	>> usuku := TwoDigitFormat sebenzisa-kunombolo-ephelele: (Inombolo phakathi: 1 no: 28), umbhalo.
+	>> ihora := TwoDigitFormat sebenzisa-kunombolo-ephelele: (Inombolo phakathi: 1 no: 23), umbhalo.
+	>> umzuzu := TwoDigitFormat sebenzisa-kunombolo-ephelele: (Inombolo phakathi: 1 no: 59), umbhalo.
+	>> isekhondi := TwoDigitFormat sebenzisa-kunombolo-ephelele: (Inombolo phakathi: 1 no: 59), umbhalo.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: unyaka,
+		MM: inyanga,
+		DD: usuku,
+		HH: ihora,
+		II: umzuzu,
+		SS: isekhondi.
+	>> amapharamitha-okusesha :=
+	db umbuzo: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	landa: { :row
+		(row mydatetime = datetime) amanga: {
+			lo-msebenzi iphutha: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter engeza: 1.
+} * 100.
+
+# Date
+{
+	>> unyaka := Inombolo phakathi: 1995 no: 2050, umbhalo.
+	>> inyanga := TwoDigitFormat sebenzisa-kunombolo-ephelele: (Inombolo phakathi: 1 no: 12), umbhalo.
+	>> usuku := TwoDigitFormat sebenzisa-kunombolo-ephelele: (Inombolo phakathi: 1 no: 28), umbhalo.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: unyaka,
+		MM: inyanga,
+		DD: usuku.
+	>> amapharamitha-okusesha :=
+	db umbuzo: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	landa: { :row
+		(row mydate = date) amanga: {
+			lo-msebenzi iphutha: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter engeza: 1.
+} * 100.
+
+
+# Time
+{
+	>> ihora := TwoDigitFormat sebenzisa-kunombolo-ephelele: (Inombolo phakathi: 1 no: 23), umbhalo.
+	>> umzuzu := TwoDigitFormat sebenzisa-kunombolo-ephelele: (Inombolo phakathi: 1 no: 59), umbhalo.
+	>> isekhondi := TwoDigitFormat sebenzisa-kunombolo-ephelele: (Inombolo phakathi: 1 no: 59), umbhalo.
+	>> isikhathi := ['HH:II:SS'].
+	isikhathi
+		HH: ihora,
+		II: umzuzu,
+		SS: isekhondi.
+	>> amapharamitha-okusesha :=
+	db umbuzo: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: isikhathi),
+	landa: { :row
+		(row mytime = isikhathi) amanga: {
+			lo-msebenzi iphutha: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter engeza: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Uhlu okusha gcwalisa: 100000 nge: ['x'], hlanganisa: [''].
+{
+	>> str2 := Isisefo ithokheni: 40.
+	>> amapharamitha-okusesha :=
+	db umbuzo: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	landa: { :row
+		(row str1 = str1 futhi: row str2 = str2) amanga: {
+			lo-msebenzi iphutha: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter engeza: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Inombolo phakathi: 1 no: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 kusuka-embhalweni: ['9223372036854775807'] ) -
+		( Int64 kusuka-embhalweni: ['99999'] ) +
+		( Int64 kusuka-embhalweni: n1 umbhalo )
+	).
+	>> amapharamitha-okusesha :=
+	db umbuzo: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	landa: { :row
+		(row n1 = n1) amanga: {
+			lo-msebenzi iphutha: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) amanga: {
+			lo-msebenzi iphutha: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 sondeza-inani) amanga: {
+			lo-msebenzi iphutha: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) amanga: {
+			lo-msebenzi iphutha: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter engeza: 1.
+} * 100.
+
+
+Okuphumayo bhala: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), umugqa-omusha.

@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Chương-trình quản-lý-bộ-nhớ: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB mới máy-trạm: ['localhost'],
+	tên-người-dùng: ['xo'], mật-khẩu: ['pass123'], tên-cơ-sở-dữ-liệu: ['xobase'], kết-nối.
+
+>> TwoDigitFormat := Định-dạng mới: ['%02d'].
+
+# Datetime
+{
+	>> năm := Số giữa: 1995 và: 2050, chuỗi.
+	>> tháng := TwoDigitFormat áp-dụng-số-nguyên: (Số giữa: 1 và: 12), chuỗi.
+	>> ngày := TwoDigitFormat áp-dụng-số-nguyên: (Số giữa: 1 và: 28), chuỗi.
+	>> giờ := TwoDigitFormat áp-dụng-số-nguyên: (Số giữa: 1 và: 23), chuỗi.
+	>> phút := TwoDigitFormat áp-dụng-số-nguyên: (Số giữa: 1 và: 59), chuỗi.
+	>> giây := TwoDigitFormat áp-dụng-số-nguyên: (Số giữa: 1 và: 59), chuỗi.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: năm,
+		MM: tháng,
+		DD: ngày,
+		HH: giờ,
+		II: phút,
+		SS: giây.
+	>> tham-số-tìm-kiếm :=
+	db truy-vấn: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	lấy: { :row
+		(row mydatetime = datetime) sai: {
+			tác-vụ-này lỗi: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter cộng: 1.
+} * 100.
+
+# Date
+{
+	>> năm := Số giữa: 1995 và: 2050, chuỗi.
+	>> tháng := TwoDigitFormat áp-dụng-số-nguyên: (Số giữa: 1 và: 12), chuỗi.
+	>> ngày := TwoDigitFormat áp-dụng-số-nguyên: (Số giữa: 1 và: 28), chuỗi.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: năm,
+		MM: tháng,
+		DD: ngày.
+	>> tham-số-tìm-kiếm :=
+	db truy-vấn: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	lấy: { :row
+		(row mydate = date) sai: {
+			tác-vụ-này lỗi: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter cộng: 1.
+} * 100.
+
+
+# Time
+{
+	>> giờ := TwoDigitFormat áp-dụng-số-nguyên: (Số giữa: 1 và: 23), chuỗi.
+	>> phút := TwoDigitFormat áp-dụng-số-nguyên: (Số giữa: 1 và: 59), chuỗi.
+	>> giây := TwoDigitFormat áp-dụng-số-nguyên: (Số giữa: 1 và: 59), chuỗi.
+	>> thời-gian := ['HH:II:SS'].
+	thời-gian
+		HH: giờ,
+		II: phút,
+		SS: giây.
+	>> tham-số-tìm-kiếm :=
+	db truy-vấn: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: thời-gian),
+	lấy: { :row
+		(row mytime = thời-gian) sai: {
+			tác-vụ-này lỗi: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter cộng: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Danh-sách mới điền: 100000 bằng: ['x'], nối: [''].
+{
+	>> str2 := Két mã-thông-báo: 40.
+	>> tham-số-tìm-kiếm :=
+	db truy-vấn: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	lấy: { :row
+		(row str1 = str1 và: row str2 = str2) sai: {
+			tác-vụ-này lỗi: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter cộng: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Số giữa: 1 và: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 từ-chuỗi: ['9223372036854775807'] ) -
+		( Int64 từ-chuỗi: ['99999'] ) +
+		( Int64 từ-chuỗi: n1 chuỗi )
+	).
+	>> tham-số-tìm-kiếm :=
+	db truy-vấn: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	lấy: { :row
+		(row n1 = n1) sai: {
+			tác-vụ-này lỗi: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) sai: {
+			tác-vụ-này lỗi: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 làm-tròn) sai: {
+			tác-vụ-này lỗi: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) sai: {
+			tác-vụ-này lỗi: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter cộng: 1.
+} * 100.
+
+
+Xuất ghi: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), xuống-dòng.

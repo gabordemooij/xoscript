@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server инициализирай.
+Програма използвай: ['../../../src/xo/bg/webtools.xo'].
+Програма използвай: ['../../../src/xo/bg/mailtools.xo'].
+
+>> заглавка := HTTP-Заглавка нов ключ: ['Location'] стойност: ['/ok\r\nX-Injected: yes'].
+Изход пиши: заглавка.
+
+>> web := Уеб-документ нов.
+web отиди-на: ['/ok\r\nX-Injected: yes'].
+Изход пиши: ['\n'], нов-ред.
+
+>> mail := Имейл нов.
+mail получател: (Списък нов ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Списък нов ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Списък нов ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail подател: ['d@example.invalid\r\nX-From: yes'] име: ['site\r\nX-Name: yes'].
+mail тема: ['hello\r\nX-Subject: yes'].
+mail тяло: ['line1\r\nline2'].
+Изход пиши: mail генерирай.
+
+>> html := HTML-Имейл нов.
+html получател: (Списък нов ; ['a@example.invalid\r\nX-To: yes']).
+html подател: ['d@example.invalid'] име: ['site'].
+html тема: ['hello\r\nX-Subject: yes'].
+html тяло: ['body'].
+Изход пиши: ( html генерирай съдържа: ['\nX-'] ), нов-ред.
+Изход пиши: ( html генерирай съдържа: ['X-To: yes'] ), нов-ред.

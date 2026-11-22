@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> andramo := { :format :value
+	{ Vokatra soraty: ( (Endrika vaovao: format) ampiharo: value ), andalana-vaovao. } sambory: { :e Vokatra soraty: e, andalana-vaovao. }, atombohy.
+}.
+>> try-int := { :format :value
+	{ Vokatra soraty: ( (Endrika vaovao: format) ampiharo-isa-feno: value ), andalana-vaovao. } sambory: { :e Vokatra soraty: e, andalana-vaovao. }, atombohy.
+}.
+
+# fits
+andramo ampiharo: ['|%s|'] ary: ['text'].
+andramo ampiharo: ['%06.2f'] ary: 5.5.
+andramo ampiharo: ['100%% %s'] ary: ['sure'].
+try-int ampiharo: ['%03d'] ary: 7.
+try-int ampiharo: ['%x'] ary: 255.
+andramo ampiharo: ['%d'] ary: (Int64 vaovao avy-amin-ny-soratra: ['12']).
+andramo ampiharo: ['%lld'] ary: (Int64 vaovao avy-amin-ny-soratra: ['12']).
+andramo ampiharo: ['%.1lf'] ary: 5.5.
+try-int ampiharo: ['%hd'] ary: 7.
+
+# does not fit
+andramo ampiharo: ['%s'] ary: 12345.
+andramo ampiharo: ['%d'] ary: 12345.
+andramo ampiharo: ['%f'] ary: ['text'].
+try-int ampiharo: ['%d'] ary: ['text'].
+try-int ampiharo: ['%s'] ary: 5.
+andramo ampiharo: ['%s %s'] ary: ['text'].
+andramo ampiharo: ['%n'] ary: ['text'].
+andramo ampiharo: ['%*s'] ary: ['text'].
+andramo ampiharo: ['%'] ary: ['text'].
+
+# length modifier does not fit
+andramo ampiharo: ['%ls'] ary: ['text'].
+andramo ampiharo: ['%Lf'] ary: 5.5.
+try-int ampiharo: ['%ld'] ary: 7.
+try-int ampiharo: ['%lld'] ary: 7.
+andramo ampiharo: ['%Ld'] ary: (Int64 vaovao avy-amin-ny-soratra: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+andramo ampiharo: ['%99999999999s'] ary: ['text'].

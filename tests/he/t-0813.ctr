@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server אתחל.
+תוכנית השתמש: ⌝'../../../src/xo/he/webtools.xo'⌜.
+תוכנית השתמש: ⌝'../../../src/xo/he/mailtools.xo'⌜.
+
+>> כותרת := כותרת-HTTP חדש מפתח: ⌝'Location'⌜ ערך: ⌝'/ok\r\nX-Injected: yes'⌜.
+פלט כתוב: כותרת.
+
+>> web := מסמך-רשת חדש.
+web עבור-אל: ⌝'/ok\r\nX-Injected: yes'⌜.
+פלט כתוב: ⌝'\n'⌜, שורה-חדשה.
+
+>> mail := דואל חדש.
+mail אל: ﴿רשימה חדש ; ⌝'a@example.invalid\r\nX-To: yes'⌜﴾.
+mail cc: ﴿רשימה חדש ; ⌝'b@example.invalid\r\nX-Cc: yes'⌜﴾.
+mail bcc: ﴿רשימה חדש ; ⌝'c@example.invalid\r\nX-Bcc: yes'⌜﴾.
+mail שולח: ⌝'d@example.invalid\r\nX-From: yes'⌜ שם: ⌝'site\r\nX-Name: yes'⌜.
+mail נושא: ⌝'hello\r\nX-Subject: yes'⌜.
+mail גוף: ⌝'line1\r\nline2'⌜.
+פלט כתוב: mail צור.
+
+>> html := דואל-HTML חדש.
+html אל: ﴿רשימה חדש ; ⌝'a@example.invalid\r\nX-To: yes'⌜﴾.
+html שולח: ⌝'d@example.invalid'⌜ שם: ⌝'site'⌜.
+html נושא: ⌝'hello\r\nX-Subject: yes'⌜.
+html גוף: ⌝'body'⌜.
+פלט כתוב: ﴿ html צור מכיל: ⌝'\nX-'⌜ ﴾, שורה-חדשה.
+פלט כתוב: ﴿ html צור מכיל: ⌝'X-To: yes'⌜ ﴾, שורה-חדשה.

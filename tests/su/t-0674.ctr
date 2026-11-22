@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> jalur := ['/tmp/dat.csv'].
+>> csv := Berkas anyar: jalur.
+csv tulis: s.
+
+# accepts CRLF LF CR, varying row length
+csv pamisah: [';'] tanda-kutip: ['"'] baris: { :line
+	Program beresihan.
+	Kaluaran tulis: line, baris-anyar.
+	Program beresihan.
+}.
+
+# unequal lines
+s tambah-di-tungtung: ['\njustone'].
+csv tulis: s.
+{
+	csv pamisah: [';'] tanda-kutip: ['"'] baris: { :line
+		Kaluaran tulis: line, baris-anyar.
+	}.
+} tangkep: { :e 
+	Kaluaran tulis: e, baris-anyar.
+}, jalankeun.
+
+# invalid format
+s := ['"he"llo";world'].
+csv tulis: s.
+{
+	csv pamisah: [';'] tanda-kutip: ['"'] baris: { :line
+		Kaluaran tulis: line, baris-anyar.
+	}.
+} tangkep: { :e 
+	Kaluaran tulis: e, baris-anyar.
+}, jalankeun.

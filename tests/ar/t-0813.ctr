@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server هيئ.
+برنامج استخدم: ⌝'../../../src/xo/ar/webtools.xo'⌜.
+برنامج استخدم: ⌝'../../../src/xo/ar/mailtools.xo'⌜.
+
+>> ترويسة := ترويسة-HTTP جديد مفتاح: ⌝'Location'⌜ قيمة: ⌝'/ok\r\nX-Injected: yes'⌜.
+مخرج اكتب: ترويسة.
+
+>> web := مستند-ويب جديد.
+web اذهب-إلى: ⌝'/ok\r\nX-Injected: yes'⌜.
+مخرج اكتب: ⌝'\n'⌜, سطر-جديد.
+
+>> mail := بريد-إلكتروني جديد.
+mail إلى: ﴿قائمة جديد ; ⌝'a@example.invalid\r\nX-To: yes'⌜﴾.
+mail cc: ﴿قائمة جديد ; ⌝'b@example.invalid\r\nX-Cc: yes'⌜﴾.
+mail bcc: ﴿قائمة جديد ; ⌝'c@example.invalid\r\nX-Bcc: yes'⌜﴾.
+mail المرسل: ⌝'d@example.invalid\r\nX-From: yes'⌜ اسم: ⌝'site\r\nX-Name: yes'⌜.
+mail الموضوع: ⌝'hello\r\nX-Subject: yes'⌜.
+mail متن: ⌝'line1\r\nline2'⌜.
+مخرج اكتب: mail ولد.
+
+>> html := بريد-HTML جديد.
+html إلى: ﴿قائمة جديد ; ⌝'a@example.invalid\r\nX-To: yes'⌜﴾.
+html المرسل: ⌝'d@example.invalid'⌜ اسم: ⌝'site'⌜.
+html الموضوع: ⌝'hello\r\nX-Subject: yes'⌜.
+html متن: ⌝'body'⌜.
+مخرج اكتب: ﴿ html ولد يحتوي: ⌝'\nX-'⌜ ﴾, سطر-جديد.
+مخرج اكتب: ﴿ html ولد يحتوي: ⌝'X-To: yes'⌜ ﴾, سطر-جديد.

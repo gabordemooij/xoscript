@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Bagay bago.
+
+Slurp kapag: ['bago'] gawin: {
+	sarili-ko str := [''].
+}.
+
+Slurp kapag: ['nieuw'] gawin: {
+	sarili-ko str := [''].
+}.
+
+Slurp kapag: ['tumugon:'] gawin: { :blah
+		sarili-ko str idagdag-sa-dulo: blah.
+}.
+
+Slurp kapag: ['tumugon:at:'] gawin: { :blah :blahah
+		sarili-ko str idagdag-sa-dulo: (blah mula-sa: 0 haba: (blah haba - 1)).
+		sarili-ko str idagdag-sa-dulo: [' '].
+		sarili-ko str idagdag-sa-dulo: blahah.
+}.
+
+Slurp kapag: ['obtain'] gawin: {
+	>> buffer := sarili-ko str.
+	sarili-ko str := ['']. <- buffer.
+}.
+
+
+Labas isulat: (Programa sistema: (Slurp bago echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Talaksan bago: ['/tmp/from.txt'], tanggalin. } saluhin: { ['Empty']. }, patakbuhin.
+{ Talaksan bago: ['/tmp/to.txt'], tanggalin. } saluhin: { ['Empty']. }, patakbuhin.
+
+
+Talaksan bago: ['/tmp/to.txt'], umiiral mali: {
+	Labas isulat: ['Confirmed. Target file does not exist.\
+'].
+}.
+Talaksan bago: ['/tmp/from.txt'], umiiral mali: {
+	Labas isulat: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Programa sistema: (Slurp bago touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Programa sistema: (Slurp bago cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Talaksan bago: ['/tmp/to.txt'], umiiral totoo: {
+	Labas isulat: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Labas isulat: ['Contents of file is:'] + (Talaksan bago: ['/tmp/to.txt'], basahin), bagong-linya.

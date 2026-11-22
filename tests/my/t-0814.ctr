@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server ပြင်ဆင်.
+ပရိုဂရမ် သုံး: ['../../../src/xo/my/webtools.xo'].
+
+>> Fake-Request := အရာဝတ္ထု အသစ်.
+Fake-Request ရလျှင်: ['value:'] လုပ်: { :တန်ဖိုး
+	ကိုယ်ပိုင် တန်ဖိုး := တန်ဖိုး.
+}.
+Fake-Request ရလျှင်: ['cookie:'] လုပ်: { :အမည် <- ကိုယ်ပိုင် တန်ဖိုး.
+}.
+
+>> Test-Session := ယာယီဖိုင်ဆက်ရှင် အသစ်.
+Test-Session ရလျှင်: ['ဖွင့်ယူ'] လုပ်: { <- အဘိဓာန် အသစ်.
+}.
+Test-Session ရလျှင်: ['session-id'] လုပ်: { <- ကိုယ်ပိုင် id.
+}.
+
+>> cookies := အစီအစဉ် အသစ်
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies တစ်ခုစီ: { :i :cookie
+	>> တောင်းဆိုမှု-http := Fake-Request အသစ်.
+	တောင်းဆိုမှု-http value: cookie.
+	>> စီမံသူ := Test-Session အသစ်.
+	>> web := ဝဘ်စာရွက်စာတမ်း အသစ်.
+	web တောင်းဆိုမှု-http: တောင်းဆိုမှု-http.
+	web ဆက်ရှင်စီမံသူ: စီမံသူ.
+	web ဆက်ရှင်စတင်.
+	အထွက် ရေး: ( စီမံသူ session-id = cookie ), စာကြောင်းသစ်.
+}.
+
+>> web := ဝဘ်စာရွက်စာတမ်း အသစ်.
+web json: (အဘိဓာန် အသစ် ထည့်: ['b'] သော့: ['a']).
+အထွက် ရေး: ['\n'], စာကြောင်းသစ်.
+
+{ ကွန်ရက် get: ['file:///etc/hostname']. } ဖမ်း: { :e
+	အထွက် ရေး: e, စာကြောင်းသစ်.
+}, စတင်.
+
+>> svg := ဖိုင် အသစ်: ['/tmp/test0814.svg'].
+svg ရေး: ['<svg xmlns="x"></svg>'].
+အထွက် စာကြောင်းသစ်.
+Server လွှဲပေး: ['test0814.svg'] ရှေ့ဆက်: ['/tmp/'].
+svg ဖျက်.

@@ -1,0 +1,30 @@
+输出 写入: ['Test object'], 停止.
+>> a := 对象 新建. 
+
+a 在: ['item:'] 执行: { :out
+	拥有 out := out. 
+}.
+
+a 在: ['item'] 执行: { <- 拥有 out.
+}.
+
+a 在: ['greet'] 执行: {
+	输出 写入: ['hi from original out!'], 停止.
+}.
+
+a item: 输出.
+
+输出 写入: a item, 停止.
+
+>> old-out-address := a item 原型 内存地址.
+a save-as: ['/tmp/a.bin'].
+输出 写入: ['========== RELOADING SNAP:'], 停止.
+
+>> b := 对象 load-from: ['/tmp/a.bin'].
+
+(b item 原型 内存地址 = old-out-address) 是: {
+	输出 写入: ['Object link re-attached.'], 停止.
+}.
+
+b item 写入: ['hello from loaded out!'], 停止.
+b greet.

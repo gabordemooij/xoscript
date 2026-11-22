@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> tsela-ea-faele := ['/tmp/dat.csv'].
+>> csv := Faele ncha: tsela-ea-faele.
+csv ngola: s.
+
+# accepts CRLF LF CR, varying row length
+csv searoli: [';'] letšoao-la-qotso: ['"'] mela: { :line
+	Lenaneo hloekisa.
+	Sephetho ngola: line, mola-o-mocha.
+	Lenaneo hloekisa.
+}.
+
+# unequal lines
+s eketsa-qetellong: ['\njustone'].
+csv ngola: s.
+{
+	csv searoli: [';'] letšoao-la-qotso: ['"'] mela: { :line
+		Sephetho ngola: line, mola-o-mocha.
+	}.
+} tšoasa: { :e 
+	Sephetho ngola: e, mola-o-mocha.
+}, qala.
+
+# invalid format
+s := ['"he"llo";world'].
+csv ngola: s.
+{
+	csv searoli: [';'] letšoao-la-qotso: ['"'] mela: { :line
+		Sephetho ngola: line, mola-o-mocha.
+	}.
+} tšoasa: { :e 
+	Sephetho ngola: e, mola-o-mocha.
+}, qala.

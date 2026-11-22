@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Zavatra vaovao.
+
+Log rehefa: ['say:'] ataovy: { :str
+	Vokatra soraty: str, andalana-vaovao.
+}.
+
+>> Item := Zavatra vaovao.
+
+Item rehefa: ['vaovao:'] ataovy: { :id <- tena vaovao id: id.
+}.
+
+Item rehefa: ['id:'] ataovy: { :id
+	azy id := id.
+}.
+
+Item rehefa: ['id'] ataovy: { <- azy id. }.
+
+
+Item rehefa: ['soratra'] ataovy: {
+	>> str := ['Item#~no'].
+	str ~no: azy id. <- str.
+}.
+
+
+>> Print := Zavatra vaovao.
+
+Print rehefa: ['items'] ataovy: { 
+	
+	azy item := Item vaovao: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: azy item
+	).
+	
+	
+}.
+
+Print items.

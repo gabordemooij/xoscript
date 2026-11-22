@@ -1,0 +1,43 @@
+#Linux
+>> OS := Program system: (Kommando uname -s), trim.
+
+>> Slurp := Objekt ny.
+Slurp ved: ['ny'] gør: {
+	egen str := [''].
+}.
+Slurp ved: ['svar:'] gør: { :blah
+		(egen str ≠ ['']) sand: {
+			egen str tilføj: [' '].
+		}.
+		egen str tilføj: blah.
+}.
+Slurp ved: ['svar:og:'] gør: { :blah :blahah
+		(egen str ≠ ['']) sand: {
+			egen str tilføj: [' '].
+		}.
+		(blah længde > 1) sand: {
+			egen str tilføj: (blah fra: 0 længde: (blah længde - 1)).
+		}, ellers: {
+			egen str tilføj: blah.
+		}.
+		egen str tilføj: [' '].
+		egen str tilføj: blahah.
+}.
+Slurp ved: ['obtain'] gør: {
+	>> buffer := egen str.
+	egen str := ['']. <- buffer.
+}.
+>> large text := [''].
+{
+	large text tilføj: ['hello'].
+} × 1000.
+
+
+Uddata skriv: (
+	Program system: (
+		Slurp ny
+			echo: large text,
+			| (['./xo ../../../tests/assets/stdin_test.ctr'] OS: OS)
+		) obtain
+).
+

@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Барнома танзим: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server пайванд: ( Феҳрист нав ;
+ libname ; ['fopen'] ;
+ ( Феҳрист нав ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+пайванд: ( Феҳрист нав ;
+ Ҳеҷ ; # means same lib
+ ['fread'] ;
+ ( Феҳрист нав ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Ҳеҷ ; # means same object (i.e. Stream)
+ ['fread']
+),
+пайванд: (
+ Феҳрист нав ;
+ Ҳеҷ ; # means same lib
+ ['fwrite'] ;
+ ( Феҳрист нав ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Ҳеҷ ; # means same lib
+ ['fwrite']
+),
+пайванд: (
+ Феҳрист нав ;
+ Ҳеҷ ; # means same lib
+ ['rewind'] ;
+ ( Феҳрист нав ; ['pointer'] ) ;
+ ['int'] ;
+ Ҳеҷ ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> роҳ := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: роҳ mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream паём: ['fwrite'] аргументҳо: (Феҳрист нав ; str ; 1 ; 6 ; fd ).
+Баромад навис: bytes-written, сатри-нав.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob нав: 20.
+
+# read from file
+>> bytes-read := Stream паём: ['fread'] аргументҳо: (Феҳрист нав ; buf ; 1 ; 6 ; fd ).
+Баромад навис: bytes-read, сатри-нав.
+Баромад навис: buf, сатри-нав.
+
+# free memory
+str  озод.
+роҳ озод.
+mode озод.
+buf  озод.
+
+

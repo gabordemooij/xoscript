@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> valores := Listar novo
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+valores cada-um: { :i :value
+	>> d := Mapa novo.
+	d colocar: value em: ['k'].
+	>> r := d code objeto.
+	Saída escrever: r conta, stop.
+	Saída escrever: ( (r em: ['k']) = value ), stop.
+}.

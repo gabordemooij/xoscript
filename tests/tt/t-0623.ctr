@@ -1,0 +1,43 @@
+
+
+>> g := Server яңа.
+>> v := Сейф яңа.
+>> ok := 0.
+
+>> secrets := Тезмә яңа ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets күчермә.
+passwords һәрбер: { :i :p
+	secrets һәрбер: { :n :s
+		{
+			>> encrypted := v шифрла: s ачкыч: p.
+			>> decrypted := v шифрны-ач: encrypted ачкыч: p.
+			(decrypted = s) дөрес: {
+				ok өстә: 1.
+			}, югыйсә: {
+				Чыгыш яз: ['failed encrypting/decrypting: '], яңа-юл.
+				Чыгыш яз: s, яңа-юл.
+				Чыгыш яз: ['encrypted: '] + encrypted, яңа-юл.
+				Чыгыш яз: ['decrypted: '] + encrypted, яңа-юл.
+				Программа тәмамла.
+			}.
+		} тот: { :err
+			(s = [''] яки: p = ['']) дөрес: {
+				ok өстә: 1.
+			}, югыйсә: {
+				Чыгыш яз: err, яңа-юл.
+				Программа тәмамла.
+			}.
+		}, җибәр.
+	}.
+}.
+
+Чыгыш яз: ( ok + [' vault encryptions tested.'] ), яңа-юл.

@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Izhod piši: ['Database test'], nova-vrstica.
+
+>> db := Maria-DB nov gostitelj: ['localhost'],
+	uporabnik: ['xo'], geslo: ['pass123'], ime-baze: ['xobase'], poveži-se.
+
+Izhod piši: ['Can we connect? '] + db povezano?, nova-vrstica.
+
+>> iskalni-parametri := db poizvedba: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametri: ( Seznam nov ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  iskalni-parametri izvedi. db potrdi. } ujemi: { :e db razveljavi.  }, zaženi.
+
+Izhod piši: ['Can we insert? '] + ( iskalni-parametri insert-id > 0 ), nova-vrstica.
+
+>> x := 0.
+>> iskalni-parametri :=
+db poizvedba: ['SELECT * FROM book order by id desc limit 2'], 
+pridobi: { :row 
+	x prištej: 1.
+	Resnično prekini. # must clean up, no 'Commands out of sync'
+}.
+
+>> iskalni-parametri :=
+db poizvedba: ['SELECT * FROM book order by id desc limit 2'], 
+pridobi: { :row
+	x prištej: 1.
+	Resnično prekini.
+}.
+
+(x > 0) resnično: {
+	Izhod piši: ['Can we break in the middle of a fetch? '].
+}.
+
+Izhod piši: Resnično, nova-vrstica.

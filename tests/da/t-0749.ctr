@@ -1,0 +1,25 @@
+Uddata skriv: ['Test object'], stop.
+>> a := Objekt ny. 
+
+a ved: ['item:'] gør: { :boolsk
+	egen boolsk := boolsk. 
+}.
+
+a ved: ['item'] gør: { <- egen boolsk.
+}.
+
+a item: Falsk.
+
+Uddata skriv: a item, stop.
+
+>> old-bool-address := a item prototype hukommelsesadresse.
+a save-as: ['/tmp/a.bin'].
+Uddata skriv: ['========== RELOADING SNAP:'], stop.
+
+>> b := Objekt load-from: ['/tmp/a.bin'].
+
+(b item prototype hukommelsesadresse = old-bool-address) sand: {
+	Uddata skriv: ['Object link re-attached.'], stop.
+}.
+
+Uddata skriv: b item, stop.

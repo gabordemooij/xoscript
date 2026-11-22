@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server башлангыч-халәт.
+Программа файдалан: ['../../../src/xo/tt/webtools.xo'].
+
+>> Fake-Request := Объект яңа.
+Fake-Request килгәндә: ['value:'] эшлә: { :кыйммәт
+	үзенең кыйммәт := кыйммәт.
+}.
+Fake-Request килгәндә: ['cookie:'] эшлә: { :исем <- үзенең кыйммәт.
+}.
+
+>> Test-Session := Вакытлыча-файл-сеансы яңа.
+Test-Session килгәндә: ['йөкләү'] эшлә: { <- Сүзлек яңа.
+}.
+Test-Session килгәндә: ['session-id'] эшлә: { <- үзенең id.
+}.
+
+>> cookies := Тезмә яңа
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies һәрбер: { :i :cookie
+	>> http-сорау := Fake-Request яңа.
+	http-сорау value: cookie.
+	>> идарәче := Test-Session яңа.
+	>> web := Веб-документ яңа.
+	web http-сорау: http-сорау.
+	web сеанс-идарәчесе: идарәче.
+	web сеансны-башлау.
+	Чыгыш яз: ( идарәче session-id = cookie ), яңа-юл.
+}.
+
+>> web := Веб-документ яңа.
+web json: (Сүзлек яңа куй: ['b'] ачкыч: ['a']).
+Чыгыш яз: ['\n'], яңа-юл.
+
+{ Челтәр get: ['file:///etc/hostname']. } тот: { :e
+	Чыгыш яз: e, яңа-юл.
+}, җибәр.
+
+>> svg := Файл яңа: ['/tmp/test0814.svg'].
+svg яз: ['<svg xmlns="x"></svg>'].
+Чыгыш яңа-юл.
+Server үткәр: ['test0814.svg'] префикс: ['/tmp/'].
+svg бетер.

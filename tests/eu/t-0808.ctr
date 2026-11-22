@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Kutxa-gotorra sortu-gakoak.
+>> sk := keys lehena.
+>> pk := keys azkena.
+>> sig := Kutxa-gotorra sinatu: ['abc'] gakoarekin: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Kutxa-gotorra sinatu: ['abc'] gakoarekin: long. } harrapatu: { :e
+	Irteera idatzi: e, lerro-jauzia.
+}, hasi.
+
+{ Kutxa-gotorra egiaztatu: ['abc'] sinadura: long gakoarekin: pk. } harrapatu: { :e
+	Irteera idatzi: e, lerro-jauzia.
+}, hasi.
+
+{ Kutxa-gotorra egiaztatu: ['abc'] sinadura: sig gakoarekin: short. } harrapatu: { :e
+	Irteera idatzi: e, lerro-jauzia.
+}, hasi.

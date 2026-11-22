@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> pad := ['/tmp/test0821.csv'].
+>> file := Lêer nuut: pad.
+
+file skryf: ['a,b\n"1,2\n'].
+{
+	file skeidingsteken: [','] aanhalingsteken: ['"'] reëls: { :line
+		Uitvoer skryf: line, nuwe-reël.
+	}.
+} vang: { :e Uitvoer skryf: e, nuwe-reël. }, begin.
+
+# a closed quote still works
+file skryf: ['a,b\n"1,2",3'].
+file skeidingsteken: [','] aanhalingsteken: ['"'] reëls: { :line
+	Uitvoer skryf: line, nuwe-reël.
+}.
+file verwyder.

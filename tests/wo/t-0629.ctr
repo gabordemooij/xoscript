@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Génn bind: ['Database test'], taxaw.
+
+>> db := Maria-DB xees dalalkat: ['localhost'],
+	turu-jëfandikukat: ['xo'], baatu-jall: ['pass123'], turu-dencukaayu-njoxe: ['xobase'], lëkkaloo.
+
+Génn bind: ['Can we connect? '] + db lëkkaloo-na?, taxaw.
+
+>> tànneefi-seet := db laaj-njoxe: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], tànneef-yi: ( Jokkalante xees ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  tànneefi-seet jëfe. db dëggal. } jàpp: { :e db delloo-gannaaw.  }, dox.
+
+Génn bind: ['Can we insert? '] + ( tànneefi-seet insert-id > 0 ), taxaw.
+
+>> Obj := Denc xees.
+Obj bu: ['retrieve-rows'] def: {
+	sama waññ := 0.
+	>> tànneefi-seet :=
+	db laaj-njoxe: ['SELECT * FROM book order by id desc limit 2'], 
+	indi: { :row 
+		sama waññ yokk: 1.
+		Dëgg dog.
+	}. <- sama waññ duppitu.
+}.
+
+Génn bind: ['Can we query? '] + ( Obj retrieve-rows > 0 ), taxaw.

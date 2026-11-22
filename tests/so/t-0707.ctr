@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Barnaamij maamulka-xusuusta: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB cusub martigeliye: ['localhost'],
+	magaca-isticmaalaha: ['xo'], furaha-sirta: ['pass123'], magaca-xogta: ['xobase'], ku-xirmo.
+
+>> TwoDigitFormat := Qaab cusub: ['%02d'].
+
+# Datetime
+{
+	>> sannad := Tiro dhexeeya: 1995 iyo: 2050, qoraal.
+	>> bil := TwoDigitFormat ku-dabaq-tiro-dhan: (Tiro dhexeeya: 1 iyo: 12), qoraal.
+	>> maalin := TwoDigitFormat ku-dabaq-tiro-dhan: (Tiro dhexeeya: 1 iyo: 28), qoraal.
+	>> saac := TwoDigitFormat ku-dabaq-tiro-dhan: (Tiro dhexeeya: 1 iyo: 23), qoraal.
+	>> daqiiqad := TwoDigitFormat ku-dabaq-tiro-dhan: (Tiro dhexeeya: 1 iyo: 59), qoraal.
+	>> ilbiriqsi := TwoDigitFormat ku-dabaq-tiro-dhan: (Tiro dhexeeya: 1 iyo: 59), qoraal.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: sannad,
+		MM: bil,
+		DD: maalin,
+		HH: saac,
+		II: daqiiqad,
+		SS: ilbiriqsi.
+	>> xuduudaha-raadinta :=
+	db weydiin: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	soo-qaad: { :row
+		(row mydatetime = datetime) been: {
+			hawshan qalad: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ku-dar: 1.
+} * 100.
+
+# Date
+{
+	>> sannad := Tiro dhexeeya: 1995 iyo: 2050, qoraal.
+	>> bil := TwoDigitFormat ku-dabaq-tiro-dhan: (Tiro dhexeeya: 1 iyo: 12), qoraal.
+	>> maalin := TwoDigitFormat ku-dabaq-tiro-dhan: (Tiro dhexeeya: 1 iyo: 28), qoraal.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: sannad,
+		MM: bil,
+		DD: maalin.
+	>> xuduudaha-raadinta :=
+	db weydiin: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	soo-qaad: { :row
+		(row mydate = date) been: {
+			hawshan qalad: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ku-dar: 1.
+} * 100.
+
+
+# Time
+{
+	>> saac := TwoDigitFormat ku-dabaq-tiro-dhan: (Tiro dhexeeya: 1 iyo: 23), qoraal.
+	>> daqiiqad := TwoDigitFormat ku-dabaq-tiro-dhan: (Tiro dhexeeya: 1 iyo: 59), qoraal.
+	>> ilbiriqsi := TwoDigitFormat ku-dabaq-tiro-dhan: (Tiro dhexeeya: 1 iyo: 59), qoraal.
+	>> waqti := ['HH:II:SS'].
+	waqti
+		HH: saac,
+		II: daqiiqad,
+		SS: ilbiriqsi.
+	>> xuduudaha-raadinta :=
+	db weydiin: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: waqti),
+	soo-qaad: { :row
+		(row mytime = waqti) been: {
+			hawshan qalad: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ku-dar: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Liis cusub buuxi: 100000 ku: ['x'], isku-dar: [''].
+{
+	>> str2 := Khasnad token: 40.
+	>> xuduudaha-raadinta :=
+	db weydiin: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	soo-qaad: { :row
+		(row str1 = str1 iyo: row str2 = str2) been: {
+			hawshan qalad: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ku-dar: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Tiro dhexeeya: 1 iyo: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 qoraal-ka: ['9223372036854775807'] ) -
+		( Int64 qoraal-ka: ['99999'] ) +
+		( Int64 qoraal-ka: n1 qoraal )
+	).
+	>> xuduudaha-raadinta :=
+	db weydiin: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	soo-qaad: { :row
+		(row n1 = n1) been: {
+			hawshan qalad: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) been: {
+			hawshan qalad: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 soo-koob) been: {
+			hawshan qalad: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) been: {
+			hawshan qalad: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ku-dar: 1.
+} * 100.
+
+
+Soo-saar qor: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), sadar-cusub.

@@ -1,0 +1,43 @@
+
+
+>> g := Server ໃໝ່.
+>> v := ຕູ້ນິລະໄພ ໃໝ່.
+>> ok := 0.
+
+>> secrets := ລິສ ໃໝ່ ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets ສຳເນົາ.
+passwords ແຕ່ລະຕົວ: { :i :p
+	secrets ແຕ່ລະຕົວ: { :n :s
+		{
+			>> encrypted := v ເຂົ້າລະຫັດລັບ: s ກະແຈ: p.
+			>> decrypted := v ຖອດລະຫັດລັບ: encrypted ກະແຈ: p.
+			(decrypted = s) ຖ້າຈິງ: {
+				ok ບວກ: 1.
+			}, ຖ້າບໍ່ດັ່ງນັ້ນ: {
+				ຜົນອອກ ຂຽນ: ['failed encrypting/decrypting: '], ຂຶ້ນແຖວໃໝ່.
+				ຜົນອອກ ຂຽນ: s, ຂຶ້ນແຖວໃໝ່.
+				ຜົນອອກ ຂຽນ: ['encrypted: '] + encrypted, ຂຶ້ນແຖວໃໝ່.
+				ຜົນອອກ ຂຽນ: ['decrypted: '] + encrypted, ຂຶ້ນແຖວໃໝ່.
+				ໂປຣແກຣມ ຈົບ.
+			}.
+		} ຈັບ: { :err
+			(s = [''] ຫຼື: p = ['']) ຖ້າຈິງ: {
+				ok ບວກ: 1.
+			}, ຖ້າບໍ່ດັ່ງນັ້ນ: {
+				ຜົນອອກ ຂຽນ: err, ຂຶ້ນແຖວໃໝ່.
+				ໂປຣແກຣມ ຈົບ.
+			}.
+		}, ເລີ່ມ.
+	}.
+}.
+
+ຜົນອອກ ຂຽນ: ( ok + [' vault encryptions tested.'] ), ຂຶ້ນແຖວໃໝ່.

@@ -1,0 +1,43 @@
+
+
+>> g := Server ncha.
+>> v := Polokelo-e-sireletsehileng ncha.
+>> ok := 0.
+
+>> secrets := Lethathamo ncha ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopitsa.
+passwords e-ngoe-le-e-ngoe: { :i :p
+	secrets e-ngoe-le-e-ngoe: { :n :s
+		{
+			>> encrypted := v pata: s senotlolo: p.
+			>> decrypted := v senola: encrypted senotlolo: p.
+			(decrypted = s) nnete: {
+				ok eketsa: 1.
+			}, ho-seng-joalo: {
+				Sephetho ngola: ['failed encrypting/decrypting: '], mola-o-mocha.
+				Sephetho ngola: s, mola-o-mocha.
+				Sephetho ngola: ['encrypted: '] + encrypted, mola-o-mocha.
+				Sephetho ngola: ['decrypted: '] + encrypted, mola-o-mocha.
+				Lenaneo qeta.
+			}.
+		} tšoasa: { :err
+			(s = [''] kapa: p = ['']) nnete: {
+				ok eketsa: 1.
+			}, ho-seng-joalo: {
+				Sephetho ngola: err, mola-o-mocha.
+				Lenaneo qeta.
+			}.
+		}, qala.
+	}.
+}.
+
+Sephetho ngola: ( ok + [' vault encryptions tested.'] ), mola-o-mocha.

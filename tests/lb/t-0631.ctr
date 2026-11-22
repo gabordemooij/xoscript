@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Programm späicherverwaltung: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Programm astellung: ['FFITESTLIB'].
+
+
+
+Server verbannen: (
+ Lëscht nei ;
+ libname ;
+ ['puts'] ;
+ ( Lëscht nei ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s fräiginn.
+
+# test with struct
+
+>> a := Blob nei: 8.
+a bytes: (
+	Lëscht <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Lëscht <<: ['int'], ; ['int']).
+
+Server verbannen: (
+	Lëscht <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Lëscht <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Ausgab schreiwen: ['Sum test:'] + (ffitest ffisum: a), nei-zeil.
+
+struct struct-fräiginn.
+struct fräiginn.
+a fräiginn.

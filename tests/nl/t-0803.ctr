@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB nieuw host: ['localhost'],
+	gebruikersnaam: ['xo'],
+	wachtwoord: ['pass123'],
+	databanknaam: ['xobase'],
+	verbinden.
+
+>> conn2 := Maria-DB nieuw host: ['localhost'],
+	gebruikersnaam: ['xo'],
+	wachtwoord: ['pass123'],
+	databanknaam: ['xobase'],
+	verbinden.
+#...
+>> del := conn1 query: ['DELETE FROM book WHERE id > 0'].
+{  del uitvoeren. conn1 bevestigen. } afhandelen: { :e conn1 terugdraaien.  }, start.
+
+>> insert := conn1 query: ['INSERT INTO book (id) VALUES(null)'].
+insert uitvoeren.
+
+>> aantal := conn1 query: ['SELECT COUNT(*) AS num FROM book'].
+aantal ophalen: { :row Uit schrijf: row num, stop. }.
+
+# does not show up
+# insert not committed on connection 1
+>> aantal := conn2 query: ['SELECT COUNT(*) AS num FROM book'].
+aantal ophalen: { :row Uit schrijf: row num, stop. }.

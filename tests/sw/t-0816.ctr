@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> jaribu := { :format :value
+	{ Towe andika: ( (Umbizo mpya: format) tekeleza: value ), mstari-mpya. } nasa: { :e Towe andika: e, mstari-mpya. }, anza.
+}.
+>> try-int := { :format :value
+	{ Towe andika: ( (Umbizo mpya: format) tekeleza-namba-kamili: value ), mstari-mpya. } nasa: { :e Towe andika: e, mstari-mpya. }, anza.
+}.
+
+# fits
+jaribu tekeleza: ['|%s|'] na: ['text'].
+jaribu tekeleza: ['%06.2f'] na: 5.5.
+jaribu tekeleza: ['100%% %s'] na: ['sure'].
+try-int tekeleza: ['%03d'] na: 7.
+try-int tekeleza: ['%x'] na: 255.
+jaribu tekeleza: ['%d'] na: (Int64 mpya kutoka-maandishi: ['12']).
+jaribu tekeleza: ['%lld'] na: (Int64 mpya kutoka-maandishi: ['12']).
+jaribu tekeleza: ['%.1lf'] na: 5.5.
+try-int tekeleza: ['%hd'] na: 7.
+
+# does not fit
+jaribu tekeleza: ['%s'] na: 12345.
+jaribu tekeleza: ['%d'] na: 12345.
+jaribu tekeleza: ['%f'] na: ['text'].
+try-int tekeleza: ['%d'] na: ['text'].
+try-int tekeleza: ['%s'] na: 5.
+jaribu tekeleza: ['%s %s'] na: ['text'].
+jaribu tekeleza: ['%n'] na: ['text'].
+jaribu tekeleza: ['%*s'] na: ['text'].
+jaribu tekeleza: ['%'] na: ['text'].
+
+# length modifier does not fit
+jaribu tekeleza: ['%ls'] na: ['text'].
+jaribu tekeleza: ['%Lf'] na: 5.5.
+try-int tekeleza: ['%ld'] na: 7.
+try-int tekeleza: ['%lld'] na: 7.
+jaribu tekeleza: ['%Ld'] na: (Int64 mpya kutoka-maandishi: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+jaribu tekeleza: ['%99999999999s'] na: ['text'].

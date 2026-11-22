@@ -1,0 +1,43 @@
+
+
+>> g := Server nuovo.
+>> v := Caveau nuovo.
+>> ok := 0.
+
+>> secrets := Serie nuovo ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets copia.
+passwords ogni: { :i :p
+	secrets ogni: { :n :s
+		{
+			>> encrypted := v critta: s chiave: p.
+			>> decrypted := v decritta: encrypted chiave: p.
+			(decrypted = s) vero: {
+				ok inserisci: 1.
+			}, altro: {
+				Uscita scrivi: ['failed encrypting/decrypting: '], stop.
+				Uscita scrivi: s, stop.
+				Uscita scrivi: ['encrypted: '] + encrypted, stop.
+				Uscita scrivi: ['decrypted: '] + encrypted, stop.
+				Programma fine.
+			}.
+		} catturare: { :err
+			(s = [''] o: p = ['']) vero: {
+				ok inserisci: 1.
+			}, altro: {
+				Uscita scrivi: err, stop.
+				Programma fine.
+			}.
+		}, correre.
+	}.
+}.
+
+Uscita scrivi: ( ok + [' vault encryptions tested.'] ), stop.

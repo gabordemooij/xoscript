@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB नयाँ होस्ट: ['localhost'],
+	प्रयोगकर्ता-नाम: ['xo'],
+	पासवर्ड: ['pass123'],
+	डाटाबेस-नाम: ['xobase'],
+	जोडिऊ.
+
+>> conn2 := Maria-DB नयाँ होस्ट: ['localhost'],
+	प्रयोगकर्ता-नाम: ['xo'],
+	पासवर्ड: ['pass123'],
+	डाटाबेस-नाम: ['xobase'],
+	जोडिऊ.
+#...
+>> del := conn1 क्वेरी: ['DELETE FROM book WHERE id > 0'].
+{  del कार्यान्वयन. conn1 पुष्टि. } समात: { :e conn1 फिर्ता-लिऊ.  }, चलाऊ.
+
+>> insert := conn1 क्वेरी: ['INSERT INTO book (id) VALUES(null)'].
+insert कार्यान्वयन.
+
+>> गन्ती := conn1 क्वेरी: ['SELECT COUNT(*) AS num FROM book'].
+गन्ती ल्याऊ: { :row आउटपुट लेख: row num, नयाँ-पङ्क्ति. }.
+
+# does not show up
+# insert not committed on connection 1
+>> गन्ती := conn2 क्वेरी: ['SELECT COUNT(*) AS num FROM book'].
+गन्ती ल्याऊ: { :row आउटपुट लेख: row num, नयाँ-पङ्क्ति. }.

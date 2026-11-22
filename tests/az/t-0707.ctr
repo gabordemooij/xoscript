@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Proqram yaddaş-idarəsi: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB yeni host: ['localhost'],
+	istifadəçi: ['xo'], parol: ['pass123'], baza-adı: ['xobase'], qoşul.
+
+>> TwoDigitFormat := Format yeni: ['%02d'].
+
+# Datetime
+{
+	>> il := Ədəd arasında: 1995 və: 2050, mətn.
+	>> ay := TwoDigitFormat tətbiq-et-tam: (Ədəd arasında: 1 və: 12), mətn.
+	>> gün := TwoDigitFormat tətbiq-et-tam: (Ədəd arasında: 1 və: 28), mətn.
+	>> saat := TwoDigitFormat tətbiq-et-tam: (Ədəd arasında: 1 və: 23), mətn.
+	>> dəqiqə := TwoDigitFormat tətbiq-et-tam: (Ədəd arasında: 1 və: 59), mətn.
+	>> saniyə := TwoDigitFormat tətbiq-et-tam: (Ədəd arasında: 1 və: 59), mətn.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: il,
+		MM: ay,
+		DD: gün,
+		HH: saat,
+		II: dəqiqə,
+		SS: saniyə.
+	>> axtarış-parametrləri :=
+	db sorğu: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	gətir: { :row
+		(row mydatetime = datetime) yalan: {
+			bu-tapşırıq səhv: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter əlavə-et: 1.
+} * 100.
+
+# Date
+{
+	>> il := Ədəd arasında: 1995 və: 2050, mətn.
+	>> ay := TwoDigitFormat tətbiq-et-tam: (Ədəd arasında: 1 və: 12), mətn.
+	>> gün := TwoDigitFormat tətbiq-et-tam: (Ədəd arasında: 1 və: 28), mətn.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: il,
+		MM: ay,
+		DD: gün.
+	>> axtarış-parametrləri :=
+	db sorğu: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	gətir: { :row
+		(row mydate = date) yalan: {
+			bu-tapşırıq səhv: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter əlavə-et: 1.
+} * 100.
+
+
+# Time
+{
+	>> saat := TwoDigitFormat tətbiq-et-tam: (Ədəd arasında: 1 və: 23), mətn.
+	>> dəqiqə := TwoDigitFormat tətbiq-et-tam: (Ədəd arasında: 1 və: 59), mətn.
+	>> saniyə := TwoDigitFormat tətbiq-et-tam: (Ədəd arasında: 1 və: 59), mətn.
+	>> vaxt := ['HH:II:SS'].
+	vaxt
+		HH: saat,
+		II: dəqiqə,
+		SS: saniyə.
+	>> axtarış-parametrləri :=
+	db sorğu: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: vaxt),
+	gətir: { :row
+		(row mytime = vaxt) yalan: {
+			bu-tapşırıq səhv: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter əlavə-et: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Siyahı yeni doldur: 100000 ilə: ['x'], birləşdir: [''].
+{
+	>> str2 := Seyf token: 40.
+	>> axtarış-parametrləri :=
+	db sorğu: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	gətir: { :row
+		(row str1 = str1 və: row str2 = str2) yalan: {
+			bu-tapşırıq səhv: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter əlavə-et: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Ədəd arasında: 1 və: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 mətndən: ['9223372036854775807'] ) -
+		( Int64 mətndən: ['99999'] ) +
+		( Int64 mətndən: n1 mətn )
+	).
+	>> axtarış-parametrləri :=
+	db sorğu: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	gətir: { :row
+		(row n1 = n1) yalan: {
+			bu-tapşırıq səhv: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) yalan: {
+			bu-tapşırıq səhv: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 yuvarlaqlaşdır) yalan: {
+			bu-tapşırıq səhv: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) yalan: {
+			bu-tapşırıq səhv: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter əlavə-et: 1.
+} * 100.
+
+
+Çıxış yaz: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), yeni-sətir.

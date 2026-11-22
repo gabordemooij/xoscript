@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Programma atmiņas-pārvaldība: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Programma iestatījums: ['FFITESTLIB'].
+
+
+
+Server saistīt: (
+ Saraksts jauns ;
+ libname ;
+ ['puts'] ;
+ ( Saraksts jauns ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s atbrīvot.
+
+# test with struct
+
+>> a := Blob jauns: 8.
+a bytes: (
+	Saraksts <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Saraksts <<: ['int'], ; ['int']).
+
+Server saistīt: (
+	Saraksts <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Saraksts <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Izvade rakstīt: ['Sum test:'] + (ffitest ffisum: a), jauna-rinda.
+
+struct atbrīvot-struct.
+struct atbrīvot.
+a atbrīvot.

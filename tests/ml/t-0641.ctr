@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := നിഘണ്ടു പുതിയ
+	# ASCII only
+	വെക്കുക: ( ശ്രേണി പുതിയ ; 65 ; 65 ; 65 ; 65 ; 0 ) താക്കോൽ: ['AAAA'],
+	# valid 2 byte sequence
+	വെക്കുക: ( ശ്രേണി പുതിയ ; 194 ; 162 ; 0 ) താക്കോൽ: ['¢'],
+	# Valid 3-byte UTF-8
+    വെക്കുക: ( ശ്രേണി പുതിയ ; 226 ; 130 ; 172 ; 0 ) താക്കോൽ: ['€'],
+	# Valid 4-byte UTF-8
+    വെക്കുക: ( ശ്രേണി പുതിയ ; 240 ; 144 ; 141 ; 136 ; 0 ) താക്കോൽ: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    വെക്കുക: ( ശ്രേണി പുതിയ ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) താക്കോൽ: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    വെക്കുക: ( ശ്രേണി പുതിയ ; 65 ; 193 ; 129 ; 0 ) താക്കോൽ: ['A?'],
+	# Invalid first byte (0xFF)
+    വെക്കുക: ( ശ്രേണി പുതിയ ; 255 ; 0 ) താക്കോൽ: ['?'],
+	# Incomplete multi-byte sequence at end
+    വെക്കുക: ( ശ്രേണി പുതിയ ; 66 ; 226 ; 0 ) താക്കോൽ: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    വെക്കുക: ( ശ്രേണി പുതിയ ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) താക്കോൽ: ['A€?𐍈B'].
+	 
+utf8cases ഓരോന്നും: { :key :value
+	>> blob := Blob പുതിയ: value എണ്ണം, bytes: value.
+	>> str := blob വാചകമായി.
+	(str = key) ശരിയെങ്കിൽ: {
+		ഔട്ട്പുട്ട് എഴുതുക: ['OK'], പുതിയ-വരി.
+	}, ഇല്ലെങ്കിൽ: {
+		ഔട്ട്പുട്ട് എഴുതുക: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, പുതിയ-വരി.
+	}.
+	blob സ്വതന്ത്രമാക്കുക.
+}.

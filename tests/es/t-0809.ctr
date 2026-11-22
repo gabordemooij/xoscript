@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> valores := Lista crear
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+valores cada: { :i :value
+	>> d := Diccionario crear.
+	d poner: value en: ['k'].
+	>> r := d código objeto.
+	Salida escribir: r contar, detener.
+	Salida escribir: ( (r en: ['k']) = value ), detener.
+}.

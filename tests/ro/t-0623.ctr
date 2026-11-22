@@ -1,0 +1,43 @@
+
+
+>> g := Server nou.
+>> v := Seif nou.
+>> ok := 0.
+
+>> secrets := Listă nou ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets copiază.
+passwords fiecare: { :i :p
+	secrets fiecare: { :n :s
+		{
+			>> encrypted := v criptează: s cheie: p.
+			>> decrypted := v decriptează: encrypted cheie: p.
+			(decrypted = s) adevărat: {
+				ok adaugă: 1.
+			}, altfel: {
+				Ieșire scrie: ['failed encrypting/decrypting: '], rând-nou.
+				Ieșire scrie: s, rând-nou.
+				Ieșire scrie: ['encrypted: '] + encrypted, rând-nou.
+				Ieșire scrie: ['decrypted: '] + encrypted, rând-nou.
+				Program sfârșit.
+			}.
+		} prinde: { :err
+			(s = [''] sau: p = ['']) adevărat: {
+				ok adaugă: 1.
+			}, altfel: {
+				Ieșire scrie: err, rând-nou.
+				Program sfârșit.
+			}.
+		}, pornește.
+	}.
+}.
+
+Ieșire scrie: ( ok + [' vault encryptions tested.'] ), rând-nou.

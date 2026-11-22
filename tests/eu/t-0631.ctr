@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Programa memoria-kudeaketa: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Programa ezarpena: ['FFITESTLIB'].
+
+
+
+Server lotu: (
+ Zerrenda berria ;
+ libname ;
+ ['puts'] ;
+ ( Zerrenda berria ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s askatu.
+
+# test with struct
+
+>> a := Blob berria: 8.
+a bytes: (
+	Zerrenda <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Zerrenda <<: ['int'], ; ['int']).
+
+Server lotu: (
+	Zerrenda <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Zerrenda <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Irteera idatzi: ['Sum test:'] + (ffitest ffisum: a), lerro-jauzia.
+
+struct askatu-struct.
+struct askatu.
+a askatu.

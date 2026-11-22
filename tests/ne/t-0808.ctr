@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := ढुकुटी साँचा-बनाऊ.
+>> sk := keys पहिलो.
+>> pk := keys अन्तिम.
+>> sig := ढुकुटी हस्ताक्षर: ['abc'] साँचोले: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ ढुकुटी हस्ताक्षर: ['abc'] साँचोले: long. } समात: { :e
+	आउटपुट लेख: e, नयाँ-पङ्क्ति.
+}, चलाऊ.
+
+{ ढुकुटी जाँच: ['abc'] हस्ताक्षर: long साँचोले: pk. } समात: { :e
+	आउटपुट लेख: e, नयाँ-पङ्क्ति.
+}, चलाऊ.
+
+{ ढुकुटी जाँच: ['abc'] हस्ताक्षर: sig साँचोले: short. } समात: { :e
+	आउटपुट लेख: e, नयाँ-पङ्क्ति.
+}, चलाऊ.

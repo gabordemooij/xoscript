@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB പുതിയ ഹോസ്റ്റ്: ['localhost'],
+	ഉപയോക്തൃനാമം: ['xo'],
+	രഹസ്യവാക്ക്: ['pass123'],
+	ഡാറ്റാബേസ്-പേര്: ['xobase'],
+	ബന്ധിപ്പിക്കുക.
+
+>> conn2 := Maria-DB പുതിയ ഹോസ്റ്റ്: ['localhost'],
+	ഉപയോക്തൃനാമം: ['xo'],
+	രഹസ്യവാക്ക്: ['pass123'],
+	ഡാറ്റാബേസ്-പേര്: ['xobase'],
+	ബന്ധിപ്പിക്കുക.
+#...
+>> del := conn1 ചോദ്യം: ['DELETE FROM book WHERE id > 0'].
+{  del നടപ്പാക്കുക. conn1 സ്ഥിരീകരിക്കുക. } പിടിക്കുക: { :e conn1 പിൻവലിക്കുക.  }, പ്രവർത്തിപ്പിക്കുക.
+
+>> insert := conn1 ചോദ്യം: ['INSERT INTO book (id) VALUES(null)'].
+insert നടപ്പാക്കുക.
+
+>> എണ്ണം := conn1 ചോദ്യം: ['SELECT COUNT(*) AS num FROM book'].
+എണ്ണം കൊണ്ടുവരിക: { :row ഔട്ട്പുട്ട് എഴുതുക: row num, പുതിയ-വരി. }.
+
+# does not show up
+# insert not committed on connection 1
+>> എണ്ണം := conn2 ചോദ്യം: ['SELECT COUNT(*) AS num FROM book'].
+എണ്ണം കൊണ്ടുവരിക: { :row ഔട്ട്പുട്ട് എഴുതുക: row num, പുതിയ-വരി. }.

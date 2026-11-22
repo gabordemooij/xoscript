@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Liosta ùr ;
+	# {"key":"normal"} normal ASCII
+	( Faclair ùr cuir: ['normal'] aig: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Faclair ùr cuir: ['hello world'] aig: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Faclair ùr cuir: ['"'] aig: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Faclair ùr cuir: ['backslash: \\'] aig: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Faclair ùr cuir: ['slash: /'] aig: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Faclair ùr cuir: ['backspace: \b'] aig: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Faclair ùr cuir: ['formfeed: \f'] aig: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Faclair ùr cuir: ['newline: \n'] aig: ['key'] ) ;
+	( Faclair ùr cuir: ['newline: ↵'] aig: ['key'] ) ;
+	( Faclair ùr cuir: ['newline: 
+	'] aig: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Faclair ùr cuir: ['carriage return: \r'] aig: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Faclair ùr cuir: ['tab \t'] aig: ['key'] ) ;
+	( Faclair ùr cuir: ['tab ⇿'] aig: ['key'] ) ;
+	( Faclair ùr cuir: ['tab  '] aig: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Faclair ùr cuir: ['NUL \u0000'] aig: ['key'] ) ;
+	( Faclair ùr cuir: ['NUL \0'] aig: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Faclair ùr cuir: ['control: \u0001'] aig: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Faclair ùr cuir: ['control: \u001F'] aig: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Faclair ùr cuir: ['unicode: é'] aig: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Faclair ùr cuir: ['unicode: €'] aig: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Faclair ùr cuir: ['unicode: 日本語'] aig: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Faclair ùr cuir: ['unicode: 😀'] aig: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Faclair ùr cuir: ['unicode: 🧑‍💻'] aig: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Faclair ùr cuir: ['combining: e\u0301'] aig: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Faclair ùr cuir: ['escaped unicode: \u00e9'] aig: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Faclair ùr cuir: ['escaped unicode: \u20ac'] aig: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Faclair ùr cuir: ['escaped unicode: \ud83d\ude00'] aig: ['key'] ) ;
+	# {"key":""} empty value
+	( Faclair ùr cuir: [''] aig: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Faclair ùr cuir: ['@ < > & = % + ? #'] aig: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Faclair ùr cuir: ['''] aig: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Faclair ùr cuir: ['multiple: \" \\ \n \r \t'] aig: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Faclair ùr cuir: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] aig: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Faclair ùr cuir: [' value'] aig: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Faclair ùr cuir: ['value '] aig: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Faclair ùr cuir: [' \t\n\r '] aig: ['key'] ).
+
+dicts gach: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Faclair ùr cuir: d key aig: ['key']).
+	>> b := JSON jsonify: (Faclair ùr cuir: ['value'] aig: d key).
+	>> e := JSON oibseact: a.
+	>> f := JSON oibseact: b.
+	((e key = d key agus: (f ? d key = ['value'])) no: (e key = ['NUL ?'])) fìor: {
+		Às-chur sgrìobh: ['OK'], loidhne-ùr.
+	}, eile: {
+		Às-chur sgrìobh: ['Unable to properly encode/decode: '] + d + j, loidhne-ùr.
+		Prògram deireadh.
+	}.
+}.

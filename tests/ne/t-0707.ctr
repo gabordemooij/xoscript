@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+प्रोग्राम मेमोरी-व्यवस्थापन: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB नयाँ होस्ट: ['localhost'],
+	प्रयोगकर्ता-नाम: ['xo'], पासवर्ड: ['pass123'], डाटाबेस-नाम: ['xobase'], जोडिऊ.
+
+>> TwoDigitFormat := ढाँचा नयाँ: ['%02d'].
+
+# Datetime
+{
+	>> वर्ष := सङ्ख्या बीच: 1995 र: 2050, पाठमा.
+	>> महिना := TwoDigitFormat लागू-पूर्णाङ्क: (सङ्ख्या बीच: 1 र: 12), पाठमा.
+	>> दिन := TwoDigitFormat लागू-पूर्णाङ्क: (सङ्ख्या बीच: 1 र: 28), पाठमा.
+	>> घण्टा := TwoDigitFormat लागू-पूर्णाङ्क: (सङ्ख्या बीच: 1 र: 23), पाठमा.
+	>> मिनेट := TwoDigitFormat लागू-पूर्णाङ्क: (सङ्ख्या बीच: 1 र: 59), पाठमा.
+	>> सेकेन्ड := TwoDigitFormat लागू-पूर्णाङ्क: (सङ्ख्या बीच: 1 र: 59), पाठमा.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: वर्ष,
+		MM: महिना,
+		DD: दिन,
+		HH: घण्टा,
+		II: मिनेट,
+		SS: सेकेन्ड.
+	>> खोज-प्यारामिटर :=
+	db क्वेरी: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ल्याऊ: { :row
+		(row mydatetime = datetime) असत्य-भए: {
+			यो-कार्य त्रुटि: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter थप: 1.
+} * 100.
+
+# Date
+{
+	>> वर्ष := सङ्ख्या बीच: 1995 र: 2050, पाठमा.
+	>> महिना := TwoDigitFormat लागू-पूर्णाङ्क: (सङ्ख्या बीच: 1 र: 12), पाठमा.
+	>> दिन := TwoDigitFormat लागू-पूर्णाङ्क: (सङ्ख्या बीच: 1 र: 28), पाठमा.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: वर्ष,
+		MM: महिना,
+		DD: दिन.
+	>> खोज-प्यारामिटर :=
+	db क्वेरी: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ल्याऊ: { :row
+		(row mydate = date) असत्य-भए: {
+			यो-कार्य त्रुटि: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter थप: 1.
+} * 100.
+
+
+# Time
+{
+	>> घण्टा := TwoDigitFormat लागू-पूर्णाङ्क: (सङ्ख्या बीच: 1 र: 23), पाठमा.
+	>> मिनेट := TwoDigitFormat लागू-पूर्णाङ्क: (सङ्ख्या बीच: 1 र: 59), पाठमा.
+	>> सेकेन्ड := TwoDigitFormat लागू-पूर्णाङ्क: (सङ्ख्या बीच: 1 र: 59), पाठमा.
+	>> समय := ['HH:II:SS'].
+	समय
+		HH: घण्टा,
+		II: मिनेट,
+		SS: सेकेन्ड.
+	>> खोज-प्यारामिटर :=
+	db क्वेरी: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: समय),
+	ल्याऊ: { :row
+		(row mytime = समय) असत्य-भए: {
+			यो-कार्य त्रुटि: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter थप: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := तालिका नयाँ भर: 100000 मानले: ['x'], जोड: [''].
+{
+	>> str2 := ढुकुटी टोकन: 40.
+	>> खोज-प्यारामिटर :=
+	db क्वेरी: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ल्याऊ: { :row
+		(row str1 = str1 र: row str2 = str2) असत्य-भए: {
+			यो-कार्य त्रुटि: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter थप: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := सङ्ख्या बीच: 1 र: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 पाठबाट: ['9223372036854775807'] ) -
+		( Int64 पाठबाट: ['99999'] ) +
+		( Int64 पाठबाट: n1 पाठमा )
+	).
+	>> खोज-प्यारामिटर :=
+	db क्वेरी: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ल्याऊ: { :row
+		(row n1 = n1) असत्य-भए: {
+			यो-कार्य त्रुटि: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) असत्य-भए: {
+			यो-कार्य त्रुटि: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 पूर्णाङ्कन) असत्य-भए: {
+			यो-कार्य त्रुटि: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) असत्य-भए: {
+			यो-कार्य त्रुटि: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter थप: 1.
+} * 100.
+
+
+आउटपुट लेख: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), नयाँ-पङ्क्ति.

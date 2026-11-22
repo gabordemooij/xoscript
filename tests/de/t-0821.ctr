@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> pfad := ['/tmp/test0821.csv'].
+>> file := Datei neu: pfad.
+
+file schreiben: ['a,b\n"1,2\n'].
+{
+	file trennzeichen: [','] anführungszeichen: ['"'] zeilen: { :line
+		Ausgabe schreiben: line, stopp.
+	}.
+} abfangen: { :e Ausgabe schreiben: e, stopp. }, starten.
+
+# a closed quote still works
+file schreiben: ['a,b\n"1,2",3'].
+file trennzeichen: [','] anführungszeichen: ['"'] zeilen: { :line
+	Ausgabe schreiben: line, stopp.
+}.
+file löschen.

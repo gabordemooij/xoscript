@@ -1,0 +1,16 @@
+# a value ending in the first part of an opening quote must survive serialization
+>> 所有值 := 数组对象 新建
+	; ['abc\[']
+	; ['\[']
+	; ['\[\[']
+	; ['x\\\[']
+	; ['abc'].
+
+所有值 每个: { :i :value
+	>> d := 映射对象 新建.
+	d 放: value 在: ['k'].
+	d 放: ['second'] 在: ['j'].
+	>> r := d 代码 转对象.
+	输出 写入: r 计数, 停止.
+	输出 写入: ( (r 在: ['k']) = value ), 停止.
+}.

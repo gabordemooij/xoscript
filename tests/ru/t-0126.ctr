@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Объект новый.
+
+Slurp в: ['новый'] сделать: {
+	мой str := [''].
+}.
+
+Slurp в: ['nieuw'] сделать: {
+	мой str := [''].
+}.
+
+Slurp в: ['ответить:'] сделать: { :blah
+		мой str добавить-в-конец: blah.
+}.
+
+Slurp в: ['ответить:и:'] сделать: { :blah :blahah
+		мой str добавить-в-конец: (blah от: 0 длина: (blah длина - 1)).
+		мой str добавить-в-конец: [' '].
+		мой str добавить-в-конец: blahah.
+}.
+
+Slurp в: ['obtain'] сделать: {
+	>> buffer := мой str.
+	мой str := ['']. <- buffer.
+}.
+
+
+Выход написать: (Программа Системная-команда: (Slurp новый echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Файл новый: ['/tmp/from.txt'], удалить. } впоймать: { ['Empty']. }, запуск.
+{ Файл новый: ['/tmp/to.txt'], удалить. } впоймать: { ['Empty']. }, запуск.
+
+
+Файл новый: ['/tmp/to.txt'], существует ложь: {
+	Выход написать: ['Confirmed. Target file does not exist.\
+'].
+}.
+Файл новый: ['/tmp/from.txt'], существует ложь: {
+	Выход написать: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Программа Системная-команда: (Slurp новый touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Программа Системная-команда: (Slurp новый cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Файл новый: ['/tmp/to.txt'], существует истина: {
+	Выход написать: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Выход написать: ['Contents of file is:'] + (Файл новый: ['/tmp/to.txt'], прочитать), стоп.

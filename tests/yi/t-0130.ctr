@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := פּראָגראַם אײַנשטעלונג: ⌝'FFITESTLIB'⌜.
+
+# link stdio functions from c for advances file operations
+Server פֿאַרבינד: ﴿ ליסטע ניי ;
+ libname ; ⌝'fopen'⌜ ;
+ ﴿ ליסטע ניי ; ⌝'pointer'⌜ ; ⌝'pointer'⌜﴾ ;
+ ⌝'pointer'⌜ ;
+ ⌝'Stream'⌜ ;
+ ⌝'path:mode:'⌜
+﴾,
+פֿאַרבינד: ﴿ ליסטע ניי ;
+ גאָרנישט ; # means same lib
+ ⌝'fread'⌜ ;
+ ﴿ ליסטע ניי ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ גאָרנישט ; # means same object (i.e. Stream)
+ ⌝'fread'⌜
+﴾,
+פֿאַרבינד: ﴿
+ ליסטע ניי ;
+ גאָרנישט ; # means same lib
+ ⌝'fwrite'⌜ ;
+ ﴿ ליסטע ניי ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ גאָרנישט ; # means same lib
+ ⌝'fwrite'⌜
+﴾,
+פֿאַרבינד: ﴿
+ ליסטע ניי ;
+ גאָרנישט ; # means same lib
+ ⌝'rewind'⌜ ;
+ ﴿ ליסטע ניי ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ גאָרנישט ; # means same lib
+ ⌝'rewind:'⌜
+﴾.
+
+>> str := Blob utf8: ⌝'abc123'⌜.
+>> טעקע-וועג := Blob utf8: ⌝'/tmp/bla.txt'⌜.
+>> mode := Blob utf8: ⌝'w+'⌜.
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: טעקע-וועג mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream אָנזאָג: ⌝'fwrite'⌜ אַרגומענטן: ﴿ליסטע ניי ; str ; 1 ; 6 ; fd ﴾.
+אויסגאָב שרײַב: bytes-written, נײַע-שורה.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob ניי: 20.
+
+# read from file
+>> bytes-read := Stream אָנזאָג: ⌝'fread'⌜ אַרגומענטן: ﴿ליסטע ניי ; buf ; 1 ; 6 ; fd ﴾.
+אויסגאָב שרײַב: bytes-read, נײַע-שורה.
+אויסגאָב שרײַב: buf, נײַע-שורה.
+
+# free memory
+str  באַפֿרײַ.
+טעקע-וועג באַפֿרײַ.
+mode באַפֿרײַ.
+buf  באַפֿרײַ.
+
+

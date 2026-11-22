@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB hou hoʻokipa: ['localhost'],
+	inoa-mea-hoʻohana: ['xo'],
+	ʻōlelo-huna: ['pass123'],
+	inoa-waihona-ʻikepili: ['xobase'],
+	hoʻohui-pū.
+
+>> conn2 := Maria-DB hou hoʻokipa: ['localhost'],
+	inoa-mea-hoʻohana: ['xo'],
+	ʻōlelo-huna: ['pass123'],
+	inoa-waihona-ʻikepili: ['xobase'],
+	hoʻohui-pū.
+#...
+>> del := conn1 nīnau: ['DELETE FROM book WHERE id > 0'].
+{  del hoʻokō. conn1 hoʻopaʻa. } hopu: { :e conn1 hoʻihoʻi-hope.  }, hoʻomaka.
+
+>> insert := conn1 nīnau: ['INSERT INTO book (id) VALUES(null)'].
+insert hoʻokō.
+
+>> heluna := conn1 nīnau: ['SELECT COUNT(*) AS num FROM book'].
+heluna kiʻi: { :row Huapuka kākau: row num, laina-hou. }.
+
+# does not show up
+# insert not committed on connection 1
+>> heluna := conn2 nīnau: ['SELECT COUNT(*) AS num FROM book'].
+heluna kiʻi: { :row Huapuka kākau: row num, laina-hou. }.

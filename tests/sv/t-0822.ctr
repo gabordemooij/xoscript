@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB ny värd: ['localhost'],
+	användarnamn: ['xo'],
+	lösenord: ['pass123'],
+	databasnamn: ['xobase'],
+	anslut.
+
+>> sökparametrar := db fråga: ['SELECT ? AS a, ? AS b, ? AS c'].
+sökparametrar parametrar: (Lista ny ; ['1']).
+{ sökparametrar hämta: { :row Utdata skriv: row, stop. }. } fånga: { :e Utdata skriv: e, stop. }, starta.
+
+>> sökparametrar := db fråga: ['SELECT ? AS a'].
+{ sökparametrar hämta: { :row Utdata skriv: row, stop. }. } fånga: { :e Utdata skriv: e, stop. }, starta.
+
+# the right number still works, more parameters are ignored as before
+>> sökparametrar := db fråga: ['SELECT ? AS a, ? AS b'].
+sökparametrar parametrar: (Lista ny ; ['1'] ; ['2']).
+sökparametrar hämta: { :row Utdata skriv: (row vid: ['a']), skriv: (row vid: ['b']), stop. }.
+sökparametrar parametrar: (Lista ny ; ['1'] ; ['2'] ; ['3']).
+sökparametrar hämta: { :row Utdata skriv: (row vid: ['a']), skriv: (row vid: ['b']), stop. }.

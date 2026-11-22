@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> hodnoty := Zoznam nový
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+hodnoty každý: { :i :value
+	>> d := Slovník nový.
+	d umiestniť: value na: ['k'].
+	>> r := d kód objekt.
+	Výstup písať: r počet, nový-riadok.
+	Výstup písať: ( (r na: ['k']) = value ), nový-riadok.
+}.

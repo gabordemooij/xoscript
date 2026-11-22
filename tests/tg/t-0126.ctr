@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Объект нав.
+
+Slurp ҳангоми: ['нав'] иҷро: {
+	худӣ str := [''].
+}.
+
+Slurp ҳангоми: ['nieuw'] иҷро: {
+	худӣ str := [''].
+}.
+
+Slurp ҳангоми: ['ҷавоб:'] иҷро: { :blah
+		худӣ str ба-охир-илова: blah.
+}.
+
+Slurp ҳангоми: ['ҷавоб:ва:'] иҷро: { :blah :blahah
+		худӣ str ба-охир-илова: (blah оғоз: 0 дарозӣ: (blah дарозӣ - 1)).
+		худӣ str ба-охир-илова: [' '].
+		худӣ str ба-охир-илова: blahah.
+}.
+
+Slurp ҳангоми: ['obtain'] иҷро: {
+	>> buffer := худӣ str.
+	худӣ str := ['']. <- buffer.
+}.
+
+
+Баромад навис: (Барнома система: (Slurp нав echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Файл нав: ['/tmp/from.txt'], ҳазф. } дошта-гир: { ['Empty']. }, оғоз.
+{ Файл нав: ['/tmp/to.txt'], ҳазф. } дошта-гир: { ['Empty']. }, оғоз.
+
+
+Файл нав: ['/tmp/to.txt'], мавҷуд агар-дурӯғ: {
+	Баромад навис: ['Confirmed. Target file does not exist.\
+'].
+}.
+Файл нав: ['/tmp/from.txt'], мавҷуд агар-дурӯғ: {
+	Баромад навис: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Барнома система: (Slurp нав touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Барнома система: (Slurp нав cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Файл нав: ['/tmp/to.txt'], мавҷуд агар-рост: {
+	Баромад навис: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Баромад навис: ['Contents of file is:'] + (Файл нав: ['/tmp/to.txt'], хон), сатри-нав.

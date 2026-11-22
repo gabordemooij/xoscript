@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB nû mêvandar: ['localhost'],
+	navê-bikarhêner: ['xo'],
+	şîfre: ['pass123'],
+	navê-danegehê: ['xobase'],
+	girêbide-pê.
+
+>> parametreyên-lêgerînê := db lêpirsîn: ['SELECT ? AS a, ? AS b, ? AS c'].
+parametreyên-lêgerînê parametre: (Lîste nû ; ['1']).
+{ parametreyên-lêgerînê bîne: { :row Derketin binivîse: row, rêza-nû. }. } bigire: { :e Derketin binivîse: e, rêza-nû. }, bide-destpêkirin.
+
+>> parametreyên-lêgerînê := db lêpirsîn: ['SELECT ? AS a'].
+{ parametreyên-lêgerînê bîne: { :row Derketin binivîse: row, rêza-nû. }. } bigire: { :e Derketin binivîse: e, rêza-nû. }, bide-destpêkirin.
+
+# the right number still works, more parameters are ignored as before
+>> parametreyên-lêgerînê := db lêpirsîn: ['SELECT ? AS a, ? AS b'].
+parametreyên-lêgerînê parametre: (Lîste nû ; ['1'] ; ['2']).
+parametreyên-lêgerînê bîne: { :row Derketin binivîse: (row li: ['a']), binivîse: (row li: ['b']), rêza-nû. }.
+parametreyên-lêgerînê parametre: (Lîste nû ; ['1'] ; ['2'] ; ['3']).
+parametreyên-lêgerînê bîne: { :row Derketin binivîse: (row li: ['a']), binivîse: (row li: ['b']), rêza-nû. }.

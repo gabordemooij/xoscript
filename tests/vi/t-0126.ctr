@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Đối-tượng mới.
+
+Slurp khi: ['mới'] làm: {
+	riêng str := [''].
+}.
+
+Slurp khi: ['nieuw'] làm: {
+	riêng str := [''].
+}.
+
+Slurp khi: ['đáp:'] làm: { :blah
+		riêng str thêm-cuối: blah.
+}.
+
+Slurp khi: ['đáp:và:'] làm: { :blah :blahah
+		riêng str thêm-cuối: (blah từ: 0 độ-dài: (blah độ-dài - 1)).
+		riêng str thêm-cuối: [' '].
+		riêng str thêm-cuối: blahah.
+}.
+
+Slurp khi: ['obtain'] làm: {
+	>> buffer := riêng str.
+	riêng str := ['']. <- buffer.
+}.
+
+
+Xuất ghi: (Chương-trình hệ-thống: (Slurp mới echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Tệp mới: ['/tmp/from.txt'], xóa. } bắt-lỗi: { ['Empty']. }, chạy.
+{ Tệp mới: ['/tmp/to.txt'], xóa. } bắt-lỗi: { ['Empty']. }, chạy.
+
+
+Tệp mới: ['/tmp/to.txt'], tồn-tại sai: {
+	Xuất ghi: ['Confirmed. Target file does not exist.\
+'].
+}.
+Tệp mới: ['/tmp/from.txt'], tồn-tại sai: {
+	Xuất ghi: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Chương-trình hệ-thống: (Slurp mới touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Chương-trình hệ-thống: (Slurp mới cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Tệp mới: ['/tmp/to.txt'], tồn-tại đúng: {
+	Xuất ghi: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Xuất ghi: ['Contents of file is:'] + (Tệp mới: ['/tmp/to.txt'], đọc), xuống-dòng.

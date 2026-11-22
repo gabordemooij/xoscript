@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> leka := { :format :value
+	{ Sephetho ngola: ( (Sebopeho ncha: format) sebelisa-ho: value ), mola-o-mocha. } tšoasa: { :e Sephetho ngola: e, mola-o-mocha. }, qala.
+}.
+>> try-int := { :format :value
+	{ Sephetho ngola: ( (Sebopeho ncha: format) sebelisa-ho-palo-e-felletseng: value ), mola-o-mocha. } tšoasa: { :e Sephetho ngola: e, mola-o-mocha. }, qala.
+}.
+
+# fits
+leka sebelisa-ho: ['|%s|'] le: ['text'].
+leka sebelisa-ho: ['%06.2f'] le: 5.5.
+leka sebelisa-ho: ['100%% %s'] le: ['sure'].
+try-int sebelisa-ho: ['%03d'] le: 7.
+try-int sebelisa-ho: ['%x'] le: 255.
+leka sebelisa-ho: ['%d'] le: (Int64 ncha ho-tsoa-mongolong: ['12']).
+leka sebelisa-ho: ['%lld'] le: (Int64 ncha ho-tsoa-mongolong: ['12']).
+leka sebelisa-ho: ['%.1lf'] le: 5.5.
+try-int sebelisa-ho: ['%hd'] le: 7.
+
+# does not fit
+leka sebelisa-ho: ['%s'] le: 12345.
+leka sebelisa-ho: ['%d'] le: 12345.
+leka sebelisa-ho: ['%f'] le: ['text'].
+try-int sebelisa-ho: ['%d'] le: ['text'].
+try-int sebelisa-ho: ['%s'] le: 5.
+leka sebelisa-ho: ['%s %s'] le: ['text'].
+leka sebelisa-ho: ['%n'] le: ['text'].
+leka sebelisa-ho: ['%*s'] le: ['text'].
+leka sebelisa-ho: ['%'] le: ['text'].
+
+# length modifier does not fit
+leka sebelisa-ho: ['%ls'] le: ['text'].
+leka sebelisa-ho: ['%Lf'] le: 5.5.
+try-int sebelisa-ho: ['%ld'] le: 7.
+try-int sebelisa-ho: ['%lld'] le: 7.
+leka sebelisa-ho: ['%Ld'] le: (Int64 ncha ho-tsoa-mongolong: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+leka sebelisa-ho: ['%99999999999s'] le: ['text'].

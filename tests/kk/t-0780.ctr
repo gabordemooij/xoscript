@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Тізім жаңа ;
+	# {"key":"normal"} normal ASCII
+	( Сөздік жаңа қою: ['normal'] кілт: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Сөздік жаңа қою: ['hello world'] кілт: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Сөздік жаңа қою: ['"'] кілт: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Сөздік жаңа қою: ['backslash: \\'] кілт: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Сөздік жаңа қою: ['slash: /'] кілт: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Сөздік жаңа қою: ['backspace: \b'] кілт: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Сөздік жаңа қою: ['formfeed: \f'] кілт: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Сөздік жаңа қою: ['newline: \n'] кілт: ['key'] ) ;
+	( Сөздік жаңа қою: ['newline: ↵'] кілт: ['key'] ) ;
+	( Сөздік жаңа қою: ['newline: 
+	'] кілт: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Сөздік жаңа қою: ['carriage return: \r'] кілт: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Сөздік жаңа қою: ['tab \t'] кілт: ['key'] ) ;
+	( Сөздік жаңа қою: ['tab ⇿'] кілт: ['key'] ) ;
+	( Сөздік жаңа қою: ['tab  '] кілт: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Сөздік жаңа қою: ['NUL \u0000'] кілт: ['key'] ) ;
+	( Сөздік жаңа қою: ['NUL \0'] кілт: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Сөздік жаңа қою: ['control: \u0001'] кілт: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Сөздік жаңа қою: ['control: \u001F'] кілт: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Сөздік жаңа қою: ['unicode: é'] кілт: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Сөздік жаңа қою: ['unicode: €'] кілт: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Сөздік жаңа қою: ['unicode: 日本語'] кілт: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Сөздік жаңа қою: ['unicode: 😀'] кілт: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Сөздік жаңа қою: ['unicode: 🧑‍💻'] кілт: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Сөздік жаңа қою: ['combining: e\u0301'] кілт: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Сөздік жаңа қою: ['escaped unicode: \u00e9'] кілт: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Сөздік жаңа қою: ['escaped unicode: \u20ac'] кілт: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Сөздік жаңа қою: ['escaped unicode: \ud83d\ude00'] кілт: ['key'] ) ;
+	# {"key":""} empty value
+	( Сөздік жаңа қою: [''] кілт: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Сөздік жаңа қою: ['@ < > & = % + ? #'] кілт: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Сөздік жаңа қою: ['''] кілт: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Сөздік жаңа қою: ['multiple: \" \\ \n \r \t'] кілт: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Сөздік жаңа қою: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] кілт: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Сөздік жаңа қою: [' value'] кілт: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Сөздік жаңа қою: ['value '] кілт: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Сөздік жаңа қою: [' \t\n\r '] кілт: ['key'] ).
+
+dicts әрбір: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Сөздік жаңа қою: d key кілт: ['key']).
+	>> b := JSON jsonify: (Сөздік жаңа қою: ['value'] кілт: d key).
+	>> e := JSON нысан: a.
+	>> f := JSON нысан: b.
+	((e key = d key және: (f ? d key = ['value'])) немесе: (e key = ['NUL ?'])) ақиқат-болса: {
+		Шығыс жазу: ['OK'], жаңа-жол.
+	}, әйтпесе: {
+		Шығыс жазу: ['Unable to properly encode/decode: '] + d + j, жаңа-жол.
+		Бағдарлама аяқтау.
+	}.
+}.

@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Akojọ tuntun ;
+	# {"key":"normal"} normal ASCII
+	( Atumọ-ede tuntun fi: ['normal'] si: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Atumọ-ede tuntun fi: ['hello world'] si: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Atumọ-ede tuntun fi: ['"'] si: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Atumọ-ede tuntun fi: ['backslash: \\'] si: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Atumọ-ede tuntun fi: ['slash: /'] si: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Atumọ-ede tuntun fi: ['backspace: \b'] si: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Atumọ-ede tuntun fi: ['formfeed: \f'] si: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Atumọ-ede tuntun fi: ['newline: \n'] si: ['key'] ) ;
+	( Atumọ-ede tuntun fi: ['newline: ↵'] si: ['key'] ) ;
+	( Atumọ-ede tuntun fi: ['newline: 
+	'] si: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Atumọ-ede tuntun fi: ['carriage return: \r'] si: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Atumọ-ede tuntun fi: ['tab \t'] si: ['key'] ) ;
+	( Atumọ-ede tuntun fi: ['tab ⇿'] si: ['key'] ) ;
+	( Atumọ-ede tuntun fi: ['tab  '] si: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Atumọ-ede tuntun fi: ['NUL \u0000'] si: ['key'] ) ;
+	( Atumọ-ede tuntun fi: ['NUL \0'] si: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Atumọ-ede tuntun fi: ['control: \u0001'] si: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Atumọ-ede tuntun fi: ['control: \u001F'] si: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Atumọ-ede tuntun fi: ['unicode: é'] si: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Atumọ-ede tuntun fi: ['unicode: €'] si: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Atumọ-ede tuntun fi: ['unicode: 日本語'] si: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Atumọ-ede tuntun fi: ['unicode: 😀'] si: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Atumọ-ede tuntun fi: ['unicode: 🧑‍💻'] si: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Atumọ-ede tuntun fi: ['combining: e\u0301'] si: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Atumọ-ede tuntun fi: ['escaped unicode: \u00e9'] si: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Atumọ-ede tuntun fi: ['escaped unicode: \u20ac'] si: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Atumọ-ede tuntun fi: ['escaped unicode: \ud83d\ude00'] si: ['key'] ) ;
+	# {"key":""} empty value
+	( Atumọ-ede tuntun fi: [''] si: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Atumọ-ede tuntun fi: ['@ < > & = % + ? #'] si: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Atumọ-ede tuntun fi: ['''] si: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Atumọ-ede tuntun fi: ['multiple: \" \\ \n \r \t'] si: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Atumọ-ede tuntun fi: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] si: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Atumọ-ede tuntun fi: [' value'] si: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Atumọ-ede tuntun fi: ['value '] si: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Atumọ-ede tuntun fi: [' \t\n\r '] si: ['key'] ).
+
+dicts kọọkan: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Atumọ-ede tuntun fi: d key si: ['key']).
+	>> b := JSON jsonify: (Atumọ-ede tuntun fi: ['value'] si: d key).
+	>> e := JSON nkan: a.
+	>> f := JSON nkan: b.
+	((e key = d key ati: (f ? d key = ['value'])) tabi: (e key = ['NUL ?'])) otitọ: {
+		Ijade kọ: ['OK'], ila-tuntun.
+	}, bibẹkọ: {
+		Ijade kọ: ['Unable to properly encode/decode: '] + d + j, ila-tuntun.
+		Eto ipari.
+	}.
+}.

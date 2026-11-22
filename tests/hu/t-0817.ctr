@@ -1,0 +1,16 @@
+# a value ending in the first part of an opening quote must survive serialization
+>> értékek := Lista új
+	; ['abc\[']
+	; ['\[']
+	; ['\[\[']
+	; ['x\\\[']
+	; ['abc'].
+
+értékek mindegyik: { :i :value
+	>> d := Szótár új.
+	d tesz: value ide: ['k'].
+	d tesz: ['second'] ide: ['j'].
+	>> r := d kód objektum.
+	Kimenet ír: r darabszám, újsor.
+	Kimenet ír: ( (r itt: ['k']) = value ), újsor.
+}.

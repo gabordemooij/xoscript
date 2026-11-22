@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server siapkeun.
+Program paké: ['../../../src/xo/su/webtools.xo'].
+
+>> Fake-Request := Obyek anyar.
+Fake-Request nalika: ['value:'] lakukeun: { :nilai
+	milik nilai := nilai.
+}.
+Fake-Request nalika: ['cookie:'] lakukeun: { :ngaran <- milik nilai.
+}.
+
+>> Test-Session := Sési-berkas-samentawis anyar.
+Test-Session nalika: ['muat'] lakukeun: { <- Kamus anyar.
+}.
+Test-Session nalika: ['session-id'] lakukeun: { <- milik id.
+}.
+
+>> cookies := Daptar anyar
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies unggal: { :i :cookie
+	>> pamundut-http := Fake-Request anyar.
+	pamundut-http value: cookie.
+	>> pangatur := Test-Session anyar.
+	>> web := Dokumén-Wéb anyar.
+	web pamundut-http: pamundut-http.
+	web pangatur-sési: pangatur.
+	web mimitian-sési.
+	Kaluaran tulis: ( pangatur session-id = cookie ), baris-anyar.
+}.
+
+>> web := Dokumén-Wéb anyar.
+web json: (Kamus anyar teundeun: ['b'] di: ['a']).
+Kaluaran tulis: ['\n'], baris-anyar.
+
+{ Jaringan get: ['file:///etc/hostname']. } tangkep: { :e
+	Kaluaran tulis: e, baris-anyar.
+}, jalankeun.
+
+>> svg := Berkas anyar: ['/tmp/test0814.svg'].
+svg tulis: ['<svg xmlns="x"></svg>'].
+Kaluaran baris-anyar.
+Server teruskeun: ['test0814.svg'] awalan: ['/tmp/'].
+svg pupus.

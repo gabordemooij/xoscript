@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> whakamātau := { :format :value
+	{ Huaputa tuhi: ( (Hōputu hou: format) whakahaere: value ), rārangi-hou. } hopu: { :e Huaputa tuhi: e, rārangi-hou. }, tīmata.
+}.
+>> try-int := { :format :value
+	{ Huaputa tuhi: ( (Hōputu hou: format) whakahaere-tau-tōpū: value ), rārangi-hou. } hopu: { :e Huaputa tuhi: e, rārangi-hou. }, tīmata.
+}.
+
+# fits
+whakamātau whakahaere: ['|%s|'] a: ['text'].
+whakamātau whakahaere: ['%06.2f'] a: 5.5.
+whakamātau whakahaere: ['100%% %s'] a: ['sure'].
+try-int whakahaere: ['%03d'] a: 7.
+try-int whakahaere: ['%x'] a: 255.
+whakamātau whakahaere: ['%d'] a: (Int64 hou mai-i-te-aho: ['12']).
+whakamātau whakahaere: ['%lld'] a: (Int64 hou mai-i-te-aho: ['12']).
+whakamātau whakahaere: ['%.1lf'] a: 5.5.
+try-int whakahaere: ['%hd'] a: 7.
+
+# does not fit
+whakamātau whakahaere: ['%s'] a: 12345.
+whakamātau whakahaere: ['%d'] a: 12345.
+whakamātau whakahaere: ['%f'] a: ['text'].
+try-int whakahaere: ['%d'] a: ['text'].
+try-int whakahaere: ['%s'] a: 5.
+whakamātau whakahaere: ['%s %s'] a: ['text'].
+whakamātau whakahaere: ['%n'] a: ['text'].
+whakamātau whakahaere: ['%*s'] a: ['text'].
+whakamātau whakahaere: ['%'] a: ['text'].
+
+# length modifier does not fit
+whakamātau whakahaere: ['%ls'] a: ['text'].
+whakamātau whakahaere: ['%Lf'] a: 5.5.
+try-int whakahaere: ['%ld'] a: 7.
+try-int whakahaere: ['%lld'] a: 7.
+whakamātau whakahaere: ['%Ld'] a: (Int64 hou mai-i-te-aho: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+whakamātau whakahaere: ['%99999999999s'] a: ['text'].

@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> 시도 := { :format :value
+	{ 출력 쓰기: ( (형식 새로: format) 적용: value ), 줄바꿈. } 예외시: { :e 출력 쓰기: e, 줄바꿈. }, 시작.
+}.
+>> try-int := { :format :value
+	{ 출력 쓰기: ( (형식 새로: format) 정수에적용: value ), 줄바꿈. } 예외시: { :e 출력 쓰기: e, 줄바꿈. }, 시작.
+}.
+
+# fits
+시도 적용: ['|%s|'] 그리고: ['text'].
+시도 적용: ['%06.2f'] 그리고: 5.5.
+시도 적용: ['100%% %s'] 그리고: ['sure'].
+try-int 적용: ['%03d'] 그리고: 7.
+try-int 적용: ['%x'] 그리고: 255.
+시도 적용: ['%d'] 그리고: (Int64 새로 문자열에서: ['12']).
+시도 적용: ['%lld'] 그리고: (Int64 새로 문자열에서: ['12']).
+시도 적용: ['%.1lf'] 그리고: 5.5.
+try-int 적용: ['%hd'] 그리고: 7.
+
+# does not fit
+시도 적용: ['%s'] 그리고: 12345.
+시도 적용: ['%d'] 그리고: 12345.
+시도 적용: ['%f'] 그리고: ['text'].
+try-int 적용: ['%d'] 그리고: ['text'].
+try-int 적용: ['%s'] 그리고: 5.
+시도 적용: ['%s %s'] 그리고: ['text'].
+시도 적용: ['%n'] 그리고: ['text'].
+시도 적용: ['%*s'] 그리고: ['text'].
+시도 적용: ['%'] 그리고: ['text'].
+
+# length modifier does not fit
+시도 적용: ['%ls'] 그리고: ['text'].
+시도 적용: ['%Lf'] 그리고: 5.5.
+try-int 적용: ['%ld'] 그리고: 7.
+try-int 적용: ['%lld'] 그리고: 7.
+시도 적용: ['%Ld'] 그리고: (Int64 새로 문자열에서: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+시도 적용: ['%99999999999s'] 그리고: ['text'].

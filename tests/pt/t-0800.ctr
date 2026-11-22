@@ -1,0 +1,16 @@
+Server init.
+
+>> db := MariaDB novo host: ['localhost'],
+	utilizador: ['xo'],
+	palavra-passe: ['pass123'],
+	nome-database: ['xobase'],
+	conectar.
+
+>> parametros := db consulta: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametros: ( Listar novo ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  parametros executar. db commit. } pegar: { :e db rollback.  }, iniciar.
+
+Saída escrever: ['Can we insert? '] + ( parametros insert-id > 0 ), stop.

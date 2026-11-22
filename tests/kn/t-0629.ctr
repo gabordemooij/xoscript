@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+ಔಟ್-ಪುಟ್ ಬರೆ: ['Database test'], ಹೊಸ-ಸಾಲು.
+
+>> db := Maria-DB ಹೊಸ ಹೋಸ್ಟ್: ['localhost'],
+	ಬಳಕೆದಾರ-ಹೆಸರು: ['xo'], ಗುಪ್ತಪದ: ['pass123'], ದತ್ತಸಂಚಯ-ಹೆಸರು: ['xobase'], ಸಂಪರ್ಕಿಸು.
+
+ಔಟ್-ಪುಟ್ ಬರೆ: ['Can we connect? '] + db ಸಂಪರ್ಕಗೊಂಡಿದೆಯೇ?, ಹೊಸ-ಸಾಲು.
+
+>> ಹುಡುಕಾಟ-ನಿಯತಾಂಕಗಳು := db ಪ್ರಶ್ನೆ: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], ನಿಯತಾಂಕಗಳು: ( ಸರಣಿ ಹೊಸ ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  ಹುಡುಕಾಟ-ನಿಯತಾಂಕಗಳು ಕಾರ್ಯಗತಗೊಳಿಸು. db ದೃಢೀಕರಿಸು. } ಹಿಡಿ: { :e db ಹಿಂತೆಗೆ.  }, ಚಲಾಯಿಸು.
+
+ಔಟ್-ಪುಟ್ ಬರೆ: ['Can we insert? '] + ( ಹುಡುಕಾಟ-ನಿಯತಾಂಕಗಳು insert-id > 0 ), ಹೊಸ-ಸಾಲು.
+
+>> Obj := ವಸ್ತು ಹೊಸ.
+Obj ಬಂದಾಗ: ['retrieve-rows'] ಮಾಡು: {
+	ತನ್ನ ಎಣಿಕೆ := 0.
+	>> ಹುಡುಕಾಟ-ನಿಯತಾಂಕಗಳು :=
+	db ಪ್ರಶ್ನೆ: ['SELECT * FROM book order by id desc limit 2'], 
+	ತರು: { :row 
+		ತನ್ನ ಎಣಿಕೆ ಕೂಡಿಸು: 1.
+		ಸತ್ಯ ನಿಲ್ಲಿಸು.
+	}. <- ತನ್ನ ಎಣಿಕೆ ನಕಲು.
+}.
+
+ಔಟ್-ಪುಟ್ ಬರೆ: ['Can we query? '] + ( Obj retrieve-rows > 0 ), ಹೊಸ-ಸಾಲು.

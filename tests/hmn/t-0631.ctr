@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Kev-pab-cuam-khoos-phis-tawj tswj-chaw-nco: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Kev-pab-cuam-khoos-phis-tawj kev-teeb-tsa: ['FFITESTLIB'].
+
+
+
+Server txuas: (
+ Daim-teev tshiab ;
+ libname ;
+ ['puts'] ;
+ ( Daim-teev tshiab ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s tso-tawm.
+
+# test with struct
+
+>> a := Blob tshiab: 8.
+a bytes: (
+	Daim-teev <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Daim-teev <<: ['int'], ; ['int']).
+
+Server txuas: (
+	Daim-teev <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Daim-teev <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Tawm sau-ntawv: ['Sum test:'] + (ffitest ffisum: a), kab-tshiab.
+
+struct tso-struct-tawm.
+struct tso-tawm.
+a tso-tawm.

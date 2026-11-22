@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Zerrenda berria ;
+	# {"key":"normal"} normal ASCII
+	( Hiztegia berria jarri: ['normal'] non: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Hiztegia berria jarri: ['hello world'] non: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Hiztegia berria jarri: ['"'] non: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Hiztegia berria jarri: ['backslash: \\'] non: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Hiztegia berria jarri: ['slash: /'] non: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Hiztegia berria jarri: ['backspace: \b'] non: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Hiztegia berria jarri: ['formfeed: \f'] non: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Hiztegia berria jarri: ['newline: \n'] non: ['key'] ) ;
+	( Hiztegia berria jarri: ['newline: ↵'] non: ['key'] ) ;
+	( Hiztegia berria jarri: ['newline: 
+	'] non: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Hiztegia berria jarri: ['carriage return: \r'] non: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Hiztegia berria jarri: ['tab \t'] non: ['key'] ) ;
+	( Hiztegia berria jarri: ['tab ⇿'] non: ['key'] ) ;
+	( Hiztegia berria jarri: ['tab  '] non: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Hiztegia berria jarri: ['NUL \u0000'] non: ['key'] ) ;
+	( Hiztegia berria jarri: ['NUL \0'] non: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Hiztegia berria jarri: ['control: \u0001'] non: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Hiztegia berria jarri: ['control: \u001F'] non: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Hiztegia berria jarri: ['unicode: é'] non: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Hiztegia berria jarri: ['unicode: €'] non: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Hiztegia berria jarri: ['unicode: 日本語'] non: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Hiztegia berria jarri: ['unicode: 😀'] non: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Hiztegia berria jarri: ['unicode: 🧑‍💻'] non: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Hiztegia berria jarri: ['combining: e\u0301'] non: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Hiztegia berria jarri: ['escaped unicode: \u00e9'] non: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Hiztegia berria jarri: ['escaped unicode: \u20ac'] non: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Hiztegia berria jarri: ['escaped unicode: \ud83d\ude00'] non: ['key'] ) ;
+	# {"key":""} empty value
+	( Hiztegia berria jarri: [''] non: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Hiztegia berria jarri: ['@ < > & = % + ? #'] non: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Hiztegia berria jarri: ['''] non: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Hiztegia berria jarri: ['multiple: \" \\ \n \r \t'] non: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Hiztegia berria jarri: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] non: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Hiztegia berria jarri: [' value'] non: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Hiztegia berria jarri: ['value '] non: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Hiztegia berria jarri: [' \t\n\r '] non: ['key'] ).
+
+dicts bakoitza: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Hiztegia berria jarri: d key non: ['key']).
+	>> b := JSON jsonify: (Hiztegia berria jarri: ['value'] non: d key).
+	>> e := JSON objektua: a.
+	>> f := JSON objektua: b.
+	((e key = d key eta: (f ? d key = ['value'])) edo: (e key = ['NUL ?'])) egia: {
+		Irteera idatzi: ['OK'], lerro-jauzia.
+	}, bestela: {
+		Irteera idatzi: ['Unable to properly encode/decode: '] + d + j, lerro-jauzia.
+		Programa amaitu.
+	}.
+}.

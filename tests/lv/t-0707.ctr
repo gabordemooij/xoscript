@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programma atmiņas-pārvaldība: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB jauns resursdators: ['localhost'],
+	lietotājs: ['xo'], parole: ['pass123'], datubāzes-nosaukums: ['xobase'], savienot.
+
+>> TwoDigitFormat := Formāts jauns: ['%02d'].
+
+# Datetime
+{
+	>> gads := Skaitlis starp: 1995 un: 2050, teksts.
+	>> mēnesis := TwoDigitFormat lietot-veselam: (Skaitlis starp: 1 un: 12), teksts.
+	>> diena := TwoDigitFormat lietot-veselam: (Skaitlis starp: 1 un: 28), teksts.
+	>> stunda := TwoDigitFormat lietot-veselam: (Skaitlis starp: 1 un: 23), teksts.
+	>> minūte := TwoDigitFormat lietot-veselam: (Skaitlis starp: 1 un: 59), teksts.
+	>> sekunde := TwoDigitFormat lietot-veselam: (Skaitlis starp: 1 un: 59), teksts.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: gads,
+		MM: mēnesis,
+		DD: diena,
+		HH: stunda,
+		II: minūte,
+		SS: sekunde.
+	>> meklēšanas-parametri :=
+	db vaicājums: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	iegūt: { :row
+		(row mydatetime = datetime) aplams: {
+			šis-uzdevums kļūda: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter pieskaitīt: 1.
+} * 100.
+
+# Date
+{
+	>> gads := Skaitlis starp: 1995 un: 2050, teksts.
+	>> mēnesis := TwoDigitFormat lietot-veselam: (Skaitlis starp: 1 un: 12), teksts.
+	>> diena := TwoDigitFormat lietot-veselam: (Skaitlis starp: 1 un: 28), teksts.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: gads,
+		MM: mēnesis,
+		DD: diena.
+	>> meklēšanas-parametri :=
+	db vaicājums: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	iegūt: { :row
+		(row mydate = date) aplams: {
+			šis-uzdevums kļūda: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter pieskaitīt: 1.
+} * 100.
+
+
+# Time
+{
+	>> stunda := TwoDigitFormat lietot-veselam: (Skaitlis starp: 1 un: 23), teksts.
+	>> minūte := TwoDigitFormat lietot-veselam: (Skaitlis starp: 1 un: 59), teksts.
+	>> sekunde := TwoDigitFormat lietot-veselam: (Skaitlis starp: 1 un: 59), teksts.
+	>> laiks := ['HH:II:SS'].
+	laiks
+		HH: stunda,
+		II: minūte,
+		SS: sekunde.
+	>> meklēšanas-parametri :=
+	db vaicājums: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: laiks),
+	iegūt: { :row
+		(row mytime = laiks) aplams: {
+			šis-uzdevums kļūda: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter pieskaitīt: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Saraksts jauns piepildīt: 100000 ar: ['x'], apvienot: [''].
+{
+	>> str2 := Seifs marķieris: 40.
+	>> meklēšanas-parametri :=
+	db vaicājums: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	iegūt: { :row
+		(row str1 = str1 un: row str2 = str2) aplams: {
+			šis-uzdevums kļūda: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter pieskaitīt: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Skaitlis starp: 1 un: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 no-teksta: ['9223372036854775807'] ) -
+		( Int64 no-teksta: ['99999'] ) +
+		( Int64 no-teksta: n1 teksts )
+	).
+	>> meklēšanas-parametri :=
+	db vaicājums: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	iegūt: { :row
+		(row n1 = n1) aplams: {
+			šis-uzdevums kļūda: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) aplams: {
+			šis-uzdevums kļūda: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 noapaļot) aplams: {
+			šis-uzdevums kļūda: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) aplams: {
+			šis-uzdevums kļūda: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter pieskaitīt: 1.
+} * 100.
+
+
+Izvade rakstīt: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), jauna-rinda.

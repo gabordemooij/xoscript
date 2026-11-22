@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Kasa anahtar-üret.
+>> sk := keys ilk.
+>> pk := keys sonuncu.
+>> sig := Kasa imzala: ['abc'] anahtar: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Kasa imzala: ['abc'] anahtar: long. } yakala: { :e
+	Çıktı yaz: e, yeni-satır.
+}, başlat.
+
+{ Kasa denetle: ['abc'] imza: long anahtar: pk. } yakala: { :e
+	Çıktı yaz: e, yeni-satır.
+}, başlat.
+
+{ Kasa denetle: ['abc'] imza: sig anahtar: short. } yakala: { :e
+	Çıktı yaz: e, yeni-satır.
+}, başlat.

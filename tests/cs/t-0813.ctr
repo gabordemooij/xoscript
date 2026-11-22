@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inicializovat.
+Program použít: ['../../../src/xo/cs/webtools.xo'].
+Program použít: ['../../../src/xo/cs/mailtools.xo'].
+
+>> hlavička := HTTP-Hlavička nový klíč: ['Location'] hodnota: ['/ok\r\nX-Injected: yes'].
+Výstup psát: hlavička.
+
+>> web := Webový-dokument nový.
+web přejít-na: ['/ok\r\nX-Injected: yes'].
+Výstup psát: ['\n'], nový-řádek.
+
+>> mail := Email nový.
+mail komu: (Seznam nový ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Seznam nový ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Seznam nový ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail odesílatel: ['d@example.invalid\r\nX-From: yes'] název: ['site\r\nX-Name: yes'].
+mail předmět: ['hello\r\nX-Subject: yes'].
+mail tělo: ['line1\r\nline2'].
+Výstup psát: mail generovat.
+
+>> html := HTML-Email nový.
+html komu: (Seznam nový ; ['a@example.invalid\r\nX-To: yes']).
+html odesílatel: ['d@example.invalid'] název: ['site'].
+html předmět: ['hello\r\nX-Subject: yes'].
+html tělo: ['body'].
+Výstup psát: ( html generovat obsahuje: ['\nX-'] ), nový-řádek.
+Výstup psát: ( html generovat obsahuje: ['X-To: yes'] ), nový-řádek.

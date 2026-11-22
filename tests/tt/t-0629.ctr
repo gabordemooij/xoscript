@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Чыгыш яз: ['Database test'], яңа-юл.
+
+>> db := Maria-DB яңа хост: ['localhost'],
+	кулланучы-исеме: ['xo'], серсүз: ['pass123'], база-исеме: ['xobase'], тоташ.
+
+Чыгыш яз: ['Can we connect? '] + db тоташканмы?, яңа-юл.
+
+>> эзләү-параметрлары := db сорау: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], параметрлар: ( Тезмә яңа ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  эзләү-параметрлары башкар. db раслау. } тот: { :e db кире-кайтар.  }, җибәр.
+
+Чыгыш яз: ['Can we insert? '] + ( эзләү-параметрлары insert-id > 0 ), яңа-юл.
+
+>> Obj := Объект яңа.
+Obj килгәндә: ['retrieve-rows'] эшлә: {
+	үзенең саны := 0.
+	>> эзләү-параметрлары :=
+	db сорау: ['SELECT * FROM book order by id desc limit 2'], 
+	алып-кил: { :row 
+		үзенең саны өстә: 1.
+		Дөрес өз.
+	}. <- үзенең саны күчермә.
+}.
+
+Чыгыш яз: ['Can we query? '] + ( Obj retrieve-rows > 0 ), яңа-юл.

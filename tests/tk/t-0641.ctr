@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Sözlük täze
+	# ASCII only
+	goý: ( Sanaw täze ; 65 ; 65 ; 65 ; 65 ; 0 ) açar: ['AAAA'],
+	# valid 2 byte sequence
+	goý: ( Sanaw täze ; 194 ; 162 ; 0 ) açar: ['¢'],
+	# Valid 3-byte UTF-8
+    goý: ( Sanaw täze ; 226 ; 130 ; 172 ; 0 ) açar: ['€'],
+	# Valid 4-byte UTF-8
+    goý: ( Sanaw täze ; 240 ; 144 ; 141 ; 136 ; 0 ) açar: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    goý: ( Sanaw täze ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) açar: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    goý: ( Sanaw täze ; 65 ; 193 ; 129 ; 0 ) açar: ['A?'],
+	# Invalid first byte (0xFF)
+    goý: ( Sanaw täze ; 255 ; 0 ) açar: ['?'],
+	# Incomplete multi-byte sequence at end
+    goý: ( Sanaw täze ; 66 ; 226 ; 0 ) açar: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    goý: ( Sanaw täze ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) açar: ['A€?𐍈B'].
+	 
+utf8cases her: { :key :value
+	>> blob := Blob täze: value sany, bytes: value.
+	>> str := blob tekst.
+	(str = key) dogry: {
+		Çykyş ýaz: ['OK'], täze-setir.
+	}, ýogsa: {
+		Çykyş ýaz: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, täze-setir.
+	}.
+	blob boşat.
+}.

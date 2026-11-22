@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> besykje := { :format :value
+	{ Utfier skriuwe: ( (Formaat nĳ: format) tapasse: value ), nije-rigel. } fange: { :e Utfier skriuwe: e, nije-rigel. }, begjinne.
+}.
+>> try-int := { :format :value
+	{ Utfier skriuwe: ( (Formaat nĳ: format) tapasse-int: value ), nije-rigel. } fange: { :e Utfier skriuwe: e, nije-rigel. }, begjinne.
+}.
+
+# fits
+besykje tapasse: ['|%s|'] en: ['text'].
+besykje tapasse: ['%06.2f'] en: 5.5.
+besykje tapasse: ['100%% %s'] en: ['sure'].
+try-int tapasse: ['%03d'] en: 7.
+try-int tapasse: ['%x'] en: 255.
+besykje tapasse: ['%d'] en: (Int64 nĳ út-tekst: ['12']).
+besykje tapasse: ['%lld'] en: (Int64 nĳ út-tekst: ['12']).
+besykje tapasse: ['%.1lf'] en: 5.5.
+try-int tapasse: ['%hd'] en: 7.
+
+# does not fit
+besykje tapasse: ['%s'] en: 12345.
+besykje tapasse: ['%d'] en: 12345.
+besykje tapasse: ['%f'] en: ['text'].
+try-int tapasse: ['%d'] en: ['text'].
+try-int tapasse: ['%s'] en: 5.
+besykje tapasse: ['%s %s'] en: ['text'].
+besykje tapasse: ['%n'] en: ['text'].
+besykje tapasse: ['%*s'] en: ['text'].
+besykje tapasse: ['%'] en: ['text'].
+
+# length modifier does not fit
+besykje tapasse: ['%ls'] en: ['text'].
+besykje tapasse: ['%Lf'] en: 5.5.
+try-int tapasse: ['%ld'] en: 7.
+try-int tapasse: ['%lld'] en: 7.
+besykje tapasse: ['%Ld'] en: (Int64 nĳ út-tekst: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+besykje tapasse: ['%99999999999s'] en: ['text'].

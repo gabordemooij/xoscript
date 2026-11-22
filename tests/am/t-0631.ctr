@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+ፕሮግራም የትውስታ-አስተዳደር: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := ፕሮግራም ቅንብር: ['FFITESTLIB'].
+
+
+
+Server አያይዝ: (
+ ሰልፍ አዲስ ;
+ libname ;
+ ['puts'] ;
+ ( ሰልፍ አዲስ ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s ልቀቅ.
+
+# test with struct
+
+>> a := Blob አዲስ: 8.
+a bytes: (
+	ሰልፍ <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (ሰልፍ <<: ['int'], ; ['int']).
+
+Server አያይዝ: (
+	ሰልፍ <<: ['@structtest'], ;
+	['@structtest'] ;
+	(ሰልፍ <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+ውጤት ፃፍ: ['Sum test:'] + (ffitest ffisum: a), አዲስ-መስመር.
+
+struct struct-ልቀቅ.
+struct ልቀቅ.
+a ልቀቅ.

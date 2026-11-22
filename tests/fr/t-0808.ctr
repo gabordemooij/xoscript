@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Coffre générer-clés.
+>> sk := keys premier.
+>> pk := keys dernier.
+>> sig := Coffre signer: ['abc'] avec: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Coffre signer: ['abc'] avec: long. } intercepter: { :e
+	Sortie écrire: e, stop.
+}, démarrer.
+
+{ Coffre vérifier: ['abc'] signature: long avec: pk. } intercepter: { :e
+	Sortie écrire: e, stop.
+}, démarrer.
+
+{ Coffre vérifier: ['abc'] signature: sig avec: short. } intercepter: { :e
+	Sortie écrire: e, stop.
+}, démarrer.

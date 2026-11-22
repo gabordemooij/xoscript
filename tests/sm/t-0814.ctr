@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server sauni.
+Polokalama faʻaoga: ['../../../src/xo/sm/webtools.xo'].
+
+>> Fake-Request := Mea fou.
+Fake-Request pe-a-oo-mai: ['value:'] fai: { :tau
+	lana-lava tau := tau.
+}.
+Fake-Request pe-a-oo-mai: ['cookie:'] fai: { :igoa <- lana-lava tau.
+}.
+
+>> Test-Session := Sauniga-faila-le-tumau fou.
+Test-Session pe-a-oo-mai: ['utaina'] fai: { <- Lomifefiloi fou.
+}.
+Test-Session pe-a-oo-mai: ['session-id'] fai: { <- lana-lava id.
+}.
+
+>> cookies := Lisi fou
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies taʻitasi: { :i :cookie
+	>> talosaga-http := Fake-Request fou.
+	talosaga-http value: cookie.
+	>> pule := Test-Session fou.
+	>> web := Pepa-Upega fou.
+	web talosaga-http: talosaga-http.
+	web pule-sauniga: pule.
+	web amata-sauniga.
+	Tuuina-atu tusi: ( pule session-id = cookie ), laina-fou.
+}.
+
+>> web := Pepa-Upega fou.
+web json: (Lomifefiloi fou tuʻu: ['b'] i: ['a']).
+Tuuina-atu tusi: ['\n'], laina-fou.
+
+{ Fesootaiga get: ['file:///etc/hostname']. } puʻe: { :e
+	Tuuina-atu tusi: e, laina-fou.
+}, amata.
+
+>> svg := Faila fou: ['/tmp/test0814.svg'].
+svg tusi: ['<svg xmlns="x"></svg>'].
+Tuuina-atu laina-fou.
+Server pasi: ['test0814.svg'] muamua-upu: ['/tmp/'].
+svg tape.

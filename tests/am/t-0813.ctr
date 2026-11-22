@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server አዘጋጅ.
+ፕሮግራም ተጠቀም: ['../../../src/xo/am/webtools.xo'].
+ፕሮግራም ተጠቀም: ['../../../src/xo/am/mailtools.xo'].
+
+>> ራስጌ := HTTP-ራስጌ አዲስ ቁልፍ: ['Location'] እሴት: ['/ok\r\nX-Injected: yes'].
+ውጤት ፃፍ: ራስጌ.
+
+>> web := የድር-ሰነድ አዲስ.
+web ሂድ-ወደ: ['/ok\r\nX-Injected: yes'].
+ውጤት ፃፍ: ['\n'], አዲስ-መስመር.
+
+>> mail := ኢሜይል አዲስ.
+mail ወደ: (ሰልፍ አዲስ ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (ሰልፍ አዲስ ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (ሰልፍ አዲስ ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail ላኪ: ['d@example.invalid\r\nX-From: yes'] ስም: ['site\r\nX-Name: yes'].
+mail ርዕሰ-ጉዳይ: ['hello\r\nX-Subject: yes'].
+mail ዋና-ጽሑፍ: ['line1\r\nline2'].
+ውጤት ፃፍ: mail አመንጭ.
+
+>> html := ኢሜይል-HTML አዲስ.
+html ወደ: (ሰልፍ አዲስ ; ['a@example.invalid\r\nX-To: yes']).
+html ላኪ: ['d@example.invalid'] ስም: ['site'].
+html ርዕሰ-ጉዳይ: ['hello\r\nX-Subject: yes'].
+html ዋና-ጽሑፍ: ['body'].
+ውጤት ፃፍ: ( html አመንጭ ይዟል: ['\nX-'] ), አዲስ-መስመር.
+ውጤት ፃፍ: ( html አመንጭ ይዟል: ['X-To: yes'] ), አዲስ-መስመር.

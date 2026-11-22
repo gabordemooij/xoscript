@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Карта новый
+	# ASCII only
+	разместить: ( Список новый ; 65 ; 65 ; 65 ; 65 ; 0 ) в: ['AAAA'],
+	# valid 2 byte sequence
+	разместить: ( Список новый ; 194 ; 162 ; 0 ) в: ['¢'],
+	# Valid 3-byte UTF-8
+    разместить: ( Список новый ; 226 ; 130 ; 172 ; 0 ) в: ['€'],
+	# Valid 4-byte UTF-8
+    разместить: ( Список новый ; 240 ; 144 ; 141 ; 136 ; 0 ) в: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    разместить: ( Список новый ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) в: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    разместить: ( Список новый ; 65 ; 193 ; 129 ; 0 ) в: ['A?'],
+	# Invalid first byte (0xFF)
+    разместить: ( Список новый ; 255 ; 0 ) в: ['?'],
+	# Incomplete multi-byte sequence at end
+    разместить: ( Список новый ; 66 ; 226 ; 0 ) в: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    разместить: ( Список новый ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) в: ['A€?𐍈B'].
+	 
+utf8cases каждый: { :key :value
+	>> blob := Blob новый: value счетчик, байта: value.
+	>> str := blob к-тексту.
+	(str = key) истина: {
+		Выход написать: ['OK'], стоп.
+	}, иначе: {
+		Выход написать: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, стоп.
+	}.
+	blob свободно.
+}.

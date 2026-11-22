@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Program manajemén-mémori: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Program setélan: ['FFITESTLIB'].
+
+
+
+Server tautkeun: (
+ Daptar anyar ;
+ libname ;
+ ['puts'] ;
+ ( Daptar anyar ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s bébaskeun.
+
+# test with struct
+
+>> a := Blob anyar: 8.
+a bytes: (
+	Daptar <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Daptar <<: ['int'], ; ['int']).
+
+Server tautkeun: (
+	Daptar <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Daptar <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Kaluaran tulis: ['Sum test:'] + (ffitest ffisum: a), baris-anyar.
+
+struct bébaskeun-struct.
+struct bébaskeun.
+a bébaskeun.

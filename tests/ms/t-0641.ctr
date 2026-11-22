@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Kamus baharu
+	# ASCII only
+	letak: ( Senarai baharu ; 65 ; 65 ; 65 ; 65 ; 0 ) di: ['AAAA'],
+	# valid 2 byte sequence
+	letak: ( Senarai baharu ; 194 ; 162 ; 0 ) di: ['¢'],
+	# Valid 3-byte UTF-8
+    letak: ( Senarai baharu ; 226 ; 130 ; 172 ; 0 ) di: ['€'],
+	# Valid 4-byte UTF-8
+    letak: ( Senarai baharu ; 240 ; 144 ; 141 ; 136 ; 0 ) di: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    letak: ( Senarai baharu ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) di: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    letak: ( Senarai baharu ; 65 ; 193 ; 129 ; 0 ) di: ['A?'],
+	# Invalid first byte (0xFF)
+    letak: ( Senarai baharu ; 255 ; 0 ) di: ['?'],
+	# Incomplete multi-byte sequence at end
+    letak: ( Senarai baharu ; 66 ; 226 ; 0 ) di: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    letak: ( Senarai baharu ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) di: ['A€?𐍈B'].
+	 
+utf8cases setiap: { :key :value
+	>> blob := Blob baharu: value bilangan, bytes: value.
+	>> str := blob teks.
+	(str = key) benar: {
+		Keluaran tulis: ['OK'], baris-baharu.
+	}, jika-tidak: {
+		Keluaran tulis: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, baris-baharu.
+	}.
+	blob bebaskan.
+}.

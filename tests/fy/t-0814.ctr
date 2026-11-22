@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inisjalisearje.
+Programma brûke: ['../../../src/xo/fy/webtools.xo'].
+
+>> Fake-Request := Objekt nĳ.
+Fake-Request by: ['value:'] dwaan: { :wearde
+	eigen wearde := wearde.
+}.
+Fake-Request by: ['cookie:'] dwaan: { :namme <- eigen wearde.
+}.
+
+>> Test-Session := Tydlik-bestân-sesje nĳ.
+Test-Session by: ['lade'] dwaan: { <- List nĳ.
+}.
+Test-Session by: ['session-id'] dwaan: { <- eigen id.
+}.
+
+>> cookies := Rige nĳ
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies elk: { :i :cookie
+	>> fersyk := Fake-Request nĳ.
+	fersyk value: cookie.
+	>> behearder := Test-Session nĳ.
+	>> web := Webdokumint nĳ.
+	web fersyk: fersyk.
+	web sesjebehearder: behearder.
+	web sesje-begjinne.
+	Utfier skriuwe: ( behearder session-id = cookie ), nije-rigel.
+}.
+
+>> web := Webdokumint nĳ.
+web json: (List nĳ set: ['b'] by: ['a']).
+Utfier skriuwe: ['\n'], nije-rigel.
+
+{ Netwurk get: ['file:///etc/hostname']. } fange: { :e
+	Utfier skriuwe: e, nije-rigel.
+}, begjinne.
+
+>> svg := Bestand nĳ: ['/tmp/test0814.svg'].
+svg skriuwe: ['<svg xmlns="x"></svg>'].
+Utfier nije-rigel.
+Server trochjaan: ['test0814.svg'] foarheaksel: ['/tmp/'].
+svg wiskje.

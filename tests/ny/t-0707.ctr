@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Pulogalamu kasamalidwe-ka-kukumbukira: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB chatsopano wolandira: ['localhost'],
+	dzina-la-wogwiritsa: ['xo'], mawu-achinsinsi: ['pass123'], dzina-la-nkhokwe-ya-deta: ['xobase'], lumikizana.
+
+>> TwoDigitFormat := Kapangidwe chatsopano: ['%02d'].
+
+# Datetime
+{
+	>> chaka := Nambala pakati: 1995 ndi: 2050, malemba-a-mawu.
+	>> mwezi := TwoDigitFormat gwiritsa-pa-nambala-yonse: (Nambala pakati: 1 ndi: 12), malemba-a-mawu.
+	>> tsiku := TwoDigitFormat gwiritsa-pa-nambala-yonse: (Nambala pakati: 1 ndi: 28), malemba-a-mawu.
+	>> ola := TwoDigitFormat gwiritsa-pa-nambala-yonse: (Nambala pakati: 1 ndi: 23), malemba-a-mawu.
+	>> miniti := TwoDigitFormat gwiritsa-pa-nambala-yonse: (Nambala pakati: 1 ndi: 59), malemba-a-mawu.
+	>> sekondi := TwoDigitFormat gwiritsa-pa-nambala-yonse: (Nambala pakati: 1 ndi: 59), malemba-a-mawu.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: chaka,
+		MM: mwezi,
+		DD: tsiku,
+		HH: ola,
+		II: miniti,
+		SS: sekondi.
+	>> zofufuzira :=
+	db funso: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	tenga: { :row
+		(row mydatetime = datetime) zabodza: {
+			ntchito-iyi cholakwika: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter onjezani: 1.
+} * 100.
+
+# Date
+{
+	>> chaka := Nambala pakati: 1995 ndi: 2050, malemba-a-mawu.
+	>> mwezi := TwoDigitFormat gwiritsa-pa-nambala-yonse: (Nambala pakati: 1 ndi: 12), malemba-a-mawu.
+	>> tsiku := TwoDigitFormat gwiritsa-pa-nambala-yonse: (Nambala pakati: 1 ndi: 28), malemba-a-mawu.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: chaka,
+		MM: mwezi,
+		DD: tsiku.
+	>> zofufuzira :=
+	db funso: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	tenga: { :row
+		(row mydate = date) zabodza: {
+			ntchito-iyi cholakwika: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter onjezani: 1.
+} * 100.
+
+
+# Time
+{
+	>> ola := TwoDigitFormat gwiritsa-pa-nambala-yonse: (Nambala pakati: 1 ndi: 23), malemba-a-mawu.
+	>> miniti := TwoDigitFormat gwiritsa-pa-nambala-yonse: (Nambala pakati: 1 ndi: 59), malemba-a-mawu.
+	>> sekondi := TwoDigitFormat gwiritsa-pa-nambala-yonse: (Nambala pakati: 1 ndi: 59), malemba-a-mawu.
+	>> nthawi := ['HH:II:SS'].
+	nthawi
+		HH: ola,
+		II: miniti,
+		SS: sekondi.
+	>> zofufuzira :=
+	db funso: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: nthawi),
+	tenga: { :row
+		(row mytime = nthawi) zabodza: {
+			ntchito-iyi cholakwika: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter onjezani: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Mndandanda chatsopano dzaza: 100000 ndi: ['x'], lumikiza: [''].
+{
+	>> str2 := Nkhokwe-yotetezedwa token: 40.
+	>> zofufuzira :=
+	db funso: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	tenga: { :row
+		(row str1 = str1 ndi: row str2 = str2) zabodza: {
+			ntchito-iyi cholakwika: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter onjezani: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Nambala pakati: 1 ndi: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 kuchokera-ku-malemba: ['9223372036854775807'] ) -
+		( Int64 kuchokera-ku-malemba: ['99999'] ) +
+		( Int64 kuchokera-ku-malemba: n1 malemba-a-mawu )
+	).
+	>> zofufuzira :=
+	db funso: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	tenga: { :row
+		(row n1 = n1) zabodza: {
+			ntchito-iyi cholakwika: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) zabodza: {
+			ntchito-iyi cholakwika: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 yandikitsa-nambala) zabodza: {
+			ntchito-iyi cholakwika: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) zabodza: {
+			ntchito-iyi cholakwika: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter onjezani: 1.
+} * 100.
+
+
+Zotuluka lembani: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), mzere-watsopano.

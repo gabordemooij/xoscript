@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Utdata skriv: ['Database test'], stop.
+
+>> db := Maria-DB ny värd: ['localhost'],
+	användarnamn: ['xo'], lösenord: ['pass123'], databasnamn: ['xobase'], anslut.
+
+Utdata skriv: ['Can we connect? '] + db ansluten?, stop.
+
+>> sökparametrar := db fråga: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametrar: ( Lista ny ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  sökparametrar utför. db bekräfta. } fånga: { :e db återställ.  }, starta.
+
+Utdata skriv: ['Can we insert? '] + ( sökparametrar insert-id > 0 ), stop.
+
+>> Obj := Objekt ny.
+Obj vid: ['retrieve-rows'] gör: {
+	egen antal := 0.
+	>> sökparametrar :=
+	db fråga: ['SELECT * FROM book order by id desc limit 2'], 
+	hämta: { :row 
+		egen antal lägg-till: 1.
+		Sann avbryt.
+	}. <- egen antal kopiera.
+}.
+
+Utdata skriv: ['Can we query? '] + ( Obj retrieve-rows > 0 ), stop.

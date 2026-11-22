@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+ຜົນອອກ ຂຽນ: ['Database test'], ຂຶ້ນແຖວໃໝ່.
+
+>> db := Maria-DB ໃໝ່ ໂຮສ: ['localhost'],
+	ຊື່ຜູ້ໃຊ້: ['xo'], ລະຫັດຜ່ານ: ['pass123'], ຊື່ຖານຂໍ້ມູນ: ['xobase'], ເຊື່ອມຕໍ່.
+
+ຜົນອອກ ຂຽນ: ['Can we connect? '] + db ເຊື່ອມຕໍ່ຢູ່?, ຂຶ້ນແຖວໃໝ່.
+
+>> ພາຣາມິເຕີຄົ້ນຫາ := db ຄິວຣີ: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], ພາຣາມິເຕີ: ( ລິສ ໃໝ່ ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  ພາຣາມິເຕີຄົ້ນຫາ ດຳເນີນການ. db ຢືນຢັນ. } ຈັບ: { :e db ຍ້ອນກັບ.  }, ເລີ່ມ.
+
+ຜົນອອກ ຂຽນ: ['Can we insert? '] + ( ພາຣາມິເຕີຄົ້ນຫາ insert-id > 0 ), ຂຶ້ນແຖວໃໝ່.
+
+>> Obj := ວັດຖຸ ໃໝ່.
+Obj ເມື່ອ: ['retrieve-rows'] ເຮັດ: {
+	ຂອງຕົນ ຈຳນວນ := 0.
+	>> ພາຣາມິເຕີຄົ້ນຫາ :=
+	db ຄິວຣີ: ['SELECT * FROM book order by id desc limit 2'], 
+	ດຶງຂໍ້ມູນ: { :row 
+		ຂອງຕົນ ຈຳນວນ ບວກ: 1.
+		ຈິງ ຢຸດວົນ.
+	}. <- ຂອງຕົນ ຈຳນວນ ສຳເນົາ.
+}.
+
+ຜົນອອກ ຂຽນ: ['Can we query? '] + ( Obj retrieve-rows > 0 ), ຂຶ້ນແຖວໃໝ່.

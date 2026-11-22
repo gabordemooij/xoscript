@@ -1,0 +1,53 @@
+Programa maneho-di-memoria: 0.
+Lista ora: ['sum'] hasi: {
+	>> total := 0.
+	mes kada: { :index :element
+		total suma: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Archivo nobo: ['/tmp/test.txt'].
+f skirbi: ['Lorem Ipsum'].
+f sera.
+  
+
+f := Archivo nobo: ['/tmp/test.txt'].
+>> text := f lesa.
+f sera.
+
+
+
+Programa limpia.
+usedMemory1 := (Programa memoria ? 1).
+
+
+
+f := Archivo nobo: ['/tmp/test.txt'].
+text := f lesa.
+f sera.
+
+Programa limpia.
+usedMemory2 := (Programa memoria ? 1).
+
+
+f := Archivo nobo: ['/tmp/test.txt'].
+text := f lesa.
+f sera.
+
+Programa limpia.
+usedMemory3 := (Programa memoria ? 1).
+
+
+
+( usedMemory1 = usedMemory2 i: usedMemory1 = usedMemory3, i: usedMemory2 = usedMemory3 ) bèrdat: {
+	Salida skirbi: ['No memory leaks here'].
+}, falsu: {
+	Salida skirbi: ['Leaking memory...'].
+}.

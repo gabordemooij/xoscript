@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> shteg := ['/tmp/test0821.csv'].
+>> file := Skedar ri: shteg.
+
+file shkruaj: ['a,b\n"1,2\n'].
+{
+	file ndarës: [','] thonjëz: ['"'] rreshta: { :line
+		Dalje shkruaj: line, rresht-ri.
+	}.
+} kap: { :e Dalje shkruaj: e, rresht-ri. }, nis.
+
+# a closed quote still works
+file shkruaj: ['a,b\n"1,2",3'].
+file ndarës: [','] thonjëz: ['"'] rreshta: { :line
+	Dalje shkruaj: line, rresht-ri.
+}.
+file fshi.

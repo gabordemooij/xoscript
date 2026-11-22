@@ -1,0 +1,43 @@
+
+
+>> g := Server 새로.
+>> v := 금고 새로.
+>> ok := 0.
+
+>> secrets := 리스트 새로 ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets 복사.
+passwords 각각: { :i :p
+	secrets 각각: { :n :s
+		{
+			>> encrypted := v 암호화: s 키: p.
+			>> decrypted := v 복호화: encrypted 키: p.
+			(decrypted = s) 참이면: {
+				ok 더하기: 1.
+			}, 아니면: {
+				출력 쓰기: ['failed encrypting/decrypting: '], 줄바꿈.
+				출력 쓰기: s, 줄바꿈.
+				출력 쓰기: ['encrypted: '] + encrypted, 줄바꿈.
+				출력 쓰기: ['decrypted: '] + encrypted, 줄바꿈.
+				프로그램 종료.
+			}.
+		} 예외시: { :err
+			(s = [''] 또는: p = ['']) 참이면: {
+				ok 더하기: 1.
+			}, 아니면: {
+				출력 쓰기: err, 줄바꿈.
+				프로그램 종료.
+			}.
+		}, 시작.
+	}.
+}.
+
+출력 쓰기: ( ok + [' vault encryptions tested.'] ), 줄바꿈.

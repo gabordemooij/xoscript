@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := ファイル 新規: ['/tmp/test.gif'].
+f 書く: ['GIF87a01234567810'].
+
+# serve the file
+Server 素通し: ['test.gif'] 接頭辞: ['/tmp/'].
+
+出力 改行.
+
+出力 書く: ['Outside container (security):'], 改行.
+{ Server 素通し: ['../passwd'] 接頭辞: ['/tmp/']. }
+例外時: { :e 出力 書く: e, 改行. },
+開始.
+
+出力 書く: ['Invalid prefix:'], 改行.
+{ Server 素通し: ['test.gif'] 接頭辞: ['z:\\']. }
+例外時: { :e 出力 書く: e, 改行. },
+開始.
+
+出力 書く: ['Non-existant file:'], 改行.
+{ Server 素通し: ['xxx.xxx'] 接頭辞: ['/tmp/']. }
+例外時: { :e 出力 書く: e, 改行. },
+開始.

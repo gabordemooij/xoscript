@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Çıxış yaz: ['Database test'], yeni-sətir.
+
+>> db := Maria-DB yeni host: ['localhost'],
+	istifadəçi: ['xo'], parol: ['pass123'], baza-adı: ['xobase'], qoşul.
+
+Çıxış yaz: ['Can we connect? '] + db qoşulub?, yeni-sətir.
+
+>> axtarış-parametrləri := db sorğu: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametrlər: ( Siyahı yeni ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  axtarış-parametrləri icra-et. db təsdiqlə. } tut: { :e db geri-qaytar.  }, başlat.
+
+Çıxış yaz: ['Can we insert? '] + ( axtarış-parametrləri insert-id > 0 ), yeni-sətir.
+
+>> Obj := Obyekt yeni.
+Obj olanda: ['retrieve-rows'] et: {
+	öz say := 0.
+	>> axtarış-parametrləri :=
+	db sorğu: ['SELECT * FROM book order by id desc limit 2'], 
+	gətir: { :row 
+		öz say əlavə-et: 1.
+		Doğru kəs.
+	}. <- öz say surət.
+}.
+
+Çıxış yaz: ['Can we query? '] + ( Obj retrieve-rows > 0 ), yeni-sətir.

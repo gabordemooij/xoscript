@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lista crear ;
+	# {"key":"normal"} normal ASCII
+	( Diccionario crear poner: ['normal'] en: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Diccionario crear poner: ['hello world'] en: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Diccionario crear poner: ['"'] en: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Diccionario crear poner: ['backslash: \\'] en: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Diccionario crear poner: ['slash: /'] en: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Diccionario crear poner: ['backspace: \b'] en: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Diccionario crear poner: ['formfeed: \f'] en: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Diccionario crear poner: ['newline: \n'] en: ['key'] ) ;
+	( Diccionario crear poner: ['newline: ↵'] en: ['key'] ) ;
+	( Diccionario crear poner: ['newline: 
+	'] en: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Diccionario crear poner: ['carriage return: \r'] en: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Diccionario crear poner: ['tab \t'] en: ['key'] ) ;
+	( Diccionario crear poner: ['tab ⇿'] en: ['key'] ) ;
+	( Diccionario crear poner: ['tab  '] en: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Diccionario crear poner: ['NUL \u0000'] en: ['key'] ) ;
+	( Diccionario crear poner: ['NUL \0'] en: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Diccionario crear poner: ['control: \u0001'] en: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Diccionario crear poner: ['control: \u001F'] en: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Diccionario crear poner: ['unicode: é'] en: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Diccionario crear poner: ['unicode: €'] en: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Diccionario crear poner: ['unicode: 日本語'] en: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Diccionario crear poner: ['unicode: 😀'] en: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Diccionario crear poner: ['unicode: 🧑‍💻'] en: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Diccionario crear poner: ['combining: e\u0301'] en: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Diccionario crear poner: ['escaped unicode: \u00e9'] en: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Diccionario crear poner: ['escaped unicode: \u20ac'] en: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Diccionario crear poner: ['escaped unicode: \ud83d\ude00'] en: ['key'] ) ;
+	# {"key":""} empty value
+	( Diccionario crear poner: [''] en: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Diccionario crear poner: ['@ < > & = % + ? #'] en: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Diccionario crear poner: ['''] en: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Diccionario crear poner: ['multiple: \" \\ \n \r \t'] en: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Diccionario crear poner: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] en: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Diccionario crear poner: [' value'] en: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Diccionario crear poner: ['value '] en: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Diccionario crear poner: [' \t\n\r '] en: ['key'] ).
+
+dicts cada: { :_ :d
+	>> j := JSON jsonificar: d.
+	>> a := JSON jsonificar: (Diccionario crear poner: d key en: ['key']).
+	>> b := JSON jsonificar: (Diccionario crear poner: ['value'] en: d key).
+	>> e := JSON objeto: a.
+	>> f := JSON objeto: b.
+	((e key = d key y: (f ? d key = ['value'])) o: (e key = ['NUL ?'])) verdadero: {
+		Salida escribir: ['OK'], detener.
+	}, otro: {
+		Salida escribir: ['Unable to properly encode/decode: '] + d + j, detener.
+		Programa finalizar.
+	}.
+}.

@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Daptar anyar ;
+	# {"key":"normal"} normal ASCII
+	( Kamus anyar teundeun: ['normal'] di: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Kamus anyar teundeun: ['hello world'] di: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Kamus anyar teundeun: ['"'] di: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Kamus anyar teundeun: ['backslash: \\'] di: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Kamus anyar teundeun: ['slash: /'] di: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Kamus anyar teundeun: ['backspace: \b'] di: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Kamus anyar teundeun: ['formfeed: \f'] di: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Kamus anyar teundeun: ['newline: \n'] di: ['key'] ) ;
+	( Kamus anyar teundeun: ['newline: ↵'] di: ['key'] ) ;
+	( Kamus anyar teundeun: ['newline: 
+	'] di: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Kamus anyar teundeun: ['carriage return: \r'] di: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Kamus anyar teundeun: ['tab \t'] di: ['key'] ) ;
+	( Kamus anyar teundeun: ['tab ⇿'] di: ['key'] ) ;
+	( Kamus anyar teundeun: ['tab  '] di: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Kamus anyar teundeun: ['NUL \u0000'] di: ['key'] ) ;
+	( Kamus anyar teundeun: ['NUL \0'] di: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Kamus anyar teundeun: ['control: \u0001'] di: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Kamus anyar teundeun: ['control: \u001F'] di: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Kamus anyar teundeun: ['unicode: é'] di: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Kamus anyar teundeun: ['unicode: €'] di: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Kamus anyar teundeun: ['unicode: 日本語'] di: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Kamus anyar teundeun: ['unicode: 😀'] di: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Kamus anyar teundeun: ['unicode: 🧑‍💻'] di: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Kamus anyar teundeun: ['combining: e\u0301'] di: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Kamus anyar teundeun: ['escaped unicode: \u00e9'] di: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Kamus anyar teundeun: ['escaped unicode: \u20ac'] di: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Kamus anyar teundeun: ['escaped unicode: \ud83d\ude00'] di: ['key'] ) ;
+	# {"key":""} empty value
+	( Kamus anyar teundeun: [''] di: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Kamus anyar teundeun: ['@ < > & = % + ? #'] di: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Kamus anyar teundeun: ['''] di: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Kamus anyar teundeun: ['multiple: \" \\ \n \r \t'] di: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Kamus anyar teundeun: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] di: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Kamus anyar teundeun: [' value'] di: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Kamus anyar teundeun: ['value '] di: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Kamus anyar teundeun: [' \t\n\r '] di: ['key'] ).
+
+dicts unggal: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Kamus anyar teundeun: d key di: ['key']).
+	>> b := JSON jsonify: (Kamus anyar teundeun: ['value'] di: d key).
+	>> e := JSON obyek: a.
+	>> f := JSON obyek: b.
+	((e key = d key jeung: (f ? d key = ['value'])) atawa: (e key = ['NUL ?'])) bener: {
+		Kaluaran tulis: ['OK'], baris-anyar.
+	}, lamun-henteu: {
+		Kaluaran tulis: ['Unable to properly encode/decode: '] + d + j, baris-anyar.
+		Program réngsékeun.
+	}.
+}.

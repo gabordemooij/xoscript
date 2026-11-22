@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> eseye := { :format :value
+	{ Sòti ekri: ( (Fòma nouvo: format) aplike: value ), nouvo-liy. } trape: { :e Sòti ekri: e, nouvo-liy. }, lanse.
+}.
+>> try-int := { :format :value
+	{ Sòti ekri: ( (Fòma nouvo: format) aplike-antye: value ), nouvo-liy. } trape: { :e Sòti ekri: e, nouvo-liy. }, lanse.
+}.
+
+# fits
+eseye aplike: ['|%s|'] ak: ['text'].
+eseye aplike: ['%06.2f'] ak: 5.5.
+eseye aplike: ['100%% %s'] ak: ['sure'].
+try-int aplike: ['%03d'] ak: 7.
+try-int aplike: ['%x'] ak: 255.
+eseye aplike: ['%d'] ak: (Int64 nouvo apati-tèks: ['12']).
+eseye aplike: ['%lld'] ak: (Int64 nouvo apati-tèks: ['12']).
+eseye aplike: ['%.1lf'] ak: 5.5.
+try-int aplike: ['%hd'] ak: 7.
+
+# does not fit
+eseye aplike: ['%s'] ak: 12345.
+eseye aplike: ['%d'] ak: 12345.
+eseye aplike: ['%f'] ak: ['text'].
+try-int aplike: ['%d'] ak: ['text'].
+try-int aplike: ['%s'] ak: 5.
+eseye aplike: ['%s %s'] ak: ['text'].
+eseye aplike: ['%n'] ak: ['text'].
+eseye aplike: ['%*s'] ak: ['text'].
+eseye aplike: ['%'] ak: ['text'].
+
+# length modifier does not fit
+eseye aplike: ['%ls'] ak: ['text'].
+eseye aplike: ['%Lf'] ak: 5.5.
+try-int aplike: ['%ld'] ak: 7.
+try-int aplike: ['%lld'] ak: 7.
+eseye aplike: ['%Ld'] ak: (Int64 nouvo apati-tèks: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+eseye aplike: ['%99999999999s'] ak: ['text'].

@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server npaj.
+Kev-pab-cuam-khoos-phis-tawj siv: ['../../../src/xo/hmn/webtools.xo'].
+Kev-pab-cuam-khoos-phis-tawj siv: ['../../../src/xo/hmn/mailtools.xo'].
+
+>> taub-hau := Taub-hau-HTTP tshiab yuam-sij: ['Location'] nqi: ['/ok\r\nX-Injected: yes'].
+Tawm sau-ntawv: taub-hau.
+
+>> web := Ntaub-ntawv-Web tshiab.
+web mus-rau: ['/ok\r\nX-Injected: yes'].
+Tawm sau-ntawv: ['\n'], kab-tshiab.
+
+>> mail := Email tshiab.
+mail mus-cuag: (Daim-teev tshiab ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Daim-teev tshiab ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Daim-teev tshiab ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail tus-xa: ['d@example.invalid\r\nX-From: yes'] npe: ['site\r\nX-Name: yes'].
+mail lub-ntsiab: ['hello\r\nX-Subject: yes'].
+mail lub-cev: ['line1\r\nline2'].
+Tawm sau-ntawv: mail tsim.
+
+>> html := HTML-Email tshiab.
+html mus-cuag: (Daim-teev tshiab ; ['a@example.invalid\r\nX-To: yes']).
+html tus-xa: ['d@example.invalid'] npe: ['site'].
+html lub-ntsiab: ['hello\r\nX-Subject: yes'].
+html lub-cev: ['body'].
+Tawm sau-ntawv: ( html tsim muaj: ['\nX-'] ), kab-tshiab.
+Tawm sau-ntawv: ( html tsim muaj: ['X-To: yes'] ), kab-tshiab.

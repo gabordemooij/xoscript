@@ -1,0 +1,42 @@
+
+Ọrọ nigbati: ['html'] ṣe: { <- (
+		ara-rẹ
+		rọpo: ['&'] pẹlu: ['&amp;'],
+		rọpo: ['<'] pẹlu: ['&lt;'],
+		rọpo: ['>'] pẹlu: ['&gt;'],
+		rọpo: ['"'] pẹlu: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Nkan tuntun.
+
+HtmlBrush nigbati: ['fesi:'] ṣe: { :tag
+	Ijade kọ: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush nigbati: ['fesi:ati:'] ṣe: { :tag :content
+	tag := ( tag lati: 0 gigun: (tag gigun - 1) ).
+	Ijade kọ: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush nigbati: ['content:'] ṣe: { :text
+	Ijade kọ: text html, ila-tuntun.
+}.
+
+HtmlBrush nigbati: ['attr:value:'] ṣe: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush tuntun.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

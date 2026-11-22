@@ -1,0 +1,43 @@
+
+
+>> g := Server ohuru.
+>> v := Igbe-nchekwa ohuru.
+>> ok := 0.
+
+>> secrets := Ndepụta ohuru ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets detuo.
+passwords nke-ọ-bụla: { :i :p
+	secrets nke-ọ-bụla: { :n :s
+		{
+			>> encrypted := v zoo: s igodo: p.
+			>> decrypted := v kpughee: encrypted igodo: p.
+			(decrypted = s) eziokwu: {
+				ok gbakwunye: 1.
+			}, ma-ọ-bụghị-ya: {
+				Mpụta dee: ['failed encrypting/decrypting: '], ahịrị-ọhụrụ.
+				Mpụta dee: s, ahịrị-ọhụrụ.
+				Mpụta dee: ['encrypted: '] + encrypted, ahịrị-ọhụrụ.
+				Mpụta dee: ['decrypted: '] + encrypted, ahịrị-ọhụrụ.
+				Mmemme njedebe.
+			}.
+		} jide: { :err
+			(s = [''] ma-ọ-bụ: p = ['']) eziokwu: {
+				ok gbakwunye: 1.
+			}, ma-ọ-bụghị-ya: {
+				Mpụta dee: err, ahịrị-ọhụrụ.
+				Mmemme njedebe.
+			}.
+		}, bido.
+	}.
+}.
+
+Mpụta dee: ( ok + [' vault encryptions tested.'] ), ahịrị-ọhụrụ.

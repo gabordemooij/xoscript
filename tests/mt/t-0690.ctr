@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Ħruġ ikteb: ['Database test'], linja-ġdida.
+
+>> db := Maria-DB ġdid host: ['localhost'],
+	isem-utent: ['xo'], password: ['pass123'], isem-database: ['xobase'], qabbad.
+
+Ħruġ ikteb: ['Can we connect? '] + db imqabbad?, linja-ġdida.
+
+>> parametri-tfittxija := db mistoqsija: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametri: ( Lista ġdid ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  parametri-tfittxija esegwixxi. db ikkonferma. } aqbad: { :e db reġġa-lura.  }, ibda.
+
+Ħruġ ikteb: ['Can we insert? '] + ( parametri-tfittxija insert-id > 0 ), linja-ġdida.
+
+>> x := 0.
+>> parametri-tfittxija :=
+db mistoqsija: ['SELECT * FROM book order by id desc limit 2'], 
+ġib: { :row 
+	x żid: 1.
+	Veru waqqaf. # must clean up, no 'Commands out of sync'
+}.
+
+>> parametri-tfittxija :=
+db mistoqsija: ['SELECT * FROM book order by id desc limit 2'], 
+ġib: { :row
+	x żid: 1.
+	Veru waqqaf.
+}.
+
+(x > 0) veru: {
+	Ħruġ ikteb: ['Can we break in the middle of a fetch? '].
+}.
+
+Ħruġ ikteb: Veru, linja-ġdida.

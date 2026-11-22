@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB yeni host: ['localhost'],
+	istifadəçi: ['xo'],
+	parol: ['pass123'],
+	baza-adı: ['xobase'],
+	qoşul.
+
+>> axtarış-parametrləri := db sorğu: ['SELECT ? AS a, ? AS b, ? AS c'].
+axtarış-parametrləri parametrlər: (Siyahı yeni ; ['1']).
+{ axtarış-parametrləri gətir: { :row Çıxış yaz: row, yeni-sətir. }. } tut: { :e Çıxış yaz: e, yeni-sətir. }, başlat.
+
+>> axtarış-parametrləri := db sorğu: ['SELECT ? AS a'].
+{ axtarış-parametrləri gətir: { :row Çıxış yaz: row, yeni-sətir. }. } tut: { :e Çıxış yaz: e, yeni-sətir. }, başlat.
+
+# the right number still works, more parameters are ignored as before
+>> axtarış-parametrləri := db sorğu: ['SELECT ? AS a, ? AS b'].
+axtarış-parametrləri parametrlər: (Siyahı yeni ; ['1'] ; ['2']).
+axtarış-parametrləri gətir: { :row Çıxış yaz: (row yerdə: ['a']), yaz: (row yerdə: ['b']), yeni-sətir. }.
+axtarış-parametrləri parametrlər: (Siyahı yeni ; ['1'] ; ['2'] ; ['3']).
+axtarış-parametrləri gətir: { :row Çıxış yaz: (row yerdə: ['a']), yaz: (row yerdə: ['b']), yeni-sətir. }.

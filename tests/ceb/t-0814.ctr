@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server andama.
+Programa gamita: ['../../../src/xo/ceb/webtools.xo'].
+
+>> Fake-Request := Butang bag-o.
+Fake-Request kon: ['value:'] buhata: { :bili
+	akoa bili := bili.
+}.
+Fake-Request kon: ['cookie:'] buhata: { :ngalan <- akoa bili.
+}.
+
+>> Test-Session := Sesyon-sa-temporaryong-file bag-o.
+Test-Session kon: ['karga'] buhata: { <- Diksyonaryo bag-o.
+}.
+Test-Session kon: ['session-id'] buhata: { <- akoa id.
+}.
+
+>> cookies := Lista bag-o
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies matag: { :i :cookie
+	>> hangyo-http := Fake-Request bag-o.
+	hangyo-http value: cookie.
+	>> tigdumala := Test-Session bag-o.
+	>> web := Dokumento-sa-Web bag-o.
+	web hangyo-http: hangyo-http.
+	web tigdumala-sa-sesyon: tigdumala.
+	web sugdi-ang-sesyon.
+	Gawas isulat: ( tigdumala session-id = cookie ), bag-ong-linya.
+}.
+
+>> web := Dokumento-sa-Web bag-o.
+web json: (Diksyonaryo bag-o ibutang: ['b'] sa: ['a']).
+Gawas isulat: ['\n'], bag-ong-linya.
+
+{ Network get: ['file:///etc/hostname']. } dakpon: { :e
+	Gawas isulat: e, bag-ong-linya.
+}, padagana.
+
+>> svg := Payl bag-o: ['/tmp/test0814.svg'].
+svg isulat: ['<svg xmlns="x"></svg>'].
+Gawas bag-ong-linya.
+Server ipasa: ['test0814.svg'] unlapi: ['/tmp/'].
+svg papasa.

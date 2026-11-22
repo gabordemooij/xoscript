@@ -1,0 +1,25 @@
+Saída escrever: ['Test object'], stop.
+>> a := Objeto novo. 
+
+a em: ['item:'] fazer: { :fmt
+	prop fmt := fmt. 
+}.
+
+a em: ['item'] fazer: { <- prop fmt.
+}.
+
+a item: ( Formato novo: ['|%s|'] ).
+
+Saída escrever: a item, stop.
+
+>> old-fmt-address := a item protótipo endereço-de-memória.
+a save-as: ['/tmp/a.bin'].
+Saída escrever: ['========== RELOADING SNAP:'], stop.
+
+>> b := Objeto load-from: ['/tmp/a.bin'].
+
+(b item protótipo endereço-de-memória = old-fmt-address) sim: {
+	Saída escrever: ['Object link re-attached.'], stop.
+}.
+
+Saída escrever: ( b item aplicar: ['hello'] ), stop.

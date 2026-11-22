@@ -1,0 +1,42 @@
+
+Текст на: ['html'] уради: { <- (
+		себе
+		замени: ['&'] са: ['&amp;'],
+		замени: ['<'] са: ['&lt;'],
+		замени: ['>'] са: ['&gt;'],
+		замени: ['"'] са: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Објекат нови.
+
+HtmlBrush на: ['одговори:'] уради: { :tag
+	Излаз пиши: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush на: ['одговори:и:'] уради: { :tag :content
+	tag := ( tag од: 0 дужина: (tag дужина - 1) ).
+	Излаз пиши: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush на: ['content:'] уради: { :text
+	Излаз пиши: text html, нови-ред.
+}.
+
+HtmlBrush на: ['attr:value:'] уради: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush нови.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

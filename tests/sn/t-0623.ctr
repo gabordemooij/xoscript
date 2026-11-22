@@ -1,0 +1,43 @@
+
+
+>> g := Server nyowani.
+>> v := Dura-rakachengeteka nyowani.
+>> ok := 0.
+
+>> secrets := Rondedzero nyowani ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopa.
+passwords chimwe-nechimwe: { :i :p
+	secrets chimwe-nechimwe: { :n :s
+		{
+			>> encrypted := v viga: s kiyi: p.
+			>> decrypted := v vhura-chakavigwa: encrypted kiyi: p.
+			(decrypted = s) chokwadi: {
+				ok wedzera: 1.
+			}, kana-zvisiri: {
+				Zvabuda nyora: ['failed encrypting/decrypting: '], mutsara-mutsva.
+				Zvabuda nyora: s, mutsara-mutsva.
+				Zvabuda nyora: ['encrypted: '] + encrypted, mutsara-mutsva.
+				Zvabuda nyora: ['decrypted: '] + encrypted, mutsara-mutsva.
+				Chirongwa pedza.
+			}.
+		} bata: { :err
+			(s = [''] kana: p = ['']) chokwadi: {
+				ok wedzera: 1.
+			}, kana-zvisiri: {
+				Zvabuda nyora: err, mutsara-mutsva.
+				Chirongwa pedza.
+			}.
+		}, tanga.
+	}.
+}.
+
+Zvabuda nyora: ( ok + [' vault encryptions tested.'] ), mutsara-mutsva.

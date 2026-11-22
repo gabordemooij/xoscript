@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := Fichye nouvo: ['/tmp/test.gif'].
+f ekri: ['GIF87a01234567810'].
+
+# serve the file
+Server pase: ['test.gif'] prefiks: ['/tmp/'].
+
+Sòti nouvo-liy.
+
+Sòti ekri: ['Outside container (security):'], nouvo-liy.
+{ Server pase: ['../passwd'] prefiks: ['/tmp/']. }
+trape: { :e Sòti ekri: e, nouvo-liy. },
+lanse.
+
+Sòti ekri: ['Invalid prefix:'], nouvo-liy.
+{ Server pase: ['test.gif'] prefiks: ['z:\\']. }
+trape: { :e Sòti ekri: e, nouvo-liy. },
+lanse.
+
+Sòti ekri: ['Non-existant file:'], nouvo-liy.
+{ Server pase: ['xxx.xxx'] prefiks: ['/tmp/']. }
+trape: { :e Sòti ekri: e, nouvo-liy. },
+lanse.

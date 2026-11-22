@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Puke-wehewehe hou
+	# ASCII only
+	waiho: ( Papa hou ; 65 ; 65 ; 65 ; 65 ; 0 ) ma: ['AAAA'],
+	# valid 2 byte sequence
+	waiho: ( Papa hou ; 194 ; 162 ; 0 ) ma: ['¢'],
+	# Valid 3-byte UTF-8
+    waiho: ( Papa hou ; 226 ; 130 ; 172 ; 0 ) ma: ['€'],
+	# Valid 4-byte UTF-8
+    waiho: ( Papa hou ; 240 ; 144 ; 141 ; 136 ; 0 ) ma: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    waiho: ( Papa hou ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ma: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    waiho: ( Papa hou ; 65 ; 193 ; 129 ; 0 ) ma: ['A?'],
+	# Invalid first byte (0xFF)
+    waiho: ( Papa hou ; 255 ; 0 ) ma: ['?'],
+	# Incomplete multi-byte sequence at end
+    waiho: ( Papa hou ; 66 ; 226 ; 0 ) ma: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    waiho: ( Papa hou ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ma: ['A€?𐍈B'].
+	 
+utf8cases pākahi: { :key :value
+	>> blob := Blob hou: value heluna, bytes: value.
+	>> str := blob kaula.
+	(str = key) ʻoiaʻiʻo: {
+		Huapuka kākau: ['OK'], laina-hou.
+	}, ʻi-ole-ia: {
+		Huapuka kākau: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, laina-hou.
+	}.
+	blob hoʻokuʻu.
+}.

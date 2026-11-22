@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+வெளியீடு எழுது: ['Database test'], புதிய-வரி.
+
+>> db := Maria-DB புதிய புரவலன்: ['localhost'],
+	பயனர்-பெயர்: ['xo'], கடவுச்சொல்: ['pass123'], தரவுத்தள-பெயர்: ['xobase'], இணைந்திடு.
+
+வெளியீடு எழுது: ['Can we connect? '] + db இணைந்ததா?, புதிய-வரி.
+
+>> தேடல்-அளவுருக்கள் := db வினவல்: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], அளவுருக்கள்: ( வரிசை புதிய ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  தேடல்-அளவுருக்கள் செயல்படுத்து. db உறுதிசெய். } பிடி: { :e db பின்வாங்கு.  }, இயக்கு.
+
+வெளியீடு எழுது: ['Can we insert? '] + ( தேடல்-அளவுருக்கள் insert-id > 0 ), புதிய-வரி.
+
+>> x := 0.
+>> தேடல்-அளவுருக்கள் :=
+db வினவல்: ['SELECT * FROM book order by id desc limit 2'], 
+கொணர்: { :row 
+	x கூட்டு: 1.
+	உண்மை நிறுத்து. # must clean up, no 'Commands out of sync'
+}.
+
+>> தேடல்-அளவுருக்கள் :=
+db வினவல்: ['SELECT * FROM book order by id desc limit 2'], 
+கொணர்: { :row
+	x கூட்டு: 1.
+	உண்மை நிறுத்து.
+}.
+
+(x > 0) உண்மையெனில்: {
+	வெளியீடு எழுது: ['Can we break in the middle of a fetch? '].
+}.
+
+வெளியீடு எழுது: உண்மை, புதிய-வரி.

@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Pulogalamu kakhazikitsidwe: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server lumikizana-ndi: ( Mndandanda chatsopano ;
+ libname ; ['fopen'] ;
+ ( Mndandanda chatsopano ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+lumikizana-ndi: ( Mndandanda chatsopano ;
+ Palibe ; # means same lib
+ ['fread'] ;
+ ( Mndandanda chatsopano ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Palibe ; # means same object (i.e. Stream)
+ ['fread']
+),
+lumikizana-ndi: (
+ Mndandanda chatsopano ;
+ Palibe ; # means same lib
+ ['fwrite'] ;
+ ( Mndandanda chatsopano ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Palibe ; # means same lib
+ ['fwrite']
+),
+lumikizana-ndi: (
+ Mndandanda chatsopano ;
+ Palibe ; # means same lib
+ ['rewind'] ;
+ ( Mndandanda chatsopano ; ['pointer'] ) ;
+ ['int'] ;
+ Palibe ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> njira-ya-fayilo := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: njira-ya-fayilo mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream uthenga: ['fwrite'] zolowetsa: (Mndandanda chatsopano ; str ; 1 ; 6 ; fd ).
+Zotuluka lembani: bytes-written, mzere-watsopano.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob chatsopano: 20.
+
+# read from file
+>> bytes-read := Stream uthenga: ['fread'] zolowetsa: (Mndandanda chatsopano ; buf ; 1 ; 6 ; fd ).
+Zotuluka lembani: bytes-read, mzere-watsopano.
+Zotuluka lembani: buf, mzere-watsopano.
+
+# free memory
+str  masula.
+njira-ya-fayilo masula.
+mode masula.
+buf  masula.
+
+

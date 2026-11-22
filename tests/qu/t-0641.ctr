@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Simi-taqi musuq
+	# ASCII only
+	churay: ( Katiray musuq ; 65 ; 65 ; 65 ; 65 ; 0 ) maypi: ['AAAA'],
+	# valid 2 byte sequence
+	churay: ( Katiray musuq ; 194 ; 162 ; 0 ) maypi: ['¢'],
+	# Valid 3-byte UTF-8
+    churay: ( Katiray musuq ; 226 ; 130 ; 172 ; 0 ) maypi: ['€'],
+	# Valid 4-byte UTF-8
+    churay: ( Katiray musuq ; 240 ; 144 ; 141 ; 136 ; 0 ) maypi: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    churay: ( Katiray musuq ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) maypi: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    churay: ( Katiray musuq ; 65 ; 193 ; 129 ; 0 ) maypi: ['A?'],
+	# Invalid first byte (0xFF)
+    churay: ( Katiray musuq ; 255 ; 0 ) maypi: ['?'],
+	# Incomplete multi-byte sequence at end
+    churay: ( Katiray musuq ; 66 ; 226 ; 0 ) maypi: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    churay: ( Katiray musuq ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) maypi: ['A€?𐍈B'].
+	 
+utf8cases sapallanpaq: { :key :value
+	>> blob := Blob musuq: value hayka?, bytes: value.
+	>> str := blob qillqaman.
+	(str = key) chiqapqtin: {
+		Lluqsiy qillqay: ['OK'], sayay.
+	}, manahinaqa: {
+		Lluqsiy qillqay: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, sayay.
+	}.
+	blob kacharichiy.
+}.

@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Program memóriakezelés: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB új gazdagép: ['localhost'],
+	felhasználónév: ['xo'], jelszó: ['pass123'], adatbázisnév: ['xobase'], csatlakozik.
+
+>> TwoDigitFormat := Formátum új: ['%02d'].
+
+# Datetime
+{
+	>> év := Szám között: 1995 és: 2050, szöveg.
+	>> hónap := TwoDigitFormat alkalmaz-egész: (Szám között: 1 és: 12), szöveg.
+	>> nap := TwoDigitFormat alkalmaz-egész: (Szám között: 1 és: 28), szöveg.
+	>> óra := TwoDigitFormat alkalmaz-egész: (Szám között: 1 és: 23), szöveg.
+	>> perc := TwoDigitFormat alkalmaz-egész: (Szám között: 1 és: 59), szöveg.
+	>> másodperc := TwoDigitFormat alkalmaz-egész: (Szám között: 1 és: 59), szöveg.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: év,
+		MM: hónap,
+		DD: nap,
+		HH: óra,
+		II: perc,
+		SS: másodperc.
+	>> keresőparaméterek :=
+	db lekérdezés: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	lekér: { :row
+		(row mydatetime = datetime) hamis: {
+			ez-a-feladat hiba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter hozzáad: 1.
+} * 100.
+
+# Date
+{
+	>> év := Szám között: 1995 és: 2050, szöveg.
+	>> hónap := TwoDigitFormat alkalmaz-egész: (Szám között: 1 és: 12), szöveg.
+	>> nap := TwoDigitFormat alkalmaz-egész: (Szám között: 1 és: 28), szöveg.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: év,
+		MM: hónap,
+		DD: nap.
+	>> keresőparaméterek :=
+	db lekérdezés: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	lekér: { :row
+		(row mydate = date) hamis: {
+			ez-a-feladat hiba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter hozzáad: 1.
+} * 100.
+
+
+# Time
+{
+	>> óra := TwoDigitFormat alkalmaz-egész: (Szám között: 1 és: 23), szöveg.
+	>> perc := TwoDigitFormat alkalmaz-egész: (Szám között: 1 és: 59), szöveg.
+	>> másodperc := TwoDigitFormat alkalmaz-egész: (Szám között: 1 és: 59), szöveg.
+	>> idő := ['HH:II:SS'].
+	idő
+		HH: óra,
+		II: perc,
+		SS: másodperc.
+	>> keresőparaméterek :=
+	db lekérdezés: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: idő),
+	lekér: { :row
+		(row mytime = idő) hamis: {
+			ez-a-feladat hiba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter hozzáad: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lista új feltölt: 100000 ezzel: ['x'], összefűz: [''].
+{
+	>> str2 := Széf token: 40.
+	>> keresőparaméterek :=
+	db lekérdezés: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	lekér: { :row
+		(row str1 = str1 és: row str2 = str2) hamis: {
+			ez-a-feladat hiba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter hozzáad: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Szám között: 1 és: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 szövegből: ['9223372036854775807'] ) -
+		( Int64 szövegből: ['99999'] ) +
+		( Int64 szövegből: n1 szöveg )
+	).
+	>> keresőparaméterek :=
+	db lekérdezés: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	lekér: { :row
+		(row n1 = n1) hamis: {
+			ez-a-feladat hiba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) hamis: {
+			ez-a-feladat hiba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 kerekít) hamis: {
+			ez-a-feladat hiba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) hamis: {
+			ez-a-feladat hiba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter hozzáad: 1.
+} * 100.
+
+
+Kimenet ír: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), újsor.

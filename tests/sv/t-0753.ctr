@@ -1,0 +1,25 @@
+Utdata skriv: ['Test object'], stop.
+>> a := Objekt ny. 
+
+a vid: ['item:'] gör: { :fmt
+	egen fmt := fmt. 
+}.
+
+a vid: ['item'] gör: { <- egen fmt.
+}.
+
+a item: ( Format ny: ['|%s|'] ).
+
+Utdata skriv: a item, stop.
+
+>> old-fmt-address := a item prototyp minnesadress.
+a save-as: ['/tmp/a.bin'].
+Utdata skriv: ['========== RELOADING SNAP:'], stop.
+
+>> b := Objekt load-from: ['/tmp/a.bin'].
+
+(b item prototyp minnesadress = old-fmt-address) sann: {
+	Utdata skriv: ['Object link re-attached.'], stop.
+}.
+
+Utdata skriv: ( b item tillämpa: ['hello'] ), stop.

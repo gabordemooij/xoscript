@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Orodha mpya ;
+	# {"key":"normal"} normal ASCII
+	( Kamusi mpya weka: ['normal'] kwenye: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Kamusi mpya weka: ['hello world'] kwenye: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Kamusi mpya weka: ['"'] kwenye: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Kamusi mpya weka: ['backslash: \\'] kwenye: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Kamusi mpya weka: ['slash: /'] kwenye: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Kamusi mpya weka: ['backspace: \b'] kwenye: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Kamusi mpya weka: ['formfeed: \f'] kwenye: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Kamusi mpya weka: ['newline: \n'] kwenye: ['key'] ) ;
+	( Kamusi mpya weka: ['newline: ↵'] kwenye: ['key'] ) ;
+	( Kamusi mpya weka: ['newline: 
+	'] kwenye: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Kamusi mpya weka: ['carriage return: \r'] kwenye: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Kamusi mpya weka: ['tab \t'] kwenye: ['key'] ) ;
+	( Kamusi mpya weka: ['tab ⇿'] kwenye: ['key'] ) ;
+	( Kamusi mpya weka: ['tab  '] kwenye: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Kamusi mpya weka: ['NUL \u0000'] kwenye: ['key'] ) ;
+	( Kamusi mpya weka: ['NUL \0'] kwenye: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Kamusi mpya weka: ['control: \u0001'] kwenye: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Kamusi mpya weka: ['control: \u001F'] kwenye: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Kamusi mpya weka: ['unicode: é'] kwenye: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Kamusi mpya weka: ['unicode: €'] kwenye: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Kamusi mpya weka: ['unicode: 日本語'] kwenye: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Kamusi mpya weka: ['unicode: 😀'] kwenye: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Kamusi mpya weka: ['unicode: 🧑‍💻'] kwenye: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Kamusi mpya weka: ['combining: e\u0301'] kwenye: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Kamusi mpya weka: ['escaped unicode: \u00e9'] kwenye: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Kamusi mpya weka: ['escaped unicode: \u20ac'] kwenye: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Kamusi mpya weka: ['escaped unicode: \ud83d\ude00'] kwenye: ['key'] ) ;
+	# {"key":""} empty value
+	( Kamusi mpya weka: [''] kwenye: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Kamusi mpya weka: ['@ < > & = % + ? #'] kwenye: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Kamusi mpya weka: ['''] kwenye: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Kamusi mpya weka: ['multiple: \" \\ \n \r \t'] kwenye: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Kamusi mpya weka: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] kwenye: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Kamusi mpya weka: [' value'] kwenye: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Kamusi mpya weka: ['value '] kwenye: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Kamusi mpya weka: [' \t\n\r '] kwenye: ['key'] ).
+
+dicts kila: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Kamusi mpya weka: d key kwenye: ['key']).
+	>> b := JSON jsonify: (Kamusi mpya weka: ['value'] kwenye: d key).
+	>> e := JSON kipengee: a.
+	>> f := JSON kipengee: b.
+	((e key = d key na: (f ? d key = ['value'])) au: (e key = ['NUL ?'])) kweli: {
+		Towe andika: ['OK'], mstari-mpya.
+	}, vinginevyo: {
+		Towe andika: ['Unable to properly encode/decode: '] + d + j, mstari-mpya.
+		Programu maliza.
+	}.
+}.

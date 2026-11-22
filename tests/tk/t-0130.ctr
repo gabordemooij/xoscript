@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Programma sazlama: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server bagla: ( Sanaw täze ;
+ libname ; ['fopen'] ;
+ ( Sanaw täze ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+bagla: ( Sanaw täze ;
+ Boş ; # means same lib
+ ['fread'] ;
+ ( Sanaw täze ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Boş ; # means same object (i.e. Stream)
+ ['fread']
+),
+bagla: (
+ Sanaw täze ;
+ Boş ; # means same lib
+ ['fwrite'] ;
+ ( Sanaw täze ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Boş ; # means same lib
+ ['fwrite']
+),
+bagla: (
+ Sanaw täze ;
+ Boş ; # means same lib
+ ['rewind'] ;
+ ( Sanaw täze ; ['pointer'] ) ;
+ ['int'] ;
+ Boş ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> ýol := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: ýol mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream habar: ['fwrite'] argumentler: (Sanaw täze ; str ; 1 ; 6 ; fd ).
+Çykyş ýaz: bytes-written, täze-setir.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob täze: 20.
+
+# read from file
+>> bytes-read := Stream habar: ['fread'] argumentler: (Sanaw täze ; buf ; 1 ; 6 ; fd ).
+Çykyş ýaz: bytes-read, täze-setir.
+Çykyş ýaz: buf, täze-setir.
+
+# free memory
+str  boşat.
+ýol boşat.
+mode boşat.
+buf  boşat.
+
+

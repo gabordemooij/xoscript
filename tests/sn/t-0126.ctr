@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Chinhu nyowani.
+
+Slurp kana-zvasvika: ['nyowani'] ita: {
+	zvako str := [''].
+}.
+
+Slurp kana-zvasvika: ['nieuw'] ita: {
+	zvako str := [''].
+}.
+
+Slurp kana-zvasvika: ['pindura:'] ita: { :blah
+		zvako str wedzera-kumagumo: blah.
+}.
+
+Slurp kana-zvasvika: ['pindura:uye:'] ita: { :blah :blahah
+		zvako str wedzera-kumagumo: (blah kubva: 0 kureba: (blah kureba - 1)).
+		zvako str wedzera-kumagumo: [' '].
+		zvako str wedzera-kumagumo: blahah.
+}.
+
+Slurp kana-zvasvika: ['obtain'] ita: {
+	>> buffer := zvako str.
+	zvako str := ['']. <- buffer.
+}.
+
+
+Zvabuda nyora: (Chirongwa sisitimu: (Slurp nyowani echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Faira nyowani: ['/tmp/from.txt'], bvisa. } bata: { ['Empty']. }, tanga.
+{ Faira nyowani: ['/tmp/to.txt'], bvisa. } bata: { ['Empty']. }, tanga.
+
+
+Faira nyowani: ['/tmp/to.txt'], iripo nhema: {
+	Zvabuda nyora: ['Confirmed. Target file does not exist.\
+'].
+}.
+Faira nyowani: ['/tmp/from.txt'], iripo nhema: {
+	Zvabuda nyora: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Chirongwa sisitimu: (Slurp nyowani touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Chirongwa sisitimu: (Slurp nyowani cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Faira nyowani: ['/tmp/to.txt'], iripo chokwadi: {
+	Zvabuda nyora: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Zvabuda nyora: ['Contents of file is:'] + (Faira nyowani: ['/tmp/to.txt'], verenga), mutsara-mutsva.

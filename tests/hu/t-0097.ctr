@@ -1,0 +1,42 @@
+
+Szöveg ha: ['html'] tedd: { <- (
+		maga
+		csere: ['&'] erre: ['&amp;'],
+		csere: ['<'] erre: ['&lt;'],
+		csere: ['>'] erre: ['&gt;'],
+		csere: ['"'] erre: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objektum új.
+
+HtmlBrush ha: ['válaszol:'] tedd: { :tag
+	Kimenet ír: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush ha: ['válaszol:és:'] tedd: { :tag :content
+	tag := ( tag ettől: 0 hossz: (tag hossz - 1) ).
+	Kimenet ír: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush ha: ['content:'] tedd: { :text
+	Kimenet ír: text html, újsor.
+}.
+
+HtmlBrush ha: ['attr:value:'] tedd: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush új.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

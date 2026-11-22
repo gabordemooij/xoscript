@@ -1,0 +1,42 @@
+
+Inyandiko bigeze: ['html'] kora: { <- (
+		ubwacyo
+		simbuza: ['&'] na: ['&amp;'],
+		simbuza: ['<'] na: ['&lt;'],
+		simbuza: ['>'] na: ['&gt;'],
+		simbuza: ['"'] na: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Ikintu gishya.
+
+HtmlBrush bigeze: ['subiza:'] kora: { :tag
+	Ibisohoka andika: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush bigeze: ['subiza:na:'] kora: { :tag :content
+	tag := ( tag kuva: 0 uburebure: (tag uburebure - 1) ).
+	Ibisohoka andika: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush bigeze: ['content:'] kora: { :text
+	Ibisohoka andika: text html, umurongo-mushya.
+}.
+
+HtmlBrush bigeze: ['attr:value:'] kora: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush gishya.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

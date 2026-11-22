@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Программа хәтер-идарәсе: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB яңа хост: ['localhost'],
+	кулланучы-исеме: ['xo'], серсүз: ['pass123'], база-исеме: ['xobase'], тоташ.
+
+>> TwoDigitFormat := Формат яңа: ['%02d'].
+
+# Datetime
+{
+	>> ел := Сан арасында: 1995 һәм: 2050, текст.
+	>> ай := TwoDigitFormat куллан-бөтен: (Сан арасында: 1 һәм: 12), текст.
+	>> көн := TwoDigitFormat куллан-бөтен: (Сан арасында: 1 һәм: 28), текст.
+	>> сәгать := TwoDigitFormat куллан-бөтен: (Сан арасында: 1 һәм: 23), текст.
+	>> минут := TwoDigitFormat куллан-бөтен: (Сан арасында: 1 һәм: 59), текст.
+	>> секунд := TwoDigitFormat куллан-бөтен: (Сан арасында: 1 һәм: 59), текст.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: ел,
+		MM: ай,
+		DD: көн,
+		HH: сәгать,
+		II: минут,
+		SS: секунд.
+	>> эзләү-параметрлары :=
+	db сорау: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	алып-кил: { :row
+		(row mydatetime = datetime) ялган: {
+			бу-бирем хата: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter өстә: 1.
+} * 100.
+
+# Date
+{
+	>> ел := Сан арасында: 1995 һәм: 2050, текст.
+	>> ай := TwoDigitFormat куллан-бөтен: (Сан арасында: 1 һәм: 12), текст.
+	>> көн := TwoDigitFormat куллан-бөтен: (Сан арасында: 1 һәм: 28), текст.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: ел,
+		MM: ай,
+		DD: көн.
+	>> эзләү-параметрлары :=
+	db сорау: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	алып-кил: { :row
+		(row mydate = date) ялган: {
+			бу-бирем хата: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter өстә: 1.
+} * 100.
+
+
+# Time
+{
+	>> сәгать := TwoDigitFormat куллан-бөтен: (Сан арасында: 1 һәм: 23), текст.
+	>> минут := TwoDigitFormat куллан-бөтен: (Сан арасында: 1 һәм: 59), текст.
+	>> секунд := TwoDigitFormat куллан-бөтен: (Сан арасында: 1 һәм: 59), текст.
+	>> вакыт := ['HH:II:SS'].
+	вакыт
+		HH: сәгать,
+		II: минут,
+		SS: секунд.
+	>> эзләү-параметрлары :=
+	db сорау: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: вакыт),
+	алып-кил: { :row
+		(row mytime = вакыт) ялган: {
+			бу-бирем хата: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter өстә: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Тезмә яңа тутыру: 100000 белән: ['x'], берләштер: [''].
+{
+	>> str2 := Сейф токен: 40.
+	>> эзләү-параметрлары :=
+	db сорау: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	алып-кил: { :row
+		(row str1 = str1 һәм: row str2 = str2) ялган: {
+			бу-бирем хата: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter өстә: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Сан арасында: 1 һәм: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 тексттан: ['9223372036854775807'] ) -
+		( Int64 тексттан: ['99999'] ) +
+		( Int64 тексттан: n1 текст )
+	).
+	>> эзләү-параметрлары :=
+	db сорау: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	алып-кил: { :row
+		(row n1 = n1) ялган: {
+			бу-бирем хата: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) ялган: {
+			бу-бирем хата: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 түгәрәкләү) ялган: {
+			бу-бирем хата: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) ялган: {
+			бу-бирем хата: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter өстә: 1.
+} * 100.
+
+
+Чыгыш яз: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), яңа-юл.

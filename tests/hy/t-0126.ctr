@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Օբյեկտ նոր.
+
+Slurp ստանալիս: ['նոր'] կատարել: {
+	սեփական str := [''].
+}.
+
+Slurp ստանալիս: ['nieuw'] կատարել: {
+	սեփական str := [''].
+}.
+
+Slurp ստանալիս: ['պատասխանել:'] կատարել: { :blah
+		սեփական str ավելացնել-վերջում: blah.
+}.
+
+Slurp ստանալիս: ['պատասխանել:և:'] կատարել: { :blah :blahah
+		սեփական str ավելացնել-վերջում: (blah սկիզբ: 0 երկարություն: (blah երկարություն - 1)).
+		սեփական str ավելացնել-վերջում: [' '].
+		սեփական str ավելացնել-վերջում: blahah.
+}.
+
+Slurp ստանալիս: ['obtain'] կատարել: {
+	>> buffer := սեփական str.
+	սեփական str := ['']. <- buffer.
+}.
+
+
+Ելք գրել: (Ծրագիր համակարգ: (Slurp նոր echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Ֆայլ նոր: ['/tmp/from.txt'], ջնջել. } որսալ: { ['Empty']. }, գործարկել.
+{ Ֆայլ նոր: ['/tmp/to.txt'], ջնջել. } որսալ: { ['Empty']. }, գործարկել.
+
+
+Ֆայլ նոր: ['/tmp/to.txt'], գոյություն-ունի եթե-սխալ: {
+	Ելք գրել: ['Confirmed. Target file does not exist.\
+'].
+}.
+Ֆայլ նոր: ['/tmp/from.txt'], գոյություն-ունի եթե-սխալ: {
+	Ելք գրել: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Ծրագիր համակարգ: (Slurp նոր touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Ծրագիր համակարգ: (Slurp նոր cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Ֆայլ նոր: ['/tmp/to.txt'], գոյություն-ունի եթե-ճիշտ: {
+	Ելք գրել: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Ելք գրել: ['Contents of file is:'] + (Ֆայլ նոր: ['/tmp/to.txt'], կարդալ), նոր-տող.

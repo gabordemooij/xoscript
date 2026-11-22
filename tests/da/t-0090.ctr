@@ -1,0 +1,36 @@
+Uddata skriv: ['1,2,3,4,5,6,7,8,9,A,'], stop.
+>> Scope := Objekt ny.
+Scope ved: ['initialize:'] gør: { :x egen property := x. }.
+Scope ved: ['confirm'] gør: { Uddata skriv: [',']. }.
+Scope ved: ['test'] gør: {
+	Uddata skriv: egen property.
+	selv confirm.
+	( 1 = 1 ) sand: { Uddata skriv: egen property. selv confirm. }.
+	( 1 = 0 ) falsk: { Uddata skriv: egen property. selv confirm. }.
+	>> y := 2. { Uddata skriv: egen property. selv confirm. } mens: { y træk-fra: 1. <- (y > 0). }.
+	{ Uddata skriv: egen property. selv confirm. } × 1.
+	(Liste ← 1) hver: {  Uddata skriv: egen property. selv confirm. }.
+	#(List ← 1 ; 2) sort: {  Out write: own property. self confirm. <- 0. }. @todo impl own sorting, this test fails because diff. num iterations per platform
+	(Ordbog ny one: ['item']) hver: { Uddata skriv: egen property. selv confirm. }.
+	{ 1 ÷ 0. } fang: { Uddata skriv: egen property. selv confirm. }, start.
+	Uddata stop.
+}.
+>> scope1 := Scope ny.
+scope1 initialize: ['X'].
+scope1 test.
+>> function := { 
+	egen property := ['Y'].
+	Uddata skriv: egen property.
+	selv confirm.
+	( 1 = 1 ) sand: { Uddata skriv: egen property. selv confirm. }.
+	( 1 = 0 ) falsk: { Uddata skriv: egen property. selv confirm. }.
+	>> y := 2. { Uddata skriv: egen property. selv confirm. } mens: { y træk-fra: 1. <- (y > 0). }.
+	{ Uddata skriv: egen property. selv confirm. } × 1.
+	(Liste ← 1) hver: {  Uddata skriv: egen property. selv confirm. }.
+	#(List ← 1 ; 2) sort: {  Out write: own property. self confirm. <- 0. }.
+	(Ordbog ny one: ['item']) hver: { Uddata skriv: egen property. selv confirm. }.
+	{ 1 ÷ 0. } fang: { Uddata skriv: egen property. selv confirm. }, start.
+	Uddata stop.
+}.
+function ved: ['confirm'] gør: { Uddata skriv: [',']. }.
+function anvend: 1 og: 2.

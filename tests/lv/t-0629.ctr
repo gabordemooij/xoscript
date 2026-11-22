@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Izvade rakstīt: ['Database test'], jauna-rinda.
+
+>> db := Maria-DB jauns resursdators: ['localhost'],
+	lietotājs: ['xo'], parole: ['pass123'], datubāzes-nosaukums: ['xobase'], savienot.
+
+Izvade rakstīt: ['Can we connect? '] + db savienots?, jauna-rinda.
+
+>> meklēšanas-parametri := db vaicājums: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametri: ( Saraksts jauns ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  meklēšanas-parametri izpildīt. db apstiprināt. } tvert: { :e db atcelt.  }, palaist.
+
+Izvade rakstīt: ['Can we insert? '] + ( meklēšanas-parametri insert-id > 0 ), jauna-rinda.
+
+>> Obj := Objekts jauns.
+Obj kad: ['retrieve-rows'] darīt: {
+	savs skaits := 0.
+	>> meklēšanas-parametri :=
+	db vaicājums: ['SELECT * FROM book order by id desc limit 2'], 
+	iegūt: { :row 
+		savs skaits pieskaitīt: 1.
+		Patiess pārtraukt.
+	}. <- savs skaits kopēt.
+}.
+
+Izvade rakstīt: ['Can we query? '] + ( Obj retrieve-rows > 0 ), jauna-rinda.

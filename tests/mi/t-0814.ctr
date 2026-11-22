@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server whakarite.
+Papatono whakamahi: ['../../../src/xo/mi/webtools.xo'].
+
+>> Fake-Request := Ahanoa hou.
+Fake-Request ina-tae: ['value:'] mahia: { :uara
+	ake uara := uara.
+}.
+Fake-Request ina-tae: ['cookie:'] mahia: { :ingoa <- ake uara.
+}.
+
+>> Test-Session := Wāhanga-kōnae-poto hou.
+Test-Session ina-tae: ['uta'] mahia: { <- Papakupu hou.
+}.
+Test-Session ina-tae: ['session-id'] mahia: { <- ake id.
+}.
+
+>> cookies := Rārangi hou
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies ia: { :i :cookie
+	>> tono-http := Fake-Request hou.
+	tono-http value: cookie.
+	>> kaiwhakahaere := Test-Session hou.
+	>> web := Tuhinga-Ipurangi hou.
+	web tono-http: tono-http.
+	web kaiwhakahaere-wāhanga: kaiwhakahaere.
+	web tīmata-wāhanga.
+	Huaputa tuhi: ( kaiwhakahaere session-id = cookie ), rārangi-hou.
+}.
+
+>> web := Tuhinga-Ipurangi hou.
+web json: (Papakupu hou tuku: ['b'] kei: ['a']).
+Huaputa tuhi: ['\n'], rārangi-hou.
+
+{ Whatunga get: ['file:///etc/hostname']. } hopu: { :e
+	Huaputa tuhi: e, rārangi-hou.
+}, tīmata.
+
+>> svg := Kōnae hou: ['/tmp/test0814.svg'].
+svg tuhi: ['<svg xmlns="x"></svg>'].
+Huaputa rārangi-hou.
+Server whakawhiti: ['test0814.svg'] kuhimua: ['/tmp/'].
+svg muku.

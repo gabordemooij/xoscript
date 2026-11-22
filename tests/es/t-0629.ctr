@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Salida escribir: ['Database test'], detener.
+
+>> db := Maria-DB crear host: ['localhost'],
+	usuario: ['xo'], contraseña: ['pass123'], nombre-base-datos: ['xobase'], conectar.
+
+Salida escribir: ['Can we connect? '] + db ¿conectado?, detener.
+
+>> consulta := db consultar: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parámetros: ( Lista crear ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  consulta ejecutar. db confirmar. } capturar: { :e db revertir.  }, empezar.
+
+Salida escribir: ['Can we insert? '] + ( consulta id-insertado > 0 ), detener.
+
+>> Obj := Objeto crear.
+Obj al: ['retrieve-rows'] hacer: {
+	mi contar := 0.
+	>> consulta :=
+	db consultar: ['SELECT * FROM book order by id desc limit 2'], 
+	extraer: { :row 
+		mi contar añadir: 1.
+		Verdadero salir.
+	}. <- mi contar copiar.
+}.
+
+Salida escribir: ['Can we query? '] + ( Obj retrieve-rows > 0 ), detener.

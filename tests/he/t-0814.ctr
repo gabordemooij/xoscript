@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server אתחל.
+תוכנית השתמש: ⌝'../../../src/xo/he/webtools.xo'⌜.
+
+>> Fake-Request := אובייקט חדש.
+Fake-Request בקבלת: ⌝'value:'⌜ בצע: ⎬ :ערך
+	שלי ערך := ערך.
+⎨.
+Fake-Request בקבלת: ⌝'cookie:'⌜ בצע: ⎬ :שם <- שלי ערך.
+⎨.
+
+>> Test-Session := הפעלה-קובץ-זמני חדש.
+Test-Session בקבלת: ⌝'טען'⌜ בצע: ⎬ <- מילון חדש.
+⎨.
+Test-Session בקבלת: ⌝'session-id'⌜ בצע: ⎬ <- שלי id.
+⎨.
+
+>> cookies := רשימה חדש
+	; ⌝'abc123'⌜
+	; ⌝'../outside'⌜
+	; ⌝''⌜
+	; ⌝'abc\n'⌜.
+
+cookies לכל: ⎬ :i :cookie
+	>> בקשת-http := Fake-Request חדש.
+	בקשת-http value: cookie.
+	>> מנהל := Test-Session חדש.
+	>> web := מסמך-רשת חדש.
+	web בקשת-http: בקשת-http.
+	web מנהל-הפעלות: מנהל.
+	web התחל-הפעלה.
+	פלט כתוב: ﴿ מנהל session-id = cookie ﴾, שורה-חדשה.
+⎨.
+
+>> web := מסמך-רשת חדש.
+web json: ﴿מילון חדש שים: ⌝'b'⌜ במפתח: ⌝'a'⌜﴾.
+פלט כתוב: ⌝'\n'⌜, שורה-חדשה.
+
+⎬ רשת get: ⌝'file:///etc/hostname'⌜. ⎨ תפוס: ⎬ :e
+	פלט כתוב: e, שורה-חדשה.
+⎨, הפעל.
+
+>> svg := קובץ חדש: ⌝'/tmp/test0814.svg'⌜.
+svg כתוב: ⌝'<svg xmlns="x"></svg>'⌜.
+פלט שורה-חדשה.
+Server העבר: ⌝'test0814.svg'⌜ קידומת: ⌝'/tmp/'⌜.
+svg מחק.

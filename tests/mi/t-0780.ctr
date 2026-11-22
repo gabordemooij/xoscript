@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Rārangi hou ;
+	# {"key":"normal"} normal ASCII
+	( Papakupu hou tuku: ['normal'] kei: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Papakupu hou tuku: ['hello world'] kei: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Papakupu hou tuku: ['"'] kei: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Papakupu hou tuku: ['backslash: \\'] kei: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Papakupu hou tuku: ['slash: /'] kei: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Papakupu hou tuku: ['backspace: \b'] kei: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Papakupu hou tuku: ['formfeed: \f'] kei: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Papakupu hou tuku: ['newline: \n'] kei: ['key'] ) ;
+	( Papakupu hou tuku: ['newline: ↵'] kei: ['key'] ) ;
+	( Papakupu hou tuku: ['newline: 
+	'] kei: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Papakupu hou tuku: ['carriage return: \r'] kei: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Papakupu hou tuku: ['tab \t'] kei: ['key'] ) ;
+	( Papakupu hou tuku: ['tab ⇿'] kei: ['key'] ) ;
+	( Papakupu hou tuku: ['tab  '] kei: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Papakupu hou tuku: ['NUL \u0000'] kei: ['key'] ) ;
+	( Papakupu hou tuku: ['NUL \0'] kei: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Papakupu hou tuku: ['control: \u0001'] kei: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Papakupu hou tuku: ['control: \u001F'] kei: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Papakupu hou tuku: ['unicode: é'] kei: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Papakupu hou tuku: ['unicode: €'] kei: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Papakupu hou tuku: ['unicode: 日本語'] kei: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Papakupu hou tuku: ['unicode: 😀'] kei: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Papakupu hou tuku: ['unicode: 🧑‍💻'] kei: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Papakupu hou tuku: ['combining: e\u0301'] kei: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Papakupu hou tuku: ['escaped unicode: \u00e9'] kei: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Papakupu hou tuku: ['escaped unicode: \u20ac'] kei: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Papakupu hou tuku: ['escaped unicode: \ud83d\ude00'] kei: ['key'] ) ;
+	# {"key":""} empty value
+	( Papakupu hou tuku: [''] kei: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Papakupu hou tuku: ['@ < > & = % + ? #'] kei: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Papakupu hou tuku: ['''] kei: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Papakupu hou tuku: ['multiple: \" \\ \n \r \t'] kei: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Papakupu hou tuku: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] kei: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Papakupu hou tuku: [' value'] kei: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Papakupu hou tuku: ['value '] kei: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Papakupu hou tuku: [' \t\n\r '] kei: ['key'] ).
+
+dicts ia: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Papakupu hou tuku: d key kei: ['key']).
+	>> b := JSON jsonify: (Papakupu hou tuku: ['value'] kei: d key).
+	>> e := JSON ahanoa: a.
+	>> f := JSON ahanoa: b.
+	((e key = d key a: (f ? d key = ['value'])) ranei: (e key = ['NUL ?'])) pono: {
+		Huaputa tuhi: ['OK'], rārangi-hou.
+	}, ki-te-kore: {
+		Huaputa tuhi: ['Unable to properly encode/decode: '] + d + j, rārangi-hou.
+		Papatono mutu.
+	}.
+}.

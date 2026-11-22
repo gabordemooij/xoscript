@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Програм управљање-меморијом: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB нови домаћин: ['localhost'],
+	корисник: ['xo'], лозинка: ['pass123'], назив-базе: ['xobase'], повежи-се.
+
+>> TwoDigitFormat := Формат нови: ['%02d'].
+
+# Datetime
+{
+	>> година := Број између: 1995 и: 2050, текст.
+	>> месец := TwoDigitFormat примени-цео: (Број између: 1 и: 12), текст.
+	>> дан := TwoDigitFormat примени-цео: (Број између: 1 и: 28), текст.
+	>> сат := TwoDigitFormat примени-цео: (Број између: 1 и: 23), текст.
+	>> минут := TwoDigitFormat примени-цео: (Број између: 1 и: 59), текст.
+	>> секунда := TwoDigitFormat примени-цео: (Број између: 1 и: 59), текст.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: година,
+		MM: месец,
+		DD: дан,
+		HH: сат,
+		II: минут,
+		SS: секунда.
+	>> параметри-претраге :=
+	db упит: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	преузми: { :row
+		(row mydatetime = datetime) нетачно: {
+			овај-задатак грешка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter додај: 1.
+} * 100.
+
+# Date
+{
+	>> година := Број између: 1995 и: 2050, текст.
+	>> месец := TwoDigitFormat примени-цео: (Број између: 1 и: 12), текст.
+	>> дан := TwoDigitFormat примени-цео: (Број између: 1 и: 28), текст.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: година,
+		MM: месец,
+		DD: дан.
+	>> параметри-претраге :=
+	db упит: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	преузми: { :row
+		(row mydate = date) нетачно: {
+			овај-задатак грешка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter додај: 1.
+} * 100.
+
+
+# Time
+{
+	>> сат := TwoDigitFormat примени-цео: (Број између: 1 и: 23), текст.
+	>> минут := TwoDigitFormat примени-цео: (Број између: 1 и: 59), текст.
+	>> секунда := TwoDigitFormat примени-цео: (Број између: 1 и: 59), текст.
+	>> време := ['HH:II:SS'].
+	време
+		HH: сат,
+		II: минут,
+		SS: секунда.
+	>> параметри-претраге :=
+	db упит: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: време),
+	преузми: { :row
+		(row mytime = време) нетачно: {
+			овај-задатак грешка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter додај: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Листа нови попуни: 100000 са: ['x'], споји: [''].
+{
+	>> str2 := Сеф токен: 40.
+	>> параметри-претраге :=
+	db упит: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	преузми: { :row
+		(row str1 = str1 и: row str2 = str2) нетачно: {
+			овај-задатак грешка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter додај: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Број између: 1 и: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 из-текста: ['9223372036854775807'] ) -
+		( Int64 из-текста: ['99999'] ) +
+		( Int64 из-текста: n1 текст )
+	).
+	>> параметри-претраге :=
+	db упит: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	преузми: { :row
+		(row n1 = n1) нетачно: {
+			овај-задатак грешка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) нетачно: {
+			овај-задатак грешка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 заокружи) нетачно: {
+			овај-задатак грешка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) нетачно: {
+			овај-задатак грешка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter додај: 1.
+} * 100.
+
+
+Излаз пиши: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), нови-ред.

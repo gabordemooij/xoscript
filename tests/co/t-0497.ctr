@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := Schedariu novu: ['/tmp/test.gif'].
+f scrive: ['GIF87a01234567810'].
+
+# serve the file
+Server trasmette: ['test.gif'] prefissu: ['/tmp/'].
+
+Esciuta linea-nova.
+
+Esciuta scrive: ['Outside container (security):'], linea-nova.
+{ Server trasmette: ['../passwd'] prefissu: ['/tmp/']. }
+catturà: { :e Esciuta scrive: e, linea-nova. },
+lancià.
+
+Esciuta scrive: ['Invalid prefix:'], linea-nova.
+{ Server trasmette: ['test.gif'] prefissu: ['z:\\']. }
+catturà: { :e Esciuta scrive: e, linea-nova. },
+lancià.
+
+Esciuta scrive: ['Non-existant file:'], linea-nova.
+{ Server trasmette: ['xxx.xxx'] prefissu: ['/tmp/']. }
+catturà: { :e Esciuta scrive: e, linea-nova. },
+lancià.

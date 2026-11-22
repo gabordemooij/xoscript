@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Nkhokwe-yotetezedwa panga-makiyi.
+>> sk := keys choyamba.
+>> pk := keys chomaliza.
+>> sig := Nkhokwe-yotetezedwa saina: ['abc'] ndi: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Nkhokwe-yotetezedwa saina: ['abc'] ndi: long. } gwira: { :e
+	Zotuluka lembani: e, mzere-watsopano.
+}, yamba.
+
+{ Nkhokwe-yotetezedwa onani: ['abc'] siginecha: long ndi: pk. } gwira: { :e
+	Zotuluka lembani: e, mzere-watsopano.
+}, yamba.
+
+{ Nkhokwe-yotetezedwa onani: ['abc'] siginecha: sig ndi: short. } gwira: { :e
+	Zotuluka lembani: e, mzere-watsopano.
+}, yamba.

@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programa pagdumala-sa-panumduman: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB bag-o host: ['localhost'],
+	ngalan-sa-user: ['xo'], password: ['pass123'], ngalan-sa-database: ['xobase'], sumpay.
+
+>> TwoDigitFormat := Porma bag-o: ['%02d'].
+
+# Datetime
+{
+	>> tuig := Numero sa-taliwala: 1995 ug: 2050, teksto.
+	>> bulan := TwoDigitFormat ipadapat-tibuok-numero: (Numero sa-taliwala: 1 ug: 12), teksto.
+	>> adlaw := TwoDigitFormat ipadapat-tibuok-numero: (Numero sa-taliwala: 1 ug: 28), teksto.
+	>> oras := TwoDigitFormat ipadapat-tibuok-numero: (Numero sa-taliwala: 1 ug: 23), teksto.
+	>> minuto := TwoDigitFormat ipadapat-tibuok-numero: (Numero sa-taliwala: 1 ug: 59), teksto.
+	>> segundo := TwoDigitFormat ipadapat-tibuok-numero: (Numero sa-taliwala: 1 ug: 59), teksto.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: tuig,
+		MM: bulan,
+		DD: adlaw,
+		HH: oras,
+		II: minuto,
+		SS: segundo.
+	>> parametro-sa-pagpangita :=
+	db pangutana: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	kuhaa: { :row
+		(row mydatetime = datetime) bakak: {
+			kining-buluhaton sayup: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter idugang: 1.
+} * 100.
+
+# Date
+{
+	>> tuig := Numero sa-taliwala: 1995 ug: 2050, teksto.
+	>> bulan := TwoDigitFormat ipadapat-tibuok-numero: (Numero sa-taliwala: 1 ug: 12), teksto.
+	>> adlaw := TwoDigitFormat ipadapat-tibuok-numero: (Numero sa-taliwala: 1 ug: 28), teksto.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: tuig,
+		MM: bulan,
+		DD: adlaw.
+	>> parametro-sa-pagpangita :=
+	db pangutana: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	kuhaa: { :row
+		(row mydate = date) bakak: {
+			kining-buluhaton sayup: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter idugang: 1.
+} * 100.
+
+
+# Time
+{
+	>> oras := TwoDigitFormat ipadapat-tibuok-numero: (Numero sa-taliwala: 1 ug: 23), teksto.
+	>> minuto := TwoDigitFormat ipadapat-tibuok-numero: (Numero sa-taliwala: 1 ug: 59), teksto.
+	>> segundo := TwoDigitFormat ipadapat-tibuok-numero: (Numero sa-taliwala: 1 ug: 59), teksto.
+	>> oras-karon := ['HH:II:SS'].
+	oras-karon
+		HH: oras,
+		II: minuto,
+		SS: segundo.
+	>> parametro-sa-pagpangita :=
+	db pangutana: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: oras-karon),
+	kuhaa: { :row
+		(row mytime = oras-karon) bakak: {
+			kining-buluhaton sayup: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter idugang: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lista bag-o pun-on: 100000 sa: ['x'], hiusaha: [''].
+{
+	>> str2 := Kaha token: 40.
+	>> parametro-sa-pagpangita :=
+	db pangutana: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	kuhaa: { :row
+		(row str1 = str1 ug: row str2 = str2) bakak: {
+			kining-buluhaton sayup: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter idugang: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Numero sa-taliwala: 1 ug: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 gikan-sa-teksto: ['9223372036854775807'] ) -
+		( Int64 gikan-sa-teksto: ['99999'] ) +
+		( Int64 gikan-sa-teksto: n1 teksto )
+	).
+	>> parametro-sa-pagpangita :=
+	db pangutana: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	kuhaa: { :row
+		(row n1 = n1) bakak: {
+			kining-buluhaton sayup: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) bakak: {
+			kining-buluhaton sayup: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 lingina) bakak: {
+			kining-buluhaton sayup: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) bakak: {
+			kining-buluhaton sayup: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter idugang: 1.
+} * 100.
+
+
+Gawas isulat: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), bag-ong-linya.

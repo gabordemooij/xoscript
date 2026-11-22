@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Urutonde gishya ;
+	# {"key":"normal"} normal ASCII
+	( Inkoranyamagambo gishya shyira: ['normal'] kuri: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Inkoranyamagambo gishya shyira: ['hello world'] kuri: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Inkoranyamagambo gishya shyira: ['"'] kuri: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Inkoranyamagambo gishya shyira: ['backslash: \\'] kuri: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Inkoranyamagambo gishya shyira: ['slash: /'] kuri: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Inkoranyamagambo gishya shyira: ['backspace: \b'] kuri: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Inkoranyamagambo gishya shyira: ['formfeed: \f'] kuri: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Inkoranyamagambo gishya shyira: ['newline: \n'] kuri: ['key'] ) ;
+	( Inkoranyamagambo gishya shyira: ['newline: ↵'] kuri: ['key'] ) ;
+	( Inkoranyamagambo gishya shyira: ['newline: 
+	'] kuri: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Inkoranyamagambo gishya shyira: ['carriage return: \r'] kuri: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Inkoranyamagambo gishya shyira: ['tab \t'] kuri: ['key'] ) ;
+	( Inkoranyamagambo gishya shyira: ['tab ⇿'] kuri: ['key'] ) ;
+	( Inkoranyamagambo gishya shyira: ['tab  '] kuri: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Inkoranyamagambo gishya shyira: ['NUL \u0000'] kuri: ['key'] ) ;
+	( Inkoranyamagambo gishya shyira: ['NUL \0'] kuri: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Inkoranyamagambo gishya shyira: ['control: \u0001'] kuri: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Inkoranyamagambo gishya shyira: ['control: \u001F'] kuri: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Inkoranyamagambo gishya shyira: ['unicode: é'] kuri: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Inkoranyamagambo gishya shyira: ['unicode: €'] kuri: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Inkoranyamagambo gishya shyira: ['unicode: 日本語'] kuri: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Inkoranyamagambo gishya shyira: ['unicode: 😀'] kuri: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Inkoranyamagambo gishya shyira: ['unicode: 🧑‍💻'] kuri: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Inkoranyamagambo gishya shyira: ['combining: e\u0301'] kuri: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Inkoranyamagambo gishya shyira: ['escaped unicode: \u00e9'] kuri: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Inkoranyamagambo gishya shyira: ['escaped unicode: \u20ac'] kuri: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Inkoranyamagambo gishya shyira: ['escaped unicode: \ud83d\ude00'] kuri: ['key'] ) ;
+	# {"key":""} empty value
+	( Inkoranyamagambo gishya shyira: [''] kuri: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Inkoranyamagambo gishya shyira: ['@ < > & = % + ? #'] kuri: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Inkoranyamagambo gishya shyira: ['''] kuri: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Inkoranyamagambo gishya shyira: ['multiple: \" \\ \n \r \t'] kuri: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Inkoranyamagambo gishya shyira: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] kuri: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Inkoranyamagambo gishya shyira: [' value'] kuri: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Inkoranyamagambo gishya shyira: ['value '] kuri: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Inkoranyamagambo gishya shyira: [' \t\n\r '] kuri: ['key'] ).
+
+dicts buri: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Inkoranyamagambo gishya shyira: d key kuri: ['key']).
+	>> b := JSON jsonify: (Inkoranyamagambo gishya shyira: ['value'] kuri: d key).
+	>> e := JSON ikintu: a.
+	>> f := JSON ikintu: b.
+	((e key = d key na: (f ? d key = ['value'])) cyangwa: (e key = ['NUL ?'])) ukuri: {
+		Ibisohoka andika: ['OK'], umurongo-mushya.
+	}, bitabaye-ibyo: {
+		Ibisohoka andika: ['Unable to properly encode/decode: '] + d + j, umurongo-mushya.
+		Gahunda soza.
+	}.
+}.

@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Loend uus ;
+	# {"key":"normal"} normal ASCII
+	( Sõnastik uus pane: ['normal'] kohale: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Sõnastik uus pane: ['hello world'] kohale: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Sõnastik uus pane: ['"'] kohale: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Sõnastik uus pane: ['backslash: \\'] kohale: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Sõnastik uus pane: ['slash: /'] kohale: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Sõnastik uus pane: ['backspace: \b'] kohale: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Sõnastik uus pane: ['formfeed: \f'] kohale: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Sõnastik uus pane: ['newline: \n'] kohale: ['key'] ) ;
+	( Sõnastik uus pane: ['newline: ↵'] kohale: ['key'] ) ;
+	( Sõnastik uus pane: ['newline: 
+	'] kohale: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Sõnastik uus pane: ['carriage return: \r'] kohale: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Sõnastik uus pane: ['tab \t'] kohale: ['key'] ) ;
+	( Sõnastik uus pane: ['tab ⇿'] kohale: ['key'] ) ;
+	( Sõnastik uus pane: ['tab  '] kohale: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Sõnastik uus pane: ['NUL \u0000'] kohale: ['key'] ) ;
+	( Sõnastik uus pane: ['NUL \0'] kohale: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Sõnastik uus pane: ['control: \u0001'] kohale: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Sõnastik uus pane: ['control: \u001F'] kohale: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Sõnastik uus pane: ['unicode: é'] kohale: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Sõnastik uus pane: ['unicode: €'] kohale: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Sõnastik uus pane: ['unicode: 日本語'] kohale: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Sõnastik uus pane: ['unicode: 😀'] kohale: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Sõnastik uus pane: ['unicode: 🧑‍💻'] kohale: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Sõnastik uus pane: ['combining: e\u0301'] kohale: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Sõnastik uus pane: ['escaped unicode: \u00e9'] kohale: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Sõnastik uus pane: ['escaped unicode: \u20ac'] kohale: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Sõnastik uus pane: ['escaped unicode: \ud83d\ude00'] kohale: ['key'] ) ;
+	# {"key":""} empty value
+	( Sõnastik uus pane: [''] kohale: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Sõnastik uus pane: ['@ < > & = % + ? #'] kohale: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Sõnastik uus pane: ['''] kohale: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Sõnastik uus pane: ['multiple: \" \\ \n \r \t'] kohale: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Sõnastik uus pane: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] kohale: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Sõnastik uus pane: [' value'] kohale: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Sõnastik uus pane: ['value '] kohale: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Sõnastik uus pane: [' \t\n\r '] kohale: ['key'] ).
+
+dicts iga: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Sõnastik uus pane: d key kohale: ['key']).
+	>> b := JSON jsonify: (Sõnastik uus pane: ['value'] kohale: d key).
+	>> e := JSON objekt: a.
+	>> f := JSON objekt: b.
+	((e key = d key ja: (f ? d key = ['value'])) või: (e key = ['NUL ?'])) tõsi: {
+		Väljund kirjuta: ['OK'], reavahetus.
+	}, muidu: {
+		Väljund kirjuta: ['Unable to properly encode/decode: '] + d + j, reavahetus.
+		Programm lõpp.
+	}.
+}.

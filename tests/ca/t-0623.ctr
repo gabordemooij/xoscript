@@ -1,0 +1,43 @@
+
+
+>> g := Server nou.
+>> v := Caixa-forta nou.
+>> ok := 0.
+
+>> secrets := Llista nou ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets copia.
+passwords cada: { :i :p
+	secrets cada: { :n :s
+		{
+			>> encrypted := v xifra: s clau: p.
+			>> decrypted := v desxifra: encrypted clau: p.
+			(decrypted = s) cert: {
+				ok suma: 1.
+			}, si-no: {
+				Sortida escriu: ['failed encrypting/decrypting: '], salt-de-línia.
+				Sortida escriu: s, salt-de-línia.
+				Sortida escriu: ['encrypted: '] + encrypted, salt-de-línia.
+				Sortida escriu: ['decrypted: '] + encrypted, salt-de-línia.
+				Programa final.
+			}.
+		} captura: { :err
+			(s = [''] o: p = ['']) cert: {
+				ok suma: 1.
+			}, si-no: {
+				Sortida escriu: err, salt-de-línia.
+				Programa final.
+			}.
+		}, inicia.
+	}.
+}.
+
+Sortida escriu: ( ok + [' vault encryptions tested.'] ), salt-de-línia.

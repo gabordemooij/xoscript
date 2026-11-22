@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB жаңы хост: ['localhost'],
+	колдонуучу-аты: ['xo'],
+	сырсөз: ['pass123'],
+	маалымат-базасынын-аты: ['xobase'],
+	туташуу.
+
+>> conn2 := Maria-DB жаңы хост: ['localhost'],
+	колдонуучу-аты: ['xo'],
+	сырсөз: ['pass123'],
+	маалымат-базасынын-аты: ['xobase'],
+	туташуу.
+#...
+>> del := conn1 суроо-талап: ['DELETE FROM book WHERE id > 0'].
+{  del аткаруу. conn1 бекитүү. } кармоо: { :e conn1 артка-кайтаруу.  }, иштетүү.
+
+>> insert := conn1 суроо-талап: ['INSERT INTO book (id) VALUES(null)'].
+insert аткаруу.
+
+>> саны := conn1 суроо-талап: ['SELECT COUNT(*) AS num FROM book'].
+саны алуу: { :row Чыгаруу жазуу: row num, жаңы-сап. }.
+
+# does not show up
+# insert not committed on connection 1
+>> саны := conn2 суроо-талап: ['SELECT COUNT(*) AS num FROM book'].
+саны алуу: { :row Чыгаруу жазуу: row num, жаңы-сап. }.

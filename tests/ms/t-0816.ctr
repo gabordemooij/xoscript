@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> cuba := { :format :value
+	{ Keluaran tulis: ( (Format baharu: format) gunakan-pada: value ), baris-baharu. } tangkap: { :e Keluaran tulis: e, baris-baharu. }, mula.
+}.
+>> try-int := { :format :value
+	{ Keluaran tulis: ( (Format baharu: format) gunakan-pada-integer: value ), baris-baharu. } tangkap: { :e Keluaran tulis: e, baris-baharu. }, mula.
+}.
+
+# fits
+cuba gunakan-pada: ['|%s|'] dan: ['text'].
+cuba gunakan-pada: ['%06.2f'] dan: 5.5.
+cuba gunakan-pada: ['100%% %s'] dan: ['sure'].
+try-int gunakan-pada: ['%03d'] dan: 7.
+try-int gunakan-pada: ['%x'] dan: 255.
+cuba gunakan-pada: ['%d'] dan: (Int64 baharu daripada-teks: ['12']).
+cuba gunakan-pada: ['%lld'] dan: (Int64 baharu daripada-teks: ['12']).
+cuba gunakan-pada: ['%.1lf'] dan: 5.5.
+try-int gunakan-pada: ['%hd'] dan: 7.
+
+# does not fit
+cuba gunakan-pada: ['%s'] dan: 12345.
+cuba gunakan-pada: ['%d'] dan: 12345.
+cuba gunakan-pada: ['%f'] dan: ['text'].
+try-int gunakan-pada: ['%d'] dan: ['text'].
+try-int gunakan-pada: ['%s'] dan: 5.
+cuba gunakan-pada: ['%s %s'] dan: ['text'].
+cuba gunakan-pada: ['%n'] dan: ['text'].
+cuba gunakan-pada: ['%*s'] dan: ['text'].
+cuba gunakan-pada: ['%'] dan: ['text'].
+
+# length modifier does not fit
+cuba gunakan-pada: ['%ls'] dan: ['text'].
+cuba gunakan-pada: ['%Lf'] dan: 5.5.
+try-int gunakan-pada: ['%ld'] dan: 7.
+try-int gunakan-pada: ['%lld'] dan: 7.
+cuba gunakan-pada: ['%Ld'] dan: (Int64 baharu daripada-teks: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+cuba gunakan-pada: ['%99999999999s'] dan: ['text'].

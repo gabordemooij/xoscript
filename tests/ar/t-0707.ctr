@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+برنامج إدارة-الذاكرة: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB جديد مضيف: ⌝'localhost'⌜,
+	اسم-المستخدم: ⌝'xo'⌜, كلمة-السر: ⌝'pass123'⌜, اسم-القاعدة: ⌝'xobase'⌜, اتصل.
+
+>> TwoDigitFormat := تنسيق جديد: ⌝'%02d'⌜.
+
+# Datetime
+⎬
+	>> سنة := عدد بين: 1995 وبين: 2050, كنص.
+	>> شهر := TwoDigitFormat طبق-صحيح: ﴿عدد بين: 1 وبين: 12﴾, كنص.
+	>> يوم := TwoDigitFormat طبق-صحيح: ﴿عدد بين: 1 وبين: 28﴾, كنص.
+	>> ساعة := TwoDigitFormat طبق-صحيح: ﴿عدد بين: 1 وبين: 23﴾, كنص.
+	>> دقيقة := TwoDigitFormat طبق-صحيح: ﴿عدد بين: 1 وبين: 59﴾, كنص.
+	>> ثانية := TwoDigitFormat طبق-صحيح: ﴿عدد بين: 1 وبين: 59﴾, كنص.
+	>> datetime := ⌝'YYYY-MM-DD HH:II:SS'⌜.	
+	datetime
+		YYYY: سنة,
+		MM: شهر,
+		DD: يوم,
+		HH: ساعة,
+		II: دقيقة,
+		SS: ثانية.
+	>> معاملات-البحث :=
+	db استعلام: ﴿⌝'
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'⌜ <datetime>: datetime﴾,
+	اجلب: ⎬ :row
+		﴿row mydatetime = datetime﴾ إذا-خطأ: ⎬
+			هذه-المهمة خطأ-مخرج: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mydatetime
+			﴾.
+		⎨.
+	
+	⎨.
+	counter أضف: 1.
+⎨ * 100.
+
+# Date
+⎬
+	>> سنة := عدد بين: 1995 وبين: 2050, كنص.
+	>> شهر := TwoDigitFormat طبق-صحيح: ﴿عدد بين: 1 وبين: 12﴾, كنص.
+	>> يوم := TwoDigitFormat طبق-صحيح: ﴿عدد بين: 1 وبين: 28﴾, كنص.
+	>> date := ⌝'YYYY-MM-DD'⌜.
+	date
+		YYYY: سنة,
+		MM: شهر,
+		DD: يوم.
+	>> معاملات-البحث :=
+	db استعلام: ﴿⌝'
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'⌜ <date>: date﴾,
+	اجلب: ⎬ :row
+		﴿row mydate = date﴾ إذا-خطأ: ⎬
+			هذه-المهمة خطأ-مخرج: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: date,
+				<observation>: row mydate
+			﴾.
+		⎨.
+	⎨.
+	counter أضف: 1.
+⎨ * 100.
+
+
+# Time
+⎬
+	>> ساعة := TwoDigitFormat طبق-صحيح: ﴿عدد بين: 1 وبين: 23﴾, كنص.
+	>> دقيقة := TwoDigitFormat طبق-صحيح: ﴿عدد بين: 1 وبين: 59﴾, كنص.
+	>> ثانية := TwoDigitFormat طبق-صحيح: ﴿عدد بين: 1 وبين: 59﴾, كنص.
+	>> وقت := ⌝'HH:II:SS'⌜.
+	وقت
+		HH: ساعة,
+		II: دقيقة,
+		SS: ثانية.
+	>> معاملات-البحث :=
+	db استعلام: ﴿⌝'
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'⌜ <time>: وقت﴾,
+	اجلب: ⎬ :row
+		﴿row mytime = وقت﴾ إذا-خطأ: ⎬
+			هذه-المهمة خطأ-مخرج: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter أضف: 1.
+⎨ * 100.
+
+
+# Strings (varchar/text)
+>> str1 := قائمة جديد املأ: 100000 بقيمة: ⌝'x'⌜, ادمج: ⌝''⌜.
+⎬
+	>> str2 := خزنة رمز-مميز: 40.
+	>> معاملات-البحث :=
+	db استعلام: ﴿⌝'
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'⌜ 
+	<str1>: str1,
+	<str2>: str2
+	﴾,
+	اجلب: ⎬ :row
+		﴿row str1 = str1 و: row str2 = str2﴾ إذا-خطأ: ⎬
+			هذه-المهمة خطأ-مخرج: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter أضف: 1.
+⎨ * 100.
+
+
+# Numbers
+⎬
+	>> n1 := عدد بين: 1 وبين: 99999.
+	>> n2 := n1 / 1000.
+	>> big := ﴿
+		﴿ Int64 من-نص: ⌝'9223372036854775807'⌜ ﴾ -
+		﴿ Int64 من-نص: ⌝'99999'⌜ ﴾ +
+		﴿ Int64 من-نص: n1 كنص ﴾
+	﴾.
+	>> معاملات-البحث :=
+	db استعلام: ﴿⌝'
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	'⌜
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	﴾,
+	اجلب: ⎬ :row
+		﴿row n1 = n1﴾ إذا-خطأ: ⎬
+			هذه-المهمة خطأ-مخرج: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n1
+			﴾.
+		⎨.
+		﴿row n2 = n2﴾ إذا-خطأ: ⎬
+			هذه-المهمة خطأ-مخرج: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n2
+			﴾.
+		⎨.
+		﴿row n3 = n2 تقريب﴾ إذا-خطأ: ⎬
+			هذه-المهمة خطأ-مخرج: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n3
+			﴾.
+		⎨.
+		﴿row big = big﴾ إذا-خطأ: ⎬
+			هذه-المهمة خطأ-مخرج: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: big,
+				<observation>: row big
+			﴾.
+		⎨.
+		
+	⎨.
+	counter أضف: 1.
+⎨ * 100.
+
+
+مخرج اكتب: ﴿
+	⌝'OK, <counter> fuzzy casts/conversions tested.'⌜
+	<counter>: counter
+﴾, سطر-جديد.

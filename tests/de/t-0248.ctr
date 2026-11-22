@@ -1,0 +1,39 @@
+
+
+Text wenn: ['evaluate'] tun: {
+	>> code := Datei neu: ['/tmp/eval.ctr'].
+	code schreiben: selbst text + ['.'].
+	Programm verwenden: ['/tmp/eval.ctr'].
+}.
+
+>> a := (Liste ← (
+	(Wörterbuch neu)
+		setzen: ['domain'] auf: ['mywebsite.com'],
+		setzen: (Liste ←
+			((Wörterbuch neu)
+				setzen: ['home'] auf: ['title'],
+				setzen: ['<html></html>'] auf: ['body'],
+				setzen: ['2017-01-01'] auf: ['created']
+			) ;
+			((Wörterbuch neu)
+				setzen: ['aboutus(c)'] auf: ['title'],
+				setzen: ['<credits>Author Inc.</credits>'] auf: ['body']
+			)
+		) auf: ['pages']
+	)
+) text.
+
+Ausgabe schreiben: a typ, stopp.
+Ausgabe schreiben: a, stopp.
+
+>> b := Nichts.
+(['b := '] + a) evaluate.
+Ausgabe schreiben: b ? 0 ? ['pages'] ? 1 ? ['body'], stopp.
+
+>> c := b ? 0.
+>> d := c text.
+Ausgabe schreiben: d typ, stopp.
+
+>> e := Nichts.
+(['e := '] + d) evaluate.
+Ausgabe schreiben: e ? ['pages'] ? 0, stopp.

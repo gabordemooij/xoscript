@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Sortida escriu: ['Database test'], salt-de-línia.
+
+>> db := Maria-DB nou amfitrió: ['localhost'],
+	usuari: ['xo'], contrasenya: ['pass123'], nom-base: ['xobase'], connecta.
+
+Sortida escriu: ['Can we connect? '] + db connectat?, salt-de-línia.
+
+>> paràmetres-de-cerca := db consulta: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], paràmetres: ( Llista nou ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  paràmetres-de-cerca executa. db confirma. } captura: { :e db desfés.  }, inicia.
+
+Sortida escriu: ['Can we insert? '] + ( paràmetres-de-cerca insert-id > 0 ), salt-de-línia.
+
+>> Obj := Objecte nou.
+Obj en: ['retrieve-rows'] fes: {
+	propi compta := 0.
+	>> paràmetres-de-cerca :=
+	db consulta: ['SELECT * FROM book order by id desc limit 2'], 
+	obtén: { :row 
+		propi compta suma: 1.
+		Cert interromp.
+	}. <- propi compta copia.
+}.
+
+Sortida escriu: ['Can we query? '] + ( Obj retrieve-rows > 0 ), salt-de-línia.

@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> nwaa := { :format :value
+	{ Mpụta dee: ( (Usoro-ọdịdị ohuru: format) tinye-nọrụ: value ), ahịrị-ọhụrụ. } jide: { :e Mpụta dee: e, ahịrị-ọhụrụ. }, bido.
+}.
+>> try-int := { :format :value
+	{ Mpụta dee: ( (Usoro-ọdịdị ohuru: format) tinye-nọrụ-ọnụọgụ-zuru: value ), ahịrị-ọhụrụ. } jide: { :e Mpụta dee: e, ahịrị-ọhụrụ. }, bido.
+}.
+
+# fits
+nwaa tinye-nọrụ: ['|%s|'] na: ['text'].
+nwaa tinye-nọrụ: ['%06.2f'] na: 5.5.
+nwaa tinye-nọrụ: ['100%% %s'] na: ['sure'].
+try-int tinye-nọrụ: ['%03d'] na: 7.
+try-int tinye-nọrụ: ['%x'] na: 255.
+nwaa tinye-nọrụ: ['%d'] na: (Int64 ohuru site-na-ederede: ['12']).
+nwaa tinye-nọrụ: ['%lld'] na: (Int64 ohuru site-na-ederede: ['12']).
+nwaa tinye-nọrụ: ['%.1lf'] na: 5.5.
+try-int tinye-nọrụ: ['%hd'] na: 7.
+
+# does not fit
+nwaa tinye-nọrụ: ['%s'] na: 12345.
+nwaa tinye-nọrụ: ['%d'] na: 12345.
+nwaa tinye-nọrụ: ['%f'] na: ['text'].
+try-int tinye-nọrụ: ['%d'] na: ['text'].
+try-int tinye-nọrụ: ['%s'] na: 5.
+nwaa tinye-nọrụ: ['%s %s'] na: ['text'].
+nwaa tinye-nọrụ: ['%n'] na: ['text'].
+nwaa tinye-nọrụ: ['%*s'] na: ['text'].
+nwaa tinye-nọrụ: ['%'] na: ['text'].
+
+# length modifier does not fit
+nwaa tinye-nọrụ: ['%ls'] na: ['text'].
+nwaa tinye-nọrụ: ['%Lf'] na: 5.5.
+try-int tinye-nọrụ: ['%ld'] na: 7.
+try-int tinye-nọrụ: ['%lld'] na: 7.
+nwaa tinye-nọrụ: ['%Ld'] na: (Int64 ohuru site-na-ederede: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+nwaa tinye-nọrụ: ['%99999999999s'] na: ['text'].

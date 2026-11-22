@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> sulayi := { :format :value
+	{ Gawas isulat: ( (Porma bag-o: format) ipadapat: value ), bag-ong-linya. } dakpon: { :e Gawas isulat: e, bag-ong-linya. }, padagana.
+}.
+>> try-int := { :format :value
+	{ Gawas isulat: ( (Porma bag-o: format) ipadapat-tibuok-numero: value ), bag-ong-linya. } dakpon: { :e Gawas isulat: e, bag-ong-linya. }, padagana.
+}.
+
+# fits
+sulayi ipadapat: ['|%s|'] ug: ['text'].
+sulayi ipadapat: ['%06.2f'] ug: 5.5.
+sulayi ipadapat: ['100%% %s'] ug: ['sure'].
+try-int ipadapat: ['%03d'] ug: 7.
+try-int ipadapat: ['%x'] ug: 255.
+sulayi ipadapat: ['%d'] ug: (Int64 bag-o gikan-sa-teksto: ['12']).
+sulayi ipadapat: ['%lld'] ug: (Int64 bag-o gikan-sa-teksto: ['12']).
+sulayi ipadapat: ['%.1lf'] ug: 5.5.
+try-int ipadapat: ['%hd'] ug: 7.
+
+# does not fit
+sulayi ipadapat: ['%s'] ug: 12345.
+sulayi ipadapat: ['%d'] ug: 12345.
+sulayi ipadapat: ['%f'] ug: ['text'].
+try-int ipadapat: ['%d'] ug: ['text'].
+try-int ipadapat: ['%s'] ug: 5.
+sulayi ipadapat: ['%s %s'] ug: ['text'].
+sulayi ipadapat: ['%n'] ug: ['text'].
+sulayi ipadapat: ['%*s'] ug: ['text'].
+sulayi ipadapat: ['%'] ug: ['text'].
+
+# length modifier does not fit
+sulayi ipadapat: ['%ls'] ug: ['text'].
+sulayi ipadapat: ['%Lf'] ug: 5.5.
+try-int ipadapat: ['%ld'] ug: 7.
+try-int ipadapat: ['%lld'] ug: 7.
+sulayi ipadapat: ['%Ld'] ug: (Int64 bag-o gikan-sa-teksto: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+sulayi ipadapat: ['%99999999999s'] ug: ['text'].

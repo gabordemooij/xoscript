@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> მნიშვნელობები := სია ახალი
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+მნიშვნელობები თითოეული: { :i :value
+	>> d := ლექსიკონი ახალი.
+	d ჩასმა: value ადგილზე: ['k'].
+	>> r := d კოდი ობიექტად.
+	გამოტანა დაწერე: r რაოდენობა, ახალი-ხაზი.
+	გამოტანა დაწერე: ( (r ადგილზე: ['k']) = value ), ახალი-ხაზი.
+}.

@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server նախաձեռնել.
+Ծրագիր օգտագործել: ['../../../src/xo/hy/webtools.xo'].
+
+>> Fake-Request := Օբյեկտ նոր.
+Fake-Request ստանալիս: ['value:'] կատարել: { :արժեք
+	սեփական արժեք := արժեք.
+}.
+Fake-Request ստանալիս: ['cookie:'] կատարել: { :անուն <- սեփական արժեք.
+}.
+
+>> Test-Session := Ժամանակավոր-ֆայլի-սեանս նոր.
+Test-Session ստանալիս: ['բեռնել'] կատարել: { <- Բառարան նոր.
+}.
+Test-Session ստանալիս: ['session-id'] կատարել: { <- սեփական id.
+}.
+
+>> cookies := Ցուցակ նոր
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies յուրաքանչյուր: { :i :cookie
+	>> http-հարցում := Fake-Request նոր.
+	http-հարցում value: cookie.
+	>> կառավարիչ := Test-Session նոր.
+	>> web := Վեբ-փաստաթուղթ նոր.
+	web http-հարցում: http-հարցում.
+	web սեանսների-կառավարիչ: կառավարիչ.
+	web սկսել-սեանսը.
+	Ելք գրել: ( կառավարիչ session-id = cookie ), նոր-տող.
+}.
+
+>> web := Վեբ-փաստաթուղթ նոր.
+web json: (Բառարան նոր դնել: ['b'] բանալի: ['a']).
+Ելք գրել: ['\n'], նոր-տող.
+
+{ Ցանց get: ['file:///etc/hostname']. } որսալ: { :e
+	Ելք գրել: e, նոր-տող.
+}, գործարկել.
+
+>> svg := Ֆայլ նոր: ['/tmp/test0814.svg'].
+svg գրել: ['<svg xmlns="x"></svg>'].
+Ելք նոր-տող.
+Server փոխանցել: ['test0814.svg'] նախածանց: ['/tmp/'].
+svg ջնջել.

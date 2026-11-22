@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+ਪ੍ਰੋਗਰਾਮ ਮੈਮੋਰੀ-ਪ੍ਰਬੰਧ: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB ਨਵਾਂ ਹੋਸਟ: ['localhost'],
+	ਵਰਤੋਂਕਾਰ-ਨਾਮ: ['xo'], ਪਾਸਵਰਡ: ['pass123'], ਡਾਟਾਬੇਸ-ਨਾਮ: ['xobase'], ਜੁੜੋ.
+
+>> TwoDigitFormat := ਫਾਰਮੈਟ ਨਵਾਂ: ['%02d'].
+
+# Datetime
+{
+	>> ਸਾਲ := ਸੰਖਿਆ ਵਿਚਕਾਰ: 1995 ਅਤੇ: 2050, ਲਿਖਤ-ਵਿੱਚ.
+	>> ਮਹੀਨਾ := TwoDigitFormat ਲਾਗੂ-ਪੂਰਨ-ਅੰਕ: (ਸੰਖਿਆ ਵਿਚਕਾਰ: 1 ਅਤੇ: 12), ਲਿਖਤ-ਵਿੱਚ.
+	>> ਦਿਨ := TwoDigitFormat ਲਾਗੂ-ਪੂਰਨ-ਅੰਕ: (ਸੰਖਿਆ ਵਿਚਕਾਰ: 1 ਅਤੇ: 28), ਲਿਖਤ-ਵਿੱਚ.
+	>> ਘੰਟਾ := TwoDigitFormat ਲਾਗੂ-ਪੂਰਨ-ਅੰਕ: (ਸੰਖਿਆ ਵਿਚਕਾਰ: 1 ਅਤੇ: 23), ਲਿਖਤ-ਵਿੱਚ.
+	>> ਮਿੰਟ := TwoDigitFormat ਲਾਗੂ-ਪੂਰਨ-ਅੰਕ: (ਸੰਖਿਆ ਵਿਚਕਾਰ: 1 ਅਤੇ: 59), ਲਿਖਤ-ਵਿੱਚ.
+	>> ਸਕਿੰਟ := TwoDigitFormat ਲਾਗੂ-ਪੂਰਨ-ਅੰਕ: (ਸੰਖਿਆ ਵਿਚਕਾਰ: 1 ਅਤੇ: 59), ਲਿਖਤ-ਵਿੱਚ.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: ਸਾਲ,
+		MM: ਮਹੀਨਾ,
+		DD: ਦਿਨ,
+		HH: ਘੰਟਾ,
+		II: ਮਿੰਟ,
+		SS: ਸਕਿੰਟ.
+	>> ਖੋਜ-ਪੈਰਾਮੀਟਰ :=
+	db ਕਿਊਰੀ: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ਲਿਆਓ: { :row
+		(row mydatetime = datetime) ਝੂਠ-ਹੋਵੇ-ਤਾਂ: {
+			ਇਹ-ਕੰਮ ਗਲਤੀ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ਜਮ੍ਹਾਂ: 1.
+} * 100.
+
+# Date
+{
+	>> ਸਾਲ := ਸੰਖਿਆ ਵਿਚਕਾਰ: 1995 ਅਤੇ: 2050, ਲਿਖਤ-ਵਿੱਚ.
+	>> ਮਹੀਨਾ := TwoDigitFormat ਲਾਗੂ-ਪੂਰਨ-ਅੰਕ: (ਸੰਖਿਆ ਵਿਚਕਾਰ: 1 ਅਤੇ: 12), ਲਿਖਤ-ਵਿੱਚ.
+	>> ਦਿਨ := TwoDigitFormat ਲਾਗੂ-ਪੂਰਨ-ਅੰਕ: (ਸੰਖਿਆ ਵਿਚਕਾਰ: 1 ਅਤੇ: 28), ਲਿਖਤ-ਵਿੱਚ.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: ਸਾਲ,
+		MM: ਮਹੀਨਾ,
+		DD: ਦਿਨ.
+	>> ਖੋਜ-ਪੈਰਾਮੀਟਰ :=
+	db ਕਿਊਰੀ: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ਲਿਆਓ: { :row
+		(row mydate = date) ਝੂਠ-ਹੋਵੇ-ਤਾਂ: {
+			ਇਹ-ਕੰਮ ਗਲਤੀ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ਜਮ੍ਹਾਂ: 1.
+} * 100.
+
+
+# Time
+{
+	>> ਘੰਟਾ := TwoDigitFormat ਲਾਗੂ-ਪੂਰਨ-ਅੰਕ: (ਸੰਖਿਆ ਵਿਚਕਾਰ: 1 ਅਤੇ: 23), ਲਿਖਤ-ਵਿੱਚ.
+	>> ਮਿੰਟ := TwoDigitFormat ਲਾਗੂ-ਪੂਰਨ-ਅੰਕ: (ਸੰਖਿਆ ਵਿਚਕਾਰ: 1 ਅਤੇ: 59), ਲਿਖਤ-ਵਿੱਚ.
+	>> ਸਕਿੰਟ := TwoDigitFormat ਲਾਗੂ-ਪੂਰਨ-ਅੰਕ: (ਸੰਖਿਆ ਵਿਚਕਾਰ: 1 ਅਤੇ: 59), ਲਿਖਤ-ਵਿੱਚ.
+	>> ਸਮਾਂ := ['HH:II:SS'].
+	ਸਮਾਂ
+		HH: ਘੰਟਾ,
+		II: ਮਿੰਟ,
+		SS: ਸਕਿੰਟ.
+	>> ਖੋਜ-ਪੈਰਾਮੀਟਰ :=
+	db ਕਿਊਰੀ: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: ਸਮਾਂ),
+	ਲਿਆਓ: { :row
+		(row mytime = ਸਮਾਂ) ਝੂਠ-ਹੋਵੇ-ਤਾਂ: {
+			ਇਹ-ਕੰਮ ਗਲਤੀ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ਜਮ੍ਹਾਂ: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := ਲਿਸਟ ਨਵਾਂ ਭਰੋ: 100000 ਮੁੱਲ-ਨਾਲ: ['x'], ਜੋੜੋ: [''].
+{
+	>> str2 := ਤਿਜੋਰੀ ਟੋਕਨ: 40.
+	>> ਖੋਜ-ਪੈਰਾਮੀਟਰ :=
+	db ਕਿਊਰੀ: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ਲਿਆਓ: { :row
+		(row str1 = str1 ਅਤੇ: row str2 = str2) ਝੂਠ-ਹੋਵੇ-ਤਾਂ: {
+			ਇਹ-ਕੰਮ ਗਲਤੀ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ਜਮ੍ਹਾਂ: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := ਸੰਖਿਆ ਵਿਚਕਾਰ: 1 ਅਤੇ: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 ਲਿਖਤ-ਤੋਂ: ['9223372036854775807'] ) -
+		( Int64 ਲਿਖਤ-ਤੋਂ: ['99999'] ) +
+		( Int64 ਲਿਖਤ-ਤੋਂ: n1 ਲਿਖਤ-ਵਿੱਚ )
+	).
+	>> ਖੋਜ-ਪੈਰਾਮੀਟਰ :=
+	db ਕਿਊਰੀ: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ਲਿਆਓ: { :row
+		(row n1 = n1) ਝੂਠ-ਹੋਵੇ-ਤਾਂ: {
+			ਇਹ-ਕੰਮ ਗਲਤੀ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) ਝੂਠ-ਹੋਵੇ-ਤਾਂ: {
+			ਇਹ-ਕੰਮ ਗਲਤੀ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 ਪੂਰਨ-ਅੰਕ) ਝੂਠ-ਹੋਵੇ-ਤਾਂ: {
+			ਇਹ-ਕੰਮ ਗਲਤੀ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) ਝੂਠ-ਹੋਵੇ-ਤਾਂ: {
+			ਇਹ-ਕੰਮ ਗਲਤੀ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ਜਮ੍ਹਾਂ: 1.
+} * 100.
+
+
+ਆਉਟਪੁੱਟ ਲਿਖੋ: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), ਨਵੀਂ-ਲਾਈਨ.

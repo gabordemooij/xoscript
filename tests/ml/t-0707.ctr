@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+പ്രോഗ്രാം മെമ്മറി-നിർവഹണം: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB പുതിയ ഹോസ്റ്റ്: ['localhost'],
+	ഉപയോക്തൃനാമം: ['xo'], രഹസ്യവാക്ക്: ['pass123'], ഡാറ്റാബേസ്-പേര്: ['xobase'], ബന്ധിപ്പിക്കുക.
+
+>> TwoDigitFormat := രൂപം പുതിയ: ['%02d'].
+
+# Datetime
+{
+	>> വർഷം := സംഖ്യ ഇടയിൽ: 1995 മുതൽ: 2050, വാചകമായി.
+	>> മാസം := TwoDigitFormat പ്രയോഗിക്കുക-പൂർണ്ണസംഖ്യ: (സംഖ്യ ഇടയിൽ: 1 മുതൽ: 12), വാചകമായി.
+	>> ദിവസം := TwoDigitFormat പ്രയോഗിക്കുക-പൂർണ്ണസംഖ്യ: (സംഖ്യ ഇടയിൽ: 1 മുതൽ: 28), വാചകമായി.
+	>> മണിക്കൂർ := TwoDigitFormat പ്രയോഗിക്കുക-പൂർണ്ണസംഖ്യ: (സംഖ്യ ഇടയിൽ: 1 മുതൽ: 23), വാചകമായി.
+	>> മിനിറ്റ് := TwoDigitFormat പ്രയോഗിക്കുക-പൂർണ്ണസംഖ്യ: (സംഖ്യ ഇടയിൽ: 1 മുതൽ: 59), വാചകമായി.
+	>> സെക്കൻഡ് := TwoDigitFormat പ്രയോഗിക്കുക-പൂർണ്ണസംഖ്യ: (സംഖ്യ ഇടയിൽ: 1 മുതൽ: 59), വാചകമായി.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: വർഷം,
+		MM: മാസം,
+		DD: ദിവസം,
+		HH: മണിക്കൂർ,
+		II: മിനിറ്റ്,
+		SS: സെക്കൻഡ്.
+	>> തിരയൽ-പരാമീറ്ററുകൾ :=
+	db ചോദ്യം: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	കൊണ്ടുവരിക: { :row
+		(row mydatetime = datetime) തെറ്റെങ്കിൽ: {
+			ഈ-ജോലി പിശക്: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter കൂട്ടുക: 1.
+} * 100.
+
+# Date
+{
+	>> വർഷം := സംഖ്യ ഇടയിൽ: 1995 മുതൽ: 2050, വാചകമായി.
+	>> മാസം := TwoDigitFormat പ്രയോഗിക്കുക-പൂർണ്ണസംഖ്യ: (സംഖ്യ ഇടയിൽ: 1 മുതൽ: 12), വാചകമായി.
+	>> ദിവസം := TwoDigitFormat പ്രയോഗിക്കുക-പൂർണ്ണസംഖ്യ: (സംഖ്യ ഇടയിൽ: 1 മുതൽ: 28), വാചകമായി.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: വർഷം,
+		MM: മാസം,
+		DD: ദിവസം.
+	>> തിരയൽ-പരാമീറ്ററുകൾ :=
+	db ചോദ്യം: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	കൊണ്ടുവരിക: { :row
+		(row mydate = date) തെറ്റെങ്കിൽ: {
+			ഈ-ജോലി പിശക്: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter കൂട്ടുക: 1.
+} * 100.
+
+
+# Time
+{
+	>> മണിക്കൂർ := TwoDigitFormat പ്രയോഗിക്കുക-പൂർണ്ണസംഖ്യ: (സംഖ്യ ഇടയിൽ: 1 മുതൽ: 23), വാചകമായി.
+	>> മിനിറ്റ് := TwoDigitFormat പ്രയോഗിക്കുക-പൂർണ്ണസംഖ്യ: (സംഖ്യ ഇടയിൽ: 1 മുതൽ: 59), വാചകമായി.
+	>> സെക്കൻഡ് := TwoDigitFormat പ്രയോഗിക്കുക-പൂർണ്ണസംഖ്യ: (സംഖ്യ ഇടയിൽ: 1 മുതൽ: 59), വാചകമായി.
+	>> സമയം := ['HH:II:SS'].
+	സമയം
+		HH: മണിക്കൂർ,
+		II: മിനിറ്റ്,
+		SS: സെക്കൻഡ്.
+	>> തിരയൽ-പരാമീറ്ററുകൾ :=
+	db ചോദ്യം: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: സമയം),
+	കൊണ്ടുവരിക: { :row
+		(row mytime = സമയം) തെറ്റെങ്കിൽ: {
+			ഈ-ജോലി പിശക്: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter കൂട്ടുക: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := ശ്രേണി പുതിയ നിറയ്ക്കുക: 100000 മൂല്യത്താൽ: ['x'], ചേർക്കുക: [''].
+{
+	>> str2 := നിലവറ ടോക്കൺ: 40.
+	>> തിരയൽ-പരാമീറ്ററുകൾ :=
+	db ചോദ്യം: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	കൊണ്ടുവരിക: { :row
+		(row str1 = str1 കൂടാതെ: row str2 = str2) തെറ്റെങ്കിൽ: {
+			ഈ-ജോലി പിശക്: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter കൂട്ടുക: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := സംഖ്യ ഇടയിൽ: 1 മുതൽ: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 വാചകത്തിൽനിന്ന്: ['9223372036854775807'] ) -
+		( Int64 വാചകത്തിൽനിന്ന്: ['99999'] ) +
+		( Int64 വാചകത്തിൽനിന്ന്: n1 വാചകമായി )
+	).
+	>> തിരയൽ-പരാമീറ്ററുകൾ :=
+	db ചോദ്യം: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	കൊണ്ടുവരിക: { :row
+		(row n1 = n1) തെറ്റെങ്കിൽ: {
+			ഈ-ജോലി പിശക്: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) തെറ്റെങ്കിൽ: {
+			ഈ-ജോലി പിശക്: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 പൂർണ്ണമാക്കുക) തെറ്റെങ്കിൽ: {
+			ഈ-ജോലി പിശക്: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) തെറ്റെങ്കിൽ: {
+			ഈ-ജോലി പിശക്: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter കൂട്ടുക: 1.
+} * 100.
+
+
+ഔട്ട്പുട്ട് എഴുതുക: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), പുതിയ-വരി.

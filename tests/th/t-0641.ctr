@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := พจนานุกรม สร้างใหม่
+	# ASCII only
+	ใส่: ( ลิสต์ สร้างใหม่ ; 65 ; 65 ; 65 ; 65 ; 0 ) ที่: ['AAAA'],
+	# valid 2 byte sequence
+	ใส่: ( ลิสต์ สร้างใหม่ ; 194 ; 162 ; 0 ) ที่: ['¢'],
+	# Valid 3-byte UTF-8
+    ใส่: ( ลิสต์ สร้างใหม่ ; 226 ; 130 ; 172 ; 0 ) ที่: ['€'],
+	# Valid 4-byte UTF-8
+    ใส่: ( ลิสต์ สร้างใหม่ ; 240 ; 144 ; 141 ; 136 ; 0 ) ที่: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    ใส่: ( ลิสต์ สร้างใหม่ ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ที่: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    ใส่: ( ลิสต์ สร้างใหม่ ; 65 ; 193 ; 129 ; 0 ) ที่: ['A?'],
+	# Invalid first byte (0xFF)
+    ใส่: ( ลิสต์ สร้างใหม่ ; 255 ; 0 ) ที่: ['?'],
+	# Incomplete multi-byte sequence at end
+    ใส่: ( ลิสต์ สร้างใหม่ ; 66 ; 226 ; 0 ) ที่: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    ใส่: ( ลิสต์ สร้างใหม่ ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ที่: ['A€?𐍈B'].
+	 
+utf8cases แต่ละตัว: { :key :value
+	>> blob := Blob สร้างใหม่: value จำนวน, bytes: value.
+	>> str := blob เป็นข้อความ.
+	(str = key) ถ้าจริง: {
+		แสดงผล เขียน: ['OK'], ขึ้นบรรทัดใหม่.
+	}, มิฉะนั้น: {
+		แสดงผล เขียน: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, ขึ้นบรรทัดใหม่.
+	}.
+	blob คืนหน่วยความจำ.
+}.

@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := Fail uus: ['/tmp/test.gif'].
+f kirjuta: ['GIF87a01234567810'].
+
+# serve the file
+Server edasta: ['test.gif'] eesliide: ['/tmp/'].
+
+Väljund reavahetus.
+
+Väljund kirjuta: ['Outside container (security):'], reavahetus.
+{ Server edasta: ['../passwd'] eesliide: ['/tmp/']. }
+püüa: { :e Väljund kirjuta: e, reavahetus. },
+käivita.
+
+Väljund kirjuta: ['Invalid prefix:'], reavahetus.
+{ Server edasta: ['test.gif'] eesliide: ['z:\\']. }
+püüa: { :e Väljund kirjuta: e, reavahetus. },
+käivita.
+
+Väljund kirjuta: ['Non-existant file:'], reavahetus.
+{ Server edasta: ['xxx.xxx'] eesliide: ['/tmp/']. }
+püüa: { :e Väljund kirjuta: e, reavahetus. },
+käivita.

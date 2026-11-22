@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server ihanda.
+Programa gamitin: ['../../../src/xo/tl/webtools.xo'].
+
+>> Fake-Request := Bagay bago.
+Fake-Request kapag: ['value:'] gawin: { :halaga
+	sarili-ko halaga := halaga.
+}.
+Fake-Request kapag: ['cookie:'] gawin: { :pangalan <- sarili-ko halaga.
+}.
+
+>> Test-Session := Sesyon-pansamantalang-file bago.
+Test-Session kapag: ['ikarga'] gawin: { <- Diksyunaryo bago.
+}.
+Test-Session kapag: ['session-id'] gawin: { <- sarili-ko id.
+}.
+
+>> cookies := Listahan bago
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies bawat: { :i :cookie
+	>> kahilingang-http := Fake-Request bago.
+	kahilingang-http value: cookie.
+	>> tagapamahala := Test-Session bago.
+	>> web := Dokumentong-Web bago.
+	web kahilingang-http: kahilingang-http.
+	web tagapamahala-ng-sesyon: tagapamahala.
+	web simulan-ang-sesyon.
+	Labas isulat: ( tagapamahala session-id = cookie ), bagong-linya.
+}.
+
+>> web := Dokumentong-Web bago.
+web json: (Diksyunaryo bago ilagay: ['b'] sa: ['a']).
+Labas isulat: ['\n'], bagong-linya.
+
+{ Network get: ['file:///etc/hostname']. } saluhin: { :e
+	Labas isulat: e, bagong-linya.
+}, patakbuhin.
+
+>> svg := Talaksan bago: ['/tmp/test0814.svg'].
+svg isulat: ['<svg xmlns="x"></svg>'].
+Labas bagong-linya.
+Server ipasa: ['test0814.svg'] unlapi: ['/tmp/'].
+svg tanggalin.

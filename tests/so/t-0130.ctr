@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Barnaamij dejin: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server xiriiri: ( Liis cusub ;
+ libname ; ['fopen'] ;
+ ( Liis cusub ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+xiriiri: ( Liis cusub ;
+ Waxba ; # means same lib
+ ['fread'] ;
+ ( Liis cusub ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Waxba ; # means same object (i.e. Stream)
+ ['fread']
+),
+xiriiri: (
+ Liis cusub ;
+ Waxba ; # means same lib
+ ['fwrite'] ;
+ ( Liis cusub ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Waxba ; # means same lib
+ ['fwrite']
+),
+xiriiri: (
+ Liis cusub ;
+ Waxba ; # means same lib
+ ['rewind'] ;
+ ( Liis cusub ; ['pointer'] ) ;
+ ['int'] ;
+ Waxba ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> waddada-faylka := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: waddada-faylka mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream farriin: ['fwrite'] dooddo: (Liis cusub ; str ; 1 ; 6 ; fd ).
+Soo-saar qor: bytes-written, sadar-cusub.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob cusub: 20.
+
+# read from file
+>> bytes-read := Stream farriin: ['fread'] dooddo: (Liis cusub ; buf ; 1 ; 6 ; fd ).
+Soo-saar qor: bytes-read, sadar-cusub.
+Soo-saar qor: buf, sadar-cusub.
+
+# free memory
+str  sii-daa.
+waddada-faylka sii-daa.
+mode sii-daa.
+buf  sii-daa.
+
+

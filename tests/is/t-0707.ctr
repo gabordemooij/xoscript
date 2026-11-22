@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Forrit minnisstjórnun: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB nýtt hýsill: ['localhost'],
+	notandanafn: ['xo'], lykilorð: ['pass123'], nafn-gagnagrunns: ['xobase'], tengjast.
+
+>> TwoDigitFormat := Snið nýtt: ['%02d'].
+
+# Datetime
+{
+	>> ár := Tala milli: 1995 og: 2050, texti.
+	>> mánuður := TwoDigitFormat beita-heiltölu: (Tala milli: 1 og: 12), texti.
+	>> dagur := TwoDigitFormat beita-heiltölu: (Tala milli: 1 og: 28), texti.
+	>> klukkustund := TwoDigitFormat beita-heiltölu: (Tala milli: 1 og: 23), texti.
+	>> mínúta := TwoDigitFormat beita-heiltölu: (Tala milli: 1 og: 59), texti.
+	>> sekúnda := TwoDigitFormat beita-heiltölu: (Tala milli: 1 og: 59), texti.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: ár,
+		MM: mánuður,
+		DD: dagur,
+		HH: klukkustund,
+		II: mínúta,
+		SS: sekúnda.
+	>> leitarfæribreytur :=
+	db fyrirspurn: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	sækja: { :row
+		(row mydatetime = datetime) rangt: {
+			þetta-verk villa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter leggja-við: 1.
+} * 100.
+
+# Date
+{
+	>> ár := Tala milli: 1995 og: 2050, texti.
+	>> mánuður := TwoDigitFormat beita-heiltölu: (Tala milli: 1 og: 12), texti.
+	>> dagur := TwoDigitFormat beita-heiltölu: (Tala milli: 1 og: 28), texti.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: ár,
+		MM: mánuður,
+		DD: dagur.
+	>> leitarfæribreytur :=
+	db fyrirspurn: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	sækja: { :row
+		(row mydate = date) rangt: {
+			þetta-verk villa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter leggja-við: 1.
+} * 100.
+
+
+# Time
+{
+	>> klukkustund := TwoDigitFormat beita-heiltölu: (Tala milli: 1 og: 23), texti.
+	>> mínúta := TwoDigitFormat beita-heiltölu: (Tala milli: 1 og: 59), texti.
+	>> sekúnda := TwoDigitFormat beita-heiltölu: (Tala milli: 1 og: 59), texti.
+	>> tími := ['HH:II:SS'].
+	tími
+		HH: klukkustund,
+		II: mínúta,
+		SS: sekúnda.
+	>> leitarfæribreytur :=
+	db fyrirspurn: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: tími),
+	sækja: { :row
+		(row mytime = tími) rangt: {
+			þetta-verk villa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter leggja-við: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Listi nýtt fylla: 100000 með: ['x'], sameina: [''].
+{
+	>> str2 := Hvelfing tóki: 40.
+	>> leitarfæribreytur :=
+	db fyrirspurn: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	sækja: { :row
+		(row str1 = str1 og: row str2 = str2) rangt: {
+			þetta-verk villa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter leggja-við: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Tala milli: 1 og: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 úr-texta: ['9223372036854775807'] ) -
+		( Int64 úr-texta: ['99999'] ) +
+		( Int64 úr-texta: n1 texti )
+	).
+	>> leitarfæribreytur :=
+	db fyrirspurn: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	sækja: { :row
+		(row n1 = n1) rangt: {
+			þetta-verk villa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) rangt: {
+			þetta-verk villa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 námunda) rangt: {
+			þetta-verk villa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) rangt: {
+			þetta-verk villa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter leggja-við: 1.
+} * 100.
+
+
+Úttak skrifa: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), ný-lína.

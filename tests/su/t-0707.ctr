@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Program manajemén-mémori: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB anyar hos: ['localhost'],
+	ngaran-pamaké: ['xo'], sandi: ['pass123'], ngaran-basis-data: ['xobase'], sambungkeun.
+
+>> TwoDigitFormat := Format anyar: ['%02d'].
+
+# Datetime
+{
+	>> taun := Angka antara: 1995 jeung: 2050, téks.
+	>> bulan := TwoDigitFormat larapkeun-wilangan-buleud: (Angka antara: 1 jeung: 12), téks.
+	>> poé := TwoDigitFormat larapkeun-wilangan-buleud: (Angka antara: 1 jeung: 28), téks.
+	>> jam := TwoDigitFormat larapkeun-wilangan-buleud: (Angka antara: 1 jeung: 23), téks.
+	>> menit := TwoDigitFormat larapkeun-wilangan-buleud: (Angka antara: 1 jeung: 59), téks.
+	>> detik := TwoDigitFormat larapkeun-wilangan-buleud: (Angka antara: 1 jeung: 59), téks.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: taun,
+		MM: bulan,
+		DD: poé,
+		HH: jam,
+		II: menit,
+		SS: detik.
+	>> paraméter-panéangan :=
+	db kueri: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	cokot: { :row
+		(row mydatetime = datetime) salah: {
+			tugas-ieu kasalahan: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter tambah: 1.
+} * 100.
+
+# Date
+{
+	>> taun := Angka antara: 1995 jeung: 2050, téks.
+	>> bulan := TwoDigitFormat larapkeun-wilangan-buleud: (Angka antara: 1 jeung: 12), téks.
+	>> poé := TwoDigitFormat larapkeun-wilangan-buleud: (Angka antara: 1 jeung: 28), téks.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: taun,
+		MM: bulan,
+		DD: poé.
+	>> paraméter-panéangan :=
+	db kueri: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	cokot: { :row
+		(row mydate = date) salah: {
+			tugas-ieu kasalahan: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter tambah: 1.
+} * 100.
+
+
+# Time
+{
+	>> jam := TwoDigitFormat larapkeun-wilangan-buleud: (Angka antara: 1 jeung: 23), téks.
+	>> menit := TwoDigitFormat larapkeun-wilangan-buleud: (Angka antara: 1 jeung: 59), téks.
+	>> detik := TwoDigitFormat larapkeun-wilangan-buleud: (Angka antara: 1 jeung: 59), téks.
+	>> wanci := ['HH:II:SS'].
+	wanci
+		HH: jam,
+		II: menit,
+		SS: detik.
+	>> paraméter-panéangan :=
+	db kueri: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: wanci),
+	cokot: { :row
+		(row mytime = wanci) salah: {
+			tugas-ieu kasalahan: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter tambah: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Daptar anyar eusian: 100000 ku: ['x'], gabungkeun: [''].
+{
+	>> str2 := Brankas token: 40.
+	>> paraméter-panéangan :=
+	db kueri: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	cokot: { :row
+		(row str1 = str1 jeung: row str2 = str2) salah: {
+			tugas-ieu kasalahan: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter tambah: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Angka antara: 1 jeung: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 tina-téks: ['9223372036854775807'] ) -
+		( Int64 tina-téks: ['99999'] ) +
+		( Int64 tina-téks: n1 téks )
+	).
+	>> paraméter-panéangan :=
+	db kueri: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	cokot: { :row
+		(row n1 = n1) salah: {
+			tugas-ieu kasalahan: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) salah: {
+			tugas-ieu kasalahan: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 buleudkeun) salah: {
+			tugas-ieu kasalahan: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) salah: {
+			tugas-ieu kasalahan: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter tambah: 1.
+} * 100.
+
+
+Kaluaran tulis: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), baris-anyar.

@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Hlutur nýtt.
+
+Slurp við: ['nýtt'] gera: {
+	eigin str := [''].
+}.
+
+Slurp við: ['nieuw'] gera: {
+	eigin str := [''].
+}.
+
+Slurp við: ['svara:'] gera: { :blah
+		eigin str bæta-aftast: blah.
+}.
+
+Slurp við: ['svara:og:'] gera: { :blah :blahah
+		eigin str bæta-aftast: (blah frá: 0 lengd: (blah lengd - 1)).
+		eigin str bæta-aftast: [' '].
+		eigin str bæta-aftast: blahah.
+}.
+
+Slurp við: ['obtain'] gera: {
+	>> buffer := eigin str.
+	eigin str := ['']. <- buffer.
+}.
+
+
+Úttak skrifa: (Forrit kerfi: (Slurp nýtt echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Skrá nýtt: ['/tmp/from.txt'], eyða. } grípa: { ['Empty']. }, ræsa.
+{ Skrá nýtt: ['/tmp/to.txt'], eyða. } grípa: { ['Empty']. }, ræsa.
+
+
+Skrá nýtt: ['/tmp/to.txt'], er-til rangt: {
+	Úttak skrifa: ['Confirmed. Target file does not exist.\
+'].
+}.
+Skrá nýtt: ['/tmp/from.txt'], er-til rangt: {
+	Úttak skrifa: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Forrit kerfi: (Slurp nýtt touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Forrit kerfi: (Slurp nýtt cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Skrá nýtt: ['/tmp/to.txt'], er-til satt: {
+	Úttak skrifa: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Úttak skrifa: ['Contents of file is:'] + (Skrá nýtt: ['/tmp/to.txt'], lesa), ný-lína.

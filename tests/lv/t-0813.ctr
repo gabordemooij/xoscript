@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inicializēt.
+Programma izmantot: ['../../../src/xo/lv/webtools.xo'].
+Programma izmantot: ['../../../src/xo/lv/mailtools.xo'].
+
+>> galvene := HTTP-Galvene jauns atslēga: ['Location'] vērtība: ['/ok\r\nX-Injected: yes'].
+Izvade rakstīt: galvene.
+
+>> web := Tīmekļa-dokuments jauns.
+web doties-uz: ['/ok\r\nX-Injected: yes'].
+Izvade rakstīt: ['\n'], jauna-rinda.
+
+>> mail := E-pasts jauns.
+mail kam: (Saraksts jauns ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Saraksts jauns ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Saraksts jauns ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail sūtītājs: ['d@example.invalid\r\nX-From: yes'] nosaukums: ['site\r\nX-Name: yes'].
+mail temats: ['hello\r\nX-Subject: yes'].
+mail vēstules-teksts: ['line1\r\nline2'].
+Izvade rakstīt: mail ģenerēt.
+
+>> html := HTML-E-pasts jauns.
+html kam: (Saraksts jauns ; ['a@example.invalid\r\nX-To: yes']).
+html sūtītājs: ['d@example.invalid'] nosaukums: ['site'].
+html temats: ['hello\r\nX-Subject: yes'].
+html vēstules-teksts: ['body'].
+Izvade rakstīt: ( html ģenerēt satur: ['\nX-'] ), jauna-rinda.
+Izvade rakstīt: ( html ģenerēt satur: ['X-To: yes'] ), jauna-rinda.

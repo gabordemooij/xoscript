@@ -1,0 +1,42 @@
+
+Text en: ['html'] fes: { <- (
+		jo
+		substitueix: ['&'] per: ['&amp;'],
+		substitueix: ['<'] per: ['&lt;'],
+		substitueix: ['>'] per: ['&gt;'],
+		substitueix: ['"'] per: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objecte nou.
+
+HtmlBrush en: ['respon:'] fes: { :tag
+	Sortida escriu: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush en: ['respon:i:'] fes: { :tag :content
+	tag := ( tag de: 0 longitud: (tag longitud - 1) ).
+	Sortida escriu: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush en: ['content:'] fes: { :text
+	Sortida escriu: text html, salt-de-línia.
+}.
+
+HtmlBrush en: ['attr:value:'] fes: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush nou.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

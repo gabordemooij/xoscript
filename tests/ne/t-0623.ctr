@@ -1,0 +1,43 @@
+
+
+>> g := Server नयाँ.
+>> v := ढुकुटी नयाँ.
+>> ok := 0.
+
+>> secrets := तालिका नयाँ ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets प्रतिलिपि.
+passwords प्रत्येक: { :i :p
+	secrets प्रत्येक: { :n :s
+		{
+			>> encrypted := v इन्क्रिप्ट: s साँचो: p.
+			>> decrypted := v डिक्रिप्ट: encrypted साँचो: p.
+			(decrypted = s) सत्य-भए: {
+				ok थप: 1.
+			}, नत्र: {
+				आउटपुट लेख: ['failed encrypting/decrypting: '], नयाँ-पङ्क्ति.
+				आउटपुट लेख: s, नयाँ-पङ्क्ति.
+				आउटपुट लेख: ['encrypted: '] + encrypted, नयाँ-पङ्क्ति.
+				आउटपुट लेख: ['decrypted: '] + encrypted, नयाँ-पङ्क्ति.
+				प्रोग्राम अन्त्य.
+			}.
+		} समात: { :err
+			(s = [''] वा: p = ['']) सत्य-भए: {
+				ok थप: 1.
+			}, नत्र: {
+				आउटपुट लेख: err, नयाँ-पङ्क्ति.
+				प्रोग्राम अन्त्य.
+			}.
+		}, चलाऊ.
+	}.
+}.
+
+आउटपुट लेख: ( ok + [' vault encryptions tested.'] ), नयाँ-पङ्क्ति.

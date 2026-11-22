@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server waajal.
+Prograam ay-jumtukaay: ['../../../src/xo/wo/webtools.xo'].
+
+>> Fake-Request := Denc xees.
+Fake-Request bu: ['value:'] def: { :njëg
+	sama njëg := njëg.
+}.
+Fake-Request bu: ['cookie:'] def: { :tur <- sama njëg.
+}.
+
+>> Test-Session := Ndaje-dencukaay-bu-gàtt xees.
+Test-Session bu: ['yeb'] def: { <- Listin xees.
+}.
+Test-Session bu: ['session-id'] def: { <- sama id.
+}.
+
+>> cookies := Jokkalante xees
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies kenn-ci-kenn: { :i :cookie
+	>> laaj-http := Fake-Request xees.
+	laaj-http value: cookie.
+	>> saytukat := Test-Session xees.
+	>> web := Wérukaay-Web xees.
+	web laaj-http: laaj-http.
+	web saytukatu-ndaje: saytukat.
+	web tàmbali-ndaje.
+	Génn bind: ( saytukat session-id = cookie ), taxaw.
+}.
+
+>> web := Wérukaay-Web xees.
+web json: (Listin xees teg: ['b'] ci: ['a']).
+Génn bind: ['\n'], taxaw.
+
+{ Lënd get: ['file:///etc/hostname']. } jàpp: { :e
+	Génn bind: e, taxaw.
+}, dox.
+
+>> svg := Dencukaayu xees: ['/tmp/test0814.svg'].
+svg bind: ['<svg xmlns="x"></svg>'].
+Génn taxaw.
+Server jàllale: ['test0814.svg'] njëkk-baat: ['/tmp/'].
+svg far.

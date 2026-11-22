@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := ପ୍ରୋଗ୍ରାମ୍ ସେଟିଂ: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server ଲିଙ୍କ୍: ( ସାରଣୀ ନୂତନ ;
+ libname ; ['fopen'] ;
+ ( ସାରଣୀ ନୂତନ ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+ଲିଙ୍କ୍: ( ସାରଣୀ ନୂତନ ;
+ ଶୂନ୍ୟ ; # means same lib
+ ['fread'] ;
+ ( ସାରଣୀ ନୂତନ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ଶୂନ୍ୟ ; # means same object (i.e. Stream)
+ ['fread']
+),
+ଲିଙ୍କ୍: (
+ ସାରଣୀ ନୂତନ ;
+ ଶୂନ୍ୟ ; # means same lib
+ ['fwrite'] ;
+ ( ସାରଣୀ ନୂତନ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ଶୂନ୍ୟ ; # means same lib
+ ['fwrite']
+),
+ଲିଙ୍କ୍: (
+ ସାରଣୀ ନୂତନ ;
+ ଶୂନ୍ୟ ; # means same lib
+ ['rewind'] ;
+ ( ସାରଣୀ ନୂତନ ; ['pointer'] ) ;
+ ['int'] ;
+ ଶୂନ୍ୟ ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> ଫାଇଲ୍-ପଥ := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: ଫାଇଲ୍-ପଥ mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream ବାର୍ତ୍ତା: ['fwrite'] ଯୁକ୍ତିଗୁଡ଼ିକ: (ସାରଣୀ ନୂତନ ; str ; 1 ; 6 ; fd ).
+ଆଉଟପୁଟ୍ ଲେଖ: bytes-written, ନୂଆ-ଧାଡ଼ି.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob ନୂତନ: 20.
+
+# read from file
+>> bytes-read := Stream ବାର୍ତ୍ତା: ['fread'] ଯୁକ୍ତିଗୁଡ଼ିକ: (ସାରଣୀ ନୂତନ ; buf ; 1 ; 6 ; fd ).
+ଆଉଟପୁଟ୍ ଲେଖ: bytes-read, ନୂଆ-ଧାଡ଼ି.
+ଆଉଟପୁଟ୍ ଲେଖ: buf, ନୂଆ-ଧାଡ଼ି.
+
+# free memory
+str  ମୁକ୍ତ.
+ଫାଇଲ୍-ପଥ ମୁକ୍ତ.
+mode ମୁକ୍ତ.
+buf  ମୁକ୍ତ.
+
+

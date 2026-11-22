@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lisitra vaovao ;
+	# {"key":"normal"} normal ASCII
+	( Rakibolana vaovao apetraho: ['normal'] eo: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Rakibolana vaovao apetraho: ['hello world'] eo: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Rakibolana vaovao apetraho: ['"'] eo: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Rakibolana vaovao apetraho: ['backslash: \\'] eo: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Rakibolana vaovao apetraho: ['slash: /'] eo: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Rakibolana vaovao apetraho: ['backspace: \b'] eo: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Rakibolana vaovao apetraho: ['formfeed: \f'] eo: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Rakibolana vaovao apetraho: ['newline: \n'] eo: ['key'] ) ;
+	( Rakibolana vaovao apetraho: ['newline: ↵'] eo: ['key'] ) ;
+	( Rakibolana vaovao apetraho: ['newline: 
+	'] eo: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Rakibolana vaovao apetraho: ['carriage return: \r'] eo: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Rakibolana vaovao apetraho: ['tab \t'] eo: ['key'] ) ;
+	( Rakibolana vaovao apetraho: ['tab ⇿'] eo: ['key'] ) ;
+	( Rakibolana vaovao apetraho: ['tab  '] eo: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Rakibolana vaovao apetraho: ['NUL \u0000'] eo: ['key'] ) ;
+	( Rakibolana vaovao apetraho: ['NUL \0'] eo: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Rakibolana vaovao apetraho: ['control: \u0001'] eo: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Rakibolana vaovao apetraho: ['control: \u001F'] eo: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Rakibolana vaovao apetraho: ['unicode: é'] eo: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Rakibolana vaovao apetraho: ['unicode: €'] eo: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Rakibolana vaovao apetraho: ['unicode: 日本語'] eo: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Rakibolana vaovao apetraho: ['unicode: 😀'] eo: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Rakibolana vaovao apetraho: ['unicode: 🧑‍💻'] eo: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Rakibolana vaovao apetraho: ['combining: e\u0301'] eo: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Rakibolana vaovao apetraho: ['escaped unicode: \u00e9'] eo: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Rakibolana vaovao apetraho: ['escaped unicode: \u20ac'] eo: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Rakibolana vaovao apetraho: ['escaped unicode: \ud83d\ude00'] eo: ['key'] ) ;
+	# {"key":""} empty value
+	( Rakibolana vaovao apetraho: [''] eo: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Rakibolana vaovao apetraho: ['@ < > & = % + ? #'] eo: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Rakibolana vaovao apetraho: ['''] eo: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Rakibolana vaovao apetraho: ['multiple: \" \\ \n \r \t'] eo: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Rakibolana vaovao apetraho: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] eo: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Rakibolana vaovao apetraho: [' value'] eo: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Rakibolana vaovao apetraho: ['value '] eo: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Rakibolana vaovao apetraho: [' \t\n\r '] eo: ['key'] ).
+
+dicts tsirairay: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Rakibolana vaovao apetraho: d key eo: ['key']).
+	>> b := JSON jsonify: (Rakibolana vaovao apetraho: ['value'] eo: d key).
+	>> e := JSON zavatra: a.
+	>> f := JSON zavatra: b.
+	((e key = d key ary: (f ? d key = ['value'])) na: (e key = ['NUL ?'])) marina: {
+		Vokatra soraty: ['OK'], andalana-vaovao.
+	}, raha-tsy-izany: {
+		Vokatra soraty: ['Unable to properly encode/decode: '] + d + j, andalana-vaovao.
+		Fandaharana faranana.
+	}.
+}.

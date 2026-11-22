@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server tegura.
+Gahunda koresha: ['../../../src/xo/rw/webtools.xo'].
+Gahunda koresha: ['../../../src/xo/rw/mailtools.xo'].
+
+>> umutwe := Umutwe-wa-HTTP gishya urufunguzo: ['Location'] agaciro: ['/ok\r\nX-Injected: yes'].
+Ibisohoka andika: umutwe.
+
+>> web := Inyandiko-ya-Interineti gishya.
+web jya-kuri: ['/ok\r\nX-Injected: yes'].
+Ibisohoka andika: ['\n'], umurongo-mushya.
+
+>> mail := Imeyili gishya.
+mail kuri: (Urutonde gishya ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Urutonde gishya ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Urutonde gishya ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail uwohereje: ['d@example.invalid\r\nX-From: yes'] izina: ['site\r\nX-Name: yes'].
+mail insanganyamatsiko: ['hello\r\nX-Subject: yes'].
+mail umubiri: ['line1\r\nline2'].
+Ibisohoka andika: mail hanga.
+
+>> html := Imeyili-HTML gishya.
+html kuri: (Urutonde gishya ; ['a@example.invalid\r\nX-To: yes']).
+html uwohereje: ['d@example.invalid'] izina: ['site'].
+html insanganyamatsiko: ['hello\r\nX-Subject: yes'].
+html umubiri: ['body'].
+Ibisohoka andika: ( html hanga ikubiyemo: ['\nX-'] ), umurongo-mushya.
+Ibisohoka andika: ( html hanga ikubiyemo: ['X-To: yes'] ), umurongo-mushya.

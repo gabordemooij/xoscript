@@ -1,0 +1,41 @@
+Server init.
+
+Uddata skriv: (
+	Mønster ny: ['^\\w+$'],
+	match: ['test@example.com'] 
+), stop. # 0 match, fails on @ and .
+
+Uddata skriv: (
+	Mønster ny: ['^[^@]+@[^\.]+\.\\w+$'],
+	match: ['test@example.com'] 
+), stop. # 1 match
+
+Uddata skriv: (
+	Mønster ny: ['[^@]+@[^\.]+\.\\w+'],
+	match: ['test@example.com'] 
+), stop. # 1 match
+
+Uddata skriv: (
+	Mønster ny: ['([^@]+)@([^\.]+)\.\\w+'],
+	match: ['test@example.com'] 
+), stop. # 1 match, groups dont matter
+
+Uddata skriv: (
+	Mønster ny: ['[a-z]'],
+	match: ['test@example.com'] 
+), stop. # 14 matches
+
+Uddata skriv: (
+	Mønster ny: ['.*'],
+	match: ['test@example.com'] 
+), stop. # 1 match (all)
+
+Uddata skriv: (
+	Mønster ny: ['(.*)'],
+	match: ['test@example.com'] 
+), stop. # 1 match (all)
+
+Uddata skriv: (
+	Mønster ny: ['\\s*[^@]+@[^\.]+\.\\w+'],
+	match: ['test@example.com'] 
+), stop. # 1 match, prefix space optional, gets ignored

@@ -1,0 +1,43 @@
+
+
+>> g := Server bago.
+>> v := Kaha bago.
+>> ok := 0.
+
+>> secrets := Listahan bago ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopyahin.
+passwords bawat: { :i :p
+	secrets bawat: { :n :s
+		{
+			>> encrypted := v i-encrypt: s susi: p.
+			>> decrypted := v i-decrypt: encrypted susi: p.
+			(decrypted = s) totoo: {
+				ok idagdag: 1.
+			}, kung-hindi: {
+				Labas isulat: ['failed encrypting/decrypting: '], bagong-linya.
+				Labas isulat: s, bagong-linya.
+				Labas isulat: ['encrypted: '] + encrypted, bagong-linya.
+				Labas isulat: ['decrypted: '] + encrypted, bagong-linya.
+				Programa tapusin.
+			}.
+		} saluhin: { :err
+			(s = [''] o: p = ['']) totoo: {
+				ok idagdag: 1.
+			}, kung-hindi: {
+				Labas isulat: err, bagong-linya.
+				Programa tapusin.
+			}.
+		}, patakbuhin.
+	}.
+}.
+
+Labas isulat: ( ok + [' vault encryptions tested.'] ), bagong-linya.

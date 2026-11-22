@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB nový hostiteľ: ['localhost'],
+	používateľ: ['xo'],
+	heslo: ['pass123'],
+	názov-databázy: ['xobase'],
+	pripojiť-sa.
+
+>> parametre-hľadania := db dopyt: ['SELECT ? AS a, ? AS b, ? AS c'].
+parametre-hľadania parametre: (Zoznam nový ; ['1']).
+{ parametre-hľadania načítať: { :row Výstup písať: row, nový-riadok. }. } zachytiť: { :e Výstup písať: e, nový-riadok. }, spustiť.
+
+>> parametre-hľadania := db dopyt: ['SELECT ? AS a'].
+{ parametre-hľadania načítať: { :row Výstup písať: row, nový-riadok. }. } zachytiť: { :e Výstup písať: e, nový-riadok. }, spustiť.
+
+# the right number still works, more parameters are ignored as before
+>> parametre-hľadania := db dopyt: ['SELECT ? AS a, ? AS b'].
+parametre-hľadania parametre: (Zoznam nový ; ['1'] ; ['2']).
+parametre-hľadania načítať: { :row Výstup písať: (row na: ['a']), písať: (row na: ['b']), nový-riadok. }.
+parametre-hľadania parametre: (Zoznam nový ; ['1'] ; ['2'] ; ['3']).
+parametre-hľadania načítať: { :row Výstup písať: (row na: ['a']), písať: (row na: ['b']), nový-riadok. }.

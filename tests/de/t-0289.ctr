@@ -1,0 +1,43 @@
+#Linux
+>> OS := Programm system: (Befehl uname -s), trimmen.
+
+>> Slurp := Objekt neu.
+Slurp wenn: ['neu'] tun: {
+	eigen str := [''].
+}.
+Slurp wenn: ['antworten:'] tun: { :blah
+		(eigen str ≠ ['']) ja: {
+			eigen str anhängen: [' '].
+		}.
+		eigen str anhängen: blah.
+}.
+Slurp wenn: ['antworten:und:'] tun: { :blah :blahah
+		(eigen str ≠ ['']) ja: {
+			eigen str anhängen: [' '].
+		}.
+		(blah länge > 1) ja: {
+			eigen str anhängen: (blah von: 0 länge: (blah länge - 1)).
+		}, sonst: {
+			eigen str anhängen: blah.
+		}.
+		eigen str anhängen: [' '].
+		eigen str anhängen: blahah.
+}.
+Slurp wenn: ['obtain'] tun: {
+	>> buffer := eigen str.
+	eigen str := ['']. <- buffer.
+}.
+>> large text := [''].
+{
+	large text anhängen: ['hello'].
+} × 1000.
+
+
+Ausgabe schreiben: (
+	Programm system: (
+		Slurp neu
+			echo: large text,
+			| (['./xo ../../../tests/assets/stdin_test.ctr'] OS: OS)
+		) obtain
+).
+

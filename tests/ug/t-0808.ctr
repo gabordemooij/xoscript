@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := ساندۇق ئاچقۇچ-ھاسىللا.
+>> sk := keys بىرىنچى.
+>> pk := keys ئاخىرقى.
+>> sig := ساندۇق ئىمزالا: ⌝'abc'⌜ ئاچقۇچتا: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+
+# 44 characters without padding decode to 33 bytes
+>> short := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+
+⎬ ساندۇق ئىمزالا: ⌝'abc'⌜ ئاچقۇچتا: long. ⎨ تۇت: ⎬ :e
+	چىقىرىش ياز: e, يېڭى-قۇر.
+⎨, ئىجرا.
+
+⎬ ساندۇق تەكشۈر: ⌝'abc'⌜ ئىمزا: long ئاچقۇچتا: pk. ⎨ تۇت: ⎬ :e
+	چىقىرىش ياز: e, يېڭى-قۇر.
+⎨, ئىجرا.
+
+⎬ ساندۇق تەكشۈر: ⌝'abc'⌜ ئىمزا: sig ئاچقۇچتا: short. ⎨ تۇت: ⎬ :e
+	چىقىرىش ياز: e, يېڭى-قۇر.
+⎨, ئىجرا.

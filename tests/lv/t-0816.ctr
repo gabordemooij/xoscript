@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> mēģināt := { :format :value
+	{ Izvade rakstīt: ( (Formāts jauns: format) lietot: value ), jauna-rinda. } tvert: { :e Izvade rakstīt: e, jauna-rinda. }, palaist.
+}.
+>> try-int := { :format :value
+	{ Izvade rakstīt: ( (Formāts jauns: format) lietot-veselam: value ), jauna-rinda. } tvert: { :e Izvade rakstīt: e, jauna-rinda. }, palaist.
+}.
+
+# fits
+mēģināt lietot: ['|%s|'] un: ['text'].
+mēģināt lietot: ['%06.2f'] un: 5.5.
+mēģināt lietot: ['100%% %s'] un: ['sure'].
+try-int lietot: ['%03d'] un: 7.
+try-int lietot: ['%x'] un: 255.
+mēģināt lietot: ['%d'] un: (Int64 jauns no-teksta: ['12']).
+mēģināt lietot: ['%lld'] un: (Int64 jauns no-teksta: ['12']).
+mēģināt lietot: ['%.1lf'] un: 5.5.
+try-int lietot: ['%hd'] un: 7.
+
+# does not fit
+mēģināt lietot: ['%s'] un: 12345.
+mēģināt lietot: ['%d'] un: 12345.
+mēģināt lietot: ['%f'] un: ['text'].
+try-int lietot: ['%d'] un: ['text'].
+try-int lietot: ['%s'] un: 5.
+mēģināt lietot: ['%s %s'] un: ['text'].
+mēģināt lietot: ['%n'] un: ['text'].
+mēģināt lietot: ['%*s'] un: ['text'].
+mēģināt lietot: ['%'] un: ['text'].
+
+# length modifier does not fit
+mēģināt lietot: ['%ls'] un: ['text'].
+mēģināt lietot: ['%Lf'] un: 5.5.
+try-int lietot: ['%ld'] un: 7.
+try-int lietot: ['%lld'] un: 7.
+mēģināt lietot: ['%Ld'] un: (Int64 jauns no-teksta: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+mēģināt lietot: ['%99999999999s'] un: ['text'].

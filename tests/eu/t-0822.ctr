@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB berria ostalaria: ['localhost'],
+	erabiltzailea: ['xo'],
+	pasahitza: ['pass123'],
+	datu-base-izena: ['xobase'],
+	konektatu.
+
+>> bilaketa-parametroak := db kontsulta: ['SELECT ? AS a, ? AS b, ? AS c'].
+bilaketa-parametroak parametroak: (Zerrenda berria ; ['1']).
+{ bilaketa-parametroak eskuratu: { :row Irteera idatzi: row, lerro-jauzia. }. } harrapatu: { :e Irteera idatzi: e, lerro-jauzia. }, hasi.
+
+>> bilaketa-parametroak := db kontsulta: ['SELECT ? AS a'].
+{ bilaketa-parametroak eskuratu: { :row Irteera idatzi: row, lerro-jauzia. }. } harrapatu: { :e Irteera idatzi: e, lerro-jauzia. }, hasi.
+
+# the right number still works, more parameters are ignored as before
+>> bilaketa-parametroak := db kontsulta: ['SELECT ? AS a, ? AS b'].
+bilaketa-parametroak parametroak: (Zerrenda berria ; ['1'] ; ['2']).
+bilaketa-parametroak eskuratu: { :row Irteera idatzi: (row non: ['a']), idatzi: (row non: ['b']), lerro-jauzia. }.
+bilaketa-parametroak parametroak: (Zerrenda berria ; ['1'] ; ['2'] ; ['3']).
+bilaketa-parametroak eskuratu: { :row Irteera idatzi: (row non: ['a']), idatzi: (row non: ['b']), lerro-jauzia. }.

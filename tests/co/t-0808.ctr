@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Cascia-forte generà-chjavi.
+>> sk := keys primu.
+>> pk := keys ultimu.
+>> sig := Cascia-forte firmà: ['abc'] cù: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Cascia-forte firmà: ['abc'] cù: long. } catturà: { :e
+	Esciuta scrive: e, linea-nova.
+}, lancià.
+
+{ Cascia-forte verificà: ['abc'] firma: long cù: pk. } catturà: { :e
+	Esciuta scrive: e, linea-nova.
+}, lancià.
+
+{ Cascia-forte verificà: ['abc'] firma: sig cù: short. } catturà: { :e
+	Esciuta scrive: e, linea-nova.
+}, lancià.

@@ -1,0 +1,43 @@
+
+
+>> g := Server täze.
+>> v := Seýf täze.
+>> ok := 0.
+
+>> secrets := Sanaw täze ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets göçür.
+passwords her: { :i :p
+	secrets her: { :n :s
+		{
+			>> encrypted := v şifrle: s açar: p.
+			>> decrypted := v şifri-aç: encrypted açar: p.
+			(decrypted = s) dogry: {
+				ok goş: 1.
+			}, ýogsa: {
+				Çykyş ýaz: ['failed encrypting/decrypting: '], täze-setir.
+				Çykyş ýaz: s, täze-setir.
+				Çykyş ýaz: ['encrypted: '] + encrypted, täze-setir.
+				Çykyş ýaz: ['decrypted: '] + encrypted, täze-setir.
+				Programma tamamla.
+			}.
+		} tut: { :err
+			(s = [''] ýa-da: p = ['']) dogry: {
+				ok goş: 1.
+			}, ýogsa: {
+				Çykyş ýaz: err, täze-setir.
+				Programma tamamla.
+			}.
+		}, işlet.
+	}.
+}.
+
+Çykyş ýaz: ( ok + [' vault encryptions tested.'] ), täze-setir.

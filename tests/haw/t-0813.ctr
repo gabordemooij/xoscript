@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server hoʻomākaukau.
+Polokalamu hoʻohana: ['../../../src/xo/haw/webtools.xo'].
+Polokalamu hoʻohana: ['../../../src/xo/haw/mailtools.xo'].
+
+>> poʻo := Poʻo-HTTP hou kī: ['Location'] waiwai: ['/ok\r\nX-Injected: yes'].
+Huapuka kākau: poʻo.
+
+>> web := Palapala-Pūnaewele hou.
+web hele-i: ['/ok\r\nX-Injected: yes'].
+Huapuka kākau: ['\n'], laina-hou.
+
+>> mail := Leka-uila hou.
+mail iā: (Papa hou ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Papa hou ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Papa hou ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail mea-hoʻouna: ['d@example.invalid\r\nX-From: yes'] inoa: ['site\r\nX-Name: yes'].
+mail kumuhana: ['hello\r\nX-Subject: yes'].
+mail kino: ['line1\r\nline2'].
+Huapuka kākau: mail hoʻopuka-hou.
+
+>> html := Leka-uila-HTML hou.
+html iā: (Papa hou ; ['a@example.invalid\r\nX-To: yes']).
+html mea-hoʻouna: ['d@example.invalid'] inoa: ['site'].
+html kumuhana: ['hello\r\nX-Subject: yes'].
+html kino: ['body'].
+Huapuka kākau: ( html hoʻopuka-hou aia-i-loko: ['\nX-'] ), laina-hou.
+Huapuka kākau: ( html hoʻopuka-hou aia-i-loko: ['X-To: yes'] ), laina-hou.

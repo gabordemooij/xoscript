@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> değerler := Liste yeni
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+değerler her: { :i :value
+	>> d := Sözlük yeni.
+	d koy: value konum: ['k'].
+	>> r := d kod nesne.
+	Çıktı yaz: r adet, yeni-satır.
+	Çıktı yaz: ( (r konum: ['k']) = value ), yeni-satır.
+}.

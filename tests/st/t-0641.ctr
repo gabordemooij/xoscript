@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Bukantswe ncha
+	# ASCII only
+	beha: ( Lethathamo ncha ; 65 ; 65 ; 65 ; 65 ; 0 ) sebakeng: ['AAAA'],
+	# valid 2 byte sequence
+	beha: ( Lethathamo ncha ; 194 ; 162 ; 0 ) sebakeng: ['¢'],
+	# Valid 3-byte UTF-8
+    beha: ( Lethathamo ncha ; 226 ; 130 ; 172 ; 0 ) sebakeng: ['€'],
+	# Valid 4-byte UTF-8
+    beha: ( Lethathamo ncha ; 240 ; 144 ; 141 ; 136 ; 0 ) sebakeng: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    beha: ( Lethathamo ncha ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) sebakeng: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    beha: ( Lethathamo ncha ; 65 ; 193 ; 129 ; 0 ) sebakeng: ['A?'],
+	# Invalid first byte (0xFF)
+    beha: ( Lethathamo ncha ; 255 ; 0 ) sebakeng: ['?'],
+	# Incomplete multi-byte sequence at end
+    beha: ( Lethathamo ncha ; 66 ; 226 ; 0 ) sebakeng: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    beha: ( Lethathamo ncha ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) sebakeng: ['A€?𐍈B'].
+	 
+utf8cases e-ngoe-le-e-ngoe: { :key :value
+	>> blob := Blob ncha: value palo-ea-lintho, bytes: value.
+	>> str := blob mongolo.
+	(str = key) nnete: {
+		Sephetho ngola: ['OK'], mola-o-mocha.
+	}, ho-seng-joalo: {
+		Sephetho ngola: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, mola-o-mocha.
+	}.
+	blob lokolla.
+}.

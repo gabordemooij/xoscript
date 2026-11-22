@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> cəhd-et := { :format :value
+	{ Çıxış yaz: ( (Format yeni: format) tətbiq-et: value ), yeni-sətir. } tut: { :e Çıxış yaz: e, yeni-sətir. }, başlat.
+}.
+>> try-int := { :format :value
+	{ Çıxış yaz: ( (Format yeni: format) tətbiq-et-tam: value ), yeni-sətir. } tut: { :e Çıxış yaz: e, yeni-sətir. }, başlat.
+}.
+
+# fits
+cəhd-et tətbiq-et: ['|%s|'] və: ['text'].
+cəhd-et tətbiq-et: ['%06.2f'] və: 5.5.
+cəhd-et tətbiq-et: ['100%% %s'] və: ['sure'].
+try-int tətbiq-et: ['%03d'] və: 7.
+try-int tətbiq-et: ['%x'] və: 255.
+cəhd-et tətbiq-et: ['%d'] və: (Int64 yeni mətndən: ['12']).
+cəhd-et tətbiq-et: ['%lld'] və: (Int64 yeni mətndən: ['12']).
+cəhd-et tətbiq-et: ['%.1lf'] və: 5.5.
+try-int tətbiq-et: ['%hd'] və: 7.
+
+# does not fit
+cəhd-et tətbiq-et: ['%s'] və: 12345.
+cəhd-et tətbiq-et: ['%d'] və: 12345.
+cəhd-et tətbiq-et: ['%f'] və: ['text'].
+try-int tətbiq-et: ['%d'] və: ['text'].
+try-int tətbiq-et: ['%s'] və: 5.
+cəhd-et tətbiq-et: ['%s %s'] və: ['text'].
+cəhd-et tətbiq-et: ['%n'] və: ['text'].
+cəhd-et tətbiq-et: ['%*s'] və: ['text'].
+cəhd-et tətbiq-et: ['%'] və: ['text'].
+
+# length modifier does not fit
+cəhd-et tətbiq-et: ['%ls'] və: ['text'].
+cəhd-et tətbiq-et: ['%Lf'] və: 5.5.
+try-int tətbiq-et: ['%ld'] və: 7.
+try-int tətbiq-et: ['%lld'] və: 7.
+cəhd-et tətbiq-et: ['%Ld'] və: (Int64 yeni mətndən: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+cəhd-et tətbiq-et: ['%99999999999s'] və: ['text'].

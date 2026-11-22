@@ -1,0 +1,43 @@
+
+
+>> g := Server саҥа.
+>> v := Сейф саҥа.
+>> ok := 0.
+
+>> secrets := Испииһэк саҥа ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets скопировать.
+passwords хас-биирдии: { :i :p
+	secrets хас-биирдии: { :n :s
+		{
+			>> encrypted := v шифрдээ: s күлүүс: p.
+			>> decrypted := v шифри-ас: encrypted күлүүс: p.
+			(decrypted = s) даа: {
+				ok добавить: 1.
+			}, иначе: {
+				Таһаарыы суруй: ['failed encrypting/decrypting: '], стоп.
+				Таһаарыы суруй: s, стоп.
+				Таһаарыы суруй: ['encrypted: '] + encrypted, стоп.
+				Таһаарыы суруй: ['decrypted: '] + encrypted, стоп.
+				Программа бүтэр.
+			}.
+		} проблеманы-быһаарыы: { :err
+			(s = [''] или: p = ['']) даа: {
+				ok добавить: 1.
+			}, иначе: {
+				Таһаарыы суруй: err, стоп.
+				Программа бүтэр.
+			}.
+		}, саҕалаа.
+	}.
+}.
+
+Таһаарыы суруй: ( ok + [' vault encryptions tested.'] ), стоп.

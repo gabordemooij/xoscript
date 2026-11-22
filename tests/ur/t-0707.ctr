@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+پروگرام میموری-انتظام: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB نیا میزبان: ⌝'localhost'⌜,
+	صارف-نام: ⌝'xo'⌜, پاسورڈ: ⌝'pass123'⌜, ڈیٹابیس-نام: ⌝'xobase'⌜, جڑو.
+
+>> TwoDigitFormat := وضع نیا: ⌝'%02d'⌜.
+
+# Datetime
+⎬
+	>> سال := عدد درمیان: 1995 اور: 2050, بطور-متن.
+	>> مہینہ := TwoDigitFormat لاگو-صحیح-عدد: ﴿عدد درمیان: 1 اور: 12﴾, بطور-متن.
+	>> دن := TwoDigitFormat لاگو-صحیح-عدد: ﴿عدد درمیان: 1 اور: 28﴾, بطور-متن.
+	>> گھنٹہ := TwoDigitFormat لاگو-صحیح-عدد: ﴿عدد درمیان: 1 اور: 23﴾, بطور-متن.
+	>> منٹ := TwoDigitFormat لاگو-صحیح-عدد: ﴿عدد درمیان: 1 اور: 59﴾, بطور-متن.
+	>> سیکنڈ := TwoDigitFormat لاگو-صحیح-عدد: ﴿عدد درمیان: 1 اور: 59﴾, بطور-متن.
+	>> datetime := ⌝'YYYY-MM-DD HH:II:SS'⌜.	
+	datetime
+		YYYY: سال,
+		MM: مہینہ,
+		DD: دن,
+		HH: گھنٹہ,
+		II: منٹ,
+		SS: سیکنڈ.
+	>> تلاش-پیرامیٹر :=
+	db استفسار: ﴿⌝'
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'⌜ <datetime>: datetime﴾,
+	حاصل: ⎬ :row
+		﴿row mydatetime = datetime﴾ اگر-جھوٹ: ⎬
+			یہ-کام خرابی: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mydatetime
+			﴾.
+		⎨.
+	
+	⎨.
+	counter جمع: 1.
+⎨ * 100.
+
+# Date
+⎬
+	>> سال := عدد درمیان: 1995 اور: 2050, بطور-متن.
+	>> مہینہ := TwoDigitFormat لاگو-صحیح-عدد: ﴿عدد درمیان: 1 اور: 12﴾, بطور-متن.
+	>> دن := TwoDigitFormat لاگو-صحیح-عدد: ﴿عدد درمیان: 1 اور: 28﴾, بطور-متن.
+	>> date := ⌝'YYYY-MM-DD'⌜.
+	date
+		YYYY: سال,
+		MM: مہینہ,
+		DD: دن.
+	>> تلاش-پیرامیٹر :=
+	db استفسار: ﴿⌝'
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'⌜ <date>: date﴾,
+	حاصل: ⎬ :row
+		﴿row mydate = date﴾ اگر-جھوٹ: ⎬
+			یہ-کام خرابی: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: date,
+				<observation>: row mydate
+			﴾.
+		⎨.
+	⎨.
+	counter جمع: 1.
+⎨ * 100.
+
+
+# Time
+⎬
+	>> گھنٹہ := TwoDigitFormat لاگو-صحیح-عدد: ﴿عدد درمیان: 1 اور: 23﴾, بطور-متن.
+	>> منٹ := TwoDigitFormat لاگو-صحیح-عدد: ﴿عدد درمیان: 1 اور: 59﴾, بطور-متن.
+	>> سیکنڈ := TwoDigitFormat لاگو-صحیح-عدد: ﴿عدد درمیان: 1 اور: 59﴾, بطور-متن.
+	>> وقت := ⌝'HH:II:SS'⌜.
+	وقت
+		HH: گھنٹہ,
+		II: منٹ,
+		SS: سیکنڈ.
+	>> تلاش-پیرامیٹر :=
+	db استفسار: ﴿⌝'
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'⌜ <time>: وقت﴾,
+	حاصل: ⎬ :row
+		﴿row mytime = وقت﴾ اگر-جھوٹ: ⎬
+			یہ-کام خرابی: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter جمع: 1.
+⎨ * 100.
+
+
+# Strings (varchar/text)
+>> str1 := لسٹ نیا بھرو: 100000 سے: ⌝'x'⌜, جوڑو: ⌝''⌜.
+⎬
+	>> str2 := تجوری ٹوکن: 40.
+	>> تلاش-پیرامیٹر :=
+	db استفسار: ﴿⌝'
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'⌜ 
+	<str1>: str1,
+	<str2>: str2
+	﴾,
+	حاصل: ⎬ :row
+		﴿row str1 = str1 اور: row str2 = str2﴾ اگر-جھوٹ: ⎬
+			یہ-کام خرابی: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: datetime,
+				<observation>: row mytime
+			﴾.
+		⎨.
+	⎨.
+	counter جمع: 1.
+⎨ * 100.
+
+
+# Numbers
+⎬
+	>> n1 := عدد درمیان: 1 اور: 99999.
+	>> n2 := n1 / 1000.
+	>> big := ﴿
+		﴿ Int64 متن-سے: ⌝'9223372036854775807'⌜ ﴾ -
+		﴿ Int64 متن-سے: ⌝'99999'⌜ ﴾ +
+		﴿ Int64 متن-سے: n1 بطور-متن ﴾
+	﴾.
+	>> تلاش-پیرامیٹر :=
+	db استفسار: ﴿⌝'
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	'⌜
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	﴾,
+	حاصل: ⎬ :row
+		﴿row n1 = n1﴾ اگر-جھوٹ: ⎬
+			یہ-کام خرابی: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n1
+			﴾.
+		⎨.
+		﴿row n2 = n2﴾ اگر-جھوٹ: ⎬
+			یہ-کام خرابی: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n2
+			﴾.
+		⎨.
+		﴿row n3 = n2 گول﴾ اگر-جھوٹ: ⎬
+			یہ-کام خرابی: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: n1,
+				<observation>: row n3
+			﴾.
+		⎨.
+		﴿row big = big﴾ اگر-جھوٹ: ⎬
+			یہ-کام خرابی: ﴿
+				⌝'Expected: <expected> but got: <observation>'⌜
+				<expected>: big,
+				<observation>: row big
+			﴾.
+		⎨.
+		
+	⎨.
+	counter جمع: 1.
+⎨ * 100.
+
+
+آؤٹ-پٹ لکھو: ﴿
+	⌝'OK, <counter> fuzzy casts/conversions tested.'⌜
+	<counter>: counter
+﴾, نئی-سطر.

@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Polokalamu hoʻonohonoho: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server loulou: ( Papa hou ;
+ libname ; ['fopen'] ;
+ ( Papa hou ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+loulou: ( Papa hou ;
+ ʻOle ; # means same lib
+ ['fread'] ;
+ ( Papa hou ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ʻOle ; # means same object (i.e. Stream)
+ ['fread']
+),
+loulou: (
+ Papa hou ;
+ ʻOle ; # means same lib
+ ['fwrite'] ;
+ ( Papa hou ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ʻOle ; # means same lib
+ ['fwrite']
+),
+loulou: (
+ Papa hou ;
+ ʻOle ; # means same lib
+ ['rewind'] ;
+ ( Papa hou ; ['pointer'] ) ;
+ ['int'] ;
+ ʻOle ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> ala-waihona := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: ala-waihona mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream leka: ['fwrite'] nā-hoʻokomo: (Papa hou ; str ; 1 ; 6 ; fd ).
+Huapuka kākau: bytes-written, laina-hou.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob hou: 20.
+
+# read from file
+>> bytes-read := Stream leka: ['fread'] nā-hoʻokomo: (Papa hou ; buf ; 1 ; 6 ; fd ).
+Huapuka kākau: bytes-read, laina-hou.
+Huapuka kākau: buf, laina-hou.
+
+# free memory
+str  hoʻokuʻu.
+ala-waihona hoʻokuʻu.
+mode hoʻokuʻu.
+buf  hoʻokuʻu.
+
+

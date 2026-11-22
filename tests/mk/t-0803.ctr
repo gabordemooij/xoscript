@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB нов домаќин: ['localhost'],
+	корисник: ['xo'],
+	лозинка: ['pass123'],
+	име-на-база: ['xobase'],
+	поврзи-се.
+
+>> conn2 := Maria-DB нов домаќин: ['localhost'],
+	корисник: ['xo'],
+	лозинка: ['pass123'],
+	име-на-база: ['xobase'],
+	поврзи-се.
+#...
+>> del := conn1 барање: ['DELETE FROM book WHERE id > 0'].
+{  del изврши. conn1 потврди. } фати: { :e conn1 поништи.  }, стартувај.
+
+>> insert := conn1 барање: ['INSERT INTO book (id) VALUES(null)'].
+insert изврши.
+
+>> број-на-елементи := conn1 барање: ['SELECT COUNT(*) AS num FROM book'].
+број-на-елементи преземи: { :row Излез напиши: row num, нов-ред. }.
+
+# does not show up
+# insert not committed on connection 1
+>> број-на-елементи := conn2 барање: ['SELECT COUNT(*) AS num FROM book'].
+број-на-елементи преземи: { :row Излез напиши: row num, нов-ред. }.

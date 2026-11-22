@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> llwybr := ['/tmp/test0821.csv'].
+>> file := Ffeil newydd: llwybr.
+
+file ysgrifennu: ['a,b\n"1,2\n'].
+{
+	file amffinydd: [','] dyfynnod: ['"'] llinellau: { :line
+		Allbwn ysgrifennu: line, llinell-newydd.
+	}.
+} dal: { :e Allbwn ysgrifennu: e, llinell-newydd. }, cychwyn.
+
+# a closed quote still works
+file ysgrifennu: ['a,b\n"1,2",3'].
+file amffinydd: [','] dyfynnod: ['"'] llinellau: { :line
+	Allbwn ysgrifennu: line, llinell-newydd.
+}.
+file dileu.

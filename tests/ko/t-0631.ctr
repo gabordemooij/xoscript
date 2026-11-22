@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+프로그램 메모리관리: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := 프로그램 설정값: ['FFITESTLIB'].
+
+
+
+Server 연결: (
+ 리스트 새로 ;
+ libname ;
+ ['puts'] ;
+ ( 리스트 새로 ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s 해제.
+
+# test with struct
+
+>> a := Blob 새로: 8.
+a bytes: (
+	리스트 <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (리스트 <<: ['int'], ; ['int']).
+
+Server 연결: (
+	리스트 <<: ['@structtest'], ;
+	['@structtest'] ;
+	(리스트 <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+출력 쓰기: ['Sum test:'] + (ffitest ffisum: a), 줄바꿈.
+
+struct struct-해제.
+struct 해제.
+a 해제.

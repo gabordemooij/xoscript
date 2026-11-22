@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programa pamamahala-ng-memorya: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB bago host: ['localhost'],
+	pangalan-ng-user: ['xo'], password: ['pass123'], pangalan-ng-database: ['xobase'], kumonekta.
+
+>> TwoDigitFormat := Anyo bago: ['%02d'].
+
+# Datetime
+{
+	>> taon := Bilang sa-pagitan-ng: 1995 at: 2050, teksto.
+	>> buwan := TwoDigitFormat ilapat-buumbilang: (Bilang sa-pagitan-ng: 1 at: 12), teksto.
+	>> araw := TwoDigitFormat ilapat-buumbilang: (Bilang sa-pagitan-ng: 1 at: 28), teksto.
+	>> oras := TwoDigitFormat ilapat-buumbilang: (Bilang sa-pagitan-ng: 1 at: 23), teksto.
+	>> minuto := TwoDigitFormat ilapat-buumbilang: (Bilang sa-pagitan-ng: 1 at: 59), teksto.
+	>> segundo := TwoDigitFormat ilapat-buumbilang: (Bilang sa-pagitan-ng: 1 at: 59), teksto.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: taon,
+		MM: buwan,
+		DD: araw,
+		HH: oras,
+		II: minuto,
+		SS: segundo.
+	>> parametro-ng-paghahanap :=
+	db tanong: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	kunin: { :row
+		(row mydatetime = datetime) mali: {
+			gawaing-ito mali-sa-labas: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter idagdag: 1.
+} * 100.
+
+# Date
+{
+	>> taon := Bilang sa-pagitan-ng: 1995 at: 2050, teksto.
+	>> buwan := TwoDigitFormat ilapat-buumbilang: (Bilang sa-pagitan-ng: 1 at: 12), teksto.
+	>> araw := TwoDigitFormat ilapat-buumbilang: (Bilang sa-pagitan-ng: 1 at: 28), teksto.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: taon,
+		MM: buwan,
+		DD: araw.
+	>> parametro-ng-paghahanap :=
+	db tanong: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	kunin: { :row
+		(row mydate = date) mali: {
+			gawaing-ito mali-sa-labas: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter idagdag: 1.
+} * 100.
+
+
+# Time
+{
+	>> oras := TwoDigitFormat ilapat-buumbilang: (Bilang sa-pagitan-ng: 1 at: 23), teksto.
+	>> minuto := TwoDigitFormat ilapat-buumbilang: (Bilang sa-pagitan-ng: 1 at: 59), teksto.
+	>> segundo := TwoDigitFormat ilapat-buumbilang: (Bilang sa-pagitan-ng: 1 at: 59), teksto.
+	>> oras-ngayon := ['HH:II:SS'].
+	oras-ngayon
+		HH: oras,
+		II: minuto,
+		SS: segundo.
+	>> parametro-ng-paghahanap :=
+	db tanong: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: oras-ngayon),
+	kunin: { :row
+		(row mytime = oras-ngayon) mali: {
+			gawaing-ito mali-sa-labas: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter idagdag: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Listahan bago punan: 100000 ng: ['x'], pagsamahin: [''].
+{
+	>> str2 := Kaha token: 40.
+	>> parametro-ng-paghahanap :=
+	db tanong: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	kunin: { :row
+		(row str1 = str1 at: row str2 = str2) mali: {
+			gawaing-ito mali-sa-labas: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter idagdag: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Bilang sa-pagitan-ng: 1 at: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 mula-sa-teksto: ['9223372036854775807'] ) -
+		( Int64 mula-sa-teksto: ['99999'] ) +
+		( Int64 mula-sa-teksto: n1 teksto )
+	).
+	>> parametro-ng-paghahanap :=
+	db tanong: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	kunin: { :row
+		(row n1 = n1) mali: {
+			gawaing-ito mali-sa-labas: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) mali: {
+			gawaing-ito mali-sa-labas: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 bilugin) mali: {
+			gawaing-ito mali-sa-labas: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) mali: {
+			gawaing-ito mali-sa-labas: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter idagdag: 1.
+} * 100.
+
+
+Labas isulat: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), bagong-linya.

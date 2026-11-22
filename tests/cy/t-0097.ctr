@@ -1,0 +1,42 @@
+
+Llinyn ar: ['html'] gwneud: { <- (
+		hun
+		disodli: ['&'] gyda: ['&amp;'],
+		disodli: ['<'] gyda: ['&lt;'],
+		disodli: ['>'] gyda: ['&gt;'],
+		disodli: ['"'] gyda: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Gwrthrych newydd.
+
+HtmlBrush ar: ['ymateb:'] gwneud: { :tag
+	Allbwn ysgrifennu: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush ar: ['ymateb:a:'] gwneud: { :tag :content
+	tag := ( tag o: 0 hyd: (tag hyd - 1) ).
+	Allbwn ysgrifennu: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush ar: ['content:'] gwneud: { :text
+	Allbwn ysgrifennu: text html, llinell-newydd.
+}.
+
+HtmlBrush ar: ['attr:value:'] gwneud: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush newydd.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

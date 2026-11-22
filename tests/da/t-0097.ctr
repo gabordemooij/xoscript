@@ -1,0 +1,42 @@
+
+Tekst ved: ['html'] gør: { <- (
+		selv
+		erstat: ['&'] med: ['&amp;'],
+		erstat: ['<'] med: ['&lt;'],
+		erstat: ['>'] med: ['&gt;'],
+		erstat: ['"'] med: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objekt ny.
+
+HtmlBrush ved: ['svar:'] gør: { :tag
+	Uddata skriv: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush ved: ['svar:og:'] gør: { :tag :content
+	tag := ( tag fra: 0 længde: (tag længde - 1) ).
+	Uddata skriv: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush ved: ['content:'] gør: { :text
+	Uddata skriv: text html, stop.
+}.
+
+HtmlBrush ved: ['attr:value:'] gør: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush ny.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

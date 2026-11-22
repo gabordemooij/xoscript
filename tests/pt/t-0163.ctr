@@ -1,0 +1,43 @@
+
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+Programa arranjo: 0.
+
+>> f := Arquivo novo: ['/tmp/citrine_test_file.txt'].
+f exists: { f apagar. }.
+f open: ['w'].
+f write bytes: ['hello'].
+f fechar.
+
+Programa limpa-a-memória.
+usedMemory1 := (Programa memoria ? 0).
+
+
+f := Arquivo novo: ['/tmp/citrine_test_file.txt'].
+f exists: {f apagar. }.
+f open: ['w'].
+f write bytes: ['hello world'].
+f fechar.
+Programa limpa-a-memória.
+usedMemory2 := (Programa memoria ? 0).
+
+
+f := Arquivo novo: ['/tmp/citrine_test_file.txt'].
+f exists: { f apagar. }.
+f open: ['w'].
+f write bytes: ['hello world'].
+f fechar.
+Programa limpa-a-memória.
+usedMemory3 := (Programa memoria ? 0).
+
+
+
+( usedMemory1 = usedMemory2 e: usedMemory1 = usedMemory3, e: usedMemory2 = usedMemory3 ) sim: {
+	Saída escrever: ['No memory leaks here'].
+}, não: {
+	Saída escrever: ['Leaking memory...'].
+}.

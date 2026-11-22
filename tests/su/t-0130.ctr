@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Program setélan: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server tautkeun: ( Daptar anyar ;
+ libname ; ['fopen'] ;
+ ( Daptar anyar ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+tautkeun: ( Daptar anyar ;
+ Kosong ; # means same lib
+ ['fread'] ;
+ ( Daptar anyar ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Kosong ; # means same object (i.e. Stream)
+ ['fread']
+),
+tautkeun: (
+ Daptar anyar ;
+ Kosong ; # means same lib
+ ['fwrite'] ;
+ ( Daptar anyar ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Kosong ; # means same lib
+ ['fwrite']
+),
+tautkeun: (
+ Daptar anyar ;
+ Kosong ; # means same lib
+ ['rewind'] ;
+ ( Daptar anyar ; ['pointer'] ) ;
+ ['int'] ;
+ Kosong ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> jalur := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: jalur mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream pesen: ['fwrite'] argumén: (Daptar anyar ; str ; 1 ; 6 ; fd ).
+Kaluaran tulis: bytes-written, baris-anyar.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob anyar: 20.
+
+# read from file
+>> bytes-read := Stream pesen: ['fread'] argumén: (Daptar anyar ; buf ; 1 ; 6 ; fd ).
+Kaluaran tulis: bytes-read, baris-anyar.
+Kaluaran tulis: buf, baris-anyar.
+
+# free memory
+str  bébaskeun.
+jalur bébaskeun.
+mode bébaskeun.
+buf  bébaskeun.
+
+

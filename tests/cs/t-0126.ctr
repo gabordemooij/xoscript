@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Objekt nový.
+
+Slurp při: ['nový'] udělat: {
+	vlastní str := [''].
+}.
+
+Slurp při: ['nieuw'] udělat: {
+	vlastní str := [''].
+}.
+
+Slurp při: ['odpovědět:'] udělat: { :blah
+		vlastní str připojit: blah.
+}.
+
+Slurp při: ['odpovědět:a:'] udělat: { :blah :blahah
+		vlastní str připojit: (blah od: 0 délka: (blah délka - 1)).
+		vlastní str připojit: [' '].
+		vlastní str připojit: blahah.
+}.
+
+Slurp při: ['obtain'] udělat: {
+	>> buffer := vlastní str.
+	vlastní str := ['']. <- buffer.
+}.
+
+
+Výstup psát: (Program systém: (Slurp nový echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Soubor nový: ['/tmp/from.txt'], smazat. } chytit: { ['Empty']. }, spustit.
+{ Soubor nový: ['/tmp/to.txt'], smazat. } chytit: { ['Empty']. }, spustit.
+
+
+Soubor nový: ['/tmp/to.txt'], existuje nepravda: {
+	Výstup psát: ['Confirmed. Target file does not exist.\
+'].
+}.
+Soubor nový: ['/tmp/from.txt'], existuje nepravda: {
+	Výstup psát: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Program systém: (Slurp nový touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Program systém: (Slurp nový cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Soubor nový: ['/tmp/to.txt'], existuje pravda: {
+	Výstup psát: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Výstup psát: ['Contents of file is:'] + (Soubor nový: ['/tmp/to.txt'], číst), nový-řádek.

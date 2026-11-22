@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Gahunda imicungire-yububiko: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB gishya uwakira: ['localhost'],
+	izina-ryukoresha: ['xo'], ijambobanga: ['pass123'], izina-ryububikoshingiro: ['xobase'], ihuze.
+
+>> TwoDigitFormat := Imiterere gishya: ['%02d'].
+
+# Datetime
+{
+	>> umwaka := Umubare hagati: 1995 na: 2050, inyandiko.
+	>> ukwezi := TwoDigitFormat shyira-kuri-umubare-wuzuye: (Umubare hagati: 1 na: 12), inyandiko.
+	>> umunsi := TwoDigitFormat shyira-kuri-umubare-wuzuye: (Umubare hagati: 1 na: 28), inyandiko.
+	>> isaha := TwoDigitFormat shyira-kuri-umubare-wuzuye: (Umubare hagati: 1 na: 23), inyandiko.
+	>> umunota := TwoDigitFormat shyira-kuri-umubare-wuzuye: (Umubare hagati: 1 na: 59), inyandiko.
+	>> isegonda := TwoDigitFormat shyira-kuri-umubare-wuzuye: (Umubare hagati: 1 na: 59), inyandiko.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: umwaka,
+		MM: ukwezi,
+		DD: umunsi,
+		HH: isaha,
+		II: umunota,
+		SS: isegonda.
+	>> ibipimo-byishakisha :=
+	db ikibazo: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	zana: { :row
+		(row mydatetime = datetime) ikinyoma: {
+			uyu-murimo ikosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ongeraho: 1.
+} * 100.
+
+# Date
+{
+	>> umwaka := Umubare hagati: 1995 na: 2050, inyandiko.
+	>> ukwezi := TwoDigitFormat shyira-kuri-umubare-wuzuye: (Umubare hagati: 1 na: 12), inyandiko.
+	>> umunsi := TwoDigitFormat shyira-kuri-umubare-wuzuye: (Umubare hagati: 1 na: 28), inyandiko.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: umwaka,
+		MM: ukwezi,
+		DD: umunsi.
+	>> ibipimo-byishakisha :=
+	db ikibazo: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	zana: { :row
+		(row mydate = date) ikinyoma: {
+			uyu-murimo ikosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ongeraho: 1.
+} * 100.
+
+
+# Time
+{
+	>> isaha := TwoDigitFormat shyira-kuri-umubare-wuzuye: (Umubare hagati: 1 na: 23), inyandiko.
+	>> umunota := TwoDigitFormat shyira-kuri-umubare-wuzuye: (Umubare hagati: 1 na: 59), inyandiko.
+	>> isegonda := TwoDigitFormat shyira-kuri-umubare-wuzuye: (Umubare hagati: 1 na: 59), inyandiko.
+	>> igihe := ['HH:II:SS'].
+	igihe
+		HH: isaha,
+		II: umunota,
+		SS: isegonda.
+	>> ibipimo-byishakisha :=
+	db ikibazo: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: igihe),
+	zana: { :row
+		(row mytime = igihe) ikinyoma: {
+			uyu-murimo ikosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ongeraho: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Urutonde gishya uzuza: 100000 na: ['x'], huza: [''].
+{
+	>> str2 := Isanduku-yumutekano token: 40.
+	>> ibipimo-byishakisha :=
+	db ikibazo: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	zana: { :row
+		(row str1 = str1 na: row str2 = str2) ikinyoma: {
+			uyu-murimo ikosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ongeraho: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Umubare hagati: 1 na: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 bivuye-mu-nyandiko: ['9223372036854775807'] ) -
+		( Int64 bivuye-mu-nyandiko: ['99999'] ) +
+		( Int64 bivuye-mu-nyandiko: n1 inyandiko )
+	).
+	>> ibipimo-byishakisha :=
+	db ikibazo: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	zana: { :row
+		(row n1 = n1) ikinyoma: {
+			uyu-murimo ikosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) ikinyoma: {
+			uyu-murimo ikosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 egereza-umubare) ikinyoma: {
+			uyu-murimo ikosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) ikinyoma: {
+			uyu-murimo ikosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ongeraho: 1.
+} * 100.
+
+
+Ibisohoka andika: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), umurongo-mushya.

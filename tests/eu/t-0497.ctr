@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := Fitxategia berria: ['/tmp/test.gif'].
+f idatzi: ['GIF87a01234567810'].
+
+# serve the file
+Server pasatu: ['test.gif'] aurrizkia: ['/tmp/'].
+
+Irteera lerro-jauzia.
+
+Irteera idatzi: ['Outside container (security):'], lerro-jauzia.
+{ Server pasatu: ['../passwd'] aurrizkia: ['/tmp/']. }
+harrapatu: { :e Irteera idatzi: e, lerro-jauzia. },
+hasi.
+
+Irteera idatzi: ['Invalid prefix:'], lerro-jauzia.
+{ Server pasatu: ['test.gif'] aurrizkia: ['z:\\']. }
+harrapatu: { :e Irteera idatzi: e, lerro-jauzia. },
+hasi.
+
+Irteera idatzi: ['Non-existant file:'], lerro-jauzia.
+{ Server pasatu: ['xxx.xxx'] aurrizkia: ['/tmp/']. }
+harrapatu: { :e Irteera idatzi: e, lerro-jauzia. },
+hasi.

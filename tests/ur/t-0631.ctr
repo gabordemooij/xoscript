@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+پروگرام میموری-انتظام: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := پروگرام ترتیب-قدر: ⌝'FFITESTLIB'⌜.
+
+
+
+Server ربط: ﴿
+ لسٹ نیا ;
+ libname ;
+ ⌝'puts'⌜ ;
+ ﴿ لسٹ نیا ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'void'⌜ ;
+ ⌝'Puts'⌜ ;
+ ⌝'str:'⌜
+﴾.
+
+>> s := Blob utf8: ⌝'Hello from FFI!\n'⌜.
+
+Puts str: s.
+s آزاد-کرو.
+
+# test with struct
+
+>> a := Blob نیا: 8.
+a بائٹس: ﴿
+	لسٹ <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+﴾.
+
+>> struct := Blob struct: ﴿لسٹ <<: ⌝'int'⌜, ; ⌝'int'⌜﴾.
+
+Server ربط: ﴿
+	لسٹ <<: ⌝'@structtest'⌜, ;
+	⌝'@structtest'⌜ ;
+	﴿لسٹ <<: struct﴾ ; 
+	⌝'int'⌜ ;	
+	⌝'ffitest'⌜ ;
+	⌝'ffisum:'⌜
+﴾.
+	
+آؤٹ-پٹ لکھو: ⌝'Sum test:'⌜ + ﴿ffitest ffisum: a﴾, نئی-سطر.
+
+struct آزاد-کرو-struct.
+struct آزاد-کرو.
+a آزاد-کرو.

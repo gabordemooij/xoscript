@@ -1,0 +1,43 @@
+
+
+>> g := Server nov.
+>> v := Sef nov.
+>> ok := 0.
+
+>> secrets := Seznam nov ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopiraj.
+passwords vsak: { :i :p
+	secrets vsak: { :n :s
+		{
+			>> encrypted := v šifriraj: s ključ: p.
+			>> decrypted := v dešifriraj: encrypted ključ: p.
+			(decrypted = s) resnično: {
+				ok prištej: 1.
+			}, sicer: {
+				Izhod piši: ['failed encrypting/decrypting: '], nova-vrstica.
+				Izhod piši: s, nova-vrstica.
+				Izhod piši: ['encrypted: '] + encrypted, nova-vrstica.
+				Izhod piši: ['decrypted: '] + encrypted, nova-vrstica.
+				Program konec.
+			}.
+		} ujemi: { :err
+			(s = [''] ali: p = ['']) resnično: {
+				ok prištej: 1.
+			}, sicer: {
+				Izhod piši: err, nova-vrstica.
+				Program konec.
+			}.
+		}, zaženi.
+	}.
+}.
+
+Izhod piši: ( ok + [' vault encryptions tested.'] ), nova-vrstica.

@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Ríomhchlár bainistíocht-cuimhne: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB nua óstach: ['localhost'],
+	ainm-úsáideora: ['xo'], pasfhocal: ['pass123'], ainm-bunachair: ['xobase'], ceangail.
+
+>> TwoDigitFormat := Formáid nua: ['%02d'].
+
+# Datetime
+{
+	>> bliain := Uimhir idir: 1995 agus: 2050, teaghrán.
+	>> mí := TwoDigitFormat feidhmigh-slánuimhir: (Uimhir idir: 1 agus: 12), teaghrán.
+	>> lá := TwoDigitFormat feidhmigh-slánuimhir: (Uimhir idir: 1 agus: 28), teaghrán.
+	>> uair := TwoDigitFormat feidhmigh-slánuimhir: (Uimhir idir: 1 agus: 23), teaghrán.
+	>> nóiméad := TwoDigitFormat feidhmigh-slánuimhir: (Uimhir idir: 1 agus: 59), teaghrán.
+	>> soicind := TwoDigitFormat feidhmigh-slánuimhir: (Uimhir idir: 1 agus: 59), teaghrán.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: bliain,
+		MM: mí,
+		DD: lá,
+		HH: uair,
+		II: nóiméad,
+		SS: soicind.
+	>> paraiméadair-chuardaigh :=
+	db iarratas: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	faigh-sonraí: { :row
+		(row mydatetime = datetime) bréagach: {
+			an-tasc-seo earráid: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter suimigh: 1.
+} * 100.
+
+# Date
+{
+	>> bliain := Uimhir idir: 1995 agus: 2050, teaghrán.
+	>> mí := TwoDigitFormat feidhmigh-slánuimhir: (Uimhir idir: 1 agus: 12), teaghrán.
+	>> lá := TwoDigitFormat feidhmigh-slánuimhir: (Uimhir idir: 1 agus: 28), teaghrán.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: bliain,
+		MM: mí,
+		DD: lá.
+	>> paraiméadair-chuardaigh :=
+	db iarratas: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	faigh-sonraí: { :row
+		(row mydate = date) bréagach: {
+			an-tasc-seo earráid: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter suimigh: 1.
+} * 100.
+
+
+# Time
+{
+	>> uair := TwoDigitFormat feidhmigh-slánuimhir: (Uimhir idir: 1 agus: 23), teaghrán.
+	>> nóiméad := TwoDigitFormat feidhmigh-slánuimhir: (Uimhir idir: 1 agus: 59), teaghrán.
+	>> soicind := TwoDigitFormat feidhmigh-slánuimhir: (Uimhir idir: 1 agus: 59), teaghrán.
+	>> am := ['HH:II:SS'].
+	am
+		HH: uair,
+		II: nóiméad,
+		SS: soicind.
+	>> paraiméadair-chuardaigh :=
+	db iarratas: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: am),
+	faigh-sonraí: { :row
+		(row mytime = am) bréagach: {
+			an-tasc-seo earráid: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter suimigh: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Liosta nua líon: 100000 le: ['x'], ceangail: [''].
+{
+	>> str2 := Taisceadán ceadchomhartha: 40.
+	>> paraiméadair-chuardaigh :=
+	db iarratas: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	faigh-sonraí: { :row
+		(row str1 = str1 agus: row str2 = str2) bréagach: {
+			an-tasc-seo earráid: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter suimigh: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Uimhir idir: 1 agus: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 as-teaghrán: ['9223372036854775807'] ) -
+		( Int64 as-teaghrán: ['99999'] ) +
+		( Int64 as-teaghrán: n1 teaghrán )
+	).
+	>> paraiméadair-chuardaigh :=
+	db iarratas: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	faigh-sonraí: { :row
+		(row n1 = n1) bréagach: {
+			an-tasc-seo earráid: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) bréagach: {
+			an-tasc-seo earráid: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 slánaigh) bréagach: {
+			an-tasc-seo earráid: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) bréagach: {
+			an-tasc-seo earráid: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter suimigh: 1.
+} * 100.
+
+
+Aschur scríobh: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), líne-nua.

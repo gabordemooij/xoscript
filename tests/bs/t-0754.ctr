@@ -1,0 +1,30 @@
+Izlaz piši: ['Test object'], novi-red.
+>> a := Objekat novi. 
+
+a na: ['item:'] uradi: { :out
+	svoj out := out. 
+}.
+
+a na: ['item'] uradi: { <- svoj out.
+}.
+
+a na: ['greet'] uradi: {
+	Izlaz piši: ['hi from original out!'], novi-red.
+}.
+
+a item: Izlaz.
+
+Izlaz piši: a item, novi-red.
+
+>> old-out-address := a item prototip memorijska-adresa.
+a save-as: ['/tmp/a.bin'].
+Izlaz piši: ['========== RELOADING SNAP:'], novi-red.
+
+>> b := Objekat load-from: ['/tmp/a.bin'].
+
+(b item prototip memorijska-adresa = old-out-address) tačno: {
+	Izlaz piši: ['Object link re-attached.'], novi-red.
+}.
+
+b item piši: ['hello from loaded out!'], novi-red.
+b greet.

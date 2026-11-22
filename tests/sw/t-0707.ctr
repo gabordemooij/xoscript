@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programu usimamizi-wa-kumbukumbu: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB mpya mwenyeji: ['localhost'],
+	jina-la-mtumiaji: ['xo'], nywila: ['pass123'], jina-la-hifadhidata: ['xobase'], unganika.
+
+>> TwoDigitFormat := Umbizo mpya: ['%02d'].
+
+# Datetime
+{
+	>> mwaka := Nambari kati-ya: 1995 na: 2050, maandishi.
+	>> mwezi := TwoDigitFormat tekeleza-namba-kamili: (Nambari kati-ya: 1 na: 12), maandishi.
+	>> siku := TwoDigitFormat tekeleza-namba-kamili: (Nambari kati-ya: 1 na: 28), maandishi.
+	>> saa := TwoDigitFormat tekeleza-namba-kamili: (Nambari kati-ya: 1 na: 23), maandishi.
+	>> dakika := TwoDigitFormat tekeleza-namba-kamili: (Nambari kati-ya: 1 na: 59), maandishi.
+	>> sekunde := TwoDigitFormat tekeleza-namba-kamili: (Nambari kati-ya: 1 na: 59), maandishi.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: mwaka,
+		MM: mwezi,
+		DD: siku,
+		HH: saa,
+		II: dakika,
+		SS: sekunde.
+	>> vigezo-vya-utafutaji :=
+	db ulizo: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	leta: { :row
+		(row mydatetime = datetime) uongo: {
+			jukumu-hili kosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ongeza: 1.
+} * 100.
+
+# Date
+{
+	>> mwaka := Nambari kati-ya: 1995 na: 2050, maandishi.
+	>> mwezi := TwoDigitFormat tekeleza-namba-kamili: (Nambari kati-ya: 1 na: 12), maandishi.
+	>> siku := TwoDigitFormat tekeleza-namba-kamili: (Nambari kati-ya: 1 na: 28), maandishi.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: mwaka,
+		MM: mwezi,
+		DD: siku.
+	>> vigezo-vya-utafutaji :=
+	db ulizo: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	leta: { :row
+		(row mydate = date) uongo: {
+			jukumu-hili kosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ongeza: 1.
+} * 100.
+
+
+# Time
+{
+	>> saa := TwoDigitFormat tekeleza-namba-kamili: (Nambari kati-ya: 1 na: 23), maandishi.
+	>> dakika := TwoDigitFormat tekeleza-namba-kamili: (Nambari kati-ya: 1 na: 59), maandishi.
+	>> sekunde := TwoDigitFormat tekeleza-namba-kamili: (Nambari kati-ya: 1 na: 59), maandishi.
+	>> wakati := ['HH:II:SS'].
+	wakati
+		HH: saa,
+		II: dakika,
+		SS: sekunde.
+	>> vigezo-vya-utafutaji :=
+	db ulizo: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: wakati),
+	leta: { :row
+		(row mytime = wakati) uongo: {
+			jukumu-hili kosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ongeza: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Orodha mpya jaza: 100000 kwa: ['x'], unganisha: [''].
+{
+	>> str2 := Kasha tokeni: 40.
+	>> vigezo-vya-utafutaji :=
+	db ulizo: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	leta: { :row
+		(row str1 = str1 na: row str2 = str2) uongo: {
+			jukumu-hili kosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ongeza: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Nambari kati-ya: 1 na: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 kutoka-maandishi: ['9223372036854775807'] ) -
+		( Int64 kutoka-maandishi: ['99999'] ) +
+		( Int64 kutoka-maandishi: n1 maandishi )
+	).
+	>> vigezo-vya-utafutaji :=
+	db ulizo: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	leta: { :row
+		(row n1 = n1) uongo: {
+			jukumu-hili kosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) uongo: {
+			jukumu-hili kosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 kadiria) uongo: {
+			jukumu-hili kosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) uongo: {
+			jukumu-hili kosa: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ongeza: 1.
+} * 100.
+
+
+Towe andika: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), mstari-mpya.

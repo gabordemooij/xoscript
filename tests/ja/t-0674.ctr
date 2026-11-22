@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> 経路 := ['/tmp/dat.csv'].
+>> csv := ファイル 新規: 経路.
+csv 書く: s.
+
+# accepts CRLF LF CR, varying row length
+csv 区切り: [';'] 引用符: ['"'] 各行: { :line
+	プログラム 掃除.
+	出力 書く: line, 改行.
+	プログラム 掃除.
+}.
+
+# unequal lines
+s 末尾に追加: ['\njustone'].
+csv 書く: s.
+{
+	csv 区切り: [';'] 引用符: ['"'] 各行: { :line
+		出力 書く: line, 改行.
+	}.
+} 例外時: { :e 
+	出力 書く: e, 改行.
+}, 開始.
+
+# invalid format
+s := ['"he"llo";world'].
+csv 書く: s.
+{
+	csv 区切り: [';'] 引用符: ['"'] 各行: { :line
+		出力 書く: line, 改行.
+	}.
+} 例外時: { :e 
+	出力 書く: e, 改行.
+}, 開始.

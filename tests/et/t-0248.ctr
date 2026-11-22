@@ -1,0 +1,39 @@
+
+
+Tekst kui: ['evaluate'] tee: {
+	>> kood := Fail uus: ['/tmp/eval.ctr'].
+	kood kirjuta: ise tekst + ['.'].
+	Programm kasuta: ['/tmp/eval.ctr'].
+}.
+
+>> a := (Loend ← (
+	(Sõnastik uus)
+		pane: ['domain'] kohale: ['mywebsite.com'],
+		pane: (Loend ←
+			((Sõnastik uus)
+				pane: ['home'] kohale: ['title'],
+				pane: ['<html></html>'] kohale: ['body'],
+				pane: ['2017-01-01'] kohale: ['created']
+			) ;
+			((Sõnastik uus)
+				pane: ['aboutus(c)'] kohale: ['title'],
+				pane: ['<credits>Author Inc.</credits>'] kohale: ['body']
+			)
+		) kohale: ['pages']
+	)
+) tekst.
+
+Väljund kirjuta: a tüüp, reavahetus.
+Väljund kirjuta: a, reavahetus.
+
+>> b := Tühi.
+(['b := '] + a) evaluate.
+Väljund kirjuta: b ? 0 ? ['pages'] ? 1 ? ['body'], reavahetus.
+
+>> c := b ? 0.
+>> d := c tekst.
+Väljund kirjuta: d tüüp, reavahetus.
+
+>> e := Tühi.
+(['e := '] + d) evaluate.
+Väljund kirjuta: e ? ['pages'] ? 0, reavahetus.

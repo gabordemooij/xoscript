@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> nilai-nilai := Daftar baru
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+nilai-nilai setiap: { :i :value
+	>> d := Kamus baru.
+	d taruh: value di: ['k'].
+	>> r := d kode objek.
+	Keluaran tulis: r jumlah, baris-baru.
+	Keluaran tulis: ( (r di: ['k']) = value ), baris-baru.
+}.

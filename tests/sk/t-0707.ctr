@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Program správa-pamäte: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB nový hostiteľ: ['localhost'],
+	používateľ: ['xo'], heslo: ['pass123'], názov-databázy: ['xobase'], pripojiť-sa.
+
+>> TwoDigitFormat := Formát nový: ['%02d'].
+
+# Datetime
+{
+	>> rok := Číslo medzi: 1995 a: 2050, text.
+	>> mesiac := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 12), text.
+	>> deň := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 28), text.
+	>> hodina := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 23), text.
+	>> minúta := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 59), text.
+	>> sekunda := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 59), text.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: rok,
+		MM: mesiac,
+		DD: deň,
+		HH: hodina,
+		II: minúta,
+		SS: sekunda.
+	>> parametre-hľadania :=
+	db dopyt: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	načítať: { :row
+		(row mydatetime = datetime) nepravda: {
+			táto-úloha chyba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter pridať: 1.
+} * 100.
+
+# Date
+{
+	>> rok := Číslo medzi: 1995 a: 2050, text.
+	>> mesiac := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 12), text.
+	>> deň := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 28), text.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: rok,
+		MM: mesiac,
+		DD: deň.
+	>> parametre-hľadania :=
+	db dopyt: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	načítať: { :row
+		(row mydate = date) nepravda: {
+			táto-úloha chyba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter pridať: 1.
+} * 100.
+
+
+# Time
+{
+	>> hodina := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 23), text.
+	>> minúta := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 59), text.
+	>> sekunda := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 59), text.
+	>> čas := ['HH:II:SS'].
+	čas
+		HH: hodina,
+		II: minúta,
+		SS: sekunda.
+	>> parametre-hľadania :=
+	db dopyt: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: čas),
+	načítať: { :row
+		(row mytime = čas) nepravda: {
+			táto-úloha chyba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter pridať: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Zoznam nový naplniť: 100000 čím: ['x'], spojiť: [''].
+{
+	>> str2 := Trezor token: 40.
+	>> parametre-hľadania :=
+	db dopyt: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	načítať: { :row
+		(row str1 = str1 a: row str2 = str2) nepravda: {
+			táto-úloha chyba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter pridať: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Číslo medzi: 1 a: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 z-textu: ['9223372036854775807'] ) -
+		( Int64 z-textu: ['99999'] ) +
+		( Int64 z-textu: n1 text )
+	).
+	>> parametre-hľadania :=
+	db dopyt: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	načítať: { :row
+		(row n1 = n1) nepravda: {
+			táto-úloha chyba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) nepravda: {
+			táto-úloha chyba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 zaokrúhliť) nepravda: {
+			táto-úloha chyba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) nepravda: {
+			táto-úloha chyba: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter pridať: 1.
+} * 100.
+
+
+Výstup písať: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), nový-riadok.

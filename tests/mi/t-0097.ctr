@@ -1,0 +1,42 @@
+
+Aho ina-tae: ['html'] mahia: { <- (
+		whaiaro
+		whakakapihia: ['&'] me: ['&amp;'],
+		whakakapihia: ['<'] me: ['&lt;'],
+		whakakapihia: ['>'] me: ['&gt;'],
+		whakakapihia: ['"'] me: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Ahanoa hou.
+
+HtmlBrush ina-tae: ['whakautu:'] mahia: { :tag
+	Huaputa tuhi: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush ina-tae: ['whakautu:a:'] mahia: { :tag :content
+	tag := ( tag mai: 0 roa: (tag roa - 1) ).
+	Huaputa tuhi: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush ina-tae: ['content:'] mahia: { :text
+	Huaputa tuhi: text html, rārangi-hou.
+}.
+
+HtmlBrush ina-tae: ['attr:value:'] mahia: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush hou.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> pot := ['/tmp/test0821.csv'].
+>> file := Datoteka nov: pot.
+
+file piši: ['a,b\n"1,2\n'].
+{
+	file ločilo: [','] narekovaj: ['"'] vrstice: { :line
+		Izhod piši: line, nova-vrstica.
+	}.
+} ujemi: { :e Izhod piši: e, nova-vrstica. }, zaženi.
+
+# a closed quote still works
+file piši: ['a,b\n"1,2",3'].
+file ločilo: [','] narekovaj: ['"'] vrstice: { :line
+	Izhod piši: line, nova-vrstica.
+}.
+file izbriši.

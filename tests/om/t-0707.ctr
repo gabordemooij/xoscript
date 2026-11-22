@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Sagantaa qulqullina: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB haaraa keessummeessaa: ['localhost'],
+	maqaa-fayyadamaa: ['xo'], jecha-icciitii: ['pass123'], maqaa-kuusaa-deetaa: ['xobase'], walqunnami.
+
+>> TwoDigitFormat := Bifa haaraa: ['%02d'].
+
+# Datetime
+{
+	>> bara := Lakkoofsa gidduu: 1995 fi: 2050, gara-barreeffamaatti.
+	>> jiʼa := TwoDigitFormat raawwadhu-lakkoofsa-guutuu: (Lakkoofsa gidduu: 1 fi: 12), gara-barreeffamaatti.
+	>> guyyaa := TwoDigitFormat raawwadhu-lakkoofsa-guutuu: (Lakkoofsa gidduu: 1 fi: 28), gara-barreeffamaatti.
+	>> saʼaatii := TwoDigitFormat raawwadhu-lakkoofsa-guutuu: (Lakkoofsa gidduu: 1 fi: 23), gara-barreeffamaatti.
+	>> daqiiqaa := TwoDigitFormat raawwadhu-lakkoofsa-guutuu: (Lakkoofsa gidduu: 1 fi: 59), gara-barreeffamaatti.
+	>> sekoondii := TwoDigitFormat raawwadhu-lakkoofsa-guutuu: (Lakkoofsa gidduu: 1 fi: 59), gara-barreeffamaatti.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: bara,
+		MM: jiʼa,
+		DD: guyyaa,
+		HH: saʼaatii,
+		II: daqiiqaa,
+		SS: sekoondii.
+	>> ulaagaalee-barbaacha :=
+	db iyyaafannoo: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	fidi: { :row
+		(row mydatetime = datetime) yoosoba: {
+			hojii-kana dogoggora: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter idaʼi: 1.
+} * 100.
+
+# Date
+{
+	>> bara := Lakkoofsa gidduu: 1995 fi: 2050, gara-barreeffamaatti.
+	>> jiʼa := TwoDigitFormat raawwadhu-lakkoofsa-guutuu: (Lakkoofsa gidduu: 1 fi: 12), gara-barreeffamaatti.
+	>> guyyaa := TwoDigitFormat raawwadhu-lakkoofsa-guutuu: (Lakkoofsa gidduu: 1 fi: 28), gara-barreeffamaatti.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: bara,
+		MM: jiʼa,
+		DD: guyyaa.
+	>> ulaagaalee-barbaacha :=
+	db iyyaafannoo: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	fidi: { :row
+		(row mydate = date) yoosoba: {
+			hojii-kana dogoggora: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter idaʼi: 1.
+} * 100.
+
+
+# Time
+{
+	>> saʼaatii := TwoDigitFormat raawwadhu-lakkoofsa-guutuu: (Lakkoofsa gidduu: 1 fi: 23), gara-barreeffamaatti.
+	>> daqiiqaa := TwoDigitFormat raawwadhu-lakkoofsa-guutuu: (Lakkoofsa gidduu: 1 fi: 59), gara-barreeffamaatti.
+	>> sekoondii := TwoDigitFormat raawwadhu-lakkoofsa-guutuu: (Lakkoofsa gidduu: 1 fi: 59), gara-barreeffamaatti.
+	>> yeroo := ['HH:II:SS'].
+	yeroo
+		HH: saʼaatii,
+		II: daqiiqaa,
+		SS: sekoondii.
+	>> ulaagaalee-barbaacha :=
+	db iyyaafannoo: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: yeroo),
+	fidi: { :row
+		(row mytime = yeroo) yoosoba: {
+			hojii-kana dogoggora: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter idaʼi: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Tarree-wantootaa haaraa guuti: 100000 tiin: ['x'], waliingalchi: [''].
+{
+	>> str2 := Kuusaa-nageenyaa token: 40.
+	>> ulaagaalee-barbaacha :=
+	db iyyaafannoo: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	fidi: { :row
+		(row str1 = str1 fi: row str2 = str2) yoosoba: {
+			hojii-kana dogoggora: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter idaʼi: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Lakkoofsa gidduu: 1 fi: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 barreeffama-irraa: ['9223372036854775807'] ) -
+		( Int64 barreeffama-irraa: ['99999'] ) +
+		( Int64 barreeffama-irraa: n1 gara-barreeffamaatti )
+	).
+	>> ulaagaalee-barbaacha :=
+	db iyyaafannoo: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	fidi: { :row
+		(row n1 = n1) yoosoba: {
+			hojii-kana dogoggora: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) yoosoba: {
+			hojii-kana dogoggora: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 naanna) yoosoba: {
+			hojii-kana dogoggora: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) yoosoba: {
+			hojii-kana dogoggora: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter idaʼi: 1.
+} * 100.
+
+
+Baʼii barreessi: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), dhaabi.

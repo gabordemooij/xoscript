@@ -1,0 +1,20 @@
+
+文本 在: ['evaluate'] 执行: {
+	>> 代码 := 文件 新建: ['/tmp/eval.ctr'].
+	代码 写入: (自身 转文本 + ['.']).
+	程序 使用: ['/tmp/eval.ctr'].
+}.
+
+>> map :=
+	(映射对象 新建)
+	放: ['Hi There'] 在: ['two'],
+	放: (数组对象 ← ['hello'] ; ['world'] ; (数组对象 ← 1 ; 2; 9) ; 否) 在: ['one'],
+	放: ( (映射对象 新建) 放: ['wrrld'] 在: ['misspelled'] ) 在: ['three'],
+	放: (数组对象 ← ((映射对象 新建) 放: ['treasure'] 在: ['hidden']) ; 2) 在: ['four']. 
+>> str := map 转文本.
+>> map2 := 空.
+(['map2 := '] + str ) evaluate.
+输出 写入: map2 ? ['one'] ? 0.
+输出 写入: map2 ? ['one'] ? 1.
+输出 写入: map2 ? ['four'] ? 0 ? ['hidden'].
+输出 写入: map2 ? ['one'] ? 2 ? 2.

@@ -1,0 +1,43 @@
+
+
+>> g := Server tshiab.
+>> v := Lub-thawv-ruaj-ntseg tshiab.
+>> ok := 0.
+
+>> secrets := Daim-teev tshiab ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets luam.
+passwords txhua: { :i :p
+	secrets txhua: { :n :s
+		{
+			>> encrypted := v zais: s yuam-sij: p.
+			>> decrypted := v qhib-zais: encrypted yuam-sij: p.
+			(decrypted = s) tseeb: {
+				ok ntxiv: 1.
+			}, lwm-yam: {
+				Tawm sau-ntawv: ['failed encrypting/decrypting: '], kab-tshiab.
+				Tawm sau-ntawv: s, kab-tshiab.
+				Tawm sau-ntawv: ['encrypted: '] + encrypted, kab-tshiab.
+				Tawm sau-ntawv: ['decrypted: '] + encrypted, kab-tshiab.
+				Kev-pab-cuam-khoos-phis-tawj ua-tiav.
+			}.
+		} txhom: { :err
+			(s = [''] lossis: p = ['']) tseeb: {
+				ok ntxiv: 1.
+			}, lwm-yam: {
+				Tawm sau-ntawv: err, kab-tshiab.
+				Kev-pab-cuam-khoos-phis-tawj ua-tiav.
+			}.
+		}, pib.
+	}.
+}.
+
+Tawm sau-ntawv: ( ok + [' vault encryptions tested.'] ), kab-tshiab.

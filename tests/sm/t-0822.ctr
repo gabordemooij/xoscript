@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB fou talimalo: ['localhost'],
+	igoa-tagata-faaaoga: ['xo'],
+	upu-faataga: ['pass123'],
+	igoa-faaputuga-faamatalaga: ['xobase'],
+	fesootai-atu.
+
+>> mea-suesue := db fesili-faamatalaga: ['SELECT ? AS a, ? AS b, ? AS c'].
+mea-suesue mea-suesue-uma: (Lisi fou ; ['1']).
+{ mea-suesue aumai: { :row Tuuina-atu tusi: row, laina-fou. }. } puʻe: { :e Tuuina-atu tusi: e, laina-fou. }, amata.
+
+>> mea-suesue := db fesili-faamatalaga: ['SELECT ? AS a'].
+{ mea-suesue aumai: { :row Tuuina-atu tusi: row, laina-fou. }. } puʻe: { :e Tuuina-atu tusi: e, laina-fou. }, amata.
+
+# the right number still works, more parameters are ignored as before
+>> mea-suesue := db fesili-faamatalaga: ['SELECT ? AS a, ? AS b'].
+mea-suesue mea-suesue-uma: (Lisi fou ; ['1'] ; ['2']).
+mea-suesue aumai: { :row Tuuina-atu tusi: (row i: ['a']), tusi: (row i: ['b']), laina-fou. }.
+mea-suesue mea-suesue-uma: (Lisi fou ; ['1'] ; ['2'] ; ['3']).
+mea-suesue aumai: { :row Tuuina-atu tusi: (row i: ['a']), tusi: (row i: ['b']), laina-fou. }.

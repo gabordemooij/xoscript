@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> значение := Список новый
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+значение каждый: { :i :value
+	>> d := Карта новый.
+	d разместить: value в: ['k'].
+	>> r := d код объект.
+	Выход написать: r счетчик, стоп.
+	Выход написать: ( (r в: ['k']) = value ), стоп.
+}.

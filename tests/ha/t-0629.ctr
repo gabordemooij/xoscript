@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Fitarwa rubuta: ['Database test'], sabon-layi.
+
+>> db := Maria-DB sabo mai-masauki: ['localhost'],
+	sunan-mai-amfani: ['xo'], kalmar-sirri: ['pass123'], sunan-rumbun-bayanai: ['xobase'], haɗu.
+
+Fitarwa rubuta: ['Can we connect? '] + db an-haɗu?, sabon-layi.
+
+>> sigogin-nema := db tambaya: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], sigogi: ( Jeri sabo ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  sigogin-nema zartar. db tabbatar. } kama: { :e db mayar-baya.  }, fara.
+
+Fitarwa rubuta: ['Can we insert? '] + ( sigogin-nema insert-id > 0 ), sabon-layi.
+
+>> Obj := Abu sabo.
+Obj idan: ['retrieve-rows'] yi: {
+	nasa ƙidaya := 0.
+	>> sigogin-nema :=
+	db tambaya: ['SELECT * FROM book order by id desc limit 2'], 
+	ɗauko: { :row 
+		nasa ƙidaya ƙara: 1.
+		Gaskiya katse.
+	}. <- nasa ƙidaya kwafi.
+}.
+
+Fitarwa rubuta: ['Can we query? '] + ( Obj retrieve-rows > 0 ), sabon-layi.

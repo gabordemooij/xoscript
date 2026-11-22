@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := सूची नया ;
+	# {"key":"normal"} normal ASCII
+	( शब्दकोश नया रखो: ['normal'] कुंजी: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( शब्दकोश नया रखो: ['hello world'] कुंजी: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( शब्दकोश नया रखो: ['"'] कुंजी: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( शब्दकोश नया रखो: ['backslash: \\'] कुंजी: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( शब्दकोश नया रखो: ['slash: /'] कुंजी: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( शब्दकोश नया रखो: ['backspace: \b'] कुंजी: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( शब्दकोश नया रखो: ['formfeed: \f'] कुंजी: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( शब्दकोश नया रखो: ['newline: \n'] कुंजी: ['key'] ) ;
+	( शब्दकोश नया रखो: ['newline: ↵'] कुंजी: ['key'] ) ;
+	( शब्दकोश नया रखो: ['newline: 
+	'] कुंजी: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( शब्दकोश नया रखो: ['carriage return: \r'] कुंजी: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( शब्दकोश नया रखो: ['tab \t'] कुंजी: ['key'] ) ;
+	( शब्दकोश नया रखो: ['tab ⇿'] कुंजी: ['key'] ) ;
+	( शब्दकोश नया रखो: ['tab  '] कुंजी: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( शब्दकोश नया रखो: ['NUL \u0000'] कुंजी: ['key'] ) ;
+	( शब्दकोश नया रखो: ['NUL \0'] कुंजी: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( शब्दकोश नया रखो: ['control: \u0001'] कुंजी: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( शब्दकोश नया रखो: ['control: \u001F'] कुंजी: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( शब्दकोश नया रखो: ['unicode: é'] कुंजी: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( शब्दकोश नया रखो: ['unicode: €'] कुंजी: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( शब्दकोश नया रखो: ['unicode: 日本語'] कुंजी: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( शब्दकोश नया रखो: ['unicode: 😀'] कुंजी: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( शब्दकोश नया रखो: ['unicode: 🧑‍💻'] कुंजी: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( शब्दकोश नया रखो: ['combining: e\u0301'] कुंजी: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( शब्दकोश नया रखो: ['escaped unicode: \u00e9'] कुंजी: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( शब्दकोश नया रखो: ['escaped unicode: \u20ac'] कुंजी: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( शब्दकोश नया रखो: ['escaped unicode: \ud83d\ude00'] कुंजी: ['key'] ) ;
+	# {"key":""} empty value
+	( शब्दकोश नया रखो: [''] कुंजी: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( शब्दकोश नया रखो: ['@ < > & = % + ? #'] कुंजी: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( शब्दकोश नया रखो: ['''] कुंजी: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( शब्दकोश नया रखो: ['multiple: \" \\ \n \r \t'] कुंजी: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( शब्दकोश नया रखो: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] कुंजी: ['key'] ) ;
+	# {"key":" value"} leading space
+	( शब्दकोश नया रखो: [' value'] कुंजी: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( शब्दकोश नया रखो: ['value '] कुंजी: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( शब्दकोश नया रखो: [' \t\n\r '] कुंजी: ['key'] ).
+
+dicts प्रत्येक: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (शब्दकोश नया रखो: d key कुंजी: ['key']).
+	>> b := JSON jsonify: (शब्दकोश नया रखो: ['value'] कुंजी: d key).
+	>> e := JSON वस्तु: a.
+	>> f := JSON वस्तु: b.
+	((e key = d key और: (f ? d key = ['value'])) या: (e key = ['NUL ?'])) सत्य-हो-तो: {
+		निर्गम लिखो: ['OK'], नई-पंक्ति.
+	}, अन्यथा: {
+		निर्गम लिखो: ['Unable to properly encode/decode: '] + d + j, नई-पंक्ति.
+		प्रोग्राम समाप्त.
+	}.
+}.

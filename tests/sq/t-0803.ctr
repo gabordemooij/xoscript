@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB ri pritës: ['localhost'],
+	përdorues: ['xo'],
+	fjalëkalim: ['pass123'],
+	emër-baze: ['xobase'],
+	lidhu.
+
+>> conn2 := Maria-DB ri pritës: ['localhost'],
+	përdorues: ['xo'],
+	fjalëkalim: ['pass123'],
+	emër-baze: ['xobase'],
+	lidhu.
+#...
+>> del := conn1 pyetësor: ['DELETE FROM book WHERE id > 0'].
+{  del ekzekuto. conn1 konfirmo. } kap: { :e conn1 zhbëj.  }, nis.
+
+>> insert := conn1 pyetësor: ['INSERT INTO book (id) VALUES(null)'].
+insert ekzekuto.
+
+>> numëro := conn1 pyetësor: ['SELECT COUNT(*) AS num FROM book'].
+numëro merr: { :row Dalje shkruaj: row num, rresht-ri. }.
+
+# does not show up
+# insert not committed on connection 1
+>> numëro := conn2 pyetësor: ['SELECT COUNT(*) AS num FROM book'].
+numëro merr: { :row Dalje shkruaj: row num, rresht-ri. }.

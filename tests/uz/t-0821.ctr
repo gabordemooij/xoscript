@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> yoʻl := ['/tmp/test0821.csv'].
+>> file := Fayl yangi: yoʻl.
+
+file yozish: ['a,b\n"1,2\n'].
+{
+	file ajratuvchi: [','] qoʻshtirnoq: ['"'] qatorlar: { :line
+		Chiqish yozish: line, yangi-qator.
+	}.
+} ushlash: { :e Chiqish yozish: e, yangi-qator. }, ishga-tushirish.
+
+# a closed quote still works
+file yozish: ['a,b\n"1,2",3'].
+file ajratuvchi: [','] qoʻshtirnoq: ['"'] qatorlar: { :line
+	Chiqish yozish: line, yangi-qator.
+}.
+file oʻchirish.

@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Pulogalamu kasamalidwe-ka-kukumbukira: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Pulogalamu kakhazikitsidwe: ['FFITESTLIB'].
+
+
+
+Server lumikizana-ndi: (
+ Mndandanda chatsopano ;
+ libname ;
+ ['puts'] ;
+ ( Mndandanda chatsopano ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s masula.
+
+# test with struct
+
+>> a := Blob chatsopano: 8.
+a bytes: (
+	Mndandanda <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Mndandanda <<: ['int'], ; ['int']).
+
+Server lumikizana-ndi: (
+	Mndandanda <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Mndandanda <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Zotuluka lembani: ['Sum test:'] + (ffitest ffisum: a), mzere-watsopano.
+
+struct masula-struct.
+struct masula.
+a masula.

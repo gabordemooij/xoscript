@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB anyar hos: ['localhost'],
+	ngaran-pamaké: ['xo'],
+	sandi: ['pass123'],
+	ngaran-basis-data: ['xobase'],
+	sambungkeun.
+
+>> conn2 := Maria-DB anyar hos: ['localhost'],
+	ngaran-pamaké: ['xo'],
+	sandi: ['pass123'],
+	ngaran-basis-data: ['xobase'],
+	sambungkeun.
+#...
+>> del := conn1 kueri: ['DELETE FROM book WHERE id > 0'].
+{  del laksanakeun. conn1 tetepkeun. } tangkep: { :e conn1 bolaykeun.  }, jalankeun.
+
+>> insert := conn1 kueri: ['INSERT INTO book (id) VALUES(null)'].
+insert laksanakeun.
+
+>> jumlah := conn1 kueri: ['SELECT COUNT(*) AS num FROM book'].
+jumlah cokot: { :row Kaluaran tulis: row num, baris-anyar. }.
+
+# does not show up
+# insert not committed on connection 1
+>> jumlah := conn2 kueri: ['SELECT COUNT(*) AS num FROM book'].
+jumlah cokot: { :row Kaluaran tulis: row num, baris-anyar. }.

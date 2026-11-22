@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> патека := ['/tmp/test0821.csv'].
+>> file := Датотека нов: патека.
+
+file напиши: ['a,b\n"1,2\n'].
+{
+	file разделувач: [','] наводник: ['"'] редови: { :line
+		Излез напиши: line, нов-ред.
+	}.
+} фати: { :e Излез напиши: e, нов-ред. }, стартувај.
+
+# a closed quote still works
+file напиши: ['a,b\n"1,2",3'].
+file разделувач: [','] наводник: ['"'] редови: { :line
+	Излез напиши: line, нов-ред.
+}.
+file избриши.

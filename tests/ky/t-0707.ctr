@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Программа эсти-башкаруу: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB жаңы хост: ['localhost'],
+	колдонуучу-аты: ['xo'], сырсөз: ['pass123'], маалымат-базасынын-аты: ['xobase'], туташуу.
+
+>> TwoDigitFormat := Формат жаңы: ['%02d'].
+
+# Datetime
+{
+	>> жыл := Сан арасында: 1995 менен: 2050, текст.
+	>> ай := TwoDigitFormat колдонуу-бүтүн: (Сан арасында: 1 менен: 12), текст.
+	>> күн := TwoDigitFormat колдонуу-бүтүн: (Сан арасында: 1 менен: 28), текст.
+	>> саат := TwoDigitFormat колдонуу-бүтүн: (Сан арасында: 1 менен: 23), текст.
+	>> мүнөт := TwoDigitFormat колдонуу-бүтүн: (Сан арасында: 1 менен: 59), текст.
+	>> секунд := TwoDigitFormat колдонуу-бүтүн: (Сан арасында: 1 менен: 59), текст.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: жыл,
+		MM: ай,
+		DD: күн,
+		HH: саат,
+		II: мүнөт,
+		SS: секунд.
+	>> издөө-параметрлери :=
+	db суроо-талап: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	алуу: { :row
+		(row mydatetime = datetime) жалган-болсо: {
+			ушул-тапшырма ката: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter кошуу: 1.
+} * 100.
+
+# Date
+{
+	>> жыл := Сан арасында: 1995 менен: 2050, текст.
+	>> ай := TwoDigitFormat колдонуу-бүтүн: (Сан арасында: 1 менен: 12), текст.
+	>> күн := TwoDigitFormat колдонуу-бүтүн: (Сан арасында: 1 менен: 28), текст.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: жыл,
+		MM: ай,
+		DD: күн.
+	>> издөө-параметрлери :=
+	db суроо-талап: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	алуу: { :row
+		(row mydate = date) жалган-болсо: {
+			ушул-тапшырма ката: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter кошуу: 1.
+} * 100.
+
+
+# Time
+{
+	>> саат := TwoDigitFormat колдонуу-бүтүн: (Сан арасында: 1 менен: 23), текст.
+	>> мүнөт := TwoDigitFormat колдонуу-бүтүн: (Сан арасында: 1 менен: 59), текст.
+	>> секунд := TwoDigitFormat колдонуу-бүтүн: (Сан арасында: 1 менен: 59), текст.
+	>> убакыт := ['HH:II:SS'].
+	убакыт
+		HH: саат,
+		II: мүнөт,
+		SS: секунд.
+	>> издөө-параметрлери :=
+	db суроо-талап: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: убакыт),
+	алуу: { :row
+		(row mytime = убакыт) жалган-болсо: {
+			ушул-тапшырма ката: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter кошуу: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Тизме жаңы толтуруу: 100000 мааниге: ['x'], бириктирүү: [''].
+{
+	>> str2 := Сейф токен: 40.
+	>> издөө-параметрлери :=
+	db суроо-талап: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	алуу: { :row
+		(row str1 = str1 жана: row str2 = str2) жалган-болсо: {
+			ушул-тапшырма ката: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter кошуу: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Сан арасында: 1 менен: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 тексттен: ['9223372036854775807'] ) -
+		( Int64 тексттен: ['99999'] ) +
+		( Int64 тексттен: n1 текст )
+	).
+	>> издөө-параметрлери :=
+	db суроо-талап: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	алуу: { :row
+		(row n1 = n1) жалган-болсо: {
+			ушул-тапшырма ката: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) жалган-болсо: {
+			ушул-тапшырма ката: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 тегеректөө) жалган-болсо: {
+			ушул-тапшырма ката: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) жалган-болсо: {
+			ушул-тапшырма ката: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter кошуу: 1.
+} * 100.
+
+
+Чыгаруу жазуу: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), жаңы-сап.

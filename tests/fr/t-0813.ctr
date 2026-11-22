@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server initialiser.
+Programme utiliser: ['../../../src/xo/fr/webtools.xo'].
+Programme utiliser: ['../../../src/xo/fr/mailtools.xo'].
+
+>> en-tête := En-tête-HTTP nouveau clé: ['Location'] valeur: ['/ok\r\nX-Injected: yes'].
+Sortie écrire: en-tête.
+
+>> web := Document-Web nouveau.
+web aller-à: ['/ok\r\nX-Injected: yes'].
+Sortie écrire: ['\n'], stop.
+
+>> mail := E-mail nouveau.
+mail destinataire: (Liste nouveau ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Liste nouveau ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Liste nouveau ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail expéditeur: ['d@example.invalid\r\nX-From: yes'] nom: ['site\r\nX-Name: yes'].
+mail sujet: ['hello\r\nX-Subject: yes'].
+mail corps: ['line1\r\nline2'].
+Sortie écrire: mail générer.
+
+>> html := E-mail-HTML nouveau.
+html destinataire: (Liste nouveau ; ['a@example.invalid\r\nX-To: yes']).
+html expéditeur: ['d@example.invalid'] nom: ['site'].
+html sujet: ['hello\r\nX-Subject: yes'].
+html corps: ['body'].
+Sortie écrire: ( html générer contient: ['\nX-'] ), stop.
+Sortie écrire: ( html générer contient: ['X-To: yes'] ), stop.

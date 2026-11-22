@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server initialiser.
+Program brug: ['../../../src/xo/da/webtools.xo'].
+
+>> Fake-Request := Objekt ny.
+Fake-Request ved: ['value:'] gør: { :værdi
+	egen værdi := værdi.
+}.
+Fake-Request ved: ['cookie:'] gør: { :navn <- egen værdi.
+}.
+
+>> Test-Session := Midlertidig-fil-session ny.
+Test-Session ved: ['indlæs'] gør: { <- Ordbog ny.
+}.
+Test-Session ved: ['session-id'] gør: { <- egen id.
+}.
+
+>> cookies := Liste ny
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies hver: { :i :cookie
+	>> http-forespørgsel := Fake-Request ny.
+	http-forespørgsel value: cookie.
+	>> håndtering := Test-Session ny.
+	>> web := Webdokument ny.
+	web http-forespørgsel: http-forespørgsel.
+	web sessionshåndtering: håndtering.
+	web start-session.
+	Uddata skriv: ( håndtering session-id = cookie ), stop.
+}.
+
+>> web := Webdokument ny.
+web json: (Ordbog ny sæt: ['b'] ved: ['a']).
+Uddata skriv: ['\n'], stop.
+
+{ Netværk get: ['file:///etc/hostname']. } fang: { :e
+	Uddata skriv: e, stop.
+}, start.
+
+>> svg := Fil ny: ['/tmp/test0814.svg'].
+svg skriv: ['<svg xmlns="x"></svg>'].
+Uddata stop.
+Server videresend: ['test0814.svg'] præfiks: ['/tmp/'].
+svg slet.

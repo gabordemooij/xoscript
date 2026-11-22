@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> τιμές := Λίστα νέο
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+τιμές κάθε: { :i :value
+	>> d := Λεξικό νέο.
+	d τοποθέτηση: value στο: ['k'].
+	>> r := d κώδικας αντικείμενο.
+	Έξοδος γράψε: r πλήθος, νέα-γραμμή.
+	Έξοδος γράψε: ( (r στο: ['k']) = value ), νέα-γραμμή.
+}.

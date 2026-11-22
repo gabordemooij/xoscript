@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+ပရိုဂရမ် မှတ်ဉာဏ်စီမံ: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := ပရိုဂရမ် ဆက်တင်: ['FFITESTLIB'].
+
+
+
+Server ချိတ်ဆက်: (
+ အစီအစဉ် အသစ် ;
+ libname ;
+ ['puts'] ;
+ ( အစီအစဉ် အသစ် ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s လွှတ်ပေး.
+
+# test with struct
+
+>> a := Blob အသစ်: 8.
+a bytes: (
+	အစီအစဉ် <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (အစီအစဉ် <<: ['int'], ; ['int']).
+
+Server ချိတ်ဆက်: (
+	အစီအစဉ် <<: ['@structtest'], ;
+	['@structtest'] ;
+	(အစီအစဉ် <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+အထွက် ရေး: ['Sum test:'] + (ffitest ffisum: a), စာကြောင်းသစ်.
+
+struct struct-လွှတ်ပေး.
+struct လွှတ်ပေး.
+a လွှတ်ပေး.

@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server баштоо.
+Программа пайдалануу: ['../../../src/xo/ky/webtools.xo'].
+Программа пайдалануу: ['../../../src/xo/ky/mailtools.xo'].
+
+>> баш-сап := HTTP-Баш-сап жаңы ачкыч: ['Location'] маани: ['/ok\r\nX-Injected: yes'].
+Чыгаруу жазуу: баш-сап.
+
+>> web := Веб-документ жаңы.
+web өтүү: ['/ok\r\nX-Injected: yes'].
+Чыгаруу жазуу: ['\n'], жаңы-сап.
+
+>> mail := Электрондук-кат жаңы.
+mail алуучуга: (Тизме жаңы ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Тизме жаңы ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Тизме жаңы ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail жөнөтүүчү: ['d@example.invalid\r\nX-From: yes'] аталыш: ['site\r\nX-Name: yes'].
+mail тема: ['hello\r\nX-Subject: yes'].
+mail негизги-текст: ['line1\r\nline2'].
+Чыгаруу жазуу: mail түзүү.
+
+>> html := HTML-Электрондук-кат жаңы.
+html алуучуга: (Тизме жаңы ; ['a@example.invalid\r\nX-To: yes']).
+html жөнөтүүчү: ['d@example.invalid'] аталыш: ['site'].
+html тема: ['hello\r\nX-Subject: yes'].
+html негизги-текст: ['body'].
+Чыгаруу жазуу: ( html түзүү камтыйт: ['\nX-'] ), жаңы-сап.
+Чыгаруу жазуу: ( html түзүү камтыйт: ['X-To: yes'] ), жаңы-сап.

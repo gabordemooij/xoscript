@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Rhaglen rheoli-cof: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB newydd gwesteiwr: ['localhost'],
+	enw-defnyddiwr: ['xo'], cyfrinair: ['pass123'], enw-cronfa: ['xobase'], cysylltu.
+
+>> TwoDigitFormat := Fformat newydd: ['%02d'].
+
+# Datetime
+{
+	>> blwyddyn := Rhif rhwng: 1995 a: 2050, llinyn.
+	>> mis := TwoDigitFormat cymhwyso-cyfanrif: (Rhif rhwng: 1 a: 12), llinyn.
+	>> dydd := TwoDigitFormat cymhwyso-cyfanrif: (Rhif rhwng: 1 a: 28), llinyn.
+	>> awr := TwoDigitFormat cymhwyso-cyfanrif: (Rhif rhwng: 1 a: 23), llinyn.
+	>> munud := TwoDigitFormat cymhwyso-cyfanrif: (Rhif rhwng: 1 a: 59), llinyn.
+	>> eiliad := TwoDigitFormat cymhwyso-cyfanrif: (Rhif rhwng: 1 a: 59), llinyn.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: blwyddyn,
+		MM: mis,
+		DD: dydd,
+		HH: awr,
+		II: munud,
+		SS: eiliad.
+	>> paramedrau-chwilio :=
+	db ymholiad: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	nôl: { :row
+		(row mydatetime = datetime) gau: {
+			y-dasg-hon gwall: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ychwanegu: 1.
+} * 100.
+
+# Date
+{
+	>> blwyddyn := Rhif rhwng: 1995 a: 2050, llinyn.
+	>> mis := TwoDigitFormat cymhwyso-cyfanrif: (Rhif rhwng: 1 a: 12), llinyn.
+	>> dydd := TwoDigitFormat cymhwyso-cyfanrif: (Rhif rhwng: 1 a: 28), llinyn.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: blwyddyn,
+		MM: mis,
+		DD: dydd.
+	>> paramedrau-chwilio :=
+	db ymholiad: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	nôl: { :row
+		(row mydate = date) gau: {
+			y-dasg-hon gwall: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ychwanegu: 1.
+} * 100.
+
+
+# Time
+{
+	>> awr := TwoDigitFormat cymhwyso-cyfanrif: (Rhif rhwng: 1 a: 23), llinyn.
+	>> munud := TwoDigitFormat cymhwyso-cyfanrif: (Rhif rhwng: 1 a: 59), llinyn.
+	>> eiliad := TwoDigitFormat cymhwyso-cyfanrif: (Rhif rhwng: 1 a: 59), llinyn.
+	>> amser := ['HH:II:SS'].
+	amser
+		HH: awr,
+		II: munud,
+		SS: eiliad.
+	>> paramedrau-chwilio :=
+	db ymholiad: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: amser),
+	nôl: { :row
+		(row mytime = amser) gau: {
+			y-dasg-hon gwall: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ychwanegu: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Rhestr newydd llenwi: 100000 gyda: ['x'], cyfuno: [''].
+{
+	>> str2 := Cromgell tocyn: 40.
+	>> paramedrau-chwilio :=
+	db ymholiad: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	nôl: { :row
+		(row str1 = str1 a: row str2 = str2) gau: {
+			y-dasg-hon gwall: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ychwanegu: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Rhif rhwng: 1 a: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 o-linyn: ['9223372036854775807'] ) -
+		( Int64 o-linyn: ['99999'] ) +
+		( Int64 o-linyn: n1 llinyn )
+	).
+	>> paramedrau-chwilio :=
+	db ymholiad: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	nôl: { :row
+		(row n1 = n1) gau: {
+			y-dasg-hon gwall: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) gau: {
+			y-dasg-hon gwall: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 talgrynnu) gau: {
+			y-dasg-hon gwall: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) gau: {
+			y-dasg-hon gwall: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ychwanegu: 1.
+} * 100.
+
+
+Allbwn ysgrifennu: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), llinell-newydd.

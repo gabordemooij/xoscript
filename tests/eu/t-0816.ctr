@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> saiatu := { :format :value
+	{ Irteera idatzi: ( (Formatua berria: format) aplikatu: value ), lerro-jauzia. } harrapatu: { :e Irteera idatzi: e, lerro-jauzia. }, hasi.
+}.
+>> try-int := { :format :value
+	{ Irteera idatzi: ( (Formatua berria: format) aplikatu-osoa: value ), lerro-jauzia. } harrapatu: { :e Irteera idatzi: e, lerro-jauzia. }, hasi.
+}.
+
+# fits
+saiatu aplikatu: ['|%s|'] eta: ['text'].
+saiatu aplikatu: ['%06.2f'] eta: 5.5.
+saiatu aplikatu: ['100%% %s'] eta: ['sure'].
+try-int aplikatu: ['%03d'] eta: 7.
+try-int aplikatu: ['%x'] eta: 255.
+saiatu aplikatu: ['%d'] eta: (Int64 berria testutik: ['12']).
+saiatu aplikatu: ['%lld'] eta: (Int64 berria testutik: ['12']).
+saiatu aplikatu: ['%.1lf'] eta: 5.5.
+try-int aplikatu: ['%hd'] eta: 7.
+
+# does not fit
+saiatu aplikatu: ['%s'] eta: 12345.
+saiatu aplikatu: ['%d'] eta: 12345.
+saiatu aplikatu: ['%f'] eta: ['text'].
+try-int aplikatu: ['%d'] eta: ['text'].
+try-int aplikatu: ['%s'] eta: 5.
+saiatu aplikatu: ['%s %s'] eta: ['text'].
+saiatu aplikatu: ['%n'] eta: ['text'].
+saiatu aplikatu: ['%*s'] eta: ['text'].
+saiatu aplikatu: ['%'] eta: ['text'].
+
+# length modifier does not fit
+saiatu aplikatu: ['%ls'] eta: ['text'].
+saiatu aplikatu: ['%Lf'] eta: 5.5.
+try-int aplikatu: ['%ld'] eta: 7.
+try-int aplikatu: ['%lld'] eta: 7.
+saiatu aplikatu: ['%Ld'] eta: (Int64 berria testutik: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+saiatu aplikatu: ['%99999999999s'] eta: ['text'].

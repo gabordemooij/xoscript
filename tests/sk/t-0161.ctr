@@ -1,0 +1,53 @@
+Program správa-pamäte: 0.
+Zoznam pri: ['sum'] urobiť: {
+	>> total := 0.
+	seba každý: { :index :element
+		total pridať: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Súbor nový: ['/tmp/test.txt'].
+f písať: ['Lorem Ipsum'].
+f zavrieť.
+  
+
+f := Súbor nový: ['/tmp/test.txt'].
+>> text := f čítať.
+f zavrieť.
+
+
+
+Program upratať.
+usedMemory1 := (Program pamäť ? 1).
+
+
+
+f := Súbor nový: ['/tmp/test.txt'].
+text := f čítať.
+f zavrieť.
+
+Program upratať.
+usedMemory2 := (Program pamäť ? 1).
+
+
+f := Súbor nový: ['/tmp/test.txt'].
+text := f čítať.
+f zavrieť.
+
+Program upratať.
+usedMemory3 := (Program pamäť ? 1).
+
+
+
+( usedMemory1 = usedMemory2 a: usedMemory1 = usedMemory3, a: usedMemory2 = usedMemory3 ) pravda: {
+	Výstup písať: ['No memory leaks here'].
+}, nepravda: {
+	Výstup písať: ['Leaking memory...'].
+}.

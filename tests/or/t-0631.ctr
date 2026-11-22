@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+ପ୍ରୋଗ୍ରାମ୍ ମେମୋରୀ-ପରିଚାଳନା: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := ପ୍ରୋଗ୍ରାମ୍ ସେଟିଂ: ['FFITESTLIB'].
+
+
+
+Server ଲିଙ୍କ୍: (
+ ସାରଣୀ ନୂତନ ;
+ libname ;
+ ['puts'] ;
+ ( ସାରଣୀ ନୂତନ ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s ମୁକ୍ତ.
+
+# test with struct
+
+>> a := Blob ନୂତନ: 8.
+a bytes: (
+	ସାରଣୀ <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (ସାରଣୀ <<: ['int'], ; ['int']).
+
+Server ଲିଙ୍କ୍: (
+	ସାରଣୀ <<: ['@structtest'], ;
+	['@structtest'] ;
+	(ସାରଣୀ <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+ଆଉଟପୁଟ୍ ଲେଖ: ['Sum test:'] + (ffitest ffisum: a), ନୂଆ-ଧାଡ଼ି.
+
+struct struct-ମୁକ୍ତ.
+struct ମୁକ୍ତ.
+a ମୁକ୍ତ.

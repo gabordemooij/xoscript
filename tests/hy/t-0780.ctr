@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Ցուցակ նոր ;
+	# {"key":"normal"} normal ASCII
+	( Բառարան նոր դնել: ['normal'] բանալի: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Բառարան նոր դնել: ['hello world'] բանալի: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Բառարան նոր դնել: ['"'] բանալի: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Բառարան նոր դնել: ['backslash: \\'] բանալի: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Բառարան նոր դնել: ['slash: /'] բանալի: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Բառարան նոր դնել: ['backspace: \b'] բանալի: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Բառարան նոր դնել: ['formfeed: \f'] բանալի: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Բառարան նոր դնել: ['newline: \n'] բանալի: ['key'] ) ;
+	( Բառարան նոր դնել: ['newline: ↵'] բանալի: ['key'] ) ;
+	( Բառարան նոր դնել: ['newline: 
+	'] բանալի: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Բառարան նոր դնել: ['carriage return: \r'] բանալի: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Բառարան նոր դնել: ['tab \t'] բանալի: ['key'] ) ;
+	( Բառարան նոր դնել: ['tab ⇿'] բանալի: ['key'] ) ;
+	( Բառարան նոր դնել: ['tab  '] բանալի: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Բառարան նոր դնել: ['NUL \u0000'] բանալի: ['key'] ) ;
+	( Բառարան նոր դնել: ['NUL \0'] բանալի: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Բառարան նոր դնել: ['control: \u0001'] բանալի: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Բառարան նոր դնել: ['control: \u001F'] բանալի: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Բառարան նոր դնել: ['unicode: é'] բանալի: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Բառարան նոր դնել: ['unicode: €'] բանալի: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Բառարան նոր դնել: ['unicode: 日本語'] բանալի: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Բառարան նոր դնել: ['unicode: 😀'] բանալի: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Բառարան նոր դնել: ['unicode: 🧑‍💻'] բանալի: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Բառարան նոր դնել: ['combining: e\u0301'] բանալի: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Բառարան նոր դնել: ['escaped unicode: \u00e9'] բանալի: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Բառարան նոր դնել: ['escaped unicode: \u20ac'] բանալի: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Բառարան նոր դնել: ['escaped unicode: \ud83d\ude00'] բանալի: ['key'] ) ;
+	# {"key":""} empty value
+	( Բառարան նոր դնել: [''] բանալի: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Բառարան նոր դնել: ['@ < > & = % + ? #'] բանալի: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Բառարան նոր դնել: ['''] բանալի: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Բառարան նոր դնել: ['multiple: \" \\ \n \r \t'] բանալի: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Բառարան նոր դնել: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] բանալի: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Բառարան նոր դնել: [' value'] բանալի: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Բառարան նոր դնել: ['value '] բանալի: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Բառարան նոր դնել: [' \t\n\r '] բանալի: ['key'] ).
+
+dicts յուրաքանչյուր: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Բառարան նոր դնել: d key բանալի: ['key']).
+	>> b := JSON jsonify: (Բառարան նոր դնել: ['value'] բանալի: d key).
+	>> e := JSON օբյեկտ: a.
+	>> f := JSON օբյեկտ: b.
+	((e key = d key և: (f ? d key = ['value'])) կամ: (e key = ['NUL ?'])) եթե-ճիշտ: {
+		Ելք գրել: ['OK'], նոր-տող.
+	}, այլապես: {
+		Ելք գրել: ['Unable to properly encode/decode: '] + d + j, նոր-տող.
+		Ծրագիր ավարտել.
+	}.
+}.

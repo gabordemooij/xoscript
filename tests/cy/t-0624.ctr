@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Gwrthrych newydd.
+
+Log ar: ['say:'] gwneud: { :str
+	Allbwn ysgrifennu: str, llinell-newydd.
+}.
+
+>> Item := Gwrthrych newydd.
+
+Item ar: ['newydd:'] gwneud: { :id <- hun newydd id: id.
+}.
+
+Item ar: ['id:'] gwneud: { :id
+	eiddo id := id.
+}.
+
+Item ar: ['id'] gwneud: { <- eiddo id. }.
+
+
+Item ar: ['llinyn'] gwneud: {
+	>> str := ['Item#~no'].
+	str ~no: eiddo id. <- str.
+}.
+
+
+>> Print := Gwrthrych newydd.
+
+Print ar: ['items'] gwneud: { 
+	
+	eiddo item := Item newydd: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: eiddo item
+	).
+	
+	
+}.
+
+Print items.

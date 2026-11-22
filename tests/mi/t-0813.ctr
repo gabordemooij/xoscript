@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server whakarite.
+Papatono whakamahi: ['../../../src/xo/mi/webtools.xo'].
+Papatono whakamahi: ['../../../src/xo/mi/mailtools.xo'].
+
+>> pane := Pane-HTTP hou kī: ['Location'] uara: ['/ok\r\nX-Injected: yes'].
+Huaputa tuhi: pane.
+
+>> web := Tuhinga-Ipurangi hou.
+web haere-ki: ['/ok\r\nX-Injected: yes'].
+Huaputa tuhi: ['\n'], rārangi-hou.
+
+>> mail := Īmēra hou.
+mail ki: (Rārangi hou ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Rārangi hou ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Rārangi hou ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail kaituku: ['d@example.invalid\r\nX-From: yes'] ingoa: ['site\r\nX-Name: yes'].
+mail kaupapa: ['hello\r\nX-Subject: yes'].
+mail tinana: ['line1\r\nline2'].
+Huaputa tuhi: mail waihangatia.
+
+>> html := Īmēra-HTML hou.
+html ki: (Rārangi hou ; ['a@example.invalid\r\nX-To: yes']).
+html kaituku: ['d@example.invalid'] ingoa: ['site'].
+html kaupapa: ['hello\r\nX-Subject: yes'].
+html tinana: ['body'].
+Huaputa tuhi: ( html waihangatia kei-roto: ['\nX-'] ), rārangi-hou.
+Huaputa tuhi: ( html waihangatia kei-roto: ['X-To: yes'] ), rārangi-hou.

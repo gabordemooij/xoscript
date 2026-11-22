@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Siyahı yeni ;
+	# {"key":"normal"} normal ASCII
+	( Lüğət yeni qoy: ['normal'] yerə: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Lüğət yeni qoy: ['hello world'] yerə: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Lüğət yeni qoy: ['"'] yerə: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Lüğət yeni qoy: ['backslash: \\'] yerə: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Lüğət yeni qoy: ['slash: /'] yerə: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Lüğət yeni qoy: ['backspace: \b'] yerə: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Lüğət yeni qoy: ['formfeed: \f'] yerə: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Lüğət yeni qoy: ['newline: \n'] yerə: ['key'] ) ;
+	( Lüğət yeni qoy: ['newline: ↵'] yerə: ['key'] ) ;
+	( Lüğət yeni qoy: ['newline: 
+	'] yerə: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Lüğət yeni qoy: ['carriage return: \r'] yerə: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Lüğət yeni qoy: ['tab \t'] yerə: ['key'] ) ;
+	( Lüğət yeni qoy: ['tab ⇿'] yerə: ['key'] ) ;
+	( Lüğət yeni qoy: ['tab  '] yerə: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Lüğət yeni qoy: ['NUL \u0000'] yerə: ['key'] ) ;
+	( Lüğət yeni qoy: ['NUL \0'] yerə: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Lüğət yeni qoy: ['control: \u0001'] yerə: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Lüğət yeni qoy: ['control: \u001F'] yerə: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Lüğət yeni qoy: ['unicode: é'] yerə: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Lüğət yeni qoy: ['unicode: €'] yerə: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Lüğət yeni qoy: ['unicode: 日本語'] yerə: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Lüğət yeni qoy: ['unicode: 😀'] yerə: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Lüğət yeni qoy: ['unicode: 🧑‍💻'] yerə: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Lüğət yeni qoy: ['combining: e\u0301'] yerə: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Lüğət yeni qoy: ['escaped unicode: \u00e9'] yerə: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Lüğət yeni qoy: ['escaped unicode: \u20ac'] yerə: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Lüğət yeni qoy: ['escaped unicode: \ud83d\ude00'] yerə: ['key'] ) ;
+	# {"key":""} empty value
+	( Lüğət yeni qoy: [''] yerə: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Lüğət yeni qoy: ['@ < > & = % + ? #'] yerə: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Lüğət yeni qoy: ['''] yerə: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Lüğət yeni qoy: ['multiple: \" \\ \n \r \t'] yerə: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Lüğət yeni qoy: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] yerə: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Lüğət yeni qoy: [' value'] yerə: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Lüğət yeni qoy: ['value '] yerə: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Lüğət yeni qoy: [' \t\n\r '] yerə: ['key'] ).
+
+dicts hər: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Lüğət yeni qoy: d key yerə: ['key']).
+	>> b := JSON jsonify: (Lüğət yeni qoy: ['value'] yerə: d key).
+	>> e := JSON obyekt: a.
+	>> f := JSON obyekt: b.
+	((e key = d key və: (f ? d key = ['value'])) və-ya: (e key = ['NUL ?'])) doğru: {
+		Çıxış yaz: ['OK'], yeni-sətir.
+	}, əks-halda: {
+		Çıxış yaz: ['Unable to properly encode/decode: '] + d + j, yeni-sətir.
+		Proqram son.
+	}.
+}.

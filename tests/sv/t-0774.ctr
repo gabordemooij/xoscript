@@ -1,0 +1,23 @@
+Utdata skriv: ['Test object'], stop.
+>> a := Objekt ny. 
+a vid: ['item:'] gör: { :lst
+	egen lst := lst. 
+}.
+a vid: ['item'] gör: { <- egen lst.
+}.
+a item: (
+	Lista ny ; 1 ; (
+		Lista ny ; ['a'] ; (
+			Lista ny ; ( Moment ny: 1 )
+		) ; ( Int64 från-text: ['321'] )
+	)
+).
+Utdata skriv: a item, stop.
+>> old-lst-address := a item prototyp minnesadress.
+a save-as: ['/tmp/a.bin'].
+Utdata skriv: ['========== RELOADING SNAP:'], stop.
+>> b := Objekt load-from: ['/tmp/a.bin'].
+(b item prototyp minnesadress = old-lst-address) sann: {
+	Utdata skriv: ['Object link re-attached.'], stop.
+}.
+Utdata skriv: ( b item ), stop.

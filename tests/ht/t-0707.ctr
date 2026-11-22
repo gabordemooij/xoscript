@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Pwogram jesyon-memwa: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB nouvo lame: ['localhost'],
+	non-itilizatè: ['xo'], modpas: ['pass123'], non-baz: ['xobase'], konekte.
+
+>> TwoDigitFormat := Fòma nouvo: ['%02d'].
+
+# Datetime
+{
+	>> ane := Nimewo ant: 1995 ak: 2050, tèks.
+	>> mwa := TwoDigitFormat aplike-antye: (Nimewo ant: 1 ak: 12), tèks.
+	>> jou := TwoDigitFormat aplike-antye: (Nimewo ant: 1 ak: 28), tèks.
+	>> lè := TwoDigitFormat aplike-antye: (Nimewo ant: 1 ak: 23), tèks.
+	>> minit := TwoDigitFormat aplike-antye: (Nimewo ant: 1 ak: 59), tèks.
+	>> segonn := TwoDigitFormat aplike-antye: (Nimewo ant: 1 ak: 59), tèks.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: ane,
+		MM: mwa,
+		DD: jou,
+		HH: lè,
+		II: minit,
+		SS: segonn.
+	>> paramèt-rechèch :=
+	db rekèt: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	chache: { :row
+		(row mydatetime = datetime) fo: {
+			travay-sa-a erè: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ajoute: 1.
+} * 100.
+
+# Date
+{
+	>> ane := Nimewo ant: 1995 ak: 2050, tèks.
+	>> mwa := TwoDigitFormat aplike-antye: (Nimewo ant: 1 ak: 12), tèks.
+	>> jou := TwoDigitFormat aplike-antye: (Nimewo ant: 1 ak: 28), tèks.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: ane,
+		MM: mwa,
+		DD: jou.
+	>> paramèt-rechèch :=
+	db rekèt: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	chache: { :row
+		(row mydate = date) fo: {
+			travay-sa-a erè: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ajoute: 1.
+} * 100.
+
+
+# Time
+{
+	>> lè := TwoDigitFormat aplike-antye: (Nimewo ant: 1 ak: 23), tèks.
+	>> minit := TwoDigitFormat aplike-antye: (Nimewo ant: 1 ak: 59), tèks.
+	>> segonn := TwoDigitFormat aplike-antye: (Nimewo ant: 1 ak: 59), tèks.
+	>> tan := ['HH:II:SS'].
+	tan
+		HH: lè,
+		II: minit,
+		SS: segonn.
+	>> paramèt-rechèch :=
+	db rekèt: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: tan),
+	chache: { :row
+		(row mytime = tan) fo: {
+			travay-sa-a erè: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ajoute: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lis nouvo ranpli: 100000 ak: ['x'], kole-ansanm: [''].
+{
+	>> str2 := Kòfrefò jeton: 40.
+	>> paramèt-rechèch :=
+	db rekèt: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	chache: { :row
+		(row str1 = str1 ak: row str2 = str2) fo: {
+			travay-sa-a erè: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ajoute: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Nimewo ant: 1 ak: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 apati-tèks: ['9223372036854775807'] ) -
+		( Int64 apati-tèks: ['99999'] ) +
+		( Int64 apati-tèks: n1 tèks )
+	).
+	>> paramèt-rechèch :=
+	db rekèt: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	chache: { :row
+		(row n1 = n1) fo: {
+			travay-sa-a erè: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) fo: {
+			travay-sa-a erè: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 awondi) fo: {
+			travay-sa-a erè: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) fo: {
+			travay-sa-a erè: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ajoute: 1.
+} * 100.
+
+
+Sòti ekri: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), nouvo-liy.

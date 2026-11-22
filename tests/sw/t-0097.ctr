@@ -1,0 +1,42 @@
+
+Maandishi ikija: ['html'] fanya: { <- (
+		binafsi
+		badilisha: ['&'] kwa: ['&amp;'],
+		badilisha: ['<'] kwa: ['&lt;'],
+		badilisha: ['>'] kwa: ['&gt;'],
+		badilisha: ['"'] kwa: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Kipengee mpya.
+
+HtmlBrush ikija: ['jibu:'] fanya: { :tag
+	Towe andika: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush ikija: ['jibu:na:'] fanya: { :tag :content
+	tag := ( tag kutoka: 0 urefu: (tag urefu - 1) ).
+	Towe andika: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush ikija: ['content:'] fanya: { :text
+	Towe andika: text html, mstari-mpya.
+}.
+
+HtmlBrush ikija: ['attr:value:'] fanya: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush mpya.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

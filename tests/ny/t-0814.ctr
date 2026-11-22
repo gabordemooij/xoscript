@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server konzekera.
+Pulogalamu gwiritsa-chida: ['../../../src/xo/ny/webtools.xo'].
+
+>> Fake-Request := Chinthu chatsopano.
+Fake-Request chikafika: ['value:'] chitani: { :mtengo
+	zake mtengo := mtengo.
+}.
+Fake-Request chikafika: ['cookie:'] chitani: { :dzina <- zake mtengo.
+}.
+
+>> Test-Session := Gawo-la-fayilo-lakanthawi chatsopano.
+Test-Session chikafika: ['tsegula'] chitani: { <- Mtanthauziramawu chatsopano.
+}.
+Test-Session chikafika: ['session-id'] chitani: { <- zake id.
+}.
+
+>> cookies := Mndandanda chatsopano
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies chilichonse: { :i :cookie
+	>> pempho-http := Fake-Request chatsopano.
+	pempho-http value: cookie.
+	>> woyanganira := Test-Session chatsopano.
+	>> web := Chikalata-cha-Webusayiti chatsopano.
+	web pempho-http: pempho-http.
+	web woyanganira-magawo: woyanganira.
+	web yamba-gawo.
+	Zotuluka lembani: ( woyanganira session-id = cookie ), mzere-watsopano.
+}.
+
+>> web := Chikalata-cha-Webusayiti chatsopano.
+web json: (Mtanthauziramawu chatsopano ikani: ['b'] pa: ['a']).
+Zotuluka lembani: ['\n'], mzere-watsopano.
+
+{ Netiweki get: ['file:///etc/hostname']. } gwira: { :e
+	Zotuluka lembani: e, mzere-watsopano.
+}, yamba.
+
+>> svg := Fayilo chatsopano: ['/tmp/test0814.svg'].
+svg lembani: ['<svg xmlns="x"></svg>'].
+Zotuluka mzere-watsopano.
+Server pititsa: ['test0814.svg'] choyambirira: ['/tmp/'].
+svg chotsani.

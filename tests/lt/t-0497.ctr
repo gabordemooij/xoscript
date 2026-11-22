@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := Failas naujas: ['/tmp/test.gif'].
+f rašyti: ['GIF87a01234567810'].
+
+# serve the file
+Server perduoti: ['test.gif'] priešdėlis: ['/tmp/'].
+
+Išvestis nauja-eilutė.
+
+Išvestis rašyti: ['Outside container (security):'], nauja-eilutė.
+{ Server perduoti: ['../passwd'] priešdėlis: ['/tmp/']. }
+pagauti: { :e Išvestis rašyti: e, nauja-eilutė. },
+paleisti.
+
+Išvestis rašyti: ['Invalid prefix:'], nauja-eilutė.
+{ Server perduoti: ['test.gif'] priešdėlis: ['z:\\']. }
+pagauti: { :e Išvestis rašyti: e, nauja-eilutė. },
+paleisti.
+
+Išvestis rašyti: ['Non-existant file:'], nauja-eilutė.
+{ Server perduoti: ['xxx.xxx'] priešdėlis: ['/tmp/']. }
+pagauti: { :e Išvestis rašyti: e, nauja-eilutė. },
+paleisti.

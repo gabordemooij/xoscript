@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> dene := { :format :value
+	{ Çıktı yaz: ( (Biçim yeni: format) uygula: value ), yeni-satır. } yakala: { :e Çıktı yaz: e, yeni-satır. }, başlat.
+}.
+>> try-int := { :format :value
+	{ Çıktı yaz: ( (Biçim yeni: format) uygula-tamsayı: value ), yeni-satır. } yakala: { :e Çıktı yaz: e, yeni-satır. }, başlat.
+}.
+
+# fits
+dene uygula: ['|%s|'] ve: ['text'].
+dene uygula: ['%06.2f'] ve: 5.5.
+dene uygula: ['100%% %s'] ve: ['sure'].
+try-int uygula: ['%03d'] ve: 7.
+try-int uygula: ['%x'] ve: 255.
+dene uygula: ['%d'] ve: (Int64 yeni metinden: ['12']).
+dene uygula: ['%lld'] ve: (Int64 yeni metinden: ['12']).
+dene uygula: ['%.1lf'] ve: 5.5.
+try-int uygula: ['%hd'] ve: 7.
+
+# does not fit
+dene uygula: ['%s'] ve: 12345.
+dene uygula: ['%d'] ve: 12345.
+dene uygula: ['%f'] ve: ['text'].
+try-int uygula: ['%d'] ve: ['text'].
+try-int uygula: ['%s'] ve: 5.
+dene uygula: ['%s %s'] ve: ['text'].
+dene uygula: ['%n'] ve: ['text'].
+dene uygula: ['%*s'] ve: ['text'].
+dene uygula: ['%'] ve: ['text'].
+
+# length modifier does not fit
+dene uygula: ['%ls'] ve: ['text'].
+dene uygula: ['%Lf'] ve: 5.5.
+try-int uygula: ['%ld'] ve: 7.
+try-int uygula: ['%lld'] ve: 7.
+dene uygula: ['%Ld'] ve: (Int64 yeni metinden: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+dene uygula: ['%99999999999s'] ve: ['text'].

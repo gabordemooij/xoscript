@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Utfier skriuwe: ['Database test'], nije-rigel.
+
+>> db := Maria-DB nĳ host: ['localhost'],
+	brûkersnamme: ['xo'], wachtwurd: ['pass123'], databanknamme: ['xobase'], ferbine.
+
+Utfier skriuwe: ['Can we connect? '] + db ferbûn?, nije-rigel.
+
+>> sykparameters := db fraach: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameters: ( Rige nĳ ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  sykparameters útfiere. db befêstigje. } fange: { :e db weromdraaie.  }, begjinne.
+
+Utfier skriuwe: ['Can we insert? '] + ( sykparameters insert-id > 0 ), nije-rigel.
+
+>> x := 0.
+>> sykparameters :=
+db fraach: ['SELECT * FROM book order by id desc limit 2'], 
+ophelje: { :row 
+	x optelle: 1.
+	Ja ôfbrekke. # must clean up, no 'Commands out of sync'
+}.
+
+>> sykparameters :=
+db fraach: ['SELECT * FROM book order by id desc limit 2'], 
+ophelje: { :row
+	x optelle: 1.
+	Ja ôfbrekke.
+}.
+
+(x > 0) ja: {
+	Utfier skriuwe: ['Can we break in the middle of a fetch? '].
+}.
+
+Utfier skriuwe: Ja, nije-rigel.

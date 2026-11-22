@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := オブジェクト 新規.
+
+Slurp 受信時: ['新規'] 実行: {
+	自分の str := [''].
+}.
+
+Slurp 受信時: ['nieuw'] 実行: {
+	自分の str := [''].
+}.
+
+Slurp 受信時: ['応答:'] 実行: { :blah
+		自分の str 末尾に追加: blah.
+}.
+
+Slurp 受信時: ['応答:かつ:'] 実行: { :blah :blahah
+		自分の str 末尾に追加: (blah 開始: 0 長さ: (blah 長さ - 1)).
+		自分の str 末尾に追加: [' '].
+		自分の str 末尾に追加: blahah.
+}.
+
+Slurp 受信時: ['obtain'] 実行: {
+	>> buffer := 自分の str.
+	自分の str := ['']. <- buffer.
+}.
+
+
+出力 書く: (プログラム システム: (Slurp 新規 echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ ファイル 新規: ['/tmp/from.txt'], 削除. } 例外時: { ['Empty']. }, 開始.
+{ ファイル 新規: ['/tmp/to.txt'], 削除. } 例外時: { ['Empty']. }, 開始.
+
+
+ファイル 新規: ['/tmp/to.txt'], 存在する 偽なら: {
+	出力 書く: ['Confirmed. Target file does not exist.\
+'].
+}.
+ファイル 新規: ['/tmp/from.txt'], 存在する 偽なら: {
+	出力 書く: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+プログラム システム: (Slurp 新規 touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+プログラム システム: (Slurp 新規 cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+ファイル 新規: ['/tmp/to.txt'], 存在する 真なら: {
+	出力 書く: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+出力 書く: ['Contents of file is:'] + (ファイル 新規: ['/tmp/to.txt'], 読む), 改行.

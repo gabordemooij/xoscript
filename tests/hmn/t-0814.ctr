@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server npaj.
+Kev-pab-cuam-khoos-phis-tawj siv: ['../../../src/xo/hmn/webtools.xo'].
+
+>> Fake-Request := Yam-khoom tshiab.
+Fake-Request thaum-tuaj: ['value:'] ua: { :nqi
+	nws-li nqi := nqi.
+}.
+Fake-Request thaum-tuaj: ['cookie:'] ua: { :npe <- nws-li nqi.
+}.
+
+>> Test-Session := Kev-sib-txuas-ntaub-ntawv-ib-ntus tshiab.
+Test-Session thaum-tuaj: ['thauj'] ua: { <- Phau-txhais-lus tshiab.
+}.
+Test-Session thaum-tuaj: ['session-id'] ua: { <- nws-li id.
+}.
+
+>> cookies := Daim-teev tshiab
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies txhua: { :i :cookie
+	>> kev-thov-http := Fake-Request tshiab.
+	kev-thov-http value: cookie.
+	>> tus-tswj := Test-Session tshiab.
+	>> web := Ntaub-ntawv-Web tshiab.
+	web kev-thov-http: kev-thov-http.
+	web tus-tswj-kev-sib-txuas: tus-tswj.
+	web pib-kev-sib-txuas.
+	Tawm sau-ntawv: ( tus-tswj session-id = cookie ), kab-tshiab.
+}.
+
+>> web := Ntaub-ntawv-Web tshiab.
+web json: (Phau-txhais-lus tshiab muab: ['b'] rau: ['a']).
+Tawm sau-ntawv: ['\n'], kab-tshiab.
+
+{ Network get: ['file:///etc/hostname']. } txhom: { :e
+	Tawm sau-ntawv: e, kab-tshiab.
+}, pib.
+
+>> svg := Ntaub-ntawv tshiab: ['/tmp/test0814.svg'].
+svg sau-ntawv: ['<svg xmlns="x"></svg>'].
+Tawm kab-tshiab.
+Server xa-dhau: ['test0814.svg'] lus-ua-ntej: ['/tmp/'].
+svg rho-tawm.

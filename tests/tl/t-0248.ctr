@@ -1,0 +1,39 @@
+
+
+Teksto kapag: ['evaluate'] gawin: {
+	>> kodigo := Talaksan bago: ['/tmp/eval.ctr'].
+	kodigo isulat: sarili teksto + ['.'].
+	Programa gamitin: ['/tmp/eval.ctr'].
+}.
+
+>> a := (Listahan ← (
+	(Diksyunaryo bago)
+		ilagay: ['domain'] sa: ['mywebsite.com'],
+		ilagay: (Listahan ←
+			((Diksyunaryo bago)
+				ilagay: ['home'] sa: ['title'],
+				ilagay: ['<html></html>'] sa: ['body'],
+				ilagay: ['2017-01-01'] sa: ['created']
+			) ;
+			((Diksyunaryo bago)
+				ilagay: ['aboutus(c)'] sa: ['title'],
+				ilagay: ['<credits>Author Inc.</credits>'] sa: ['body']
+			)
+		) sa: ['pages']
+	)
+) teksto.
+
+Labas isulat: a uri, bagong-linya.
+Labas isulat: a, bagong-linya.
+
+>> b := Wala.
+(['b := '] + a) evaluate.
+Labas isulat: b ? 0 ? ['pages'] ? 1 ? ['body'], bagong-linya.
+
+>> c := b ? 0.
+>> d := c teksto.
+Labas isulat: d uri, bagong-linya.
+
+>> e := Wala.
+(['e := '] + d) evaluate.
+Labas isulat: e ? ['pages'] ? 0, bagong-linya.

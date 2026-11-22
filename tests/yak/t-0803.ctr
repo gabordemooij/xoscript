@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB саҥа хост: ['localhost'],
+	туһааччы-аата: ['xo'],
+	пароль: ['pass123'],
+	база-аата: ['xobase'],
+	холбон.
+
+>> conn2 := Maria-DB саҥа хост: ['localhost'],
+	туһааччы-аата: ['xo'],
+	пароль: ['pass123'],
+	база-аата: ['xobase'],
+	холбон.
+#...
+>> del := conn1 запрос: ['DELETE FROM book WHERE id > 0'].
+{  del толор. conn1 бигэргэт. } проблеманы-быһаарыы: { :e conn1 төттөрү-төнүннэр.  }, саҕалаа.
+
+>> insert := conn1 запрос: ['INSERT INTO book (id) VALUES(null)'].
+insert толор.
+
+>> счетчик := conn1 запрос: ['SELECT COUNT(*) AS num FROM book'].
+счетчик аҕал: { :row Таһаарыы суруй: row num, стоп. }.
+
+# does not show up
+# insert not committed on connection 1
+>> счетчик := conn2 запрос: ['SELECT COUNT(*) AS num FROM book'].
+счетчик аҕал: { :row Таһаарыы суруй: row num, стоп. }.

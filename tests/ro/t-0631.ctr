@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Program gestiune-memorie: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Program setare: ['FFITESTLIB'].
+
+
+
+Server leagă: (
+ Listă nou ;
+ libname ;
+ ['puts'] ;
+ ( Listă nou ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s eliberează.
+
+# test with struct
+
+>> a := Blob nou: 8.
+a bytes: (
+	Listă <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Listă <<: ['int'], ; ['int']).
+
+Server leagă: (
+	Listă <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Listă <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Ieșire scrie: ['Sum test:'] + (ffitest ffisum: a), rând-nou.
+
+struct eliberează-struct.
+struct eliberează.
+a eliberează.

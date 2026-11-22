@@ -1,0 +1,53 @@
+Programme gestion-mémoire: 0.
+Liste quand: ['sum'] faire: {
+	>> total := 0.
+	soi chaque: { :index :element
+		total additionner: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Fichier nouveau: ['/tmp/test.txt'].
+f écrire: ['Lorem Ipsum'].
+f fermer.
+  
+
+f := Fichier nouveau: ['/tmp/test.txt'].
+>> text := f lire.
+f fermer.
+
+
+
+Programme nettoyer.
+usedMemory1 := (Programme mémoire ? 1).
+
+
+
+f := Fichier nouveau: ['/tmp/test.txt'].
+text := f lire.
+f fermer.
+
+Programme nettoyer.
+usedMemory2 := (Programme mémoire ? 1).
+
+
+f := Fichier nouveau: ['/tmp/test.txt'].
+text := f lire.
+f fermer.
+
+Programme nettoyer.
+usedMemory3 := (Programme mémoire ? 1).
+
+
+
+( usedMemory1 = usedMemory2 et: usedMemory1 = usedMemory3, et: usedMemory2 = usedMemory3 ) oui: {
+	Sortie écrire: ['No memory leaks here'].
+}, non: {
+	Sortie écrire: ['Leaking memory...'].
+}.

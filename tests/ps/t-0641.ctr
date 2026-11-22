@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := قاموس نوی
+	# ASCII only
+	کېږده: ﴿ لیست نوی ; 65 ; 65 ; 65 ; 65 ; 0 ﴾ کیلي: ⌝'AAAA'⌜,
+	# valid 2 byte sequence
+	کېږده: ﴿ لیست نوی ; 194 ; 162 ; 0 ﴾ کیلي: ⌝'¢'⌜,
+	# Valid 3-byte UTF-8
+    کېږده: ﴿ لیست نوی ; 226 ; 130 ; 172 ; 0 ﴾ کیلي: ⌝'€'⌜,
+	# Valid 4-byte UTF-8
+    کېږده: ﴿ لیست نوی ; 240 ; 144 ; 141 ; 136 ; 0 ﴾ کیلي: ⌝'𐍈'⌜,
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    کېږده: ﴿ لیست نوی ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ﴾ کیلي: ⌝'A?A'⌜,
+	# Overlong encoding of ASCII 'A' (should become ?),
+    کېږده: ﴿ لیست نوی ; 65 ; 193 ; 129 ; 0 ﴾ کیلي: ⌝'A?'⌜,
+	# Invalid first byte (0xFF)
+    کېږده: ﴿ لیست نوی ; 255 ; 0 ﴾ کیلي: ⌝'?'⌜,
+	# Incomplete multi-byte sequence at end
+    کېږده: ﴿ لیست نوی ; 66 ; 226 ; 0 ﴾ کیلي: ⌝'B?'⌜,
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    کېږده: ﴿ لیست نوی ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ﴾ کیلي: ⌝'A€?𐍈B'⌜.
+	 
+utf8cases هر-یو: ⎬ :key :value
+	>> blob := Blob نوی: value شمېر, بایټونه: value.
+	>> str := blob په-متن.
+	﴿str = key﴾ که-رښتیا: ⎬
+		وتنه ولیکه: ⌝'OK'⌜, نوې-کرښه.
+	⎨, که-نه: ⎬
+		وتنه ولیکه: ⌝'UTF8 sanitizer failed on: '⌜ + key + ⌝' got: '⌜ + str, نوې-کرښه.
+	⎨.
+	blob ازاد-کړه.
+⎨.

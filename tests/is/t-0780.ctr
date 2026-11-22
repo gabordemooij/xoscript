@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Listi nýtt ;
+	# {"key":"normal"} normal ASCII
+	( Orðabók nýtt setja: ['normal'] við: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Orðabók nýtt setja: ['hello world'] við: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Orðabók nýtt setja: ['"'] við: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Orðabók nýtt setja: ['backslash: \\'] við: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Orðabók nýtt setja: ['slash: /'] við: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Orðabók nýtt setja: ['backspace: \b'] við: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Orðabók nýtt setja: ['formfeed: \f'] við: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Orðabók nýtt setja: ['newline: \n'] við: ['key'] ) ;
+	( Orðabók nýtt setja: ['newline: ↵'] við: ['key'] ) ;
+	( Orðabók nýtt setja: ['newline: 
+	'] við: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Orðabók nýtt setja: ['carriage return: \r'] við: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Orðabók nýtt setja: ['tab \t'] við: ['key'] ) ;
+	( Orðabók nýtt setja: ['tab ⇿'] við: ['key'] ) ;
+	( Orðabók nýtt setja: ['tab  '] við: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Orðabók nýtt setja: ['NUL \u0000'] við: ['key'] ) ;
+	( Orðabók nýtt setja: ['NUL \0'] við: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Orðabók nýtt setja: ['control: \u0001'] við: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Orðabók nýtt setja: ['control: \u001F'] við: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Orðabók nýtt setja: ['unicode: é'] við: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Orðabók nýtt setja: ['unicode: €'] við: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Orðabók nýtt setja: ['unicode: 日本語'] við: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Orðabók nýtt setja: ['unicode: 😀'] við: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Orðabók nýtt setja: ['unicode: 🧑‍💻'] við: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Orðabók nýtt setja: ['combining: e\u0301'] við: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Orðabók nýtt setja: ['escaped unicode: \u00e9'] við: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Orðabók nýtt setja: ['escaped unicode: \u20ac'] við: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Orðabók nýtt setja: ['escaped unicode: \ud83d\ude00'] við: ['key'] ) ;
+	# {"key":""} empty value
+	( Orðabók nýtt setja: [''] við: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Orðabók nýtt setja: ['@ < > & = % + ? #'] við: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Orðabók nýtt setja: ['''] við: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Orðabók nýtt setja: ['multiple: \" \\ \n \r \t'] við: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Orðabók nýtt setja: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] við: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Orðabók nýtt setja: [' value'] við: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Orðabók nýtt setja: ['value '] við: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Orðabók nýtt setja: [' \t\n\r '] við: ['key'] ).
+
+dicts hver: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Orðabók nýtt setja: d key við: ['key']).
+	>> b := JSON jsonify: (Orðabók nýtt setja: ['value'] við: d key).
+	>> e := JSON hlutur: a.
+	>> f := JSON hlutur: b.
+	((e key = d key og: (f ? d key = ['value'])) eða: (e key = ['NUL ?'])) satt: {
+		Úttak skrifa: ['OK'], ný-lína.
+	}, annars: {
+		Úttak skrifa: ['Unable to properly encode/decode: '] + d + j, ný-lína.
+		Forrit enda.
+	}.
+}.

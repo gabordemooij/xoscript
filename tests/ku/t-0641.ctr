@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Ferheng nû
+	# ASCII only
+	deyne: ( Lîste nû ; 65 ; 65 ; 65 ; 65 ; 0 ) li: ['AAAA'],
+	# valid 2 byte sequence
+	deyne: ( Lîste nû ; 194 ; 162 ; 0 ) li: ['¢'],
+	# Valid 3-byte UTF-8
+    deyne: ( Lîste nû ; 226 ; 130 ; 172 ; 0 ) li: ['€'],
+	# Valid 4-byte UTF-8
+    deyne: ( Lîste nû ; 240 ; 144 ; 141 ; 136 ; 0 ) li: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    deyne: ( Lîste nû ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) li: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    deyne: ( Lîste nû ; 65 ; 193 ; 129 ; 0 ) li: ['A?'],
+	# Invalid first byte (0xFF)
+    deyne: ( Lîste nû ; 255 ; 0 ) li: ['?'],
+	# Incomplete multi-byte sequence at end
+    deyne: ( Lîste nû ; 66 ; 226 ; 0 ) li: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    deyne: ( Lîste nû ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) li: ['A€?𐍈B'].
+	 
+utf8cases her-yek: { :key :value
+	>> blob := Blob nû: value hejmara-tiştan, bytes: value.
+	>> str := blob nivîs.
+	(str = key) rast: {
+		Derketin binivîse: ['OK'], rêza-nû.
+	}, wekî-din: {
+		Derketin binivîse: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, rêza-nû.
+	}.
+	blob azad-bike.
+}.

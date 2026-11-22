@@ -1,0 +1,43 @@
+#Linux
+>> OS := プログラム システム: (コマンド uname -s), 空白除去.
+
+>> Slurp := オブジェクト 新規.
+Slurp 受信時: ['新規'] 実行: {
+	自分の str := [''].
+}.
+Slurp 受信時: ['応答:'] 実行: { :blah
+		(自分の str ≠ ['']) 真なら: {
+			自分の str 末尾に追加: [' '].
+		}.
+		自分の str 末尾に追加: blah.
+}.
+Slurp 受信時: ['応答:かつ:'] 実行: { :blah :blahah
+		(自分の str ≠ ['']) 真なら: {
+			自分の str 末尾に追加: [' '].
+		}.
+		(blah 長さ > 1) 真なら: {
+			自分の str 末尾に追加: (blah 開始: 0 長さ: (blah 長さ - 1)).
+		}, さもなければ: {
+			自分の str 末尾に追加: blah.
+		}.
+		自分の str 末尾に追加: [' '].
+		自分の str 末尾に追加: blahah.
+}.
+Slurp 受信時: ['obtain'] 実行: {
+	>> buffer := 自分の str.
+	自分の str := ['']. <- buffer.
+}.
+>> large text := [''].
+{
+	large text 末尾に追加: ['hello'].
+} × 1000.
+
+
+出力 書く: (
+	プログラム システム: (
+		Slurp 新規
+			echo: large text,
+			| (['./xo ../../../tests/assets/stdin_test.ctr'] OS: OS)
+		) obtain
+).
+

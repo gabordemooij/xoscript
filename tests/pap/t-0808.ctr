@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Kaha-fuerte generá-yabi.
+>> sk := keys promé.
+>> pk := keys último.
+>> sig := Kaha-fuerte firma: ['abc'] ku: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Kaha-fuerte firma: ['abc'] ku: long. } kapta: { :e
+	Salida skirbi: e, liña-nobo.
+}, kuminsá.
+
+{ Kaha-fuerte kontrolá: ['abc'] firma: long ku: pk. } kapta: { :e
+	Salida skirbi: e, liña-nobo.
+}, kuminsá.
+
+{ Kaha-fuerte kontrolá: ['abc'] firma: sig ku: short. } kapta: { :e
+	Salida skirbi: e, liña-nobo.
+}, kuminsá.

@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server initialiser.
+Program brug: ['../../../src/xo/da/webtools.xo'].
+Program brug: ['../../../src/xo/da/mailtools.xo'].
+
+>> header := HTTP-Header ny nøgle: ['Location'] værdi: ['/ok\r\nX-Injected: yes'].
+Uddata skriv: header.
+
+>> web := Webdokument ny.
+web gå-til: ['/ok\r\nX-Injected: yes'].
+Uddata skriv: ['\n'], stop.
+
+>> mail := E-mail ny.
+mail til: (Liste ny ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Liste ny ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Liste ny ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail afsender: ['d@example.invalid\r\nX-From: yes'] navn: ['site\r\nX-Name: yes'].
+mail emne: ['hello\r\nX-Subject: yes'].
+mail brødtekst: ['line1\r\nline2'].
+Uddata skriv: mail generer.
+
+>> html := HTML-E-mail ny.
+html til: (Liste ny ; ['a@example.invalid\r\nX-To: yes']).
+html afsender: ['d@example.invalid'] navn: ['site'].
+html emne: ['hello\r\nX-Subject: yes'].
+html brødtekst: ['body'].
+Uddata skriv: ( html generer indeholder: ['\nX-'] ), stop.
+Uddata skriv: ( html generer indeholder: ['X-To: yes'] ), stop.

@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Wanta haaraa.
+
+Log irratti: ['say:'] godhi: { :str
+	Baʼii barreessi: str, dhaabi.
+}.
+
+>> Item := Wanta haaraa.
+
+Item irratti: ['haaraa:'] godhi: { :id <- ofii haaraa id: id.
+}.
+
+Item irratti: ['id:'] godhi: { :id
+	koo id := id.
+}.
+
+Item irratti: ['id'] godhi: { <- koo id. }.
+
+
+Item irratti: ['gara-barreeffamaatti'] godhi: {
+	>> str := ['Item#~no'].
+	str ~no: koo id. <- str.
+}.
+
+
+>> Print := Wanta haaraa.
+
+Print irratti: ['items'] godhi: { 
+	
+	koo item := Item haaraa: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: koo item
+	).
+	
+	
+}.
+
+Print items.

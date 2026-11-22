@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Barnaamij maamulka-xusuusta: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Barnaamij dejin: ['FFITESTLIB'].
+
+
+
+Server xiriiri: (
+ Liis cusub ;
+ libname ;
+ ['puts'] ;
+ ( Liis cusub ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s sii-daa.
+
+# test with struct
+
+>> a := Blob cusub: 8.
+a bytes: (
+	Liis <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Liis <<: ['int'], ; ['int']).
+
+Server xiriiri: (
+	Liis <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Liis <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Soo-saar qor: ['Sum test:'] + (ffitest ffisum: a), sadar-cusub.
+
+struct sii-daa-struct.
+struct sii-daa.
+a sii-daa.

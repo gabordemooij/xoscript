@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lista ġdid ;
+	# {"key":"normal"} normal ASCII
+	( Dizzjunarju ġdid poġġi: ['normal'] fi: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Dizzjunarju ġdid poġġi: ['hello world'] fi: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Dizzjunarju ġdid poġġi: ['"'] fi: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Dizzjunarju ġdid poġġi: ['backslash: \\'] fi: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Dizzjunarju ġdid poġġi: ['slash: /'] fi: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Dizzjunarju ġdid poġġi: ['backspace: \b'] fi: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Dizzjunarju ġdid poġġi: ['formfeed: \f'] fi: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Dizzjunarju ġdid poġġi: ['newline: \n'] fi: ['key'] ) ;
+	( Dizzjunarju ġdid poġġi: ['newline: ↵'] fi: ['key'] ) ;
+	( Dizzjunarju ġdid poġġi: ['newline: 
+	'] fi: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Dizzjunarju ġdid poġġi: ['carriage return: \r'] fi: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Dizzjunarju ġdid poġġi: ['tab \t'] fi: ['key'] ) ;
+	( Dizzjunarju ġdid poġġi: ['tab ⇿'] fi: ['key'] ) ;
+	( Dizzjunarju ġdid poġġi: ['tab  '] fi: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Dizzjunarju ġdid poġġi: ['NUL \u0000'] fi: ['key'] ) ;
+	( Dizzjunarju ġdid poġġi: ['NUL \0'] fi: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Dizzjunarju ġdid poġġi: ['control: \u0001'] fi: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Dizzjunarju ġdid poġġi: ['control: \u001F'] fi: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Dizzjunarju ġdid poġġi: ['unicode: é'] fi: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Dizzjunarju ġdid poġġi: ['unicode: €'] fi: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Dizzjunarju ġdid poġġi: ['unicode: 日本語'] fi: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Dizzjunarju ġdid poġġi: ['unicode: 😀'] fi: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Dizzjunarju ġdid poġġi: ['unicode: 🧑‍💻'] fi: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Dizzjunarju ġdid poġġi: ['combining: e\u0301'] fi: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Dizzjunarju ġdid poġġi: ['escaped unicode: \u00e9'] fi: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Dizzjunarju ġdid poġġi: ['escaped unicode: \u20ac'] fi: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Dizzjunarju ġdid poġġi: ['escaped unicode: \ud83d\ude00'] fi: ['key'] ) ;
+	# {"key":""} empty value
+	( Dizzjunarju ġdid poġġi: [''] fi: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Dizzjunarju ġdid poġġi: ['@ < > & = % + ? #'] fi: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Dizzjunarju ġdid poġġi: ['''] fi: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Dizzjunarju ġdid poġġi: ['multiple: \" \\ \n \r \t'] fi: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Dizzjunarju ġdid poġġi: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] fi: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Dizzjunarju ġdid poġġi: [' value'] fi: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Dizzjunarju ġdid poġġi: ['value '] fi: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Dizzjunarju ġdid poġġi: [' \t\n\r '] fi: ['key'] ).
+
+dicts kull: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Dizzjunarju ġdid poġġi: d key fi: ['key']).
+	>> b := JSON jsonify: (Dizzjunarju ġdid poġġi: ['value'] fi: d key).
+	>> e := JSON oġġett: a.
+	>> f := JSON oġġett: b.
+	((e key = d key u: (f ? d key = ['value'])) jew: (e key = ['NUL ?'])) veru: {
+		Ħruġ ikteb: ['OK'], linja-ġdida.
+	}, inkella: {
+		Ħruġ ikteb: ['Unable to properly encode/decode: '] + d + j, linja-ġdida.
+		Programm tmiem.
+	}.
+}.

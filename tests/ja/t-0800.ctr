@@ -1,0 +1,16 @@
+Server init.
+
+>> db := Maria-DB 新規 ホスト: ['localhost'],
+	ユーザー名: ['xo'],
+	パスワード: ['pass123'],
+	データベース名: ['xobase'],
+	接続.
+
+>> 検索パラメータ := db クエリ: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], パラメータ: ( リスト 新規 ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  検索パラメータ 実行. db コミット. } 例外時: { :e db ロールバック.  }, 開始.
+
+出力 書く: ['Can we insert? '] + ( 検索パラメータ insert-id > 0 ), 改行.

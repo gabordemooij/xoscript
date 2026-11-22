@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> proovi := { :format :value
+	{ Väljund kirjuta: ( (Vorming uus: format) rakenda: value ), reavahetus. } püüa: { :e Väljund kirjuta: e, reavahetus. }, käivita.
+}.
+>> try-int := { :format :value
+	{ Väljund kirjuta: ( (Vorming uus: format) rakenda-täisarvule: value ), reavahetus. } püüa: { :e Väljund kirjuta: e, reavahetus. }, käivita.
+}.
+
+# fits
+proovi rakenda: ['|%s|'] ja: ['text'].
+proovi rakenda: ['%06.2f'] ja: 5.5.
+proovi rakenda: ['100%% %s'] ja: ['sure'].
+try-int rakenda: ['%03d'] ja: 7.
+try-int rakenda: ['%x'] ja: 255.
+proovi rakenda: ['%d'] ja: (Int64 uus tekstist: ['12']).
+proovi rakenda: ['%lld'] ja: (Int64 uus tekstist: ['12']).
+proovi rakenda: ['%.1lf'] ja: 5.5.
+try-int rakenda: ['%hd'] ja: 7.
+
+# does not fit
+proovi rakenda: ['%s'] ja: 12345.
+proovi rakenda: ['%d'] ja: 12345.
+proovi rakenda: ['%f'] ja: ['text'].
+try-int rakenda: ['%d'] ja: ['text'].
+try-int rakenda: ['%s'] ja: 5.
+proovi rakenda: ['%s %s'] ja: ['text'].
+proovi rakenda: ['%n'] ja: ['text'].
+proovi rakenda: ['%*s'] ja: ['text'].
+proovi rakenda: ['%'] ja: ['text'].
+
+# length modifier does not fit
+proovi rakenda: ['%ls'] ja: ['text'].
+proovi rakenda: ['%Lf'] ja: 5.5.
+try-int rakenda: ['%ld'] ja: 7.
+try-int rakenda: ['%lld'] ja: 7.
+proovi rakenda: ['%Ld'] ja: (Int64 uus tekstist: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+proovi rakenda: ['%99999999999s'] ja: ['text'].

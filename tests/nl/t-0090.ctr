@@ -1,0 +1,36 @@
+Uit schrijf: ['1,2,3,4,5,6,7,8,9,A,'], stop.
+>> Scope := Object nieuw.
+Scope bij: ['initialize:'] doen: { :x eigen property := x. }.
+Scope bij: ['confirm'] doen: { Uit schrijf: [',']. }.
+Scope bij: ['test'] doen: {
+	Uit schrijf: eigen property.
+	zelf confirm.
+	( 1 = 1 ) ja: { Uit schrijf: eigen property. zelf confirm. }.
+	( 1 = 0 ) nee: { Uit schrijf: eigen property. zelf confirm. }.
+	>> y := 2. { Uit schrijf: eigen property. zelf confirm. } zolang: { y aftrekken: 1. <- (y > 0). }.
+	{ Uit schrijf: eigen property. zelf confirm. } × 1.
+	(Reeks ← 1) elk: {  Uit schrijf: eigen property. zelf confirm. }.
+	#(List ← 1 ; 2) sort: {  Out write: own property. self confirm. <- 0. }. @todo impl own sorting, this test fails because diff. num iterations per platform
+	(Lijst nieuw one: ['item']) elk: { Uit schrijf: eigen property. zelf confirm. }.
+	{ 1 ÷ 0. } afhandelen: { Uit schrijf: eigen property. zelf confirm. }, start.
+	Uit stop.
+}.
+>> scope1 := Scope nieuw.
+scope1 initialize: ['X'].
+scope1 test.
+>> function := { 
+	eigen property := ['Y'].
+	Uit schrijf: eigen property.
+	zelf confirm.
+	( 1 = 1 ) ja: { Uit schrijf: eigen property. zelf confirm. }.
+	( 1 = 0 ) nee: { Uit schrijf: eigen property. zelf confirm. }.
+	>> y := 2. { Uit schrijf: eigen property. zelf confirm. } zolang: { y aftrekken: 1. <- (y > 0). }.
+	{ Uit schrijf: eigen property. zelf confirm. } × 1.
+	(Reeks ← 1) elk: {  Uit schrijf: eigen property. zelf confirm. }.
+	#(List ← 1 ; 2) sort: {  Out write: own property. self confirm. <- 0. }.
+	(Lijst nieuw one: ['item']) elk: { Uit schrijf: eigen property. zelf confirm. }.
+	{ 1 ÷ 0. } afhandelen: { Uit schrijf: eigen property. zelf confirm. }, start.
+	Uit stop.
+}.
+function bij: ['confirm'] doen: { Uit schrijf: [',']. }.
+function toepassen: 1 en: 2.

@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> ceļš := ['/tmp/test0821.csv'].
+>> file := Fails jauns: ceļš.
+
+file rakstīt: ['a,b\n"1,2\n'].
+{
+	file atdalītājs: [','] pēdiņa: ['"'] rindas: { :line
+		Izvade rakstīt: line, jauna-rinda.
+	}.
+} tvert: { :e Izvade rakstīt: e, jauna-rinda. }, palaist.
+
+# a closed quote still works
+file rakstīt: ['a,b\n"1,2",3'].
+file atdalītājs: [','] pēdiņa: ['"'] rindas: { :line
+	Izvade rakstīt: line, jauna-rinda.
+}.
+file dzēst.

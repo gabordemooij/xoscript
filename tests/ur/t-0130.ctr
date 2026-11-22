@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := پروگرام ترتیب-قدر: ⌝'FFITESTLIB'⌜.
+
+# link stdio functions from c for advances file operations
+Server ربط: ﴿ لسٹ نیا ;
+ libname ; ⌝'fopen'⌜ ;
+ ﴿ لسٹ نیا ; ⌝'pointer'⌜ ; ⌝'pointer'⌜﴾ ;
+ ⌝'pointer'⌜ ;
+ ⌝'Stream'⌜ ;
+ ⌝'path:mode:'⌜
+﴾,
+ربط: ﴿ لسٹ نیا ;
+ خالی ; # means same lib
+ ⌝'fread'⌜ ;
+ ﴿ لسٹ نیا ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ خالی ; # means same object (i.e. Stream)
+ ⌝'fread'⌜
+﴾,
+ربط: ﴿
+ لسٹ نیا ;
+ خالی ; # means same lib
+ ⌝'fwrite'⌜ ;
+ ﴿ لسٹ نیا ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ خالی ; # means same lib
+ ⌝'fwrite'⌜
+﴾,
+ربط: ﴿
+ لسٹ نیا ;
+ خالی ; # means same lib
+ ⌝'rewind'⌜ ;
+ ﴿ لسٹ نیا ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ خالی ; # means same lib
+ ⌝'rewind:'⌜
+﴾.
+
+>> str := Blob utf8: ⌝'abc123'⌜.
+>> فائل-راستہ := Blob utf8: ⌝'/tmp/bla.txt'⌜.
+>> mode := Blob utf8: ⌝'w+'⌜.
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: فائل-راستہ mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream پیغام: ⌝'fwrite'⌜ دلائل: ﴿لسٹ نیا ; str ; 1 ; 6 ; fd ﴾.
+آؤٹ-پٹ لکھو: bytes-written, نئی-سطر.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob نیا: 20.
+
+# read from file
+>> bytes-read := Stream پیغام: ⌝'fread'⌜ دلائل: ﴿لسٹ نیا ; buf ; 1 ; 6 ; fd ﴾.
+آؤٹ-پٹ لکھو: bytes-read, نئی-سطر.
+آؤٹ-پٹ لکھو: buf, نئی-سطر.
+
+# free memory
+str  آزاد-کرو.
+فائل-راستہ آزاد-کرو.
+mode آزاد-کرو.
+buf  آزاد-کرو.
+
+

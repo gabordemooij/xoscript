@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+ଆଉଟପୁଟ୍ ଲେଖ: ['Database test'], ନୂଆ-ଧାଡ଼ି.
+
+>> db := Maria-DB ନୂତନ ହୋଷ୍ଟ: ['localhost'],
+	ଉପଯୋଗକର୍ତ୍ତା-ନାମ: ['xo'], ପାସୱାର୍ଡ: ['pass123'], ଡାଟାବେସ୍-ନାମ: ['xobase'], ସଂଯୋଗ.
+
+ଆଉଟପୁଟ୍ ଲେଖ: ['Can we connect? '] + db ସଂଯୁକ୍ତ?, ନୂଆ-ଧାଡ଼ି.
+
+>> ସନ୍ଧାନ-ପାରାମିଟର := db କ୍ୱେରୀ: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], ପାରାମିଟର: ( ସାରଣୀ ନୂତନ ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  ସନ୍ଧାନ-ପାରାମିଟର ନିର୍ବାହ. db ନିଶ୍ଚିତ. } ଧର: { :e db ଫେରାଇ-ନିଅ.  }, ଚଲାଅ.
+
+ଆଉଟପୁଟ୍ ଲେଖ: ['Can we insert? '] + ( ସନ୍ଧାନ-ପାରାମିଟର insert-id > 0 ), ନୂଆ-ଧାଡ଼ି.
+
+>> x := 0.
+>> ସନ୍ଧାନ-ପାରାମିଟର :=
+db କ୍ୱେରୀ: ['SELECT * FROM book order by id desc limit 2'], 
+ଆଣ: { :row 
+	x ମିଶାଅ: 1.
+	ସତ୍ୟ ଅଟକାଅ. # must clean up, no 'Commands out of sync'
+}.
+
+>> ସନ୍ଧାନ-ପାରାମିଟର :=
+db କ୍ୱେରୀ: ['SELECT * FROM book order by id desc limit 2'], 
+ଆଣ: { :row
+	x ମିଶାଅ: 1.
+	ସତ୍ୟ ଅଟକାଅ.
+}.
+
+(x > 0) ସତ୍ୟ-ହେଲେ: {
+	ଆଉଟପୁଟ୍ ଲେଖ: ['Can we break in the middle of a fetch? '].
+}.
+
+ଆଉଟପୁଟ୍ ଲେଖ: ସତ୍ୟ, ନୂଆ-ଧାଡ଼ି.

@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Tişt nû.
+
+Log gava: ['say:'] bike: { :str
+	Derketin binivîse: str, rêza-nû.
+}.
+
+>> Item := Tişt nû.
+
+Item gava: ['nû:'] bike: { :id <- xwe nû id: id.
+}.
+
+Item gava: ['id:'] bike: { :id
+	xweyî id := id.
+}.
+
+Item gava: ['id'] bike: { <- xweyî id. }.
+
+
+Item gava: ['nivîs'] bike: {
+	>> str := ['Item#~no'].
+	str ~no: xweyî id. <- str.
+}.
+
+
+>> Print := Tişt nû.
+
+Print gava: ['items'] bike: { 
+	
+	xweyî item := Item nû: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: xweyî item
+	).
+	
+	
+}.
+
+Print items.

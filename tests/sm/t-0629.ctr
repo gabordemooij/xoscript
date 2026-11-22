@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Tuuina-atu tusi: ['Database test'], laina-fou.
+
+>> db := Maria-DB fou talimalo: ['localhost'],
+	igoa-tagata-faaaoga: ['xo'], upu-faataga: ['pass123'], igoa-faaputuga-faamatalaga: ['xobase'], fesootai-atu.
+
+Tuuina-atu tusi: ['Can we connect? '] + db ua-fesootai?, laina-fou.
+
+>> mea-suesue := db fesili-faamatalaga: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], mea-suesue-uma: ( Lisi fou ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  mea-suesue faatino. db faamautu. } puʻe: { :e db toe-foi-i-tua.  }, amata.
+
+Tuuina-atu tusi: ['Can we insert? '] + ( mea-suesue insert-id > 0 ), laina-fou.
+
+>> Obj := Mea fou.
+Obj pe-a-oo-mai: ['retrieve-rows'] fai: {
+	lana-lava aofaiga := 0.
+	>> mea-suesue :=
+	db fesili-faamatalaga: ['SELECT * FROM book order by id desc limit 2'], 
+	aumai: { :row 
+		lana-lava aofaiga faʻaopoopo: 1.
+		Moni motusia.
+	}. <- lana-lava aofaiga kopi-mea.
+}.
+
+Tuuina-atu tusi: ['Can we query? '] + ( Obj retrieve-rows > 0 ), laina-fou.

@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Szótár új
+	# ASCII only
+	tesz: ( Lista új ; 65 ; 65 ; 65 ; 65 ; 0 ) ide: ['AAAA'],
+	# valid 2 byte sequence
+	tesz: ( Lista új ; 194 ; 162 ; 0 ) ide: ['¢'],
+	# Valid 3-byte UTF-8
+    tesz: ( Lista új ; 226 ; 130 ; 172 ; 0 ) ide: ['€'],
+	# Valid 4-byte UTF-8
+    tesz: ( Lista új ; 240 ; 144 ; 141 ; 136 ; 0 ) ide: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    tesz: ( Lista új ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ide: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    tesz: ( Lista új ; 65 ; 193 ; 129 ; 0 ) ide: ['A?'],
+	# Invalid first byte (0xFF)
+    tesz: ( Lista új ; 255 ; 0 ) ide: ['?'],
+	# Incomplete multi-byte sequence at end
+    tesz: ( Lista új ; 66 ; 226 ; 0 ) ide: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    tesz: ( Lista új ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ide: ['A€?𐍈B'].
+	 
+utf8cases mindegyik: { :key :value
+	>> blob := Blob új: value darabszám, bytes: value.
+	>> str := blob szöveg.
+	(str = key) igaz: {
+		Kimenet ír: ['OK'], újsor.
+	}, különben: {
+		Kimenet ír: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, újsor.
+	}.
+	blob felszabadít.
+}.

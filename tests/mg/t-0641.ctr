@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Rakibolana vaovao
+	# ASCII only
+	apetraho: ( Lisitra vaovao ; 65 ; 65 ; 65 ; 65 ; 0 ) eo: ['AAAA'],
+	# valid 2 byte sequence
+	apetraho: ( Lisitra vaovao ; 194 ; 162 ; 0 ) eo: ['¢'],
+	# Valid 3-byte UTF-8
+    apetraho: ( Lisitra vaovao ; 226 ; 130 ; 172 ; 0 ) eo: ['€'],
+	# Valid 4-byte UTF-8
+    apetraho: ( Lisitra vaovao ; 240 ; 144 ; 141 ; 136 ; 0 ) eo: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    apetraho: ( Lisitra vaovao ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) eo: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    apetraho: ( Lisitra vaovao ; 65 ; 193 ; 129 ; 0 ) eo: ['A?'],
+	# Invalid first byte (0xFF)
+    apetraho: ( Lisitra vaovao ; 255 ; 0 ) eo: ['?'],
+	# Incomplete multi-byte sequence at end
+    apetraho: ( Lisitra vaovao ; 66 ; 226 ; 0 ) eo: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    apetraho: ( Lisitra vaovao ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) eo: ['A€?𐍈B'].
+	 
+utf8cases tsirairay: { :key :value
+	>> blob := Blob vaovao: value isan-javatra, bytes: value.
+	>> str := blob soratra.
+	(str = key) marina: {
+		Vokatra soraty: ['OK'], andalana-vaovao.
+	}, raha-tsy-izany: {
+		Vokatra soraty: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, andalana-vaovao.
+	}.
+	blob afaho.
+}.

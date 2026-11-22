@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lista ny ;
+	# {"key":"normal"} normal ASCII
+	( Ordbok ny sätt: ['normal'] vid: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Ordbok ny sätt: ['hello world'] vid: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Ordbok ny sätt: ['"'] vid: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Ordbok ny sätt: ['backslash: \\'] vid: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Ordbok ny sätt: ['slash: /'] vid: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Ordbok ny sätt: ['backspace: \b'] vid: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Ordbok ny sätt: ['formfeed: \f'] vid: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Ordbok ny sätt: ['newline: \n'] vid: ['key'] ) ;
+	( Ordbok ny sätt: ['newline: ↵'] vid: ['key'] ) ;
+	( Ordbok ny sätt: ['newline: 
+	'] vid: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Ordbok ny sätt: ['carriage return: \r'] vid: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Ordbok ny sätt: ['tab \t'] vid: ['key'] ) ;
+	( Ordbok ny sätt: ['tab ⇿'] vid: ['key'] ) ;
+	( Ordbok ny sätt: ['tab  '] vid: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Ordbok ny sätt: ['NUL \u0000'] vid: ['key'] ) ;
+	( Ordbok ny sätt: ['NUL \0'] vid: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Ordbok ny sätt: ['control: \u0001'] vid: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Ordbok ny sätt: ['control: \u001F'] vid: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Ordbok ny sätt: ['unicode: é'] vid: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Ordbok ny sätt: ['unicode: €'] vid: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Ordbok ny sätt: ['unicode: 日本語'] vid: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Ordbok ny sätt: ['unicode: 😀'] vid: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Ordbok ny sätt: ['unicode: 🧑‍💻'] vid: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Ordbok ny sätt: ['combining: e\u0301'] vid: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Ordbok ny sätt: ['escaped unicode: \u00e9'] vid: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Ordbok ny sätt: ['escaped unicode: \u20ac'] vid: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Ordbok ny sätt: ['escaped unicode: \ud83d\ude00'] vid: ['key'] ) ;
+	# {"key":""} empty value
+	( Ordbok ny sätt: [''] vid: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Ordbok ny sätt: ['@ < > & = % + ? #'] vid: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Ordbok ny sätt: ['''] vid: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Ordbok ny sätt: ['multiple: \" \\ \n \r \t'] vid: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Ordbok ny sätt: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] vid: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Ordbok ny sätt: [' value'] vid: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Ordbok ny sätt: ['value '] vid: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Ordbok ny sätt: [' \t\n\r '] vid: ['key'] ).
+
+dicts varje: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Ordbok ny sätt: d key vid: ['key']).
+	>> b := JSON jsonify: (Ordbok ny sätt: ['value'] vid: d key).
+	>> e := JSON objekt: a.
+	>> f := JSON objekt: b.
+	((e key = d key och: (f ? d key = ['value'])) eller: (e key = ['NUL ?'])) sann: {
+		Utdata skriv: ['OK'], stop.
+	}, annars: {
+		Utdata skriv: ['Unable to properly encode/decode: '] + d + j, stop.
+		Program avsluta.
+	}.
+}.

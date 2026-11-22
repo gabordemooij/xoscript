@@ -1,0 +1,42 @@
+
+சரம் பெறும்போது: ['html'] செய்: { <- (
+		தான்
+		மாற்று: ['&'] கொண்டு: ['&amp;'],
+		மாற்று: ['<'] கொண்டு: ['&lt;'],
+		மாற்று: ['>'] கொண்டு: ['&gt;'],
+		மாற்று: ['"'] கொண்டு: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := பொருள் புதிய.
+
+HtmlBrush பெறும்போது: ['பதில்:'] செய்: { :tag
+	வெளியீடு எழுது: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush பெறும்போது: ['பதில்:மற்றும்:'] செய்: { :tag :content
+	tag := ( tag தொடக்கம்: 0 நீளம்: (tag நீளம் - 1) ).
+	வெளியீடு எழுது: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush பெறும்போது: ['content:'] செய்: { :text
+	வெளியீடு எழுது: text html, புதிய-வரி.
+}.
+
+HtmlBrush பெறும்போது: ['attr:value:'] செய்: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush புதிய.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

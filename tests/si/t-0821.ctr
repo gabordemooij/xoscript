@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> ගොනු-මාර්ගය := ['/tmp/test0821.csv'].
+>> file := ගොනුව නව: ගොනු-මාර්ගය.
+
+file ලියන්න: ['a,b\n"1,2\n'].
+{
+	file බෙදුම්කරු: [','] උද්ධෘතය: ['"'] පේළි: { :line
+		නිමැවුම ලියන්න: line, නව-පේළිය.
+	}.
+} අල්ලන්න: { :e නිමැවුම ලියන්න: e, නව-පේළිය. }, ධාවනය.
+
+# a closed quote still works
+file ලියන්න: ['a,b\n"1,2",3'].
+file බෙදුම්කරු: [','] උද්ධෘතය: ['"'] පේළි: { :line
+	නිමැවුම ලියන්න: line, නව-පේළිය.
+}.
+file මකන්න.

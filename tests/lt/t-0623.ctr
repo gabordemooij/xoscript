@@ -1,0 +1,43 @@
+
+
+>> g := Server naujas.
+>> v := Seifas naujas.
+>> ok := 0.
+
+>> secrets := Sąrašas naujas ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopijuoti.
+passwords kiekvienas: { :i :p
+	secrets kiekvienas: { :n :s
+		{
+			>> encrypted := v šifruoti: s raktas: p.
+			>> decrypted := v iššifruoti: encrypted raktas: p.
+			(decrypted = s) tiesa: {
+				ok sudėti: 1.
+			}, kitu-atveju: {
+				Išvestis rašyti: ['failed encrypting/decrypting: '], nauja-eilutė.
+				Išvestis rašyti: s, nauja-eilutė.
+				Išvestis rašyti: ['encrypted: '] + encrypted, nauja-eilutė.
+				Išvestis rašyti: ['decrypted: '] + encrypted, nauja-eilutė.
+				Programa baigti.
+			}.
+		} pagauti: { :err
+			(s = [''] arba: p = ['']) tiesa: {
+				ok sudėti: 1.
+			}, kitu-atveju: {
+				Išvestis rašyti: err, nauja-eilutė.
+				Programa baigti.
+			}.
+		}, paleisti.
+	}.
+}.
+
+Išvestis rašyti: ( ok + [' vault encryptions tested.'] ), nauja-eilutė.

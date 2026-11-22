@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> prova := { :format :value
+	{ Uscita scrivi: ( (Formato nuovo: format) applica: value ), stop. } catturare: { :e Uscita scrivi: e, stop. }, correre.
+}.
+>> try-int := { :format :value
+	{ Uscita scrivi: ( (Formato nuovo: format) applica-int: value ), stop. } catturare: { :e Uscita scrivi: e, stop. }, correre.
+}.
+
+# fits
+prova applica: ['|%s|'] e: ['text'].
+prova applica: ['%06.2f'] e: 5.5.
+prova applica: ['100%% %s'] e: ['sure'].
+try-int applica: ['%03d'] e: 7.
+try-int applica: ['%x'] e: 255.
+prova applica: ['%d'] e: (Int64 nuovo da-testo: ['12']).
+prova applica: ['%lld'] e: (Int64 nuovo da-testo: ['12']).
+prova applica: ['%.1lf'] e: 5.5.
+try-int applica: ['%hd'] e: 7.
+
+# does not fit
+prova applica: ['%s'] e: 12345.
+prova applica: ['%d'] e: 12345.
+prova applica: ['%f'] e: ['text'].
+try-int applica: ['%d'] e: ['text'].
+try-int applica: ['%s'] e: 5.
+prova applica: ['%s %s'] e: ['text'].
+prova applica: ['%n'] e: ['text'].
+prova applica: ['%*s'] e: ['text'].
+prova applica: ['%'] e: ['text'].
+
+# length modifier does not fit
+prova applica: ['%ls'] e: ['text'].
+prova applica: ['%Lf'] e: 5.5.
+try-int applica: ['%ld'] e: 7.
+try-int applica: ['%lld'] e: 7.
+prova applica: ['%Ld'] e: (Int64 nuovo da-testo: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+prova applica: ['%99999999999s'] e: ['text'].

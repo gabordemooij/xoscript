@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB tuntun agbalejo: ['localhost'],
+	orukọ-olumulo: ['xo'],
+	ọrọ-igbaniwọle: ['pass123'],
+	orukọ-ibi-ipamọ: ['xobase'],
+	sopọ-mọ.
+
+>> awọn-apa-iwadii := db ibeere: ['SELECT ? AS a, ? AS b, ? AS c'].
+awọn-apa-iwadii awọn-apa-ibeere: (Akojọ tuntun ; ['1']).
+{ awọn-apa-iwadii mu-wa: { :row Ijade kọ: row, ila-tuntun. }. } mu: { :e Ijade kọ: e, ila-tuntun. }, bẹrẹ.
+
+>> awọn-apa-iwadii := db ibeere: ['SELECT ? AS a'].
+{ awọn-apa-iwadii mu-wa: { :row Ijade kọ: row, ila-tuntun. }. } mu: { :e Ijade kọ: e, ila-tuntun. }, bẹrẹ.
+
+# the right number still works, more parameters are ignored as before
+>> awọn-apa-iwadii := db ibeere: ['SELECT ? AS a, ? AS b'].
+awọn-apa-iwadii awọn-apa-ibeere: (Akojọ tuntun ; ['1'] ; ['2']).
+awọn-apa-iwadii mu-wa: { :row Ijade kọ: (row ni: ['a']), kọ: (row ni: ['b']), ila-tuntun. }.
+awọn-apa-iwadii awọn-apa-ibeere: (Akojọ tuntun ; ['1'] ; ['2'] ; ['3']).
+awọn-apa-iwadii mu-wa: { :row Ijade kọ: (row ni: ['a']), kọ: (row ni: ['b']), ila-tuntun. }.

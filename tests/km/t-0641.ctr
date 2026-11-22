@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := វចនានុក្រម ថ្មី
+	# ASCII only
+	ដាក់: ( ស៊េរី ថ្មី ; 65 ; 65 ; 65 ; 65 ; 0 ) សោ: ['AAAA'],
+	# valid 2 byte sequence
+	ដាក់: ( ស៊េរី ថ្មី ; 194 ; 162 ; 0 ) សោ: ['¢'],
+	# Valid 3-byte UTF-8
+    ដាក់: ( ស៊េរី ថ្មី ; 226 ; 130 ; 172 ; 0 ) សោ: ['€'],
+	# Valid 4-byte UTF-8
+    ដាក់: ( ស៊េរី ថ្មី ; 240 ; 144 ; 141 ; 136 ; 0 ) សោ: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    ដាក់: ( ស៊េរី ថ្មី ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) សោ: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    ដាក់: ( ស៊េរី ថ្មី ; 65 ; 193 ; 129 ; 0 ) សោ: ['A?'],
+	# Invalid first byte (0xFF)
+    ដាក់: ( ស៊េរី ថ្មី ; 255 ; 0 ) សោ: ['?'],
+	# Incomplete multi-byte sequence at end
+    ដាក់: ( ស៊េរី ថ្មី ; 66 ; 226 ; 0 ) សោ: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    ដាក់: ( ស៊េរី ថ្មី ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) សោ: ['A€?𐍈B'].
+	 
+utf8cases នីមួយៗ: { :key :value
+	>> blob := Blob ថ្មី: value ចំនួនធាតុ, bytes: value.
+	>> str := blob ជាអត្ថបទ.
+	(str = key) បើពិត: {
+		លទ្ធផល សរសេរ: ['OK'], បន្ទាត់ថ្មី.
+	}, បើមិនដូច្នោះ: {
+		លទ្ធផល សរសេរ: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, បន្ទាត់ថ្មី.
+	}.
+	blob ដោះលែង.
+}.

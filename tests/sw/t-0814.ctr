@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server andaa.
+Programu tumia: ['../../../src/xo/sw/webtools.xo'].
+
+>> Fake-Request := Kipengee mpya.
+Fake-Request ikija: ['value:'] fanya: { :thamani
+	yangu thamani := thamani.
+}.
+Fake-Request ikija: ['cookie:'] fanya: { :jina <- yangu thamani.
+}.
+
+>> Test-Session := Kipindi-faili-la-muda mpya.
+Test-Session ikija: ['pakia'] fanya: { <- Kamusi mpya.
+}.
+Test-Session ikija: ['session-id'] fanya: { <- yangu id.
+}.
+
+>> cookies := Orodha mpya
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies kila: { :i :cookie
+	>> ombi-http := Fake-Request mpya.
+	ombi-http value: cookie.
+	>> msimamizi := Test-Session mpya.
+	>> web := Hati-ya-Wavuti mpya.
+	web ombi-http: ombi-http.
+	web msimamizi-wa-vipindi: msimamizi.
+	web anza-kipindi.
+	Towe andika: ( msimamizi session-id = cookie ), mstari-mpya.
+}.
+
+>> web := Hati-ya-Wavuti mpya.
+web json: (Kamusi mpya weka: ['b'] kwenye: ['a']).
+Towe andika: ['\n'], mstari-mpya.
+
+{ Mtandao get: ['file:///etc/hostname']. } nasa: { :e
+	Towe andika: e, mstari-mpya.
+}, anza.
+
+>> svg := Faili mpya: ['/tmp/test0814.svg'].
+svg andika: ['<svg xmlns="x"></svg>'].
+Towe mstari-mpya.
+Server pitisha: ['test0814.svg'] kiambishi: ['/tmp/'].
+svg futa.

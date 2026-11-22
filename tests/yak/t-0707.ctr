@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Программа өйү-салайыы: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB саҥа хост: ['localhost'],
+	туһааччы-аата: ['xo'], пароль: ['pass123'], база-аата: ['xobase'], холбон.
+
+>> TwoDigitFormat := Формат саҥа: ['%02d'].
+
+# Datetime
+{
+	>> год := Чыыһыла между: 1995 и: 2050, к-тексту.
+	>> месяц := TwoDigitFormat туһан-бүтүн: (Чыыһыла между: 1 и: 12), к-тексту.
+	>> день := TwoDigitFormat туһан-бүтүн: (Чыыһыла между: 1 и: 28), к-тексту.
+	>> час := TwoDigitFormat туһан-бүтүн: (Чыыһыла между: 1 и: 23), к-тексту.
+	>> минут := TwoDigitFormat туһан-бүтүн: (Чыыһыла между: 1 и: 59), к-тексту.
+	>> секунд := TwoDigitFormat туһан-бүтүн: (Чыыһыла между: 1 и: 59), к-тексту.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: год,
+		MM: месяц,
+		DD: день,
+		HH: час,
+		II: минут,
+		SS: секунд.
+	>> көрдөөһүн-параметрдара :=
+	db запрос: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	аҕал: { :row
+		(row mydatetime = datetime) суох: {
+			этот-блок-кода алҕас: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter добавить: 1.
+} * 100.
+
+# Date
+{
+	>> год := Чыыһыла между: 1995 и: 2050, к-тексту.
+	>> месяц := TwoDigitFormat туһан-бүтүн: (Чыыһыла между: 1 и: 12), к-тексту.
+	>> день := TwoDigitFormat туһан-бүтүн: (Чыыһыла между: 1 и: 28), к-тексту.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: год,
+		MM: месяц,
+		DD: день.
+	>> көрдөөһүн-параметрдара :=
+	db запрос: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	аҕал: { :row
+		(row mydate = date) суох: {
+			этот-блок-кода алҕас: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter добавить: 1.
+} * 100.
+
+
+# Time
+{
+	>> час := TwoDigitFormat туһан-бүтүн: (Чыыһыла между: 1 и: 23), к-тексту.
+	>> минут := TwoDigitFormat туһан-бүтүн: (Чыыһыла между: 1 и: 59), к-тексту.
+	>> секунд := TwoDigitFormat туһан-бүтүн: (Чыыһыла между: 1 и: 59), к-тексту.
+	>> бириэмэ := ['HH:II:SS'].
+	бириэмэ
+		HH: час,
+		II: минут,
+		SS: секунд.
+	>> көрдөөһүн-параметрдара :=
+	db запрос: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: бириэмэ),
+	аҕал: { :row
+		(row mytime = бириэмэ) суох: {
+			этот-блок-кода алҕас: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter добавить: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Испииһэк саҥа заполнить: 100000 буквой: ['x'], присоединить: [''].
+{
+	>> str2 := Сейф токен: 40.
+	>> көрдөөһүн-параметрдара :=
+	db запрос: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	аҕал: { :row
+		(row str1 = str1 и: row str2 = str2) суох: {
+			этот-блок-кода алҕас: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter добавить: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Чыыһыла между: 1 и: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 из-текста: ['9223372036854775807'] ) -
+		( Int64 из-текста: ['99999'] ) +
+		( Int64 из-текста: n1 к-тексту )
+	).
+	>> көрдөөһүн-параметрдара :=
+	db запрос: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	аҕал: { :row
+		(row n1 = n1) суох: {
+			этот-блок-кода алҕас: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) суох: {
+			этот-блок-кода алҕас: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 төгүрүк) суох: {
+			этот-блок-кода алҕас: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) суох: {
+			этот-блок-кода алҕас: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter добавить: 1.
+} * 100.
+
+
+Таһаарыы суруй: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), стоп.

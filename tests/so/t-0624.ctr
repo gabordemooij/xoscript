@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Walax cusub.
+
+Log marka: ['say:'] samee: { :str
+	Soo-saar qor: str, sadar-cusub.
+}.
+
+>> Item := Walax cusub.
+
+Item marka: ['cusub:'] samee: { :id <- naf cusub id: id.
+}.
+
+Item marka: ['id:'] samee: { :id
+	iska-leh id := id.
+}.
+
+Item marka: ['id'] samee: { <- iska-leh id. }.
+
+
+Item marka: ['qoraal'] samee: {
+	>> str := ['Item#~no'].
+	str ~no: iska-leh id. <- str.
+}.
+
+
+>> Print := Walax cusub.
+
+Print marka: ['items'] samee: { 
+	
+	iska-leh item := Item cusub: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: iska-leh item
+	).
+	
+	
+}.
+
+Print items.

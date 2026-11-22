@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Баромад навис: ['Database test'], сатри-нав.
+
+>> db := Maria-DB нав мизбон: ['localhost'],
+	номи-корбар: ['xo'], парол: ['pass123'], номи-пойгоҳ: ['xobase'], пайваст-шав.
+
+Баромад навис: ['Can we connect? '] + db пайваст-аст?, сатри-нав.
+
+>> параметрҳои-ҷустуҷӯ := db дархост: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], параметрҳо: ( Феҳрист нав ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  параметрҳои-ҷустуҷӯ иҷро-кун. db тасдиқ. } дошта-гир: { :e db бозгашт.  }, оғоз.
+
+Баромад навис: ['Can we insert? '] + ( параметрҳои-ҷустуҷӯ insert-id > 0 ), сатри-нав.
+
+>> Obj := Объект нав.
+Obj ҳангоми: ['retrieve-rows'] иҷро: {
+	худӣ шумора := 0.
+	>> параметрҳои-ҷустуҷӯ :=
+	db дархост: ['SELECT * FROM book order by id desc limit 2'], 
+	гирифтан: { :row 
+		худӣ шумора ҷамъ: 1.
+		Рост буридан.
+	}. <- худӣ шумора нусха.
+}.
+
+Баромад навис: ['Can we query? '] + ( Obj retrieve-rows > 0 ), сатри-нав.

@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Atumọ-ede tuntun
+	# ASCII only
+	fi: ( Akojọ tuntun ; 65 ; 65 ; 65 ; 65 ; 0 ) si: ['AAAA'],
+	# valid 2 byte sequence
+	fi: ( Akojọ tuntun ; 194 ; 162 ; 0 ) si: ['¢'],
+	# Valid 3-byte UTF-8
+    fi: ( Akojọ tuntun ; 226 ; 130 ; 172 ; 0 ) si: ['€'],
+	# Valid 4-byte UTF-8
+    fi: ( Akojọ tuntun ; 240 ; 144 ; 141 ; 136 ; 0 ) si: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    fi: ( Akojọ tuntun ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) si: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    fi: ( Akojọ tuntun ; 65 ; 193 ; 129 ; 0 ) si: ['A?'],
+	# Invalid first byte (0xFF)
+    fi: ( Akojọ tuntun ; 255 ; 0 ) si: ['?'],
+	# Incomplete multi-byte sequence at end
+    fi: ( Akojọ tuntun ; 66 ; 226 ; 0 ) si: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    fi: ( Akojọ tuntun ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) si: ['A€?𐍈B'].
+	 
+utf8cases kọọkan: { :key :value
+	>> blob := Blob tuntun: value iye-nọmba, bytes: value.
+	>> str := blob ọrọ.
+	(str = key) otitọ: {
+		Ijade kọ: ['OK'], ila-tuntun.
+	}, bibẹkọ: {
+		Ijade kọ: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, ila-tuntun.
+	}.
+	blob tu-silẹ.
+}.

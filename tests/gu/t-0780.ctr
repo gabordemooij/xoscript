@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := સૂચિ નવું ;
+	# {"key":"normal"} normal ASCII
+	( શબ્દકોશ નવું મૂકો: ['normal'] ચાવી: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( શબ્દકોશ નવું મૂકો: ['hello world'] ચાવી: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( શબ્દકોશ નવું મૂકો: ['"'] ચાવી: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( શબ્દકોશ નવું મૂકો: ['backslash: \\'] ચાવી: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( શબ્દકોશ નવું મૂકો: ['slash: /'] ચાવી: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( શબ્દકોશ નવું મૂકો: ['backspace: \b'] ચાવી: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( શબ્દકોશ નવું મૂકો: ['formfeed: \f'] ચાવી: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( શબ્દકોશ નવું મૂકો: ['newline: \n'] ચાવી: ['key'] ) ;
+	( શબ્દકોશ નવું મૂકો: ['newline: ↵'] ચાવી: ['key'] ) ;
+	( શબ્દકોશ નવું મૂકો: ['newline: 
+	'] ચાવી: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( શબ્દકોશ નવું મૂકો: ['carriage return: \r'] ચાવી: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( શબ્દકોશ નવું મૂકો: ['tab \t'] ચાવી: ['key'] ) ;
+	( શબ્દકોશ નવું મૂકો: ['tab ⇿'] ચાવી: ['key'] ) ;
+	( શબ્દકોશ નવું મૂકો: ['tab  '] ચાવી: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( શબ્દકોશ નવું મૂકો: ['NUL \u0000'] ચાવી: ['key'] ) ;
+	( શબ્દકોશ નવું મૂકો: ['NUL \0'] ચાવી: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( શબ્દકોશ નવું મૂકો: ['control: \u0001'] ચાવી: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( શબ્દકોશ નવું મૂકો: ['control: \u001F'] ચાવી: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( શબ્દકોશ નવું મૂકો: ['unicode: é'] ચાવી: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( શબ્દકોશ નવું મૂકો: ['unicode: €'] ચાવી: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( શબ્દકોશ નવું મૂકો: ['unicode: 日本語'] ચાવી: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( શબ્દકોશ નવું મૂકો: ['unicode: 😀'] ચાવી: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( શબ્દકોશ નવું મૂકો: ['unicode: 🧑‍💻'] ચાવી: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( શબ્દકોશ નવું મૂકો: ['combining: e\u0301'] ચાવી: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( શબ્દકોશ નવું મૂકો: ['escaped unicode: \u00e9'] ચાવી: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( શબ્દકોશ નવું મૂકો: ['escaped unicode: \u20ac'] ચાવી: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( શબ્દકોશ નવું મૂકો: ['escaped unicode: \ud83d\ude00'] ચાવી: ['key'] ) ;
+	# {"key":""} empty value
+	( શબ્દકોશ નવું મૂકો: [''] ચાવી: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( શબ્દકોશ નવું મૂકો: ['@ < > & = % + ? #'] ચાવી: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( શબ્દકોશ નવું મૂકો: ['''] ચાવી: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( શબ્દકોશ નવું મૂકો: ['multiple: \" \\ \n \r \t'] ચાવી: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( શબ્દકોશ નવું મૂકો: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] ચાવી: ['key'] ) ;
+	# {"key":" value"} leading space
+	( શબ્દકોશ નવું મૂકો: [' value'] ચાવી: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( શબ્દકોશ નવું મૂકો: ['value '] ચાવી: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( શબ્દકોશ નવું મૂકો: [' \t\n\r '] ચાવી: ['key'] ).
+
+dicts દરેક: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (શબ્દકોશ નવું મૂકો: d key ચાવી: ['key']).
+	>> b := JSON jsonify: (શબ્દકોશ નવું મૂકો: ['value'] ચાવી: d key).
+	>> e := JSON વસ્તુ: a.
+	>> f := JSON વસ્તુ: b.
+	((e key = d key અને: (f ? d key = ['value'])) અથવા: (e key = ['NUL ?'])) સાચું-હોય-તો: {
+		આઉટપુટ લખો: ['OK'], નવી-લીટી.
+	}, નહીંતર: {
+		આઉટપુટ લખો: ['Unable to properly encode/decode: '] + d + j, નવી-લીટી.
+		પ્રોગ્રામ સમાપ્ત.
+	}.
+}.

@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB يېڭى باش-ماشىنا: ⌝'localhost'⌜,
+	ئىشلەتكۈچى-ئاتى: ⌝'xo'⌜,
+	ئىم: ⌝'pass123'⌜,
+	ساندان-ئاتى: ⌝'xobase'⌜,
+	باغلان.
+
+>> conn2 := Maria-DB يېڭى باش-ماشىنا: ⌝'localhost'⌜,
+	ئىشلەتكۈچى-ئاتى: ⌝'xo'⌜,
+	ئىم: ⌝'pass123'⌜,
+	ساندان-ئاتى: ⌝'xobase'⌜,
+	باغلان.
+#...
+>> del := conn1 سۈرۈشتۈرۈش: ⌝'DELETE FROM book WHERE id > 0'⌜.
+⎬  del ئىجرا-قىل. conn1 جەزملە. ⎨ تۇت: ⎬ :e conn1 قايتۇر.  ⎨, ئىجرا.
+
+>> insert := conn1 سۈرۈشتۈرۈش: ⌝'INSERT INTO book (id) VALUES(null)'⌜.
+insert ئىجرا-قىل.
+
+>> سانى := conn1 سۈرۈشتۈرۈش: ⌝'SELECT COUNT(*) AS num FROM book'⌜.
+سانى ئېلىپ-كەل: ⎬ :row چىقىرىش ياز: row num, يېڭى-قۇر. ⎨.
+
+# does not show up
+# insert not committed on connection 1
+>> سانى := conn2 سۈرۈشتۈرۈش: ⌝'SELECT COUNT(*) AS num FROM book'⌜.
+سانى ئېلىپ-كەل: ⎬ :row چىقىرىش ياز: row num, يېڭى-قۇر. ⎨.

@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lista nobo ;
+	# {"key":"normal"} normal ASCII
+	( Dikshonario nobo pone: ['normal'] na: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Dikshonario nobo pone: ['hello world'] na: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Dikshonario nobo pone: ['"'] na: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Dikshonario nobo pone: ['backslash: \\'] na: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Dikshonario nobo pone: ['slash: /'] na: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Dikshonario nobo pone: ['backspace: \b'] na: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Dikshonario nobo pone: ['formfeed: \f'] na: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Dikshonario nobo pone: ['newline: \n'] na: ['key'] ) ;
+	( Dikshonario nobo pone: ['newline: ↵'] na: ['key'] ) ;
+	( Dikshonario nobo pone: ['newline: 
+	'] na: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Dikshonario nobo pone: ['carriage return: \r'] na: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Dikshonario nobo pone: ['tab \t'] na: ['key'] ) ;
+	( Dikshonario nobo pone: ['tab ⇿'] na: ['key'] ) ;
+	( Dikshonario nobo pone: ['tab  '] na: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Dikshonario nobo pone: ['NUL \u0000'] na: ['key'] ) ;
+	( Dikshonario nobo pone: ['NUL \0'] na: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Dikshonario nobo pone: ['control: \u0001'] na: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Dikshonario nobo pone: ['control: \u001F'] na: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Dikshonario nobo pone: ['unicode: é'] na: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Dikshonario nobo pone: ['unicode: €'] na: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Dikshonario nobo pone: ['unicode: 日本語'] na: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Dikshonario nobo pone: ['unicode: 😀'] na: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Dikshonario nobo pone: ['unicode: 🧑‍💻'] na: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Dikshonario nobo pone: ['combining: e\u0301'] na: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Dikshonario nobo pone: ['escaped unicode: \u00e9'] na: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Dikshonario nobo pone: ['escaped unicode: \u20ac'] na: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Dikshonario nobo pone: ['escaped unicode: \ud83d\ude00'] na: ['key'] ) ;
+	# {"key":""} empty value
+	( Dikshonario nobo pone: [''] na: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Dikshonario nobo pone: ['@ < > & = % + ? #'] na: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Dikshonario nobo pone: ['''] na: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Dikshonario nobo pone: ['multiple: \" \\ \n \r \t'] na: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Dikshonario nobo pone: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] na: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Dikshonario nobo pone: [' value'] na: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Dikshonario nobo pone: ['value '] na: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Dikshonario nobo pone: [' \t\n\r '] na: ['key'] ).
+
+dicts kada: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Dikshonario nobo pone: d key na: ['key']).
+	>> b := JSON jsonify: (Dikshonario nobo pone: ['value'] na: d key).
+	>> e := JSON opheto: a.
+	>> f := JSON opheto: b.
+	((e key = d key i: (f ? d key = ['value'])) òf: (e key = ['NUL ?'])) bèrdat: {
+		Salida skirbi: ['OK'], liña-nobo.
+	}, sino: {
+		Salida skirbi: ['Unable to properly encode/decode: '] + d + j, liña-nobo.
+		Programa terminá.
+	}.
+}.

@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+پروگرامما ئەسلەك-باشقۇرۇش: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := پروگرامما تەڭشەك: ⌝'FFITESTLIB'⌜.
+
+
+
+Server ئۇلا: ﴿
+ تىزىم يېڭى ;
+ libname ;
+ ⌝'puts'⌜ ;
+ ﴿ تىزىم يېڭى ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'void'⌜ ;
+ ⌝'Puts'⌜ ;
+ ⌝'str:'⌜
+﴾.
+
+>> s := Blob utf8: ⌝'Hello from FFI!\n'⌜.
+
+Puts str: s.
+s بوشات.
+
+# test with struct
+
+>> a := Blob يېڭى: 8.
+a بايتلار: ﴿
+	تىزىم <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+﴾.
+
+>> struct := Blob struct: ﴿تىزىم <<: ⌝'int'⌜, ; ⌝'int'⌜﴾.
+
+Server ئۇلا: ﴿
+	تىزىم <<: ⌝'@structtest'⌜, ;
+	⌝'@structtest'⌜ ;
+	﴿تىزىم <<: struct﴾ ; 
+	⌝'int'⌜ ;	
+	⌝'ffitest'⌜ ;
+	⌝'ffisum:'⌜
+﴾.
+	
+چىقىرىش ياز: ⌝'Sum test:'⌜ + ﴿ffitest ffisum: a﴾, يېڭى-قۇر.
+
+struct بوشات-struct.
+struct بوشات.
+a بوشات.

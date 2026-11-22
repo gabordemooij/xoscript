@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+ውጤት ፃፍ: ['Database test'], አዲስ-መስመር.
+
+>> db := Maria-DB አዲስ አስተናጋጅ: ['localhost'],
+	የተጠቃሚ-ስም: ['xo'], የይለፍ-ቃል: ['pass123'], የውሂብ-ጎታ-ስም: ['xobase'], ተገናኝ.
+
+ውጤት ፃፍ: ['Can we connect? '] + db ተገናኝቷል?, አዲስ-መስመር.
+
+>> የፍለጋ-መለኪያዎች := db መጠይቅ: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], መለኪያዎች: ( ሰልፍ አዲስ ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  የፍለጋ-መለኪያዎች አስፈጽም. db አጽድቅ. } ያዝ: { :e db ወደኋላ-መልስ.  }, ጀምር.
+
+ውጤት ፃፍ: ['Can we insert? '] + ( የፍለጋ-መለኪያዎች insert-id > 0 ), አዲስ-መስመር.
+
+>> Obj := ነገር አዲስ.
+Obj ሲደርስ: ['retrieve-rows'] አድርግ: {
+	የራሱ ብዛት := 0.
+	>> የፍለጋ-መለኪያዎች :=
+	db መጠይቅ: ['SELECT * FROM book order by id desc limit 2'], 
+	አምጣ: { :row 
+		የራሱ ብዛት ደምር: 1.
+		እውነት አቋርጥ.
+	}. <- የራሱ ብዛት ቅዳ.
+}.
+
+ውጤት ፃፍ: ['Can we query? '] + ( Obj retrieve-rows > 0 ), አዲስ-መስመር.

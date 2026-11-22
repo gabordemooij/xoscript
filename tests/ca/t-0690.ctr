@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Sortida escriu: ['Database test'], salt-de-línia.
+
+>> db := Maria-DB nou amfitrió: ['localhost'],
+	usuari: ['xo'], contrasenya: ['pass123'], nom-base: ['xobase'], connecta.
+
+Sortida escriu: ['Can we connect? '] + db connectat?, salt-de-línia.
+
+>> paràmetres-de-cerca := db consulta: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], paràmetres: ( Llista nou ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  paràmetres-de-cerca executa. db confirma. } captura: { :e db desfés.  }, inicia.
+
+Sortida escriu: ['Can we insert? '] + ( paràmetres-de-cerca insert-id > 0 ), salt-de-línia.
+
+>> x := 0.
+>> paràmetres-de-cerca :=
+db consulta: ['SELECT * FROM book order by id desc limit 2'], 
+obtén: { :row 
+	x suma: 1.
+	Cert interromp. # must clean up, no 'Commands out of sync'
+}.
+
+>> paràmetres-de-cerca :=
+db consulta: ['SELECT * FROM book order by id desc limit 2'], 
+obtén: { :row
+	x suma: 1.
+	Cert interromp.
+}.
+
+(x > 0) cert: {
+	Sortida escriu: ['Can we break in the middle of a fetch? '].
+}.
+
+Sortida escriu: Cert, salt-de-línia.

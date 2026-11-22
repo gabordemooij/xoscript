@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server shirya.
+Shiri yi-amfani: ['../../../src/xo/ha/webtools.xo'].
+Shiri yi-amfani: ['../../../src/xo/ha/mailtools.xo'].
+
+>> kanun-saƙo := Kan-HTTP sabo maɓalli: ['Location'] ƙima: ['/ok\r\nX-Injected: yes'].
+Fitarwa rubuta: kanun-saƙo.
+
+>> web := Takardar-Yanar-Gizo sabo.
+web je-zuwa: ['/ok\r\nX-Injected: yes'].
+Fitarwa rubuta: ['\n'], sabon-layi.
+
+>> mail := Imel sabo.
+mail zuwa: (Jeri sabo ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Jeri sabo ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Jeri sabo ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail mai-aikawa: ['d@example.invalid\r\nX-From: yes'] suna: ['site\r\nX-Name: yes'].
+mail batu: ['hello\r\nX-Subject: yes'].
+mail jiki: ['line1\r\nline2'].
+Fitarwa rubuta: mail samar.
+
+>> html := Imel-HTML sabo.
+html zuwa: (Jeri sabo ; ['a@example.invalid\r\nX-To: yes']).
+html mai-aikawa: ['d@example.invalid'] suna: ['site'].
+html batu: ['hello\r\nX-Subject: yes'].
+html jiki: ['body'].
+Fitarwa rubuta: ( html samar ya-ƙunshi: ['\nX-'] ), sabon-layi.
+Fitarwa rubuta: ( html samar ya-ƙunshi: ['X-To: yes'] ), sabon-layi.

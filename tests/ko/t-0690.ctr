@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+출력 쓰기: ['Database test'], 줄바꿈.
+
+>> db := Maria-DB 새로 호스트: ['localhost'],
+	사용자이름: ['xo'], 비밀번호: ['pass123'], 데이터베이스이름: ['xobase'], 접속.
+
+출력 쓰기: ['Can we connect? '] + db 접속됨?, 줄바꿈.
+
+>> 검색매개변수 := db 쿼리: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], 매개변수: ( 리스트 새로 ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  검색매개변수 실행. db 커밋. } 예외시: { :e db 롤백.  }, 시작.
+
+출력 쓰기: ['Can we insert? '] + ( 검색매개변수 insert-id > 0 ), 줄바꿈.
+
+>> x := 0.
+>> 검색매개변수 :=
+db 쿼리: ['SELECT * FROM book order by id desc limit 2'], 
+가져오기: { :row 
+	x 더하기: 1.
+	참 중단. # must clean up, no 'Commands out of sync'
+}.
+
+>> 검색매개변수 :=
+db 쿼리: ['SELECT * FROM book order by id desc limit 2'], 
+가져오기: { :row
+	x 더하기: 1.
+	참 중단.
+}.
+
+(x > 0) 참이면: {
+	출력 쓰기: ['Can we break in the middle of a fetch? '].
+}.
+
+출력 쓰기: 참, 줄바꿈.

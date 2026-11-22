@@ -1,0 +1,16 @@
+# a value ending in the first part of an opening quote must survive serialization
+>> valores := Listar novo
+	; ['abc\[']
+	; ['\[']
+	; ['\[\[']
+	; ['x\\\[']
+	; ['abc'].
+
+valores cada-um: { :i :value
+	>> d := Mapa novo.
+	d colocar: value em: ['k'].
+	d colocar: ['second'] em: ['j'].
+	>> r := d code objeto.
+	Saída escrever: r conta, stop.
+	Saída escrever: ( (r em: ['k']) = value ), stop.
+}.

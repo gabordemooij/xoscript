@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programm mäluhaldus: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB uus host: ['localhost'],
+	kasutajanimi: ['xo'], parool: ['pass123'], andmebaasi-nimi: ['xobase'], ühendu.
+
+>> TwoDigitFormat := Vorming uus: ['%02d'].
+
+# Datetime
+{
+	>> aasta := Arv vahel: 1995 ja: 2050, tekst.
+	>> kuu := TwoDigitFormat rakenda-täisarvule: (Arv vahel: 1 ja: 12), tekst.
+	>> päev := TwoDigitFormat rakenda-täisarvule: (Arv vahel: 1 ja: 28), tekst.
+	>> tund := TwoDigitFormat rakenda-täisarvule: (Arv vahel: 1 ja: 23), tekst.
+	>> minut := TwoDigitFormat rakenda-täisarvule: (Arv vahel: 1 ja: 59), tekst.
+	>> sekund := TwoDigitFormat rakenda-täisarvule: (Arv vahel: 1 ja: 59), tekst.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: aasta,
+		MM: kuu,
+		DD: päev,
+		HH: tund,
+		II: minut,
+		SS: sekund.
+	>> otsinguparameetrid :=
+	db päring: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	too: { :row
+		(row mydatetime = datetime) vale: {
+			see-ülesanne viga: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter liida: 1.
+} * 100.
+
+# Date
+{
+	>> aasta := Arv vahel: 1995 ja: 2050, tekst.
+	>> kuu := TwoDigitFormat rakenda-täisarvule: (Arv vahel: 1 ja: 12), tekst.
+	>> päev := TwoDigitFormat rakenda-täisarvule: (Arv vahel: 1 ja: 28), tekst.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: aasta,
+		MM: kuu,
+		DD: päev.
+	>> otsinguparameetrid :=
+	db päring: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	too: { :row
+		(row mydate = date) vale: {
+			see-ülesanne viga: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter liida: 1.
+} * 100.
+
+
+# Time
+{
+	>> tund := TwoDigitFormat rakenda-täisarvule: (Arv vahel: 1 ja: 23), tekst.
+	>> minut := TwoDigitFormat rakenda-täisarvule: (Arv vahel: 1 ja: 59), tekst.
+	>> sekund := TwoDigitFormat rakenda-täisarvule: (Arv vahel: 1 ja: 59), tekst.
+	>> aeg := ['HH:II:SS'].
+	aeg
+		HH: tund,
+		II: minut,
+		SS: sekund.
+	>> otsinguparameetrid :=
+	db päring: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: aeg),
+	too: { :row
+		(row mytime = aeg) vale: {
+			see-ülesanne viga: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter liida: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Loend uus täida: 100000 väärtusega: ['x'], ühenda: [''].
+{
+	>> str2 := Seif tunnus: 40.
+	>> otsinguparameetrid :=
+	db päring: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	too: { :row
+		(row str1 = str1 ja: row str2 = str2) vale: {
+			see-ülesanne viga: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter liida: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Arv vahel: 1 ja: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 tekstist: ['9223372036854775807'] ) -
+		( Int64 tekstist: ['99999'] ) +
+		( Int64 tekstist: n1 tekst )
+	).
+	>> otsinguparameetrid :=
+	db päring: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	too: { :row
+		(row n1 = n1) vale: {
+			see-ülesanne viga: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) vale: {
+			see-ülesanne viga: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 ümarda) vale: {
+			see-ülesanne viga: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) vale: {
+			see-ülesanne viga: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter liida: 1.
+} * 100.
+
+
+Väljund kirjuta: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), reavahetus.

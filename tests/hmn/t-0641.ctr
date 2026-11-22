@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Phau-txhais-lus tshiab
+	# ASCII only
+	muab: ( Daim-teev tshiab ; 65 ; 65 ; 65 ; 65 ; 0 ) rau: ['AAAA'],
+	# valid 2 byte sequence
+	muab: ( Daim-teev tshiab ; 194 ; 162 ; 0 ) rau: ['¢'],
+	# Valid 3-byte UTF-8
+    muab: ( Daim-teev tshiab ; 226 ; 130 ; 172 ; 0 ) rau: ['€'],
+	# Valid 4-byte UTF-8
+    muab: ( Daim-teev tshiab ; 240 ; 144 ; 141 ; 136 ; 0 ) rau: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    muab: ( Daim-teev tshiab ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) rau: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    muab: ( Daim-teev tshiab ; 65 ; 193 ; 129 ; 0 ) rau: ['A?'],
+	# Invalid first byte (0xFF)
+    muab: ( Daim-teev tshiab ; 255 ; 0 ) rau: ['?'],
+	# Incomplete multi-byte sequence at end
+    muab: ( Daim-teev tshiab ; 66 ; 226 ; 0 ) rau: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    muab: ( Daim-teev tshiab ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) rau: ['A€?𐍈B'].
+	 
+utf8cases txhua: { :key :value
+	>> blob := Blob tshiab: value tus-lej-suav, bytes: value.
+	>> str := blob kab-ntawv.
+	(str = key) tseeb: {
+		Tawm sau-ntawv: ['OK'], kab-tshiab.
+	}, lwm-yam: {
+		Tawm sau-ntawv: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, kab-tshiab.
+	}.
+	blob tso-tawm.
+}.

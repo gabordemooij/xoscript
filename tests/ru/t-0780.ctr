@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Список новый ;
+	# {"key":"normal"} normal ASCII
+	( Карта новый разместить: ['normal'] в: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Карта новый разместить: ['hello world'] в: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Карта новый разместить: ['"'] в: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Карта новый разместить: ['backslash: \\'] в: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Карта новый разместить: ['slash: /'] в: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Карта новый разместить: ['backspace: \b'] в: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Карта новый разместить: ['formfeed: \f'] в: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Карта новый разместить: ['newline: \n'] в: ['key'] ) ;
+	( Карта новый разместить: ['newline: ↵'] в: ['key'] ) ;
+	( Карта новый разместить: ['newline: 
+	'] в: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Карта новый разместить: ['carriage return: \r'] в: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Карта новый разместить: ['tab \t'] в: ['key'] ) ;
+	( Карта новый разместить: ['tab ⇿'] в: ['key'] ) ;
+	( Карта новый разместить: ['tab  '] в: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Карта новый разместить: ['NUL \u0000'] в: ['key'] ) ;
+	( Карта новый разместить: ['NUL \0'] в: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Карта новый разместить: ['control: \u0001'] в: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Карта новый разместить: ['control: \u001F'] в: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Карта новый разместить: ['unicode: é'] в: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Карта новый разместить: ['unicode: €'] в: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Карта новый разместить: ['unicode: 日本語'] в: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Карта новый разместить: ['unicode: 😀'] в: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Карта новый разместить: ['unicode: 🧑‍💻'] в: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Карта новый разместить: ['combining: e\u0301'] в: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Карта новый разместить: ['escaped unicode: \u00e9'] в: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Карта новый разместить: ['escaped unicode: \u20ac'] в: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Карта новый разместить: ['escaped unicode: \ud83d\ude00'] в: ['key'] ) ;
+	# {"key":""} empty value
+	( Карта новый разместить: [''] в: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Карта новый разместить: ['@ < > & = % + ? #'] в: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Карта новый разместить: ['''] в: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Карта новый разместить: ['multiple: \" \\ \n \r \t'] в: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Карта новый разместить: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] в: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Карта новый разместить: [' value'] в: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Карта новый разместить: ['value '] в: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Карта новый разместить: [' \t\n\r '] в: ['key'] ).
+
+dicts каждый: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Карта новый разместить: d key в: ['key']).
+	>> b := JSON jsonify: (Карта новый разместить: ['value'] в: d key).
+	>> e := JSON объект: a.
+	>> f := JSON объект: b.
+	((e key = d key и: (f ? d key = ['value'])) или: (e key = ['NUL ?'])) истина: {
+		Выход написать: ['OK'], стоп.
+	}, иначе: {
+		Выход написать: ['Unable to properly encode/decode: '] + d + j, стоп.
+		Программа конец.
+	}.
+}.

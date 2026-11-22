@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Ausgab schreiwen: ['Database test'], nei-zeil.
+
+>> db := Maria-DB nei host: ['localhost'],
+	benotzernumm: ['xo'], passwuert: ['pass123'], datebanknumm: ['xobase'], verbannen.
+
+Ausgab schreiwen: ['Can we connect? '] + db verbonnen?, nei-zeil.
+
+>> sichparameter := db ufro: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameter: ( Lëscht nei ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  sichparameter ausféieren. db bestätegen. } offänken: { :e db zréckrullen.  }, starten.
+
+Ausgab schreiwen: ['Can we insert? '] + ( sichparameter insert-id > 0 ), nei-zeil.
+
+>> Obj := Objet nei.
+Obj bei: ['retrieve-rows'] maachen: {
+	eegen zielen := 0.
+	>> sichparameter :=
+	db ufro: ['SELECT * FROM book order by id desc limit 2'], 
+	ofruffen: { :row 
+		eegen zielen dobäisetzen: 1.
+		Wouer ofbriechen.
+	}. <- eegen zielen kopéieren.
+}.
+
+Ausgab schreiwen: ['Can we query? '] + ( Obj retrieve-rows > 0 ), nei-zeil.

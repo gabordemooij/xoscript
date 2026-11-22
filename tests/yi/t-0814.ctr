@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server אינעשאַלירן.
+פּראָגראַם ניץ: ⌝'../../../src/xo/yi/webtools.xo'⌜.
+
+>> Fake-Request := אָביעקט ניי.
+Fake-Request ווען: ⌝'value:'⌜ טו: ⎬ :ווערט
+	אייגן ווערט := ווערט.
+⎨.
+Fake-Request ווען: ⌝'cookie:'⌜ טו: ⎬ :נאָמען <- אייגן ווערט.
+⎨.
+
+>> Test-Session := סעסיע-צייַטווייַליקע-טעקע ניי.
+Test-Session ווען: ⌝'לאָדן'⌜ טו: ⎬ <- ווערטערבוך ניי.
+⎨.
+Test-Session ווען: ⌝'session-id'⌜ טו: ⎬ <- אייגן id.
+⎨.
+
+>> cookies := ליסטע ניי
+	; ⌝'abc123'⌜
+	; ⌝'../outside'⌜
+	; ⌝''⌜
+	; ⌝'abc\n'⌜.
+
+cookies יעדער: ⎬ :i :cookie
+	>> בקשה-http := Fake-Request ניי.
+	בקשה-http value: cookie.
+	>> פֿאַרוואַלטער := Test-Session ניי.
+	>> web := וועב-דאָקומענט ניי.
+	web בקשה-http: בקשה-http.
+	web סעסיע-פֿאַרוואַלטער: פֿאַרוואַלטער.
+	web אָנהייבן-סעסיע.
+	אויסגאָב שרײַב: ﴿ פֿאַרוואַלטער session-id = cookie ﴾, נײַע-שורה.
+⎨.
+
+>> web := וועב-דאָקומענט ניי.
+web json: ﴿ווערטערבוך ניי לייג: ⌝'b'⌜ שליסל: ⌝'a'⌜﴾.
+אויסגאָב שרײַב: ⌝'\n'⌜, נײַע-שורה.
+
+⎬ נעץ get: ⌝'file:///etc/hostname'⌜. ⎨ כאַפּ: ⎬ :e
+	אויסגאָב שרײַב: e, נײַע-שורה.
+⎨, לאָז-לויפֿן.
+
+>> svg := טעקע ניי: ⌝'/tmp/test0814.svg'⌜.
+svg שרײַב: ⌝'<svg xmlns="x"></svg>'⌜.
+אויסגאָב נײַע-שורה.
+Server גיב-ווײַטער: ⌝'test0814.svg'⌜ פּרעפֿיקס: ⌝'/tmp/'⌜.
+svg מעק-אויס.

@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server tòisich-suas.
+Prògram cleachd: ['../../../src/xo/gd/webtools.xo'].
+
+>> Fake-Request := Oibseact ùr.
+Fake-Request air: ['value:'] dèan: { :luach
+	leis luach := luach.
+}.
+Fake-Request air: ['cookie:'] dèan: { :ainm <- leis luach.
+}.
+
+>> Test-Session := Seisean-faidhle-sealach ùr.
+Test-Session air: ['luchdaich'] dèan: { <- Faclair ùr.
+}.
+Test-Session air: ['session-id'] dèan: { <- leis id.
+}.
+
+>> cookies := Liosta ùr
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies gach: { :i :cookie
+	>> iarrtas := Fake-Request ùr.
+	iarrtas value: cookie.
+	>> manaidsear := Test-Session ùr.
+	>> web := Sgrìobhainn-lìn ùr.
+	web iarrtas: iarrtas.
+	web manaidsear-sheiseanan: manaidsear.
+	web tòisich-seisean.
+	Às-chur sgrìobh: ( manaidsear session-id = cookie ), loidhne-ùr.
+}.
+
+>> web := Sgrìobhainn-lìn ùr.
+web json: (Faclair ùr cuir: ['b'] aig: ['a']).
+Às-chur sgrìobh: ['\n'], loidhne-ùr.
+
+{ Lìonra get: ['file:///etc/hostname']. } glac: { :e
+	Às-chur sgrìobh: e, loidhne-ùr.
+}, tòisich.
+
+>> svg := Faidhle ùr: ['/tmp/test0814.svg'].
+svg sgrìobh: ['<svg xmlns="x"></svg>'].
+Às-chur loidhne-ùr.
+Server cuir-air-adhart: ['test0814.svg'] ro-leasachan: ['/tmp/'].
+svg cuir-às.

@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> gerageza := { :format :value
+	{ Ibisohoka andika: ( (Imiterere gishya: format) shyira-kuri: value ), umurongo-mushya. } fata-ikosa: { :e Ibisohoka andika: e, umurongo-mushya. }, tangira.
+}.
+>> try-int := { :format :value
+	{ Ibisohoka andika: ( (Imiterere gishya: format) shyira-kuri-umubare-wuzuye: value ), umurongo-mushya. } fata-ikosa: { :e Ibisohoka andika: e, umurongo-mushya. }, tangira.
+}.
+
+# fits
+gerageza shyira-kuri: ['|%s|'] na: ['text'].
+gerageza shyira-kuri: ['%06.2f'] na: 5.5.
+gerageza shyira-kuri: ['100%% %s'] na: ['sure'].
+try-int shyira-kuri: ['%03d'] na: 7.
+try-int shyira-kuri: ['%x'] na: 255.
+gerageza shyira-kuri: ['%d'] na: (Int64 gishya bivuye-mu-nyandiko: ['12']).
+gerageza shyira-kuri: ['%lld'] na: (Int64 gishya bivuye-mu-nyandiko: ['12']).
+gerageza shyira-kuri: ['%.1lf'] na: 5.5.
+try-int shyira-kuri: ['%hd'] na: 7.
+
+# does not fit
+gerageza shyira-kuri: ['%s'] na: 12345.
+gerageza shyira-kuri: ['%d'] na: 12345.
+gerageza shyira-kuri: ['%f'] na: ['text'].
+try-int shyira-kuri: ['%d'] na: ['text'].
+try-int shyira-kuri: ['%s'] na: 5.
+gerageza shyira-kuri: ['%s %s'] na: ['text'].
+gerageza shyira-kuri: ['%n'] na: ['text'].
+gerageza shyira-kuri: ['%*s'] na: ['text'].
+gerageza shyira-kuri: ['%'] na: ['text'].
+
+# length modifier does not fit
+gerageza shyira-kuri: ['%ls'] na: ['text'].
+gerageza shyira-kuri: ['%Lf'] na: 5.5.
+try-int shyira-kuri: ['%ld'] na: 7.
+try-int shyira-kuri: ['%lld'] na: 7.
+gerageza shyira-kuri: ['%Ld'] na: (Int64 gishya bivuye-mu-nyandiko: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+gerageza shyira-kuri: ['%99999999999s'] na: ['text'].

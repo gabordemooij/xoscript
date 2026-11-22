@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Isisefu yenza-izitshixo.
+>> sk := keys eyokuqala.
+>> pk := keys eyokugqibela.
+>> sig := Isisefu tyikitya: ['abc'] nge: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Isisefu tyikitya: ['abc'] nge: long. } bamba: { :e
+	Imveliso bhala: e, umgca-omtsha.
+}, qala.
+
+{ Isisefu hlola: ['abc'] utyikityo: long nge: pk. } bamba: { :e
+	Imveliso bhala: e, umgca-omtsha.
+}, qala.
+
+{ Isisefu hlola: ['abc'] utyikityo: sig nge: short. } bamba: { :e
+	Imveliso bhala: e, umgca-omtsha.
+}, qala.

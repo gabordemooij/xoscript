@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> wartości := Lista nowy
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+wartości każdy: { :i :value
+	>> d := Słownik nowy.
+	d umieść: value w: ['k'].
+	>> r := d code obiekt.
+	Wyjście pisz: r liczność, nowa-linia.
+	Wyjście pisz: ( (r w: ['k']) = value ), nowa-linia.
+}.

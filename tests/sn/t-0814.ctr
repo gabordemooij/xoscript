@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server gadzirira.
+Chirongwa shandisa-chishandiso: ['../../../src/xo/sn/webtools.xo'].
+
+>> Fake-Request := Chinhu nyowani.
+Fake-Request kana-zvasvika: ['value:'] ita: { :kukosha
+	zvako kukosha := kukosha.
+}.
+Fake-Request kana-zvasvika: ['cookie:'] ita: { :zita <- zvako kukosha.
+}.
+
+>> Test-Session := Chikamu-chefaira-renguva-pfupi nyowani.
+Test-Session kana-zvasvika: ['kwidza'] ita: { <- Duramazwi nyowani.
+}.
+Test-Session kana-zvasvika: ['session-id'] ita: { <- zvako id.
+}.
+
+>> cookies := Rondedzero nyowani
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies chimwe-nechimwe: { :i :cookie
+	>> chikumbiro-http := Fake-Request nyowani.
+	chikumbiro-http value: cookie.
+	>> maneja := Test-Session nyowani.
+	>> web := Gwaro-reWebhu nyowani.
+	web chikumbiro-http: chikumbiro-http.
+	web maneja-wezvikamu: maneja.
+	web tanga-chikamu.
+	Zvabuda nyora: ( maneja session-id = cookie ), mutsara-mutsva.
+}.
+
+>> web := Gwaro-reWebhu nyowani.
+web json: (Duramazwi nyowani isa: ['b'] pa: ['a']).
+Zvabuda nyora: ['\n'], mutsara-mutsva.
+
+{ Netiweki get: ['file:///etc/hostname']. } bata: { :e
+	Zvabuda nyora: e, mutsara-mutsva.
+}, tanga.
+
+>> svg := Faira nyowani: ['/tmp/test0814.svg'].
+svg nyora: ['<svg xmlns="x"></svg>'].
+Zvabuda mutsara-mutsva.
+Server pfuudza: ['test0814.svg'] chivakamberi: ['/tmp/'].
+svg bvisa.

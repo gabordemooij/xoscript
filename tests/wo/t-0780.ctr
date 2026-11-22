@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Jokkalante xees ;
+	# {"key":"normal"} normal ASCII
+	( Listin xees teg: ['normal'] ci: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Listin xees teg: ['hello world'] ci: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Listin xees teg: ['"'] ci: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Listin xees teg: ['backslash: \\'] ci: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Listin xees teg: ['slash: /'] ci: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Listin xees teg: ['backspace: \b'] ci: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Listin xees teg: ['formfeed: \f'] ci: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Listin xees teg: ['newline: \n'] ci: ['key'] ) ;
+	( Listin xees teg: ['newline: ↵'] ci: ['key'] ) ;
+	( Listin xees teg: ['newline: 
+	'] ci: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Listin xees teg: ['carriage return: \r'] ci: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Listin xees teg: ['tab \t'] ci: ['key'] ) ;
+	( Listin xees teg: ['tab ⇿'] ci: ['key'] ) ;
+	( Listin xees teg: ['tab  '] ci: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Listin xees teg: ['NUL \u0000'] ci: ['key'] ) ;
+	( Listin xees teg: ['NUL \0'] ci: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Listin xees teg: ['control: \u0001'] ci: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Listin xees teg: ['control: \u001F'] ci: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Listin xees teg: ['unicode: é'] ci: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Listin xees teg: ['unicode: €'] ci: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Listin xees teg: ['unicode: 日本語'] ci: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Listin xees teg: ['unicode: 😀'] ci: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Listin xees teg: ['unicode: 🧑‍💻'] ci: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Listin xees teg: ['combining: e\u0301'] ci: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Listin xees teg: ['escaped unicode: \u00e9'] ci: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Listin xees teg: ['escaped unicode: \u20ac'] ci: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Listin xees teg: ['escaped unicode: \ud83d\ude00'] ci: ['key'] ) ;
+	# {"key":""} empty value
+	( Listin xees teg: [''] ci: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Listin xees teg: ['@ < > & = % + ? #'] ci: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Listin xees teg: ['''] ci: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Listin xees teg: ['multiple: \" \\ \n \r \t'] ci: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Listin xees teg: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] ci: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Listin xees teg: [' value'] ci: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Listin xees teg: ['value '] ci: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Listin xees teg: [' \t\n\r '] ci: ['key'] ).
+
+dicts kenn-ci-kenn: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Listin xees teg: d key ci: ['key']).
+	>> b := JSON jsonify: (Listin xees teg: ['value'] ci: d key).
+	>> e := JSON denc: a.
+	>> f := JSON denc: b.
+	((e key = d key ak: (f ? d key = ['value'])) walla: (e key = ['NUL ?'])) dëgg: {
+		Génn bind: ['OK'], taxaw.
+	}, lu-dul: {
+		Génn bind: ['Unable to properly encode/decode: '] + d + j, taxaw.
+		Prograam nopi.
+	}.
+}.

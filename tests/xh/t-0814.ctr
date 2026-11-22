@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server lungiselela.
+Inkqubo sebenzisa: ['../../../src/xo/xh/webtools.xo'].
+
+>> Fake-Request := Into entsha.
+Fake-Request xa-kufika: ['value:'] yenza: { :ixabiso
+	eyakho ixabiso := ixabiso.
+}.
+Fake-Request xa-kufika: ['cookie:'] yenza: { :igama <- eyakho ixabiso.
+}.
+
+>> Test-Session := Iseshoni-yefayile-yethutyana entsha.
+Test-Session xa-kufika: ['layisha'] yenza: { <- Isichazimagama entsha.
+}.
+Test-Session xa-kufika: ['session-id'] yenza: { <- eyakho id.
+}.
+
+>> cookies := Uluhlu entsha
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies nganye: { :i :cookie
+	>> isicelo-http := Fake-Request entsha.
+	isicelo-http value: cookie.
+	>> umphathi := Test-Session entsha.
+	>> web := Uxwebhu-lwewebhu entsha.
+	web isicelo-http: isicelo-http.
+	web umphathi-weeseshoni: umphathi.
+	web qala-iseshoni.
+	Imveliso bhala: ( umphathi session-id = cookie ), umgca-omtsha.
+}.
+
+>> web := Uxwebhu-lwewebhu entsha.
+web json: (Isichazimagama entsha beka: ['b'] kwindawo: ['a']).
+Imveliso bhala: ['\n'], umgca-omtsha.
+
+{ Inethiwekhi get: ['file:///etc/hostname']. } bamba: { :e
+	Imveliso bhala: e, umgca-omtsha.
+}, qala.
+
+>> svg := Ifayile entsha: ['/tmp/test0814.svg'].
+svg bhala: ['<svg xmlns="x"></svg>'].
+Imveliso umgca-omtsha.
+Server gqithisa: ['test0814.svg'] isimaphambili: ['/tmp/'].
+svg cima.

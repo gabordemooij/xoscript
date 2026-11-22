@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Isichazamazwi okusha
+	# ASCII only
+	beka: ( Uhlu okusha ; 65 ; 65 ; 65 ; 65 ; 0 ) endaweni: ['AAAA'],
+	# valid 2 byte sequence
+	beka: ( Uhlu okusha ; 194 ; 162 ; 0 ) endaweni: ['¢'],
+	# Valid 3-byte UTF-8
+    beka: ( Uhlu okusha ; 226 ; 130 ; 172 ; 0 ) endaweni: ['€'],
+	# Valid 4-byte UTF-8
+    beka: ( Uhlu okusha ; 240 ; 144 ; 141 ; 136 ; 0 ) endaweni: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    beka: ( Uhlu okusha ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) endaweni: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    beka: ( Uhlu okusha ; 65 ; 193 ; 129 ; 0 ) endaweni: ['A?'],
+	# Invalid first byte (0xFF)
+    beka: ( Uhlu okusha ; 255 ; 0 ) endaweni: ['?'],
+	# Incomplete multi-byte sequence at end
+    beka: ( Uhlu okusha ; 66 ; 226 ; 0 ) endaweni: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    beka: ( Uhlu okusha ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) endaweni: ['A€?𐍈B'].
+	 
+utf8cases ngamunye: { :key :value
+	>> blob := Blob okusha: value inani, bytes: value.
+	>> str := blob umbhalo.
+	(str = key) iqiniso: {
+		Okuphumayo bhala: ['OK'], umugqa-omusha.
+	}, uma-kungenjalo: {
+		Okuphumayo bhala: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, umugqa-omusha.
+	}.
+	blob khulula.
+}.

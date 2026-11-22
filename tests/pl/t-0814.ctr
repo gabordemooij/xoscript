@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inicjuj.
+Program użyj: ['../../../src/xo/pl/webtools.xo'].
+
+>> Fake-Request := Obiekt nowy.
+Fake-Request na: ['value:'] wykonaj: { :wartość
+	własny wartość := wartość.
+}.
+Fake-Request na: ['cookie:'] wykonaj: { :nazwa <- własny wartość.
+}.
+
+>> Test-Session := Sesja-plik-tymczasowy nowy.
+Test-Session na: ['wczytaj'] wykonaj: { <- Słownik nowy.
+}.
+Test-Session na: ['session-id'] wykonaj: { <- własny id.
+}.
+
+>> cookies := Lista nowy
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies każdy: { :i :cookie
+	>> żądanie := Fake-Request nowy.
+	żądanie value: cookie.
+	>> menedżer := Test-Session nowy.
+	>> web := Dokument-Web nowy.
+	web żądanie: żądanie.
+	web menedżer-sesji: menedżer.
+	web rozpocznij-sesję.
+	Wyjście pisz: ( menedżer session-id = cookie ), nowa-linia.
+}.
+
+>> web := Dokument-Web nowy.
+web json: (Słownik nowy umieść: ['b'] w: ['a']).
+Wyjście pisz: ['\n'], nowa-linia.
+
+{ Sieć get: ['file:///etc/hostname']. } przechwyć: { :e
+	Wyjście pisz: e, nowa-linia.
+}, uruchom.
+
+>> svg := Plik nowy: ['/tmp/test0814.svg'].
+svg pisz: ['<svg xmlns="x"></svg>'].
+Wyjście nowa-linia.
+Server przekaż: ['test0814.svg'] prefiks: ['/tmp/'].
+svg usuń.

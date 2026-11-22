@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Chương-trình thiết-lập: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server liên-kết: ( Danh-sách mới ;
+ libname ; ['fopen'] ;
+ ( Danh-sách mới ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+liên-kết: ( Danh-sách mới ;
+ Rỗng ; # means same lib
+ ['fread'] ;
+ ( Danh-sách mới ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Rỗng ; # means same object (i.e. Stream)
+ ['fread']
+),
+liên-kết: (
+ Danh-sách mới ;
+ Rỗng ; # means same lib
+ ['fwrite'] ;
+ ( Danh-sách mới ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Rỗng ; # means same lib
+ ['fwrite']
+),
+liên-kết: (
+ Danh-sách mới ;
+ Rỗng ; # means same lib
+ ['rewind'] ;
+ ( Danh-sách mới ; ['pointer'] ) ;
+ ['int'] ;
+ Rỗng ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> đường-dẫn := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: đường-dẫn mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream thông-điệp: ['fwrite'] đối-số: (Danh-sách mới ; str ; 1 ; 6 ; fd ).
+Xuất ghi: bytes-written, xuống-dòng.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob mới: 20.
+
+# read from file
+>> bytes-read := Stream thông-điệp: ['fread'] đối-số: (Danh-sách mới ; buf ; 1 ; 6 ; fd ).
+Xuất ghi: bytes-read, xuống-dòng.
+Xuất ghi: buf, xuống-dòng.
+
+# free memory
+str  giải-phóng.
+đường-dẫn giải-phóng.
+mode giải-phóng.
+buf  giải-phóng.
+
+

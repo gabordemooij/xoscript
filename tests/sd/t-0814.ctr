@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server شروعات-ڪريو.
+پروگرام استعمال: ⌝'../../../src/xo/sd/webtools.xo'⌜.
+
+>> Fake-Request := شيء نئون.
+Fake-Request جڏهن: ⌝'value:'⌜ ڪريو: ⎬ :قيمت
+	پنهنجو قيمت := قيمت.
+⎨.
+Fake-Request جڏهن: ⌝'cookie:'⌜ ڪريو: ⎬ :نالو <- پنهنجو قيمت.
+⎨.
+
+>> Test-Session := عارضي-فائل-سيشن نئون.
+Test-Session جڏهن: ⌝'لوڊ-ڪريو'⌜ ڪريو: ⎬ <- لغت نئون.
+⎨.
+Test-Session جڏهن: ⌝'session-id'⌜ ڪريو: ⎬ <- پنهنجو id.
+⎨.
+
+>> cookies := لسٽ نئون
+	; ⌝'abc123'⌜
+	; ⌝'../outside'⌜
+	; ⌝''⌜
+	; ⌝'abc\n'⌜.
+
+cookies هر-هڪ: ⎬ :i :cookie
+	>> درخواست-http := Fake-Request نئون.
+	درخواست-http value: cookie.
+	>> منتظم := Test-Session نئون.
+	>> web := ويب-دستاويز نئون.
+	web درخواست-http: درخواست-http.
+	web سيشن-منتظم: منتظم.
+	web سيشن-شروع-ڪريو.
+	آئوٽ-پٽ لکو: ﴿ منتظم session-id = cookie ﴾, نئين-سٽ.
+⎨.
+
+>> web := ويب-دستاويز نئون.
+web json: ﴿لغت نئون رکو: ⌝'b'⌜ ڪنجي: ⌝'a'⌜﴾.
+آئوٽ-پٽ لکو: ⌝'\n'⌜, نئين-سٽ.
+
+⎬ نيٽ-ورڪ get: ⌝'file:///etc/hostname'⌜. ⎨ پڪڙيو: ⎬ :e
+	آئوٽ-پٽ لکو: e, نئين-سٽ.
+⎨, هلايو.
+
+>> svg := فائل نئون: ⌝'/tmp/test0814.svg'⌜.
+svg لکو: ⌝'<svg xmlns="x"></svg>'⌜.
+آئوٽ-پٽ نئين-سٽ.
+Server اڳتي-موڪليو: ⌝'test0814.svg'⌜ اڳياڙي: ⌝'/tmp/'⌜.
+svg ڊاهيو.

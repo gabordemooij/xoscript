@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := பொருள் புதிய.
+
+Log பெறும்போது: ['say:'] செய்: { :str
+	வெளியீடு எழுது: str, புதிய-வரி.
+}.
+
+>> Item := பொருள் புதிய.
+
+Item பெறும்போது: ['புதிய:'] செய்: { :id <- தான் புதிய id: id.
+}.
+
+Item பெறும்போது: ['id:'] செய்: { :id
+	தனது id := id.
+}.
+
+Item பெறும்போது: ['id'] செய்: { <- தனது id. }.
+
+
+Item பெறும்போது: ['சரமாக'] செய்: {
+	>> str := ['Item#~no'].
+	str ~no: தனது id. <- str.
+}.
+
+
+>> Print := பொருள் புதிய.
+
+Print பெறும்போது: ['items'] செய்: { 
+	
+	தனது item := Item புதிய: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: தனது item
+	).
+	
+	
+}.
+
+Print items.

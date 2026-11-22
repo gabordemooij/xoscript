@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Hiztegia berria
+	# ASCII only
+	jarri: ( Zerrenda berria ; 65 ; 65 ; 65 ; 65 ; 0 ) non: ['AAAA'],
+	# valid 2 byte sequence
+	jarri: ( Zerrenda berria ; 194 ; 162 ; 0 ) non: ['¢'],
+	# Valid 3-byte UTF-8
+    jarri: ( Zerrenda berria ; 226 ; 130 ; 172 ; 0 ) non: ['€'],
+	# Valid 4-byte UTF-8
+    jarri: ( Zerrenda berria ; 240 ; 144 ; 141 ; 136 ; 0 ) non: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    jarri: ( Zerrenda berria ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) non: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    jarri: ( Zerrenda berria ; 65 ; 193 ; 129 ; 0 ) non: ['A?'],
+	# Invalid first byte (0xFF)
+    jarri: ( Zerrenda berria ; 255 ; 0 ) non: ['?'],
+	# Incomplete multi-byte sequence at end
+    jarri: ( Zerrenda berria ; 66 ; 226 ; 0 ) non: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    jarri: ( Zerrenda berria ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) non: ['A€?𐍈B'].
+	 
+utf8cases bakoitza: { :key :value
+	>> blob := Blob berria: value zenbatu, bytes: value.
+	>> str := blob testua.
+	(str = key) egia: {
+		Irteera idatzi: ['OK'], lerro-jauzia.
+	}, bestela: {
+		Irteera idatzi: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, lerro-jauzia.
+	}.
+	blob askatu.
+}.

@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programa maneho-di-memoria: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB nobo anfitrion: ['localhost'],
+	nòmber-di-usuario: ['xo'], kontraseña: ['pass123'], nòmber-di-base: ['xobase'], konektá.
+
+>> TwoDigitFormat := Formato nobo: ['%02d'].
+
+# Datetime
+{
+	>> aña := Number entre: 1995 ku: 2050, teksto.
+	>> luna := TwoDigitFormat apliká-number-entero: (Number entre: 1 ku: 12), teksto.
+	>> dia := TwoDigitFormat apliká-number-entero: (Number entre: 1 ku: 28), teksto.
+	>> ora := TwoDigitFormat apliká-number-entero: (Number entre: 1 ku: 23), teksto.
+	>> minüt := TwoDigitFormat apliká-number-entero: (Number entre: 1 ku: 59), teksto.
+	>> sekònde := TwoDigitFormat apliká-number-entero: (Number entre: 1 ku: 59), teksto.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: aña,
+		MM: luna,
+		DD: dia,
+		HH: ora,
+		II: minüt,
+		SS: sekònde.
+	>> parameternan-di-buskeda :=
+	db konsulta: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	trese: { :row
+		(row mydatetime = datetime) falsu: {
+			e-tarea-aki eror: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter suma: 1.
+} * 100.
+
+# Date
+{
+	>> aña := Number entre: 1995 ku: 2050, teksto.
+	>> luna := TwoDigitFormat apliká-number-entero: (Number entre: 1 ku: 12), teksto.
+	>> dia := TwoDigitFormat apliká-number-entero: (Number entre: 1 ku: 28), teksto.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: aña,
+		MM: luna,
+		DD: dia.
+	>> parameternan-di-buskeda :=
+	db konsulta: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	trese: { :row
+		(row mydate = date) falsu: {
+			e-tarea-aki eror: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter suma: 1.
+} * 100.
+
+
+# Time
+{
+	>> ora := TwoDigitFormat apliká-number-entero: (Number entre: 1 ku: 23), teksto.
+	>> minüt := TwoDigitFormat apliká-number-entero: (Number entre: 1 ku: 59), teksto.
+	>> sekònde := TwoDigitFormat apliká-number-entero: (Number entre: 1 ku: 59), teksto.
+	>> tempu := ['HH:II:SS'].
+	tempu
+		HH: ora,
+		II: minüt,
+		SS: sekònde.
+	>> parameternan-di-buskeda :=
+	db konsulta: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: tempu),
+	trese: { :row
+		(row mytime = tempu) falsu: {
+			e-tarea-aki eror: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter suma: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lista nobo yena: 100000 ku: ['x'], uni: [''].
+{
+	>> str2 := Kaha-fuerte token: 40.
+	>> parameternan-di-buskeda :=
+	db konsulta: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	trese: { :row
+		(row str1 = str1 i: row str2 = str2) falsu: {
+			e-tarea-aki eror: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter suma: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Number entre: 1 ku: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 for-di-teksto: ['9223372036854775807'] ) -
+		( Int64 for-di-teksto: ['99999'] ) +
+		( Int64 for-di-teksto: n1 teksto )
+	).
+	>> parameternan-di-buskeda :=
+	db konsulta: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	trese: { :row
+		(row n1 = n1) falsu: {
+			e-tarea-aki eror: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) falsu: {
+			e-tarea-aki eror: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 rondia) falsu: {
+			e-tarea-aki eror: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) falsu: {
+			e-tarea-aki eror: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter suma: 1.
+} * 100.
+
+
+Salida skirbi: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), liña-nobo.

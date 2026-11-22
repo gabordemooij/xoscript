@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Словник новий
+	# ASCII only
+	поставити: ( Список новий ; 65 ; 65 ; 65 ; 65 ; 0 ) у: ['AAAA'],
+	# valid 2 byte sequence
+	поставити: ( Список новий ; 194 ; 162 ; 0 ) у: ['¢'],
+	# Valid 3-byte UTF-8
+    поставити: ( Список новий ; 226 ; 130 ; 172 ; 0 ) у: ['€'],
+	# Valid 4-byte UTF-8
+    поставити: ( Список новий ; 240 ; 144 ; 141 ; 136 ; 0 ) у: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    поставити: ( Список новий ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) у: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    поставити: ( Список новий ; 65 ; 193 ; 129 ; 0 ) у: ['A?'],
+	# Invalid first byte (0xFF)
+    поставити: ( Список новий ; 255 ; 0 ) у: ['?'],
+	# Incomplete multi-byte sequence at end
+    поставити: ( Список новий ; 66 ; 226 ; 0 ) у: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    поставити: ( Список новий ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) у: ['A€?𐍈B'].
+	 
+utf8cases кожен: { :key :value
+	>> blob := Blob новий: value кількість, bytes: value.
+	>> str := blob текст.
+	(str = key) істина: {
+		Вивід написати: ['OK'], новий-рядок.
+	}, інакше: {
+		Вивід написати: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, новий-рядок.
+	}.
+	blob звільнити.
+}.

@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server khởi-tạo.
+Chương-trình dùng: ['../../../src/xo/vi/webtools.xo'].
+
+>> Fake-Request := Đối-tượng mới.
+Fake-Request khi: ['value:'] làm: { :giá-trị
+	riêng giá-trị := giá-trị.
+}.
+Fake-Request khi: ['cookie:'] làm: { :tên <- riêng giá-trị.
+}.
+
+>> Test-Session := Phiên-tệp-tạm mới.
+Test-Session khi: ['tải'] làm: { <- Từ-điển mới.
+}.
+Test-Session khi: ['session-id'] làm: { <- riêng id.
+}.
+
+>> cookies := Danh-sách mới
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies mỗi: { :i :cookie
+	>> yêu-cầu-http := Fake-Request mới.
+	yêu-cầu-http value: cookie.
+	>> trình-quản-lý := Test-Session mới.
+	>> web := Tài-liệu-Web mới.
+	web yêu-cầu-http: yêu-cầu-http.
+	web trình-quản-lý-phiên: trình-quản-lý.
+	web bắt-đầu-phiên.
+	Xuất ghi: ( trình-quản-lý session-id = cookie ), xuống-dòng.
+}.
+
+>> web := Tài-liệu-Web mới.
+web json: (Từ-điển mới đặt: ['b'] tại: ['a']).
+Xuất ghi: ['\n'], xuống-dòng.
+
+{ Mạng get: ['file:///etc/hostname']. } bắt-lỗi: { :e
+	Xuất ghi: e, xuống-dòng.
+}, chạy.
+
+>> svg := Tệp mới: ['/tmp/test0814.svg'].
+svg ghi: ['<svg xmlns="x"></svg>'].
+Xuất xuống-dòng.
+Server chuyển-tiếp: ['test0814.svg'] tiền-tố: ['/tmp/'].
+svg xóa.

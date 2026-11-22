@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Objek baharu.
+
+Log apabila: ['say:'] lakukan: { :str
+	Keluaran tulis: str, baris-baharu.
+}.
+
+>> Item := Objek baharu.
+
+Item apabila: ['baharu:'] lakukan: { :id <- diri baharu id: id.
+}.
+
+Item apabila: ['id:'] lakukan: { :id
+	milik id := id.
+}.
+
+Item apabila: ['id'] lakukan: { <- milik id. }.
+
+
+Item apabila: ['teks'] lakukan: {
+	>> str := ['Item#~no'].
+	str ~no: milik id. <- str.
+}.
+
+
+>> Print := Objek baharu.
+
+Print apabila: ['items'] lakukan: { 
+	
+	milik item := Item baharu: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: milik item
+	).
+	
+	
+}.
+
+Print items.

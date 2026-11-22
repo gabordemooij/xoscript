@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server தொடக்கம்-செய்.
+நிரல் உபயோகி: ['../../../src/xo/ta/webtools.xo'].
+நிரல் உபயோகி: ['../../../src/xo/ta/mailtools.xo'].
+
+>> தலைப்பு := HTTP-தலைப்பு புதிய சாவி: ['Location'] மதிப்பு: ['/ok\r\nX-Injected: yes'].
+வெளியீடு எழுது: தலைப்பு.
+
+>> web := வலை-ஆவணம் புதிய.
+web செல்: ['/ok\r\nX-Injected: yes'].
+வெளியீடு எழுது: ['\n'], புதிய-வரி.
+
+>> mail := மின்னஞ்சல் புதிய.
+mail பெறுநருக்கு: (வரிசை புதிய ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (வரிசை புதிய ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (வரிசை புதிய ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail அனுப்புநர்: ['d@example.invalid\r\nX-From: yes'] பெயர்: ['site\r\nX-Name: yes'].
+mail தலைப்புச்செய்தி: ['hello\r\nX-Subject: yes'].
+mail முதன்மை-உரை: ['line1\r\nline2'].
+வெளியீடு எழுது: mail உருவாக்கு.
+
+>> html := HTML-மின்னஞ்சல் புதிய.
+html பெறுநருக்கு: (வரிசை புதிய ; ['a@example.invalid\r\nX-To: yes']).
+html அனுப்புநர்: ['d@example.invalid'] பெயர்: ['site'].
+html தலைப்புச்செய்தி: ['hello\r\nX-Subject: yes'].
+html முதன்மை-உரை: ['body'].
+வெளியீடு எழுது: ( html உருவாக்கு உள்ளடக்கியது: ['\nX-'] ), புதிய-வரி.
+வெளியீடு எழுது: ( html உருவாக்கு உள்ளடக்கியது: ['X-To: yes'] ), புதிய-வரி.

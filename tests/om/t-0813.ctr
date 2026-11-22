@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server qopheessi.
+Sagantaa fayyadami: ['../../../src/xo/om/webtools.xo'].
+Sagantaa fayyadami: ['../../../src/xo/om/mailtools.xo'].
+
+>> mataa := Mataa-HTTP haaraa furtuu: ['Location'] gatii: ['/ok\r\nX-Injected: yes'].
+Baʼii barreessi: mataa.
+
+>> web := Sanada-Weebii haaraa.
+web gara-deemi: ['/ok\r\nX-Injected: yes'].
+Baʼii barreessi: ['\n'], dhaabi.
+
+>> mail := Imeelii haaraa.
+mail gara: (Tarree-wantootaa haaraa ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Tarree-wantootaa haaraa ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Tarree-wantootaa haaraa ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail ergituu: ['d@example.invalid\r\nX-From: yes'] maqaa: ['site\r\nX-Name: yes'].
+mail mata-duree: ['hello\r\nX-Subject: yes'].
+mail qaama: ['line1\r\nline2'].
+Baʼii barreessi: mail uumi.
+
+>> html := Imeelii-HTML haaraa.
+html gara: (Tarree-wantootaa haaraa ; ['a@example.invalid\r\nX-To: yes']).
+html ergituu: ['d@example.invalid'] maqaa: ['site'].
+html mata-duree: ['hello\r\nX-Subject: yes'].
+html qaama: ['body'].
+Baʼii barreessi: ( html uumi hammataa: ['\nX-'] ), dhaabi.
+Baʼii barreessi: ( html uumi hammataa: ['X-To: yes'] ), dhaabi.

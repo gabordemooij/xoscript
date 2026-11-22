@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Inkqubo ulawulo-lwenkumbulo: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB entsha umamkeli: ['localhost'],
+	igama-lomsebenzisi: ['xo'], iphasiwedi: ['pass123'], igama-ledatabheyisi: ['xobase'], qhagamshelana.
+
+>> TwoDigitFormat := Ifomathi entsha: ['%02d'].
+
+# Datetime
+{
+	>> unyaka := Inani phakathi: 1995 kunye: 2050, umbhalo.
+	>> inyanga := TwoDigitFormat sebenzisa-kwinani-elipheleleyo: (Inani phakathi: 1 kunye: 12), umbhalo.
+	>> usuku := TwoDigitFormat sebenzisa-kwinani-elipheleleyo: (Inani phakathi: 1 kunye: 28), umbhalo.
+	>> iyure := TwoDigitFormat sebenzisa-kwinani-elipheleleyo: (Inani phakathi: 1 kunye: 23), umbhalo.
+	>> umzuzu := TwoDigitFormat sebenzisa-kwinani-elipheleleyo: (Inani phakathi: 1 kunye: 59), umbhalo.
+	>> umzuzwana := TwoDigitFormat sebenzisa-kwinani-elipheleleyo: (Inani phakathi: 1 kunye: 59), umbhalo.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: unyaka,
+		MM: inyanga,
+		DD: usuku,
+		HH: iyure,
+		II: umzuzu,
+		SS: umzuzwana.
+	>> iiparamitha-zokukhangela :=
+	db umbuzo: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	landa: { :row
+		(row mydatetime = datetime) ubuxoki: {
+			lo-msebenzi impazamo: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter yongeza: 1.
+} * 100.
+
+# Date
+{
+	>> unyaka := Inani phakathi: 1995 kunye: 2050, umbhalo.
+	>> inyanga := TwoDigitFormat sebenzisa-kwinani-elipheleleyo: (Inani phakathi: 1 kunye: 12), umbhalo.
+	>> usuku := TwoDigitFormat sebenzisa-kwinani-elipheleleyo: (Inani phakathi: 1 kunye: 28), umbhalo.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: unyaka,
+		MM: inyanga,
+		DD: usuku.
+	>> iiparamitha-zokukhangela :=
+	db umbuzo: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	landa: { :row
+		(row mydate = date) ubuxoki: {
+			lo-msebenzi impazamo: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter yongeza: 1.
+} * 100.
+
+
+# Time
+{
+	>> iyure := TwoDigitFormat sebenzisa-kwinani-elipheleleyo: (Inani phakathi: 1 kunye: 23), umbhalo.
+	>> umzuzu := TwoDigitFormat sebenzisa-kwinani-elipheleleyo: (Inani phakathi: 1 kunye: 59), umbhalo.
+	>> umzuzwana := TwoDigitFormat sebenzisa-kwinani-elipheleleyo: (Inani phakathi: 1 kunye: 59), umbhalo.
+	>> ixesha := ['HH:II:SS'].
+	ixesha
+		HH: iyure,
+		II: umzuzu,
+		SS: umzuzwana.
+	>> iiparamitha-zokukhangela :=
+	db umbuzo: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: ixesha),
+	landa: { :row
+		(row mytime = ixesha) ubuxoki: {
+			lo-msebenzi impazamo: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter yongeza: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Uluhlu entsha zalisa: 100000 nge: ['x'], dibanisa: [''].
+{
+	>> str2 := Isisefu ithokheni: 40.
+	>> iiparamitha-zokukhangela :=
+	db umbuzo: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	landa: { :row
+		(row str1 = str1 kwaye: row str2 = str2) ubuxoki: {
+			lo-msebenzi impazamo: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter yongeza: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Inani phakathi: 1 kunye: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 ukusuka-kumbhalo: ['9223372036854775807'] ) -
+		( Int64 ukusuka-kumbhalo: ['99999'] ) +
+		( Int64 ukusuka-kumbhalo: n1 umbhalo )
+	).
+	>> iiparamitha-zokukhangela :=
+	db umbuzo: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	landa: { :row
+		(row n1 = n1) ubuxoki: {
+			lo-msebenzi impazamo: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) ubuxoki: {
+			lo-msebenzi impazamo: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 sondeza-inani) ubuxoki: {
+			lo-msebenzi impazamo: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) ubuxoki: {
+			lo-msebenzi impazamo: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter yongeza: 1.
+} * 100.
+
+
+Imveliso bhala: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), umgca-omtsha.

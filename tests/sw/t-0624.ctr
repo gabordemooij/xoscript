@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Kipengee mpya.
+
+Log ikija: ['say:'] fanya: { :str
+	Towe andika: str, mstari-mpya.
+}.
+
+>> Item := Kipengee mpya.
+
+Item ikija: ['mpya:'] fanya: { :id <- binafsi mpya id: id.
+}.
+
+Item ikija: ['id:'] fanya: { :id
+	yangu id := id.
+}.
+
+Item ikija: ['id'] fanya: { <- yangu id. }.
+
+
+Item ikija: ['maandishi'] fanya: {
+	>> str := ['Item#~no'].
+	str ~no: yangu id. <- str.
+}.
+
+
+>> Print := Kipengee mpya.
+
+Print ikija: ['items'] fanya: { 
+	
+	yangu item := Item mpya: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: yangu item
+	).
+	
+	
+}.
+
+Print items.

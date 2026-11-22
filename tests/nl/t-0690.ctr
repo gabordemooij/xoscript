@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Uit schrijf: ['Database test'], stop.
+
+>> db := Maria-DB nieuw host: ['localhost'],
+	gebruikersnaam: ['xo'], wachtwoord: ['pass123'], databanknaam: ['xobase'], verbinden.
+
+Uit schrijf: ['Can we connect? '] + db verbinding?, stop.
+
+>> zoekparameters := db query: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameters: ( Reeks nieuw ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  zoekparameters uitvoeren. db bevestigen. } afhandelen: { :e db terugdraaien.  }, start.
+
+Uit schrijf: ['Can we insert? '] + ( zoekparameters insert-id > 0 ), stop.
+
+>> x := 0.
+>> zoekparameters :=
+db query: ['SELECT * FROM book order by id desc limit 2'], 
+ophalen: { :row 
+	x optellen: 1.
+	Ja afbreken. # must clean up, no 'Commands out of sync'
+}.
+
+>> zoekparameters :=
+db query: ['SELECT * FROM book order by id desc limit 2'], 
+ophalen: { :row
+	x optellen: 1.
+	Ja afbreken.
+}.
+
+(x > 0) ja: {
+	Uit schrijf: ['Can we break in the middle of a fetch? '].
+}.
+
+Uit schrijf: Ja, stop.

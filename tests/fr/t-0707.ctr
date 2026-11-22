@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programme gestion-mémoire: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB nouveau hôte: ['localhost'],
+	utilisateur: ['xo'], mot-de-passe: ['pass123'], nom-base: ['xobase'], connecter.
+
+>> TwoDigitFormat := Format nouveau: ['%02d'].
+
+# Datetime
+{
+	>> année := Nombre entre: 1995 et: 2050, texte.
+	>> mois := TwoDigitFormat appliquer-entier: (Nombre entre: 1 et: 12), texte.
+	>> jour := TwoDigitFormat appliquer-entier: (Nombre entre: 1 et: 28), texte.
+	>> heure := TwoDigitFormat appliquer-entier: (Nombre entre: 1 et: 23), texte.
+	>> minute := TwoDigitFormat appliquer-entier: (Nombre entre: 1 et: 59), texte.
+	>> seconde := TwoDigitFormat appliquer-entier: (Nombre entre: 1 et: 59), texte.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: année,
+		MM: mois,
+		DD: jour,
+		HH: heure,
+		II: minute,
+		SS: seconde.
+	>> paramètres-recherche :=
+	db requête: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	récupérer: { :row
+		(row mydatetime = datetime) non: {
+			cette-tâche erreur: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter additionner: 1.
+} * 100.
+
+# Date
+{
+	>> année := Nombre entre: 1995 et: 2050, texte.
+	>> mois := TwoDigitFormat appliquer-entier: (Nombre entre: 1 et: 12), texte.
+	>> jour := TwoDigitFormat appliquer-entier: (Nombre entre: 1 et: 28), texte.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: année,
+		MM: mois,
+		DD: jour.
+	>> paramètres-recherche :=
+	db requête: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	récupérer: { :row
+		(row mydate = date) non: {
+			cette-tâche erreur: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter additionner: 1.
+} * 100.
+
+
+# Time
+{
+	>> heure := TwoDigitFormat appliquer-entier: (Nombre entre: 1 et: 23), texte.
+	>> minute := TwoDigitFormat appliquer-entier: (Nombre entre: 1 et: 59), texte.
+	>> seconde := TwoDigitFormat appliquer-entier: (Nombre entre: 1 et: 59), texte.
+	>> temps := ['HH:II:SS'].
+	temps
+		HH: heure,
+		II: minute,
+		SS: seconde.
+	>> paramètres-recherche :=
+	db requête: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: temps),
+	récupérer: { :row
+		(row mytime = temps) non: {
+			cette-tâche erreur: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter additionner: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Liste nouveau remplir: 100000 avec: ['x'], joindre: [''].
+{
+	>> str2 := Coffre jeton: 40.
+	>> paramètres-recherche :=
+	db requête: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	récupérer: { :row
+		(row str1 = str1 et: row str2 = str2) non: {
+			cette-tâche erreur: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter additionner: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Nombre entre: 1 et: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 depuis-texte: ['9223372036854775807'] ) -
+		( Int64 depuis-texte: ['99999'] ) +
+		( Int64 depuis-texte: n1 texte )
+	).
+	>> paramètres-recherche :=
+	db requête: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	récupérer: { :row
+		(row n1 = n1) non: {
+			cette-tâche erreur: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) non: {
+			cette-tâche erreur: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 arrondi) non: {
+			cette-tâche erreur: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) non: {
+			cette-tâche erreur: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter additionner: 1.
+} * 100.
+
+
+Sortie écrire: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), stop.

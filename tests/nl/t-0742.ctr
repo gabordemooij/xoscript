@@ -1,0 +1,21 @@
+Uit schrijf: ['Test object'], stop.
+>> a := Object nieuw. 
+
+a bij: ['item:'] doen: { :hexhelper
+	eigen hexhelper := hexhelper. 
+}.
+
+a bij: ['item'] doen: { <- eigen hexhelper.
+}.
+
+a item: Hx nieuw.
+
+>> old-hexhelper-address := a item prototype geheugenadres.
+a save-as: ['/tmp/a.bin'].
+Uit schrijf: ['========== RELOADING SNAP:'], stop.
+
+>> b := Object load-from: ['/tmp/a.bin'].
+
+(b item prototype geheugenadres = old-hexhelper-address) ja: {
+	Uit schrijf: ['Object link re-attached.'], stop.
+}.

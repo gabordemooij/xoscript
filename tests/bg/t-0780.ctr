@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Списък нов ;
+	# {"key":"normal"} normal ASCII
+	( Речник нов постави: ['normal'] на: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Речник нов постави: ['hello world'] на: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Речник нов постави: ['"'] на: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Речник нов постави: ['backslash: \\'] на: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Речник нов постави: ['slash: /'] на: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Речник нов постави: ['backspace: \b'] на: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Речник нов постави: ['formfeed: \f'] на: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Речник нов постави: ['newline: \n'] на: ['key'] ) ;
+	( Речник нов постави: ['newline: ↵'] на: ['key'] ) ;
+	( Речник нов постави: ['newline: 
+	'] на: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Речник нов постави: ['carriage return: \r'] на: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Речник нов постави: ['tab \t'] на: ['key'] ) ;
+	( Речник нов постави: ['tab ⇿'] на: ['key'] ) ;
+	( Речник нов постави: ['tab  '] на: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Речник нов постави: ['NUL \u0000'] на: ['key'] ) ;
+	( Речник нов постави: ['NUL \0'] на: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Речник нов постави: ['control: \u0001'] на: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Речник нов постави: ['control: \u001F'] на: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Речник нов постави: ['unicode: é'] на: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Речник нов постави: ['unicode: €'] на: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Речник нов постави: ['unicode: 日本語'] на: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Речник нов постави: ['unicode: 😀'] на: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Речник нов постави: ['unicode: 🧑‍💻'] на: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Речник нов постави: ['combining: e\u0301'] на: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Речник нов постави: ['escaped unicode: \u00e9'] на: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Речник нов постави: ['escaped unicode: \u20ac'] на: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Речник нов постави: ['escaped unicode: \ud83d\ude00'] на: ['key'] ) ;
+	# {"key":""} empty value
+	( Речник нов постави: [''] на: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Речник нов постави: ['@ < > & = % + ? #'] на: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Речник нов постави: ['''] на: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Речник нов постави: ['multiple: \" \\ \n \r \t'] на: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Речник нов постави: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] на: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Речник нов постави: [' value'] на: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Речник нов постави: ['value '] на: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Речник нов постави: [' \t\n\r '] на: ['key'] ).
+
+dicts всеки: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Речник нов постави: d key на: ['key']).
+	>> b := JSON jsonify: (Речник нов постави: ['value'] на: d key).
+	>> e := JSON обект: a.
+	>> f := JSON обект: b.
+	((e key = d key и: (f ? d key = ['value'])) или: (e key = ['NUL ?'])) вярно: {
+		Изход пиши: ['OK'], нов-ред.
+	}, иначе: {
+		Изход пиши: ['Unable to properly encode/decode: '] + d + j, нов-ред.
+		Програма край.
+	}.
+}.

@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB nouvo lame: ['localhost'],
+	non-itilizatè: ['xo'],
+	modpas: ['pass123'],
+	non-baz: ['xobase'],
+	konekte.
+
+>> paramèt-rechèch := db rekèt: ['SELECT ? AS a, ? AS b, ? AS c'].
+paramèt-rechèch paramèt-yo: (Lis nouvo ; ['1']).
+{ paramèt-rechèch chache: { :row Sòti ekri: row, nouvo-liy. }. } trape: { :e Sòti ekri: e, nouvo-liy. }, lanse.
+
+>> paramèt-rechèch := db rekèt: ['SELECT ? AS a'].
+{ paramèt-rechèch chache: { :row Sòti ekri: row, nouvo-liy. }. } trape: { :e Sòti ekri: e, nouvo-liy. }, lanse.
+
+# the right number still works, more parameters are ignored as before
+>> paramèt-rechèch := db rekèt: ['SELECT ? AS a, ? AS b'].
+paramèt-rechèch paramèt-yo: (Lis nouvo ; ['1'] ; ['2']).
+paramèt-rechèch chache: { :row Sòti ekri: (row nan: ['a']), ekri: (row nan: ['b']), nouvo-liy. }.
+paramèt-rechèch paramèt-yo: (Lis nouvo ; ['1'] ; ['2'] ; ['3']).
+paramèt-rechèch chache: { :row Sòti ekri: (row nan: ['a']), ekri: (row nan: ['b']), nouvo-liy. }.

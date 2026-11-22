@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lethathamo ncha ;
+	# {"key":"normal"} normal ASCII
+	( Bukantswe ncha beha: ['normal'] sebakeng: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Bukantswe ncha beha: ['hello world'] sebakeng: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Bukantswe ncha beha: ['"'] sebakeng: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Bukantswe ncha beha: ['backslash: \\'] sebakeng: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Bukantswe ncha beha: ['slash: /'] sebakeng: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Bukantswe ncha beha: ['backspace: \b'] sebakeng: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Bukantswe ncha beha: ['formfeed: \f'] sebakeng: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Bukantswe ncha beha: ['newline: \n'] sebakeng: ['key'] ) ;
+	( Bukantswe ncha beha: ['newline: ↵'] sebakeng: ['key'] ) ;
+	( Bukantswe ncha beha: ['newline: 
+	'] sebakeng: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Bukantswe ncha beha: ['carriage return: \r'] sebakeng: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Bukantswe ncha beha: ['tab \t'] sebakeng: ['key'] ) ;
+	( Bukantswe ncha beha: ['tab ⇿'] sebakeng: ['key'] ) ;
+	( Bukantswe ncha beha: ['tab  '] sebakeng: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Bukantswe ncha beha: ['NUL \u0000'] sebakeng: ['key'] ) ;
+	( Bukantswe ncha beha: ['NUL \0'] sebakeng: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Bukantswe ncha beha: ['control: \u0001'] sebakeng: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Bukantswe ncha beha: ['control: \u001F'] sebakeng: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Bukantswe ncha beha: ['unicode: é'] sebakeng: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Bukantswe ncha beha: ['unicode: €'] sebakeng: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Bukantswe ncha beha: ['unicode: 日本語'] sebakeng: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Bukantswe ncha beha: ['unicode: 😀'] sebakeng: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Bukantswe ncha beha: ['unicode: 🧑‍💻'] sebakeng: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Bukantswe ncha beha: ['combining: e\u0301'] sebakeng: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Bukantswe ncha beha: ['escaped unicode: \u00e9'] sebakeng: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Bukantswe ncha beha: ['escaped unicode: \u20ac'] sebakeng: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Bukantswe ncha beha: ['escaped unicode: \ud83d\ude00'] sebakeng: ['key'] ) ;
+	# {"key":""} empty value
+	( Bukantswe ncha beha: [''] sebakeng: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Bukantswe ncha beha: ['@ < > & = % + ? #'] sebakeng: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Bukantswe ncha beha: ['''] sebakeng: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Bukantswe ncha beha: ['multiple: \" \\ \n \r \t'] sebakeng: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Bukantswe ncha beha: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] sebakeng: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Bukantswe ncha beha: [' value'] sebakeng: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Bukantswe ncha beha: ['value '] sebakeng: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Bukantswe ncha beha: [' \t\n\r '] sebakeng: ['key'] ).
+
+dicts e-ngoe-le-e-ngoe: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Bukantswe ncha beha: d key sebakeng: ['key']).
+	>> b := JSON jsonify: (Bukantswe ncha beha: ['value'] sebakeng: d key).
+	>> e := JSON ntho: a.
+	>> f := JSON ntho: b.
+	((e key = d key le: (f ? d key = ['value'])) kapa: (e key = ['NUL ?'])) nnete: {
+		Sephetho ngola: ['OK'], mola-o-mocha.
+	}, ho-seng-joalo: {
+		Sephetho ngola: ['Unable to properly encode/decode: '] + d + j, mola-o-mocha.
+		Lenaneo qeta.
+	}.
+}.

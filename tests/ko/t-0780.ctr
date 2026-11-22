@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := 리스트 새로 ;
+	# {"key":"normal"} normal ASCII
+	( 사전 새로 넣기: ['normal'] 위치: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( 사전 새로 넣기: ['hello world'] 위치: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( 사전 새로 넣기: ['"'] 위치: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( 사전 새로 넣기: ['backslash: \\'] 위치: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( 사전 새로 넣기: ['slash: /'] 위치: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( 사전 새로 넣기: ['backspace: \b'] 위치: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( 사전 새로 넣기: ['formfeed: \f'] 위치: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( 사전 새로 넣기: ['newline: \n'] 위치: ['key'] ) ;
+	( 사전 새로 넣기: ['newline: ↵'] 위치: ['key'] ) ;
+	( 사전 새로 넣기: ['newline: 
+	'] 위치: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( 사전 새로 넣기: ['carriage return: \r'] 위치: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( 사전 새로 넣기: ['tab \t'] 위치: ['key'] ) ;
+	( 사전 새로 넣기: ['tab ⇿'] 위치: ['key'] ) ;
+	( 사전 새로 넣기: ['tab  '] 위치: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( 사전 새로 넣기: ['NUL \u0000'] 위치: ['key'] ) ;
+	( 사전 새로 넣기: ['NUL \0'] 위치: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( 사전 새로 넣기: ['control: \u0001'] 위치: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( 사전 새로 넣기: ['control: \u001F'] 위치: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( 사전 새로 넣기: ['unicode: é'] 위치: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( 사전 새로 넣기: ['unicode: €'] 위치: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( 사전 새로 넣기: ['unicode: 日本語'] 위치: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( 사전 새로 넣기: ['unicode: 😀'] 위치: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( 사전 새로 넣기: ['unicode: 🧑‍💻'] 위치: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( 사전 새로 넣기: ['combining: e\u0301'] 위치: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( 사전 새로 넣기: ['escaped unicode: \u00e9'] 위치: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( 사전 새로 넣기: ['escaped unicode: \u20ac'] 위치: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( 사전 새로 넣기: ['escaped unicode: \ud83d\ude00'] 위치: ['key'] ) ;
+	# {"key":""} empty value
+	( 사전 새로 넣기: [''] 위치: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( 사전 새로 넣기: ['@ < > & = % + ? #'] 위치: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( 사전 새로 넣기: ['''] 위치: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( 사전 새로 넣기: ['multiple: \" \\ \n \r \t'] 위치: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( 사전 새로 넣기: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] 위치: ['key'] ) ;
+	# {"key":" value"} leading space
+	( 사전 새로 넣기: [' value'] 위치: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( 사전 새로 넣기: ['value '] 위치: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( 사전 새로 넣기: [' \t\n\r '] 위치: ['key'] ).
+
+dicts 각각: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (사전 새로 넣기: d key 위치: ['key']).
+	>> b := JSON jsonify: (사전 새로 넣기: ['value'] 위치: d key).
+	>> e := JSON 객체: a.
+	>> f := JSON 객체: b.
+	((e key = d key 그리고: (f ? d key = ['value'])) 또는: (e key = ['NUL ?'])) 참이면: {
+		출력 쓰기: ['OK'], 줄바꿈.
+	}, 아니면: {
+		출력 쓰기: ['Unable to properly encode/decode: '] + d + j, 줄바꿈.
+		프로그램 종료.
+	}.
+}.

@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Праграма кіраванне-памяццю: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB новы хост: ['localhost'],
+	карыстальнік: ['xo'], пароль: ['pass123'], назва-базы: ['xobase'], падключыць.
+
+>> TwoDigitFormat := Фармат новы: ['%02d'].
+
+# Datetime
+{
+	>> год := Лік паміж: 1995 і: 2050, тэкст.
+	>> месяц := TwoDigitFormat прымяніць-цэлы: (Лік паміж: 1 і: 12), тэкст.
+	>> дзень := TwoDigitFormat прымяніць-цэлы: (Лік паміж: 1 і: 28), тэкст.
+	>> гадзіна := TwoDigitFormat прымяніць-цэлы: (Лік паміж: 1 і: 23), тэкст.
+	>> хвіліна := TwoDigitFormat прымяніць-цэлы: (Лік паміж: 1 і: 59), тэкст.
+	>> секунда := TwoDigitFormat прымяніць-цэлы: (Лік паміж: 1 і: 59), тэкст.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: год,
+		MM: месяц,
+		DD: дзень,
+		HH: гадзіна,
+		II: хвіліна,
+		SS: секунда.
+	>> параметры-пошуку :=
+	db запыт: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	атрымаць: { :row
+		(row mydatetime = datetime) хлусня: {
+			гэта-задача памылка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter дадаць: 1.
+} * 100.
+
+# Date
+{
+	>> год := Лік паміж: 1995 і: 2050, тэкст.
+	>> месяц := TwoDigitFormat прымяніць-цэлы: (Лік паміж: 1 і: 12), тэкст.
+	>> дзень := TwoDigitFormat прымяніць-цэлы: (Лік паміж: 1 і: 28), тэкст.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: год,
+		MM: месяц,
+		DD: дзень.
+	>> параметры-пошуку :=
+	db запыт: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	атрымаць: { :row
+		(row mydate = date) хлусня: {
+			гэта-задача памылка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter дадаць: 1.
+} * 100.
+
+
+# Time
+{
+	>> гадзіна := TwoDigitFormat прымяніць-цэлы: (Лік паміж: 1 і: 23), тэкст.
+	>> хвіліна := TwoDigitFormat прымяніць-цэлы: (Лік паміж: 1 і: 59), тэкст.
+	>> секунда := TwoDigitFormat прымяніць-цэлы: (Лік паміж: 1 і: 59), тэкст.
+	>> час := ['HH:II:SS'].
+	час
+		HH: гадзіна,
+		II: хвіліна,
+		SS: секунда.
+	>> параметры-пошуку :=
+	db запыт: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: час),
+	атрымаць: { :row
+		(row mytime = час) хлусня: {
+			гэта-задача памылка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter дадаць: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Спіс новы запоўніць: 100000 чым: ['x'], злучыць: [''].
+{
+	>> str2 := Сховішча токен: 40.
+	>> параметры-пошуку :=
+	db запыт: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	атрымаць: { :row
+		(row str1 = str1 і: row str2 = str2) хлусня: {
+			гэта-задача памылка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter дадаць: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Лік паміж: 1 і: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 з-тэксту: ['9223372036854775807'] ) -
+		( Int64 з-тэксту: ['99999'] ) +
+		( Int64 з-тэксту: n1 тэкст )
+	).
+	>> параметры-пошуку :=
+	db запыт: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	атрымаць: { :row
+		(row n1 = n1) хлусня: {
+			гэта-задача памылка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) хлусня: {
+			гэта-задача памылка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 акругліць) хлусня: {
+			гэта-задача памылка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) хлусня: {
+			гэта-задача памылка: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter дадаць: 1.
+} * 100.
+
+
+Вывад пісаць: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), новы-радок.

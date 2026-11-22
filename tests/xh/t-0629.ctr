@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Imveliso bhala: ['Database test'], umgca-omtsha.
+
+>> db := Maria-DB entsha umamkeli: ['localhost'],
+	igama-lomsebenzisi: ['xo'], iphasiwedi: ['pass123'], igama-ledatabheyisi: ['xobase'], qhagamshelana.
+
+Imveliso bhala: ['Can we connect? '] + db kuqhagamshelwe?, umgca-omtsha.
+
+>> iiparamitha-zokukhangela := db umbuzo: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], iiparamitha: ( Uluhlu entsha ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  iiparamitha-zokukhangela phumeza. db qinisekisa. } bamba: { :e db buyisela-umva.  }, qala.
+
+Imveliso bhala: ['Can we insert? '] + ( iiparamitha-zokukhangela insert-id > 0 ), umgca-omtsha.
+
+>> Obj := Into entsha.
+Obj xa-kufika: ['retrieve-rows'] yenza: {
+	eyakho inani-lezinto := 0.
+	>> iiparamitha-zokukhangela :=
+	db umbuzo: ['SELECT * FROM book order by id desc limit 2'], 
+	landa: { :row 
+		eyakho inani-lezinto yongeza: 1.
+		Inyaniso yaphula.
+	}. <- eyakho inani-lezinto kopa.
+}.
+
+Imveliso bhala: ['Can we query? '] + ( Obj retrieve-rows > 0 ), umgca-omtsha.

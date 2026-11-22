@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server ଆରମ୍ଭ-କର.
+ପ୍ରୋଗ୍ରାମ୍ ବ୍ୟବହାର: ['../../../src/xo/or/webtools.xo'].
+ପ୍ରୋଗ୍ରାମ୍ ବ୍ୟବହାର: ['../../../src/xo/or/mailtools.xo'].
+
+>> ହେଡର := HTTP-ହେଡର ନୂତନ ଚାବି: ['Location'] ମୂଲ୍ୟ: ['/ok\r\nX-Injected: yes'].
+ଆଉଟପୁଟ୍ ଲେଖ: ହେଡର.
+
+>> web := ୱେବ-ଦଲିଲ ନୂତନ.
+web ଯାଅ: ['/ok\r\nX-Injected: yes'].
+ଆଉଟପୁଟ୍ ଲେଖ: ['\n'], ନୂଆ-ଧାଡ଼ି.
+
+>> mail := ଇମେଲ ନୂତନ.
+mail ପ୍ରାପକଙ୍କୁ: (ସାରଣୀ ନୂତନ ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (ସାରଣୀ ନୂତନ ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (ସାରଣୀ ନୂତନ ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail ପ୍ରେରକ: ['d@example.invalid\r\nX-From: yes'] ନାମ: ['site\r\nX-Name: yes'].
+mail ବିଷୟ: ['hello\r\nX-Subject: yes'].
+mail ମୁଖ୍ୟ-ପାଠ: ['line1\r\nline2'].
+ଆଉଟପୁଟ୍ ଲେଖ: mail ସୃଷ୍ଟି-କର.
+
+>> html := HTML-ଇମେଲ ନୂତନ.
+html ପ୍ରାପକଙ୍କୁ: (ସାରଣୀ ନୂତନ ; ['a@example.invalid\r\nX-To: yes']).
+html ପ୍ରେରକ: ['d@example.invalid'] ନାମ: ['site'].
+html ବିଷୟ: ['hello\r\nX-Subject: yes'].
+html ମୁଖ୍ୟ-ପାଠ: ['body'].
+ଆଉଟପୁଟ୍ ଲେଖ: ( html ସୃଷ୍ଟି-କର ଧାରଣ-କରେ: ['\nX-'] ), ନୂଆ-ଧାଡ଼ି.
+ଆଉଟପୁଟ୍ ଲେଖ: ( html ସୃଷ୍ଟି-କର ଧାରଣ-କରେ: ['X-To: yes'] ), ନୂଆ-ଧାଡ଼ି.

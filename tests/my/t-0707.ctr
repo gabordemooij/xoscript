@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+ပရိုဂရမ် မှတ်ဉာဏ်စီမံ: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB အသစ် ဟို့စ်: ['localhost'],
+	အသုံးပြုသူအမည်: ['xo'], စကားဝှက်: ['pass123'], ဒေတာဘေ့စ်အမည်: ['xobase'], ဆက်သွယ်.
+
+>> TwoDigitFormat := ပုံစံ အသစ်: ['%02d'].
+
+# Datetime
+{
+	>> နှစ် := ကိန်း ကြား: 1995 မှ: 2050, စာသားသို့.
+	>> လအမှတ် := TwoDigitFormat အသုံးချကိန်းပြည့်: (ကိန်း ကြား: 1 မှ: 12), စာသားသို့.
+	>> ရက် := TwoDigitFormat အသုံးချကိန်းပြည့်: (ကိန်း ကြား: 1 မှ: 28), စာသားသို့.
+	>> နာရီ := TwoDigitFormat အသုံးချကိန်းပြည့်: (ကိန်း ကြား: 1 မှ: 23), စာသားသို့.
+	>> မိနစ် := TwoDigitFormat အသုံးချကိန်းပြည့်: (ကိန်း ကြား: 1 မှ: 59), စာသားသို့.
+	>> စက္ကန့် := TwoDigitFormat အသုံးချကိန်းပြည့်: (ကိန်း ကြား: 1 မှ: 59), စာသားသို့.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: နှစ်,
+		MM: လအမှတ်,
+		DD: ရက်,
+		HH: နာရီ,
+		II: မိနစ်,
+		SS: စက္ကန့်.
+	>> ရှာဖွေမှုပါရာမီတာ :=
+	db မေးမြန်းချက်: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ယူဆောင်: { :row
+		(row mydatetime = datetime) မှားလျှင်: {
+			ဤလုပ်ငန်း အမှား: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ပေါင်း: 1.
+} * 100.
+
+# Date
+{
+	>> နှစ် := ကိန်း ကြား: 1995 မှ: 2050, စာသားသို့.
+	>> လအမှတ် := TwoDigitFormat အသုံးချကိန်းပြည့်: (ကိန်း ကြား: 1 မှ: 12), စာသားသို့.
+	>> ရက် := TwoDigitFormat အသုံးချကိန်းပြည့်: (ကိန်း ကြား: 1 မှ: 28), စာသားသို့.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: နှစ်,
+		MM: လအမှတ်,
+		DD: ရက်.
+	>> ရှာဖွေမှုပါရာမီတာ :=
+	db မေးမြန်းချက်: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ယူဆောင်: { :row
+		(row mydate = date) မှားလျှင်: {
+			ဤလုပ်ငန်း အမှား: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ပေါင်း: 1.
+} * 100.
+
+
+# Time
+{
+	>> နာရီ := TwoDigitFormat အသုံးချကိန်းပြည့်: (ကိန်း ကြား: 1 မှ: 23), စာသားသို့.
+	>> မိနစ် := TwoDigitFormat အသုံးချကိန်းပြည့်: (ကိန်း ကြား: 1 မှ: 59), စာသားသို့.
+	>> စက္ကန့် := TwoDigitFormat အသုံးချကိန်းပြည့်: (ကိန်း ကြား: 1 မှ: 59), စာသားသို့.
+	>> အချိန် := ['HH:II:SS'].
+	အချိန်
+		HH: နာရီ,
+		II: မိနစ်,
+		SS: စက္ကန့်.
+	>> ရှာဖွေမှုပါရာမီတာ :=
+	db မေးမြန်းချက်: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: အချိန်),
+	ယူဆောင်: { :row
+		(row mytime = အချိန်) မှားလျှင်: {
+			ဤလုပ်ငန်း အမှား: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ပေါင်း: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := အစီအစဉ် အသစ် ဖြည့်: 100000 တန်ဖိုးဖြင့်: ['x'], ပေါင်းစပ်: [''].
+{
+	>> str2 := မီးခံသေတ္တာ တိုကင်: 40.
+	>> ရှာဖွေမှုပါရာမီတာ :=
+	db မေးမြန်းချက်: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ယူဆောင်: { :row
+		(row str1 = str1 နှင့်: row str2 = str2) မှားလျှင်: {
+			ဤလုပ်ငန်း အမှား: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ပေါင်း: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := ကိန်း ကြား: 1 မှ: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 စာသားမှ: ['9223372036854775807'] ) -
+		( Int64 စာသားမှ: ['99999'] ) +
+		( Int64 စာသားမှ: n1 စာသားသို့ )
+	).
+	>> ရှာဖွေမှုပါရာမီတာ :=
+	db မေးမြန်းချက်: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ယူဆောင်: { :row
+		(row n1 = n1) မှားလျှင်: {
+			ဤလုပ်ငန်း အမှား: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) မှားလျှင်: {
+			ဤလုပ်ငန်း အမှား: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 အနီးဆုံးယူ) မှားလျှင်: {
+			ဤလုပ်ငန်း အမှား: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) မှားလျှင်: {
+			ဤလုပ်ငန်း အမှား: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ပေါင်း: 1.
+} * 100.
+
+
+အထွက် ရေး: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), စာကြောင်းသစ်.

@@ -1,0 +1,39 @@
+
+
+Text la: ['evaluate'] execută: {
+	>> cod := Fișier nou: ['/tmp/eval.ctr'].
+	cod scrie: sine text + ['.'].
+	Program folosește: ['/tmp/eval.ctr'].
+}.
+
+>> a := (Listă ← (
+	(Dicționar nou)
+		pune: ['domain'] la: ['mywebsite.com'],
+		pune: (Listă ←
+			((Dicționar nou)
+				pune: ['home'] la: ['title'],
+				pune: ['<html></html>'] la: ['body'],
+				pune: ['2017-01-01'] la: ['created']
+			) ;
+			((Dicționar nou)
+				pune: ['aboutus(c)'] la: ['title'],
+				pune: ['<credits>Author Inc.</credits>'] la: ['body']
+			)
+		) la: ['pages']
+	)
+) text.
+
+Ieșire scrie: a tip, rând-nou.
+Ieșire scrie: a, rând-nou.
+
+>> b := Nimic.
+(['b := '] + a) evaluate.
+Ieșire scrie: b ? 0 ? ['pages'] ? 1 ? ['body'], rând-nou.
+
+>> c := b ? 0.
+>> d := c text.
+Ieșire scrie: d tip, rând-nou.
+
+>> e := Nimic.
+(['e := '] + d) evaluate.
+Ieșire scrie: e ? ['pages'] ? 0, rând-nou.

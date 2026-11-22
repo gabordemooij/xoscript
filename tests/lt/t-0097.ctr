@@ -1,0 +1,42 @@
+
+Tekstas kai: ['html'] daryti: { <- (
+		pats
+		pakeisti: ['&'] į: ['&amp;'],
+		pakeisti: ['<'] į: ['&lt;'],
+		pakeisti: ['>'] į: ['&gt;'],
+		pakeisti: ['"'] į: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objektas naujas.
+
+HtmlBrush kai: ['atsakyti:'] daryti: { :tag
+	Išvestis rašyti: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush kai: ['atsakyti:ir:'] daryti: { :tag :content
+	tag := ( tag nuo: 0 ilgis: (tag ilgis - 1) ).
+	Išvestis rašyti: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush kai: ['content:'] daryti: { :text
+	Išvestis rašyti: text html, nauja-eilutė.
+}.
+
+HtmlBrush kai: ['attr:value:'] daryti: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush naujas.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

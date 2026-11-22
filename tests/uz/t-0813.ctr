@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server ishga-tushir.
+Dastur foydalanish: ['../../../src/xo/uz/webtools.xo'].
+Dastur foydalanish: ['../../../src/xo/uz/mailtools.xo'].
+
+>> sarlavha := HTTP-Sarlavha yangi kalit: ['Location'] qiymat: ['/ok\r\nX-Injected: yes'].
+Chiqish yozish: sarlavha.
+
+>> web := Veb-hujjat yangi.
+web oʻt: ['/ok\r\nX-Injected: yes'].
+Chiqish yozish: ['\n'], yangi-qator.
+
+>> mail := Elektron-pochta yangi.
+mail qabul-qiluvchiga: (Roʻyxat yangi ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Roʻyxat yangi ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Roʻyxat yangi ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail yuboruvchi: ['d@example.invalid\r\nX-From: yes'] nom: ['site\r\nX-Name: yes'].
+mail mavzu: ['hello\r\nX-Subject: yes'].
+mail tana: ['line1\r\nline2'].
+Chiqish yozish: mail yarat.
+
+>> html := HTML-Elektron-pochta yangi.
+html qabul-qiluvchiga: (Roʻyxat yangi ; ['a@example.invalid\r\nX-To: yes']).
+html yuboruvchi: ['d@example.invalid'] nom: ['site'].
+html mavzu: ['hello\r\nX-Subject: yes'].
+html tana: ['body'].
+Chiqish yozish: ( html yarat ichida-bor: ['\nX-'] ), yangi-qator.
+Chiqish yozish: ( html yarat ichida-bor: ['X-To: yes'] ), yangi-qator.

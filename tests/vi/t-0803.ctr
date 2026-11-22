@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB mới máy-trạm: ['localhost'],
+	tên-người-dùng: ['xo'],
+	mật-khẩu: ['pass123'],
+	tên-cơ-sở-dữ-liệu: ['xobase'],
+	kết-nối.
+
+>> conn2 := Maria-DB mới máy-trạm: ['localhost'],
+	tên-người-dùng: ['xo'],
+	mật-khẩu: ['pass123'],
+	tên-cơ-sở-dữ-liệu: ['xobase'],
+	kết-nối.
+#...
+>> del := conn1 truy-vấn: ['DELETE FROM book WHERE id > 0'].
+{  del thực-thi. conn1 xác-nhận. } bắt-lỗi: { :e conn1 hoàn-tác.  }, chạy.
+
+>> insert := conn1 truy-vấn: ['INSERT INTO book (id) VALUES(null)'].
+insert thực-thi.
+
+>> đếm := conn1 truy-vấn: ['SELECT COUNT(*) AS num FROM book'].
+đếm lấy: { :row Xuất ghi: row num, xuống-dòng. }.
+
+# does not show up
+# insert not committed on connection 1
+>> đếm := conn2 truy-vấn: ['SELECT COUNT(*) AS num FROM book'].
+đếm lấy: { :row Xuất ghi: row num, xuống-dòng. }.

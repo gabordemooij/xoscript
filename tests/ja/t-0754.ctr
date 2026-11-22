@@ -1,0 +1,30 @@
+出力 書く: ['Test object'], 改行.
+>> a := オブジェクト 新規. 
+
+a 受信時: ['item:'] 実行: { :out
+	自分の out := out. 
+}.
+
+a 受信時: ['item'] 実行: { <- 自分の out.
+}.
+
+a 受信時: ['greet'] 実行: {
+	出力 書く: ['hi from original out!'], 改行.
+}.
+
+a item: 出力.
+
+出力 書く: a item, 改行.
+
+>> old-out-address := a item プロトタイプ メモリアドレス.
+a save-as: ['/tmp/a.bin'].
+出力 書く: ['========== RELOADING SNAP:'], 改行.
+
+>> b := オブジェクト load-from: ['/tmp/a.bin'].
+
+(b item プロトタイプ メモリアドレス = old-out-address) 真なら: {
+	出力 書く: ['Object link re-attached.'], 改行.
+}.
+
+b item 書く: ['hello from loaded out!'], 改行.
+b greet.

@@ -1,0 +1,43 @@
+#Linux
+>> OS := Program systém: (Příkaz uname -s), odstranit-okolní-mezery.
+
+>> Slurp := Objekt nový.
+Slurp při: ['nový'] udělat: {
+	vlastní str := [''].
+}.
+Slurp při: ['odpovědět:'] udělat: { :blah
+		(vlastní str ≠ ['']) pravda: {
+			vlastní str připojit: [' '].
+		}.
+		vlastní str připojit: blah.
+}.
+Slurp při: ['odpovědět:a:'] udělat: { :blah :blahah
+		(vlastní str ≠ ['']) pravda: {
+			vlastní str připojit: [' '].
+		}.
+		(blah délka > 1) pravda: {
+			vlastní str připojit: (blah od: 0 délka: (blah délka - 1)).
+		}, jinak: {
+			vlastní str připojit: blah.
+		}.
+		vlastní str připojit: [' '].
+		vlastní str připojit: blahah.
+}.
+Slurp při: ['obtain'] udělat: {
+	>> buffer := vlastní str.
+	vlastní str := ['']. <- buffer.
+}.
+>> large text := [''].
+{
+	large text připojit: ['hello'].
+} × 1000.
+
+
+Výstup psát: (
+	Program systém: (
+		Slurp nový
+			echo: large text,
+			| (['./xo ../../../tests/assets/stdin_test.ctr'] OS: OS)
+		) obtain
+).
+

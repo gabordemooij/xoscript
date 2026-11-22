@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Program geheuebestuur: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB nuut gasheer: ['localhost'],
+	gebruikersnaam: ['xo'], wagwoord: ['pass123'], databasisnaam: ['xobase'], verbind.
+
+>> TwoDigitFormat := Formaat nuut: ['%02d'].
+
+# Datetime
+{
+	>> jaar := Getal tussen: 1995 en: 2050, teks.
+	>> maand := TwoDigitFormat pas-toe-heelgetal: (Getal tussen: 1 en: 12), teks.
+	>> dag := TwoDigitFormat pas-toe-heelgetal: (Getal tussen: 1 en: 28), teks.
+	>> uur := TwoDigitFormat pas-toe-heelgetal: (Getal tussen: 1 en: 23), teks.
+	>> minuut := TwoDigitFormat pas-toe-heelgetal: (Getal tussen: 1 en: 59), teks.
+	>> sekonde := TwoDigitFormat pas-toe-heelgetal: (Getal tussen: 1 en: 59), teks.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: jaar,
+		MM: maand,
+		DD: dag,
+		HH: uur,
+		II: minuut,
+		SS: sekonde.
+	>> soekparameters :=
+	db navraag: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	haal: { :row
+		(row mydatetime = datetime) nee: {
+			hierdie-taak fout: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter tel-by: 1.
+} * 100.
+
+# Date
+{
+	>> jaar := Getal tussen: 1995 en: 2050, teks.
+	>> maand := TwoDigitFormat pas-toe-heelgetal: (Getal tussen: 1 en: 12), teks.
+	>> dag := TwoDigitFormat pas-toe-heelgetal: (Getal tussen: 1 en: 28), teks.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: jaar,
+		MM: maand,
+		DD: dag.
+	>> soekparameters :=
+	db navraag: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	haal: { :row
+		(row mydate = date) nee: {
+			hierdie-taak fout: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter tel-by: 1.
+} * 100.
+
+
+# Time
+{
+	>> uur := TwoDigitFormat pas-toe-heelgetal: (Getal tussen: 1 en: 23), teks.
+	>> minuut := TwoDigitFormat pas-toe-heelgetal: (Getal tussen: 1 en: 59), teks.
+	>> sekonde := TwoDigitFormat pas-toe-heelgetal: (Getal tussen: 1 en: 59), teks.
+	>> tyd := ['HH:II:SS'].
+	tyd
+		HH: uur,
+		II: minuut,
+		SS: sekonde.
+	>> soekparameters :=
+	db navraag: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: tyd),
+	haal: { :row
+		(row mytime = tyd) nee: {
+			hierdie-taak fout: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter tel-by: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lys nuut vul: 100000 met: ['x'], voeg-saam: [''].
+{
+	>> str2 := Kluis token: 40.
+	>> soekparameters :=
+	db navraag: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	haal: { :row
+		(row str1 = str1 en: row str2 = str2) nee: {
+			hierdie-taak fout: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter tel-by: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Getal tussen: 1 en: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 vanuit-teks: ['9223372036854775807'] ) -
+		( Int64 vanuit-teks: ['99999'] ) +
+		( Int64 vanuit-teks: n1 teks )
+	).
+	>> soekparameters :=
+	db navraag: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	haal: { :row
+		(row n1 = n1) nee: {
+			hierdie-taak fout: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) nee: {
+			hierdie-taak fout: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 afgerond) nee: {
+			hierdie-taak fout: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) nee: {
+			hierdie-taak fout: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter tel-by: 1.
+} * 100.
+
+
+Uitvoer skryf: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), nuwe-reël.

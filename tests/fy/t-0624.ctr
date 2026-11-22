@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Objekt nĳ.
+
+Log by: ['say:'] dwaan: { :str
+	Utfier skriuwe: str, nije-rigel.
+}.
+
+>> Item := Objekt nĳ.
+
+Item by: ['nĳ:'] dwaan: { :id <- sels nĳ id: id.
+}.
+
+Item by: ['id:'] dwaan: { :id
+	eigen id := id.
+}.
+
+Item by: ['id'] dwaan: { <- eigen id. }.
+
+
+Item by: ['tekst'] dwaan: {
+	>> str := ['Item#~no'].
+	str ~no: eigen id. <- str.
+}.
+
+
+>> Print := Objekt nĳ.
+
+Print by: ['items'] dwaan: { 
+	
+	eigen item := Item nĳ: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: eigen item
+	).
+	
+	
+}.
+
+Print items.

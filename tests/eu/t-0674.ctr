@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> bidea := ['/tmp/dat.csv'].
+>> csv := Fitxategia berria: bidea.
+csv idatzi: s.
+
+# accepts CRLF LF CR, varying row length
+csv mugatzailea: [';'] komatxoa: ['"'] lerroak: { :line
+	Programa garbitu.
+	Irteera idatzi: line, lerro-jauzia.
+	Programa garbitu.
+}.
+
+# unequal lines
+s erantsi: ['\njustone'].
+csv idatzi: s.
+{
+	csv mugatzailea: [';'] komatxoa: ['"'] lerroak: { :line
+		Irteera idatzi: line, lerro-jauzia.
+	}.
+} harrapatu: { :e 
+	Irteera idatzi: e, lerro-jauzia.
+}, hasi.
+
+# invalid format
+s := ['"he"llo";world'].
+csv idatzi: s.
+{
+	csv mugatzailea: [';'] komatxoa: ['"'] lerroak: { :line
+		Irteera idatzi: line, lerro-jauzia.
+	}.
+} harrapatu: { :e 
+	Irteera idatzi: e, lerro-jauzia.
+}, hasi.

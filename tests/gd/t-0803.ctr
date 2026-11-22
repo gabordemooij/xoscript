@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB ùr òstair: ['localhost'],
+	ainm-cleachdaiche: ['xo'],
+	facal-faire: ['pass123'],
+	ainm-stòir-dàta: ['xobase'],
+	ceangail-ris.
+
+>> conn2 := Maria-DB ùr òstair: ['localhost'],
+	ainm-cleachdaiche: ['xo'],
+	facal-faire: ['pass123'],
+	ainm-stòir-dàta: ['xobase'],
+	ceangail-ris.
+#...
+>> del := conn1 ceist: ['DELETE FROM book WHERE id > 0'].
+{  del ruith-àithne. conn1 dearbhaich. } glac: { :e conn1 till-air-ais.  }, tòisich.
+
+>> insert := conn1 ceist: ['INSERT INTO book (id) VALUES(null)'].
+insert ruith-àithne.
+
+>> cunnt := conn1 ceist: ['SELECT COUNT(*) AS num FROM book'].
+cunnt faigh: { :row Às-chur sgrìobh: row num, loidhne-ùr. }.
+
+# does not show up
+# insert not committed on connection 1
+>> cunnt := conn2 ceist: ['SELECT COUNT(*) AS num FROM book'].
+cunnt faigh: { :row Às-chur sgrìobh: row num, loidhne-ùr. }.

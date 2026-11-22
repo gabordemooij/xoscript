@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server инициализировать.
+Программа импортировать: ['../../../src/xo/ru/webtools.xo'].
+Программа импортировать: ['../../../src/xo/ru/mailtools.xo'].
+
+>> заголовок := HTTP-Заголовок новый ключ: ['Location'] величина: ['/ok\r\nX-Injected: yes'].
+Выход написать: заголовок.
+
+>> web := Веб-документ новый.
+web перейти-к: ['/ok\r\nX-Injected: yes'].
+Выход написать: ['\n'], стоп.
+
+>> mail := Письмо новый.
+mail кому: (Список новый ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Список новый ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Список новый ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail отправитель: ['d@example.invalid\r\nX-From: yes'] имя: ['site\r\nX-Name: yes'].
+mail тема: ['hello\r\nX-Subject: yes'].
+mail тело: ['line1\r\nline2'].
+Выход написать: mail сгенерировать.
+
+>> html := HTML-Письмо новый.
+html кому: (Список новый ; ['a@example.invalid\r\nX-To: yes']).
+html отправитель: ['d@example.invalid'] имя: ['site'].
+html тема: ['hello\r\nX-Subject: yes'].
+html тело: ['body'].
+Выход написать: ( html сгенерировать содержит: ['\nX-'] ), стоп.
+Выход написать: ( html сгенерировать содержит: ['X-To: yes'] ), стоп.

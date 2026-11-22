@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Програм санах-ойн-удирдлага: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Програм тохиргоо: ['FFITESTLIB'].
+
+
+
+Server холбох: (
+ Жагсаалт шинэ ;
+ libname ;
+ ['puts'] ;
+ ( Жагсаалт шинэ ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s чөлөөлөх.
+
+# test with struct
+
+>> a := Blob шинэ: 8.
+a bytes: (
+	Жагсаалт <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Жагсаалт <<: ['int'], ; ['int']).
+
+Server холбох: (
+	Жагсаалт <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Жагсаалт <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Гаралт бичих: ['Sum test:'] + (ffitest ffisum: a), шинэ-мөр.
+
+struct struct-чөлөөлөх.
+struct чөлөөлөх.
+a чөлөөлөх.

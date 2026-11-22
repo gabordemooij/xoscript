@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Πρόγραμμα διαχείριση-μνήμης: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Πρόγραμμα ρύθμιση: ['FFITESTLIB'].
+
+
+
+Server σύνδεση: (
+ Λίστα νέο ;
+ libname ;
+ ['puts'] ;
+ ( Λίστα νέο ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s αποδέσμευση.
+
+# test with struct
+
+>> a := Blob νέο: 8.
+a bytes: (
+	Λίστα <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Λίστα <<: ['int'], ; ['int']).
+
+Server σύνδεση: (
+	Λίστα <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Λίστα <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Έξοδος γράψε: ['Sum test:'] + (ffitest ffisum: a), νέα-γραμμή.
+
+struct αποδέσμευση-struct.
+struct αποδέσμευση.
+a αποδέσμευση.

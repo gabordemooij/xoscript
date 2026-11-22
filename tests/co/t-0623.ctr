@@ -1,0 +1,43 @@
+
+
+>> g := Server novu.
+>> v := Cascia-forte novu.
+>> ok := 0.
+
+>> secrets := Lista novu ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets cupià.
+passwords ognunu: { :i :p
+	secrets ognunu: { :n :s
+		{
+			>> encrypted := v cifrà: s chjave: p.
+			>> decrypted := v decifrà: encrypted chjave: p.
+			(decrypted = s) veru: {
+				ok aghjunghje: 1.
+			}, altrimenti: {
+				Esciuta scrive: ['failed encrypting/decrypting: '], linea-nova.
+				Esciuta scrive: s, linea-nova.
+				Esciuta scrive: ['encrypted: '] + encrypted, linea-nova.
+				Esciuta scrive: ['decrypted: '] + encrypted, linea-nova.
+				Prugramma finisci.
+			}.
+		} catturà: { :err
+			(s = [''] o: p = ['']) veru: {
+				ok aghjunghje: 1.
+			}, altrimenti: {
+				Esciuta scrive: err, linea-nova.
+				Prugramma finisci.
+			}.
+		}, lancià.
+	}.
+}.
+
+Esciuta scrive: ( ok + [' vault encryptions tested.'] ), linea-nova.

@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := برنامج إعداد: ⌝'FFITESTLIB'⌜.
+
+# link stdio functions from c for advances file operations
+Server اربط: ﴿ قائمة جديد ;
+ libname ; ⌝'fopen'⌜ ;
+ ﴿ قائمة جديد ; ⌝'pointer'⌜ ; ⌝'pointer'⌜﴾ ;
+ ⌝'pointer'⌜ ;
+ ⌝'Stream'⌜ ;
+ ⌝'path:mode:'⌜
+﴾,
+اربط: ﴿ قائمة جديد ;
+ لاشيء ; # means same lib
+ ⌝'fread'⌜ ;
+ ﴿ قائمة جديد ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ لاشيء ; # means same object (i.e. Stream)
+ ⌝'fread'⌜
+﴾,
+اربط: ﴿
+ قائمة جديد ;
+ لاشيء ; # means same lib
+ ⌝'fwrite'⌜ ;
+ ﴿ قائمة جديد ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ لاشيء ; # means same lib
+ ⌝'fwrite'⌜
+﴾,
+اربط: ﴿
+ قائمة جديد ;
+ لاشيء ; # means same lib
+ ⌝'rewind'⌜ ;
+ ﴿ قائمة جديد ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'int'⌜ ;
+ لاشيء ; # means same lib
+ ⌝'rewind:'⌜
+﴾.
+
+>> str := Blob utf8: ⌝'abc123'⌜.
+>> مسار-الملف := Blob utf8: ⌝'/tmp/bla.txt'⌜.
+>> mode := Blob utf8: ⌝'w+'⌜.
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: مسار-الملف mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream رسالة: ⌝'fwrite'⌜ معطيات: ﴿قائمة جديد ; str ; 1 ; 6 ; fd ﴾.
+مخرج اكتب: bytes-written, سطر-جديد.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob جديد: 20.
+
+# read from file
+>> bytes-read := Stream رسالة: ⌝'fread'⌜ معطيات: ﴿قائمة جديد ; buf ; 1 ; 6 ; fd ﴾.
+مخرج اكتب: bytes-read, سطر-جديد.
+مخرج اكتب: buf, سطر-جديد.
+
+# free memory
+str  حرر.
+مسار-الملف حرر.
+mode حرر.
+buf  حرر.
+
+

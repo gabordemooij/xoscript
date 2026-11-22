@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> pokušaj := { :format :value
+	{ Izlaz piši: ( (Format novi: format) primijeni: value ), novi-red. } uhvati: { :e Izlaz piši: e, novi-red. }, pokreni.
+}.
+>> try-int := { :format :value
+	{ Izlaz piši: ( (Format novi: format) primijeni-cijeli: value ), novi-red. } uhvati: { :e Izlaz piši: e, novi-red. }, pokreni.
+}.
+
+# fits
+pokušaj primijeni: ['|%s|'] i: ['text'].
+pokušaj primijeni: ['%06.2f'] i: 5.5.
+pokušaj primijeni: ['100%% %s'] i: ['sure'].
+try-int primijeni: ['%03d'] i: 7.
+try-int primijeni: ['%x'] i: 255.
+pokušaj primijeni: ['%d'] i: (Int64 novi iz-teksta: ['12']).
+pokušaj primijeni: ['%lld'] i: (Int64 novi iz-teksta: ['12']).
+pokušaj primijeni: ['%.1lf'] i: 5.5.
+try-int primijeni: ['%hd'] i: 7.
+
+# does not fit
+pokušaj primijeni: ['%s'] i: 12345.
+pokušaj primijeni: ['%d'] i: 12345.
+pokušaj primijeni: ['%f'] i: ['text'].
+try-int primijeni: ['%d'] i: ['text'].
+try-int primijeni: ['%s'] i: 5.
+pokušaj primijeni: ['%s %s'] i: ['text'].
+pokušaj primijeni: ['%n'] i: ['text'].
+pokušaj primijeni: ['%*s'] i: ['text'].
+pokušaj primijeni: ['%'] i: ['text'].
+
+# length modifier does not fit
+pokušaj primijeni: ['%ls'] i: ['text'].
+pokušaj primijeni: ['%Lf'] i: 5.5.
+try-int primijeni: ['%ld'] i: 7.
+try-int primijeni: ['%lld'] i: 7.
+pokušaj primijeni: ['%Ld'] i: (Int64 novi iz-teksta: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+pokušaj primijeni: ['%99999999999s'] i: ['text'].

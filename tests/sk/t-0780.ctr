@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Zoznam nový ;
+	# {"key":"normal"} normal ASCII
+	( Slovník nový umiestniť: ['normal'] na: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Slovník nový umiestniť: ['hello world'] na: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Slovník nový umiestniť: ['"'] na: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Slovník nový umiestniť: ['backslash: \\'] na: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Slovník nový umiestniť: ['slash: /'] na: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Slovník nový umiestniť: ['backspace: \b'] na: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Slovník nový umiestniť: ['formfeed: \f'] na: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Slovník nový umiestniť: ['newline: \n'] na: ['key'] ) ;
+	( Slovník nový umiestniť: ['newline: ↵'] na: ['key'] ) ;
+	( Slovník nový umiestniť: ['newline: 
+	'] na: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Slovník nový umiestniť: ['carriage return: \r'] na: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Slovník nový umiestniť: ['tab \t'] na: ['key'] ) ;
+	( Slovník nový umiestniť: ['tab ⇿'] na: ['key'] ) ;
+	( Slovník nový umiestniť: ['tab  '] na: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Slovník nový umiestniť: ['NUL \u0000'] na: ['key'] ) ;
+	( Slovník nový umiestniť: ['NUL \0'] na: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Slovník nový umiestniť: ['control: \u0001'] na: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Slovník nový umiestniť: ['control: \u001F'] na: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Slovník nový umiestniť: ['unicode: é'] na: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Slovník nový umiestniť: ['unicode: €'] na: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Slovník nový umiestniť: ['unicode: 日本語'] na: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Slovník nový umiestniť: ['unicode: 😀'] na: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Slovník nový umiestniť: ['unicode: 🧑‍💻'] na: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Slovník nový umiestniť: ['combining: e\u0301'] na: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Slovník nový umiestniť: ['escaped unicode: \u00e9'] na: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Slovník nový umiestniť: ['escaped unicode: \u20ac'] na: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Slovník nový umiestniť: ['escaped unicode: \ud83d\ude00'] na: ['key'] ) ;
+	# {"key":""} empty value
+	( Slovník nový umiestniť: [''] na: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Slovník nový umiestniť: ['@ < > & = % + ? #'] na: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Slovník nový umiestniť: ['''] na: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Slovník nový umiestniť: ['multiple: \" \\ \n \r \t'] na: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Slovník nový umiestniť: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] na: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Slovník nový umiestniť: [' value'] na: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Slovník nový umiestniť: ['value '] na: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Slovník nový umiestniť: [' \t\n\r '] na: ['key'] ).
+
+dicts každý: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Slovník nový umiestniť: d key na: ['key']).
+	>> b := JSON jsonify: (Slovník nový umiestniť: ['value'] na: d key).
+	>> e := JSON objekt: a.
+	>> f := JSON objekt: b.
+	((e key = d key a: (f ? d key = ['value'])) alebo: (e key = ['NUL ?'])) pravda: {
+		Výstup písať: ['OK'], nový-riadok.
+	}, inak: {
+		Výstup písať: ['Unable to properly encode/decode: '] + d + j, nový-riadok.
+		Program koniec.
+	}.
+}.

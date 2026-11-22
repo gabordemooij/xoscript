@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Obyek anyar.
+
+Slurp nalika: ['anyar'] lakukeun: {
+	milik str := [''].
+}.
+
+Slurp nalika: ['nieuw'] lakukeun: {
+	milik str := [''].
+}.
+
+Slurp nalika: ['jawab:'] lakukeun: { :blah
+		milik str tambah-di-tungtung: blah.
+}.
+
+Slurp nalika: ['jawab:jeung:'] lakukeun: { :blah :blahah
+		milik str tambah-di-tungtung: (blah tina: 0 panjang: (blah panjang - 1)).
+		milik str tambah-di-tungtung: [' '].
+		milik str tambah-di-tungtung: blahah.
+}.
+
+Slurp nalika: ['obtain'] lakukeun: {
+	>> buffer := milik str.
+	milik str := ['']. <- buffer.
+}.
+
+
+Kaluaran tulis: (Program sistem: (Slurp anyar echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Berkas anyar: ['/tmp/from.txt'], pupus. } tangkep: { ['Empty']. }, jalankeun.
+{ Berkas anyar: ['/tmp/to.txt'], pupus. } tangkep: { ['Empty']. }, jalankeun.
+
+
+Berkas anyar: ['/tmp/to.txt'], aya salah: {
+	Kaluaran tulis: ['Confirmed. Target file does not exist.\
+'].
+}.
+Berkas anyar: ['/tmp/from.txt'], aya salah: {
+	Kaluaran tulis: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Program sistem: (Slurp anyar touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Program sistem: (Slurp anyar cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Berkas anyar: ['/tmp/to.txt'], aya bener: {
+	Kaluaran tulis: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Kaluaran tulis: ['Contents of file is:'] + (Berkas anyar: ['/tmp/to.txt'], baca), baris-anyar.

@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Sanaw täze ;
+	# {"key":"normal"} normal ASCII
+	( Sözlük täze goý: ['normal'] açar: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Sözlük täze goý: ['hello world'] açar: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Sözlük täze goý: ['"'] açar: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Sözlük täze goý: ['backslash: \\'] açar: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Sözlük täze goý: ['slash: /'] açar: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Sözlük täze goý: ['backspace: \b'] açar: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Sözlük täze goý: ['formfeed: \f'] açar: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Sözlük täze goý: ['newline: \n'] açar: ['key'] ) ;
+	( Sözlük täze goý: ['newline: ↵'] açar: ['key'] ) ;
+	( Sözlük täze goý: ['newline: 
+	'] açar: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Sözlük täze goý: ['carriage return: \r'] açar: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Sözlük täze goý: ['tab \t'] açar: ['key'] ) ;
+	( Sözlük täze goý: ['tab ⇿'] açar: ['key'] ) ;
+	( Sözlük täze goý: ['tab  '] açar: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Sözlük täze goý: ['NUL \u0000'] açar: ['key'] ) ;
+	( Sözlük täze goý: ['NUL \0'] açar: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Sözlük täze goý: ['control: \u0001'] açar: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Sözlük täze goý: ['control: \u001F'] açar: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Sözlük täze goý: ['unicode: é'] açar: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Sözlük täze goý: ['unicode: €'] açar: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Sözlük täze goý: ['unicode: 日本語'] açar: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Sözlük täze goý: ['unicode: 😀'] açar: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Sözlük täze goý: ['unicode: 🧑‍💻'] açar: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Sözlük täze goý: ['combining: e\u0301'] açar: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Sözlük täze goý: ['escaped unicode: \u00e9'] açar: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Sözlük täze goý: ['escaped unicode: \u20ac'] açar: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Sözlük täze goý: ['escaped unicode: \ud83d\ude00'] açar: ['key'] ) ;
+	# {"key":""} empty value
+	( Sözlük täze goý: [''] açar: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Sözlük täze goý: ['@ < > & = % + ? #'] açar: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Sözlük täze goý: ['''] açar: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Sözlük täze goý: ['multiple: \" \\ \n \r \t'] açar: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Sözlük täze goý: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] açar: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Sözlük täze goý: [' value'] açar: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Sözlük täze goý: ['value '] açar: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Sözlük täze goý: [' \t\n\r '] açar: ['key'] ).
+
+dicts her: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Sözlük täze goý: d key açar: ['key']).
+	>> b := JSON jsonify: (Sözlük täze goý: ['value'] açar: d key).
+	>> e := JSON obýekt: a.
+	>> f := JSON obýekt: b.
+	((e key = d key we: (f ? d key = ['value'])) ýa-da: (e key = ['NUL ?'])) dogry: {
+		Çykyş ýaz: ['OK'], täze-setir.
+	}, ýogsa: {
+		Çykyş ýaz: ['Unable to properly encode/decode: '] + d + j, täze-setir.
+		Programma tamamla.
+	}.
+}.

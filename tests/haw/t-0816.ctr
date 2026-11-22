@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> hoʻāʻo-hana := { :format :value
+	{ Huapuka kākau: ( (Hōʻano hou: format) hoʻopili: value ), laina-hou. } hopu: { :e Huapuka kākau: e, laina-hou. }, hoʻomaka.
+}.
+>> try-int := { :format :value
+	{ Huapuka kākau: ( (Hōʻano hou: format) hoʻopili-helu-piha: value ), laina-hou. } hopu: { :e Huapuka kākau: e, laina-hou. }, hoʻomaka.
+}.
+
+# fits
+hoʻāʻo-hana hoʻopili: ['|%s|'] a: ['text'].
+hoʻāʻo-hana hoʻopili: ['%06.2f'] a: 5.5.
+hoʻāʻo-hana hoʻopili: ['100%% %s'] a: ['sure'].
+try-int hoʻopili: ['%03d'] a: 7.
+try-int hoʻopili: ['%x'] a: 255.
+hoʻāʻo-hana hoʻopili: ['%d'] a: (Int64 hou mai-ke-kaula: ['12']).
+hoʻāʻo-hana hoʻopili: ['%lld'] a: (Int64 hou mai-ke-kaula: ['12']).
+hoʻāʻo-hana hoʻopili: ['%.1lf'] a: 5.5.
+try-int hoʻopili: ['%hd'] a: 7.
+
+# does not fit
+hoʻāʻo-hana hoʻopili: ['%s'] a: 12345.
+hoʻāʻo-hana hoʻopili: ['%d'] a: 12345.
+hoʻāʻo-hana hoʻopili: ['%f'] a: ['text'].
+try-int hoʻopili: ['%d'] a: ['text'].
+try-int hoʻopili: ['%s'] a: 5.
+hoʻāʻo-hana hoʻopili: ['%s %s'] a: ['text'].
+hoʻāʻo-hana hoʻopili: ['%n'] a: ['text'].
+hoʻāʻo-hana hoʻopili: ['%*s'] a: ['text'].
+hoʻāʻo-hana hoʻopili: ['%'] a: ['text'].
+
+# length modifier does not fit
+hoʻāʻo-hana hoʻopili: ['%ls'] a: ['text'].
+hoʻāʻo-hana hoʻopili: ['%Lf'] a: 5.5.
+try-int hoʻopili: ['%ld'] a: 7.
+try-int hoʻopili: ['%lld'] a: 7.
+hoʻāʻo-hana hoʻopili: ['%Ld'] a: (Int64 hou mai-ke-kaula: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+hoʻāʻo-hana hoʻopili: ['%99999999999s'] a: ['text'].

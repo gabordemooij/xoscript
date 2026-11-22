@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> mga-halaga := Listahan bago
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+mga-halaga bawat: { :i :value
+	>> d := Diksyunaryo bago.
+	d ilagay: value sa: ['k'].
+	>> r := d kodigo bagay.
+	Labas isulat: r bilangin, bagong-linya.
+	Labas isulat: ( (r sa: ['k']) = value ), bagong-linya.
+}.

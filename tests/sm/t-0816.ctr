@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> taumafai := { :format :value
+	{ Tuuina-atu tusi: ( (Faatulagaga fou: format) faʻaaoga: value ), laina-fou. } puʻe: { :e Tuuina-atu tusi: e, laina-fou. }, amata.
+}.
+>> try-int := { :format :value
+	{ Tuuina-atu tusi: ( (Faatulagaga fou: format) faʻaaoga-numera-atoa: value ), laina-fou. } puʻe: { :e Tuuina-atu tusi: e, laina-fou. }, amata.
+}.
+
+# fits
+taumafai faʻaaoga: ['|%s|'] ma: ['text'].
+taumafai faʻaaoga: ['%06.2f'] ma: 5.5.
+taumafai faʻaaoga: ['100%% %s'] ma: ['sure'].
+try-int faʻaaoga: ['%03d'] ma: 7.
+try-int faʻaaoga: ['%x'] ma: 255.
+taumafai faʻaaoga: ['%d'] ma: (Int64 fou mai-le-manoa: ['12']).
+taumafai faʻaaoga: ['%lld'] ma: (Int64 fou mai-le-manoa: ['12']).
+taumafai faʻaaoga: ['%.1lf'] ma: 5.5.
+try-int faʻaaoga: ['%hd'] ma: 7.
+
+# does not fit
+taumafai faʻaaoga: ['%s'] ma: 12345.
+taumafai faʻaaoga: ['%d'] ma: 12345.
+taumafai faʻaaoga: ['%f'] ma: ['text'].
+try-int faʻaaoga: ['%d'] ma: ['text'].
+try-int faʻaaoga: ['%s'] ma: 5.
+taumafai faʻaaoga: ['%s %s'] ma: ['text'].
+taumafai faʻaaoga: ['%n'] ma: ['text'].
+taumafai faʻaaoga: ['%*s'] ma: ['text'].
+taumafai faʻaaoga: ['%'] ma: ['text'].
+
+# length modifier does not fit
+taumafai faʻaaoga: ['%ls'] ma: ['text'].
+taumafai faʻaaoga: ['%Lf'] ma: 5.5.
+try-int faʻaaoga: ['%ld'] ma: 7.
+try-int faʻaaoga: ['%lld'] ma: 7.
+taumafai faʻaaoga: ['%Ld'] ma: (Int64 fou mai-le-manoa: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+taumafai faʻaaoga: ['%99999999999s'] ma: ['text'].

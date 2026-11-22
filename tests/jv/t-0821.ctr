@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> dalan := ['/tmp/test0821.csv'].
+>> file := Berkas anyar: dalan.
+
+file tulis: ['a,b\n"1,2\n'].
+{
+	file pamisah: [','] tandha-petik: ['"'] larik: { :line
+		Wetonan tulis: line, baris-anyar.
+	}.
+} cekel: { :e Wetonan tulis: e, baris-anyar. }, wiwiti.
+
+# a closed quote still works
+file tulis: ['a,b\n"1,2",3'].
+file pamisah: [','] tandha-petik: ['"'] larik: { :line
+	Wetonan tulis: line, baris-anyar.
+}.
+file busak.

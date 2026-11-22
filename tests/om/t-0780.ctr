@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Tarree-wantootaa haaraa ;
+	# {"key":"normal"} normal ASCII
+	( Galmee-jechootaa haaraa kaaʼi: ['normal'] itti: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Galmee-jechootaa haaraa kaaʼi: ['hello world'] itti: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Galmee-jechootaa haaraa kaaʼi: ['"'] itti: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Galmee-jechootaa haaraa kaaʼi: ['backslash: \\'] itti: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Galmee-jechootaa haaraa kaaʼi: ['slash: /'] itti: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Galmee-jechootaa haaraa kaaʼi: ['backspace: \b'] itti: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Galmee-jechootaa haaraa kaaʼi: ['formfeed: \f'] itti: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Galmee-jechootaa haaraa kaaʼi: ['newline: \n'] itti: ['key'] ) ;
+	( Galmee-jechootaa haaraa kaaʼi: ['newline: ↵'] itti: ['key'] ) ;
+	( Galmee-jechootaa haaraa kaaʼi: ['newline: 
+	'] itti: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Galmee-jechootaa haaraa kaaʼi: ['carriage return: \r'] itti: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Galmee-jechootaa haaraa kaaʼi: ['tab \t'] itti: ['key'] ) ;
+	( Galmee-jechootaa haaraa kaaʼi: ['tab ⇿'] itti: ['key'] ) ;
+	( Galmee-jechootaa haaraa kaaʼi: ['tab  '] itti: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Galmee-jechootaa haaraa kaaʼi: ['NUL \u0000'] itti: ['key'] ) ;
+	( Galmee-jechootaa haaraa kaaʼi: ['NUL \0'] itti: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Galmee-jechootaa haaraa kaaʼi: ['control: \u0001'] itti: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Galmee-jechootaa haaraa kaaʼi: ['control: \u001F'] itti: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Galmee-jechootaa haaraa kaaʼi: ['unicode: é'] itti: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Galmee-jechootaa haaraa kaaʼi: ['unicode: €'] itti: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Galmee-jechootaa haaraa kaaʼi: ['unicode: 日本語'] itti: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Galmee-jechootaa haaraa kaaʼi: ['unicode: 😀'] itti: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Galmee-jechootaa haaraa kaaʼi: ['unicode: 🧑‍💻'] itti: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Galmee-jechootaa haaraa kaaʼi: ['combining: e\u0301'] itti: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Galmee-jechootaa haaraa kaaʼi: ['escaped unicode: \u00e9'] itti: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Galmee-jechootaa haaraa kaaʼi: ['escaped unicode: \u20ac'] itti: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Galmee-jechootaa haaraa kaaʼi: ['escaped unicode: \ud83d\ude00'] itti: ['key'] ) ;
+	# {"key":""} empty value
+	( Galmee-jechootaa haaraa kaaʼi: [''] itti: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Galmee-jechootaa haaraa kaaʼi: ['@ < > & = % + ? #'] itti: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Galmee-jechootaa haaraa kaaʼi: ['''] itti: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Galmee-jechootaa haaraa kaaʼi: ['multiple: \" \\ \n \r \t'] itti: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Galmee-jechootaa haaraa kaaʼi: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] itti: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Galmee-jechootaa haaraa kaaʼi: [' value'] itti: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Galmee-jechootaa haaraa kaaʼi: ['value '] itti: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Galmee-jechootaa haaraa kaaʼi: [' \t\n\r '] itti: ['key'] ).
+
+dicts hundaaf: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Galmee-jechootaa haaraa kaaʼi: d key itti: ['key']).
+	>> b := JSON jsonify: (Galmee-jechootaa haaraa kaaʼi: ['value'] itti: d key).
+	>> e := JSON wanta: a.
+	>> f := JSON wanta: b.
+	((e key = d key fi: (f ? d key = ['value'])) ykn: (e key = ['NUL ?'])) yoodhugaa: {
+		Baʼii barreessi: ['OK'], dhaabi.
+	}, yoobaate: {
+		Baʼii barreessi: ['Unable to properly encode/decode: '] + d + j, dhaabi.
+		Sagantaa dhuma.
+	}.
+}.

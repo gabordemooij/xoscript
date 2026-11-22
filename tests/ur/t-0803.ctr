@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB نیا میزبان: ⌝'localhost'⌜,
+	صارف-نام: ⌝'xo'⌜,
+	پاسورڈ: ⌝'pass123'⌜,
+	ڈیٹابیس-نام: ⌝'xobase'⌜,
+	جڑو.
+
+>> conn2 := Maria-DB نیا میزبان: ⌝'localhost'⌜,
+	صارف-نام: ⌝'xo'⌜,
+	پاسورڈ: ⌝'pass123'⌜,
+	ڈیٹابیس-نام: ⌝'xobase'⌜,
+	جڑو.
+#...
+>> del := conn1 استفسار: ⌝'DELETE FROM book WHERE id > 0'⌜.
+⎬  del عمل-کرو. conn1 توثیق. ⎨ پکڑو: ⎬ :e conn1 واپس-لو.  ⎨, چلاؤ.
+
+>> insert := conn1 استفسار: ⌝'INSERT INTO book (id) VALUES(null)'⌜.
+insert عمل-کرو.
+
+>> تعداد := conn1 استفسار: ⌝'SELECT COUNT(*) AS num FROM book'⌜.
+تعداد حاصل: ⎬ :row آؤٹ-پٹ لکھو: row num, نئی-سطر. ⎨.
+
+# does not show up
+# insert not committed on connection 1
+>> تعداد := conn2 استفسار: ⌝'SELECT COUNT(*) AS num FROM book'⌜.
+تعداد حاصل: ⎬ :row آؤٹ-پٹ لکھو: row num, نئی-سطر. ⎨.

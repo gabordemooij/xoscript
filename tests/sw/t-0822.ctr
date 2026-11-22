@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB mpya mwenyeji: ['localhost'],
+	jina-la-mtumiaji: ['xo'],
+	nywila: ['pass123'],
+	jina-la-hifadhidata: ['xobase'],
+	unganika.
+
+>> vigezo-vya-utafutaji := db ulizo: ['SELECT ? AS a, ? AS b, ? AS c'].
+vigezo-vya-utafutaji vigezo: (Orodha mpya ; ['1']).
+{ vigezo-vya-utafutaji leta: { :row Towe andika: row, mstari-mpya. }. } nasa: { :e Towe andika: e, mstari-mpya. }, anza.
+
+>> vigezo-vya-utafutaji := db ulizo: ['SELECT ? AS a'].
+{ vigezo-vya-utafutaji leta: { :row Towe andika: row, mstari-mpya. }. } nasa: { :e Towe andika: e, mstari-mpya. }, anza.
+
+# the right number still works, more parameters are ignored as before
+>> vigezo-vya-utafutaji := db ulizo: ['SELECT ? AS a, ? AS b'].
+vigezo-vya-utafutaji vigezo: (Orodha mpya ; ['1'] ; ['2']).
+vigezo-vya-utafutaji leta: { :row Towe andika: (row katika: ['a']), andika: (row katika: ['b']), mstari-mpya. }.
+vigezo-vya-utafutaji vigezo: (Orodha mpya ; ['1'] ; ['2'] ; ['3']).
+vigezo-vya-utafutaji leta: { :row Towe andika: (row katika: ['a']), andika: (row katika: ['b']), mstari-mpya. }.

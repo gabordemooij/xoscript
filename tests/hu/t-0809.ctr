@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> értékek := Lista új
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+értékek mindegyik: { :i :value
+	>> d := Szótár új.
+	d tesz: value ide: ['k'].
+	>> r := d kód objektum.
+	Kimenet ír: r darabszám, újsor.
+	Kimenet ír: ( (r itt: ['k']) = value ), újsor.
+}.

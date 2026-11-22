@@ -1,0 +1,42 @@
+
+Teks apabila: ['html'] lakukan: { <- (
+		diri
+		ganti: ['&'] dengan: ['&amp;'],
+		ganti: ['<'] dengan: ['&lt;'],
+		ganti: ['>'] dengan: ['&gt;'],
+		ganti: ['"'] dengan: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objek baharu.
+
+HtmlBrush apabila: ['balas:'] lakukan: { :tag
+	Keluaran tulis: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush apabila: ['balas:dan:'] lakukan: { :tag :content
+	tag := ( tag dari: 0 panjang: (tag panjang - 1) ).
+	Keluaran tulis: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush apabila: ['content:'] lakukan: { :text
+	Keluaran tulis: text html, baris-baharu.
+}.
+
+HtmlBrush apabila: ['attr:value:'] lakukan: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush baharu.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

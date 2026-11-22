@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Хранилище криптографические-ключи.
+>> sk := keys первый.
+>> pk := keys последний.
+>> sig := Хранилище подписать: ['abc'] с: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Хранилище подписать: ['abc'] с: long. } впоймать: { :e
+	Выход написать: e, стоп.
+}, запуск.
+
+{ Хранилище проверить: ['abc'] подпись: long с: pk. } впоймать: { :e
+	Выход написать: e, стоп.
+}, запуск.
+
+{ Хранилище проверить: ['abc'] подпись: sig с: short. } впоймать: { :e
+	Выход написать: e, стоп.
+}, запуск.

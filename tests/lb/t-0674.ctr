@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> wee := ['/tmp/dat.csv'].
+>> csv := Fichier nei: wee.
+csv schreiwen: s.
+
+# accepts CRLF LF CR, varying row length
+csv trennzeechen: [';'] gänseféisschen: ['"'] zeilen: { :line
+	Programm opraumen.
+	Ausgab schreiwen: line, nei-zeil.
+	Programm opraumen.
+}.
+
+# unequal lines
+s drunhänken: ['\njustone'].
+csv schreiwen: s.
+{
+	csv trennzeechen: [';'] gänseféisschen: ['"'] zeilen: { :line
+		Ausgab schreiwen: line, nei-zeil.
+	}.
+} offänken: { :e 
+	Ausgab schreiwen: e, nei-zeil.
+}, starten.
+
+# invalid format
+s := ['"he"llo";world'].
+csv schreiwen: s.
+{
+	csv trennzeechen: [';'] gänseféisschen: ['"'] zeilen: { :line
+		Ausgab schreiwen: line, nei-zeil.
+	}.
+} offänken: { :e 
+	Ausgab schreiwen: e, nei-zeil.
+}, starten.

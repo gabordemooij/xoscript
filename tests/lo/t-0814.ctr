@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server ກະກຽມ.
+ໂປຣແກຣມ ໃຊ້: ['../../../src/xo/lo/webtools.xo'].
+
+>> Fake-Request := ວັດຖຸ ໃໝ່.
+Fake-Request ເມື່ອ: ['value:'] ເຮັດ: { :ຄ່າ
+	ຂອງຕົນ ຄ່າ := ຄ່າ.
+}.
+Fake-Request ເມື່ອ: ['cookie:'] ເຮັດ: { :ຊື່ <- ຂອງຕົນ ຄ່າ.
+}.
+
+>> Test-Session := ເຊດຊັນໄຟລ໌ຊົ່ວຄາວ ໃໝ່.
+Test-Session ເມື່ອ: ['ໂຫຼດ'] ເຮັດ: { <- ວັດຈະນານຸກົມ ໃໝ່.
+}.
+Test-Session ເມື່ອ: ['session-id'] ເຮັດ: { <- ຂອງຕົນ id.
+}.
+
+>> cookies := ລິສ ໃໝ່
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies ແຕ່ລະຕົວ: { :i :cookie
+	>> ຄຳຂໍ-http := Fake-Request ໃໝ່.
+	ຄຳຂໍ-http value: cookie.
+	>> ຕົວຈັດການ := Test-Session ໃໝ່.
+	>> web := ເອກະສານເວັບ ໃໝ່.
+	web ຄຳຂໍ-http: ຄຳຂໍ-http.
+	web ຕົວຈັດການເຊດຊັນ: ຕົວຈັດການ.
+	web ເລີ່ມເຊດຊັນ.
+	ຜົນອອກ ຂຽນ: ( ຕົວຈັດການ session-id = cookie ), ຂຶ້ນແຖວໃໝ່.
+}.
+
+>> web := ເອກະສານເວັບ ໃໝ່.
+web json: (ວັດຈະນານຸກົມ ໃໝ່ ໃສ່: ['b'] ທີ່ກະແຈ: ['a']).
+ຜົນອອກ ຂຽນ: ['\n'], ຂຶ້ນແຖວໃໝ່.
+
+{ ເຄືອຂ່າຍ get: ['file:///etc/hostname']. } ຈັບ: { :e
+	ຜົນອອກ ຂຽນ: e, ຂຶ້ນແຖວໃໝ່.
+}, ເລີ່ມ.
+
+>> svg := ໄຟລ໌ ໃໝ່: ['/tmp/test0814.svg'].
+svg ຂຽນ: ['<svg xmlns="x"></svg>'].
+ຜົນອອກ ຂຶ້ນແຖວໃໝ່.
+Server ສົ່ງຜ່ານ: ['test0814.svg'] ຄຳນຳໜ້າ: ['/tmp/'].
+svg ລຶບ.

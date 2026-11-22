@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inicializo.
+Program përdor: ['../../../src/xo/sq/webtools.xo'].
+
+>> Fake-Request := Objekt ri.
+Fake-Request kur: ['value:'] bëj: { :vlerë
+	vetjak vlerë := vlerë.
+}.
+Fake-Request kur: ['cookie:'] bëj: { :emër <- vetjak vlerë.
+}.
+
+>> Test-Session := Seancë-skedar-i-përkohshëm ri.
+Test-Session kur: ['ngarko'] bëj: { <- Fjalor ri.
+}.
+Test-Session kur: ['session-id'] bëj: { <- vetjak id.
+}.
+
+>> cookies := Listë ri
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies secili: { :i :cookie
+	>> kërkesë := Fake-Request ri.
+	kërkesë value: cookie.
+	>> menaxher := Test-Session ri.
+	>> web := Dokument-Web ri.
+	web kërkesë: kërkesë.
+	web menaxher-seancash: menaxher.
+	web nis-seancën.
+	Dalje shkruaj: ( menaxher session-id = cookie ), rresht-ri.
+}.
+
+>> web := Dokument-Web ri.
+web json: (Fjalor ri vendos: ['b'] në: ['a']).
+Dalje shkruaj: ['\n'], rresht-ri.
+
+{ Rrjet get: ['file:///etc/hostname']. } kap: { :e
+	Dalje shkruaj: e, rresht-ri.
+}, nis.
+
+>> svg := Skedar ri: ['/tmp/test0814.svg'].
+svg shkruaj: ['<svg xmlns="x"></svg>'].
+Dalje rresht-ri.
+Server përcill: ['test0814.svg'] parashtesë: ['/tmp/'].
+svg fshi.

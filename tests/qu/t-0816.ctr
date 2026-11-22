@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> llamiy := { :format :value
+	{ Lluqsiy qillqay: ( (Formato musuq: format) rurachiy: value ), sayay. } hapiy: { :e Lluqsiy qillqay: e, sayay. }, kallpay.
+}.
+>> try-int := { :format :value
+	{ Lluqsiy qillqay: ( (Formato musuq: format) rurachiy-yupay-huntasqa: value ), sayay. } hapiy: { :e Lluqsiy qillqay: e, sayay. }, kallpay.
+}.
+
+# fits
+llamiy rurachiy: ['|%s|'] wan: ['text'].
+llamiy rurachiy: ['%06.2f'] wan: 5.5.
+llamiy rurachiy: ['100%% %s'] wan: ['sure'].
+try-int rurachiy: ['%03d'] wan: 7.
+try-int rurachiy: ['%x'] wan: 255.
+llamiy rurachiy: ['%d'] wan: (Int64 musuq qillqamanta: ['12']).
+llamiy rurachiy: ['%lld'] wan: (Int64 musuq qillqamanta: ['12']).
+llamiy rurachiy: ['%.1lf'] wan: 5.5.
+try-int rurachiy: ['%hd'] wan: 7.
+
+# does not fit
+llamiy rurachiy: ['%s'] wan: 12345.
+llamiy rurachiy: ['%d'] wan: 12345.
+llamiy rurachiy: ['%f'] wan: ['text'].
+try-int rurachiy: ['%d'] wan: ['text'].
+try-int rurachiy: ['%s'] wan: 5.
+llamiy rurachiy: ['%s %s'] wan: ['text'].
+llamiy rurachiy: ['%n'] wan: ['text'].
+llamiy rurachiy: ['%*s'] wan: ['text'].
+llamiy rurachiy: ['%'] wan: ['text'].
+
+# length modifier does not fit
+llamiy rurachiy: ['%ls'] wan: ['text'].
+llamiy rurachiy: ['%Lf'] wan: 5.5.
+try-int rurachiy: ['%ld'] wan: 7.
+try-int rurachiy: ['%lld'] wan: 7.
+llamiy rurachiy: ['%Ld'] wan: (Int64 musuq qillqamanta: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+llamiy rurachiy: ['%99999999999s'] wan: ['text'].

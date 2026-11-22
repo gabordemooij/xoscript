@@ -1,0 +1,43 @@
+
+
+>> g := Server nieuw.
+>> v := Kluis nieuw.
+>> ok := 0.
+
+>> secrets := Reeks nieuw ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopieer.
+passwords elk: { :i :p
+	secrets elk: { :n :s
+		{
+			>> encrypted := v versleutel: s sleutel: p.
+			>> decrypted := v ontsleutel: encrypted sleutel: p.
+			(decrypted = s) ja: {
+				ok optellen: 1.
+			}, anders: {
+				Uit schrijf: ['failed encrypting/decrypting: '], stop.
+				Uit schrijf: s, stop.
+				Uit schrijf: ['encrypted: '] + encrypted, stop.
+				Uit schrijf: ['decrypted: '] + encrypted, stop.
+				Programma einde.
+			}.
+		} afhandelen: { :err
+			(s = [''] of: p = ['']) ja: {
+				ok optellen: 1.
+			}, anders: {
+				Uit schrijf: err, stop.
+				Programma einde.
+			}.
+		}, start.
+	}.
+}.
+
+Uit schrijf: ( ok + [' vault encryptions tested.'] ), stop.

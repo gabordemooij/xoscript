@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server khởi-tạo.
+Chương-trình dùng: ['../../../src/xo/vi/webtools.xo'].
+Chương-trình dùng: ['../../../src/xo/vi/mailtools.xo'].
+
+>> tiêu-đề := Tiêu-đề-HTTP mới khóa-tiêu-đề: ['Location'] giá-trị: ['/ok\r\nX-Injected: yes'].
+Xuất ghi: tiêu-đề.
+
+>> web := Tài-liệu-Web mới.
+web đi-đến: ['/ok\r\nX-Injected: yes'].
+Xuất ghi: ['\n'], xuống-dòng.
+
+>> mail := Thư-điện-tử mới.
+mail đến: (Danh-sách mới ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Danh-sách mới ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Danh-sách mới ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail người-gửi: ['d@example.invalid\r\nX-From: yes'] tên: ['site\r\nX-Name: yes'].
+mail chủ-đề: ['hello\r\nX-Subject: yes'].
+mail thân-thư: ['line1\r\nline2'].
+Xuất ghi: mail tạo-ra.
+
+>> html := Thư-HTML mới.
+html đến: (Danh-sách mới ; ['a@example.invalid\r\nX-To: yes']).
+html người-gửi: ['d@example.invalid'] tên: ['site'].
+html chủ-đề: ['hello\r\nX-Subject: yes'].
+html thân-thư: ['body'].
+Xuất ghi: ( html tạo-ra chứa: ['\nX-'] ), xuống-dòng.
+Xuất ghi: ( html tạo-ra chứa: ['X-To: yes'] ), xuống-dòng.

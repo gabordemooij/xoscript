@@ -1,0 +1,43 @@
+
+
+>> g := Server ថ្មី.
+>> v := ទូដែក ថ្មី.
+>> ok := 0.
+
+>> secrets := ស៊េរី ថ្មី ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets ចម្លង.
+passwords នីមួយៗ: { :i :p
+	secrets នីមួយៗ: { :n :s
+		{
+			>> encrypted := v អ៊ិនគ្រីប: s កូនសោ: p.
+			>> decrypted := v ឌិគ្រីប: encrypted កូនសោ: p.
+			(decrypted = s) បើពិត: {
+				ok បូក: 1.
+			}, បើមិនដូច្នោះ: {
+				លទ្ធផល សរសេរ: ['failed encrypting/decrypting: '], បន្ទាត់ថ្មី.
+				លទ្ធផល សរសេរ: s, បន្ទាត់ថ្មី.
+				លទ្ធផល សរសេរ: ['encrypted: '] + encrypted, បន្ទាត់ថ្មី.
+				លទ្ធផល សរសេរ: ['decrypted: '] + encrypted, បន្ទាត់ថ្មី.
+				កម្មវិធី បញ្ចប់.
+			}.
+		} ចាប់: { :err
+			(s = [''] ឬ: p = ['']) បើពិត: {
+				ok បូក: 1.
+			}, បើមិនដូច្នោះ: {
+				លទ្ធផល សរសេរ: err, បន្ទាត់ថ្មី.
+				កម្មវិធី បញ្ចប់.
+			}.
+		}, ដំណើរការ.
+	}.
+}.
+
+លទ្ធផល សរសេរ: ( ok + [' vault encryptions tested.'] ), បន្ទាត់ថ្មី.

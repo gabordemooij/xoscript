@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Nesne yeni.
+
+Log olunca: ['say:'] yap: { :str
+	Çıktı yaz: str, yeni-satır.
+}.
+
+>> Item := Nesne yeni.
+
+Item olunca: ['yeni:'] yap: { :id <- kendi yeni id: id.
+}.
+
+Item olunca: ['id:'] yap: { :id
+	öz id := id.
+}.
+
+Item olunca: ['id'] yap: { <- öz id. }.
+
+
+Item olunca: ['metin'] yap: {
+	>> str := ['Item#~no'].
+	str ~no: öz id. <- str.
+}.
+
+
+>> Print := Nesne yeni.
+
+Print olunca: ['items'] yap: { 
+	
+	öz item := Item yeni: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: öz item
+	).
+	
+	
+}.
+
+Print items.

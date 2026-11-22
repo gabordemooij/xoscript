@@ -1,0 +1,43 @@
+
+
+>> g := Server bag-o.
+>> v := Kaha bag-o.
+>> ok := 0.
+
+>> secrets := Lista bag-o ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopyaha.
+passwords matag: { :i :p
+	secrets matag: { :n :s
+		{
+			>> encrypted := v i-encrypt: s yawe: p.
+			>> decrypted := v i-decrypt: encrypted yawe: p.
+			(decrypted = s) tinuod: {
+				ok idugang: 1.
+			}, kon-dili: {
+				Gawas isulat: ['failed encrypting/decrypting: '], bag-ong-linya.
+				Gawas isulat: s, bag-ong-linya.
+				Gawas isulat: ['encrypted: '] + encrypted, bag-ong-linya.
+				Gawas isulat: ['decrypted: '] + encrypted, bag-ong-linya.
+				Programa taposa.
+			}.
+		} dakpon: { :err
+			(s = [''] o: p = ['']) tinuod: {
+				ok idugang: 1.
+			}, kon-dili: {
+				Gawas isulat: err, bag-ong-linya.
+				Programa taposa.
+			}.
+		}, padagana.
+	}.
+}.
+
+Gawas isulat: ( ok + [' vault encryptions tested.'] ), bag-ong-linya.

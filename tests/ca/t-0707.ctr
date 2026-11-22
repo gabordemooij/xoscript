@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programa gestió-memòria: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB nou amfitrió: ['localhost'],
+	usuari: ['xo'], contrasenya: ['pass123'], nom-base: ['xobase'], connecta.
+
+>> TwoDigitFormat := Format nou: ['%02d'].
+
+# Datetime
+{
+	>> any := Número entre: 1995 i: 2050, text.
+	>> mes := TwoDigitFormat aplica-enter: (Número entre: 1 i: 12), text.
+	>> dia := TwoDigitFormat aplica-enter: (Número entre: 1 i: 28), text.
+	>> hora := TwoDigitFormat aplica-enter: (Número entre: 1 i: 23), text.
+	>> minut := TwoDigitFormat aplica-enter: (Número entre: 1 i: 59), text.
+	>> segon := TwoDigitFormat aplica-enter: (Número entre: 1 i: 59), text.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: any,
+		MM: mes,
+		DD: dia,
+		HH: hora,
+		II: minut,
+		SS: segon.
+	>> paràmetres-de-cerca :=
+	db consulta: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	obtén: { :row
+		(row mydatetime = datetime) fals: {
+			aquesta-tasca error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter suma: 1.
+} * 100.
+
+# Date
+{
+	>> any := Número entre: 1995 i: 2050, text.
+	>> mes := TwoDigitFormat aplica-enter: (Número entre: 1 i: 12), text.
+	>> dia := TwoDigitFormat aplica-enter: (Número entre: 1 i: 28), text.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: any,
+		MM: mes,
+		DD: dia.
+	>> paràmetres-de-cerca :=
+	db consulta: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	obtén: { :row
+		(row mydate = date) fals: {
+			aquesta-tasca error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter suma: 1.
+} * 100.
+
+
+# Time
+{
+	>> hora := TwoDigitFormat aplica-enter: (Número entre: 1 i: 23), text.
+	>> minut := TwoDigitFormat aplica-enter: (Número entre: 1 i: 59), text.
+	>> segon := TwoDigitFormat aplica-enter: (Número entre: 1 i: 59), text.
+	>> temps := ['HH:II:SS'].
+	temps
+		HH: hora,
+		II: minut,
+		SS: segon.
+	>> paràmetres-de-cerca :=
+	db consulta: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: temps),
+	obtén: { :row
+		(row mytime = temps) fals: {
+			aquesta-tasca error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter suma: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Llista nou omple: 100000 amb: ['x'], uneix: [''].
+{
+	>> str2 := Caixa-forta token: 40.
+	>> paràmetres-de-cerca :=
+	db consulta: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	obtén: { :row
+		(row str1 = str1 i: row str2 = str2) fals: {
+			aquesta-tasca error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter suma: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Número entre: 1 i: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 des-de-text: ['9223372036854775807'] ) -
+		( Int64 des-de-text: ['99999'] ) +
+		( Int64 des-de-text: n1 text )
+	).
+	>> paràmetres-de-cerca :=
+	db consulta: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	obtén: { :row
+		(row n1 = n1) fals: {
+			aquesta-tasca error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) fals: {
+			aquesta-tasca error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 arrodoneix) fals: {
+			aquesta-tasca error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) fals: {
+			aquesta-tasca error: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter suma: 1.
+} * 100.
+
+
+Sortida escriu: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), salt-de-línia.

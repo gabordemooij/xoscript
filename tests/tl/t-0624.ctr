@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Bagay bago.
+
+Log kapag: ['say:'] gawin: { :str
+	Labas isulat: str, bagong-linya.
+}.
+
+>> Item := Bagay bago.
+
+Item kapag: ['bago:'] gawin: { :id <- sarili bago id: id.
+}.
+
+Item kapag: ['id:'] gawin: { :id
+	sarili-ko id := id.
+}.
+
+Item kapag: ['id'] gawin: { <- sarili-ko id. }.
+
+
+Item kapag: ['teksto'] gawin: {
+	>> str := ['Item#~no'].
+	str ~no: sarili-ko id. <- str.
+}.
+
+
+>> Print := Bagay bago.
+
+Print kapag: ['items'] gawin: { 
+	
+	sarili-ko item := Item bago: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: sarili-ko item
+	).
+	
+	
+}.
+
+Print items.

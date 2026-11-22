@@ -1,0 +1,39 @@
+
+
+Test meta: ['evaluate'] agħmel: {
+	>> kodiċi := Fajl ġdid: ['/tmp/eval.ctr'].
+	kodiċi ikteb: innifsu test + ['.'].
+	Programm uża: ['/tmp/eval.ctr'].
+}.
+
+>> a := (Lista ← (
+	(Dizzjunarju ġdid)
+		poġġi: ['domain'] fi: ['mywebsite.com'],
+		poġġi: (Lista ←
+			((Dizzjunarju ġdid)
+				poġġi: ['home'] fi: ['title'],
+				poġġi: ['<html></html>'] fi: ['body'],
+				poġġi: ['2017-01-01'] fi: ['created']
+			) ;
+			((Dizzjunarju ġdid)
+				poġġi: ['aboutus(c)'] fi: ['title'],
+				poġġi: ['<credits>Author Inc.</credits>'] fi: ['body']
+			)
+		) fi: ['pages']
+	)
+) test.
+
+Ħruġ ikteb: a tip, linja-ġdida.
+Ħruġ ikteb: a, linja-ġdida.
+
+>> b := Xejn.
+(['b := '] + a) evaluate.
+Ħruġ ikteb: b ? 0 ? ['pages'] ? 1 ? ['body'], linja-ġdida.
+
+>> c := b ? 0.
+>> d := c test.
+Ħruġ ikteb: d tip, linja-ġdida.
+
+>> e := Xejn.
+(['e := '] + d) evaluate.
+Ħruġ ikteb: e ? ['pages'] ? 0, linja-ġdida.

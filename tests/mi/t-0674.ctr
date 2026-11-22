@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> ara-kōnae := ['/tmp/dat.csv'].
+>> csv := Kōnae hou: ara-kōnae.
+csv tuhi: s.
+
+# accepts CRLF LF CR, varying row length
+csv kaiwehe: [';'] tohukī: ['"'] rārangi-kupu: { :line
+	Papatono whakapai.
+	Huaputa tuhi: line, rārangi-hou.
+	Papatono whakapai.
+}.
+
+# unequal lines
+s tāpiri-muri: ['\njustone'].
+csv tuhi: s.
+{
+	csv kaiwehe: [';'] tohukī: ['"'] rārangi-kupu: { :line
+		Huaputa tuhi: line, rārangi-hou.
+	}.
+} hopu: { :e 
+	Huaputa tuhi: e, rārangi-hou.
+}, tīmata.
+
+# invalid format
+s := ['"he"llo";world'].
+csv tuhi: s.
+{
+	csv kaiwehe: [';'] tohukī: ['"'] rārangi-kupu: { :line
+		Huaputa tuhi: line, rārangi-hou.
+	}.
+} hopu: { :e 
+	Huaputa tuhi: e, rārangi-hou.
+}, tīmata.

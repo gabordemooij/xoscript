@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server ప్రారంభించు.
+ప్రోగ్రామ్ వాడు: ['../../../src/xo/te/webtools.xo'].
+
+>> Fake-Request := వస్తువు కొత్త.
+Fake-Request అందినప్పుడు: ['value:'] చేయి: { :విలువ
+	తన విలువ := విలువ.
+}.
+Fake-Request అందినప్పుడు: ['cookie:'] చేయి: { :పేరు <- తన విలువ.
+}.
+
+>> Test-Session := తాత్కాలిక-ఫైల్-సెషన్ కొత్త.
+Test-Session అందినప్పుడు: ['లోడ్-చేయి'] చేయి: { <- నిఘంటువు కొత్త.
+}.
+Test-Session అందినప్పుడు: ['session-id'] చేయి: { <- తన id.
+}.
+
+>> cookies := వరుస కొత్త
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies ప్రతి: { :i :cookie
+	>> అభ్యర్థన-http := Fake-Request కొత్త.
+	అభ్యర్థన-http value: cookie.
+	>> నిర్వాహకుడు := Test-Session కొత్త.
+	>> web := వెబ్-పత్రం కొత్త.
+	web అభ్యర్థన-http: అభ్యర్థన-http.
+	web సెషన్-నిర్వాహకుడు: నిర్వాహకుడు.
+	web సెషన్-ప్రారంభించు.
+	అవుట్-పుట్ రాయి: ( నిర్వాహకుడు session-id = cookie ), కొత్త-పంక్తి.
+}.
+
+>> web := వెబ్-పత్రం కొత్త.
+web json: (నిఘంటువు కొత్త ఉంచు: ['b'] కీ: ['a']).
+అవుట్-పుట్ రాయి: ['\n'], కొత్త-పంక్తి.
+
+{ నెట్-వర్క్ get: ['file:///etc/hostname']. } పట్టుకో: { :e
+	అవుట్-పుట్ రాయి: e, కొత్త-పంక్తి.
+}, నడుపు.
+
+>> svg := ఫైల్ కొత్త: ['/tmp/test0814.svg'].
+svg రాయి: ['<svg xmlns="x"></svg>'].
+అవుట్-పుట్ కొత్త-పంక్తి.
+Server ముందుకు-పంపు: ['test0814.svg'] ఉపసర్గ: ['/tmp/'].
+svg తొలగించు.

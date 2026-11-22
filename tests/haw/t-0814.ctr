@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server hoʻomākaukau.
+Polokalamu hoʻohana: ['../../../src/xo/haw/webtools.xo'].
+
+>> Fake-Request := Mea hou.
+Fake-Request i: ['value:'] hana: { :waiwai
+	ponoʻī waiwai := waiwai.
+}.
+Fake-Request i: ['cookie:'] hana: { :inoa <- ponoʻī waiwai.
+}.
+
+>> Test-Session := Kau-waihona-manawa hou.
+Test-Session i: ['hoʻouka'] hana: { <- Puke-wehewehe hou.
+}.
+Test-Session i: ['session-id'] hana: { <- ponoʻī id.
+}.
+
+>> cookies := Papa hou
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies pākahi: { :i :cookie
+	>> noi-http := Fake-Request hou.
+	noi-http value: cookie.
+	>> luna := Test-Session hou.
+	>> web := Palapala-Pūnaewele hou.
+	web noi-http: noi-http.
+	web luna-kau: luna.
+	web hoʻomaka-kau.
+	Huapuka kākau: ( luna session-id = cookie ), laina-hou.
+}.
+
+>> web := Palapala-Pūnaewele hou.
+web json: (Puke-wehewehe hou waiho: ['b'] ma: ['a']).
+Huapuka kākau: ['\n'], laina-hou.
+
+{ Pūnaewele get: ['file:///etc/hostname']. } hopu: { :e
+	Huapuka kākau: e, laina-hou.
+}, hoʻomaka.
+
+>> svg := Waihona hou: ['/tmp/test0814.svg'].
+svg kākau: ['<svg xmlns="x"></svg>'].
+Huapuka laina-hou.
+Server hoʻoili: ['test0814.svg'] pākuʻina-mua: ['/tmp/'].
+svg hoʻopau.

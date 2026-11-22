@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server ଆରମ୍ଭ-କର.
+ପ୍ରୋଗ୍ରାମ୍ ବ୍ୟବହାର: ['../../../src/xo/or/webtools.xo'].
+
+>> Fake-Request := ବସ୍ତୁ ନୂତନ.
+Fake-Request ଯେବେ: ['value:'] କର: { :ମୂଲ୍ୟ
+	ନିଜର ମୂଲ୍ୟ := ମୂଲ୍ୟ.
+}.
+Fake-Request ଯେବେ: ['cookie:'] କର: { :ନାମ <- ନିଜର ମୂଲ୍ୟ.
+}.
+
+>> Test-Session := ଅସ୍ଥାୟୀ-ଫାଇଲ-ଅଧିବେଶନ ନୂତନ.
+Test-Session ଯେବେ: ['ଲୋଡ-କର'] କର: { <- ଅଭିଧାନ ନୂତନ.
+}.
+Test-Session ଯେବେ: ['session-id'] କର: { <- ନିଜର id.
+}.
+
+>> cookies := ସାରଣୀ ନୂତନ
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies ପ୍ରତ୍ୟେକ: { :i :cookie
+	>> ଅନୁରୋଧ-http := Fake-Request ନୂତନ.
+	ଅନୁରୋଧ-http value: cookie.
+	>> ପରିଚାଳକ := Test-Session ନୂତନ.
+	>> web := ୱେବ-ଦଲିଲ ନୂତନ.
+	web ଅନୁରୋଧ-http: ଅନୁରୋଧ-http.
+	web ଅଧିବେଶନ-ପରିଚାଳକ: ପରିଚାଳକ.
+	web ଅଧିବେଶନ-ଆରମ୍ଭ-କର.
+	ଆଉଟପୁଟ୍ ଲେଖ: ( ପରିଚାଳକ session-id = cookie ), ନୂଆ-ଧାଡ଼ି.
+}.
+
+>> web := ୱେବ-ଦଲିଲ ନୂତନ.
+web json: (ଅଭିଧାନ ନୂତନ ରଖ: ['b'] ଚାବି: ['a']).
+ଆଉଟପୁଟ୍ ଲେଖ: ['\n'], ନୂଆ-ଧାଡ଼ି.
+
+{ ନେଟୱର୍କ get: ['file:///etc/hostname']. } ଧର: { :e
+	ଆଉଟପୁଟ୍ ଲେଖ: e, ନୂଆ-ଧାଡ଼ି.
+}, ଚଲାଅ.
+
+>> svg := ଫାଇଲ୍ ନୂତନ: ['/tmp/test0814.svg'].
+svg ଲେଖ: ['<svg xmlns="x"></svg>'].
+ଆଉଟପୁଟ୍ ନୂଆ-ଧାଡ଼ି.
+Server ଆଗକୁ-ପଠାଅ: ['test0814.svg'] ଉପସର୍ଗ: ['/tmp/'].
+svg ଲିଭାଅ.

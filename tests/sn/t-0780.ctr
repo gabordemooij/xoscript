@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Rondedzero nyowani ;
+	# {"key":"normal"} normal ASCII
+	( Duramazwi nyowani isa: ['normal'] pa: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Duramazwi nyowani isa: ['hello world'] pa: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Duramazwi nyowani isa: ['"'] pa: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Duramazwi nyowani isa: ['backslash: \\'] pa: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Duramazwi nyowani isa: ['slash: /'] pa: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Duramazwi nyowani isa: ['backspace: \b'] pa: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Duramazwi nyowani isa: ['formfeed: \f'] pa: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Duramazwi nyowani isa: ['newline: \n'] pa: ['key'] ) ;
+	( Duramazwi nyowani isa: ['newline: ↵'] pa: ['key'] ) ;
+	( Duramazwi nyowani isa: ['newline: 
+	'] pa: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Duramazwi nyowani isa: ['carriage return: \r'] pa: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Duramazwi nyowani isa: ['tab \t'] pa: ['key'] ) ;
+	( Duramazwi nyowani isa: ['tab ⇿'] pa: ['key'] ) ;
+	( Duramazwi nyowani isa: ['tab  '] pa: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Duramazwi nyowani isa: ['NUL \u0000'] pa: ['key'] ) ;
+	( Duramazwi nyowani isa: ['NUL \0'] pa: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Duramazwi nyowani isa: ['control: \u0001'] pa: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Duramazwi nyowani isa: ['control: \u001F'] pa: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Duramazwi nyowani isa: ['unicode: é'] pa: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Duramazwi nyowani isa: ['unicode: €'] pa: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Duramazwi nyowani isa: ['unicode: 日本語'] pa: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Duramazwi nyowani isa: ['unicode: 😀'] pa: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Duramazwi nyowani isa: ['unicode: 🧑‍💻'] pa: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Duramazwi nyowani isa: ['combining: e\u0301'] pa: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Duramazwi nyowani isa: ['escaped unicode: \u00e9'] pa: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Duramazwi nyowani isa: ['escaped unicode: \u20ac'] pa: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Duramazwi nyowani isa: ['escaped unicode: \ud83d\ude00'] pa: ['key'] ) ;
+	# {"key":""} empty value
+	( Duramazwi nyowani isa: [''] pa: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Duramazwi nyowani isa: ['@ < > & = % + ? #'] pa: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Duramazwi nyowani isa: ['''] pa: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Duramazwi nyowani isa: ['multiple: \" \\ \n \r \t'] pa: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Duramazwi nyowani isa: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] pa: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Duramazwi nyowani isa: [' value'] pa: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Duramazwi nyowani isa: ['value '] pa: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Duramazwi nyowani isa: [' \t\n\r '] pa: ['key'] ).
+
+dicts chimwe-nechimwe: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Duramazwi nyowani isa: d key pa: ['key']).
+	>> b := JSON jsonify: (Duramazwi nyowani isa: ['value'] pa: d key).
+	>> e := JSON chinhu: a.
+	>> f := JSON chinhu: b.
+	((e key = d key uye: (f ? d key = ['value'])) kana: (e key = ['NUL ?'])) chokwadi: {
+		Zvabuda nyora: ['OK'], mutsara-mutsva.
+	}, kana-zvisiri: {
+		Zvabuda nyora: ['Unable to properly encode/decode: '] + d + j, mutsara-mutsva.
+		Chirongwa pedza.
+	}.
+}.

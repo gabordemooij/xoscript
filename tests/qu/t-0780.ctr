@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Katiray musuq ;
+	# {"key":"normal"} normal ASCII
+	( Simi-taqi musuq churay: ['normal'] maypi: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Simi-taqi musuq churay: ['hello world'] maypi: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Simi-taqi musuq churay: ['"'] maypi: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Simi-taqi musuq churay: ['backslash: \\'] maypi: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Simi-taqi musuq churay: ['slash: /'] maypi: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Simi-taqi musuq churay: ['backspace: \b'] maypi: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Simi-taqi musuq churay: ['formfeed: \f'] maypi: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Simi-taqi musuq churay: ['newline: \n'] maypi: ['key'] ) ;
+	( Simi-taqi musuq churay: ['newline: ↵'] maypi: ['key'] ) ;
+	( Simi-taqi musuq churay: ['newline: 
+	'] maypi: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Simi-taqi musuq churay: ['carriage return: \r'] maypi: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Simi-taqi musuq churay: ['tab \t'] maypi: ['key'] ) ;
+	( Simi-taqi musuq churay: ['tab ⇿'] maypi: ['key'] ) ;
+	( Simi-taqi musuq churay: ['tab  '] maypi: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Simi-taqi musuq churay: ['NUL \u0000'] maypi: ['key'] ) ;
+	( Simi-taqi musuq churay: ['NUL \0'] maypi: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Simi-taqi musuq churay: ['control: \u0001'] maypi: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Simi-taqi musuq churay: ['control: \u001F'] maypi: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Simi-taqi musuq churay: ['unicode: é'] maypi: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Simi-taqi musuq churay: ['unicode: €'] maypi: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Simi-taqi musuq churay: ['unicode: 日本語'] maypi: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Simi-taqi musuq churay: ['unicode: 😀'] maypi: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Simi-taqi musuq churay: ['unicode: 🧑‍💻'] maypi: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Simi-taqi musuq churay: ['combining: e\u0301'] maypi: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Simi-taqi musuq churay: ['escaped unicode: \u00e9'] maypi: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Simi-taqi musuq churay: ['escaped unicode: \u20ac'] maypi: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Simi-taqi musuq churay: ['escaped unicode: \ud83d\ude00'] maypi: ['key'] ) ;
+	# {"key":""} empty value
+	( Simi-taqi musuq churay: [''] maypi: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Simi-taqi musuq churay: ['@ < > & = % + ? #'] maypi: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Simi-taqi musuq churay: ['''] maypi: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Simi-taqi musuq churay: ['multiple: \" \\ \n \r \t'] maypi: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Simi-taqi musuq churay: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] maypi: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Simi-taqi musuq churay: [' value'] maypi: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Simi-taqi musuq churay: ['value '] maypi: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Simi-taqi musuq churay: [' \t\n\r '] maypi: ['key'] ).
+
+dicts sapallanpaq: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Simi-taqi musuq churay: d key maypi: ['key']).
+	>> b := JSON jsonify: (Simi-taqi musuq churay: ['value'] maypi: d key).
+	>> e := JSON ima: a.
+	>> f := JSON ima: b.
+	((e key = d key wan: (f ? d key = ['value'])) utaq: (e key = ['NUL ?'])) chiqapqtin: {
+		Lluqsiy qillqay: ['OK'], sayay.
+	}, manahinaqa: {
+		Lluqsiy qillqay: ['Unable to properly encode/decode: '] + d + j, sayay.
+		Programa tukukuy.
+	}.
+}.

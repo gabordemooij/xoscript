@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Objeto crear.
+
+Slurp al: ['crear'] hacer: {
+	mi str := [''].
+}.
+
+Slurp al: ['nieuw'] hacer: {
+	mi str := [''].
+}.
+
+Slurp al: ['responder:'] hacer: { :blah
+		mi str adjuntar: blah.
+}.
+
+Slurp al: ['responder:y:'] hacer: { :blah :blahah
+		mi str adjuntar: (blah desde: 0 longitud: (blah longitud - 1)).
+		mi str adjuntar: [' '].
+		mi str adjuntar: blahah.
+}.
+
+Slurp al: ['obtain'] hacer: {
+	>> buffer := mi str.
+	mi str := ['']. <- buffer.
+}.
+
+
+Salida escribir: (Programa sistema: (Slurp crear echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Archivo crear: ['/tmp/from.txt'], eliminar. } capturar: { ['Empty']. }, empezar.
+{ Archivo crear: ['/tmp/to.txt'], eliminar. } capturar: { ['Empty']. }, empezar.
+
+
+Archivo crear: ['/tmp/to.txt'], existe falso: {
+	Salida escribir: ['Confirmed. Target file does not exist.\
+'].
+}.
+Archivo crear: ['/tmp/from.txt'], existe falso: {
+	Salida escribir: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Programa sistema: (Slurp crear touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Programa sistema: (Slurp crear cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Archivo crear: ['/tmp/to.txt'], existe verdadero: {
+	Salida escribir: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Salida escribir: ['Contents of file is:'] + (Archivo crear: ['/tmp/to.txt'], leer), detener.

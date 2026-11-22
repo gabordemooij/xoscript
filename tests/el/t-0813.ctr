@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server αρχικοποίησε.
+Πρόγραμμα χρήση: ['../../../src/xo/el/webtools.xo'].
+Πρόγραμμα χρήση: ['../../../src/xo/el/mailtools.xo'].
+
+>> κεφαλίδα := Κεφαλίδα-HTTP νέο κλειδί: ['Location'] τιμή: ['/ok\r\nX-Injected: yes'].
+Έξοδος γράψε: κεφαλίδα.
+
+>> web := Έγγραφο-Ιστού νέο.
+web μετάβαση: ['/ok\r\nX-Injected: yes'].
+Έξοδος γράψε: ['\n'], νέα-γραμμή.
+
+>> mail := Ηλ-μήνυμα νέο.
+mail προς: (Λίστα νέο ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Λίστα νέο ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Λίστα νέο ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail αποστολέας: ['d@example.invalid\r\nX-From: yes'] όνομα: ['site\r\nX-Name: yes'].
+mail θέμα: ['hello\r\nX-Subject: yes'].
+mail σώμα: ['line1\r\nline2'].
+Έξοδος γράψε: mail δημιούργησε.
+
+>> html := HTML-Ηλ-μήνυμα νέο.
+html προς: (Λίστα νέο ; ['a@example.invalid\r\nX-To: yes']).
+html αποστολέας: ['d@example.invalid'] όνομα: ['site'].
+html θέμα: ['hello\r\nX-Subject: yes'].
+html σώμα: ['body'].
+Έξοδος γράψε: ( html δημιούργησε περιέχει: ['\nX-'] ), νέα-γραμμή.
+Έξοδος γράψε: ( html δημιούργησε περιέχει: ['X-To: yes'] ), νέα-γραμμή.

@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> ruta := ['/tmp/dat.csv'].
+>> csv := Archivo crear: ruta.
+csv escribir: s.
+
+# accepts CRLF LF CR, varying row length
+csv separador: [';'] comillas: ['"'] reglas: { :line
+	Programa limpiar-memoria.
+	Salida escribir: line, detener.
+	Programa limpiar-memoria.
+}.
+
+# unequal lines
+s adjuntar: ['\njustone'].
+csv escribir: s.
+{
+	csv separador: [';'] comillas: ['"'] reglas: { :line
+		Salida escribir: line, detener.
+	}.
+} capturar: { :e 
+	Salida escribir: e, detener.
+}, empezar.
+
+# invalid format
+s := ['"he"llo";world'].
+csv escribir: s.
+{
+	csv separador: [';'] comillas: ['"'] reglas: { :line
+		Salida escribir: line, detener.
+	}.
+} capturar: { :e 
+	Salida escribir: e, detener.
+}, empezar.

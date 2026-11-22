@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> slóð := ['/tmp/test0821.csv'].
+>> file := Skrá nýtt: slóð.
+
+file skrifa: ['a,b\n"1,2\n'].
+{
+	file afmarkari: [','] gæsalöpp: ['"'] línur: { :line
+		Úttak skrifa: line, ný-lína.
+	}.
+} grípa: { :e Úttak skrifa: e, ný-lína. }, ræsa.
+
+# a closed quote still works
+file skrifa: ['a,b\n"1,2",3'].
+file afmarkari: [','] gæsalöpp: ['"'] línur: { :line
+	Úttak skrifa: line, ný-lína.
+}.
+file eyða.

@@ -1,0 +1,25 @@
+Sortie écrire: ['Test object'], stop.
+>> a := Objet nouveau. 
+
+a quand: ['item:'] faire: { :dict
+	propre dict := dict. 
+}.
+
+a quand: ['item'] faire: { <- propre dict.
+}.
+
+a item: (
+Dictionnaire nouveau
+	hello: ['world']).
+
+>> old-dict-address := a item prototype adresse-mémoire.
+a save-as: ['/tmp/a.bin'].
+Sortie écrire: ['========== RELOADING SNAP:'], stop.
+
+>> b := Objet load-from: ['/tmp/a.bin'].
+
+(b item prototype adresse-mémoire = old-dict-address) oui: {
+	Sortie écrire: ['Object link re-attached.'], stop.
+}.
+
+Sortie écrire: b item, stop.

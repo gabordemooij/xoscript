@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Ikintu gishya.
+
+Log bigeze: ['say:'] kora: { :str
+	Ibisohoka andika: str, umurongo-mushya.
+}.
+
+>> Item := Ikintu gishya.
+
+Item bigeze: ['gishya:'] kora: { :id <- ubwacyo gishya id: id.
+}.
+
+Item bigeze: ['id:'] kora: { :id
+	icyacyo id := id.
+}.
+
+Item bigeze: ['id'] kora: { <- icyacyo id. }.
+
+
+Item bigeze: ['inyandiko'] kora: {
+	>> str := ['Item#~no'].
+	str ~no: icyacyo id. <- str.
+}.
+
+
+>> Print := Ikintu gishya.
+
+Print bigeze: ['items'] kora: { 
+	
+	icyacyo item := Item gishya: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: icyacyo item
+	).
+	
+	
+}.
+
+Print items.

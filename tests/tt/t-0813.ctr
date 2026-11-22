@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server башлангыч-халәт.
+Программа файдалан: ['../../../src/xo/tt/webtools.xo'].
+Программа файдалан: ['../../../src/xo/tt/mailtools.xo'].
+
+>> башлык := HTTP-Башлык яңа ачкыч: ['Location'] кыйммәт: ['/ok\r\nX-Injected: yes'].
+Чыгыш яз: башлык.
+
+>> web := Веб-документ яңа.
+web күчү: ['/ok\r\nX-Injected: yes'].
+Чыгыш яз: ['\n'], яңа-юл.
+
+>> mail := Электрон-хат яңа.
+mail алучыга: (Тезмә яңа ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Тезмә яңа ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Тезмә яңа ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail җибәрүче: ['d@example.invalid\r\nX-From: yes'] исем: ['site\r\nX-Name: yes'].
+mail тема: ['hello\r\nX-Subject: yes'].
+mail төп-текст: ['line1\r\nline2'].
+Чыгыш яз: mail ясау.
+
+>> html := HTML-Электрон-хат яңа.
+html алучыга: (Тезмә яңа ; ['a@example.invalid\r\nX-To: yes']).
+html җибәрүче: ['d@example.invalid'] исем: ['site'].
+html тема: ['hello\r\nX-Subject: yes'].
+html төп-текст: ['body'].
+Чыгыш яз: ( html ясау эченә-ала: ['\nX-'] ), яңа-юл.
+Чыгыш яз: ( html ясау эченә-ала: ['X-To: yes'] ), яңа-юл.

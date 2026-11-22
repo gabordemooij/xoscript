@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Program minneshantering: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB ny värd: ['localhost'],
+	användarnamn: ['xo'], lösenord: ['pass123'], databasnamn: ['xobase'], anslut.
+
+>> TwoDigitFormat := Format ny: ['%02d'].
+
+# Datetime
+{
+	>> år := Tal mellan: 1995 och: 2050, text.
+	>> månad := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 12), text.
+	>> dag := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 28), text.
+	>> timme := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 23), text.
+	>> minut := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 59), text.
+	>> sekund := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 59), text.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: år,
+		MM: månad,
+		DD: dag,
+		HH: timme,
+		II: minut,
+		SS: sekund.
+	>> sökparametrar :=
+	db fråga: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	hämta: { :row
+		(row mydatetime = datetime) falsk: {
+			denna-uppgift fel: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter lägg-till: 1.
+} * 100.
+
+# Date
+{
+	>> år := Tal mellan: 1995 och: 2050, text.
+	>> månad := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 12), text.
+	>> dag := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 28), text.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: år,
+		MM: månad,
+		DD: dag.
+	>> sökparametrar :=
+	db fråga: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	hämta: { :row
+		(row mydate = date) falsk: {
+			denna-uppgift fel: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter lägg-till: 1.
+} * 100.
+
+
+# Time
+{
+	>> timme := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 23), text.
+	>> minut := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 59), text.
+	>> sekund := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 59), text.
+	>> tid := ['HH:II:SS'].
+	tid
+		HH: timme,
+		II: minut,
+		SS: sekund.
+	>> sökparametrar :=
+	db fråga: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: tid),
+	hämta: { :row
+		(row mytime = tid) falsk: {
+			denna-uppgift fel: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter lägg-till: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lista ny fyll: 100000 med: ['x'], sammanfoga: [''].
+{
+	>> str2 := Valv token: 40.
+	>> sökparametrar :=
+	db fråga: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	hämta: { :row
+		(row str1 = str1 och: row str2 = str2) falsk: {
+			denna-uppgift fel: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter lägg-till: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Tal mellan: 1 och: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 från-text: ['9223372036854775807'] ) -
+		( Int64 från-text: ['99999'] ) +
+		( Int64 från-text: n1 text )
+	).
+	>> sökparametrar :=
+	db fråga: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	hämta: { :row
+		(row n1 = n1) falsk: {
+			denna-uppgift fel: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) falsk: {
+			denna-uppgift fel: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 avrunda) falsk: {
+			denna-uppgift fel: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) falsk: {
+			denna-uppgift fel: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter lägg-till: 1.
+} * 100.
+
+
+Utdata skriv: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), stop.

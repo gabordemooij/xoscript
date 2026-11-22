@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Programm issettjar: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server għaqqad-ma: ( Lista ġdid ;
+ libname ; ['fopen'] ;
+ ( Lista ġdid ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+għaqqad-ma: ( Lista ġdid ;
+ Xejn ; # means same lib
+ ['fread'] ;
+ ( Lista ġdid ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Xejn ; # means same object (i.e. Stream)
+ ['fread']
+),
+għaqqad-ma: (
+ Lista ġdid ;
+ Xejn ; # means same lib
+ ['fwrite'] ;
+ ( Lista ġdid ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Xejn ; # means same lib
+ ['fwrite']
+),
+għaqqad-ma: (
+ Lista ġdid ;
+ Xejn ; # means same lib
+ ['rewind'] ;
+ ( Lista ġdid ; ['pointer'] ) ;
+ ['int'] ;
+ Xejn ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> mogħdija := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: mogħdija mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream messaġġ: ['fwrite'] argumenti: (Lista ġdid ; str ; 1 ; 6 ; fd ).
+Ħruġ ikteb: bytes-written, linja-ġdida.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob ġdid: 20.
+
+# read from file
+>> bytes-read := Stream messaġġ: ['fread'] argumenti: (Lista ġdid ; buf ; 1 ; 6 ; fd ).
+Ħruġ ikteb: bytes-read, linja-ġdida.
+Ħruġ ikteb: buf, linja-ġdida.
+
+# free memory
+str  eħles.
+mogħdija eħles.
+mode eħles.
+buf  eħles.
+
+

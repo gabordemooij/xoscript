@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> ọna-faili := ['/tmp/dat.csv'].
+>> csv := Faili tuntun: ọna-faili.
+csv kọ: s.
+
+# accepts CRLF LF CR, varying row length
+csv olupin: [';'] ami-ọrọ: ['"'] awọn-ila: { :line
+	Eto sọ-di-mimọ.
+	Ijade kọ: line, ila-tuntun.
+	Eto sọ-di-mimọ.
+}.
+
+# unequal lines
+s fi-kun-opin: ['\njustone'].
+csv kọ: s.
+{
+	csv olupin: [';'] ami-ọrọ: ['"'] awọn-ila: { :line
+		Ijade kọ: line, ila-tuntun.
+	}.
+} mu: { :e 
+	Ijade kọ: e, ila-tuntun.
+}, bẹrẹ.
+
+# invalid format
+s := ['"he"llo";world'].
+csv kọ: s.
+{
+	csv olupin: [';'] ami-ọrọ: ['"'] awọn-ila: { :line
+		Ijade kọ: line, ila-tuntun.
+	}.
+} mu: { :e 
+	Ijade kọ: e, ila-tuntun.
+}, bẹrẹ.

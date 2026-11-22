@@ -1,0 +1,42 @@
+
+Teaghrán ar: ['html'] déan: { <- (
+		féin
+		ionadaigh: ['&'] le: ['&amp;'],
+		ionadaigh: ['<'] le: ['&lt;'],
+		ionadaigh: ['>'] le: ['&gt;'],
+		ionadaigh: ['"'] le: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Réad nua.
+
+HtmlBrush ar: ['freagair:'] déan: { :tag
+	Aschur scríobh: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush ar: ['freagair:agus:'] déan: { :tag :content
+	tag := ( tag ó: 0 fad: (tag fad - 1) ).
+	Aschur scríobh: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush ar: ['content:'] déan: { :text
+	Aschur scríobh: text html, líne-nua.
+}.
+
+HtmlBrush ar: ['attr:value:'] déan: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush nua.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

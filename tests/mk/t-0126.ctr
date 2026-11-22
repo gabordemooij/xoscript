@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Објект нов.
+
+Slurp при: ['нов'] направи: {
+	свој str := [''].
+}.
+
+Slurp при: ['nieuw'] направи: {
+	свој str := [''].
+}.
+
+Slurp при: ['одговори:'] направи: { :blah
+		свој str додај-на-крај: blah.
+}.
+
+Slurp при: ['одговори:и:'] направи: { :blah :blahah
+		свој str додај-на-крај: (blah од: 0 должина: (blah должина - 1)).
+		свој str додај-на-крај: [' '].
+		свој str додај-на-крај: blahah.
+}.
+
+Slurp при: ['obtain'] направи: {
+	>> buffer := свој str.
+	свој str := ['']. <- buffer.
+}.
+
+
+Излез напиши: (Програма систем: (Slurp нов echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Датотека нов: ['/tmp/from.txt'], избриши. } фати: { ['Empty']. }, стартувај.
+{ Датотека нов: ['/tmp/to.txt'], избриши. } фати: { ['Empty']. }, стартувај.
+
+
+Датотека нов: ['/tmp/to.txt'], постои неточно: {
+	Излез напиши: ['Confirmed. Target file does not exist.\
+'].
+}.
+Датотека нов: ['/tmp/from.txt'], постои неточно: {
+	Излез напиши: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Програма систем: (Slurp нов touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Програма систем: (Slurp нов cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Датотека нов: ['/tmp/to.txt'], постои точно: {
+	Излез напиши: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Излез напиши: ['Contents of file is:'] + (Датотека нов: ['/tmp/to.txt'], читај), нов-ред.

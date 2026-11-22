@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Сейф түлхүүр-үүсгэх.
+>> sk := keys эхний.
+>> pk := keys сүүлийн.
+>> sig := Сейф гарын-үсэг: ['abc'] түлхүүрээр: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Сейф гарын-үсэг: ['abc'] түлхүүрээр: long. } барих: { :e
+	Гаралт бичих: e, шинэ-мөр.
+}, ажиллуулах.
+
+{ Сейф шалгах: ['abc'] гарын-үсэг: long түлхүүрээр: pk. } барих: { :e
+	Гаралт бичих: e, шинэ-мөр.
+}, ажиллуулах.
+
+{ Сейф шалгах: ['abc'] гарын-үсэг: sig түлхүүрээр: short. } барих: { :e
+	Гаралт бичих: e, шинэ-мөр.
+}, ажиллуулах.

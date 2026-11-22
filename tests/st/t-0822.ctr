@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB ncha moamoheli: ['localhost'],
+	lebitso-la-mosebelisi: ['xo'],
+	phasewete: ['pass123'],
+	lebitso-la-database: ['xobase'],
+	hokela.
+
+>> liparamente-tsa-patlo := db potso: ['SELECT ? AS a, ? AS b, ? AS c'].
+liparamente-tsa-patlo liparamente: (Lethathamo ncha ; ['1']).
+{ liparamente-tsa-patlo lata: { :row Sephetho ngola: row, mola-o-mocha. }. } tšoasa: { :e Sephetho ngola: e, mola-o-mocha. }, qala.
+
+>> liparamente-tsa-patlo := db potso: ['SELECT ? AS a'].
+{ liparamente-tsa-patlo lata: { :row Sephetho ngola: row, mola-o-mocha. }. } tšoasa: { :e Sephetho ngola: e, mola-o-mocha. }, qala.
+
+# the right number still works, more parameters are ignored as before
+>> liparamente-tsa-patlo := db potso: ['SELECT ? AS a, ? AS b'].
+liparamente-tsa-patlo liparamente: (Lethathamo ncha ; ['1'] ; ['2']).
+liparamente-tsa-patlo lata: { :row Sephetho ngola: (row sebakeng: ['a']), ngola: (row sebakeng: ['b']), mola-o-mocha. }.
+liparamente-tsa-patlo liparamente: (Lethathamo ncha ; ['1'] ; ['2'] ; ['3']).
+liparamente-tsa-patlo lata: { :row Sephetho ngola: (row sebakeng: ['a']), ngola: (row sebakeng: ['b']), mola-o-mocha. }.

@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Objekt novi.
+
+Slurp na: ['novi'] učini: {
+	svoj str := [''].
+}.
+
+Slurp na: ['nieuw'] učini: {
+	svoj str := [''].
+}.
+
+Slurp na: ['odgovori:'] učini: { :blah
+		svoj str dodaj-na-kraj: blah.
+}.
+
+Slurp na: ['odgovori:i:'] učini: { :blah :blahah
+		svoj str dodaj-na-kraj: (blah od: 0 duljina: (blah duljina - 1)).
+		svoj str dodaj-na-kraj: [' '].
+		svoj str dodaj-na-kraj: blahah.
+}.
+
+Slurp na: ['obtain'] učini: {
+	>> buffer := svoj str.
+	svoj str := ['']. <- buffer.
+}.
+
+
+Izlaz piši: (Program sustav: (Slurp novi echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Datoteka novi: ['/tmp/from.txt'], izbriši. } uhvati: { ['Empty']. }, pokreni.
+{ Datoteka novi: ['/tmp/to.txt'], izbriši. } uhvati: { ['Empty']. }, pokreni.
+
+
+Datoteka novi: ['/tmp/to.txt'], postoji laž: {
+	Izlaz piši: ['Confirmed. Target file does not exist.\
+'].
+}.
+Datoteka novi: ['/tmp/from.txt'], postoji laž: {
+	Izlaz piši: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Program sustav: (Slurp novi touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Program sustav: (Slurp novi cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Datoteka novi: ['/tmp/to.txt'], postoji istina: {
+	Izlaz piši: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Izlaz piši: ['Contents of file is:'] + (Datoteka novi: ['/tmp/to.txt'], čitaj), novi-red.

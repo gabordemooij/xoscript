@@ -1,0 +1,43 @@
+
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+Programma gcmode: 0.
+
+>> f := File nuovo: ['/tmp/citrine_test_file.txt'].
+f exists: { f elimina. }.
+f scrivi: ['hello world'].
+
+f := File nuovo: ['/tmp/citrine_test_file.txt'].
+>> q := f leggere.
+Uscita scrivi: q, stop.
+
+Programma spazzare.
+usedMemory1 := (Programma memoria ? 0).
+
+
+f := File nuovo: ['/tmp/citrine_test_file.txt'].
+q := f leggere.
+Uscita scrivi: q, stop.
+
+Programma spazzare.
+usedMemory2 := (Programma memoria ? 0).
+
+
+f := File nuovo: ['/tmp/citrine_test_file.txt'].
+q := f leggere.
+Uscita scrivi: q, stop.
+
+Programma spazzare.
+usedMemory3 := (Programma memoria ? 0).
+
+
+
+( usedMemory1 = usedMemory2 e: usedMemory1 = usedMemory3, e: usedMemory2 = usedMemory3 ) vero: {
+	Uscita scrivi: ['No memory leaks here'].
+}, falso: {
+	Uscita scrivi: ['Leaking memory...'].
+}.

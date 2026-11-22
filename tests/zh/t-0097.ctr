@@ -1,0 +1,42 @@
+
+文本 在: ['互联网文档'] 执行: { <- (
+		自身
+		替换: ['&'] 为: ['&amp;'],
+		替换: ['<'] 为: ['&lt;'],
+		替换: ['>'] 为: ['&gt;'],
+		替换: ['"'] 为: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := 对象 新建.
+
+HtmlBrush 在: ['响应:'] 执行: { :tag
+	输出 写入: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush 在: ['响应:参数:'] 执行: { :tag :content
+	tag := ( tag 从: 0 长度: (tag 长度 - 1) ).
+	输出 写入: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush 在: ['content:'] 执行: { :text
+	输出 写入: text 互联网文档, 停止.
+}.
+
+HtmlBrush 在: ['attr:value:'] 执行: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush 新建.
+
+
+h 互联网文档
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

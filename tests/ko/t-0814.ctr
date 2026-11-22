@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server 초기화.
+프로그램 사용: ['../../../src/xo/ko/webtools.xo'].
+
+>> Fake-Request := 객체 새로.
+Fake-Request 받으면: ['value:'] 실행: { :설정값
+	자기 설정값 := 설정값.
+}.
+Fake-Request 받으면: ['cookie:'] 실행: { :이름 <- 자기 설정값.
+}.
+
+>> Test-Session := 임시파일세션 새로.
+Test-Session 받으면: ['불러오기'] 실행: { <- 사전 새로.
+}.
+Test-Session 받으면: ['session-id'] 실행: { <- 자기 id.
+}.
+
+>> cookies := 리스트 새로
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies 각각: { :i :cookie
+	>> http요청 := Fake-Request 새로.
+	http요청 value: cookie.
+	>> 관리자 := Test-Session 새로.
+	>> web := 웹문서 새로.
+	web http요청: http요청.
+	web 세션관리자: 관리자.
+	web 세션시작.
+	출력 쓰기: ( 관리자 session-id = cookie ), 줄바꿈.
+}.
+
+>> web := 웹문서 새로.
+web json: (사전 새로 넣기: ['b'] 위치: ['a']).
+출력 쓰기: ['\n'], 줄바꿈.
+
+{ 네트워크 get: ['file:///etc/hostname']. } 예외시: { :e
+	출력 쓰기: e, 줄바꿈.
+}, 시작.
+
+>> svg := 파일 새로: ['/tmp/test0814.svg'].
+svg 쓰기: ['<svg xmlns="x"></svg>'].
+출력 줄바꿈.
+Server 통과: ['test0814.svg'] 접두사: ['/tmp/'].
+svg 삭제.

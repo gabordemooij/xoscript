@@ -1,0 +1,23 @@
+Väljund kirjuta: ['Test object'], reavahetus.
+>> a := Objekt uus. 
+a kui: ['item:'] tee: { :lst
+	oma lst := lst. 
+}.
+a kui: ['item'] tee: { <- oma lst.
+}.
+a item: (
+	Loend uus ; 1 ; (
+		Loend uus ; ['a'] ; (
+			Loend uus ; ( Hetk uus: 1 )
+		) ; ( Int64 tekstist: ['321'] )
+	)
+).
+Väljund kirjuta: a item, reavahetus.
+>> old-lst-address := a item prototüüp mäluaadress.
+a save-as: ['/tmp/a.bin'].
+Väljund kirjuta: ['========== RELOADING SNAP:'], reavahetus.
+>> b := Objekt load-from: ['/tmp/a.bin'].
+(b item prototüüp mäluaadress = old-lst-address) tõsi: {
+	Väljund kirjuta: ['Object link re-attached.'], reavahetus.
+}.
+Väljund kirjuta: ( b item ), reavahetus.

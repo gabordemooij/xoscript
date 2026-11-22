@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := ตู้นิรภัย สร้างกุญแจ.
+>> sk := keys ตัวแรก.
+>> pk := keys ตัวสุดท้าย.
+>> sig := ตู้นิรภัย ลงนาม: ['abc'] ด้วย: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ ตู้นิรภัย ลงนาม: ['abc'] ด้วย: long. } ดักจับ: { :e
+	แสดงผล เขียน: e, ขึ้นบรรทัดใหม่.
+}, เริ่ม.
+
+{ ตู้นิรภัย ตรวจ: ['abc'] ลายเซ็น: long ด้วย: pk. } ดักจับ: { :e
+	แสดงผล เขียน: e, ขึ้นบรรทัดใหม่.
+}, เริ่ม.
+
+{ ตู้นิรภัย ตรวจ: ['abc'] ลายเซ็น: sig ด้วย: short. } ดักจับ: { :e
+	แสดงผล เขียน: e, ขึ้นบรรทัดใหม่.
+}, เริ่ม.

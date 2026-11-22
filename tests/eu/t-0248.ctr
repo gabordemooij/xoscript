@@ -1,0 +1,39 @@
+
+
+Testua noiz: ['evaluate'] egin: {
+	>> kodea := Fitxategia berria: ['/tmp/eval.ctr'].
+	kodea idatzi: norbera testua + ['.'].
+	Programa erabili: ['/tmp/eval.ctr'].
+}.
+
+>> a := (Zerrenda ← (
+	(Hiztegia berria)
+		jarri: ['domain'] non: ['mywebsite.com'],
+		jarri: (Zerrenda ←
+			((Hiztegia berria)
+				jarri: ['home'] non: ['title'],
+				jarri: ['<html></html>'] non: ['body'],
+				jarri: ['2017-01-01'] non: ['created']
+			) ;
+			((Hiztegia berria)
+				jarri: ['aboutus(c)'] non: ['title'],
+				jarri: ['<credits>Author Inc.</credits>'] non: ['body']
+			)
+		) non: ['pages']
+	)
+) testua.
+
+Irteera idatzi: a mota, lerro-jauzia.
+Irteera idatzi: a, lerro-jauzia.
+
+>> b := Ezer.
+(['b := '] + a) evaluate.
+Irteera idatzi: b ? 0 ? ['pages'] ? 1 ? ['body'], lerro-jauzia.
+
+>> c := b ? 0.
+>> d := c testua.
+Irteera idatzi: d mota, lerro-jauzia.
+
+>> e := Ezer.
+(['e := '] + d) evaluate.
+Irteera idatzi: e ? ['pages'] ? 0, lerro-jauzia.

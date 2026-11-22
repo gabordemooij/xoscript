@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := বস্তু নতুন.
+
+Slurp যখন: ['নতুন'] করো: {
+	নিজের str := [''].
+}.
+
+Slurp যখন: ['nieuw'] করো: {
+	নিজের str := [''].
+}.
+
+Slurp যখন: ['উত্তর:'] করো: { :blah
+		নিজের str শেষে-যোগ: blah.
+}.
+
+Slurp যখন: ['উত্তর:এবং:'] করো: { :blah :blahah
+		নিজের str শেষে-যোগ: (blah শুরু: 0 দৈর্ঘ্য: (blah দৈর্ঘ্য - 1)).
+		নিজের str শেষে-যোগ: [' '].
+		নিজের str শেষে-যোগ: blahah.
+}.
+
+Slurp যখন: ['obtain'] করো: {
+	>> buffer := নিজের str.
+	নিজের str := ['']. <- buffer.
+}.
+
+
+আউটপুট লেখো: (প্রোগ্রাম সিস্টেম: (Slurp নতুন echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ ফাইল নতুন: ['/tmp/from.txt'], মুছো. } ধরো: { ['Empty']. }, চালাও.
+{ ফাইল নতুন: ['/tmp/to.txt'], মুছো. } ধরো: { ['Empty']. }, চালাও.
+
+
+ফাইল নতুন: ['/tmp/to.txt'], আছে মিথ্যা-হলে: {
+	আউটপুট লেখো: ['Confirmed. Target file does not exist.\
+'].
+}.
+ফাইল নতুন: ['/tmp/from.txt'], আছে মিথ্যা-হলে: {
+	আউটপুট লেখো: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+প্রোগ্রাম সিস্টেম: (Slurp নতুন touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+প্রোগ্রাম সিস্টেম: (Slurp নতুন cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+ফাইল নতুন: ['/tmp/to.txt'], আছে সত্য-হলে: {
+	আউটপুট লেখো: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+আউটপুট লেখো: ['Contents of file is:'] + (ফাইল নতুন: ['/tmp/to.txt'], পড়ো), নতুন-লাইন.

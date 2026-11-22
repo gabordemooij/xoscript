@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := ໂປຣແກຣມ ການຕັ້ງຄ່າ: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server ເຊື່ອມໂຍງ: ( ລິສ ໃໝ່ ;
+ libname ; ['fopen'] ;
+ ( ລິສ ໃໝ່ ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+ເຊື່ອມໂຍງ: ( ລິສ ໃໝ່ ;
+ ວ່າງ ; # means same lib
+ ['fread'] ;
+ ( ລິສ ໃໝ່ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ວ່າງ ; # means same object (i.e. Stream)
+ ['fread']
+),
+ເຊື່ອມໂຍງ: (
+ ລິສ ໃໝ່ ;
+ ວ່າງ ; # means same lib
+ ['fwrite'] ;
+ ( ລິສ ໃໝ່ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ວ່າງ ; # means same lib
+ ['fwrite']
+),
+ເຊື່ອມໂຍງ: (
+ ລິສ ໃໝ່ ;
+ ວ່າງ ; # means same lib
+ ['rewind'] ;
+ ( ລິສ ໃໝ່ ; ['pointer'] ) ;
+ ['int'] ;
+ ວ່າງ ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> ເສັ້ນທາງ := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: ເສັ້ນທາງ mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream ສົ່ງຂໍ້ຄວາມ: ['fwrite'] ອາກິວເມັນ: (ລິສ ໃໝ່ ; str ; 1 ; 6 ; fd ).
+ຜົນອອກ ຂຽນ: bytes-written, ຂຶ້ນແຖວໃໝ່.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob ໃໝ່: 20.
+
+# read from file
+>> bytes-read := Stream ສົ່ງຂໍ້ຄວາມ: ['fread'] ອາກິວເມັນ: (ລິສ ໃໝ່ ; buf ; 1 ; 6 ; fd ).
+ຜົນອອກ ຂຽນ: bytes-read, ຂຶ້ນແຖວໃໝ່.
+ຜົນອອກ ຂຽນ: buf, ຂຶ້ນແຖວໃໝ່.
+
+# free memory
+str  ປ່ອຍໜ່ວຍຄວາມຈຳ.
+ເສັ້ນທາງ ປ່ອຍໜ່ວຍຄວາມຈຳ.
+mode ປ່ອຍໜ່ວຍຄວາມຈຳ.
+buf  ປ່ອຍໜ່ວຍຄວາມຈຳ.
+
+

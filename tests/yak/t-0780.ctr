@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Испииһэк саҥа ;
+	# {"key":"normal"} normal ASCII
+	( Тылдьыт саҥа олоохсуй: ['normal'] в: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Тылдьыт саҥа олоохсуй: ['hello world'] в: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Тылдьыт саҥа олоохсуй: ['"'] в: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Тылдьыт саҥа олоохсуй: ['backslash: \\'] в: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Тылдьыт саҥа олоохсуй: ['slash: /'] в: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Тылдьыт саҥа олоохсуй: ['backspace: \b'] в: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Тылдьыт саҥа олоохсуй: ['formfeed: \f'] в: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Тылдьыт саҥа олоохсуй: ['newline: \n'] в: ['key'] ) ;
+	( Тылдьыт саҥа олоохсуй: ['newline: ↵'] в: ['key'] ) ;
+	( Тылдьыт саҥа олоохсуй: ['newline: 
+	'] в: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Тылдьыт саҥа олоохсуй: ['carriage return: \r'] в: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Тылдьыт саҥа олоохсуй: ['tab \t'] в: ['key'] ) ;
+	( Тылдьыт саҥа олоохсуй: ['tab ⇿'] в: ['key'] ) ;
+	( Тылдьыт саҥа олоохсуй: ['tab  '] в: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Тылдьыт саҥа олоохсуй: ['NUL \u0000'] в: ['key'] ) ;
+	( Тылдьыт саҥа олоохсуй: ['NUL \0'] в: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Тылдьыт саҥа олоохсуй: ['control: \u0001'] в: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Тылдьыт саҥа олоохсуй: ['control: \u001F'] в: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Тылдьыт саҥа олоохсуй: ['unicode: é'] в: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Тылдьыт саҥа олоохсуй: ['unicode: €'] в: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Тылдьыт саҥа олоохсуй: ['unicode: 日本語'] в: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Тылдьыт саҥа олоохсуй: ['unicode: 😀'] в: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Тылдьыт саҥа олоохсуй: ['unicode: 🧑‍💻'] в: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Тылдьыт саҥа олоохсуй: ['combining: e\u0301'] в: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Тылдьыт саҥа олоохсуй: ['escaped unicode: \u00e9'] в: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Тылдьыт саҥа олоохсуй: ['escaped unicode: \u20ac'] в: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Тылдьыт саҥа олоохсуй: ['escaped unicode: \ud83d\ude00'] в: ['key'] ) ;
+	# {"key":""} empty value
+	( Тылдьыт саҥа олоохсуй: [''] в: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Тылдьыт саҥа олоохсуй: ['@ < > & = % + ? #'] в: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Тылдьыт саҥа олоохсуй: ['''] в: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Тылдьыт саҥа олоохсуй: ['multiple: \" \\ \n \r \t'] в: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Тылдьыт саҥа олоохсуй: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] в: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Тылдьыт саҥа олоохсуй: [' value'] в: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Тылдьыт саҥа олоохсуй: ['value '] в: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Тылдьыт саҥа олоохсуй: [' \t\n\r '] в: ['key'] ).
+
+dicts хас-биирдии: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Тылдьыт саҥа олоохсуй: d key в: ['key']).
+	>> b := JSON jsonify: (Тылдьыт саҥа олоохсуй: ['value'] в: d key).
+	>> e := JSON объект: a.
+	>> f := JSON объект: b.
+	((e key = d key и: (f ? d key = ['value'])) или: (e key = ['NUL ?'])) даа: {
+		Таһаарыы суруй: ['OK'], стоп.
+	}, иначе: {
+		Таһаарыы суруй: ['Unable to properly encode/decode: '] + d + j, стоп.
+		Программа бүтэр.
+	}.
+}.

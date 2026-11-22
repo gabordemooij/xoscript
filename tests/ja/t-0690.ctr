@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+出力 書く: ['Database test'], 改行.
+
+>> db := Maria-DB 新規 ホスト: ['localhost'],
+	ユーザー名: ['xo'], パスワード: ['pass123'], データベース名: ['xobase'], 接続.
+
+出力 書く: ['Can we connect? '] + db 接続中?, 改行.
+
+>> 検索パラメータ := db クエリ: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], パラメータ: ( リスト 新規 ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  検索パラメータ 実行. db コミット. } 例外時: { :e db ロールバック.  }, 開始.
+
+出力 書く: ['Can we insert? '] + ( 検索パラメータ insert-id > 0 ), 改行.
+
+>> x := 0.
+>> 検索パラメータ :=
+db クエリ: ['SELECT * FROM book order by id desc limit 2'], 
+取得: { :row 
+	x 加算: 1.
+	真 中断. # must clean up, no 'Commands out of sync'
+}.
+
+>> 検索パラメータ :=
+db クエリ: ['SELECT * FROM book order by id desc limit 2'], 
+取得: { :row
+	x 加算: 1.
+	真 中断.
+}.
+
+(x > 0) 真なら: {
+	出力 書く: ['Can we break in the middle of a fetch? '].
+}.
+
+出力 書く: 真, 改行.

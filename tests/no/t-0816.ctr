@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> prøv := { :format :value
+	{ Utdata skriv: ( (Format ny: format) bruk: value ), stop. } fang: { :e Utdata skriv: e, stop. }, start.
+}.
+>> try-int := { :format :value
+	{ Utdata skriv: ( (Format ny: format) bruk-heltall: value ), stop. } fang: { :e Utdata skriv: e, stop. }, start.
+}.
+
+# fits
+prøv bruk: ['|%s|'] og: ['text'].
+prøv bruk: ['%06.2f'] og: 5.5.
+prøv bruk: ['100%% %s'] og: ['sure'].
+try-int bruk: ['%03d'] og: 7.
+try-int bruk: ['%x'] og: 255.
+prøv bruk: ['%d'] og: (Int64 ny fra-tekst: ['12']).
+prøv bruk: ['%lld'] og: (Int64 ny fra-tekst: ['12']).
+prøv bruk: ['%.1lf'] og: 5.5.
+try-int bruk: ['%hd'] og: 7.
+
+# does not fit
+prøv bruk: ['%s'] og: 12345.
+prøv bruk: ['%d'] og: 12345.
+prøv bruk: ['%f'] og: ['text'].
+try-int bruk: ['%d'] og: ['text'].
+try-int bruk: ['%s'] og: 5.
+prøv bruk: ['%s %s'] og: ['text'].
+prøv bruk: ['%n'] og: ['text'].
+prøv bruk: ['%*s'] og: ['text'].
+prøv bruk: ['%'] og: ['text'].
+
+# length modifier does not fit
+prøv bruk: ['%ls'] og: ['text'].
+prøv bruk: ['%Lf'] og: 5.5.
+try-int bruk: ['%ld'] og: 7.
+try-int bruk: ['%lld'] og: 7.
+prøv bruk: ['%Ld'] og: (Int64 ny fra-tekst: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+prøv bruk: ['%99999999999s'] og: ['text'].

@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Programm mäluhaldus: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Programm seade: ['FFITESTLIB'].
+
+
+
+Server seo: (
+ Loend uus ;
+ libname ;
+ ['puts'] ;
+ ( Loend uus ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s vabasta.
+
+# test with struct
+
+>> a := Blob uus: 8.
+a bytes: (
+	Loend <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Loend <<: ['int'], ; ['int']).
+
+Server seo: (
+	Loend <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Loend <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Väljund kirjuta: ['Sum test:'] + (ffitest ffisum: a), reavahetus.
+
+struct vabasta-struct.
+struct vabasta.
+a vabasta.

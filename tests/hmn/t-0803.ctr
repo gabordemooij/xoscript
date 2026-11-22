@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB tshiab tus-tswv-tsev: ['localhost'],
+	npe-neeg-siv: ['xo'],
+	lo-lus-zais: ['pass123'],
+	npe-chaw-khaws-ntaub-ntawv: ['xobase'],
+	txuas-mus.
+
+>> conn2 := Maria-DB tshiab tus-tswv-tsev: ['localhost'],
+	npe-neeg-siv: ['xo'],
+	lo-lus-zais: ['pass123'],
+	npe-chaw-khaws-ntaub-ntawv: ['xobase'],
+	txuas-mus.
+#...
+>> del := conn1 lus-nug: ['DELETE FROM book WHERE id > 0'].
+{  del ua-raws-lus-txib. conn1 lees-paub. } txhom: { :e conn1 thim-rov-qab.  }, pib.
+
+>> insert := conn1 lus-nug: ['INSERT INTO book (id) VALUES(null)'].
+insert ua-raws-lus-txib.
+
+>> tus-lej-suav := conn1 lus-nug: ['SELECT COUNT(*) AS num FROM book'].
+tus-lej-suav mus-nqa: { :row Tawm sau-ntawv: row num, kab-tshiab. }.
+
+# does not show up
+# insert not committed on connection 1
+>> tus-lej-suav := conn2 lus-nug: ['SELECT COUNT(*) AS num FROM book'].
+tus-lej-suav mus-nqa: { :row Tawm sau-ntawv: row num, kab-tshiab. }.

@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Dastur xotira-boshqaruvi: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Dastur sozlama: ['FFITESTLIB'].
+
+
+
+Server bogʻlash: (
+ Roʻyxat yangi ;
+ libname ;
+ ['puts'] ;
+ ( Roʻyxat yangi ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s boʻshatish.
+
+# test with struct
+
+>> a := Blob yangi: 8.
+a bytes: (
+	Roʻyxat <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Roʻyxat <<: ['int'], ; ['int']).
+
+Server bogʻlash: (
+	Roʻyxat <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Roʻyxat <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Chiqish yozish: ['Sum test:'] + (ffitest ffisum: a), yangi-qator.
+
+struct struct-boʻshatish.
+struct boʻshatish.
+a boʻshatish.

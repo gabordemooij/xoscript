@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Oġġett ġdid.
+
+Log meta: ['say:'] agħmel: { :str
+	Ħruġ ikteb: str, linja-ġdida.
+}.
+
+>> Item := Oġġett ġdid.
+
+Item meta: ['ġdid:'] agħmel: { :id <- innifsu ġdid id: id.
+}.
+
+Item meta: ['id:'] agħmel: { :id
+	proprju id := id.
+}.
+
+Item meta: ['id'] agħmel: { <- proprju id. }.
+
+
+Item meta: ['test'] agħmel: {
+	>> str := ['Item#~no'].
+	str ~no: proprju id. <- str.
+}.
+
+
+>> Print := Oġġett ġdid.
+
+Print meta: ['items'] agħmel: { 
+	
+	proprju item := Item ġdid: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: proprju item
+	).
+	
+	
+}.
+
+Print items.

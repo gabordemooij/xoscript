@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> dalan-sa-payl := ['/tmp/test0821.csv'].
+>> file := Payl bag-o: dalan-sa-payl.
+
+file isulat: ['a,b\n"1,2\n'].
+{
+	file tigbulag: [','] kutlo: ['"'] mga-linya: { :line
+		Gawas isulat: line, bag-ong-linya.
+	}.
+} dakpon: { :e Gawas isulat: e, bag-ong-linya. }, padagana.
+
+# a closed quote still works
+file isulat: ['a,b\n"1,2",3'].
+file tigbulag: [','] kutlo: ['"'] mga-linya: { :line
+	Gawas isulat: line, bag-ong-linya.
+}.
+file papasa.

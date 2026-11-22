@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Феҳрист нав ;
+	# {"key":"normal"} normal ASCII
+	( Луғат нав гузор: ['normal'] калид: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Луғат нав гузор: ['hello world'] калид: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Луғат нав гузор: ['"'] калид: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Луғат нав гузор: ['backslash: \\'] калид: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Луғат нав гузор: ['slash: /'] калид: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Луғат нав гузор: ['backspace: \b'] калид: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Луғат нав гузор: ['formfeed: \f'] калид: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Луғат нав гузор: ['newline: \n'] калид: ['key'] ) ;
+	( Луғат нав гузор: ['newline: ↵'] калид: ['key'] ) ;
+	( Луғат нав гузор: ['newline: 
+	'] калид: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Луғат нав гузор: ['carriage return: \r'] калид: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Луғат нав гузор: ['tab \t'] калид: ['key'] ) ;
+	( Луғат нав гузор: ['tab ⇿'] калид: ['key'] ) ;
+	( Луғат нав гузор: ['tab  '] калид: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Луғат нав гузор: ['NUL \u0000'] калид: ['key'] ) ;
+	( Луғат нав гузор: ['NUL \0'] калид: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Луғат нав гузор: ['control: \u0001'] калид: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Луғат нав гузор: ['control: \u001F'] калид: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Луғат нав гузор: ['unicode: é'] калид: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Луғат нав гузор: ['unicode: €'] калид: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Луғат нав гузор: ['unicode: 日本語'] калид: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Луғат нав гузор: ['unicode: 😀'] калид: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Луғат нав гузор: ['unicode: 🧑‍💻'] калид: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Луғат нав гузор: ['combining: e\u0301'] калид: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Луғат нав гузор: ['escaped unicode: \u00e9'] калид: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Луғат нав гузор: ['escaped unicode: \u20ac'] калид: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Луғат нав гузор: ['escaped unicode: \ud83d\ude00'] калид: ['key'] ) ;
+	# {"key":""} empty value
+	( Луғат нав гузор: [''] калид: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Луғат нав гузор: ['@ < > & = % + ? #'] калид: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Луғат нав гузор: ['''] калид: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Луғат нав гузор: ['multiple: \" \\ \n \r \t'] калид: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Луғат нав гузор: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] калид: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Луғат нав гузор: [' value'] калид: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Луғат нав гузор: ['value '] калид: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Луғат нав гузор: [' \t\n\r '] калид: ['key'] ).
+
+dicts ҳар-як: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Луғат нав гузор: d key калид: ['key']).
+	>> b := JSON jsonify: (Луғат нав гузор: ['value'] калид: d key).
+	>> e := JSON объект: a.
+	>> f := JSON объект: b.
+	((e key = d key ва: (f ? d key = ['value'])) ё: (e key = ['NUL ?'])) агар-рост: {
+		Баромад навис: ['OK'], сатри-нав.
+	}, вагарна: {
+		Баромад навис: ['Unable to properly encode/decode: '] + d + j, сатри-нав.
+		Барнома анҷом.
+	}.
+}.

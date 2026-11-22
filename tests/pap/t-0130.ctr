@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Programa konfigurashon: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server konektá-ku: ( Lista nobo ;
+ libname ; ['fopen'] ;
+ ( Lista nobo ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+konektá-ku: ( Lista nobo ;
+ Nada ; # means same lib
+ ['fread'] ;
+ ( Lista nobo ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Nada ; # means same object (i.e. Stream)
+ ['fread']
+),
+konektá-ku: (
+ Lista nobo ;
+ Nada ; # means same lib
+ ['fwrite'] ;
+ ( Lista nobo ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Nada ; # means same lib
+ ['fwrite']
+),
+konektá-ku: (
+ Lista nobo ;
+ Nada ; # means same lib
+ ['rewind'] ;
+ ( Lista nobo ; ['pointer'] ) ;
+ ['int'] ;
+ Nada ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> ruta := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: ruta mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream mensahe: ['fwrite'] argumentonan: (Lista nobo ; str ; 1 ; 6 ; fd ).
+Salida skirbi: bytes-written, liña-nobo.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob nobo: 20.
+
+# read from file
+>> bytes-read := Stream mensahe: ['fread'] argumentonan: (Lista nobo ; buf ; 1 ; 6 ; fd ).
+Salida skirbi: bytes-read, liña-nobo.
+Salida skirbi: buf, liña-nobo.
+
+# free memory
+str  libra.
+ruta libra.
+mode libra.
+buf  libra.
+
+

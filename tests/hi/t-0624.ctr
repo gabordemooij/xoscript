@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := वस्तु नया.
+
+Log जब: ['say:'] करो: { :str
+	निर्गम लिखो: str, नई-पंक्ति.
+}.
+
+>> Item := वस्तु नया.
+
+Item जब: ['नया:'] करो: { :id <- स्वयं नया id: id.
+}.
+
+Item जब: ['id:'] करो: { :id
+	अपना id := id.
+}.
+
+Item जब: ['id'] करो: { <- अपना id. }.
+
+
+Item जब: ['पाठ-में'] करो: {
+	>> str := ['Item#~no'].
+	str ~no: अपना id. <- str.
+}.
+
+
+>> Print := वस्तु नया.
+
+Print जब: ['items'] करो: { 
+	
+	अपना item := Item नया: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: अपना item
+	).
+	
+	
+}.
+
+Print items.

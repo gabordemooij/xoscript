@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB anyar hos: ['localhost'],
+	jeneng-panganggo: ['xo'],
+	sandhi: ['pass123'],
+	jeneng-basis-data: ['xobase'],
+	sambung.
+
+>> parameter-panggolekan := db kueri: ['SELECT ? AS a, ? AS b, ? AS c'].
+parameter-panggolekan parameter: (Dhaptar anyar ; ['1']).
+{ parameter-panggolekan jupuk: { :row Wetonan tulis: row, baris-anyar. }. } cekel: { :e Wetonan tulis: e, baris-anyar. }, wiwiti.
+
+>> parameter-panggolekan := db kueri: ['SELECT ? AS a'].
+{ parameter-panggolekan jupuk: { :row Wetonan tulis: row, baris-anyar. }. } cekel: { :e Wetonan tulis: e, baris-anyar. }, wiwiti.
+
+# the right number still works, more parameters are ignored as before
+>> parameter-panggolekan := db kueri: ['SELECT ? AS a, ? AS b'].
+parameter-panggolekan parameter: (Dhaptar anyar ; ['1'] ; ['2']).
+parameter-panggolekan jupuk: { :row Wetonan tulis: (row ing: ['a']), tulis: (row ing: ['b']), baris-anyar. }.
+parameter-panggolekan parameter: (Dhaptar anyar ; ['1'] ; ['2'] ; ['3']).
+parameter-panggolekan jupuk: { :row Wetonan tulis: (row ing: ['a']), tulis: (row ing: ['b']), baris-anyar. }.

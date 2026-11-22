@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Rhaglen rheoli-cof: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Rhaglen gosodiad: ['FFITESTLIB'].
+
+
+
+Server cysylltu: (
+ Rhestr newydd ;
+ libname ;
+ ['puts'] ;
+ ( Rhestr newydd ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s rhyddhau.
+
+# test with struct
+
+>> a := Blob newydd: 8.
+a bytes: (
+	Rhestr <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Rhestr <<: ['int'], ; ['int']).
+
+Server cysylltu: (
+	Rhestr <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Rhestr <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Allbwn ysgrifennu: ['Sum test:'] + (ffitest ffisum: a), llinell-newydd.
+
+struct rhyddhau-struct.
+struct rhyddhau.
+a rhyddhau.

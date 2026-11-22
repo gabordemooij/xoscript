@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server frumstilla.
+Forrit nota: ['../../../src/xo/is/webtools.xo'].
+
+>> Fake-Request := Hlutur nýtt.
+Fake-Request við: ['value:'] gera: { :gildið
+	eigin gildið := gildið.
+}.
+Fake-Request við: ['cookie:'] gera: { :nafn <- eigin gildið.
+}.
+
+>> Test-Session := Bráðabirgðaskrár-seta nýtt.
+Test-Session við: ['hlaða'] gera: { <- Orðabók nýtt.
+}.
+Test-Session við: ['session-id'] gera: { <- eigin id.
+}.
+
+>> cookies := Listi nýtt
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies hver: { :i :cookie
+	>> beiðni := Fake-Request nýtt.
+	beiðni value: cookie.
+	>> stjóri := Test-Session nýtt.
+	>> web := Vefskjal nýtt.
+	web beiðni: beiðni.
+	web setustjóri: stjóri.
+	web hefja-setu.
+	Úttak skrifa: ( stjóri session-id = cookie ), ný-lína.
+}.
+
+>> web := Vefskjal nýtt.
+web json: (Orðabók nýtt setja: ['b'] við: ['a']).
+Úttak skrifa: ['\n'], ný-lína.
+
+{ Net get: ['file:///etc/hostname']. } grípa: { :e
+	Úttak skrifa: e, ný-lína.
+}, ræsa.
+
+>> svg := Skrá nýtt: ['/tmp/test0814.svg'].
+svg skrifa: ['<svg xmlns="x"></svg>'].
+Úttak ný-lína.
+Server áframsenda: ['test0814.svg'] forskeyti: ['/tmp/'].
+svg eyða.

@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Aschur scríobh: ['Database test'], líne-nua.
+
+>> db := Maria-DB nua óstach: ['localhost'],
+	ainm-úsáideora: ['xo'], pasfhocal: ['pass123'], ainm-bunachair: ['xobase'], ceangail.
+
+Aschur scríobh: ['Can we connect? '] + db ceangailte?, líne-nua.
+
+>> paraiméadair-chuardaigh := db iarratas: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], paraiméadair: ( Liosta nua ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  paraiméadair-chuardaigh rith-ordú. db deimhnigh. } gabh: { :e db cealaigh.  }, tosaigh.
+
+Aschur scríobh: ['Can we insert? '] + ( paraiméadair-chuardaigh insert-id > 0 ), líne-nua.
+
+>> x := 0.
+>> paraiméadair-chuardaigh :=
+db iarratas: ['SELECT * FROM book order by id desc limit 2'], 
+faigh-sonraí: { :row 
+	x suimigh: 1.
+	Fíor bris. # must clean up, no 'Commands out of sync'
+}.
+
+>> paraiméadair-chuardaigh :=
+db iarratas: ['SELECT * FROM book order by id desc limit 2'], 
+faigh-sonraí: { :row
+	x suimigh: 1.
+	Fíor bris.
+}.
+
+(x > 0) fíor: {
+	Aschur scríobh: ['Can we break in the middle of a fetch? '].
+}.
+
+Aschur scríobh: Fíor, líne-nua.

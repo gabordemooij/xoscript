@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Obyekt yangi.
+
+Slurp kelganda: ['yangi'] bajar: {
+	oʻzining str := [''].
+}.
+
+Slurp kelganda: ['nieuw'] bajar: {
+	oʻzining str := [''].
+}.
+
+Slurp kelganda: ['javob:'] bajar: { :blah
+		oʻzining str oxiriga-qoʻshish: blah.
+}.
+
+Slurp kelganda: ['javob:va:'] bajar: { :blah :blahah
+		oʻzining str oxiriga-qoʻshish: (blah boshlab: 0 uzunlik: (blah uzunlik - 1)).
+		oʻzining str oxiriga-qoʻshish: [' '].
+		oʻzining str oxiriga-qoʻshish: blahah.
+}.
+
+Slurp kelganda: ['obtain'] bajar: {
+	>> buffer := oʻzining str.
+	oʻzining str := ['']. <- buffer.
+}.
+
+
+Chiqish yozish: (Dastur tizim: (Slurp yangi echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Fayl yangi: ['/tmp/from.txt'], oʻchirish. } ushlash: { ['Empty']. }, ishga-tushirish.
+{ Fayl yangi: ['/tmp/to.txt'], oʻchirish. } ushlash: { ['Empty']. }, ishga-tushirish.
+
+
+Fayl yangi: ['/tmp/to.txt'], mavjud yolgʻon-boʻlsa: {
+	Chiqish yozish: ['Confirmed. Target file does not exist.\
+'].
+}.
+Fayl yangi: ['/tmp/from.txt'], mavjud yolgʻon-boʻlsa: {
+	Chiqish yozish: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Dastur tizim: (Slurp yangi touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Dastur tizim: (Slurp yangi cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Fayl yangi: ['/tmp/to.txt'], mavjud rost-boʻlsa: {
+	Chiqish yozish: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Chiqish yozish: ['Contents of file is:'] + (Fayl yangi: ['/tmp/to.txt'], oʻqish), yangi-qator.

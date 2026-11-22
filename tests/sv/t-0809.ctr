@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> värden := Lista ny
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+värden varje: { :i :value
+	>> d := Ordbok ny.
+	d sätt: value vid: ['k'].
+	>> r := d code objekt.
+	Utdata skriv: r antal, stop.
+	Utdata skriv: ( (r vid: ['k']) = value ), stop.
+}.

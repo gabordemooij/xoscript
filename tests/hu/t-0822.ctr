@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB új gazdagép: ['localhost'],
+	felhasználónév: ['xo'],
+	jelszó: ['pass123'],
+	adatbázisnév: ['xobase'],
+	csatlakozik.
+
+>> keresőparaméterek := db lekérdezés: ['SELECT ? AS a, ? AS b, ? AS c'].
+keresőparaméterek paraméterek: (Lista új ; ['1']).
+{ keresőparaméterek lekér: { :row Kimenet ír: row, újsor. }. } elkap: { :e Kimenet ír: e, újsor. }, indít.
+
+>> keresőparaméterek := db lekérdezés: ['SELECT ? AS a'].
+{ keresőparaméterek lekér: { :row Kimenet ír: row, újsor. }. } elkap: { :e Kimenet ír: e, újsor. }, indít.
+
+# the right number still works, more parameters are ignored as before
+>> keresőparaméterek := db lekérdezés: ['SELECT ? AS a, ? AS b'].
+keresőparaméterek paraméterek: (Lista új ; ['1'] ; ['2']).
+keresőparaméterek lekér: { :row Kimenet ír: (row itt: ['a']), ír: (row itt: ['b']), újsor. }.
+keresőparaméterek paraméterek: (Lista új ; ['1'] ; ['2'] ; ['3']).
+keresőparaméterek lekér: { :row Kimenet ír: (row itt: ['a']), ír: (row itt: ['b']), újsor. }.

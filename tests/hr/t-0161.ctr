@@ -1,0 +1,53 @@
+Program upravljanje-memorijom: 0.
+Popis na: ['sum'] učini: {
+	>> total := 0.
+	sebe svaki: { :index :element
+		total dodaj: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Datoteka novi: ['/tmp/test.txt'].
+f piši: ['Lorem Ipsum'].
+f zatvori.
+  
+
+f := Datoteka novi: ['/tmp/test.txt'].
+>> text := f čitaj.
+f zatvori.
+
+
+
+Program počisti.
+usedMemory1 := (Program memorija ? 1).
+
+
+
+f := Datoteka novi: ['/tmp/test.txt'].
+text := f čitaj.
+f zatvori.
+
+Program počisti.
+usedMemory2 := (Program memorija ? 1).
+
+
+f := Datoteka novi: ['/tmp/test.txt'].
+text := f čitaj.
+f zatvori.
+
+Program počisti.
+usedMemory3 := (Program memorija ? 1).
+
+
+
+( usedMemory1 = usedMemory2 i: usedMemory1 = usedMemory3, i: usedMemory2 = usedMemory3 ) istina: {
+	Izlaz piši: ['No memory leaks here'].
+}, laž: {
+	Izlaz piši: ['Leaking memory...'].
+}.

@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server 初期化.
+プログラム 使用: ['../../../src/xo/ja/webtools.xo'].
+
+>> Fake-Request := オブジェクト 新規.
+Fake-Request 受信時: ['value:'] 実行: { :設定値
+	自分の 設定値 := 設定値.
+}.
+Fake-Request 受信時: ['cookie:'] 実行: { :名前 <- 自分の 設定値.
+}.
+
+>> Test-Session := 一時ファイルセッション 新規.
+Test-Session 受信時: ['読み込み'] 実行: { <- 辞書 新規.
+}.
+Test-Session 受信時: ['session-id'] 実行: { <- 自分の id.
+}.
+
+>> cookies := リスト 新規
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies 各要素: { :i :cookie
+	>> http要求 := Fake-Request 新規.
+	http要求 value: cookie.
+	>> 管理者 := Test-Session 新規.
+	>> web := ウェブ文書 新規.
+	web http要求: http要求.
+	web セッション管理: 管理者.
+	web セッション開始.
+	出力 書く: ( 管理者 session-id = cookie ), 改行.
+}.
+
+>> web := ウェブ文書 新規.
+web json: (辞書 新規 格納: ['b'] 場所: ['a']).
+出力 書く: ['\n'], 改行.
+
+{ ネットワーク get: ['file:///etc/hostname']. } 例外時: { :e
+	出力 書く: e, 改行.
+}, 開始.
+
+>> svg := ファイル 新規: ['/tmp/test0814.svg'].
+svg 書く: ['<svg xmlns="x"></svg>'].
+出力 改行.
+Server 素通し: ['test0814.svg'] 接頭辞: ['/tmp/'].
+svg 削除.

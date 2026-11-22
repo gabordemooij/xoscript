@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> sti := ['/tmp/test0821.csv'].
+>> file := Fil ny: sti.
+
+file skriv: ['a,b\n"1,2\n'].
+{
+	file skilletegn: [','] citationstegn: ['"'] linjer: { :line
+		Uddata skriv: line, stop.
+	}.
+} fang: { :e Uddata skriv: e, stop. }, start.
+
+# a closed quote still works
+file skriv: ['a,b\n"1,2",3'].
+file skilletegn: [','] citationstegn: ['"'] linjer: { :line
+	Uddata skriv: line, stop.
+}.
+file slet.

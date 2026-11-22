@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB haaraa keessummeessaa: ['localhost'],
+	maqaa-fayyadamaa: ['xo'],
+	jecha-icciitii: ['pass123'],
+	maqaa-kuusaa-deetaa: ['xobase'],
+	walqunnami.
+
+>> ulaagaalee-barbaacha := db iyyaafannoo: ['SELECT ? AS a, ? AS b, ? AS c'].
+ulaagaalee-barbaacha ulaagaalee: (Tarree-wantootaa haaraa ; ['1']).
+{ ulaagaalee-barbaacha fidi: { :row Baʼii barreessi: row, dhaabi. }. } qabi: { :e Baʼii barreessi: e, dhaabi. }, fiigi.
+
+>> ulaagaalee-barbaacha := db iyyaafannoo: ['SELECT ? AS a'].
+{ ulaagaalee-barbaacha fidi: { :row Baʼii barreessi: row, dhaabi. }. } qabi: { :e Baʼii barreessi: e, dhaabi. }, fiigi.
+
+# the right number still works, more parameters are ignored as before
+>> ulaagaalee-barbaacha := db iyyaafannoo: ['SELECT ? AS a, ? AS b'].
+ulaagaalee-barbaacha ulaagaalee: (Tarree-wantootaa haaraa ; ['1'] ; ['2']).
+ulaagaalee-barbaacha fidi: { :row Baʼii barreessi: (row bakka: ['a']), barreessi: (row bakka: ['b']), dhaabi. }.
+ulaagaalee-barbaacha ulaagaalee: (Tarree-wantootaa haaraa ; ['1'] ; ['2'] ; ['3']).
+ulaagaalee-barbaacha fidi: { :row Baʼii barreessi: (row bakka: ['a']), barreessi: (row bakka: ['b']), dhaabi. }.

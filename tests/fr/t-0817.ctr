@@ -1,0 +1,16 @@
+# a value ending in the first part of an opening quote must survive serialization
+>> valeurs := Liste nouveau
+	; ['abc\[']
+	; ['\[']
+	; ['\[\[']
+	; ['x\\\[']
+	; ['abc'].
+
+valeurs chaque: { :i :value
+	>> d := Dictionnaire nouveau.
+	d mettre: value à: ['k'].
+	d mettre: ['second'] à: ['j'].
+	>> r := d code objet.
+	Sortie écrire: r compter, stop.
+	Sortie écrire: ( (r à: ['k']) = value ), stop.
+}.

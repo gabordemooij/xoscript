@@ -1,0 +1,43 @@
+
+
+>> g := Server yeni.
+>> v := Seyf yeni.
+>> ok := 0.
+
+>> secrets := Siyahı yeni ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets surət.
+passwords hər: { :i :p
+	secrets hər: { :n :s
+		{
+			>> encrypted := v şifrələ: s açar: p.
+			>> decrypted := v şifrəni-aç: encrypted açar: p.
+			(decrypted = s) doğru: {
+				ok əlavə-et: 1.
+			}, əks-halda: {
+				Çıxış yaz: ['failed encrypting/decrypting: '], yeni-sətir.
+				Çıxış yaz: s, yeni-sətir.
+				Çıxış yaz: ['encrypted: '] + encrypted, yeni-sətir.
+				Çıxış yaz: ['decrypted: '] + encrypted, yeni-sətir.
+				Proqram son.
+			}.
+		} tut: { :err
+			(s = [''] və-ya: p = ['']) doğru: {
+				ok əlavə-et: 1.
+			}, əks-halda: {
+				Çıxış yaz: err, yeni-sətir.
+				Proqram son.
+			}.
+		}, başlat.
+	}.
+}.
+
+Çıxış yaz: ( ok + [' vault encryptions tested.'] ), yeni-sətir.

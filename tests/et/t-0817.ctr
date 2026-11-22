@@ -1,0 +1,16 @@
+# a value ending in the first part of an opening quote must survive serialization
+>> väärtused := Loend uus
+	; ['abc\[']
+	; ['\[']
+	; ['\[\[']
+	; ['x\\\[']
+	; ['abc'].
+
+väärtused iga: { :i :value
+	>> d := Sõnastik uus.
+	d pane: value kohale: ['k'].
+	d pane: ['second'] kohale: ['j'].
+	>> r := d kood objekt.
+	Väljund kirjuta: r arvuta, reavahetus.
+	Väljund kirjuta: ( (r kohal: ['k']) = value ), reavahetus.
+}.

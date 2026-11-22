@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server ಆರಂಭಿಸು.
+ಪ್ರೋಗ್ರಾಂ ಬಳಸು: ['../../../src/xo/kn/webtools.xo'].
+
+>> Fake-Request := ವಸ್ತು ಹೊಸ.
+Fake-Request ಬಂದಾಗ: ['value:'] ಮಾಡು: { :ಮೌಲ್ಯ
+	ತನ್ನ ಮೌಲ್ಯ := ಮೌಲ್ಯ.
+}.
+Fake-Request ಬಂದಾಗ: ['cookie:'] ಮಾಡು: { :ಹೆಸರು <- ತನ್ನ ಮೌಲ್ಯ.
+}.
+
+>> Test-Session := ತಾತ್ಕಾಲಿಕ-ಕಡತ-ಅಧಿವೇಶನ ಹೊಸ.
+Test-Session ಬಂದಾಗ: ['ಲೋಡ್-ಮಾಡು'] ಮಾಡು: { <- ನಿಘಂಟು ಹೊಸ.
+}.
+Test-Session ಬಂದಾಗ: ['session-id'] ಮಾಡು: { <- ತನ್ನ id.
+}.
+
+>> cookies := ಸರಣಿ ಹೊಸ
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies ಪ್ರತಿಯೊಂದು: { :i :cookie
+	>> ವಿನಂತಿ-http := Fake-Request ಹೊಸ.
+	ವಿನಂತಿ-http value: cookie.
+	>> ನಿರ್ವಾಹಕ := Test-Session ಹೊಸ.
+	>> web := ವೆಬ್-ದಸ್ತಾವೇಜು ಹೊಸ.
+	web ವಿನಂತಿ-http: ವಿನಂತಿ-http.
+	web ಅಧಿವೇಶನ-ನಿರ್ವಾಹಕ: ನಿರ್ವಾಹಕ.
+	web ಅಧಿವೇಶನ-ಆರಂಭಿಸು.
+	ಔಟ್-ಪುಟ್ ಬರೆ: ( ನಿರ್ವಾಹಕ session-id = cookie ), ಹೊಸ-ಸಾಲು.
+}.
+
+>> web := ವೆಬ್-ದಸ್ತಾವೇಜು ಹೊಸ.
+web json: (ನಿಘಂಟು ಹೊಸ ಇಡು: ['b'] ಕೀಲಿ: ['a']).
+ಔಟ್-ಪುಟ್ ಬರೆ: ['\n'], ಹೊಸ-ಸಾಲು.
+
+{ ಜಾಲ get: ['file:///etc/hostname']. } ಹಿಡಿ: { :e
+	ಔಟ್-ಪುಟ್ ಬರೆ: e, ಹೊಸ-ಸಾಲು.
+}, ಚಲಾಯಿಸು.
+
+>> svg := ಕಡತ ಹೊಸ: ['/tmp/test0814.svg'].
+svg ಬರೆ: ['<svg xmlns="x"></svg>'].
+ಔಟ್-ಪುಟ್ ಹೊಸ-ಸಾಲು.
+Server ಮುಂದೆ-ಕಳಿಸು: ['test0814.svg'] ಪೂರ್ವಪ್ರತ್ಯಯ: ['/tmp/'].
+svg ಅಳಿಸು.

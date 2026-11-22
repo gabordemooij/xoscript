@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Αντικείμενο νέο.
+
+Log όταν: ['say:'] κάνε: { :str
+	Έξοδος γράψε: str, νέα-γραμμή.
+}.
+
+>> Item := Αντικείμενο νέο.
+
+Item όταν: ['νέο:'] κάνε: { :id <- εαυτός νέο id: id.
+}.
+
+Item όταν: ['id:'] κάνε: { :id
+	δικό id := id.
+}.
+
+Item όταν: ['id'] κάνε: { <- δικό id. }.
+
+
+Item όταν: ['κείμενο'] κάνε: {
+	>> str := ['Item#~no'].
+	str ~no: δικό id. <- str.
+}.
+
+
+>> Print := Αντικείμενο νέο.
+
+Print όταν: ['items'] κάνε: { 
+	
+	δικό item := Item νέο: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: δικό item
+	).
+	
+	
+}.
+
+Print items.

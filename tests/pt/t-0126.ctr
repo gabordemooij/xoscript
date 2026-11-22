@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Objeto novo.
+
+Slurp em: ['novo'] fazer: {
+	prop str := [''].
+}.
+
+Slurp em: ['nieuw'] fazer: {
+	prop str := [''].
+}.
+
+Slurp em: ['responder:'] fazer: { :blah
+		prop str acrescentar: blah.
+}.
+
+Slurp em: ['responder:e:'] fazer: { :blah :blahah
+		prop str acrescentar: (blah de: 0 comprimento: (blah comprimento - 1)).
+		prop str acrescentar: [' '].
+		prop str acrescentar: blahah.
+}.
+
+Slurp em: ['obtain'] fazer: {
+	>> buffer := prop str.
+	prop str := ['']. <- buffer.
+}.
+
+
+Saída escrever: (Programa comando-do-sistema: (Slurp novo echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Arquivo novo: ['/tmp/from.txt'], apagar. } pegar: { ['Empty']. }, iniciar.
+{ Arquivo novo: ['/tmp/to.txt'], apagar. } pegar: { ['Empty']. }, iniciar.
+
+
+Arquivo novo: ['/tmp/to.txt'], existe não: {
+	Saída escrever: ['Confirmed. Target file does not exist.\
+'].
+}.
+Arquivo novo: ['/tmp/from.txt'], existe não: {
+	Saída escrever: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Programa comando-do-sistema: (Slurp novo touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Programa comando-do-sistema: (Slurp novo cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Arquivo novo: ['/tmp/to.txt'], existe sim: {
+	Saída escrever: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Saída escrever: ['Contents of file is:'] + (Arquivo novo: ['/tmp/to.txt'], ler), stop.

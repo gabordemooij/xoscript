@@ -1,0 +1,43 @@
+
+
+>> g := Server නව.
+>> v := සුරක්ෂිතාගාරය නව.
+>> ok := 0.
+
+>> secrets := ලේඛනය නව ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets පිටපත.
+passwords එකිනෙක: { :i :p
+	secrets එකිනෙක: { :n :s
+		{
+			>> encrypted := v සංකේතනය: s යතුර: p.
+			>> decrypted := v විසංකේතනය: encrypted යතුර: p.
+			(decrypted = s) ඇත්ත-නම්: {
+				ok එකතුව: 1.
+			}, නැතිනම්: {
+				නිමැවුම ලියන්න: ['failed encrypting/decrypting: '], නව-පේළිය.
+				නිමැවුම ලියන්න: s, නව-පේළිය.
+				නිමැවුම ලියන්න: ['encrypted: '] + encrypted, නව-පේළිය.
+				නිමැවුම ලියන්න: ['decrypted: '] + encrypted, නව-පේළිය.
+				වැඩසටහන අවසන්.
+			}.
+		} අල්ලන්න: { :err
+			(s = [''] හෝ: p = ['']) ඇත්ත-නම්: {
+				ok එකතුව: 1.
+			}, නැතිනම්: {
+				නිමැවුම ලියන්න: err, නව-පේළිය.
+				වැඩසටහන අවසන්.
+			}.
+		}, ධාවනය.
+	}.
+}.
+
+නිමැවුම ලියන්න: ( ok + [' vault encryptions tested.'] ), නව-පේළිය.

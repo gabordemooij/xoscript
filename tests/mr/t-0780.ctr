@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := सूची नवीन ;
+	# {"key":"normal"} normal ASCII
+	( शब्दकोश नवीन ठेवा: ['normal'] किल्ली: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( शब्दकोश नवीन ठेवा: ['hello world'] किल्ली: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( शब्दकोश नवीन ठेवा: ['"'] किल्ली: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( शब्दकोश नवीन ठेवा: ['backslash: \\'] किल्ली: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( शब्दकोश नवीन ठेवा: ['slash: /'] किल्ली: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( शब्दकोश नवीन ठेवा: ['backspace: \b'] किल्ली: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( शब्दकोश नवीन ठेवा: ['formfeed: \f'] किल्ली: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( शब्दकोश नवीन ठेवा: ['newline: \n'] किल्ली: ['key'] ) ;
+	( शब्दकोश नवीन ठेवा: ['newline: ↵'] किल्ली: ['key'] ) ;
+	( शब्दकोश नवीन ठेवा: ['newline: 
+	'] किल्ली: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( शब्दकोश नवीन ठेवा: ['carriage return: \r'] किल्ली: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( शब्दकोश नवीन ठेवा: ['tab \t'] किल्ली: ['key'] ) ;
+	( शब्दकोश नवीन ठेवा: ['tab ⇿'] किल्ली: ['key'] ) ;
+	( शब्दकोश नवीन ठेवा: ['tab  '] किल्ली: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( शब्दकोश नवीन ठेवा: ['NUL \u0000'] किल्ली: ['key'] ) ;
+	( शब्दकोश नवीन ठेवा: ['NUL \0'] किल्ली: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( शब्दकोश नवीन ठेवा: ['control: \u0001'] किल्ली: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( शब्दकोश नवीन ठेवा: ['control: \u001F'] किल्ली: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( शब्दकोश नवीन ठेवा: ['unicode: é'] किल्ली: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( शब्दकोश नवीन ठेवा: ['unicode: €'] किल्ली: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( शब्दकोश नवीन ठेवा: ['unicode: 日本語'] किल्ली: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( शब्दकोश नवीन ठेवा: ['unicode: 😀'] किल्ली: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( शब्दकोश नवीन ठेवा: ['unicode: 🧑‍💻'] किल्ली: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( शब्दकोश नवीन ठेवा: ['combining: e\u0301'] किल्ली: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( शब्दकोश नवीन ठेवा: ['escaped unicode: \u00e9'] किल्ली: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( शब्दकोश नवीन ठेवा: ['escaped unicode: \u20ac'] किल्ली: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( शब्दकोश नवीन ठेवा: ['escaped unicode: \ud83d\ude00'] किल्ली: ['key'] ) ;
+	# {"key":""} empty value
+	( शब्दकोश नवीन ठेवा: [''] किल्ली: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( शब्दकोश नवीन ठेवा: ['@ < > & = % + ? #'] किल्ली: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( शब्दकोश नवीन ठेवा: ['''] किल्ली: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( शब्दकोश नवीन ठेवा: ['multiple: \" \\ \n \r \t'] किल्ली: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( शब्दकोश नवीन ठेवा: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] किल्ली: ['key'] ) ;
+	# {"key":" value"} leading space
+	( शब्दकोश नवीन ठेवा: [' value'] किल्ली: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( शब्दकोश नवीन ठेवा: ['value '] किल्ली: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( शब्दकोश नवीन ठेवा: [' \t\n\r '] किल्ली: ['key'] ).
+
+dicts प्रत्येक: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (शब्दकोश नवीन ठेवा: d key किल्ली: ['key']).
+	>> b := JSON jsonify: (शब्दकोश नवीन ठेवा: ['value'] किल्ली: d key).
+	>> e := JSON वस्तू: a.
+	>> f := JSON वस्तू: b.
+	((e key = d key आणि: (f ? d key = ['value'])) किंवा: (e key = ['NUL ?'])) खरे-असल्यास: {
+		आउटपुट लिहा: ['OK'], नवी-ओळ.
+	}, अन्यथा: {
+		आउटपुट लिहा: ['Unable to properly encode/decode: '] + d + j, नवी-ओळ.
+		प्रोग्राम समाप्त.
+	}.
+}.

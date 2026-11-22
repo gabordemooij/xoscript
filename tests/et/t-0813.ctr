@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server lähtesta.
+Programm kasuta: ['../../../src/xo/et/webtools.xo'].
+Programm kasuta: ['../../../src/xo/et/mailtools.xo'].
+
+>> päis := HTTP-Päis uus võti: ['Location'] väärtus: ['/ok\r\nX-Injected: yes'].
+Väljund kirjuta: päis.
+
+>> web := Veebidokument uus.
+web mine: ['/ok\r\nX-Injected: yes'].
+Väljund kirjuta: ['\n'], reavahetus.
+
+>> mail := E-kiri uus.
+mail kellele: (Loend uus ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Loend uus ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Loend uus ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail saatja: ['d@example.invalid\r\nX-From: yes'] nimi: ['site\r\nX-Name: yes'].
+mail teema: ['hello\r\nX-Subject: yes'].
+mail kirja-sisu: ['line1\r\nline2'].
+Väljund kirjuta: mail genereeri.
+
+>> html := HTML-E-kiri uus.
+html kellele: (Loend uus ; ['a@example.invalid\r\nX-To: yes']).
+html saatja: ['d@example.invalid'] nimi: ['site'].
+html teema: ['hello\r\nX-Subject: yes'].
+html kirja-sisu: ['body'].
+Väljund kirjuta: ( html genereeri hõlmab: ['\nX-'] ), reavahetus.
+Väljund kirjuta: ( html genereeri hõlmab: ['X-To: yes'] ), reavahetus.

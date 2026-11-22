@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> кыйммәтләр := Тезмә яңа
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+кыйммәтләр һәрбер: { :i :value
+	>> d := Сүзлек яңа.
+	d куй: value ачкыч: ['k'].
+	>> r := d код объект.
+	Чыгыш яз: r саны, яңа-юл.
+	Чыгыш яз: ( (r урында: ['k']) = value ), яңа-юл.
+}.

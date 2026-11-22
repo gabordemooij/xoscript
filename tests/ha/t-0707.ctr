@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Shiri sarrafa-ƙwaƙwalwa: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB sabo mai-masauki: ['localhost'],
+	sunan-mai-amfani: ['xo'], kalmar-sirri: ['pass123'], sunan-rumbun-bayanai: ['xobase'], haɗu.
+
+>> TwoDigitFormat := Tsari sabo: ['%02d'].
+
+# Datetime
+{
+	>> shekara := Lamba tsakanin: 1995 da: 2050, rubutu.
+	>> wata := TwoDigitFormat aiwatar-cikakkiyar-lamba: (Lamba tsakanin: 1 da: 12), rubutu.
+	>> rana := TwoDigitFormat aiwatar-cikakkiyar-lamba: (Lamba tsakanin: 1 da: 28), rubutu.
+	>> awa := TwoDigitFormat aiwatar-cikakkiyar-lamba: (Lamba tsakanin: 1 da: 23), rubutu.
+	>> minti := TwoDigitFormat aiwatar-cikakkiyar-lamba: (Lamba tsakanin: 1 da: 59), rubutu.
+	>> daƙiƙa := TwoDigitFormat aiwatar-cikakkiyar-lamba: (Lamba tsakanin: 1 da: 59), rubutu.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: shekara,
+		MM: wata,
+		DD: rana,
+		HH: awa,
+		II: minti,
+		SS: daƙiƙa.
+	>> sigogin-nema :=
+	db tambaya: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ɗauko: { :row
+		(row mydatetime = datetime) ƙarya: {
+			wannan-aiki kuskure: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ƙara: 1.
+} * 100.
+
+# Date
+{
+	>> shekara := Lamba tsakanin: 1995 da: 2050, rubutu.
+	>> wata := TwoDigitFormat aiwatar-cikakkiyar-lamba: (Lamba tsakanin: 1 da: 12), rubutu.
+	>> rana := TwoDigitFormat aiwatar-cikakkiyar-lamba: (Lamba tsakanin: 1 da: 28), rubutu.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: shekara,
+		MM: wata,
+		DD: rana.
+	>> sigogin-nema :=
+	db tambaya: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ɗauko: { :row
+		(row mydate = date) ƙarya: {
+			wannan-aiki kuskure: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ƙara: 1.
+} * 100.
+
+
+# Time
+{
+	>> awa := TwoDigitFormat aiwatar-cikakkiyar-lamba: (Lamba tsakanin: 1 da: 23), rubutu.
+	>> minti := TwoDigitFormat aiwatar-cikakkiyar-lamba: (Lamba tsakanin: 1 da: 59), rubutu.
+	>> daƙiƙa := TwoDigitFormat aiwatar-cikakkiyar-lamba: (Lamba tsakanin: 1 da: 59), rubutu.
+	>> lokaci := ['HH:II:SS'].
+	lokaci
+		HH: awa,
+		II: minti,
+		SS: daƙiƙa.
+	>> sigogin-nema :=
+	db tambaya: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: lokaci),
+	ɗauko: { :row
+		(row mytime = lokaci) ƙarya: {
+			wannan-aiki kuskure: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ƙara: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Jeri sabo cika: 100000 da: ['x'], haɗa: [''].
+{
+	>> str2 := Asusu token: 40.
+	>> sigogin-nema :=
+	db tambaya: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ɗauko: { :row
+		(row str1 = str1 da: row str2 = str2) ƙarya: {
+			wannan-aiki kuskure: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ƙara: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Lamba tsakanin: 1 da: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 daga-rubutu: ['9223372036854775807'] ) -
+		( Int64 daga-rubutu: ['99999'] ) +
+		( Int64 daga-rubutu: n1 rubutu )
+	).
+	>> sigogin-nema :=
+	db tambaya: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ɗauko: { :row
+		(row n1 = n1) ƙarya: {
+			wannan-aiki kuskure: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) ƙarya: {
+			wannan-aiki kuskure: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 zagaye) ƙarya: {
+			wannan-aiki kuskure: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) ƙarya: {
+			wannan-aiki kuskure: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ƙara: 1.
+} * 100.
+
+
+Fitarwa rubuta: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), sabon-layi.

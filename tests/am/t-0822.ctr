@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB አዲስ አስተናጋጅ: ['localhost'],
+	የተጠቃሚ-ስም: ['xo'],
+	የይለፍ-ቃል: ['pass123'],
+	የውሂብ-ጎታ-ስም: ['xobase'],
+	ተገናኝ.
+
+>> የፍለጋ-መለኪያዎች := db መጠይቅ: ['SELECT ? AS a, ? AS b, ? AS c'].
+የፍለጋ-መለኪያዎች መለኪያዎች: (ሰልፍ አዲስ ; ['1']).
+{ የፍለጋ-መለኪያዎች አምጣ: { :row ውጤት ፃፍ: row, አዲስ-መስመር. }. } ያዝ: { :e ውጤት ፃፍ: e, አዲስ-መስመር. }, ጀምር.
+
+>> የፍለጋ-መለኪያዎች := db መጠይቅ: ['SELECT ? AS a'].
+{ የፍለጋ-መለኪያዎች አምጣ: { :row ውጤት ፃፍ: row, አዲስ-መስመር. }. } ያዝ: { :e ውጤት ፃፍ: e, አዲስ-መስመር. }, ጀምር.
+
+# the right number still works, more parameters are ignored as before
+>> የፍለጋ-መለኪያዎች := db መጠይቅ: ['SELECT ? AS a, ? AS b'].
+የፍለጋ-መለኪያዎች መለኪያዎች: (ሰልፍ አዲስ ; ['1'] ; ['2']).
+የፍለጋ-መለኪያዎች አምጣ: { :row ውጤት ፃፍ: (row በቦታ: ['a']), ፃፍ: (row በቦታ: ['b']), አዲስ-መስመር. }.
+የፍለጋ-መለኪያዎች መለኪያዎች: (ሰልፍ አዲስ ; ['1'] ; ['2'] ; ['3']).
+የፍለጋ-መለኪያዎች አምጣ: { :row ውጤት ፃፍ: (row በቦታ: ['a']), ፃፍ: (row በቦታ: ['b']), አዲስ-መስመር. }.

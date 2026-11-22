@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB nobo anfitrion: ['localhost'],
+	nòmber-di-usuario: ['xo'],
+	kontraseña: ['pass123'],
+	nòmber-di-base: ['xobase'],
+	konektá.
+
+>> conn2 := Maria-DB nobo anfitrion: ['localhost'],
+	nòmber-di-usuario: ['xo'],
+	kontraseña: ['pass123'],
+	nòmber-di-base: ['xobase'],
+	konektá.
+#...
+>> del := conn1 konsulta: ['DELETE FROM book WHERE id > 0'].
+{  del ehekutá. conn1 konfirmá. } kapta: { :e conn1 bolbe-atras.  }, kuminsá.
+
+>> insert := conn1 konsulta: ['INSERT INTO book (id) VALUES(null)'].
+insert ehekutá.
+
+>> konta := conn1 konsulta: ['SELECT COUNT(*) AS num FROM book'].
+konta trese: { :row Salida skirbi: row num, liña-nobo. }.
+
+# does not show up
+# insert not committed on connection 1
+>> konta := conn2 konsulta: ['SELECT COUNT(*) AS num FROM book'].
+konta trese: { :row Salida skirbi: row num, liña-nobo. }.

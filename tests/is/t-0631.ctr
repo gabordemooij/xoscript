@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Forrit minnisstjórnun: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Forrit stilling: ['FFITESTLIB'].
+
+
+
+Server tengja: (
+ Listi nýtt ;
+ libname ;
+ ['puts'] ;
+ ( Listi nýtt ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s losa.
+
+# test with struct
+
+>> a := Blob nýtt: 8.
+a bytes: (
+	Listi <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Listi <<: ['int'], ; ['int']).
+
+Server tengja: (
+	Listi <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Listi <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Úttak skrifa: ['Sum test:'] + (ffitest ffisum: a), ný-lína.
+
+struct losa-struct.
+struct losa.
+a losa.

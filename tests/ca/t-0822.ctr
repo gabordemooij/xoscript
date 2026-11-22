@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB nou amfitrió: ['localhost'],
+	usuari: ['xo'],
+	contrasenya: ['pass123'],
+	nom-base: ['xobase'],
+	connecta.
+
+>> paràmetres-de-cerca := db consulta: ['SELECT ? AS a, ? AS b, ? AS c'].
+paràmetres-de-cerca paràmetres: (Llista nou ; ['1']).
+{ paràmetres-de-cerca obtén: { :row Sortida escriu: row, salt-de-línia. }. } captura: { :e Sortida escriu: e, salt-de-línia. }, inicia.
+
+>> paràmetres-de-cerca := db consulta: ['SELECT ? AS a'].
+{ paràmetres-de-cerca obtén: { :row Sortida escriu: row, salt-de-línia. }. } captura: { :e Sortida escriu: e, salt-de-línia. }, inicia.
+
+# the right number still works, more parameters are ignored as before
+>> paràmetres-de-cerca := db consulta: ['SELECT ? AS a, ? AS b'].
+paràmetres-de-cerca paràmetres: (Llista nou ; ['1'] ; ['2']).
+paràmetres-de-cerca obtén: { :row Sortida escriu: (row a: ['a']), escriu: (row a: ['b']), salt-de-línia. }.
+paràmetres-de-cerca paràmetres: (Llista nou ; ['1'] ; ['2'] ; ['3']).
+paràmetres-de-cerca obtén: { :row Sortida escriu: (row a: ['a']), escriu: (row a: ['b']), salt-de-línia. }.

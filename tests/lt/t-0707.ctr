@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programa atminties-valdymas: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB naujas mazgas: ['localhost'],
+	naudotojas: ['xo'], slaptažodis: ['pass123'], duomenų-bazės-vardas: ['xobase'], prisijungti.
+
+>> TwoDigitFormat := Formatas naujas: ['%02d'].
+
+# Datetime
+{
+	>> metai := Skaičius tarp: 1995 ir: 2050, tekstas.
+	>> mėnesis := TwoDigitFormat taikyti-sveikajam: (Skaičius tarp: 1 ir: 12), tekstas.
+	>> diena := TwoDigitFormat taikyti-sveikajam: (Skaičius tarp: 1 ir: 28), tekstas.
+	>> valanda := TwoDigitFormat taikyti-sveikajam: (Skaičius tarp: 1 ir: 23), tekstas.
+	>> minutė := TwoDigitFormat taikyti-sveikajam: (Skaičius tarp: 1 ir: 59), tekstas.
+	>> sekundė := TwoDigitFormat taikyti-sveikajam: (Skaičius tarp: 1 ir: 59), tekstas.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: metai,
+		MM: mėnesis,
+		DD: diena,
+		HH: valanda,
+		II: minutė,
+		SS: sekundė.
+	>> paieškos-parametrai :=
+	db užklausa: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	gauti: { :row
+		(row mydatetime = datetime) netiesa: {
+			ši-užduotis klaida: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter sudėti: 1.
+} * 100.
+
+# Date
+{
+	>> metai := Skaičius tarp: 1995 ir: 2050, tekstas.
+	>> mėnesis := TwoDigitFormat taikyti-sveikajam: (Skaičius tarp: 1 ir: 12), tekstas.
+	>> diena := TwoDigitFormat taikyti-sveikajam: (Skaičius tarp: 1 ir: 28), tekstas.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: metai,
+		MM: mėnesis,
+		DD: diena.
+	>> paieškos-parametrai :=
+	db užklausa: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	gauti: { :row
+		(row mydate = date) netiesa: {
+			ši-užduotis klaida: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter sudėti: 1.
+} * 100.
+
+
+# Time
+{
+	>> valanda := TwoDigitFormat taikyti-sveikajam: (Skaičius tarp: 1 ir: 23), tekstas.
+	>> minutė := TwoDigitFormat taikyti-sveikajam: (Skaičius tarp: 1 ir: 59), tekstas.
+	>> sekundė := TwoDigitFormat taikyti-sveikajam: (Skaičius tarp: 1 ir: 59), tekstas.
+	>> laikas := ['HH:II:SS'].
+	laikas
+		HH: valanda,
+		II: minutė,
+		SS: sekundė.
+	>> paieškos-parametrai :=
+	db užklausa: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: laikas),
+	gauti: { :row
+		(row mytime = laikas) netiesa: {
+			ši-užduotis klaida: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter sudėti: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Sąrašas naujas užpildyti: 100000 su: ['x'], sujungti: [''].
+{
+	>> str2 := Seifas žetonas: 40.
+	>> paieškos-parametrai :=
+	db užklausa: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	gauti: { :row
+		(row str1 = str1 ir: row str2 = str2) netiesa: {
+			ši-užduotis klaida: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter sudėti: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Skaičius tarp: 1 ir: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 iš-teksto: ['9223372036854775807'] ) -
+		( Int64 iš-teksto: ['99999'] ) +
+		( Int64 iš-teksto: n1 tekstas )
+	).
+	>> paieškos-parametrai :=
+	db užklausa: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	gauti: { :row
+		(row n1 = n1) netiesa: {
+			ši-užduotis klaida: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) netiesa: {
+			ši-užduotis klaida: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 apvalinti) netiesa: {
+			ši-užduotis klaida: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) netiesa: {
+			ši-užduotis klaida: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter sudėti: 1.
+} * 100.
+
+
+Išvestis rašyti: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), nauja-eilutė.

@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> zkusit := { :format :value
+	{ Výstup psát: ( (Formát nový: format) aplikovat: value ), nový-řádek. } chytit: { :e Výstup psát: e, nový-řádek. }, spustit.
+}.
+>> try-int := { :format :value
+	{ Výstup psát: ( (Formát nový: format) aplikovat-celé: value ), nový-řádek. } chytit: { :e Výstup psát: e, nový-řádek. }, spustit.
+}.
+
+# fits
+zkusit aplikovat: ['|%s|'] a: ['text'].
+zkusit aplikovat: ['%06.2f'] a: 5.5.
+zkusit aplikovat: ['100%% %s'] a: ['sure'].
+try-int aplikovat: ['%03d'] a: 7.
+try-int aplikovat: ['%x'] a: 255.
+zkusit aplikovat: ['%d'] a: (Int64 nový z-řetězce: ['12']).
+zkusit aplikovat: ['%lld'] a: (Int64 nový z-řetězce: ['12']).
+zkusit aplikovat: ['%.1lf'] a: 5.5.
+try-int aplikovat: ['%hd'] a: 7.
+
+# does not fit
+zkusit aplikovat: ['%s'] a: 12345.
+zkusit aplikovat: ['%d'] a: 12345.
+zkusit aplikovat: ['%f'] a: ['text'].
+try-int aplikovat: ['%d'] a: ['text'].
+try-int aplikovat: ['%s'] a: 5.
+zkusit aplikovat: ['%s %s'] a: ['text'].
+zkusit aplikovat: ['%n'] a: ['text'].
+zkusit aplikovat: ['%*s'] a: ['text'].
+zkusit aplikovat: ['%'] a: ['text'].
+
+# length modifier does not fit
+zkusit aplikovat: ['%ls'] a: ['text'].
+zkusit aplikovat: ['%Lf'] a: 5.5.
+try-int aplikovat: ['%ld'] a: 7.
+try-int aplikovat: ['%lld'] a: 7.
+zkusit aplikovat: ['%Ld'] a: (Int64 nový z-řetězce: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+zkusit aplikovat: ['%99999999999s'] a: ['text'].

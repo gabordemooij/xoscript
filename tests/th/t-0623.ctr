@@ -1,0 +1,43 @@
+
+
+>> g := Server สร้างใหม่.
+>> v := ตู้นิรภัย สร้างใหม่.
+>> ok := 0.
+
+>> secrets := ลิสต์ สร้างใหม่ ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets คัดลอก.
+passwords แต่ละตัว: { :i :p
+	secrets แต่ละตัว: { :n :s
+		{
+			>> encrypted := v เข้ารหัสลับ: s กุญแจ: p.
+			>> decrypted := v ถอดรหัสลับ: encrypted กุญแจ: p.
+			(decrypted = s) ถ้าจริง: {
+				ok บวก: 1.
+			}, มิฉะนั้น: {
+				แสดงผล เขียน: ['failed encrypting/decrypting: '], ขึ้นบรรทัดใหม่.
+				แสดงผล เขียน: s, ขึ้นบรรทัดใหม่.
+				แสดงผล เขียน: ['encrypted: '] + encrypted, ขึ้นบรรทัดใหม่.
+				แสดงผล เขียน: ['decrypted: '] + encrypted, ขึ้นบรรทัดใหม่.
+				โปรแกรม จบ.
+			}.
+		} ดักจับ: { :err
+			(s = [''] หรือ: p = ['']) ถ้าจริง: {
+				ok บวก: 1.
+			}, มิฉะนั้น: {
+				แสดงผล เขียน: err, ขึ้นบรรทัดใหม่.
+				โปรแกรม จบ.
+			}.
+		}, เริ่ม.
+	}.
+}.
+
+แสดงผล เขียน: ( ok + [' vault encryptions tested.'] ), ขึ้นบรรทัดใหม่.

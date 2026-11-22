@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Llista nou ;
+	# {"key":"normal"} normal ASCII
+	( Diccionari nou posa: ['normal'] a: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Diccionari nou posa: ['hello world'] a: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Diccionari nou posa: ['"'] a: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Diccionari nou posa: ['backslash: \\'] a: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Diccionari nou posa: ['slash: /'] a: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Diccionari nou posa: ['backspace: \b'] a: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Diccionari nou posa: ['formfeed: \f'] a: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Diccionari nou posa: ['newline: \n'] a: ['key'] ) ;
+	( Diccionari nou posa: ['newline: ↵'] a: ['key'] ) ;
+	( Diccionari nou posa: ['newline: 
+	'] a: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Diccionari nou posa: ['carriage return: \r'] a: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Diccionari nou posa: ['tab \t'] a: ['key'] ) ;
+	( Diccionari nou posa: ['tab ⇿'] a: ['key'] ) ;
+	( Diccionari nou posa: ['tab  '] a: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Diccionari nou posa: ['NUL \u0000'] a: ['key'] ) ;
+	( Diccionari nou posa: ['NUL \0'] a: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Diccionari nou posa: ['control: \u0001'] a: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Diccionari nou posa: ['control: \u001F'] a: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Diccionari nou posa: ['unicode: é'] a: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Diccionari nou posa: ['unicode: €'] a: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Diccionari nou posa: ['unicode: 日本語'] a: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Diccionari nou posa: ['unicode: 😀'] a: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Diccionari nou posa: ['unicode: 🧑‍💻'] a: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Diccionari nou posa: ['combining: e\u0301'] a: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Diccionari nou posa: ['escaped unicode: \u00e9'] a: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Diccionari nou posa: ['escaped unicode: \u20ac'] a: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Diccionari nou posa: ['escaped unicode: \ud83d\ude00'] a: ['key'] ) ;
+	# {"key":""} empty value
+	( Diccionari nou posa: [''] a: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Diccionari nou posa: ['@ < > & = % + ? #'] a: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Diccionari nou posa: ['''] a: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Diccionari nou posa: ['multiple: \" \\ \n \r \t'] a: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Diccionari nou posa: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] a: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Diccionari nou posa: [' value'] a: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Diccionari nou posa: ['value '] a: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Diccionari nou posa: [' \t\n\r '] a: ['key'] ).
+
+dicts cada: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Diccionari nou posa: d key a: ['key']).
+	>> b := JSON jsonify: (Diccionari nou posa: ['value'] a: d key).
+	>> e := JSON objecte: a.
+	>> f := JSON objecte: b.
+	((e key = d key i: (f ? d key = ['value'])) o: (e key = ['NUL ?'])) cert: {
+		Sortida escriu: ['OK'], salt-de-línia.
+	}, si-no: {
+		Sortida escriu: ['Unable to properly encode/decode: '] + d + j, salt-de-línia.
+		Programa final.
+	}.
+}.

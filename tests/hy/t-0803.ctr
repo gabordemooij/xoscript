@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB նոր հոսթ: ['localhost'],
+	օգտանուն: ['xo'],
+	գաղտնաբառ: ['pass123'],
+	բազայի-անուն: ['xobase'],
+	միանալ.
+
+>> conn2 := Maria-DB նոր հոսթ: ['localhost'],
+	օգտանուն: ['xo'],
+	գաղտնաբառ: ['pass123'],
+	բազայի-անուն: ['xobase'],
+	միանալ.
+#...
+>> del := conn1 հարցում: ['DELETE FROM book WHERE id > 0'].
+{  del կատարել. conn1 հաստատել. } որսալ: { :e conn1 հետարկել.  }, գործարկել.
+
+>> insert := conn1 հարցում: ['INSERT INTO book (id) VALUES(null)'].
+insert կատարել.
+
+>> քանակ := conn1 հարցում: ['SELECT COUNT(*) AS num FROM book'].
+քանակ ստանալ: { :row Ելք գրել: row num, նոր-տող. }.
+
+# does not show up
+# insert not committed on connection 1
+>> քանակ := conn2 հարցում: ['SELECT COUNT(*) AS num FROM book'].
+քանակ ստանալ: { :row Ելք գրել: row num, նոր-տող. }.

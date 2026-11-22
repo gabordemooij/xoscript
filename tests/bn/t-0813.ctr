@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server প্রস্তুত-করো.
+প্রোগ্রাম ব্যবহার: ['../../../src/xo/bn/webtools.xo'].
+প্রোগ্রাম ব্যবহার: ['../../../src/xo/bn/mailtools.xo'].
+
+>> হেডার := HTTP-হেডার নতুন চাবি: ['Location'] মূল্য: ['/ok\r\nX-Injected: yes'].
+আউটপুট লেখো: হেডার.
+
+>> web := ওয়েব-নথি নতুন.
+web যাও: ['/ok\r\nX-Injected: yes'].
+আউটপুট লেখো: ['\n'], নতুন-লাইন.
+
+>> mail := ইমেইল নতুন.
+mail প্রাপককে: (লিস্ট নতুন ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (লিস্ট নতুন ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (লিস্ট নতুন ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail প্রেরক: ['d@example.invalid\r\nX-From: yes'] নাম: ['site\r\nX-Name: yes'].
+mail বিষয়: ['hello\r\nX-Subject: yes'].
+mail মূল-পাঠ্য: ['line1\r\nline2'].
+আউটপুট লেখো: mail তৈরি-করো.
+
+>> html := HTML-ইমেইল নতুন.
+html প্রাপককে: (লিস্ট নতুন ; ['a@example.invalid\r\nX-To: yes']).
+html প্রেরক: ['d@example.invalid'] নাম: ['site'].
+html বিষয়: ['hello\r\nX-Subject: yes'].
+html মূল-পাঠ্য: ['body'].
+আউটপুট লেখো: ( html তৈরি-করো ধারণ-করে: ['\nX-'] ), নতুন-লাইন.
+আউটপুট লেখো: ( html তৈরি-করো ধারণ-করে: ['X-To: yes'] ), নতুন-লাইন.

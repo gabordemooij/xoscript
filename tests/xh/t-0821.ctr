@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> indlela-yefayile := ['/tmp/test0821.csv'].
+>> file := Ifayile entsha: indlela-yefayile.
+
+file bhala: ['a,b\n"1,2\n'].
+{
+	file isahluli: [','] isicatshulwa: ['"'] imigca: { :line
+		Imveliso bhala: line, umgca-omtsha.
+	}.
+} bamba: { :e Imveliso bhala: e, umgca-omtsha. }, qala.
+
+# a closed quote still works
+file bhala: ['a,b\n"1,2",3'].
+file isahluli: [','] isicatshulwa: ['"'] imigca: { :line
+	Imveliso bhala: line, umgca-omtsha.
+}.
+file cima.

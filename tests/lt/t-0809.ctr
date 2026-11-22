@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> reikšmės := Sąrašas naujas
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+reikšmės kiekvienas: { :i :value
+	>> d := Žodynas naujas.
+	d įdėti: value į: ['k'].
+	>> r := d kodas objektas.
+	Išvestis rašyti: r kiekis, nauja-eilutė.
+	Išvestis rašyti: ( (r vietoje: ['k']) = value ), nauja-eilutė.
+}.

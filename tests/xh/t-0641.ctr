@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Isichazimagama entsha
+	# ASCII only
+	beka: ( Uluhlu entsha ; 65 ; 65 ; 65 ; 65 ; 0 ) kwindawo: ['AAAA'],
+	# valid 2 byte sequence
+	beka: ( Uluhlu entsha ; 194 ; 162 ; 0 ) kwindawo: ['¢'],
+	# Valid 3-byte UTF-8
+    beka: ( Uluhlu entsha ; 226 ; 130 ; 172 ; 0 ) kwindawo: ['€'],
+	# Valid 4-byte UTF-8
+    beka: ( Uluhlu entsha ; 240 ; 144 ; 141 ; 136 ; 0 ) kwindawo: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    beka: ( Uluhlu entsha ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) kwindawo: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    beka: ( Uluhlu entsha ; 65 ; 193 ; 129 ; 0 ) kwindawo: ['A?'],
+	# Invalid first byte (0xFF)
+    beka: ( Uluhlu entsha ; 255 ; 0 ) kwindawo: ['?'],
+	# Incomplete multi-byte sequence at end
+    beka: ( Uluhlu entsha ; 66 ; 226 ; 0 ) kwindawo: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    beka: ( Uluhlu entsha ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) kwindawo: ['A€?𐍈B'].
+	 
+utf8cases nganye: { :key :value
+	>> blob := Blob entsha: value inani-lezinto, bytes: value.
+	>> str := blob umbhalo.
+	(str = key) inyaniso: {
+		Imveliso bhala: ['OK'], umgca-omtsha.
+	}, kungenjalo: {
+		Imveliso bhala: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, umgca-omtsha.
+	}.
+	blob khulula.
+}.

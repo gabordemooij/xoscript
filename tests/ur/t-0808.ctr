@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := تجوری کلیدیں-بناؤ.
+>> sk := keys پہلا.
+>> pk := keys آخری.
+>> sig := تجوری دستخط: ⌝'abc'⌜ کلید-سے: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+
+# 44 characters without padding decode to 33 bytes
+>> short := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+
+⎬ تجوری دستخط: ⌝'abc'⌜ کلید-سے: long. ⎨ پکڑو: ⎬ :e
+	آؤٹ-پٹ لکھو: e, نئی-سطر.
+⎨, چلاؤ.
+
+⎬ تجوری جانچو: ⌝'abc'⌜ دستخط: long کلید-سے: pk. ⎨ پکڑو: ⎬ :e
+	آؤٹ-پٹ لکھو: e, نئی-سطر.
+⎨, چلاؤ.
+
+⎬ تجوری جانچو: ⌝'abc'⌜ دستخط: sig کلید-سے: short. ⎨ پکڑو: ⎬ :e
+	آؤٹ-پٹ لکھو: e, نئی-سطر.
+⎨, چلاؤ.

@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB шинэ хост: ['localhost'],
+	хэрэглэгчийн-нэр: ['xo'],
+	нууц-үг: ['pass123'],
+	өгөгдлийн-сангийн-нэр: ['xobase'],
+	холбогдох.
+
+>> conn2 := Maria-DB шинэ хост: ['localhost'],
+	хэрэглэгчийн-нэр: ['xo'],
+	нууц-үг: ['pass123'],
+	өгөгдлийн-сангийн-нэр: ['xobase'],
+	холбогдох.
+#...
+>> del := conn1 асуулга: ['DELETE FROM book WHERE id > 0'].
+{  del гүйцэтгэх. conn1 батлах. } барих: { :e conn1 буцаах.  }, ажиллуулах.
+
+>> insert := conn1 асуулга: ['INSERT INTO book (id) VALUES(null)'].
+insert гүйцэтгэх.
+
+>> тоо-ширхэг := conn1 асуулга: ['SELECT COUNT(*) AS num FROM book'].
+тоо-ширхэг татах: { :row Гаралт бичих: row num, шинэ-мөр. }.
+
+# does not show up
+# insert not committed on connection 1
+>> тоо-ширхэг := conn2 асуулга: ['SELECT COUNT(*) AS num FROM book'].
+тоо-ширхэг татах: { :row Гаралт бичих: row num, шинэ-мөр. }.

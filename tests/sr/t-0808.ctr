@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Сеф генериши-кључеве.
+>> sk := keys први.
+>> pk := keys последњи.
+>> sig := Сеф потпиши: ['abc'] кључем: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Сеф потпиши: ['abc'] кључем: long. } ухвати: { :e
+	Излаз пиши: e, нови-ред.
+}, покрени.
+
+{ Сеф провери: ['abc'] потпис: long кључем: pk. } ухвати: { :e
+	Излаз пиши: e, нови-ред.
+}, покрени.
+
+{ Сеф провери: ['abc'] потпис: sig кључем: short. } ухвати: { :e
+	Излаз пиши: e, нови-ред.
+}, покрени.

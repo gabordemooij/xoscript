@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Спіс новы ;
+	# {"key":"normal"} normal ASCII
+	( Слоўнік новы пакласці: ['normal'] на: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Слоўнік новы пакласці: ['hello world'] на: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Слоўнік новы пакласці: ['"'] на: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Слоўнік новы пакласці: ['backslash: \\'] на: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Слоўнік новы пакласці: ['slash: /'] на: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Слоўнік новы пакласці: ['backspace: \b'] на: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Слоўнік новы пакласці: ['formfeed: \f'] на: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Слоўнік новы пакласці: ['newline: \n'] на: ['key'] ) ;
+	( Слоўнік новы пакласці: ['newline: ↵'] на: ['key'] ) ;
+	( Слоўнік новы пакласці: ['newline: 
+	'] на: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Слоўнік новы пакласці: ['carriage return: \r'] на: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Слоўнік новы пакласці: ['tab \t'] на: ['key'] ) ;
+	( Слоўнік новы пакласці: ['tab ⇿'] на: ['key'] ) ;
+	( Слоўнік новы пакласці: ['tab  '] на: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Слоўнік новы пакласці: ['NUL \u0000'] на: ['key'] ) ;
+	( Слоўнік новы пакласці: ['NUL \0'] на: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Слоўнік новы пакласці: ['control: \u0001'] на: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Слоўнік новы пакласці: ['control: \u001F'] на: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Слоўнік новы пакласці: ['unicode: é'] на: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Слоўнік новы пакласці: ['unicode: €'] на: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Слоўнік новы пакласці: ['unicode: 日本語'] на: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Слоўнік новы пакласці: ['unicode: 😀'] на: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Слоўнік новы пакласці: ['unicode: 🧑‍💻'] на: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Слоўнік новы пакласці: ['combining: e\u0301'] на: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Слоўнік новы пакласці: ['escaped unicode: \u00e9'] на: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Слоўнік новы пакласці: ['escaped unicode: \u20ac'] на: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Слоўнік новы пакласці: ['escaped unicode: \ud83d\ude00'] на: ['key'] ) ;
+	# {"key":""} empty value
+	( Слоўнік новы пакласці: [''] на: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Слоўнік новы пакласці: ['@ < > & = % + ? #'] на: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Слоўнік новы пакласці: ['''] на: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Слоўнік новы пакласці: ['multiple: \" \\ \n \r \t'] на: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Слоўнік новы пакласці: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] на: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Слоўнік новы пакласці: [' value'] на: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Слоўнік новы пакласці: ['value '] на: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Слоўнік новы пакласці: [' \t\n\r '] на: ['key'] ).
+
+dicts кожны: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Слоўнік новы пакласці: d key на: ['key']).
+	>> b := JSON jsonify: (Слоўнік новы пакласці: ['value'] на: d key).
+	>> e := JSON абʼект: a.
+	>> f := JSON абʼект: b.
+	((e key = d key і: (f ? d key = ['value'])) альбо: (e key = ['NUL ?'])) праўда: {
+		Вывад пісаць: ['OK'], новы-радок.
+	}, інакш: {
+		Вывад пісаць: ['Unable to properly encode/decode: '] + d + j, новы-радок.
+		Праграма канец.
+	}.
+}.

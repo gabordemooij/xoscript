@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server เตรียม.
+โปรแกรม ใช้: ['../../../src/xo/th/webtools.xo'].
+โปรแกรม ใช้: ['../../../src/xo/th/mailtools.xo'].
+
+>> ส่วนหัว := ส่วนหัว-HTTP สร้างใหม่ คีย์: ['Location'] ค่า: ['/ok\r\nX-Injected: yes'].
+แสดงผล เขียน: ส่วนหัว.
+
+>> web := เอกสารเว็บ สร้างใหม่.
+web ไปที่: ['/ok\r\nX-Injected: yes'].
+แสดงผล เขียน: ['\n'], ขึ้นบรรทัดใหม่.
+
+>> mail := อีเมล สร้างใหม่.
+mail ถึง: (ลิสต์ สร้างใหม่ ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (ลิสต์ สร้างใหม่ ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (ลิสต์ สร้างใหม่ ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail ผู้ส่ง: ['d@example.invalid\r\nX-From: yes'] ชื่อ: ['site\r\nX-Name: yes'].
+mail หัวเรื่อง: ['hello\r\nX-Subject: yes'].
+mail เนื้อความ: ['line1\r\nline2'].
+แสดงผล เขียน: mail สร้างขึ้น.
+
+>> html := อีเมล-HTML สร้างใหม่.
+html ถึง: (ลิสต์ สร้างใหม่ ; ['a@example.invalid\r\nX-To: yes']).
+html ผู้ส่ง: ['d@example.invalid'] ชื่อ: ['site'].
+html หัวเรื่อง: ['hello\r\nX-Subject: yes'].
+html เนื้อความ: ['body'].
+แสดงผล เขียน: ( html สร้างขึ้น ประกอบด้วย: ['\nX-'] ), ขึ้นบรรทัดใหม่.
+แสดงผล เขียน: ( html สร้างขึ้น ประกอบด้วย: ['X-To: yes'] ), ขึ้นบรรทัดใหม่.

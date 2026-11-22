@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Lomifefiloi fou
+	# ASCII only
+	tuʻu: ( Lisi fou ; 65 ; 65 ; 65 ; 65 ; 0 ) i: ['AAAA'],
+	# valid 2 byte sequence
+	tuʻu: ( Lisi fou ; 194 ; 162 ; 0 ) i: ['¢'],
+	# Valid 3-byte UTF-8
+    tuʻu: ( Lisi fou ; 226 ; 130 ; 172 ; 0 ) i: ['€'],
+	# Valid 4-byte UTF-8
+    tuʻu: ( Lisi fou ; 240 ; 144 ; 141 ; 136 ; 0 ) i: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    tuʻu: ( Lisi fou ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) i: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    tuʻu: ( Lisi fou ; 65 ; 193 ; 129 ; 0 ) i: ['A?'],
+	# Invalid first byte (0xFF)
+    tuʻu: ( Lisi fou ; 255 ; 0 ) i: ['?'],
+	# Incomplete multi-byte sequence at end
+    tuʻu: ( Lisi fou ; 66 ; 226 ; 0 ) i: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    tuʻu: ( Lisi fou ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) i: ['A€?𐍈B'].
+	 
+utf8cases taʻitasi: { :key :value
+	>> blob := Blob fou: value aofaiga, bytes: value.
+	>> str := blob manoa.
+	(str = key) moni: {
+		Tuuina-atu tusi: ['OK'], laina-fou.
+	}, a-leai: {
+		Tuuina-atu tusi: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, laina-fou.
+	}.
+	blob faasaoloto.
+}.

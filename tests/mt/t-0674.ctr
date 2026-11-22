@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> mogħdija := ['/tmp/dat.csv'].
+>> csv := Fajl ġdid: mogħdija.
+csv ikteb: s.
+
+# accepts CRLF LF CR, varying row length
+csv delimitatur: [';'] virgoletta: ['"'] linji: { :line
+	Programm naddaf.
+	Ħruġ ikteb: line, linja-ġdida.
+	Programm naddaf.
+}.
+
+# unequal lines
+s żid-fit-tmiem: ['\njustone'].
+csv ikteb: s.
+{
+	csv delimitatur: [';'] virgoletta: ['"'] linji: { :line
+		Ħruġ ikteb: line, linja-ġdida.
+	}.
+} aqbad: { :e 
+	Ħruġ ikteb: e, linja-ġdida.
+}, ibda.
+
+# invalid format
+s := ['"he"llo";world'].
+csv ikteb: s.
+{
+	csv delimitatur: [';'] virgoletta: ['"'] linji: { :line
+		Ħruġ ikteb: line, linja-ġdida.
+	}.
+} aqbad: { :e 
+	Ħruġ ikteb: e, linja-ġdida.
+}, ibda.

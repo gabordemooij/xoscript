@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server தொடக்கம்-செய்.
+நிரல் உபயோகி: ['../../../src/xo/ta/webtools.xo'].
+
+>> Fake-Request := பொருள் புதிய.
+Fake-Request பெறும்போது: ['value:'] செய்: { :மதிப்பு
+	தனது மதிப்பு := மதிப்பு.
+}.
+Fake-Request பெறும்போது: ['cookie:'] செய்: { :பெயர் <- தனது மதிப்பு.
+}.
+
+>> Test-Session := தற்காலிக-கோப்பு-அமர்வு புதிய.
+Test-Session பெறும்போது: ['ஏற்று'] செய்: { <- அகராதி புதிய.
+}.
+Test-Session பெறும்போது: ['session-id'] செய்: { <- தனது id.
+}.
+
+>> cookies := வரிசை புதிய
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies ஒவ்வொன்றும்: { :i :cookie
+	>> கோரிக்கை-http := Fake-Request புதிய.
+	கோரிக்கை-http value: cookie.
+	>> மேலாளர் := Test-Session புதிய.
+	>> web := வலை-ஆவணம் புதிய.
+	web கோரிக்கை-http: கோரிக்கை-http.
+	web அமர்வு-மேலாளர்: மேலாளர்.
+	web அமர்வைத்-தொடங்கு.
+	வெளியீடு எழுது: ( மேலாளர் session-id = cookie ), புதிய-வரி.
+}.
+
+>> web := வலை-ஆவணம் புதிய.
+web json: (அகராதி புதிய வை: ['b'] திறவுகோல்: ['a']).
+வெளியீடு எழுது: ['\n'], புதிய-வரி.
+
+{ வலையமைப்பு get: ['file:///etc/hostname']. } பிடி: { :e
+	வெளியீடு எழுது: e, புதிய-வரி.
+}, இயக்கு.
+
+>> svg := கோப்பு புதிய: ['/tmp/test0814.svg'].
+svg எழுது: ['<svg xmlns="x"></svg>'].
+வெளியீடு புதிய-வரி.
+Server கடத்து: ['test0814.svg'] முன்னொட்டு: ['/tmp/'].
+svg நீக்கு.

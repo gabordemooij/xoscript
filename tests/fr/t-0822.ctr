@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB nouveau hôte: ['localhost'],
+	utilisateur: ['xo'],
+	mot-de-passe: ['pass123'],
+	nom-base: ['xobase'],
+	connecter.
+
+>> paramètres-recherche := db requête: ['SELECT ? AS a, ? AS b, ? AS c'].
+paramètres-recherche paramètres: (Liste nouveau ; ['1']).
+{ paramètres-recherche récupérer: { :row Sortie écrire: row, stop. }. } intercepter: { :e Sortie écrire: e, stop. }, démarrer.
+
+>> paramètres-recherche := db requête: ['SELECT ? AS a'].
+{ paramètres-recherche récupérer: { :row Sortie écrire: row, stop. }. } intercepter: { :e Sortie écrire: e, stop. }, démarrer.
+
+# the right number still works, more parameters are ignored as before
+>> paramètres-recherche := db requête: ['SELECT ? AS a, ? AS b'].
+paramètres-recherche paramètres: (Liste nouveau ; ['1'] ; ['2']).
+paramètres-recherche récupérer: { :row Sortie écrire: (row à: ['a']), écrire: (row à: ['b']), stop. }.
+paramètres-recherche paramètres: (Liste nouveau ; ['1'] ; ['2'] ; ['3']).
+paramètres-recherche récupérer: { :row Sortie écrire: (row à: ['a']), écrire: (row à: ['b']), stop. }.

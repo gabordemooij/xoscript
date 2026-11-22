@@ -1,0 +1,39 @@
+
+
+Teksts kad: ['evaluate'] darīt: {
+	>> kods := Fails jauns: ['/tmp/eval.ctr'].
+	kods rakstīt: pats teksts + ['.'].
+	Programma izmantot: ['/tmp/eval.ctr'].
+}.
+
+>> a := (Saraksts ← (
+	(Vārdnīca jauns)
+		ielikt: ['domain'] pie: ['mywebsite.com'],
+		ielikt: (Saraksts ←
+			((Vārdnīca jauns)
+				ielikt: ['home'] pie: ['title'],
+				ielikt: ['<html></html>'] pie: ['body'],
+				ielikt: ['2017-01-01'] pie: ['created']
+			) ;
+			((Vārdnīca jauns)
+				ielikt: ['aboutus(c)'] pie: ['title'],
+				ielikt: ['<credits>Author Inc.</credits>'] pie: ['body']
+			)
+		) pie: ['pages']
+	)
+) teksts.
+
+Izvade rakstīt: a tips, jauna-rinda.
+Izvade rakstīt: a, jauna-rinda.
+
+>> b := Nekas.
+(['b := '] + a) evaluate.
+Izvade rakstīt: b ? 0 ? ['pages'] ? 1 ? ['body'], jauna-rinda.
+
+>> c := b ? 0.
+>> d := c teksts.
+Izvade rakstīt: d tips, jauna-rinda.
+
+>> e := Nekas.
+(['e := '] + d) evaluate.
+Izvade rakstīt: e ? ['pages'] ? 0, jauna-rinda.

@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB xees dalalkat: ['localhost'],
+	turu-jëfandikukat: ['xo'],
+	baatu-jall: ['pass123'],
+	turu-dencukaayu-njoxe: ['xobase'],
+	lëkkaloo.
+
+>> tànneefi-seet := db laaj-njoxe: ['SELECT ? AS a, ? AS b, ? AS c'].
+tànneefi-seet tànneef-yi: (Jokkalante xees ; ['1']).
+{ tànneefi-seet indi: { :row Génn bind: row, taxaw. }. } jàpp: { :e Génn bind: e, taxaw. }, dox.
+
+>> tànneefi-seet := db laaj-njoxe: ['SELECT ? AS a'].
+{ tànneefi-seet indi: { :row Génn bind: row, taxaw. }. } jàpp: { :e Génn bind: e, taxaw. }, dox.
+
+# the right number still works, more parameters are ignored as before
+>> tànneefi-seet := db laaj-njoxe: ['SELECT ? AS a, ? AS b'].
+tànneefi-seet tànneef-yi: (Jokkalante xees ; ['1'] ; ['2']).
+tànneefi-seet indi: { :row Génn bind: (row ci: ['a']), bind: (row ci: ['b']), taxaw. }.
+tànneefi-seet tànneef-yi: (Jokkalante xees ; ['1'] ; ['2'] ; ['3']).
+tànneefi-seet indi: { :row Génn bind: (row ci: ['a']), bind: (row ci: ['b']), taxaw. }.

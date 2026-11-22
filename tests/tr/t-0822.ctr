@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB yeni sunucu-adı: ['localhost'],
+	kullanıcı: ['xo'],
+	parola: ['pass123'],
+	veritabanı-adı: ['xobase'],
+	bağlan.
+
+>> arama-parametreleri := db sorgu: ['SELECT ? AS a, ? AS b, ? AS c'].
+arama-parametreleri parametreler: (Liste yeni ; ['1']).
+{ arama-parametreleri getir: { :row Çıktı yaz: row, yeni-satır. }. } yakala: { :e Çıktı yaz: e, yeni-satır. }, başlat.
+
+>> arama-parametreleri := db sorgu: ['SELECT ? AS a'].
+{ arama-parametreleri getir: { :row Çıktı yaz: row, yeni-satır. }. } yakala: { :e Çıktı yaz: e, yeni-satır. }, başlat.
+
+# the right number still works, more parameters are ignored as before
+>> arama-parametreleri := db sorgu: ['SELECT ? AS a, ? AS b'].
+arama-parametreleri parametreler: (Liste yeni ; ['1'] ; ['2']).
+arama-parametreleri getir: { :row Çıktı yaz: (row konum: ['a']), yaz: (row konum: ['b']), yeni-satır. }.
+arama-parametreleri parametreler: (Liste yeni ; ['1'] ; ['2'] ; ['3']).
+arama-parametreleri getir: { :row Çıktı yaz: (row konum: ['a']), yaz: (row konum: ['b']), yeni-satır. }.

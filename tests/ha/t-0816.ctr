@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> gwada := { :format :value
+	{ Fitarwa rubuta: ( (Tsari sabo: format) aiwatar: value ), sabon-layi. } kama: { :e Fitarwa rubuta: e, sabon-layi. }, fara.
+}.
+>> try-int := { :format :value
+	{ Fitarwa rubuta: ( (Tsari sabo: format) aiwatar-cikakkiyar-lamba: value ), sabon-layi. } kama: { :e Fitarwa rubuta: e, sabon-layi. }, fara.
+}.
+
+# fits
+gwada aiwatar: ['|%s|'] da: ['text'].
+gwada aiwatar: ['%06.2f'] da: 5.5.
+gwada aiwatar: ['100%% %s'] da: ['sure'].
+try-int aiwatar: ['%03d'] da: 7.
+try-int aiwatar: ['%x'] da: 255.
+gwada aiwatar: ['%d'] da: (Int64 sabo daga-rubutu: ['12']).
+gwada aiwatar: ['%lld'] da: (Int64 sabo daga-rubutu: ['12']).
+gwada aiwatar: ['%.1lf'] da: 5.5.
+try-int aiwatar: ['%hd'] da: 7.
+
+# does not fit
+gwada aiwatar: ['%s'] da: 12345.
+gwada aiwatar: ['%d'] da: 12345.
+gwada aiwatar: ['%f'] da: ['text'].
+try-int aiwatar: ['%d'] da: ['text'].
+try-int aiwatar: ['%s'] da: 5.
+gwada aiwatar: ['%s %s'] da: ['text'].
+gwada aiwatar: ['%n'] da: ['text'].
+gwada aiwatar: ['%*s'] da: ['text'].
+gwada aiwatar: ['%'] da: ['text'].
+
+# length modifier does not fit
+gwada aiwatar: ['%ls'] da: ['text'].
+gwada aiwatar: ['%Lf'] da: 5.5.
+try-int aiwatar: ['%ld'] da: 7.
+try-int aiwatar: ['%lld'] da: 7.
+gwada aiwatar: ['%Ld'] da: (Int64 sabo daga-rubutu: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+gwada aiwatar: ['%99999999999s'] da: ['text'].

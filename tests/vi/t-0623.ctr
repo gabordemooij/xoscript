@@ -1,0 +1,43 @@
+
+
+>> g := Server mới.
+>> v := Két mới.
+>> ok := 0.
+
+>> secrets := Danh-sách mới ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets sao-chép.
+passwords mỗi: { :i :p
+	secrets mỗi: { :n :s
+		{
+			>> encrypted := v mã-hóa: s khóa: p.
+			>> decrypted := v giải-mã: encrypted khóa: p.
+			(decrypted = s) đúng: {
+				ok cộng: 1.
+			}, ngược-lại: {
+				Xuất ghi: ['failed encrypting/decrypting: '], xuống-dòng.
+				Xuất ghi: s, xuống-dòng.
+				Xuất ghi: ['encrypted: '] + encrypted, xuống-dòng.
+				Xuất ghi: ['decrypted: '] + encrypted, xuống-dòng.
+				Chương-trình kết-thúc.
+			}.
+		} bắt-lỗi: { :err
+			(s = [''] hoặc: p = ['']) đúng: {
+				ok cộng: 1.
+			}, ngược-lại: {
+				Xuất ghi: err, xuống-dòng.
+				Chương-trình kết-thúc.
+			}.
+		}, chạy.
+	}.
+}.
+
+Xuất ghi: ( ok + [' vault encryptions tested.'] ), xuống-dòng.

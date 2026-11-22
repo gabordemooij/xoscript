@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB nový hostitel: ['localhost'],
+	uživatel: ['xo'],
+	heslo: ['pass123'],
+	název-databáze: ['xobase'],
+	připojit.
+
+>> conn2 := Maria-DB nový hostitel: ['localhost'],
+	uživatel: ['xo'],
+	heslo: ['pass123'],
+	název-databáze: ['xobase'],
+	připojit.
+#...
+>> del := conn1 dotaz: ['DELETE FROM book WHERE id > 0'].
+{  del provést. conn1 potvrdit. } chytit: { :e conn1 vrátit-zpět.  }, spustit.
+
+>> insert := conn1 dotaz: ['INSERT INTO book (id) VALUES(null)'].
+insert provést.
+
+>> počet := conn1 dotaz: ['SELECT COUNT(*) AS num FROM book'].
+počet načíst: { :row Výstup psát: row num, nový-řádek. }.
+
+# does not show up
+# insert not committed on connection 1
+>> počet := conn2 dotaz: ['SELECT COUNT(*) AS num FROM book'].
+počet načíst: { :row Výstup psát: row num, nový-řádek. }.

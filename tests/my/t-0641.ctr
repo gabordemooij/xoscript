@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := အဘိဓာန် အသစ်
+	# ASCII only
+	ထည့်: ( အစီအစဉ် အသစ် ; 65 ; 65 ; 65 ; 65 ; 0 ) သော့: ['AAAA'],
+	# valid 2 byte sequence
+	ထည့်: ( အစီအစဉ် အသစ် ; 194 ; 162 ; 0 ) သော့: ['¢'],
+	# Valid 3-byte UTF-8
+    ထည့်: ( အစီအစဉ် အသစ် ; 226 ; 130 ; 172 ; 0 ) သော့: ['€'],
+	# Valid 4-byte UTF-8
+    ထည့်: ( အစီအစဉ် အသစ် ; 240 ; 144 ; 141 ; 136 ; 0 ) သော့: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    ထည့်: ( အစီအစဉ် အသစ် ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) သော့: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    ထည့်: ( အစီအစဉ် အသစ် ; 65 ; 193 ; 129 ; 0 ) သော့: ['A?'],
+	# Invalid first byte (0xFF)
+    ထည့်: ( အစီအစဉ် အသစ် ; 255 ; 0 ) သော့: ['?'],
+	# Incomplete multi-byte sequence at end
+    ထည့်: ( အစီအစဉ် အသစ် ; 66 ; 226 ; 0 ) သော့: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    ထည့်: ( အစီအစဉ် အသစ် ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) သော့: ['A€?𐍈B'].
+	 
+utf8cases တစ်ခုစီ: { :key :value
+	>> blob := Blob အသစ်: value အရေအတွက်, bytes: value.
+	>> str := blob စာသားသို့.
+	(str = key) မှန်လျှင်: {
+		အထွက် ရေး: ['OK'], စာကြောင်းသစ်.
+	}, မဟုတ်လျှင်: {
+		အထွက် ရေး: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, စာကြောင်းသစ်.
+	}.
+	blob လွှတ်ပေး.
+}.

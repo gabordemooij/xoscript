@@ -1,0 +1,42 @@
+
+Κείμενο όταν: ['html'] κάνε: { <- (
+		εαυτός
+		αντικατάσταση: ['&'] με: ['&amp;'],
+		αντικατάσταση: ['<'] με: ['&lt;'],
+		αντικατάσταση: ['>'] με: ['&gt;'],
+		αντικατάσταση: ['"'] με: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Αντικείμενο νέο.
+
+HtmlBrush όταν: ['απάντηση:'] κάνε: { :tag
+	Έξοδος γράψε: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush όταν: ['απάντηση:και:'] κάνε: { :tag :content
+	tag := ( tag από: 0 μήκος: (tag μήκος - 1) ).
+	Έξοδος γράψε: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush όταν: ['content:'] κάνε: { :text
+	Έξοδος γράψε: text html, νέα-γραμμή.
+}.
+
+HtmlBrush όταν: ['attr:value:'] κάνε: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush νέο.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

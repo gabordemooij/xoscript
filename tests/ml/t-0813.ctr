@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server ആരംഭിക്കുക.
+പ്രോഗ്രാം ഉപയോഗിക്കുക: ['../../../src/xo/ml/webtools.xo'].
+പ്രോഗ്രാം ഉപയോഗിക്കുക: ['../../../src/xo/ml/mailtools.xo'].
+
+>> തലക്കെട്ട് := HTTP-തലക്കെട്ട് പുതിയ താക്കോൽ: ['Location'] മൂല്യം: ['/ok\r\nX-Injected: yes'].
+ഔട്ട്പുട്ട് എഴുതുക: തലക്കെട്ട്.
+
+>> web := വെബ്-പ്രമാണം പുതിയ.
+web പോകുക: ['/ok\r\nX-Injected: yes'].
+ഔട്ട്പുട്ട് എഴുതുക: ['\n'], പുതിയ-വരി.
+
+>> mail := ഇമെയിൽ പുതിയ.
+mail സ്വീകർത്താവിന്: (ശ്രേണി പുതിയ ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (ശ്രേണി പുതിയ ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (ശ്രേണി പുതിയ ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail അയച്ചയാൾ: ['d@example.invalid\r\nX-From: yes'] പേര്: ['site\r\nX-Name: yes'].
+mail വിഷയം: ['hello\r\nX-Subject: yes'].
+mail പ്രധാന-വാചകം: ['line1\r\nline2'].
+ഔട്ട്പുട്ട് എഴുതുക: mail സൃഷ്ടിക്കുക.
+
+>> html := HTML-ഇമെയിൽ പുതിയ.
+html സ്വീകർത്താവിന്: (ശ്രേണി പുതിയ ; ['a@example.invalid\r\nX-To: yes']).
+html അയച്ചയാൾ: ['d@example.invalid'] പേര്: ['site'].
+html വിഷയം: ['hello\r\nX-Subject: yes'].
+html പ്രധാന-വാചകം: ['body'].
+ഔട്ട്പുട്ട് എഴുതുക: ( html സൃഷ്ടിക്കുക ഉൾക്കൊള്ളുന്നു: ['\nX-'] ), പുതിയ-വരി.
+ഔട്ട്പുട്ട് എഴുതുക: ( html സൃഷ്ടിക്കുക ഉൾക്കൊള്ളുന്നു: ['X-To: yes'] ), പുതിയ-വരി.

@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Объект яңа.
+
+Slurp килгәндә: ['яңа'] эшлә: {
+	үзенең str := [''].
+}.
+
+Slurp килгәндә: ['nieuw'] эшлә: {
+	үзенең str := [''].
+}.
+
+Slurp килгәндә: ['җавап-бир:'] эшлә: { :blah
+		үзенең str ахырга-өстә: blah.
+}.
+
+Slurp килгәндә: ['җавап-бир:һәм:'] эшлә: { :blah :blahah
+		үзенең str ахырга-өстә: (blah башлап: 0 озынлык: (blah озынлык - 1)).
+		үзенең str ахырга-өстә: [' '].
+		үзенең str ахырга-өстә: blahah.
+}.
+
+Slurp килгәндә: ['obtain'] эшлә: {
+	>> buffer := үзенең str.
+	үзенең str := ['']. <- buffer.
+}.
+
+
+Чыгыш яз: (Программа система: (Slurp яңа echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Файл яңа: ['/tmp/from.txt'], бетер. } тот: { ['Empty']. }, җибәр.
+{ Файл яңа: ['/tmp/to.txt'], бетер. } тот: { ['Empty']. }, җибәр.
+
+
+Файл яңа: ['/tmp/to.txt'], бар ялган: {
+	Чыгыш яз: ['Confirmed. Target file does not exist.\
+'].
+}.
+Файл яңа: ['/tmp/from.txt'], бар ялган: {
+	Чыгыш яз: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Программа система: (Slurp яңа touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Программа система: (Slurp яңа cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Файл яңа: ['/tmp/to.txt'], бар дөрес: {
+	Чыгыш яз: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Чыгыш яз: ['Contents of file is:'] + (Файл яңа: ['/tmp/to.txt'], укы), яңа-юл.

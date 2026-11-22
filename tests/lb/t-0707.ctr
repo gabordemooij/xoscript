@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programm späicherverwaltung: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB nei host: ['localhost'],
+	benotzernumm: ['xo'], passwuert: ['pass123'], datebanknumm: ['xobase'], verbannen.
+
+>> TwoDigitFormat := Format nei: ['%02d'].
+
+# Datetime
+{
+	>> joer := Zuel tëscht: 1995 an: 2050, text.
+	>> mount := TwoDigitFormat uwenden-int: (Zuel tëscht: 1 an: 12), text.
+	>> dag := TwoDigitFormat uwenden-int: (Zuel tëscht: 1 an: 28), text.
+	>> stonn := TwoDigitFormat uwenden-int: (Zuel tëscht: 1 an: 23), text.
+	>> minutt := TwoDigitFormat uwenden-int: (Zuel tëscht: 1 an: 59), text.
+	>> sekonn := TwoDigitFormat uwenden-int: (Zuel tëscht: 1 an: 59), text.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: joer,
+		MM: mount,
+		DD: dag,
+		HH: stonn,
+		II: minutt,
+		SS: sekonn.
+	>> sichparameter :=
+	db ufro: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ofruffen: { :row
+		(row mydatetime = datetime) falsch: {
+			dës-aufgab feeler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter dobäisetzen: 1.
+} * 100.
+
+# Date
+{
+	>> joer := Zuel tëscht: 1995 an: 2050, text.
+	>> mount := TwoDigitFormat uwenden-int: (Zuel tëscht: 1 an: 12), text.
+	>> dag := TwoDigitFormat uwenden-int: (Zuel tëscht: 1 an: 28), text.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: joer,
+		MM: mount,
+		DD: dag.
+	>> sichparameter :=
+	db ufro: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ofruffen: { :row
+		(row mydate = date) falsch: {
+			dës-aufgab feeler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter dobäisetzen: 1.
+} * 100.
+
+
+# Time
+{
+	>> stonn := TwoDigitFormat uwenden-int: (Zuel tëscht: 1 an: 23), text.
+	>> minutt := TwoDigitFormat uwenden-int: (Zuel tëscht: 1 an: 59), text.
+	>> sekonn := TwoDigitFormat uwenden-int: (Zuel tëscht: 1 an: 59), text.
+	>> zäit := ['HH:II:SS'].
+	zäit
+		HH: stonn,
+		II: minutt,
+		SS: sekonn.
+	>> sichparameter :=
+	db ufro: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: zäit),
+	ofruffen: { :row
+		(row mytime = zäit) falsch: {
+			dës-aufgab feeler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter dobäisetzen: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lëscht nei fëllt: 100000 mat: ['x'], zesummesetzen: [''].
+{
+	>> str2 := Tresor token: 40.
+	>> sichparameter :=
+	db ufro: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ofruffen: { :row
+		(row str1 = str1 an: row str2 = str2) falsch: {
+			dës-aufgab feeler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter dobäisetzen: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Zuel tëscht: 1 an: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 aus-text: ['9223372036854775807'] ) -
+		( Int64 aus-text: ['99999'] ) +
+		( Int64 aus-text: n1 text )
+	).
+	>> sichparameter :=
+	db ufro: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ofruffen: { :row
+		(row n1 = n1) falsch: {
+			dës-aufgab feeler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) falsch: {
+			dës-aufgab feeler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 gerënnt) falsch: {
+			dës-aufgab feeler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) falsch: {
+			dës-aufgab feeler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter dobäisetzen: 1.
+} * 100.
+
+
+Ausgab schreiwen: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), nei-zeil.

@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server ინიციალიზაცია.
+პროგრამა გამოიყენე: ['../../../src/xo/ka/webtools.xo'].
+პროგრამა გამოიყენე: ['../../../src/xo/ka/mailtools.xo'].
+
+>> სათაური := HTTP-სათაური ახალი გასაღები: ['Location'] მნიშვნელობა: ['/ok\r\nX-Injected: yes'].
+გამოტანა დაწერე: სათაური.
+
+>> web := ვებ-დოკუმენტი ახალი.
+web გადასვლა: ['/ok\r\nX-Injected: yes'].
+გამოტანა დაწერე: ['\n'], ახალი-ხაზი.
+
+>> mail := ელფოსტა ახალი.
+mail მიმღებს: (სია ახალი ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (სია ახალი ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (სია ახალი ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail გამგზავნი: ['d@example.invalid\r\nX-From: yes'] სახელი: ['site\r\nX-Name: yes'].
+mail თემა: ['hello\r\nX-Subject: yes'].
+mail წერილის-ტექსტი: ['line1\r\nline2'].
+გამოტანა დაწერე: mail გენერირება.
+
+>> html := HTML-ელფოსტა ახალი.
+html მიმღებს: (სია ახალი ; ['a@example.invalid\r\nX-To: yes']).
+html გამგზავნი: ['d@example.invalid'] სახელი: ['site'].
+html თემა: ['hello\r\nX-Subject: yes'].
+html წერილის-ტექსტი: ['body'].
+გამოტანა დაწერე: ( html გენერირება შეიცავს: ['\nX-'] ), ახალი-ხაზი.
+გამოტანა დაწერე: ( html გენერირება შეიცავს: ['X-To: yes'] ), ახალი-ხაზი.

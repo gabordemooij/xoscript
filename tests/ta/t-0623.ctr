@@ -1,0 +1,43 @@
+
+
+>> g := Server புதிய.
+>> v := பெட்டகம் புதிய.
+>> ok := 0.
+
+>> secrets := வரிசை புதிய ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets நகல்.
+passwords ஒவ்வொன்றும்: { :i :p
+	secrets ஒவ்வொன்றும்: { :n :s
+		{
+			>> encrypted := v மறையாக்கு: s திறவுகோல்: p.
+			>> decrypted := v மறைநீக்கு: encrypted திறவுகோல்: p.
+			(decrypted = s) உண்மையெனில்: {
+				ok கூட்டு: 1.
+			}, இல்லையெனில்: {
+				வெளியீடு எழுது: ['failed encrypting/decrypting: '], புதிய-வரி.
+				வெளியீடு எழுது: s, புதிய-வரி.
+				வெளியீடு எழுது: ['encrypted: '] + encrypted, புதிய-வரி.
+				வெளியீடு எழுது: ['decrypted: '] + encrypted, புதிய-வரி.
+				நிரல் முடி.
+			}.
+		} பிடி: { :err
+			(s = [''] அல்லது: p = ['']) உண்மையெனில்: {
+				ok கூட்டு: 1.
+			}, இல்லையெனில்: {
+				வெளியீடு எழுது: err, புதிய-வரி.
+				நிரல் முடி.
+			}.
+		}, இயக்கு.
+	}.
+}.
+
+வெளியீடு எழுது: ( ok + [' vault encryptions tested.'] ), புதிய-வரி.

@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> 試行 := { :format :value
+	{ 出力 書く: ( (書式 新規: format) 適用: value ), 改行. } 例外時: { :e 出力 書く: e, 改行. }, 開始.
+}.
+>> try-int := { :format :value
+	{ 出力 書く: ( (書式 新規: format) 整数に適用: value ), 改行. } 例外時: { :e 出力 書く: e, 改行. }, 開始.
+}.
+
+# fits
+試行 適用: ['|%s|'] かつ: ['text'].
+試行 適用: ['%06.2f'] かつ: 5.5.
+試行 適用: ['100%% %s'] かつ: ['sure'].
+try-int 適用: ['%03d'] かつ: 7.
+try-int 適用: ['%x'] かつ: 255.
+試行 適用: ['%d'] かつ: (Int64 新規 文字列から: ['12']).
+試行 適用: ['%lld'] かつ: (Int64 新規 文字列から: ['12']).
+試行 適用: ['%.1lf'] かつ: 5.5.
+try-int 適用: ['%hd'] かつ: 7.
+
+# does not fit
+試行 適用: ['%s'] かつ: 12345.
+試行 適用: ['%d'] かつ: 12345.
+試行 適用: ['%f'] かつ: ['text'].
+try-int 適用: ['%d'] かつ: ['text'].
+try-int 適用: ['%s'] かつ: 5.
+試行 適用: ['%s %s'] かつ: ['text'].
+試行 適用: ['%n'] かつ: ['text'].
+試行 適用: ['%*s'] かつ: ['text'].
+試行 適用: ['%'] かつ: ['text'].
+
+# length modifier does not fit
+試行 適用: ['%ls'] かつ: ['text'].
+試行 適用: ['%Lf'] かつ: 5.5.
+try-int 適用: ['%ld'] かつ: 7.
+try-int 適用: ['%lld'] かつ: 7.
+試行 適用: ['%Ld'] かつ: (Int64 新規 文字列から: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+試行 適用: ['%99999999999s'] かつ: ['text'].

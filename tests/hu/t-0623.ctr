@@ -1,0 +1,43 @@
+
+
+>> g := Server új.
+>> v := Széf új.
+>> ok := 0.
+
+>> secrets := Lista új ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets másol.
+passwords mindegyik: { :i :p
+	secrets mindegyik: { :n :s
+		{
+			>> encrypted := v titkosít: s kulcs: p.
+			>> decrypted := v visszafejt: encrypted kulcs: p.
+			(decrypted = s) igaz: {
+				ok hozzáad: 1.
+			}, különben: {
+				Kimenet ír: ['failed encrypting/decrypting: '], újsor.
+				Kimenet ír: s, újsor.
+				Kimenet ír: ['encrypted: '] + encrypted, újsor.
+				Kimenet ír: ['decrypted: '] + encrypted, újsor.
+				Program vége.
+			}.
+		} elkap: { :err
+			(s = [''] vagy: p = ['']) igaz: {
+				ok hozzáad: 1.
+			}, különben: {
+				Kimenet ír: err, újsor.
+				Program vége.
+			}.
+		}, indít.
+	}.
+}.
+
+Kimenet ír: ( ok + [' vault encryptions tested.'] ), újsor.

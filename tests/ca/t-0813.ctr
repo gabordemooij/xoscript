@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inicialitzar.
+Programa utilitza: ['../../../src/xo/ca/webtools.xo'].
+Programa utilitza: ['../../../src/xo/ca/mailtools.xo'].
+
+>> capçalera := Capçalera-HTTP nou clau: ['Location'] valor: ['/ok\r\nX-Injected: yes'].
+Sortida escriu: capçalera.
+
+>> web := Document-Web nou.
+web anar-a: ['/ok\r\nX-Injected: yes'].
+Sortida escriu: ['\n'], salt-de-línia.
+
+>> mail := Correu nou.
+mail destinatari: (Llista nou ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Llista nou ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Llista nou ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail remitent: ['d@example.invalid\r\nX-From: yes'] nom: ['site\r\nX-Name: yes'].
+mail assumpte: ['hello\r\nX-Subject: yes'].
+mail cos-missatge: ['line1\r\nline2'].
+Sortida escriu: mail generar.
+
+>> html := Correu-HTML nou.
+html destinatari: (Llista nou ; ['a@example.invalid\r\nX-To: yes']).
+html remitent: ['d@example.invalid'] nom: ['site'].
+html assumpte: ['hello\r\nX-Subject: yes'].
+html cos-missatge: ['body'].
+Sortida escriu: ( html generar conté: ['\nX-'] ), salt-de-línia.
+Sortida escriu: ( html generar conté: ['X-To: yes'] ), salt-de-línia.

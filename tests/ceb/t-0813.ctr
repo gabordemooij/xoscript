@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server andama.
+Programa gamita: ['../../../src/xo/ceb/webtools.xo'].
+Programa gamita: ['../../../src/xo/ceb/mailtools.xo'].
+
+>> ulohan := Ulohan-sa-HTTP bag-o yawe: ['Location'] bili: ['/ok\r\nX-Injected: yes'].
+Gawas isulat: ulohan.
+
+>> web := Dokumento-sa-Web bag-o.
+web adto-sa: ['/ok\r\nX-Injected: yes'].
+Gawas isulat: ['\n'], bag-ong-linya.
+
+>> mail := Email bag-o.
+mail ngadto: (Lista bag-o ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lista bag-o ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lista bag-o ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail nagpadala: ['d@example.invalid\r\nX-From: yes'] ngalan: ['site\r\nX-Name: yes'].
+mail hilisgutan: ['hello\r\nX-Subject: yes'].
+mail lawas: ['line1\r\nline2'].
+Gawas isulat: mail himoa.
+
+>> html := HTML-Email bag-o.
+html ngadto: (Lista bag-o ; ['a@example.invalid\r\nX-To: yes']).
+html nagpadala: ['d@example.invalid'] ngalan: ['site'].
+html hilisgutan: ['hello\r\nX-Subject: yes'].
+html lawas: ['body'].
+Gawas isulat: ( html himoa naglangkob: ['\nX-'] ), bag-ong-linya.
+Gawas isulat: ( html himoa naglangkob: ['X-To: yes'] ), bag-ong-linya.

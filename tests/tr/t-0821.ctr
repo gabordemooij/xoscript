@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> yol := ['/tmp/test0821.csv'].
+>> file := Dosya yeni: yol.
+
+file yaz: ['a,b\n"1,2\n'].
+{
+	file ayırıcı: [','] tırnak: ['"'] satırlar: { :line
+		Çıktı yaz: line, yeni-satır.
+	}.
+} yakala: { :e Çıktı yaz: e, yeni-satır. }, başlat.
+
+# a closed quote still works
+file yaz: ['a,b\n"1,2",3'].
+file ayırıcı: [','] tırnak: ['"'] satırlar: { :line
+	Çıktı yaz: line, yeni-satır.
+}.
+file sil.

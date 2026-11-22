@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Papa hou ;
+	# {"key":"normal"} normal ASCII
+	( Puke-wehewehe hou waiho: ['normal'] ma: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Puke-wehewehe hou waiho: ['hello world'] ma: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Puke-wehewehe hou waiho: ['"'] ma: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Puke-wehewehe hou waiho: ['backslash: \\'] ma: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Puke-wehewehe hou waiho: ['slash: /'] ma: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Puke-wehewehe hou waiho: ['backspace: \b'] ma: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Puke-wehewehe hou waiho: ['formfeed: \f'] ma: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Puke-wehewehe hou waiho: ['newline: \n'] ma: ['key'] ) ;
+	( Puke-wehewehe hou waiho: ['newline: ↵'] ma: ['key'] ) ;
+	( Puke-wehewehe hou waiho: ['newline: 
+	'] ma: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Puke-wehewehe hou waiho: ['carriage return: \r'] ma: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Puke-wehewehe hou waiho: ['tab \t'] ma: ['key'] ) ;
+	( Puke-wehewehe hou waiho: ['tab ⇿'] ma: ['key'] ) ;
+	( Puke-wehewehe hou waiho: ['tab  '] ma: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Puke-wehewehe hou waiho: ['NUL \u0000'] ma: ['key'] ) ;
+	( Puke-wehewehe hou waiho: ['NUL \0'] ma: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Puke-wehewehe hou waiho: ['control: \u0001'] ma: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Puke-wehewehe hou waiho: ['control: \u001F'] ma: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Puke-wehewehe hou waiho: ['unicode: é'] ma: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Puke-wehewehe hou waiho: ['unicode: €'] ma: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Puke-wehewehe hou waiho: ['unicode: 日本語'] ma: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Puke-wehewehe hou waiho: ['unicode: 😀'] ma: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Puke-wehewehe hou waiho: ['unicode: 🧑‍💻'] ma: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Puke-wehewehe hou waiho: ['combining: e\u0301'] ma: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Puke-wehewehe hou waiho: ['escaped unicode: \u00e9'] ma: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Puke-wehewehe hou waiho: ['escaped unicode: \u20ac'] ma: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Puke-wehewehe hou waiho: ['escaped unicode: \ud83d\ude00'] ma: ['key'] ) ;
+	# {"key":""} empty value
+	( Puke-wehewehe hou waiho: [''] ma: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Puke-wehewehe hou waiho: ['@ < > & = % + ? #'] ma: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Puke-wehewehe hou waiho: ['''] ma: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Puke-wehewehe hou waiho: ['multiple: \" \\ \n \r \t'] ma: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Puke-wehewehe hou waiho: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] ma: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Puke-wehewehe hou waiho: [' value'] ma: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Puke-wehewehe hou waiho: ['value '] ma: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Puke-wehewehe hou waiho: [' \t\n\r '] ma: ['key'] ).
+
+dicts pākahi: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Puke-wehewehe hou waiho: d key ma: ['key']).
+	>> b := JSON jsonify: (Puke-wehewehe hou waiho: ['value'] ma: d key).
+	>> e := JSON mea: a.
+	>> f := JSON mea: b.
+	((e key = d key a: (f ? d key = ['value'])) a-i-ʻole: (e key = ['NUL ?'])) ʻoiaʻiʻo: {
+		Huapuka kākau: ['OK'], laina-hou.
+	}, ʻi-ole-ia: {
+		Huapuka kākau: ['Unable to properly encode/decode: '] + d + j, laina-hou.
+		Polokalamu pau.
+	}.
+}.

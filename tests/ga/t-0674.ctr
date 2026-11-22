@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> conair := ['/tmp/dat.csv'].
+>> csv := Comhad nua: conair.
+csv scríobh: s.
+
+# accepts CRLF LF CR, varying row length
+csv teorantóir: [';'] comhartha-athfhriotail: ['"'] línte: { :line
+	Ríomhchlár glan-suas.
+	Aschur scríobh: line, líne-nua.
+	Ríomhchlár glan-suas.
+}.
+
+# unequal lines
+s iarcheangail: ['\njustone'].
+csv scríobh: s.
+{
+	csv teorantóir: [';'] comhartha-athfhriotail: ['"'] línte: { :line
+		Aschur scríobh: line, líne-nua.
+	}.
+} gabh: { :e 
+	Aschur scríobh: e, líne-nua.
+}, tosaigh.
+
+# invalid format
+s := ['"he"llo";world'].
+csv scríobh: s.
+{
+	csv teorantóir: [';'] comhartha-athfhriotail: ['"'] línte: { :line
+		Aschur scríobh: line, líne-nua.
+	}.
+} gabh: { :e 
+	Aschur scríobh: e, líne-nua.
+}, tosaigh.

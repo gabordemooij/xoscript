@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> cobaan := { :format :value
+	{ Kaluaran tulis: ( (Format anyar: format) larapkeun: value ), baris-anyar. } tangkep: { :e Kaluaran tulis: e, baris-anyar. }, jalankeun.
+}.
+>> try-int := { :format :value
+	{ Kaluaran tulis: ( (Format anyar: format) larapkeun-wilangan-buleud: value ), baris-anyar. } tangkep: { :e Kaluaran tulis: e, baris-anyar. }, jalankeun.
+}.
+
+# fits
+cobaan larapkeun: ['|%s|'] jeung: ['text'].
+cobaan larapkeun: ['%06.2f'] jeung: 5.5.
+cobaan larapkeun: ['100%% %s'] jeung: ['sure'].
+try-int larapkeun: ['%03d'] jeung: 7.
+try-int larapkeun: ['%x'] jeung: 255.
+cobaan larapkeun: ['%d'] jeung: (Int64 anyar tina-téks: ['12']).
+cobaan larapkeun: ['%lld'] jeung: (Int64 anyar tina-téks: ['12']).
+cobaan larapkeun: ['%.1lf'] jeung: 5.5.
+try-int larapkeun: ['%hd'] jeung: 7.
+
+# does not fit
+cobaan larapkeun: ['%s'] jeung: 12345.
+cobaan larapkeun: ['%d'] jeung: 12345.
+cobaan larapkeun: ['%f'] jeung: ['text'].
+try-int larapkeun: ['%d'] jeung: ['text'].
+try-int larapkeun: ['%s'] jeung: 5.
+cobaan larapkeun: ['%s %s'] jeung: ['text'].
+cobaan larapkeun: ['%n'] jeung: ['text'].
+cobaan larapkeun: ['%*s'] jeung: ['text'].
+cobaan larapkeun: ['%'] jeung: ['text'].
+
+# length modifier does not fit
+cobaan larapkeun: ['%ls'] jeung: ['text'].
+cobaan larapkeun: ['%Lf'] jeung: 5.5.
+try-int larapkeun: ['%ld'] jeung: 7.
+try-int larapkeun: ['%lld'] jeung: 7.
+cobaan larapkeun: ['%Ld'] jeung: (Int64 anyar tina-téks: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+cobaan larapkeun: ['%99999999999s'] jeung: ['text'].

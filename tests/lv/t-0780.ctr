@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Saraksts jauns ;
+	# {"key":"normal"} normal ASCII
+	( Vārdnīca jauns ielikt: ['normal'] pie: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Vārdnīca jauns ielikt: ['hello world'] pie: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Vārdnīca jauns ielikt: ['"'] pie: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Vārdnīca jauns ielikt: ['backslash: \\'] pie: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Vārdnīca jauns ielikt: ['slash: /'] pie: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Vārdnīca jauns ielikt: ['backspace: \b'] pie: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Vārdnīca jauns ielikt: ['formfeed: \f'] pie: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Vārdnīca jauns ielikt: ['newline: \n'] pie: ['key'] ) ;
+	( Vārdnīca jauns ielikt: ['newline: ↵'] pie: ['key'] ) ;
+	( Vārdnīca jauns ielikt: ['newline: 
+	'] pie: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Vārdnīca jauns ielikt: ['carriage return: \r'] pie: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Vārdnīca jauns ielikt: ['tab \t'] pie: ['key'] ) ;
+	( Vārdnīca jauns ielikt: ['tab ⇿'] pie: ['key'] ) ;
+	( Vārdnīca jauns ielikt: ['tab  '] pie: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Vārdnīca jauns ielikt: ['NUL \u0000'] pie: ['key'] ) ;
+	( Vārdnīca jauns ielikt: ['NUL \0'] pie: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Vārdnīca jauns ielikt: ['control: \u0001'] pie: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Vārdnīca jauns ielikt: ['control: \u001F'] pie: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Vārdnīca jauns ielikt: ['unicode: é'] pie: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Vārdnīca jauns ielikt: ['unicode: €'] pie: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Vārdnīca jauns ielikt: ['unicode: 日本語'] pie: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Vārdnīca jauns ielikt: ['unicode: 😀'] pie: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Vārdnīca jauns ielikt: ['unicode: 🧑‍💻'] pie: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Vārdnīca jauns ielikt: ['combining: e\u0301'] pie: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Vārdnīca jauns ielikt: ['escaped unicode: \u00e9'] pie: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Vārdnīca jauns ielikt: ['escaped unicode: \u20ac'] pie: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Vārdnīca jauns ielikt: ['escaped unicode: \ud83d\ude00'] pie: ['key'] ) ;
+	# {"key":""} empty value
+	( Vārdnīca jauns ielikt: [''] pie: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Vārdnīca jauns ielikt: ['@ < > & = % + ? #'] pie: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Vārdnīca jauns ielikt: ['''] pie: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Vārdnīca jauns ielikt: ['multiple: \" \\ \n \r \t'] pie: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Vārdnīca jauns ielikt: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] pie: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Vārdnīca jauns ielikt: [' value'] pie: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Vārdnīca jauns ielikt: ['value '] pie: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Vārdnīca jauns ielikt: [' \t\n\r '] pie: ['key'] ).
+
+dicts katrs: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Vārdnīca jauns ielikt: d key pie: ['key']).
+	>> b := JSON jsonify: (Vārdnīca jauns ielikt: ['value'] pie: d key).
+	>> e := JSON objekts: a.
+	>> f := JSON objekts: b.
+	((e key = d key un: (f ? d key = ['value'])) vai: (e key = ['NUL ?'])) patiess: {
+		Izvade rakstīt: ['OK'], jauna-rinda.
+	}, citādi: {
+		Izvade rakstīt: ['Unable to properly encode/decode: '] + d + j, jauna-rinda.
+		Programma beigas.
+	}.
+}.

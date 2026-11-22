@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> zama := { :format :value
+	{ Okuphumayo bhala: ( (Ifomethi okusha: format) sebenzisa-ku: value ), umugqa-omusha. } bamba: { :e Okuphumayo bhala: e, umugqa-omusha. }, qala.
+}.
+>> try-int := { :format :value
+	{ Okuphumayo bhala: ( (Ifomethi okusha: format) sebenzisa-kunombolo-ephelele: value ), umugqa-omusha. } bamba: { :e Okuphumayo bhala: e, umugqa-omusha. }, qala.
+}.
+
+# fits
+zama sebenzisa-ku: ['|%s|'] futhi: ['text'].
+zama sebenzisa-ku: ['%06.2f'] futhi: 5.5.
+zama sebenzisa-ku: ['100%% %s'] futhi: ['sure'].
+try-int sebenzisa-ku: ['%03d'] futhi: 7.
+try-int sebenzisa-ku: ['%x'] futhi: 255.
+zama sebenzisa-ku: ['%d'] futhi: (Int64 okusha kusuka-embhalweni: ['12']).
+zama sebenzisa-ku: ['%lld'] futhi: (Int64 okusha kusuka-embhalweni: ['12']).
+zama sebenzisa-ku: ['%.1lf'] futhi: 5.5.
+try-int sebenzisa-ku: ['%hd'] futhi: 7.
+
+# does not fit
+zama sebenzisa-ku: ['%s'] futhi: 12345.
+zama sebenzisa-ku: ['%d'] futhi: 12345.
+zama sebenzisa-ku: ['%f'] futhi: ['text'].
+try-int sebenzisa-ku: ['%d'] futhi: ['text'].
+try-int sebenzisa-ku: ['%s'] futhi: 5.
+zama sebenzisa-ku: ['%s %s'] futhi: ['text'].
+zama sebenzisa-ku: ['%n'] futhi: ['text'].
+zama sebenzisa-ku: ['%*s'] futhi: ['text'].
+zama sebenzisa-ku: ['%'] futhi: ['text'].
+
+# length modifier does not fit
+zama sebenzisa-ku: ['%ls'] futhi: ['text'].
+zama sebenzisa-ku: ['%Lf'] futhi: 5.5.
+try-int sebenzisa-ku: ['%ld'] futhi: 7.
+try-int sebenzisa-ku: ['%lld'] futhi: 7.
+zama sebenzisa-ku: ['%Ld'] futhi: (Int64 okusha kusuka-embhalweni: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+zama sebenzisa-ku: ['%99999999999s'] futhi: ['text'].

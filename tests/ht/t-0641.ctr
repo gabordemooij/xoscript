@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Diksyonè nouvo
+	# ASCII only
+	mete: ( Lis nouvo ; 65 ; 65 ; 65 ; 65 ; 0 ) nan: ['AAAA'],
+	# valid 2 byte sequence
+	mete: ( Lis nouvo ; 194 ; 162 ; 0 ) nan: ['¢'],
+	# Valid 3-byte UTF-8
+    mete: ( Lis nouvo ; 226 ; 130 ; 172 ; 0 ) nan: ['€'],
+	# Valid 4-byte UTF-8
+    mete: ( Lis nouvo ; 240 ; 144 ; 141 ; 136 ; 0 ) nan: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    mete: ( Lis nouvo ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) nan: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    mete: ( Lis nouvo ; 65 ; 193 ; 129 ; 0 ) nan: ['A?'],
+	# Invalid first byte (0xFF)
+    mete: ( Lis nouvo ; 255 ; 0 ) nan: ['?'],
+	# Incomplete multi-byte sequence at end
+    mete: ( Lis nouvo ; 66 ; 226 ; 0 ) nan: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    mete: ( Lis nouvo ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) nan: ['A€?𐍈B'].
+	 
+utf8cases chak: { :key :value
+	>> blob := Blob nouvo: value konte, bytes: value.
+	>> str := blob tèks.
+	(str = key) vre: {
+		Sòti ekri: ['OK'], nouvo-liy.
+	}, sinon: {
+		Sòti ekri: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, nouvo-liy.
+	}.
+	blob libere.
+}.

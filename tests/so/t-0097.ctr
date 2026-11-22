@@ -1,0 +1,42 @@
+
+Qoraal marka: ['html'] samee: { <- (
+		naf
+		beddel: ['&'] ku: ['&amp;'],
+		beddel: ['<'] ku: ['&lt;'],
+		beddel: ['>'] ku: ['&gt;'],
+		beddel: ['"'] ku: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Walax cusub.
+
+HtmlBrush marka: ['jawaab:'] samee: { :tag
+	Soo-saar qor: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush marka: ['jawaab:iyo:'] samee: { :tag :content
+	tag := ( tag ka: 0 dherer: (tag dherer - 1) ).
+	Soo-saar qor: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush marka: ['content:'] samee: { :text
+	Soo-saar qor: text html, sadar-cusub.
+}.
+
+HtmlBrush marka: ['attr:value:'] samee: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush cusub.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

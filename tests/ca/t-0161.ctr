@@ -1,0 +1,53 @@
+Programa gestió-memòria: 0.
+Llista en: ['sum'] fes: {
+	>> total := 0.
+	jo cada: { :index :element
+		total suma: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Fitxer nou: ['/tmp/test.txt'].
+f escriu: ['Lorem Ipsum'].
+f tanca.
+  
+
+f := Fitxer nou: ['/tmp/test.txt'].
+>> text := f llegeix.
+f tanca.
+
+
+
+Programa neteja.
+usedMemory1 := (Programa memòria ? 1).
+
+
+
+f := Fitxer nou: ['/tmp/test.txt'].
+text := f llegeix.
+f tanca.
+
+Programa neteja.
+usedMemory2 := (Programa memòria ? 1).
+
+
+f := Fitxer nou: ['/tmp/test.txt'].
+text := f llegeix.
+f tanca.
+
+Programa neteja.
+usedMemory3 := (Programa memòria ? 1).
+
+
+
+( usedMemory1 = usedMemory2 i: usedMemory1 = usedMemory3, i: usedMemory2 = usedMemory3 ) cert: {
+	Sortida escriu: ['No memory leaks here'].
+}, fals: {
+	Sortida escriu: ['Leaking memory...'].
+}.

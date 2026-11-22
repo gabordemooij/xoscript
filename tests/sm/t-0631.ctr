@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Polokalama pulega-manatua: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Polokalama faatulagaga-masini: ['FFITESTLIB'].
+
+
+
+Server fesootai: (
+ Lisi fou ;
+ libname ;
+ ['puts'] ;
+ ( Lisi fou ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s faasaoloto.
+
+# test with struct
+
+>> a := Blob fou: 8.
+a bytes: (
+	Lisi <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Lisi <<: ['int'], ; ['int']).
+
+Server fesootai: (
+	Lisi <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Lisi <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Tuuina-atu tusi: ['Sum test:'] + (ffitest ffisum: a), laina-fou.
+
+struct faasaoloto-struct.
+struct faasaoloto.
+a faasaoloto.

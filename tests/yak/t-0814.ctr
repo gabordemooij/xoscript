@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server саҕалааһын.
+Программа инструмент: ['../../../src/xo/yak/webtools.xo'].
+
+>> Fake-Request := Объект саҥа.
+Fake-Request в: ['value:'] сделать: { :суолта
+	бэйэм суолта := суолта.
+}.
+Fake-Request в: ['cookie:'] сделать: { :аат <- бэйэм суолта.
+}.
+
+>> Test-Session := Кэмчэ-файл-сеанса саҥа.
+Test-Session в: ['киллэр'] сделать: { <- Тылдьыт саҥа.
+}.
+Test-Session в: ['session-id'] сделать: { <- бэйэм id.
+}.
+
+>> cookies := Испииһэк саҥа
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies хас-биирдии: { :i :cookie
+	>> көрдөһүү := Fake-Request саҥа.
+	көрдөһүү value: cookie.
+	>> салайааччы := Test-Session саҥа.
+	>> web := Веб-докумуон саҥа.
+	web көрдөһүү: көрдөһүү.
+	web сеанс-салайааччыта: салайааччы.
+	web сеаны-саҕалаа.
+	Таһаарыы суруй: ( салайааччы session-id = cookie ), стоп.
+}.
+
+>> web := Веб-докумуон саҥа.
+web json: (Тылдьыт саҥа олоохсуй: ['b'] в: ['a']).
+Таһаарыы суруй: ['\n'], стоп.
+
+{ Ситим get: ['file:///etc/hostname']. } проблеманы-быһаарыы: { :e
+	Таһаарыы суруй: e, стоп.
+}, саҕалаа.
+
+>> svg := Файл саҥа: ['/tmp/test0814.svg'].
+svg суруй: ['<svg xmlns="x"></svg>'].
+Таһаарыы стоп.
+Server аһар: ['test0814.svg'] префикс: ['/tmp/'].
+svg ыраас.

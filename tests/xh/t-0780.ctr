@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Uluhlu entsha ;
+	# {"key":"normal"} normal ASCII
+	( Isichazimagama entsha beka: ['normal'] kwindawo: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Isichazimagama entsha beka: ['hello world'] kwindawo: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Isichazimagama entsha beka: ['"'] kwindawo: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Isichazimagama entsha beka: ['backslash: \\'] kwindawo: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Isichazimagama entsha beka: ['slash: /'] kwindawo: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Isichazimagama entsha beka: ['backspace: \b'] kwindawo: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Isichazimagama entsha beka: ['formfeed: \f'] kwindawo: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Isichazimagama entsha beka: ['newline: \n'] kwindawo: ['key'] ) ;
+	( Isichazimagama entsha beka: ['newline: ↵'] kwindawo: ['key'] ) ;
+	( Isichazimagama entsha beka: ['newline: 
+	'] kwindawo: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Isichazimagama entsha beka: ['carriage return: \r'] kwindawo: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Isichazimagama entsha beka: ['tab \t'] kwindawo: ['key'] ) ;
+	( Isichazimagama entsha beka: ['tab ⇿'] kwindawo: ['key'] ) ;
+	( Isichazimagama entsha beka: ['tab  '] kwindawo: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Isichazimagama entsha beka: ['NUL \u0000'] kwindawo: ['key'] ) ;
+	( Isichazimagama entsha beka: ['NUL \0'] kwindawo: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Isichazimagama entsha beka: ['control: \u0001'] kwindawo: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Isichazimagama entsha beka: ['control: \u001F'] kwindawo: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Isichazimagama entsha beka: ['unicode: é'] kwindawo: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Isichazimagama entsha beka: ['unicode: €'] kwindawo: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Isichazimagama entsha beka: ['unicode: 日本語'] kwindawo: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Isichazimagama entsha beka: ['unicode: 😀'] kwindawo: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Isichazimagama entsha beka: ['unicode: 🧑‍💻'] kwindawo: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Isichazimagama entsha beka: ['combining: e\u0301'] kwindawo: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Isichazimagama entsha beka: ['escaped unicode: \u00e9'] kwindawo: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Isichazimagama entsha beka: ['escaped unicode: \u20ac'] kwindawo: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Isichazimagama entsha beka: ['escaped unicode: \ud83d\ude00'] kwindawo: ['key'] ) ;
+	# {"key":""} empty value
+	( Isichazimagama entsha beka: [''] kwindawo: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Isichazimagama entsha beka: ['@ < > & = % + ? #'] kwindawo: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Isichazimagama entsha beka: ['''] kwindawo: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Isichazimagama entsha beka: ['multiple: \" \\ \n \r \t'] kwindawo: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Isichazimagama entsha beka: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] kwindawo: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Isichazimagama entsha beka: [' value'] kwindawo: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Isichazimagama entsha beka: ['value '] kwindawo: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Isichazimagama entsha beka: [' \t\n\r '] kwindawo: ['key'] ).
+
+dicts nganye: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Isichazimagama entsha beka: d key kwindawo: ['key']).
+	>> b := JSON jsonify: (Isichazimagama entsha beka: ['value'] kwindawo: d key).
+	>> e := JSON into: a.
+	>> f := JSON into: b.
+	((e key = d key kwaye: (f ? d key = ['value'])) okanye: (e key = ['NUL ?'])) inyaniso: {
+		Imveliso bhala: ['OK'], umgca-omtsha.
+	}, kungenjalo: {
+		Imveliso bhala: ['Unable to properly encode/decode: '] + d + j, umgca-omtsha.
+		Inkqubo gqiba.
+	}.
+}.

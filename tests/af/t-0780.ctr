@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lys nuut ;
+	# {"key":"normal"} normal ASCII
+	( Woordeboek nuut sit: ['normal'] by: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Woordeboek nuut sit: ['hello world'] by: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Woordeboek nuut sit: ['"'] by: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Woordeboek nuut sit: ['backslash: \\'] by: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Woordeboek nuut sit: ['slash: /'] by: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Woordeboek nuut sit: ['backspace: \b'] by: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Woordeboek nuut sit: ['formfeed: \f'] by: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Woordeboek nuut sit: ['newline: \n'] by: ['key'] ) ;
+	( Woordeboek nuut sit: ['newline: ↵'] by: ['key'] ) ;
+	( Woordeboek nuut sit: ['newline: 
+	'] by: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Woordeboek nuut sit: ['carriage return: \r'] by: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Woordeboek nuut sit: ['tab \t'] by: ['key'] ) ;
+	( Woordeboek nuut sit: ['tab ⇿'] by: ['key'] ) ;
+	( Woordeboek nuut sit: ['tab  '] by: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Woordeboek nuut sit: ['NUL \u0000'] by: ['key'] ) ;
+	( Woordeboek nuut sit: ['NUL \0'] by: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Woordeboek nuut sit: ['control: \u0001'] by: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Woordeboek nuut sit: ['control: \u001F'] by: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Woordeboek nuut sit: ['unicode: é'] by: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Woordeboek nuut sit: ['unicode: €'] by: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Woordeboek nuut sit: ['unicode: 日本語'] by: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Woordeboek nuut sit: ['unicode: 😀'] by: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Woordeboek nuut sit: ['unicode: 🧑‍💻'] by: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Woordeboek nuut sit: ['combining: e\u0301'] by: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Woordeboek nuut sit: ['escaped unicode: \u00e9'] by: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Woordeboek nuut sit: ['escaped unicode: \u20ac'] by: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Woordeboek nuut sit: ['escaped unicode: \ud83d\ude00'] by: ['key'] ) ;
+	# {"key":""} empty value
+	( Woordeboek nuut sit: [''] by: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Woordeboek nuut sit: ['@ < > & = % + ? #'] by: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Woordeboek nuut sit: ['''] by: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Woordeboek nuut sit: ['multiple: \" \\ \n \r \t'] by: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Woordeboek nuut sit: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] by: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Woordeboek nuut sit: [' value'] by: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Woordeboek nuut sit: ['value '] by: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Woordeboek nuut sit: [' \t\n\r '] by: ['key'] ).
+
+dicts elk: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Woordeboek nuut sit: d key by: ['key']).
+	>> b := JSON jsonify: (Woordeboek nuut sit: ['value'] by: d key).
+	>> e := JSON objek: a.
+	>> f := JSON objek: b.
+	((e key = d key en: (f ? d key = ['value'])) of: (e key = ['NUL ?'])) ja: {
+		Uitvoer skryf: ['OK'], nuwe-reël.
+	}, anders: {
+		Uitvoer skryf: ['Unable to properly encode/decode: '] + d + j, nuwe-reël.
+		Program einde.
+	}.
+}.

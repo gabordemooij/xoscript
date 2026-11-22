@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := 对象 新建.
+
+Slurp 在: ['新建'] 执行: {
+	拥有 str := [''].
+}.
+
+Slurp 在: ['nieuw'] 执行: {
+	拥有 str := [''].
+}.
+
+Slurp 在: ['响应:'] 执行: { :blah
+		拥有 str 追加: blah.
+}.
+
+Slurp 在: ['响应:参数:'] 执行: { :blah :blahah
+		拥有 str 追加: (blah 从: 0 长度: (blah 长度 - 1)).
+		拥有 str 追加: [' '].
+		拥有 str 追加: blahah.
+}.
+
+Slurp 在: ['obtain'] 执行: {
+	>> buffer := 拥有 str.
+	拥有 str := ['']. <- buffer.
+}.
+
+
+输出 写入: (程序 系统命令: (Slurp 新建 echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ 文件 新建: ['/tmp/from.txt'], 删除. } 捕获: { ['Empty']. }, 运行.
+{ 文件 新建: ['/tmp/to.txt'], 删除. } 捕获: { ['Empty']. }, 运行.
+
+
+文件 新建: ['/tmp/to.txt'], 存在 否: {
+	输出 写入: ['Confirmed. Target file does not exist.\
+'].
+}.
+文件 新建: ['/tmp/from.txt'], 存在 否: {
+	输出 写入: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+程序 系统命令: (Slurp 新建 touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+程序 系统命令: (Slurp 新建 cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+文件 新建: ['/tmp/to.txt'], 存在 是: {
+	输出 写入: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+输出 写入: ['Contents of file is:'] + (文件 新建: ['/tmp/to.txt'], 读取), 停止.

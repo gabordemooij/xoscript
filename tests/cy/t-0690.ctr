@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Allbwn ysgrifennu: ['Database test'], llinell-newydd.
+
+>> db := Maria-DB newydd gwesteiwr: ['localhost'],
+	enw-defnyddiwr: ['xo'], cyfrinair: ['pass123'], enw-cronfa: ['xobase'], cysylltu.
+
+Allbwn ysgrifennu: ['Can we connect? '] + db wedi-cysylltu?, llinell-newydd.
+
+>> paramedrau-chwilio := db ymholiad: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], paramedrau: ( Rhestr newydd ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  paramedrau-chwilio gweithredu. db cadarnhau. } dal: { :e db dadwneud.  }, cychwyn.
+
+Allbwn ysgrifennu: ['Can we insert? '] + ( paramedrau-chwilio insert-id > 0 ), llinell-newydd.
+
+>> x := 0.
+>> paramedrau-chwilio :=
+db ymholiad: ['SELECT * FROM book order by id desc limit 2'], 
+nôl: { :row 
+	x ychwanegu: 1.
+	Gwir torri. # must clean up, no 'Commands out of sync'
+}.
+
+>> paramedrau-chwilio :=
+db ymholiad: ['SELECT * FROM book order by id desc limit 2'], 
+nôl: { :row
+	x ychwanegu: 1.
+	Gwir torri.
+}.
+
+(x > 0) gwir: {
+	Allbwn ysgrifennu: ['Can we break in the middle of a fetch? '].
+}.
+
+Allbwn ysgrifennu: Gwir, llinell-newydd.

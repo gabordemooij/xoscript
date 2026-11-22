@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Вивід написати: ['Database test'], новий-рядок.
+
+>> db := Maria-DB новий хост: ['localhost'],
+	користувач: ['xo'], пароль: ['pass123'], назва-бази: ['xobase'], підключити.
+
+Вивід написати: ['Can we connect? '] + db підключено?, новий-рядок.
+
+>> параметри-пошуку := db запит: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], параметри: ( Список новий ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  параметри-пошуку виконати. db підтвердити. } перехопити: { :e db відкотити.  }, запустити.
+
+Вивід написати: ['Can we insert? '] + ( параметри-пошуку insert-id > 0 ), новий-рядок.
+
+>> Obj := Обʼєкт новий.
+Obj при: ['retrieve-rows'] виконати: {
+	свій кількість := 0.
+	>> параметри-пошуку :=
+	db запит: ['SELECT * FROM book order by id desc limit 2'], 
+	отримати: { :row 
+		свій кількість додати: 1.
+		Істина перервати.
+	}. <- свій кількість копіювати.
+}.
+
+Вивід написати: ['Can we query? '] + ( Obj retrieve-rows > 0 ), новий-рядок.

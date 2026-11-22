@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Objekt neu.
+
+Slurp wenn: ['neu'] tun: {
+	eigen str := [''].
+}.
+
+Slurp wenn: ['nieuw'] tun: {
+	eigen str := [''].
+}.
+
+Slurp wenn: ['antworten:'] tun: { :blah
+		eigen str anhängen: blah.
+}.
+
+Slurp wenn: ['antworten:und:'] tun: { :blah :blahah
+		eigen str anhängen: (blah von: 0 länge: (blah länge - 1)).
+		eigen str anhängen: [' '].
+		eigen str anhängen: blahah.
+}.
+
+Slurp wenn: ['obtain'] tun: {
+	>> buffer := eigen str.
+	eigen str := ['']. <- buffer.
+}.
+
+
+Ausgabe schreiben: (Programm system: (Slurp neu echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Datei neu: ['/tmp/from.txt'], löschen. } abfangen: { ['Empty']. }, starten.
+{ Datei neu: ['/tmp/to.txt'], löschen. } abfangen: { ['Empty']. }, starten.
+
+
+Datei neu: ['/tmp/to.txt'], existiert nein: {
+	Ausgabe schreiben: ['Confirmed. Target file does not exist.\
+'].
+}.
+Datei neu: ['/tmp/from.txt'], existiert nein: {
+	Ausgabe schreiben: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Programm system: (Slurp neu touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Programm system: (Slurp neu cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Datei neu: ['/tmp/to.txt'], existiert ja: {
+	Ausgabe schreiben: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Ausgabe schreiben: ['Contents of file is:'] + (Datei neu: ['/tmp/to.txt'], lesen), stopp.

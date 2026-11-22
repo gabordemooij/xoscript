@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB entsha umamkeli: ['localhost'],
+	igama-lomsebenzisi: ['xo'],
+	iphasiwedi: ['pass123'],
+	igama-ledatabheyisi: ['xobase'],
+	qhagamshelana.
+
+>> conn2 := Maria-DB entsha umamkeli: ['localhost'],
+	igama-lomsebenzisi: ['xo'],
+	iphasiwedi: ['pass123'],
+	igama-ledatabheyisi: ['xobase'],
+	qhagamshelana.
+#...
+>> del := conn1 umbuzo: ['DELETE FROM book WHERE id > 0'].
+{  del phumeza. conn1 qinisekisa. } bamba: { :e conn1 buyisela-umva.  }, qala.
+
+>> insert := conn1 umbuzo: ['INSERT INTO book (id) VALUES(null)'].
+insert phumeza.
+
+>> inani-lezinto := conn1 umbuzo: ['SELECT COUNT(*) AS num FROM book'].
+inani-lezinto landa: { :row Imveliso bhala: row num, umgca-omtsha. }.
+
+# does not show up
+# insert not committed on connection 1
+>> inani-lezinto := conn2 umbuzo: ['SELECT COUNT(*) AS num FROM book'].
+inani-lezinto landa: { :row Imveliso bhala: row num, umgca-omtsha. }.

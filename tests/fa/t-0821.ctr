@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> مسیر-پرونده := ⌝'/tmp/test0821.csv'⌜.
+>> file := پرونده جدید: مسیر-پرونده.
+
+file بنویس: ⌝'a,b\n"1,2\n'⌜.
+⎬
+	file جداکننده: ⌝','⌜ نقل-قول: ⌝'"'⌜ سطرها: ⎬ :line
+		خروجی بنویس: line, سطر-نو.
+	⎨.
+⎨ بگیر: ⎬ :e خروجی بنویس: e, سطر-نو. ⎨, اجرا.
+
+# a closed quote still works
+file بنویس: ⌝'a,b\n"1,2",3'⌜.
+file جداکننده: ⌝','⌜ نقل-قول: ⌝'"'⌜ سطرها: ⎬ :line
+	خروجی بنویس: line, سطر-نو.
+⎨.
+file پاک-کن.

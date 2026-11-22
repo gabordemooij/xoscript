@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> ceļš := ['/tmp/dat.csv'].
+>> csv := Fails jauns: ceļš.
+csv rakstīt: s.
+
+# accepts CRLF LF CR, varying row length
+csv atdalītājs: [';'] pēdiņa: ['"'] rindas: { :line
+	Programma satīrīt.
+	Izvade rakstīt: line, jauna-rinda.
+	Programma satīrīt.
+}.
+
+# unequal lines
+s pievienot-beigās: ['\njustone'].
+csv rakstīt: s.
+{
+	csv atdalītājs: [';'] pēdiņa: ['"'] rindas: { :line
+		Izvade rakstīt: line, jauna-rinda.
+	}.
+} tvert: { :e 
+	Izvade rakstīt: e, jauna-rinda.
+}, palaist.
+
+# invalid format
+s := ['"he"llo";world'].
+csv rakstīt: s.
+{
+	csv atdalītājs: [';'] pēdiņa: ['"'] rindas: { :line
+		Izvade rakstīt: line, jauna-rinda.
+	}.
+} tvert: { :e 
+	Izvade rakstīt: e, jauna-rinda.
+}, palaist.

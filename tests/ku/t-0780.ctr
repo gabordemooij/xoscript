@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lîste nû ;
+	# {"key":"normal"} normal ASCII
+	( Ferheng nû deyne: ['normal'] li: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Ferheng nû deyne: ['hello world'] li: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Ferheng nû deyne: ['"'] li: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Ferheng nû deyne: ['backslash: \\'] li: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Ferheng nû deyne: ['slash: /'] li: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Ferheng nû deyne: ['backspace: \b'] li: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Ferheng nû deyne: ['formfeed: \f'] li: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Ferheng nû deyne: ['newline: \n'] li: ['key'] ) ;
+	( Ferheng nû deyne: ['newline: ↵'] li: ['key'] ) ;
+	( Ferheng nû deyne: ['newline: 
+	'] li: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Ferheng nû deyne: ['carriage return: \r'] li: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Ferheng nû deyne: ['tab \t'] li: ['key'] ) ;
+	( Ferheng nû deyne: ['tab ⇿'] li: ['key'] ) ;
+	( Ferheng nû deyne: ['tab  '] li: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Ferheng nû deyne: ['NUL \u0000'] li: ['key'] ) ;
+	( Ferheng nû deyne: ['NUL \0'] li: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Ferheng nû deyne: ['control: \u0001'] li: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Ferheng nû deyne: ['control: \u001F'] li: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Ferheng nû deyne: ['unicode: é'] li: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Ferheng nû deyne: ['unicode: €'] li: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Ferheng nû deyne: ['unicode: 日本語'] li: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Ferheng nû deyne: ['unicode: 😀'] li: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Ferheng nû deyne: ['unicode: 🧑‍💻'] li: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Ferheng nû deyne: ['combining: e\u0301'] li: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Ferheng nû deyne: ['escaped unicode: \u00e9'] li: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Ferheng nû deyne: ['escaped unicode: \u20ac'] li: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Ferheng nû deyne: ['escaped unicode: \ud83d\ude00'] li: ['key'] ) ;
+	# {"key":""} empty value
+	( Ferheng nû deyne: [''] li: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Ferheng nû deyne: ['@ < > & = % + ? #'] li: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Ferheng nû deyne: ['''] li: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Ferheng nû deyne: ['multiple: \" \\ \n \r \t'] li: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Ferheng nû deyne: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] li: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Ferheng nû deyne: [' value'] li: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Ferheng nû deyne: ['value '] li: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Ferheng nû deyne: [' \t\n\r '] li: ['key'] ).
+
+dicts her-yek: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Ferheng nû deyne: d key li: ['key']).
+	>> b := JSON jsonify: (Ferheng nû deyne: ['value'] li: d key).
+	>> e := JSON tişt: a.
+	>> f := JSON tişt: b.
+	((e key = d key û: (f ? d key = ['value'])) an: (e key = ['NUL ?'])) rast: {
+		Derketin binivîse: ['OK'], rêza-nû.
+	}, wekî-din: {
+		Derketin binivîse: ['Unable to properly encode/decode: '] + d + j, rêza-nû.
+		Bername biqedîne.
+	}.
+}.

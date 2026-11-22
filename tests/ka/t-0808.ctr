@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := სეიფი გასაღებების-შექმნა.
+>> sk := keys პირველი.
+>> pk := keys ბოლო.
+>> sig := სეიფი ხელმოწერა: ['abc'] გასაღებით: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ სეიფი ხელმოწერა: ['abc'] გასაღებით: long. } დაჭერა: { :e
+	გამოტანა დაწერე: e, ახალი-ხაზი.
+}, გაშვება.
+
+{ სეიფი შემოწმება: ['abc'] ხელმოწერა: long გასაღებით: pk. } დაჭერა: { :e
+	გამოტანა დაწერე: e, ახალი-ხაზი.
+}, გაშვება.
+
+{ სეიფი შემოწმება: ['abc'] ხელმოწერა: sig გასაღებით: short. } დაჭერა: { :e
+	გამოტანა დაწერე: e, ახალი-ხაზი.
+}, გაშვება.

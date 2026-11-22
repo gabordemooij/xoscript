@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Objet nouveau.
+
+Log quand: ['say:'] faire: { :str
+	Sortie écrire: str, stop.
+}.
+
+>> Item := Objet nouveau.
+
+Item quand: ['nouveau:'] faire: { :id <- soi nouveau id: id.
+}.
+
+Item quand: ['id:'] faire: { :id
+	propre id := id.
+}.
+
+Item quand: ['id'] faire: { <- propre id. }.
+
+
+Item quand: ['texte'] faire: {
+	>> str := ['Item#~no'].
+	str ~no: propre id. <- str.
+}.
+
+
+>> Print := Objet nouveau.
+
+Print quand: ['items'] faire: { 
+	
+	propre item := Item nouveau: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: propre item
+	).
+	
+	
+}.
+
+Print items.

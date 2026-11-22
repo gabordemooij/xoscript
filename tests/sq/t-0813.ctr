@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inicializo.
+Program përdor: ['../../../src/xo/sq/webtools.xo'].
+Program përdor: ['../../../src/xo/sq/mailtools.xo'].
+
+>> kokë := Kokë-HTTP ri çelës: ['Location'] vlerë: ['/ok\r\nX-Injected: yes'].
+Dalje shkruaj: kokë.
+
+>> web := Dokument-Web ri.
+web shko-te: ['/ok\r\nX-Injected: yes'].
+Dalje shkruaj: ['\n'], rresht-ri.
+
+>> mail := Email ri.
+mail marrës: (Listë ri ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Listë ri ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Listë ri ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail dërgues: ['d@example.invalid\r\nX-From: yes'] emër: ['site\r\nX-Name: yes'].
+mail subjekt: ['hello\r\nX-Subject: yes'].
+mail trup: ['line1\r\nline2'].
+Dalje shkruaj: mail gjenero.
+
+>> html := HTML-Email ri.
+html marrës: (Listë ri ; ['a@example.invalid\r\nX-To: yes']).
+html dërgues: ['d@example.invalid'] emër: ['site'].
+html subjekt: ['hello\r\nX-Subject: yes'].
+html trup: ['body'].
+Dalje shkruaj: ( html gjenero përmban: ['\nX-'] ), rresht-ri.
+Dalje shkruaj: ( html gjenero përmban: ['X-To: yes'] ), rresht-ri.

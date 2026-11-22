@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Rječnik novi
+	# ASCII only
+	stavi: ( Popis novi ; 65 ; 65 ; 65 ; 65 ; 0 ) na: ['AAAA'],
+	# valid 2 byte sequence
+	stavi: ( Popis novi ; 194 ; 162 ; 0 ) na: ['¢'],
+	# Valid 3-byte UTF-8
+    stavi: ( Popis novi ; 226 ; 130 ; 172 ; 0 ) na: ['€'],
+	# Valid 4-byte UTF-8
+    stavi: ( Popis novi ; 240 ; 144 ; 141 ; 136 ; 0 ) na: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    stavi: ( Popis novi ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) na: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    stavi: ( Popis novi ; 65 ; 193 ; 129 ; 0 ) na: ['A?'],
+	# Invalid first byte (0xFF)
+    stavi: ( Popis novi ; 255 ; 0 ) na: ['?'],
+	# Incomplete multi-byte sequence at end
+    stavi: ( Popis novi ; 66 ; 226 ; 0 ) na: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    stavi: ( Popis novi ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) na: ['A€?𐍈B'].
+	 
+utf8cases svaki: { :key :value
+	>> blob := Blob novi: value broj-elemenata, bytes: value.
+	>> str := blob tekst.
+	(str = key) istina: {
+		Izlaz piši: ['OK'], novi-red.
+	}, inače: {
+		Izlaz piši: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, novi-red.
+	}.
+	blob oslobodi.
+}.

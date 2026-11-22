@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+நிரல் நினைவக-மேலாண்மை: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB புதிய புரவலன்: ['localhost'],
+	பயனர்-பெயர்: ['xo'], கடவுச்சொல்: ['pass123'], தரவுத்தள-பெயர்: ['xobase'], இணைந்திடு.
+
+>> TwoDigitFormat := வடிவம் புதிய: ['%02d'].
+
+# Datetime
+{
+	>> ஆண்டு := எண் இடையில்: 1995 முதல்: 2050, சரமாக.
+	>> மாதம் := TwoDigitFormat பயன்படுத்து-முழுஎண்: (எண் இடையில்: 1 முதல்: 12), சரமாக.
+	>> நாள் := TwoDigitFormat பயன்படுத்து-முழுஎண்: (எண் இடையில்: 1 முதல்: 28), சரமாக.
+	>> மணி := TwoDigitFormat பயன்படுத்து-முழுஎண்: (எண் இடையில்: 1 முதல்: 23), சரமாக.
+	>> நிமிடம் := TwoDigitFormat பயன்படுத்து-முழுஎண்: (எண் இடையில்: 1 முதல்: 59), சரமாக.
+	>> வினாடி := TwoDigitFormat பயன்படுத்து-முழுஎண்: (எண் இடையில்: 1 முதல்: 59), சரமாக.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: ஆண்டு,
+		MM: மாதம்,
+		DD: நாள்,
+		HH: மணி,
+		II: நிமிடம்,
+		SS: வினாடி.
+	>> தேடல்-அளவுருக்கள் :=
+	db வினவல்: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	கொணர்: { :row
+		(row mydatetime = datetime) பொய்யெனில்: {
+			இந்தப்-பணி பிழை: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter கூட்டு: 1.
+} * 100.
+
+# Date
+{
+	>> ஆண்டு := எண் இடையில்: 1995 முதல்: 2050, சரமாக.
+	>> மாதம் := TwoDigitFormat பயன்படுத்து-முழுஎண்: (எண் இடையில்: 1 முதல்: 12), சரமாக.
+	>> நாள் := TwoDigitFormat பயன்படுத்து-முழுஎண்: (எண் இடையில்: 1 முதல்: 28), சரமாக.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: ஆண்டு,
+		MM: மாதம்,
+		DD: நாள்.
+	>> தேடல்-அளவுருக்கள் :=
+	db வினவல்: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	கொணர்: { :row
+		(row mydate = date) பொய்யெனில்: {
+			இந்தப்-பணி பிழை: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter கூட்டு: 1.
+} * 100.
+
+
+# Time
+{
+	>> மணி := TwoDigitFormat பயன்படுத்து-முழுஎண்: (எண் இடையில்: 1 முதல்: 23), சரமாக.
+	>> நிமிடம் := TwoDigitFormat பயன்படுத்து-முழுஎண்: (எண் இடையில்: 1 முதல்: 59), சரமாக.
+	>> வினாடி := TwoDigitFormat பயன்படுத்து-முழுஎண்: (எண் இடையில்: 1 முதல்: 59), சரமாக.
+	>> நேரம் := ['HH:II:SS'].
+	நேரம்
+		HH: மணி,
+		II: நிமிடம்,
+		SS: வினாடி.
+	>> தேடல்-அளவுருக்கள் :=
+	db வினவல்: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: நேரம்),
+	கொணர்: { :row
+		(row mytime = நேரம்) பொய்யெனில்: {
+			இந்தப்-பணி பிழை: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter கூட்டு: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := வரிசை புதிய நிரப்பு: 100000 மதிப்பால்: ['x'], இணை: [''].
+{
+	>> str2 := பெட்டகம் டோக்கன்: 40.
+	>> தேடல்-அளவுருக்கள் :=
+	db வினவல்: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	கொணர்: { :row
+		(row str1 = str1 மற்றும்: row str2 = str2) பொய்யெனில்: {
+			இந்தப்-பணி பிழை: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter கூட்டு: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := எண் இடையில்: 1 முதல்: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 சரத்திலிருந்து: ['9223372036854775807'] ) -
+		( Int64 சரத்திலிருந்து: ['99999'] ) +
+		( Int64 சரத்திலிருந்து: n1 சரமாக )
+	).
+	>> தேடல்-அளவுருக்கள் :=
+	db வினவல்: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	கொணர்: { :row
+		(row n1 = n1) பொய்யெனில்: {
+			இந்தப்-பணி பிழை: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) பொய்யெனில்: {
+			இந்தப்-பணி பிழை: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 முழுமையாக்கு) பொய்யெனில்: {
+			இந்தப்-பணி பிழை: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) பொய்யெனில்: {
+			இந்தப்-பணி பிழை: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter கூட்டு: 1.
+} * 100.
+
+
+வெளியீடு எழுது: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), புதிய-வரி.

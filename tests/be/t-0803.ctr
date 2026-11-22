@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB новы хост: ['localhost'],
+	карыстальнік: ['xo'],
+	пароль: ['pass123'],
+	назва-базы: ['xobase'],
+	падключыць.
+
+>> conn2 := Maria-DB новы хост: ['localhost'],
+	карыстальнік: ['xo'],
+	пароль: ['pass123'],
+	назва-базы: ['xobase'],
+	падключыць.
+#...
+>> del := conn1 запыт: ['DELETE FROM book WHERE id > 0'].
+{  del выканаць. conn1 пацвердзіць. } перахапіць: { :e conn1 адкаціць.  }, запусціць.
+
+>> insert := conn1 запыт: ['INSERT INTO book (id) VALUES(null)'].
+insert выканаць.
+
+>> колькасць := conn1 запыт: ['SELECT COUNT(*) AS num FROM book'].
+колькасць атрымаць: { :row Вывад пісаць: row num, новы-радок. }.
+
+# does not show up
+# insert not committed on connection 1
+>> колькасць := conn2 запыт: ['SELECT COUNT(*) AS num FROM book'].
+колькасць атрымаць: { :row Вывад пісаць: row num, новы-радок. }.

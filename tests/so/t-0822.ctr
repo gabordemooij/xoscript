@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB cusub martigeliye: ['localhost'],
+	magaca-isticmaalaha: ['xo'],
+	furaha-sirta: ['pass123'],
+	magaca-xogta: ['xobase'],
+	ku-xirmo.
+
+>> xuduudaha-raadinta := db weydiin: ['SELECT ? AS a, ? AS b, ? AS c'].
+xuduudaha-raadinta xuduudo: (Liis cusub ; ['1']).
+{ xuduudaha-raadinta soo-qaad: { :row Soo-saar qor: row, sadar-cusub. }. } qabo: { :e Soo-saar qor: e, sadar-cusub. }, bilow.
+
+>> xuduudaha-raadinta := db weydiin: ['SELECT ? AS a'].
+{ xuduudaha-raadinta soo-qaad: { :row Soo-saar qor: row, sadar-cusub. }. } qabo: { :e Soo-saar qor: e, sadar-cusub. }, bilow.
+
+# the right number still works, more parameters are ignored as before
+>> xuduudaha-raadinta := db weydiin: ['SELECT ? AS a, ? AS b'].
+xuduudaha-raadinta xuduudo: (Liis cusub ; ['1'] ; ['2']).
+xuduudaha-raadinta soo-qaad: { :row Soo-saar qor: (row meesha: ['a']), qor: (row meesha: ['b']), sadar-cusub. }.
+xuduudaha-raadinta xuduudo: (Liis cusub ; ['1'] ; ['2'] ; ['3']).
+xuduudaha-raadinta soo-qaad: { :row Soo-saar qor: (row meesha: ['a']), qor: (row meesha: ['b']), sadar-cusub. }.

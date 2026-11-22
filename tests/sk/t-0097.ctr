@@ -1,0 +1,42 @@
+
+Text pri: ['html'] urobiť: { <- (
+		seba
+		nahradiť: ['&'] za: ['&amp;'],
+		nahradiť: ['<'] za: ['&lt;'],
+		nahradiť: ['>'] za: ['&gt;'],
+		nahradiť: ['"'] za: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objekt nový.
+
+HtmlBrush pri: ['odpovedať:'] urobiť: { :tag
+	Výstup písať: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush pri: ['odpovedať:a:'] urobiť: { :tag :content
+	tag := ( tag od: 0 dĺžka: (tag dĺžka - 1) ).
+	Výstup písať: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush pri: ['content:'] urobiť: { :text
+	Výstup písať: text html, nový-riadok.
+}.
+
+HtmlBrush pri: ['attr:value:'] urobiť: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush nový.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

@@ -1,0 +1,43 @@
+
+
+>> g := Server ନୂତନ.
+>> v := ସିନ୍ଦୁକ ନୂତନ.
+>> ok := 0.
+
+>> secrets := ସାରଣୀ ନୂତନ ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets ନକଲ.
+passwords ପ୍ରତ୍ୟେକ: { :i :p
+	secrets ପ୍ରତ୍ୟେକ: { :n :s
+		{
+			>> encrypted := v ଏନକ୍ରିପ୍ଟ: s ଚାବି: p.
+			>> decrypted := v ଡିକ୍ରିପ୍ଟ: encrypted ଚାବି: p.
+			(decrypted = s) ସତ୍ୟ-ହେଲେ: {
+				ok ମିଶାଅ: 1.
+			}, ନଚେତ୍: {
+				ଆଉଟପୁଟ୍ ଲେଖ: ['failed encrypting/decrypting: '], ନୂଆ-ଧାଡ଼ି.
+				ଆଉଟପୁଟ୍ ଲେଖ: s, ନୂଆ-ଧାଡ଼ି.
+				ଆଉଟପୁଟ୍ ଲେଖ: ['encrypted: '] + encrypted, ନୂଆ-ଧାଡ଼ି.
+				ଆଉଟପୁଟ୍ ଲେଖ: ['decrypted: '] + encrypted, ନୂଆ-ଧାଡ଼ି.
+				ପ୍ରୋଗ୍ରାମ୍ ଶେଷ.
+			}.
+		} ଧର: { :err
+			(s = [''] କିମ୍ବା: p = ['']) ସତ୍ୟ-ହେଲେ: {
+				ok ମିଶାଅ: 1.
+			}, ନଚେତ୍: {
+				ଆଉଟପୁଟ୍ ଲେଖ: err, ନୂଆ-ଧାଡ଼ି.
+				ପ୍ରୋଗ୍ରାମ୍ ଶେଷ.
+			}.
+		}, ଚଲାଅ.
+	}.
+}.
+
+ଆଉଟପୁଟ୍ ଲେଖ: ( ok + [' vault encryptions tested.'] ), ନୂଆ-ଧାଡ଼ି.

@@ -1,0 +1,42 @@
+
+String em: ['html'] fazer: { <- (
+		isto
+		substituir: ['&'] com: ['&amp;'],
+		substituir: ['<'] com: ['&lt;'],
+		substituir: ['>'] com: ['&gt;'],
+		substituir: ['"'] com: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objeto novo.
+
+HtmlBrush em: ['responder:'] fazer: { :tag
+	Saída escrever: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush em: ['responder:e:'] fazer: { :tag :content
+	tag := ( tag de: 0 comprimento: (tag comprimento - 1) ).
+	Saída escrever: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush em: ['content:'] fazer: { :text
+	Saída escrever: text html, stop.
+}.
+
+HtmlBrush em: ['attr:value:'] fazer: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush novo.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

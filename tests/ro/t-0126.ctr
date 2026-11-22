@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Obiect nou.
+
+Slurp la: ['nou'] execută: {
+	propriu str := [''].
+}.
+
+Slurp la: ['nieuw'] execută: {
+	propriu str := [''].
+}.
+
+Slurp la: ['răspunde:'] execută: { :blah
+		propriu str adaugă-la-sfârșit: blah.
+}.
+
+Slurp la: ['răspunde:și:'] execută: { :blah :blahah
+		propriu str adaugă-la-sfârșit: (blah de-la: 0 lungime: (blah lungime - 1)).
+		propriu str adaugă-la-sfârșit: [' '].
+		propriu str adaugă-la-sfârșit: blahah.
+}.
+
+Slurp la: ['obtain'] execută: {
+	>> buffer := propriu str.
+	propriu str := ['']. <- buffer.
+}.
+
+
+Ieșire scrie: (Program sistem: (Slurp nou echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Fișier nou: ['/tmp/from.txt'], șterge. } prinde: { ['Empty']. }, pornește.
+{ Fișier nou: ['/tmp/to.txt'], șterge. } prinde: { ['Empty']. }, pornește.
+
+
+Fișier nou: ['/tmp/to.txt'], există fals: {
+	Ieșire scrie: ['Confirmed. Target file does not exist.\
+'].
+}.
+Fișier nou: ['/tmp/from.txt'], există fals: {
+	Ieșire scrie: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Program sistem: (Slurp nou touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Program sistem: (Slurp nou cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Fișier nou: ['/tmp/to.txt'], există adevărat: {
+	Ieșire scrie: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Ieșire scrie: ['Contents of file is:'] + (Fișier nou: ['/tmp/to.txt'], citește), rând-nou.

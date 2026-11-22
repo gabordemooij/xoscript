@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB nou gazdă: ['localhost'],
+	utilizator: ['xo'],
+	parolă: ['pass123'],
+	nume-bază: ['xobase'],
+	conectează.
+
+>> parametri-căutare := db interogare: ['SELECT ? AS a, ? AS b, ? AS c'].
+parametri-căutare parametri: (Listă nou ; ['1']).
+{ parametri-căutare preia: { :row Ieșire scrie: row, rând-nou. }. } prinde: { :e Ieșire scrie: e, rând-nou. }, pornește.
+
+>> parametri-căutare := db interogare: ['SELECT ? AS a'].
+{ parametri-căutare preia: { :row Ieșire scrie: row, rând-nou. }. } prinde: { :e Ieșire scrie: e, rând-nou. }, pornește.
+
+# the right number still works, more parameters are ignored as before
+>> parametri-căutare := db interogare: ['SELECT ? AS a, ? AS b'].
+parametri-căutare parametri: (Listă nou ; ['1'] ; ['2']).
+parametri-căutare preia: { :row Ieșire scrie: (row la: ['a']), scrie: (row la: ['b']), rând-nou. }.
+parametri-căutare parametri: (Listă nou ; ['1'] ; ['2'] ; ['3']).
+parametri-căutare preia: { :row Ieșire scrie: (row la: ['a']), scrie: (row la: ['b']), rând-nou. }.

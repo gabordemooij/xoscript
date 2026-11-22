@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server siapkeun.
+Program paké: ['../../../src/xo/su/webtools.xo'].
+Program paké: ['../../../src/xo/su/mailtools.xo'].
+
+>> lulugu := Lulugu-HTTP anyar konci-lulugu: ['Location'] nilai: ['/ok\r\nX-Injected: yes'].
+Kaluaran tulis: lulugu.
+
+>> web := Dokumén-Wéb anyar.
+web angkat-ka: ['/ok\r\nX-Injected: yes'].
+Kaluaran tulis: ['\n'], baris-anyar.
+
+>> mail := Surélék anyar.
+mail ka: (Daptar anyar ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Daptar anyar ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Daptar anyar ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail pangirim: ['d@example.invalid\r\nX-From: yes'] ngaran: ['site\r\nX-Name: yes'].
+mail jejer: ['hello\r\nX-Subject: yes'].
+mail awak: ['line1\r\nline2'].
+Kaluaran tulis: mail jieun.
+
+>> html := Surélék-HTML anyar.
+html ka: (Daptar anyar ; ['a@example.invalid\r\nX-To: yes']).
+html pangirim: ['d@example.invalid'] ngaran: ['site'].
+html jejer: ['hello\r\nX-Subject: yes'].
+html awak: ['body'].
+Kaluaran tulis: ( html jieun ngandung: ['\nX-'] ), baris-anyar.
+Kaluaran tulis: ( html jieun ngandung: ['X-To: yes'] ), baris-anyar.

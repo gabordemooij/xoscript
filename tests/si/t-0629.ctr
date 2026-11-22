@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+නිමැවුම ලියන්න: ['Database test'], නව-පේළිය.
+
+>> db := Maria-DB නව සත්කාරකය: ['localhost'],
+	පරිශීලක-නම: ['xo'], මුරපදය: ['pass123'], දත්ත-සමුදා-නම: ['xobase'], සම්බන්ධ-වන්න.
+
+නිමැවුම ලියන්න: ['Can we connect? '] + db සම්බන්ධද?, නව-පේළිය.
+
+>> සෙවුම්-පරාමිති := db විමසුම: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], පරාමිති: ( ලේඛනය නව ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  සෙවුම්-පරාමිති ඉටුකරන්න. db තහවුරු-කරන්න. } අල්ලන්න: { :e db ආපසු-හරවන්න.  }, ධාවනය.
+
+නිමැවුම ලියන්න: ['Can we insert? '] + ( සෙවුම්-පරාමිති insert-id > 0 ), නව-පේළිය.
+
+>> Obj := වස්තුව නව.
+Obj ලැබුණු-විට: ['retrieve-rows'] කරන්න: {
+	තමාගේ ගණන := 0.
+	>> සෙවුම්-පරාමිති :=
+	db විමසුම: ['SELECT * FROM book order by id desc limit 2'], 
+	ගෙනෙන්න: { :row 
+		තමාගේ ගණන එකතුව: 1.
+		ඇත්ත නවතන්න.
+	}. <- තමාගේ ගණන පිටපත.
+}.
+
+නිමැවුම ලියන්න: ['Can we query? '] + ( Obj retrieve-rows > 0 ), නව-පේළිය.

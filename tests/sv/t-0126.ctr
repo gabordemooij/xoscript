@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Objekt ny.
+
+Slurp vid: ['ny'] gör: {
+	egen str := [''].
+}.
+
+Slurp vid: ['nieuw'] gör: {
+	egen str := [''].
+}.
+
+Slurp vid: ['svara:'] gör: { :blah
+		egen str lägg-till-sist: blah.
+}.
+
+Slurp vid: ['svara:och:'] gör: { :blah :blahah
+		egen str lägg-till-sist: (blah från: 0 längd: (blah längd - 1)).
+		egen str lägg-till-sist: [' '].
+		egen str lägg-till-sist: blahah.
+}.
+
+Slurp vid: ['obtain'] gör: {
+	>> buffer := egen str.
+	egen str := ['']. <- buffer.
+}.
+
+
+Utdata skriv: (Program system: (Slurp ny echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Fil ny: ['/tmp/from.txt'], radera. } fånga: { ['Empty']. }, starta.
+{ Fil ny: ['/tmp/to.txt'], radera. } fånga: { ['Empty']. }, starta.
+
+
+Fil ny: ['/tmp/to.txt'], finns falsk: {
+	Utdata skriv: ['Confirmed. Target file does not exist.\
+'].
+}.
+Fil ny: ['/tmp/from.txt'], finns falsk: {
+	Utdata skriv: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Program system: (Slurp ny touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Program system: (Slurp ny cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Fil ny: ['/tmp/to.txt'], finns sann: {
+	Utdata skriv: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Utdata skriv: ['Contents of file is:'] + (Fil ny: ['/tmp/to.txt'], läs), stop.

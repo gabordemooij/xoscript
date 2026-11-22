@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server រៀបចំ.
+កម្មវិធី ប្រើ: ['../../../src/xo/km/webtools.xo'].
+
+>> Fake-Request := វត្ថុ ថ្មី.
+Fake-Request ពេលទទួល: ['value:'] ធ្វើ: { :តម្លៃ
+	ផ្ទាល់ តម្លៃ := តម្លៃ.
+}.
+Fake-Request ពេលទទួល: ['cookie:'] ធ្វើ: { :ឈ្មោះ <- ផ្ទាល់ តម្លៃ.
+}.
+
+>> Test-Session := សម័យឯកសារបណ្ដោះអាសន្ន ថ្មី.
+Test-Session ពេលទទួល: ['ផ្ទុក'] ធ្វើ: { <- វចនានុក្រម ថ្មី.
+}.
+Test-Session ពេលទទួល: ['session-id'] ធ្វើ: { <- ផ្ទាល់ id.
+}.
+
+>> cookies := ស៊េរី ថ្មី
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies នីមួយៗ: { :i :cookie
+	>> សំណើ-http := Fake-Request ថ្មី.
+	សំណើ-http value: cookie.
+	>> អ្នកគ្រប់គ្រង := Test-Session ថ្មី.
+	>> web := ឯកសារបណ្ដាញ ថ្មី.
+	web សំណើ-http: សំណើ-http.
+	web អ្នកគ្រប់គ្រងសម័យ: អ្នកគ្រប់គ្រង.
+	web ចាប់ផ្ដើមសម័យ.
+	លទ្ធផល សរសេរ: ( អ្នកគ្រប់គ្រង session-id = cookie ), បន្ទាត់ថ្មី.
+}.
+
+>> web := ឯកសារបណ្ដាញ ថ្មី.
+web json: (វចនានុក្រម ថ្មី ដាក់: ['b'] សោ: ['a']).
+លទ្ធផល សរសេរ: ['\n'], បន្ទាត់ថ្មី.
+
+{ បណ្តាញ get: ['file:///etc/hostname']. } ចាប់: { :e
+	លទ្ធផល សរសេរ: e, បន្ទាត់ថ្មី.
+}, ដំណើរការ.
+
+>> svg := ឯកសារ ថ្មី: ['/tmp/test0814.svg'].
+svg សរសេរ: ['<svg xmlns="x"></svg>'].
+លទ្ធផល បន្ទាត់ថ្មី.
+Server បញ្ជូនបន្ត: ['test0814.svg'] បុព្វបទ: ['/tmp/'].
+svg លុប.

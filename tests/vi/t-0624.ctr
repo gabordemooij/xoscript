@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Đối-tượng mới.
+
+Log khi: ['say:'] làm: { :str
+	Xuất ghi: str, xuống-dòng.
+}.
+
+>> Item := Đối-tượng mới.
+
+Item khi: ['mới:'] làm: { :id <- bản-thân mới id: id.
+}.
+
+Item khi: ['id:'] làm: { :id
+	riêng id := id.
+}.
+
+Item khi: ['id'] làm: { <- riêng id. }.
+
+
+Item khi: ['chuỗi'] làm: {
+	>> str := ['Item#~no'].
+	str ~no: riêng id. <- str.
+}.
+
+
+>> Print := Đối-tượng mới.
+
+Print khi: ['items'] làm: { 
+	
+	riêng item := Item mới: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: riêng item
+	).
+	
+	
+}.
+
+Print items.

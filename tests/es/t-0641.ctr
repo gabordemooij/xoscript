@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Diccionario crear
+	# ASCII only
+	poner: ( Lista crear ; 65 ; 65 ; 65 ; 65 ; 0 ) en: ['AAAA'],
+	# valid 2 byte sequence
+	poner: ( Lista crear ; 194 ; 162 ; 0 ) en: ['¢'],
+	# Valid 3-byte UTF-8
+    poner: ( Lista crear ; 226 ; 130 ; 172 ; 0 ) en: ['€'],
+	# Valid 4-byte UTF-8
+    poner: ( Lista crear ; 240 ; 144 ; 141 ; 136 ; 0 ) en: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    poner: ( Lista crear ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) en: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    poner: ( Lista crear ; 65 ; 193 ; 129 ; 0 ) en: ['A?'],
+	# Invalid first byte (0xFF)
+    poner: ( Lista crear ; 255 ; 0 ) en: ['?'],
+	# Incomplete multi-byte sequence at end
+    poner: ( Lista crear ; 66 ; 226 ; 0 ) en: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    poner: ( Lista crear ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) en: ['A€?𐍈B'].
+	 
+utf8cases cada: { :key :value
+	>> blob := Blob crear: value contar, bytes: value.
+	>> str := blob texto.
+	(str = key) verdadero: {
+		Salida escribir: ['OK'], detener.
+	}, otro: {
+		Salida escribir: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, detener.
+	}.
+	blob liberar.
+}.

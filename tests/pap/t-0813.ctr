@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server prepará.
+Programa usa: ['../../../src/xo/pap/webtools.xo'].
+Programa usa: ['../../../src/xo/pap/mailtools.xo'].
+
+>> encabesamentu := Encabesamentu-HTTP nobo yabi: ['Location'] balor: ['/ok\r\nX-Injected: yes'].
+Salida skirbi: encabesamentu.
+
+>> web := Dokumento-Web nobo.
+web bai-na: ['/ok\r\nX-Injected: yes'].
+Salida skirbi: ['\n'], liña-nobo.
+
+>> mail := Email nobo.
+mail pa-risibidó: (Lista nobo ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lista nobo ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lista nobo ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail remitente: ['d@example.invalid\r\nX-From: yes'] nòmber: ['site\r\nX-Name: yes'].
+mail asunto: ['hello\r\nX-Subject: yes'].
+mail kurpa: ['line1\r\nline2'].
+Salida skirbi: mail generá.
+
+>> html := HTML-Email nobo.
+html pa-risibidó: (Lista nobo ; ['a@example.invalid\r\nX-To: yes']).
+html remitente: ['d@example.invalid'] nòmber: ['site'].
+html asunto: ['hello\r\nX-Subject: yes'].
+html kurpa: ['body'].
+Salida skirbi: ( html generá ta-kontené: ['\nX-'] ), liña-nobo.
+Salida skirbi: ( html generá ta-kontené: ['X-To: yes'] ), liña-nobo.

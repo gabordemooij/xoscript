@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> skúsiť := { :format :value
+	{ Výstup písať: ( (Formát nový: format) aplikovať: value ), nový-riadok. } zachytiť: { :e Výstup písať: e, nový-riadok. }, spustiť.
+}.
+>> try-int := { :format :value
+	{ Výstup písať: ( (Formát nový: format) aplikovať-celé: value ), nový-riadok. } zachytiť: { :e Výstup písať: e, nový-riadok. }, spustiť.
+}.
+
+# fits
+skúsiť aplikovať: ['|%s|'] a: ['text'].
+skúsiť aplikovať: ['%06.2f'] a: 5.5.
+skúsiť aplikovať: ['100%% %s'] a: ['sure'].
+try-int aplikovať: ['%03d'] a: 7.
+try-int aplikovať: ['%x'] a: 255.
+skúsiť aplikovať: ['%d'] a: (Int64 nový z-textu: ['12']).
+skúsiť aplikovať: ['%lld'] a: (Int64 nový z-textu: ['12']).
+skúsiť aplikovať: ['%.1lf'] a: 5.5.
+try-int aplikovať: ['%hd'] a: 7.
+
+# does not fit
+skúsiť aplikovať: ['%s'] a: 12345.
+skúsiť aplikovať: ['%d'] a: 12345.
+skúsiť aplikovať: ['%f'] a: ['text'].
+try-int aplikovať: ['%d'] a: ['text'].
+try-int aplikovať: ['%s'] a: 5.
+skúsiť aplikovať: ['%s %s'] a: ['text'].
+skúsiť aplikovať: ['%n'] a: ['text'].
+skúsiť aplikovať: ['%*s'] a: ['text'].
+skúsiť aplikovať: ['%'] a: ['text'].
+
+# length modifier does not fit
+skúsiť aplikovať: ['%ls'] a: ['text'].
+skúsiť aplikovať: ['%Lf'] a: 5.5.
+try-int aplikovať: ['%ld'] a: 7.
+try-int aplikovať: ['%lld'] a: 7.
+skúsiť aplikovať: ['%Ld'] a: (Int64 nový z-textu: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+skúsiť aplikovať: ['%99999999999s'] a: ['text'].

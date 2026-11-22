@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := ශබ්දකෝෂය නව
+	# ASCII only
+	තබන්න: ( ලේඛනය නව ; 65 ; 65 ; 65 ; 65 ; 0 ) යතුර: ['AAAA'],
+	# valid 2 byte sequence
+	තබන්න: ( ලේඛනය නව ; 194 ; 162 ; 0 ) යතුර: ['¢'],
+	# Valid 3-byte UTF-8
+    තබන්න: ( ලේඛනය නව ; 226 ; 130 ; 172 ; 0 ) යතුර: ['€'],
+	# Valid 4-byte UTF-8
+    තබන්න: ( ලේඛනය නව ; 240 ; 144 ; 141 ; 136 ; 0 ) යතුර: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    තබන්න: ( ලේඛනය නව ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) යතුර: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    තබන්න: ( ලේඛනය නව ; 65 ; 193 ; 129 ; 0 ) යතුර: ['A?'],
+	# Invalid first byte (0xFF)
+    තබන්න: ( ලේඛනය නව ; 255 ; 0 ) යතුර: ['?'],
+	# Incomplete multi-byte sequence at end
+    තබන්න: ( ලේඛනය නව ; 66 ; 226 ; 0 ) යතුර: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    තබන්න: ( ලේඛනය නව ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) යතුර: ['A€?𐍈B'].
+	 
+utf8cases එකිනෙක: { :key :value
+	>> blob := Blob නව: value ගණන, bytes: value.
+	>> str := blob පෙළට.
+	(str = key) ඇත්ත-නම්: {
+		නිමැවුම ලියන්න: ['OK'], නව-පේළිය.
+	}, නැතිනම්: {
+		නිමැවුම ලියන්න: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, නව-පේළිය.
+	}.
+	blob නිදහස්-කරන්න.
+}.

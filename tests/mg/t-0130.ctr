@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Fandaharana fikirakirana: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server ampifandraiso: ( Lisitra vaovao ;
+ libname ; ['fopen'] ;
+ ( Lisitra vaovao ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+ampifandraiso: ( Lisitra vaovao ;
+ Tsinontsinona ; # means same lib
+ ['fread'] ;
+ ( Lisitra vaovao ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Tsinontsinona ; # means same object (i.e. Stream)
+ ['fread']
+),
+ampifandraiso: (
+ Lisitra vaovao ;
+ Tsinontsinona ; # means same lib
+ ['fwrite'] ;
+ ( Lisitra vaovao ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Tsinontsinona ; # means same lib
+ ['fwrite']
+),
+ampifandraiso: (
+ Lisitra vaovao ;
+ Tsinontsinona ; # means same lib
+ ['rewind'] ;
+ ( Lisitra vaovao ; ['pointer'] ) ;
+ ['int'] ;
+ Tsinontsinona ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> lalan-drakitra := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: lalan-drakitra mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream hafatra: ['fwrite'] fampidirana: (Lisitra vaovao ; str ; 1 ; 6 ; fd ).
+Vokatra soraty: bytes-written, andalana-vaovao.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob vaovao: 20.
+
+# read from file
+>> bytes-read := Stream hafatra: ['fread'] fampidirana: (Lisitra vaovao ; buf ; 1 ; 6 ; fd ).
+Vokatra soraty: bytes-read, andalana-vaovao.
+Vokatra soraty: buf, andalana-vaovao.
+
+# free memory
+str  afaho.
+lalan-drakitra afaho.
+mode afaho.
+buf  afaho.
+
+

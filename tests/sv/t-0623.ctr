@@ -1,0 +1,43 @@
+
+
+>> g := Server ny.
+>> v := Valv ny.
+>> ok := 0.
+
+>> secrets := Lista ny ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopiera.
+passwords varje: { :i :p
+	secrets varje: { :n :s
+		{
+			>> encrypted := v kryptera: s nyckel: p.
+			>> decrypted := v dekryptera: encrypted nyckel: p.
+			(decrypted = s) sann: {
+				ok lägg-till: 1.
+			}, annars: {
+				Utdata skriv: ['failed encrypting/decrypting: '], stop.
+				Utdata skriv: s, stop.
+				Utdata skriv: ['encrypted: '] + encrypted, stop.
+				Utdata skriv: ['decrypted: '] + encrypted, stop.
+				Program avsluta.
+			}.
+		} fånga: { :err
+			(s = [''] eller: p = ['']) sann: {
+				ok lägg-till: 1.
+			}, annars: {
+				Utdata skriv: err, stop.
+				Program avsluta.
+			}.
+		}, starta.
+	}.
+}.
+
+Utdata skriv: ( ok + [' vault encryptions tested.'] ), stop.

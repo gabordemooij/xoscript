@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+آئوٽ-پٽ لکو: ⌝'Database test'⌜, نئين-سٽ.
+
+>> db := Maria-DB نئون ميزبان: ⌝'localhost'⌜,
+	يوزر-نالو: ⌝'xo'⌜, پاسورڊ: ⌝'pass123'⌜, ڊيٽابيس-نالو: ⌝'xobase'⌜, ڳنڍجو.
+
+آئوٽ-پٽ لکو: ⌝'Can we connect? '⌜ + db ڳنڍيل?, نئين-سٽ.
+
+>> ڳولا-پيراميٽر := db سوال: ⌝'
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'⌜, پيراميٽر: ﴿ لسٽ نئون ; ⌝'abc'⌜ ; 12.35 ; 6 ﴾. # parameterized queries
+
+⎬  ڳولا-پيراميٽر عمل-ڪريو. db پڪو-ڪريو. ⎨ پڪڙيو: ⎬ :e db واپس-ورايو.  ⎨, هلايو.
+
+آئوٽ-پٽ لکو: ⌝'Can we insert? '⌜ + ﴿ ڳولا-پيراميٽر insert-id > 0 ﴾, نئين-سٽ.
+
+>> Obj := شيء نئون.
+Obj جڏهن: ⌝'retrieve-rows'⌜ ڪريو: ⎬
+	پنهنجو ڳڻپ := 0.
+	>> ڳولا-پيراميٽر :=
+	db سوال: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+	آڻيو: ⎬ :row 
+		پنهنجو ڳڻپ جوڙ: 1.
+		سچ ٽوڙيو.
+	⎨. <- پنهنجو ڳڻپ نقل.
+⎨.
+
+آئوٽ-پٽ لکو: ⌝'Can we query? '⌜ + ﴿ Obj retrieve-rows > 0 ﴾, نئين-سٽ.

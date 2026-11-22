@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Излез напиши: ['Database test'], нов-ред.
+
+>> db := Maria-DB нов домаќин: ['localhost'],
+	корисник: ['xo'], лозинка: ['pass123'], име-на-база: ['xobase'], поврзи-се.
+
+Излез напиши: ['Can we connect? '] + db поврзано?, нов-ред.
+
+>> параметри-за-пребарување := db барање: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], параметри: ( Листа нов ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  параметри-за-пребарување изврши. db потврди. } фати: { :e db поништи.  }, стартувај.
+
+Излез напиши: ['Can we insert? '] + ( параметри-за-пребарување insert-id > 0 ), нов-ред.
+
+>> Obj := Објект нов.
+Obj при: ['retrieve-rows'] направи: {
+	свој број-на-елементи := 0.
+	>> параметри-за-пребарување :=
+	db барање: ['SELECT * FROM book order by id desc limit 2'], 
+	преземи: { :row 
+		свој број-на-елементи додај: 1.
+		Точно прекини.
+	}. <- свој број-на-елементи копирај.
+}.
+
+Излез напиши: ['Can we query? '] + ( Obj retrieve-rows > 0 ), нов-ред.

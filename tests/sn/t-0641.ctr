@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Duramazwi nyowani
+	# ASCII only
+	isa: ( Rondedzero nyowani ; 65 ; 65 ; 65 ; 65 ; 0 ) pa: ['AAAA'],
+	# valid 2 byte sequence
+	isa: ( Rondedzero nyowani ; 194 ; 162 ; 0 ) pa: ['¢'],
+	# Valid 3-byte UTF-8
+    isa: ( Rondedzero nyowani ; 226 ; 130 ; 172 ; 0 ) pa: ['€'],
+	# Valid 4-byte UTF-8
+    isa: ( Rondedzero nyowani ; 240 ; 144 ; 141 ; 136 ; 0 ) pa: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    isa: ( Rondedzero nyowani ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) pa: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    isa: ( Rondedzero nyowani ; 65 ; 193 ; 129 ; 0 ) pa: ['A?'],
+	# Invalid first byte (0xFF)
+    isa: ( Rondedzero nyowani ; 255 ; 0 ) pa: ['?'],
+	# Incomplete multi-byte sequence at end
+    isa: ( Rondedzero nyowani ; 66 ; 226 ; 0 ) pa: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    isa: ( Rondedzero nyowani ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) pa: ['A€?𐍈B'].
+	 
+utf8cases chimwe-nechimwe: { :key :value
+	>> blob := Blob nyowani: value huwandu, bytes: value.
+	>> str := blob mavara-emashoko.
+	(str = key) chokwadi: {
+		Zvabuda nyora: ['OK'], mutsara-mutsva.
+	}, kana-zvisiri: {
+		Zvabuda nyora: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, mutsara-mutsva.
+	}.
+	blob sunungura.
+}.

@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Objektua berria.
+
+Log noiz: ['say:'] egin: { :str
+	Irteera idatzi: str, lerro-jauzia.
+}.
+
+>> Item := Objektua berria.
+
+Item noiz: ['berria:'] egin: { :id <- norbera berria id: id.
+}.
+
+Item noiz: ['id:'] egin: { :id
+	berezko id := id.
+}.
+
+Item noiz: ['id'] egin: { <- berezko id. }.
+
+
+Item noiz: ['testua'] egin: {
+	>> str := ['Item#~no'].
+	str ~no: berezko id. <- str.
+}.
+
+
+>> Print := Objektua berria.
+
+Print noiz: ['items'] egin: { 
+	
+	berezko item := Item berria: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: berezko item
+	).
+	
+	
+}.
+
+Print items.

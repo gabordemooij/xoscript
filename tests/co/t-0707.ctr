@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Prugramma gestione-memoria: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB novu ospite: ['localhost'],
+	nome-di-utilizatore: ['xo'], parolla-secreta: ['pass123'], nome-di-basa: ['xobase'], cunnette.
+
+>> TwoDigitFormat := Furmatu novu: ['%02d'].
+
+# Datetime
+{
+	>> annu := Numeru trà: 1995 è: 2050, testu.
+	>> mese := TwoDigitFormat applicà-interu: (Numeru trà: 1 è: 12), testu.
+	>> ghjornu := TwoDigitFormat applicà-interu: (Numeru trà: 1 è: 28), testu.
+	>> ora := TwoDigitFormat applicà-interu: (Numeru trà: 1 è: 23), testu.
+	>> minutu := TwoDigitFormat applicà-interu: (Numeru trà: 1 è: 59), testu.
+	>> secondu := TwoDigitFormat applicà-interu: (Numeru trà: 1 è: 59), testu.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: annu,
+		MM: mese,
+		DD: ghjornu,
+		HH: ora,
+		II: minutu,
+		SS: secondu.
+	>> parametri-di-ricerca :=
+	db richiesta: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ricuperà: { :row
+		(row mydatetime = datetime) falsu: {
+			sta-faccenda errore: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter aghjunghje: 1.
+} * 100.
+
+# Date
+{
+	>> annu := Numeru trà: 1995 è: 2050, testu.
+	>> mese := TwoDigitFormat applicà-interu: (Numeru trà: 1 è: 12), testu.
+	>> ghjornu := TwoDigitFormat applicà-interu: (Numeru trà: 1 è: 28), testu.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: annu,
+		MM: mese,
+		DD: ghjornu.
+	>> parametri-di-ricerca :=
+	db richiesta: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ricuperà: { :row
+		(row mydate = date) falsu: {
+			sta-faccenda errore: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter aghjunghje: 1.
+} * 100.
+
+
+# Time
+{
+	>> ora := TwoDigitFormat applicà-interu: (Numeru trà: 1 è: 23), testu.
+	>> minutu := TwoDigitFormat applicà-interu: (Numeru trà: 1 è: 59), testu.
+	>> secondu := TwoDigitFormat applicà-interu: (Numeru trà: 1 è: 59), testu.
+	>> tempu := ['HH:II:SS'].
+	tempu
+		HH: ora,
+		II: minutu,
+		SS: secondu.
+	>> parametri-di-ricerca :=
+	db richiesta: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: tempu),
+	ricuperà: { :row
+		(row mytime = tempu) falsu: {
+			sta-faccenda errore: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter aghjunghje: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lista novu empie: 100000 cù: ['x'], unisce: [''].
+{
+	>> str2 := Cascia-forte gettone: 40.
+	>> parametri-di-ricerca :=
+	db richiesta: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ricuperà: { :row
+		(row str1 = str1 è: row str2 = str2) falsu: {
+			sta-faccenda errore: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter aghjunghje: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Numeru trà: 1 è: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 da-testu: ['9223372036854775807'] ) -
+		( Int64 da-testu: ['99999'] ) +
+		( Int64 da-testu: n1 testu )
+	).
+	>> parametri-di-ricerca :=
+	db richiesta: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ricuperà: { :row
+		(row n1 = n1) falsu: {
+			sta-faccenda errore: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) falsu: {
+			sta-faccenda errore: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 arrutundà) falsu: {
+			sta-faccenda errore: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) falsu: {
+			sta-faccenda errore: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter aghjunghje: 1.
+} * 100.
+
+
+Esciuta scrive: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), linea-nova.

@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+פלט כתוב: ⌝'Database test'⌜, שורה-חדשה.
+
+>> db := Maria-DB חדש מארח: ⌝'localhost'⌜,
+	שם-משתמש: ⌝'xo'⌜, סיסמה: ⌝'pass123'⌜, שם-מסד: ⌝'xobase'⌜, התחבר.
+
+פלט כתוב: ⌝'Can we connect? '⌜ + db מחובר?, שורה-חדשה.
+
+>> פרמטרי-חיפוש := db שאילתה: ⌝'
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'⌜, פרמטרים: ﴿ רשימה חדש ; ⌝'abc'⌜ ; 12.35 ; 6 ﴾. # parameterized queries
+
+⎬  פרמטרי-חיפוש בצע. db אשר. ⎨ תפוס: ⎬ :e db בטל-שינויים.  ⎨, הפעל.
+
+פלט כתוב: ⌝'Can we insert? '⌜ + ﴿ פרמטרי-חיפוש insert-id > 0 ﴾, שורה-חדשה.
+
+>> Obj := אובייקט חדש.
+Obj בקבלת: ⌝'retrieve-rows'⌜ בצע: ⎬
+	שלי כמות := 0.
+	>> פרמטרי-חיפוש :=
+	db שאילתה: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+	שלוף: ⎬ :row 
+		שלי כמות חבר: 1.
+		אמת צא.
+	⎨. <- שלי כמות העתק.
+⎨.
+
+פלט כתוב: ⌝'Can we query? '⌜ + ﴿ Obj retrieve-rows > 0 ﴾, שורה-חדשה.

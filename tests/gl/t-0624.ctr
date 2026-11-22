@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Obxecto novo.
+
+Log en: ['say:'] facer: { :str
+	Saída escribir: str, salto-de-liña.
+}.
+
+>> Item := Obxecto novo.
+
+Item en: ['novo:'] facer: { :id <- eu novo id: id.
+}.
+
+Item en: ['id:'] facer: { :id
+	propio id := id.
+}.
+
+Item en: ['id'] facer: { <- propio id. }.
+
+
+Item en: ['texto'] facer: {
+	>> str := ['Item#~no'].
+	str ~no: propio id. <- str.
+}.
+
+
+>> Print := Obxecto novo.
+
+Print en: ['items'] facer: { 
+	
+	propio item := Item novo: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: propio item
+	).
+	
+	
+}.
+
+Print items.

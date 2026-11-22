@@ -1,0 +1,43 @@
+
+
+>> g := Server hou.
+>> v := Pahu-kūʻono hou.
+>> ok := 0.
+
+>> secrets := Papa hou ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kope.
+passwords pākahi: { :i :p
+	secrets pākahi: { :n :s
+		{
+			>> encrypted := v hoʻohuna: s kī: p.
+			>> decrypted := v wehe-huna: encrypted kī: p.
+			(decrypted = s) ʻoiaʻiʻo: {
+				ok hoʻohui-helu: 1.
+			}, ʻi-ole-ia: {
+				Huapuka kākau: ['failed encrypting/decrypting: '], laina-hou.
+				Huapuka kākau: s, laina-hou.
+				Huapuka kākau: ['encrypted: '] + encrypted, laina-hou.
+				Huapuka kākau: ['decrypted: '] + encrypted, laina-hou.
+				Polokalamu pau.
+			}.
+		} hopu: { :err
+			(s = [''] a-i-ʻole: p = ['']) ʻoiaʻiʻo: {
+				ok hoʻohui-helu: 1.
+			}, ʻi-ole-ia: {
+				Huapuka kākau: err, laina-hou.
+				Polokalamu pau.
+			}.
+		}, hoʻomaka.
+	}.
+}.
+
+Huapuka kākau: ( ok + [' vault encryptions tested.'] ), laina-hou.

@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> útvonal := ['/tmp/test0821.csv'].
+>> file := Fájl új: útvonal.
+
+file ír: ['a,b\n"1,2\n'].
+{
+	file elválasztó: [','] idézőjel: ['"'] sorok: { :line
+		Kimenet ír: line, újsor.
+	}.
+} elkap: { :e Kimenet ír: e, újsor. }, indít.
+
+# a closed quote still works
+file ír: ['a,b\n"1,2",3'].
+file elválasztó: [','] idézőjel: ['"'] sorok: { :line
+	Kimenet ír: line, újsor.
+}.
+file töröl.

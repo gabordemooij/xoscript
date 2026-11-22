@@ -1,0 +1,16 @@
+# a value ending in the first part of an opening quote must survive serialization
+>> vērtības := Saraksts jauns
+	; ['abc\[']
+	; ['\[']
+	; ['\[\[']
+	; ['x\\\[']
+	; ['abc'].
+
+vērtības katrs: { :i :value
+	>> d := Vārdnīca jauns.
+	d ielikt: value pie: ['k'].
+	d ielikt: ['second'] pie: ['j'].
+	>> r := d kods objekts.
+	Izvade rakstīt: r skaits, jauna-rinda.
+	Izvade rakstīt: ( (r pie: ['k']) = value ), jauna-rinda.
+}.

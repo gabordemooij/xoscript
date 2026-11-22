@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := 映射对象 新建
+	# ASCII only
+	放: ( 数组对象 新建 ; 65 ; 65 ; 65 ; 65 ; 0 ) 在: ['AAAA'],
+	# valid 2 byte sequence
+	放: ( 数组对象 新建 ; 194 ; 162 ; 0 ) 在: ['¢'],
+	# Valid 3-byte UTF-8
+    放: ( 数组对象 新建 ; 226 ; 130 ; 172 ; 0 ) 在: ['€'],
+	# Valid 4-byte UTF-8
+    放: ( 数组对象 新建 ; 240 ; 144 ; 141 ; 136 ; 0 ) 在: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    放: ( 数组对象 新建 ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) 在: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    放: ( 数组对象 新建 ; 65 ; 193 ; 129 ; 0 ) 在: ['A?'],
+	# Invalid first byte (0xFF)
+    放: ( 数组对象 新建 ; 255 ; 0 ) 在: ['?'],
+	# Incomplete multi-byte sequence at end
+    放: ( 数组对象 新建 ; 66 ; 226 ; 0 ) 在: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    放: ( 数组对象 新建 ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) 在: ['A€?𐍈B'].
+	 
+utf8cases 每个: { :key :value
+	>> 二进制对象 := 二进制 新建: value 计数, 字节: value.
+	>> str := 二进制对象 转文本.
+	(str = key) 是: {
+		输出 写入: ['OK'], 停止.
+	}, 否则: {
+		输出 写入: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, 停止.
+	}.
+	二进制对象 释放.
+}.

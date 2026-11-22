@@ -1,0 +1,17 @@
+Uit schrijf: ['Test object'], stop.
+>> a := Object nieuw. 
+a bij: ['item:'] doen: { :int64
+	eigen int64 := int64. 
+}.
+a bij: ['item'] doen: { <- eigen int64.
+}.
+a item: ( Int64 van-string: ['9999'] ).
+Uit schrijf: a item, stop.
+>> old-int64-address := a item prototype geheugenadres.
+a save-as: ['/tmp/a.bin'].
+Uit schrijf: ['========== RELOADING SNAP:'], stop.
+>> b := Object load-from: ['/tmp/a.bin'].
+(b item prototype geheugenadres = old-int64-address) ja: {
+	Uit schrijf: ['Object link re-attached.'], stop.
+}.
+Uit schrijf: ( b item ), stop.

@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Сейф сохтани-калидҳо.
+>> sk := keys якум.
+>> pk := keys охирин.
+>> sig := Сейф имзо: ['abc'] бо-калид: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Сейф имзо: ['abc'] бо-калид: long. } дошта-гир: { :e
+	Баромад навис: e, сатри-нав.
+}, оғоз.
+
+{ Сейф санҷ: ['abc'] имзо: long бо-калид: pk. } дошта-гир: { :e
+	Баромад навис: e, сатри-нав.
+}, оғоз.
+
+{ Сейф санҷ: ['abc'] имзо: sig бо-калид: short. } дошта-гир: { :e
+	Баромад навис: e, сатри-нав.
+}, оғоз.

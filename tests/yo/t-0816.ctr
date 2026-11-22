@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> gbiyanju := { :format :value
+	{ Ijade kọ: ( (Ọna-kika tuntun: format) mulo: value ), ila-tuntun. } mu: { :e Ijade kọ: e, ila-tuntun. }, bẹrẹ.
+}.
+>> try-int := { :format :value
+	{ Ijade kọ: ( (Ọna-kika tuntun: format) mulo-odidi: value ), ila-tuntun. } mu: { :e Ijade kọ: e, ila-tuntun. }, bẹrẹ.
+}.
+
+# fits
+gbiyanju mulo: ['|%s|'] ati: ['text'].
+gbiyanju mulo: ['%06.2f'] ati: 5.5.
+gbiyanju mulo: ['100%% %s'] ati: ['sure'].
+try-int mulo: ['%03d'] ati: 7.
+try-int mulo: ['%x'] ati: 255.
+gbiyanju mulo: ['%d'] ati: (Int64 tuntun lati-ọrọ: ['12']).
+gbiyanju mulo: ['%lld'] ati: (Int64 tuntun lati-ọrọ: ['12']).
+gbiyanju mulo: ['%.1lf'] ati: 5.5.
+try-int mulo: ['%hd'] ati: 7.
+
+# does not fit
+gbiyanju mulo: ['%s'] ati: 12345.
+gbiyanju mulo: ['%d'] ati: 12345.
+gbiyanju mulo: ['%f'] ati: ['text'].
+try-int mulo: ['%d'] ati: ['text'].
+try-int mulo: ['%s'] ati: 5.
+gbiyanju mulo: ['%s %s'] ati: ['text'].
+gbiyanju mulo: ['%n'] ati: ['text'].
+gbiyanju mulo: ['%*s'] ati: ['text'].
+gbiyanju mulo: ['%'] ati: ['text'].
+
+# length modifier does not fit
+gbiyanju mulo: ['%ls'] ati: ['text'].
+gbiyanju mulo: ['%Lf'] ati: 5.5.
+try-int mulo: ['%ld'] ati: 7.
+try-int mulo: ['%lld'] ati: 7.
+gbiyanju mulo: ['%Ld'] ati: (Int64 tuntun lati-ọrọ: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+gbiyanju mulo: ['%99999999999s'] ati: ['text'].

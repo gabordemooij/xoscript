@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server waajal.
+Prograam ay-jumtukaay: ['../../../src/xo/wo/webtools.xo'].
+Prograam ay-jumtukaay: ['../../../src/xo/wo/mailtools.xo'].
+
+>> bopp := Bopp-HTTP xees caabi: ['Location'] njëg: ['/ok\r\nX-Injected: yes'].
+Génn bind: bopp.
+
+>> web := Wérukaay-Web xees.
+web dem-ci: ['/ok\r\nX-Injected: yes'].
+Génn bind: ['\n'], taxaw.
+
+>> mail := Imeel xees.
+mail ci-jotkat: (Jokkalante xees ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Jokkalante xees ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Jokkalante xees ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail yónnekat: ['d@example.invalid\r\nX-From: yes'] tur: ['site\r\nX-Name: yes'].
+mail tëralin: ['hello\r\nX-Subject: yes'].
+mail yaram: ['line1\r\nline2'].
+Génn bind: mail sos.
+
+>> html := Imeel-HTML xees.
+html ci-jotkat: (Jokkalante xees ; ['a@example.invalid\r\nX-To: yes']).
+html yónnekat: ['d@example.invalid'] tur: ['site'].
+html tëralin: ['hello\r\nX-Subject: yes'].
+html yaram: ['body'].
+Génn bind: ( html sos ëmb: ['\nX-'] ), taxaw.
+Génn bind: ( html sos ëmb: ['X-To: yes'] ), taxaw.

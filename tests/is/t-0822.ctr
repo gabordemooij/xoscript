@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB nýtt hýsill: ['localhost'],
+	notandanafn: ['xo'],
+	lykilorð: ['pass123'],
+	nafn-gagnagrunns: ['xobase'],
+	tengjast.
+
+>> leitarfæribreytur := db fyrirspurn: ['SELECT ? AS a, ? AS b, ? AS c'].
+leitarfæribreytur færibreytur: (Listi nýtt ; ['1']).
+{ leitarfæribreytur sækja: { :row Úttak skrifa: row, ný-lína. }. } grípa: { :e Úttak skrifa: e, ný-lína. }, ræsa.
+
+>> leitarfæribreytur := db fyrirspurn: ['SELECT ? AS a'].
+{ leitarfæribreytur sækja: { :row Úttak skrifa: row, ný-lína. }. } grípa: { :e Úttak skrifa: e, ný-lína. }, ræsa.
+
+# the right number still works, more parameters are ignored as before
+>> leitarfæribreytur := db fyrirspurn: ['SELECT ? AS a, ? AS b'].
+leitarfæribreytur færibreytur: (Listi nýtt ; ['1'] ; ['2']).
+leitarfæribreytur sækja: { :row Úttak skrifa: (row við: ['a']), skrifa: (row við: ['b']), ný-lína. }.
+leitarfæribreytur færibreytur: (Listi nýtt ; ['1'] ; ['2'] ; ['3']).
+leitarfæribreytur sækja: { :row Úttak skrifa: (row við: ['a']), skrifa: (row við: ['b']), ný-lína. }.

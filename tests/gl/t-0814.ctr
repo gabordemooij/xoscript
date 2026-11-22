@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inicializar.
+Programa usar: ['../../../src/xo/gl/webtools.xo'].
+
+>> Fake-Request := Obxecto novo.
+Fake-Request en: ['value:'] facer: { :valor
+	propio valor := valor.
+}.
+Fake-Request en: ['cookie:'] facer: { :nome <- propio valor.
+}.
+
+>> Test-Session := Sesión-ficheiro-temporal novo.
+Test-Session en: ['cargar'] facer: { <- Dicionario novo.
+}.
+Test-Session en: ['session-id'] facer: { <- propio id.
+}.
+
+>> cookies := Lista novo
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies cada: { :i :cookie
+	>> petición := Fake-Request novo.
+	petición value: cookie.
+	>> xestor := Test-Session novo.
+	>> web := Documento-Web novo.
+	web petición: petición.
+	web xestor-sesión: xestor.
+	web iniciar-sesión.
+	Saída escribir: ( xestor session-id = cookie ), salto-de-liña.
+}.
+
+>> web := Documento-Web novo.
+web json: (Dicionario novo poñer: ['b'] en: ['a']).
+Saída escribir: ['\n'], salto-de-liña.
+
+{ Rede get: ['file:///etc/hostname']. } capturar: { :e
+	Saída escribir: e, salto-de-liña.
+}, iniciar.
+
+>> svg := Ficheiro novo: ['/tmp/test0814.svg'].
+svg escribir: ['<svg xmlns="x"></svg>'].
+Saída salto-de-liña.
+Server transmitir: ['test0814.svg'] prefixo: ['/tmp/'].
+svg eliminar.

@@ -1,0 +1,42 @@
+
+Besedilo ob: ['html'] izvedi: { <- (
+		sebe
+		zamenjaj: ['&'] z: ['&amp;'],
+		zamenjaj: ['<'] z: ['&lt;'],
+		zamenjaj: ['>'] z: ['&gt;'],
+		zamenjaj: ['"'] z: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objekt nov.
+
+HtmlBrush ob: ['odgovori:'] izvedi: { :tag
+	Izhod piši: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush ob: ['odgovori:in:'] izvedi: { :tag :content
+	tag := ( tag od: 0 dolžina: (tag dolžina - 1) ).
+	Izhod piši: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush ob: ['content:'] izvedi: { :text
+	Izhod piši: text html, nova-vrstica.
+}.
+
+HtmlBrush ob: ['attr:value:'] izvedi: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush nov.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

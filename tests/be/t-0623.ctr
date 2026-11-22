@@ -1,0 +1,43 @@
+
+
+>> g := Server новы.
+>> v := Сховішча новы.
+>> ok := 0.
+
+>> secrets := Спіс новы ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets капіяваць.
+passwords кожны: { :i :p
+	secrets кожны: { :n :s
+		{
+			>> encrypted := v шыфраваць: s ключ: p.
+			>> decrypted := v расшыфраваць: encrypted ключ: p.
+			(decrypted = s) праўда: {
+				ok дадаць: 1.
+			}, інакш: {
+				Вывад пісаць: ['failed encrypting/decrypting: '], новы-радок.
+				Вывад пісаць: s, новы-радок.
+				Вывад пісаць: ['encrypted: '] + encrypted, новы-радок.
+				Вывад пісаць: ['decrypted: '] + encrypted, новы-радок.
+				Праграма канец.
+			}.
+		} перахапіць: { :err
+			(s = [''] альбо: p = ['']) праўда: {
+				ok дадаць: 1.
+			}, інакш: {
+				Вывад пісаць: err, новы-радок.
+				Праграма канец.
+			}.
+		}, запусціць.
+	}.
+}.
+
+Вывад пісаць: ( ok + [' vault encryptions tested.'] ), новы-радок.

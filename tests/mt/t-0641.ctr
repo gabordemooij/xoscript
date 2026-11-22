@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Dizzjunarju ġdid
+	# ASCII only
+	poġġi: ( Lista ġdid ; 65 ; 65 ; 65 ; 65 ; 0 ) fi: ['AAAA'],
+	# valid 2 byte sequence
+	poġġi: ( Lista ġdid ; 194 ; 162 ; 0 ) fi: ['¢'],
+	# Valid 3-byte UTF-8
+    poġġi: ( Lista ġdid ; 226 ; 130 ; 172 ; 0 ) fi: ['€'],
+	# Valid 4-byte UTF-8
+    poġġi: ( Lista ġdid ; 240 ; 144 ; 141 ; 136 ; 0 ) fi: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    poġġi: ( Lista ġdid ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) fi: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    poġġi: ( Lista ġdid ; 65 ; 193 ; 129 ; 0 ) fi: ['A?'],
+	# Invalid first byte (0xFF)
+    poġġi: ( Lista ġdid ; 255 ; 0 ) fi: ['?'],
+	# Incomplete multi-byte sequence at end
+    poġġi: ( Lista ġdid ; 66 ; 226 ; 0 ) fi: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    poġġi: ( Lista ġdid ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) fi: ['A€?𐍈B'].
+	 
+utf8cases kull: { :key :value
+	>> blob := Blob ġdid: value għodd, bytes: value.
+	>> str := blob test.
+	(str = key) veru: {
+		Ħruġ ikteb: ['OK'], linja-ġdida.
+	}, inkella: {
+		Ħruġ ikteb: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, linja-ġdida.
+	}.
+	blob eħles.
+}.

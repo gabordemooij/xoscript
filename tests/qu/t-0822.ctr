@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB musuq samachiq: ['localhost'],
+	ruraqpa-sutin: ['xo'],
+	pakasqa-simi: ['pass123'],
+	willay-waqaychanap-sutin: ['xobase'],
+	tinkiy.
+
+>> maskana-tupukuna := db tapuy: ['SELECT ? AS a, ? AS b, ? AS c'].
+maskana-tupukuna tupukuna: (Katiray musuq ; ['1']).
+{ maskana-tupukuna apamuy: { :row Lluqsiy qillqay: row, sayay. }. } hapiy: { :e Lluqsiy qillqay: e, sayay. }, kallpay.
+
+>> maskana-tupukuna := db tapuy: ['SELECT ? AS a'].
+{ maskana-tupukuna apamuy: { :row Lluqsiy qillqay: row, sayay. }. } hapiy: { :e Lluqsiy qillqay: e, sayay. }, kallpay.
+
+# the right number still works, more parameters are ignored as before
+>> maskana-tupukuna := db tapuy: ['SELECT ? AS a, ? AS b'].
+maskana-tupukuna tupukuna: (Katiray musuq ; ['1'] ; ['2']).
+maskana-tupukuna apamuy: { :row Lluqsiy qillqay: (row maypi: ['a']), qillqay: (row maypi: ['b']), sayay. }.
+maskana-tupukuna tupukuna: (Katiray musuq ; ['1'] ; ['2'] ; ['3']).
+maskana-tupukuna apamuy: { :row Lluqsiy qillqay: (row maypi: ['a']), qillqay: (row maypi: ['b']), sayay. }.

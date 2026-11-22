@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> balioak := Zerrenda berria
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+balioak bakoitza: { :i :value
+	>> d := Hiztegia berria.
+	d jarri: value non: ['k'].
+	>> r := d kodea objektua.
+	Irteera idatzi: r zenbatu, lerro-jauzia.
+	Irteera idatzi: ( (r non: ['k']) = value ), lerro-jauzia.
+}.

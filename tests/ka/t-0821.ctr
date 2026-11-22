@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> ბილიკი := ['/tmp/test0821.csv'].
+>> file := ფაილი ახალი: ბილიკი.
+
+file დაწერე: ['a,b\n"1,2\n'].
+{
+	file გამყოფი: [','] ბრჭყალი: ['"'] ხაზები: { :line
+		გამოტანა დაწერე: line, ახალი-ხაზი.
+	}.
+} დაჭერა: { :e გამოტანა დაწერე: e, ახალი-ხაზი. }, გაშვება.
+
+# a closed quote still works
+file დაწერე: ['a,b\n"1,2",3'].
+file გამყოფი: [','] ბრჭყალი: ['"'] ხაზები: { :line
+	გამოტანა დაწერე: line, ახალი-ხაზი.
+}.
+file წაშლა.

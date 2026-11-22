@@ -1,0 +1,42 @@
+
+ጽሑፍ ሲደርስ: ['html'] አድርግ: { <- (
+		ራሱ
+		ተካ: ['&'] በዚህ: ['&amp;'],
+		ተካ: ['<'] በዚህ: ['&lt;'],
+		ተካ: ['>'] በዚህ: ['&gt;'],
+		ተካ: ['"'] በዚህ: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := ነገር አዲስ.
+
+HtmlBrush ሲደርስ: ['መልስ:'] አድርግ: { :tag
+	ውጤት ፃፍ: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush ሲደርስ: ['መልስ:እና:'] አድርግ: { :tag :content
+	tag := ( tag መነሻ: 0 ርዝመት: (tag ርዝመት - 1) ).
+	ውጤት ፃፍ: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush ሲደርስ: ['content:'] አድርግ: { :text
+	ውጤት ፃፍ: text html, አዲስ-መስመር.
+}.
+
+HtmlBrush ሲደርስ: ['attr:value:'] አድርግ: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush አዲስ.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

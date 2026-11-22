@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB newydd gwesteiwr: ['localhost'],
+	enw-defnyddiwr: ['xo'],
+	cyfrinair: ['pass123'],
+	enw-cronfa: ['xobase'],
+	cysylltu.
+
+>> conn2 := Maria-DB newydd gwesteiwr: ['localhost'],
+	enw-defnyddiwr: ['xo'],
+	cyfrinair: ['pass123'],
+	enw-cronfa: ['xobase'],
+	cysylltu.
+#...
+>> del := conn1 ymholiad: ['DELETE FROM book WHERE id > 0'].
+{  del gweithredu. conn1 cadarnhau. } dal: { :e conn1 dadwneud.  }, cychwyn.
+
+>> insert := conn1 ymholiad: ['INSERT INTO book (id) VALUES(null)'].
+insert gweithredu.
+
+>> cyfrif := conn1 ymholiad: ['SELECT COUNT(*) AS num FROM book'].
+cyfrif nôl: { :row Allbwn ysgrifennu: row num, llinell-newydd. }.
+
+# does not show up
+# insert not committed on connection 1
+>> cyfrif := conn2 ymholiad: ['SELECT COUNT(*) AS num FROM book'].
+cyfrif nôl: { :row Allbwn ysgrifennu: row num, llinell-newydd. }.

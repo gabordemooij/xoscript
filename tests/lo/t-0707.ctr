@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+ໂປຣແກຣມ ຈັດການໜ່ວຍຄວາມຈຳ: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB ໃໝ່ ໂຮສ: ['localhost'],
+	ຊື່ຜູ້ໃຊ້: ['xo'], ລະຫັດຜ່ານ: ['pass123'], ຊື່ຖານຂໍ້ມູນ: ['xobase'], ເຊື່ອມຕໍ່.
+
+>> TwoDigitFormat := ຮູບແບບ ໃໝ່: ['%02d'].
+
+# Datetime
+{
+	>> ປີ := ຕົວເລກ ລະຫວ່າງ: 1995 ຫາ: 2050, ເປັນຂໍ້ຄວາມ.
+	>> ເດືອນ := TwoDigitFormat ນຳໃຊ້ກັບຈຳນວນເຕັມ: (ຕົວເລກ ລະຫວ່າງ: 1 ຫາ: 12), ເປັນຂໍ້ຄວາມ.
+	>> ມື້ := TwoDigitFormat ນຳໃຊ້ກັບຈຳນວນເຕັມ: (ຕົວເລກ ລະຫວ່າງ: 1 ຫາ: 28), ເປັນຂໍ້ຄວາມ.
+	>> ຊົ່ວໂມງ := TwoDigitFormat ນຳໃຊ້ກັບຈຳນວນເຕັມ: (ຕົວເລກ ລະຫວ່າງ: 1 ຫາ: 23), ເປັນຂໍ້ຄວາມ.
+	>> ນາທີ := TwoDigitFormat ນຳໃຊ້ກັບຈຳນວນເຕັມ: (ຕົວເລກ ລະຫວ່າງ: 1 ຫາ: 59), ເປັນຂໍ້ຄວາມ.
+	>> ວິນາທີ := TwoDigitFormat ນຳໃຊ້ກັບຈຳນວນເຕັມ: (ຕົວເລກ ລະຫວ່າງ: 1 ຫາ: 59), ເປັນຂໍ້ຄວາມ.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: ປີ,
+		MM: ເດືອນ,
+		DD: ມື້,
+		HH: ຊົ່ວໂມງ,
+		II: ນາທີ,
+		SS: ວິນາທີ.
+	>> ພາຣາມິເຕີຄົ້ນຫາ :=
+	db ຄິວຣີ: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	ດຶງຂໍ້ມູນ: { :row
+		(row mydatetime = datetime) ຖ້າເທັດ: {
+			ວຽກນີ້ ຂໍ້ຜິດພາດ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ບວກ: 1.
+} * 100.
+
+# Date
+{
+	>> ປີ := ຕົວເລກ ລະຫວ່າງ: 1995 ຫາ: 2050, ເປັນຂໍ້ຄວາມ.
+	>> ເດືອນ := TwoDigitFormat ນຳໃຊ້ກັບຈຳນວນເຕັມ: (ຕົວເລກ ລະຫວ່າງ: 1 ຫາ: 12), ເປັນຂໍ້ຄວາມ.
+	>> ມື້ := TwoDigitFormat ນຳໃຊ້ກັບຈຳນວນເຕັມ: (ຕົວເລກ ລະຫວ່າງ: 1 ຫາ: 28), ເປັນຂໍ້ຄວາມ.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: ປີ,
+		MM: ເດືອນ,
+		DD: ມື້.
+	>> ພາຣາມິເຕີຄົ້ນຫາ :=
+	db ຄິວຣີ: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	ດຶງຂໍ້ມູນ: { :row
+		(row mydate = date) ຖ້າເທັດ: {
+			ວຽກນີ້ ຂໍ້ຜິດພາດ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ບວກ: 1.
+} * 100.
+
+
+# Time
+{
+	>> ຊົ່ວໂມງ := TwoDigitFormat ນຳໃຊ້ກັບຈຳນວນເຕັມ: (ຕົວເລກ ລະຫວ່າງ: 1 ຫາ: 23), ເປັນຂໍ້ຄວາມ.
+	>> ນາທີ := TwoDigitFormat ນຳໃຊ້ກັບຈຳນວນເຕັມ: (ຕົວເລກ ລະຫວ່າງ: 1 ຫາ: 59), ເປັນຂໍ້ຄວາມ.
+	>> ວິນາທີ := TwoDigitFormat ນຳໃຊ້ກັບຈຳນວນເຕັມ: (ຕົວເລກ ລະຫວ່າງ: 1 ຫາ: 59), ເປັນຂໍ້ຄວາມ.
+	>> ເວລາ := ['HH:II:SS'].
+	ເວລາ
+		HH: ຊົ່ວໂມງ,
+		II: ນາທີ,
+		SS: ວິນາທີ.
+	>> ພາຣາມິເຕີຄົ້ນຫາ :=
+	db ຄິວຣີ: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: ເວລາ),
+	ດຶງຂໍ້ມູນ: { :row
+		(row mytime = ເວລາ) ຖ້າເທັດ: {
+			ວຽກນີ້ ຂໍ້ຜິດພາດ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ບວກ: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := ລິສ ໃໝ່ ຕື່ມ: 100000 ດ້ວຍ: ['x'], ລວມ: [''].
+{
+	>> str2 := ຕູ້ນິລະໄພ ໂທເຄັນ: 40.
+	>> ພາຣາມິເຕີຄົ້ນຫາ :=
+	db ຄິວຣີ: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	ດຶງຂໍ້ມູນ: { :row
+		(row str1 = str1 ແລະ: row str2 = str2) ຖ້າເທັດ: {
+			ວຽກນີ້ ຂໍ້ຜິດພາດ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ບວກ: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := ຕົວເລກ ລະຫວ່າງ: 1 ຫາ: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 ຈາກຂໍ້ຄວາມ: ['9223372036854775807'] ) -
+		( Int64 ຈາກຂໍ້ຄວາມ: ['99999'] ) +
+		( Int64 ຈາກຂໍ້ຄວາມ: n1 ເປັນຂໍ້ຄວາມ )
+	).
+	>> ພາຣາມິເຕີຄົ້ນຫາ :=
+	db ຄິວຣີ: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	ດຶງຂໍ້ມູນ: { :row
+		(row n1 = n1) ຖ້າເທັດ: {
+			ວຽກນີ້ ຂໍ້ຜິດພາດ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) ຖ້າເທັດ: {
+			ວຽກນີ້ ຂໍ້ຜິດພາດ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 ປັດເສດ) ຖ້າເທັດ: {
+			ວຽກນີ້ ຂໍ້ຜິດພາດ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) ຖ້າເທັດ: {
+			ວຽກນີ້ ຂໍ້ຜິດພາດ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ບວກ: 1.
+} * 100.
+
+
+ຜົນອອກ ຂຽນ: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), ຂຶ້ນແຖວໃໝ່.

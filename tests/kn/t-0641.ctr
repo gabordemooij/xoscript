@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := ನಿಘಂಟು ಹೊಸ
+	# ASCII only
+	ಇಡು: ( ಸರಣಿ ಹೊಸ ; 65 ; 65 ; 65 ; 65 ; 0 ) ಕೀಲಿ: ['AAAA'],
+	# valid 2 byte sequence
+	ಇಡು: ( ಸರಣಿ ಹೊಸ ; 194 ; 162 ; 0 ) ಕೀಲಿ: ['¢'],
+	# Valid 3-byte UTF-8
+    ಇಡು: ( ಸರಣಿ ಹೊಸ ; 226 ; 130 ; 172 ; 0 ) ಕೀಲಿ: ['€'],
+	# Valid 4-byte UTF-8
+    ಇಡು: ( ಸರಣಿ ಹೊಸ ; 240 ; 144 ; 141 ; 136 ; 0 ) ಕೀಲಿ: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    ಇಡು: ( ಸರಣಿ ಹೊಸ ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ಕೀಲಿ: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    ಇಡು: ( ಸರಣಿ ಹೊಸ ; 65 ; 193 ; 129 ; 0 ) ಕೀಲಿ: ['A?'],
+	# Invalid first byte (0xFF)
+    ಇಡು: ( ಸರಣಿ ಹೊಸ ; 255 ; 0 ) ಕೀಲಿ: ['?'],
+	# Incomplete multi-byte sequence at end
+    ಇಡು: ( ಸರಣಿ ಹೊಸ ; 66 ; 226 ; 0 ) ಕೀಲಿ: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    ಇಡು: ( ಸರಣಿ ಹೊಸ ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ಕೀಲಿ: ['A€?𐍈B'].
+	 
+utf8cases ಪ್ರತಿಯೊಂದು: { :key :value
+	>> blob := Blob ಹೊಸ: value ಎಣಿಕೆ, bytes: value.
+	>> str := blob ಪಠ್ಯವಾಗಿ.
+	(str = key) ಸತ್ಯವಾದರೆ: {
+		ಔಟ್-ಪುಟ್ ಬರೆ: ['OK'], ಹೊಸ-ಸಾಲು.
+	}, ಇಲ್ಲದಿದ್ದರೆ: {
+		ಔಟ್-ಪುಟ್ ಬರೆ: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, ಹೊಸ-ಸಾಲು.
+	}.
+	blob ಬಿಡುಗಡೆ.
+}.

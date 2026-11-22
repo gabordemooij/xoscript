@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Seif loo-võtmed.
+>> sk := keys esimene.
+>> pk := keys viimane.
+>> sig := Seif allkirjasta: ['abc'] võtmega: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Seif allkirjasta: ['abc'] võtmega: long. } püüa: { :e
+	Väljund kirjuta: e, reavahetus.
+}, käivita.
+
+{ Seif kontrolli: ['abc'] allkiri: long võtmega: pk. } püüa: { :e
+	Väljund kirjuta: e, reavahetus.
+}, käivita.
+
+{ Seif kontrolli: ['abc'] allkiri: sig võtmega: short. } püüa: { :e
+	Väljund kirjuta: e, reavahetus.
+}, käivita.

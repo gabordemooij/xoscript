@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inicijuoti.
+Programa naudoti: ['../../../src/xo/lt/webtools.xo'].
+
+>> Fake-Request := Objektas naujas.
+Fake-Request kai: ['value:'] daryti: { :reikšmė
+	savas reikšmė := reikšmė.
+}.
+Fake-Request kai: ['cookie:'] daryti: { :pavadinimas <- savas reikšmė.
+}.
+
+>> Test-Session := Laikinojo-failo-seansas naujas.
+Test-Session kai: ['įkelti'] daryti: { <- Žodynas naujas.
+}.
+Test-Session kai: ['session-id'] daryti: { <- savas id.
+}.
+
+>> cookies := Sąrašas naujas
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies kiekvienas: { :i :cookie
+	>> http-užklausa := Fake-Request naujas.
+	http-užklausa value: cookie.
+	>> tvarkytuvas := Test-Session naujas.
+	>> web := Žiniatinklio-dokumentas naujas.
+	web http-užklausa: http-užklausa.
+	web seansų-tvarkytuvas: tvarkytuvas.
+	web pradėti-seansą.
+	Išvestis rašyti: ( tvarkytuvas session-id = cookie ), nauja-eilutė.
+}.
+
+>> web := Žiniatinklio-dokumentas naujas.
+web json: (Žodynas naujas įdėti: ['b'] į: ['a']).
+Išvestis rašyti: ['\n'], nauja-eilutė.
+
+{ Tinklas get: ['file:///etc/hostname']. } pagauti: { :e
+	Išvestis rašyti: e, nauja-eilutė.
+}, paleisti.
+
+>> svg := Failas naujas: ['/tmp/test0814.svg'].
+svg rašyti: ['<svg xmlns="x"></svg>'].
+Išvestis nauja-eilutė.
+Server perduoti: ['test0814.svg'] priešdėlis: ['/tmp/'].
+svg ištrinti.

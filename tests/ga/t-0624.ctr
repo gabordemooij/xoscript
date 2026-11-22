@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Réad nua.
+
+Log ar: ['say:'] déan: { :str
+	Aschur scríobh: str, líne-nua.
+}.
+
+>> Item := Réad nua.
+
+Item ar: ['nua:'] déan: { :id <- féin nua id: id.
+}.
+
+Item ar: ['id:'] déan: { :id
+	dílis id := id.
+}.
+
+Item ar: ['id'] déan: { <- dílis id. }.
+
+
+Item ar: ['teaghrán'] déan: {
+	>> str := ['Item#~no'].
+	str ~no: dílis id. <- str.
+}.
+
+
+>> Print := Réad nua.
+
+Print ar: ['items'] déan: { 
+	
+	dílis item := Item nua: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: dílis item
+	).
+	
+	
+}.
+
+Print items.

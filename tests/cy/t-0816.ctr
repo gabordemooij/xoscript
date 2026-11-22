@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> ceisio := { :format :value
+	{ Allbwn ysgrifennu: ( (Fformat newydd: format) cymhwyso: value ), llinell-newydd. } dal: { :e Allbwn ysgrifennu: e, llinell-newydd. }, cychwyn.
+}.
+>> try-int := { :format :value
+	{ Allbwn ysgrifennu: ( (Fformat newydd: format) cymhwyso-cyfanrif: value ), llinell-newydd. } dal: { :e Allbwn ysgrifennu: e, llinell-newydd. }, cychwyn.
+}.
+
+# fits
+ceisio cymhwyso: ['|%s|'] a: ['text'].
+ceisio cymhwyso: ['%06.2f'] a: 5.5.
+ceisio cymhwyso: ['100%% %s'] a: ['sure'].
+try-int cymhwyso: ['%03d'] a: 7.
+try-int cymhwyso: ['%x'] a: 255.
+ceisio cymhwyso: ['%d'] a: (Int64 newydd o-linyn: ['12']).
+ceisio cymhwyso: ['%lld'] a: (Int64 newydd o-linyn: ['12']).
+ceisio cymhwyso: ['%.1lf'] a: 5.5.
+try-int cymhwyso: ['%hd'] a: 7.
+
+# does not fit
+ceisio cymhwyso: ['%s'] a: 12345.
+ceisio cymhwyso: ['%d'] a: 12345.
+ceisio cymhwyso: ['%f'] a: ['text'].
+try-int cymhwyso: ['%d'] a: ['text'].
+try-int cymhwyso: ['%s'] a: 5.
+ceisio cymhwyso: ['%s %s'] a: ['text'].
+ceisio cymhwyso: ['%n'] a: ['text'].
+ceisio cymhwyso: ['%*s'] a: ['text'].
+ceisio cymhwyso: ['%'] a: ['text'].
+
+# length modifier does not fit
+ceisio cymhwyso: ['%ls'] a: ['text'].
+ceisio cymhwyso: ['%Lf'] a: 5.5.
+try-int cymhwyso: ['%ld'] a: 7.
+try-int cymhwyso: ['%lld'] a: 7.
+ceisio cymhwyso: ['%Ld'] a: (Int64 newydd o-linyn: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+ceisio cymhwyso: ['%99999999999s'] a: ['text'].

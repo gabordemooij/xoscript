@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server ກະກຽມ.
+ໂປຣແກຣມ ໃຊ້: ['../../../src/xo/lo/webtools.xo'].
+ໂປຣແກຣມ ໃຊ້: ['../../../src/xo/lo/mailtools.xo'].
+
+>> ສ່ວນຫົວ := ສ່ວນຫົວ-HTTP ໃໝ່ ກະແຈ: ['Location'] ຄ່າ: ['/ok\r\nX-Injected: yes'].
+ຜົນອອກ ຂຽນ: ສ່ວນຫົວ.
+
+>> web := ເອກະສານເວັບ ໃໝ່.
+web ໄປທີ່: ['/ok\r\nX-Injected: yes'].
+ຜົນອອກ ຂຽນ: ['\n'], ຂຶ້ນແຖວໃໝ່.
+
+>> mail := ອີເມວ ໃໝ່.
+mail ເຖິງ: (ລິສ ໃໝ່ ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (ລິສ ໃໝ່ ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (ລິສ ໃໝ່ ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail ຜູ້ສົ່ງ: ['d@example.invalid\r\nX-From: yes'] ຊື່: ['site\r\nX-Name: yes'].
+mail ຫົວເລື່ອງ: ['hello\r\nX-Subject: yes'].
+mail ເນື້ອຄວາມ: ['line1\r\nline2'].
+ຜົນອອກ ຂຽນ: mail ສ້າງຂຶ້ນ.
+
+>> html := ອີເມວ-HTML ໃໝ່.
+html ເຖິງ: (ລິສ ໃໝ່ ; ['a@example.invalid\r\nX-To: yes']).
+html ຜູ້ສົ່ງ: ['d@example.invalid'] ຊື່: ['site'].
+html ຫົວເລື່ອງ: ['hello\r\nX-Subject: yes'].
+html ເນື້ອຄວາມ: ['body'].
+ຜົນອອກ ຂຽນ: ( html ສ້າງຂຶ້ນ ປະກອບດ້ວຍ: ['\nX-'] ), ຂຶ້ນແຖວໃໝ່.
+ຜົນອອກ ຂຽນ: ( html ສ້າງຂຶ້ນ ປະກອບດ້ວຍ: ['X-To: yes'] ), ຂຶ້ນແຖວໃໝ່.

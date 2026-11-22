@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+ഔട്ട്പുട്ട് എഴുതുക: ['Database test'], പുതിയ-വരി.
+
+>> db := Maria-DB പുതിയ ഹോസ്റ്റ്: ['localhost'],
+	ഉപയോക്തൃനാമം: ['xo'], രഹസ്യവാക്ക്: ['pass123'], ഡാറ്റാബേസ്-പേര്: ['xobase'], ബന്ധിപ്പിക്കുക.
+
+ഔട്ട്പുട്ട് എഴുതുക: ['Can we connect? '] + db ബന്ധിച്ചോ?, പുതിയ-വരി.
+
+>> തിരയൽ-പരാമീറ്ററുകൾ := db ചോദ്യം: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], പരാമീറ്ററുകൾ: ( ശ്രേണി പുതിയ ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  തിരയൽ-പരാമീറ്ററുകൾ നടപ്പാക്കുക. db സ്ഥിരീകരിക്കുക. } പിടിക്കുക: { :e db പിൻവലിക്കുക.  }, പ്രവർത്തിപ്പിക്കുക.
+
+ഔട്ട്പുട്ട് എഴുതുക: ['Can we insert? '] + ( തിരയൽ-പരാമീറ്ററുകൾ insert-id > 0 ), പുതിയ-വരി.
+
+>> Obj := വസ്തു പുതിയ.
+Obj കിട്ടുമ്പോൾ: ['retrieve-rows'] ചെയ്യുക: {
+	തന്റെ എണ്ണം := 0.
+	>> തിരയൽ-പരാമീറ്ററുകൾ :=
+	db ചോദ്യം: ['SELECT * FROM book order by id desc limit 2'], 
+	കൊണ്ടുവരിക: { :row 
+		തന്റെ എണ്ണം കൂട്ടുക: 1.
+		ശരി നിർത്തുക.
+	}. <- തന്റെ എണ്ണം പകർപ്പ്.
+}.
+
+ഔട്ട്പുട്ട് എഴുതുക: ['Can we query? '] + ( Obj retrieve-rows > 0 ), പുതിയ-വരി.

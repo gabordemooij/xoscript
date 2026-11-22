@@ -1,0 +1,34 @@
+>> Animal := 对象 新建.
+>> Factory := 对象 新建.
+
+Animal 在: ['新建'] 执行: {
+	>> animal := 自身 新建.
+	animal sound: ['?']. <- animal.
+}.
+
+Animal 在: ['sound:'] 执行: { :s
+	拥有 sound := s.
+}.
+
+Animal 在: ['sound'] 执行: { <- 拥有 sound.
+}.
+
+>> Dog := 对象 新建.
+>> Cat := 对象 新建.
+
+Dog 在: ['新建'] 执行: { <- Animal 新建 sound: ['woof!'].
+}.
+
+Cat 在: ['新建'] 执行: { <- Animal 新建 sound: ['meow!'].
+}.
+
+输出 写入: Dog 新建 sound, 停止.
+输出 写入: Cat 新建 sound, 停止.
+
+Factory 在: ['mix:and:'] 执行: { :beast1 :beast2 <- Animal 新建 sound: (
+		( beast1 sound 从: 0 长度: 2 ) +
+		( beast2 sound 从: 2 长度: 5 )
+	).
+}.
+
+输出 写入: (Factory mix: Dog 新建 and: Cat 新建) sound, 停止.

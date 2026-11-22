@@ -1,0 +1,53 @@
+Programm mäluhaldus: 0.
+Loend kui: ['sum'] tee: {
+	>> total := 0.
+	ise iga: { :index :element
+		total liida: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Fail uus: ['/tmp/test.txt'].
+f kirjuta: ['Lorem Ipsum'].
+f sulge.
+  
+
+f := Fail uus: ['/tmp/test.txt'].
+>> text := f loe.
+f sulge.
+
+
+
+Programm korista.
+usedMemory1 := (Programm mälu ? 1).
+
+
+
+f := Fail uus: ['/tmp/test.txt'].
+text := f loe.
+f sulge.
+
+Programm korista.
+usedMemory2 := (Programm mälu ? 1).
+
+
+f := Fail uus: ['/tmp/test.txt'].
+text := f loe.
+f sulge.
+
+Programm korista.
+usedMemory3 := (Programm mälu ? 1).
+
+
+
+( usedMemory1 = usedMemory2 ja: usedMemory1 = usedMemory3, ja: usedMemory2 = usedMemory3 ) tõsi: {
+	Väljund kirjuta: ['No memory leaks here'].
+}, vale: {
+	Väljund kirjuta: ['Leaking memory...'].
+}.

@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Программа көйләү: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server бәйлә: ( Тезмә яңа ;
+ libname ; ['fopen'] ;
+ ( Тезмә яңа ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+бәйлә: ( Тезмә яңа ;
+ Буш ; # means same lib
+ ['fread'] ;
+ ( Тезмә яңа ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Буш ; # means same object (i.e. Stream)
+ ['fread']
+),
+бәйлә: (
+ Тезмә яңа ;
+ Буш ; # means same lib
+ ['fwrite'] ;
+ ( Тезмә яңа ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Буш ; # means same lib
+ ['fwrite']
+),
+бәйлә: (
+ Тезмә яңа ;
+ Буш ; # means same lib
+ ['rewind'] ;
+ ( Тезмә яңа ; ['pointer'] ) ;
+ ['int'] ;
+ Буш ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> юл := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: юл mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream хәбәр: ['fwrite'] аргументлар: (Тезмә яңа ; str ; 1 ; 6 ; fd ).
+Чыгыш яз: bytes-written, яңа-юл.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob яңа: 20.
+
+# read from file
+>> bytes-read := Stream хәбәр: ['fread'] аргументлар: (Тезмә яңа ; buf ; 1 ; 6 ; fd ).
+Чыгыш яз: bytes-read, яңа-юл.
+Чыгыш яз: buf, яңа-юл.
+
+# free memory
+str  бушат.
+юл бушат.
+mode бушат.
+buf  бушат.
+
+

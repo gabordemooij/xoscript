@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> isku-day := { :format :value
+	{ Soo-saar qor: ( (Qaab cusub: format) ku-dabaq: value ), sadar-cusub. } qabo: { :e Soo-saar qor: e, sadar-cusub. }, bilow.
+}.
+>> try-int := { :format :value
+	{ Soo-saar qor: ( (Qaab cusub: format) ku-dabaq-tiro-dhan: value ), sadar-cusub. } qabo: { :e Soo-saar qor: e, sadar-cusub. }, bilow.
+}.
+
+# fits
+isku-day ku-dabaq: ['|%s|'] iyo: ['text'].
+isku-day ku-dabaq: ['%06.2f'] iyo: 5.5.
+isku-day ku-dabaq: ['100%% %s'] iyo: ['sure'].
+try-int ku-dabaq: ['%03d'] iyo: 7.
+try-int ku-dabaq: ['%x'] iyo: 255.
+isku-day ku-dabaq: ['%d'] iyo: (Int64 cusub qoraal-ka: ['12']).
+isku-day ku-dabaq: ['%lld'] iyo: (Int64 cusub qoraal-ka: ['12']).
+isku-day ku-dabaq: ['%.1lf'] iyo: 5.5.
+try-int ku-dabaq: ['%hd'] iyo: 7.
+
+# does not fit
+isku-day ku-dabaq: ['%s'] iyo: 12345.
+isku-day ku-dabaq: ['%d'] iyo: 12345.
+isku-day ku-dabaq: ['%f'] iyo: ['text'].
+try-int ku-dabaq: ['%d'] iyo: ['text'].
+try-int ku-dabaq: ['%s'] iyo: 5.
+isku-day ku-dabaq: ['%s %s'] iyo: ['text'].
+isku-day ku-dabaq: ['%n'] iyo: ['text'].
+isku-day ku-dabaq: ['%*s'] iyo: ['text'].
+isku-day ku-dabaq: ['%'] iyo: ['text'].
+
+# length modifier does not fit
+isku-day ku-dabaq: ['%ls'] iyo: ['text'].
+isku-day ku-dabaq: ['%Lf'] iyo: 5.5.
+try-int ku-dabaq: ['%ld'] iyo: 7.
+try-int ku-dabaq: ['%lld'] iyo: 7.
+isku-day ku-dabaq: ['%Ld'] iyo: (Int64 cusub qoraal-ka: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+isku-day ku-dabaq: ['%99999999999s'] iyo: ['text'].

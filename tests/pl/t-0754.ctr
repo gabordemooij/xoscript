@@ -1,0 +1,30 @@
+Wyjście pisz: ['Test object'], nowa-linia.
+>> a := Obiekt nowy. 
+
+a na: ['item:'] wykonaj: { :out
+	własny out := out. 
+}.
+
+a na: ['item'] wykonaj: { <- własny out.
+}.
+
+a na: ['greet'] wykonaj: {
+	Wyjście pisz: ['hi from original out!'], nowa-linia.
+}.
+
+a item: Wyjście.
+
+Wyjście pisz: a item, nowa-linia.
+
+>> old-out-address := a item prototyp adres-pamięci.
+a save-as: ['/tmp/a.bin'].
+Wyjście pisz: ['========== RELOADING SNAP:'], nowa-linia.
+
+>> b := Obiekt load-from: ['/tmp/a.bin'].
+
+(b item prototyp adres-pamięci = old-out-address) prawda: {
+	Wyjście pisz: ['Object link re-attached.'], nowa-linia.
+}.
+
+b item pisz: ['hello from loaded out!'], nowa-linia.
+b greet.

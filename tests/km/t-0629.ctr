@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+លទ្ធផល សរសេរ: ['Database test'], បន្ទាត់ថ្មី.
+
+>> db := Maria-DB ថ្មី ម៉ាស៊ីនបង្ហោះ: ['localhost'],
+	ឈ្មោះអ្នកប្រើ: ['xo'], ពាក្យសម្ងាត់: ['pass123'], ឈ្មោះមូលដ្ឋានទិន្នន័យ: ['xobase'], ភ្ជាប់ទៅ.
+
+លទ្ធផល សរសេរ: ['Can we connect? '] + db បានភ្ជាប់?, បន្ទាត់ថ្មី.
+
+>> ប៉ារ៉ាម៉ែត្រស្វែងរក := db សំណួរ: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], ប៉ារ៉ាម៉ែត្រ: ( ស៊េរី ថ្មី ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  ប៉ារ៉ាម៉ែត្រស្វែងរក ប្រតិបត្តិ. db បញ្ជាក់. } ចាប់: { :e db ត្រឡប់ក្រោយ.  }, ដំណើរការ.
+
+លទ្ធផល សរសេរ: ['Can we insert? '] + ( ប៉ារ៉ាម៉ែត្រស្វែងរក insert-id > 0 ), បន្ទាត់ថ្មី.
+
+>> Obj := វត្ថុ ថ្មី.
+Obj ពេលទទួល: ['retrieve-rows'] ធ្វើ: {
+	ផ្ទាល់ ចំនួនធាតុ := 0.
+	>> ប៉ារ៉ាម៉ែត្រស្វែងរក :=
+	db សំណួរ: ['SELECT * FROM book order by id desc limit 2'], 
+	ទាញយក: { :row 
+		ផ្ទាល់ ចំនួនធាតុ បូក: 1.
+		ពិត បំបែក.
+	}. <- ផ្ទាល់ ចំនួនធាតុ ចម្លង.
+}.
+
+លទ្ធផល សរសេរ: ['Can we query? '] + ( Obj retrieve-rows > 0 ), បន្ទាត់ថ្មី.

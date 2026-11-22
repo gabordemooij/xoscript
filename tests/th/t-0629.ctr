@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+แสดงผล เขียน: ['Database test'], ขึ้นบรรทัดใหม่.
+
+>> db := Maria-DB สร้างใหม่ โฮสต์: ['localhost'],
+	ชื่อผู้ใช้: ['xo'], รหัสผ่าน: ['pass123'], ชื่อฐานข้อมูล: ['xobase'], เชื่อมต่อ.
+
+แสดงผล เขียน: ['Can we connect? '] + db เชื่อมต่ออยู่?, ขึ้นบรรทัดใหม่.
+
+>> พารามิเตอร์ค้นหา := db คิวรี: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], พารามิเตอร์: ( ลิสต์ สร้างใหม่ ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  พารามิเตอร์ค้นหา ดำเนินการ. db คอมมิต. } ดักจับ: { :e db ย้อนกลับ.  }, เริ่ม.
+
+แสดงผล เขียน: ['Can we insert? '] + ( พารามิเตอร์ค้นหา insert-id > 0 ), ขึ้นบรรทัดใหม่.
+
+>> Obj := ออบเจกต์ สร้างใหม่.
+Obj เมื่อ: ['retrieve-rows'] ทำ: {
+	ของตน จำนวน := 0.
+	>> พารามิเตอร์ค้นหา :=
+	db คิวรี: ['SELECT * FROM book order by id desc limit 2'], 
+	ดึงข้อมูล: { :row 
+		ของตน จำนวน บวก: 1.
+		จริง หยุดวน.
+	}. <- ของตน จำนวน คัดลอก.
+}.
+
+แสดงผล เขียน: ['Can we query? '] + ( Obj retrieve-rows > 0 ), ขึ้นบรรทัดใหม่.

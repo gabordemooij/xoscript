@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Programma ýat-dolandyryş: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Programma sazlama: ['FFITESTLIB'].
+
+
+
+Server bagla: (
+ Sanaw täze ;
+ libname ;
+ ['puts'] ;
+ ( Sanaw täze ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s boşat.
+
+# test with struct
+
+>> a := Blob täze: 8.
+a bytes: (
+	Sanaw <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Sanaw <<: ['int'], ; ['int']).
+
+Server bagla: (
+	Sanaw <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Sanaw <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Çykyş ýaz: ['Sum test:'] + (ffitest ffisum: a), täze-setir.
+
+struct struct-boşat.
+struct boşat.
+a boşat.

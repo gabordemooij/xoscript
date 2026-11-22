@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := പ്രോഗ്രാം ക്രമീകരണം: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server കണ്ണി: ( ശ്രേണി പുതിയ ;
+ libname ; ['fopen'] ;
+ ( ശ്രേണി പുതിയ ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+കണ്ണി: ( ശ്രേണി പുതിയ ;
+ ശൂന്യം ; # means same lib
+ ['fread'] ;
+ ( ശ്രേണി പുതിയ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ശൂന്യം ; # means same object (i.e. Stream)
+ ['fread']
+),
+കണ്ണി: (
+ ശ്രേണി പുതിയ ;
+ ശൂന്യം ; # means same lib
+ ['fwrite'] ;
+ ( ശ്രേണി പുതിയ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ ശൂന്യം ; # means same lib
+ ['fwrite']
+),
+കണ്ണി: (
+ ശ്രേണി പുതിയ ;
+ ശൂന്യം ; # means same lib
+ ['rewind'] ;
+ ( ശ്രേണി പുതിയ ; ['pointer'] ) ;
+ ['int'] ;
+ ശൂന്യം ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> ഫയൽ-പാത := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: ഫയൽ-പാത mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream സന്ദേശം: ['fwrite'] വാദങ്ങൾ: (ശ്രേണി പുതിയ ; str ; 1 ; 6 ; fd ).
+ഔട്ട്പുട്ട് എഴുതുക: bytes-written, പുതിയ-വരി.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob പുതിയ: 20.
+
+# read from file
+>> bytes-read := Stream സന്ദേശം: ['fread'] വാദങ്ങൾ: (ശ്രേണി പുതിയ ; buf ; 1 ; 6 ; fd ).
+ഔട്ട്പുട്ട് എഴുതുക: bytes-read, പുതിയ-വരി.
+ഔട്ട്പുട്ട് എഴുതുക: buf, പുതിയ-വരി.
+
+# free memory
+str  സ്വതന്ത്രമാക്കുക.
+ഫയൽ-പാത സ്വതന്ത്രമാക്കുക.
+mode സ്വതന്ത്രമാക്കുക.
+buf  സ്വതന്ത്രമാക്കുക.
+
+

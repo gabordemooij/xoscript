@@ -1,0 +1,30 @@
+Изход пиши: ['Test object'], нов-ред.
+>> a := Обект нов. 
+
+a при: ['item:'] изпълни: { :out
+	свой out := out. 
+}.
+
+a при: ['item'] изпълни: { <- свой out.
+}.
+
+a при: ['greet'] изпълни: {
+	Изход пиши: ['hi from original out!'], нов-ред.
+}.
+
+a item: Изход.
+
+Изход пиши: a item, нов-ред.
+
+>> old-out-address := a item прототип адрес-в-паметта.
+a save-as: ['/tmp/a.bin'].
+Изход пиши: ['========== RELOADING SNAP:'], нов-ред.
+
+>> b := Обект load-from: ['/tmp/a.bin'].
+
+(b item прототип адрес-в-паметта = old-out-address) вярно: {
+	Изход пиши: ['Object link re-attached.'], нов-ред.
+}.
+
+b item пиши: ['hello from loaded out!'], нов-ред.
+b greet.

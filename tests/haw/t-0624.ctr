@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Mea hou.
+
+Log i: ['say:'] hana: { :str
+	Huapuka kākau: str, laina-hou.
+}.
+
+>> Item := Mea hou.
+
+Item i: ['hou:'] hana: { :id <- iho hou id: id.
+}.
+
+Item i: ['id:'] hana: { :id
+	ponoʻī id := id.
+}.
+
+Item i: ['id'] hana: { <- ponoʻī id. }.
+
+
+Item i: ['kaula'] hana: {
+	>> str := ['Item#~no'].
+	str ~no: ponoʻī id. <- str.
+}.
+
+
+>> Print := Mea hou.
+
+Print i: ['items'] hana: { 
+	
+	ponoʻī item := Item hou: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: ponoʻī item
+	).
+	
+	
+}.
+
+Print items.

@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Ելք գրել: ['Database test'], նոր-տող.
+
+>> db := Maria-DB նոր հոսթ: ['localhost'],
+	օգտանուն: ['xo'], գաղտնաբառ: ['pass123'], բազայի-անուն: ['xobase'], միանալ.
+
+Ելք գրել: ['Can we connect? '] + db միացված?, նոր-տող.
+
+>> որոնման-պարամետրեր := db հարցում: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], պարամետրեր: ( Ցուցակ նոր ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  որոնման-պարամետրեր կատարել. db հաստատել. } որսալ: { :e db հետարկել.  }, գործարկել.
+
+Ելք գրել: ['Can we insert? '] + ( որոնման-պարամետրեր insert-id > 0 ), նոր-տող.
+
+>> Obj := Օբյեկտ նոր.
+Obj ստանալիս: ['retrieve-rows'] կատարել: {
+	սեփական քանակ := 0.
+	>> որոնման-պարամետրեր :=
+	db հարցում: ['SELECT * FROM book order by id desc limit 2'], 
+	ստանալ: { :row 
+		սեփական քանակ գումարել: 1.
+		Ճիշտ ընդհատել.
+	}. <- սեփական քանակ պատճենել.
+}.
+
+Ելք գրել: ['Can we query? '] + ( Obj retrieve-rows > 0 ), նոր-տող.

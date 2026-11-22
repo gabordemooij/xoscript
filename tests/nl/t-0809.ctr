@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> waarden := Reeks nieuw
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+waarden elk: { :i :value
+	>> d := Lijst nieuw.
+	d zet: value bij: ['k'].
+	>> r := d code object.
+	Uit schrijf: r aantal, stop.
+	Uit schrijf: ( (r bij: ['k']) = value ), stop.
+}.

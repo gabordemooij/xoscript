@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := ออบเจกต์ สร้างใหม่.
+
+Slurp เมื่อ: ['สร้างใหม่'] ทำ: {
+	ของตน str := [''].
+}.
+
+Slurp เมื่อ: ['nieuw'] ทำ: {
+	ของตน str := [''].
+}.
+
+Slurp เมื่อ: ['ตอบ:'] ทำ: { :blah
+		ของตน str ต่อท้าย: blah.
+}.
+
+Slurp เมื่อ: ['ตอบ:และ:'] ทำ: { :blah :blahah
+		ของตน str ต่อท้าย: (blah เริ่มที่: 0 ความยาว: (blah ความยาว - 1)).
+		ของตน str ต่อท้าย: [' '].
+		ของตน str ต่อท้าย: blahah.
+}.
+
+Slurp เมื่อ: ['obtain'] ทำ: {
+	>> buffer := ของตน str.
+	ของตน str := ['']. <- buffer.
+}.
+
+
+แสดงผล เขียน: (โปรแกรม ระบบ: (Slurp สร้างใหม่ echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ ไฟล์ สร้างใหม่: ['/tmp/from.txt'], ลบ. } ดักจับ: { ['Empty']. }, เริ่ม.
+{ ไฟล์ สร้างใหม่: ['/tmp/to.txt'], ลบ. } ดักจับ: { ['Empty']. }, เริ่ม.
+
+
+ไฟล์ สร้างใหม่: ['/tmp/to.txt'], มีอยู่ ถ้าเท็จ: {
+	แสดงผล เขียน: ['Confirmed. Target file does not exist.\
+'].
+}.
+ไฟล์ สร้างใหม่: ['/tmp/from.txt'], มีอยู่ ถ้าเท็จ: {
+	แสดงผล เขียน: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+โปรแกรม ระบบ: (Slurp สร้างใหม่ touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+โปรแกรม ระบบ: (Slurp สร้างใหม่ cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+ไฟล์ สร้างใหม่: ['/tmp/to.txt'], มีอยู่ ถ้าจริง: {
+	แสดงผล เขียน: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+แสดงผล เขียน: ['Contents of file is:'] + (ไฟล์ สร้างใหม่: ['/tmp/to.txt'], อ่าน), ขึ้นบรรทัดใหม่.

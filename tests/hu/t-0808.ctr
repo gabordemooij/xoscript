@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Széf kulcsokat-generál.
+>> sk := keys első.
+>> pk := keys utolsó.
+>> sig := Széf aláír: ['abc'] kulccsal: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Széf aláír: ['abc'] kulccsal: long. } elkap: { :e
+	Kimenet ír: e, újsor.
+}, indít.
+
+{ Széf ellenőriz: ['abc'] aláírás: long kulccsal: pk. } elkap: { :e
+	Kimenet ír: e, újsor.
+}, indít.
+
+{ Széf ellenőriz: ['abc'] aláírás: sig kulccsal: short. } elkap: { :e
+	Kimenet ír: e, újsor.
+}, indít.

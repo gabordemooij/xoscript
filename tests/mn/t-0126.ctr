@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Объект шинэ.
+
+Slurp ирэхэд: ['шинэ'] гүйцэтгэ: {
+	өөрийн str := [''].
+}.
+
+Slurp ирэхэд: ['nieuw'] гүйцэтгэ: {
+	өөрийн str := [''].
+}.
+
+Slurp ирэхэд: ['хариулах:'] гүйцэтгэ: { :blah
+		өөрийн str төгсгөлд-нэмэх: blah.
+}.
+
+Slurp ирэхэд: ['хариулах:ба:'] гүйцэтгэ: { :blah :blahah
+		өөрийн str төгсгөлд-нэмэх: (blah эхлэл: 0 урт: (blah урт - 1)).
+		өөрийн str төгсгөлд-нэмэх: [' '].
+		өөрийн str төгсгөлд-нэмэх: blahah.
+}.
+
+Slurp ирэхэд: ['obtain'] гүйцэтгэ: {
+	>> buffer := өөрийн str.
+	өөрийн str := ['']. <- buffer.
+}.
+
+
+Гаралт бичих: (Програм систем: (Slurp шинэ echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Файл шинэ: ['/tmp/from.txt'], устгах. } барих: { ['Empty']. }, ажиллуулах.
+{ Файл шинэ: ['/tmp/to.txt'], устгах. } барих: { ['Empty']. }, ажиллуулах.
+
+
+Файл шинэ: ['/tmp/to.txt'], байгаа худал-бол: {
+	Гаралт бичих: ['Confirmed. Target file does not exist.\
+'].
+}.
+Файл шинэ: ['/tmp/from.txt'], байгаа худал-бол: {
+	Гаралт бичих: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Програм систем: (Slurp шинэ touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Програм систем: (Slurp шинэ cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Файл шинэ: ['/tmp/to.txt'], байгаа үнэн-бол: {
+	Гаралт бичих: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Гаралт бичих: ['Contents of file is:'] + (Файл шинэ: ['/tmp/to.txt'], унших), шинэ-мөр.

@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Seifs ģenerēt-atslēgas.
+>> sk := keys pirmais.
+>> pk := keys pēdējais.
+>> sig := Seifs parakstīt: ['abc'] ar: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Seifs parakstīt: ['abc'] ar: long. } tvert: { :e
+	Izvade rakstīt: e, jauna-rinda.
+}, palaist.
+
+{ Seifs pārbaudīt: ['abc'] paraksts: long ar: pk. } tvert: { :e
+	Izvade rakstīt: e, jauna-rinda.
+}, palaist.
+
+{ Seifs pārbaudīt: ['abc'] paraksts: sig ar: short. } tvert: { :e
+	Izvade rakstīt: e, jauna-rinda.
+}, palaist.

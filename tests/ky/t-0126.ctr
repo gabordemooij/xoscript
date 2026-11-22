@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Объект жаңы.
+
+Slurp келгенде: ['жаңы'] аткар: {
+	өзүнүн str := [''].
+}.
+
+Slurp келгенде: ['nieuw'] аткар: {
+	өзүнүн str := [''].
+}.
+
+Slurp келгенде: ['жооп:'] аткар: { :blah
+		өзүнүн str аягына-кошуу: blah.
+}.
+
+Slurp келгенде: ['жооп:жана:'] аткар: { :blah :blahah
+		өзүнүн str аягына-кошуу: (blah баштап: 0 узундук: (blah узундук - 1)).
+		өзүнүн str аягына-кошуу: [' '].
+		өзүнүн str аягына-кошуу: blahah.
+}.
+
+Slurp келгенде: ['obtain'] аткар: {
+	>> buffer := өзүнүн str.
+	өзүнүн str := ['']. <- buffer.
+}.
+
+
+Чыгаруу жазуу: (Программа система: (Slurp жаңы echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Файл жаңы: ['/tmp/from.txt'], өчүрүү. } кармоо: { ['Empty']. }, иштетүү.
+{ Файл жаңы: ['/tmp/to.txt'], өчүрүү. } кармоо: { ['Empty']. }, иштетүү.
+
+
+Файл жаңы: ['/tmp/to.txt'], бар жалган-болсо: {
+	Чыгаруу жазуу: ['Confirmed. Target file does not exist.\
+'].
+}.
+Файл жаңы: ['/tmp/from.txt'], бар жалган-болсо: {
+	Чыгаруу жазуу: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Программа система: (Slurp жаңы touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Программа система: (Slurp жаңы cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Файл жаңы: ['/tmp/to.txt'], бар чын-болсо: {
+	Чыгаруу жазуу: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Чыгаруу жазуу: ['Contents of file is:'] + (Файл жаңы: ['/tmp/to.txt'], окуу), жаңы-сап.

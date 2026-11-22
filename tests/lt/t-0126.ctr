@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Objektas naujas.
+
+Slurp kai: ['naujas'] daryti: {
+	savas str := [''].
+}.
+
+Slurp kai: ['nieuw'] daryti: {
+	savas str := [''].
+}.
+
+Slurp kai: ['atsakyti:'] daryti: { :blah
+		savas str pridėti: blah.
+}.
+
+Slurp kai: ['atsakyti:ir:'] daryti: { :blah :blahah
+		savas str pridėti: (blah nuo: 0 ilgis: (blah ilgis - 1)).
+		savas str pridėti: [' '].
+		savas str pridėti: blahah.
+}.
+
+Slurp kai: ['obtain'] daryti: {
+	>> buffer := savas str.
+	savas str := ['']. <- buffer.
+}.
+
+
+Išvestis rašyti: (Programa sistema: (Slurp naujas echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Failas naujas: ['/tmp/from.txt'], ištrinti. } pagauti: { ['Empty']. }, paleisti.
+{ Failas naujas: ['/tmp/to.txt'], ištrinti. } pagauti: { ['Empty']. }, paleisti.
+
+
+Failas naujas: ['/tmp/to.txt'], egzistuoja netiesa: {
+	Išvestis rašyti: ['Confirmed. Target file does not exist.\
+'].
+}.
+Failas naujas: ['/tmp/from.txt'], egzistuoja netiesa: {
+	Išvestis rašyti: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Programa sistema: (Slurp naujas touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Programa sistema: (Slurp naujas cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Failas naujas: ['/tmp/to.txt'], egzistuoja tiesa: {
+	Išvestis rašyti: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Išvestis rašyti: ['Contents of file is:'] + (Failas naujas: ['/tmp/to.txt'], skaityti), nauja-eilutė.

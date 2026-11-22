@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Сейф кілттер-жасау.
+>> sk := keys бірінші.
+>> pk := keys соңғы.
+>> sig := Сейф қол-қою: ['abc'] кілтпен: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Сейф қол-қою: ['abc'] кілтпен: long. } ұстау: { :e
+	Шығыс жазу: e, жаңа-жол.
+}, іске-қосу.
+
+{ Сейф тексеру: ['abc'] қолтаңба: long кілтпен: pk. } ұстау: { :e
+	Шығыс жазу: e, жаңа-жол.
+}, іске-қосу.
+
+{ Сейф тексеру: ['abc'] қолтаңба: sig кілтпен: short. } ұстау: { :e
+	Шығыс жазу: e, жаңа-жол.
+}, іске-қосу.

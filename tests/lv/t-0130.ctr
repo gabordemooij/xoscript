@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Programma iestatījums: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server saistīt: ( Saraksts jauns ;
+ libname ; ['fopen'] ;
+ ( Saraksts jauns ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+saistīt: ( Saraksts jauns ;
+ Nekas ; # means same lib
+ ['fread'] ;
+ ( Saraksts jauns ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Nekas ; # means same object (i.e. Stream)
+ ['fread']
+),
+saistīt: (
+ Saraksts jauns ;
+ Nekas ; # means same lib
+ ['fwrite'] ;
+ ( Saraksts jauns ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Nekas ; # means same lib
+ ['fwrite']
+),
+saistīt: (
+ Saraksts jauns ;
+ Nekas ; # means same lib
+ ['rewind'] ;
+ ( Saraksts jauns ; ['pointer'] ) ;
+ ['int'] ;
+ Nekas ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> ceļš := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: ceļš mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream ziņojums: ['fwrite'] argumenti: (Saraksts jauns ; str ; 1 ; 6 ; fd ).
+Izvade rakstīt: bytes-written, jauna-rinda.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob jauns: 20.
+
+# read from file
+>> bytes-read := Stream ziņojums: ['fread'] argumenti: (Saraksts jauns ; buf ; 1 ; 6 ; fd ).
+Izvade rakstīt: bytes-read, jauna-rinda.
+Izvade rakstīt: buf, jauna-rinda.
+
+# free memory
+str  atbrīvot.
+ceļš atbrīvot.
+mode atbrīvot.
+buf  atbrīvot.
+
+

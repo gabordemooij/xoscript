@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Kaha paghimo-ug-yawe.
+>> sk := keys una.
+>> pk := keys katapusan.
+>> sig := Kaha pirmahi: ['abc'] gamit: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Kaha pirmahi: ['abc'] gamit: long. } dakpon: { :e
+	Gawas isulat: e, bag-ong-linya.
+}, padagana.
+
+{ Kaha susiha: ['abc'] pirma: long gamit: pk. } dakpon: { :e
+	Gawas isulat: e, bag-ong-linya.
+}, padagana.
+
+{ Kaha susiha: ['abc'] pirma: sig gamit: short. } dakpon: { :e
+	Gawas isulat: e, bag-ong-linya.
+}, padagana.

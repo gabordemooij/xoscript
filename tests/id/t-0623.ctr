@@ -1,0 +1,43 @@
+
+
+>> g := Server baru.
+>> v := Brankas baru.
+>> ok := 0.
+
+>> secrets := Daftar baru ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets salin.
+passwords setiap: { :i :p
+	secrets setiap: { :n :s
+		{
+			>> encrypted := v enkripsi: s kunci: p.
+			>> decrypted := v dekripsi: encrypted kunci: p.
+			(decrypted = s) benar: {
+				ok tambah: 1.
+			}, selain-itu: {
+				Keluaran tulis: ['failed encrypting/decrypting: '], baris-baru.
+				Keluaran tulis: s, baris-baru.
+				Keluaran tulis: ['encrypted: '] + encrypted, baris-baru.
+				Keluaran tulis: ['decrypted: '] + encrypted, baris-baru.
+				Program akhiri.
+			}.
+		} tangkap: { :err
+			(s = [''] atau: p = ['']) benar: {
+				ok tambah: 1.
+			}, selain-itu: {
+				Keluaran tulis: err, baris-baru.
+				Program akhiri.
+			}.
+		}, mulai.
+	}.
+}.
+
+Keluaran tulis: ( ok + [' vault encryptions tested.'] ), baris-baru.

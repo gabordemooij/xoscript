@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Dalje shkruaj: ['Database test'], rresht-ri.
+
+>> db := Maria-DB ri pritës: ['localhost'],
+	përdorues: ['xo'], fjalëkalim: ['pass123'], emër-baze: ['xobase'], lidhu.
+
+Dalje shkruaj: ['Can we connect? '] + db lidhur?, rresht-ri.
+
+>> parametra-kërkimi := db pyetësor: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametra: ( Listë ri ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  parametra-kërkimi ekzekuto. db konfirmo. } kap: { :e db zhbëj.  }, nis.
+
+Dalje shkruaj: ['Can we insert? '] + ( parametra-kërkimi insert-id > 0 ), rresht-ri.
+
+>> Obj := Objekt ri.
+Obj kur: ['retrieve-rows'] bëj: {
+	vetjak numëro := 0.
+	>> parametra-kërkimi :=
+	db pyetësor: ['SELECT * FROM book order by id desc limit 2'], 
+	merr: { :row 
+		vetjak numëro shto: 1.
+		Vërtetë ndërprit.
+	}. <- vetjak numëro kopjo.
+}.
+
+Dalje shkruaj: ['Can we query? '] + ( Obj retrieve-rows > 0 ), rresht-ri.

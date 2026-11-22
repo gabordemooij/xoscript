@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB novo anfitrión: ['localhost'],
+	usuario: ['xo'],
+	contrasinal: ['pass123'],
+	nome-base: ['xobase'],
+	conectar.
+
+>> parámetros-de-busca := db consulta: ['SELECT ? AS a, ? AS b, ? AS c'].
+parámetros-de-busca parámetros: (Lista novo ; ['1']).
+{ parámetros-de-busca obter: { :row Saída escribir: row, salto-de-liña. }. } capturar: { :e Saída escribir: e, salto-de-liña. }, iniciar.
+
+>> parámetros-de-busca := db consulta: ['SELECT ? AS a'].
+{ parámetros-de-busca obter: { :row Saída escribir: row, salto-de-liña. }. } capturar: { :e Saída escribir: e, salto-de-liña. }, iniciar.
+
+# the right number still works, more parameters are ignored as before
+>> parámetros-de-busca := db consulta: ['SELECT ? AS a, ? AS b'].
+parámetros-de-busca parámetros: (Lista novo ; ['1'] ; ['2']).
+parámetros-de-busca obter: { :row Saída escribir: (row en: ['a']), escribir: (row en: ['b']), salto-de-liña. }.
+parámetros-de-busca parámetros: (Lista novo ; ['1'] ; ['2'] ; ['3']).
+parámetros-de-busca obter: { :row Saída escribir: (row en: ['a']), escribir: (row en: ['b']), salto-de-liña. }.

@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := Skedar ri: ['/tmp/test.gif'].
+f shkruaj: ['GIF87a01234567810'].
+
+# serve the file
+Server përcill: ['test.gif'] parashtesë: ['/tmp/'].
+
+Dalje rresht-ri.
+
+Dalje shkruaj: ['Outside container (security):'], rresht-ri.
+{ Server përcill: ['../passwd'] parashtesë: ['/tmp/']. }
+kap: { :e Dalje shkruaj: e, rresht-ri. },
+nis.
+
+Dalje shkruaj: ['Invalid prefix:'], rresht-ri.
+{ Server përcill: ['test.gif'] parashtesë: ['z:\\']. }
+kap: { :e Dalje shkruaj: e, rresht-ri. },
+nis.
+
+Dalje shkruaj: ['Non-existant file:'], rresht-ri.
+{ Server përcill: ['xxx.xxx'] parashtesë: ['/tmp/']. }
+kap: { :e Dalje shkruaj: e, rresht-ri. },
+nis.

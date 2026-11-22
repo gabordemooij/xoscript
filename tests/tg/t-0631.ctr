@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Барнома идораи-хотира: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Барнома танзим: ['FFITESTLIB'].
+
+
+
+Server пайванд: (
+ Феҳрист нав ;
+ libname ;
+ ['puts'] ;
+ ( Феҳрист нав ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s озод.
+
+# test with struct
+
+>> a := Blob нав: 8.
+a bytes: (
+	Феҳрист <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Феҳрист <<: ['int'], ; ['int']).
+
+Server пайванд: (
+	Феҳрист <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Феҳрист <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Баромад навис: ['Sum test:'] + (ffitest ffisum: a), сатри-нав.
+
+struct struct-озод.
+struct озод.
+a озод.

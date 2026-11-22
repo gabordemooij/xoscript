@@ -1,0 +1,43 @@
+
+
+>> g := Server nĳ.
+>> v := Klûs nĳ.
+>> ok := 0.
+
+>> secrets := Rige nĳ ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopiearje.
+passwords elk: { :i :p
+	secrets elk: { :n :s
+		{
+			>> encrypted := v fersiferje: s kaai: p.
+			>> decrypted := v ûntsiferje: encrypted kaai: p.
+			(decrypted = s) ja: {
+				ok optelle: 1.
+			}, oars: {
+				Utfier skriuwe: ['failed encrypting/decrypting: '], nije-rigel.
+				Utfier skriuwe: s, nije-rigel.
+				Utfier skriuwe: ['encrypted: '] + encrypted, nije-rigel.
+				Utfier skriuwe: ['decrypted: '] + encrypted, nije-rigel.
+				Programma ein.
+			}.
+		} fange: { :err
+			(s = [''] of: p = ['']) ja: {
+				ok optelle: 1.
+			}, oars: {
+				Utfier skriuwe: err, nije-rigel.
+				Programma ein.
+			}.
+		}, begjinne.
+	}.
+}.
+
+Utfier skriuwe: ( ok + [' vault encryptions tested.'] ), nije-rigel.

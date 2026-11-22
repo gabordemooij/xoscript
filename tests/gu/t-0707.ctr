@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+પ્રોગ્રામ મેમરી-વ્યવસ્થાપન: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB નવું હોસ્ટ: ['localhost'],
+	વપરાશકર્તા-નામ: ['xo'], પાસવર્ડ: ['pass123'], ડેટાબેઝ-નામ: ['xobase'], જોડાઓ.
+
+>> TwoDigitFormat := ફોર્મેટ નવું: ['%02d'].
+
+# Datetime
+{
+	>> વર્ષ := સંખ્યા વચ્ચે: 1995 અને: 2050, લખાણમાં.
+	>> મહિનો := TwoDigitFormat લાગુ-પૂર્ણાંક: (સંખ્યા વચ્ચે: 1 અને: 12), લખાણમાં.
+	>> દિવસ := TwoDigitFormat લાગુ-પૂર્ણાંક: (સંખ્યા વચ્ચે: 1 અને: 28), લખાણમાં.
+	>> કલાક := TwoDigitFormat લાગુ-પૂર્ણાંક: (સંખ્યા વચ્ચે: 1 અને: 23), લખાણમાં.
+	>> મિનિટ := TwoDigitFormat લાગુ-પૂર્ણાંક: (સંખ્યા વચ્ચે: 1 અને: 59), લખાણમાં.
+	>> સેકન્ડ := TwoDigitFormat લાગુ-પૂર્ણાંક: (સંખ્યા વચ્ચે: 1 અને: 59), લખાણમાં.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: વર્ષ,
+		MM: મહિનો,
+		DD: દિવસ,
+		HH: કલાક,
+		II: મિનિટ,
+		SS: સેકન્ડ.
+	>> શોધ-પેરામીટર :=
+	db ક્વેરી: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	લાવો: { :row
+		(row mydatetime = datetime) ખોટું-હોય-તો: {
+			આ-કાર્ય ભૂલ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter સરવાળો: 1.
+} * 100.
+
+# Date
+{
+	>> વર્ષ := સંખ્યા વચ્ચે: 1995 અને: 2050, લખાણમાં.
+	>> મહિનો := TwoDigitFormat લાગુ-પૂર્ણાંક: (સંખ્યા વચ્ચે: 1 અને: 12), લખાણમાં.
+	>> દિવસ := TwoDigitFormat લાગુ-પૂર્ણાંક: (સંખ્યા વચ્ચે: 1 અને: 28), લખાણમાં.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: વર્ષ,
+		MM: મહિનો,
+		DD: દિવસ.
+	>> શોધ-પેરામીટર :=
+	db ક્વેરી: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	લાવો: { :row
+		(row mydate = date) ખોટું-હોય-તો: {
+			આ-કાર્ય ભૂલ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter સરવાળો: 1.
+} * 100.
+
+
+# Time
+{
+	>> કલાક := TwoDigitFormat લાગુ-પૂર્ણાંક: (સંખ્યા વચ્ચે: 1 અને: 23), લખાણમાં.
+	>> મિનિટ := TwoDigitFormat લાગુ-પૂર્ણાંક: (સંખ્યા વચ્ચે: 1 અને: 59), લખાણમાં.
+	>> સેકન્ડ := TwoDigitFormat લાગુ-પૂર્ણાંક: (સંખ્યા વચ્ચે: 1 અને: 59), લખાણમાં.
+	>> સમય := ['HH:II:SS'].
+	સમય
+		HH: કલાક,
+		II: મિનિટ,
+		SS: સેકન્ડ.
+	>> શોધ-પેરામીટર :=
+	db ક્વેરી: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: સમય),
+	લાવો: { :row
+		(row mytime = સમય) ખોટું-હોય-તો: {
+			આ-કાર્ય ભૂલ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter સરવાળો: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := સૂચિ નવું ભરો: 100000 મૂલ્યથી: ['x'], જોડો: [''].
+{
+	>> str2 := તિજોરી ટોકન: 40.
+	>> શોધ-પેરામીટર :=
+	db ક્વેરી: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	લાવો: { :row
+		(row str1 = str1 અને: row str2 = str2) ખોટું-હોય-તો: {
+			આ-કાર્ય ભૂલ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter સરવાળો: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := સંખ્યા વચ્ચે: 1 અને: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 લખાણમાંથી: ['9223372036854775807'] ) -
+		( Int64 લખાણમાંથી: ['99999'] ) +
+		( Int64 લખાણમાંથી: n1 લખાણમાં )
+	).
+	>> શોધ-પેરામીટર :=
+	db ક્વેરી: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	લાવો: { :row
+		(row n1 = n1) ખોટું-હોય-તો: {
+			આ-કાર્ય ભૂલ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) ખોટું-હોય-તો: {
+			આ-કાર્ય ભૂલ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 પૂર્ણાંકન) ખોટું-હોય-તો: {
+			આ-કાર્ય ભૂલ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) ખોટું-હોય-તો: {
+			આ-કાર્ય ભૂલ: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter સરવાળો: 1.
+} * 100.
+
+
+આઉટપુટ લખો: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), નવી-લીટી.

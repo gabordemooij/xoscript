@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Obyekt yeni.
+
+Slurp olanda: ['yeni'] et: {
+	öz str := [''].
+}.
+
+Slurp olanda: ['nieuw'] et: {
+	öz str := [''].
+}.
+
+Slurp olanda: ['cavab-ver:'] et: { :blah
+		öz str sona-əlavə-et: blah.
+}.
+
+Slurp olanda: ['cavab-ver:və:'] et: { :blah :blahah
+		öz str sona-əlavə-et: (blah başlanğıc: 0 uzunluq: (blah uzunluq - 1)).
+		öz str sona-əlavə-et: [' '].
+		öz str sona-əlavə-et: blahah.
+}.
+
+Slurp olanda: ['obtain'] et: {
+	>> buffer := öz str.
+	öz str := ['']. <- buffer.
+}.
+
+
+Çıxış yaz: (Proqram sistem: (Slurp yeni echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Fayl yeni: ['/tmp/from.txt'], sil. } tut: { ['Empty']. }, başlat.
+{ Fayl yeni: ['/tmp/to.txt'], sil. } tut: { ['Empty']. }, başlat.
+
+
+Fayl yeni: ['/tmp/to.txt'], mövcuddur yalan: {
+	Çıxış yaz: ['Confirmed. Target file does not exist.\
+'].
+}.
+Fayl yeni: ['/tmp/from.txt'], mövcuddur yalan: {
+	Çıxış yaz: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Proqram sistem: (Slurp yeni touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Proqram sistem: (Slurp yeni cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Fayl yeni: ['/tmp/to.txt'], mövcuddur doğru: {
+	Çıxış yaz: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Çıxış yaz: ['Contents of file is:'] + (Fayl yeni: ['/tmp/to.txt'], oxu), yeni-sətir.

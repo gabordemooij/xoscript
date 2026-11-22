@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Fandaharana fitantanana-fahatsiarovana: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Fandaharana fikirakirana: ['FFITESTLIB'].
+
+
+
+Server ampifandraiso: (
+ Lisitra vaovao ;
+ libname ;
+ ['puts'] ;
+ ( Lisitra vaovao ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s afaho.
+
+# test with struct
+
+>> a := Blob vaovao: 8.
+a bytes: (
+	Lisitra <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Lisitra <<: ['int'], ; ['int']).
+
+Server ampifandraiso: (
+	Lisitra <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Lisitra <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Vokatra soraty: ['Sum test:'] + (ffitest ffisum: a), andalana-vaovao.
+
+struct afaho-struct.
+struct afaho.
+a afaho.

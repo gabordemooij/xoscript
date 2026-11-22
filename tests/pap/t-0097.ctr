@@ -1,0 +1,42 @@
+
+Teksto ora: ['html'] hasi: { <- (
+		mes
+		remplasá: ['&'] ku: ['&amp;'],
+		remplasá: ['<'] ku: ['&lt;'],
+		remplasá: ['>'] ku: ['&gt;'],
+		remplasá: ['"'] ku: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Opheto nobo.
+
+HtmlBrush ora: ['kontestá:'] hasi: { :tag
+	Salida skirbi: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush ora: ['kontestá:i:'] hasi: { :tag :content
+	tag := ( tag kuminsá: 0 largura: (tag largura - 1) ).
+	Salida skirbi: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush ora: ['content:'] hasi: { :text
+	Salida skirbi: text html, liña-nobo.
+}.
+
+HtmlBrush ora: ['attr:value:'] hasi: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush nobo.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

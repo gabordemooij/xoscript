@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inicializiraj.
+Program uporabljaj: ['../../../src/xo/sl/webtools.xo'].
+
+>> Fake-Request := Objekt nov.
+Fake-Request ob: ['value:'] izvedi: { :vrednost
+	svoj vrednost := vrednost.
+}.
+Fake-Request ob: ['cookie:'] izvedi: { :ime <- svoj vrednost.
+}.
+
+>> Test-Session := Seja-začasna-datoteka nov.
+Test-Session ob: ['naloži'] izvedi: { <- Slovar nov.
+}.
+Test-Session ob: ['session-id'] izvedi: { <- svoj id.
+}.
+
+>> cookies := Seznam nov
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies vsak: { :i :cookie
+	>> zahteva := Fake-Request nov.
+	zahteva value: cookie.
+	>> upravitelj := Test-Session nov.
+	>> web := Spletni-dokument nov.
+	web zahteva: zahteva.
+	web upravitelj-sej: upravitelj.
+	web začni-sejo.
+	Izhod piši: ( upravitelj session-id = cookie ), nova-vrstica.
+}.
+
+>> web := Spletni-dokument nov.
+web json: (Slovar nov postavi: ['b'] na: ['a']).
+Izhod piši: ['\n'], nova-vrstica.
+
+{ Omrežje get: ['file:///etc/hostname']. } ujemi: { :e
+	Izhod piši: e, nova-vrstica.
+}, zaženi.
+
+>> svg := Datoteka nov: ['/tmp/test0814.svg'].
+svg piši: ['<svg xmlns="x"></svg>'].
+Izhod nova-vrstica.
+Server posreduj: ['test0814.svg'] predpona: ['/tmp/'].
+svg izbriši.

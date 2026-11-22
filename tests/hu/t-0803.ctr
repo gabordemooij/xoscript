@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB új gazdagép: ['localhost'],
+	felhasználónév: ['xo'],
+	jelszó: ['pass123'],
+	adatbázisnév: ['xobase'],
+	csatlakozik.
+
+>> conn2 := Maria-DB új gazdagép: ['localhost'],
+	felhasználónév: ['xo'],
+	jelszó: ['pass123'],
+	adatbázisnév: ['xobase'],
+	csatlakozik.
+#...
+>> del := conn1 lekérdezés: ['DELETE FROM book WHERE id > 0'].
+{  del végrehajt. conn1 véglegesít. } elkap: { :e conn1 visszavon.  }, indít.
+
+>> insert := conn1 lekérdezés: ['INSERT INTO book (id) VALUES(null)'].
+insert végrehajt.
+
+>> darabszám := conn1 lekérdezés: ['SELECT COUNT(*) AS num FROM book'].
+darabszám lekér: { :row Kimenet ír: row num, újsor. }.
+
+# does not show up
+# insert not committed on connection 1
+>> darabszám := conn2 lekérdezés: ['SELECT COUNT(*) AS num FROM book'].
+darabszám lekér: { :row Kimenet ír: row num, újsor. }.

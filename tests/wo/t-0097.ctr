@@ -1,0 +1,42 @@
+
+Mbind bu: ['html'] def: { <- (
+		man
+		wuutal: ['&'] ci: ['&amp;'],
+		wuutal: ['<'] ci: ['&lt;'],
+		wuutal: ['>'] ci: ['&gt;'],
+		wuutal: ['"'] ci: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Denc xees.
+
+HtmlBrush bu: ['tontu:'] def: { :tag
+	Génn bind: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush bu: ['tontu:ak:'] def: { :tag :content
+	tag := ( tag dale: 0 guddaay: (tag guddaay - 1) ).
+	Génn bind: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush bu: ['content:'] def: { :text
+	Génn bind: text html, taxaw.
+}.
+
+HtmlBrush bu: ['attr:value:'] def: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush xees.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

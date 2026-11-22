@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inicjuj.
+Program użyj: ['../../../src/xo/pl/webtools.xo'].
+Program użyj: ['../../../src/xo/pl/mailtools.xo'].
+
+>> nagłówek := Nagłówek-HTTP nowy klucz: ['Location'] wartość: ['/ok\r\nX-Injected: yes'].
+Wyjście pisz: nagłówek.
+
+>> web := Dokument-Web nowy.
+web przejdź-do: ['/ok\r\nX-Injected: yes'].
+Wyjście pisz: ['\n'], nowa-linia.
+
+>> mail := Email nowy.
+mail adresat: (Lista nowy ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lista nowy ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lista nowy ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail nadawca: ['d@example.invalid\r\nX-From: yes'] nazwa: ['site\r\nX-Name: yes'].
+mail temat: ['hello\r\nX-Subject: yes'].
+mail treść-wiadomości: ['line1\r\nline2'].
+Wyjście pisz: mail generuj.
+
+>> html := HTML-Email nowy.
+html adresat: (Lista nowy ; ['a@example.invalid\r\nX-To: yes']).
+html nadawca: ['d@example.invalid'] nazwa: ['site'].
+html temat: ['hello\r\nX-Subject: yes'].
+html treść-wiadomości: ['body'].
+Wyjście pisz: ( html generuj zawiera: ['\nX-'] ), nowa-linia.
+Wyjście pisz: ( html generuj zawiera: ['X-To: yes'] ), nowa-linia.

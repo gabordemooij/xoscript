@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Gahunda igenamiterere: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server hambira: ( Urutonde gishya ;
+ libname ; ['fopen'] ;
+ ( Urutonde gishya ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+hambira: ( Urutonde gishya ;
+ Ntacyo ; # means same lib
+ ['fread'] ;
+ ( Urutonde gishya ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Ntacyo ; # means same object (i.e. Stream)
+ ['fread']
+),
+hambira: (
+ Urutonde gishya ;
+ Ntacyo ; # means same lib
+ ['fwrite'] ;
+ ( Urutonde gishya ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Ntacyo ; # means same lib
+ ['fwrite']
+),
+hambira: (
+ Urutonde gishya ;
+ Ntacyo ; # means same lib
+ ['rewind'] ;
+ ( Urutonde gishya ; ['pointer'] ) ;
+ ['int'] ;
+ Ntacyo ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> inzira-ya-dosiye := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: inzira-ya-dosiye mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream ubutumwa: ['fwrite'] ibyinjizwa: (Urutonde gishya ; str ; 1 ; 6 ; fd ).
+Ibisohoka andika: bytes-written, umurongo-mushya.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob gishya: 20.
+
+# read from file
+>> bytes-read := Stream ubutumwa: ['fread'] ibyinjizwa: (Urutonde gishya ; buf ; 1 ; 6 ; fd ).
+Ibisohoka andika: bytes-read, umurongo-mushya.
+Ibisohoka andika: buf, umurongo-mushya.
+
+# free memory
+str  rekura.
+inzira-ya-dosiye rekura.
+mode rekura.
+buf  rekura.
+
+

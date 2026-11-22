@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Tawm sau-ntawv: ['Database test'], kab-tshiab.
+
+>> db := Maria-DB tshiab tus-tswv-tsev: ['localhost'],
+	npe-neeg-siv: ['xo'], lo-lus-zais: ['pass123'], npe-chaw-khaws-ntaub-ntawv: ['xobase'], txuas-mus.
+
+Tawm sau-ntawv: ['Can we connect? '] + db txuas-lawm?, kab-tshiab.
+
+>> cov-nqe-nrhiav := db lus-nug: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], cov-nqe: ( Daim-teev tshiab ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  cov-nqe-nrhiav ua-raws-lus-txib. db lees-paub. } txhom: { :e db thim-rov-qab.  }, pib.
+
+Tawm sau-ntawv: ['Can we insert? '] + ( cov-nqe-nrhiav insert-id > 0 ), kab-tshiab.
+
+>> Obj := Yam-khoom tshiab.
+Obj thaum-tuaj: ['retrieve-rows'] ua: {
+	nws-li tus-lej-suav := 0.
+	>> cov-nqe-nrhiav :=
+	db lus-nug: ['SELECT * FROM book order by id desc limit 2'], 
+	mus-nqa: { :row 
+		nws-li tus-lej-suav ntxiv: 1.
+		Tseeb tso-tseg.
+	}. <- nws-li tus-lej-suav luam.
+}.
+
+Tawm sau-ntawv: ['Can we query? '] + ( Obj retrieve-rows > 0 ), kab-tshiab.

@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server आरंभ-करा.
+प्रोग्राम वापरा: ['../../../src/xo/mr/webtools.xo'].
+प्रोग्राम वापरा: ['../../../src/xo/mr/mailtools.xo'].
+
+>> शीर्षलेख := HTTP-शीर्षलेख नवीन किल्ली: ['Location'] मूल्य: ['/ok\r\nX-Injected: yes'].
+आउटपुट लिहा: शीर्षलेख.
+
+>> web := वेब-दस्तऐवज नवीन.
+web जा: ['/ok\r\nX-Injected: yes'].
+आउटपुट लिहा: ['\n'], नवी-ओळ.
+
+>> mail := ईमेल नवीन.
+mail प्राप्तकर्त्याला: (सूची नवीन ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (सूची नवीन ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (सूची नवीन ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail प्रेषक: ['d@example.invalid\r\nX-From: yes'] नाव: ['site\r\nX-Name: yes'].
+mail विषय: ['hello\r\nX-Subject: yes'].
+mail मुख्य-मजकूर: ['line1\r\nline2'].
+आउटपुट लिहा: mail निर्माण-करा.
+
+>> html := HTML-ईमेल नवीन.
+html प्राप्तकर्त्याला: (सूची नवीन ; ['a@example.invalid\r\nX-To: yes']).
+html प्रेषक: ['d@example.invalid'] नाव: ['site'].
+html विषय: ['hello\r\nX-Subject: yes'].
+html मुख्य-मजकूर: ['body'].
+आउटपुट लिहा: ( html निर्माण-करा समाविष्ट: ['\nX-'] ), नवी-ओळ.
+आउटपुट लिहा: ( html निर्माण-करा समाविष्ट: ['X-To: yes'] ), नवी-ओळ.

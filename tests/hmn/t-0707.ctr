@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Kev-pab-cuam-khoos-phis-tawj tswj-chaw-nco: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB tshiab tus-tswv-tsev: ['localhost'],
+	npe-neeg-siv: ['xo'], lo-lus-zais: ['pass123'], npe-chaw-khaws-ntaub-ntawv: ['xobase'], txuas-mus.
+
+>> TwoDigitFormat := Hom-ntawv tshiab: ['%02d'].
+
+# Datetime
+{
+	>> xyoo := Lej ntawm: 1995 thiab: 2050, kab-ntawv.
+	>> lub-hli := TwoDigitFormat siv-rau-lej-tag-nrho: (Lej ntawm: 1 thiab: 12), kab-ntawv.
+	>> hnub := TwoDigitFormat siv-rau-lej-tag-nrho: (Lej ntawm: 1 thiab: 28), kab-ntawv.
+	>> teev := TwoDigitFormat siv-rau-lej-tag-nrho: (Lej ntawm: 1 thiab: 23), kab-ntawv.
+	>> feeb := TwoDigitFormat siv-rau-lej-tag-nrho: (Lej ntawm: 1 thiab: 59), kab-ntawv.
+	>> vib-nas-this := TwoDigitFormat siv-rau-lej-tag-nrho: (Lej ntawm: 1 thiab: 59), kab-ntawv.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: xyoo,
+		MM: lub-hli,
+		DD: hnub,
+		HH: teev,
+		II: feeb,
+		SS: vib-nas-this.
+	>> cov-nqe-nrhiav :=
+	db lus-nug: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	mus-nqa: { :row
+		(row mydatetime = datetime) cuav: {
+			txoj-haujlwm-no yuam-kev: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ntxiv: 1.
+} * 100.
+
+# Date
+{
+	>> xyoo := Lej ntawm: 1995 thiab: 2050, kab-ntawv.
+	>> lub-hli := TwoDigitFormat siv-rau-lej-tag-nrho: (Lej ntawm: 1 thiab: 12), kab-ntawv.
+	>> hnub := TwoDigitFormat siv-rau-lej-tag-nrho: (Lej ntawm: 1 thiab: 28), kab-ntawv.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: xyoo,
+		MM: lub-hli,
+		DD: hnub.
+	>> cov-nqe-nrhiav :=
+	db lus-nug: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	mus-nqa: { :row
+		(row mydate = date) cuav: {
+			txoj-haujlwm-no yuam-kev: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ntxiv: 1.
+} * 100.
+
+
+# Time
+{
+	>> teev := TwoDigitFormat siv-rau-lej-tag-nrho: (Lej ntawm: 1 thiab: 23), kab-ntawv.
+	>> feeb := TwoDigitFormat siv-rau-lej-tag-nrho: (Lej ntawm: 1 thiab: 59), kab-ntawv.
+	>> vib-nas-this := TwoDigitFormat siv-rau-lej-tag-nrho: (Lej ntawm: 1 thiab: 59), kab-ntawv.
+	>> sijhawm := ['HH:II:SS'].
+	sijhawm
+		HH: teev,
+		II: feeb,
+		SS: vib-nas-this.
+	>> cov-nqe-nrhiav :=
+	db lus-nug: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: sijhawm),
+	mus-nqa: { :row
+		(row mytime = sijhawm) cuav: {
+			txoj-haujlwm-no yuam-kev: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ntxiv: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Daim-teev tshiab sau-kom-puv: 100000 nrog: ['x'], muab-sib-txuas: [''].
+{
+	>> str2 := Lub-thawv-ruaj-ntseg token: 40.
+	>> cov-nqe-nrhiav :=
+	db lus-nug: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	mus-nqa: { :row
+		(row str1 = str1 thiab: row str2 = str2) cuav: {
+			txoj-haujlwm-no yuam-kev: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ntxiv: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Lej ntawm: 1 thiab: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 los-ntawm-kab-ntawv: ['9223372036854775807'] ) -
+		( Int64 los-ntawm-kab-ntawv: ['99999'] ) +
+		( Int64 los-ntawm-kab-ntawv: n1 kab-ntawv )
+	).
+	>> cov-nqe-nrhiav :=
+	db lus-nug: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	mus-nqa: { :row
+		(row n1 = n1) cuav: {
+			txoj-haujlwm-no yuam-kev: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) cuav: {
+			txoj-haujlwm-no yuam-kev: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 puag-ncig) cuav: {
+			txoj-haujlwm-no yuam-kev: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) cuav: {
+			txoj-haujlwm-no yuam-kev: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ntxiv: 1.
+} * 100.
+
+
+Tawm sau-ntawv: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), kab-tshiab.

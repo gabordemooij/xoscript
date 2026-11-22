@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := සුරක්ෂිතාගාරය යතුරු-සාදන්න.
+>> sk := keys පළමු.
+>> pk := keys අවසාන.
+>> sig := සුරක්ෂිතාගාරය අත්සන: ['abc'] යතුරෙන්: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ සුරක්ෂිතාගාරය අත්සන: ['abc'] යතුරෙන්: long. } අල්ලන්න: { :e
+	නිමැවුම ලියන්න: e, නව-පේළිය.
+}, ධාවනය.
+
+{ සුරක්ෂිතාගාරය පිරික්සන්න: ['abc'] අත්සන: long යතුරෙන්: pk. } අල්ලන්න: { :e
+	නිමැවුම ලියන්න: e, නව-පේළිය.
+}, ධාවනය.
+
+{ සුරක්ෂිතාගාරය පිරික්සන්න: ['abc'] අත්සන: sig යතුරෙන්: short. } අල්ලන්න: { :e
+	නිමැවුම ලියන්න: e, නව-පේළිය.
+}, ධාවනය.

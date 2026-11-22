@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server prepare.
+Pwogram itilize: ['../../../src/xo/ht/webtools.xo'].
+
+>> Fake-Request := Objè nouvo.
+Fake-Request lè: ['value:'] fè: { :valè
+	pwòp valè := valè.
+}.
+Fake-Request lè: ['cookie:'] fè: { :non <- pwòp valè.
+}.
+
+>> Test-Session := Sesyon-fichye-tanporè nouvo.
+Test-Session lè: ['chaje'] fè: { <- Diksyonè nouvo.
+}.
+Test-Session lè: ['session-id'] fè: { <- pwòp id.
+}.
+
+>> cookies := Lis nouvo
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies chak: { :i :cookie
+	>> demann-http := Fake-Request nouvo.
+	demann-http value: cookie.
+	>> jesyonè := Test-Session nouvo.
+	>> web := Dokiman-Wèb nouvo.
+	web demann-http: demann-http.
+	web jesyonè-sesyon: jesyonè.
+	web kòmanse-sesyon.
+	Sòti ekri: ( jesyonè session-id = cookie ), nouvo-liy.
+}.
+
+>> web := Dokiman-Wèb nouvo.
+web json: (Diksyonè nouvo mete: ['b'] nan: ['a']).
+Sòti ekri: ['\n'], nouvo-liy.
+
+{ Rezo get: ['file:///etc/hostname']. } trape: { :e
+	Sòti ekri: e, nouvo-liy.
+}, lanse.
+
+>> svg := Fichye nouvo: ['/tmp/test0814.svg'].
+svg ekri: ['<svg xmlns="x"></svg>'].
+Sòti nouvo-liy.
+Server pase: ['test0814.svg'] prefiks: ['/tmp/'].
+svg efase.

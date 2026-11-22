@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Huapuka kākau: ['Database test'], laina-hou.
+
+>> db := Maria-DB hou hoʻokipa: ['localhost'],
+	inoa-mea-hoʻohana: ['xo'], ʻōlelo-huna: ['pass123'], inoa-waihona-ʻikepili: ['xobase'], hoʻohui-pū.
+
+Huapuka kākau: ['Can we connect? '] + db pili?, laina-hou.
+
+>> nā-koina-huli := db nīnau: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], nā-koina: ( Papa hou ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  nā-koina-huli hoʻokō. db hoʻopaʻa. } hopu: { :e db hoʻihoʻi-hope.  }, hoʻomaka.
+
+Huapuka kākau: ['Can we insert? '] + ( nā-koina-huli insert-id > 0 ), laina-hou.
+
+>> Obj := Mea hou.
+Obj i: ['retrieve-rows'] hana: {
+	ponoʻī heluna := 0.
+	>> nā-koina-huli :=
+	db nīnau: ['SELECT * FROM book order by id desc limit 2'], 
+	kiʻi: { :row 
+		ponoʻī heluna hoʻohui-helu: 1.
+		ʻOiaʻiʻo hoʻōki.
+	}. <- ponoʻī heluna kope.
+}.
+
+Huapuka kākau: ['Can we query? '] + ( Obj retrieve-rows > 0 ), laina-hou.

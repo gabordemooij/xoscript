@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server omano.
+Fandaharana ampiasao: ['../../../src/xo/mg/webtools.xo'].
+Fandaharana ampiasao: ['../../../src/xo/mg/mailtools.xo'].
+
+>> lohateny := Lohateny-HTTP vaovao lakile: ['Location'] sanda: ['/ok\r\nX-Injected: yes'].
+Vokatra soraty: lohateny.
+
+>> web := Antontan-taratasy-Web vaovao.
+web mandehana-any: ['/ok\r\nX-Injected: yes'].
+Vokatra soraty: ['\n'], andalana-vaovao.
+
+>> mail := Mailaka vaovao.
+mail ho-an-i: (Lisitra vaovao ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lisitra vaovao ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lisitra vaovao ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail mpandefa: ['d@example.invalid\r\nX-From: yes'] anarana: ['site\r\nX-Name: yes'].
+mail lohahevitra: ['hello\r\nX-Subject: yes'].
+mail vatana: ['line1\r\nline2'].
+Vokatra soraty: mail mamorona.
+
+>> html := Mailaka-HTML vaovao.
+html ho-an-i: (Lisitra vaovao ; ['a@example.invalid\r\nX-To: yes']).
+html mpandefa: ['d@example.invalid'] anarana: ['site'].
+html lohahevitra: ['hello\r\nX-Subject: yes'].
+html vatana: ['body'].
+Vokatra soraty: ( html mamorona misy: ['\nX-'] ), andalana-vaovao.
+Vokatra soraty: ( html mamorona misy: ['X-To: yes'] ), andalana-vaovao.

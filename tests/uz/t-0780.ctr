@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Roʻyxat yangi ;
+	# {"key":"normal"} normal ASCII
+	( Lugʻat yangi qoʻyish: ['normal'] kalit: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Lugʻat yangi qoʻyish: ['hello world'] kalit: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Lugʻat yangi qoʻyish: ['"'] kalit: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Lugʻat yangi qoʻyish: ['backslash: \\'] kalit: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Lugʻat yangi qoʻyish: ['slash: /'] kalit: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Lugʻat yangi qoʻyish: ['backspace: \b'] kalit: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Lugʻat yangi qoʻyish: ['formfeed: \f'] kalit: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Lugʻat yangi qoʻyish: ['newline: \n'] kalit: ['key'] ) ;
+	( Lugʻat yangi qoʻyish: ['newline: ↵'] kalit: ['key'] ) ;
+	( Lugʻat yangi qoʻyish: ['newline: 
+	'] kalit: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Lugʻat yangi qoʻyish: ['carriage return: \r'] kalit: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Lugʻat yangi qoʻyish: ['tab \t'] kalit: ['key'] ) ;
+	( Lugʻat yangi qoʻyish: ['tab ⇿'] kalit: ['key'] ) ;
+	( Lugʻat yangi qoʻyish: ['tab  '] kalit: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Lugʻat yangi qoʻyish: ['NUL \u0000'] kalit: ['key'] ) ;
+	( Lugʻat yangi qoʻyish: ['NUL \0'] kalit: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Lugʻat yangi qoʻyish: ['control: \u0001'] kalit: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Lugʻat yangi qoʻyish: ['control: \u001F'] kalit: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Lugʻat yangi qoʻyish: ['unicode: é'] kalit: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Lugʻat yangi qoʻyish: ['unicode: €'] kalit: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Lugʻat yangi qoʻyish: ['unicode: 日本語'] kalit: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Lugʻat yangi qoʻyish: ['unicode: 😀'] kalit: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Lugʻat yangi qoʻyish: ['unicode: 🧑‍💻'] kalit: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Lugʻat yangi qoʻyish: ['combining: e\u0301'] kalit: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Lugʻat yangi qoʻyish: ['escaped unicode: \u00e9'] kalit: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Lugʻat yangi qoʻyish: ['escaped unicode: \u20ac'] kalit: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Lugʻat yangi qoʻyish: ['escaped unicode: \ud83d\ude00'] kalit: ['key'] ) ;
+	# {"key":""} empty value
+	( Lugʻat yangi qoʻyish: [''] kalit: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Lugʻat yangi qoʻyish: ['@ < > & = % + ? #'] kalit: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Lugʻat yangi qoʻyish: ['''] kalit: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Lugʻat yangi qoʻyish: ['multiple: \" \\ \n \r \t'] kalit: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Lugʻat yangi qoʻyish: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] kalit: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Lugʻat yangi qoʻyish: [' value'] kalit: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Lugʻat yangi qoʻyish: ['value '] kalit: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Lugʻat yangi qoʻyish: [' \t\n\r '] kalit: ['key'] ).
+
+dicts har-bir: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Lugʻat yangi qoʻyish: d key kalit: ['key']).
+	>> b := JSON jsonify: (Lugʻat yangi qoʻyish: ['value'] kalit: d key).
+	>> e := JSON obyekt: a.
+	>> f := JSON obyekt: b.
+	((e key = d key va: (f ? d key = ['value'])) yoki: (e key = ['NUL ?'])) rost-boʻlsa: {
+		Chiqish yozish: ['OK'], yangi-qator.
+	}, aks-holda: {
+		Chiqish yozish: ['Unable to properly encode/decode: '] + d + j, yangi-qator.
+		Dastur tugatish.
+	}.
+}.

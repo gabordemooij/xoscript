@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server lähtesta.
+Programm kasuta: ['../../../src/xo/et/webtools.xo'].
+
+>> Fake-Request := Objekt uus.
+Fake-Request kui: ['value:'] tee: { :väärtus
+	oma väärtus := väärtus.
+}.
+Fake-Request kui: ['cookie:'] tee: { :nimi <- oma väärtus.
+}.
+
+>> Test-Session := Ajutise-faili-seanss uus.
+Test-Session kui: ['laadi'] tee: { <- Sõnastik uus.
+}.
+Test-Session kui: ['session-id'] tee: { <- oma id.
+}.
+
+>> cookies := Loend uus
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies iga: { :i :cookie
+	>> http-päring := Fake-Request uus.
+	http-päring value: cookie.
+	>> haldur := Test-Session uus.
+	>> web := Veebidokument uus.
+	web http-päring: http-päring.
+	web seansihaldur: haldur.
+	web alusta-seanssi.
+	Väljund kirjuta: ( haldur session-id = cookie ), reavahetus.
+}.
+
+>> web := Veebidokument uus.
+web json: (Sõnastik uus pane: ['b'] kohale: ['a']).
+Väljund kirjuta: ['\n'], reavahetus.
+
+{ Võrk get: ['file:///etc/hostname']. } püüa: { :e
+	Väljund kirjuta: e, reavahetus.
+}, käivita.
+
+>> svg := Fail uus: ['/tmp/test0814.svg'].
+svg kirjuta: ['<svg xmlns="x"></svg>'].
+Väljund reavahetus.
+Server edasta: ['test0814.svg'] eesliide: ['/tmp/'].
+svg kustuta.

@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Polokalamu hoʻoponopono-waihona-hoʻomanaʻo: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Polokalamu hoʻonohonoho: ['FFITESTLIB'].
+
+
+
+Server loulou: (
+ Papa hou ;
+ libname ;
+ ['puts'] ;
+ ( Papa hou ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s hoʻokuʻu.
+
+# test with struct
+
+>> a := Blob hou: 8.
+a bytes: (
+	Papa <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Papa <<: ['int'], ; ['int']).
+
+Server loulou: (
+	Papa <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Papa <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Huapuka kākau: ['Sum test:'] + (ffitest ffisum: a), laina-hou.
+
+struct hoʻokuʻu-struct.
+struct hoʻokuʻu.
+a hoʻokuʻu.

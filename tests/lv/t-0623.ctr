@@ -1,0 +1,43 @@
+
+
+>> g := Server jauns.
+>> v := Seifs jauns.
+>> ok := 0.
+
+>> secrets := Saraksts jauns ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets kopēt.
+passwords katrs: { :i :p
+	secrets katrs: { :n :s
+		{
+			>> encrypted := v šifrēt: s atslēga: p.
+			>> decrypted := v atšifrēt: encrypted atslēga: p.
+			(decrypted = s) patiess: {
+				ok pieskaitīt: 1.
+			}, citādi: {
+				Izvade rakstīt: ['failed encrypting/decrypting: '], jauna-rinda.
+				Izvade rakstīt: s, jauna-rinda.
+				Izvade rakstīt: ['encrypted: '] + encrypted, jauna-rinda.
+				Izvade rakstīt: ['decrypted: '] + encrypted, jauna-rinda.
+				Programma beigas.
+			}.
+		} tvert: { :err
+			(s = [''] vai: p = ['']) patiess: {
+				ok pieskaitīt: 1.
+			}, citādi: {
+				Izvade rakstīt: err, jauna-rinda.
+				Programma beigas.
+			}.
+		}, palaist.
+	}.
+}.
+
+Izvade rakstīt: ( ok + [' vault encryptions tested.'] ), jauna-rinda.

@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server hasieratu.
+Programa erabili: ['../../../src/xo/eu/webtools.xo'].
+
+>> Fake-Request := Objektua berria.
+Fake-Request noiz: ['value:'] egin: { :balioa
+	berezko balioa := balioa.
+}.
+Fake-Request noiz: ['cookie:'] egin: { :izena <- berezko balioa.
+}.
+
+>> Test-Session := Behin-behineko-fitxategi-saioa berria.
+Test-Session noiz: ['kargatu'] egin: { <- Hiztegia berria.
+}.
+Test-Session noiz: ['session-id'] egin: { <- berezko id.
+}.
+
+>> cookies := Zerrenda berria
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies bakoitza: { :i :cookie
+	>> eskaera := Fake-Request berria.
+	eskaera value: cookie.
+	>> kudeatzailea := Test-Session berria.
+	>> web := Web-dokumentua berria.
+	web eskaera: eskaera.
+	web saio-kudeatzailea: kudeatzailea.
+	web hasi-saioa.
+	Irteera idatzi: ( kudeatzailea session-id = cookie ), lerro-jauzia.
+}.
+
+>> web := Web-dokumentua berria.
+web json: (Hiztegia berria jarri: ['b'] non: ['a']).
+Irteera idatzi: ['\n'], lerro-jauzia.
+
+{ Sarea get: ['file:///etc/hostname']. } harrapatu: { :e
+	Irteera idatzi: e, lerro-jauzia.
+}, hasi.
+
+>> svg := Fitxategia berria: ['/tmp/test0814.svg'].
+svg idatzi: ['<svg xmlns="x"></svg>'].
+Irteera lerro-jauzia.
+Server pasatu: ['test0814.svg'] aurrizkia: ['/tmp/'].
+svg ezabatu.

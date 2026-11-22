@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Saída escrever: ['Database test'], stop.
+
+>> db := MariaDB novo host: ['localhost'],
+	utilizador: ['xo'], palavra-passe: ['pass123'], nome-database: ['xobase'], conectar.
+
+Saída escrever: ['Can we connect? '] + db conectado?, stop.
+
+>> parametros := db consulta: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametros: ( Listar novo ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  parametros executar. db commit. } pegar: { :e db rollback.  }, iniciar.
+
+Saída escrever: ['Can we insert? '] + ( parametros insert-id > 0 ), stop.
+
+>> x := 0.
+>> parametros :=
+db consulta: ['SELECT * FROM book order by id desc limit 2'], 
+buscar: { :row 
+	x adicionar: 1.
+	Sim parar. # must clean up, no 'Commands out of sync'
+}.
+
+>> parametros :=
+db consulta: ['SELECT * FROM book order by id desc limit 2'], 
+buscar: { :row
+	x adicionar: 1.
+	Sim parar.
+}.
+
+(x > 0) sim: {
+	Saída escrever: ['Can we break in the middle of a fetch? '].
+}.
+
+Saída escrever: Sim, stop.

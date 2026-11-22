@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server ప్రారంభించు.
+ప్రోగ్రామ్ వాడు: ['../../../src/xo/te/webtools.xo'].
+ప్రోగ్రామ్ వాడు: ['../../../src/xo/te/mailtools.xo'].
+
+>> శీర్షిక := HTTP-శీర్షిక కొత్త కీ: ['Location'] విలువ: ['/ok\r\nX-Injected: yes'].
+అవుట్-పుట్ రాయి: శీర్షిక.
+
+>> web := వెబ్-పత్రం కొత్త.
+web వెళ్ళు: ['/ok\r\nX-Injected: yes'].
+అవుట్-పుట్ రాయి: ['\n'], కొత్త-పంక్తి.
+
+>> mail := ఈమెయిల్ కొత్త.
+mail గ్రహీతకు: (వరుస కొత్త ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (వరుస కొత్త ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (వరుస కొత్త ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail పంపినవారు: ['d@example.invalid\r\nX-From: yes'] పేరు: ['site\r\nX-Name: yes'].
+mail విషయం: ['hello\r\nX-Subject: yes'].
+mail ప్రధాన-పాఠ్యం: ['line1\r\nline2'].
+అవుట్-పుట్ రాయి: mail ఉత్పత్తిచేయి.
+
+>> html := HTML-ఈమెయిల్ కొత్త.
+html గ్రహీతకు: (వరుస కొత్త ; ['a@example.invalid\r\nX-To: yes']).
+html పంపినవారు: ['d@example.invalid'] పేరు: ['site'].
+html విషయం: ['hello\r\nX-Subject: yes'].
+html ప్రధాన-పాఠ్యం: ['body'].
+అవుట్-పుట్ రాయి: ( html ఉత్పత్తిచేయి ఇమిడి-ఉంది: ['\nX-'] ), కొత్త-పంక్తి.
+అవుట్-పుట్ రాయి: ( html ఉత్పత్తిచేయి ఇమిడి-ఉంది: ['X-To: yes'] ), కొత్త-పంక్తి.

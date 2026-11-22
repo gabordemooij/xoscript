@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> camiño := ['/tmp/test0821.csv'].
+>> file := Ficheiro novo: camiño.
+
+file escribir: ['a,b\n"1,2\n'].
+{
+	file delimitador: [','] comiña: ['"'] liñas: { :line
+		Saída escribir: line, salto-de-liña.
+	}.
+} capturar: { :e Saída escribir: e, salto-de-liña. }, iniciar.
+
+# a closed quote still works
+file escribir: ['a,b\n"1,2",3'].
+file delimitador: [','] comiña: ['"'] liñas: { :line
+	Saída escribir: line, salto-de-liña.
+}.
+file eliminar.

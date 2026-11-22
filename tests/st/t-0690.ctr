@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Sephetho ngola: ['Database test'], mola-o-mocha.
+
+>> db := Maria-DB ncha moamoheli: ['localhost'],
+	lebitso-la-mosebelisi: ['xo'], phasewete: ['pass123'], lebitso-la-database: ['xobase'], hokela.
+
+Sephetho ngola: ['Can we connect? '] + db e-hoketsoe?, mola-o-mocha.
+
+>> liparamente-tsa-patlo := db potso: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], liparamente: ( Lethathamo ncha ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  liparamente-tsa-patlo phetha. db tiisa. } tšoasa: { :e db khutlisetsa-morao.  }, qala.
+
+Sephetho ngola: ['Can we insert? '] + ( liparamente-tsa-patlo insert-id > 0 ), mola-o-mocha.
+
+>> x := 0.
+>> liparamente-tsa-patlo :=
+db potso: ['SELECT * FROM book order by id desc limit 2'], 
+lata: { :row 
+	x eketsa: 1.
+	Nnete khaola. # must clean up, no 'Commands out of sync'
+}.
+
+>> liparamente-tsa-patlo :=
+db potso: ['SELECT * FROM book order by id desc limit 2'], 
+lata: { :row
+	x eketsa: 1.
+	Nnete khaola.
+}.
+
+(x > 0) nnete: {
+	Sephetho ngola: ['Can we break in the middle of a fetch? '].
+}.
+
+Sephetho ngola: Nnete, mola-o-mocha.

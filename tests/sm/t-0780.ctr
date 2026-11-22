@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lisi fou ;
+	# {"key":"normal"} normal ASCII
+	( Lomifefiloi fou tuʻu: ['normal'] i: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Lomifefiloi fou tuʻu: ['hello world'] i: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Lomifefiloi fou tuʻu: ['"'] i: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Lomifefiloi fou tuʻu: ['backslash: \\'] i: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Lomifefiloi fou tuʻu: ['slash: /'] i: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Lomifefiloi fou tuʻu: ['backspace: \b'] i: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Lomifefiloi fou tuʻu: ['formfeed: \f'] i: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Lomifefiloi fou tuʻu: ['newline: \n'] i: ['key'] ) ;
+	( Lomifefiloi fou tuʻu: ['newline: ↵'] i: ['key'] ) ;
+	( Lomifefiloi fou tuʻu: ['newline: 
+	'] i: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Lomifefiloi fou tuʻu: ['carriage return: \r'] i: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Lomifefiloi fou tuʻu: ['tab \t'] i: ['key'] ) ;
+	( Lomifefiloi fou tuʻu: ['tab ⇿'] i: ['key'] ) ;
+	( Lomifefiloi fou tuʻu: ['tab  '] i: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Lomifefiloi fou tuʻu: ['NUL \u0000'] i: ['key'] ) ;
+	( Lomifefiloi fou tuʻu: ['NUL \0'] i: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Lomifefiloi fou tuʻu: ['control: \u0001'] i: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Lomifefiloi fou tuʻu: ['control: \u001F'] i: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Lomifefiloi fou tuʻu: ['unicode: é'] i: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Lomifefiloi fou tuʻu: ['unicode: €'] i: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Lomifefiloi fou tuʻu: ['unicode: 日本語'] i: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Lomifefiloi fou tuʻu: ['unicode: 😀'] i: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Lomifefiloi fou tuʻu: ['unicode: 🧑‍💻'] i: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Lomifefiloi fou tuʻu: ['combining: e\u0301'] i: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Lomifefiloi fou tuʻu: ['escaped unicode: \u00e9'] i: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Lomifefiloi fou tuʻu: ['escaped unicode: \u20ac'] i: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Lomifefiloi fou tuʻu: ['escaped unicode: \ud83d\ude00'] i: ['key'] ) ;
+	# {"key":""} empty value
+	( Lomifefiloi fou tuʻu: [''] i: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Lomifefiloi fou tuʻu: ['@ < > & = % + ? #'] i: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Lomifefiloi fou tuʻu: ['''] i: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Lomifefiloi fou tuʻu: ['multiple: \" \\ \n \r \t'] i: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Lomifefiloi fou tuʻu: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] i: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Lomifefiloi fou tuʻu: [' value'] i: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Lomifefiloi fou tuʻu: ['value '] i: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Lomifefiloi fou tuʻu: [' \t\n\r '] i: ['key'] ).
+
+dicts taʻitasi: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Lomifefiloi fou tuʻu: d key i: ['key']).
+	>> b := JSON jsonify: (Lomifefiloi fou tuʻu: ['value'] i: d key).
+	>> e := JSON mea: a.
+	>> f := JSON mea: b.
+	((e key = d key ma: (f ? d key = ['value'])) poʻo: (e key = ['NUL ?'])) moni: {
+		Tuuina-atu tusi: ['OK'], laina-fou.
+	}, a-leai: {
+		Tuuina-atu tusi: ['Unable to properly encode/decode: '] + d + j, laina-fou.
+		Polokalama iuga.
+	}.
+}.

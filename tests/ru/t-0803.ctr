@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := MariaDB новый хост: ['localhost'],
+	пользователь: ['xo'],
+	пароль: ['pass123'],
+	имя-базы: ['xobase'],
+	подключить.
+
+>> conn2 := MariaDB новый хост: ['localhost'],
+	пользователь: ['xo'],
+	пароль: ['pass123'],
+	имя-базы: ['xobase'],
+	подключить.
+#...
+>> del := conn1 запрос: ['DELETE FROM book WHERE id > 0'].
+{  del мутация. conn1 commit. } впоймать: { :e conn1 rollback.  }, запуск.
+
+>> insert := conn1 запрос: ['INSERT INTO book (id) VALUES(null)'].
+insert мутация.
+
+>> счетчик := conn1 запрос: ['SELECT COUNT(*) AS num FROM book'].
+счетчик получить: { :row Выход написать: row num, стоп. }.
+
+# does not show up
+# insert not committed on connection 1
+>> счетчик := conn2 запрос: ['SELECT COUNT(*) AS num FROM book'].
+счетчик получить: { :row Выход написать: row num, стоп. }.

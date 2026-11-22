@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Listë ri ;
+	# {"key":"normal"} normal ASCII
+	( Fjalor ri vendos: ['normal'] në: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Fjalor ri vendos: ['hello world'] në: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Fjalor ri vendos: ['"'] në: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Fjalor ri vendos: ['backslash: \\'] në: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Fjalor ri vendos: ['slash: /'] në: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Fjalor ri vendos: ['backspace: \b'] në: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Fjalor ri vendos: ['formfeed: \f'] në: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Fjalor ri vendos: ['newline: \n'] në: ['key'] ) ;
+	( Fjalor ri vendos: ['newline: ↵'] në: ['key'] ) ;
+	( Fjalor ri vendos: ['newline: 
+	'] në: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Fjalor ri vendos: ['carriage return: \r'] në: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Fjalor ri vendos: ['tab \t'] në: ['key'] ) ;
+	( Fjalor ri vendos: ['tab ⇿'] në: ['key'] ) ;
+	( Fjalor ri vendos: ['tab  '] në: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Fjalor ri vendos: ['NUL \u0000'] në: ['key'] ) ;
+	( Fjalor ri vendos: ['NUL \0'] në: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Fjalor ri vendos: ['control: \u0001'] në: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Fjalor ri vendos: ['control: \u001F'] në: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Fjalor ri vendos: ['unicode: é'] në: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Fjalor ri vendos: ['unicode: €'] në: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Fjalor ri vendos: ['unicode: 日本語'] në: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Fjalor ri vendos: ['unicode: 😀'] në: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Fjalor ri vendos: ['unicode: 🧑‍💻'] në: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Fjalor ri vendos: ['combining: e\u0301'] në: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Fjalor ri vendos: ['escaped unicode: \u00e9'] në: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Fjalor ri vendos: ['escaped unicode: \u20ac'] në: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Fjalor ri vendos: ['escaped unicode: \ud83d\ude00'] në: ['key'] ) ;
+	# {"key":""} empty value
+	( Fjalor ri vendos: [''] në: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Fjalor ri vendos: ['@ < > & = % + ? #'] në: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Fjalor ri vendos: ['''] në: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Fjalor ri vendos: ['multiple: \" \\ \n \r \t'] në: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Fjalor ri vendos: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] në: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Fjalor ri vendos: [' value'] në: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Fjalor ri vendos: ['value '] në: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Fjalor ri vendos: [' \t\n\r '] në: ['key'] ).
+
+dicts secili: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Fjalor ri vendos: d key në: ['key']).
+	>> b := JSON jsonify: (Fjalor ri vendos: ['value'] në: d key).
+	>> e := JSON objekt: a.
+	>> f := JSON objekt: b.
+	((e key = d key dhe: (f ? d key = ['value'])) ose: (e key = ['NUL ?'])) vërtetë: {
+		Dalje shkruaj: ['OK'], rresht-ri.
+	}, përndryshe: {
+		Dalje shkruaj: ['Unable to properly encode/decode: '] + d + j, rresht-ri.
+		Program fund.
+	}.
+}.

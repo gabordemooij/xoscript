@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Барнома идораи-хотира: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB нав мизбон: ['localhost'],
+	номи-корбар: ['xo'], парол: ['pass123'], номи-пойгоҳ: ['xobase'], пайваст-шав.
+
+>> TwoDigitFormat := Формат нав: ['%02d'].
+
+# Datetime
+{
+	>> сол := Адад байни: 1995 то: 2050, матн.
+	>> моҳ := TwoDigitFormat татбиқ-ба-бутун: (Адад байни: 1 то: 12), матн.
+	>> рӯз := TwoDigitFormat татбиқ-ба-бутун: (Адад байни: 1 то: 28), матн.
+	>> соат := TwoDigitFormat татбиқ-ба-бутун: (Адад байни: 1 то: 23), матн.
+	>> дақиқа := TwoDigitFormat татбиқ-ба-бутун: (Адад байни: 1 то: 59), матн.
+	>> сония := TwoDigitFormat татбиқ-ба-бутун: (Адад байни: 1 то: 59), матн.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: сол,
+		MM: моҳ,
+		DD: рӯз,
+		HH: соат,
+		II: дақиқа,
+		SS: сония.
+	>> параметрҳои-ҷустуҷӯ :=
+	db дархост: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	гирифтан: { :row
+		(row mydatetime = datetime) агар-дурӯғ: {
+			ин-вазифа хато: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ҷамъ: 1.
+} * 100.
+
+# Date
+{
+	>> сол := Адад байни: 1995 то: 2050, матн.
+	>> моҳ := TwoDigitFormat татбиқ-ба-бутун: (Адад байни: 1 то: 12), матн.
+	>> рӯз := TwoDigitFormat татбиқ-ба-бутун: (Адад байни: 1 то: 28), матн.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: сол,
+		MM: моҳ,
+		DD: рӯз.
+	>> параметрҳои-ҷустуҷӯ :=
+	db дархост: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	гирифтан: { :row
+		(row mydate = date) агар-дурӯғ: {
+			ин-вазифа хато: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ҷамъ: 1.
+} * 100.
+
+
+# Time
+{
+	>> соат := TwoDigitFormat татбиқ-ба-бутун: (Адад байни: 1 то: 23), матн.
+	>> дақиқа := TwoDigitFormat татбиқ-ба-бутун: (Адад байни: 1 то: 59), матн.
+	>> сония := TwoDigitFormat татбиқ-ба-бутун: (Адад байни: 1 то: 59), матн.
+	>> вақт := ['HH:II:SS'].
+	вақт
+		HH: соат,
+		II: дақиқа,
+		SS: сония.
+	>> параметрҳои-ҷустуҷӯ :=
+	db дархост: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: вақт),
+	гирифтан: { :row
+		(row mytime = вақт) агар-дурӯғ: {
+			ин-вазифа хато: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ҷамъ: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Феҳрист нав пур: 100000 бо-қимат: ['x'], пайваст: [''].
+{
+	>> str2 := Сейф токен: 40.
+	>> параметрҳои-ҷустуҷӯ :=
+	db дархост: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	гирифтан: { :row
+		(row str1 = str1 ва: row str2 = str2) агар-дурӯғ: {
+			ин-вазифа хато: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ҷамъ: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Адад байни: 1 то: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 аз-матн: ['9223372036854775807'] ) -
+		( Int64 аз-матн: ['99999'] ) +
+		( Int64 аз-матн: n1 матн )
+	).
+	>> параметрҳои-ҷустуҷӯ :=
+	db дархост: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	гирифтан: { :row
+		(row n1 = n1) агар-дурӯғ: {
+			ин-вазифа хато: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) агар-дурӯғ: {
+			ин-вазифа хато: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 яклухт) агар-дурӯғ: {
+			ин-вазифа хато: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) агар-дурӯғ: {
+			ин-вазифа хато: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ҷамъ: 1.
+} * 100.
+
+
+Баромад навис: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), сатри-нав.

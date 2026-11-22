@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> camí := ['/tmp/test0821.csv'].
+>> file := Fitxer nou: camí.
+
+file escriu: ['a,b\n"1,2\n'].
+{
+	file delimitador: [','] cometa: ['"'] línies: { :line
+		Sortida escriu: line, salt-de-línia.
+	}.
+} captura: { :e Sortida escriu: e, salt-de-línia. }, inicia.
+
+# a closed quote still works
+file escriu: ['a,b\n"1,2",3'].
+file delimitador: [','] cometa: ['"'] línies: { :line
+	Sortida escriu: line, salt-de-línia.
+}.
+file suprimeix.

@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Program bellek-yönetimi: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Program ayar: ['FFITESTLIB'].
+
+
+
+Server bağla: (
+ Liste yeni ;
+ libname ;
+ ['puts'] ;
+ ( Liste yeni ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s serbest-bırak.
+
+# test with struct
+
+>> a := Blob yeni: 8.
+a bytes: (
+	Liste <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Liste <<: ['int'], ; ['int']).
+
+Server bağla: (
+	Liste <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Liste <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Çıktı yaz: ['Sum test:'] + (ffitest ffisum: a), yeni-satır.
+
+struct struct-serbest-bırak.
+struct serbest-bırak.
+a serbest-bırak.

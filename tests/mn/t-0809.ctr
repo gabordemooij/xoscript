@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> утгууд := Жагсаалт шинэ
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+утгууд бүр: { :i :value
+	>> d := Толь шинэ.
+	d хийх: value түлхүүр: ['k'].
+	>> r := d код объект.
+	Гаралт бичих: r тоо-ширхэг, шинэ-мөр.
+	Гаралт бичих: ( (r байрлалд: ['k']) = value ), шинэ-мөр.
+}.

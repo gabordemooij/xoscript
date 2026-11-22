@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Obyek anyar.
+
+Log nalika: ['say:'] tindakna: { :str
+	Wetonan tulis: str, baris-anyar.
+}.
+
+>> Item := Obyek anyar.
+
+Item nalika: ['anyar:'] tindakna: { :id <- dhiri anyar id: id.
+}.
+
+Item nalika: ['id:'] tindakna: { :id
+	duweke id := id.
+}.
+
+Item nalika: ['id'] tindakna: { <- duweke id. }.
+
+
+Item nalika: ['tèks'] tindakna: {
+	>> str := ['Item#~no'].
+	str ~no: duweke id. <- str.
+}.
+
+
+>> Print := Obyek anyar.
+
+Print nalika: ['items'] tindakna: { 
+	
+	duweke item := Item anyar: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: duweke item
+	).
+	
+	
+}.
+
+Print items.

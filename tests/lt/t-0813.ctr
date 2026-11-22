@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inicijuoti.
+Programa naudoti: ['../../../src/xo/lt/webtools.xo'].
+Programa naudoti: ['../../../src/xo/lt/mailtools.xo'].
+
+>> antraštė := HTTP-Antraštė naujas raktas: ['Location'] reikšmė: ['/ok\r\nX-Injected: yes'].
+Išvestis rašyti: antraštė.
+
+>> web := Žiniatinklio-dokumentas naujas.
+web eiti-į: ['/ok\r\nX-Injected: yes'].
+Išvestis rašyti: ['\n'], nauja-eilutė.
+
+>> mail := El-laiškas naujas.
+mail kam: (Sąrašas naujas ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Sąrašas naujas ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Sąrašas naujas ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail siuntėjas: ['d@example.invalid\r\nX-From: yes'] pavadinimas: ['site\r\nX-Name: yes'].
+mail tema: ['hello\r\nX-Subject: yes'].
+mail laiško-tekstas: ['line1\r\nline2'].
+Išvestis rašyti: mail generuoti.
+
+>> html := HTML-El-laiškas naujas.
+html kam: (Sąrašas naujas ; ['a@example.invalid\r\nX-To: yes']).
+html siuntėjas: ['d@example.invalid'] pavadinimas: ['site'].
+html tema: ['hello\r\nX-Subject: yes'].
+html laiško-tekstas: ['body'].
+Išvestis rašyti: ( html generuoti apima: ['\nX-'] ), nauja-eilutė.
+Išvestis rašyti: ( html generuoti apima: ['X-To: yes'] ), nauja-eilutė.

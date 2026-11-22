@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server ਸ਼ੁਰੂਆਤ-ਕਰੋ.
+ਪ੍ਰੋਗਰਾਮ ਵਰਤੋ: ['../../../src/xo/pa/webtools.xo'].
+
+>> Fake-Request := ਵਸਤੂ ਨਵਾਂ.
+Fake-Request ਜਦੋਂ: ['value:'] ਕਰੋ: { :ਮੁੱਲ
+	ਆਪਣਾ ਮੁੱਲ := ਮੁੱਲ.
+}.
+Fake-Request ਜਦੋਂ: ['cookie:'] ਕਰੋ: { :ਨਾਮ <- ਆਪਣਾ ਮੁੱਲ.
+}.
+
+>> Test-Session := ਅਸਥਾਈ-ਫਾਈਲ-ਸੈਸ਼ਨ ਨਵਾਂ.
+Test-Session ਜਦੋਂ: ['ਲੋਡ-ਕਰੋ'] ਕਰੋ: { <- ਸ਼ਬਦਕੋਸ਼ ਨਵਾਂ.
+}.
+Test-Session ਜਦੋਂ: ['session-id'] ਕਰੋ: { <- ਆਪਣਾ id.
+}.
+
+>> cookies := ਲਿਸਟ ਨਵਾਂ
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies ਹਰੇਕ: { :i :cookie
+	>> ਬੇਨਤੀ-http := Fake-Request ਨਵਾਂ.
+	ਬੇਨਤੀ-http value: cookie.
+	>> ਪ੍ਰਬੰਧਕ := Test-Session ਨਵਾਂ.
+	>> web := ਵੈੱਬ-ਦਸਤਾਵੇਜ਼ ਨਵਾਂ.
+	web ਬੇਨਤੀ-http: ਬੇਨਤੀ-http.
+	web ਸੈਸ਼ਨ-ਪ੍ਰਬੰਧਕ: ਪ੍ਰਬੰਧਕ.
+	web ਸੈਸ਼ਨ-ਸ਼ੁਰੂ-ਕਰੋ.
+	ਆਉਟਪੁੱਟ ਲਿਖੋ: ( ਪ੍ਰਬੰਧਕ session-id = cookie ), ਨਵੀਂ-ਲਾਈਨ.
+}.
+
+>> web := ਵੈੱਬ-ਦਸਤਾਵੇਜ਼ ਨਵਾਂ.
+web json: (ਸ਼ਬਦਕੋਸ਼ ਨਵਾਂ ਰੱਖੋ: ['b'] ਕੁੰਜੀ: ['a']).
+ਆਉਟਪੁੱਟ ਲਿਖੋ: ['\n'], ਨਵੀਂ-ਲਾਈਨ.
+
+{ ਨੈੱਟਵਰਕ get: ['file:///etc/hostname']. } ਫੜੋ: { :e
+	ਆਉਟਪੁੱਟ ਲਿਖੋ: e, ਨਵੀਂ-ਲਾਈਨ.
+}, ਚਲਾਓ.
+
+>> svg := ਫਾਈਲ ਨਵਾਂ: ['/tmp/test0814.svg'].
+svg ਲਿਖੋ: ['<svg xmlns="x"></svg>'].
+ਆਉਟਪੁੱਟ ਨਵੀਂ-ਲਾਈਨ.
+Server ਅੱਗੇ-ਭੇਜੋ: ['test0814.svg'] ਅਗੇਤਰ: ['/tmp/'].
+svg ਮਿਟਾਓ.

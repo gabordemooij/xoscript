@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+आउटपुट लिहा: ['Database test'], नवी-ओळ.
+
+>> db := Maria-DB नवीन होस्ट: ['localhost'],
+	वापरकर्ता-नाव: ['xo'], पासवर्ड: ['pass123'], डेटाबेस-नाव: ['xobase'], जोडणी.
+
+आउटपुट लिहा: ['Can we connect? '] + db जोडलेले?, नवी-ओळ.
+
+>> शोध-पॅरामीटर := db क्वेरी: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], पॅरामीटर: ( सूची नवीन ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  शोध-पॅरामीटर कार्यान्वित. db पुष्टी. } पकडा: { :e db मागे-घ्या.  }, चालवा.
+
+आउटपुट लिहा: ['Can we insert? '] + ( शोध-पॅरामीटर insert-id > 0 ), नवी-ओळ.
+
+>> x := 0.
+>> शोध-पॅरामीटर :=
+db क्वेरी: ['SELECT * FROM book order by id desc limit 2'], 
+आणा: { :row 
+	x बेरीज: 1.
+	खरे थांबवा. # must clean up, no 'Commands out of sync'
+}.
+
+>> शोध-पॅरामीटर :=
+db क्वेरी: ['SELECT * FROM book order by id desc limit 2'], 
+आणा: { :row
+	x बेरीज: 1.
+	खरे थांबवा.
+}.
+
+(x > 0) खरे-असल्यास: {
+	आउटपुट लिहा: ['Can we break in the middle of a fetch? '].
+}.
+
+आउटपुट लिहा: खरे, नवी-ओळ.

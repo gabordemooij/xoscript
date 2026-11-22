@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> vrednosti := Seznam nov
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+vrednosti vsak: { :i :value
+	>> d := Slovar nov.
+	d postavi: value na: ['k'].
+	>> r := d koda objekt.
+	Izhod piši: r število-elementov, nova-vrstica.
+	Izhod piši: ( (r na: ['k']) = value ), nova-vrstica.
+}.

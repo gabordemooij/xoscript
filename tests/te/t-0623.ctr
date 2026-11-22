@@ -1,0 +1,43 @@
+
+
+>> g := Server కొత్త.
+>> v := ఖజానా కొత్త.
+>> ok := 0.
+
+>> secrets := వరుస కొత్త ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets నకలు.
+passwords ప్రతి: { :i :p
+	secrets ప్రతి: { :n :s
+		{
+			>> encrypted := v ఎన్-క్రిప్ట్: s కీ: p.
+			>> decrypted := v డీక్రిప్ట్: encrypted కీ: p.
+			(decrypted = s) నిజమైతే: {
+				ok కూడు: 1.
+			}, లేకపోతే: {
+				అవుట్-పుట్ రాయి: ['failed encrypting/decrypting: '], కొత్త-పంక్తి.
+				అవుట్-పుట్ రాయి: s, కొత్త-పంక్తి.
+				అవుట్-పుట్ రాయి: ['encrypted: '] + encrypted, కొత్త-పంక్తి.
+				అవుట్-పుట్ రాయి: ['decrypted: '] + encrypted, కొత్త-పంక్తి.
+				ప్రోగ్రామ్ ముగించు.
+			}.
+		} పట్టుకో: { :err
+			(s = [''] లేదా: p = ['']) నిజమైతే: {
+				ok కూడు: 1.
+			}, లేకపోతే: {
+				అవుట్-పుట్ రాయి: err, కొత్త-పంక్తి.
+				ప్రోగ్రామ్ ముగించు.
+			}.
+		}, నడుపు.
+	}.
+}.
+
+అవుట్-పుట్ రాయి: ( ok + [' vault encryptions tested.'] ), కొత్త-పంక్తి.

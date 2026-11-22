@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := プログラム 設定値: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server リンク: ( リスト 新規 ;
+ libname ; ['fopen'] ;
+ ( リスト 新規 ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+リンク: ( リスト 新規 ;
+ 無 ; # means same lib
+ ['fread'] ;
+ ( リスト 新規 ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ 無 ; # means same object (i.e. Stream)
+ ['fread']
+),
+リンク: (
+ リスト 新規 ;
+ 無 ; # means same lib
+ ['fwrite'] ;
+ ( リスト 新規 ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ 無 ; # means same lib
+ ['fwrite']
+),
+リンク: (
+ リスト 新規 ;
+ 無 ; # means same lib
+ ['rewind'] ;
+ ( リスト 新規 ; ['pointer'] ) ;
+ ['int'] ;
+ 無 ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> 経路 := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: 経路 mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream メッセージ: ['fwrite'] 引数: (リスト 新規 ; str ; 1 ; 6 ; fd ).
+出力 書く: bytes-written, 改行.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob 新規: 20.
+
+# read from file
+>> bytes-read := Stream メッセージ: ['fread'] 引数: (リスト 新規 ; buf ; 1 ; 6 ; fd ).
+出力 書く: bytes-read, 改行.
+出力 書く: buf, 改行.
+
+# free memory
+str  解放.
+経路 解放.
+mode 解放.
+buf  解放.
+
+

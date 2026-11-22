@@ -1,0 +1,42 @@
+
+Kaula i: ['html'] hana: { <- (
+		iho
+		pani: ['&'] me: ['&amp;'],
+		pani: ['<'] me: ['&lt;'],
+		pani: ['>'] me: ['&gt;'],
+		pani: ['"'] me: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Mea hou.
+
+HtmlBrush i: ['pane:'] hana: { :tag
+	Huapuka kākau: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush i: ['pane:a:'] hana: { :tag :content
+	tag := ( tag mai: 0 lōʻihi: (tag lōʻihi - 1) ).
+	Huapuka kākau: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush i: ['content:'] hana: { :text
+	Huapuka kākau: text html, laina-hou.
+}.
+
+HtmlBrush i: ['attr:value:'] hana: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush hou.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

@@ -1,0 +1,53 @@
+Program zarządzanie-pamięcią: 0.
+Lista na: ['sum'] wykonaj: {
+	>> total := 0.
+	sam każdy: { :index :element
+		total dodaj: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Plik nowy: ['/tmp/test.txt'].
+f pisz: ['Lorem Ipsum'].
+f zamknij.
+  
+
+f := Plik nowy: ['/tmp/test.txt'].
+>> text := f czytaj.
+f zamknij.
+
+
+
+Program posprzątaj.
+usedMemory1 := (Program pamięć ? 1).
+
+
+
+f := Plik nowy: ['/tmp/test.txt'].
+text := f czytaj.
+f zamknij.
+
+Program posprzątaj.
+usedMemory2 := (Program pamięć ? 1).
+
+
+f := Plik nowy: ['/tmp/test.txt'].
+text := f czytaj.
+f zamknij.
+
+Program posprzątaj.
+usedMemory3 := (Program pamięć ? 1).
+
+
+
+( usedMemory1 = usedMemory2 i: usedMemory1 = usedMemory3, i: usedMemory2 = usedMemory3 ) prawda: {
+	Wyjście pisz: ['No memory leaks here'].
+}, fałsz: {
+	Wyjście pisz: ['Leaking memory...'].
+}.

@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Mpụta dee: ['Database test'], ahịrị-ọhụrụ.
+
+>> db := Maria-DB ohuru onye-nnabata: ['localhost'],
+	aha-onye-ọrụ: ['xo'], okwuntughe: ['pass123'], aha-nchekwa-data: ['xobase'], jikọta.
+
+Mpụta dee: ['Can we connect? '] + db ejikọtala?, ahịrị-ọhụrụ.
+
+>> ihe-ọchụchọ := db ajụjụ: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], ntinye-ajụjụ: ( Ndepụta ohuru ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  ihe-ọchụchọ mezuo. db kwado. } jide: { :e db laghachi-azụ.  }, bido.
+
+Mpụta dee: ['Can we insert? '] + ( ihe-ọchụchọ insert-id > 0 ), ahịrị-ọhụrụ.
+
+>> Obj := Ihe ohuru.
+Obj mgbe-ọbịara: ['retrieve-rows'] mee: {
+	nke-ya ọnụ-ọgụgụ := 0.
+	>> ihe-ọchụchọ :=
+	db ajụjụ: ['SELECT * FROM book order by id desc limit 2'], 
+	weta: { :row 
+		nke-ya ọnụ-ọgụgụ gbakwunye: 1.
+		Eziokwu kwụsịtụ.
+	}. <- nke-ya ọnụ-ọgụgụ detuo.
+}.
+
+Mpụta dee: ['Can we query? '] + ( Obj retrieve-rows > 0 ), ahịrị-ọhụrụ.

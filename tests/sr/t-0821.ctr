@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> путања := ['/tmp/test0821.csv'].
+>> file := Датотека нови: путања.
+
+file пиши: ['a,b\n"1,2\n'].
+{
+	file раздвајач: [','] наводник: ['"'] редови: { :line
+		Излаз пиши: line, нови-ред.
+	}.
+} ухвати: { :e Излаз пиши: e, нови-ред. }, покрени.
+
+# a closed quote still works
+file пиши: ['a,b\n"1,2",3'].
+file раздвајач: [','] наводник: ['"'] редови: { :line
+	Излаз пиши: line, нови-ред.
+}.
+file избриши.

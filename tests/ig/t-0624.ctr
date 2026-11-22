@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Ihe ohuru.
+
+Log mgbe-ọbịara: ['say:'] mee: { :str
+	Mpụta dee: str, ahịrị-ọhụrụ.
+}.
+
+>> Item := Ihe ohuru.
+
+Item mgbe-ọbịara: ['ohuru:'] mee: { :id <- onwe ohuru id: id.
+}.
+
+Item mgbe-ọbịara: ['id:'] mee: { :id
+	nke-ya id := id.
+}.
+
+Item mgbe-ọbịara: ['id'] mee: { <- nke-ya id. }.
+
+
+Item mgbe-ọbịara: ['ederede'] mee: {
+	>> str := ['Item#~no'].
+	str ~no: nke-ya id. <- str.
+}.
+
+
+>> Print := Ihe ohuru.
+
+Print mgbe-ọbịara: ['items'] mee: { 
+	
+	nke-ya item := Item ohuru: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: nke-ya item
+	).
+	
+	
+}.
+
+Print items.

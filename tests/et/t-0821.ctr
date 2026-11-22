@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> rada := ['/tmp/test0821.csv'].
+>> file := Fail uus: rada.
+
+file kirjuta: ['a,b\n"1,2\n'].
+{
+	file eraldaja: [','] jutumärk: ['"'] read: { :line
+		Väljund kirjuta: line, reavahetus.
+	}.
+} püüa: { :e Väljund kirjuta: e, reavahetus. }, käivita.
+
+# a closed quote still works
+file kirjuta: ['a,b\n"1,2",3'].
+file eraldaja: [','] jutumärk: ['"'] read: { :line
+	Väljund kirjuta: line, reavahetus.
+}.
+file kustuta.

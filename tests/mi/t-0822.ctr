@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB hou manaaki: ['localhost'],
+	ingoa-kaiwhakamahi: ['xo'],
+	kupuhipa: ['pass123'],
+	ingoa-pātengi-raraunga: ['xobase'],
+	tūhono.
+
+>> tawhā-rapu := db uiui: ['SELECT ? AS a, ? AS b, ? AS c'].
+tawhā-rapu tawhā: (Rārangi hou ; ['1']).
+{ tawhā-rapu tikina: { :row Huaputa tuhi: row, rārangi-hou. }. } hopu: { :e Huaputa tuhi: e, rārangi-hou. }, tīmata.
+
+>> tawhā-rapu := db uiui: ['SELECT ? AS a'].
+{ tawhā-rapu tikina: { :row Huaputa tuhi: row, rārangi-hou. }. } hopu: { :e Huaputa tuhi: e, rārangi-hou. }, tīmata.
+
+# the right number still works, more parameters are ignored as before
+>> tawhā-rapu := db uiui: ['SELECT ? AS a, ? AS b'].
+tawhā-rapu tawhā: (Rārangi hou ; ['1'] ; ['2']).
+tawhā-rapu tikina: { :row Huaputa tuhi: (row kei: ['a']), tuhi: (row kei: ['b']), rārangi-hou. }.
+tawhā-rapu tawhā: (Rārangi hou ; ['1'] ; ['2'] ; ['3']).
+tawhā-rapu tikina: { :row Huaputa tuhi: (row kei: ['a']), tuhi: (row kei: ['b']), rārangi-hou. }.

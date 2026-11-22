@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := Datoteka nov: ['/tmp/test.gif'].
+f piši: ['GIF87a01234567810'].
+
+# serve the file
+Server posreduj: ['test.gif'] predpona: ['/tmp/'].
+
+Izhod nova-vrstica.
+
+Izhod piši: ['Outside container (security):'], nova-vrstica.
+{ Server posreduj: ['../passwd'] predpona: ['/tmp/']. }
+ujemi: { :e Izhod piši: e, nova-vrstica. },
+zaženi.
+
+Izhod piši: ['Invalid prefix:'], nova-vrstica.
+{ Server posreduj: ['test.gif'] predpona: ['z:\\']. }
+ujemi: { :e Izhod piši: e, nova-vrstica. },
+zaženi.
+
+Izhod piši: ['Non-existant file:'], nova-vrstica.
+{ Server posreduj: ['xxx.xxx'] predpona: ['/tmp/']. }
+ujemi: { :e Izhod piši: e, nova-vrstica. },
+zaženi.

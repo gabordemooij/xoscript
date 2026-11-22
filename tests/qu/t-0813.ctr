@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server wakichiy.
+Programa llamkʼachiy: ['../../../src/xo/qu/webtools.xo'].
+Programa llamkʼachiy: ['../../../src/xo/qu/mailtools.xo'].
+
+>> uma := HTTP-Uma musuq llave: ['Location'] chani: ['/ok\r\nX-Injected: yes'].
+Lluqsiy qillqay: uma.
+
+>> web := Llika-qillqa musuq.
+web riy: ['/ok\r\nX-Injected: yes'].
+Lluqsiy qillqay: ['\n'], sayay.
+
+>> mail := Antañiqiq-chaski musuq.
+mail man: (Katiray musuq ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Katiray musuq ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Katiray musuq ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail kachaq: ['d@example.invalid\r\nX-From: yes'] suti: ['site\r\nX-Name: yes'].
+mail ima-nisqa: ['hello\r\nX-Subject: yes'].
+mail ukhu: ['line1\r\nline2'].
+Lluqsiy qillqay: mail paqarichiy.
+
+>> html := Antañiqiq-chaski-HTML musuq.
+html man: (Katiray musuq ; ['a@example.invalid\r\nX-To: yes']).
+html kachaq: ['d@example.invalid'] suti: ['site'].
+html ima-nisqa: ['hello\r\nX-Subject: yes'].
+html ukhu: ['body'].
+Lluqsiy qillqay: ( html paqarichiy kapun: ['\nX-'] ), sayay.
+Lluqsiy qillqay: ( html paqarichiy kapun: ['X-To: yes'] ), sayay.

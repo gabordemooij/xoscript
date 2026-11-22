@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB nuut gasheer: ['localhost'],
+	gebruikersnaam: ['xo'],
+	wagwoord: ['pass123'],
+	databasisnaam: ['xobase'],
+	verbind.
+
+>> conn2 := Maria-DB nuut gasheer: ['localhost'],
+	gebruikersnaam: ['xo'],
+	wagwoord: ['pass123'],
+	databasisnaam: ['xobase'],
+	verbind.
+#...
+>> del := conn1 navraag: ['DELETE FROM book WHERE id > 0'].
+{  del voer-uit. conn1 bevestig. } vang: { :e conn1 rol-terug.  }, begin.
+
+>> insert := conn1 navraag: ['INSERT INTO book (id) VALUES(null)'].
+insert voer-uit.
+
+>> tel := conn1 navraag: ['SELECT COUNT(*) AS num FROM book'].
+tel haal: { :row Uitvoer skryf: row num, nuwe-reël. }.
+
+# does not show up
+# insert not committed on connection 1
+>> tel := conn2 navraag: ['SELECT COUNT(*) AS num FROM book'].
+tel haal: { :row Uitvoer skryf: row num, nuwe-reël. }.

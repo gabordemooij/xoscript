@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Brankas jieun-konci.
+>> sk := keys kahiji.
+>> pk := keys pamungkas.
+>> sig := Brankas tanda-tangan: ['abc'] maké: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Brankas tanda-tangan: ['abc'] maké: long. } tangkep: { :e
+	Kaluaran tulis: e, baris-anyar.
+}, jalankeun.
+
+{ Brankas pariksa: ['abc'] tanda-tangan: long maké: pk. } tangkep: { :e
+	Kaluaran tulis: e, baris-anyar.
+}, jalankeun.
+
+{ Brankas pariksa: ['abc'] tanda-tangan: sig maké: short. } tangkep: { :e
+	Kaluaran tulis: e, baris-anyar.
+}, jalankeun.

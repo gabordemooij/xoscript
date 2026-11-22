@@ -1,0 +1,39 @@
+
+
+Besedilo ob: ['evaluate'] izvedi: {
+	>> koda := Datoteka nov: ['/tmp/eval.ctr'].
+	koda piši: sebe besedilo + ['.'].
+	Program uporabljaj: ['/tmp/eval.ctr'].
+}.
+
+>> a := (Seznam ← (
+	(Slovar nov)
+		postavi: ['domain'] na: ['mywebsite.com'],
+		postavi: (Seznam ←
+			((Slovar nov)
+				postavi: ['home'] na: ['title'],
+				postavi: ['<html></html>'] na: ['body'],
+				postavi: ['2017-01-01'] na: ['created']
+			) ;
+			((Slovar nov)
+				postavi: ['aboutus(c)'] na: ['title'],
+				postavi: ['<credits>Author Inc.</credits>'] na: ['body']
+			)
+		) na: ['pages']
+	)
+) besedilo.
+
+Izhod piši: a tip, nova-vrstica.
+Izhod piši: a, nova-vrstica.
+
+>> b := Nič.
+(['b := '] + a) evaluate.
+Izhod piši: b ? 0 ? ['pages'] ? 1 ? ['body'], nova-vrstica.
+
+>> c := b ? 0.
+>> d := c besedilo.
+Izhod piši: d tip, nova-vrstica.
+
+>> e := Nič.
+(['e := '] + d) evaluate.
+Izhod piši: e ? ['pages'] ? 0, nova-vrstica.

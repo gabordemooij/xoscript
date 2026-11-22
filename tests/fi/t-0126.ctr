@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Olio uusi.
+
+Slurp kun: ['uusi'] tee: {
+	oma str := [''].
+}.
+
+Slurp kun: ['nieuw'] tee: {
+	oma str := [''].
+}.
+
+Slurp kun: ['vastaa:'] tee: { :blah
+		oma str lisää-loppuun: blah.
+}.
+
+Slurp kun: ['vastaa:ja:'] tee: { :blah :blahah
+		oma str lisää-loppuun: (blah alkaen: 0 pituus: (blah pituus - 1)).
+		oma str lisää-loppuun: [' '].
+		oma str lisää-loppuun: blahah.
+}.
+
+Slurp kun: ['obtain'] tee: {
+	>> buffer := oma str.
+	oma str := ['']. <- buffer.
+}.
+
+
+Tuloste kirjoita: (Ohjelma järjestelmä: (Slurp uusi echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Tiedosto uusi: ['/tmp/from.txt'], poista. } sieppaa: { ['Empty']. }, käynnistä.
+{ Tiedosto uusi: ['/tmp/to.txt'], poista. } sieppaa: { ['Empty']. }, käynnistä.
+
+
+Tiedosto uusi: ['/tmp/to.txt'], on-olemassa epätosi: {
+	Tuloste kirjoita: ['Confirmed. Target file does not exist.\
+'].
+}.
+Tiedosto uusi: ['/tmp/from.txt'], on-olemassa epätosi: {
+	Tuloste kirjoita: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Ohjelma järjestelmä: (Slurp uusi touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Ohjelma järjestelmä: (Slurp uusi cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Tiedosto uusi: ['/tmp/to.txt'], on-olemassa tosi: {
+	Tuloste kirjoita: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Tuloste kirjoita: ['Contents of file is:'] + (Tiedosto uusi: ['/tmp/to.txt'], lue), rivinvaihto.

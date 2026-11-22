@@ -1,0 +1,25 @@
+Server init.
+
+# write a test file
+>> f := Fails jauns: ['/tmp/test.gif'].
+f rakstīt: ['GIF87a01234567810'].
+
+# serve the file
+Server pārsūtīt: ['test.gif'] prefikss: ['/tmp/'].
+
+Izvade jauna-rinda.
+
+Izvade rakstīt: ['Outside container (security):'], jauna-rinda.
+{ Server pārsūtīt: ['../passwd'] prefikss: ['/tmp/']. }
+tvert: { :e Izvade rakstīt: e, jauna-rinda. },
+palaist.
+
+Izvade rakstīt: ['Invalid prefix:'], jauna-rinda.
+{ Server pārsūtīt: ['test.gif'] prefikss: ['z:\\']. }
+tvert: { :e Izvade rakstīt: e, jauna-rinda. },
+palaist.
+
+Izvade rakstīt: ['Non-existant file:'], jauna-rinda.
+{ Server pārsūtīt: ['xxx.xxx'] prefikss: ['/tmp/']. }
+tvert: { :e Izvade rakstīt: e, jauna-rinda. },
+palaist.

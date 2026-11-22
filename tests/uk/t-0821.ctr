@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> шлях := ['/tmp/test0821.csv'].
+>> file := Файл новий: шлях.
+
+file написати: ['a,b\n"1,2\n'].
+{
+	file роздільник: [','] лапки: ['"'] рядки: { :line
+		Вивід написати: line, новий-рядок.
+	}.
+} перехопити: { :e Вивід написати: e, новий-рядок. }, запустити.
+
+# a closed quote still works
+file написати: ['a,b\n"1,2",3'].
+file роздільник: [','] лапки: ['"'] рядки: { :line
+	Вивід написати: line, новий-рядок.
+}.
+file видалити.

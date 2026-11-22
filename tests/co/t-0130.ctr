@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Prugramma parametru: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server ligà: ( Lista novu ;
+ libname ; ['fopen'] ;
+ ( Lista novu ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+ligà: ( Lista novu ;
+ Nunda ; # means same lib
+ ['fread'] ;
+ ( Lista novu ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Nunda ; # means same object (i.e. Stream)
+ ['fread']
+),
+ligà: (
+ Lista novu ;
+ Nunda ; # means same lib
+ ['fwrite'] ;
+ ( Lista novu ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Nunda ; # means same lib
+ ['fwrite']
+),
+ligà: (
+ Lista novu ;
+ Nunda ; # means same lib
+ ['rewind'] ;
+ ( Lista novu ; ['pointer'] ) ;
+ ['int'] ;
+ Nunda ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> caminu-di-schedariu := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: caminu-di-schedariu mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream messaghju: ['fwrite'] argumenti: (Lista novu ; str ; 1 ; 6 ; fd ).
+Esciuta scrive: bytes-written, linea-nova.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob novu: 20.
+
+# read from file
+>> bytes-read := Stream messaghju: ['fread'] argumenti: (Lista novu ; buf ; 1 ; 6 ; fd ).
+Esciuta scrive: bytes-read, linea-nova.
+Esciuta scrive: buf, linea-nova.
+
+# free memory
+str  liberà.
+caminu-di-schedariu liberà.
+mode liberà.
+buf  liberà.
+
+

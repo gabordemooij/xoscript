@@ -1,0 +1,53 @@
+Rhaglen rheoli-cof: 0.
+Rhestr ar: ['sum'] gwneud: {
+	>> total := 0.
+	hun pob: { :index :element
+		total ychwanegu: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Ffeil newydd: ['/tmp/test.txt'].
+f ysgrifennu: ['Lorem Ipsum'].
+f cau.
+  
+
+f := Ffeil newydd: ['/tmp/test.txt'].
+>> text := f darllen.
+f cau.
+
+
+
+Rhaglen tacluso.
+usedMemory1 := (Rhaglen cof ? 1).
+
+
+
+f := Ffeil newydd: ['/tmp/test.txt'].
+text := f darllen.
+f cau.
+
+Rhaglen tacluso.
+usedMemory2 := (Rhaglen cof ? 1).
+
+
+f := Ffeil newydd: ['/tmp/test.txt'].
+text := f darllen.
+f cau.
+
+Rhaglen tacluso.
+usedMemory3 := (Rhaglen cof ? 1).
+
+
+
+( usedMemory1 = usedMemory2 a: usedMemory1 = usedMemory3, a: usedMemory2 = usedMemory3 ) gwir: {
+	Allbwn ysgrifennu: ['No memory leaks here'].
+}, gau: {
+	Allbwn ysgrifennu: ['Leaking memory...'].
+}.

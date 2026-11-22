@@ -1,0 +1,53 @@
+Program memóriakezelés: 0.
+Lista ha: ['sum'] tedd: {
+	>> total := 0.
+	maga mindegyik: { :index :element
+		total hozzáad: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Fájl új: ['/tmp/test.txt'].
+f ír: ['Lorem Ipsum'].
+f bezár.
+  
+
+f := Fájl új: ['/tmp/test.txt'].
+>> text := f olvas.
+f bezár.
+
+
+
+Program takarít.
+usedMemory1 := (Program memória ? 1).
+
+
+
+f := Fájl új: ['/tmp/test.txt'].
+text := f olvas.
+f bezár.
+
+Program takarít.
+usedMemory2 := (Program memória ? 1).
+
+
+f := Fájl új: ['/tmp/test.txt'].
+text := f olvas.
+f bezár.
+
+Program takarít.
+usedMemory3 := (Program memória ? 1).
+
+
+
+( usedMemory1 = usedMemory2 és: usedMemory1 = usedMemory3, és: usedMemory2 = usedMemory3 ) igaz: {
+	Kimenet ír: ['No memory leaks here'].
+}, hamis: {
+	Kimenet ír: ['Leaking memory...'].
+}.

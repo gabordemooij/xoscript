@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Fandaharana fitantanana-fahatsiarovana: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB vaovao mpampiantrano: ['localhost'],
+	anaran-mpampiasa: ['xo'], tenimiafina: ['pass123'], anaran-tahirin-kevitra: ['xobase'], mifandraisa.
+
+>> TwoDigitFormat := Endrika vaovao: ['%02d'].
+
+# Datetime
+{
+	>> taona := Isa eo: 1995 ary: 2050, soratra.
+	>> volana := TwoDigitFormat ampiharo-isa-feno: (Isa eo: 1 ary: 12), soratra.
+	>> andro := TwoDigitFormat ampiharo-isa-feno: (Isa eo: 1 ary: 28), soratra.
+	>> ora := TwoDigitFormat ampiharo-isa-feno: (Isa eo: 1 ary: 23), soratra.
+	>> minitra := TwoDigitFormat ampiharo-isa-feno: (Isa eo: 1 ary: 59), soratra.
+	>> segondra := TwoDigitFormat ampiharo-isa-feno: (Isa eo: 1 ary: 59), soratra.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: taona,
+		MM: volana,
+		DD: andro,
+		HH: ora,
+		II: minitra,
+		SS: segondra.
+	>> masontsivana-fikarohana :=
+	db fanontaniana: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	alaivo: { :row
+		(row mydatetime = datetime) diso: {
+			ity-asa-ity fahadisoana: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter ampio: 1.
+} * 100.
+
+# Date
+{
+	>> taona := Isa eo: 1995 ary: 2050, soratra.
+	>> volana := TwoDigitFormat ampiharo-isa-feno: (Isa eo: 1 ary: 12), soratra.
+	>> andro := TwoDigitFormat ampiharo-isa-feno: (Isa eo: 1 ary: 28), soratra.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: taona,
+		MM: volana,
+		DD: andro.
+	>> masontsivana-fikarohana :=
+	db fanontaniana: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	alaivo: { :row
+		(row mydate = date) diso: {
+			ity-asa-ity fahadisoana: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter ampio: 1.
+} * 100.
+
+
+# Time
+{
+	>> ora := TwoDigitFormat ampiharo-isa-feno: (Isa eo: 1 ary: 23), soratra.
+	>> minitra := TwoDigitFormat ampiharo-isa-feno: (Isa eo: 1 ary: 59), soratra.
+	>> segondra := TwoDigitFormat ampiharo-isa-feno: (Isa eo: 1 ary: 59), soratra.
+	>> fotoana := ['HH:II:SS'].
+	fotoana
+		HH: ora,
+		II: minitra,
+		SS: segondra.
+	>> masontsivana-fikarohana :=
+	db fanontaniana: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: fotoana),
+	alaivo: { :row
+		(row mytime = fotoana) diso: {
+			ity-asa-ity fahadisoana: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ampio: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Lisitra vaovao fenoy: 100000 amin: ['x'], atambaro: [''].
+{
+	>> str2 := Vata-fiarovana token: 40.
+	>> masontsivana-fikarohana :=
+	db fanontaniana: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	alaivo: { :row
+		(row str1 = str1 ary: row str2 = str2) diso: {
+			ity-asa-ity fahadisoana: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter ampio: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Isa eo: 1 ary: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 avy-amin-ny-soratra: ['9223372036854775807'] ) -
+		( Int64 avy-amin-ny-soratra: ['99999'] ) +
+		( Int64 avy-amin-ny-soratra: n1 soratra )
+	).
+	>> masontsivana-fikarohana :=
+	db fanontaniana: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	alaivo: { :row
+		(row n1 = n1) diso: {
+			ity-asa-ity fahadisoana: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) diso: {
+			ity-asa-ity fahadisoana: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 boribory-isa) diso: {
+			ity-asa-ity fahadisoana: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) diso: {
+			ity-asa-ity fahadisoana: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter ampio: 1.
+} * 100.
+
+
+Vokatra soraty: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), andalana-vaovao.

@@ -1,0 +1,43 @@
+
+
+>> g := Server crear.
+>> v := Contenedor-seguro crear.
+>> ok := 0.
+
+>> secrets := Lista crear ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets copiar.
+passwords cada: { :i :p
+	secrets cada: { :n :s
+		{
+			>> encrypted := v cifrar: s clave: p.
+			>> decrypted := v descifrar: encrypted clave: p.
+			(decrypted = s) verdadero: {
+				ok añadir: 1.
+			}, otro: {
+				Salida escribir: ['failed encrypting/decrypting: '], detener.
+				Salida escribir: s, detener.
+				Salida escribir: ['encrypted: '] + encrypted, detener.
+				Salida escribir: ['decrypted: '] + encrypted, detener.
+				Programa finalizar.
+			}.
+		} capturar: { :err
+			(s = [''] o: p = ['']) verdadero: {
+				ok añadir: 1.
+			}, otro: {
+				Salida escribir: err, detener.
+				Programa finalizar.
+			}.
+		}, empezar.
+	}.
+}.
+
+Salida escribir: ( ok + [' vault encryptions tested.'] ), detener.

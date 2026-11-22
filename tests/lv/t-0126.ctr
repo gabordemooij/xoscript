@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Objekts jauns.
+
+Slurp kad: ['jauns'] darīt: {
+	savs str := [''].
+}.
+
+Slurp kad: ['nieuw'] darīt: {
+	savs str := [''].
+}.
+
+Slurp kad: ['atbildēt:'] darīt: { :blah
+		savs str pievienot-beigās: blah.
+}.
+
+Slurp kad: ['atbildēt:un:'] darīt: { :blah :blahah
+		savs str pievienot-beigās: (blah no: 0 garums: (blah garums - 1)).
+		savs str pievienot-beigās: [' '].
+		savs str pievienot-beigās: blahah.
+}.
+
+Slurp kad: ['obtain'] darīt: {
+	>> buffer := savs str.
+	savs str := ['']. <- buffer.
+}.
+
+
+Izvade rakstīt: (Programma sistēma: (Slurp jauns echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Fails jauns: ['/tmp/from.txt'], dzēst. } tvert: { ['Empty']. }, palaist.
+{ Fails jauns: ['/tmp/to.txt'], dzēst. } tvert: { ['Empty']. }, palaist.
+
+
+Fails jauns: ['/tmp/to.txt'], pastāv aplams: {
+	Izvade rakstīt: ['Confirmed. Target file does not exist.\
+'].
+}.
+Fails jauns: ['/tmp/from.txt'], pastāv aplams: {
+	Izvade rakstīt: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Programma sistēma: (Slurp jauns touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Programma sistēma: (Slurp jauns cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Fails jauns: ['/tmp/to.txt'], pastāv patiess: {
+	Izvade rakstīt: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Izvade rakstīt: ['Contents of file is:'] + (Fails jauns: ['/tmp/to.txt'], lasīt), jauna-rinda.

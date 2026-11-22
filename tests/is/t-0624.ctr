@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Hlutur nýtt.
+
+Log við: ['say:'] gera: { :str
+	Úttak skrifa: str, ný-lína.
+}.
+
+>> Item := Hlutur nýtt.
+
+Item við: ['nýtt:'] gera: { :id <- sjálfur nýtt id: id.
+}.
+
+Item við: ['id:'] gera: { :id
+	eigin id := id.
+}.
+
+Item við: ['id'] gera: { <- eigin id. }.
+
+
+Item við: ['texti'] gera: {
+	>> str := ['Item#~no'].
+	str ~no: eigin id. <- str.
+}.
+
+
+>> Print := Hlutur nýtt.
+
+Print við: ['items'] gera: { 
+	
+	eigin item := Item nýtt: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: eigin item
+	).
+	
+	
+}.
+
+Print items.

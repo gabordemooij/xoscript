@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Gahunda imicungire-yububiko: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Gahunda igenamiterere: ['FFITESTLIB'].
+
+
+
+Server hambira: (
+ Urutonde gishya ;
+ libname ;
+ ['puts'] ;
+ ( Urutonde gishya ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s rekura.
+
+# test with struct
+
+>> a := Blob gishya: 8.
+a bytes: (
+	Urutonde <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Urutonde <<: ['int'], ; ['int']).
+
+Server hambira: (
+	Urutonde <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Urutonde <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Ibisohoka andika: ['Sum test:'] + (ffitest ffisum: a), umurongo-mushya.
+
+struct rekura-struct.
+struct rekura.
+a rekura.

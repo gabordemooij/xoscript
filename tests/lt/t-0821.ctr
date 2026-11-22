@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> kelias := ['/tmp/test0821.csv'].
+>> file := Failas naujas: kelias.
+
+file rašyti: ['a,b\n"1,2\n'].
+{
+	file skyriklis: [','] kabutė: ['"'] eilutės: { :line
+		Išvestis rašyti: line, nauja-eilutė.
+	}.
+} pagauti: { :e Išvestis rašyti: e, nauja-eilutė. }, paleisti.
+
+# a closed quote still works
+file rašyti: ['a,b\n"1,2",3'].
+file skyriklis: [','] kabutė: ['"'] eilutės: { :line
+	Išvestis rašyti: line, nauja-eilutė.
+}.
+file ištrinti.

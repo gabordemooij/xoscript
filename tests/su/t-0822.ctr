@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB anyar hos: ['localhost'],
+	ngaran-pamaké: ['xo'],
+	sandi: ['pass123'],
+	ngaran-basis-data: ['xobase'],
+	sambungkeun.
+
+>> paraméter-panéangan := db kueri: ['SELECT ? AS a, ? AS b, ? AS c'].
+paraméter-panéangan paraméter: (Daptar anyar ; ['1']).
+{ paraméter-panéangan cokot: { :row Kaluaran tulis: row, baris-anyar. }. } tangkep: { :e Kaluaran tulis: e, baris-anyar. }, jalankeun.
+
+>> paraméter-panéangan := db kueri: ['SELECT ? AS a'].
+{ paraméter-panéangan cokot: { :row Kaluaran tulis: row, baris-anyar. }. } tangkep: { :e Kaluaran tulis: e, baris-anyar. }, jalankeun.
+
+# the right number still works, more parameters are ignored as before
+>> paraméter-panéangan := db kueri: ['SELECT ? AS a, ? AS b'].
+paraméter-panéangan paraméter: (Daptar anyar ; ['1'] ; ['2']).
+paraméter-panéangan cokot: { :row Kaluaran tulis: (row di: ['a']), tulis: (row di: ['b']), baris-anyar. }.
+paraméter-panéangan paraméter: (Daptar anyar ; ['1'] ; ['2'] ; ['3']).
+paraméter-panéangan cokot: { :row Kaluaran tulis: (row di: ['a']), tulis: (row di: ['b']), baris-anyar. }.

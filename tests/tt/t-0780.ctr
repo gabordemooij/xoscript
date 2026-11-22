@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Тезмә яңа ;
+	# {"key":"normal"} normal ASCII
+	( Сүзлек яңа куй: ['normal'] ачкыч: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Сүзлек яңа куй: ['hello world'] ачкыч: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Сүзлек яңа куй: ['"'] ачкыч: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Сүзлек яңа куй: ['backslash: \\'] ачкыч: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Сүзлек яңа куй: ['slash: /'] ачкыч: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Сүзлек яңа куй: ['backspace: \b'] ачкыч: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Сүзлек яңа куй: ['formfeed: \f'] ачкыч: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Сүзлек яңа куй: ['newline: \n'] ачкыч: ['key'] ) ;
+	( Сүзлек яңа куй: ['newline: ↵'] ачкыч: ['key'] ) ;
+	( Сүзлек яңа куй: ['newline: 
+	'] ачкыч: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Сүзлек яңа куй: ['carriage return: \r'] ачкыч: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Сүзлек яңа куй: ['tab \t'] ачкыч: ['key'] ) ;
+	( Сүзлек яңа куй: ['tab ⇿'] ачкыч: ['key'] ) ;
+	( Сүзлек яңа куй: ['tab  '] ачкыч: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Сүзлек яңа куй: ['NUL \u0000'] ачкыч: ['key'] ) ;
+	( Сүзлек яңа куй: ['NUL \0'] ачкыч: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Сүзлек яңа куй: ['control: \u0001'] ачкыч: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Сүзлек яңа куй: ['control: \u001F'] ачкыч: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Сүзлек яңа куй: ['unicode: é'] ачкыч: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Сүзлек яңа куй: ['unicode: €'] ачкыч: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Сүзлек яңа куй: ['unicode: 日本語'] ачкыч: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Сүзлек яңа куй: ['unicode: 😀'] ачкыч: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Сүзлек яңа куй: ['unicode: 🧑‍💻'] ачкыч: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Сүзлек яңа куй: ['combining: e\u0301'] ачкыч: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Сүзлек яңа куй: ['escaped unicode: \u00e9'] ачкыч: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Сүзлек яңа куй: ['escaped unicode: \u20ac'] ачкыч: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Сүзлек яңа куй: ['escaped unicode: \ud83d\ude00'] ачкыч: ['key'] ) ;
+	# {"key":""} empty value
+	( Сүзлек яңа куй: [''] ачкыч: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Сүзлек яңа куй: ['@ < > & = % + ? #'] ачкыч: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Сүзлек яңа куй: ['''] ачкыч: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Сүзлек яңа куй: ['multiple: \" \\ \n \r \t'] ачкыч: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Сүзлек яңа куй: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] ачкыч: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Сүзлек яңа куй: [' value'] ачкыч: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Сүзлек яңа куй: ['value '] ачкыч: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Сүзлек яңа куй: [' \t\n\r '] ачкыч: ['key'] ).
+
+dicts һәрбер: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Сүзлек яңа куй: d key ачкыч: ['key']).
+	>> b := JSON jsonify: (Сүзлек яңа куй: ['value'] ачкыч: d key).
+	>> e := JSON объект: a.
+	>> f := JSON объект: b.
+	((e key = d key һәм: (f ? d key = ['value'])) яки: (e key = ['NUL ?'])) дөрес: {
+		Чыгыш яз: ['OK'], яңа-юл.
+	}, югыйсә: {
+		Чыгыш яз: ['Unable to properly encode/decode: '] + d + j, яңа-юл.
+		Программа тәмамла.
+	}.
+}.

@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := तिजोरी कुंजी-बनाओ.
+>> sk := keys पहला.
+>> pk := keys अंतिम.
+>> sig := तिजोरी हस्ताक्षर: ['abc'] कुंजी-से: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ तिजोरी हस्ताक्षर: ['abc'] कुंजी-से: long. } पकड़ो: { :e
+	निर्गम लिखो: e, नई-पंक्ति.
+}, चलाओ.
+
+{ तिजोरी जाँचो: ['abc'] हस्ताक्षर: long कुंजी-से: pk. } पकड़ो: { :e
+	निर्गम लिखो: e, नई-पंक्ति.
+}, चलाओ.
+
+{ तिजोरी जाँचो: ['abc'] हस्ताक्षर: sig कुंजी-से: short. } पकड़ो: { :e
+	निर्गम लिखो: e, नई-पंक्ति.
+}, चलाओ.

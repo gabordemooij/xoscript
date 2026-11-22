@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Výstup písať: ['Database test'], nový-riadok.
+
+>> db := Maria-DB nový hostiteľ: ['localhost'],
+	používateľ: ['xo'], heslo: ['pass123'], názov-databázy: ['xobase'], pripojiť-sa.
+
+Výstup písať: ['Can we connect? '] + db pripojené?, nový-riadok.
+
+>> parametre-hľadania := db dopyt: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametre: ( Zoznam nový ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  parametre-hľadania vykonať. db potvrdiť. } zachytiť: { :e db vrátiť-späť.  }, spustiť.
+
+Výstup písať: ['Can we insert? '] + ( parametre-hľadania insert-id > 0 ), nový-riadok.
+
+>> x := 0.
+>> parametre-hľadania :=
+db dopyt: ['SELECT * FROM book order by id desc limit 2'], 
+načítať: { :row 
+	x pridať: 1.
+	Pravda prerušiť. # must clean up, no 'Commands out of sync'
+}.
+
+>> parametre-hľadania :=
+db dopyt: ['SELECT * FROM book order by id desc limit 2'], 
+načítať: { :row
+	x pridať: 1.
+	Pravda prerušiť.
+}.
+
+(x > 0) pravda: {
+	Výstup písať: ['Can we break in the middle of a fetch? '].
+}.
+
+Výstup písať: Pravda, nový-riadok.

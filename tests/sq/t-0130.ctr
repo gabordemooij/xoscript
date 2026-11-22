@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Program cilësim: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server lidh: ( Listë ri ;
+ libname ; ['fopen'] ;
+ ( Listë ri ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+lidh: ( Listë ri ;
+ Asgjë ; # means same lib
+ ['fread'] ;
+ ( Listë ri ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Asgjë ; # means same object (i.e. Stream)
+ ['fread']
+),
+lidh: (
+ Listë ri ;
+ Asgjë ; # means same lib
+ ['fwrite'] ;
+ ( Listë ri ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Asgjë ; # means same lib
+ ['fwrite']
+),
+lidh: (
+ Listë ri ;
+ Asgjë ; # means same lib
+ ['rewind'] ;
+ ( Listë ri ; ['pointer'] ) ;
+ ['int'] ;
+ Asgjë ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> shteg := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: shteg mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream mesazh: ['fwrite'] argumente: (Listë ri ; str ; 1 ; 6 ; fd ).
+Dalje shkruaj: bytes-written, rresht-ri.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob ri: 20.
+
+# read from file
+>> bytes-read := Stream mesazh: ['fread'] argumente: (Listë ri ; buf ; 1 ; 6 ; fd ).
+Dalje shkruaj: bytes-read, rresht-ri.
+Dalje shkruaj: buf, rresht-ri.
+
+# free memory
+str  liro.
+shteg liro.
+mode liro.
+buf  liro.
+
+

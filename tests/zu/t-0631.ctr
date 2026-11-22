@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Uhlelo ukuphathwa-kwenkumbulo: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Uhlelo isilungiselelo: ['FFITESTLIB'].
+
+
+
+Server xhuma: (
+ Uhlu okusha ;
+ libname ;
+ ['puts'] ;
+ ( Uhlu okusha ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s khulula.
+
+# test with struct
+
+>> a := Blob okusha: 8.
+a bytes: (
+	Uhlu <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Uhlu <<: ['int'], ; ['int']).
+
+Server xhuma: (
+	Uhlu <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Uhlu <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Okuphumayo bhala: ['Sum test:'] + (ffitest ffisum: a), umugqa-omusha.
+
+struct khulula-struct.
+struct khulula.
+a khulula.

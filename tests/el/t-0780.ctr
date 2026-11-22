@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Λίστα νέο ;
+	# {"key":"normal"} normal ASCII
+	( Λεξικό νέο τοποθέτηση: ['normal'] στο: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Λεξικό νέο τοποθέτηση: ['hello world'] στο: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Λεξικό νέο τοποθέτηση: ['"'] στο: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Λεξικό νέο τοποθέτηση: ['backslash: \\'] στο: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Λεξικό νέο τοποθέτηση: ['slash: /'] στο: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Λεξικό νέο τοποθέτηση: ['backspace: \b'] στο: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Λεξικό νέο τοποθέτηση: ['formfeed: \f'] στο: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Λεξικό νέο τοποθέτηση: ['newline: \n'] στο: ['key'] ) ;
+	( Λεξικό νέο τοποθέτηση: ['newline: ↵'] στο: ['key'] ) ;
+	( Λεξικό νέο τοποθέτηση: ['newline: 
+	'] στο: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Λεξικό νέο τοποθέτηση: ['carriage return: \r'] στο: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Λεξικό νέο τοποθέτηση: ['tab \t'] στο: ['key'] ) ;
+	( Λεξικό νέο τοποθέτηση: ['tab ⇿'] στο: ['key'] ) ;
+	( Λεξικό νέο τοποθέτηση: ['tab  '] στο: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Λεξικό νέο τοποθέτηση: ['NUL \u0000'] στο: ['key'] ) ;
+	( Λεξικό νέο τοποθέτηση: ['NUL \0'] στο: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Λεξικό νέο τοποθέτηση: ['control: \u0001'] στο: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Λεξικό νέο τοποθέτηση: ['control: \u001F'] στο: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Λεξικό νέο τοποθέτηση: ['unicode: é'] στο: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Λεξικό νέο τοποθέτηση: ['unicode: €'] στο: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Λεξικό νέο τοποθέτηση: ['unicode: 日本語'] στο: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Λεξικό νέο τοποθέτηση: ['unicode: 😀'] στο: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Λεξικό νέο τοποθέτηση: ['unicode: 🧑‍💻'] στο: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Λεξικό νέο τοποθέτηση: ['combining: e\u0301'] στο: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Λεξικό νέο τοποθέτηση: ['escaped unicode: \u00e9'] στο: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Λεξικό νέο τοποθέτηση: ['escaped unicode: \u20ac'] στο: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Λεξικό νέο τοποθέτηση: ['escaped unicode: \ud83d\ude00'] στο: ['key'] ) ;
+	# {"key":""} empty value
+	( Λεξικό νέο τοποθέτηση: [''] στο: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Λεξικό νέο τοποθέτηση: ['@ < > & = % + ? #'] στο: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Λεξικό νέο τοποθέτηση: ['''] στο: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Λεξικό νέο τοποθέτηση: ['multiple: \" \\ \n \r \t'] στο: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Λεξικό νέο τοποθέτηση: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] στο: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Λεξικό νέο τοποθέτηση: [' value'] στο: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Λεξικό νέο τοποθέτηση: ['value '] στο: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Λεξικό νέο τοποθέτηση: [' \t\n\r '] στο: ['key'] ).
+
+dicts κάθε: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Λεξικό νέο τοποθέτηση: d key στο: ['key']).
+	>> b := JSON jsonify: (Λεξικό νέο τοποθέτηση: ['value'] στο: d key).
+	>> e := JSON αντικείμενο: a.
+	>> f := JSON αντικείμενο: b.
+	((e key = d key και: (f ? d key = ['value'])) ή: (e key = ['NUL ?'])) αληθές: {
+		Έξοδος γράψε: ['OK'], νέα-γραμμή.
+	}, αλλιώς: {
+		Έξοδος γράψε: ['Unable to properly encode/decode: '] + d + j, νέα-γραμμή.
+		Πρόγραμμα τέλος.
+	}.
+}.

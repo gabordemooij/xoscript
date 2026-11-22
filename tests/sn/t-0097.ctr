@@ -1,0 +1,42 @@
+
+Mavara kana-zvasvika: ['html'] ita: { <- (
+		pachako
+		tsiva: ['&'] na: ['&amp;'],
+		tsiva: ['<'] na: ['&lt;'],
+		tsiva: ['>'] na: ['&gt;'],
+		tsiva: ['"'] na: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Chinhu nyowani.
+
+HtmlBrush kana-zvasvika: ['pindura:'] ita: { :tag
+	Zvabuda nyora: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush kana-zvasvika: ['pindura:uye:'] ita: { :tag :content
+	tag := ( tag kubva: 0 kureba: (tag kureba - 1) ).
+	Zvabuda nyora: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush kana-zvasvika: ['content:'] ita: { :text
+	Zvabuda nyora: text html, mutsara-mutsva.
+}.
+
+HtmlBrush kana-zvasvika: ['attr:value:'] ita: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush nyowani.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

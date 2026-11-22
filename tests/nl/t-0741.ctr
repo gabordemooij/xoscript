@@ -1,0 +1,21 @@
+Uit schrijf: ['Test object'], stop.
+>> a := Object nieuw. 
+
+a bij: ['item:'] doen: { :octhelper
+	eigen octhelper := octhelper. 
+}.
+
+a bij: ['item'] doen: { <- eigen octhelper.
+}.
+
+a item: Oct nieuw.
+
+>> old-octhelper-address := a item prototype geheugenadres.
+a save-as: ['/tmp/a.bin'].
+Uit schrijf: ['========== RELOADING SNAP:'], stop.
+
+>> b := Object load-from: ['/tmp/a.bin'].
+
+(b item prototype geheugenadres = old-octhelper-address) ja: {
+	Uit schrijf: ['Object link re-attached.'], stop.
+}.

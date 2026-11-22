@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inicializēt.
+Programma izmantot: ['../../../src/xo/lv/webtools.xo'].
+
+>> Fake-Request := Objekts jauns.
+Fake-Request kad: ['value:'] darīt: { :vērtība
+	savs vērtība := vērtība.
+}.
+Fake-Request kad: ['cookie:'] darīt: { :nosaukums <- savs vērtība.
+}.
+
+>> Test-Session := Pagaidu-faila-sesija jauns.
+Test-Session kad: ['ielādēt'] darīt: { <- Vārdnīca jauns.
+}.
+Test-Session kad: ['session-id'] darīt: { <- savs id.
+}.
+
+>> cookies := Saraksts jauns
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies katrs: { :i :cookie
+	>> pieprasījums := Fake-Request jauns.
+	pieprasījums value: cookie.
+	>> pārvaldnieks := Test-Session jauns.
+	>> web := Tīmekļa-dokuments jauns.
+	web pieprasījums: pieprasījums.
+	web sesiju-pārvaldnieks: pārvaldnieks.
+	web sākt-sesiju.
+	Izvade rakstīt: ( pārvaldnieks session-id = cookie ), jauna-rinda.
+}.
+
+>> web := Tīmekļa-dokuments jauns.
+web json: (Vārdnīca jauns ielikt: ['b'] pie: ['a']).
+Izvade rakstīt: ['\n'], jauna-rinda.
+
+{ Tīkls get: ['file:///etc/hostname']. } tvert: { :e
+	Izvade rakstīt: e, jauna-rinda.
+}, palaist.
+
+>> svg := Fails jauns: ['/tmp/test0814.svg'].
+svg rakstīt: ['<svg xmlns="x"></svg>'].
+Izvade jauna-rinda.
+Server pārsūtīt: ['test0814.svg'] prefikss: ['/tmp/'].
+svg dzēst.

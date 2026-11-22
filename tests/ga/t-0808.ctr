@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Taisceadán gin-eochracha.
+>> sk := keys céad.
+>> pk := keys deireanach.
+>> sig := Taisceadán sínigh: ['abc'] le: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Taisceadán sínigh: ['abc'] le: long. } gabh: { :e
+	Aschur scríobh: e, líne-nua.
+}, tosaigh.
+
+{ Taisceadán seiceáil: ['abc'] síniú: long le: pk. } gabh: { :e
+	Aschur scríobh: e, líne-nua.
+}, tosaigh.
+
+{ Taisceadán seiceáil: ['abc'] síniú: sig le: short. } gabh: { :e
+	Aschur scríobh: e, líne-nua.
+}, tosaigh.

@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Két tạo-khóa.
+>> sk := keys đầu.
+>> pk := keys cuối.
+>> sig := Két ký: ['abc'] bằng: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Két ký: ['abc'] bằng: long. } bắt-lỗi: { :e
+	Xuất ghi: e, xuống-dòng.
+}, chạy.
+
+{ Két kiểm-tra: ['abc'] chữ-ký: long bằng: pk. } bắt-lỗi: { :e
+	Xuất ghi: e, xuống-dòng.
+}, chạy.
+
+{ Két kiểm-tra: ['abc'] chữ-ký: sig bằng: short. } bắt-lỗi: { :e
+	Xuất ghi: e, xuống-dòng.
+}, chạy.

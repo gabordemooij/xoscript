@@ -1,0 +1,16 @@
+# a value ending in the first part of an opening quote must survive serialization
+>> valores := Lista novo
+	; ['abc\[']
+	; ['\[']
+	; ['\[\[']
+	; ['x\\\[']
+	; ['abc'].
+
+valores cada: { :i :value
+	>> d := Dicionario novo.
+	d poñer: value en: ['k'].
+	d poñer: ['second'] en: ['j'].
+	>> r := d código obxecto.
+	Saída escribir: r contar, salto-de-liña.
+	Saída escribir: ( (r en: ['k']) = value ), salto-de-liña.
+}.

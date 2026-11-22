@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB নতুন হোস্ট: ['localhost'],
+	ব্যবহারকারী-নাম: ['xo'],
+	পাসওয়ার্ড: ['pass123'],
+	ডেটাবেস-নাম: ['xobase'],
+	যুক্ত-হও.
+
+>> conn2 := Maria-DB নতুন হোস্ট: ['localhost'],
+	ব্যবহারকারী-নাম: ['xo'],
+	পাসওয়ার্ড: ['pass123'],
+	ডেটাবেস-নাম: ['xobase'],
+	যুক্ত-হও.
+#...
+>> del := conn1 কোয়েরি: ['DELETE FROM book WHERE id > 0'].
+{  del নির্বাহ. conn1 নিশ্চিত. } ধরো: { :e conn1 ফিরিয়ে-নাও.  }, চালাও.
+
+>> insert := conn1 কোয়েরি: ['INSERT INTO book (id) VALUES(null)'].
+insert নির্বাহ.
+
+>> গণনা := conn1 কোয়েরি: ['SELECT COUNT(*) AS num FROM book'].
+গণনা আনো: { :row আউটপুট লেখো: row num, নতুন-লাইন. }.
+
+# does not show up
+# insert not committed on connection 1
+>> গণনা := conn2 কোয়েরি: ['SELECT COUNT(*) AS num FROM book'].
+গণনা আনো: { :row আউটপুট লেখো: row num, নতুন-লাইন. }.

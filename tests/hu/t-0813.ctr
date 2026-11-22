@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server inicializál.
+Program használ: ['../../../src/xo/hu/webtools.xo'].
+Program használ: ['../../../src/xo/hu/mailtools.xo'].
+
+>> fejléc := HTTP-Fejléc új kulcs: ['Location'] érték: ['/ok\r\nX-Injected: yes'].
+Kimenet ír: fejléc.
+
+>> web := Webdokumentum új.
+web ugrás: ['/ok\r\nX-Injected: yes'].
+Kimenet ír: ['\n'], újsor.
+
+>> mail := Email új.
+mail címzett: (Lista új ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Lista új ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Lista új ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail feladó: ['d@example.invalid\r\nX-From: yes'] név: ['site\r\nX-Name: yes'].
+mail tárgy: ['hello\r\nX-Subject: yes'].
+mail levéltörzs: ['line1\r\nline2'].
+Kimenet ír: mail generál.
+
+>> html := HTML-Email új.
+html címzett: (Lista új ; ['a@example.invalid\r\nX-To: yes']).
+html feladó: ['d@example.invalid'] név: ['site'].
+html tárgy: ['hello\r\nX-Subject: yes'].
+html levéltörzs: ['body'].
+Kimenet ír: ( html generál tartalmazza: ['\nX-'] ), újsor.
+Kimenet ír: ( html generál tartalmazza: ['X-To: yes'] ), újsor.

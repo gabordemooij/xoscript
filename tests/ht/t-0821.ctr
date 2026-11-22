@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> chemen-fichye := ['/tmp/test0821.csv'].
+>> file := Fichye nouvo: chemen-fichye.
+
+file ekri: ['a,b\n"1,2\n'].
+{
+	file separatè: [','] gimè: ['"'] liy-yo: { :line
+		Sòti ekri: line, nouvo-liy.
+	}.
+} trape: { :e Sòti ekri: e, nouvo-liy. }, lanse.
+
+# a closed quote still works
+file ekri: ['a,b\n"1,2",3'].
+file separatè: [','] gimè: ['"'] liy-yo: { :line
+	Sòti ekri: line, nouvo-liy.
+}.
+file efase.

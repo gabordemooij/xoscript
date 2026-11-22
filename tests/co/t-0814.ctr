@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server inizializà.
+Prugramma aduprà: ['../../../src/xo/co/webtools.xo'].
+
+>> Fake-Request := Ughjettu novu.
+Fake-Request quandu: ['value:'] fà: { :valore
+	propiu valore := valore.
+}.
+Fake-Request quandu: ['cookie:'] fà: { :nome <- propiu valore.
+}.
+
+>> Test-Session := Sessione-schedariu-tempurariu novu.
+Test-Session quandu: ['caricà'] fà: { <- Dizziunariu novu.
+}.
+Test-Session quandu: ['session-id'] fà: { <- propiu id.
+}.
+
+>> cookies := Lista novu
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies ognunu: { :i :cookie
+	>> dumanda := Fake-Request novu.
+	dumanda value: cookie.
+	>> gestore := Test-Session novu.
+	>> web := Ducumentu-Web novu.
+	web dumanda: dumanda.
+	web gestore-sessione: gestore.
+	web avvià-sessione.
+	Esciuta scrive: ( gestore session-id = cookie ), linea-nova.
+}.
+
+>> web := Ducumentu-Web novu.
+web json: (Dizziunariu novu mette: ['b'] à: ['a']).
+Esciuta scrive: ['\n'], linea-nova.
+
+{ Rete get: ['file:///etc/hostname']. } catturà: { :e
+	Esciuta scrive: e, linea-nova.
+}, lancià.
+
+>> svg := Schedariu novu: ['/tmp/test0814.svg'].
+svg scrive: ['<svg xmlns="x"></svg>'].
+Esciuta linea-nova.
+Server trasmette: ['test0814.svg'] prefissu: ['/tmp/'].
+svg eliminà.

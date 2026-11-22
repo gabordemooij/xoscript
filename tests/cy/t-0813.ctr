@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server paratoi.
+Rhaglen defnyddio: ['../../../src/xo/cy/webtools.xo'].
+Rhaglen defnyddio: ['../../../src/xo/cy/mailtools.xo'].
+
+>> pennawd := Pennawd-HTTP newydd allwedd: ['Location'] gwerth: ['/ok\r\nX-Injected: yes'].
+Allbwn ysgrifennu: pennawd.
+
+>> web := Dogfen-We newydd.
+web mynd-i: ['/ok\r\nX-Injected: yes'].
+Allbwn ysgrifennu: ['\n'], llinell-newydd.
+
+>> mail := E-bost newydd.
+mail at: (Rhestr newydd ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (Rhestr newydd ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (Rhestr newydd ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail anfonwr: ['d@example.invalid\r\nX-From: yes'] enw: ['site\r\nX-Name: yes'].
+mail pwnc: ['hello\r\nX-Subject: yes'].
+mail corff: ['line1\r\nline2'].
+Allbwn ysgrifennu: mail cynhyrchu.
+
+>> html := E-bost-HTML newydd.
+html at: (Rhestr newydd ; ['a@example.invalid\r\nX-To: yes']).
+html anfonwr: ['d@example.invalid'] enw: ['site'].
+html pwnc: ['hello\r\nX-Subject: yes'].
+html corff: ['body'].
+Allbwn ysgrifennu: ( html cynhyrchu yn-cynnwys: ['\nX-'] ), llinell-newydd.
+Allbwn ysgrifennu: ( html cynhyrchu yn-cynnwys: ['X-To: yes'] ), llinell-newydd.

@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Prograam faraay: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB xees dalalkat: ['localhost'],
+	turu-jëfandikukat: ['xo'], baatu-jall: ['pass123'], turu-dencukaayu-njoxe: ['xobase'], lëkkaloo.
+
+>> TwoDigitFormat := Melo xees: ['%02d'].
+
+# Datetime
+{
+	>> at := Lim digante: 1995 ak: 2050, mbind.
+	>> weer := TwoDigitFormat jëfandikoo-lim-bu-mat: (Lim digante: 1 ak: 12), mbind.
+	>> bés := TwoDigitFormat jëfandikoo-lim-bu-mat: (Lim digante: 1 ak: 28), mbind.
+	>> waxtu := TwoDigitFormat jëfandikoo-lim-bu-mat: (Lim digante: 1 ak: 23), mbind.
+	>> simaa := TwoDigitFormat jëfandikoo-lim-bu-mat: (Lim digante: 1 ak: 59), mbind.
+	>> saa := TwoDigitFormat jëfandikoo-lim-bu-mat: (Lim digante: 1 ak: 59), mbind.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: at,
+		MM: weer,
+		DD: bés,
+		HH: waxtu,
+		II: simaa,
+		SS: saa.
+	>> tànneefi-seet :=
+	db laaj-njoxe: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	indi: { :row
+		(row mydatetime = datetime) dëkkul: {
+			liggéey-bi njuumte: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter yokk: 1.
+} * 100.
+
+# Date
+{
+	>> at := Lim digante: 1995 ak: 2050, mbind.
+	>> weer := TwoDigitFormat jëfandikoo-lim-bu-mat: (Lim digante: 1 ak: 12), mbind.
+	>> bés := TwoDigitFormat jëfandikoo-lim-bu-mat: (Lim digante: 1 ak: 28), mbind.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: at,
+		MM: weer,
+		DD: bés.
+	>> tànneefi-seet :=
+	db laaj-njoxe: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	indi: { :row
+		(row mydate = date) dëkkul: {
+			liggéey-bi njuumte: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter yokk: 1.
+} * 100.
+
+
+# Time
+{
+	>> waxtu := TwoDigitFormat jëfandikoo-lim-bu-mat: (Lim digante: 1 ak: 23), mbind.
+	>> simaa := TwoDigitFormat jëfandikoo-lim-bu-mat: (Lim digante: 1 ak: 59), mbind.
+	>> saa := TwoDigitFormat jëfandikoo-lim-bu-mat: (Lim digante: 1 ak: 59), mbind.
+	>> léegi := ['HH:II:SS'].
+	léegi
+		HH: waxtu,
+		II: simaa,
+		SS: saa.
+	>> tànneefi-seet :=
+	db laaj-njoxe: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: léegi),
+	indi: { :row
+		(row mytime = léegi) dëkkul: {
+			liggéey-bi njuumte: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter yokk: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Jokkalante xees feese: 100000 ak: ['x'], boole: [''].
+{
+	>> str2 := Wàqu-kaaraange token: 40.
+	>> tànneefi-seet :=
+	db laaj-njoxe: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	indi: { :row
+		(row str1 = str1 ak: row str2 = str2) dëkkul: {
+			liggéey-bi njuumte: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter yokk: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Lim digante: 1 ak: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 bawoo-ci-mbind: ['9223372036854775807'] ) -
+		( Int64 bawoo-ci-mbind: ['99999'] ) +
+		( Int64 bawoo-ci-mbind: n1 mbind )
+	).
+	>> tànneefi-seet :=
+	db laaj-njoxe: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	indi: { :row
+		(row n1 = n1) dëkkul: {
+			liggéey-bi njuumte: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) dëkkul: {
+			liggéey-bi njuumte: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 waññi) dëkkul: {
+			liggéey-bi njuumte: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) dëkkul: {
+			liggéey-bi njuumte: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter yokk: 1.
+} * 100.
+
+
+Génn bind: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), taxaw.

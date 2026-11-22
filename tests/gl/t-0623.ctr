@@ -1,0 +1,43 @@
+
+
+>> g := Server novo.
+>> v := Caixa-forte novo.
+>> ok := 0.
+
+>> secrets := Lista novo ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets copiar.
+passwords cada: { :i :p
+	secrets cada: { :n :s
+		{
+			>> encrypted := v cifrar: s chave: p.
+			>> decrypted := v descifrar: encrypted chave: p.
+			(decrypted = s) certo: {
+				ok sumar: 1.
+			}, senón: {
+				Saída escribir: ['failed encrypting/decrypting: '], salto-de-liña.
+				Saída escribir: s, salto-de-liña.
+				Saída escribir: ['encrypted: '] + encrypted, salto-de-liña.
+				Saída escribir: ['decrypted: '] + encrypted, salto-de-liña.
+				Programa final.
+			}.
+		} capturar: { :err
+			(s = [''] ou: p = ['']) certo: {
+				ok sumar: 1.
+			}, senón: {
+				Saída escribir: err, salto-de-liña.
+				Programa final.
+			}.
+		}, iniciar.
+	}.
+}.
+
+Saída escribir: ( ok + [' vault encryptions tested.'] ), salto-de-liña.

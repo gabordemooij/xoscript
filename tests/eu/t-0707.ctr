@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programa memoria-kudeaketa: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB berria ostalaria: ['localhost'],
+	erabiltzailea: ['xo'], pasahitza: ['pass123'], datu-base-izena: ['xobase'], konektatu.
+
+>> TwoDigitFormat := Formatua berria: ['%02d'].
+
+# Datetime
+{
+	>> urtea := Zenbakia artean: 1995 eta: 2050, testua.
+	>> hilabetea := TwoDigitFormat aplikatu-osoa: (Zenbakia artean: 1 eta: 12), testua.
+	>> eguna := TwoDigitFormat aplikatu-osoa: (Zenbakia artean: 1 eta: 28), testua.
+	>> ordua := TwoDigitFormat aplikatu-osoa: (Zenbakia artean: 1 eta: 23), testua.
+	>> minutua := TwoDigitFormat aplikatu-osoa: (Zenbakia artean: 1 eta: 59), testua.
+	>> segundoa := TwoDigitFormat aplikatu-osoa: (Zenbakia artean: 1 eta: 59), testua.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: urtea,
+		MM: hilabetea,
+		DD: eguna,
+		HH: ordua,
+		II: minutua,
+		SS: segundoa.
+	>> bilaketa-parametroak :=
+	db kontsulta: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	eskuratu: { :row
+		(row mydatetime = datetime) faltsua: {
+			ataza-hau errorea: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter gehitu: 1.
+} * 100.
+
+# Date
+{
+	>> urtea := Zenbakia artean: 1995 eta: 2050, testua.
+	>> hilabetea := TwoDigitFormat aplikatu-osoa: (Zenbakia artean: 1 eta: 12), testua.
+	>> eguna := TwoDigitFormat aplikatu-osoa: (Zenbakia artean: 1 eta: 28), testua.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: urtea,
+		MM: hilabetea,
+		DD: eguna.
+	>> bilaketa-parametroak :=
+	db kontsulta: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	eskuratu: { :row
+		(row mydate = date) faltsua: {
+			ataza-hau errorea: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter gehitu: 1.
+} * 100.
+
+
+# Time
+{
+	>> ordua := TwoDigitFormat aplikatu-osoa: (Zenbakia artean: 1 eta: 23), testua.
+	>> minutua := TwoDigitFormat aplikatu-osoa: (Zenbakia artean: 1 eta: 59), testua.
+	>> segundoa := TwoDigitFormat aplikatu-osoa: (Zenbakia artean: 1 eta: 59), testua.
+	>> denbora := ['HH:II:SS'].
+	denbora
+		HH: ordua,
+		II: minutua,
+		SS: segundoa.
+	>> bilaketa-parametroak :=
+	db kontsulta: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: denbora),
+	eskuratu: { :row
+		(row mytime = denbora) faltsua: {
+			ataza-hau errorea: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter gehitu: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Zerrenda berria bete: 100000 honekin: ['x'], batu: [''].
+{
+	>> str2 := Kutxa-gotorra token: 40.
+	>> bilaketa-parametroak :=
+	db kontsulta: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	eskuratu: { :row
+		(row str1 = str1 eta: row str2 = str2) faltsua: {
+			ataza-hau errorea: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter gehitu: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Zenbakia artean: 1 eta: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 testutik: ['9223372036854775807'] ) -
+		( Int64 testutik: ['99999'] ) +
+		( Int64 testutik: n1 testua )
+	).
+	>> bilaketa-parametroak :=
+	db kontsulta: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	eskuratu: { :row
+		(row n1 = n1) faltsua: {
+			ataza-hau errorea: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) faltsua: {
+			ataza-hau errorea: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 biribildu) faltsua: {
+			ataza-hau errorea: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) faltsua: {
+			ataza-hau errorea: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter gehitu: 1.
+} * 100.
+
+
+Irteera idatzi: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), lerro-jauzia.

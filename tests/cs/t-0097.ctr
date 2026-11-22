@@ -1,0 +1,42 @@
+
+Řetězec při: ['html'] udělat: { <- (
+		sebe
+		nahradit: ['&'] za: ['&amp;'],
+		nahradit: ['<'] za: ['&lt;'],
+		nahradit: ['>'] za: ['&gt;'],
+		nahradit: ['"'] za: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objekt nový.
+
+HtmlBrush při: ['odpovědět:'] udělat: { :tag
+	Výstup psát: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush při: ['odpovědět:a:'] udělat: { :tag :content
+	tag := ( tag od: 0 délka: (tag délka - 1) ).
+	Výstup psát: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush při: ['content:'] udělat: { :text
+	Výstup psát: text html, nový-řádek.
+}.
+
+HtmlBrush při: ['attr:value:'] udělat: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush nový.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

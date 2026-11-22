@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Zotuluka lembani: ['Database test'], mzere-watsopano.
+
+>> db := Maria-DB chatsopano wolandira: ['localhost'],
+	dzina-la-wogwiritsa: ['xo'], mawu-achinsinsi: ['pass123'], dzina-la-nkhokwe-ya-deta: ['xobase'], lumikizana.
+
+Zotuluka lembani: ['Can we connect? '] + db zalumikizana?, mzere-watsopano.
+
+>> zofufuzira := db funso: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], zolowetsa-za-funso: ( Mndandanda chatsopano ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  zofufuzira chita-lamulo. db tsimikizira. } gwira: { :e db bwezera-mmbuyo.  }, yamba.
+
+Zotuluka lembani: ['Can we insert? '] + ( zofufuzira insert-id > 0 ), mzere-watsopano.
+
+>> Obj := Chinthu chatsopano.
+Obj chikafika: ['retrieve-rows'] chitani: {
+	zake chiwerengero-cha-zinthu := 0.
+	>> zofufuzira :=
+	db funso: ['SELECT * FROM book order by id desc limit 2'], 
+	tenga: { :row 
+		zake chiwerengero-cha-zinthu onjezani: 1.
+		Zoona dula.
+	}. <- zake chiwerengero-cha-zinthu koperani.
+}.
+
+Zotuluka lembani: ['Can we query? '] + ( Obj retrieve-rows > 0 ), mzere-watsopano.

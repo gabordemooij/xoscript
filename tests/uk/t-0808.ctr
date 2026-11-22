@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Сховище згенерувати-ключі.
+>> sk := keys перший.
+>> pk := keys останній.
+>> sig := Сховище підписати: ['abc'] ключем: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Сховище підписати: ['abc'] ключем: long. } перехопити: { :e
+	Вивід написати: e, новий-рядок.
+}, запустити.
+
+{ Сховище перевірити: ['abc'] підпис: long ключем: pk. } перехопити: { :e
+	Вивід написати: e, новий-рядок.
+}, запустити.
+
+{ Сховище перевірити: ['abc'] підпис: sig ключем: short. } перехопити: { :e
+	Вивід написати: e, новий-рядок.
+}, запустити.

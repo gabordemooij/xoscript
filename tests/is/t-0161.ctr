@@ -1,0 +1,53 @@
+Forrit minnisstjórnun: 0.
+Listi við: ['sum'] gera: {
+	>> total := 0.
+	sjálfur hver: { :index :element
+		total leggja-við: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Skrá nýtt: ['/tmp/test.txt'].
+f skrifa: ['Lorem Ipsum'].
+f loka.
+  
+
+f := Skrá nýtt: ['/tmp/test.txt'].
+>> text := f lesa.
+f loka.
+
+
+
+Forrit taka-til.
+usedMemory1 := (Forrit minni ? 1).
+
+
+
+f := Skrá nýtt: ['/tmp/test.txt'].
+text := f lesa.
+f loka.
+
+Forrit taka-til.
+usedMemory2 := (Forrit minni ? 1).
+
+
+f := Skrá nýtt: ['/tmp/test.txt'].
+text := f lesa.
+f loka.
+
+Forrit taka-til.
+usedMemory3 := (Forrit minni ? 1).
+
+
+
+( usedMemory1 = usedMemory2 og: usedMemory1 = usedMemory3, og: usedMemory2 = usedMemory3 ) satt: {
+	Úttak skrifa: ['No memory leaks here'].
+}, rangt: {
+	Úttak skrifa: ['Leaking memory...'].
+}.

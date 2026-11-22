@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB uusi isäntä: ['localhost'],
+	käyttäjänimi: ['xo'],
+	salasana: ['pass123'],
+	tietokannan-nimi: ['xobase'],
+	yhdistä.
+
+>> hakuparametrit := db kysely: ['SELECT ? AS a, ? AS b, ? AS c'].
+hakuparametrit parametrit: (Lista uusi ; ['1']).
+{ hakuparametrit hae: { :row Tuloste kirjoita: row, rivinvaihto. }. } sieppaa: { :e Tuloste kirjoita: e, rivinvaihto. }, käynnistä.
+
+>> hakuparametrit := db kysely: ['SELECT ? AS a'].
+{ hakuparametrit hae: { :row Tuloste kirjoita: row, rivinvaihto. }. } sieppaa: { :e Tuloste kirjoita: e, rivinvaihto. }, käynnistä.
+
+# the right number still works, more parameters are ignored as before
+>> hakuparametrit := db kysely: ['SELECT ? AS a, ? AS b'].
+hakuparametrit parametrit: (Lista uusi ; ['1'] ; ['2']).
+hakuparametrit hae: { :row Tuloste kirjoita: (row kohdassa: ['a']), kirjoita: (row kohdassa: ['b']), rivinvaihto. }.
+hakuparametrit parametrit: (Lista uusi ; ['1'] ; ['2'] ; ['3']).
+hakuparametrit hae: { :row Tuloste kirjoita: (row kohdassa: ['a']), kirjoita: (row kohdassa: ['b']), rivinvaihto. }.

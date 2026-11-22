@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := ਤਿਜੋਰੀ ਕੁੰਜੀਆਂ-ਬਣਾਓ.
+>> sk := keys ਪਹਿਲਾ.
+>> pk := keys ਆਖਰੀ.
+>> sig := ਤਿਜੋਰੀ ਦਸਤਖਤ: ['abc'] ਕੁੰਜੀ-ਨਾਲ: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ ਤਿਜੋਰੀ ਦਸਤਖਤ: ['abc'] ਕੁੰਜੀ-ਨਾਲ: long. } ਫੜੋ: { :e
+	ਆਉਟਪੁੱਟ ਲਿਖੋ: e, ਨਵੀਂ-ਲਾਈਨ.
+}, ਚਲਾਓ.
+
+{ ਤਿਜੋਰੀ ਜਾਂਚੋ: ['abc'] ਦਸਤਖਤ: long ਕੁੰਜੀ-ਨਾਲ: pk. } ਫੜੋ: { :e
+	ਆਉਟਪੁੱਟ ਲਿਖੋ: e, ਨਵੀਂ-ਲਾਈਨ.
+}, ਚਲਾਓ.
+
+{ ਤਿਜੋਰੀ ਜਾਂਚੋ: ['abc'] ਦਸਤਖਤ: sig ਕੁੰਜੀ-ਨਾਲ: short. } ਫੜੋ: { :e
+	ਆਉਟਪੁੱਟ ਲਿਖੋ: e, ਨਵੀਂ-ਲਾਈਨ.
+}, ਚਲਾਓ.

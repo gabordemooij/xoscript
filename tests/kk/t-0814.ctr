@@ -1,0 +1,47 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server инициализациялау.
+Бағдарлама пайдалану: ['../../../src/xo/kk/webtools.xo'].
+
+>> Fake-Request := Нысан жаңа.
+Fake-Request келгенде: ['value:'] орында: { :мән
+	өзінің мән := мән.
+}.
+Fake-Request келгенде: ['cookie:'] орында: { :атау <- өзінің мән.
+}.
+
+>> Test-Session := Уақытша-файл-сеансы жаңа.
+Test-Session келгенде: ['жүктеу'] орында: { <- Сөздік жаңа.
+}.
+Test-Session келгенде: ['session-id'] орында: { <- өзінің id.
+}.
+
+>> cookies := Тізім жаңа
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies әрбір: { :i :cookie
+	>> сұраныс := Fake-Request жаңа.
+	сұраныс value: cookie.
+	>> менеджер := Test-Session жаңа.
+	>> web := Веб-құжат жаңа.
+	web сұраныс: сұраныс.
+	web сеанс-менеджері: менеджер.
+	web сеансты-бастау.
+	Шығыс жазу: ( менеджер session-id = cookie ), жаңа-жол.
+}.
+
+>> web := Веб-құжат жаңа.
+web json: (Сөздік жаңа қою: ['b'] кілт: ['a']).
+Шығыс жазу: ['\n'], жаңа-жол.
+
+{ Желі get: ['file:///etc/hostname']. } ұстау: { :e
+	Шығыс жазу: e, жаңа-жол.
+}, іске-қосу.
+
+>> svg := Файл жаңа: ['/tmp/test0814.svg'].
+svg жазу: ['<svg xmlns="x"></svg>'].
+Шығыс жаңа-жол.
+Server өткізу: ['test0814.svg'] префикс: ['/tmp/'].
+svg жою.

@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Foclóir nua
+	# ASCII only
+	cuir: ( Liosta nua ; 65 ; 65 ; 65 ; 65 ; 0 ) ag: ['AAAA'],
+	# valid 2 byte sequence
+	cuir: ( Liosta nua ; 194 ; 162 ; 0 ) ag: ['¢'],
+	# Valid 3-byte UTF-8
+    cuir: ( Liosta nua ; 226 ; 130 ; 172 ; 0 ) ag: ['€'],
+	# Valid 4-byte UTF-8
+    cuir: ( Liosta nua ; 240 ; 144 ; 141 ; 136 ; 0 ) ag: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    cuir: ( Liosta nua ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ag: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    cuir: ( Liosta nua ; 65 ; 193 ; 129 ; 0 ) ag: ['A?'],
+	# Invalid first byte (0xFF)
+    cuir: ( Liosta nua ; 255 ; 0 ) ag: ['?'],
+	# Incomplete multi-byte sequence at end
+    cuir: ( Liosta nua ; 66 ; 226 ; 0 ) ag: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    cuir: ( Liosta nua ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ag: ['A€?𐍈B'].
+	 
+utf8cases gach: { :key :value
+	>> blob := Blob nua: value comhair, bytes: value.
+	>> str := blob teaghrán.
+	(str = key) fíor: {
+		Aschur scríobh: ['OK'], líne-nua.
+	}, eile: {
+		Aschur scríobh: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, líne-nua.
+	}.
+	blob saor.
+}.

@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Seifas generuoti-raktus.
+>> sk := keys pirmas.
+>> pk := keys paskutinis.
+>> sig := Seifas pasirašyti: ['abc'] raktu: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Seifas pasirašyti: ['abc'] raktu: long. } pagauti: { :e
+	Išvestis rašyti: e, nauja-eilutė.
+}, paleisti.
+
+{ Seifas patikrinti: ['abc'] parašas: long raktu: pk. } pagauti: { :e
+	Išvestis rašyti: e, nauja-eilutė.
+}, paleisti.
+
+{ Seifas patikrinti: ['abc'] parašas: sig raktu: short. } pagauti: { :e
+	Išvestis rašyti: e, nauja-eilutė.
+}, paleisti.

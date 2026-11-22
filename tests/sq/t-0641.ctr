@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Fjalor ri
+	# ASCII only
+	vendos: ( Listë ri ; 65 ; 65 ; 65 ; 65 ; 0 ) në: ['AAAA'],
+	# valid 2 byte sequence
+	vendos: ( Listë ri ; 194 ; 162 ; 0 ) në: ['¢'],
+	# Valid 3-byte UTF-8
+    vendos: ( Listë ri ; 226 ; 130 ; 172 ; 0 ) në: ['€'],
+	# Valid 4-byte UTF-8
+    vendos: ( Listë ri ; 240 ; 144 ; 141 ; 136 ; 0 ) në: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    vendos: ( Listë ri ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) në: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    vendos: ( Listë ri ; 65 ; 193 ; 129 ; 0 ) në: ['A?'],
+	# Invalid first byte (0xFF)
+    vendos: ( Listë ri ; 255 ; 0 ) në: ['?'],
+	# Incomplete multi-byte sequence at end
+    vendos: ( Listë ri ; 66 ; 226 ; 0 ) në: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    vendos: ( Listë ri ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) në: ['A€?𐍈B'].
+	 
+utf8cases secili: { :key :value
+	>> blob := Blob ri: value numëro, bytes: value.
+	>> str := blob tekst.
+	(str = key) vërtetë: {
+		Dalje shkruaj: ['OK'], rresht-ri.
+	}, përndryshe: {
+		Dalje shkruaj: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, rresht-ri.
+	}.
+	blob liro.
+}.

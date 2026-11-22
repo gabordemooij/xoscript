@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Izhod piši: ['Database test'], nova-vrstica.
+
+>> db := Maria-DB nov gostitelj: ['localhost'],
+	uporabnik: ['xo'], geslo: ['pass123'], ime-baze: ['xobase'], poveži-se.
+
+Izhod piši: ['Can we connect? '] + db povezano?, nova-vrstica.
+
+>> iskalni-parametri := db poizvedba: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametri: ( Seznam nov ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  iskalni-parametri izvedi. db potrdi. } ujemi: { :e db razveljavi.  }, zaženi.
+
+Izhod piši: ['Can we insert? '] + ( iskalni-parametri insert-id > 0 ), nova-vrstica.
+
+>> Obj := Objekt nov.
+Obj ob: ['retrieve-rows'] izvedi: {
+	svoj število-elementov := 0.
+	>> iskalni-parametri :=
+	db poizvedba: ['SELECT * FROM book order by id desc limit 2'], 
+	pridobi: { :row 
+		svoj število-elementov prištej: 1.
+		Resnično prekini.
+	}. <- svoj število-elementov kopiraj.
+}.
+
+Izhod piši: ['Can we query? '] + ( Obj retrieve-rows > 0 ), nova-vrstica.

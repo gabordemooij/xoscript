@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+Programma geheugenbeheer: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := Programma instelling: ['FFITESTLIB'].
+
+
+
+Server koppel: (
+ Reeks nieuw ;
+ libname ;
+ ['puts'] ;
+ ( Reeks nieuw ; ['pointer'] ) ;
+ ['void'] ;
+ ['Puts'] ;
+ ['str:']
+).
+
+>> s := Blob utf8: ['Hello from FFI!\n'].
+
+Puts str: s.
+s vrij.
+
+# test with struct
+
+>> a := Blob nieuw: 8.
+a bytes: (
+	Reeks <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+).
+
+>> struct := Blob struct: (Reeks <<: ['int'], ; ['int']).
+
+Server koppel: (
+	Reeks <<: ['@structtest'], ;
+	['@structtest'] ;
+	(Reeks <<: struct) ; 
+	['int'] ;	
+	['ffitest'] ;
+	['ffisum:']
+).
+	
+Uit schrijf: ['Sum test:'] + (ffitest ffisum: a), stop.
+
+struct structvrij.
+struct vrij.
+a vrij.

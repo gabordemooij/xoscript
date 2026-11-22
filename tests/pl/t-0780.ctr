@@ -1,0 +1,85 @@
+Server init.
+
+# JSON encoder only supports UTF-8, no surrogate pairs
+
+>> dicts := Lista nowy ;
+	# {"key":"normal"} normal ASCII
+	( Słownik nowy umieść: ['normal'] w: ['key'] ) ;
+	# {"key":"hello world"} space character
+	( Słownik nowy umieść: ['hello world'] w: ['key'] ) ;
+	# {"key":"quote: \""} double quote
+	( Słownik nowy umieść: ['"'] w: ['key'] ) ;
+	# {"key":"backslash: \\"} backslash
+	( Słownik nowy umieść: ['backslash: \\'] w: ['key'] ) ;
+	# {"key":"slash: /"} slash
+	( Słownik nowy umieść: ['slash: /'] w: ['key'] ) ;
+	# {"key":"backspace: \b"} backspace
+	( Słownik nowy umieść: ['backspace: \b'] w: ['key'] ) ;
+	# {"key":"formfeed: \f"} form-feed escape
+	( Słownik nowy umieść: ['formfeed: \f'] w: ['key'] ) ;
+	# {"key":"newline: \n"} newline
+	( Słownik nowy umieść: ['newline: \n'] w: ['key'] ) ;
+	( Słownik nowy umieść: ['newline: ↵'] w: ['key'] ) ;
+	( Słownik nowy umieść: ['newline: 
+	'] w: ['key'] ) ;
+	# {"key":"carriage return: \r"} carriage-return
+	( Słownik nowy umieść: ['carriage return: \r'] w: ['key'] ) ;
+	# {"key":"tab: \t"} tab
+	( Słownik nowy umieść: ['tab \t'] w: ['key'] ) ;
+	( Słownik nowy umieść: ['tab ⇿'] w: ['key'] ) ;
+	( Słownik nowy umieść: ['tab  '] w: ['key'] ) ;
+	# {"key":"control: \u0000"} NUL
+	( Słownik nowy umieść: ['NUL \u0000'] w: ['key'] ) ;
+	( Słownik nowy umieść: ['NUL \0'] w: ['key'] ) ;
+	# {"key":"control: \u0001"} control character 0x01
+	( Słownik nowy umieść: ['control: \u0001'] w: ['key'] ) ;
+	# {"key":"control: \u001F"} control character 0x1F
+	( Słownik nowy umieść: ['control: \u001F'] w: ['key'] ) ;
+	# {"key":"unicode: é"} UTF-8, 2-byte char
+	( Słownik nowy umieść: ['unicode: é'] w: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-byte char
+	( Słownik nowy umieść: ['unicode: €'] w: ['key'] ) ;
+	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	( Słownik nowy umieść: ['unicode: 日本語'] w: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	( Słownik nowy umieść: ['unicode: 😀'] w: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	( Słownik nowy umieść: ['unicode: 🧑‍💻'] w: ['key'] ) ;
+	# {"key":"combining: e\u0301"} combining accent
+	( Słownik nowy umieść: ['combining: e\u0301'] w: ['key'] ) ;
+	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	( Słownik nowy umieść: ['escaped unicode: \u00e9'] w: ['key'] ) ;
+	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	( Słownik nowy umieść: ['escaped unicode: \u20ac'] w: ['key'] ) ;
+	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	( Słownik nowy umieść: ['escaped unicode: \ud83d\ude00'] w: ['key'] ) ;
+	# {"key":""} empty value
+	( Słownik nowy umieść: [''] w: ['key'] ) ;
+	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	( Słownik nowy umieść: ['@ < > & = % + ? #'] w: ['key'] ) ;
+	# {"key":"single quote: '"} single quote
+	( Słownik nowy umieść: ['''] w: ['key'] ) ;
+	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	( Słownik nowy umieść: ['multiple: \" \\ \n \r \t'] w: ['key'] ) ;
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	( Słownik nowy umieść: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] w: ['key'] ) ;
+	# {"key":" value"} leading space
+	( Słownik nowy umieść: [' value'] w: ['key'] ) ;
+	# {"key":"value "} trailing space
+	( Słownik nowy umieść: ['value '] w: ['key'] ) ;
+	# {"key":" \t\n\r "} whitespace
+	( Słownik nowy umieść: [' \t\n\r '] w: ['key'] ).
+
+dicts każdy: { :_ :d
+	>> j := JSON jsonify: d.
+	>> a := JSON jsonify: (Słownik nowy umieść: d key w: ['key']).
+	>> b := JSON jsonify: (Słownik nowy umieść: ['value'] w: d key).
+	>> e := JSON obiekt: a.
+	>> f := JSON obiekt: b.
+	((e key = d key i: (f ? d key = ['value'])) lub: (e key = ['NUL ?'])) prawda: {
+		Wyjście pisz: ['OK'], nowa-linia.
+	}, inaczej: {
+		Wyjście pisz: ['Unable to properly encode/decode: '] + d + j, nowa-linia.
+		Program koniec.
+	}.
+}.

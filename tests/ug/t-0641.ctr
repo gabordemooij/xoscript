@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := لۇغەت يېڭى
+	# ASCII only
+	قوي: ﴿ تىزىم يېڭى ; 65 ; 65 ; 65 ; 65 ; 0 ﴾ ئاچقۇچ: ⌝'AAAA'⌜,
+	# valid 2 byte sequence
+	قوي: ﴿ تىزىم يېڭى ; 194 ; 162 ; 0 ﴾ ئاچقۇچ: ⌝'¢'⌜,
+	# Valid 3-byte UTF-8
+    قوي: ﴿ تىزىم يېڭى ; 226 ; 130 ; 172 ; 0 ﴾ ئاچقۇچ: ⌝'€'⌜,
+	# Valid 4-byte UTF-8
+    قوي: ﴿ تىزىم يېڭى ; 240 ; 144 ; 141 ; 136 ; 0 ﴾ ئاچقۇچ: ⌝'𐍈'⌜,
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    قوي: ﴿ تىزىم يېڭى ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ﴾ ئاچقۇچ: ⌝'A?A'⌜,
+	# Overlong encoding of ASCII 'A' (should become ?),
+    قوي: ﴿ تىزىم يېڭى ; 65 ; 193 ; 129 ; 0 ﴾ ئاچقۇچ: ⌝'A?'⌜,
+	# Invalid first byte (0xFF)
+    قوي: ﴿ تىزىم يېڭى ; 255 ; 0 ﴾ ئاچقۇچ: ⌝'?'⌜,
+	# Incomplete multi-byte sequence at end
+    قوي: ﴿ تىزىم يېڭى ; 66 ; 226 ; 0 ﴾ ئاچقۇچ: ⌝'B?'⌜,
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    قوي: ﴿ تىزىم يېڭى ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ﴾ ئاچقۇچ: ⌝'A€?𐍈B'⌜.
+	 
+utf8cases ھەربىر: ⎬ :key :value
+	>> blob := Blob يېڭى: value سانى, بايتلار: value.
+	>> str := blob تېكىستكە.
+	﴿str = key﴾ راست-بولسا: ⎬
+		چىقىرىش ياز: ⌝'OK'⌜, يېڭى-قۇر.
+	⎨, بولمىسا: ⎬
+		چىقىرىش ياز: ⌝'UTF8 sanitizer failed on: '⌜ + key + ⌝' got: '⌜ + str, يېڭى-قۇر.
+	⎨.
+	blob بوشات.
+⎨.

@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Sanakirja uusi
+	# ASCII only
+	aseta: ( Lista uusi ; 65 ; 65 ; 65 ; 65 ; 0 ) kohtaan: ['AAAA'],
+	# valid 2 byte sequence
+	aseta: ( Lista uusi ; 194 ; 162 ; 0 ) kohtaan: ['¢'],
+	# Valid 3-byte UTF-8
+    aseta: ( Lista uusi ; 226 ; 130 ; 172 ; 0 ) kohtaan: ['€'],
+	# Valid 4-byte UTF-8
+    aseta: ( Lista uusi ; 240 ; 144 ; 141 ; 136 ; 0 ) kohtaan: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    aseta: ( Lista uusi ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) kohtaan: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    aseta: ( Lista uusi ; 65 ; 193 ; 129 ; 0 ) kohtaan: ['A?'],
+	# Invalid first byte (0xFF)
+    aseta: ( Lista uusi ; 255 ; 0 ) kohtaan: ['?'],
+	# Incomplete multi-byte sequence at end
+    aseta: ( Lista uusi ; 66 ; 226 ; 0 ) kohtaan: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    aseta: ( Lista uusi ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) kohtaan: ['A€?𐍈B'].
+	 
+utf8cases jokainen: { :key :value
+	>> blob := Blob uusi: value lukumäärä, bytes: value.
+	>> str := blob teksti.
+	(str = key) tosi: {
+		Tuloste kirjoita: ['OK'], rivinvaihto.
+	}, muuten: {
+		Tuloste kirjoita: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, rivinvaihto.
+	}.
+	blob vapauta.
+}.

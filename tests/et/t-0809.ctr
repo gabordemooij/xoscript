@@ -1,0 +1,14 @@
+# backslashes must survive code serialization, strings must not end early
+>> väärtused := Loend uus
+	; ['C:\\new']
+	; ['ends with backslash \\']
+	; ['\\\\']
+	; ['x\\\'] at: 9, put: 1 at: 2).'].
+
+väärtused iga: { :i :value
+	>> d := Sõnastik uus.
+	d pane: value kohale: ['k'].
+	>> r := d kood objekt.
+	Väljund kirjuta: r arvuta, reavahetus.
+	Väljund kirjuta: ( (r kohal: ['k']) = value ), reavahetus.
+}.

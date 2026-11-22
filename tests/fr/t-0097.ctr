@@ -1,0 +1,42 @@
+
+Texte quand: ['html'] faire: { <- (
+		soi
+		remplacer: ['&'] par: ['&amp;'],
+		remplacer: ['<'] par: ['&lt;'],
+		remplacer: ['>'] par: ['&gt;'],
+		remplacer: ['"'] par: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Objet nouveau.
+
+HtmlBrush quand: ['répondre:'] faire: { :tag
+	Sortie écrire: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush quand: ['répondre:et:'] faire: { :tag :content
+	tag := ( tag de: 0 longueur: (tag longueur - 1) ).
+	Sortie écrire: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush quand: ['content:'] faire: { :text
+	Sortie écrire: text html, stop.
+}.
+
+HtmlBrush quand: ['attr:value:'] faire: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush nouveau.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

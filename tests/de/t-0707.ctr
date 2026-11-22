@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+Programm speicherverwaltung: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB neu host: ['localhost'],
+	benutzername: ['xo'], passwort: ['pass123'], datenbankname: ['xobase'], verbinden.
+
+>> TwoDigitFormat := Format neu: ['%02d'].
+
+# Datetime
+{
+	>> jahr := Zahl zwischen: 1995 und: 2050, text.
+	>> monat := TwoDigitFormat anwenden-int: (Zahl zwischen: 1 und: 12), text.
+	>> tag := TwoDigitFormat anwenden-int: (Zahl zwischen: 1 und: 28), text.
+	>> stunde := TwoDigitFormat anwenden-int: (Zahl zwischen: 1 und: 23), text.
+	>> minute := TwoDigitFormat anwenden-int: (Zahl zwischen: 1 und: 59), text.
+	>> sekunde := TwoDigitFormat anwenden-int: (Zahl zwischen: 1 und: 59), text.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: jahr,
+		MM: monat,
+		DD: tag,
+		HH: stunde,
+		II: minute,
+		SS: sekunde.
+	>> suchparameter :=
+	db abfrage: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	abrufen: { :row
+		(row mydatetime = datetime) nein: {
+			diese-aufgabe fehler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter hinzufügen: 1.
+} * 100.
+
+# Date
+{
+	>> jahr := Zahl zwischen: 1995 und: 2050, text.
+	>> monat := TwoDigitFormat anwenden-int: (Zahl zwischen: 1 und: 12), text.
+	>> tag := TwoDigitFormat anwenden-int: (Zahl zwischen: 1 und: 28), text.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: jahr,
+		MM: monat,
+		DD: tag.
+	>> suchparameter :=
+	db abfrage: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	abrufen: { :row
+		(row mydate = date) nein: {
+			diese-aufgabe fehler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter hinzufügen: 1.
+} * 100.
+
+
+# Time
+{
+	>> stunde := TwoDigitFormat anwenden-int: (Zahl zwischen: 1 und: 23), text.
+	>> minute := TwoDigitFormat anwenden-int: (Zahl zwischen: 1 und: 59), text.
+	>> sekunde := TwoDigitFormat anwenden-int: (Zahl zwischen: 1 und: 59), text.
+	>> zeit := ['HH:II:SS'].
+	zeit
+		HH: stunde,
+		II: minute,
+		SS: sekunde.
+	>> suchparameter :=
+	db abfrage: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: zeit),
+	abrufen: { :row
+		(row mytime = zeit) nein: {
+			diese-aufgabe fehler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter hinzufügen: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := Liste neu füllen: 100000 mit: ['x'], zusammenfügen: [''].
+{
+	>> str2 := Tresor token: 40.
+	>> suchparameter :=
+	db abfrage: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	abrufen: { :row
+		(row str1 = str1 und: row str2 = str2) nein: {
+			diese-aufgabe fehler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter hinzufügen: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := Zahl zwischen: 1 und: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 aus-text: ['9223372036854775807'] ) -
+		( Int64 aus-text: ['99999'] ) +
+		( Int64 aus-text: n1 text )
+	).
+	>> suchparameter :=
+	db abfrage: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	abrufen: { :row
+		(row n1 = n1) nein: {
+			diese-aufgabe fehler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) nein: {
+			diese-aufgabe fehler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 gerundet) nein: {
+			diese-aufgabe fehler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) nein: {
+			diese-aufgabe fehler: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter hinzufügen: 1.
+} * 100.
+
+
+Ausgabe schreiben: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), stopp.

@@ -1,0 +1,52 @@
+#ffi test
+
+
+Server init.
+
+برنامج إدارة-الذاكرة: 4.
+
+# for this test you need set a path to libc (puts)
+>> libname := برنامج إعداد: ⌝'FFITESTLIB'⌜.
+
+
+
+Server اربط: ﴿
+ قائمة جديد ;
+ libname ;
+ ⌝'puts'⌜ ;
+ ﴿ قائمة جديد ; ⌝'pointer'⌜ ﴾ ;
+ ⌝'void'⌜ ;
+ ⌝'Puts'⌜ ;
+ ⌝'str:'⌜
+﴾.
+
+>> s := Blob utf8: ⌝'Hello from FFI!\n'⌜.
+
+Puts str: s.
+s حرر.
+
+# test with struct
+
+>> a := Blob جديد: 8.
+a بايتات: ﴿
+	قائمة <<: 
+	2, ; 0 ; 0 ; 0 ;
+    1  ; 0 ; 0 ; 0
+﴾.
+
+>> struct := Blob struct: ﴿قائمة <<: ⌝'int'⌜, ; ⌝'int'⌜﴾.
+
+Server اربط: ﴿
+	قائمة <<: ⌝'@structtest'⌜, ;
+	⌝'@structtest'⌜ ;
+	﴿قائمة <<: struct﴾ ; 
+	⌝'int'⌜ ;	
+	⌝'ffitest'⌜ ;
+	⌝'ffisum:'⌜
+﴾.
+	
+مخرج اكتب: ⌝'Sum test:'⌜ + ﴿ffitest ffisum: a﴾, سطر-جديد.
+
+struct حرر-struct.
+struct حرر.
+a حرر.

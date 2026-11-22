@@ -1,0 +1,58 @@
+#Linux
+>> Slurp := Objek baru.
+
+Slurp saat: ['baru'] lakukan: {
+	milik str := [''].
+}.
+
+Slurp saat: ['nieuw'] lakukan: {
+	milik str := [''].
+}.
+
+Slurp saat: ['tanggapi:'] lakukan: { :blah
+		milik str tambah-di-akhir: blah.
+}.
+
+Slurp saat: ['tanggapi:dan:'] lakukan: { :blah :blahah
+		milik str tambah-di-akhir: (blah dari: 0 panjang: (blah panjang - 1)).
+		milik str tambah-di-akhir: [' '].
+		milik str tambah-di-akhir: blahah.
+}.
+
+Slurp saat: ['obtain'] lakukan: {
+	>> buffer := milik str.
+	milik str := ['']. <- buffer.
+}.
+
+
+Keluaran tulis: (Program sistem: (Slurp baru echo: ['Hello I can write to console using fluid API!'], obtain)).
+
+
+{ Berkas baru: ['/tmp/from.txt'], hapus. } tangkap: { ['Empty']. }, mulai.
+{ Berkas baru: ['/tmp/to.txt'], hapus. } tangkap: { ['Empty']. }, mulai.
+
+
+Berkas baru: ['/tmp/to.txt'], ada salah: {
+	Keluaran tulis: ['Confirmed. Target file does not exist.\
+'].
+}.
+Berkas baru: ['/tmp/from.txt'], ada salah: {
+	Keluaran tulis: ['Confirmed. Source file does not exist.\
+'].
+}.
+
+
+
+Program sistem: (Slurp baru touch: ['/tmp/from.txt ;'], echo: ['"hello world" > /tmp/from.txt'], obtain).
+
+
+
+Program sistem: (Slurp baru cp: ['/tmp/from.txt /tmp/to.txt'], obtain).
+
+Berkas baru: ['/tmp/to.txt'], ada benar: {
+	Keluaran tulis: ['Confirmed. Target file has been created by shell.\
+'].
+}.
+
+
+Keluaran tulis: ['Contents of file is:'] + (Berkas baru: ['/tmp/to.txt'], baca), baris-baru.

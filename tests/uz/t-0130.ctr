@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Dastur sozlama: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server bogʻlash: ( Roʻyxat yangi ;
+ libname ; ['fopen'] ;
+ ( Roʻyxat yangi ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+bogʻlash: ( Roʻyxat yangi ;
+ Hech ; # means same lib
+ ['fread'] ;
+ ( Roʻyxat yangi ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Hech ; # means same object (i.e. Stream)
+ ['fread']
+),
+bogʻlash: (
+ Roʻyxat yangi ;
+ Hech ; # means same lib
+ ['fwrite'] ;
+ ( Roʻyxat yangi ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Hech ; # means same lib
+ ['fwrite']
+),
+bogʻlash: (
+ Roʻyxat yangi ;
+ Hech ; # means same lib
+ ['rewind'] ;
+ ( Roʻyxat yangi ; ['pointer'] ) ;
+ ['int'] ;
+ Hech ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> yoʻl := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: yoʻl mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream xabar: ['fwrite'] argumentlar: (Roʻyxat yangi ; str ; 1 ; 6 ; fd ).
+Chiqish yozish: bytes-written, yangi-qator.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob yangi: 20.
+
+# read from file
+>> bytes-read := Stream xabar: ['fread'] argumentlar: (Roʻyxat yangi ; buf ; 1 ; 6 ; fd ).
+Chiqish yozish: bytes-read, yangi-qator.
+Chiqish yozish: buf, yangi-qator.
+
+# free memory
+str  boʻshatish.
+yoʻl boʻshatish.
+mode boʻshatish.
+buf  boʻshatish.
+
+

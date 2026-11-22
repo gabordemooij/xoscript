@@ -1,0 +1,43 @@
+
+
+>> g := Server አዲስ.
+>> v := ካዝና አዲስ.
+>> ok := 0.
+
+>> secrets := ሰልፍ አዲስ ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets ቅዳ.
+passwords እያንዳንዱ: { :i :p
+	secrets እያንዳንዱ: { :n :s
+		{
+			>> encrypted := v መስጥር: s ቁልፍ: p.
+			>> decrypted := v ምስጢር-ፍታ: encrypted ቁልፍ: p.
+			(decrypted = s) እውነት-ከሆነ: {
+				ok ደምር: 1.
+			}, አለበለዚያ: {
+				ውጤት ፃፍ: ['failed encrypting/decrypting: '], አዲስ-መስመር.
+				ውጤት ፃፍ: s, አዲስ-መስመር.
+				ውጤት ፃፍ: ['encrypted: '] + encrypted, አዲስ-መስመር.
+				ውጤት ፃፍ: ['decrypted: '] + encrypted, አዲስ-መስመር.
+				ፕሮግራም ጨርስ.
+			}.
+		} ያዝ: { :err
+			(s = [''] ወይም: p = ['']) እውነት-ከሆነ: {
+				ok ደምር: 1.
+			}, አለበለዚያ: {
+				ውጤት ፃፍ: err, አዲስ-መስመር.
+				ፕሮግራም ጨርስ.
+			}.
+		}, ጀምር.
+	}.
+}.
+
+ውጤት ፃፍ: ( ok + [' vault encryptions tested.'] ), አዲስ-መስመር.

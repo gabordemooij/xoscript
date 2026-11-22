@@ -1,0 +1,32 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Baʼii barreessi: ['Database test'], dhaabi.
+
+>> db := Maria-DB haaraa keessummeessaa: ['localhost'],
+	maqaa-fayyadamaa: ['xo'], jecha-icciitii: ['pass123'], maqaa-kuusaa-deetaa: ['xobase'], walqunnami.
+
+Baʼii barreessi: ['Can we connect? '] + db walqunnameera?, dhaabi.
+
+>> ulaagaalee-barbaacha := db iyyaafannoo: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], ulaagaalee: ( Tarree-wantootaa haaraa ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  ulaagaalee-barbaacha hojiirra-oolchi. db mirkaneessi. } qabi: { :e db duubatti-deebisi.  }, fiigi.
+
+Baʼii barreessi: ['Can we insert? '] + ( ulaagaalee-barbaacha insert-id > 0 ), dhaabi.
+
+>> Obj := Wanta haaraa.
+Obj irratti: ['retrieve-rows'] godhi: {
+	koo lakkaaʼi := 0.
+	>> ulaagaalee-barbaacha :=
+	db iyyaafannoo: ['SELECT * FROM book order by id desc limit 2'], 
+	fidi: { :row 
+		koo lakkaaʼi idaʼi: 1.
+		Dhugaa adda-kuti.
+	}. <- koo lakkaaʼi kopii.
+}.
+
+Baʼii barreessi: ['Can we query? '] + ( Obj retrieve-rows > 0 ), dhaabi.

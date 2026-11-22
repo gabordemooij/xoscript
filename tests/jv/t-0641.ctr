@@ -1,0 +1,35 @@
+# Test utf8 sanitizer
+Server init.
+
+>> utf8cases := Kamus anyar
+	# ASCII only
+	seleh: ( Dhaptar anyar ; 65 ; 65 ; 65 ; 65 ; 0 ) ing: ['AAAA'],
+	# valid 2 byte sequence
+	seleh: ( Dhaptar anyar ; 194 ; 162 ; 0 ) ing: ['¢'],
+	# Valid 3-byte UTF-8
+    seleh: ( Dhaptar anyar ; 226 ; 130 ; 172 ; 0 ) ing: ['€'],
+	# Valid 4-byte UTF-8
+    seleh: ( Dhaptar anyar ; 240 ; 144 ; 141 ; 136 ; 0 ) ing: ['𐍈'],
+	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+    seleh: ( Dhaptar anyar ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ing: ['A?A'],
+	# Overlong encoding of ASCII 'A' (should become ?),
+    seleh: ( Dhaptar anyar ; 65 ; 193 ; 129 ; 0 ) ing: ['A?'],
+	# Invalid first byte (0xFF)
+    seleh: ( Dhaptar anyar ; 255 ; 0 ) ing: ['?'],
+	# Incomplete multi-byte sequence at end
+    seleh: ( Dhaptar anyar ; 66 ; 226 ; 0 ) ing: ['B?'],
+    # Empty string
+    #put: ( List new ) at: [''],
+	# Multiple mixed sequences
+    seleh: ( Dhaptar anyar ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ing: ['A€?𐍈B'].
+	 
+utf8cases saben: { :key :value
+	>> blob := Blob anyar: value cacah, bytes: value.
+	>> str := blob tèks.
+	(str = key) bener: {
+		Wetonan tulis: ['OK'], baris-anyar.
+	}, yen-ora: {
+		Wetonan tulis: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, baris-anyar.
+	}.
+	blob bebasna.
+}.

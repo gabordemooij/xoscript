@@ -1,0 +1,30 @@
+Tuloste kirjoita: ['Test object'], rivinvaihto.
+>> a := Olio uusi. 
+
+a kun: ['item:'] tee: { :out
+	oma out := out. 
+}.
+
+a kun: ['item'] tee: { <- oma out.
+}.
+
+a kun: ['greet'] tee: {
+	Tuloste kirjoita: ['hi from original out!'], rivinvaihto.
+}.
+
+a item: Tuloste.
+
+Tuloste kirjoita: a item, rivinvaihto.
+
+>> old-out-address := a item prototyyppi muistiosoite.
+a save-as: ['/tmp/a.bin'].
+Tuloste kirjoita: ['========== RELOADING SNAP:'], rivinvaihto.
+
+>> b := Olio load-from: ['/tmp/a.bin'].
+
+(b item prototyyppi muistiosoite = old-out-address) tosi: {
+	Tuloste kirjoita: ['Object link re-attached.'], rivinvaihto.
+}.
+
+b item kirjoita: ['hello from loaded out!'], rivinvaihto.
+b greet.

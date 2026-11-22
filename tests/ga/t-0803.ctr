@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB nua óstach: ['localhost'],
+	ainm-úsáideora: ['xo'],
+	pasfhocal: ['pass123'],
+	ainm-bunachair: ['xobase'],
+	ceangail.
+
+>> conn2 := Maria-DB nua óstach: ['localhost'],
+	ainm-úsáideora: ['xo'],
+	pasfhocal: ['pass123'],
+	ainm-bunachair: ['xobase'],
+	ceangail.
+#...
+>> del := conn1 iarratas: ['DELETE FROM book WHERE id > 0'].
+{  del rith-ordú. conn1 deimhnigh. } gabh: { :e conn1 cealaigh.  }, tosaigh.
+
+>> insert := conn1 iarratas: ['INSERT INTO book (id) VALUES(null)'].
+insert rith-ordú.
+
+>> comhair := conn1 iarratas: ['SELECT COUNT(*) AS num FROM book'].
+comhair faigh-sonraí: { :row Aschur scríobh: row num, líne-nua. }.
+
+# does not show up
+# insert not committed on connection 1
+>> comhair := conn2 iarratas: ['SELECT COUNT(*) AS num FROM book'].
+comhair faigh-sonraí: { :row Aschur scríobh: row num, líne-nua. }.

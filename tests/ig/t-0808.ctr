@@ -1,0 +1,25 @@
+# vault keys and signatures that decode too long must not overflow the stack
+Server init.
+
+>> keys := Igbe-nchekwa mepụta-igodo.
+>> sk := keys mbụ.
+>> pk := keys nke-ikpeazụ.
+>> sig := Igbe-nchekwa bịanye-aka: ['abc'] jiri: sk.
+
+# 88 characters without padding decode to 66 bytes
+>> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+# 44 characters without padding decode to 33 bytes
+>> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+
+{ Igbe-nchekwa bịanye-aka: ['abc'] jiri: long. } jide: { :e
+	Mpụta dee: e, ahịrị-ọhụrụ.
+}, bido.
+
+{ Igbe-nchekwa lelee: ['abc'] mbinye-aka: long jiri: pk. } jide: { :e
+	Mpụta dee: e, ahịrị-ọhụrụ.
+}, bido.
+
+{ Igbe-nchekwa lelee: ['abc'] mbinye-aka: sig jiri: short. } jide: { :e
+	Mpụta dee: e, ahịrị-ọhụrụ.
+}, bido.

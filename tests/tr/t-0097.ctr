@@ -1,0 +1,42 @@
+
+Metin olunca: ['html'] yap: { <- (
+		kendi
+		değiştir: ['&'] yenisi: ['&amp;'],
+		değiştir: ['<'] yenisi: ['&lt;'],
+		değiştir: ['>'] yenisi: ['&gt;'],
+		değiştir: ['"'] yenisi: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := Nesne yeni.
+
+HtmlBrush olunca: ['yanıtla:'] yap: { :tag
+	Çıktı yaz: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush olunca: ['yanıtla:ve:'] yap: { :tag :content
+	tag := ( tag başlangıç: 0 uzunluk: (tag uzunluk - 1) ).
+	Çıktı yaz: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush olunca: ['content:'] yap: { :text
+	Çıktı yaz: text html, yeni-satır.
+}.
+
+HtmlBrush olunca: ['attr:value:'] yap: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush yeni.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

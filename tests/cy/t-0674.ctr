@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> llwybr := ['/tmp/dat.csv'].
+>> csv := Ffeil newydd: llwybr.
+csv ysgrifennu: s.
+
+# accepts CRLF LF CR, varying row length
+csv amffinydd: [';'] dyfynnod: ['"'] llinellau: { :line
+	Rhaglen tacluso.
+	Allbwn ysgrifennu: line, llinell-newydd.
+	Rhaglen tacluso.
+}.
+
+# unequal lines
+s atodi: ['\njustone'].
+csv ysgrifennu: s.
+{
+	csv amffinydd: [';'] dyfynnod: ['"'] llinellau: { :line
+		Allbwn ysgrifennu: line, llinell-newydd.
+	}.
+} dal: { :e 
+	Allbwn ysgrifennu: e, llinell-newydd.
+}, cychwyn.
+
+# invalid format
+s := ['"he"llo";world'].
+csv ysgrifennu: s.
+{
+	csv amffinydd: [';'] dyfynnod: ['"'] llinellau: { :line
+		Allbwn ysgrifennu: line, llinell-newydd.
+	}.
+} dal: { :e 
+	Allbwn ysgrifennu: e, llinell-newydd.
+}, cychwyn.

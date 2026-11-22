@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Çıktı yaz: ['Database test'], yeni-satır.
+
+>> db := Maria-DB yeni sunucu-adı: ['localhost'],
+	kullanıcı: ['xo'], parola: ['pass123'], veritabanı-adı: ['xobase'], bağlan.
+
+Çıktı yaz: ['Can we connect? '] + db bağlı?, yeni-satır.
+
+>> arama-parametreleri := db sorgu: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametreler: ( Liste yeni ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  arama-parametreleri yürüt. db onayla. } yakala: { :e db geri-al.  }, başlat.
+
+Çıktı yaz: ['Can we insert? '] + ( arama-parametreleri insert-id > 0 ), yeni-satır.
+
+>> x := 0.
+>> arama-parametreleri :=
+db sorgu: ['SELECT * FROM book order by id desc limit 2'], 
+getir: { :row 
+	x ekle: 1.
+	Doğru kır. # must clean up, no 'Commands out of sync'
+}.
+
+>> arama-parametreleri :=
+db sorgu: ['SELECT * FROM book order by id desc limit 2'], 
+getir: { :row
+	x ekle: 1.
+	Doğru kır.
+}.
+
+(x > 0) doğru: {
+	Çıktı yaz: ['Can we break in the middle of a fetch? '].
+}.
+
+Çıktı yaz: Doğru, yeni-satır.

@@ -1,0 +1,53 @@
+Праграма кіраванне-памяццю: 0.
+Спіс пры: ['sum'] выканаць: {
+	>> total := 0.
+	сам кожны: { :index :element
+		total дадаць: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Файл новы: ['/tmp/test.txt'].
+f пісаць: ['Lorem Ipsum'].
+f закрыць.
+  
+
+f := Файл новы: ['/tmp/test.txt'].
+>> text := f чытаць.
+f закрыць.
+
+
+
+Праграма прыбраць.
+usedMemory1 := (Праграма памяць ? 1).
+
+
+
+f := Файл новы: ['/tmp/test.txt'].
+text := f чытаць.
+f закрыць.
+
+Праграма прыбраць.
+usedMemory2 := (Праграма памяць ? 1).
+
+
+f := Файл новы: ['/tmp/test.txt'].
+text := f чытаць.
+f закрыць.
+
+Праграма прыбраць.
+usedMemory3 := (Праграма памяць ? 1).
+
+
+
+( usedMemory1 = usedMemory2 і: usedMemory1 = usedMemory3, і: usedMemory2 = usedMemory3 ) праўда: {
+	Вывад пісаць: ['No memory leaks here'].
+}, хлусня: {
+	Вывад пісаць: ['Leaking memory...'].
+}.

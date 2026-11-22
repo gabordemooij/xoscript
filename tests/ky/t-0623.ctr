@@ -1,0 +1,43 @@
+
+
+>> g := Server жаңы.
+>> v := Сейф жаңы.
+>> ok := 0.
+
+>> secrets := Тизме жаңы ; 
+	 ['aaa'] ;
+	 [''] ; 
+	 ['AB'] ;
+	 ['abcdefghijklmnopqrstuvwxyz0123456789'] ; 
+	 ['!@--+467hdHJKJs__=3hjsakd'] ;
+	 ['spaces and	tabs'] ;
+	 ['漢字'] ;
+	 ['==[abc]=='].
+	
+>> passwords := secrets көчүрүү.
+passwords ар-бир: { :i :p
+	secrets ар-бир: { :n :s
+		{
+			>> encrypted := v шифрлөө: s ачкыч: p.
+			>> decrypted := v шифрди-чечүү: encrypted ачкыч: p.
+			(decrypted = s) чын-болсо: {
+				ok кошуу: 1.
+			}, антпесе: {
+				Чыгаруу жазуу: ['failed encrypting/decrypting: '], жаңы-сап.
+				Чыгаруу жазуу: s, жаңы-сап.
+				Чыгаруу жазуу: ['encrypted: '] + encrypted, жаңы-сап.
+				Чыгаруу жазуу: ['decrypted: '] + encrypted, жаңы-сап.
+				Программа бүтүрүү.
+			}.
+		} кармоо: { :err
+			(s = [''] же: p = ['']) чын-болсо: {
+				ok кошуу: 1.
+			}, антпесе: {
+				Чыгаруу жазуу: err, жаңы-сап.
+				Программа бүтүрүү.
+			}.
+		}, иштетүү.
+	}.
+}.
+
+Чыгаруу жазуу: ( ok + [' vault encryptions tested.'] ), жаңы-сап.

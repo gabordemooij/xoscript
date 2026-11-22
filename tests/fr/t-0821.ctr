@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> chemin := ['/tmp/test0821.csv'].
+>> file := Fichier nouveau: chemin.
+
+file écrire: ['a,b\n"1,2\n'].
+{
+	file délimiteur: [','] guillemet: ['"'] lignes: { :line
+		Sortie écrire: line, stop.
+	}.
+} intercepter: { :e Sortie écrire: e, stop. }, démarrer.
+
+# a closed quote still works
+file écrire: ['a,b\n"1,2",3'].
+file délimiteur: [','] guillemet: ['"'] lignes: { :line
+	Sortie écrire: line, stop.
+}.
+file supprimer.

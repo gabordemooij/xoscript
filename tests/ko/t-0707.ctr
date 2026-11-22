@@ -1,0 +1,190 @@
+# test type casts / conversions / bindings
+프로그램 메모리관리: 4.
+Server init.
+
+>> counter := 0.
+>> db := Maria-DB 새로 호스트: ['localhost'],
+	사용자이름: ['xo'], 비밀번호: ['pass123'], 데이터베이스이름: ['xobase'], 접속.
+
+>> TwoDigitFormat := 형식 새로: ['%02d'].
+
+# Datetime
+{
+	>> 연도 := 숫자 사이: 1995 와: 2050, 문자열로.
+	>> 월값 := TwoDigitFormat 정수에적용: (숫자 사이: 1 와: 12), 문자열로.
+	>> 일값 := TwoDigitFormat 정수에적용: (숫자 사이: 1 와: 28), 문자열로.
+	>> 시간 := TwoDigitFormat 정수에적용: (숫자 사이: 1 와: 23), 문자열로.
+	>> 분값 := TwoDigitFormat 정수에적용: (숫자 사이: 1 와: 59), 문자열로.
+	>> 초값 := TwoDigitFormat 정수에적용: (숫자 사이: 1 와: 59), 문자열로.
+	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
+	datetime
+		YYYY: 연도,
+		MM: 월값,
+		DD: 일값,
+		HH: 시간,
+		II: 분값,
+		SS: 초값.
+	>> 검색매개변수 :=
+	db 쿼리: (['
+		SELECT 
+		"extra" AS paddingA,
+		CAST("<datetime>" AS DATETIME) AS mydatetime,
+		"extra" AS paddingB
+	'] <datetime>: datetime),
+	가져오기: { :row
+		(row mydatetime = datetime) 거짓이면: {
+			이작업 오류: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mydatetime
+			).
+		}.
+	
+	}.
+	counter 더하기: 1.
+} * 100.
+
+# Date
+{
+	>> 연도 := 숫자 사이: 1995 와: 2050, 문자열로.
+	>> 월값 := TwoDigitFormat 정수에적용: (숫자 사이: 1 와: 12), 문자열로.
+	>> 일값 := TwoDigitFormat 정수에적용: (숫자 사이: 1 와: 28), 문자열로.
+	>> date := ['YYYY-MM-DD'].
+	date
+		YYYY: 연도,
+		MM: 월값,
+		DD: 일값.
+	>> 검색매개변수 :=
+	db 쿼리: (['
+		SELECT
+		"extra" AS paddingA,
+		CAST("<date>" AS DATE) AS mydate,
+		"extra" AS paddingB
+	'] <date>: date),
+	가져오기: { :row
+		(row mydate = date) 거짓이면: {
+			이작업 오류: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: date,
+				<observation>: row mydate
+			).
+		}.
+	}.
+	counter 더하기: 1.
+} * 100.
+
+
+# Time
+{
+	>> 시간 := TwoDigitFormat 정수에적용: (숫자 사이: 1 와: 23), 문자열로.
+	>> 분값 := TwoDigitFormat 정수에적용: (숫자 사이: 1 와: 59), 문자열로.
+	>> 초값 := TwoDigitFormat 정수에적용: (숫자 사이: 1 와: 59), 문자열로.
+	>> 시각 := ['HH:II:SS'].
+	시각
+		HH: 시간,
+		II: 분값,
+		SS: 초값.
+	>> 검색매개변수 :=
+	db 쿼리: (['
+		SELECT CAST("<time>" AS TIME)
+		AS mytime
+	'] <time>: 시각),
+	가져오기: { :row
+		(row mytime = 시각) 거짓이면: {
+			이작업 오류: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter 더하기: 1.
+} * 100.
+
+
+# Strings (varchar/text)
+>> str1 := 리스트 새로 채우기: 100000 값: ['x'], 합치기: [''].
+{
+	>> str2 := 금고 토큰: 40.
+	>> 검색매개변수 :=
+	db 쿼리: (['
+		SELECT
+		"<str1>" AS str1,
+		"<str2>" AS str2
+	'] 
+	<str1>: str1,
+	<str2>: str2
+	),
+	가져오기: { :row
+		(row str1 = str1 그리고: row str2 = str2) 거짓이면: {
+			이작업 오류: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: datetime,
+				<observation>: row mytime
+			).
+		}.
+	}.
+	counter 더하기: 1.
+} * 100.
+
+
+# Numbers
+{
+	>> n1 := 숫자 사이: 1 와: 99999.
+	>> n2 := n1 / 1000.
+	>> big := (
+		( Int64 문자열에서: ['9223372036854775807'] ) -
+		( Int64 문자열에서: ['99999'] ) +
+		( Int64 문자열에서: n1 문자열로 )
+	).
+	>> 검색매개변수 :=
+	db 쿼리: (['
+		SELECT
+		<n1> AS n1,
+		<n2> AS n2,
+		CAST(<n2> AS DECIMAL) AS n3,
+		<big> AS big
+	']
+	<n1>: n1,
+	<n2>: n2,
+	<big>: big
+	),
+	가져오기: { :row
+		(row n1 = n1) 거짓이면: {
+			이작업 오류: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n1
+			).
+		}.
+		(row n2 = n2) 거짓이면: {
+			이작업 오류: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n2
+			).
+		}.
+		(row n3 = n2 반올림) 거짓이면: {
+			이작업 오류: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: n1,
+				<observation>: row n3
+			).
+		}.
+		(row big = big) 거짓이면: {
+			이작업 오류: (
+				['Expected: <expected> but got: <observation>']
+				<expected>: big,
+				<observation>: row big
+			).
+		}.
+		
+	}.
+	counter 더하기: 1.
+} * 100.
+
+
+출력 쓰기: (
+	['OK, <counter> fuzzy casts/conversions tested.']
+	<counter>: counter
+), 줄바꿈.

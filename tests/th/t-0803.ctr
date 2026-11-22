@@ -1,0 +1,27 @@
+Server init.
+
+>> conn1 := Maria-DB สร้างใหม่ โฮสต์: ['localhost'],
+	ชื่อผู้ใช้: ['xo'],
+	รหัสผ่าน: ['pass123'],
+	ชื่อฐานข้อมูล: ['xobase'],
+	เชื่อมต่อ.
+
+>> conn2 := Maria-DB สร้างใหม่ โฮสต์: ['localhost'],
+	ชื่อผู้ใช้: ['xo'],
+	รหัสผ่าน: ['pass123'],
+	ชื่อฐานข้อมูล: ['xobase'],
+	เชื่อมต่อ.
+#...
+>> del := conn1 คิวรี: ['DELETE FROM book WHERE id > 0'].
+{  del ดำเนินการ. conn1 คอมมิต. } ดักจับ: { :e conn1 ย้อนกลับ.  }, เริ่ม.
+
+>> insert := conn1 คิวรี: ['INSERT INTO book (id) VALUES(null)'].
+insert ดำเนินการ.
+
+>> จำนวน := conn1 คิวรี: ['SELECT COUNT(*) AS num FROM book'].
+จำนวน ดึงข้อมูล: { :row แสดงผล เขียน: row num, ขึ้นบรรทัดใหม่. }.
+
+# does not show up
+# insert not committed on connection 1
+>> จำนวน := conn2 คิวรี: ['SELECT COUNT(*) AS num FROM book'].
+จำนวน ดึงข้อมูล: { :row แสดงผล เขียน: row num, ขึ้นบรรทัดใหม่. }.

@@ -1,0 +1,34 @@
+# happy flow
+>> s := ['hello;"""world"""\n"of";"c\ns\nv"'].
+>> hanyar-fayil := ['/tmp/dat.csv'].
+>> csv := Fayil sabo: hanyar-fayil.
+csv rubuta: s.
+
+# accepts CRLF LF CR, varying row length
+csv mai-rabawa: [';'] alamar-zance: ['"'] layuka: { :line
+	Shiri tsaftace.
+	Fitarwa rubuta: line, sabon-layi.
+	Shiri tsaftace.
+}.
+
+# unequal lines
+s ƙara-a-ƙarshe: ['\njustone'].
+csv rubuta: s.
+{
+	csv mai-rabawa: [';'] alamar-zance: ['"'] layuka: { :line
+		Fitarwa rubuta: line, sabon-layi.
+	}.
+} kama: { :e 
+	Fitarwa rubuta: e, sabon-layi.
+}, fara.
+
+# invalid format
+s := ['"he"llo";world'].
+csv rubuta: s.
+{
+	csv mai-rabawa: [';'] alamar-zance: ['"'] layuka: { :line
+		Fitarwa rubuta: line, sabon-layi.
+	}.
+} kama: { :e 
+	Fitarwa rubuta: e, sabon-layi.
+}, fara.

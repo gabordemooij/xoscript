@@ -1,0 +1,69 @@
+# using FFI with the Server plugin
+
+# connect to libc (platform specific)
+>> libname := Programa kaayusan: ['FFITESTLIB'].
+
+# link stdio functions from c for advances file operations
+Server iugnay: ( Listahan bago ;
+ libname ; ['fopen'] ;
+ ( Listahan bago ; ['pointer'] ; ['pointer']) ;
+ ['pointer'] ;
+ ['Stream'] ;
+ ['path:mode:']
+),
+iugnay: ( Listahan bago ;
+ Wala ; # means same lib
+ ['fread'] ;
+ ( Listahan bago ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Wala ; # means same object (i.e. Stream)
+ ['fread']
+),
+iugnay: (
+ Listahan bago ;
+ Wala ; # means same lib
+ ['fwrite'] ;
+ ( Listahan bago ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
+ ['int'] ;
+ Wala ; # means same lib
+ ['fwrite']
+),
+iugnay: (
+ Listahan bago ;
+ Wala ; # means same lib
+ ['rewind'] ;
+ ( Listahan bago ; ['pointer'] ) ;
+ ['int'] ;
+ Wala ; # means same lib
+ ['rewind:']
+).
+
+>> str := Blob utf8: ['abc123'].
+>> landas-ng-file := Blob utf8: ['/tmp/bla.txt'].
+>> mode := Blob utf8: ['w+'].
+
+# open a file with fopen(path, mode)
+>> fd := Stream path: landas-ng-file mode: mode.
+
+# write bytes from buffer str to file
+>> bytes-written := Stream mensahe: ['fwrite'] argumento: (Listahan bago ; str ; 1 ; 6 ; fd ).
+Labas isulat: bytes-written, bagong-linya.
+
+# rewind file pointer
+Stream rewind: fd.
+
+# allocate a buffer
+>> buf := Blob bago: 20.
+
+# read from file
+>> bytes-read := Stream mensahe: ['fread'] argumento: (Listahan bago ; buf ; 1 ; 6 ; fd ).
+Labas isulat: bytes-read, bagong-linya.
+Labas isulat: buf, bagong-linya.
+
+# free memory
+str  palayain.
+landas-ng-file palayain.
+mode palayain.
+buf  palayain.
+
+

@@ -1,0 +1,42 @@
+
+文字列 受信時: ['html'] 実行: { <- (
+		自身
+		置換: ['&'] 新: ['&amp;'],
+		置換: ['<'] 新: ['&lt;'],
+		置換: ['>'] 新: ['&gt;'],
+		置換: ['"'] 新: ['&quot;']
+	).
+}.
+
+>> HtmlBrush := オブジェクト 新規.
+
+HtmlBrush 受信時: ['応答:'] 実行: { :tag
+	出力 書く: (['<tag>↵'] tag: tag ).
+}.
+
+HtmlBrush 受信時: ['応答:かつ:'] 実行: { :tag :content
+	tag := ( tag 開始: 0 長さ: (tag 長さ - 1) ).
+	出力 書く: (['<tag content>↵'] tag: tag, content: content).
+}.
+
+HtmlBrush 受信時: ['content:'] 実行: { :text
+	出力 書く: text html, 改行.
+}.
+
+HtmlBrush 受信時: ['attr:value:'] 実行: { :attr :value <- ['attr="value"'] attr: attr, value: value.
+}.
+
+>> h := HtmlBrush 新規.
+
+
+h html
+	body
+		h1
+			content: ['hello world'],
+		/h1
+		span:
+			(h attr: ['class'] value: ['bold']),
+		/span
+	/body
+/html.
+		

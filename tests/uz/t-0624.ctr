@@ -1,0 +1,41 @@
+# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
+# reference in world.c
+>> Log := Obyekt yangi.
+
+Log kelganda: ['say:'] bajar: { :str
+	Chiqish yozish: str, yangi-qator.
+}.
+
+>> Item := Obyekt yangi.
+
+Item kelganda: ['yangi:'] bajar: { :id <- oʻzi yangi id: id.
+}.
+
+Item kelganda: ['id:'] bajar: { :id
+	oʻzining id := id.
+}.
+
+Item kelganda: ['id'] bajar: { <- oʻzining id. }.
+
+
+Item kelganda: ['matn'] bajar: {
+	>> str := ['Item#~no'].
+	str ~no: oʻzining id. <- str.
+}.
+
+
+>> Print := Obyekt yangi.
+
+Print kelganda: ['items'] bajar: { 
+	
+	oʻzining item := Item yangi: 1.
+	
+	# either segfault or wrong str here
+	Log say: (
+		['~item printed.'] ~item: oʻzining item
+	).
+	
+	
+}.
+
+Print items.

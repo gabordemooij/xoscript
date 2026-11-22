@@ -1,0 +1,53 @@
+Programa memoria-kudeaketa: 0.
+Zerrenda noiz: ['sum'] egin: {
+	>> total := 0.
+	norbera bakoitza: { :index :element
+		total gehitu: element.
+	}. <- total.
+}.
+
+>> usedMemory1 := 0.
+>> usedMemory2 := 0.
+>> usedMemory3 := 0.
+>> usedMemory4 := 0.
+
+
+
+>> f := Fitxategia berria: ['/tmp/test.txt'].
+f idatzi: ['Lorem Ipsum'].
+f itxi.
+  
+
+f := Fitxategia berria: ['/tmp/test.txt'].
+>> text := f irakurri.
+f itxi.
+
+
+
+Programa garbitu.
+usedMemory1 := (Programa memoria ? 1).
+
+
+
+f := Fitxategia berria: ['/tmp/test.txt'].
+text := f irakurri.
+f itxi.
+
+Programa garbitu.
+usedMemory2 := (Programa memoria ? 1).
+
+
+f := Fitxategia berria: ['/tmp/test.txt'].
+text := f irakurri.
+f itxi.
+
+Programa garbitu.
+usedMemory3 := (Programa memoria ? 1).
+
+
+
+( usedMemory1 = usedMemory2 eta: usedMemory1 = usedMemory3, eta: usedMemory2 = usedMemory3 ) egia: {
+	Irteera idatzi: ['No memory leaks here'].
+}, faltsua: {
+	Irteera idatzi: ['Leaking memory...'].
+}.

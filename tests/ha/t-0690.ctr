@@ -1,0 +1,40 @@
+# database test
+# see example server.xo for required config
+
+Server init.
+Fitarwa rubuta: ['Database test'], sabon-layi.
+
+>> db := Maria-DB sabo mai-masauki: ['localhost'],
+	sunan-mai-amfani: ['xo'], kalmar-sirri: ['pass123'], sunan-rumbun-bayanai: ['xobase'], haɗu.
+
+Fitarwa rubuta: ['Can we connect? '] + db an-haɗu?, sabon-layi.
+
+>> sigogin-nema := db tambaya: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], sigogi: ( Jeri sabo ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  sigogin-nema zartar. db tabbatar. } kama: { :e db mayar-baya.  }, fara.
+
+Fitarwa rubuta: ['Can we insert? '] + ( sigogin-nema insert-id > 0 ), sabon-layi.
+
+>> x := 0.
+>> sigogin-nema :=
+db tambaya: ['SELECT * FROM book order by id desc limit 2'], 
+ɗauko: { :row 
+	x ƙara: 1.
+	Gaskiya katse. # must clean up, no 'Commands out of sync'
+}.
+
+>> sigogin-nema :=
+db tambaya: ['SELECT * FROM book order by id desc limit 2'], 
+ɗauko: { :row
+	x ƙara: 1.
+	Gaskiya katse.
+}.
+
+(x > 0) gaskiya: {
+	Fitarwa rubuta: ['Can we break in the middle of a fetch? '].
+}.
+
+Fitarwa rubuta: Gaskiya, sabon-layi.
