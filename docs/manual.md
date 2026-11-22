@@ -2651,6 +2651,37 @@ add the dictionary for your language if it is not provided yet.
 This chapters discusses additional tools that work together with
 XOScript.
 
+## XOCAT
+
+XOCAT is a tool to run an XO-application or any interactive CLI
+application in any programming language securely over TLS.
+This allows you to connect to your XOScript application remotely.
+
+One XOCAT server only serves on XO-application. So any defects
+in a XOCAT server only impacts the associated application and
+nothing else.
+
+To start a XOCAT server:
+
+```
+PORT=4433 XOCAT_CERT=cert.pem \
+XOCAT_KEY=key.pem xocat server \
+./xo myapp.xo 2>/var/log/err.txt
+```
+
+The stdin/stdout will be connected to the remote clients. Stderr will
+never be shared with clients to avoid revealing senstive data.
+
+The client can use the XO-application like this:
+
+```
+XOCAT_CA=cert.pem xocat client \
+myexamplehost.com 4433
+```
+
+Hostnames will be verified, IPs are not allowed. It's not possible
+to disable TLS or have verification turned off.
+
 ## XOCL
 
 XOCL (XO Client) can be used to turn a webapp into a desktop

@@ -6,9 +6,6 @@ over TLS, for humans and agents.
 Server:  PORT=4433 XOCAT_CERT=cert.pem XOCAT_KEY=key.pem xocat server ./xo myapp.xo 2>/var/log/err.txt
 Client:  XOCAT_CA=cert.pem xocat client example.com 4433
 
-PORT=4433 XOCAT_CERT=demo/cert.pem XOCAT_KEY=demo/key.pem ./xocat server ./xo hello.xo
-XOCAT_CA=demo/cert.pem ./xocat client localhost 4433
-
 Environment (server):
   PORT        port to listen on (IPv4 and IPv6)
   XOCAT_BIND  optional address to bind to (default: all)
