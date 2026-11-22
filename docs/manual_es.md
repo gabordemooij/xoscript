@@ -1,1644 +1,1614 @@
-# Base
+# Conceptos básicos
 
 {{messages}}
 
-XOScript es un lenguaje de programación puramente orientado a objetos.
-Esto significa que en XOScript todo es un objeto; no existen otros tipos de datos.
-Un programa informático escrito en XOScript puede constar, a grandes rasgos,
-de tres tipos de acciones: asignar, enviar mensajes y responder.
-El intercambio de mensajes entre objetos es la parte más
-importante de un programa XOScript.
+
+Bienvenido a XOScript
+El proyecto XOScript tiene como objetivo crear un lenguaje de scripting sencillo y auditable.
+Sencillo no significa necesariamente fácil.
+Un lenguaje de programación conocido puede resultar más fácil de usar que XOScript.
+Aquí, sencillez significa algo distinto:
+poder formarse un modelo mental completo del lenguaje y de su comportamiento.
+
+XOScript está diseñado para caber en tu cabeza.
+Su gramática y su número de conceptos son deliberadamente reducidos.
+No hay clases; los objetos se pueden extender directamente.
+Los objetos se pasan por referencia, la copia es explícita
+y las funciones tienen un único punto de salida.
+
+Algunas de estas decisiones difieren considerablemente de los lenguajes más extendidos.
+XOScript no tiene, por ejemplo, un sistema de tipos y utiliza ámbito dinámico.
+Los mensajes que no se pueden atender se ignoran en lugar de producir una excepción.
+Estas decisiones tienen consecuencias y no pretenden eliminar los errores.
+Su propósito es mantener pequeño y coherente el modelo subyacente del lenguaje.
+
+XOScript también se puede localizar, lo que permite expresar reglas de negocio
+en un lenguaje natural y, potencialmente, compartirlas con partes interesadas sin formación técnica.
+
+Auditabilidad significa aplicar la misma filosofía a la implementación.
+El entorno de ejecución está escrito en C, con un pequeño analizador léxico, un analizador sintáctico y un recorredor de árbol escritos a mano.
+La biblioteca estándar y el entorno de ejecución reflejan en gran medida la estructura del lenguaje,
+lo que hace que la relación entre el código XOScript y su implementación sea relativamente directa.
+
+Las pruebas también están estrechamente ligadas a la documentación.
+Cada método debería tener una prueba asociada que pueda incorporarse al manual,
+lo que ayuda a mantener la documentación sincronizada con la implementación.
+
+XOScript no pretende competir con los lenguajes más extendidos en
+funcionalidades ni en familiaridad. Explora un objetivo diferente:
+un entorno de programación que un desarrollador pueda comprender en su totalidad.
+
+La esperanza es que un lenguaje pequeño y una implementación
+pequeña hagan viable comprender el software
+desde el byte hasta el objeto, desde la sintaxis hasta el entorno de ejecución, y escribir código con
+confianza, porque entiendes tanto lo que ocurre en
+el script como lo que ocurre por debajo.
+
+La arquitectura de una instalación de servidor con xoscript
+es sencilla, pero flexible.
+
+{{architecture.png}}
+
+Para usar xoscript como lenguaje de servidor, debes instalar el
+plugin de servidor en una carpeta llamada /mods/server. 
+
+Esto se debe a que preferimos
+desacoplar el núcleo del lenguaje de las funcionalidades específicas del servidor,
+a diferencia, por ejemplo, de PHP o Python. De lo contrario, tendríamos que entregar a todo el mundo
+el paquete completo con todo incluido sin ningún propósito, lo cual es simplemente absurdo.
+También puedes instalar otros módulos si lo deseas. El sistema es muy
+flexible.
+
+Además, algunas funciones se implementan mejor en el propio lenguaje
+de scripting, como las plantillas y la gestión de sesiones, por lo que también
+incluimos las bibliotecas template.xo y webtools.xo para tu comodidad.
+El motivo de todo esto es que no sabemos cómo quieres
+usar xoscript. Puedes usarlo como lenguaje de scripting del lado del servidor,
+pero también para interfaces gráficas, dispositivos embebidos o simplemente procesamiento por lotes.
+Incluso si lo usas como lenguaje de scripting del lado del servidor (que es
+actualmente uno de los principales casos de uso), es posible que quieras
+usar otro motor de plantillas u otro gestor de sesiones.
+¿Quiénes somos nosotros para decidir que debes usar los nuestros?
+
+Una de las ventajas de usar nuestro propio motor de plantillas es, eso sí, que
+no tienes que aprender una sintaxis adicional para crear plantillas.
+El motor de plantillas predeterminado que se incluye con xoscript ofrece una
+separación del 100% entre presentación y lógica. En lugar de una sintaxis
+especial de plantillas, utiliza simplemente un sistema de marcadores de ranura muy flexible.
+Para más información, consulta el capítulo Servidor.
+
+Ten en cuenta que, si no quieres usar el motor de plantillas predeterminado ni
+las webtools predeterminadas, ni que decir tiene que debes proporcionar
+los tuyos propios.
+
+Si ejecutas tu servidor web en un chroot, una jail u otro tipo de entorno aislado,
+también debes instalar las dependencias de xo en ese entorno; puedes
+ver qué bibliotecas necesitas con ldd (consulta la página de manual de Linux o BSD).
+Si quieres usar comandos de shell en tus scripts xo, copia también una shell
+(como bash o ksh) a ese entorno.
+
+También queremos señalar que nos tomamos muy en serio la compatibilidad con versiones anteriores.
+Incluso existe una funcionalidad especial de compatibilidad con versiones anteriores llamada
+'version'. En general, aspiramos a que tu código funcione para siempre. Así, nunca
+tendrás que actualizar tu código para que siga siendo compatible con versiones más recientes
+de xoscript. Nuestro objetivo es: escribir una vez, ejecutar para siempre.
+
+El resto de este manual está dedicado a explicar en detalle el lenguaje
+de programación xoscript. El scripting de servidor se trata en el capítulo
+llamado Servidor. Si eres un desarrollador de software con experiencia, quizá quieras
+saltarte algunos capítulos, porque algunos son demasiado detallados o
+muy parecidos a las prácticas generales de programación. Así que, quienes
+ya tengáis experiencia con varios otros lenguajes de programación,
+haréis mejor en tratar este manual como una guía de referencia.
+
+## Instalación en Linux
+
+Descarga apache2 y mariadb:
+
+
+```
+sudo apt-get install apache2 mariadb-server
+sudo a2enmod cgi
+```
+
+Descarga xoscript.
+¡Sustituye X por el número de versión correcto!
+
+```
+wget https://xoscript.com/downloads/xoserver-linux-1_5_X.tar.gz
+tar xvf xoserver*.tar.gz
+```
+
+Copia los archivos al directorio raíz web y a /bin:
+
+
+```
+sudo cp bin/xo /bin/xo
+sudo cp -R bin/mods /var/www/html/
+sudo cp *.xo /var/www/html/
+```
+
+Edita tu configuración de apache2:
+
+```
+sudo nano /etc/apache2/sites-enabled/000-default.conf
+```
+
+Sustituye Virtualhost por:
+
+```
+<VirtualHost *:80>
+    <Directory /var/www/html>
+        Options +ExecCGI
+        AllowOverride All
+        AddHandler cgi-script .xo
+        Require all granted
+    </Directory>
+    DocumentRoot /var/www/html
+</VirtualHost>
+```
+
+Crea una página de prueba:
+
+```
+sudo nano /var/www/html/test.xo
+```
+
+y escribe un pequeño programa de prueba:
+
+```
+#!/bin/xo
+Server iniciar.
+Programa utilizar: ['webtools.xo'].
+>> web := Documento-Web crear.
+web salida: ['Hello World'].
+```
+
+Permite que apache2 ejecute tu programa mediante CGI:
+
+```
+sudo chmod uog+x /var/www/html/test.xo
+```
+
+Reinicia apache2:
+
+```
+sudo systemctl restart apache2
+```
+
+Abre tu página de prueba en el navegador:
+
+```
+http://localhost/test.xo
+```
+
+Deberías ver:
+
+```
+Hello World
+```
+
+
+## Instalación en OpenBSD
+
+Edita /etc/httpd.conf y añade:
+
+
+```
+server "mydomain.com" {
+    listen on * port 80
+    root "/htdocs/mydomain/"
+
+    location "*.xo" {
+        fastcgi
+        fastcgi socket "/run/slowcgi.sock"   # inside chroot
+    }
+}
+```
+
+Si quieres usar SSL:
+
+```
+listen on * tls port 443
+tls {
+	certificate "/etc/ssl/mycert.crt"
+	key "/etc/ssl/private/mykey.key"
+}
+```
+
+Para proteger el intercambio de claves frente a la computación cuántica,
+selecciona el cifrado mlkem:
+
+```
+tls {
+ ... 
+ ecdhe "X25519MLKEM768"
+ ...
+}
+```
+
+Añade el binario xo y los mods, así como todas las dependencias, al
+chroot (averígualas con ldd).
+
+## Ejecutar ejemplos
+
+
+Para ejecutar uno de los programas de ejemplo del paquete:
+
+```
+./example.sh <name> <Linux/OBSD> [clean]
+```
+
+Por ejemplo, para ejecutar el ejemplo FizzBuzz en Linux:
+
+```
+./example.sh fizzbuzz Linux
+```
+
+Para ejecutar el mismo ejemplo en OpenBSD:
+
+```
+./example.sh fizzbuzz OBSD
+```
+
+Para ejecutar el ejemplo con una compilación limpia:
+
+```
+./example.sh fizzbuzz OBSD clean
+```
+
+## Pruebas unitarias
+
+Para ejecutar las pruebas unitarias:
+
+```
+./runtests.sh
+```
+
+Para ejecutar las pruebas unitarias sin compilar (solo probar):
+
+```
+./runtests.sh nobuild
+```
+
+## Compilación
+
+Para compilar desde el código fuente en Linux:
+
+```
+make clean
+ISO="en" make
+```
+
+En OpenBSD:
+
+```
+make -f makefile.obsd clean
+ISO="en" make -f makefile.obsd
+```
+
+Para compilar el plugin de servidor en Linux:
+
+```
+PACKAGE="server" NAME="server.so" make plugin-clean
+ISO="en" PACKAGE="server" NAME="server.so" make plugin
+```
+
+Para compilar el plugin de servidor en OpenBSD:
+
+```
+PACKAGE="server" NAME="server.so" make -f makefile.obsd plugin-clean
+ISO="en" PACKAGE="server" NAME="server.so" make -f makefile.obsd plugin
+```
+
+## Hola mundo
+
+Una vez transferido el archivo a tu ordenador, puedes extraerlo
+e iniciar xo con el siguiente comando:
+
+```
+xo
+```
+
+Para ejecutar un XOScript, guarda el programa como archivo añadiendo el sufijo
+-xo (opcional). Además, escribe el nombre del archivo de tu programa
+después del comando de XOScript:
+
+```
+xo myprogram.xo
+```
+
+Cuando ejecutas un comando de XOScript usando el archivo de tu programa como
+parámetro, xo leerá y ejecutará ese archivo.
+
+{{note}}
+También puedes iniciar tu programa arrastrándolo sobre el icono de xo.
+{{/note}}
+
+{{warning}}
+En algunos sistemas debes conceder previamente a xo permiso para cargar
+bibliotecas dinámicas.
+{{/warning}}
+
+La tradición dicta que el primer programa en cualquier lenguaje de
+programación nuevo sea una especie de saludo al mundo. En XOScript, un
+programa **Hola mundo** de este tipo tiene este aspecto:
+
+@test598
+
+Cuando este texto se guarda en un archivo, p. ej. hello.xo, se puede ejecutar
+de la siguiente manera: .
+
+xo hello.xo
+
+Hello world
+
+
+Puedes ver la salida del programa en la ventana negra mostrada arriba.
+A lo largo de este manual se usará la misma representación para mostrar
+la salida.
+
+{{note}}
+Salida se escribe con S mayúscula.
+En general, los objetos empiezan con mayúscula,
+salvo que actúen como instancia (no tienen métodos
+propios, solo datos). Esto refleja las convenciones
+de clase frente a instancia de otros lenguajes de programación.
+{{/note}}
+
+
+## Sintaxis 
+
+XOScript es un lenguaje de programación *puramente* *orientado a objetos*. Esto significa
+que xoscript considera que todo es un objeto, por lo que no existen
+otros *tipos de datos*. Hay esencialmente tres acciones básicas
+en un programa escrito en XOScript: *asignar*, *enviar mensajes*
+y *responder*. El intercambio de mensajes entre objetos es la parte clave de
+un programa XOScript. Las tres acciones se ilustran
+a continuación:
+
+
+Acción          | Ejemplo
+--------------- | --------
+asignación      |  \>\> x := 1. 
+mensajes unarios | x ¿par?.
+mensaje binario | 1 + 2.
+mensaje de palabra clave | x desde: 0 longitud: 10.
+respuesta       | <- respuesta.  
+
+
+Este capítulo te dará una impresión general del lenguaje XOScript
+y describe sus principios básicos. XOScript es un lenguaje pequeño,
+basado en tres acciones (ver ilustración) que se traducen en
+aproximadamente seis reglas gramaticales. Eso es todo lo que hace falta para dominar el
+lenguaje.
+
+No te preocupes si las cosas no te resultan evidentes de inmediato: todos los
+elementos básicos se analizarán en el próximo capítulo (3) y las reglas básicas
+se repetirán. Este capítulo, sin embargo, sirve principalmente como introducción
+general al lenguaje. Los principios básicos se explicarán brevemente
+y se ilustrarán con varios ejemplos relevantes. Los detalles que falten
+se tratarán más adelante.
+
+Los comentarios en XOScript van precedidos del símbolo \#. Así, la siguiente línea
+se ignorará:
+
+```
+# this is just a comment
+```
 
 ## Variables
 
-El primer paso es asignar un objeto a una variable. Para asignar una variable, se utiliza
-el símbolo de declaración de variable: >> .El nombre de una variable puede contener
-todos los signos excepto: <-, := , espacios en blanco , puntos, comas, dos puntos,
-comillas [''] y paréntesis (). Además, una variable no puede constar de varias líneas.
-Tenga en cuenta que una variable no puede comenzar con un número o un signo menos.
+Para asignar
+una variable se usa el símbolo de declaración de variables: >>. El nombre de una
+variable puede contener todos los signos excepto: <-, :=, espacios en blanco,
+puntos, comas, dos puntos, comillas [' '] y paréntesis ().
+Además, una variable no puede ocupar varias líneas. Ten en cuenta
+que una variable no puede empezar con un número ni con un signo menos.
+
 Estos son ejemplos de variables válidas:
 
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
 >> $ := ['dollar'].
->> +plus := True.
->> user password := ['Pssst!'].
+>> +plus := Verdadero.
+>> user-password := ['Pssst!'].
 ```
 
-Las variables no válidas son, por ejemplo:
+Variables no válidas son, por ejemplo:
+
 
 ```
->> -123 := ['número negativo'].
->> contraseña del usuario := ['Clasificado'].
->> contraseña.del:usuario := ['Clasificado'].
+>> -123 := ['negative number'].
+>> password of user := ['Classified'].
+>> password.of:user := ['Classified'].
 >> ,x := 10.
 ```
 
-Una vez declarada una variable, se puede utilizar libremente. Esto signiﬁca que solo es
-necesario utilizar el símbolo de declaración la primera vez que se utiliza la variable (la
-declaración).
+{{note}}
+No tienes que escapar ningún carácter
+(incluidas comillas simples, comillas dobles y
+delimitadores de texto) en
+un literal de texto, siempre que no
+cause ambigüedad para el analizador léxico.
+{{/note}}
 
-Para ser más especíﬁcos, no se puede comenzar a declarar aleatoriamente un valor
-para la variable ( x := 2 ), ya que primero se debe declarar la variable ( >> x := 2 ).
-Sin embargo, una vez declarada se puede cambiar su valor sin utilizar el símbolo de
-declaración ( >> x := 2. x := 3. ).
+Una vez declarada una variable, se puede usar libremente. Esto significa
+que solo es necesario usar el símbolo de declaración la primera vez
+que usas la variable (la declaración).
 
-Tenga en cuenta que es obligatorio asignar un valor a una variable en el momento de la
-declaración. A diferencia de otros lenguajes de programación, no se permite declarar una
-variable sin valor. Es esencial vincular explícitamente cada variable a un valor inicial. No
-obstante, siéntase libre de inicializar la variable con el objeto Nulo. En este caso, la
-variable puede considerarse vacía ( >> x := Nulo .). En resumen, no está permitido
-declarar una variable sin un valor inicial. Por lo tanto,
+Más concretamente, no puedes empezar sin más a asignar un valor a
+tu variable *(x := 2)*, ya que primero debes declarar la variable *(\>\>
+x := 2)*. Sin embargo, una vez declarada, puedes cambiar su valor
+sin usar el símbolo de declaración *(\>\> x := 2. x := 3.)*.
 
-```
->> x
-```
-
-no es válido y mostrará un mensaje de error. (Obtenga más información sobre el objeto
-Nulo en el capítulo 3).
-
-## Acciones
-
-XOScript percibe todo como un objeto, por lo tanto, no hay otros tipos de datos.
-Básicamente, hay tres acciones rutinarias básicas en un programa escrito en XOScript:
-asignar, mensajes programming y responder.
-El intercambio de mensajes entre objetos latypes parte clave un programa XOScript. Las
-tres acciones: Asignar, Mensajes, Respuesta.
-
-## Objetos y mensajes
-
-Todo es un objeto; es decir, todos los dígitos, textos y fragmentos de código. Los números,
-como 1, 2, 100, -999 y 1234, son objetos numéricos. Todos los textos entre comillas simples son
-objetos de texto. Todos los fragmentos de código
-agrupados entre llaves {...} son objetos de tarea.
-
-Los objetos como los números y el texto siempre tienen
-su origen en un objeto base. Todos los números, por ejemplo, derivan del objeto número.
-En principio, la programación implica enviar mensajes a objetos. La forma general de enviar un mensaje a un objeto es:
+Ten en cuenta que es obligatorio asignar un valor a una variable en el momento de
+declararla. A diferencia de otros lenguajes de programación, no se permite
+declarar una variable sin valor. Es imprescindible vincular explícitamente
+cada variable a un valor inicial. No obstante, puedes inicializar
+la variable con el objeto **Nulo**. En ese caso, la variable puede
+considerarse vacía *(\>\> x := Nulo.)*. En resumen, declarar una
+variable sin valor inicial no está permitido. Así,
 
 ```
-<objeto> <mensaje>
+>> x.
 ```
 
+no es válido y producirá un mensaje de error.
 
-Por ejemplo, para comprobar si un número es par, se envía el mensaje:
+{{note}}
+xoscript usa ámbito dinámico para las variables;
+para más detalles, consulta el capítulo Funciones.
+{{/note}}
+
+
+## Literales
+
+XOScript considera que todo es un objeto; es decir, todos los números, textos
+y fragmentos de código. Los números, como 1, 2, 100, -999 y 1,234, son
+objetos Número. Todos los textos entre comillas simples son objetos
+Texto. Todos los fragmentos de código agrupados entre llaves {...} son
+objetos Función.
+
+Literal         | Objeto raíz  | Ejemplo
+--------------- | ------------ | ----------
+números         | Número       | 1,2,3... 
+textos          | Texto        | \['hola'\]
+función         | Función      | { 1 + 2. }.
+                
+     
+Los objetos como los números y los textos siempre tienen su origen en un objeto
+raíz. Por ejemplo, todos los números derivan del objeto **Número**. Todos
+los textos derivan de **Texto** y todos los fragmentos de código de **Función**. A
+su vez, todos estos objetos provienen de **Objeto**, que es, de hecho, el
+objeto raíz de todos los objetos.
+
+
+## Mensajes
+
+Programar en XOScript consiste básicamente en
+enviar mensajes a objetos. La notación general para enviar un mensaje a
+un objeto es la siguiente:
 
 ```
-2 ¿par?.
+<object> <message>
 ```
 
-La respuesta será Verdadero (otro objeto).
-Los objetos suelen ignorar los mensajes desconocidos.
-
-objeto puede recibir tres tipos de mensajes. En primer lugar, están mensajes unitarios,
-véase el ejemplo anterior, que no tienen argumentos. En segundo lugar, hay mensajes de
-palabras clave, que tienen uno o varios argumentos, por ejemplo:
+Para averiguar si el número **2**, por ejemplo, es par, se envía
+el mensaje **¿par?** al objeto **2**:
 
 ```
->> x := Número entre: 1 y: 10 .
+2 ¿par?
 ```
 
+La respuesta será **Verdadero** (de nuevo, un objeto). Los mensajes desconocidos
+suelen ser ignorados por los objetos; por tanto, no se produce ningún error. Algunos objetos (p. ej.,
+números o textos) responden a un mensaje desconocido de una forma predefinida
+(más sobre este tema más adelante).
 
-En este caso, el mensaje entre: y: se envía a Número, que es el objeto raíz de todos
-los números. El resultado será un número aleatorio entre 1 y 10. Por último, hay mensajes
-binarios, que tienen solo un carácter y un argumento:
+Un objeto puede recibir tres tipos de mensajes. 
+
+Tipo            | Número de argumentos
+--------------- | -------------------
+Unario          | 0      
+Binario         | 1     
+De palabra clave | 1+    
+
+
+En primer lugar, están los **mensajes
+unarios**, como en el ejemplo anterior, que no tienen argumentos. En segundo lugar,
+están los **mensajes de palabra clave**, que tienen uno o varios argumentos,
+por ejemplo:
+
+```
+>> x := Número entre: 1 y: 10.
+```
+
+En este caso, el mensaje **entre:y:** se envía a **Número**, que
+es el objeto raíz de todos los números. El resultado será un número aleatorio
+entre 1 y 10. Por último, están los **mensajes binarios**, que tienen
+un solo carácter y un argumento:
 
 ```
 2 + 3
 ```
 
-Esto parece una suma matemática, pero en realidad es solo otro mensaje. El mensaje +
-se envía a 2, con argumento 3 que devolverá la respuesta 5. Se permite escribir mensajes
-binarios sin dos puntos. Los mensajes binarios se pueden encadenar:
+Parece una suma matemática, pero en realidad es solo otro mensaje. El
+mensaje **+** se envía a **2**, con el argumento **3**, lo que devolverá
+la respuesta **5**. Los mensajes binarios pueden escribirse sin dos puntos.
+
+Los mensajes binarios se pueden encadenar:
 
 ```
 >> x := 3 + 2 - 1.
 ```
 
-En este fragmento, + 2 se envía primero al objeto Número 3, lo que da como resultado
-el objeto Número 5, después de lo cual se envía -1 a este número. Los lectores
-observadores tienen razón al notar la discrepancia que muestra este protocolo con
-respecto a las secuencias matemáticas convencionales de operadores. XOScript ignora la
-secuencia matemática a favor de la coherencia en su sistema de mensajes. Como
-resultado, la suma:
+En este fragmento, primero se envía **+ 2** al objeto **Número** **3**, lo que
+da como resultado el objeto Número **5**, tras lo cual se envía **-1** a este
+número. Los lectores atentos habrán notado con razón la discrepancia que
+muestra este protocolo respecto al orden matemático convencional de
+los operadores. XOScript ignora el orden matemático en favor de la
+coherencia de su sistema de mensajes. Como resultado, la suma:
 
 ```
 2 + 3 * 5 = 25
 ```
 
-no 17. Esto es intencional. Se pueden usar paréntesis para modiﬁcar el orden de la secuencia:
+no 17.
+
+Esto es intencionado. Se pueden usar paréntesis para modificar el orden:
 
 ```
 2 + (3 * 5) = 17
 ```
 
 La mayoría de los objetos se devuelven a sí mismos como resultado en respuesta a un
-determinado mensaje. Esto es útil ya que estimula un diálogo adicional con este objeto al
-enviarle un mensaje de seguimiento:
+mensaje. Esto resulta útil, ya que favorece continuar el diálogo con ese
+objeto enviándole un mensaje siguiente:
 
 ```
 Salida escribir:
 [' hello '] recortar mayúsculas.
 ```
 
-Aquí, se envían dos mensajes al objeto Texto : recortar , seguido de mayúsculas.
-En el siguiente fragmento, es necesario el uso de una coma para indicar que se está
-entrando un nuevo mensaje. De lo contrario, XOScript se confundirá.
-
 ```
-Salida escribir: ['Hola!'], detener .
+HELLO
 ```
 
-Primero, se envía el mensaje escribir: al objeto Salida , seguido del mensaje detener .
-Sin la coma, XOScript pensaría que desea enviar el mensaje detener al objeto de
-Texto Hola , lo cual resultaría un resultado incorrecto.
-La secuencia de proceso de mensajes es la siguiente: de izquierda a derecha; comience
-con los mensajes entre paréntesis seguidos de los mensajes unitarios. A continuación,
-los mensajes binarios y luego termine con los mensajes de palabras clave . Vea el
-siguiente ejemplo:
+Aquí se envían dos mensajes al objeto **Texto**: **recortar**, seguido
+de **mayúsculas**.
+
+En el siguiente fragmento, es necesario usar una coma para indicar
+que llega un mensaje nuevo. De lo contrario, XOScript se confundirá.
 
 ```
-Salida escribir: 0.5 redondear + (2 – 1), detener .
+Salida escribir: ['Hello!'], detener.
 ```
 
-XOScript siempre lee de izquierda a derecha: primero, se envía el mensaje escribir: a
-Salida y es seguido por el mensaje detener .Dentro del argumento en sí,(el
-argumento de un mensaje es aquello que va despues de los 2 puntos :) XOScript lee de
-izquierda a derecha, por lo que 0,5 redondear y luego el +.
+Primero, el mensaje **escribir:** se envía al símbolo del lápiz, seguido de
+**detener**. Sin la coma, XOScript pensaría que quieres enviar
+**detener** al **texto** **¡Hola!**, un ejercicio inútil.
 
-Además, redondear tiene prioridad sobre +, porque es un mensaje unitario.
-Como hay paréntesis, primero se calcula 2 – 1, después de lo cual se suma 1 al
-resultado de 0,5 redondear (1). Todo el proceso dará como resultado 2,
-que también es la respuesta a escribir. Después
-de la coma sigue el mensaje de parada, que mueve el cursor a una nueva línea. Por
-supuesto, la mejor manera de comprender completamente el orden de secuencia de los
-programas de XOScript es con la práctica.
-Es importante señalar que en XOScript, al contrario de muchos otros lenguajes de
-programación, los espacios en blanco son una parte fundamental de su sintaxis. En
-particular, cuando se trata de mensajes binarios, los espacios en blanco pueden causar
-cierta confusión.
-Utilice siempre un espacio en blanco después de un mensaje binario.
-No puede adjuntar directamente un número al mensaje, por ejemplo: 3 + 2 es diferente
-de 3 +2. El primer ejemplo (3 + 2), envía el mensaje + al número 3, con el argumento el
-número 2. El resultado, en este caso, será 5. En el segundo ejemplo (3 +2), el mensaje
-unario +2 se envía al número 3. Dependiendo del contexto eso podría producir un
-resultado muy diferente.
+El orden de procesamiento de los mensajes es el siguiente: de izquierda a derecha;
+se empieza por los mensajes entre paréntesis, seguidos de los mensajes unarios. A continuación,
+los mensajes binarios y, por último, los mensajes de palabra clave. Mira el ejemplo
+siguiente:
 
-## El flujo del programa
+```
+Salida escribir: 0.5 redondeado + (2 - 1), detener.
+```
 
-En XOScript no hay necesidad de reglas gramaticales separadas para bucles y condicionales.
-Una declaración condicional es simplemente un simple mensaje verdadero: o falso: a un
-objeto Verdadero o a un objeto Falso .
+XOScript siempre lee de izquierda a derecha: primero, el mensaje **escribir:**
+se envía a Salida y le sigue el mensaje **detener**. Dentro del propio
+argumento, XOScript lee de izquierda a derecha, así que primero **0.5 redondeado**
+y después **+**.
+
+{{note}}
+El mensaje detener añade un carácter de nueva línea al texto.
+El nombre de este mensaje está inspirado en los sistemas telegráficos.
+Los mensajes en los sistemas telegráficos 
+usaban a menudo la palabra STOP para marcar el final de una frase
+(ya que la puntuación era poco fiable o costosa).
+{{/note}}
+
+Además, **redondeado** tiene prioridad sobre **+**, porque es un
+**mensaje unario**. Debido a los paréntesis, primero se calcula **2 - 1**,
+y después se suma **1** al resultado de **0.5 redondeado** (1).
+
+Todo el proceso dará como resultado **2**, que es también la respuesta
+escrita. Después de la coma viene el mensaje detener, que mueve el cursor
+a una nueva línea. Por supuesto, la mejor manera de comprender por completo el
+orden de ejecución de los programas XOScript es con la práctica.
+
+Cabe señalar que en XOScript, a diferencia de muchos otros lenguajes de
+programación, los espacios en blanco son una parte fundamental de la sintaxis. En
+particular, en el caso de los mensajes binarios, los espacios en blanco pueden causar cierta
+confusión. Usa siempre un espacio en blanco después de un mensaje binario. No puedes
+unir directamente un número al mensaje; por ejemplo: 
+
+```
+3 + 2
+```
+
+es diferente de 
+
+```
+3 +2
+```
+
+El primer ejemplo (**3 + 2**) envía el
+mensaje **+** al número **3**, con el número **2** como argumento. El
+resultado, en este caso, será **5**. En el segundo ejemplo (**3 +2**),
+se envía el mensaje unario **+2** al número **3**. Según el
+contexto, eso podría dar un resultado muy distinto.
+
+## Métodos inexistentes
+
+Enviar un mensaje a un objeto invoca la función que se ha
+asociado a ese objeto con ese nombre de mensaje. Si envías un mensaje
+que no se entiende, el objeto receptor ignorará tu mensaje
+y, en su lugar, devolverá una referencia a sí mismo para continuar la comunicación.
+Esto se denomina paso de mensajes tolerante.
+
+Ejemplo:
+
+```
+Salida escribir: Objeto blah, detener.
+```
+
+Esto no producirá ningún error. Simplemente imprimirá el texto **Objeto**.
+
+
+## Flujo de control
+
+En XOScript no hacen falta reglas gramaticales separadas para *bucles* ni
+*condicionales*. Una sentencia if es simplemente un mensaje **verdadero:** o **falso:**
+enviado a un objeto **Verdadero** o a un objeto **Falso**:
 
 ```
 2 ¿par? verdadero: {
-	Salida escribir: ['Dos es un número par'] , detener.
+	Salida escribir: ['Two is an even number'], detener.
 }.
 ```
+En el ejemplo anterior, el mensaje **verdadero:** se envía a **Verdadero** (la
+respuesta a la pregunta: ¿es 2 un número par?). Como argumento se envía además
+un fragmento de código: un objeto **Función**. Esta función escribe en
+la pantalla que 2 es, en efecto, un número par.
 
-Los objetos Verdadero y Falso también se conocen como objetos de toma de decisiones.
-Esta denominación a veces es más precisa, porque especiﬁca que estos objetos se utilizan
-para hacer que el programa maneje ciertas decisiones. Al igual que otros lenguajes de
-programación, un programa escrito en XOScript sigue un curso especíﬁco y conlleva varios
-patrones de ramiﬁcación. Las formas seleccionadas dentro de un programa dependen en
-gran medida de estos objetos de toma de decisiones.
-En el ejemplo anterior, el mensaje verdadero: se envía a Verdadero (la respuesta a la
-pregunta: ¿es 2 un número par?). Como argumento, se envía un fragmento adicional de
-código: un objeto Tarea. Esta tarea escribe en la pantalla que 2 es, de hecho, un número
-par.
-Tampoco es necesario que existan reglas de escritura independientes para un bucle. Para
-ejecutar un fragmento de código tres veces, simplemente envíe * con el argumento 3 a esa
-tarea:
+Tampoco hacen falta reglas de escritura separadas para un *bucle*. Para
+ejecutar un fragmento de código tres veces, basta con enviar **\*** con el argumento
+**3** a esa **Función**:
 
-```
-{ Salida escribir: [' '], detener. } * 3.
-```
+@test5
 
-Consideremos otro ejemplo. Cuando se necesita imprimir una tabla de conversión de
-kJ (kilojulio) a kcal (kilocaloría) en pasos de 100, consulte a continuación la notación
-correcta:
+En este fragmento de código, **i** es el índice. Así, la primera vez que se
+ejecuta la Función, **i** vale 0, la siguiente vez que se ejecuta, **i** = 1, y
+así sucesivamente.
 
-```
-{ :linea
->> kJ := linea * 100.
-Salida escribir: kJ, detener.
-Salida escribir: kJ * 0.239, detener.
-} * 10.
-```
+Veamos otro ejemplo. Cuando hay que imprimir una tabla de conversión
+de *kJ* (kilojulios) a *kcal* (kilocalorías) en pasos de 100,
+la notación correcta es la siguiente:
 
+@test599
 
-Este programa generará la siguiente lista:
+Aquí, el número de la línea actual se transmite al parámetro
+**:line**. Al principio de una función se definen los parámetros
+de la función. Los parámetros no utilizados permanecen vacíos (**Nulo**). Los parámetros
+siempre se colocan al inicio de la función, justo después de la llave
+de apertura, y van precedidos de dos puntos.
 
-Aquí, el número de la línea actual se transmite al parámetro :linea. Al comienzo de una
-tarea, se deﬁnen los parámetros de la tarea. Los parámetros no utilizados permanecen
-vacíos ( Nulo ). Los parámetros se colocan siempre al comienzo de la tarea, directamente
-después del corchete inicial y están precedidos por dos puntos.
-El mensaje mientras: es una combinación de un bucle y una condición. Se pueden vincular
-dos tareas utilizando el mensaje mientras: La tarea receptora continuará ejecutándose
-hasta que la tarea después de los dos puntos dé un resultado negativo. Así es como
-funciona:
+El mensaje **mientras:** es una combinación de un *bucle* y una *condición*.
+Se pueden enlazar dos funciones mediante el mensaje **mientras:**. La función receptora
+seguirá ejecutándose hasta que la función que va después de los dos puntos dé un
+resultado negativo. Ejemplo:
 
-```
->> x := 0.
-{ x añadir: 1. } mientras: { <- x < 5. }.
-Salida escribir: x, detener.
-```
+@test600
 
-En el fragmento de código ilustrado anteriormente, se agrega 1 a x siempre que x sea
-menor que 5. Cuando este ya no sea el caso, la segunda tarea responderá Falso y, en
-consecuencia, la ejecución de la primera tarea ﬁnalizará.
+En el fragmento de código anterior, se suma **1** a **x** mientras
+**x** sea menor que **5**. Cuando esto deja de cumplirse, la segunda
+función responderá con **Falso** y, en consecuencia, la ejecución de la
+primera función terminará. Ten en cuenta que **x** se ha definido fuera de la
+función y es una variable global. Para saber más sobre las reglas de ámbito,
+consulta el capítulo sobre Funciones.
 
-## Plantillas
+## Interpolación de textos
 
-La lista de kJ/kcal del capítulo anterior podría hacerse más presentable. Preferiblemente,
-la lista sería como sigue:
+La lista de *kJ/kcal* podría presentarse
+mejor. Preferiblemente, la lista sería así:
 
 ```
-100 kj ➞ 23,88 kcal
-200 kj ➞ 47,76 kcal
+100 kj ➞ 23.88 kcal
+
+200 kj ➞ 47.76 kcal
 ```
 
-Cuando convierte la salida que quieres obtener en una plantilla, su notación podría ser:
+Si conviertes la salida deseada en una plantilla, su notación
+podría ser:
 
 ```
-número1 kJ ➞ número2 kcal
+number1 kJ ➞ number2 kcal
 ```
 
-Esto signiﬁca que número1 representa el valor de kJ y número2 el valor de kcal. Así es
-como funciona la interpolación de cadenas en XOScript. No se necesitan reglas gramaticales
-diferentes para hacer esto en XOScript. Simplemente envíe la palabra que necesita ser
-reemplazada al texto con el texto sustituto como argumento:
+Esto significa que **number1** representa el valor en kJ y **number2** el
+valor en kcal. Así es como funciona la interpolación de textos en XOScript. No
+hacen falta reglas gramaticales separadas para ello en XOScript. Basta con enviar
+al texto la palabra que debe sustituirse, con el texto sustituto como
+argumento:
 
 ```
->> texto :=
-['número1 kJ ➞ número2 kcal']
-número1: 100,
-número2: 23.9.
+>> text :=
+
+['number1 kJ ➞ number2 kcal']
+
+number1: 100,
+
+number2: 23.9.
+```
+
 El resultado:
-```
-
-La regla de sustitución funciona para cada mensaje indeﬁnido que recibe un objeto Texto.
-Cada mensaje que no sea reconocido por el objeto Texto será interpretado de la siguiente
-manera: reemplace el texto del mensaje con el texto dentro del argumento mensaje.
-Puede adaptar el programa de la siguiente manera:
 
 ```
-{ :linea
->> kJ := linea * 100.
->> kcal := kJ * 0.239.
-Salida escribir: (
-['número1 kJ ➞ número2 kcal']
-número1: kJ,
-número2: kcal
-), detener .
-} * 10.
+100 kj ➞ 23.9 kcal
 ```
 
-Para evitar confusiones sobre qué mensaje se puede o no utilizar como sustituto, es
-mejor introducir un carácter no designado, por ejemplo, un rombo ( ⬧) (U+2B27, ALT+Z),
-antes de los segmentos de texto en la plantilla que se deben reemplazar. Este tipo de
-carácter es a veces no recomendable en el contexto internacional.
+Esta regla de sustitución funciona para cada mensaje no definido que recibe
+un objeto **texto**. Cada mensaje que el objeto **texto** no reconoce
+se interpretará de la siguiente manera: *sustituir el texto del mensaje
+por el texto del argumento del mensaje.* Puedes adaptar el
+programa de la siguiente manera:
 
-## Respondiendo
 
-Hasta ahora, ha enviado mensajes a objetos. Sin embargo, todavía no ha respondido usted
-a ningún mensaje . Para responder un mensaje se utiliza la ﬂecha de retorno (<- ). El
-siguiente ejemplo ilustra cómo crear una tarea para calcular un porcentaje:
+@test601
 
-```
->> porcentaje := {
-	:numero :porciento
-	<- numero / 100 * porciento.
-}.
-Salida escribir:
-( porcentaje aplicar: 100 y: 7 ),
-detener.
-```
 
-Una vez que se ha deﬁnido la tarea y se la ha asignado a la variable porcentaje, se envía
-el mensaje aplicar:y: con los argumentos 100 y 7.
-Esto ejecutará la tarea aplicadando a 100 y 7, es decir, 7% de 100. Al utilizar la ﬂecha de
-retorno, la respuesta se devuelve desde la tarea al programa principal. Aunque este código
-es válido, tiene una desventaja porque se debe recordar la secuencia de los argumentos.
-Entonces, ¿por qué no escribirlo así: 7 porciento de: 100 ? Se vería mucho más natural.
-Para que esto sea posible, tenemos que adaptar el objeto padre de 7, que es el objeto
-Número, para que comprenda el mensaje porciento de :. Esto se puede lograr enviando
-en:hacer: al objeto Número, de la siguiente manera:
+Para evitar confusiones sobre qué mensaje puede usarse o no como
+sustituto, lo mejor es introducir un marcador de plantilla como &lt; &gt;
+para los segmentos de texto de la plantilla que
+deben sustituirse.
 
-```
-Número en: ['porciento-de:'] hacer: {
-	:número
-	<- número / 100 * yo.
-}.
+## Valores de retorno
 
-Salida escribir:
-(7 porciento-de: 100),
-detener.
-```
+Para responder a un mensaje se usa la flecha
+de retorno (*<-*). El siguiente ejemplo muestra cómo crear una tarea
+para calcular un porcentaje:
 
-Como el porcentaje , en este caso, es el número en sí, nos referimos a yo, la palabra
-clave yo. En resumen, el símbolo yo signiﬁca: envíame este mensaje a mí mismo.
-Después de haber ejecutado el código mencionado anteriormente,
-podemos hacer:
+@test602
 
-```
-Salida escribir:
-(7 porciento-de: 100),
-detener.
-```
+Después de definir la tarea y asignarla a la variable **percentage**,
+se envía el mensaje **aplicar:y:** con los argumentos **100** y **7**.
 
-Naturalmente el resultado mostrado será:
+Esto ejecutará la tarea aplicada a **100** y **7**, es decir, el 7% de 100.
+Mediante la flecha de retorno, la respuesta se devuelve desde la tarea
+al programa principal.
 
+## Extensión
+
+Aunque este código es válido, tiene una desventaja,
+porque hay que recordar el orden de los argumentos. Entonces, ¿por qué no
+escribirlo así: *7 percent of: 100*? Eso parecería mucho más
+*natural*. Para hacerlo posible, tenemos que adaptar el objeto padre de
+**7**, que es el objeto **Número**, para que entienda el
+mensaje **percent of:**. Esto se consigue enviando **al:hacer:** al
+objeto Número, de esta manera:
+
+@test603
+
+Como el porcentaje es, en este caso, el propio número, nos referimos a yo,
+la palabra clave *yo*. En resumen, el símbolo yo significa: *envía este
+mensaje a mí mismo*.
 
 # Objetos
 
 {{messages}}
 
-El mundo de XOScript está lleno de una diversidad de objetos, que están disponibles para
-su programa desde el principio. 
+Además de ajustar y ampliar objetos existentes, también puedes crear
+tú mismo objetos nuevos simplemente enviando el mensaje **crear**. Supongamos que
+quieres crear un objeto factura que imponga una secuencia de
+numeración; en ese caso, primero necesitarás un objeto factura.
 
-Además de ajustar y expandir objetos existentes, también puede crear nuevos objetos
-usted mismo simplemente enviando el mensaje nuevo . Supongamos que desea crear un
-objeto de factura que aplique una secuencia de numeración; en ese caso, primero
-necesitará un objeto de factura.
+Sabiendo que cada objeto deriva de otro objeto, que a su vez
+tiene su origen en última instancia en el objeto raíz de todos los objetos, llamado Objeto,
+hay que elegir en cuál de esos otros objetos se basará tu
+nuevo objeto. Tu nuevo objeto hereda todas las propiedades del
+objeto en el que se basa, es decir, de aquel al que se envió
+inicialmente el mensaje **crear**.
 
-Si sabe que cada objeto deriva de otro objeto, que, a su vez, eventualmente se origina en
-el objeto raíz de todos los objetos llamado Objeto, debe elegir en cuál de esos otros
-objetos se basará su nuevo objeto. Su nuevo objeto hereda todas las propiedades del
-objeto en el que se basa, es decir, al que se envió inicialmente el mensaje nuevo.
-En este ejemplo, se preﬁere un objeto bastante neutral, uno sin demasiadas propiedades
-heredadas. Esto ofrece una elección fácil, porque en ese caso el nuevo objeto puede
-basarse en el objeto raíz en sí mismo, que es Objeto. La notación del sistema de facturas
-deseado será entonces la siguiente:
+En este ejemplo es preferible un objeto bastante neutro, sin demasiadas
+propiedades heredadas. La elección es fácil, porque en ese
+caso el nuevo objeto puede basarse en el propio objeto raíz, que es
+**Objeto**. La notación del sistema de facturas previsto será entonces la
+siguiente:
 
-```
->> factura := Objeto nuevo.
-factura en: ['empezar'] hacer: {
-	mi numero := 0.
-}.
-factura en: ['numero'] hacer: {
-	mi numero añadir: 1.
-	<- mi numero copiar bruto.
-}.
-```
+@test604
 
-Utilice este objeto de la siguiente manera:
+El número de factura actual se almacena en el objeto; por eso se
+coloca delante la palabra clave **mi**. Esto se denomina *propiedad*;
+más adelante se darán más detalles.
 
-```
-factura empezar.
-Salida escribir: factura numero, detener.
-Salida escribir: factura numero, detener.
-```
+Algunas empresas prefieren incorporar el año en los números de
+factura. En ese caso, puedes crear un nuevo objeto factura basado en un
+objeto factura anterior, pero que ofrezca a su usuario la posibilidad de
+indicar un año concreto:
 
-El número de factura actual se almacena en el objeto, por eso se coloca una palabra
-clave propia delante de él. Esto se llama propiedad; más detalles a continuación.
-Algunas empresas preﬁeren tener el año incorporado en los números de factura. En este
-caso, puede crear un nuevo objeto de factura basado en un objeto de factura anterior,
-pero que ofrece la posibilidad de su usuario de ingresar un año especíﬁco:
+@test605
 
-```
->> factura-anual := factura nuevo.
-factura-anual en: ['empezar:'] hacer: { :año
-	mi numero := año.
-}.
-```
+No es necesario volver a escribir la implementación del mensaje **número**,
+ya que se hereda del **objeto factura** escrito
+anteriormente; en consecuencia, el código antiguo se puede reutilizar. XOScript carece de conceptos
+como las clases y otros conceptos relacionados. Esto significa que los objetos solo
+pueden heredar de otros objetos, lo que también se conoce como *herencia
+prototípica*.
 
-Este objeto de factura de año se puede usar como:
+Volvamos ahora a las propiedades. Solo se puede acceder a las propiedades de un objeto
+desde *dentro de la jerarquía del objeto*, de modo que estas propiedades
+no pueden ser percibidas por otros objetos.
 
-```
-factura-anual empezar: 202000.
-Salida escribir: factura-anual numero, detener.
-Salida escribir: factura-anual numero, detener.
-```
+A diferencia de otros lenguajes de programación, todas las propiedades de los objetos son
+visibles exclusivamente para el objeto que ha creado la propiedad y para los
+objetos derivados. 
 
-No es necesario volver a escribir la implementación del mensaje número, ya que se
-hereda del objeto factura escrito anteriormente; en consecuencia, se puede reutilizar
-el código antiguo. XOScript carece de conceptos como clases y otros conceptos
-relacionados. Esto signiﬁca que los objetos solo pueden heredar de otros objetos, también
-conocido como herencia prototípica.
-Ahora, volvamos a las propiedades. Las propiedades de los objetos solo se pueden
-abordar desde dentro, por lo que otros objetos no pueden percibirlas. A diferencia de otros
-lenguajes de programación, todas las propiedades de los objetos son visibles
-exclusivamente para el objeto que ha creado la propiedad y para los objetos derivados.
+Una técnica muy utilizada es usar un objeto como una especie de *plano*,
+como ocurre, por ejemplo, con las facturas vistas antes.
+Otro buen ejemplo es **Point**. Supongamos que creas un
+programa informático que hace cálculos usando puntos de un mapa. Puedes
+desarrollar el objeto **Point**, que contiene las propiedades de una
+coordenada x y una coordenada y, que se pondrán a disposición del
+mundo exterior mediante mensajes:
+
+@test606
+
+El mensaje **=** compara los dos puntos usando el mensaje **y:**. La
+primera comparación da como resultado un **Verdadero** o un **Falso**. Estos son objetos
+booleanos. Cuando envías el mensaje **y:** a un objeto Verdadero y el
+objeto argumento que va después de los dos puntos también es **Verdadero**, recibes
+de nuevo como respuesta **Verdadero**. Cuando cualquiera de los dos es **Falso**,
+recibes la respuesta **Falso**. Ten en cuenta que un punto no puede leer las coordenadas del
+otro. Es necesario enviar un mensaje al otro punto para pedirle
+estos datos: **x-coordinate** e **y-coordinate**. Al fin y al cabo, como ya
+se ha explicado, las propiedades solo se pueden obtener desde dentro de
+la propia familia del objeto. 
+
+Ten en cuenta que aquí se usa el mensaje **=** para realizar la
+comparación de puntos. También podría haberse usado otro mensaje, como
+**is:** o **equal:**, pero reutilizar el carácter **=** parecía
+apropiado en este caso.
 
 ## Herencia
 
-En el capítulo 2 se ha ilustrado que los objetos pueden basarse en otros objetos.
-De esta manera, se puede reutilizar el código escrito previamente para crear una
-jerarquía de objetos. Por ejemplo:
+Puedes reutilizar código escrito previamente para crear una jerarquía
+de objetos. Por ejemplo:
 
 ```
->> Animal := Objeto nuevo.
->> Perro := Objeto nuevo.
->> Caniche := Objeto nuevo.
+>> Animal := Objeto crear.
+>> Dog := Animal crear.
+>> Poodle := Dog crear.
 ```
 
-En este caso, Perro hereda todo el comportamiento de Animal y, a su vez, el objeto
-Animal hereda todo el comportamiento de Objeto, el objeto raíz de todos los objetos.
+En este caso, **Dog** hereda todo el comportamiento y las propiedades
+de **Animal** y, a su vez, el objeto **Animal** hereda todo el comportamiento de
+**Objeto**, el objeto raíz de todos los objetos.
 
-## Anulación
 
-En el siguiente ejemplo se crea un nuevo tipo de secuencia: Combinación, en la que se
-garantiza que cada elemento sea único. Las funciones de la secuencia se reutilizan
-mediante herencia:
+## Sobrescritura
 
-```
->> Combinación := Serie nuevo.
-Combinación en: ['adjuntar:'] hacer: { :elemento
->> ver := yo encontrar: elemento.
-ver falso: { yo adjuntar: elemento. }.
-}.
->> colores := Combinación nuevo.
-colores
-adjuntar: ['rojo'],
-adjuntar: ['verde'],
-adjuntar: ['azul'],
-adjuntar: ['rojo'].
-Salida escribir: colores, detener.
-```
 
-Observe cómo el segundo rojo queda excluido de la serie:
-Ocasionalmente, puede ser necesario anular el comportamiento de un objeto. Por
-ejemplo, al sumar números y unidades de medida, se deben tener en cuenta. En el
-siguiente ejemplo, se crea el objeto Tamaño. Este objeto devuelve un número que,
-durante la suma, tiene en cuenta la unidad del número que se va a sumar. El objeto
-Número comprueba si se trata de pulgadas o pies.
-El código de programación podría parecerse al siguiente:
+En el siguiente ejemplo se crea un nuevo tipo de lista:
+**Combination**, en la que se garantiza que cada elemento es único. Las
+funciones de la lista se reutilizan mediante la herencia:
 
-```
->> Tamaño := Objeto nuevo.
-Tamaño en: ['es:'] hacer: { :número
-número en: ['+'] hacer: { :número
->> unidad := numéro calificador.
->> factor := 1.
-unidad
-en-caso-de: ['pulgadas'] hacer: { factor := 0.0833. }.
->> respuesta := yo + (número * factor).
-<- respuesta.
-}.
-<- número.
-}.
-```
+@test607
 
-Este número de tamaño se puede utilizar de la siguiente manera:
+Observa cómo el segundo **red** queda excluido de la lista.
 
-```
->> tablero := Tamaño es: 6 pies.
->> borde := Tamaño es: 50 pulgadas.
-Salida escribir: tablero + borde, detener.
-```
+En ocasiones, puede ser necesario sobrescribir un comportamiento de un objeto.
+Por ejemplo, cuando al sumar números hay que tener en cuenta las unidades
+de medida. En el siguiente ejemplo se crea el objeto **Size**.
+Este objeto devuelve un número que, durante la suma, tiene
+en cuenta la unidad del número que se va a sumar. El objeto **Número**
+comprueba si se trata de *pulgadas* o de *pies*. El código
+podría parecerse al siguiente:
 
-Esto se mostrará como:
-
-En el ejemplo anterior, se está anulando el signo más. Tenga en cuenta que, ﬁnalmente,
-todavía se debe realizar la suma ﬁnal, que, de hecho, tiene lugar en la siguiente línea:
-
-```
->> respuesta := yo + (número x factor).
-```
-
-Ahora bien, ¿cómo entiende XOScript que este signo más se reﬁere a la lógica original
-de la suma? Por ejemplo, otra interpretación podría ser que XOScript enviará
-repetidamente el mismo mensaje al mismo objeto, lo que, a su vez, daría como resultado
-un bucle inﬁnito. Claramente, esta no es la intención. Tan pronto como envíe un
-mensaje a un objeto, que ejecutaría exactamente el mismo código, XOScript se dará
-cuenta, en este caso, de que se trata del mensaje subyacente anulado.
-Por lo tanto, su programa estará automáticamente protegido contra esta forma de
-bucles inﬁnitos. 
+@test608
 
 ## Recursión
 
-Sin embargo, cuando su objetivo sea, de hecho, ejecutar la misma
-tarea desde la tarea actual, será necesario enviar primero el mensaje de forma
-recursiva. En este caso, el resultado será un bucle inﬁnito. Sin embargo, existen
-aplicaciones útiles para las tareas recursivas. Por ejemplo, supongamos que desea
-calcular el factorial de un número determinado. En ese caso, simplemente agregue el
-mensaje factorial a Número:
+En el ejemplo anterior, se sobrescribe el **signo** más. Ten en cuenta
+que, al final, la suma definitiva todavía tiene que realizarse, lo que, de hecho,
+ocurre en la siguiente línea:
 
 ```
-Número en: ['factorial'] hacer: {
->> respuesta := 1.
-yo > 0 verdadero: {
->> anterior := yo.
->> siguiente := anterior - 1.
-respuesta := anterior * siguiente recursivo factorial.
+>> answer := yo + (número x factor).
+```
+
+Ahora bien, ¿cómo entiende XOScript que este **signo** más se refiere a
+la lógica original de la suma? Por ejemplo, otra interpretación
+podría ser que XOScript envíe repetidamente el mismo mensaje al mismo
+objeto, lo que a su vez provocaría un **bucle infinito**. Evidentemente,
+esa no es la intención. En cuanto envías a un objeto un mensaje
+que ejecutaría exactamente el mismo código, XOScript se dará cuenta,
+en este caso, de que se refiere al mensaje subyacente sobrescrito. Así, tu
+programa queda protegido automáticamente contra esta forma de bucles
+infinitos. Sin embargo, cuando tu objetivo sea realmente ejecutar la misma función desde la
+función actual, será necesario enviar primero el mensaje
+**recursivo**. En ese caso, el resultado será un bucle
+infinito. No obstante, las tareas recursivas tienen aplicaciones útiles; por
+ejemplo, supongamos que quieres calcular el factorial de un número
+dado. En ese caso, basta con añadir el mensaje **factorial** a
+Número:
+
+@test609
+
+Esto requiere recursión. De hecho, la tarea asociada al
+mensaje **factorial** debe ejecutarse de nuevo dentro de esa función.
+Por tanto, es necesario invocar la función factorial desde dentro de la
+propia función factorial. Por regla general, XOScript impedirá esta rutina,
+por el riesgo de acabar en un bucle infinito. Por este motivo,
+es fundamental anteponer al mensaje la palabra **recursivo**. Esto
+se hace para que XOScript sepa que tu intención es
+ejecutar la misma tarea y que no has cometido un error.
+
+## Objetos similares a clases
+
+Aunque xoscript no ofrece clases, imitar un comportamiento similar al de
+las clases es trivial. Basta con sobrescribir el mensaje crear.
+
+```
+>> Animal := Objeto crear.
+Animal al: ['crear'] hacer: {
+	<- yo crear iniciar.
 }.
-<- respuesta.
+
+Animal al: ['iniciar'] hacer: {
+	mi sound := ['?'].
+	mi legs  := 4.
 }.
 ```
 
-Esto requiere recursión. De hecho, la tarea que está conectada al mensaje factorial
-debe ser ejecutada nuevamente dentro de esa tarea. Por lo tanto, es necesario invocar
-la tarea factorial desde dentro de la tarea factorial misma. Como regla, XOScript evitará
-esta rutina, debido al riesgo de terminar en un bucle inﬁnito. Por esta razón, es vital
-preceder el mensaje con la palabra recursivo. Esto se hace para que XOScript sepa
-que es tu intención ejecutar la misma tarea y que no cometiste ningún error.
-El siguiente bucle muestra los factoriales de los números del 1 al 10:
+En el fragmento de código anterior creamos un objeto llamado Animal.
+Este objeto sirve como *plano* para todo tipo de animales,
+como perros y gatos. El objeto padre Animal se escribe
+con A mayúscula para indicar que es un objeto similar a una clase.
+A continuación sobrescribimos el mensaje crear escribiendo nuestro propio método crear.
+En este caso, envía el mensaje crear a yo, seguido del mensaje
+iniciar. Como xoscript bloquea la recursión por defecto, esto no provocará
+un bucle infinito. En su lugar, enviará el mensaje crear al objeto
+padre (Objeto), lo que da como resultado una nueva instancia de Animal. Así, creamos
+un nuevo objeto basado en el mismo objeto para el que creamos nuestro método crear.
+Esto es perfectamente válido. Además enviamos el mensaje iniciar, que garantiza
+que el objeto Animal tenga valores predeterminados para sus propiedades. Por defecto,
+un animal tiene 4 patas y su sonido es desconocido (de ahí el signo de interrogación).
+Para crear una nueva instancia de nuestro Animal, bastaría con escribir:
 
 ```
-{ :x Salida escribir : x factorial , detener. } * 10.
+>> a := Animal crear.
 ```
 
-Sin la palabra recursiva, solo se produciría la multiplicación inicial. La lista quedaría
-así:
-
-## Objetos de tipo clase
-
-La creación de un objeto que se establece en un estado inicial determinado presenta
-un problema frecuente. Supongamos que se debe crear un objeto Rectángulo para
-calcular el perímetro y el área. Una posible notación sería:
+Ahora obtenemos una nueva instancia de Animal con 4 patas, sonido desconocido y
+un método iniciar. Igual que en otros lenguajes de POO, también podemos
+extender nuestro Animal:
 
 ```
->> Rectángulo := Objeto nuevo.
-Rectángulo en: ['área'] hacer: {
-	<- mi longitud * mi ancho .
+>> Dog := Animal crear.
+Dog al: ['iniciar'] hacer: {
+	yo iniciar.
+	mi sound := ['barks'].
 }.
 ```
 
-Obviamente, establecer una longitud y un ancho es una condición previa. Para ese
-propósito, se pueden agregar los mensajes longitud: y
-ancho:
+Podemos comprobarlo fácilmente añadiendo un método texto:
 
 ```
-Rectángulo en: ['longitud:'] hacer: { :longitud
+Animal al: ['texto'] hacer: {
+	<- mi legs texto + mi sound.
+}.
+```
+
+Juntémoslo todo:
+
+@test13
+
+
+Crear un objeto que se encuentre en un estado inicial determinado plantea un
+problema frecuente. Supongamos que hay que crear un objeto **Rectangle**
+para calcular el perímetro y el área. Una posible notación sería:
+
+
+```
+>> Rectangle := Objeto crear.
+
+Rectangle al: ['area'] hacer: {
+	<- mi longitud * mi width.
+}.
+```
+
+Evidentemente, establecer una longitud y una anchura es un requisito previo. Para ello
+se pueden añadir los mensajes **longitud:** y **width:**:
+
+
+```
+Rectangle al: ['length:'] hacer: { :longitud
 	mi longitud := longitud.
 }.
-Rectángulo en: ['ancho:'] hacer: { :ancho
-	mi ancho := ancho.
+
+Rectangle al: ['width:'] hacer: { :width
+	mi width := width.
 }.
-```
-
-Este rectángulo se puede utilizar de la siguiente manera:
 
 ```
->> rectángulo := Rectángulo nuevo longitud: 2, ancho: 3.
-Salida escribir: rectángulo area.
-```
 
-Sin embargo, si se pasan por alto los ajustes iniciales de longitud y ancho, aparecerá
-un mensaje de error.
+Este rectángulo se puede utilizar entonces de la siguiente manera:
+
 
 ```
->> rectángulo := Rectángulo nuevo.
-Salida escribir: rectángulo area .
+>> rectangle := Rectangle crear length: 2, width: 3.
+Salida escribir: rectangle area.
 ```
 
-Para evitar esto, es preferible que un rectángulo siempre tenga una longitud y un
-ancho iniciales, por ejemplo 0. Por lo tanto, en este caso, es necesario anular el
-mensaje nuevo.
+Sin embargo, si se olvidan los valores iniciales de longitud y anchura,
+se producirá un mensaje de error:
 
 ```
-Rectángulo en: ['nuevo'] hacer: {
->> rectángulo := yo nuevo.
-rectángulo longitud: 0.
-rectángulo ancho: 0.
-<- rectángulo.
-}.
+>> rectangle := Rectangle crear.
+Salida escribir: rectangle area.
 ```
 
-Observe que en la segunda línea se vuelve a invocar el primer nuevo inicial. Sin
-embargo, esto no resultará en un bucle inﬁnito, ya que XOScript lo evitará. 
-Cuando se crea un
-nuevo rectángulo, ahora medirá automáticamente 0 por 0, desde el principio. De esta
-manera, no se producirá ningún error al calcular el área:
+producirá el siguiente error:
 
 ```
->> rectángulo := Rectángulo nuevo.
-Salida escribir: rectángulo area.
-
->> rectángulo := Rectángulo nuevo longitud: 2, ancho: 3.
-Salida escribir: rectángulo area.
+Clave no encontrada:longitud
 ```
 
-# Nulo
+Para evitarlo, es preferible que un rectángulo tenga
+siempre una longitud y una anchura iniciales, por ejemplo 0. Así, en este
+caso, es necesario **sobrescribir** el mensaje **crear**.
 
-Objeto muy básico es el objeto Nulo. Este objeto representa el vacío, o mejor aún, la
-ausencia de información. En ocasiones, recibirás este objeto como respuesta a un
-mensaje, en caso de que el resultado sea nada. La pregunta más esencial que puedes
-hacerle al objeto Nulo es: ¿nulo?.
-La respuesta siempre será Verdadero
+@test610
+
+Si sobrescribimos el mensaje crear, básicamente estamos imitando una **clase**.
+
+El mundo de XOScript está lleno de una gran variedad de objetos, que están
+disponibles para tu programa desde el principio. En los próximos capítulos
+se analizarán todos estos objetos fundamentales.
+
+## Instantáneas
+
+Puedes guardar un objeto (junto con su estado actual) en disco con:
 
 ```
-Salida escribir: Nulo ¿nulo? .
+myobject save-as: ['saved.bin'].
 ```
 
-Cualquier objeto que no sea Nulo responderá con Falso. El fragmento de código anterior
-puede parecer un poco ﬁlosóﬁco, pero el objeto Nulo ciertamente tiene aplicaciones
-extremadamente prácticas. Por ejemplo, recibirá el objeto Nulo como respuesta en caso de
-que solicite un elemento de una serie
-que no existe.
-También puede usar el objeto Nulo si desea declarar una variable, pero no desea
-especiﬁcar un valor aún. En su lugar, simplemente asigne el valor especial Nulo. En
-XOScript no está permitido declarar una variable sin valor, como:
+Para volver a cargar el objeto desde el disco:
+
+```
+>> myobject := Objeto load-from: ['saved.bin'].
+```
+
+Las instantáneas se pueden usar para guardar un estado determinado o para mejorar el rendimiento.
+Cargar una instantánea evita el análisis léxico, el análisis sintáctico y la configuración de la aplicación.
+Además, en el futuro podrían introducirse ventajas de rendimiento adicionales
+con las instantáneas, como la optimización de ciertos patrones o la detección y
+optimización de rutas críticas.
+
+{{warning}}
+Las instantáneas son una funcionalidad experimental; no las uses en producción.
+Para activar las funcionalidades experimentales, compila con -D EXPERIMENTS.
+{{/warning}}
+
+
+@test712
+
+# Objeto Nulo
+
+{{messages}}
+
+El objeto Nulo
+representa el vacío o, mejor dicho, la ausencia de información. En
+ocasiones recibirás este objeto como respuesta a un mensaje, cuando
+el resultado sea **nada**. La pregunta más esencial
+que puedes hacerle al objeto **Nulo** es: **¿nulo?**. La
+respuesta siempre será **Verdadero**.
+
+```
+Salida escribir: Nulo ¿nulo?.
+```
+
+resultado:
+
+```
+Verdadero
+```
+
+Cualquier objeto distinto de **Nulo** responderá con **Falso**. El
+fragmento de código anterior puede parecer algo filosófico, pero el objeto **Nulo**
+tiene sin duda aplicaciones sumamente prácticas. Por ejemplo,
+recibirás el objeto Nulo como respuesta si pides un
+elemento de una lista que no existe. También puedes usar el objeto Nulo
+si quieres declarar una variable pero todavía no quieres especificar un
+valor. En su lugar, simplemente **asignas** el valor especial **Nulo**. En
+XOScript no se permite declarar una variable sin valor, como en:
+
 
 ```
 >> valor.
 ```
 
-En su lugar, debe escribir lo siguiente:
+En su lugar, debes escribir lo siguiente:
 
 ```
 >> valor := Nulo.
 ```
 
-# Booleano
+@api_None_base
 
-En los capítulos anteriores se han analizado en profundidad los objetos Verdadero o
-Falso. Hemos utilizado estos objetos, por ejemplo, para ejecutar tareas en función de
-ciertas condiciones. Verdadero y Falso se basan en el álgebra de Boole.
-A diferencia de la mayoría de los lenguajes de programación más populares en el
-momento de escribir este artículo, XOScript proporciona solo un único objeto Verdadero y un
-único objeto Falso. Para aclarar, cada vez que escribe Verdadero no implica que se haya
-creado un nuevo objeto. En cambio, siempre utiliza una referencia. Esto signiﬁca que
-cuando escribe lo siguiente:
-
-```
->> x := Verdadero.
-```
-
-La x se reﬁere al objeto Verdadero. El código condicional y los bucles también veriﬁcan
-esta referencia. En XOScript, el signiﬁcado de Verdadero y Falso no es ﬁjo. De hecho, un
-programa XOScript se confunde bastante con una declaración como esta:
-
-```
-Verdadero := Falso.
-```
-
-El resultado de tales acciones no está deﬁnido, pero sigue siendo una acción válida y, por
-lo tanto, está permitida formalmente. Además, hay un objeto Decision, que es el objeto
-raíz de Verdadero y Falso, ya que ambos son derivados del objeto raíz. Sin embargo, el
-objeto Decision en sí no proporciona ninguna
-aplicación práctica.
-Por medio de los objetos Verdadero y Falso, puede ejecutar partes de su programa bajo
-condiciones especíﬁcas:
-
-```
->> precio := Número entre: 0 y: 20.
->> presupuesto := 10.
-precio > presupuesto verdadero: {
-Salida escribir: ['demasiado caro'].
-}, falso: {
-Salida escribir: ['¡vendido!'].
-}.
-```
-
-
-Para facilitar la lectura, en lugar de falso: también puede utilizar el mensaje otro:. Esto es
-básicamente lo mismo , porque el mensaje otro: es un sinónimo de falso:. (otro , hace
-referencia a - otro caso - ) Por lo tanto, el siguiente fragmento muestra exactamente el
-mismo procedimiento:
-
-```
->> precio := Número entre: 0 y: 20.
->> presupuesto := 10.
-precio > presupuesto verdadero: {
-Salida escribir: ['demasiado caro'].
-}, otro: {
-Salida escribir: ['¡vendido!'].
-}.
-```
-
-Depende totalmente de usted cuál de las dos variaciones preﬁere utilizar para facilitar la
-lectura.
-Los objetos de decisión también se pueden utilizar para combinar diferentes condiciones.
-Por ejemplo, una tarea se puede ejecutar cuando dos cosas producen un objeto
-Verdadero. O bien, si se cumple una de dos o incluso más condiciones, como se ilustra
-en el siguiente ejemplo:
-
-```
->> azúcar := Verdadero.
->> leche := Falso.
->> x := azúcar y: leche.
-```
-
-En el fragmento anterior se crean dos nuevos objetos, que son azúcar y leche. El objeto
-azúcar es un objeto Verdadero mientras que leche es un objeto Falso. Ahora, cuando
-quieres saber si alguien preﬁere tanto leche como azúcar en su café o té, envías el
-mensaje y: a un objeto y envías el otro objeto junto con él como argumento. La respuesta
-a y: será Falso, porque y: solo responde con Verdadero cuando el objeto en sí es
-aﬁrmativo, así como el argumento. En cualquier otro caso, devolverá Falso. Entonces,
-en este caso x es igual a Falso. Además del mensaje y:, también puedes usar o: ,
-de la siguiente manera:
-
-```
->> azúcar := Verdadero.
->> leche := Falso.
->> x := azúcar o: leche.
-```
-
-En este caso, el azúcar, coincidentemente el primer objeto indicado, responderá
-Verdadero. El objeto Verdadero al que se reﬁere la variable azúcar, en realidad siempre
-responde a la pregunta o: con Verdadero si efectivamente el objeto en sí es aﬁrmativo
-o efectivamente el objeto en el argumento es aﬁrmativo, o si ambos son Verdadero.
-En caso de que ninguno de los objetos sea Verdadero, entonces la respuesta será Falso.
-Al usar el mensaje o: puede esperar Verdadero si está rodeado por dos objetos Falso.
-
-```
->> azúcar := Falso.
->> leche := Falso.
->> x := azúcar o: leche.
-```
-
-Con el mensaje no se invierte un objeto de decisión, es decir, un Verdadero se convierte
-en Falso
-
-```
->> azúcar := Falso no.
->> leche := Falso no.
->> x := azúcar y: leche.
-```
-
-Entonces, en este caso x es Verdadero, porque tanto azúcar como leche son Falso no,
-es decir, no no, por lo tanto Verdadero.
-Con entonces:caso-contrario: puedes seleccionar, por medio de un objeto Verdadero o
-Falso, un objeto diferente de un par de objetos. De la siguiente manera:
-
-```
->> azúcar := Verdadero.
->> x :=
-azúcar
-entonces: 1 cuchara caso-contrario: Nulo.
-```
-
-En el fragmento anterior x será igual a 1 cuchara. Cuando el mensaje de recepción es
-Verdadero, se seleccionará el primer objeto y si no, se seleccionará el segundo.
-También puedes convertir un Verdadero o un Falso en un número enviando el número
-del mensaje. El objeto Verdadero responderá con 1 y Falso responderá con 0.
-Obviamente, también puedes comparar objetos Verdadero y Falso entre sí:
-
-```
->> x := (Verdadero !=: Falso).
->> y := (Verdadero = Falso).
-```
-
-En este caso x es igual a Verdadero e y es igual a Falso.
-Los mensajes continuar y salir se pueden utilizar dentro de un bucle. Por lo tanto,
-cuando envía salir dentro de un bucle a un objeto Verdadero, el bucle ﬁnalizará desde
-ese punto. El programa continuará en la primera instrucción después del bucle.
-El mensaje continuar está relacionado con salir, sin embargo, en lugar de ﬁnalizar todo
-el bucle, solo ﬁnalizará la iteración actual. La parte restante de la ronda actual se omite y
-se inicia la siguiente ronda del bucle.
-A continuación, se muestran algunos ejemplos:
-
-
-```
-{ :i
-Salida escribir: i, detener.
-(i > 9) salir.
-} * 20.
-```
-
-Este fragmento de código en particular ilustra el efecto de la interrupción del mensaje.
-Muestra una pequeña lista de los números del 1 al 10; sin embargo, tan pronto como el
-número en i supera diez, el bucle se interrumpe en ese punto.
-
-```
-{ :i
-(i > 10 and: i < 15) continuar.
-Salida escribir: i, detener.
-} * 20.
-```
-
-
-Este fragmento de código produce una pequeña lista de 1 a 10 seguida de 15 a 20. Los
-números entre 10 y 15 se omiten. Esto se debe a que para este intervalo la condición
-( i > 10 y: i < 15 ) da como resultado Verdadero, por lo que el mensaje continuar se
-envía a este objeto Verdadero. Esto signiﬁca que se omite la parte restante del bucle y
-comienza la siguiente iteración. Los mensajes continuar y salir son ignorados por el
-objeto Falso.
-Finalmente, el mensaje texto le permite crear una representación textual de un objeto
-Verdadero o Falso.
-
-# Número
-
-Cada vez que escriba un número, por ejemplo 9, -10 o 3,12, detrás de la pantalla,XOScript
-convertirá estos números en un objeto Número. Puede enviar mensajes a este objeto
-Número, o puede asignar el número a una variable y enviar mensajes después:
-
-```
-10 ¿par?
-```
-
-```
->> diez := 10.
-diez ¿par?
-```
-
-Ambas notaciones son válidas. El objeto Número responde a los siguientes mensajes
-como: >, ≥( >=:), <, ≤ (<=:), =, ≠ (!=:), +, –, *, /, entre:y: , ¿impar? , ¿par?, añadir: ,
-restar:, multiplicar-por: , dividir-por:, módulo:, elevar-a:, ¿positivo?, ¿negativo?,
-redondear, redondear-al-alza , redondear-a-la-baja , raíz-cuadrada , absoluto , texto ,
-bruto , caliﬁcación , booleano y caliﬁcar:
-La mayoría de estos mensajes se explican por sí solos y permiten ejecutar operaciones
-matemáticas (+) o comparaciones (>). La diferencia entre los mensajes matemáticos
-binarios (+) y sus variaciones de palabras clave (añadir:) es que los primeros devolverán
-un nuevo número, que es el resultado de la operación, mientras que con los últimos
-se modiﬁcará el objeto en sí. Esto se ilustra en el siguiente ejemplo:
-
-```
->> a := 1.
->> b := a + 3.
-a añadir: 2.
-Salida escribir: a, detener.
-Salida escribir: b, detener.
-```
-
-En el ejemplo anterior, b = 4 y a = 3. Con añadir: 2 el valor de a se aumenta en 2,
-mientras que + 3 crea un nuevo número que es igual a a + 3. Lo mismo se aplica a otros
-procesos matemáticos, por ejemplo, las multiplicaciones. Al utilizar el símbolo de
-multiplicación, recibirá un nuevo objeto como respuesta. En caso de que utilice el mensaje
-multiplicar-por:, multiplicará el número en sí.
-Con el mensaje entre: y:, por ejemplo en: Número entre: X y: Y, obtendrá un número
-entre X e Y. De esta manera, se puede generar cualquier número aleatorio:
-
-```
->> a := Número entre: 1 y: 10 .
-```
-
-Tenga en cuenta que el generador integrado de números aleatorios en XOScript no es
-adecuado para aplicaciones criptográﬁcas.
-Puedes adjuntar un caliﬁcador a un número, por ejemplo, 6 manzanas. Cada mensaje
-que no sea reconocido por un número será considerado un caliﬁcador. Puedes recuperar
-el caliﬁcador de un número por medio del caliﬁcador de mensaje:
-
-```
->> cantidad := 6 monedas.
-Salida escribir: cantidad.
-Salida escribir: cantidad calificador.
-```
-
-Un caliﬁcador es básicamente un objeto de texto que se almacena con el objeto de
-número. El caliﬁcador también se imprime después del número en una asignación de
-escritura (escribir:) . Los caliﬁcadores se pueden utilizar para sumar cantidades en
-monedas mixtas, por ejemplo. Al sumar las cantidades, puede solicitar los caliﬁcadores.
-El siguiente ejemplo de programa ilustra este principio utilizando una calculadora de
-moneda histórica (¡ya que el tipo de cambio se mantiene razonablemente estable!).
-
-```
-Número en: ['+'] hacer: { :cantidad
-	(cantidad calificador = ['ducados']) verdadero: {
-		cantidad multiplicar-por: 5.
-	}.
-	yo añadir: cantidad.
-}.
-Salida escribir: (7 florines + 3 ducados), detener.
-```
-
-En el fragmento de código anterior, el mensaje + se adapta de tal manera que se tiene
-en cuenta la moneda. En este ejemplo, 1 ducado equivale a 5 ﬂorines. La palabra clave
-yo indica el objeto en sí: yo se utiliza para enviar un mensaje al objeto en sí. Además,
-también se puede establecer un caliﬁcador de forma explícita utilizando el caliﬁcador de
-mensaje:
-
-```
->> x := 7 calificador: ['ducatos'].
-```
-
-# Texto
+# Booleanos
 
 {{messages}}
 
-Cada vez que se coloca un texto entre bloques y comillas [‘…’],
-Xoscript crea un nuevo objeto de cadena. Sin embargo, asegúrese de usar
-las comillas correctas. La comilla al principio del texto es diferente de la
-del final (esto permite usar la comilla simple sin necesidad de escaparla).
+A diferencia de la mayoría de los lenguajes de programación populares en el momento de escribir esto,
+XOScript ofrece un único objeto Verdadero y un único objeto Falso.
+Para aclararlo: cada vez que escribes **Verdadero**, no significa que
+se haya creado un objeto nuevo. En su lugar, siempre usas una referencia. Esto
+significa que cuando escribes lo siguiente:
 
-## UTF-8
+\>\> x := Verdadero.
 
-Las cadenas en xoscript suelen contener texto codificado en UTF-8.
-Si bien técnicamente es posible incluir contenido binario o que
-no esté codificado en UTF-8 en una cadena, se recomienda usar blobs para ello.
-Los blobs los proporciona el complemento del servidor (véase el capítulo ffi).
-En general, los blobs/ffi se proporcionan según el
-complemento/plataforma, ya que están vinculados a la plataforma y
-la arquitectura (ffi/blobs). El núcleo del lenguaje de scripting
-intenta ser lo más independiente posible de la plataforma.
+**x** hace referencia al objeto **Verdadero**. El código condicional y los bucles también
+comprueban esta referencia. En XOScript, el significado de **Verdadero** y **Falso**
+no es fijo. De hecho, un programa XOScript queda bastante trastocado por una
+sentencia como esta:
 
-## Copiar
+Verdadero := Falso.
 
-Al usar := es posible guardar objetos con un nombre determinado (es decir,
-asignarlos a una variable). También es posible guardar un objeto con varios nombres.
-Tenga en cuenta que esta acción es diferente a la de realizar una copia real.
+El resultado de este tipo de acciones no está definido; sin embargo, sigue siendo una
+acción válida y, por tanto, formalmente permitida. Además, existe un objeto
+Booleano, que es el objeto raíz tanto de **Verdadero** como de **Falso**, ya que ambos
+son derivados de ese objeto raíz. Sin embargo, el propio objeto Booleano
+no tiene ninguna aplicación práctica.
 
-```
->> oveja := ['Dolly'].
->> clone := oveja.
-clone reemplazar: ['l'] con: ['n'].
-Salida escribir: oveja, detener.
-```
+## Trampas
 
-Aquí, podría haber esperado que la salida fuera Dolly, en lugar de Donny. Sin
-embargo, este no es el caso, ya que ambos nombres hacen referencia al mismo
-objeto. Cuando se trabaja con un bucle, ocurre algo similar:
+Ten cuidado al usar **y:** y **o:**
 
 ```
->> puntos := Serie ← 1 ; 2 ; 3.
-puntos cada: { :número :cantidad cantidad añadir: 1. }.
-Salida escribir: puntos, detener.
+Salida escribir: (Falso or: Verdadero or: Verdadero), detener.
+Salida escribir: (Falso o: Verdadero, o: Verdadero), detener.
 ```
 
-De hecho, XOScript siempre usa referencias, por lo que en :cantidad el bucle ilustrado
-anteriormente también indica la
-referencia al elemento en la secuencia:
-
-Para copiar un objeto, debes especiﬁcar esta acción explícitamente:
+Da como resultado
 
 ```
->> oveja := ['Dolly'].
->> clone := oveja copiar.
-clone reemplazar: ['l'] con: ['n'].
-Salida escribir: oveja, detener.
+Falso
+Verdadero
 ```
+porque el mensaje **o:** solo acepta 1 argumento. La primera línea
+envía **o:o:** a Falso, que no existe, por lo que el objeto ignora
+el mensaje y se devuelve a sí mismo (Falso). En cambio, la segunda línea
+envía **o:** seguido de otro **o:** (usando un símbolo de encadenamiento, es decir, una coma: ,).
 
-Al enviar el mensaje unario copiar a un objeto Texto, el objeto devuelve una copia de
-ese mismo objeto Texto. Es posible copiar objetos Número, Booleano, Serie, Lista y
-Momento de la misma manera.
-También puede deﬁnir su propia implementación de copia, esto es incluso una
-necesidad si crea sus propios objetos. Creemos una implementación de copia
-alternativa para series. La implementación predeterminada de copiar para una serie
-hace una copia superﬁcial, crea una nueva lista con los mismos elementos.
 
-```
->> a := Serie ← 1 ; 2 ; 3.
->> b := a copiar ; 4.
-Salida escribir: a, detener escribir: b, detener.
-```
+@api_Boolean_base
 
-En este caso, se agrega 4 solo a la copia.
-Sin embargo, debido a que la copia es superﬁcial, los objetos en ambas series son los
-mismos:
+# Números
+
+{{messages}}
+
+Cada vez que escribes un número, por ejemplo 9, -10 o 3,12, entre
+bastidores XOScript convierte esos números en un objeto **Número**. Puedes
+enviar mensajes a este objeto Número, o bien asignar el número
+a una variable y enviarle mensajes después:
 
 ```
->> oveja := Serie ← ['Dolly'] ; ['Shaun'].
->> clones := oveja copiar.
-clomes cada: { :número :sheep
-oveja adjuntar: ['2'].
-}.
-Salida escribir: oveja, detener.
-Salida escribir: clones, detener.
-```
+10 ¿par?
 
-Entonces, si agregamos 2 a cada nombre en la copia, la serie original también se ve
-afectada. Para solucionar esto, necesitamos hacer una copia profunda. Esta acción de copia
-para una secuencia podría estar compuesta de la siguiente manera:
+>> tenner := 10.
+tenner ¿par?
 
 ```
-Serie en: ['copiar'] hacer: {
->> copiar := Serie nueva.
-yo cada: { :number :sección
-copiar adjuntar: sección recursivo copiar.
-}. <- copiar.
-}.
-```
 
-Puedes usarla de esta manera:
+Ambas notaciones son válidas. El objeto Número responde a los siguientes
+mensajes...
 
-```
->> oveja := Serie ← ['Dolly'] ; ['Shaun'].
->> clones := oveja copiar.
-clones cada: { :número :sheep
-oveja adjuntar: ['2'].
-}.
-Salida escribir: oveja, detener.
-Salida escribir: clones, detener.
-```
+La mayoría de estos mensajes se explican por sí mismos y te permiten realizar
+operaciones matemáticas o comparaciones.
 
+{{note}}
+Ten en cuenta que puedes usar ≤ ≥ ≠ × y ÷ en lugar de sus equivalentes ASCII.
+Es una cuestión de preferencia.
+{{/note}}
 
-Si elimina la acción de copia, el resultado serían dos impresiones de la segunda
-serie. A primera vista, parece que la adición simplemente copia la oveja en la serie
-principal y deja de lado las subseries. Sin embargo, si el código de llamada se
-ajusta a:
+La diferencia entre los mensajes matemáticos binarios (+) y
+sus variantes de palabra clave (añadir:) es que los primeros devuelven
+un número nuevo, que es el resultado de la operación, mientras que con los
+segundos se modifica el propio objeto. Esto se ilustra en el
+siguiente ejemplo:
 
-```
->> oveja := Serie ← ['Dolly'] ; (Serie ← ['Shaun']).
-```
+@test597
 
-Entonces, a pesar de que Shaun está en una subserie, de hecho se copia
-correctamente. ¿Cómo funciona esto? Bueno, tiene todo que ver con las
-convenciones de nombres. Debido a que la acción de copia se ha conectado al
-mensaje llamado copiar, todos los objetos responderán con su respectivo
-comportamiento de copia, no importa si el objeto receptor es Texto o una (sub)Serie.
-Además, tenga en cuenta que el mensaje es recursivo, este mensaje es necesario
-para enviar antes del mensaje de copia. Más
-sobre este mensaje en el capítulo 4.4
-Es esencial tener en cuenta que, aunque una copia de un objeto a menudo tiene la
-misma apariencia que el original, de hecho, nunca será el mismo. El objeto raíz
-deﬁne un mensaje es-igual-a: , que puede usarse para comparar la identidad de los
-objetos. Observa el siguiente ejemplo:
+En el ejemplo anterior, b = 4 y a = 3. Con **añadir: 2**, el valor
+de a aumenta en 2, mientras que **+ 3** crea un número nuevo
+igual a a + 3. Lo mismo se aplica a otras operaciones matemáticas, p. ej.,
+las multiplicaciones. Al usar el símbolo de multiplicación, recibirás un
+objeto nuevo como respuesta. Si usas el mensaje **multiplicar:**,
+multiplicarás el propio número.
+
+Con el mensaje **entre:y:**, por ejemplo en **Número
+entre: X y: Y**, obtendrás un número entre X e Y. De esta
+manera se puede generar cualquier número aleatorio:
 
 ```
->> a := 1.
->> b := a copiar.
->> c := a.
-Salida escribir: a = b, detener.
-Salida escribir: a = c, detener.
-Salida escribir: ( a es-igual-a: b ),
-Salida escribir: ( a es-igual-a: c ),
-
-detener.
-detener.
+>> a := Número entre: 1 y: 10.
+Salida escribir: a, detener.
 ```
 
-En este caso, a = b, porque a es una copia de b y el mensaje ['='] mira el valor del
-objeto,que en el caso anterior, es el número. Dado que a = 1 y b = 1 y 1 = 1, la
-respuesta será Verdadero. Lo mismo se aplica a c. Solo cuando se utiliza el mensaje
-es-igual-a: , que Número hereda de Objeto, se puede notar una diferencia.
-Mientras que c es igual a a, porque aquí la referencia se asigna utilizando el símbolo
-:=, a (no es igual a) b. Esto se explica por el hecho de que dentro de la
-computadora
+A partir de la versión 1.4, el generador de números aleatorios integrado en xoscript es,
+hasta donde sabemos, criptográficamente seguro.
 
-La copia de la memoria es físicamente un objeto diferente. Por lo tanto, para averiguar
-si efectivamente la referencia es al mismo objeto físico en la memoria de la
-computadora, puede aplicar el mensaje es-igual-a:
+Puedes asociar un **calificador** a un número, por ejemplo, **6
+manzanas**. Cada mensaje que un número no reconozca
+se considerará un calificador. Puedes obtener el calificador de
+un número mediante el mensaje calificador:
+
+Un calificador es básicamente un objeto Texto que se almacena junto con el objeto
+Número. El calificador también se imprime después del número en una
+instrucción **escribir:**. Los calificadores podrían usarse, por ejemplo, para sumar importes
+en monedas mixtas. Al sumar los importes, puedes consultar
+los calificadores. El siguiente programa de ejemplo ilustra este
+principio mediante una calculadora de monedas históricas (¡ya que el tipo de
+cambio se mantiene razonablemente estable!).
+
+@test305
+
+@api_Number_base
+@api_Int64_base
+@api_Hx_base
+@api_Oct_base
+@api_Bin_base
+
+# Textos
+
+{{messages}}
+
+Cada vez que se coloca un texto entre **corchetes y comillas** ['...'],
+XOScript crea para ti un nuevo objeto texto. No obstante, asegúrate
+de usar las comillas correctas. La comilla del
+principio del texto es distinta de la del final (esto te permite
+usar la comilla simple sin necesidad de escaparla).
+
+## UTF8
+
+Los textos en xoscript suelen contener texto codificado en utf8. Aunque
+técnicamente es posible tener contenido binario o no utf8 en
+un texto, se recomienda usar blobs para ello. Los blobs los
+proporciona el plugin de servidor (consulta el capítulo ffi).
+En general, los blobs/ffi se proporcionan
+por plugin/plataforma, ya que están ligados a la plataforma
+y a la arquitectura (ffi/blobs). El núcleo del lenguaje de scripting intenta
+mantenerse lo más independiente posible de la plataforma.
+
+## Conversión de tipos
+
+Puedes crear una copia de cualquier objeto
+con un tipo diferente usando los siguientes mensajes:
+
+Mensaje | Resultado
+------- | ------
+número  | Convierte en un número
+texto   | Convierte en un texto
+booleano | Convierte en un booleano
+  
+Se **aplican** las siguientes reglas:
+
+mensaje  | Nulo      | Booleano           | Número                | Texto     | Otro              
+-------- | --------- | --------           | --------              | --------  | --------
+booleano | Falso     | n/d                | 0→Falso resto→Verdadero | Verdadero | Casi siempre Verdadero
+número   | 0         | Falso→0 Verdadero→1 | n/d                  | ['n']→n | Casi siempre 1
+texto    | ['Nulo']  | ['Falso']/['Verdadero'] | ['n']            | n/d       | Depende
+
+## Copia
+
+En XOScript, los valores siempre se pasan **por referencia**. En otros lenguajes
+depende del tipo de valor; en XOScript solo hay una forma:
+por referencia. XOScript nunca hace una copia de un valor. Para copiar un objeto,
+debes enviar el mensaje **copiar**. 
+
+@test611
+
+Aquí quizá esperabas que la salida fuera Dolly, en lugar
+de Donny. Sin embargo, no es así, ya que ambos nombres hacen referencia al mismo
+objeto. Al trabajar con un bucle ocurre algo parecido:
+
+@test612
+
+De hecho, XOScript usa **siempre** referencias, de modo que en **:quantity**
+el bucle mostrado arriba también indica la referencia al elemento
+de la lista.
+
+Para copiar un objeto, debes indicar esta acción
+de forma **explícita**:
+
+@test613
+
+Al enviar el mensaje unario **copiar** a un texto, el objeto
+devuelve una copia de ese mismo objeto texto. Es posible copiar de la misma manera
+objetos Número, objetos booleanos, listas y diccionarios.
+
+También puedes definir tu propia implementación de copiar; esto es incluso una
+necesidad si creas tus propios objetos. La implementación
+predeterminada de copiar para una lista hace una copia superficial: crea una
+lista nueva con los mismos elementos.
+
+@test614
+
+En este caso, 4 se añade solo a la copia.
+Sin embargo, como la copia es superficial, los objetos de ambas listas
+son los mismos.
+
+@test615
+
+Así que, si añadimos 2 a cada nombre de la copia, la lista
+original también se ve afectada.
+
+Para remediarlo, necesitamos hacer una **copia profunda**. Una acción de copia
+de este tipo para una lista podría componerse así:
+
+@test616
+
+Fíjate también en el mensaje recursivo; es necesario enviar este mensaje
+antes del mensaje copiar.
+
+Es fundamental tener presente que, aunque la copia de un objeto
+a menudo tiene el mismo aspecto que el original, en realidad
+nunca es el mismo. El objeto raíz define un mensaje **equal:**,
+que se puede usar para comparar la identidad de los objetos. Observa el
+siguiente ejemplo:
+
+@test617
 
 ## Conversión implícita
 
-XOScript utiliza la conversión implícita para convertir objetos. Para imprimir una
-secuencia en la pantalla, XOScript, por ejemplo, enviará el texto del mensaje i
-nternamente a la secuencia. Esto puede resultar muy útil, en caso de que
-quiera imprimir una secuencia como una lista separada por comas. El texto del
-mensaje se puede sobrescribir:
+XOScript usa la **conversión implícita** para convertir objetos. Para imprimir una
+lista en pantalla, XOScript enviará, por ejemplo, el mensaje
+*texto* internamente a la lista. Esto puede resultar muy útil
+si quieres imprimir una lista como lista separada por comas. El
+mensaje *texto* se puede sobrescribir: 
 
-```
->> suma := Serie ← 1 ; 2 ; 3.
-suma en: ['texto'] hacer: {
-<- yo unirse: [','].
-}.
-Salida escribir: suma, detener.
-```
+@test620
 
-Y de esta manera obtenemos
+@api_String_base
+@api_Format_base
 
-En las operaciones matemáticas con números, el número del mensaje se envía
-internamente. De esta manera, es posible crear una secuencia que proporcione
-automáticamente la suma durante una operación matemática:
 
-```
->> suma := Serie ← 1 ; 2 ; 3.
-suma en: ['número'] hacer: {
->> total := 0.
-yo cada: { :número :elemento
-total añadir: elemento.
-}.
-<- total.
-}.
-Salida escribir: 1 + suma, detener.
-```
+## Textos de servidor
+
+Las siguientes funcionalidades de Texto las añade el
+plugin Servidor.
+
+@api_String_server
 
 # Funciones
 
 {{messages}}
 
-El objeto de tarea responde a mensajes como: empezar, *, mientras:, error:, capturar:
-y proceder:. El capítulo 2 ilustró cómo un fragmento de código determinado se puede ejecutar varias
-veces; es decir, enviando el mensaje * a una tarea, seguido de la cantidad de iteraciones
-requeridas. Para un recordatorio rápido, aquí hay dos nuevos ejemplos de ese tipo de
-mensajes. Primero, el bucle simple:
+Puedes agrupar código entre { y }; entonces se convierte en una función.
+En xoscript también usamos a veces el término tarea o simplemente
+bloque de código.
+
+Puedes ejecutar una función enviándole el mensaje *empezar*.
+
 
 ```
-{ :grados
-	Salida escribir:
-	grados * 1.8 + 32, detener.
-} * 30.
+{ Salida escribir: 123, detener. } empezar.
 ```
 
-Este ejemplo devuelve una pequeña lista de temperaturas que van desde 1 a 30 grados
-Fahrenheit
-
-Esta secuencia se crea cuando la tarea entre corchetes {} se multiplica por el número 30.
+Si tu función acepta argumentos, usa **aplicar:**.
 
 ```
->> grados := 0.
-{
-	Salida escribir:
-	grados * 1.8 + 32, detener.
-	grados añadir: 1.
-} mientras: { <- grados <=: 0. }.
+{ :a Salida escribir: a, detener. } aplicar: a.
 ```
 
-El fragmento ilustrado anteriormente devuelve el mismo resultado, sin embargo, utiliza
-un bucle while. En este caso, el mensaje mientras: se envía a la tarea con el argumento
-una segunda tarea. La primera tarea se ejecutará repetidamente, hasta que la segunda
-tarea devuelva un Falso. Para aclarar, mientras la respuesta a la primera tarea siga
-siendo Verdadera, la primera tarea continúa ejecutándose. Debido a que cada vez que
-se agrega 1 a la cantidad de grados durante la ejecución de la primera tarea, la segunda
-tarea devolverá Falso tan pronto como cuente 31
-grados Fahrenheit.
-
-Una forma diferente de manipular el ﬂujo del programa informático es deﬁnir un fragmento
-de código con controladores en caso de error. Por ejemplo, digamos que una aplicación
-de presupuesto tiene que determinar el presupuesto mensual en función de la entrada de
-un usuario sobre los ingresos y la cantidad de meses.
-
-```
->> presupuesto := ingresos / meses.
-```
-
-¿Puedes adivinar qué sucede cuando la cantidad de meses resulta ser 0? Lo que sucede
-es un mensaje de error:
-
-La primera línea del mensaje muestra que se ha producido un error que no ha sido
-gestionado por el programa. La segunda línea de la salida indica el problema real, que es,
-en este caso, que no se permite la división por 0. La primera línea también revela que
-se puede gestionar un error. Este también es un caso de ejecución de código
-condicional; sin embargo, en esta situación se escribirá y ejecutará un fragmento de
-código en caso de que se produzca un error provocado por un fragmento de código
-diferente. Por ejemplo, vea cómo modiﬁcar este
-mensaje de error:
+Consulta también los ejemplos de abajo.
+Debido a la arquitectura simplista, una función solo puede tener
+un punto de retorno. Para evitar sobrecarga o un anidamiento excesivo de
+condiciones, puedes usar un procedimiento (que equivale a usar el
+signo de multiplicación con el argumento 1):
 
 ```
 {
->> presupuesto := ingresos / meses.
-} capturar: { :error
-	Salida escribir: ['¡No permitido!'], detener.
-}, empezar.
+  (a = 1) verdadero: { x := 1. }, salir.
+  (a = 2) verdadero: { x := 2. }, salir.
+} proceder.
 ```
 
-En este caso la salida será (en 0 meses)
+De esta manera, (a = 2) no se evaluará si a = 1.
+Además, así no necesitas mensajes verdadero: anidados.
+Siempre que te encuentres anidando condiciones, piensa
+en el mensaje proceder. Puede hacer que tu código
+sea más fácil de leer.
 
-En este caso, ha gestionado su propio manejo de errores. Tenga en cuenta que falta la
-sentencia de -error no manejado - ; después de todo, usted manejó bien el error y,
-según XOScript, ese es el ﬁnal.
-Sin embargo, ¿cómo funciona exactamente el manejo de errores en el ejemplo anterior?
-En primer lugar, hay dos tareas: la tarea original y la tarea de manejo. Estas tareas
-están vinculadas por el mensaje capturar: Al recibir el mensaje capturar: una tarea con
-la captura, el objeto Tarea receptor cambiará, en caso de que ocurra un error, al código
-dentro del objeto Tarea que se ha asignado para realizar el manejador de errores.
-Después de que los dos bloques estén vinculados, es obvio qué hacer en caso de que
-ocurra un error. 
 
-En realidad, no se está iniciando nada. Esto introduce el mensaje ﬁnal en el fragmento de
-código: empezar. Esto inicia la ejecución del primer objeto Tarea, porque el mensaje
-capturar: produce el propio objeto Tarea como respuesta. Además, dado que se trata de
-un mensaje de palabra clave, se necesitará una coma para encadenar el nuevo mensaje
-unario. Formalmente, la estructura se puede observar de la siguiente manera:
+Esta es una trampa importante:
 
 ```
-{ Tarea 1 } capturar: { Tarea 2 }, empezar.
+{
+	Falso falso: {
+		Salida escribir: ['End the loop.'].
+	}, salir.
+	
+	Salida escribir: ['Dont show me.'].
+
+} proceder.
+
 ```
 
-También puede provocar que se produzca un error en su programa de forma intencionada
-y, al hacerlo, activar el bloque manejador. Esto se hace enviando el mensaje error: a la
-tarea actual, como se muestra en la siguiente
+En este caso, se mostrará el texto 'Dont show me',
+porque **salir** se envía a Falso. Si quieres ejecutar
+un salir, debe enviarse como mensaje a **Verdadero**.
+ 
+
+```
+{
+	Falso no verdadero: {
+		Salida escribir: ['End the loop.'].
+	}, salir.
+	
+	Salida escribir: ['Dont show me.'].
+
+} proceder.
+
+```
+
+Funcionará como se espera.
+
+## Excepciones
+
+Las excepciones se pueden gestionar así:
+
+```
+{ Task 1 } capturar: { Task 2 }, empezar.
+```
+
+También puedes provocar intencionadamente un error en tu programa y,
+al hacerlo, activar el bloque de gestión. Para ello se envía el
+mensaje **error:** a la tarea actual, como se muestra en la siguiente
 ilustración:
 
 ```
 {
-	esta-tarea error: ['Whoops!'].
+la-tarea-actual error: ['Whoops!'].
 } capturar: { :mistake
-	Salida escribir: mistake.
+Salida escribir: mistake.
 }, empezar.
 ```
 
-Tenga en cuenta que el objeto de error incluido en el mensaje error:, se devuelve en la
-rutina del controlador. De esta manera, se pueden pasar diversos objetos de error
-autoinducidos a su tarea de controlador. Además, muestra cómo puede comunicarse con
-la tarea actual enviando un mensaje a esta-tarea.
+## Inyección de valores
 
-En lugar de enviar el mensaje empezar, se puede utilizar el mensaje * 1 para ejecutar la
-tarea una vez. Ambos mensajes terminan teniendo el mismo resultado. Un mensaje que
-es muy similar a empezar (o * 1, dependiendo de cómo lo mire) es el mensaje proceder.
-Este mensaje se utiliza a menudo para mejorar la legibilidad. En el siguiente ejemplo se analizarán los diversos aspectos de cómo se utiliza
-el objeto Tarea en la práctica. Este próximo programa de demostración tiene como
-objetivo convertir un número en números romanos. Este
-ejemplo en particular se limita a números inferiores a 40.
+XOScript ofrece a las tareas la opción de inyectar valores. Observa
+la siguiente tarea:
 
 ```
->> numero := 17.
-{
-	{
-		numero >=: 10 verdadero: {
-			Salida escribir: ['X'].
-			numero restar: 10.
-		}, salir.
-		numero >=:≥9 verdadero: {
-			Salida escribir: ['IX'].
-			numero restar: 9.
-		}, salir.
-		numero >=: 5 verdadero: {
-			Salida escribir: ['V'].
-			numero restar: 5.
-		}, salir.
-		numero >=:≥4 verdadero: {
-			Salida escribir: ['IV'].
-			numero restar: 4.
-		}, salir.
-		numero >=: 1 verdadero: {
-			Salida escribir: ['I'].
-			numero restar: 1.
-		}, salir.
-	} proceder.
-} mientras: { <- numero > 0. }.
-```
-
-El programa en su forma actual devuelve el número romano correspondiente al número
-17. Al modiﬁcar el valor del número 17 en la parte superior del programa por algo
-diferente, por ejemplo 20, el resultado cambiará igualmente (XX). Ahora, observe más de
-cerca el programa. Los corchetes más externos pertenecen al mensaje while:. En este
-punto, vincula dos tareas. La primera tarea continúa ejecutándose mientras la segunda
-tarea siga devolviendo Verdadero como respuesta. Esa segunda tarea es bastante
-simple:
-
-```
-{ <- numero > 0. }
-```
-
-Esto signiﬁca que, mientras numero sea mayor que 0, se ejecutará la primera tarea.
-La primera tarea es un poco más larga, sin embargo, es básicamente un conjunto de
-tareas condicionales. Eche un vistazo al primer fragmento:
-
-
-```
-numero >=: 10 verdadero: {
-	Salida escribir: ['X'].
-	numero restar: 10.
-}, salir.
-```
-
-En este caso, se pregunta si el número es mayor o igual a 10. Si la respuesta a esta
-pregunta es Verdadero, se escribe el símbolo romano del número 10, que es X. Para
-continuar, se restan 10 al número y se termina esta ronda. En consecuencia, el mensaje
-salir salta del bucle y comprueba si el número sigue siendo mayor que 0. Si es así, se
-inicia otra ronda. En el caso de que el número sea 20, se llega de nuevo a esta primera
-parte. En el caso de 17, la respuesta a la pregunta si el número ≥ 10 debe leerse
-claramente Falso, ya que 17 - 10 = 7, y 7 es menor que 10. En este caso, se desciende
-al siguiente bloque (número ≥ 9). Nuevamente, la respuesta será Falso, ya que 7 es
-menor que 9. Luego, se llega a (número ≥ 5), lo que da como resultado V. De esta
-manera, se va cortando el número romano más grande posible de su número hasta que
-no quede nada.
-Sin embargo, hay un pequeño tecnicismo oculto en este programa. Tenga en cuenta que
-también se envía el mensaje salir, en caso de que exista la posibilidad de mostrar un
-número romano en la pantalla. Esto es para evitar la visualización de un número romano
-más pequeño demasiado pronto. En el caso de 20 (XX), no es deseable mostrar un IX
-después de la X; básicamente, el objetivo es reiniciar el proceso. De hecho, es por eso
-que los comparadores de números están dentro de una tarea y el mensaje proceder se
-envía a la tarea externa. Este procedimiento garantiza la posibilidad de abortar la tarea
-después de que se haya realizado una comparación exitosa.
-XOScript proporciona a las tareas la opción de inyectar valores. Ahora, observe la tarea a
-continuación:
-
-```
->> enviando := {
-	Boletin hacia: mi recipiente.
+>> sending := {
+	Newsletter destinatario: mi recipient.
 }.
-enviando asignar: ['recipiente']
-valor: ['info@citrine-lang.org'].
-enviando empezar.
+sending valor: ['recipient']
+asignar: ['info@recipient.org'].
+sending empezar.
 ```
 
-Esta ilustración presenta una tarea imaginaria que envía un boletín informativo a una
-dirección de correo electrónico o destinatario. Este destinatario se puede inyectar en la
-tarea, de forma externa y antes de que se inicie la tarea, enviando el mensaje
-asignar:valor: a la tarea. Al hacerlo, el valor del destinatario se preestablece en la
-tarea. Este valor también se puede modiﬁcar y la tarea se puede volver a ejecutar. Este
-es un método útil cuando se utilizan objetos de tarea
 
-No se permiten tareas vacías. En teoría, una tarea vacía se vería así: {}, sin embargo,
-XOScript percibe esto como un error de lenguaje. Si desea declarar una tarea vacía, puede
-utilizar el objeto Nulo:
+Esta ilustración presenta una tarea imaginaria que envía un boletín
+a una dirección de correo electrónico o **recipient**. Este destinatario se puede inyectar
+en la tarea, desde fuera y antes de que se inicie la tarea, enviando el
+mensaje **valor:asignar:** a la tarea. De este modo, el valor de
+**recipient** queda preestablecido en la tarea. Este valor también se puede modificar
+y la tarea puede volver a ejecutarse después. Es un método útil al usar
+objetos tarea.
 
-```
->> tarea := Nulo.
-```
+## Funciones vacías
 
-Aunque no se trata de una tarea real, sino de un objeto Nulo, se puede enviar un
-mensaje de inicio:
+No se permiten tareas vacías. En teoría, una tarea vacía tendría este
+aspecto: **{}**; sin embargo, XOScript lo considera un error del lenguaje. Si
+quieres declarar una tarea vacía, puedes usar el objeto Nulo:
 
 ```
->> respuesta := tarea empezar.
+>> task := Nulo.
 ```
 
-De hecho, es lo mismo que:
+Aunque no es una tarea de verdad, sino un objeto Nulo, aún se le puede
+enviar un mensaje empezar:
 
 ```
->> respuesta := Nulo empezar.
+>> answer := task empezar.
 ```
 
-Debido a que el objeto Nulo no reconoce el mensaje empezar, se devolverá a sí mismo
-como respuesta, dejando la respuesta nuevamente como Nulo. Por lo tanto, no es
-necesario tener una tarea vacía. Debido al elegante diseño del lenguaje de programación
-XOScript, puede simplemente utilizar el objeto Nulo para esto.
-
-## Visibilidad
-
-Como ya sabes, un objeto puede asignarse a una variable, pero primero debes asignar
-memoria en la memoria bajo este nombre, y para ello utilizas un símbolo de declaración.
-Esta acción se llama declarar una variable. Por supuesto, esto ya se ha tratado en los
-capítulos anteriores. Sin embargo, no todas las secciones de la memoria son visibles
-en todas partes, porque en programas grandes, que podrían llevar código de terceros,
-es probable que los nombres entren en conﬂicto. Por este motivo, estas ubicaciones de
-memoria están separadas entre sí, por lo que las tareas forman las líneas divisorias.
-Aquí se debe tener en cuenta que una variable que se declara dentro de una tarea, solo
-es visible durante la ejecución de esa tarea especíﬁca y durante la ejecución de todas
-las tareas iniciadas por esta tarea. Cuando una tarea en la que se declara la variable
-ha ﬁnalizado, se
-olvidará de alguna manera. Observa el siguiente ejemplo:
+De hecho, esto es lo mismo que:
 
 ```
->> x := 9.
-{ Salida escribir: x. } empezar.
+>> answer := Nulo empezar.
 ```
 
-El número 9 se imprime en la pantalla con el programa que se muestra arriba. El
-nombre de objeto x se ha declarado fuera de la tarea y, en consecuencia, es visible en
-todas partes, para todas las tareas, incluso cuando x se envía como argumento al objeto
-Salida. El área fuera de la tarea se puede considerar como una especie de tarea
-paraguas.
+Como el objeto **Nulo** no reconoce el mensaje **empezar**,
+se devolverá a sí mismo como respuesta, de modo que la respuesta vuelve a ser **Nulo**.
+Así pues, no hace falta tener una tarea vacía. Gracias al elegante
+diseño del lenguaje de programación XOScript, puedes usar simplemente el objeto
+Nulo para ello.
 
-Todas las variables que se declaran en esta área son visibles en todas partes en el
-programa, de hecho, todas las tareas están dentro de los límites de esta tarea paraguas,
-por así decirlo. Las variables que se declaran fuera de todas las tareas del programa
-también se conocen como variables globales, debido a su visibilidad global.
+## Ámbito dinámico
 
-```
-{ >> x := 9. } empezar.
-Salida escribir: x.
-```
+Cuando una Función necesita una variable pero no la encuentra,
+revisa las variables de la Función que la **llamó**
+y sigue revisando hacia arriba por la cadena de Funciones.
+Este proceso de búsqueda continúa hasta que se encuentra la variable.
+Si aun así no se encuentra la variable, aparecerá un mensaje de error. Este método de búsqueda de
+una variable se denomina **ámbito dinámico**.
 
-En este caso, aparecerá un mensaje de error. El nombre de objeto x se olvida tan
-pronto como ﬁnaliza la tarea. Dado que x se ha declarado dentro de la tarea, no es
-visible fuera de ella. En este caso, x vive exclusivamente dentro de la pequeña tarea
-que se ha escrito. Ahora, observe el siguiente fragmento, no hay mensajes de error;
-Sin embargo, ¿qué número aparecerá en la pantalla?
+Para ilustrar este principio:
 
-```
->> x := 1.
-{ >> x := 9. } empezar.
-Salida escribir: x.
-```
+@test618
 
-Aquí, la respuesta correcta es 1 en lugar de 9. En este caso, hay dos ubicaciones en
-la memoria con el nombre x. Gracias a los límites entre las tareas, no se afectan entre
-sí. Durante la
+@api_Code_base
 
-ejecución de la tarea, x es igual a 9, y tan pronto como la tarea ha terminado, la otra x
-se vuelve visible de nuevo y x será igual a 1.
-Y ahora la versión más complicada:
-
-```
->> y := { x := 2. }.
-{ >> x := 1. y empezar. Salida escribir: x. } empezar.
-```
-
-¿Cuál aparecerá en pantalla: 1 o 2 ? Veamos. En primer lugar, se asigna un lugar en la
-memoria con el nombre y para una tarea. En esa tarea en particular, el número 2 se
-guarda con el nombre x.
-
-Sin embargo, esta tarea no se inicia. En la segunda línea se crea una nueva tarea, que
-comienza de inmediato. En esta nueva tarea, se declara x. Por lo tanto, se asigna un
-lugar en la memoria con el nombre x. En consecuencia, con el nombre x se guarda el
-número 1. En ese momento x=1. A continuación, se inicia la tarea llamada y, que se ha
-escrito en la primera línea de este programa. Durante la ejecución de esa tarea, el
-número 2 se guarda bajo el nombre x. ¿Es esto posible? La respuesta a esta
-pregunta es un rotundo sí. Aquí, la línea crucial está efectivamente durante la
-ejecución. Aunque la tarea y, desde un punto de vista visual, queda fuera de la tarea
-de la línea 2, la tarea y se está ejecutando de hecho durante la ejecución de la tarea
-en la segunda línea. Esto signiﬁca que, el 1 que estaba en x, se sobrescribe con el
-número 2. De hecho, en ese momento x = 2. Entonces, la tarea y ha terminado y la
-ejecución del programa vuelve a la tarea en la segunda línea, lista para imprimir x en
-la pantalla.
-Sin embargo, ¿qué hay dentro de x ahora que la tarea y ha terminado? Para aclarar,
-solo x se declaró fuera de y, es decir, en la tarea que se está procesando actualmente,
-la de la segunda línea, por lo que x todavía contiene el número 2 y, como resultado,
-se hará visible en la pantalla. Este mecanismo, como se acaba de describir, también se
-llama Alcance dinámico. A modo de comparación, en JavaScript un código similar da
-como resultado 1:
-
-```
-y = function() { x = 2; };
-(function(){ var x = 1; y(); console.log(x); }())
-```
-
-En los ejemplos que se muestran arriba, se utilizan objetos Tareas separados cada vez.
-Esto mismo se puede ilustrar en base a otros objetos. El siguiente ejemplo ilustra cómo
-el sabor del helado se modiﬁca consistentemente en malaga:
-
-```
->> heladería := Objeto nuevo.
-heladería en: ['helado'] hacer: {
-	sabor := ['Malaga'].
-}.
-Heladería en: ['visitar'] hacer: {
-	>> sabor := ['Pistachio'].
-	Heladería helado.
-	Salir escribir: sabor, detener.
-}.
-Heladería visitar.
-```
-En consecuencia, la salida del programa es:
-
-```
-Malaga
-```
-
-Tan pronto como la heladería recibe el mensaje helado, el sabor se ajusta a Málaga.
-Para las personas que nunca han trabajado con otro lenguaje de programación que no
-sea XOScript, esto no sería muy sorprendente. Después de todo, esto tiene todo el sentido
-según los procedimientos generales de XOScript. Sin embargo, en la mayoría de los otros
-lenguajes de programación, la salida sería Pistachio, o incluso devolverían un mensaje
-de error, dependiendo de las reglas de visibilidad.
-
-# El objeto raíz
+# Objeto raíz
 
 {{messages}}
 
-El objeto llamado Objeto es el objeto raíz de todos los objetos en XOScript. Este objeto
-raíz responde a mensajes como: hacer, hecho, en-caso-de:hacer: , en:hacer: ,
-mensaje:argumentos: , responder:y: … , aprender:signiﬁca: , y recursivo. Todos
-los demás objetos se derivan de este objeto, incluido el objeto Nulo. El mensaje que se
-envía con más frecuencia es en:hacer: , que amplía las funcionalidades de un objeto.
-Este mensaje es recibido por el objeto raíz, que en consecuencia vincula la tarea
-especiﬁcada al mensaje y, al hacerlo, expande el objeto derivado. Este método ya se
-mencionó en el capítulo 2, sin embargo, para completar, observe otro ejemplo.
-En la siguiente ilustración, se deﬁne un objeto circular con la intención de calcular su
-área en función de
-su radio:
+El objeto llamado **Objeto** es el objeto raíz de todos los objetos de
+XOScript y proporciona las funcionalidades básicas del lenguaje. 
 
-```
->> circulo := Objeto nuevo.
-	circulo en: ['radio:'] hacer: { :r
-	mi radio := r.
-}.
-círculo en: ['área'] hacer: {
-	<- mi radio * 2 * 3,14.
-}.
-```
+El mensaje que se envía con más frecuencia
+es **al:hacer:**, que amplía las funcionalidades de un objeto. Este
+mensaje lo recibe el objeto raíz, que a continuación vincula la
+tarea especificada al mensaje y, de este modo, amplía el objeto
+derivado.
 
-Se añaden dos mensajes: radio:, que se utiliza para establecer el radio del círculo, y
-area, que se utiliza para calcular su area. Este objeto se puede utilizar de la siguiente
-manera:
+## Métodos comodín
 
-```
-circulo radio: 4, área.
-```
+Normalmente, si envías un mensaje que no corresponde a
+ningún método del objeto, se ignora. Sin embargo, puedes definir
+los llamados **métodos mágicos** o métodos **comodín**, que se
+invocarán si el objeto no entiende el mensaje.
 
-El resultado será 25,12 (tenga en cuenta que se utiliza una aproximación muy
-aproximada de Pi, es decir, 3,14, por lo tanto, el resultado no es muy preciso). Este
-objeto también puede basarse en otro objeto, lo que signiﬁca que un objeto deﬁnido
-previamente se expande enviando mensajes en:hacer:. De esta manera, por ejemplo,
-un objeto Usuario puede basarse en un objeto Persona al que se le puede agregar un
-nombre de inicio de sesión:
+Hay 4 métodos comodín disponibles. Cada mensaje corresponde a
+un número concreto de argumentos.
 
-```
->> Usuario := Persona nuevo.
-Usuario en: ['login:'] hacer: { :nombre
-	mi login := nombre.
-}.
-```
+Mensaje comodín          | Número de argumentos
+------------------------ | -------------------
+responder:               | 0
+responder:y:             | 1
+responder:y:y:           | 2
+responder:y:y:y:         | 3
 
 
-Además, los objetos del sistema pueden expandirse, como el objeto Texto con un cifrado
-ROT-13. Esta es una manera fácil de cifrar textos, basada en la técnica de cifrado
-Cifrado César (que es muy débil para propósitos más serios). El principio detrás de
-ROT-13 es bastante simple. Cada carácter se desplaza 13 posiciones en el alfabeto.
-En caso de que un carácter pase el carácter z, el conteo continúa desde a en adelante.
-Por lo tanto, a se convierte en n, b se convierte en o y x se convierte en k. Por ejemplo,
-cuando el texto Londres se cifra con ROT-13, mostrará Lbaqba.
-Si se necesita agregar una funcionalidad de este tipo a cada texto, la manera más fácil de
-hacerlo es expandir el objeto Texto en sí (ya que cada texto deriva de este mismo objeto)
-utilizando el mensaje en:hacer:
+@test619
 
-```
-Texto en: ['rot13'] hacer: {
-	>> alfabeto :=
-	['abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz'].
-	>> código := [''].
-	yo caracteres cada: { :i :carácter
-		>> índice := alfabeto encontrar: carácter.
-		>> rot13 := índice + 13.
-		>> codificado := alfabeto carácter: rot13.
-		código añadir: codificado.
-	}.
-	<- código.
-}.
-```
+## Mensajes programáticos
 
-A partir de ahora, cada texto se puede cifrar de la siguiente manera:
+En lugar de enviar un mensaje directamente a un objeto, también se puede
+enviar mediante una variable. Para ello se usa el mensaje
+**mensaje:argumentos:**. 
 
-```
-Salida escribir: ['hola'] rot13, detener.
-```
+@test396
 
-Un detalle curioso de ROT-13 es que cuando se implementa el cifrado por segunda vez,
-el texto original vuelve a aparecer. De esta manera, el texto cifrado vuelve a ser
-descifrado:
+@api_Object_base
 
-```
-Salida escribir: ['hello'] rot13 rot13, detener.
-```
-
-Esto demuestra que el mensaje en:hacer: es uno de los principios más fundamentales
-del lenguaje de programación XOScript. Nótese que sin este mensaje, que es parte del
-objeto raíz Objeto , no sería posible ampliar las funcionalidades de los objetos.
-Un segundo mensaje esencial es es-igual-a:, que devuelve Verdadero en el caso de
-dos variables que apuntan hacia el mismo objeto, como:
-
-```
->> x := 1.
->> y := x.
-Salida escribir : (x es-igual-a: y), detener.
-```
-
-Observe la sutil diferencia entre = y es-igual-a: . El primero mencionado compara el
-valor del contenido de dos objetos, mientras que el segundo mencionado examina la
-memoria de la computadora para ver si son, de hecho, el mismo objeto.
-El mensaje en-caso-de:hacer: permite ejecutar una tarea condicional, al igual que los
-mensajes verdadero: y falso: . La diferencia es que puede adjuntar una tarea por valor.
-El siguiente ejemplo, por ejemplo, muestra el valor en la variable x. Si el valor de x es
-igual a 1, se ejecuta el primer bloque de código. Si x=2, se ejecutará la segunda tarea,
-y así sucesivamente. De esta manera, selecciona el código correcto para el valor x:
-
-```
->> x := 2.
-
-x
-en-caso-de: 1 hacer: {
-	Salida escribir: ['Status: denegado'].
-},
-en-caso-de: 2 hacer: {
-	Salida escribir: ['Status: pendiente'].
-},
-
-en-caso-de: 3 hacer: {
-	Salida escribir: ['Status: aprovado'].
-}.
-Salida detener.
-
-```
-
-
-## Manejo de mensajes desconocidos
-
-Si desea crear un objeto que muestre automáticamente en la pantalla todas las palabras
-que le envíe (que tengan varios caracteres) en líneas individuales, podría escribir algo
-como esto:
-
-Salida Humpty Dumpty se sentó en la pared.
-
-Puede lograr esto utilizando los llamados mensajes genéricos. Esta técnica le ayuda a
-conectar una tarea a mensajes indeﬁnidos:
-
-```
-Salida en: ['responder:'] hacer: { :texto
-	Salida escribir: texto, detener.
-}.
-```
-
-La tarea que está conectada a responder: se ejecuta en cada mensaje desconocido.
-Dado que el mensaje Humpty es desconocido, XOScript ejecutará internamente el
-siguiente mensaje:
-
-```
-Salida responder: ['Humpty'].
-```
-
-Existen varias aplicaciones concebibles para los mensajes generales. Una de sus
-principales aplicaciones es en combinación con el principio de uniformidad; es decir,
-la traducción del software de XOScript a otros lenguajes técnicos. 
-
-## Mensajes enviados mediante programación
-
-En lugar de enviar un mensaje directamente a un objeto, también se puede enviar a
-través de una variable. Para ello, se utiliza el mensaje mensaje:argumentos: Por
-ejemplo, en el siguiente ejemplo, el resultado muestra 14
-(de una manera muy elaborada):
-
-```
->> a := (Serie ← 7).
->> b := ['añadir:'].
->> x := 7 mensaje: b argumentos: a.
-Salida escribir: x, detener.
-```
-
-Especiﬁca el mensaje deseado como objeto de texto y los argumentos como serie. Un
-mensaje que contiene dos parámetros (por ejemplo, entre: 0 y: 10), se especiﬁca
-como entre: y:, por lo tanto, se combinan los componentes del mensaje:
-
-```
->> a := (Serie ← 1 ; 10).
->> b := ['entre:y:'].
-Salida escribir: ( Número mensaje: b argumentos: a ), detener.
-```
-
-
-# Series
+# Listas
 
 {{messages}}
 
-XOScript conoce dos tipos de colecciones: series y listas. Las series son enumeraciones
-de objetos en un orden ﬁjo. Las listas no tienen orden, sino que se parecen a una
-leyenda que incluye una clave (o término) y su valor correspondiente. Las series son
-comparables a las matrices o arreglos (PHP, Java, C) y las listas (Python). Las listas
-son comparables a las matrices asociativas o arreglos asociativos (PHP) o a los
-diccionarios (Python) en otros lenguajes de programación. Para crear una nueva serie,
-escriba:
+XOScript conoce dos tipos de colecciones: *listas* y *diccionarios*.
+Las **listas** son enumeraciones de objetos en un *orden fijo*. Los diccionarios no
+tienen orden; en su lugar, se parecen a una leyenda formada por una clave (o término) y su
+valor correspondiente. Las listas son comparables a los arrays (PHP, Java, C)
+y a las listas (Python). Los diccionarios son comparables a los arrays asociativos (PHP) o
+a los diccionarios (Python) de otros lenguajes de programación. Para crear
+una nueva Lista, escribe:
 
 ```
->> fibonacci := Serie nuevo.
+>> fibonacci := Lista crear.
 ```
 
-Esta secuencia vacía se puede rellenar con adjuntar:
+Esta lista vacía se puede llenar con **adjuntar:** :
 
 ```
 fibonacci adjuntar: 0.
@@ -1651,860 +1621,836 @@ fibonacci adjuntar: 8.
 fibonacci adjuntar: 13.
 ```
 
-Este resultado revela que también se puede utilizar esta notación más corta para
-declarar una serie:
+Si escribimos la lista en pantalla:
 
 ```
->> fibonacci := Serie ← 0 ; 1 ; 1 ; 2 ; 3 ; 5 ; 8 ; 13.
+Salida escribir: fibonacci, detener.
 ```
 
-Este programa muestra el mismo resultado. Por supuesto, esta notación es mucho más
-corta y, por lo tanto, mucho más
-cómoda
-
-La ﬂecha es un mensaje binario que crea una nueva serie y al mismo tiempo envía el
-objeto subsiguiente para que se incruste instantáneamente en esta nueva serie. Los
-puntos y coma (;) son todos mensajes binarios que colocan un valor en la serie.
-Para averiguar la cantidad de objetos de una serie, use contar
-
-En lugar de utilizar el punto y coma, se puede utilizar un símbolo de viñeta para añadir
-algo a la serie. De esta manera, la lista se parece bastante a una de texto normal:
+Veremos:
 
 ```
->> platos := Serie nuevo
-~ ['Achicoria']
-~ ['Coles de Bruselas']
-~ ['Chucrut'].
+Lista ← 0 ; 1 ; 1 ; 2 ; 3 ; 5 ; 8 ; 13
 ```
 
-Las series responden a mensajes como: adjuntar: , mínimo , máximo , cada: ,
-anteponer: , unirse: , posición: , primero , último, penúltimo, poner:en: ,
-toma-el-último , toma-el-primero , contar , desde:longitud: ,
-reemplazar:longitud:con:: , por: , copiar , ordenar: , llenar:con: , y encontrar:
-Otra forma de crear una serie es transformar una palabra en una serie de caracteres
-dividir (es decir, dividir) un texto en una serie de palabras:
-
-```
-Salida escribir: (['abc'] caracteres), detener.
-
-Salida escribir: (
-['Chicory,Brussels sprouts,Sauerkraut']
-dividir: [',']
-), detener.
-```
-
-Por ejemplo, si el mensaje caracteres se envía a un texto, la respuesta será una serie
-que contiene todos los caracteres separados de los que está hecho el texto. Cuando el
-mensaje dividir: se envía a un texto con otro texto como argumento, el pequeño
-fragmento de texto adjunto se utiliza para desglosar el texto recibido.
-
-El texto en fragmentos de texto separados. La respuesta será una serie de estos objetos
-de texto. A su vez, también es posible convertir una serie en un texto enviando el
-mensaje unirse: , vea el siguiente ejemplo:
-
-```
->> platos := Serie ←
-['Achicoria'] ;
-['Coles de Bruselas'] ;
-['Chucrut'].
-Salida escribir: (platos unirse: [' ~or~ ']), detener.
-```
-
-En este caso, el fragmento de texto adjunto se utiliza para unir los textos de la serie.
-Cada objeto dentro de una serie tiene su propio lugar, que se denomina posición. El
-primer objeto obtiene la posición 1, el segundo la posición 2, y así sucesivamente. Al
-utilizar el mensaje posición: (o la versión más corta ? ) es posible recuperar el elemento
-en la posición especiﬁcada:
-
-```
-Salida escribir: (platos posición: 3), detener.
-Salida escribir: platos ? 1.
-Salida escribir: platos ? 9.
-```
-
-En caso de que no haya nada en la posición solicitada, la respuesta será un objeto
-Nulo. Hay tres posiciones especiales en una serie, que son sus valores: el primero,
-el último y el penúltimo elemento.
-Los objetos en esas posiciones se pueden recuperar utilizando los mensajes respectivos.
-
-```
->> abc := ['ABC'] caracteres.
-Salida escribir: abc primero, detener.
-Salida escribir: abc último, detener.
-Salida escribir: abc penúltimo, detener.
-```
-
-Para reemplazar un objeto en una posición especíﬁca dentro de la secuencia misma,
-escriba: poner:en:
-
-```
-abc poner: ['2nd'] en: 2.
-```
-
-De manera similar, se puede eliminar un objeto de la serie utilizando el símbolo menos:
-
-```
->> x := Secuencia ← 1 ; 2; 3.
-Salida escribir: x, stop.
-Salida escribir: x - 2.
-```
-
-Con el mensaje anteponer: es posible insertar un objeto al inicio de la serie:
-
-```
->> x := Serie ← ['Nut'] ; ['Monkey'].
-x anteponer: ['Apple pie'].
-Salida escribir: x.
-```
-
-También es posible generar una serie rellenando una serie vacía con el mensaje
-llenar:con: En caso de que se preﬁera rellenar de antemano con ceros las
-puntuaciones máximas de un juego de ordenador,
-escribir:
+En lugar de adjuntar, también puedes usar ; para añadir elementos a una lista:
 
 
 ```
->> puntuaciones := Serie nuevo llenar: 10 con: 0.
-Salida escribir: puntuaciones, detener.
+>> fibonacci := Lista crear ; 0 ; 1 ; 1 ; 2 ; 3 ; 5 ; 8 ; 13.
 ```
 
-También es posible copiar una serie:
+Los puntos y coma (;) son todos mensajes binarios que colocan un
+valor en la lista.
+
+## Encadenamiento
+
+Supongamos que tienes una lista como:
 
 ```
->>copia := puntuaciones copiar.
+>> x := Lista crear ; 1 ; 2 ; 3.
 ```
 
-Es posible quitar objetos de la serie cortando su inicio y ﬁnal:
+Si quieres eliminar el primer y el último elemento, tu
+mensaje sería:
 
 ```
->> palabras := Serie ← ['Tarta de manzana'] ; ['Nuez'] ; ['Mono'].
->> original := palabras copiar.
->> a := palabras toma-el-primero.
->> b := palabras toma-el-último.
-Salida escribir: original, detener.
-Salida escribir: a, detener.
-Salida escribir: b, detener.
-Salida escribir: palabras, detener.
+x cortar-primero cortar-último.
 ```
 
-En el ejemplo anterior, al utilizar el mensaje toma-el-primero , se elimina el objeto
-inicial de la serie, que se coloca en consecuencia en a. Además, se elimina el último
-objeto utilizando el mensaje toma-el-último, que se coloca en b. Como resultado, es el
-objeto Texto del medio, “Nut”, el cual permanece. La copia original también se muestra,
-demostrando así la función de copia.
-El mensaje encontrar: permite encontrar información dentro de una serie:
+Por desgracia, la notación anterior no funcionará correctamente. El
+mensaje **cortar-primero** devuelve el primer elemento de la lista, que,
+a su vez, se convertirá en el receptor del mensaje **cortar-último**. Así, el
+mensaje **cortar-último** no se envía a **x**, sino a 2. Una
+posible solución a este problema sería escribir dos frases
+separadas, como: 
 
 ```
->> pinturas := Serie nuevo
-~ ['Fighting Temeraire']
-~ ['Lady of Shalott']
-~ ['Hay Wain'].
-
-Salida escribir: ( pinturas encontrar: ['Hay Wain']), detener.
-Salida escribir: ( pinturas encontrar: ['Lady of Shalott']), detener.
-Salida escribir: ( pinturas encontrar: ['Sunflowers']), detener.
+x cortar-primero.
+x cortar-último.
 ```
 
-Al utilizar el mensaje cada:, es posible aplicar una tarea a cada elemento de una serie:
-
-```
->> metros := Serie ← 1200 ; 4000 ; 6210.
-metros cada: { :numero :metros
-Salida escribir: metros / 0.3048 , detener.
-}.
-```
-
-El ejemplo que se muestra arriba muestra una conversión de metros a pies. La tarea de
-conversión se aplica a cada elemento individual de la serie. En el primer parámetro
-( :numero ), la tarea recibe la posición del elemento que se va a manipular. En el segundo
-parámetro ( :metros ), la tarea recibe el objeto que se coloca en la posición mencionada
-anteriormente. Siéntase libre de nombrar los parámetros usted mismo, sin embargo, el
-orden dentro de la tarea es ﬁjo. El primer parámetro es siempre el número de posición
-y el segundo es el objeto.
-Si se requiere el número más bajo, se puede enviar el mensaje mínimo. De hecho, si se
-requiere el número más alto dentro de la serie, se envía el mensaje máximo.La siguiente
-ilustración muestra una serie de puntajes de un juego. Se crea una nueva serie con dos
-elementos que contienen los extremos de los puntajes:
-
-```
->> puntajes := Secuencia ← 100 ; 50 ; 200 ; 350.
->> extremos := Secuencia ← puntajes mínimo ; puntajes máximo.
-Salida escribir: extremos, detener
-```
-
-Esto da como resultado:
-
-En una serie es posible ejecutar un reemplazo utilizando el mensaje
-reemplazar:longitud:con
-Por lo tanto, se puede utilizar para reemplazar un fragmento de serie por otra serie:
-
-```
->> x := Serie ← 1 ; 2 ; 3 ; 4 ; 5.
->> z := Serie ← 9.
->> y := x reemplazar: 2 longitud: 1 con: z.
-Salida escribir: y, detener.
-```
-
-La ordenación es una acción útil que se aplica con frecuencia a las series. Dado que
-solo se ordenan las series, esta acción es única para este tipo de colección. Una serie
-se puede ordenar enviando el mensaje ordenar: a un objeto Serie, junto con un
-argumento que contiene una tarea de ordenación que incluye dos parámetros:
-
-```
->> continentes := Serie nuevo
-~ ['Oceania']
-~ ['America']
-~ ['Asia']
-~ ['Europe']
-~ ['Africa']
-~ ['Antartica']
-~ ['Australia'].
-continentes ordenar: { :a :b <- a > b. }.
-```
-
-Salida escribir: continentes, detener.
-
-La ordenación de mensajes: obtendrá de forma constante dos objetos de una serie
-y, en consecuencia, solicitará que la tarea compare los dos. La tarea de ordenación
-debe responder cada ronda con Verdadero o Falso.
-
-En el fragmento ilustrado, los continentes se ordenan en orden alfabético comparando
-cada par de palabras con el mensaje >. Para ordenar en orden inverso, aplique el
-mensaje <.
-
-## Estructura alternativa de mensaje
-
-Supongamos que tiene una serie:
-
-```
->> x := Serie ← 1 ; 2 ; 3.
-```
-
-Si desea eliminar el primer y el último elemento, su mensaje sería:
-
-```
-x toma-el-primero toma-el-último.
-```
-
-Desafortunadamente, la notación anterior no funcionará correctamente. El mensaje
-toma-el-primero devuelve el primer elemento de la serie, que, a su vez, se convertirá
-en el receptor del mensaje toma-el-último. Por lo tanto, el mensaje toma-el-último
-no se envía a x, sino a 2. Una posible solución a este problema sería crear dos
-setencias separadas, como:
-
-```
-x toma-el-primero
-x toma-el-último
-```
-
-Sin embargo, esto es poco práctico, en particular cuando necesita eliminar más de dos
-elementos.
-Por lo tanto, XOScript ofrece una estructura de mensaje alternativa para este tipo de
-situaciones. En las estructuras de mensajes alternativas, las respuestas de los objetos
-se ignoran y obtendrá el objeto receptor como respuesta, una y otra vez. Una
-estructura de mensaje alternativa se inicia enviando el mensaje hacer a un objeto y la
-estructura de mensaje alternativa puede ﬁnalizar enviando el mensaje hecho. En el
+Sin embargo, esto resulta poco práctico, sobre todo cuando hay que
+eliminar más de dos elementos. Por ello, XOScript ofrece una
+estructura de mensajes alternativa para este tipo de situaciones. En las
+estructuras de mensajes **alternativas**, las respuestas de los objetos se ignoran
+y obtienes como respuesta, una y otra vez, el objeto receptor.
+Una estructura de mensajes **alternativa** se inicia enviando el
+mensaje **hacer** a un objeto, y la estructura de mensajes **alternativa**
+se puede terminar enviando el mensaje **hecho**. En el
 ejemplo ilustrado, esto podría aplicarse de la siguiente manera:
 
 ```
->> x := Serie ← 1 ; 2 ; 3.
-x hacer toma-el-primero toma-el-último hecho.
-Salida escribir: x, detener.
+>> x := Lista crear ; 1 ; 2 ; 3.
+x hacer cortar-primero cortar-último hecho.
 ```
 
-Tenga en cuenta que para evitar sorpresas desagradables, siempre cierre con echo.
-Vea lo que sucede en el próximo ejemplo:
+@api_List_collections
 
-```
->> x := Serie ← 1 ; 2.
-x hacer toma-el-primero.
-Salida escribir: x, detener.
-```
-
-El código anterior generará el mensaje de error: Debe responder con texto. La razón
-de esto es que el mensaje de escribir: desea crear un texto de x; por lo tanto, envía
-internamente el texto del mensaje. Como regla, se devuelve un objeto de texto como
-respuesta, sin embargo, como la estructura de mensaje alternativa aún está activa,
-se devuelve la serie en sí. Esto hace que el procesamiento posterior falle y XOScript
-mostrará un mensaje de error.
-
-# Listas
-
-Tanto Serie como Lista son colecciones. Sin embargo, a diferencia de una serie, una
-lista no tiene orden. Otra distinción entre las dos es que una lista consta de pares de
-objetos. Un objeto actúa como entrada (o palabra clave) para buscar el otro objeto
-(valor). Un buen ejemplo de una lista es una lista de precios, como:
-
-```
->> menu := Lista nuevo
-poner: ['£5'] en: ['tarta manzana'],
-poner: ['£6'] en: ['tarta zanahoria'],
-poner: ['£3'] en: ['algodón de azucar'].
-```
-
-Las listas pueden recibir los siguientes mensajes: tipo, poner:en: , entradas, valores,
-en : , cada : , contiene: .
-De manera similar a una serie, el mensaje poner:en: se usa para agregar un objeto a
-una lista. La diferencia es que, a diferencia de una serie, se vinculan dos objetos. El
-primer objeto es, de forma similar a una secuencia, el objeto que almacenarás en una
-lista. El segundo objeto no es su posición dentro de la colección, sino la entrada (clave)
-que permite recuperar el objeto anterior en un momento posterior. En resumen, una lista
-funciona un poco como un diccionario; por lo tanto, al usar la palabra clave se puede
-encontrar el signiﬁcado. Por ejemplo, para recuperar de la lista mencionada
-anteriormente el precio de un dulce de azúcar:
-
-```
->> precio := menu en: [’algodón de azucar'].
-```
-
-En este caso, también puedes usar la notación concisa:
-
-```
->> precio := menu ? [’algodón de azucar'].
-```
-
-La respuesta mostrará £3.
-Si las entradas (o claves) que aplicas para almacenar objetos no tienen espacios,
-también se puede usar la siguiente notación:
-
-```
->> menu := Lista nuevo
-pastel: ['£5'],
-tarta: ['£6'],
-dulce: ['£3'].
-```
-
-Sin duda, la notación anterior se lee de forma más natural, porque se parece a una lista
-que se usa comúnmente en un documento. Para solicitar el precio de un dulce, se puede
-utilizar la siguiente notación simpliﬁcada:
-
-```
->> precio := menu dulce.
-```
-
-# Archivos
-
-El objeto Archivo responde a mensajes como: ruta, leer, escribir: , existe, eliminar,
-tamaño y serie:.
-XOScript permite la edición esencial de archivos. Para ello, utilice el objeto de sistema
-Archivo.
-En este ejemplo, un archivo de texto que contiene ['verduras olvidadas'] debe ordenarse
-alfabéticamente:
-Contenido del archivo verduras en la carpeta documentos:
-Chirivía
-Alcachofa de Jerusalén
-Rábano de invierno
-Nabo
-Para imprimir el contenido de este archivo en la pantalla, escriba lo siguiente:
-
-```
->> fichero := Archivo nuevo: Ubicación-del-archivo documentos verduras.
-Salida escribir: fichero leer , detener.
-```
-
-
-Para ordenar el contenido y luego guardar la serie ordenada, escriba:
-
-```
->> verduras :=
-Archivo nuevo:
-Ubicación-del-archivo documentos verduras ,
-leer
-dividir: ['↵'] ,
-ordenar: { :a :b <- a > b. }.
-Archivo nuevo:
-Ubicación-del-archivo documentos nuevoficheroordenado ,
-escribir: (verduras combinar: [’↵']).
-```
-
-
-Así, también en este ejemplo, se lee crea un archivo con (nuevo) despues se lee el
-contenido, y se divide en líneas mediante el mensaje dividir: , como argumento
-usamos el signo de nueva línea ( ↵ ). o tambien podemos usar el salto de linea
-tradiccional en otros lenguajes de programación que es ( \n ) Para continuar, se ordena
-según el método mencionado en capítulo 3. Finalmente, se guarda en el disco, después
-de haber combinado las líneas en un solo texto.
-Además de leer y escribir:, también se pueden manejar otros asuntos. Mediante el
-mensaje adjuntar: , se puede agregar texto a un archivo, como en el siguiente ejemplo
-Archivo nuevo: Ubicación-del-archivo documentos nuevoficheroordenado ,
-adjuntar : ['Zucchini'].
-La ubicación del archivo se puede recuperar con el mensaje ruta .
-
-```
->> location := fichero ruta.
-```
-
-Para saber si un archivo existe o no, se puede enviar el mensaje existe después de lo
-cual se devuelve un objeto Verdadero o Falso.
-
-```
->> x := Archivo nuevo: Ubicación-del-archivo desconocido.
-Salida escribir: x existe, detener.
-```
-
-Los archivos se pueden eliminar enviando el mensaje eliminar .
-
-```
-fichero borrar.
-```
-
-También se puede obtener el tamaño (en bytes):
-
-```
-fichero tamaño.
-```
-
-Para solicitar el contenido de una carpeta, se puede enviar el mensaje serie al objeto
-Archivo como argumento la ubicación de la carpeta. Por ejemplo, si se solicita el
-contenido de la carpeta documentos, se debe hacer:
-
-```
-ficheros := Archivo serie: Ubicación-del-Archivo documentos.
-```
-
-Como resultado, se devuelve una serie que contiene en cada posición una lista con las
-entradas ﬁcheros y tipo que contienen el nombre del archivo y su tipo, en ese orden.
-
-# Momentos
-
-Para una representación estructurada de fecha y hora, XOScript utiliza el objeto Momento.
-En caso de que se imprima un nuevo objeto Momento en pantalla, se muestran la fecha y
-hora actuales:
-
-```
-Salida escribir: Momento nuevo, detener.
-```
-
-También es fácil leer los componentes de tiempo individuales. Así, por ejemplo, si solo es
-necesario conocer el año actual, se puede enviar el mensaje año al momento y, a su vez,
-la respuesta será un
-objeto Número que contiene únicamente el año:
-
-```
->> m := Momento nuevo.
-Salida escribir: m año bruto, stop.
-```
-
-Tenga en cuenta que el mensaje bruto debe enviarse al objeto Número resultante. Esto
-es para evitar la salida de 2,020 , que es, por supuesto, una notación correcta para
-números, sin embargo, no se usa normalmente en el contexto de notaciones de años.
-También es posible solicitar cuestiones que podrían ser menos obvias de determinar
-al principio, por ejemplo, el día de la semana (usando el mensaje día-semanal ):
-
-```
->> m := Momento nuevo.
-Salida escribir: m día-semanal, detener.
-```
-
-Aquí, el número 3 representa el martes. Un día laborable siempre comienza el 1
-(domingo), el lunes representa el segundo día, el martes el tercer día, y así
-sucesivamente. El sábado es siempre el último día de la semana, según XOScript.
-De la misma manera, se puede recuperar el número de la semana (semana), así como
-los meses, días, horas, minutos y segundos. El siguiente ejemplo muestra cómo se
-crea un nuevo objeto Momento y cómo se pueden recuperar todos los componentes
-individuales de fecha y hora: el segundo, el minuto, la hora, el día,
-el mes, el día del año (dia-del-año), el día de la semana (día-semanal) y la zona
-horaria (zona).
-
-```
->> ahora := Momento nuevo.
-Salida escribir: ahora, detener.
-Salida escribir: ahora segundo, detener.
-Salida escribir: ahora minuto, detener.
-Salida escribir: ahora hora, detener.
-Salida escribir: ahora día, detener.
-Salida escribir: ahora dia-del-año, detener.
-Salida escribir: ahora día-semanal, detener.
-Salida escribir: ahora mes, detener.
-Salida escribir: ahora zona, detener.
-```
-
-Para cambiar uno de los componentes de tiempo, se envía un objeto Número. Por lo
-tanto, para modiﬁcar el segundero a 13, se hace:
-
-```
->> m := Momento nuevo.
-m segundo: 13.
-Salida escribir: m, detener.
-```
-
-También es posible conﬁgurar otros componentes de tiempo usando año: , mes: , día:
-, hora: , minuto: , y segundo:
-
-```
->> cuando := Momento nuevo
-año: 2020,
-mes: 12,
-día: 31,
-hora: 23,
-minuto: 59,
-segundo: 59.
-Salida escribir: cuando, detener.
-```
-
-No es posible conﬁgurar ni cambiar el día de la semana ni el día del año.
-Tenga en cuenta que los ajustes deben ser de mayor a menor; de hecho, conﬁgurar un
-componente mayor borra los componentes menores. El siguiente ejemplo ilustra este
-principio:
-
-```
->> cuando := Momento nuevo
-año: 2020,
-mes: 12,
-día: 31,
-hora: 23,
-minuto: 59,
-segundo: 59,
-año: 2021.
-Salida escribir: cuando, detener.
-Esto mostrará:
-```
-
-En este caso, los componentes de tiempo más pequeños vuelven a sus valores iniciales,
-porque en el último momento se establece el año.
-Si selecciona un número demasiado alto para un componente de tiempo, el reloj seguirá
-contando de la manera habitual:
-
-```
->> entonces := Momento nuevo
-año: 2020,
-mes: 2,
-día: 30.
-Salida escribir: entonces, detener.
-El resultado será::
-01/03/2020 00:00
-```
-
-En febrero nunca hay más de 29 días, por lo que el calendario cuenta desde el 1 de
-marzo. En este caso,2020 fue un año bisiesto.
-Si desea utilizar una notación diferente para la visualización del tiempo, simplemente
-combine los componentes del tiempo libremente:
-
-```
->> pantalla := ['día mes año'].
->> fecha := Momento nuevo.
-pantalla
-año: fecha año bruto,
-mes: fecha mes,
-día: fecha día.
-Salida escribir: display, detener.
-```
-
-No olvides tener en cuenta las distintas zonas horarias para evitar sorpresas. La zona
-horaria ( zona: ) en la variante británica de XOScript se mostrará como:
-
-```
->> m := Momento nuevo.
-Salida escribir: m zona, detener.
-```
-
-
-Al enviar el mensaje tiempo obtendrás la cantidad de segundos que han pasado desde
-el 1 de enero de 1970. Este es un punto de referencia en el tiempo a partir del cual la
-mayoría de las computadoras calculan la hora del sistema.
-
-```
->> ahora := Momento nuevo tiempo.
-Salida escribir: ahora, detener.
-```
-
-También puedes crear un nuevo Momento basado en una marca de tiempo como esta:
-
-```
->> ahora := Momento nuevo: 0.
-Salida escribir: ahora año bruto, detener.
-```
-
-Estas marcas de tiempo pueden ser útiles para compartir datos de tiempo con otros
-sistemas. También se pueden utilizar para crear una descripción elegante del tiempo,
-algo que se desea comúnmente en varios programas:
-
-```
-Momento en: ['describe'] hacer: {
->> ahora := Momento nuevo.
->> descripción := ['-'].
->> diferencia := ahora tiempo - yo tiempo.
-{
-(diferencia < 60) verdadero: {
-descripción := ['ahora mismo'].
-}, salir.
-(diferencia < 3600) verdadero: {
->> minutos := (diferencia / 60) redondo.
-descripción := ['hace algunos minutos'] algunos: minutos.
-}, salir.
-descripción := (
-['día-mes-año']
-día: (ahora día),
-mes: (ahora mes),
-año: (ahora año bruto)
-).
-} proceder.
-<- descripción.
-}.
->> m := Momento nuevo.
-Salida escribir: m describe, detener.
->> m := Momento nuevo: (Momento nuevo tiempo - 1,500).
-Salida escribir: m describe, detener.
->> m := Momento nuevo: (Momento nuevo tiempo - 5,000).
-Salida escribir: m describe, detener.
-```
-
-Tenga en cuenta que en el ejemplo anterior, todo se coloca entre corchetes {},
-seguido del mensaje proceder. Esta es una optimización para acelerar el programa.
-Al colocar todo en un bloque de proceso, se habilita el uso del mensaje salir
-después de cada condicional, para evitar que también se procesen condicionales
-excesivos.
-Para calcular los tiempos, simplemente sume cada componente de tiempo por
-separado. Por ejemplo, en caso de que desee saber qué hora será dentro de una
-hora:
-
-```
->> m := Momento nuevo.
-Salida escribir: m, detener.
-m añadir: 1 hora.
-Salida escribir: m, detener.
-```
-
-Vea cómo se aplica aquí un truco para mejorar la legibilidad: añadir: 1 hora. De
-hecho, el mensaje hora se envía a 1, que es un caliﬁcador (explicado en el capítulo
-3).
-De la misma manera, puede agregar, por ejemplo, 100 segundos. No es necesario
-concentrarse en la conversión a las unidades correctas, ya que el objeto Momento
-lo hará por usted (usando el caliﬁcador).
-
-Ahora, observemos un ejemplo más complicado sobre el uso de add: y subtract::
-
-```
->> entonces := Momento nuevo
-año: 2020,
-mes: 2,
-día: 29,
-hora: 23,
-minuto: 59,
-segundo: 59,
-restar: 1 segundo,
-añadir: 2 segundo,
-restar: 9000 hora.
-Salida escribir: entonces, detener.
-```
-
-Para crear una copia de un momento, haga lo siguiente:
-
-```
->> entonces := Momento nuevo.
->> ahora := entonces copiar.
-Salida escribir: entonces = ahora, detener.
-Salida escribir: (entonces es-igual-a: ahora), detener.
-```
-
-En el ejemplo anterior, se crea una copia del momento entonces. Ambos momentos
-describen el mismo punto en el tiempo, por lo que = da como resultado Verdadero.
-Sin embargo, tenga en cuenta que sigue siendo solo una copia, no el original. Debido
-a que físicamente es, de hecho, un objeto diferente, en una ubicación diferente en la
-memoria de la computadora, el mensaje es-igual-a: solo puede dar como resultado la
-respuesta Falso.
-Una característica adicional del objeto Momento es detener momentáneamente el
-proceso. Puede pausar la ejecución del programa utilizando el mensaje esperar:
-seguido del número de segundos. Eche un vistazo al siguiente ejemplo para ver una
-breve ilustración de este principio:
-
-```
->> antes := Momento nuevo.
-Momento esperar: 2.
->> después := Momento nuevo.
-Salida escribir: antes, detener.
-Salida escribir: despúes, detener.
-```
-
-Después de 2 segundos, el fragmento de programa anterior mostrará el resultado
-de dos momentos: el momento grabado antes de la pausa y el momento grabado
-después de esa pausa. Como resultado, las descripciones de tiempo en su
-pantalla deberían mostrar una diferencia de 2 segundos.
-
-# Programa
+# Diccionarios
 
 {{messages}}
 
-En este capítulo se describe el objeto Programa, y este es el último objeto que se
-revisará en la serie de objetos básicos del sistema. La función básica del objeto
-Programa es comunicarse con el mundo exterior, de manera similar al objeto Archivo
-y al objeto Salida. Estos tres representan la puerta de entrada al mundo exterior.
-Además, este objeto contiene una serie de funciones que beneﬁcian la administración
-avanzada de la memoria. También puede cargar otros programas de XOScript utilizando el
-objeto Programa. Para combinar varios programas de XOScript, puede enviar el mensaje
-utilizar: . En este ejemplo, hay dos archivos de XOScript, que se denominan herramientas
-y programa:
-Contenido de herramientas:
+**Tanto Lista como Diccionario son colecciones. Sin embargo, a diferencia de una
+lista, un diccionario **no tiene** orden. Otra diferencia entre ambos
+es que un diccionario está formado por pares de objetos. Un objeto actúa como entrada (o
+palabra clave) para buscar el otro objeto. Un buen ejemplo de
+lista es una lista de precios, como:
+
 
 ```
->> Herramienta := Objeto nuevo.
+>> menu := Diccionario crear
+	poner: ['£5'] en: ['apple pie'],
+	poner: ['£6'] en: ['carrot cake'],
+	poner: ['£3'] en: ['fudge'].
 ```
 
-Contenido del programa:
+Al igual que en una lista, el mensaje poner:en:
+se usa para añadir un objeto a una lista. La diferencia es que, a diferencia de
+una lista, se vinculan dos objetos. El primer objeto es, igual que
+en una lista, el objeto que vas a almacenar en una lista. El segundo
+objeto no es su posición dentro de la colección, sino la **entrada**
+que permite recuperar el objeto anterior más adelante. En
+resumen, un diccionario funciona un poco como un diccionario de palabras; es decir, mediante la palabra clave
+se puede encontrar el significado. Por ejemplo, para obtener de la
+lista mencionada el precio de un fudge:
 
 ```
-Programa utilizar: Ubicación-del-Archivo heramientas.
-Salida escribir: Heramienta tipo, detener.
+>> price := menu en: ['fudge'].
 ```
 
-Al ejecutar el programa XOScript titulado programa, se cargará el código del archivo
-heramientas gracias al mensaje utilizar:
-
-De esta manera, puede incluir el trabajo de otras personas en su propio programa y
-hacer uso de la funcionalidad proporcionada por bibliotecas externas.
-Durante la ejecución del código incluido, el directorio de trabajo se cambiará a su carpeta
-principal.
-Puede ejecutar comandos del sistema desde XOScript, enviando el mensaje sistema: a
-Programa. Esto le permite, por ejemplo, copiar archivos, reubicarlos o invocar otro s
-oftware para ejecutar tareas especíﬁcas. En un sistema Linux, por ejemplo, puede
-aplicar el siguiente paso para mostrar los archivos en la
-carpeta actual.
-
-
-## Módulos
-
-El mundo de Citrine se puede ampliar con nuevos objetos de sistema, instalando
-módulos. Se puede agregar un nuevo objeto de sistema al mundo de Citrine colocando
-el archivo del módulo (normalmente un archivo con el suﬁjo .so o .dll) en la carpeta
-mods. Supongamos que desea convertir una secuencia dada al protocolo JSON;
-para ello, se puede utilizar el módulo de complemento JSON. Para instalarlo, haga lo
-siguiente:
-
-El suﬁjo exacto del archivo varía según el sistema. El ejemplo anterior se basa en un
-sistema Linux.
-Sin embargo, la ubicación del archivo de un archivo de expansión siempre se verá
-similar a lo siguiente:
-mods / <object name> / libctr <object name> . extension (so/dll/dylib)
-Cuando envías un mensaje al objeto que está disponible a través del módulo de
-complemento, Citrine lo cargará automáticamente:
+También puedes usar la notación abreviada:
 
 ```
->> cartas := Serie nuevo
-	~ ['poker']
-	~ ['belote'].
->> tableros := Serie nuevo
-	~ ['chutes and ladders']
-	~ ['ludo'].
->> juegos := Lista nuevo
-	cartas: cartas,
-	tableros: tableros.
->> texto := Json jsonify: juegos.
-Salida escribir: texto.
+>> price := menu ? ['fudge'].
 ```
 
-En el ejemplo anterior se ha aplicado el módulo JSON. La lista de juegos se convierte
-en un objeto Texto, que representa los datos según el protocolo JSON: Para ello se
-envía el mensaje jsonify: con la lista como argumento. La salida se muestra en el
-ejemplo anterior
-
-Tan pronto como se invoca Json, Citrine buscará si hay un módulo en la carpeta mods
-que haga que este objeto esté disponible. Para esta acción, Citrine implementa una
-comparación de texto. Citrine busca el archivo libctrjson, para ubicar el objeto Json.
-En caso de que se trate de un objeto llamado Xml, Citrine veriﬁcará si el archivo
-libctrxml está presente o no. Este análisis solo se ejecuta cuando se envía un mensaje
-a un objeto que no está presente en el programa actual. Como regla, no afectará el
-rendimiento del programa informático en sí. El análisis solo se ejecuta en caso de que
-sea probable que ocurra un error de programa de todos modos. Tan pronto como se
-identiﬁca, se carga y el programa seguirá manejando el mensaje.
-Si envía un mensaje a un módulo inexistente, aparecerá un mensaje de error. Este es
-el mismo mensaje de error que un mensaje que se envía a un objeto inexistente. Por lo
-tanto, en ambos casos el mensaje de error es el mismo. En consecuencia, Citrine
-iniciará una búsqueda de cada objeto desconocido para ver si el objeto aún puede
-cargarse como una expansión. Si este no es el caso, el proceso falla. El siguiente
-ejemplo prueba si un módulo de expansión está realmente presente:
+Si las entradas que utilizas para almacenar objetos no tienen espacios
+(y no coinciden con otros mensajes predefinidos),
+también se puede usar la siguiente notación:
 
 ```
-{ Tetera infusionar . } capturar: {
-	Salida escribir: ['¡No hay té para ti!'], detener.
-}, empezar.
+>> menu := Diccionario crear
+	pie:   ['£5'],
+	cake:  ['£6'],
+	fudge: ['£3'].
 ```
 
-## Detección
-
-El capítulo anterior mostró cómo averiguar si un módulo de expansión está presente
-o no.
-Sin embargo, existen varias formas de explorar el sistema durante la ejecución del
-programa. Citrine tiene un par de métodos para detectar qué objetos están presentes y
-a qué mensajes responden estos objetos.
-En primer lugar, se puede preguntar a cada objeto qué tipo es:
+Sin duda, la notación anterior se lee de forma algo más natural.
+Para consultar el precio de un
+fudge, se puede usar la siguiente notación simplificada:
 
 ```
->> cosa := Objeto.
-Salida escribir: cosa tipo , detener.
-Salida escribir: 12345 tipo , detener.
-Salida escribir: ['word salad'] tipo , detener.
-Salida escribir: Verdadero tipo , detener.
+>> price := menu fudge.
 ```
 
-A diferencia de muchos lenguajes de programación comunes, los tipos son maleables.
-El tipo estándar de un objeto es, por ejemplo, objeto, pero puedes modiﬁcarlo:
+@api_Dict_collections
+
+# Archivo
+
+{{messages}}
+
+El objeto **Archivo** proporciona acceso básico al sistema de archivos.
+Puedes usar este objeto para leer archivos completos en una variable de
+una sola vez, o para escribir variables en archivos de una sola vez. También
+se admite la lectura línea a línea. Estas son las operaciones de E/S de archivos más habituales
+en un lenguaje de scripting. Las operaciones de archivo avanzadas requieren
+el uso de FFI mediante el plugin de servidor o un plugin de E/S independiente.
+
+@api_File_file
+@api_File_vault
+@api_File_fficonnect
+
+# Fecha/Hora
+
+{{messages}}
+
+Para una representación estructurada de la hora y la fecha, XOScript usa el
+objeto **Momento**. Si se imprime en pantalla un nuevo objeto Momento, se
+muestran la fecha y la hora actuales:
 
 ```
->> Persona := Objeto nuevo.
-Persona en: ['tipo'] hacer: { <- ['humano']. }.
-Salida escribir: Persona tipo.
+Salida escribir: Momento crear, detener.
 ```
 
-Observe cómo esto no inﬂuye en el objeto Persona, ya que solo se ha modiﬁcado la
-respuesta al tipo de mensaje, nada más.
-Los tipos pueden ser útiles para veriﬁcar si el mensaje está recibiendo los argumentos
-correctos. Por ejemplo, permiten veriﬁcar durante una adición si los argumentos son, de
-hecho, números. Sin embargo, son formas más pragmáticas de recuperar las
-propiedades de los objetos. Debido a que
-los objetos Citrine no generan errores en mensajes no válidos, puede tratar los objetos
-que espera que sean numéricos como tales y ver qué sucede. Si el objeto que obtiene
-resulta ser otro, no se verá afectado por sus
-mensajes.
-El objeto Programa se presentó en el capítulo 3.12. Con este objeto y utilizando el
-mensaje utilizar:, es posible incluir programas de otros en su propio programa. Los
-objetos que están disponibles en archivos de programa externos, también se pueden
-utilizar en su propio programa. También es posible preguntar al objeto Programa si un
-objeto dado ya está presente en el programa:
+Podría dar como resultado algo como:
 
 ```
-Programa Herramienta verdadero: { … }.
+2020-10-10 12:16:39
 ```
 
-El código en el lugar de la línea de puntos se ejecutará, en este caso, si el objeto
-Herramienta realmente existe. En el caso de un nombre de objeto que consta de un solo
-símbolo, es mejor aplicar la siguiente notación para evitar confusiones:
+También es fácil leer los componentes individuales de la hora. Así, por
+ejemplo, si solo hace falta conocer el año actual, se puede enviar el mensaje
+**año** al momento y, a su vez, la respuesta será un
+objeto Número que contiene únicamente el año:
 
 ```
-Programa encontrar: ['X'], verdadero: { … }.
+>> m := Momento crear.
+Salida escribir: m año, detener.
 ```
 
-```
-Programa X
-```
+@api_Moment_system
 
-no es un mensaje válido.
-Además de preguntar por objetos, es igualmente posible preguntar al objeto Programa
-por mensajes. Por ejemplo, se puede preguntar si el objeto Número conoce el mensaje
-entre:y:, de la manera que se ilustra a continuación:
+# Programa/StdOut
 
-```
-Salida escribir: ( Programa Número: ['entre:y:'] ), detener.
-Salida escribir: ( Programa Número: ['reemplazar:con:'] ), detener.
-```
+{{messages}}
 
-Tenga en cuenta la notación del mensaje: el mensaje que debe ser reconocido por el
-objeto relevante debe escribirse junto y sin argumentos. Cuando, por ejemplo, desea
-averiguar si se le puede pedir al objeto Conejo de Pascua que salte: 5 metros a:
-izquierda, se podría enviar el siguiente mensaje a Programa:
+El objeto Programa representa la aplicación que se está ejecutando. Este objeto
+ofrece funcionalidades para ejecutar comandos del sistema, incluir subprogramas,
+leer argumentos y más. Todas las funciones relacionadas con el sistema.
 
-```
-Programa Conejo de Pascua: ['saltar:a:'].
-```
+## StdOut
 
-En resumen, el mensaje relevante que debe ser respondido por el Conejo de Pascua,
-se escribe básicamente como saltar:a:.
-El objeto Programa también puede proporcionar información sobre la versión de Citrine
-que se está utilizando en un momento determinado. Como respuesta al texto del
-mensaje, el objeto Programa muestra El lenguaje de programación Citrine/UK. Como
-respuesta al número del mensaje, se mostrará el número de versión, por
-ejemplo:
+Salida es el objeto de salida estándar. Básicamente tiene dos métodos:
+**escribir:** y **detener**. El mensaje escribir: se usa para enviar un texto
+a stdout; el mensaje detener imprime un carácter de nueva línea.
+En lugar de **detener** también puedes usar \\n.
+
+Ejemplo:
 
 ```
-Salida escribir: Programa, detener.
-Salida escribir: Programa número, detener.
+Salida escribir: ['Hello World'], detener.
 ```
+
+resultado:
+
+```
+Hello World
+```
+
+## Módulos/Plugins
+
+El mundo de XOScript se puede ampliar con nuevos objetos del sistema
+instalando módulos. Se puede añadir un nuevo objeto del sistema al mundo de
+XOScript colocando el archivo del módulo (normalmente un archivo con el sufijo .so)
+en la carpeta mods. 
+
+Cuando envías un mensaje al objeto que pone a disposición el
+módulo plugin, XOScript lo carga automáticamente.
+
+También puedes escribir plugins tú mismo. Los plugins se escriben en el
+lenguaje de programación C. Puedes encontrar un plugin de ejemplo en el paquete
+de código fuente, en src/plugins/example.
+
+
+## Reflexión
+
+Hay varias formas de explorar
+el sistema durante la ejecución del programa. XOScript dispone de un par de métodos para
+detectar qué objetos están presentes y a qué mensajes responden
+esos objetos. En primer lugar, a cada objeto se le puede preguntar de qué **tipo** es;
+sin embargo, los tipos en XOScript son maleables y, por tanto, poco fiables.
+
+También es posible preguntar al objeto Programa si un
+objeto determinado ya está presente en el programa:
+
+```
+Programa Tool verdadero: { ... }.
+```
+
+En el caso de un nombre de objeto
+que consta de un único símbolo, es mejor aplicar la
+siguiente notación para evitar confusiones:
+
+```
+Programa encontrar: ['X'], verdadero: { ... }.
+```
+
+Además de preguntar por objetos, también es posible preguntar al
+objeto Programa por mensajes. Por ejemplo, se le puede preguntar si el
+objeto **Número** conoce el mensaje **entre:y:**, de la manera
+que se ilustra a continuación:
+
+```
+Programa Number: ['between:and:'], detener.
+```
+
+@api_Program_system
+
+# Servidor
+
+{{messages}}
+
+El plugin Servidor de xoscript ofrece funcionalidades para
+crear aplicaciones del lado del servidor. Para cargar el plugin
+de servidor, usa:
+
+```
+Server iniciar.
+```
+
+Para tu comodidad, también se recomienda cargar
+los archivos webtools.xo y template.xo.
+
+```
+Programa utilizar: ['webtools.xo'].
+Programa utilizar: ['template.xo'].
+
+```
+
+## Configuración del servidor
+
+Puedes establecer los siguientes ajustes del servidor:
+
+```
+	# default values are given
+	# so if you do not set anything these
+	# values are used...
+
+	Programa 
+	establecer: ['campos-máximos']
+	valor: 40.
+
+	Programa 
+	establecer: ['contenido-máximo']
+	valor: 2000000. # 2MB
+
+	Programa 
+	establecer: ['max-time']
+	valor: 5000. # 5sec
+
+```
+
+## Hola mundo
+
+Este es un programa web muy sencillo que puedes usar con un
+servidor CGI estándar como Apache2, NGINX, OpenHTTPD o cualquier otro
+servidor conocido.
+
+```
+#!/bin/xo
+
+Server iniciar.
+Programa utilizar: ['webtools.xo'].
+
+>> web-document := Documento-Web crear.
+
+web-document salida: ['
+<html>
+<body>
+<b>Hello World!</b>
+</body>
+</html>'].
+
+```
+
+Si no quieres usar el objeto Documento-Web, no pasa nada, pero
+entonces tienes que escribir tú mismo las cabeceras HTTP:
+
+```
+#!/bin/xo
+Salida escribir: ['Content-type: text/html; charset=utf-8 \n\n'], detener.
+Salida escribir: ['hello world!'], detener.
+``` 
+
+## Petición
+
+El objeto Petición-HTTP se puede usar para obtener datos GET/POST/COOKIE y
+UPLOAD:
+
+```
+>> solicitud  := Petición-HTTP crear.
+>> search   := solicitud obtener: ['search']. # ?search=books
+>> password := solicitud enviar: ['password']. # from form
+>> selected := solicitud obtener-lista: ['sel[]']. #?sel[]=1&sel[]=2
+>> selected := solicitud enviar-lista: ['sel[]'].
+>> cookie   := solicitud cookie: ['session-id'].
+>> upload   := solicitud subir: ['file'].
+>> temppath := upload ? 1.
+>> filename := upload ? 0.
+```
+
+## Maxpost/length
+
+El número máximo predeterminado de campos POST es 40 y la longitud máxima
+predeterminada del contenido es de 2MB. Para configurarlo de otra forma en cada script:
+
+```
+Programa establecer: ['contenido-máximo'] valor: 1. 
+Programa establecer: ['campos-máximos'] valor: 1. 
+```
+
+{{note}}
+Si la longitud del contenido supera el máximo, el
+proceso se termina, porque ya no podemos estar seguros
+de que la carga útil sea segura.
+{{/note}}
+
+El límite maxtime determina el tiempo máximo en ms
+para leer stdin/los datos POST.
+
+```
+Programa establecer: ['max-time'] valor: 5000. # 5sec
+```
+
+Esto solo se aplica a la lectura de E/S del POST, lo que evita
+ataques del tipo slowloris. Si de verdad quieres limitar el
+tiempo de ejecución de cualquier operación, usa Programa tiempo-límite:.
+
+## Base de datos
+
+El objeto Database se puede usar para hacer consultas a MariaDB/MySQL.
+Para conectarte a una base de datos:
+
+```
+>> db := Maria-DB crear host: ['localhost'],
+	usuario: ['xo'],
+	contraseña: ['pass123'],
+	nombre-base-datos: ['xobase'],
+	conectar.
+
+```
+
+Para insertar un registro, usa:
+
+```
+>> consulta := db consultar: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parámetros: ( Lista crear ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+
+{  consulta ejecutar. db confirmar. }
+capturar: { :e db revertir.  }, empezar.
+```
+
+Ten en cuenta que xoscript trabaja *solo* con transacciones y nunca hace autocommit.
+Si no se puede desactivar el autocommit, obtendrás un error de conexión.
+Usa siempre la vinculación de parámetros en las consultas; nunca añadas la entrada del usuario directamente
+al SQL.
+
+Obtén el id insertado así:
+
+```
+Salida escribir: ['INSERTED: '] + consulta id-insertado, detener. # insert id
+```
+
+Para obtener registros:
+
+```
+>> consulta :=
+db
+	consultar: ['SELECT * FROM book order by id desc limit 2'], 
+	extraer: { :row 
+		Salida escribir: row id + [' '] + row description + [': '] + row price, detener.
+	}. # fetching rows
+
+```
+
+## Sesiones
+
+Para la persistencia, puedes almacenar y obtener datos de un objeto de sesión.
+Primero crea un nuevo **Documento-Web**. El objeto Documento-Web reúne
+la petición, las cabeceras, el HTML y la sesión. Esto se debe a que, cuando
+visitas un sitio web con tu navegador, solo ves el HTML. Pero el
+Documento-Web completo también consta de **cabeceras**. Por ejemplo,
+la mayoría de las respuestas HTTP incluyen una cabecera como Content-type:text/html para
+indicar al navegador que los datos que siguen deben representarse como HTML
+(y no, por ejemplo, descargarse como un archivo). Las sesiones son una forma de
+almacenar datos del usuario entre peticiones. Para hacer un seguimiento de estos datos, necesitamos
+establecer una cookie; esta cookie también se establece mediante una cabecera. Por eso
+todo se reúne en el Documento-Web (porque es el documento completo,
+que contiene tanto las cabeceras como el HTML u otros datos).
+
+
+```
+# First we make a new Web Document instance
+>> web := Documento-Web crear.
+
+# Now we start a session, this will generate a Header for a cookie and
+# create a file to store your data, associated with that cookie
+>> session := web empezar-sesión.
+
+# Now we can treat session like a dict
+session userid: 123.
+```
+
+Para destruir la sesión (al cerrar sesión):
+
+```
+web borrar-sesión.
+```
+
+## Cabeceras
+
+El Documento-Web también te permite establecer otras cabeceras conocidas.
+Por ejemplo, si quieres redirigir al usuario a otra URL:
+
+```
+web ir-a: ['/other.html'].
+```
+
+Por debajo, este comando también genera la cabecera HTTP que se envía
+junto con tus otros datos o tu HTML para indicar al navegador que navegue
+a la dirección de destino especificada.
+
+Para añadir una cabecera personalizada:
+
+```
+web cabezera: ( 
+	Cabezera-HTTP crear
+	clave: ['Content-Length']
+	valor: 400
+).
+```
+
+Para mostrar una página 404:
+
+```
+web no-encontrado: ['OOps..'].
+```
+
+
+## Plantillas
+
+El sistema de plantillas predeterminado es muy sencillo. No tienes que aprender
+una nueva sintaxis de plantillas. Además, el motor de plantillas garantiza una separación real
+entre la presentación y la lógica de negocio.
+
+Para crear una plantilla a partir de un archivo:
+
+```
+>> tpl := web plantilla: ['templates/ux.tpl'].
+```
+
+El sistema de plantillas usa marcadores. 
+Hay tres tipos de marcadores: marcadores de corte, marcadores de pegado y
+marcadores de ranura. La idea básica es muy sencilla: recortas
+las zonas identificadas por marcadores de corte y puedes pegarlas en
+las zonas identificadas por marcadores de pegado. Puedes inyectar textos en
+los marcadores de ranura.
+
+Así, por ejemplo, dada la siguiente plantilla, vamos a meter la
+gema en el joyero y añadir una etiqueta de precio.
+
+```
+<!-- cut:gem -->
+<img src="gem.gif">
+<b>$<!-- slot:price --></b>
+<!-- /cut:gem -->
+
+<div id="box">
+<!-- paste:jewels -->
+</div>
+```
+
+Puedes hacerlo de la siguiente manera:
+
+```
+>> gem := tpl cortar: ['gem'], copiar.
+gem price: 99.
+tpl pegar: gem en: ['jewels'].
+web salida: tpl depurar.
+```
+
+La última línea simplemente envía la plantilla como texto al cliente,
+junto con las cabeceras HTTP necesarias.
+
+Resultado:
+
+```
+<div id="box">
+<img src="gem.gif">
+<b>$99</b>
+</div>
+```
+
+
+## Passthru
+
+Para servir de forma segura archivos subidos por los usuarios, puedes recurrir a passthru:
+
+```
+>> uploaded := ['smile.gif'].
+Server acceso-directo: uploaded prefijo: ['/uploads/images/'].
+Programa finalizar.
+```
+
+Esto servirá el contenido subido por el usuario con el tipo mime
+adecuado. Solo se admiten tipos mime de una lista blanca:
+GIF, JPG, PNG, WEBP, MP4, WEBM, MP3, ZIP, GZIP, PDF y SVG.
+Los archivos SVG, ZIP y GZIP se envían como descarga, porque un SVG
+puede contener scripts que, de lo contrario, se ejecutarían en tu dominio.
+Este método evita ataques TOCTOU, recorridos de rutas (path traversal),
+la ejecución de código malicioso (inyección), ataques mediante enlaces simbólicos,
+ataques DDoS (límite de archivo = 50MB), ataques de sniffing y
+otros diversos problemas de seguridad.
+
+
+## JSON
+
+Para codificar un objeto como JSON:
+
+```
+>> json := ( JSON jsonificar: ( 
+	Diccionario crear poner: ( 
+		Lista crear ; 1 ; 2 ; 3
+	) en: ['abc']
+)).
+```
+
+Para decodificar JSON en un objeto xoscript:
+
+```
+>> dict := ((JSON objeto: json) abc ? 1).
+```
+
+Un JSON con más de 500 niveles de anidamiento se rechaza por no válido.
+
+Para enviar directamente un Diccionario como json con las cabeceras correctas:
+
+```
+web json: dict.
+```
+
+
+## Expresiones regulares
+
+Puedes usar expresiones regulares creando un patrón.
+Por ejemplo, para encontrar los hrefs y targets de los hipervínculos:
+
+```
+Patrón crear: ['href="([^"]+)" target="([^"]+)"'].
+```
+
+Ahora aplica el patrón al texto de entrada de esta manera:
+
+```
+pattern coincidir: asunto ejecutar: { :m :x .... }
+```
+
+Ejemplo completo:
+
+```
+>> asunto := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> pattern := Patrón crear: ['href="([^"]+)" target="([^"]+)"'].
+>> result  := pattern coincidir: asunto ejecutar: { :m :x
+	Salida escribir: m, detener.
+	Salida escribir: x, detener.
+	<- ['XXX'].
+}.
+Salida escribir: result, detener.
+```
+
+## Redes
+
+Usa el objeto Red para realizar una petición web.
+El objeto Red siempre envía una petición POST, salvo que envíes Nulo como
+datos; entonces envía una petición GET.
+
+
+```
+Red 
+enviar: Nulo 
+a: ['https://redbeanphp.com'].
+```
+
+## Cifrado
+
+El plugin de servidor incluye cifrado basado en XChaCha20 y Argon2.
+
+Ejemplo:
+
+```
+>> encrypted := Contenedor-seguro cifrar: ['hello'] clave: ['world'].
+>> decrypted := Contenedor-seguro cifrar: encrypted clave: ['world'].
+```
+
+## Tokens
+
+Para generar un token criptográficamente seguro de una longitud determinada:
+
+```
+>> mytok := Contenedor-seguro token: 40.
+```
+
+Esto generará un token de 40 caracteres.
+
+## Formato
+
+El objeto Formato te permite dar formato a datos, por ejemplo rellenar o
+añadir ceros. Usa la sintaxis de printf.
+
+```
+>> fmt := Formato crear: ['%06.0f'].
+fmt aplicar: 56. # gives 000056
+```
+
+Un formato puede contener una conversión, y esta tiene que corresponder al valor;
+de lo contrario, obtendrás un error:
+
+- `aplicar:` con un texto: `%s`
+- `aplicar:` con un número: `%f`, `%e`, `%g` o `%a`
+- `aplicar-a-entero:` con un número: `%d`, `%i`, `%o`, `%u`, `%x` o `%c`
+
+Los valores de una petición son textos. Para darle formato a uno como número,
+conviértelo primero:
+
+```
+fmt aplicar: (solicitud obtener: ['amount']) número.
+```
+
+## Codificadores
+
+Hay varios codificadores y decodificadores disponibles.
+El codificador de url prepara una url para usarla en HTML como enlace:
+
+```
+Server codificar-url: ['https://example.com?a=6&b=1 2'].
+```
+
+Para inyectar de forma segura la entrada del usuario en tu HTML sin arriesgarte a
+inyecciones XSS, usa siempre:
+
+```
+Server codificar-html: ['<harmless>'].
+```
+
+Ten en cuenta que el motor de plantillas siempre realiza la codificación html
+cuando escribes en un marcador de ranura. Así que, si usas el sistema de plantillas,
+no necesitas usar esto.
+
+## Correo
+
+Para enviar un correo, usa la biblioteca mailtools.xo.
+
+Ejemplo:
+
+```
+Server iniciar.
+Programa utilizar: ['mailtools.xo'].
+
+>> e-mail := HTML-Email crear.
+>> img := e-mail anexar: ( Archivo crear: ['myimage.png'] ).
+
+e-mail
+remitente: ['xo@xoscript.com'] nombre: ['xo'],
+destinatario: ( Lista crear ; ['xo2@xoscipt.com'] ),
+asunto: ['xoxo'],
+cuerpo: (['
+<html>
+<body>
+<h1>hello!</h1>
+<img src="<cid>">
+</body>
+</html>	
+'] <cid>: img), enviar.
+
+```
+
+
+
+## Vinculación
+
+Con el mensaje vincular: puedes vincular una biblioteca externa a
+tu programa usando libffi. Para más detalles, consulta el capítulo sobre ffi.
+
+
+@api_Request_http
+@api_URL_http
+@api_Pattern_pattern
+@api_Maria-DB_mariadb
+@api_Maria-Query_mariadb
+@api_Net_net
+@api_Vault_vault
+@api_Server_server
+@api_JSON_json
+
+# ffi
+
+{{messages}}
+
+FFI se proporciona por plataforma/plugin, porque está
+ligado a la arquitectura del sistema subyacente, algo que el
+núcleo no debe hacer.
+El plugin de servidor ofrece una implementación compatible de ffi/blob.
+Por defecto, el núcleo se conecta con la plataforma de destino
+mediante stdin/stdout, servicios limitados de E/S de archivos y la shell (Programa sistema:).
+La integración adicional la proporcionan ffi/blobs mediante plugins
+orientados a aplicaciones, como el plugin de servidor.
+
+FFI significa Foreign Function Interface (interfaz de funciones externas). Te permite usar funcionalidades escritas por otros en
+otros lenguajes de programación, proporcionadas mediante archivos DLL, archivos SO o archivos Dylib. Pueden
+ser funciones muy variadas, y mediante este método hay disponible una enorme gama de funcionalidades.
+Empecemos con un ejemplo:
+
+```
+Server vincular: (
+ Lista crear ;
+ ['/usr/lib/x86_64-linux-gnu/libc.so.6'] ;
+ ['printf'] ;
+ ( Lista crear ; ['pointer'] ; ['int'] ) ;
+ ['void'] ;
+ ['Printf'] ;
+ ['template:number:']
+).
+>> s := Blob utf8: ['FFI has %d letters.\n'].
+Printf template: s number: 3.
+s liberar.
+```
+
+El resultado de este código es que verás lo siguiente en la línea de comandos:
+FFI has 3 letters.
+Probablemente estés pensando: «Eso es mucho código para algo tan sencillo».
+Es decir, ¿no podríamos resolver esto simplemente con un comando Gui show? ¡La respuesta es un rotundo sí!
+Pero esto pretende ser un ejemplo ilustrativo.
+FFI se suele usar para tareas más complejas, pero esas no son buenos
+ejemplos, así que elegí algo trivial.
+
+Los argumentos del método link:
+
+- Argumento n.º 1: el archivo DLL o SO que quieres usar.
+- Argumento n.º 2: la función de ese archivo que quieres vincular.
+- Argumento n.º 3: una lista con los nombres de los tipos de datos de los argumentos de la función.
+- Argumento n.º 4: el nombre del tipo de retorno de la función.
+- Argumento n.º 5: el nombre del objeto al que quieres vincular esta función (si no existe, se creará
+automáticamente).
+- Argumento n.º 6: el mensaje al que debe vincularse esta función.
+
+En el ejemplo anterior, queremos vincular la función printf de libc.so. Puedes encontrar los nombres
+de los tipos de datos en la documentación del software al que te vinculas. Los tipos disponibles son:
+void, pointer, float, double, int, uint, char, uchar, intX y uintX,
+donde X puede ser 8, 16, 32 o 64.
+
+Estos tipos se refieren al número de bytes necesarios para almacenar los datos. Para printf, vinculamos a un
+nuevo objeto llamado Printf y al mensaje template:number:. Traduces la función externa
+al dialecto de XOScript antes de usarla. El mensaje template:number: espera como primer
+parámetro un búfer con el texto de la plantilla. Creamos este búfer con un objeto Blob, que
+te permite reservar memoria manualmente. Eres responsable de liberar después esta memoria
+con el mensaje liberar.
+
+Puedes llenar un blob de memoria de varias formas. En nuestro ejemplo, lo llenamos con texto, así que usamos el
+mensaje utf8: (UTF-8 es una codificación para convertir texto en bytes). También puedes llenar un blob con
+bytes:, pasándole una lista de valores de bytes. Para leer el contenido de un blob, usa desde:longitud:.
+Obtendrás los bytes como una lista. Incluso puedes crear un struct de C con un Blob usando el
+mensaje estructura:, pasándole una secuencia de tipos de C. Esto puede ser necesario al llamar a una función
+de C de una biblioteca de software externa que espera un puntero a un struct.
+
+{warning}
+Tienes que liberar los blobs tú mismo.
+El recolector de basura no limpia los blobs.
+{/warning}
+
+Como los blobs se pueden intercambiar con funciones externas de bibliotecas,
+no pueden liberarse automáticamente mediante la recolección de basura (podrían seguir en uso por
+funciones externas, o esas funciones externas podrían querer liberarlos
+ellas mismas). Por tanto, tienes que liberar los blobs tú mismo cuando sea necesario.
+
+Para liberar un blob, usa:
+
+```
+myblob liberar.
+```
+
+Para liberar un struct, usa:
+
+```
+mystruct liberar-estructura liberar.
+```
+
+Así que, para un struct, tienes que enviar dos mensajes: liberar-estructura y liberar para
+desasignar el bloque de memoria.
+
+@api_Blob_fficonnect
