@@ -1698,7 +1698,7 @@ x do shift pop done.
 
 {{messages}}
 
-**Both List and Dict are collections. However, contrary to a
+Both List and Dict are collections. However, contrary to a
 list, a dict **has no** order. Another distinction between the two
 is that a dict consists of object pairs. One object acts as entry (or
 keyword) in order to search for the other object. A good example of a
