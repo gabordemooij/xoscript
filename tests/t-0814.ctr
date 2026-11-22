@@ -1,0 +1,50 @@
+# session cookie format, json content type, web protocols only, svg shown inline
+Server init.
+Program use: ['../../../src/xo/en/webtools.xo'].
+
+>> Fake-Request := Object new.
+Fake-Request on: ['value:'] do: { :value
+	own value := value.
+}.
+Fake-Request on: ['cookie:'] do: { :name
+	<- own value.
+}.
+
+>> Test-Session := Tempfile-Session new.
+Test-Session on: ['load'] do: {
+	<- Dict new.
+}.
+Test-Session on: ['session-id'] do: {
+	<- own id.
+}.
+
+>> cookies := List new
+	; ['abc123']
+	; ['../outside']
+	; ['']
+	; ['abc\n'].
+
+cookies each: { :i :cookie
+	>> request := Fake-Request new.
+	request value: cookie.
+	>> manager := Test-Session new.
+	>> web := Web-Document new.
+	web request: request.
+	web session-manager: manager.
+	web session-start.
+	Out write: ( manager session-id = cookie ), stop.
+}.
+
+>> web := Web-Document new.
+web json: (Dict new a: ['b']).
+Out write: ['\n'], stop.
+
+{ Net get: ['file:///etc/hostname']. } except: { :e
+	Out write: e, stop.
+}, start.
+
+>> svg := File new: ['/tmp/test0814.svg'].
+svg write: ['<svg xmlns="x"></svg>'].
+Out stop.
+Server passthru: ['test0814.svg'] prefix: ['/tmp/'].
+svg delete.

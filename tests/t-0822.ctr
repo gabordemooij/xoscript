@@ -1,0 +1,22 @@
+# fewer parameters than placeholders must give an error, not read past the bindings
+Server init.
+
+>> db := Maria-DB new host: ['localhost'],
+	username: ['xo'],
+	password: ['pass123'],
+	dbname: ['xobase'],
+	connect.
+
+>> query := db query: ['SELECT ? AS a, ? AS b, ? AS c'].
+query parameters: (List new ; ['1']).
+{ query fetch: { :row Out write: row, stop. }. } except: { :e Out write: e, stop. }, start.
+
+>> query := db query: ['SELECT ? AS a'].
+{ query fetch: { :row Out write: row, stop. }. } except: { :e Out write: e, stop. }, start.
+
+# the right number still works, more parameters are ignored as before
+>> query := db query: ['SELECT ? AS a, ? AS b'].
+query parameters: (List new ; ['1'] ; ['2']).
+query fetch: { :row Out write: (row at: ['a']), write: (row at: ['b']), stop. }.
+query parameters: (List new ; ['1'] ; ['2'] ; ['3']).
+query fetch: { :row Out write: (row at: ['a']), write: (row at: ['b']), stop. }.

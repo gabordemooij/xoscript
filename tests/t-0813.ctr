@@ -1,0 +1,28 @@
+# line breaks in values must not create extra headers
+Server init.
+Program use: ['../../../src/xo/en/webtools.xo'].
+Program use: ['../../../src/xo/en/mailtools.xo'].
+
+>> header := HTTP-Header new key: ['Location'] value: ['/ok\r\nX-Injected: yes'].
+Out write: header.
+
+>> web := Web-Document new.
+web goto: ['/ok\r\nX-Injected: yes'].
+Out write: ['\n'], stop.
+
+>> mail := Email new.
+mail to: (List new ; ['a@example.invalid\r\nX-To: yes']).
+mail cc: (List new ; ['b@example.invalid\r\nX-Cc: yes']).
+mail bcc: (List new ; ['c@example.invalid\r\nX-Bcc: yes']).
+mail from: ['d@example.invalid\r\nX-From: yes'] name: ['site\r\nX-Name: yes'].
+mail subject: ['hello\r\nX-Subject: yes'].
+mail body: ['line1\r\nline2'].
+Out write: mail generate.
+
+>> html := HTML-Email new.
+html to: (List new ; ['a@example.invalid\r\nX-To: yes']).
+html from: ['d@example.invalid'] name: ['site'].
+html subject: ['hello\r\nX-Subject: yes'].
+html body: ['body'].
+Out write: ( html generate contains: ['\nX-'] ), stop.
+Out write: ( html generate contains: ['X-To: yes'] ), stop.

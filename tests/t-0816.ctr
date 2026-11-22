@@ -1,0 +1,39 @@
+# a format must fit the type of the value, the type can come from a client
+>> try := { :format :value
+	{ Out write: ( (Format new: format) apply: value ), stop. } except: { :e Out write: e, stop. }, start.
+}.
+>> try-int := { :format :value
+	{ Out write: ( (Format new: format) apply-int: value ), stop. } except: { :e Out write: e, stop. }, start.
+}.
+
+# fits
+try apply: ['|%s|'] and: ['text'].
+try apply: ['%06.2f'] and: 5.5.
+try apply: ['100%% %s'] and: ['sure'].
+try-int apply: ['%03d'] and: 7.
+try-int apply: ['%x'] and: 255.
+try apply: ['%d'] and: (Int64 new from-string: ['12']).
+try apply: ['%lld'] and: (Int64 new from-string: ['12']).
+try apply: ['%.1lf'] and: 5.5.
+try-int apply: ['%hd'] and: 7.
+
+# does not fit
+try apply: ['%s'] and: 12345.
+try apply: ['%d'] and: 12345.
+try apply: ['%f'] and: ['text'].
+try-int apply: ['%d'] and: ['text'].
+try-int apply: ['%s'] and: 5.
+try apply: ['%s %s'] and: ['text'].
+try apply: ['%n'] and: ['text'].
+try apply: ['%*s'] and: ['text'].
+try apply: ['%'] and: ['text'].
+
+# length modifier does not fit
+try apply: ['%ls'] and: ['text'].
+try apply: ['%Lf'] and: 5.5.
+try-int apply: ['%ld'] and: 7.
+try-int apply: ['%lld'] and: 7.
+try apply: ['%Ld'] and: (Int64 new from-string: ['12']).
+
+# a width that does not fit printf must give an error, not a crash
+try apply: ['%99999999999s'] and: ['text'].

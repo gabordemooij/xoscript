@@ -1,0 +1,16 @@
+# a value ending in the first part of an opening quote must survive serialization
+>> values := List new
+	; ['abc\[']
+	; ['\[']
+	; ['\[\[']
+	; ['x\\\[']
+	; ['abc'].
+
+values each: { :i :value
+	>> d := Dict new.
+	d put: value at: ['k'].
+	d put: ['second'] at: ['j'].
+	>> r := d code object.
+	Out write: r count, stop.
+	Out write: ( (r at: ['k']) = value ), stop.
+}.

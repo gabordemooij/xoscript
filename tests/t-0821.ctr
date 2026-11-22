@@ -1,0 +1,17 @@
+# a quote that never closes must give an error, not an endless loop
+>> path := ['/tmp/test0821.csv'].
+>> file := File new: path.
+
+file write: ['a,b\n"1,2\n'].
+{
+	file delimiter: [','] quote: ['"'] lines: { :line
+		Out write: line, stop.
+	}.
+} except: { :e Out write: e, stop. }, start.
+
+# a closed quote still works
+file write: ['a,b\n"1,2",3'].
+file delimiter: [','] quote: ['"'] lines: { :line
+	Out write: line, stop.
+}.
+file delete.
