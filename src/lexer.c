@@ -35,6 +35,10 @@ int ctr_clex_nil_len = 0;
 char* ivarname;
 int ivarlen;
 
+/* parentheses and blocks come from the language file, they can be longer
+ * than one byte (right-to-left languages use symbols that are not mirrored) */
+#define CTR_CLEX_SYMBOL(code, symbol) (strncmp((code), (symbol), sizeof(symbol) - 1) == 0)
+
 /**
  * Determines whether the specified symbol is a delimiter.
  * Returns 1 if the symbol is a delimiter and 0 otherwise.
@@ -52,11 +56,12 @@ static int ctr_clex_is_delimiter( char* code ) {
 	if (strncmp(code, CTR_DICT_MESSAGE_CHAIN, ctr_clex_keyword_chain_len) == 0 ) {
 		return 1;
 	}
+	if (CTR_CLEX_SYMBOL(code, CTR_DICT_PAREN_OPEN) || CTR_CLEX_SYMBOL(code, CTR_DICT_PAREN_CLOSE)) {
+		return 1;
+	}
 	char symbol = *(code);
 	return (
-	   symbol == '('
-	|| symbol == ')'
-	|| symbol == ctr_clex_param_prefix_char // ':'
+	   symbol == ctr_clex_param_prefix_char // ':'
 	|| symbol == ' '
 	|| symbol == '\n'
 	|| symbol == '\t'
@@ -173,10 +178,10 @@ int ctr_clex_tok(void) {
 		}
 	}
 	if (ctr_code == ctr_eofcode) return CTR_TOKEN_FIN;
-	if (c == '(') { ctr_code++; return CTR_TOKEN_PAROPEN; }
-	if (c == ')') { ctr_code++; return CTR_TOKEN_PARCLOSE; }
-	if (c == '{') { ctr_code++; return CTR_TOKEN_BLOCKOPEN; }
-	if (c == '}') { ctr_code++; return CTR_TOKEN_BLOCKCLOSE; }
+	if (CTR_CLEX_SYMBOL(ctr_code, CTR_DICT_PAREN_OPEN)) { ctr_code += sizeof(CTR_DICT_PAREN_OPEN) - 1; return CTR_TOKEN_PAROPEN; }
+	if (CTR_CLEX_SYMBOL(ctr_code, CTR_DICT_PAREN_CLOSE)) { ctr_code += sizeof(CTR_DICT_PAREN_CLOSE) - 1; return CTR_TOKEN_PARCLOSE; }
+	if (CTR_CLEX_SYMBOL(ctr_code, CTR_DICT_BLOCK_START)) { ctr_code += sizeof(CTR_DICT_BLOCK_START) - 1; return CTR_TOKEN_BLOCKOPEN; }
+	if (CTR_CLEX_SYMBOL(ctr_code, CTR_DICT_BLOCK_END)) { ctr_code += sizeof(CTR_DICT_BLOCK_END) - 1; return CTR_TOKEN_BLOCKCLOSE; }
 	if (strncmp(ctr_code, CTR_DICT_END_OF_LINE, ctr_clex_keyword_eol_len)==0) {
 		ctr_code+=ctr_clex_keyword_eol_len;
 		return CTR_TOKEN_DOT;
