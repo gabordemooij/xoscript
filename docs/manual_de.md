@@ -160,8 +160,8 @@ und schreiben Sie ein kleines Testprogramm:
 #!/bin/xo
 Server initialisieren.
 Programm verwenden: ['webtools.xo'].
->> web := Web-Dokument neu.
-web ausgeben: ['Hello World'].
+>> webdok := Web-Dokument neu.
+webdok ausgeben: ['Hello World'].
 ```
 
 Erlauben Sie apache2, Ihr Programm über CGI auszuführen:
@@ -394,7 +394,7 @@ Kommentare beginnen in XOScript mit dem Zeichen \#. Die folgende Zeile
 wird also ignoriert:
 
 ```
-# this is just a comment
+# das ist nur ein Kommentar
 ```
 
 ## Variablen
@@ -411,18 +411,18 @@ Dies sind Beispiele für gültige Variablen:
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
->> $ := ['dollar'].
+>> $ := ['Dollar'].
 >> +plus := Ja.
->> user-password := ['Pssst!'].
+>> benutzer-kennwort := ['Pssst!'].
 ```
 
 Ungültige Variablen sind zum Beispiel:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['negative Zahl'].
+>> password of nutzer := ['Geheim'].
+>> password.of:nutzer := ['Geheim'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ Objekt fortsetzen, indem man ihm eine weitere Nachricht sendet:
 
 ```
 Ausgabe schreiben:
-[' hello '] trimmen großbuchstaben.
+[' guten Tag '] trimmen großbuchstaben.
 ```
 
 ```
-HELLO
+GUTEN TAG
 ```
 
 Hier werden zwei Nachrichten an das **Text**-Objekt gesendet: **trimmen**, gefolgt
@@ -668,7 +668,7 @@ an ein **Ja**-Objekt oder ein **Nein**-Objekt:
 
 ```
 2 gerade? ja: {
-	Ausgabe schreiben: ['Two is an even number'], stopp.
+	Ausgabe schreiben: ['Zwei ist eine gerade Zahl'], stopp.
 }.
 ```
 Im vorigen Beispiel wird die Nachricht **ja:** an **Ja** gesendet (die
@@ -880,9 +880,9 @@ Sie können zuvor geschriebenen Code wiederverwenden, um eine Hierarchie
 von Objekten zu erstellen. Zum Beispiel:
 
 ```
->> Animal := Objekt neu.
->> Dog := Animal neu.
->> Poodle := Dog neu.
+>> Tier := Objekt neu.
+>> Hund := Tier neu.
+>> Pudel := Hund neu.
 ```
 
 In diesem Fall erbt **Dog** das gesamte Verhalten und alle Eigenschaften
@@ -918,7 +918,7 @@ dass die eigentliche Addition am Ende trotzdem noch ausgeführt werden muss; das
 geschieht tatsächlich in der folgenden Zeile:
 
 ```
->> answer := selbst + (zahl x factor).
+>> lösung := selbst + (zahl x faktor).
 ```
 
 Woher weiß XOScript nun, dass sich dieses Plus**zeichen** auf
@@ -954,14 +954,14 @@ Obwohl xoscript keine Klassen bietet, ist es trivial,
 klassenähnliches Verhalten nachzuahmen. Überschreiben Sie einfach die Nachricht neu.
 
 ```
->> Animal := Objekt neu.
-Animal wenn: ['neu'] tun: {
+>> Tier := Objekt neu.
+Tier wenn: ['neu'] tun: {
 	<- selbst neu initialisieren.
 }.
 
-Animal wenn: ['initialisieren'] tun: {
-	eigen sound := ['?'].
-	eigen legs  := 4.
+Tier wenn: ['initialisieren'] tun: {
+	eigen laut := ['?'].
+	eigen beine  := 4.
 }.
 ```
 
@@ -981,7 +981,7 @@ hat ein Tier 4 Beine, und sein Laut ist unbekannt (daher das Fragezeichen).
 Um eine neue Instanz unseres Animal zu erstellen, könnten wir einfach schreiben:
 
 ```
->> a := Animal neu.
+>> a := Tier neu.
 ```
 
 Jetzt erhalten wir eine neue Instanz von Animal mit 4 Beinen, unbekanntem Laut und
@@ -989,18 +989,18 @@ einer Methode initialisieren. Wie in anderen objektorientierten Sprachen können
 Animal auch erweitern:
 
 ```
->> Dog := Animal neu.
-Dog wenn: ['initialisieren'] tun: {
+>> Hund := Tier neu.
+Hund wenn: ['initialisieren'] tun: {
 	selbst initialisieren.
-	eigen sound := ['barks'].
+	eigen laut := ['bellt'].
 }.
 ```
 
 Das lässt sich leicht testen, indem wir eine Methode text hinzufügen:
 
 ```
-Animal wenn: ['text'] tun: {
-	<- eigen legs text + eigen sound.
+Tier wenn: ['text'] tun: {
+	<- eigen beine text + eigen laut.
 }.
 ```
 
@@ -1015,10 +1015,10 @@ um Umfang und Fläche zu berechnen. Eine mögliche Schreibweise wäre:
 
 
 ```
->> Rectangle := Objekt neu.
+>> Rechteck := Objekt neu.
 
-Rectangle wenn: ['area'] tun: {
-	<- eigen länge * eigen width.
+Rechteck wenn: ['fläche'] tun: {
+	<- eigen länge * eigen breite.
 }.
 ```
 
@@ -1027,12 +1027,12 @@ Zweck können die Nachrichten **länge:** und **width:** hinzugefügt werden:
 
 
 ```
-Rectangle wenn: ['length:'] tun: { :länge
+Rechteck wenn: ['length:'] tun: { :länge
 	eigen länge := länge.
 }.
 
-Rectangle wenn: ['width:'] tun: { :width
-	eigen width := width.
+Rechteck wenn: ['width:'] tun: { :breite
+	eigen breite := breite.
 }.
 
 ```
@@ -1041,16 +1041,16 @@ Dieses Rechteck kann dann so verwendet werden:
 
 
 ```
->> rectangle := Rectangle neu length: 2, width: 3.
-Ausgabe schreiben: rectangle area.
+>> rechteck := Rechteck neu length: 2, width: 3.
+Ausgabe schreiben: rechteck fläche.
 ```
 
 Wird jedoch vergessen, Länge und Breite anfangs festzulegen,
 tritt eine Fehlermeldung auf:
 
 ```
->> rectangle := Rectangle neu.
-Ausgabe schreiben: rectangle area.
+>> rechteck := Rechteck neu.
+Ausgabe schreiben: rechteck fläche.
 ```
 
 erzeugt den folgenden Fehler:
@@ -1076,13 +1076,13 @@ werden alle diese Kernobjekte besprochen.
 Sie können ein Objekt (samt seinem aktuellen Zustand) auf der Festplatte speichern mit:
 
 ```
-myobject save-as: ['saved.bin'].
+meinobjekt save-as: ['saved.bin'].
 ```
 
 Um das Objekt wieder von der Festplatte zu laden:
 
 ```
->> myobject := Objekt load-from: ['saved.bin'].
+>> meinobjekt := Objekt load-from: ['saved.bin'].
 ```
 
 Schnappschüsse können verwendet werden, um einen bestimmten Zustand zu sichern oder die Leistung zu verbessern.
@@ -1202,8 +1202,8 @@ einer Variable zuweisen und anschließend Nachrichten senden:
 ```
 10 gerade?
 
->> tenner := 10.
-tenner gerade?
+>> zehner := 10.
+zehner gerade?
 
 ```
 
@@ -1433,10 +1433,10 @@ Hier eine wichtige Stolperfalle:
 ```
 {
 	Nein nein: {
-		Ausgabe schreiben: ['End the loop.'].
+		Ausgabe schreiben: ['Beende die Schleife.'].
 	}, abbrechen.
 	
-	Ausgabe schreiben: ['Dont show me.'].
+	Ausgabe schreiben: ['Zeig mich nicht.'].
 
 } prozedur.
 
@@ -1450,10 +1450,10 @@ Abbruch ausführen möchten, muss er als Nachricht an **Ja** gesendet werden.
 ```
 {
 	Nein nicht ja: {
-		Ausgabe schreiben: ['End the loop.'].
+		Ausgabe schreiben: ['Beende die Schleife.'].
 	}, abbrechen.
 	
-	Ausgabe schreiben: ['Dont show me.'].
+	Ausgabe schreiben: ['Zeig mich nicht.'].
 
 } prozedur.
 
@@ -1466,7 +1466,7 @@ Das funktioniert wie erwartet.
 Ausnahmen können so behandelt werden:
 
 ```
-{ Task 1 } abfangen: { Task 2 }, starten.
+{ Aufgabe 1 } abfangen: { Aufgabe 2 }, starten.
 ```
 
 Sie können in Ihrem Programm auch absichtlich einen Fehler auslösen und
@@ -1476,9 +1476,9 @@ Abbildung gezeigt:
 
 ```
 {
-diese-aufgabe fehler: ['Whoops!'].
-} abfangen: { :mistake
-Ausgabe schreiben: mistake.
+diese-aufgabe fehler: ['Hoppla!'].
+} abfangen: { :irrtum
+Ausgabe schreiben: irrtum.
 }, starten.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript bietet für Aufgaben die Möglichkeit, Werte einzuschleusen. Sehen Sie 
 die folgende Aufgabe an:
 
 ```
->> sending := {
-	Newsletter an: eigen recipient.
+>> versand := {
+	Rundbrief an: eigen recipient.
 }.
-sending setzen: ['recipient']
+versand setzen: ['recipient']
 wert: ['info@recipient.org'].
-sending starten.
+versand starten.
 ```
 
 
@@ -1512,20 +1512,20 @@ aus: **{}**, doch XOScript betrachtet das als Sprachfehler. Wenn Sie
 eine leere Aufgabe deklarieren möchten, können Sie das Objekt Nichts verwenden:
 
 ```
->> task := Nichts.
+>> aufgabe := Nichts.
 ```
 
 Obwohl das keine echte Aufgabe ist, sondern ein Nichts-Objekt, kann trotzdem
 eine Nachricht starten gesendet werden:
 
 ```
->> answer := task starten.
+>> lösung := aufgabe starten.
 ```
 
 Tatsächlich ist das dasselbe wie:
 
 ```
->> answer := Nichts starten.
+>> lösung := Nichts starten.
 ```
 
 Da das Objekt **Nichts** die Nachricht **starten** nicht kennt,
@@ -1699,9 +1699,9 @@ solche Liste ist eine Preisliste, etwa:
 
 
 ```
->> menu := Wörterbuch neu
-	setzen: ['£5'] auf: ['apple pie'],
-	setzen: ['£6'] auf: ['carrot cake'],
+>> speisekarte := Wörterbuch neu
+	setzen: ['£5'] auf: ['Apfelkuchen'],
+	setzen: ['£6'] auf: ['Karottenkuchen'],
 	setzen: ['£3'] auf: ['fudge'].
 ```
 
@@ -1716,13 +1716,13 @@ findet man die Bedeutung. Um zum Beispiel aus der
 oben genannten Liste den Preis eines Fudge abzurufen:
 
 ```
->> price := menu bei: ['fudge'].
+>> price := speisekarte bei: ['fudge'].
 ```
 
 Sie können auch die Kurzschreibweise verwenden:
 
 ```
->> price := menu ? ['fudge'].
+>> price := speisekarte ? ['fudge'].
 ```
 
 Wenn die Einträge, unter denen Sie Objekte speichern, keine Leerzeichen enthalten
@@ -1730,7 +1730,7 @@ Wenn die Einträge, unter denen Sie Objekte speichern, keine Leerzeichen enthalt
 kann auch die folgende Schreibweise verwendet werden:
 
 ```
->> menu := Wörterbuch neu
+>> speisekarte := Wörterbuch neu
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1741,7 +1741,7 @@ Um den Preis eines
 Fudge abzufragen, kann die folgende vereinfachte Schreibweise verwendet werden:
 
 ```
->> price := menu fudge.
+>> price := speisekarte fudge.
 ```
 
 @api_Dict_collections
@@ -1845,7 +1845,7 @@ Man kann das Objekt Programm auch fragen, ob ein
 bestimmtes Objekt bereits im Programm vorhanden ist:
 
 ```
-Programm Tool ja: { ... }.
+Programm Werkzeug ja: { ... }.
 ```
 
 Bei einem Objektnamen,
@@ -1893,9 +1893,9 @@ Programm verwenden: ['template.xo'].
 Sie können die folgenden Servereinstellungen festlegen:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# Standardwerte sind vorgegeben,
+	# wenn Sie also nichts einstellen, werden diese
+	# Werte verwendet...
 
 	Programm 
 	einstellung: ['max-postfields']
@@ -1923,9 +1923,9 @@ bekannten Server verwenden können.
 Server initialisieren.
 Programm verwenden: ['webtools.xo'].
 
->> web-document := Web-Dokument neu.
+>> webseite := Web-Dokument neu.
 
-web-document ausgeben: ['
+webseite ausgeben: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ dann müssen Sie die HTTP-Header aber selbst schreiben:
 ```
 #!/bin/xo
 Ausgabe schreiben: ['Content-type: text/html; charset=utf-8 \n\n'], stopp.
-Ausgabe schreiben: ['hello world!'], stopp.
+Ausgabe schreiben: ['hallo welt!'], stopp.
 ``` 
 
 ## Anfrage
@@ -1951,13 +1951,13 @@ UPLOAD-Daten abgerufen werden:
 ```
 >> anfrage  := HTTP-Anfrage neu.
 >> search   := anfrage get: ['search']. # ?search=books
->> password := anfrage post: ['password']. # from form
->> selected := anfrage get-liste: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := anfrage post-liste: ['sel[]'].
+>> password := anfrage post: ['password']. # aus dem Formular
+>> auswahl := anfrage get-liste: ['sel[]']. #?sel[]=1&sel[]=2
+>> auswahl := anfrage post-liste: ['sel[]'].
 >> cookie   := anfrage cookie: ['session-id'].
->> upload   := anfrage upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> hochladung   := anfrage upload: ['file'].
+>> temppfad := hochladung ? 1.
+>> dateiname := hochladung ? 0.
 ```
 
 ## Maxpost/length
@@ -2007,7 +2007,7 @@ Um einen Datensatz einzufügen:
 >> suchparameter := db abfrage: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parameter: ( Liste neu ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parameter: ( Liste neu ; ['abc'] ; 12.35 ; 6 ). # parametrisierte Abfragen
 
 {  suchparameter ausführen. db bestätigen. }
 abfangen: { :e db zurückrollen.  }, starten.
@@ -2021,7 +2021,7 @@ in das SQL ein.
 Die eingefügte ID erhalten Sie so:
 
 ```
-Ausgabe schreiben: ['INSERTED: '] + suchparameter insert-id, stopp. # insert id
+Ausgabe schreiben: ['EINGEFÜGT: '] + suchparameter insert-id, stopp. # eingefügte ID
 ```
 
 Um Datensätze abzurufen:
@@ -2030,9 +2030,9 @@ Um Datensätze abzurufen:
 >> suchparameter :=
 db
 	abfrage: ['SELECT * FROM book order by id desc limit 2'], 
-	abrufen: { :row 
-		Ausgabe schreiben: row id + [' '] + row description + [': '] + row price, stopp.
-	}. # fetching rows
+	abrufen: { :reihe 
+		Ausgabe schreiben: reihe id + [' '] + reihe description + [': '] + reihe price, stopp.
+	}. # Zeilen abrufen
 
 ```
 
@@ -2053,21 +2053,21 @@ Dokument, das sowohl Header als auch HTML oder andere Daten enthält).
 
 
 ```
-# First we make a new Web Document instance
->> web := Web-Dokument neu.
+# Zuerst erstellen wir eine neue Web-Dokument-Instanz
+>> webdok := Web-Dokument neu.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web sitzung-starten.
+# Jetzt starten wir eine Sitzung; das erzeugt eine Kopfzeile für ein Cookie und
+# eine Datei für Ihre Daten, die mit diesem Cookie verknüpft ist
+>> sitzungsobjekt := webdok sitzung-starten.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Jetzt können wir die Sitzung wie ein Wörterbuch behandeln
+sitzungsobjekt userid: 123.
 ```
 
 Um die Sitzung zu beenden (beim Abmelden):
 
 ```
-web sitzung-beenden.
+webdok sitzung-beenden.
 ```
 
 ## Header
@@ -2076,7 +2076,7 @@ Mit dem Web-Dokument können Sie auch andere bekannte Header setzen.
 Wenn Sie den Benutzer zum Beispiel auf eine andere URL umleiten möchten:
 
 ```
-web gehe-zu: ['/other.html'].
+webdok gehe-zu: ['/other.html'].
 ```
 
 Im Hintergrund erzeugt dieser Befehl auch den HTTP-Header, der
@@ -2086,7 +2086,7 @@ zur angegebenen Zieladresse zu wechseln.
 Um einen eigenen Header hinzuzufügen:
 
 ```
-web kopfzeile: ( 
+webdok kopfzeile: ( 
 	HTTP-Kopfzeile neu
 	schlüssel: ['Content-Length']
 	wert: 400
@@ -2096,7 +2096,7 @@ web kopfzeile: (
 Um eine 404-Seite anzuzeigen:
 
 ```
-web nicht-gefunden: ['OOps..'].
+webdok nicht-gefunden: ['Uups..'].
 ```
 
 
@@ -2109,7 +2109,7 @@ von Darstellung und Geschäftslogik.
 Um eine Vorlage aus einer Datei zu erstellen:
 
 ```
->> tpl := web vorlage: ['templates/ux.tpl'].
+>> tpl := webdok vorlage: ['templates/ux.tpl'].
 ```
 
 Das Vorlagensystem verwendet Markierungen.
@@ -2139,7 +2139,7 @@ Das geht so:
 >> gem := tpl ausschneiden: ['gem'], kopieren.
 gem price: 99.
 tpl einfügen: gem auf: ['jewels'].
-web ausgeben: tpl säubern.
+webdok ausgeben: tpl säubern.
 ```
 
 Die letzte Zeile sendet die Vorlage einfach als Text an den Client,
@@ -2160,8 +2160,8 @@ Ergebnis:
 Um von Benutzern hochgeladene Dateien sicher auszuliefern, können Sie sich auf passthru verlassen:
 
 ```
->> uploaded := ['smile.gif'].
-Server durchreichen: uploaded präfix: ['/uploads/images/'].
+>> hochgeladen := ['smile.gif'].
+Server durchreichen: hochgeladen präfix: ['/uploads/images/'].
 Programm ende.
 ```
 
@@ -2191,7 +2191,7 @@ Um ein Objekt als JSON zu kodieren:
 Um JSON in ein xoscript-Objekt zu dekodieren:
 
 ```
->> dict := ((JSON objekt: json) abc ? 1).
+>> wb := ((JSON objekt: json) abc ? 1).
 ```
 
 JSON mit mehr als 500 Verschachtelungsebenen wird als ungültig abgelehnt.
@@ -2199,7 +2199,7 @@ JSON mit mehr als 500 Verschachtelungsebenen wird als ungültig abgelehnt.
 Um ein Wörterbuch direkt mit den richtigen Headern als JSON auszugeben:
 
 ```
-web json: dict.
+webdok json: wb.
 ```
 
 
@@ -2215,7 +2215,7 @@ Muster neu: ['href="([^"]+)" target="([^"]+)"'].
 Wenden Sie das Muster nun so auf den zu durchsuchenden Text an:
 
 ```
-pattern treffer: betreff tun: { :m :x .... }
+suchmuster treffer: betreff tun: { :m :x .... }
 ```
 
 Vollständiges Beispiel:
@@ -2225,13 +2225,13 @@ Vollständiges Beispiel:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Muster neu: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern treffer: betreff tun: { :m :x
+>> suchmuster := Muster neu: ['href="([^"]+)" target="([^"]+)"'].
+>> resultat  := suchmuster treffer: betreff tun: { :m :x
 	Ausgabe schreiben: m, stopp.
 	Ausgabe schreiben: x, stopp.
 	<- ['XXX'].
 }.
-Ausgabe schreiben: result, stopp.
+Ausgabe schreiben: resultat, stopp.
 ```
 
 ## Netzwerk
@@ -2254,8 +2254,8 @@ Das Server-Plugin bietet Verschlüsselung auf Basis von XChaCha20 und Argon2.
 Beispiel:
 
 ```
->> encrypted := Tresor verschlüsseln: ['hello'] schlüssel: ['world'].
->> decrypted := Tresor verschlüsseln: encrypted schlüssel: ['world'].
+>> verschlüsselt := Tresor verschlüsseln: ['hello'] schlüssel: ['world'].
+>> entschlüsselt := Tresor verschlüsseln: verschlüsselt schlüssel: ['world'].
 ```
 
 ## Tokens
@@ -2263,7 +2263,7 @@ Beispiel:
 Um ein kryptografisch sicheres Token einer bestimmten Länge zu erzeugen:
 
 ```
->> mytok := Tresor token: 40.
+>> meintok := Tresor token: 40.
 ```
 
 Dadurch wird ein Token mit 40 Zeichen erzeugt.
@@ -2275,7 +2275,7 @@ Hinzufügen von Nullen. Es verwendet die printf-Syntax.
 
 ```
 >> fmt := Format neu: ['%06.0f'].
-fmt anwenden: 56. # gives 000056
+fmt anwenden: 56. # ergibt 000056
 ```
 
 Ein Format darf eine Umwandlung enthalten, und diese muss zum Wert passen,
@@ -2441,13 +2441,13 @@ vielleicht selbst freigeben). Deshalb müssen Sie Blobs bei Bedarf selbst freige
 Um einen Blob freizugeben, verwenden Sie:
 
 ```
-myblob freigeben.
+meinblob freigeben.
 ```
 
 Um eine Struktur freizugeben, verwenden Sie:
 
 ```
-mystruct struct-freigeben freigeben.
+meinstruct struct-freigeben freigeben.
 ```
 
 Für eine Struktur müssen Sie also zwei Nachrichten senden: struct-freigeben und freigeben, um

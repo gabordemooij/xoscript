@@ -394,7 +394,7 @@ Kommentarer i XOScript indledes med et \#-tegn. Den følgende linje
 vil derfor blive ignoreret:
 
 ```
-# this is just a comment
+# dette er bare en kommentar
 ```
 
 ## Variabler
@@ -413,16 +413,16 @@ Dette er eksempler på gyldige variabler:
 >> ♡♡♡ := 3.
 >> $ := ['dollar'].
 >> +plus := Sand.
->> user-password := ['Pssst!'].
+>> brugerkodeord := ['Pssst!'].
 ```
 
 Ugyldige variabler er for eksempel:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['negativt tal'].
+>> password of bruger := ['Hemmeligt'].
+>> password.of:bruger := ['Hemmeligt'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ objekt ved at sende det en opfølgende besked:
 
 ```
 Uddata skriv:
-[' hello '] trim store-bogstaver.
+[' hej '] trim store-bogstaver.
 ```
 
 ```
-HELLO
+HEJ
 ```
 
 Her sendes to beskeder til **Tekst**-objektet: **trim**, efterfulgt
@@ -668,7 +668,7 @@ til enten et **Sand**-objekt eller et **Falsk**-objekt:
 
 ```
 2 lige? sand: {
-	Uddata skriv: ['Two is an even number'], stop.
+	Uddata skriv: ['To er et lige tal'], stop.
 }.
 ```
 I det foregående eksempel sendes beskeden **sand:** til **Sand** (svaret
@@ -880,9 +880,9 @@ Du kan genbruge tidligere skrevet kode til at skabe et hierarki
 af objekter. For eksempel:
 
 ```
->> Animal := Objekt ny.
->> Dog := Animal ny.
->> Poodle := Dog ny.
+>> Dyr := Objekt ny.
+>> Hund := Dyr ny.
+>> Puddel := Hund ny.
 ```
 
 I dette tilfælde arver **Dog** al opførsel og alle egenskaber
@@ -918,7 +918,7 @@ at den endelige addition til sidst stadig skal udføres, hvilket faktisk
 sker på følgende linje:
 
 ```
->> answer := selv + (tal x factor).
+>> svar := selv + (tal x faktor).
 ```
 
 Hvordan forstår XOScript så, at dette plus**tegn** henviser til
@@ -954,14 +954,14 @@ Selvom xoscript ikke tilbyder klasser, er det trivielt at efterligne
 klasselignende opførsel. Du overskriver blot beskeden ny.
 
 ```
->> Animal := Objekt ny.
-Animal ved: ['ny'] gør: {
+>> Dyr := Objekt ny.
+Dyr ved: ['ny'] gør: {
 	<- selv ny initialiser.
 }.
 
-Animal ved: ['initialiser'] gør: {
-	egen sound := ['?'].
-	egen legs  := 4.
+Dyr ved: ['initialiser'] gør: {
+	egen lyd := ['?'].
+	egen ben  := 4.
 }.
 ```
 
@@ -981,7 +981,7 @@ har et dyr 4 ben, og lyden er ukendt (deraf spørgsmålstegnet).
 For at oprette en ny instans af vores Animal kunne vi blot skrive:
 
 ```
->> a := Animal ny.
+>> a := Dyr ny.
 ```
 
 Nu får vi en ny instans af Animal med 4 ben, ukendt lyd og
@@ -989,18 +989,18 @@ en initialiser-metode. Ligesom i andre OOP-sprog kan vi også
 udvide vores Animal:
 
 ```
->> Dog := Animal ny.
-Dog ved: ['initialiser'] gør: {
+>> Hund := Dyr ny.
+Hund ved: ['initialiser'] gør: {
 	selv initialiser.
-	egen sound := ['barks'].
+	egen lyd := ['gør'].
 }.
 ```
 
 Vi kan nemt teste dette ved at tilføje en tekst-metode:
 
 ```
-Animal ved: ['tekst'] gør: {
-	<- egen legs tekst + egen sound.
+Dyr ved: ['tekst'] gør: {
+	<- egen ben tekst + egen lyd.
 }.
 ```
 
@@ -1015,10 +1015,10 @@ for at beregne omkreds og areal. En mulig notation ville være:
 
 
 ```
->> Rectangle := Objekt ny.
+>> Rektangel := Objekt ny.
 
-Rectangle ved: ['area'] gør: {
-	<- egen længde * egen width.
+Rektangel ved: ['areal'] gør: {
+	<- egen længde * egen bredde.
 }.
 ```
 
@@ -1027,12 +1027,12 @@ formål kan beskederne **længde:** og **width:** tilføjes:
 
 
 ```
-Rectangle ved: ['length:'] gør: { :længde
+Rektangel ved: ['length:'] gør: { :længde
 	egen længde := længde.
 }.
 
-Rectangle ved: ['width:'] gør: { :width
-	egen width := width.
+Rektangel ved: ['width:'] gør: { :bredde
+	egen bredde := bredde.
 }.
 
 ```
@@ -1041,16 +1041,16 @@ Dette rektangel kan derefter bruges som følger:
 
 
 ```
->> rectangle := Rectangle ny length: 2, width: 3.
-Uddata skriv: rectangle area.
+>> rektangel := Rektangel ny length: 2, width: 3.
+Uddata skriv: rektangel areal.
 ```
 
 Hvis man derimod glemmer at angive længde og bredde fra starten,
 opstår der en fejlmeddelelse:
 
 ```
->> rectangle := Rectangle ny.
-Uddata skriv: rectangle area.
+>> rektangel := Rektangel ny.
+Uddata skriv: rektangel areal.
 ```
 
 giver følgende fejl:
@@ -1076,13 +1076,13 @@ vil alle disse kerneobjekter blive gennemgået.
 Du kan gemme et objekt (sammen med dets aktuelle tilstand) på disken med:
 
 ```
-myobject save-as: ['saved.bin'].
+mitobjekt save-as: ['saved.bin'].
 ```
 
 For at indlæse objektet fra disken igen:
 
 ```
->> myobject := Objekt load-from: ['saved.bin'].
+>> mitobjekt := Objekt load-from: ['saved.bin'].
 ```
 
 Øjebliksbilleder kan bruges til at gemme en bestemt tilstand eller til at forbedre ydeevnen.
@@ -1202,8 +1202,8 @@ til en variabel og sende beskeder bagefter:
 ```
 10 lige?
 
->> tenner := 10.
-tenner lige?
+>> tier := 10.
+tier lige?
 
 ```
 
@@ -1433,10 +1433,10 @@ Her er en vigtig faldgrube:
 ```
 {
 	Falsk falsk: {
-		Uddata skriv: ['End the loop.'].
+		Uddata skriv: ['Afslut løkken.'].
 	}, afbryd.
 	
-	Uddata skriv: ['Dont show me.'].
+	Uddata skriv: ['Vis mig ikke.'].
 
 } procedure.
 
@@ -1450,10 +1450,10 @@ en afbrydelse, skal den sendes som en besked til **Sand**.
 ```
 {
 	Falsk ikke sand: {
-		Uddata skriv: ['End the loop.'].
+		Uddata skriv: ['Afslut løkken.'].
 	}, afbryd.
 	
-	Uddata skriv: ['Dont show me.'].
+	Uddata skriv: ['Vis mig ikke.'].
 
 } procedure.
 
@@ -1466,7 +1466,7 @@ Virker som forventet.
 Undtagelser kan håndteres sådan her:
 
 ```
-{ Task 1 } fang: { Task 2 }, start.
+{ Opgave 1 } fang: { Opgave 2 }, start.
 ```
 
 Du kan også med vilje få en fejl til at opstå i dit program og
@@ -1476,9 +1476,9 @@ næste illustration:
 
 ```
 {
-denne-opgave fejl: ['Whoops!'].
-} fang: { :mistake
-Uddata skriv: mistake.
+denne-opgave fejl: ['Hovsa!'].
+} fang: { :fejltagelse
+Uddata skriv: fejltagelse.
 }, start.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript giver mulighed for at indsprøjte værdier i opgaver. Se nu
 på opgaven nedenfor:
 
 ```
->> sending := {
-	Newsletter til: egen recipient.
+>> afsendelse := {
+	Nyhedsbrev til: egen recipient.
 }.
-sending sæt: ['recipient']
+afsendelse sæt: ['recipient']
 værdi: ['info@recipient.org'].
-sending start.
+afsendelse start.
 ```
 
 
@@ -1512,20 +1512,20 @@ ud: **{}**, men XOScript opfatter dette som en sprogfejl. Hvis du
 vil erklære en tom opgave, kan du bruge Intet-objektet:
 
 ```
->> task := Intet.
+>> opgave := Intet.
 ```
 
 Selvom dette ikke er en rigtig opgave, men et Intet-objekt, kan der
 stadig sendes en start-besked:
 
 ```
->> answer := task start.
+>> svar := opgave start.
 ```
 
 Det er faktisk det samme som:
 
 ```
->> answer := Intet start.
+>> svar := Intet start.
 ```
 
 Fordi objektet **Intet** ikke genkender beskeden **start**,
@@ -1700,8 +1700,8 @@ sådan liste er en prisliste, som f.eks.:
 
 ```
 >> menu := Ordbog ny
-	sæt: ['£5'] ved: ['apple pie'],
-	sæt: ['£6'] ved: ['carrot cake'],
+	sæt: ['£5'] ved: ['æbletærte'],
+	sæt: ['£6'] ved: ['gulerodskage'],
 	sæt: ['£3'] ved: ['fudge'].
 ```
 
@@ -1845,7 +1845,7 @@ Det er også muligt at spørge Program-objektet, om et
 givet objekt allerede findes i programmet:
 
 ```
-Program Tool sand: { ... }.
+Program Værktøj sand: { ... }.
 ```
 
 Hvis et objektnavn
@@ -1893,9 +1893,9 @@ Program brug: ['template.xo'].
 Du kan angive følgende serverindstillinger:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# standardværdier er angivet,
+	# så hvis du ikke indstiller noget, bruges
+	# disse værdier...
 
 	Program 
 	indstilling: ['max-postfields']
@@ -1923,9 +1923,9 @@ velkendt server.
 Server initialiser.
 Program brug: ['webtools.xo'].
 
->> web-document := Webdokument ny.
+>> web-dokument := Webdokument ny.
 
-web-document udskriv: ['
+web-dokument udskriv: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ så skal du selv skrive HTTP-headerne:
 ```
 #!/bin/xo
 Uddata skriv: ['Content-type: text/html; charset=utf-8 \n\n'], stop.
-Uddata skriv: ['hello world!'], stop.
+Uddata skriv: ['hej verden!'], stop.
 ``` 
 
 ## Forespørgsel
@@ -1951,13 +1951,13 @@ UPLOAD-data:
 ```
 >> http-forespørgsel  := HTTP-Forespørgsel ny.
 >> search   := http-forespørgsel get: ['search']. # ?search=books
->> password := http-forespørgsel post: ['password']. # from form
->> selected := http-forespørgsel get-liste: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := http-forespørgsel post-liste: ['sel[]'].
+>> password := http-forespørgsel post: ['password']. # fra formularen
+>> valgte := http-forespørgsel get-liste: ['sel[]']. #?sel[]=1&sel[]=2
+>> valgte := http-forespørgsel post-liste: ['sel[]'].
 >> cookie   := http-forespørgsel cookie: ['session-id'].
 >> upload   := http-forespørgsel upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> midlsti := upload ? 1.
+>> filnavn := upload ? 0.
 ```
 
 ## Maxpost/længde
@@ -2007,7 +2007,7 @@ Sådan indsætter du en post:
 >> søgeparametre := db forespørgsel: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametre: ( Liste ny ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametre: ( Liste ny ; ['abc'] ; 12.35 ; 6 ). # parameteriserede forespørgsler
 
 {  søgeparametre udfør. db bekræft. }
 fang: { :e db rul-tilbage.  }, start.
@@ -2021,7 +2021,7 @@ til SQL'en.
 Hent det indsatte id sådan her:
 
 ```
-Uddata skriv: ['INSERTED: '] + søgeparametre insert-id, stop. # insert id
+Uddata skriv: ['INDSAT: '] + søgeparametre insert-id, stop. # indsat id
 ```
 
 Sådan henter du poster:
@@ -2030,9 +2030,9 @@ Sådan henter du poster:
 >> søgeparametre :=
 db
 	forespørgsel: ['SELECT * FROM book order by id desc limit 2'], 
-	hent: { :row 
-		Uddata skriv: row id + [' '] + row description + [': '] + row price, stop.
-	}. # fetching rows
+	hent: { :række 
+		Uddata skriv: række id + [' '] + række description + [': '] + række price, stop.
+	}. # hentning af rækker
 
 ```
 
@@ -2053,15 +2053,15 @@ dokument, der indeholder både headere og HTML eller andre data).
 
 
 ```
-# First we make a new Web Document instance
+# Først laver vi en ny Webdokument-instans
 >> web := Webdokument ny.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web start-session.
+# Nu starter vi en session; det genererer en header til en cookie og
+# opretter en fil til dine data, knyttet til den cookie
+>> sessionen := web start-session.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Nu kan vi behandle sessionen som en Ordbog
+sessionen userid: 123.
 ```
 
 Sådan nedlægger du sessionen (ved logud):
@@ -2096,7 +2096,7 @@ web header: (
 Sådan viser du en 404-side:
 
 ```
-web ikke-fundet: ['OOps..'].
+web ikke-fundet: ['Ups..'].
 ```
 
 
@@ -2160,8 +2160,8 @@ Resultat:
 For at levere filer, som brugere har uploadet, på en sikker måde kan du bruge passthru:
 
 ```
->> uploaded := ['smile.gif'].
-Server videresend: uploaded præfiks: ['/uploads/images/'].
+>> uploadet := ['smile.gif'].
+Server videresend: uploadet præfiks: ['/uploads/images/'].
 Program afslut.
 ```
 
@@ -2191,7 +2191,7 @@ Sådan koder du et objekt som JSON:
 Sådan afkoder du JSON til et xoscript-objekt:
 
 ```
->> dict := ((JSON objekt: json) abc ? 1).
+>> ordbogen := ((JSON objekt: json) abc ? 1).
 ```
 
 JSON med mere end 500 niveauers indlejring afvises som ugyldig.
@@ -2199,7 +2199,7 @@ JSON med mere end 500 niveauers indlejring afvises som ugyldig.
 Sådan sender du en Ordbog direkte ud som json med de korrekte headere:
 
 ```
-web json: dict.
+web json: ordbogen.
 ```
 
 
@@ -2215,7 +2215,7 @@ Mønster ny: ['href="([^"]+)" target="([^"]+)"'].
 Anvend nu mønsteret på emneteksten sådan her:
 
 ```
-pattern match: emne gør: { :m :x .... }
+mønstret match: emne gør: { :m :x .... }
 ```
 
 Fuldt eksempel:
@@ -2225,13 +2225,13 @@ Fuldt eksempel:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Mønster ny: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern match: emne gør: { :m :x
+>> mønstret := Mønster ny: ['href="([^"]+)" target="([^"]+)"'].
+>> resultat  := mønstret match: emne gør: { :m :x
 	Uddata skriv: m, stop.
 	Uddata skriv: x, stop.
 	<- ['XXX'].
 }.
-Uddata skriv: result, stop.
+Uddata skriv: resultat, stop.
 ```
 
 ## Netværk
@@ -2254,8 +2254,8 @@ Server-pluginnet leveres med kryptering baseret på XChaCha20 og Argon2.
 Eksempel:
 
 ```
->> encrypted := Boks kryptér: ['hello'] nøgle: ['world'].
->> decrypted := Boks kryptér: encrypted nøgle: ['world'].
+>> krypteret := Boks kryptér: ['hello'] nøgle: ['world'].
+>> dekrypteret := Boks kryptér: krypteret nøgle: ['world'].
 ```
 
 ## Tokens
@@ -2263,7 +2263,7 @@ Eksempel:
 Sådan genererer du et kryptografisk sikkert token med en bestemt længde:
 
 ```
->> mytok := Boks token: 40.
+>> mintok := Boks token: 40.
 ```
 
 Dette genererer et token på 40 tegn.
@@ -2275,7 +2275,7 @@ tilføjelse af nuller. Det bruger printf-syntaksen.
 
 ```
 >> fmt := Format ny: ['%06.0f'].
-fmt anvend: 56. # gives 000056
+fmt anvend: 56. # giver 000056
 ```
 
 Et format kan indeholde én konvertering, og den skal passe til værdien,
@@ -2305,7 +2305,7 @@ For sikkert at indsætte brugerinput i din HTML uden at risikere XSS-injektioner
 skal du altid bruge:
 
 ```
-Server html-kode: ['<harmless>'].
+Server html-kode: ['<harmløs>'].
 ```
 
 Bemærk, at skabelonmotoren altid udfører HTML-kodning,
@@ -2322,10 +2322,10 @@ Eksempel:
 Server initialiser.
 Program brug: ['mailtools.xo'].
 
->> e-mail := HTML-E-mail ny.
->> img := e-mail vedhæft: ( Fil ny: ['myimage.png'] ).
+>> epost := HTML-E-mail ny.
+>> img := epost vedhæft: ( Fil ny: ['myimage.png'] ).
 
-e-mail
+epost
 afsender: ['xo@xoscript.com'] navn: ['xo'],
 til: ( Liste ny ; ['xo2@xoscipt.com'] ),
 emne: ['xoxo'],
@@ -2441,13 +2441,13 @@ frigive dem). Derfor skal du selv frigive blobs, hvis det er nødvendigt.
 Sådan frigiver du en blob:
 
 ```
-myblob frigiv.
+minblob frigiv.
 ```
 
 Sådan frigiver du en struct:
 
 ```
-mystruct frigiv-struct frigiv.
+minstruct frigiv-struct frigiv.
 ```
 
 For en struct skal du altså sende to beskeder: frigiv-struct og frigiv for

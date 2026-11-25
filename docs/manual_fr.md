@@ -394,7 +394,7 @@ En XOScript, les commentaires commencent par le symbole \#. La ligne suivante
 est donc ignorée :
 
 ```
-# this is just a comment
+# ceci n'est qu'un commentaire
 ```
 
 ## Variables
@@ -413,16 +413,16 @@ Voici des exemples de variables valides :
 >> ♡♡♡ := 3.
 >> $ := ['dollar'].
 >> +plus := Oui.
->> user-password := ['Pssst!'].
+>> mot-de-passe-utilisateur := ['Psst !'].
 ```
 
 Voici par exemple des variables invalides :
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['nombre négatif'].
+>> password of utilisateur := ['Confidentiel'].
+>> password.of:utilisateur := ['Confidentiel'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ objet en lui envoyant un message de suite :
 
 ```
 Sortie écrire:
-[' hello '] rogner majuscules.
+[' bonjour '] rogner majuscules.
 ```
 
 ```
-HELLO
+BONJOUR
 ```
 
 Ici, deux messages sont envoyés à l'objet **Texte** : **rogner**, suivi
@@ -668,7 +668,7 @@ envoyé à un objet **Oui** ou à un objet **Non** :
 
 ```
 2 pair? oui: {
-	Sortie écrire: ['Two is an even number'], stop.
+	Sortie écrire: ['Deux est un nombre pair'], stop.
 }.
 ```
 Dans l'exemple précédent, le message **oui:** est envoyé à **Oui** (la
@@ -881,8 +881,8 @@ d'objets. Par exemple :
 
 ```
 >> Animal := Objet nouveau.
->> Dog := Animal nouveau.
->> Poodle := Dog nouveau.
+>> Chien := Animal nouveau.
+>> Caniche := Chien nouveau.
 ```
 
 Ici, **Dog** hérite de tout le comportement et de toutes les propriétés
@@ -918,7 +918,7 @@ qu'au bout du compte, l'addition finale doit tout de même être effectuée, ce 
 se produit en fait à la ligne suivante :
 
 ```
->> answer := soi + (nombre x factor).
+>> solution := soi + (nombre x facteur).
 ```
 
 Mais comment XOScript comprend-il que ce **signe** plus fait référence à
@@ -960,8 +960,8 @@ Animal quand: ['nouveau'] faire: {
 }.
 
 Animal quand: ['initialiser'] faire: {
-	propre sound := ['?'].
-	propre legs  := 4.
+	propre son := ['?'].
+	propre pattes  := 4.
 }.
 ```
 
@@ -989,10 +989,10 @@ une méthode initialiser. Comme dans d'autres langages orientés objet, nous pou
 étendre notre Animal :
 
 ```
->> Dog := Animal nouveau.
-Dog quand: ['initialiser'] faire: {
+>> Chien := Animal nouveau.
+Chien quand: ['initialiser'] faire: {
 	soi initialiser.
-	propre sound := ['barks'].
+	propre son := ['aboie'].
 }.
 ```
 
@@ -1000,7 +1000,7 @@ Nous pouvons facilement le tester en ajoutant une méthode texte :
 
 ```
 Animal quand: ['texte'] faire: {
-	<- propre legs texte + propre sound.
+	<- propre pattes texte + propre son.
 }.
 ```
 
@@ -1017,8 +1017,8 @@ afin de calculer son périmètre et sa surface. Une notation possible serait :
 ```
 >> Rectangle := Objet nouveau.
 
-Rectangle quand: ['area'] faire: {
-	<- propre longueur * propre width.
+Rectangle quand: ['aire'] faire: {
+	<- propre longueur * propre largeur.
 }.
 ```
 
@@ -1031,8 +1031,8 @@ Rectangle quand: ['length:'] faire: { :longueur
 	propre longueur := longueur.
 }.
 
-Rectangle quand: ['width:'] faire: { :width
-	propre width := width.
+Rectangle quand: ['width:'] faire: { :largeur
+	propre largeur := largeur.
 }.
 
 ```
@@ -1042,7 +1042,7 @@ Ce rectangle peut ensuite être utilisé comme suit :
 
 ```
 >> rectangle := Rectangle nouveau length: 2, width: 3.
-Sortie écrire: rectangle area.
+Sortie écrire: rectangle aire.
 ```
 
 Cependant, si l'on oublie de définir la longueur et la largeur initiales,
@@ -1050,7 +1050,7 @@ un message d'erreur apparaît :
 
 ```
 >> rectangle := Rectangle nouveau.
-Sortie écrire: rectangle area.
+Sortie écrire: rectangle aire.
 ```
 
 produit l'erreur suivante :
@@ -1076,13 +1076,13 @@ tous ces objets de base seront présentés.
 Vous pouvez enregistrer un objet (avec son état actuel) sur disque avec :
 
 ```
-myobject save-as: ['saved.bin'].
+monobjet save-as: ['saved.bin'].
 ```
 
 Pour recharger l'objet depuis le disque :
 
 ```
->> myobject := Objet load-from: ['saved.bin'].
+>> monobjet := Objet load-from: ['saved.bin'].
 ```
 
 Les instantanés permettent d'enregistrer un état donné ou d'améliorer les performances.
@@ -1202,8 +1202,8 @@ pouvez envoyer des messages à cet objet Nombre, ou affecter le nombre
 ```
 10 pair?
 
->> tenner := 10.
-tenner pair?
+>> billetDeDix := 10.
+billetDeDix pair?
 
 ```
 
@@ -1433,10 +1433,10 @@ Voici un piège important :
 ```
 {
 	Non non: {
-		Sortie écrire: ['End the loop.'].
+		Sortie écrire: ['Terminer la boucle.'].
 	}, interrompre.
 	
-	Sortie écrire: ['Dont show me.'].
+	Sortie écrire: ['Ne me montre pas.'].
 
 } procédure.
 
@@ -1450,10 +1450,10 @@ une interruption, elle doit être envoyée comme message à **Oui**.
 ```
 {
 	Non non oui: {
-		Sortie écrire: ['End the loop.'].
+		Sortie écrire: ['Terminer la boucle.'].
 	}, interrompre.
 	
-	Sortie écrire: ['Dont show me.'].
+	Sortie écrire: ['Ne me montre pas.'].
 
 } procédure.
 
@@ -1466,7 +1466,7 @@ Fonctionnera comme prévu.
 Les exceptions peuvent être traitées ainsi :
 
 ```
-{ Task 1 } intercepter: { Task 2 }, démarrer.
+{ Tâche 1 } intercepter: { Tâche 2 }, démarrer.
 ```
 
 Vous pouvez aussi provoquer volontairement une erreur dans votre programme et
@@ -1476,9 +1476,9 @@ l'illustration suivante :
 
 ```
 {
-cette-tâche erreur: ['Whoops!'].
-} intercepter: { :mistake
-Sortie écrire: mistake.
+cette-tâche erreur: ['Oups !'].
+} intercepter: { :méprise
+Sortie écrire: méprise.
 }, démarrer.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript permet d'injecter des valeurs dans les tâches. Regardez
 la tâche ci-dessous :
 
 ```
->> sending := {
-	Newsletter destinataire: propre recipient.
+>> envoi := {
+	Lettre-Info destinataire: propre recipient.
 }.
-sending donner: ['recipient']
+envoi donner: ['recipient']
 valeur: ['info@recipient.org'].
-sending démarrer.
+envoi démarrer.
 ```
 
 
@@ -1512,20 +1512,20 @@ Les tâches vides ne sont pas permises. En théorie, une tâche vide ressemblera
 voulez déclarer une tâche vide, vous pouvez utiliser l'objet Rien :
 
 ```
->> task := Rien.
+>> tâche := Rien.
 ```
 
 Bien qu'il ne s'agisse pas d'une vraie tâche mais d'un objet Rien, on peut
 tout de même lui envoyer un message démarrer :
 
 ```
->> answer := task démarrer.
+>> solution := tâche démarrer.
 ```
 
 En fait, cela revient à :
 
 ```
->> answer := Rien démarrer.
+>> solution := Rien démarrer.
 ```
 
 Comme l'objet **Rien** ne reconnaît pas le message **démarrer**, il
@@ -1700,8 +1700,8 @@ liste est une liste de prix, comme :
 
 ```
 >> menu := Dictionnaire nouveau
-	mettre: ['£5'] à: ['apple pie'],
-	mettre: ['£6'] à: ['carrot cake'],
+	mettre: ['£5'] à: ['tarte aux pommes'],
+	mettre: ['£6'] à: ['gâteau aux carottes'],
 	mettre: ['£3'] à: ['fudge'].
 ```
 
@@ -1845,7 +1845,7 @@ On peut aussi demander à l'objet Programme si un
 objet donné est déjà présent dans le programme :
 
 ```
-Programme Tool oui: { ... }.
+Programme Outil oui: { ... }.
 ```
 
 Lorsque le nom d'un objet
@@ -1893,9 +1893,9 @@ Programme utiliser: ['template.xo'].
 Vous pouvez définir les paramètres de serveur suivants :
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# des valeurs par défaut sont fournies,
+	# donc si vous ne réglez rien, ces
+	# valeurs sont utilisées...
 
 	Programme 
 	paramètre: ['max-postfields']
@@ -1923,9 +1923,9 @@ serveur connu.
 Server initialiser.
 Programme utiliser: ['webtools.xo'].
 
->> web-document := Document-Web nouveau.
+>> document-web := Document-Web nouveau.
 
-web-document sortir: ['
+document-web sortir: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ vous devez alors écrire vous-même les en-têtes HTTP :
 ```
 #!/bin/xo
 Sortie écrire: ['Content-type: text/html; charset=utf-8 \n\n'], stop.
-Sortie écrire: ['hello world!'], stop.
+Sortie écrire: ['bonjour le monde !'], stop.
 ``` 
 
 ## Requête
@@ -1951,13 +1951,13 @@ UPLOAD :
 ```
 >> demande  := Requête-HTTP nouveau.
 >> search   := demande get: ['search']. # ?search=books
->> password := demande post: ['password']. # from form
->> selected := demande get-liste: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := demande post-liste: ['sel[]'].
+>> password := demande post: ['password']. # du formulaire
+>> sélection := demande get-liste: ['sel[]']. #?sel[]=1&sel[]=2
+>> sélection := demande post-liste: ['sel[]'].
 >> cookie   := demande cookie: ['session-id'].
->> upload   := demande upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> téléversement   := demande upload: ['file'].
+>> chemintemp := téléversement ? 1.
+>> nomfichier := téléversement ? 0.
 ```
 
 ## Maxpost/longueur
@@ -1993,7 +1993,7 @@ L'objet Database permet d'interroger MariaDB/MySQL.
 Pour se connecter à une base de données :
 
 ```
->> db := Maria-DB nouveau hôte: ['localhost'],
+>> bd := Maria-DB nouveau hôte: ['localhost'],
 	utilisateur: ['xo'],
 	mot-de-passe: ['pass123'],
 	nom-base: ['xobase'],
@@ -2004,13 +2004,13 @@ Pour se connecter à une base de données :
 Pour insérer un enregistrement, utilisez :
 
 ```
->> paramètres-recherche := db requête: ['
+>> paramètres-recherche := bd requête: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], paramètres: ( Liste nouveau ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], paramètres: ( Liste nouveau ; ['abc'] ; 12.35 ; 6 ). # requêtes paramétrées
 
-{  paramètres-recherche exécuter. db valider. }
-intercepter: { :e db annuler.  }, démarrer.
+{  paramètres-recherche exécuter. bd valider. }
+intercepter: { :e bd annuler.  }, démarrer.
 ```
 
 Notez que xoscript fonctionne *uniquement* avec des transactions et ne valide jamais automatiquement (autocommit).
@@ -2021,18 +2021,18 @@ une saisie utilisateur au SQL.
 Obtenez l'id inséré ainsi :
 
 ```
-Sortie écrire: ['INSERTED: '] + paramètres-recherche insert-id, stop. # insert id
+Sortie écrire: ['INSÉRÉ : '] + paramètres-recherche insert-id, stop. # id inséré
 ```
 
 Pour récupérer des enregistrements :
 
 ```
 >> paramètres-recherche :=
-db
+bd
 	requête: ['SELECT * FROM book order by id desc limit 2'], 
-	récupérer: { :row 
-		Sortie écrire: row id + [' '] + row description + [': '] + row price, stop.
-	}. # fetching rows
+	récupérer: { :rangée 
+		Sortie écrire: rangée id + [' '] + rangée description + [': '] + rangée price, stop.
+	}. # récupération des lignes
 
 ```
 
@@ -2053,14 +2053,14 @@ complet, contenant à la fois les en-têtes et le HTML ou d'autres données).
 
 
 ```
-# First we make a new Web Document instance
+# D'abord, nous créons une nouvelle instance de Document-Web
 >> web := Document-Web nouveau.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
+# Puis nous démarrons une session ; cela génère un en-tête pour un cookie et
+# crée un fichier pour stocker vos données, associé à ce cookie
 >> session := web démarrer-session.
 
-# Now we can treat session like a dict
+# Nous pouvons maintenant traiter la session comme un Dictionnaire
 session userid: 123.
 ```
 
@@ -2096,7 +2096,7 @@ web en-tête: (
 Pour afficher une page 404 :
 
 ```
-web introuvable: ['OOps..'].
+web introuvable: ['Oups..'].
 ```
 
 
@@ -2160,8 +2160,8 @@ Résultat :
 Pour servir de manière sécurisée des fichiers envoyés par les utilisateurs, vous pouvez vous appuyer sur passthru :
 
 ```
->> uploaded := ['smile.gif'].
-Server transmettre: uploaded préfixe: ['/uploads/images/'].
+>> téléversé := ['smile.gif'].
+Server transmettre: téléversé préfixe: ['/uploads/images/'].
 Programme fin.
 ```
 
@@ -2191,7 +2191,7 @@ Pour encoder un objet en JSON :
 Pour décoder du JSON en objet xoscript :
 
 ```
->> dict := ((JSON objet: json) abc ? 1).
+>> dico := ((JSON objet: json) abc ? 1).
 ```
 
 Un JSON comportant plus de 500 niveaux d'imbrication est rejeté comme invalide.
@@ -2199,7 +2199,7 @@ Un JSON comportant plus de 500 niveaux d'imbrication est rejeté comme invalide.
 Pour envoyer directement un Dictionnaire en json avec les bons en-têtes :
 
 ```
-web json: dict.
+web json: dico.
 ```
 
 
@@ -2215,7 +2215,7 @@ Motif nouveau: ['href="([^"]+)" target="([^"]+)"'].
 Appliquez ensuite le motif au texte à analyser comme ceci :
 
 ```
-pattern correspondance: sujet faire: { :m :x .... }
+regex correspondance: sujet faire: { :m :x .... }
 ```
 
 Exemple complet :
@@ -2225,13 +2225,13 @@ Exemple complet :
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Motif nouveau: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern correspondance: sujet faire: { :m :x
+>> regex := Motif nouveau: ['href="([^"]+)" target="([^"]+)"'].
+>> résultat  := regex correspondance: sujet faire: { :m :x
 	Sortie écrire: m, stop.
 	Sortie écrire: x, stop.
 	<- ['XXX'].
 }.
-Sortie écrire: result, stop.
+Sortie écrire: résultat, stop.
 ```
 
 ## Réseau
@@ -2254,8 +2254,8 @@ Le plugin serveur fournit un chiffrement basé sur XChaCha20 et Argon2.
 Exemple :
 
 ```
->> encrypted := Coffre chiffrer: ['hello'] clé: ['world'].
->> decrypted := Coffre chiffrer: encrypted clé: ['world'].
+>> chiffré := Coffre chiffrer: ['hello'] clé: ['world'].
+>> déchiffré := Coffre chiffrer: chiffré clé: ['world'].
 ```
 
 ## Jetons
@@ -2263,7 +2263,7 @@ Exemple :
 Pour générer un jeton cryptographiquement sûr d'une longueur donnée :
 
 ```
->> mytok := Coffre jeton: 40.
+>> monjeton := Coffre jeton: 40.
 ```
 
 Cela génère un jeton de 40 caractères.
@@ -2275,7 +2275,7 @@ en ajoutant des zéros. Il utilise la syntaxe de printf.
 
 ```
 >> fmt := Format nouveau: ['%06.0f'].
-fmt appliquer: 56. # gives 000056
+fmt appliquer: 56. # donne 000056
 ```
 
 Un format peut contenir une seule conversion, et celle-ci doit correspondre à la valeur ;
@@ -2322,10 +2322,10 @@ Exemple :
 Server initialiser.
 Programme utiliser: ['mailtools.xo'].
 
->> e-mail := E-mail-HTML nouveau.
->> img := e-mail attacher: ( Fichier nouveau: ['myimage.png'] ).
+>> courriel-html := E-mail-HTML nouveau.
+>> img := courriel-html attacher: ( Fichier nouveau: ['myimage.png'] ).
 
-e-mail
+courriel-html
 expéditeur: ['xo@xoscript.com'] nom: ['xo'],
 destinataire: ( Liste nouveau ; ['xo2@xoscipt.com'] ),
 sujet: ['xoxo'],
@@ -2441,13 +2441,13 @@ elles-mêmes). Vous devez donc libérer les blobs vous-même si nécessaire.
 Pour libérer un blob, utilisez :
 
 ```
-myblob libérer.
+monblob libérer.
 ```
 
 Pour libérer une struct, utilisez :
 
 ```
-mystruct libérer-struct libérer.
+monstruct libérer-struct libérer.
 ```
 
 Pour une struct, vous devez donc envoyer deux messages, libérer-struct et libérer, pour

@@ -394,7 +394,7 @@ Comentariile în XOScript sunt precedate de simbolul \#. Astfel, următorul rân
 va fi ignorat:
 
 ```
-# this is just a comment
+# acesta este doar un comentariu
 ```
 
 ## Variabile
@@ -411,18 +411,18 @@ Iată exemple de variabile valide:
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
->> $ := ['dollar'].
+>> $ := ['dolar'].
 >> +plus := Adevărat.
->> user-password := ['Pssst!'].
+>> parola-utilizator := ['Pssst!'].
 ```
 
 Variabile invalide sunt, de exemplu:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['număr negativ'].
+>> password of utilizator := ['Confidențial'].
+>> password.of:utilizator := ['Confidențial'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ obiect prin trimiterea unui mesaj următor:
 
 ```
 Ieșire scrie:
-[' hello '] curăță-spații majuscule.
+[' salut '] curăță-spații majuscule.
 ```
 
 ```
-HELLO
+SALUT
 ```
 
 Aici, obiectului **Text** îi sunt trimise două mesaje: **curăță-spații**, urmat
@@ -668,7 +668,7 @@ trimis fie unui obiect **Adevărat**, fie unui obiect **Fals**:
 
 ```
 2 par? adevărat: {
-	Ieșire scrie: ['Two is an even number'], rând-nou.
+	Ieșire scrie: ['Doi este un număr par'], rând-nou.
 }.
 ```
 În exemplul anterior, mesajul **adevărat:** este trimis către **Adevărat** (răspunsul
@@ -881,8 +881,8 @@ de obiecte. De exemplu:
 
 ```
 >> Animal := Obiect nou.
->> Dog := Animal nou.
->> Poodle := Dog nou.
+>> Câine := Animal nou.
+>> Pudel := Câine nou.
 ```
 
 În acest caz, **Dog** moștenește tot comportamentul și toate proprietățile
@@ -918,7 +918,7 @@ că, în cele din urmă, adunarea finală tot trebuie efectuată, ceea ce, de fa
 are loc pe rândul următor:
 
 ```
->> answer := sine + (număr x factor).
+>> răspuns := sine + (număr x factor).
 ```
 
 Cum înțelege însă XOScript că acest **semn** plus se referă la
@@ -960,8 +960,8 @@ Animal la: ['nou'] execută: {
 }.
 
 Animal la: ['inițializează'] execută: {
-	propriu sound := ['?'].
-	propriu legs  := 4.
+	propriu sunet := ['?'].
+	propriu picioare  := 4.
 }.
 ```
 
@@ -989,10 +989,10 @@ o metodă inițializează. La fel ca în alte limbaje OOP, putem de asemenea
 să extindem Animal:
 
 ```
->> Dog := Animal nou.
-Dog la: ['inițializează'] execută: {
+>> Câine := Animal nou.
+Câine la: ['inițializează'] execută: {
 	sine inițializează.
-	propriu sound := ['barks'].
+	propriu sunet := ['latră'].
 }.
 ```
 
@@ -1000,7 +1000,7 @@ Putem testa ușor acest lucru adăugând o metodă text:
 
 ```
 Animal la: ['text'] execută: {
-	<- propriu legs text + propriu sound.
+	<- propriu picioare text + propriu sunet.
 }.
 ```
 
@@ -1015,10 +1015,10 @@ pentru a calcula perimetrul și aria. O notație posibilă ar fi:
 
 
 ```
->> Rectangle := Obiect nou.
+>> Dreptunghi := Obiect nou.
 
-Rectangle la: ['area'] execută: {
-	<- propriu lungime * propriu width.
+Dreptunghi la: ['arie'] execută: {
+	<- propriu lungime * propriu lățime.
 }.
 ```
 
@@ -1027,12 +1027,12 @@ scop pot fi adăugate mesajele **lungime:** și **width:**:
 
 
 ```
-Rectangle la: ['length:'] execută: { :lungime
+Dreptunghi la: ['length:'] execută: { :lungime
 	propriu lungime := lungime.
 }.
 
-Rectangle la: ['width:'] execută: { :width
-	propriu width := width.
+Dreptunghi la: ['width:'] execută: { :lățime
+	propriu lățime := lățime.
 }.
 
 ```
@@ -1041,16 +1041,16 @@ Acest dreptunghi poate fi apoi folosit astfel:
 
 
 ```
->> rectangle := Rectangle nou length: 2, width: 3.
-Ieșire scrie: rectangle area.
+>> dreptunghi := Dreptunghi nou length: 2, width: 3.
+Ieșire scrie: dreptunghi arie.
 ```
 
 Totuși, dacă setarea inițială a lungimii și lățimii este omisă,
 va apărea un mesaj de eroare:
 
 ```
->> rectangle := Rectangle nou.
-Ieșire scrie: rectangle area.
+>> dreptunghi := Dreptunghi nou.
+Ieșire scrie: dreptunghi arie.
 ```
 
 va produce următoarea eroare:
@@ -1076,13 +1076,13 @@ vor fi discutate toate aceste obiecte de bază.
 Puteți salva un obiect (împreună cu starea sa curentă) pe disc cu:
 
 ```
-myobject save-as: ['saved.bin'].
+obiectulmeu save-as: ['saved.bin'].
 ```
 
 Pentru a reîncărca obiectul de pe disc:
 
 ```
->> myobject := Obiect load-from: ['saved.bin'].
+>> obiectulmeu := Obiect load-from: ['saved.bin'].
 ```
 
 Instantaneele pot fi folosite pentru a salva o anumită stare sau pentru a îmbunătăți performanța.
@@ -1202,8 +1202,8 @@ unei variabile și trimite mesaje ulterior:
 ```
 10 par?
 
->> tenner := 10.
-tenner par?
+>> zecar := 10.
+zecar par?
 
 ```
 
@@ -1433,10 +1433,10 @@ Iată o capcană importantă:
 ```
 {
 	Fals fals: {
-		Ieșire scrie: ['End the loop.'].
+		Ieșire scrie: ['Încheie bucla.'].
 	}, întrerupe.
 	
-	Ieșire scrie: ['Dont show me.'].
+	Ieșire scrie: ['Nu mă arăta.'].
 
 } procedură.
 
@@ -1450,10 +1450,10 @@ o întrerupere, ea trebuie trimisă ca mesaj către **Adevărat**.
 ```
 {
 	Fals nu adevărat: {
-		Ieșire scrie: ['End the loop.'].
+		Ieșire scrie: ['Încheie bucla.'].
 	}, întrerupe.
 	
-	Ieșire scrie: ['Dont show me.'].
+	Ieșire scrie: ['Nu mă arăta.'].
 
 } procedură.
 
@@ -1466,7 +1466,7 @@ Va funcționa conform așteptărilor.
 Excepțiile pot fi tratate astfel:
 
 ```
-{ Task 1 } prinde: { Task 2 }, pornește.
+{ Sarcină 1 } prinde: { Sarcină 2 }, pornește.
 ```
 
 Puteți de asemenea provoca intenționat o eroare în program și,
@@ -1476,9 +1476,9 @@ ilustrație:
 
 ```
 {
-această-sarcină eroare: ['Whoops!'].
-} prinde: { :mistake
-Ieșire scrie: mistake.
+această-sarcină eroare: ['Hopa!'].
+} prinde: { :greșeală
+Ieșire scrie: greșeală.
 }, pornește.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript oferă sarcinilor posibilitatea de a injecta valori. Priviți
 sarcina de mai jos:
 
 ```
->> sending := {
-	Newsletter către: propriu recipient.
+>> trimitere := {
+	Buletin către: propriu recipient.
 }.
-sending setează: ['recipient']
+trimitere setează: ['recipient']
 valoare: ['info@recipient.org'].
-sending pornește.
+trimitere pornește.
 ```
 
 
@@ -1512,20 +1512,20 @@ așa: **{}**, însă XOScript consideră aceasta o eroare de limbaj. Dacă
 doriți să declarați o sarcină goală, puteți folosi obiectul Nimic:
 
 ```
->> task := Nimic.
+>> sarcină := Nimic.
 ```
 
 Deși aceasta nu este o sarcină reală, ci un obiect Nimic, i se poate
 totuși trimite un mesaj pornește:
 
 ```
->> answer := task pornește.
+>> răspuns := sarcină pornește.
 ```
 
 De fapt, este același lucru cu:
 
 ```
->> answer := Nimic pornește.
+>> răspuns := Nimic pornește.
 ```
 
 Deoarece obiectul **Nimic** nu recunoaște mesajul **pornește**,
@@ -1699,9 +1699,9 @@ listă este o listă de prețuri, de exemplu:
 
 
 ```
->> menu := Dicționar nou
-	pune: ['£5'] la: ['apple pie'],
-	pune: ['£6'] la: ['carrot cake'],
+>> meniu := Dicționar nou
+	pune: ['£5'] la: ['plăcintă cu mere'],
+	pune: ['£6'] la: ['prăjitură cu morcovi'],
 	pune: ['£3'] la: ['fudge'].
 ```
 
@@ -1716,13 +1716,13 @@ poate fi găsită semnificația. De exemplu, pentru a obține din
 lista menționată mai sus prețul unui fudge:
 
 ```
->> price := menu la: ['fudge'].
+>> price := meniu la: ['fudge'].
 ```
 
 Puteți folosi și notația concisă:
 
 ```
->> price := menu ? ['fudge'].
+>> price := meniu ? ['fudge'].
 ```
 
 Dacă intrările pe care le folosiți pentru a stoca obiecte nu conțin spații
@@ -1730,7 +1730,7 @@ Dacă intrările pe care le folosiți pentru a stoca obiecte nu conțin spații
 poate fi folosită și notația următoare:
 
 ```
->> menu := Dicționar nou
+>> meniu := Dicționar nou
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1741,7 +1741,7 @@ Pentru a cere prețul unui
 fudge, se poate folosi următoarea notație simplificată:
 
 ```
->> price := menu fudge.
+>> price := meniu fudge.
 ```
 
 @api_Dict_collections
@@ -1845,7 +1845,7 @@ Este de asemenea posibil să întrebați obiectul Program dacă un
 anumit obiect este deja prezent în program:
 
 ```
-Program Tool adevărat: { ... }.
+Program Unealtă adevărat: { ... }.
 ```
 
 În cazul unui nume de obiect
@@ -1893,9 +1893,9 @@ Program folosește: ['template.xo'].
 Puteți configura următoarele setări ale serverului:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# sunt date valori implicite,
+	# deci dacă nu setați nimic, se folosesc
+	# aceste valori...
 
 	Program 
 	setare: ['max-postfields']
@@ -1923,9 +1923,9 @@ server cunoscut.
 Server inițializează.
 Program folosește: ['webtools.xo'].
 
->> web-document := Document-Web nou.
+>> document-web := Document-Web nou.
 
-web-document scrie-ieșire: ['
+document-web scrie-ieșire: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ atunci trebuie să scrieți singuri antetele HTTP:
 ```
 #!/bin/xo
 Ieșire scrie: ['Content-type: text/html; charset=utf-8 \n\n'], rând-nou.
-Ieșire scrie: ['hello world!'], rând-nou.
+Ieșire scrie: ['salut lume!'], rând-nou.
 ``` 
 
 ## Cererea
@@ -1951,13 +1951,13 @@ UPLOAD:
 ```
 >> cerere  := Cerere-HTTP nou.
 >> search   := cerere get: ['search']. # ?search=books
->> password := cerere post: ['password']. # from form
->> selected := cerere get-listă: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := cerere post-listă: ['sel[]'].
+>> password := cerere post: ['password']. # din formular
+>> selectate := cerere get-listă: ['sel[]']. #?sel[]=1&sel[]=2
+>> selectate := cerere post-listă: ['sel[]'].
 >> cookie   := cerere cookie: ['session-id'].
->> upload   := cerere upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> încărcare   := cerere upload: ['file'].
+>> caletemp := încărcare ? 1.
+>> numefișier := încărcare ? 0.
 ```
 
 ## Maxpost/length
@@ -1993,7 +1993,7 @@ Obiectul Database poate fi folosit pentru a interoga MariaDB/MySQL.
 Pentru a vă conecta la o bază de date:
 
 ```
->> db := Maria-DB nou gazdă: ['localhost'],
+>> bd := Maria-DB nou gazdă: ['localhost'],
 	utilizator: ['xo'],
 	parolă: ['pass123'],
 	nume-bază: ['xobase'],
@@ -2004,13 +2004,13 @@ Pentru a vă conecta la o bază de date:
 Pentru a insera o înregistrare folosiți:
 
 ```
->> parametri-căutare := db interogare: ['
+>> parametri-căutare := bd interogare: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametri: ( Listă nou ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametri: ( Listă nou ; ['abc'] ; 12.35 ; 6 ). # interogări parametrizate
 
-{  parametri-căutare execută-interogare. db confirmă. }
-prinde: { :e db anulează.  }, pornește.
+{  parametri-căutare execută-interogare. bd confirmă. }
+prinde: { :e bd anulează.  }, pornește.
 ```
 
 Rețineți că xoscript lucrează *doar* cu tranzacții și nu face niciodată autocommit.
@@ -2021,18 +2021,18 @@ Folosiți întotdeauna legarea parametrilor în interogări; nu adăugați nicio
 Obțineți id-ul inserat astfel:
 
 ```
-Ieșire scrie: ['INSERTED: '] + parametri-căutare insert-id, rând-nou. # insert id
+Ieșire scrie: ['INSERAT: '] + parametri-căutare insert-id, rând-nou. # id-ul inserat
 ```
 
 Pentru a prelua înregistrări:
 
 ```
 >> parametri-căutare :=
-db
+bd
 	interogare: ['SELECT * FROM book order by id desc limit 2'], 
-	preia: { :row 
-		Ieșire scrie: row id + [' '] + row description + [': '] + row price, rând-nou.
-	}. # fetching rows
+	preia: { :rând 
+		Ieșire scrie: rând id + [' '] + rând description + [': '] + rând price, rând-nou.
+	}. # preluarea rândurilor
 
 ```
 
@@ -2053,15 +2053,15 @@ care conține atât antetele, cât și HTML-ul sau alte date).
 
 
 ```
-# First we make a new Web Document instance
+# Mai întâi creăm o nouă instanță Document-Web
 >> web := Document-Web nou.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web pornește-sesiune.
+# Acum pornim o sesiune; aceasta va genera un antet pentru un cookie și
+# va crea un fișier pentru datele dumneavoastră, asociat cu acel cookie
+>> sesiune := web pornește-sesiune.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Acum putem trata sesiunea ca pe un Dicționar
+sesiune userid: 123.
 ```
 
 Pentru a distruge sesiunea (la deconectare):
@@ -2096,7 +2096,7 @@ web antet: (
 Pentru a afișa o pagină 404:
 
 ```
-web negăsit: ['OOps..'].
+web negăsit: ['Ups..'].
 ```
 
 
@@ -2160,8 +2160,8 @@ Rezultat:
 Pentru a servi în siguranță fișierele încărcate de utilizatori vă puteți baza pe passthru:
 
 ```
->> uploaded := ['smile.gif'].
-Server transmite: uploaded prefix: ['/uploads/images/'].
+>> încărcat := ['smile.gif'].
+Server transmite: încărcat prefix: ['/uploads/images/'].
 Program sfârșit.
 ```
 
@@ -2191,7 +2191,7 @@ Pentru a codifica un obiect ca JSON:
 Pentru a decodifica JSON într-un obiect xoscript:
 
 ```
->> dict := ((JSON obiect: json) abc ? 1).
+>> dicț := ((JSON obiect: json) abc ? 1).
 ```
 
 JSON cu mai mult de 500 de niveluri de imbricare este respins ca invalid.
@@ -2199,7 +2199,7 @@ JSON cu mai mult de 500 de niveluri de imbricare este respins ca invalid.
 Pentru a trimite direct un Dicționar ca json cu antetele corecte:
 
 ```
-web json: dict.
+web json: dicț.
 ```
 
 
@@ -2215,7 +2215,7 @@ De exemplu, pentru a găsi atributele href și target ale hiperlegăturilor:
 Acum aplicați șablonul textului subiect astfel:
 
 ```
-pattern potrivire: subiect fă: { :m :x .... }
+tipar potrivire: subiect fă: { :m :x .... }
 ```
 
 Exemplu complet:
@@ -2225,13 +2225,13 @@ Exemplu complet:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Șablon nou: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern potrivire: subiect fă: { :m :x
+>> tipar := Șablon nou: ['href="([^"]+)" target="([^"]+)"'].
+>> rezultat  := tipar potrivire: subiect fă: { :m :x
 	Ieșire scrie: m, rând-nou.
 	Ieșire scrie: x, rând-nou.
 	<- ['XXX'].
 }.
-Ieșire scrie: result, rând-nou.
+Ieșire scrie: rezultat, rând-nou.
 ```
 
 ## Rețea
@@ -2254,8 +2254,8 @@ Pluginul de server vine cu criptare bazată pe XChaCha20 și Argon2.
 Exemplu:
 
 ```
->> encrypted := Seif criptează: ['hello'] cheie: ['world'].
->> decrypted := Seif criptează: encrypted cheie: ['world'].
+>> criptat := Seif criptează: ['hello'] cheie: ['world'].
+>> decriptat := Seif criptează: criptat cheie: ['world'].
 ```
 
 ## Jetoane
@@ -2263,7 +2263,7 @@ Exemplu:
 Pentru a genera un jeton sigur din punct de vedere criptografic, de o anumită lungime:
 
 ```
->> mytok := Seif jeton: 40.
+>> jetonulmeu := Seif jeton: 40.
 ```
 
 Aceasta va genera un jeton de 40 de caractere.
@@ -2275,7 +2275,7 @@ adăugarea de zerouri. Folosește sintaxa printf.
 
 ```
 >> fmt := Format nou: ['%06.0f'].
-fmt aplică: 56. # gives 000056
+fmt aplică: 56. # dă 000056
 ```
 
 Un format poate conține o singură conversie, iar aceasta trebuie să se potrivească valorii,
@@ -2305,7 +2305,7 @@ Pentru a injecta în siguranță datele introduse de utilizator în HTML fără 
 injecții XSS, folosiți întotdeauna:
 
 ```
-Server html-codifică: ['<harmless>'].
+Server html-codifică: ['<inofensiv>'].
 ```
 
 Rețineți că motorul de șabloane va face întotdeauna codificarea html
@@ -2441,13 +2441,13 @@ ele însele). Prin urmare, trebuie să eliberați singuri blob-urile, dacă este
 Pentru a elibera un blob folosiți:
 
 ```
-myblob eliberează.
+blobulmeu eliberează.
 ```
 
 Pentru a elibera o structură folosiți:
 
 ```
-mystruct eliberează-struct eliberează.
+structuramea eliberează-struct eliberează.
 ```
 
 Așadar, pentru o structură trebuie să trimiteți două mesaje, eliberează-struct și eliberează, pentru

@@ -160,8 +160,8 @@ i napisz mały program testowy:
 #!/bin/xo
 Server inicjuj.
 Program użyj: ['webtools.xo'].
->> web := Dokument-Web nowy.
-web wypisz: ['Hello World'].
+>> strona := Dokument-Web nowy.
+strona wypisz: ['Hello World'].
 ```
 
 Zezwól apache2 na wykonywanie programu przez CGI:
@@ -394,7 +394,7 @@ Komentarze w XOScript poprzedza się symbolem \#. Zatem następujący wiersz
 zostanie zignorowany:
 
 ```
-# this is just a comment
+# to tylko komentarz
 ```
 
 ## Zmienne
@@ -411,18 +411,18 @@ Oto przykłady poprawnych zmiennych:
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
->> $ := ['dollar'].
+>> $ := ['dolar'].
 >> +plus := Prawda.
->> user-password := ['Pssst!'].
+>> hasło-użytkownika := ['Ciii!'].
 ```
 
 Niepoprawne zmienne to na przykład:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['liczba ujemna'].
+>> password of użytkownika := ['Tajne'].
+>> password.of:użytkownika := ['Tajne'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ obiektem przez wysłanie mu kolejnej wiadomości:
 
 ```
 Wyjście pisz:
-[' hello '] przytnij duże-litery.
+[' witaj '] przytnij duże-litery.
 ```
 
 ```
-HELLO
+WITAJ
 ```
 
 Tutaj do obiektu **Tekst** wysyłane są dwie wiadomości: **przytnij**, a po niej
@@ -668,7 +668,7 @@ wysłana do obiektu **Prawda** albo obiektu **Fałsz**:
 
 ```
 2 parzysta? prawda: {
-	Wyjście pisz: ['Two is an even number'], nowa-linia.
+	Wyjście pisz: ['Dwa to liczba parzysta'], nowa-linia.
 }.
 ```
 W poprzednim przykładzie wiadomość **prawda:** jest wysyłana do **Prawda** (odpowiedzi
@@ -880,9 +880,9 @@ Możesz ponownie wykorzystać wcześniej napisany kod, aby utworzyć hierarchię
 obiektów. Na przykład:
 
 ```
->> Animal := Obiekt nowy.
->> Dog := Animal nowy.
->> Poodle := Dog nowy.
+>> Zwierzę := Obiekt nowy.
+>> Pies := Zwierzę nowy.
+>> Pudel := Pies nowy.
 ```
 
 W tym przypadku **Dog** dziedziczy całe zachowanie i wszystkie właściwości
@@ -918,7 +918,7 @@ W poprzednim przykładzie nadpisano **znak** plus. Zauważ,
 następuje w następującym wierszu:
 
 ```
->> answer := sam + (liczba x factor).
+>> werdykt := sam + (liczba x współczynnik).
 ```
 
 Skąd więc XOScript wie, że ten **znak** plus odnosi się do
@@ -954,14 +954,14 @@ Choć xoscript nie oferuje klas, naśladowanie zachowania
 podobnego do klas jest banalne. Wystarczy nadpisać wiadomość nowy.
 
 ```
->> Animal := Obiekt nowy.
-Animal na: ['nowy'] wykonaj: {
+>> Zwierzę := Obiekt nowy.
+Zwierzę na: ['nowy'] wykonaj: {
 	<- sam nowy inicjuj.
 }.
 
-Animal na: ['inicjuj'] wykonaj: {
-	własny sound := ['?'].
-	własny legs  := 4.
+Zwierzę na: ['inicjuj'] wykonaj: {
+	własny dźwięk := ['?'].
+	własny nogi  := 4.
 }.
 ```
 
@@ -981,7 +981,7 @@ zwierzę ma 4 nogi, a jego odgłos jest nieznany (stąd znak zapytania).
 Aby utworzyć nową instancję naszego Animal, moglibyśmy po prostu napisać:
 
 ```
->> a := Animal nowy.
+>> a := Zwierzę nowy.
 ```
 
 Otrzymujemy teraz nową instancję Animal z 4 nogami, nieznanym odgłosem i
@@ -989,18 +989,18 @@ metodą inicjuj. Podobnie jak w innych językach obiektowych możemy także
 rozszerzyć nasz Animal:
 
 ```
->> Dog := Animal nowy.
-Dog na: ['inicjuj'] wykonaj: {
+>> Pies := Zwierzę nowy.
+Pies na: ['inicjuj'] wykonaj: {
 	sam inicjuj.
-	własny sound := ['barks'].
+	własny dźwięk := ['szczeka'].
 }.
 ```
 
 Łatwo możemy to przetestować, dodając metodę tekst:
 
 ```
-Animal na: ['tekst'] wykonaj: {
-	<- własny legs tekst + własny sound.
+Zwierzę na: ['tekst'] wykonaj: {
+	<- własny nogi tekst + własny dźwięk.
 }.
 ```
 
@@ -1015,10 +1015,10 @@ aby obliczyć obwód i pole. Możliwy zapis wyglądałby tak:
 
 
 ```
->> Rectangle := Obiekt nowy.
+>> Prostokąt := Obiekt nowy.
 
-Rectangle na: ['area'] wykonaj: {
-	<- własny długość * własny width.
+Prostokąt na: ['pole'] wykonaj: {
+	<- własny długość * własny szerokość.
 }.
 ```
 
@@ -1027,12 +1027,12 @@ celu można dodać wiadomości **długość:** i **width:**:
 
 
 ```
-Rectangle na: ['length:'] wykonaj: { :długość
+Prostokąt na: ['length:'] wykonaj: { :długość
 	własny długość := długość.
 }.
 
-Rectangle na: ['width:'] wykonaj: { :width
-	własny width := width.
+Prostokąt na: ['width:'] wykonaj: { :szerokość
+	własny szerokość := szerokość.
 }.
 
 ```
@@ -1041,16 +1041,16 @@ Tego prostokąta można następnie używać w następujący sposób:
 
 
 ```
->> rectangle := Rectangle nowy length: 2, width: 3.
-Wyjście pisz: rectangle area.
+>> prostokąt := Prostokąt nowy length: 2, width: 3.
+Wyjście pisz: prostokąt pole.
 ```
 
 Jeśli jednak pominie się początkowe ustawienie długości i szerokości,
 pojawi się komunikat o błędzie:
 
 ```
->> rectangle := Rectangle nowy.
-Wyjście pisz: rectangle area.
+>> prostokąt := Prostokąt nowy.
+Wyjście pisz: prostokąt pole.
 ```
 
 spowoduje następujący błąd:
@@ -1076,13 +1076,13 @@ zostaną omówione wszystkie te podstawowe obiekty.
 Obiekt (wraz z jego bieżącym stanem) możesz zapisać na dysku za pomocą:
 
 ```
-myobject save-as: ['saved.bin'].
+mójobiekt save-as: ['saved.bin'].
 ```
 
 Aby ponownie wczytać obiekt z dysku:
 
 ```
->> myobject := Obiekt load-from: ['saved.bin'].
+>> mójobiekt := Obiekt load-from: ['saved.bin'].
 ```
 
 Migawek można używać do zapisania określonego stanu lub do poprawy wydajności.
@@ -1202,8 +1202,8 @@ do zmiennej i wysyłać wiadomości później:
 ```
 10 parzysta?
 
->> tenner := 10.
-tenner parzysta?
+>> dycha := 10.
+dycha parzysta?
 
 ```
 
@@ -1433,10 +1433,10 @@ Oto ważna pułapka:
 ```
 {
 	Fałsz fałsz: {
-		Wyjście pisz: ['End the loop.'].
+		Wyjście pisz: ['Zakończ pętlę.'].
 	}, przerwij.
 	
-	Wyjście pisz: ['Dont show me.'].
+	Wyjście pisz: ['Nie pokazuj mnie.'].
 
 } procedura.
 
@@ -1450,10 +1450,10 @@ przerwanie, trzeba je wysłać jako wiadomość do **Prawda**.
 ```
 {
 	Fałsz nie prawda: {
-		Wyjście pisz: ['End the loop.'].
+		Wyjście pisz: ['Zakończ pętlę.'].
 	}, przerwij.
 	
-	Wyjście pisz: ['Dont show me.'].
+	Wyjście pisz: ['Nie pokazuj mnie.'].
 
 } procedura.
 
@@ -1466,7 +1466,7 @@ Zadziała zgodnie z oczekiwaniami.
 Wyjątki można obsługiwać w następujący sposób:
 
 ```
-{ Task 1 } przechwyć: { Task 2 }, uruchom.
+{ Zadanie 1 } przechwyć: { Zadanie 2 }, uruchom.
 ```
 
 Możesz też celowo spowodować błąd w programie
@@ -1476,9 +1476,9 @@ ilustracji:
 
 ```
 {
-to-zadanie błąd: ['Whoops!'].
-} przechwyć: { :mistake
-Wyjście pisz: mistake.
+to-zadanie błąd: ['Ojej!'].
+} przechwyć: { :pomyłka
+Wyjście pisz: pomyłka.
 }, uruchom.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript umożliwia wstrzykiwanie wartości do zadań. Spójrz
 na poniższe zadanie:
 
 ```
->> sending := {
-	Newsletter adresat: własny recipient.
+>> wysyłanie := {
+	Biuletyn adresat: własny recipient.
 }.
-sending ustaw: ['recipient']
+wysyłanie ustaw: ['recipient']
 wartość: ['info@recipient.org'].
-sending uruchom.
+wysyłanie uruchom.
 ```
 
 
@@ -1512,20 +1512,20 @@ tak: **{}**, jednak XOScript traktuje to jako błąd językowy. Jeśli
 chcesz zadeklarować puste zadanie, możesz użyć obiektu Nic:
 
 ```
->> task := Nic.
+>> zadanie := Nic.
 ```
 
 Choć nie jest to prawdziwe zadanie, lecz obiekt Nic, nadal można
 wysłać do niego wiadomość uruchom:
 
 ```
->> answer := task uruchom.
+>> werdykt := zadanie uruchom.
 ```
 
 W rzeczywistości jest to to samo co:
 
 ```
->> answer := Nic uruchom.
+>> werdykt := Nic uruchom.
 ```
 
 Ponieważ obiekt **Nic** nie rozpoznaje wiadomości **uruchom**,
@@ -1700,8 +1700,8 @@ takiej listy jest cennik, na przykład:
 
 ```
 >> menu := Słownik nowy
-	umieść: ['£5'] w: ['apple pie'],
-	umieść: ['£6'] w: ['carrot cake'],
+	umieść: ['£5'] w: ['szarlotka'],
+	umieść: ['£6'] w: ['ciasto marchewkowe'],
 	umieść: ['£3'] w: ['fudge'].
 ```
 
@@ -1845,7 +1845,7 @@ Można też zapytać obiekt Program, czy
 dany obiekt jest już obecny w programie:
 
 ```
-Program Tool prawda: { ... }.
+Program Narzędzie prawda: { ... }.
 ```
 
 W przypadku nazwy obiektu
@@ -1893,9 +1893,9 @@ Program użyj: ['template.xo'].
 Możesz ustawić następujące ustawienia serwera:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# podane są wartości domyślne,
+	# więc jeśli niczego nie ustawisz, użyte zostaną
+	# te wartości...
 
 	Program 
 	ustawienie: ['max-postfields']
@@ -1923,9 +1923,9 @@ znany serwer.
 Server inicjuj.
 Program użyj: ['webtools.xo'].
 
->> web-document := Dokument-Web nowy.
+>> dokument-www := Dokument-Web nowy.
 
-web-document wypisz: ['
+dokument-www wypisz: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ wtedy musisz samodzielnie napisać nagłówki HTTP:
 ```
 #!/bin/xo
 Wyjście pisz: ['Content-type: text/html; charset=utf-8 \n\n'], nowa-linia.
-Wyjście pisz: ['hello world!'], nowa-linia.
+Wyjście pisz: ['witaj świecie!'], nowa-linia.
 ``` 
 
 ## Żądanie
@@ -1951,13 +1951,13 @@ UPLOAD:
 ```
 >> żądanie  := Żądanie-HTTP nowy.
 >> search   := żądanie get: ['search']. # ?search=books
->> password := żądanie post: ['password']. # from form
->> selected := żądanie get-lista: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := żądanie post-lista: ['sel[]'].
->> cookie   := żądanie cookie: ['session-id'].
->> upload   := żądanie upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> password := żądanie post: ['password']. # z formularza
+>> wybrane := żądanie get-lista: ['sel[]']. #?sel[]=1&sel[]=2
+>> wybrane := żądanie post-lista: ['sel[]'].
+>> ciasteczko   := żądanie cookie: ['session-id'].
+>> przesłany   := żądanie upload: ['file'].
+>> ścieżkatymcz := przesłany ? 1.
+>> nazwapliku := przesłany ? 0.
 ```
 
 ## Maxpost/length
@@ -1993,7 +1993,7 @@ Obiektu Database można używać do wykonywania zapytań w MariaDB/MySQL.
 Aby połączyć się z bazą danych, wykonaj:
 
 ```
->> db := Maria-DB nowy host: ['localhost'],
+>> bd := Maria-DB nowy host: ['localhost'],
 	użytkownik: ['xo'],
 	hasło: ['pass123'],
 	nazwa-bazy: ['xobase'],
@@ -2004,13 +2004,13 @@ Aby połączyć się z bazą danych, wykonaj:
 Aby wstawić rekord, użyj:
 
 ```
->> parametry-wyszukiwania := db zapytanie: ['
+>> parametry-wyszukiwania := bd zapytanie: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametry: ( Lista nowy ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametry: ( Lista nowy ; ['abc'] ; 12.35 ; 6 ). # zapytania sparametryzowane
 
-{  parametry-wyszukiwania wykonaj. db zatwierdź. }
-przechwyć: { :e db wycofaj.  }, uruchom.
+{  parametry-wyszukiwania wykonaj. bd zatwierdź. }
+przechwyć: { :e bd wycofaj.  }, uruchom.
 ```
 
 Zauważ, że xoscript działa *wyłącznie* z transakcjami i nigdy nie zatwierdza automatycznie (autocommit).
@@ -2021,18 +2021,18 @@ do SQL.
 Identyfikator wstawionego rekordu uzyskasz w ten sposób:
 
 ```
-Wyjście pisz: ['INSERTED: '] + parametry-wyszukiwania insert-id, nowa-linia. # insert id
+Wyjście pisz: ['WSTAWIONO: '] + parametry-wyszukiwania insert-id, nowa-linia. # id wstawienia
 ```
 
 Aby pobrać rekordy:
 
 ```
 >> parametry-wyszukiwania :=
-db
+bd
 	zapytanie: ['SELECT * FROM book order by id desc limit 2'], 
-	pobierz: { :row 
-		Wyjście pisz: row id + [' '] + row description + [': '] + row price, nowa-linia.
-	}. # fetching rows
+	pobierz: { :rząd 
+		Wyjście pisz: rząd id + [' '] + rząd description + [': '] + rząd price, nowa-linia.
+	}. # pobieranie wierszy
 
 ```
 
@@ -2053,21 +2053,21 @@ dokument zawierający zarówno nagłówki, jak i HTML lub inne dane).
 
 
 ```
-# First we make a new Web Document instance
->> web := Dokument-Web nowy.
+# Najpierw tworzymy nową instancję Dokument-Web
+>> strona := Dokument-Web nowy.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web rozpocznij-sesję.
+# Teraz zaczynamy sesję; wygeneruje to nagłówek dla ciasteczka i
+# utworzy plik na twoje dane, powiązany z tym ciasteczkiem
+>> moja-sesja := strona rozpocznij-sesję.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Teraz możemy traktować sesję jak Słownik
+moja-sesja userid: 123.
 ```
 
 Aby zniszczyć sesję (przy wylogowaniu):
 
 ```
-web zniszcz-sesję.
+strona zniszcz-sesję.
 ```
 
 ## Nagłówki
@@ -2076,7 +2076,7 @@ Dokument-Web pozwala też ustawiać inne znane nagłówki.
 Na przykład, jeśli chcesz przekierować użytkownika pod inny URL:
 
 ```
-web przejdź-do: ['/other.html'].
+strona przejdź-do: ['/other.html'].
 ```
 
 Pod maską to polecenie generuje również nagłówek HTTP, który jest wysyłany
@@ -2086,7 +2086,7 @@ pod wskazany adres docelowy.
 Aby dodać własny nagłówek:
 
 ```
-web nagłówek: ( 
+strona nagłówek: ( 
 	Nagłówek-HTTP nowy
 	klucz: ['Content-Length']
 	wartość: 400
@@ -2096,7 +2096,7 @@ web nagłówek: (
 Aby wyświetlić stronę 404:
 
 ```
-web nie-znaleziono: ['OOps..'].
+strona nie-znaleziono: ['Ups..'].
 ```
 
 
@@ -2109,7 +2109,7 @@ prezentacji od logiki biznesowej.
 Aby utworzyć szablon z pliku:
 
 ```
->> tpl := web szablon: ['templates/ux.tpl'].
+>> tpl := strona szablon: ['templates/ux.tpl'].
 ```
 
 System szablonów używa znaczników. 
@@ -2139,7 +2139,7 @@ Możesz to zrobić w następujący sposób:
 >> gem := tpl wytnij: ['gem'], kopiuj.
 gem price: 99.
 tpl wklej: gem w: ['jewels'].
-web wypisz: tpl uporządkuj.
+strona wypisz: tpl uporządkuj.
 ```
 
 Ostatni wiersz po prostu wysyła szablon jako tekst do klienta
@@ -2160,8 +2160,8 @@ Wynik:
 Aby bezpiecznie udostępniać pliki przesłane przez użytkowników, możesz skorzystać z passthru:
 
 ```
->> uploaded := ['smile.gif'].
-Server przekaż: uploaded prefiks: ['/uploads/images/'].
+>> przesłane := ['smile.gif'].
+Server przekaż: przesłane prefiks: ['/uploads/images/'].
 Program koniec.
 ```
 
@@ -2191,7 +2191,7 @@ Aby zakodować obiekt jako JSON:
 Aby zdekodować JSON do obiektu xoscript:
 
 ```
->> dict := ((JSON obiekt: json) abc ? 1).
+>> słow := ((JSON obiekt: json) abc ? 1).
 ```
 
 JSON z więcej niż 500 poziomami zagnieżdżenia jest odrzucany jako niepoprawny.
@@ -2199,7 +2199,7 @@ JSON z więcej niż 500 poziomami zagnieżdżenia jest odrzucany jako niepoprawn
 Aby bezpośrednio wypisać Słownik jako json z poprawnymi nagłówkami:
 
 ```
-web json: dict.
+strona json: słow.
 ```
 
 
@@ -2215,7 +2215,7 @@ Wzorzec nowy: ['href="([^"]+)" target="([^"]+)"'].
 Teraz zastosuj wzorzec do przeszukiwanego tekstu w następujący sposób:
 
 ```
-pattern dopasuj: temat wykonaj: { :m :x .... }
+wyrażenie dopasuj: temat wykonaj: { :m :x .... }
 ```
 
 Pełny przykład:
@@ -2225,13 +2225,13 @@ Pełny przykład:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Wzorzec nowy: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern dopasuj: temat wykonaj: { :m :x
+>> wyrażenie := Wzorzec nowy: ['href="([^"]+)" target="([^"]+)"'].
+>> wynik  := wyrażenie dopasuj: temat wykonaj: { :m :x
 	Wyjście pisz: m, nowa-linia.
 	Wyjście pisz: x, nowa-linia.
 	<- ['XXX'].
 }.
-Wyjście pisz: result, nowa-linia.
+Wyjście pisz: wynik, nowa-linia.
 ```
 
 ## Sieć
@@ -2254,8 +2254,8 @@ Wtyczka serwera zawiera szyfrowanie oparte na XChaCha20 i Argon2.
 Przykład:
 
 ```
->> encrypted := Sejf szyfruj: ['hello'] klucz: ['world'].
->> decrypted := Sejf szyfruj: encrypted klucz: ['world'].
+>> zaszyfrowane := Sejf szyfruj: ['hello'] klucz: ['world'].
+>> odszyfrowane := Sejf szyfruj: zaszyfrowane klucz: ['world'].
 ```
 
 ## Tokeny
@@ -2263,7 +2263,7 @@ Przykład:
 Aby wygenerować kryptograficznie bezpieczny token o określonej długości:
 
 ```
->> mytok := Sejf token: 40.
+>> mójtok := Sejf token: 40.
 ```
 
 Spowoduje to wygenerowanie tokenu o długości 40 znaków.
@@ -2275,7 +2275,7 @@ dodawać zera. Używa składni printf.
 
 ```
 >> fmt := Format nowy: ['%06.0f'].
-fmt zastosuj: 56. # gives 000056
+fmt zastosuj: 56. # daje 000056
 ```
 
 Format może zawierać jedną konwersję, która musi pasować do wartości,
@@ -2322,10 +2322,10 @@ Przykład:
 Server inicjuj.
 Program użyj: ['mailtools.xo'].
 
->> e-mail := HTML-Email nowy.
->> img := e-mail załącz: ( Plik nowy: ['myimage.png'] ).
+>> wiadomość-email := HTML-Email nowy.
+>> img := wiadomość-email załącz: ( Plik nowy: ['myimage.png'] ).
 
-e-mail
+wiadomość-email
 nadawca: ['xo@xoscript.com'] nazwa: ['xo'],
 adresat: ( Lista nowy ; ['xo2@xoscipt.com'] ),
 temat: ['xoxo'],
@@ -2441,13 +2441,13 @@ zwolnić). Dlatego w razie potrzeby musisz samodzielnie zwalniać obiekty blob.
 Aby zwolnić obiekt blob, użyj:
 
 ```
-myblob zwolnij.
+mójblob zwolnij.
 ```
 
 Aby zwolnić strukturę, użyj:
 
 ```
-mystruct zwolnij-struct zwolnij.
+mojastruct zwolnij-struct zwolnij.
 ```
 
 W przypadku struktury musisz więc wysłać dwie wiadomości: zwolnij-struct i zwolnij,

@@ -394,7 +394,7 @@ Els comentaris en XOScript comencen amb el símbol \#. Així, la línia següent
 s'ignorarà:
 
 ```
-# this is just a comment
+# això és només un comentari
 ```
 
 ## Variables
@@ -411,18 +411,18 @@ Aquests són exemples de variables vàlides:
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
->> $ := ['dollar'].
+>> $ := ['dòlar'].
 >> +plus := Cert.
->> user-password := ['Pssst!'].
+>> contrasenya-usuari := ['Pssst!'].
 ```
 
 Són variables no vàlides, per exemple:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['nombre negatiu'].
+>> password of usuari := ['Confidencial'].
+>> password.of:usuari := ['Confidencial'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ objecte enviant-li un missatge següent:
 
 ```
 Sortida escriu:
-[' hello '] retalla majúscules.
+[' hola '] retalla majúscules.
 ```
 
 ```
-HELLO
+HOLA
 ```
 
 Aquí s'envien dos missatges a l'objecte **Text**: **retalla**, seguit
@@ -668,7 +668,7 @@ a un objecte **Cert** o a un objecte **Fals**:
 
 ```
 2 parell? cert: {
-	Sortida escriu: ['Two is an even number'], salt-de-línia.
+	Sortida escriu: ['Dos és un nombre parell'], salt-de-línia.
 }.
 ```
 En l'exemple anterior, el missatge **cert:** s'envia a **Cert** (la
@@ -881,8 +881,8 @@ d'objectes. Per exemple:
 
 ```
 >> Animal := Objecte nou.
->> Dog := Animal nou.
->> Poodle := Dog nou.
+>> Gos := Animal nou.
+>> Caniche := Gos nou.
 ```
 
 En aquest cas, **Dog** hereta tot el comportament i les propietats
@@ -918,7 +918,7 @@ que, al final, encara cal fer la suma definitiva, cosa que, de fet,
 té lloc a la línia següent:
 
 ```
->> answer := jo + (número x factor).
+>> contestació := jo + (número x factor).
 ```
 
 Ara bé, com entén XOScript que aquest **signe** més fa referència a
@@ -960,8 +960,8 @@ Animal en: ['nou'] fes: {
 }.
 
 Animal en: ['inicialitzar'] fes: {
-	propi sound := ['?'].
-	propi legs  := 4.
+	propi so := ['?'].
+	propi potes  := 4.
 }.
 ```
 
@@ -989,10 +989,10 @@ un mètode inicialitzar. Igual que en altres llenguatges orientats a objectes, t
 ampliar el nostre Animal:
 
 ```
->> Dog := Animal nou.
-Dog en: ['inicialitzar'] fes: {
+>> Gos := Animal nou.
+Gos en: ['inicialitzar'] fes: {
 	jo inicialitzar.
-	propi sound := ['barks'].
+	propi so := ['borda'].
 }.
 ```
 
@@ -1000,7 +1000,7 @@ Ho podem provar fàcilment afegint un mètode text:
 
 ```
 Animal en: ['text'] fes: {
-	<- propi legs text + propi sound.
+	<- propi potes text + propi so.
 }.
 ```
 
@@ -1017,8 +1017,8 @@ per calcular el perímetre i l'àrea. Una notació possible seria:
 ```
 >> Rectangle := Objecte nou.
 
-Rectangle en: ['area'] fes: {
-	<- propi longitud * propi width.
+Rectangle en: ['àrea'] fes: {
+	<- propi longitud * propi amplada.
 }.
 ```
 
@@ -1031,8 +1031,8 @@ Rectangle en: ['length:'] fes: { :longitud
 	propi longitud := longitud.
 }.
 
-Rectangle en: ['width:'] fes: { :width
-	propi width := width.
+Rectangle en: ['width:'] fes: { :amplada
+	propi amplada := amplada.
 }.
 
 ```
@@ -1042,7 +1042,7 @@ Aquest rectangle es pot utilitzar de la manera següent:
 
 ```
 >> rectangle := Rectangle nou length: 2, width: 3.
-Sortida escriu: rectangle area.
+Sortida escriu: rectangle àrea.
 ```
 
 Tanmateix, si s'obliden els valors inicials de longitud i amplada,
@@ -1050,7 +1050,7 @@ es produirà un missatge d'error:
 
 ```
 >> rectangle := Rectangle nou.
-Sortida escriu: rectangle area.
+Sortida escriu: rectangle àrea.
 ```
 
 produirà l'error següent:
@@ -1076,13 +1076,13 @@ es tractaran tots aquests objectes del nucli.
 Podeu desar un objecte (juntament amb el seu estat actual) al disc amb:
 
 ```
-myobject save-as: ['saved.bin'].
+elMeuObjecte save-as: ['saved.bin'].
 ```
 
 Per tornar a carregar l'objecte des del disc:
 
 ```
->> myobject := Objecte load-from: ['saved.bin'].
+>> elMeuObjecte := Objecte load-from: ['saved.bin'].
 ```
 
 Les instantànies es poden utilitzar per desar un estat determinat o per millorar el rendiment.
@@ -1202,8 +1202,8 @@ a una variable i enviar-li missatges després:
 ```
 10 parell?
 
->> tenner := 10.
-tenner parell?
+>> bitlletDeDeu := 10.
+bitlletDeDeu parell?
 
 ```
 
@@ -1433,10 +1433,10 @@ Aquí teniu un parany important:
 ```
 {
 	Fals fals: {
-		Sortida escriu: ['End the loop.'].
+		Sortida escriu: ['Acaba el bucle.'].
 	}, interromp.
 	
-	Sortida escriu: ['Dont show me.'].
+	Sortida escriu: ['No em mostris.'].
 
 } procediment.
 
@@ -1450,10 +1450,10 @@ una interrupció, cal enviar-la com a missatge a **Cert**.
 ```
 {
 	Fals no cert: {
-		Sortida escriu: ['End the loop.'].
+		Sortida escriu: ['Acaba el bucle.'].
 	}, interromp.
 	
-	Sortida escriu: ['Dont show me.'].
+	Sortida escriu: ['No em mostris.'].
 
 } procediment.
 
@@ -1466,7 +1466,7 @@ Funcionarà com s'espera.
 Les excepcions es poden gestionar així:
 
 ```
-{ Task 1 } captura: { Task 2 }, inicia.
+{ Tasca 1 } captura: { Tasca 2 }, inicia.
 ```
 
 També podeu provocar intencionadament un error al programa i,
@@ -1476,9 +1476,9 @@ il·lustració següent:
 
 ```
 {
-aquesta-tasca error: ['Whoops!'].
-} captura: { :mistake
-Sortida escriu: mistake.
+aquesta-tasca error: ['Ostres!'].
+} captura: { :equivocació
+Sortida escriu: equivocació.
 }, inicia.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript ofereix a les tasques l'opció d'injectar-hi valors. Vegeu
 la tasca següent:
 
 ```
->> sending := {
-	Newsletter destinatari: propi recipient.
+>> enviament := {
+	Butlletí destinatari: propi recipient.
 }.
-sending estableix: ['recipient']
+enviament estableix: ['recipient']
 valor: ['info@recipient.org'].
-sending inicia.
+enviament inicia.
 ```
 
 
@@ -1512,20 +1512,20 @@ aspecte: **{}**, però XOScript ho considera un error del llenguatge. Si
 voleu declarar una tasca buida, podeu utilitzar l'objecte Res:
 
 ```
->> task := Res.
+>> tasca := Res.
 ```
 
 Tot i que això no és una tasca real, sinó un objecte Res, encara s'hi pot
 enviar un missatge inicia:
 
 ```
->> answer := task inicia.
+>> contestació := tasca inicia.
 ```
 
 De fet, això és el mateix que:
 
 ```
->> answer := Res inicia.
+>> contestació := Res inicia.
 ```
 
 Com que l'objecte **Res** no reconeix el missatge **inicia**,
@@ -1699,9 +1699,9 @@ mena de llista és una llista de preus, com ara:
 
 
 ```
->> menu := Diccionari nou
-	posa: ['£5'] a: ['apple pie'],
-	posa: ['£6'] a: ['carrot cake'],
+>> menú := Diccionari nou
+	posa: ['£5'] a: ['pastís de poma'],
+	posa: ['£6'] a: ['pastís de pastanaga'],
 	posa: ['£3'] a: ['fudge'].
 ```
 
@@ -1716,13 +1716,13 @@ es pot trobar el significat. Per exemple, per obtenir de la
 llista esmentada a dalt el preu d'un fudge:
 
 ```
->> price := menu a: ['fudge'].
+>> price := menú a: ['fudge'].
 ```
 
 També podeu utilitzar la notació concisa:
 
 ```
->> price := menu ? ['fudge'].
+>> price := menú ? ['fudge'].
 ```
 
 Si les entrades que utilitzeu per desar objectes no tenen espais
@@ -1730,7 +1730,7 @@ Si les entrades que utilitzeu per desar objectes no tenen espais
 també es pot utilitzar la notació següent:
 
 ```
->> menu := Diccionari nou
+>> menú := Diccionari nou
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1741,7 +1741,7 @@ Per demanar el preu d'un
 fudge, es pot utilitzar la notació simplificada següent:
 
 ```
->> price := menu fudge.
+>> price := menú fudge.
 ```
 
 @api_Dict_collections
@@ -1845,7 +1845,7 @@ També es pot preguntar a l'objecte Programa si un
 objecte determinat ja és present al programa:
 
 ```
-Programa Tool cert: { ... }.
+Programa Eina cert: { ... }.
 ```
 
 En el cas d'un nom d'objecte
@@ -1893,9 +1893,9 @@ Programa utilitza: ['template.xo'].
 Podeu establir la configuració del servidor següent:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# es donen valors per defecte,
+	# de manera que si no configureu res, s'utilitzen
+	# aquests valors...
 
 	Programa 
 	configuració: ['max-postfields']
@@ -1923,9 +1923,9 @@ servidor conegut.
 Server inicialitzar.
 Programa utilitza: ['webtools.xo'].
 
->> web-document := Document-Web nou.
+>> doc-web := Document-Web nou.
 
-web-document emetre: ['
+doc-web emetre: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ aleshores heu d'escriure les capçaleres HTTP vosaltres mateixos:
 ```
 #!/bin/xo
 Sortida escriu: ['Content-type: text/html; charset=utf-8 \n\n'], salt-de-línia.
-Sortida escriu: ['hello world!'], salt-de-línia.
+Sortida escriu: ['hola món!'], salt-de-línia.
 ``` 
 
 ## Petició
@@ -1951,13 +1951,13 @@ UPLOAD:
 ```
 >> petició  := Petició-HTTP nou.
 >> search   := petició get: ['search']. # ?search=books
->> password := petició post: ['password']. # from form
->> selected := petició get-llista: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := petició post-llista: ['sel[]'].
->> cookie   := petició cookie: ['session-id'].
->> upload   := petició upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> password := petició post: ['password']. # del formulari
+>> seleccionats := petició get-llista: ['sel[]']. #?sel[]=1&sel[]=2
+>> seleccionats := petició post-llista: ['sel[]'].
+>> galeta   := petició cookie: ['session-id'].
+>> pujada   := petició upload: ['file'].
+>> camíTemporal := pujada ? 1.
+>> nomfitxer := pujada ? 0.
 ```
 
 ## Maxpost/length
@@ -1993,7 +1993,7 @@ L'objecte Database es pot utilitzar per fer consultes a MariaDB/MySQL.
 Per connectar-vos a una base de dades:
 
 ```
->> db := Maria-DB nou amfitrió: ['localhost'],
+>> bd := Maria-DB nou amfitrió: ['localhost'],
 	usuari: ['xo'],
 	contrasenya: ['pass123'],
 	nom-base: ['xobase'],
@@ -2004,13 +2004,13 @@ Per connectar-vos a una base de dades:
 Per inserir un registre, utilitzeu:
 
 ```
->> paràmetres-de-cerca := db consulta: ['
+>> paràmetres-de-cerca := bd consulta: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], paràmetres: ( Llista nou ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], paràmetres: ( Llista nou ; ['abc'] ; 12.35 ; 6 ). # consultes parametritzades
 
-{  paràmetres-de-cerca executa. db confirma. }
-captura: { :e db desfés.  }, inicia.
+{  paràmetres-de-cerca executa. bd confirma. }
+captura: { :e bd desfés.  }, inicia.
 ```
 
 Tingueu en compte que xoscript treballa *només* amb transaccions i mai no fa confirmacions automàtiques.
@@ -2021,18 +2021,18 @@ a l'SQL.
 Obteniu l'identificador inserit així:
 
 ```
-Sortida escriu: ['INSERTED: '] + paràmetres-de-cerca insert-id, salt-de-línia. # insert id
+Sortida escriu: ['INSERIT: '] + paràmetres-de-cerca insert-id, salt-de-línia. # id inserit
 ```
 
 Per obtenir registres:
 
 ```
 >> paràmetres-de-cerca :=
-db
+bd
 	consulta: ['SELECT * FROM book order by id desc limit 2'], 
-	obtén: { :row 
-		Sortida escriu: row id + [' '] + row description + [': '] + row price, salt-de-línia.
-	}. # fetching rows
+	obtén: { :fila 
+		Sortida escriu: fila id + [' '] + fila description + [': '] + fila price, salt-de-línia.
+	}. # obtenció de files
 
 ```
 
@@ -2053,15 +2053,15 @@ que conté tant les capçaleres com l'HTML o altres dades).
 
 
 ```
-# First we make a new Web Document instance
+# Primer creem una nova instància de Document-Web
 >> web := Document-Web nou.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web iniciar-sessió.
+# Ara iniciem una sessió; això generarà una capçalera per a una galeta i
+# crearà un fitxer per desar les vostres dades, associat a aquesta galeta
+>> sessió := web iniciar-sessió.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Ara podem tractar la sessió com un Diccionari
+sessió userid: 123.
 ```
 
 Per destruir la sessió (en tancar la sessió):
@@ -2096,7 +2096,7 @@ web capçalera: (
 Per mostrar una pàgina 404:
 
 ```
-web no-trobat: ['OOps..'].
+web no-trobat: ['Ups..'].
 ```
 
 
@@ -2160,8 +2160,8 @@ Resultat:
 Per servir de manera segura fitxers pujats pels usuaris, podeu recórrer a passthru:
 
 ```
->> uploaded := ['smile.gif'].
-Server transmet: uploaded prefix: ['/uploads/images/'].
+>> pujat := ['smile.gif'].
+Server transmet: pujat prefix: ['/uploads/images/'].
 Programa final.
 ```
 
@@ -2191,7 +2191,7 @@ Per codificar un objecte com a JSON:
 Per descodificar JSON en un objecte xoscript:
 
 ```
->> dict := ((JSON objecte: json) abc ? 1).
+>> dicc := ((JSON objecte: json) abc ? 1).
 ```
 
 El JSON amb més de 500 nivells de niuament es rebutja com a no vàlid.
@@ -2199,7 +2199,7 @@ El JSON amb més de 500 nivells de niuament es rebutja com a no vàlid.
 Per emetre directament un Diccionari com a json amb les capçaleres correctes:
 
 ```
-web json: dict.
+web json: dicc.
 ```
 
 
@@ -2215,7 +2215,7 @@ Patró nou: ['href="([^"]+)" target="([^"]+)"'].
 Ara apliqueu el patró al text objectiu així:
 
 ```
-pattern coincidència: assumpte fes: { :m :x .... }
+model coincidència: assumpte fes: { :m :x .... }
 ```
 
 Exemple complet:
@@ -2225,13 +2225,13 @@ Exemple complet:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Patró nou: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern coincidència: assumpte fes: { :m :x
+>> model := Patró nou: ['href="([^"]+)" target="([^"]+)"'].
+>> resultat  := model coincidència: assumpte fes: { :m :x
 	Sortida escriu: m, salt-de-línia.
 	Sortida escriu: x, salt-de-línia.
 	<- ['XXX'].
 }.
-Sortida escriu: result, salt-de-línia.
+Sortida escriu: resultat, salt-de-línia.
 ```
 
 ## Xarxa
@@ -2254,8 +2254,8 @@ El connector de servidor inclou xifratge basat en XChaCha20 i Argon2.
 Exemple:
 
 ```
->> encrypted := Caixa-forta xifra: ['hello'] clau: ['world'].
->> decrypted := Caixa-forta xifra: encrypted clau: ['world'].
+>> xifrat := Caixa-forta xifra: ['hello'] clau: ['world'].
+>> desxifrat := Caixa-forta xifra: xifrat clau: ['world'].
 ```
 
 ## Tokens
@@ -2263,7 +2263,7 @@ Exemple:
 Per generar un token criptogràficament segur d'una longitud determinada:
 
 ```
->> mytok := Caixa-forta token: 40.
+>> elMeuToken := Caixa-forta token: 40.
 ```
 
 Això generarà un token de 40 caràcters.
@@ -2275,7 +2275,7 @@ afegir zeros. Utilitza la sintaxi de printf.
 
 ```
 >> fmt := Format nou: ['%06.0f'].
-fmt aplica: 56. # gives 000056
+fmt aplica: 56. # dona 000056
 ```
 
 Un format pot contenir una conversió i ha de correspondre al valor;
@@ -2305,7 +2305,7 @@ Per injectar de manera segura l'entrada de l'usuari a l'HTML sense arriscar-vos 
 XSS, utilitzeu sempre:
 
 ```
-Server html-codifica: ['<harmless>'].
+Server html-codifica: ['<inofensiu>'].
 ```
 
 Tingueu en compte que el motor de plantilles sempre fa codificació html
@@ -2322,10 +2322,10 @@ Exemple:
 Server inicialitzar.
 Programa utilitza: ['mailtools.xo'].
 
->> e-mail := Correu-HTML nou.
->> img := e-mail adjuntar: ( Fitxer nou: ['myimage.png'] ).
+>> correu-e := Correu-HTML nou.
+>> img := correu-e adjuntar: ( Fitxer nou: ['myimage.png'] ).
 
-e-mail
+correu-e
 remitent: ['xo@xoscript.com'] nom: ['xo'],
 destinatari: ( Llista nou ; ['xo2@xoscipt.com'] ),
 assumpte: ['xoxo'],
@@ -2441,13 +2441,13 @@ elles mateixes). Per tant, cal que allibereu els blobs vosaltres mateixos si cal
 Per alliberar un blob, utilitzeu:
 
 ```
-myblob allibera.
+elMeuBlob allibera.
 ```
 
 Per alliberar una struct, utilitzeu:
 
 ```
-mystruct allibera-struct allibera.
+laMevaEstructura allibera-struct allibera.
 ```
 
 Així, per a una struct, cal enviar dos missatges: allibera-struct i allibera per

@@ -394,7 +394,7 @@ Komentari u XOScriptu započinju simbolom \#. Stoga će sljedeći redak
 biti zanemaren:
 
 ```
-# this is just a comment
+# ovo je samo komentar
 ```
 
 ## Varijable
@@ -411,18 +411,18 @@ Ovo su primjeri valjanih varijabli:
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
->> $ := ['dollar'].
+>> $ := ['dolar'].
 >> +plus := Istina.
->> user-password := ['Pssst!'].
+>> korisnička-lozinka := ['Pssst!'].
 ```
 
 Nevaljane varijable su, primjerice:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['negativan broj'].
+>> password of korisnik := ['Povjerljivo'].
+>> password.of:korisnik := ['Povjerljivo'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ objektom slanjem sljedeće poruke:
 
 ```
 Izlaz piši:
-[' hello '] skrati velika-slova.
+[' zdravo '] skrati velika-slova.
 ```
 
 ```
-HELLO
+ZDRAVO
 ```
 
 Ovdje se objektu **Tekst** šalju dvije poruke: **skrati**, a zatim
@@ -668,7 +668,7 @@ objektu **Istina** ili objektu **Laž**:
 
 ```
 2 paran? istina: {
-	Izlaz piši: ['Two is an even number'], novi-red.
+	Izlaz piši: ['Dva je paran broj'], novi-red.
 }.
 ```
 U prethodnom primjeru poruka **istina:** šalje se objektu **Istina** (odgovoru
@@ -880,9 +880,9 @@ Prethodno napisani kod možete ponovno upotrijebiti za stvaranje hijerarhije
 objekata. Na primjer:
 
 ```
->> Animal := Objekt novi.
->> Dog := Animal novi.
->> Poodle := Dog novi.
+>> Životinja := Objekt novi.
+>> Pas := Životinja novi.
+>> Pudl := Pas novi.
 ```
 
 U ovom slučaju **Dog** nasljeđuje sva ponašanja i svojstva
@@ -918,7 +918,7 @@ da se konačno zbrajanje ipak mora obaviti, a to se zapravo
 događa u sljedećem retku:
 
 ```
->> answer := sebe + (broj x factor).
+>> odgovor := sebe + (broj x faktor).
 ```
 
 Kako XOScript razumije da se ovaj **znak** plus odnosi na
@@ -954,14 +954,14 @@ Iako xoscript ne nudi klase, oponašanje ponašanja nalik
 klasama je trivijalno. Jednostavno nadjačajte poruku novi.
 
 ```
->> Animal := Objekt novi.
-Animal na: ['novi'] učini: {
+>> Životinja := Objekt novi.
+Životinja na: ['novi'] učini: {
 	<- sebe novi inicijaliziraj.
 }.
 
-Animal na: ['inicijaliziraj'] učini: {
-	svoj sound := ['?'].
-	svoj legs  := 4.
+Životinja na: ['inicijaliziraj'] učini: {
+	svoj zvuk := ['?'].
+	svoj noge  := 4.
 }.
 ```
 
@@ -981,7 +981,7 @@ da objekt Animal ima zadane vrijednosti svojih svojstava. Prema zadanim postavka
 Da bismo stvorili novu instancu našeg objekta Animal, jednostavno možemo napisati:
 
 ```
->> a := Animal novi.
+>> a := Životinja novi.
 ```
 
 Sada dobivamo novu instancu objekta Animal s 4 noge, nepoznatim zvukom i
@@ -989,18 +989,18 @@ metodom inicijaliziraj. Baš kao i u drugim OOP jezicima, možemo
 proširiti i naš Animal:
 
 ```
->> Dog := Animal novi.
-Dog na: ['inicijaliziraj'] učini: {
+>> Pas := Životinja novi.
+Pas na: ['inicijaliziraj'] učini: {
 	sebe inicijaliziraj.
-	svoj sound := ['barks'].
+	svoj zvuk := ['laje'].
 }.
 ```
 
 To lako možemo testirati dodavanjem metode tekst:
 
 ```
-Animal na: ['tekst'] učini: {
-	<- svoj legs tekst + svoj sound.
+Životinja na: ['tekst'] učini: {
+	<- svoj noge tekst + svoj zvuk.
 }.
 ```
 
@@ -1015,10 +1015,10 @@ kako bi se izračunali opseg i površina. Mogući zapis bio bi:
 
 
 ```
->> Rectangle := Objekt novi.
+>> Pravokutnik := Objekt novi.
 
-Rectangle na: ['area'] učini: {
-	<- svoj duljina * svoj width.
+Pravokutnik na: ['površina'] učini: {
+	<- svoj duljina * svoj širina.
 }.
 ```
 
@@ -1027,12 +1027,12 @@ svrhu mogu se dodati poruke **duljina:** i **width:**:
 
 
 ```
-Rectangle na: ['length:'] učini: { :duljina
+Pravokutnik na: ['length:'] učini: { :duljina
 	svoj duljina := duljina.
 }.
 
-Rectangle na: ['width:'] učini: { :width
-	svoj width := width.
+Pravokutnik na: ['width:'] učini: { :širina
+	svoj širina := širina.
 }.
 
 ```
@@ -1041,16 +1041,16 @@ Ovaj se pravokutnik tada može koristiti na sljedeći način:
 
 
 ```
->> rectangle := Rectangle novi length: 2, width: 3.
-Izlaz piši: rectangle area.
+>> pravokutnik := Pravokutnik novi length: 2, width: 3.
+Izlaz piši: pravokutnik površina.
 ```
 
 Međutim, ako se zanemare početne postavke duljine i širine,
 pojavit će se poruka o pogrešci:
 
 ```
->> rectangle := Rectangle novi.
-Izlaz piši: rectangle area.
+>> pravokutnik := Pravokutnik novi.
+Izlaz piši: pravokutnik površina.
 ```
 
 proizvest će sljedeću pogrešku:
@@ -1076,13 +1076,13 @@ bit će opisani svi ti osnovni objekti.
 Objekt (zajedno s njegovim trenutačnim stanjem) možete spremiti na disk pomoću:
 
 ```
-myobject save-as: ['saved.bin'].
+mojobjekt save-as: ['saved.bin'].
 ```
 
 Za ponovno učitavanje objekta s diska:
 
 ```
->> myobject := Objekt load-from: ['saved.bin'].
+>> mojobjekt := Objekt load-from: ['saved.bin'].
 ```
 
 Snimke stanja mogu se koristiti za spremanje određenog stanja ili za poboljšanje performansi.
@@ -1202,8 +1202,8 @@ varijabli i zatim slati poruke:
 ```
 10 paran?
 
->> tenner := 10.
-tenner paran?
+>> desetka := 10.
+desetka paran?
 
 ```
 
@@ -1433,10 +1433,10 @@ Evo jedne važne zamke:
 ```
 {
 	Laž laž: {
-		Izlaz piši: ['End the loop.'].
+		Izlaz piši: ['Završi petlju.'].
 	}, prekini.
 	
-	Izlaz piši: ['Dont show me.'].
+	Izlaz piši: ['Nemoj me prikazati.'].
 
 } postupak.
 
@@ -1450,10 +1450,10 @@ prekid, on se mora poslati kao poruka objektu **Istina**.
 ```
 {
 	Laž ne istina: {
-		Izlaz piši: ['End the loop.'].
+		Izlaz piši: ['Završi petlju.'].
 	}, prekini.
 	
-	Izlaz piši: ['Dont show me.'].
+	Izlaz piši: ['Nemoj me prikazati.'].
 
 } postupak.
 
@@ -1466,7 +1466,7 @@ Radit će prema očekivanjima.
 Iznimke se mogu obraditi ovako:
 
 ```
-{ Task 1 } uhvati: { Task 2 }, pokreni.
+{ Zadatak 1 } uhvati: { Zadatak 2 }, pokreni.
 ```
 
 Također možete namjerno izazvati pogrešku u svom programu i
@@ -1476,9 +1476,9 @@ ilustraciji:
 
 ```
 {
-ovaj-zadatak pogreška: ['Whoops!'].
-} uhvati: { :mistake
-Izlaz piši: mistake.
+ovaj-zadatak pogreška: ['Ups!'].
+} uhvati: { :propust
+Izlaz piši: propust.
 }, pokreni.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript zadacima omogućuje ubacivanje vrijednosti. Pogledajte
 sljedeći zadatak:
 
 ```
->> sending := {
-	Newsletter prima: svoj recipient.
+>> slanje := {
+	Bilten prima: svoj recipient.
 }.
-sending postavi: ['recipient']
+slanje postavi: ['recipient']
 vrijednost: ['info@recipient.org'].
-sending pokreni.
+slanje pokreni.
 ```
 
 
@@ -1512,20 +1512,20 @@ ovako: **{}**, no XOScript to smatra jezičnom pogreškom. Ako
 želite deklarirati prazan zadatak, možete koristiti objekt Ništa:
 
 ```
->> task := Ništa.
+>> zadatak := Ništa.
 ```
 
 Iako to nije pravi zadatak, nego objekt Ništa, poruka pokreni
 i dalje se može poslati:
 
 ```
->> answer := task pokreni.
+>> odgovor := zadatak pokreni.
 ```
 
 Zapravo je to isto kao:
 
 ```
->> answer := Ništa pokreni.
+>> odgovor := Ništa pokreni.
 ```
 
 Budući da objekt **Ništa** ne prepoznaje poruku **pokreni**,
@@ -1699,9 +1699,9 @@ popisa je cjenik, poput:
 
 
 ```
->> menu := Rječnik novi
-	stavi: ['£5'] na: ['apple pie'],
-	stavi: ['£6'] na: ['carrot cake'],
+>> jelovnik := Rječnik novi
+	stavi: ['£5'] na: ['pita od jabuka'],
+	stavi: ['£6'] na: ['torta od mrkve'],
 	stavi: ['£3'] na: ['fudge'].
 ```
 
@@ -1716,13 +1716,13 @@ može se pronaći značenje. Primjerice, da biste iz
 gore navedenog popisa dohvatili cijenu karamele:
 
 ```
->> price := menu na: ['fudge'].
+>> price := jelovnik na: ['fudge'].
 ```
 
 Možete koristiti i sažeti zapis:
 
 ```
->> price := menu ? ['fudge'].
+>> price := jelovnik ? ['fudge'].
 ```
 
 Ako unosi koje koristite za pohranu objekata ne sadrže razmake
@@ -1730,7 +1730,7 @@ Ako unosi koje koristite za pohranu objekata ne sadrže razmake
 može se koristiti i sljedeći zapis:
 
 ```
->> menu := Rječnik novi
+>> jelovnik := Rječnik novi
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1741,7 +1741,7 @@ Za dohvaćanje cijene
 karamele može se koristiti sljedeći pojednostavljeni zapis:
 
 ```
->> price := menu fudge.
+>> price := jelovnik fudge.
 ```
 
 @api_Dict_collections
@@ -1845,7 +1845,7 @@ Također je moguće upitati objekt Program je li
 određeni objekt već prisutan u programu:
 
 ```
-Program Tool istina: { ... }.
+Program Alat istina: { ... }.
 ```
 
 Ako se naziv
@@ -1893,9 +1893,9 @@ Program koristi: ['template.xo'].
 Možete postaviti sljedeće postavke poslužitelja:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# zadane vrijednosti su dane,
+	# pa ako ništa ne postavite, koriste se
+	# ove vrijednosti...
 
 	Program 
 	postavka: ['max-postfields']
@@ -1923,9 +1923,9 @@ poznatim poslužiteljem.
 Server inicijaliziraj.
 Program koristi: ['webtools.xo'].
 
->> web-document := Web-dokument novi.
+>> web-stranica := Web-dokument novi.
 
-web-document ispiši: ['
+web-stranica ispiši: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ tada HTTP zaglavlja morate napisati sami:
 ```
 #!/bin/xo
 Izlaz piši: ['Content-type: text/html; charset=utf-8 \n\n'], novi-red.
-Izlaz piši: ['hello world!'], novi-red.
+Izlaz piši: ['zdravo svijete!'], novi-red.
 ``` 
 
 ## Zahtjev
@@ -1951,13 +1951,13 @@ UPLOAD:
 ```
 >> zahtjev  := HTTP-Zahtjev novi.
 >> search   := zahtjev get: ['search']. # ?search=books
->> password := zahtjev post: ['password']. # from form
->> selected := zahtjev get-popis: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := zahtjev post-popis: ['sel[]'].
->> cookie   := zahtjev cookie: ['session-id'].
->> upload   := zahtjev upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> password := zahtjev post: ['password']. # iz obrasca
+>> odabrano := zahtjev get-popis: ['sel[]']. #?sel[]=1&sel[]=2
+>> odabrano := zahtjev post-popis: ['sel[]'].
+>> kolačić   := zahtjev cookie: ['session-id'].
+>> prijenos   := zahtjev upload: ['file'].
+>> privputanja := prijenos ? 1.
+>> imedatoteke := prijenos ? 0.
 ```
 
 ## Maxpost/length
@@ -1993,7 +1993,7 @@ Objekt Database može se koristiti za upite prema MariaDB/MySQL.
 Za povezivanje s bazom podataka:
 
 ```
->> db := Maria-DB novi domaćin: ['localhost'],
+>> bp := Maria-DB novi domaćin: ['localhost'],
 	korisnik: ['xo'],
 	lozinka: ['pass123'],
 	naziv-baze: ['xobase'],
@@ -2004,13 +2004,13 @@ Za povezivanje s bazom podataka:
 Za umetanje zapisa koristite:
 
 ```
->> parametri-pretrage := db upit: ['
+>> parametri-pretrage := bp upit: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametri: ( Popis novi ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametri: ( Popis novi ; ['abc'] ; 12.35 ; 6 ). # parametrizirani upiti
 
-{  parametri-pretrage izvrši. db potvrdi. }
-uhvati: { :e db poništi.  }, pokreni.
+{  parametri-pretrage izvrši. bp potvrdi. }
+uhvati: { :e bp poništi.  }, pokreni.
 ```
 
 Imajte na umu da xoscript radi *isključivo* s transakcijama i nikada ne izvodi automatsku potvrdu (autocommit).
@@ -2021,18 +2021,18 @@ u SQL.
 Umetnuti id dohvatite ovako:
 
 ```
-Izlaz piši: ['INSERTED: '] + parametri-pretrage insert-id, novi-red. # insert id
+Izlaz piši: ['UMETNUTO: '] + parametri-pretrage insert-id, novi-red. # id umetanja
 ```
 
 Za dohvaćanje zapisa:
 
 ```
 >> parametri-pretrage :=
-db
+bp
 	upit: ['SELECT * FROM book order by id desc limit 2'], 
-	dohvati: { :row 
-		Izlaz piši: row id + [' '] + row description + [': '] + row price, novi-red.
-	}. # fetching rows
+	dohvati: { :red 
+		Izlaz piši: red id + [' '] + red description + [': '] + red price, novi-red.
+	}. # dohvaćanje redaka
 
 ```
 
@@ -2053,15 +2053,15 @@ dokument koji sadrži i zaglavlja i HTML ili druge podatke).
 
 
 ```
-# First we make a new Web Document instance
+# Najprije izrađujemo novu instancu Web-dokument
 >> web := Web-dokument novi.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web pokreni-sesiju.
+# Sada pokrećemo sesiju; to će generirati zaglavlje za kolačić i
+# stvoriti datoteku za vaše podatke, povezanu s tim kolačićem
+>> sesija := web pokreni-sesiju.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Sada sesiju možemo tretirati kao Rječnik
+sesija userid: 123.
 ```
 
 Za uništavanje sesije (pri odjavi):
@@ -2096,7 +2096,7 @@ web zaglavlje: (
 Za prikaz stranice 404:
 
 ```
-web nije-pronađeno: ['OOps..'].
+web nije-pronađeno: ['Ups..'].
 ```
 
 
@@ -2160,8 +2160,8 @@ Rezultat:
 Za sigurno posluživanje datoteka koje su prenijeli korisnici možete se osloniti na passthru:
 
 ```
->> uploaded := ['smile.gif'].
-Server proslijedi: uploaded prefiks: ['/uploads/images/'].
+>> preneseno := ['smile.gif'].
+Server proslijedi: preneseno prefiks: ['/uploads/images/'].
 Program kraj.
 ```
 
@@ -2191,7 +2191,7 @@ Za kodiranje objekta kao JSON:
 Za dekodiranje JSON-a u xoscript objekt:
 
 ```
->> dict := ((JSON objekt: json) abc ? 1).
+>> rječ := ((JSON objekt: json) abc ? 1).
 ```
 
 JSON s više od 500 razina ugniježđivanja odbacuje se kao nevaljan.
@@ -2199,7 +2199,7 @@ JSON s više od 500 razina ugniježđivanja odbacuje se kao nevaljan.
 Za izravni ispis Rječnika kao json s ispravnim zaglavljima:
 
 ```
-web json: dict.
+web json: rječ.
 ```
 
 
@@ -2215,7 +2215,7 @@ Uzorak novi: ['href="([^"]+)" target="([^"]+)"'].
 Sada primijenite uzorak na tekst koji se pretražuje, ovako:
 
 ```
-pattern podudaranje: predmet učini: { :m :x .... }
+obrazac podudaranje: predmet učini: { :m :x .... }
 ```
 
 Cjeloviti primjer:
@@ -2225,13 +2225,13 @@ Cjeloviti primjer:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Uzorak novi: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern podudaranje: predmet učini: { :m :x
+>> obrazac := Uzorak novi: ['href="([^"]+)" target="([^"]+)"'].
+>> rezultat  := obrazac podudaranje: predmet učini: { :m :x
 	Izlaz piši: m, novi-red.
 	Izlaz piši: x, novi-red.
 	<- ['XXX'].
 }.
-Izlaz piši: result, novi-red.
+Izlaz piši: rezultat, novi-red.
 ```
 
 ## Umrežavanje
@@ -2254,8 +2254,8 @@ Poslužiteljski dodatak dolazi sa šifriranjem temeljenim na XChaCha20 i Argon2.
 Primjer:
 
 ```
->> encrypted := Sef šifriraj: ['hello'] ključ: ['world'].
->> decrypted := Sef šifriraj: encrypted ključ: ['world'].
+>> šifrirano := Sef šifriraj: ['hello'] ključ: ['world'].
+>> dešifrirano := Sef šifriraj: šifrirano ključ: ['world'].
 ```
 
 ## Tokeni
@@ -2263,7 +2263,7 @@ Primjer:
 Za generiranje kriptografski sigurnog tokena određene duljine:
 
 ```
->> mytok := Sef token: 40.
+>> mojtoken := Sef token: 40.
 ```
 
 Time će se generirati token od 40 znakova.
@@ -2275,7 +2275,7 @@ dodavanja nula. Koristi sintaksu printf.
 
 ```
 >> fmt := Format novi: ['%06.0f'].
-fmt primijeni: 56. # gives 000056
+fmt primijeni: 56. # daje 000056
 ```
 
 Format može sadržavati jednu pretvorbu i ona mora odgovarati vrijednosti,
@@ -2322,10 +2322,10 @@ Primjer:
 Server inicijaliziraj.
 Program koristi: ['mailtools.xo'].
 
->> e-mail := HTML-Email novi.
->> img := e-mail priloži: ( Datoteka novi: ['myimage.png'] ).
+>> e-pošta := HTML-Email novi.
+>> img := e-pošta priloži: ( Datoteka novi: ['myimage.png'] ).
 
-e-mail
+e-pošta
 pošiljatelj: ['xo@xoscript.com'] naziv: ['xo'],
 prima: ( Popis novi ; ['xo2@xoscipt.com'] ),
 predmet: ['xoxo'],
@@ -2441,13 +2441,13 @@ osloboditi). Stoga blobove po potrebi morate osloboditi sami.
 Za oslobađanje bloba koristite:
 
 ```
-myblob oslobodi.
+mojblob oslobodi.
 ```
 
 Za oslobađanje strukture koristite:
 
 ```
-mystruct oslobodi-struct oslobodi.
+mojastruktura oslobodi-struct oslobodi.
 ```
 
 Dakle, za strukturu morate poslati dvije poruke: oslobodi-struct i oslobodi kako biste

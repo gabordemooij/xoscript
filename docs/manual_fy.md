@@ -394,7 +394,7 @@ Kommentaar yn XOScript begjint mei in \#-teken. De folgjende rigel
 wurdt dus negearre:
 
 ```
-# this is just a comment
+# dit is gewoan kommentaar
 ```
 
 ## Fariabelen
@@ -413,16 +413,16 @@ Dit binne foarbylden fan jildige fariabelen:
 >> ♡♡♡ := 3.
 >> $ := ['dollar'].
 >> +plus := Ja.
->> user-password := ['Pssst!'].
+>> brûker-wachtwurd := ['Pssst!'].
 ```
 
 Unjildige fariabelen binne bygelyks:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['negatyf getal'].
+>> password of brûker := ['Geheim'].
+>> password.of:brûker := ['Geheim'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ objekt stimulearret troch it in folgjend berjocht te stjoeren:
 
 ```
 Utfier skriuwe:
-[' hello '] ynkoartsje haadletters.
+[' hoi '] ynkoartsje haadletters.
 ```
 
 ```
-HELLO
+HOI
 ```
 
 Hjir wurde twa berjochten stjoerd nei it **Tekst**-objekt: **ynkoartsje**, folge
@@ -668,7 +668,7 @@ nei in **Ja**-objekt of in **Nee**-objekt:
 
 ```
 2 even? ja: {
-	Utfier skriuwe: ['Two is an even number'], nije-rigel.
+	Utfier skriuwe: ['Twa is in even getal'], nije-rigel.
 }.
 ```
 Yn it foarige foarbyld wurdt it berjocht **ja:** stjoerd nei **Ja** (it
@@ -880,9 +880,9 @@ Jo kinne earder skreaune koade opnij brûke om in hiërargy
 fan objekten te meitsjen. Bygelyks:
 
 ```
->> Animal := Objekt nĳ.
->> Dog := Animal nĳ.
->> Poodle := Dog nĳ.
+>> Dier := Objekt nĳ.
+>> Hûn := Dier nĳ.
+>> Poedel := Hûn nĳ.
 ```
 
 Yn dit gefal erft **Dog** al it gedrach en alle eigenskippen
@@ -918,7 +918,7 @@ dat de lêste optelling úteinlik dochs noch dien wurde moat, wat feitlik
 op de folgjende rigel bart:
 
 ```
->> answer := sels + (getal x factor).
+>> antwurd := sels + (getal x faktor).
 ```
 
 No, hoe begrypt XOScript dat dit plus**teken** ferwiist nei
@@ -954,14 +954,14 @@ Hoewol't xoscript gjin klassen biedt, is it neidwaan fan klasse-eftich
 gedrach triviaal. Skriuw gewoan it berjocht nĳ oer.
 
 ```
->> Animal := Objekt nĳ.
-Animal by: ['nĳ'] dwaan: {
+>> Dier := Objekt nĳ.
+Dier by: ['nĳ'] dwaan: {
 	<- sels nĳ inisjalisearje.
 }.
 
-Animal by: ['inisjalisearje'] dwaan: {
-	eigen sound := ['?'].
-	eigen legs  := 4.
+Dier by: ['inisjalisearje'] dwaan: {
+	eigen lûd := ['?'].
+	eigen skonken  := 4.
 }.
 ```
 
@@ -981,7 +981,7 @@ hat in bist 4 poaten en is it lûd ûnbekend (dêrom it fraachteken).
 Om in nij eksimplaar fan ús Animal te meitsjen, kinne wy gewoan sizze:
 
 ```
->> a := Animal nĳ.
+>> a := Dier nĳ.
 ```
 
 No krije wy in nij eksimplaar fan Animal mei 4 poaten, in ûnbekend lûd en
@@ -989,18 +989,18 @@ in inisjalisearje-metoade. Krekt as yn oare OOP-talen kinne wy ús Animal ek
 útwreidzje:
 
 ```
->> Dog := Animal nĳ.
-Dog by: ['inisjalisearje'] dwaan: {
+>> Hûn := Dier nĳ.
+Hûn by: ['inisjalisearje'] dwaan: {
 	sels inisjalisearje.
-	eigen sound := ['barks'].
+	eigen lûd := ['blaft'].
 }.
 ```
 
 Wy kinne dit maklik teste troch in tekst-metoade ta te foegjen:
 
 ```
-Animal by: ['tekst'] dwaan: {
-	<- eigen legs tekst + eigen sound.
+Dier by: ['tekst'] dwaan: {
+	<- eigen skonken tekst + eigen lûd.
 }.
 ```
 
@@ -1015,10 +1015,10 @@ om omtrek en oerflak te berekkenjen. In mooglike notaasje soe wêze:
 
 
 ```
->> Rectangle := Objekt nĳ.
+>> Rjochthoek := Objekt nĳ.
 
-Rectangle by: ['area'] dwaan: {
-	<- eigen lingte * eigen width.
+Rjochthoek by: ['oerflak'] dwaan: {
+	<- eigen lingte * eigen breedte.
 }.
 ```
 
@@ -1027,12 +1027,12 @@ doel kinne de berjochten **lingte:** en **width:** tafoege wurde:
 
 
 ```
-Rectangle by: ['length:'] dwaan: { :lingte
+Rjochthoek by: ['length:'] dwaan: { :lingte
 	eigen lingte := lingte.
 }.
 
-Rectangle by: ['width:'] dwaan: { :width
-	eigen width := width.
+Rjochthoek by: ['width:'] dwaan: { :breedte
+	eigen breedte := breedte.
 }.
 
 ```
@@ -1041,16 +1041,16 @@ Dizze rjochthoek kin dan as folget brûkt wurde:
 
 
 ```
->> rectangle := Rectangle nĳ length: 2, width: 3.
-Utfier skriuwe: rectangle area.
+>> rjochthoek := Rjochthoek nĳ length: 2, width: 3.
+Utfier skriuwe: rjochthoek oerflak.
 ```
 
 As de begjinynstellingen fan lingte en breedte lykwols oer it holle sjoen wurde,
 ûntstiet der in flatermelding:
 
 ```
->> rectangle := Rectangle nĳ.
-Utfier skriuwe: rectangle area.
+>> rjochthoek := Rjochthoek nĳ.
+Utfier skriuwe: rjochthoek oerflak.
 ```
 
 jout de folgjende flater:
@@ -1076,13 +1076,13 @@ wurde al dizze kearnobjekten besprutsen.
 Jo kinne in objekt (tegearre mei syn hjoeddeiske tastân) op skiif bewarje mei:
 
 ```
-myobject save-as: ['saved.bin'].
+myobjekt save-as: ['saved.bin'].
 ```
 
 Om it objekt opnij fan skiif te laden:
 
 ```
->> myobject := Objekt load-from: ['saved.bin'].
+>> myobjekt := Objekt load-from: ['saved.bin'].
 ```
 
 Snapshots kinne brûkt wurde om in bepaalde tastân te bewarjen of om de prestaasjes te ferbetterjen.
@@ -1202,8 +1202,8 @@ oan in fariabele tawize en dêrnei berjochten stjoere:
 ```
 10 even?
 
->> tenner := 10.
-tenner even?
+>> tientsje := 10.
+tientsje even?
 
 ```
 
@@ -1433,10 +1433,10 @@ Hjir is in wichtige falkûle:
 ```
 {
 	Nee nee: {
-		Utfier skriuwe: ['End the loop.'].
+		Utfier skriuwe: ['Beëinigje de lus.'].
 	}, ôfbrekke.
 	
-	Utfier skriuwe: ['Dont show me.'].
+	Utfier skriuwe: ['Lit my net sjen.'].
 
 } proseduere.
 
@@ -1450,10 +1450,10 @@ Om't **ôfbrekke** nei Nee stjoerd wurdt. As jo in
 ```
 {
 	Nee net ja: {
-		Utfier skriuwe: ['End the loop.'].
+		Utfier skriuwe: ['Beëinigje de lus.'].
 	}, ôfbrekke.
 	
-	Utfier skriuwe: ['Dont show me.'].
+	Utfier skriuwe: ['Lit my net sjen.'].
 
 } proseduere.
 
@@ -1466,7 +1466,7 @@ Wurket sa't ferwachte.
 Utsûnderings kinne sa ôfhannele wurde:
 
 ```
-{ Task 1 } fange: { Task 2 }, begjinne.
+{ Taak 1 } fange: { Taak 2 }, begjinne.
 ```
 
 Jo kinne ek mei opsetsin in flater yn jo programma feroarsaakje, en
@@ -1476,9 +1476,9 @@ yllustraasje te sjen is:
 
 ```
 {
-dizze-taak flater: ['Whoops!'].
-} fange: { :mistake
-Utfier skriuwe: mistake.
+dizze-taak flater: ['Oepsy!'].
+} fange: { :fersin
+Utfier skriuwe: fersin.
 }, begjinne.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript biedt taken de mooglikheid om wearden te ynjektearjen. Besjoch
 de taak hjirûnder ris:
 
 ```
->> sending := {
-	Newsletter oan: eigen recipient.
+>> ferstjoeren := {
+	Nijsbrief oan: eigen recipient.
 }.
-sending ynstelle: ['recipient']
+ferstjoeren ynstelle: ['recipient']
 wearde: ['info@recipient.org'].
-sending begjinne.
+ferstjoeren begjinne.
 ```
 
 
@@ -1512,20 +1512,20 @@ Lege taken binne net tastien. Yn teory soe in lege taak der sa útsjen:
 in lege taak deklarearje wolle, kinne jo it objekt Neat brûke:
 
 ```
->> task := Neat.
+>> taak := Neat.
 ```
 
 Hoewol't dit gjin echte taak is, mar in Neat-objekt, kin der
 dochs in berjocht begjinne nei stjoerd wurde:
 
 ```
->> answer := task begjinne.
+>> antwurd := taak begjinne.
 ```
 
 Eins is dit itselde as:
 
 ```
->> answer := Neat begjinne.
+>> antwurd := Neat begjinne.
 ```
 
 Om't it objekt **Neat** it berjocht **begjinne** net werkent,
@@ -1700,8 +1700,8 @@ list is in priislist, lykas:
 
 ```
 >> menu := List nĳ
-	set: ['£5'] by: ['apple pie'],
-	set: ['£6'] by: ['carrot cake'],
+	set: ['£5'] by: ['appeltaart'],
+	set: ['£6'] by: ['woartelkoeke'],
 	set: ['£3'] by: ['fudge'].
 ```
 
@@ -1845,7 +1845,7 @@ It is ek mooglik om it Programma-objekt te freegjen oft in
 bepaald objekt al oanwêzich is yn it programma:
 
 ```
-Programma Tool ja: { ... }.
+Programma Ark ja: { ... }.
 ```
 
 By in objekt-
@@ -1893,9 +1893,9 @@ Programma brûke: ['template.xo'].
 Jo kinne de folgjende serverynstellingen ynstelle:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# standertwearden binne jûn,
+	# dus as jo neat ynstelle, wurde dizze
+	# wearden brûkt...
 
 	Programma 
 	ynstelling: ['max-postfields']
@@ -1923,9 +1923,9 @@ bekende server.
 Server inisjalisearje.
 Programma brûke: ['webtools.xo'].
 
->> web-document := Webdokumint nĳ.
+>> web-dokumint := Webdokumint nĳ.
 
-web-document útfiere: ['
+web-dokumint útfiere: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ dan moatte jo de HTTP-koppen sels skriuwe:
 ```
 #!/bin/xo
 Utfier skriuwe: ['Content-type: text/html; charset=utf-8 \n\n'], nije-rigel.
-Utfier skriuwe: ['hello world!'], nije-rigel.
+Utfier skriuwe: ['hallo wrâld!'], nije-rigel.
 ``` 
 
 ## Fersyk
@@ -1951,13 +1951,13 @@ UPLOAD-gegevens op te heljen:
 ```
 >> fersyk  := HTTP-Fersyk nĳ.
 >> search   := fersyk get: ['search']. # ?search=books
->> password := fersyk post: ['password']. # from form
->> selected := fersyk get-list: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := fersyk post-list: ['sel[]'].
->> cookie   := fersyk cookie: ['session-id'].
->> upload   := fersyk upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> password := fersyk post: ['password']. # út it formulier
+>> selektearre := fersyk get-list: ['sel[]']. #?sel[]=1&sel[]=2
+>> selektearre := fersyk post-list: ['sel[]'].
+>> koekje   := fersyk cookie: ['session-id'].
+>> oplaad   := fersyk upload: ['file'].
+>> tydlikpaad := oplaad ? 1.
+>> bestânsnamme := oplaad ? 0.
 ```
 
 ## Maxpost/lingte
@@ -2007,7 +2007,7 @@ Om in record yn te foegjen, brûke jo:
 >> sykparameters := db fraach: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parameters: ( Rige nĳ ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parameters: ( Rige nĳ ; ['abc'] ; 12.35 ; 6 ). # parametrisearre fragen
 
 {  sykparameters útfiere. db befêstigje. }
 fange: { :e db weromdraaie.  }, begjinne.
@@ -2021,7 +2021,7 @@ ta oan de SQL.
 Helje de ynfoege id sa op:
 
 ```
-Utfier skriuwe: ['INSERTED: '] + sykparameters insert-id, nije-rigel. # insert id
+Utfier skriuwe: ['YNFOEGE: '] + sykparameters insert-id, nije-rigel. # ynfoege id
 ```
 
 Om records op te heljen:
@@ -2030,9 +2030,9 @@ Om records op te heljen:
 >> sykparameters :=
 db
 	fraach: ['SELECT * FROM book order by id desc limit 2'], 
-	ophelje: { :row 
-		Utfier skriuwe: row id + [' '] + row description + [': '] + row price, nije-rigel.
-	}. # fetching rows
+	ophelje: { :tabelrige 
+		Utfier skriuwe: tabelrige id + [' '] + tabelrige description + [': '] + tabelrige price, nije-rigel.
+	}. # rigen ophelje
 
 ```
 
@@ -2053,15 +2053,15 @@ dokumint is mei sawol koppen as HTML of oare gegevens).
 
 
 ```
-# First we make a new Web Document instance
+# Earst meitsje wy in nije Webdokumint-ynstânsje
 >> web := Webdokumint nĳ.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web sesje-begjinne.
+# No begjinne wy in sesje; dat makket in kop foar in cookie en
+# in triem foar dyn gegevens, keppele oan dy cookie
+>> aktive-sesje := web sesje-begjinne.
 
-# Now we can treat session like a dict
-session userid: 123.
+# No kinne wy de sesje behannelje as in List
+aktive-sesje userid: 123.
 ```
 
 Om de sesje te ferneatigjen (by it ôfmelden):
@@ -2096,7 +2096,7 @@ web kop: (
 Om in 404-side te toanen:
 
 ```
-web net-fûn: ['OOps..'].
+web net-fûn: ['OEps..'].
 ```
 
 
@@ -2160,8 +2160,8 @@ Resultaat:
 Om troch brûkers opladen bestannen feilich oan te bieden, kinne jo fertrouwe op passthru:
 
 ```
->> uploaded := ['smile.gif'].
-Server trochjaan: uploaded foarheaksel: ['/uploads/images/'].
+>> opladen := ['smile.gif'].
+Server trochjaan: opladen foarheaksel: ['/uploads/images/'].
 Programma ein.
 ```
 
@@ -2191,7 +2191,7 @@ Om in objekt as JSON te kodearjen:
 Om JSON te dekodearjen nei in xoscript-objekt:
 
 ```
->> dict := ((JSON objekt: json) abc ? 1).
+>> wurdboek := ((JSON objekt: json) abc ? 1).
 ```
 
 JSON mei mear as 500 nivo's fan nesting wurdt as ûnjildich ôfwiisd.
@@ -2199,7 +2199,7 @@ JSON mei mear as 500 nivo's fan nesting wurdt as ûnjildich ôfwiisd.
 Om in List streekrjocht as json út te fieren mei de krekte koppen:
 
 ```
-web json: dict.
+web json: wurdboek.
 ```
 
 
@@ -2215,7 +2215,7 @@ Patroan nĳ: ['href="([^"]+)" target="([^"]+)"'].
 Pas it patroan no sa ta op de ûnderwerptekst:
 
 ```
-pattern oerienkomst: ûnderwerp dwaan: { :m :x .... }
+sykpatroan oerienkomst: ûnderwerp dwaan: { :m :x .... }
 ```
 
 Folslein foarbyld:
@@ -2225,13 +2225,13 @@ Folslein foarbyld:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Patroan nĳ: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern oerienkomst: ûnderwerp dwaan: { :m :x
+>> sykpatroan := Patroan nĳ: ['href="([^"]+)" target="([^"]+)"'].
+>> útkomst  := sykpatroan oerienkomst: ûnderwerp dwaan: { :m :x
 	Utfier skriuwe: m, nije-rigel.
 	Utfier skriuwe: x, nije-rigel.
 	<- ['XXX'].
 }.
-Utfier skriuwe: result, nije-rigel.
+Utfier skriuwe: útkomst, nije-rigel.
 ```
 
 ## Netwurk
@@ -2254,8 +2254,8 @@ De serverplugin komt mei fersifering op basis fan XChaCha20 en Argon2.
 Foarbyld:
 
 ```
->> encrypted := Klûs fersiferje: ['hello'] kaai: ['world'].
->> decrypted := Klûs fersiferje: encrypted kaai: ['world'].
+>> fersifere := Klûs fersiferje: ['hello'] kaai: ['world'].
+>> ûntsifere := Klûs fersiferje: fersifere kaai: ['world'].
 ```
 
 ## Tokens
@@ -2263,7 +2263,7 @@ Foarbyld:
 Om in kryptografysk feilich token fan in bepaalde lingte te generearjen:
 
 ```
->> mytok := Klûs token: 40.
+>> myntoken := Klûs token: 40.
 ```
 
 Dit generearret in token fan 40 tekens.
@@ -2275,7 +2275,7 @@ nullen tafoegje. It brûkt de printf-syntaksis.
 
 ```
 >> fmt := Formaat nĳ: ['%06.0f'].
-fmt tapasse: 56. # gives 000056
+fmt tapasse: 56. # jout 000056
 ```
 
 In formaat kin ien omsetting befetsje en dy moat by de wearde passe,
@@ -2322,10 +2322,10 @@ Foarbyld:
 Server inisjalisearje.
 Programma brûke: ['mailtools.xo'].
 
->> e-mail := HTML-E-mail nĳ.
->> img := e-mail taheakje: ( Bestand nĳ: ['myimage.png'] ).
+>> e-brief := HTML-E-mail nĳ.
+>> img := e-brief taheakje: ( Bestand nĳ: ['myimage.png'] ).
 
-e-mail
+e-brief
 ôfstjoerder: ['xo@xoscript.com'] namme: ['xo'],
 oan: ( Rige nĳ ; ['xo2@xoscipt.com'] ),
 ûnderwerp: ['xoxo'],
@@ -2441,13 +2441,13 @@ sels frijjaan). Dêrom moatte jo blobs as it nedich is sels frijjaan.
 Om in blob frij te jaan, brûke jo:
 
 ```
-myblob frijjaan.
+mynblob frijjaan.
 ```
 
 Om in struct frij te jaan, brûke jo:
 
 ```
-mystruct struct-frijjaan frijjaan.
+mynstruct struct-frijjaan frijjaan.
 ```
 
 Foar in struct moatte jo dus twa berjochten stjoere: struct-frijjaan en frijjaan, om

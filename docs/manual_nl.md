@@ -394,7 +394,7 @@ Commentaar in XOScript begint met een \#-teken. De volgende regel
 wordt dus genegeerd:
 
 ```
-# this is just a comment
+# dit is gewoon commentaar
 ```
 
 ## Variabelen
@@ -413,16 +413,16 @@ Dit zijn voorbeelden van geldige variabelen:
 >> ♡♡♡ := 3.
 >> $ := ['dollar'].
 >> +plus := Ja.
->> user-password := ['Pssst!'].
+>> gebruikerswachtwoord := ['Pssst!'].
 ```
 
 Ongeldige variabelen zijn bijvoorbeeld:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['negatief getal'].
+>> password of gebruiker := ['Geheim'].
+>> password.of:gebruiker := ['Geheim'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ object door het een vervolgbericht te sturen:
 
 ```
 Uit schrijf:
-[' hello '] kern hoofdletters.
+[' hoi '] kern hoofdletters.
 ```
 
 ```
-HELLO
+HOI
 ```
 
 Hier worden twee berichten naar het object **Tekst** gestuurd: **kern**, gevolgd
@@ -668,7 +668,7 @@ aan een **Ja**-object of een **Nee**-object:
 
 ```
 2 even? ja: {
-	Uit schrijf: ['Two is an even number'], stop.
+	Uit schrijf: ['Twee is een even getal'], stop.
 }.
 ```
 In het vorige voorbeeld wordt het bericht **ja:** naar **Ja** gestuurd (het
@@ -879,9 +879,9 @@ Je kunt eerder geschreven code hergebruiken om een hiërarchie
 van objecten te maken. Bijvoorbeeld:
 
 ```
->> Animal := Object nieuw.
->> Dog := Animal nieuw.
->> Poodle := Dog nieuw.
+>> Dier := Object nieuw.
+>> Hond := Dier nieuw.
+>> Poedel := Hond nieuw.
 ```
 
 In dit geval erft **Dog** al het gedrag en alle eigenschappen
@@ -917,7 +917,7 @@ dat de uiteindelijke optelling toch nog moet worden uitgevoerd, wat in feite
 op de volgende regel gebeurt:
 
 ```
->> answer := zelf + (getal x factor).
+>> antwoordwaarde := zelf + (getal x factor).
 ```
 
 Hoe begrijpt XOScript nu dat dit plus**teken** verwijst naar
@@ -953,14 +953,14 @@ Hoewel xoscript geen klassen biedt, is het nabootsen van klasse-achtig
 gedrag triviaal. Overschrijf simpelweg het bericht nieuw.
 
 ```
->> Animal := Object nieuw.
-Animal bij: ['nieuw'] doen: {
+>> Dier := Object nieuw.
+Dier bij: ['nieuw'] doen: {
 	<- zelf nieuw initialiseren.
 }.
 
-Animal bij: ['initialiseren'] doen: {
-	eigen sound := ['?'].
-	eigen legs  := 4.
+Dier bij: ['initialiseren'] doen: {
+	eigen geluid := ['?'].
+	eigen poten  := 4.
 }.
 ```
 
@@ -980,7 +980,7 @@ heeft een dier 4 poten en is het geluid onbekend (vandaar het vraagteken).
 Om een nieuwe instantie van ons Animal te maken, kunnen we simpelweg zeggen:
 
 ```
->> a := Animal nieuw.
+>> a := Dier nieuw.
 ```
 
 Nu krijgen we een nieuwe instantie van Animal met 4 poten, een onbekend geluid en
@@ -988,18 +988,18 @@ een init-methode. Net als in andere OOP-talen kunnen we ons Animal ook
 uitbreiden:
 
 ```
->> Dog := Animal nieuw.
-Dog bij: ['initialiseren'] doen: {
+>> Hond := Dier nieuw.
+Hond bij: ['initialiseren'] doen: {
 	zelf initialiseren.
-	eigen sound := ['barks'].
+	eigen geluid := ['blaft'].
 }.
 ```
 
 We kunnen dit eenvoudig testen door een tekst-methode toe te voegen:
 
 ```
-Animal bij: ['tekst'] doen: {
-	<- eigen legs tekst + eigen sound.
+Dier bij: ['tekst'] doen: {
+	<- eigen poten tekst + eigen geluid.
 }.
 ```
 
@@ -1014,10 +1014,10 @@ om omtrek en oppervlakte te berekenen. Een mogelijke notatie zou zijn:
 
 
 ```
->> Rectangle := Object nieuw.
+>> Rechthoek := Object nieuw.
 
-Rectangle bij: ['area'] doen: {
-	<- eigen lengte * eigen width.
+Rechthoek bij: ['oppervlakte'] doen: {
+	<- eigen lengte * eigen breedte.
 }.
 ```
 
@@ -1026,12 +1026,12 @@ kunnen de berichten **length:** en **width:** worden toegevoegd:
 
 
 ```
-Rectangle bij: ['length:'] doen: { :lengte
+Rechthoek bij: ['length:'] doen: { :lengte
 	eigen lengte := lengte.
 }.
 
-Rectangle bij: ['width:'] doen: { :width
-	eigen width := width.
+Rechthoek bij: ['width:'] doen: { :breedte
+	eigen breedte := breedte.
 }.
 
 ```
@@ -1040,16 +1040,16 @@ Deze rechthoek kan dan als volgt worden gebruikt:
 
 
 ```
->> rectangle := Rectangle nieuw length: 2, width: 3.
-Uit schrijf: rectangle area.
+>> rechthoek := Rechthoek nieuw length: 2, width: 3.
+Uit schrijf: rechthoek oppervlakte.
 ```
 
 Als het instellen van lengte en breedte echter wordt vergeten,
 verschijnt er een foutmelding:
 
 ```
->> rectangle := Rectangle nieuw.
-Uit schrijf: rectangle area.
+>> rechthoek := Rechthoek nieuw.
+Uit schrijf: rechthoek oppervlakte.
 ```
 
 geeft de volgende fout:
@@ -1075,13 +1075,13 @@ worden al deze kernobjecten besproken.
 Je kunt een object (samen met zijn huidige toestand) op schijf opslaan met:
 
 ```
-myobject save-as: ['saved.bin'].
+mijnobject save-as: ['saved.bin'].
 ```
 
 Om het object weer van schijf te laden:
 
 ```
->> myobject := Object load-from: ['saved.bin'].
+>> mijnobject := Object load-from: ['saved.bin'].
 ```
 
 Momentopnamen kunnen worden gebruikt om een bepaalde toestand op te slaan of om de prestaties te verbeteren.
@@ -1201,8 +1201,8 @@ aan een variabele toekennen en daarna berichten sturen:
 ```
 10 even?
 
->> tenner := 10.
-tenner even?
+>> tientje := 10.
+tientje even?
 
 ```
 
@@ -1432,10 +1432,10 @@ Hier is een belangrijke valkuil:
 ```
 {
 	Nee nee: {
-		Uit schrijf: ['End the loop.'].
+		Uit schrijf: ['Beëindig de lus.'].
 	}, afbreken.
 	
-	Uit schrijf: ['Dont show me.'].
+	Uit schrijf: ['Laat mij niet zien.'].
 
 } procedure.
 
@@ -1449,10 +1449,10 @@ afbreking wilt uitvoeren, moet die als bericht naar **Ja** worden gestuurd.
 ```
 {
 	Nee niet ja: {
-		Uit schrijf: ['End the loop.'].
+		Uit schrijf: ['Beëindig de lus.'].
 	}, afbreken.
 	
-	Uit schrijf: ['Dont show me.'].
+	Uit schrijf: ['Laat mij niet zien.'].
 
 } procedure.
 
@@ -1465,7 +1465,7 @@ Werkt zoals verwacht.
 Excepties kunnen als volgt worden afgehandeld:
 
 ```
-{ Task 1 } afhandelen: { Task 2 }, start.
+{ Taak 1 } afhandelen: { Taak 2 }, start.
 ```
 
 Je kunt ook opzettelijk een fout in je programma laten optreden en
@@ -1475,9 +1475,9 @@ illustratie:
 
 ```
 {
-deze-taak fout: ['Whoops!'].
-} afhandelen: { :mistake
-Uit schrijf: mistake.
+deze-taak fout: ['Oeps!'].
+} afhandelen: { :vergissing
+Uit schrijf: vergissing.
 }, start.
 ```
 
@@ -1487,12 +1487,12 @@ XOScript biedt bij taken de mogelijkheid waarden te injecteren. Bekijk
 de taak hieronder eens:
 
 ```
->> sending := {
-	Newsletter aan: eigen recipient.
+>> verzenden := {
+	Nieuwsbrief aan: eigen recipient.
 }.
-sending gebruik: ['recipient']
+verzenden gebruik: ['recipient']
 waarde: ['info@recipient.org'].
-sending start.
+verzenden start.
 ```
 
 
@@ -1511,20 +1511,20 @@ uitzien: **{}**, maar XOScript beschouwt dit als een taalfout. Als je
 een lege taak wilt declareren, kun je het object Niets gebruiken:
 
 ```
->> task := Niets.
+>> taak := Niets.
 ```
 
 Hoewel dit geen echte taak is maar een Niets-object, kan er toch
 een start-bericht naar worden gestuurd:
 
 ```
->> answer := task start.
+>> antwoordwaarde := taak start.
 ```
 
 Dit is in feite hetzelfde als:
 
 ```
->> answer := Niets start.
+>> antwoordwaarde := Niets start.
 ```
 
 Omdat het object **Niets** het bericht **start** niet herkent,
@@ -1698,9 +1698,9 @@ lijst is een prijslijst, zoals:
 
 
 ```
->> menu := Lijst nieuw
-	zet: ['£5'] bij: ['apple pie'],
-	zet: ['£6'] bij: ['carrot cake'],
+>> menukaart := Lijst nieuw
+	zet: ['£5'] bij: ['appeltaart'],
+	zet: ['£6'] bij: ['worteltaart'],
 	zet: ['£3'] bij: ['fudge'].
 ```
 
@@ -1715,13 +1715,13 @@ vind je de betekenis. Om bijvoorbeeld uit de
 hierboven genoemde lijst de prijs van een fudge op te vragen:
 
 ```
->> price := menu bij: ['fudge'].
+>> price := menukaart bij: ['fudge'].
 ```
 
 Je kunt ook de beknopte notatie gebruiken:
 
 ```
->> price := menu ? ['fudge'].
+>> price := menukaart ? ['fudge'].
 ```
 
 Als de ingangen die je gebruikt om objecten op te slaan geen spaties bevatten
@@ -1729,7 +1729,7 @@ Als de ingangen die je gebruikt om objecten op te slaan geen spaties bevatten
 kan ook de volgende notatie worden gebruikt:
 
 ```
->> menu := Lijst nieuw
+>> menukaart := Lijst nieuw
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1740,7 +1740,7 @@ Om de prijs van een
 fudge op te vragen, kan de volgende vereenvoudigde notatie worden gebruikt:
 
 ```
->> price := menu fudge.
+>> price := menukaart fudge.
 ```
 
 @api_Dict_collections
@@ -1844,7 +1844,7 @@ Je kunt het object Programma ook vragen of een
 bepaald object al in het programma aanwezig is:
 
 ```
-Programma Tool ja: { ... }.
+Programma Gereedschap ja: { ... }.
 ```
 
 Bij een objectnaam
@@ -1892,9 +1892,9 @@ Programma gebruik: ['template.xo'].
 Je kunt de volgende serverinstellingen opgeven:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# er zijn standaardwaarden gegeven,
+	# dus als je niets instelt, worden deze
+	# waarden gebruikt...
 
 	Programma 
 	instelling: ['max-postvelden']
@@ -1939,7 +1939,7 @@ dan moet je de HTTP-headers zelf schrijven:
 ```
 #!/bin/xo
 Uit schrijf: ['Content-type: text/html; charset=utf-8 \n\n'], stop.
-Uit schrijf: ['hello world!'], stop.
+Uit schrijf: ['hallo wereld!'], stop.
 ``` 
 
 ## Verzoek
@@ -1950,13 +1950,13 @@ UPLOAD-gegevens op te halen:
 ```
 >> verzoek  := HTTP-Request nieuw.
 >> search   := verzoek get: ['search']. # ?search=books
->> password := verzoek post: ['password']. # from form
->> selected := verzoek get-list: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := verzoek post-list: ['sel[]'].
+>> password := verzoek post: ['password']. # uit formulier
+>> geselecteerd := verzoek get-list: ['sel[]']. #?sel[]=1&sel[]=2
+>> geselecteerd := verzoek post-list: ['sel[]'].
 >> cookie   := verzoek cookie: ['session-id'].
 >> upload   := verzoek upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> tijdelijk-pad := upload ? 1.
+>> bestandsnaam := upload ? 0.
 ```
 
 ## Maxpost/lengte
@@ -2006,7 +2006,7 @@ Om een record in te voegen, gebruik je:
 >> zoekparameters := db query: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parameters: ( Reeks nieuw ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parameters: ( Reeks nieuw ; ['abc'] ; 12.35 ; 6 ). # geparametriseerde queries
 
 {  zoekparameters uitvoeren. db bevestigen. }
 afhandelen: { :e db terugdraaien.  }, start.
@@ -2020,7 +2020,7 @@ aan de SQL toe.
 Haal het ingevoegde id als volgt op:
 
 ```
-Uit schrijf: ['INSERTED: '] + zoekparameters insert-id, stop. # insert id
+Uit schrijf: ['INGEVOEGD: '] + zoekparameters insert-id, stop. # ingevoegde id
 ```
 
 Om records op te halen:
@@ -2029,9 +2029,9 @@ Om records op te halen:
 >> zoekparameters :=
 db
 	query: ['SELECT * FROM book order by id desc limit 2'], 
-	ophalen: { :row 
-		Uit schrijf: row id + [' '] + row description + [': '] + row price, stop.
-	}. # fetching rows
+	ophalen: { :rij 
+		Uit schrijf: rij id + [' '] + rij description + [': '] + rij price, stop.
+	}. # rijen ophalen
 
 ```
 
@@ -2052,15 +2052,15 @@ document is, met zowel de headers als de HTML of andere gegevens).
 
 
 ```
-# First we make a new Web Document instance
+# Eerst maken we een nieuwe Webdocument-instantie
 >> web := Webdocument nieuw.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web sessie-starten.
+# Nu starten we een sessie; dit maakt een kop voor een cookie en
+# een bestand voor je gegevens, gekoppeld aan die cookie
+>> sessie := web sessie-starten.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Nu kunnen we de sessie behandelen als een Lijst
+sessie userid: 123.
 ```
 
 Om de sessie te vernietigen (bij het uitloggen):
@@ -2095,7 +2095,7 @@ web kop: (
 Om een 404-pagina te tonen:
 
 ```
-web niet-gevonden: ['OOps..'].
+web niet-gevonden: ['Oeps..'].
 ```
 
 
@@ -2159,8 +2159,8 @@ Resultaat:
 Om door gebruikers geüploade bestanden veilig aan te bieden, kun je passthru gebruiken:
 
 ```
->> uploaded := ['smile.gif'].
-Server doorgave: uploaded prefix: ['/uploads/images/'].
+>> geüpload := ['smile.gif'].
+Server doorgave: geüpload prefix: ['/uploads/images/'].
 Programma einde.
 ```
 
@@ -2190,7 +2190,7 @@ Om een object als JSON te coderen:
 Om JSON te decoderen naar een xoscript-object:
 
 ```
->> dict := ((JSON object: json) abc ? 1).
+>> lst := ((JSON object: json) abc ? 1).
 ```
 
 JSON met meer dan 500 niveaus van nesting wordt als ongeldig geweigerd.
@@ -2198,7 +2198,7 @@ JSON met meer dan 500 niveaus van nesting wordt als ongeldig geweigerd.
 Om een Lijst direct als json met de juiste headers uit te voeren:
 
 ```
-web json: dict.
+web json: lst.
 ```
 
 
@@ -2214,7 +2214,7 @@ Patroon nieuw: ['href="([^"]+)" target="([^"]+)"'].
 Pas het patroon nu als volgt toe op de onderwerptekst:
 
 ```
-pattern overeenkomst: onderwerp doen: { :m :x .... }
+patroon overeenkomst: onderwerp doen: { :m :x .... }
 ```
 
 Volledig voorbeeld:
@@ -2224,13 +2224,13 @@ Volledig voorbeeld:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Patroon nieuw: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern overeenkomst: onderwerp doen: { :m :x
+>> patroon := Patroon nieuw: ['href="([^"]+)" target="([^"]+)"'].
+>> resultaat  := patroon overeenkomst: onderwerp doen: { :m :x
 	Uit schrijf: m, stop.
 	Uit schrijf: x, stop.
 	<- ['XXX'].
 }.
-Uit schrijf: result, stop.
+Uit schrijf: resultaat, stop.
 ```
 
 ## Netwerken
@@ -2253,8 +2253,8 @@ De serverplugin wordt geleverd met versleuteling op basis van XChaCha20 en Argon
 Voorbeeld:
 
 ```
->> encrypted := Kluis versleutel: ['hello'] sleutel: ['world'].
->> decrypted := Kluis versleutel: encrypted sleutel: ['world'].
+>> versleuteld := Kluis versleutel: ['hello'] sleutel: ['world'].
+>> ontsleuteld := Kluis versleutel: versleuteld sleutel: ['world'].
 ```
 
 ## Tokens
@@ -2262,7 +2262,7 @@ Voorbeeld:
 Om een cryptografisch veilig token van een bepaalde lengte te genereren:
 
 ```
->> mytok := Kluis token: 40.
+>> mijntoken := Kluis token: 40.
 ```
 
 Dit genereert een token van 40 tekens.
@@ -2274,7 +2274,7 @@ voorloopnullen. Het gebruikt de printf-syntaxis.
 
 ```
 >> fmt := Format nieuw: ['%06.0f'].
-fmt toepassen: 56. # gives 000056
+fmt toepassen: 56. # geeft 000056
 ```
 
 Een format kan één conversie bevatten, en die moet bij de waarde passen,
@@ -2321,10 +2321,10 @@ Voorbeeld:
 Server initialiseren.
 Programma gebruik: ['mailtools.xo'].
 
->> e-mail := HTML-E-mail nieuw.
->> img := e-mail bijvoegen: ( Bestand nieuw: ['myimage.png'] ).
+>> e-mailbericht := HTML-E-mail nieuw.
+>> img := e-mailbericht bijvoegen: ( Bestand nieuw: ['myimage.png'] ).
 
-e-mail
+e-mailbericht
 afzender: ['xo@xoscript.com'] naam: ['xo'],
 aan: ( Reeks nieuw ; ['xo2@xoscipt.com'] ),
 onderwerp: ['xoxo'],
@@ -2440,13 +2440,13 @@ vrijgeven). Daarom moet je blobs zo nodig zelf vrijgeven.
 Om een blob vrij te geven, gebruik je:
 
 ```
-myblob vrij.
+mijnblob vrij.
 ```
 
 Om een struct vrij te geven, gebruik je:
 
 ```
-mystruct structvrij vrij.
+mijnstruct structvrij vrij.
 ```
 
 Voor een struct moet je dus twee berichten sturen, structvrij en vrij, om

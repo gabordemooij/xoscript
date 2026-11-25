@@ -1698,7 +1698,7 @@ x do shift pop done.
 
 {{messages}}
 
-Both List and Dict are collections. However, contrary to a
+**Both List and Dict are collections. However, contrary to a
 list, a dict **has no** order. Another distinction between the two
 is that a dict consists of object pairs. One object acts as entry (or
 keyword) in order to search for the other object. A good example of a
@@ -1903,7 +1903,6 @@ Program use: ['template.xo'].
 You can set the following server settings:
 
 ```
-
 	# default values are given
 	# so if you do not set anything these
 	# values are used...
@@ -1944,16 +1943,6 @@ web-document out: ['
 </html>'].
 
 ```
-
-{{note}}
-It's often better to use 'finish:' instead of 'out:', if you
-wish to output all contents in one go. The 'finish:' message
-sets the content-length header to the correct number of bytes,
-making sure the client can close the connection as soon as the
-bytes have been transferred. This improves performance. You can
-use 'finish:' only once though whereas you can use 'out:' as
-many times as you want.
-{{/note}}
 
 If you don't want to use the Web-Document object, that's fine, but
 then you have to write the HTTP headers yourself:
@@ -2227,11 +2216,10 @@ web json: dict.
 ## Regex
 
 You can use regular expressions by creating a pattern.
-Start your pattern with (*UTF)(*UCP) for UTF-8.
 For instance to match the hrefs and targets of hyperlinks:
 
 ```
-Pattern new: ['(*UTF)(*UCP)href="([^"]+)" target="([^"]+)"'].
+Pattern new: ['href="([^"]+)" target="([^"]+)"'].
 ```
 
 Now, apply the pattern to the subject string like this:
@@ -2247,7 +2235,7 @@ Full example:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Pattern new: ['(*UTF)(*UCP)href="([^"]+)" target="([^"]+)"'].
+>> pattern := Pattern new: ['href="([^"]+)" target="([^"]+)"'].
 >> result  := pattern match: subject do: { :m :x
 	Out write: m, stop.
 	Out write: x, stop.
@@ -2301,7 +2289,12 @@ fmt apply: 56. # gives 000056
 ```
 
 A format can contain one conversion and it has to fit the value,
-otherwise you get an error (follows printf conventions).
+otherwise you get an error:
+
+- `apply:` with a string: `%s`
+- `apply:` with a number: `%f`, `%e`, `%g` or `%a`
+- `apply-int:` with a number: `%d`, `%i`, `%o`, `%u`, `%x` or `%c`
+
 Values from a request are strings. To format one as a number,
 convert it first:
 
@@ -2651,37 +2644,6 @@ add the dictionary for your language if it is not provided yet.
 This chapters discusses additional tools that work together with
 XOScript.
 
-## XOCAT
-
-XOCAT is a tool to run an XO-application or any interactive CLI
-application in any programming language securely over TLS.
-This allows you to connect to your XOScript application remotely.
-
-One XOCAT server only serves on XO-application. So any defects
-in a XOCAT server only impacts the associated application and
-nothing else.
-
-To start a XOCAT server:
-
-```
-PORT=4433 XOCAT_CERT=cert.pem \
-XOCAT_KEY=key.pem xocat server \
-./xo myapp.xo 2>/var/log/err.txt
-```
-
-The stdin/stdout will be connected to the remote clients. Stderr will
-never be shared with clients to avoid revealing senstive data.
-
-The client can use the XO-application like this:
-
-```
-XOCAT_CA=cert.pem xocat client \
-myexamplehost.com 4433
-```
-
-Hostnames will be verified, IPs are not allowed. It's not possible
-to disable TLS or have verification turned off.
-
 ## XOCL
 
 XOCL (XO Client) can be used to turn a webapp into a desktop
@@ -2749,6 +2711,178 @@ XOTEST is the XOScript testing system. It consists of two scripts
 containing XOScript code and a .exp file with the expected output.
 The main runner script in the root folder (runtests) switches
 based on the platform.
+
+### Multi-language tests
+
+The script misc/xotest/runtest_multi.sh (Linux) runs the unit tests
+in other languages. For every selected language it builds a language
+edition of XOScript and the server plugin, translates all tests
+with XOTR and runs the translated tests.
+
+Run the script from the root folder of the repository:
+
+```
+misc/xotest/runtest_multi.sh [build|nobuild] [languages] [ask|record|report]
+```
+
+| Argument | Meaning |
+|---|---|
+| build | build every language edition first (default) |
+| nobuild | use the editions of a previous run |
+| languages | all (default) or a list of ISO codes like "de fr ja" |
+| ask | upon a difference: show it and ask to save the new result (default) |
+| record | upon a difference: save the new result without asking |
+| report | upon a difference: show it, save nothing and continue |
+
+The following settings can be passed as environment variables:
+
+| Setting | Meaning | Default |
+|---|---|---|
+| FROM | first test to run | 1 |
+| TIL | last test to run | 822 |
+| MODES | memory modes to run each test in | "1 4 0" |
+| LANGS | same as the languages argument | all |
+| SANITIZE | build with address/undefined sanitizers, use no for a much faster run | yes |
+| STRINGS | translate names of messages and settings in strings | yes |
+
+For example, to test German, Japanese and Arabic with the first two
+tests in memory mode 1:
+
+```
+FROM=1 TIL=2 MODES="1" misc/xotest/runtest_multi.sh build "de ja ar" report
+```
+
+To run the same tests again without building:
+
+```
+FROM=1 TIL=2 MODES="1" misc/xotest/runtest_multi.sh nobuild "de ja ar" report
+```
+
+The English edition is always built as well, because it is needed
+to generate the dictionaries (gendict.xo). The editions are kept in
+build/Linux/bin as xo-ISO and mods-ISO, after a run the English edition
+is the active one again. The dictionaries and the translated tests are
+written to /tmp/xo. The translated tests are also kept in tests/ISO
+(like tests/de/t-0001.ctr), with paths to the libraries of the
+language (src/xo/ISO), so the multilingual manual can show every
+example in the language.
+
+At the end the script prints a summary per language and exits with
+code 1 if a test failed or could not be translated.
+
+Tests are skipped if the first line contains #OBSD or !XOTR (a test
+that cannot be translated). A test that fails to translate is reported
+as not translated.
+
+XOTR only translates code. Names of messages and settings in strings
+are translated by the script misc/xotr/strings.awk, for instance
+the string in: on: ['new'] do: { ... }. This applies to strings
+after on:, message:, learn:, means: and setting:. All other strings
+are data and remain untouched.
+
+The libraries in src/xo/en and the code in tests/assets are translated
+as well, the tests use the translated files instead of the English ones.
+
+A test that runs English code from a string cannot work in a translated
+edition. Mark such a test as a single language test by adding !XOTR to
+the first line. Do not add a new line for this, because the line numbers
+in the expected results would change, use a comment on the first line
+instead, for instance:
+
+```
+Server init. # !XOTR
+```
+
+Avoid names in tests that are a word in another language. For example,
+a message named text is the translation of string in German. The
+script misc/xotr/checklang.py does not check this, the test will
+simply fail in that language.
+
+#### Libraries per language
+
+The script misc/xotr/makelibs.sh generates the libraries of src/xo/en
+for other languages:
+
+```
+misc/xotr/makelibs.sh "de fr ja"
+```
+
+Without arguments the libraries for all languages are generated.
+The libraries are written to src/xo/ISO. Besides the words of the
+language itself, the names defined by the libraries are translated:
+objects (like Template), messages (like content:) and the variables
+inside. These names are in src/i18n/ISO/libraries.h, line by line
+equal to src/i18n/en/libraries.h, and may not be the same as a word
+in dictionary.h or server.h of that language. Strings remain untouched,
+so mail headers (like Subject:) and the markers in templates
+(like cut:) stay the same in every language. Tests that use the
+libraries are translated with these names as well.
+
+Existing files are not overwritten,
+because they may have been translated by hand. To regenerate the
+libraries of a language after its dictionary has changed:
+
+```
+FORCE=yes misc/xotr/makelibs.sh "de"
+```
+
+#### Checking language files
+
+The script misc/xotr/checklang.py checks the language files against
+the rules in src/i18n/rules.txt:
+
+```
+python3 misc/xotr/checklang.py
+python3 misc/xotr/checklang.py -w de
+```
+
+The option -w shows warnings as well.
+
+#### Right-to-left languages
+
+In right-to-left languages (like ar, fa, he and ur) parentheses,
+brackets and braces would be shown mirrored. These languages
+therefore use symbols that have no direction of their own and are
+never mirrored: ﴿ and ﴾ instead of ( and ), ⎬ and ⎨ instead of
+{ and }, and ⌝' and '⌜ instead of [' and ']. The opening symbol
+comes first in the text, so it is shown at the right. The quotes
+remain symmetrical: a symbol followed by ' to open a string and '
+followed by a symbol to close it. These symbols are defined in
+dictionary.h of the language, xotr translates them like the other
+words and checklang.py checks them (rules 21 and 22).
+
+#### Expected results per language
+
+The expected result of a test in a language is read from:
+
+```
+tests/exp/ISO/testNNNNISO.exp
+```
+
+For example tests/exp/de/test0004de.exp. If this file does not exist,
+the English result (tests/exp/en) is used as a reference. When the test
+passes, its result is saved in tests/exp/ISO, so every translated test
+gets its own result file. The multilingual manual uses these files to
+show the result of each example in the language. A result that differs
+from the reference, for instance because the output contains a
+translated word like Objekt instead of Object, is only saved with
+record (or ask).
+
+To generate the expected results for a language:
+
+```
+misc/xotest/runtest_multi.sh build "de" record
+```
+
+To check them afterwards:
+
+```
+misc/xotest/runtest_multi.sh nobuild "de" report
+```
+
+Note that record accepts the output of the translated edition as-is.
+Always review the recorded files before you rely on them, otherwise
+a bug might be recorded as the expected result.
 
 # Credits
 

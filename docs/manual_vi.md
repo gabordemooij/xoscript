@@ -160,8 +160,8 @@ và viết một chương trình thử nghiệm nhỏ:
 #!/bin/xo
 Server khởi-tạo.
 Chương-trình dùng: ['webtools.xo'].
->> web := Tài-liệu-Web mới.
-web xuất: ['Hello World'].
+>> trang-web := Tài-liệu-Web mới.
+trang-web xuất: ['Hello World'].
 ```
 
 Cho phép apache2 thực thi chương trình của bạn qua CGI:
@@ -394,7 +394,7 @@ Chú thích trong XOScript bắt đầu bằng ký hiệu \#. Vì vậy, dòng s
 sẽ bị bỏ qua:
 
 ```
-# this is just a comment
+# đây chỉ là một chú thích
 ```
 
 ## Biến
@@ -411,18 +411,18 @@ rằng tên biến không thể bắt đầu bằng chữ số hoặc dấu tr�
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
->> $ := ['dollar'].
+>> $ := ['đô la'].
 >> +plus := Đúng.
->> user-password := ['Pssst!'].
+>> mật-mã-người-dùng := ['Suỵt!'].
 ```
 
 Các biến không hợp lệ chẳng hạn như:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['số âm'].
+>> password of người-dùng := ['Tối mật'].
+>> password.of:người-dùng := ['Tối mật'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ thông điệp nào đó. Điều này rất hữu ích vì nó khuyến khích 
 
 ```
 Xuất ghi:
-[' hello '] cắt-khoảng-trắng chữ-hoa.
+[' xin chào '] cắt-khoảng-trắng chữ-hoa.
 ```
 
 ```
-HELLO
+XIN CHàO
 ```
 
 Ở đây, hai thông điệp được gửi đến đối tượng **Chuỗi**: **cắt-khoảng-trắng**, tiếp theo
@@ -668,7 +668,7 @@ gửi đến một đối tượng **Đúng** hoặc một đối tượng **Sai
 
 ```
 2 chẵn? đúng: {
-	Xuất ghi: ['Two is an even number'], xuống-dòng.
+	Xuất ghi: ['Hai là số chẵn'], xuống-dòng.
 }.
 ```
 Trong ví dụ trên, thông điệp **đúng:** được gửi đến **Đúng** (câu
@@ -880,9 +880,9 @@ Bạn có thể tái sử dụng mã đã viết trước đó để tạo một
 các đối tượng. Ví dụ:
 
 ```
->> Animal := Đối-tượng mới.
->> Dog := Animal mới.
->> Poodle := Dog mới.
+>> Động-vật := Đối-tượng mới.
+>> Chó := Động-vật mới.
+>> Chó-xù := Chó mới.
 ```
 
 Trong trường hợp này, **Dog** kế thừa toàn bộ hành vi và thuộc tính
@@ -918,7 +918,7 @@ rằng cuối cùng phép cộng thực sự vẫn phải được thực hiện
 diễn ra ở dòng sau:
 
 ```
->> answer := bản-thân + (số x factor).
+>> câu-trả-lời := bản-thân + (số x hệ-số).
 ```
 
 Vậy làm thế nào XOScript hiểu rằng **dấu** cộng này chỉ đến
@@ -954,14 +954,14 @@ Mặc dù xoscript không cung cấp lớp, việc mô phỏng hành vi
 giống lớp rất đơn giản. Chỉ cần ghi đè thông điệp mới.
 
 ```
->> Animal := Đối-tượng mới.
-Animal khi: ['mới'] làm: {
+>> Động-vật := Đối-tượng mới.
+Động-vật khi: ['mới'] làm: {
 	<- bản-thân mới khởi-tạo.
 }.
 
-Animal khi: ['khởi-tạo'] làm: {
-	riêng sound := ['?'].
-	riêng legs  := 4.
+Động-vật khi: ['khởi-tạo'] làm: {
+	riêng âm-thanh := ['?'].
+	riêng số-chân  := 4.
 }.
 ```
 
@@ -981,7 +981,7 @@ một con vật có 4 chân và tiếng kêu chưa xác định (do đó có d�
 Để tạo một thể hiện mới của Animal, chúng ta chỉ cần viết:
 
 ```
->> a := Animal mới.
+>> a := Động-vật mới.
 ```
 
 Bây giờ chúng ta có một thể hiện mới của Animal với 4 chân, tiếng kêu chưa xác định và
@@ -989,18 +989,18 @@ một phương thức khởi-tạo. Giống như trong các ngôn ngữ OOP khá
 mở rộng Animal:
 
 ```
->> Dog := Animal mới.
-Dog khi: ['khởi-tạo'] làm: {
+>> Chó := Động-vật mới.
+Chó khi: ['khởi-tạo'] làm: {
 	bản-thân khởi-tạo.
-	riêng sound := ['barks'].
+	riêng âm-thanh := ['sủa'].
 }.
 ```
 
 Chúng ta có thể kiểm tra điều này dễ dàng bằng cách thêm một phương thức chuỗi:
 
 ```
-Animal khi: ['chuỗi'] làm: {
-	<- riêng legs chuỗi + riêng sound.
+Động-vật khi: ['chuỗi'] làm: {
+	<- riêng số-chân chuỗi + riêng âm-thanh.
 }.
 ```
 
@@ -1015,10 +1015,10 @@ vấn đề thường gặp. Giả sử cần tạo một đối tượng **Rect
 
 
 ```
->> Rectangle := Đối-tượng mới.
+>> Hình-chữ-nhật := Đối-tượng mới.
 
-Rectangle khi: ['area'] làm: {
-	<- riêng độ-dài * riêng width.
+Hình-chữ-nhật khi: ['diện-tích'] làm: {
+	<- riêng độ-dài * riêng chiều-rộng.
 }.
 ```
 
@@ -1027,12 +1027,12 @@ mục đích đó, có thể thêm các thông điệp **độ-dài:** và **wid
 
 
 ```
-Rectangle khi: ['length:'] làm: { :độ-dài
+Hình-chữ-nhật khi: ['length:'] làm: { :độ-dài
 	riêng độ-dài := độ-dài.
 }.
 
-Rectangle khi: ['width:'] làm: { :width
-	riêng width := width.
+Hình-chữ-nhật khi: ['width:'] làm: { :chiều-rộng
+	riêng chiều-rộng := chiều-rộng.
 }.
 
 ```
@@ -1041,16 +1041,16 @@ Hình chữ nhật này sau đó có thể được sử dụng như sau:
 
 
 ```
->> rectangle := Rectangle mới length: 2, width: 3.
-Xuất ghi: rectangle area.
+>> hình-chữ-nhật := Hình-chữ-nhật mới length: 2, width: 3.
+Xuất ghi: hình-chữ-nhật diện-tích.
 ```
 
 Tuy nhiên, nếu quên thiết lập ban đầu cho chiều dài và chiều rộng,
 một thông báo lỗi sẽ xuất hiện:
 
 ```
->> rectangle := Rectangle mới.
-Xuất ghi: rectangle area.
+>> hình-chữ-nhật := Hình-chữ-nhật mới.
+Xuất ghi: hình-chữ-nhật diện-tích.
 ```
 
 sẽ gây ra lỗi sau:
@@ -1076,13 +1076,13 @@ tất cả các đối tượng lõi này sẽ được trình bày.
 Bạn có thể lưu một đối tượng (cùng với trạng thái hiện tại của nó) xuống đĩa bằng:
 
 ```
-myobject save-as: ['saved.bin'].
+đối-tượng-của-tôi save-as: ['saved.bin'].
 ```
 
 Để tải lại đối tượng từ đĩa:
 
 ```
->> myobject := Đối-tượng load-from: ['saved.bin'].
+>> đối-tượng-của-tôi := Đối-tượng load-from: ['saved.bin'].
 ```
 
 Ảnh chụp trạng thái có thể được dùng để lưu một trạng thái nhất định hoặc để cải thiện hiệu năng.
@@ -1202,8 +1202,8 @@ cho một biến rồi gửi thông điệp sau:
 ```
 10 chẵn?
 
->> tenner := 10.
-tenner chẵn?
+>> tờ-mười := 10.
+tờ-mười chẵn?
 
 ```
 
@@ -1433,10 +1433,10 @@ dễ đọc hơn.
 ```
 {
 	Sai sai: {
-		Xuất ghi: ['End the loop.'].
+		Xuất ghi: ['Kết thúc vòng lặp.'].
 	}, ngắt.
 	
-	Xuất ghi: ['Dont show me.'].
+	Xuất ghi: ['Đừng hiển thị tôi.'].
 
 } thủ-tục.
 
@@ -1450,10 +1450,10 @@ ngắt, nó cần được gửi dưới dạng thông điệp đến **Đúng**
 ```
 {
 	Sai phủ-định đúng: {
-		Xuất ghi: ['End the loop.'].
+		Xuất ghi: ['Kết thúc vòng lặp.'].
 	}, ngắt.
 	
-	Xuất ghi: ['Dont show me.'].
+	Xuất ghi: ['Đừng hiển thị tôi.'].
 
 } thủ-tục.
 
@@ -1466,7 +1466,7 @@ Sẽ hoạt động như mong đợi.
 Ngoại lệ có thể được xử lý như sau:
 
 ```
-{ Task 1 } bắt-lỗi: { Task 2 }, chạy.
+{ Tác-vụ 1 } bắt-lỗi: { Tác-vụ 2 }, chạy.
 ```
 
 Bạn cũng có thể cố ý gây ra lỗi trong chương trình của mình, và
@@ -1476,9 +1476,9 @@ sau đây:
 
 ```
 {
-tác-vụ-này lỗi: ['Whoops!'].
-} bắt-lỗi: { :mistake
-Xuất ghi: mistake.
+tác-vụ-này lỗi: ['Ối chà!'].
+} bắt-lỗi: { :lỗi-lầm
+Xuất ghi: lỗi-lầm.
 }, chạy.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript cho phép tiêm giá trị vào các tác vụ. Bây giờ, hãy xem
 tác vụ dưới đây:
 
 ```
->> sending := {
-	Newsletter đến: riêng recipient.
+>> việc-gửi := {
+	Bản-tin đến: riêng recipient.
 }.
-sending đặt: ['recipient']
+việc-gửi đặt: ['recipient']
 giá-trị: ['info@recipient.org'].
-sending chạy.
+việc-gửi chạy.
 ```
 
 
@@ -1512,20 +1512,20 @@ thế này: **{}**, tuy nhiên XOScript coi đây là một lỗi ngôn ngữ. N
 muốn khai báo một tác vụ rỗng, bạn có thể dùng đối tượng Rỗng:
 
 ```
->> task := Rỗng.
+>> việc := Rỗng.
 ```
 
 Mặc dù đây không phải là một tác vụ thực sự mà là một đối tượng Rỗng, bạn vẫn
 có thể gửi thông điệp chạy đến nó:
 
 ```
->> answer := task chạy.
+>> câu-trả-lời := việc chạy.
 ```
 
 Thực tế, điều này giống với:
 
 ```
->> answer := Rỗng chạy.
+>> câu-trả-lời := Rỗng chạy.
 ```
 
 Vì đối tượng **Rỗng** không nhận diện thông điệp **chạy**, nó
@@ -1699,9 +1699,9 @@ danh sách loại này là bảng giá, chẳng hạn như:
 
 
 ```
->> menu := Từ-điển mới
-	đặt: ['£5'] tại: ['apple pie'],
-	đặt: ['£6'] tại: ['carrot cake'],
+>> thực-đơn := Từ-điển mới
+	đặt: ['£5'] tại: ['bánh táo'],
+	đặt: ['£6'] tại: ['bánh cà rốt'],
 	đặt: ['£3'] tại: ['fudge'].
 ```
 
@@ -1716,13 +1716,13 @@ mà có thể tìm được ý nghĩa. Chẳng hạn, để lấy từ
 danh sách nói trên giá của một chiếc kẹo fudge:
 
 ```
->> price := menu tại: ['fudge'].
+>> price := thực-đơn tại: ['fudge'].
 ```
 
 Bạn cũng có thể dùng cách viết ngắn gọn:
 
 ```
->> price := menu ? ['fudge'].
+>> price := thực-đơn ? ['fudge'].
 ```
 
 Nếu các khóa mà bạn dùng để lưu đối tượng không chứa khoảng trắng
@@ -1730,7 +1730,7 @@ Nếu các khóa mà bạn dùng để lưu đối tượng không chứa khoả
 cũng có thể dùng cách viết sau:
 
 ```
->> menu := Từ-điển mới
+>> thực-đơn := Từ-điển mới
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1741,7 +1741,7 @@ Chắc chắn cách viết trên đọc tự nhiên hơn một chút.
 kẹo fudge, có thể dùng cách viết rút gọn sau:
 
 ```
->> price := menu fudge.
+>> price := thực-đơn fudge.
 ```
 
 @api_Dict_collections
@@ -1845,7 +1845,7 @@ Cũng có thể hỏi đối tượng Chương-trình xem một
 đối tượng cho trước đã có mặt trong chương trình hay chưa:
 
 ```
-Chương-trình Tool đúng: { ... }.
+Chương-trình Công-cụ đúng: { ... }.
 ```
 
 Trong trường hợp tên
@@ -1893,9 +1893,9 @@ Chương-trình dùng: ['template.xo'].
 Bạn có thể thiết lập các thông số máy chủ sau:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# các giá trị mặc định đã được cho sẵn,
+	# nên nếu bạn không đặt gì, các
+	# giá trị này sẽ được dùng...
 
 	Chương-trình 
 	thiết-lập: ['max-postfields']
@@ -1923,9 +1923,9 @@ phổ biến nào khác.
 Server khởi-tạo.
 Chương-trình dùng: ['webtools.xo'].
 
->> web-document := Tài-liệu-Web mới.
+>> tài-liệu-web := Tài-liệu-Web mới.
 
-web-document xuất: ['
+tài-liệu-web xuất: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ khi đó bạn phải tự viết các tiêu đề HTTP:
 ```
 #!/bin/xo
 Xuất ghi: ['Content-type: text/html; charset=utf-8 \n\n'], xuống-dòng.
-Xuất ghi: ['hello world!'], xuống-dòng.
+Xuất ghi: ['xin chào thế giới!'], xuống-dòng.
 ``` 
 
 ## Yêu cầu
@@ -1951,13 +1951,13 @@ UPLOAD:
 ```
 >> yêu-cầu-http  := Yêu-cầu-HTTP mới.
 >> search   := yêu-cầu-http get: ['search']. # ?search=books
->> password := yêu-cầu-http post: ['password']. # from form
->> selected := yêu-cầu-http get-danh-sách: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := yêu-cầu-http post-danh-sách: ['sel[]'].
+>> password := yêu-cầu-http post: ['password']. # từ biểu mẫu
+>> đã-chọn := yêu-cầu-http get-danh-sách: ['sel[]']. #?sel[]=1&sel[]=2
+>> đã-chọn := yêu-cầu-http post-danh-sách: ['sel[]'].
 >> cookie   := yêu-cầu-http cookie: ['session-id'].
->> upload   := yêu-cầu-http upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> tệp-tải-lên   := yêu-cầu-http upload: ['file'].
+>> đường-dẫn-tạm := tệp-tải-lên ? 1.
+>> tên-tệp := tệp-tải-lên ? 0.
 ```
 
 ## Giới hạn post/độ dài
@@ -1993,7 +1993,7 @@ thời gian thực thi của bất kỳ thao tác nào, hãy dùng hẹn-giờ: 
 Để kết nối tới cơ sở dữ liệu:
 
 ```
->> db := Maria-DB mới máy-trạm: ['localhost'],
+>> csdl := Maria-DB mới máy-trạm: ['localhost'],
 	tên-người-dùng: ['xo'],
 	mật-khẩu: ['pass123'],
 	tên-cơ-sở-dữ-liệu: ['xobase'],
@@ -2004,13 +2004,13 @@ thời gian thực thi của bất kỳ thao tác nào, hãy dùng hẹn-giờ: 
 Để chèn một bản ghi, hãy dùng:
 
 ```
->> tham-số-tìm-kiếm := db truy-vấn: ['
+>> tham-số-tìm-kiếm := csdl truy-vấn: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], tham-số: ( Danh-sách mới ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], tham-số: ( Danh-sách mới ; ['abc'] ; 12.35 ; 6 ). # truy vấn có tham số
 
-{  tham-số-tìm-kiếm thực-thi. db xác-nhận. }
-bắt-lỗi: { :e db hoàn-tác.  }, chạy.
+{  tham-số-tìm-kiếm thực-thi. csdl xác-nhận. }
+bắt-lỗi: { :e csdl hoàn-tác.  }, chạy.
 ```
 
 Lưu ý rằng xoscript *chỉ* làm việc với giao dịch và không bao giờ tự động commit.
@@ -2021,18 +2021,18 @@ vào SQL.
 Lấy id vừa chèn như sau:
 
 ```
-Xuất ghi: ['INSERTED: '] + tham-số-tìm-kiếm insert-id, xuống-dòng. # insert id
+Xuất ghi: ['ĐÃ CHÈN: '] + tham-số-tìm-kiếm insert-id, xuống-dòng. # id vừa chèn
 ```
 
 Để lấy các bản ghi:
 
 ```
 >> tham-số-tìm-kiếm :=
-db
+csdl
 	truy-vấn: ['SELECT * FROM book order by id desc limit 2'], 
-	lấy: { :row 
-		Xuất ghi: row id + [' '] + row description + [': '] + row price, xuống-dòng.
-	}. # fetching rows
+	lấy: { :hàng 
+		Xuất ghi: hàng id + [' '] + hàng description + [': '] + hàng price, xuống-dòng.
+	}. # lấy các hàng
 
 ```
 
@@ -2053,21 +2053,21 @@ tài liệu chứa cả tiêu đề lẫn HTML hoặc dữ liệu khác).
 
 
 ```
-# First we make a new Web Document instance
->> web := Tài-liệu-Web mới.
+# Trước tiên ta tạo một thể hiện Tài-liệu-Web mới
+>> trang-web := Tài-liệu-Web mới.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web bắt-đầu-phiên.
+# Giờ ta bắt đầu một phiên; việc này tạo một tiêu-đề cho cookie và
+# tạo một tệp lưu dữ liệu của bạn, gắn với cookie đó
+>> phiên-làm-việc := trang-web bắt-đầu-phiên.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Giờ ta có thể dùng phiên như một Từ-điển
+phiên-làm-việc userid: 123.
 ```
 
 Để hủy phiên (khi đăng xuất):
 
 ```
-web hủy-phiên.
+trang-web hủy-phiên.
 ```
 
 ## Tiêu đề
@@ -2076,7 +2076,7 @@ Tài-liệu-Web cũng cho phép bạn đặt các tiêu đề phổ biến khác
 Chẳng hạn, nếu bạn muốn chuyển hướng người dùng đến một URL khác:
 
 ```
-web đi-đến: ['/other.html'].
+trang-web đi-đến: ['/other.html'].
 ```
 
 Ở bên dưới, lệnh này cũng tạo ra tiêu đề HTTP để gửi
@@ -2086,7 +2086,7 @@ kèm với dữ liệu hoặc HTML khác của bạn, nhằm chỉ dẫn trình 
 Để thêm một tiêu đề tùy chỉnh:
 
 ```
-web tiêu-đề: ( 
+trang-web tiêu-đề: ( 
 	Tiêu-đề-HTTP mới
 	khóa-tiêu-đề: ['Content-Length']
 	giá-trị: 400
@@ -2096,7 +2096,7 @@ web tiêu-đề: (
 Để hiển thị trang 404:
 
 ```
-web không-tìm-thấy: ['OOps..'].
+trang-web không-tìm-thấy: ['Ối..'].
 ```
 
 
@@ -2109,7 +2109,7 @@ giữa phần trình bày và logic nghiệp vụ.
 Để tạo một mẫu trang từ tệp:
 
 ```
->> tpl := web mẫu-trang: ['templates/ux.tpl'].
+>> tpl := trang-web mẫu-trang: ['templates/ux.tpl'].
 ```
 
 Hệ thống mẫu trang dùng các dấu đánh dấu.
@@ -2139,7 +2139,7 @@ Bạn có thể làm như sau:
 >> gem := tpl cắt: ['gem'], sao-chép.
 gem price: 99.
 tpl dán: gem tại: ['jewels'].
-web xuất: tpl tinh-chỉnh.
+trang-web xuất: tpl tinh-chỉnh.
 ```
 
 Dòng cuối cùng chỉ đơn giản đẩy mẫu trang dưới dạng chuỗi tới máy khách
@@ -2160,8 +2160,8 @@ Kết quả:
 Để phục vụ các tệp do người dùng tải lên một cách an toàn, bạn có thể dựa vào passthru:
 
 ```
->> uploaded := ['smile.gif'].
-Server chuyển-tiếp: uploaded tiền-tố: ['/uploads/images/'].
+>> đã-tải-lên := ['smile.gif'].
+Server chuyển-tiếp: đã-tải-lên tiền-tố: ['/uploads/images/'].
 Chương-trình kết-thúc.
 ```
 
@@ -2181,7 +2181,7 @@ nhiều vấn đề bảo mật khác.
 Để mã hóa một đối tượng thành JSON:
 
 ```
->> json := ( JSON jsonify: ( 
+>> chuỗi-json := ( JSON jsonify: ( 
 	Từ-điển mới đặt: ( 
 		Danh-sách mới ; 1 ; 2 ; 3
 	) tại: ['abc']
@@ -2191,7 +2191,7 @@ nhiều vấn đề bảo mật khác.
 Để giải mã JSON thành một đối tượng xoscript:
 
 ```
->> dict := ((JSON đối-tượng: json) abc ? 1).
+>> tđ := ((JSON đối-tượng: chuỗi-json) abc ? 1).
 ```
 
 JSON có hơn 500 cấp lồng nhau sẽ bị từ chối vì không hợp lệ.
@@ -2199,7 +2199,7 @@ JSON có hơn 500 cấp lồng nhau sẽ bị từ chối vì không hợp lệ.
 Để xuất trực tiếp một Từ-điển dưới dạng json với các tiêu đề đúng:
 
 ```
-web json: dict.
+trang-web json: tđ.
 ```
 
 
@@ -2215,7 +2215,7 @@ Mẫu mới: ['href="([^"]+)" target="([^"]+)"'].
 Bây giờ, hãy áp dụng mẫu cho chuỗi cần xét như sau:
 
 ```
-pattern khớp: chủ-đề làm: { :m :x .... }
+mẫu-regex khớp: chủ-đề làm: { :m :x .... }
 ```
 
 Ví dụ đầy đủ:
@@ -2225,13 +2225,13 @@ Ví dụ đầy đủ:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Mẫu mới: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern khớp: chủ-đề làm: { :m :x
+>> mẫu-regex := Mẫu mới: ['href="([^"]+)" target="([^"]+)"'].
+>> đáp-số  := mẫu-regex khớp: chủ-đề làm: { :m :x
 	Xuất ghi: m, xuống-dòng.
 	Xuất ghi: x, xuống-dòng.
 	<- ['XXX'].
 }.
-Xuất ghi: result, xuống-dòng.
+Xuất ghi: đáp-số, xuống-dòng.
 ```
 
 ## Mạng
@@ -2254,8 +2254,8 @@ Plugin máy chủ đi kèm cơ chế mã hóa dựa trên XChaCha20 và Argon2.
 Ví dụ:
 
 ```
->> encrypted := Két mã-hóa: ['hello'] khóa: ['world'].
->> decrypted := Két mã-hóa: encrypted khóa: ['world'].
+>> đã-mã-hóa := Két mã-hóa: ['hello'] khóa: ['world'].
+>> đã-giải-mã := Két mã-hóa: đã-mã-hóa khóa: ['world'].
 ```
 
 ## Mã thông báo
@@ -2263,7 +2263,7 @@ Ví dụ:
 Để tạo một mã thông báo an toàn về mặt mật mã với độ dài cụ thể:
 
 ```
->> mytok := Két mã-thông-báo: 40.
+>> mã-thẻ-của-tôi := Két mã-thông-báo: 40.
 ```
 
 Lệnh này sẽ tạo ra một mã thông báo gồm 40 ký tự.
@@ -2274,8 +2274,8 @@ Lệnh này sẽ tạo ra một mã thông báo gồm 40 ký tự.
 thêm số không. Nó dùng cú pháp printf.
 
 ```
->> fmt := Định-dạng mới: ['%06.0f'].
-fmt áp-dụng: 56. # gives 000056
+>> đd := Định-dạng mới: ['%06.0f'].
+đd áp-dụng: 56. # cho ra 000056
 ```
 
 Một định dạng có thể chứa một phép chuyển đổi và phép chuyển đổi đó phải phù hợp với giá trị,
@@ -2289,7 +2289,7 @@ Các giá trị từ một yêu cầu là chuỗi. Để định dạng một gi
 trước tiên hãy chuyển đổi nó:
 
 ```
-fmt áp-dụng: (yêu-cầu-http get: ['amount']) số.
+đd áp-dụng: (yêu-cầu-http get: ['amount']) số.
 ```
 
 ## Bộ mã hóa
@@ -2322,10 +2322,10 @@ Ví dụ:
 Server khởi-tạo.
 Chương-trình dùng: ['mailtools.xo'].
 
->> e-mail := Thư-HTML mới.
->> img := e-mail đính-kèm: ( Tệp mới: ['myimage.png'] ).
+>> lá-thư := Thư-HTML mới.
+>> img := lá-thư đính-kèm: ( Tệp mới: ['myimage.png'] ).
 
-e-mail
+lá-thư
 người-gửi: ['xo@xoscript.com'] tên: ['xo'],
 đến: ( Danh-sách mới ; ['xo2@xoscipt.com'] ),
 chủ-đề: ['xoxo'],
@@ -2441,13 +2441,13 @@ chúng). Vì vậy, bạn cần tự giải phóng blob khi cần thiết.
 Để giải phóng một blob, hãy dùng:
 
 ```
-myblob giải-phóng.
+blob-của-tôi giải-phóng.
 ```
 
 Để giải phóng struct, hãy dùng:
 
 ```
-mystruct giải-phóng-struct giải-phóng.
+cấu-trúc-của-tôi giải-phóng-struct giải-phóng.
 ```
 
 Như vậy, với một struct, bạn cần gửi hai thông điệp: giải-phóng-struct và giải-phóng để

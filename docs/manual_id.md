@@ -394,7 +394,7 @@ Komentar dalam XOScript diawali dengan simbol \#. Jadi, baris berikut
 akan diabaikan:
 
 ```
-# this is just a comment
+# ini hanya komentar
 ```
 
 ## Variabel
@@ -411,18 +411,18 @@ Berikut contoh variabel yang valid:
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
->> $ := ['dollar'].
+>> $ := ['dolar'].
 >> +plus := Benar.
->> user-password := ['Pssst!'].
+>> kata-sandi-pengguna := ['Ssst!'].
 ```
 
 Contoh variabel yang tidak valid:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['angka negatif'].
+>> password of pengguna := ['Rahasia'].
+>> password.of:pengguna := ['Rahasia'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ tersebut dengan mengirim pesan lanjutan:
 
 ```
 Keluaran tulis:
-[' hello '] pangkas huruf-besar.
+[' halo '] pangkas huruf-besar.
 ```
 
 ```
-HELLO
+HALO
 ```
 
 Di sini, dua pesan dikirim ke objek **Teks**: **pangkas**, diikuti
@@ -668,7 +668,7 @@ sederhana ke objek **Benar** atau objek **Salah**:
 
 ```
 2 genap? benar: {
-	Keluaran tulis: ['Two is an even number'], baris-baru.
+	Keluaran tulis: ['Dua adalah bilangan genap'], baris-baru.
 }.
 ```
 Pada contoh sebelumnya, pesan **benar:** dikirim ke **Benar** (jawaban
@@ -880,9 +880,9 @@ Anda dapat menggunakan kembali kode yang ditulis sebelumnya untuk membuat hierar
 objek. Misalnya:
 
 ```
->> Animal := Objek baru.
->> Dog := Animal baru.
->> Poodle := Dog baru.
+>> Hewan := Objek baru.
+>> Anjing := Hewan baru.
+>> Pudel := Anjing baru.
 ```
 
 Dalam hal ini, **Dog** mewarisi semua perilaku dan properti
@@ -918,7 +918,7 @@ bahwa pada akhirnya penjumlahan terakhir tetap harus dilakukan, yang sebenarnya
 terjadi pada baris berikut:
 
 ```
->> answer := diri + (angka x factor).
+>> jawaban := diri + (angka x faktor).
 ```
 
 Nah, bagaimana XOScript memahami bahwa **tanda** plus ini merujuk ke
@@ -954,14 +954,14 @@ Meskipun xoscript tidak menyediakan kelas, meniru perilaku
 mirip kelas sangat mudah. Cukup timpa pesan baru.
 
 ```
->> Animal := Objek baru.
-Animal saat: ['baru'] lakukan: {
+>> Hewan := Objek baru.
+Hewan saat: ['baru'] lakukan: {
 	<- diri baru inisialisasi.
 }.
 
-Animal saat: ['inisialisasi'] lakukan: {
-	milik sound := ['?'].
-	milik legs  := 4.
+Hewan saat: ['inisialisasi'] lakukan: {
+	milik suara := ['?'].
+	milik kaki  := 4.
 }.
 ```
 
@@ -981,7 +981,7 @@ seekor hewan memiliki 4 kaki dan suaranya tidak diketahui (karena itu ada tanda 
 Untuk membuat instans baru dari Animal, kita cukup menulis:
 
 ```
->> a := Animal baru.
+>> a := Hewan baru.
 ```
 
 Sekarang kita mendapatkan instans baru dari Animal dengan 4 kaki, suara yang tidak diketahui, dan
@@ -989,18 +989,18 @@ metode inisialisasi. Sama seperti dalam bahasa OOP lainnya, kita juga dapat
 memperluas Animal:
 
 ```
->> Dog := Animal baru.
-Dog saat: ['inisialisasi'] lakukan: {
+>> Anjing := Hewan baru.
+Anjing saat: ['inisialisasi'] lakukan: {
 	diri inisialisasi.
-	milik sound := ['barks'].
+	milik suara := ['menggonggong'].
 }.
 ```
 
 Kita dapat mengujinya dengan mudah dengan menambahkan metode teks:
 
 ```
-Animal saat: ['teks'] lakukan: {
-	<- milik legs teks + milik sound.
+Hewan saat: ['teks'] lakukan: {
+	<- milik kaki teks + milik suara.
 }.
 ```
 
@@ -1015,10 +1015,10 @@ untuk menghitung keliling dan luas. Notasi yang mungkin adalah:
 
 
 ```
->> Rectangle := Objek baru.
+>> PersegiPanjang := Objek baru.
 
-Rectangle saat: ['area'] lakukan: {
-	<- milik panjang * milik width.
+PersegiPanjang saat: ['luas'] lakukan: {
+	<- milik panjang * milik lebar.
 }.
 ```
 
@@ -1027,12 +1027,12 @@ itu, pesan **panjang:** dan **width:** dapat ditambahkan:
 
 
 ```
-Rectangle saat: ['length:'] lakukan: { :panjang
+PersegiPanjang saat: ['length:'] lakukan: { :panjang
 	milik panjang := panjang.
 }.
 
-Rectangle saat: ['width:'] lakukan: { :width
-	milik width := width.
+PersegiPanjang saat: ['width:'] lakukan: { :lebar
+	milik lebar := lebar.
 }.
 
 ```
@@ -1041,16 +1041,16 @@ Persegi panjang ini kemudian dapat digunakan sebagai berikut:
 
 
 ```
->> rectangle := Rectangle baru length: 2, width: 3.
-Keluaran tulis: rectangle area.
+>> persegiPanjang := PersegiPanjang baru length: 2, width: 3.
+Keluaran tulis: persegiPanjang luas.
 ```
 
 Namun, jika pengaturan awal panjang dan lebar terlewatkan,
 akan muncul pesan galat:
 
 ```
->> rectangle := Rectangle baru.
-Keluaran tulis: rectangle area.
+>> persegiPanjang := PersegiPanjang baru.
+Keluaran tulis: persegiPanjang luas.
 ```
 
 akan menghasilkan galat berikut:
@@ -1076,13 +1076,13 @@ semua objek inti ini akan dibahas.
 Anda dapat menyimpan sebuah objek (beserta keadaannya saat ini) ke disk dengan:
 
 ```
-myobject save-as: ['saved.bin'].
+objekku save-as: ['saved.bin'].
 ```
 
 Untuk memuat ulang objek dari disk:
 
 ```
->> myobject := Objek load-from: ['saved.bin'].
+>> objekku := Objek load-from: ['saved.bin'].
 ```
 
 Snapshot dapat digunakan untuk menyimpan keadaan tertentu atau untuk meningkatkan kinerja.
@@ -1202,8 +1202,8 @@ ke sebuah variabel lalu mengirim pesan setelahnya:
 ```
 10 genap?
 
->> tenner := 10.
-tenner genap?
+>> sepuluhan := 10.
+sepuluhan genap?
 
 ```
 
@@ -1433,10 +1433,10 @@ Berikut adalah jebakan penting:
 ```
 {
 	Salah salah: {
-		Keluaran tulis: ['End the loop.'].
+		Keluaran tulis: ['Akhiri loop.'].
 	}, hentikan.
 	
-	Keluaran tulis: ['Dont show me.'].
+	Keluaran tulis: ['Jangan tampilkan saya.'].
 
 } prosedur.
 
@@ -1450,10 +1450,10 @@ penghentian, pesan tersebut harus dikirim ke **Benar**.
 ```
 {
 	Salah bukan benar: {
-		Keluaran tulis: ['End the loop.'].
+		Keluaran tulis: ['Akhiri loop.'].
 	}, hentikan.
 	
-	Keluaran tulis: ['Dont show me.'].
+	Keluaran tulis: ['Jangan tampilkan saya.'].
 
 } prosedur.
 
@@ -1466,7 +1466,7 @@ Akan berfungsi seperti yang diharapkan.
 Eksepsi dapat ditangani seperti ini:
 
 ```
-{ Task 1 } tangkap: { Task 2 }, mulai.
+{ Tugas 1 } tangkap: { Tugas 2 }, mulai.
 ```
 
 Anda juga dapat dengan sengaja menimbulkan galat dalam program Anda, dan
@@ -1476,9 +1476,9 @@ berikut:
 
 ```
 {
-tugas-ini galat: ['Whoops!'].
-} tangkap: { :mistake
-Keluaran tulis: mistake.
+tugas-ini galat: ['Waduh!'].
+} tangkap: { :kekeliruan
+Keluaran tulis: kekeliruan.
 }, mulai.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript menyediakan opsi bagi tugas untuk menyuntikkan nilai. Sekarang, perhati
 tugas di bawah ini:
 
 ```
->> sending := {
-	Newsletter kepada: milik recipient.
+>> pengiriman := {
+	Buletin kepada: milik recipient.
 }.
-sending atur: ['recipient']
+pengiriman atur: ['recipient']
 nilai: ['info@recipient.org'].
-sending mulai.
+pengiriman mulai.
 ```
 
 
@@ -1512,20 +1512,20 @@ ini: **{}**, tetapi XOScript menganggapnya sebagai kesalahan bahasa. Jika Anda
 ingin mendeklarasikan tugas kosong, Anda dapat menggunakan objek Kosong:
 
 ```
->> task := Kosong.
+>> tugas := Kosong.
 ```
 
 Meskipun ini bukan tugas sungguhan, melainkan objek Kosong, pesan mulai
 tetap dapat dikirim:
 
 ```
->> answer := task mulai.
+>> jawaban := tugas mulai.
 ```
 
 Sebenarnya, ini sama dengan:
 
 ```
->> answer := Kosong mulai.
+>> jawaban := Kosong mulai.
 ```
 
 Karena objek **Kosong** tidak mengenali pesan **mulai**, objek tersebut
@@ -1700,8 +1700,8 @@ daftar semacam itu adalah daftar harga, seperti:
 
 ```
 >> menu := Kamus baru
-	taruh: ['£5'] di: ['apple pie'],
-	taruh: ['£6'] di: ['carrot cake'],
+	taruh: ['£5'] di: ['pai apel'],
+	taruh: ['£6'] di: ['kue wortel'],
 	taruh: ['£3'] di: ['fudge'].
 ```
 
@@ -1845,7 +1845,7 @@ Anda juga dapat menanyakan kepada objek Program apakah
 suatu objek sudah ada dalam program:
 
 ```
-Program Tool benar: { ... }.
+Program Alat benar: { ... }.
 ```
 
 Jika nama objek
@@ -1893,9 +1893,9 @@ Program gunakan: ['template.xo'].
 Anda dapat mengatur pengaturan server berikut:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# nilai bawaan sudah diberikan,
+	# jadi jika Anda tidak mengatur apa pun, nilai-nilai
+	# ini yang digunakan...
 
 	Program 
 	pengaturan: ['max-postfields']
@@ -1923,9 +1923,9 @@ lainnya.
 Server inisialisasi.
 Program gunakan: ['webtools.xo'].
 
->> web-document := Dokumen-Web baru.
+>> dok-web := Dokumen-Web baru.
 
-web-document keluarkan: ['
+dok-web keluarkan: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ Anda harus menulis tajuk HTTP sendiri:
 ```
 #!/bin/xo
 Keluaran tulis: ['Content-type: text/html; charset=utf-8 \n\n'], baris-baru.
-Keluaran tulis: ['hello world!'], baris-baru.
+Keluaran tulis: ['halo dunia!'], baris-baru.
 ``` 
 
 ## Permintaan
@@ -1951,13 +1951,13 @@ UPLOAD:
 ```
 >> permintaan-http  := Permintaan-HTTP baru.
 >> search   := permintaan-http get: ['search']. # ?search=books
->> password := permintaan-http post: ['password']. # from form
->> selected := permintaan-http get-daftar: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := permintaan-http post-daftar: ['sel[]'].
->> cookie   := permintaan-http cookie: ['session-id'].
->> upload   := permintaan-http upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> password := permintaan-http post: ['password']. # dari formulir
+>> terpilih := permintaan-http get-daftar: ['sel[]']. #?sel[]=1&sel[]=2
+>> terpilih := permintaan-http post-daftar: ['sel[]'].
+>> kuki   := permintaan-http cookie: ['session-id'].
+>> unggahan   := permintaan-http upload: ['file'].
+>> jalursementara := unggahan ? 1.
+>> namaberkas := unggahan ? 0.
 ```
 
 ## Maxpost/length
@@ -1993,7 +1993,7 @@ Objek Database dapat digunakan untuk melakukan kueri ke MariaDB/MySQL.
 Untuk tersambung ke basis data, lakukan:
 
 ```
->> db := Maria-DB baru hos: ['localhost'],
+>> bd := Maria-DB baru hos: ['localhost'],
 	nama-pengguna: ['xo'],
 	kata-sandi: ['pass123'],
 	nama-basis-data: ['xobase'],
@@ -2004,13 +2004,13 @@ Untuk tersambung ke basis data, lakukan:
 Untuk menyisipkan rekaman, gunakan:
 
 ```
->> parameter-pencarian := db kueri: ['
+>> parameter-pencarian := bd kueri: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parameter: ( Daftar baru ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parameter: ( Daftar baru ; ['abc'] ; 12.35 ; 6 ). # kueri berparameter
 
-{  parameter-pencarian jalankan. db komit. }
-tangkap: { :e db batalkan.  }, mulai.
+{  parameter-pencarian jalankan. bd komit. }
+tangkap: { :e bd batalkan.  }, mulai.
 ```
 
 Perhatikan bahwa xoscript *hanya* bekerja dengan transaksi dan tidak pernah melakukan autocommit.
@@ -2021,18 +2021,18 @@ ke dalam SQL.
 Dapatkan id yang disisipkan seperti ini:
 
 ```
-Keluaran tulis: ['INSERTED: '] + parameter-pencarian insert-id, baris-baru. # insert id
+Keluaran tulis: ['DISISIPKAN: '] + parameter-pencarian insert-id, baris-baru. # id sisipan
 ```
 
 Untuk mengambil rekaman:
 
 ```
 >> parameter-pencarian :=
-db
+bd
 	kueri: ['SELECT * FROM book order by id desc limit 2'], 
-	ambil: { :row 
-		Keluaran tulis: row id + [' '] + row description + [': '] + row price, baris-baru.
-	}. # fetching rows
+	ambil: { :barisan 
+		Keluaran tulis: barisan id + [' '] + barisan description + [': '] + barisan price, baris-baru.
+	}. # mengambil baris
 
 ```
 
@@ -2053,15 +2053,15 @@ lengkap yang berisi tajuk maupun HTML atau data lainnya).
 
 
 ```
-# First we make a new Web Document instance
+# Pertama kita membuat instans Dokumen-Web baru
 >> web := Dokumen-Web baru.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web mulai-sesi.
+# Sekarang kita memulai sesi; ini akan membuat tajuk untuk cookie dan
+# membuat berkas untuk menyimpan data Anda, terkait dengan cookie itu
+>> sesi-web := web mulai-sesi.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Sekarang kita bisa memperlakukan sesi seperti Kamus
+sesi-web userid: 123.
 ```
 
 Untuk menghancurkan sesi (saat keluar):
@@ -2096,7 +2096,7 @@ web tajuk: (
 Untuk menampilkan halaman 404:
 
 ```
-web tidak-ditemukan: ['OOps..'].
+web tidak-ditemukan: ['Aduh..'].
 ```
 
 
@@ -2160,8 +2160,8 @@ Hasil:
 Untuk menyajikan berkas yang diunggah pengguna secara aman, Anda dapat mengandalkan passthru:
 
 ```
->> uploaded := ['smile.gif'].
-Server teruskan: uploaded awalan: ['/uploads/images/'].
+>> terunggah := ['smile.gif'].
+Server teruskan: terunggah awalan: ['/uploads/images/'].
 Program akhiri.
 ```
 
@@ -2181,7 +2181,7 @@ berbagai masalah keamanan lainnya.
 Untuk mengenkode objek sebagai JSON:
 
 ```
->> json := ( JSON jsonify: ( 
+>> data-json := ( JSON jsonify: ( 
 	Kamus baru taruh: ( 
 		Daftar baru ; 1 ; 2 ; 3
 	) di: ['abc']
@@ -2191,7 +2191,7 @@ Untuk mengenkode objek sebagai JSON:
 Untuk mendekode JSON menjadi objek xoscript:
 
 ```
->> dict := ((JSON objek: json) abc ? 1).
+>> kms := ((JSON objek: data-json) abc ? 1).
 ```
 
 JSON dengan lebih dari 500 tingkat penumpukan ditolak sebagai tidak valid.
@@ -2199,7 +2199,7 @@ JSON dengan lebih dari 500 tingkat penumpukan ditolak sebagai tidak valid.
 Untuk langsung mengeluarkan Kamus sebagai json dengan tajuk yang benar:
 
 ```
-web json: dict.
+web json: kms.
 ```
 
 
@@ -2215,7 +2215,7 @@ Pola baru: ['href="([^"]+)" target="([^"]+)"'].
 Sekarang, terapkan pola tersebut ke teks subjek seperti ini:
 
 ```
-pattern cocok: subjek lakukan: { :m :x .... }
+pola-cari cocok: subjek lakukan: { :m :x .... }
 ```
 
 Contoh lengkap:
@@ -2225,13 +2225,13 @@ Contoh lengkap:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Pola baru: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern cocok: subjek lakukan: { :m :x
+>> pola-cari := Pola baru: ['href="([^"]+)" target="([^"]+)"'].
+>> hasil  := pola-cari cocok: subjek lakukan: { :m :x
 	Keluaran tulis: m, baris-baru.
 	Keluaran tulis: x, baris-baru.
 	<- ['XXX'].
 }.
-Keluaran tulis: result, baris-baru.
+Keluaran tulis: hasil, baris-baru.
 ```
 
 ## Jaringan
@@ -2254,8 +2254,8 @@ Plugin server dilengkapi dengan enkripsi berbasis XChaCha20 dan Argon2.
 Contoh:
 
 ```
->> encrypted := Brankas enkripsi: ['hello'] kunci: ['world'].
->> decrypted := Brankas enkripsi: encrypted kunci: ['world'].
+>> terenkripsi := Brankas enkripsi: ['hello'] kunci: ['world'].
+>> terdekripsi := Brankas enkripsi: terenkripsi kunci: ['world'].
 ```
 
 ## Token
@@ -2263,7 +2263,7 @@ Contoh:
 Untuk menghasilkan token yang aman secara kriptografis dengan panjang tertentu:
 
 ```
->> mytok := Brankas token: 40.
+>> tokenku := Brankas token: 40.
 ```
 
 Ini akan menghasilkan token sepanjang 40 karakter.
@@ -2275,7 +2275,7 @@ angka nol. Objek ini menggunakan sintaksis printf.
 
 ```
 >> fmt := Format baru: ['%06.0f'].
-fmt terapkan: 56. # gives 000056
+fmt terapkan: 56. # menghasilkan 000056
 ```
 
 Sebuah format dapat berisi satu konversi dan harus sesuai dengan nilainya,
@@ -2322,10 +2322,10 @@ Contoh:
 Server inisialisasi.
 Program gunakan: ['mailtools.xo'].
 
->> e-mail := Surel-HTML baru.
->> img := e-mail lampirkan: ( Berkas baru: ['myimage.png'] ).
+>> surat-el := Surel-HTML baru.
+>> img := surat-el lampirkan: ( Berkas baru: ['myimage.png'] ).
 
-e-mail
+surat-el
 pengirim: ['xo@xoscript.com'] nama: ['xo'],
 kepada: ( Daftar baru ; ['xo2@xoscipt.com'] ),
 subjek: ['xoxo'],
@@ -2441,13 +2441,13 @@ sendiri). Oleh karena itu, Anda perlu membebaskan blob sendiri jika diperlukan.
 Untuk membebaskan blob, gunakan:
 
 ```
-myblob bebaskan.
+blobku bebaskan.
 ```
 
 Untuk membebaskan struct, gunakan:
 
 ```
-mystruct bebaskan-struct bebaskan.
+strukturku bebaskan-struct bebaskan.
 ```
 
 Jadi, untuk struct, Anda perlu mengirim dua pesan: bebaskan-struct dan bebaskan untuk

@@ -160,8 +160,8 @@ och skriv ett litet testprogram:
 #!/bin/xo
 Server initiera.
 Program använd: ['webtools.xo'].
->> web := Webbdokument ny.
-web skriv-ut: ['Hello World'].
+>> webb := Webbdokument ny.
+webb skriv-ut: ['Hello World'].
 ```
 
 Tillåt apache2 att köra ditt program via CGI:
@@ -394,7 +394,7 @@ Kommentarer i XOScript inleds med symbolen \#. Följande rad
 ignoreras alltså:
 
 ```
-# this is just a comment
+# detta är bara en kommentar
 ```
 
 ## Variabler
@@ -413,16 +413,16 @@ Detta är exempel på giltiga variabler:
 >> ♡♡♡ := 3.
 >> $ := ['dollar'].
 >> +plus := Sann.
->> user-password := ['Pssst!'].
+>> användarlösen := ['Pssst!'].
 ```
 
 Ogiltiga variabler är till exempel:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['negativt tal'].
+>> password of användaren := ['Hemligstämplat'].
+>> password.of:användaren := ['Hemligstämplat'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ objektet genom att skicka det ett uppföljande meddelande:
 
 ```
 Utdata skriv:
-[' hello '] trimma versaler.
+[' hallå '] trimma versaler.
 ```
 
 ```
-HELLO
+HALLå
 ```
 
 Här skickas två meddelanden till **Text**-objektet: **trimma**, följt
@@ -668,7 +668,7 @@ till antingen ett **Sann**-objekt eller ett **Falsk**-objekt:
 
 ```
 2 jämn? sann: {
-	Utdata skriv: ['Two is an even number'], stop.
+	Utdata skriv: ['Två är ett jämnt tal'], stop.
 }.
 ```
 I föregående exempel skickas meddelandet **sann:** till **Sann** (svaret
@@ -880,9 +880,9 @@ Du kan återanvända tidigare skriven kod för att skapa en hierarki
 av objekt. Till exempel:
 
 ```
->> Animal := Objekt ny.
->> Dog := Animal ny.
->> Poodle := Dog ny.
+>> Djur := Objekt ny.
+>> Hund := Djur ny.
+>> Pudel := Hund ny.
 ```
 
 I detta fall ärver **Dog** allt beteende och alla egenskaper
@@ -918,7 +918,7 @@ att den slutliga additionen ändå måste utföras till slut, vilket faktiskt
 sker på följande rad:
 
 ```
->> answer := själv + (tal x factor).
+>> svaret := själv + (tal x faktor).
 ```
 
 Hur förstår då XOScript att detta plus**tecken** syftar på
@@ -954,14 +954,14 @@ avsikt att köra samma uppgift, och att du inte har gjort ett misstag.
 beteende. Åsidosätt helt enkelt meddelandet ny.
 
 ```
->> Animal := Objekt ny.
-Animal vid: ['ny'] gör: {
+>> Djur := Objekt ny.
+Djur vid: ['ny'] gör: {
 	<- själv ny initiera.
 }.
 
-Animal vid: ['initiera'] gör: {
-	egen sound := ['?'].
-	egen legs  := 4.
+Djur vid: ['initiera'] gör: {
+	egen läte := ['?'].
+	egen ben  := 4.
 }.
 ```
 
@@ -981,7 +981,7 @@ har ett djur 4 ben och ljudet är okänt (därav frågetecknet).
 För att skapa en ny instans av vårt Animal kan vi helt enkelt skriva:
 
 ```
->> a := Animal ny.
+>> a := Djur ny.
 ```
 
 Nu får vi en ny instans av Animal med 4 ben, okänt ljud och
@@ -989,18 +989,18 @@ en initiera-metod. Precis som i andra OOP-språk kan vi också
 utöka vårt Animal:
 
 ```
->> Dog := Animal ny.
-Dog vid: ['initiera'] gör: {
+>> Hund := Djur ny.
+Hund vid: ['initiera'] gör: {
 	själv initiera.
-	egen sound := ['barks'].
+	egen läte := ['skäller'].
 }.
 ```
 
 Vi kan enkelt testa detta genom att lägga till en text-metod:
 
 ```
-Animal vid: ['text'] gör: {
-	<- egen legs text + egen sound.
+Djur vid: ['text'] gör: {
+	<- egen ben text + egen läte.
 }.
 ```
 
@@ -1015,10 +1015,10 @@ för att beräkna omkrets och area. En möjlig notation vore:
 
 
 ```
->> Rectangle := Objekt ny.
+>> Rektangel := Objekt ny.
 
-Rectangle vid: ['area'] gör: {
-	<- egen längd * egen width.
+Rektangel vid: ['area'] gör: {
+	<- egen längd * egen bredd.
 }.
 ```
 
@@ -1027,12 +1027,12 @@ Att ange en längd och en bredd är uppenbarligen en förutsättning. För det
 
 
 ```
-Rectangle vid: ['length:'] gör: { :längd
+Rektangel vid: ['length:'] gör: { :längd
 	egen längd := längd.
 }.
 
-Rectangle vid: ['width:'] gör: { :width
-	egen width := width.
+Rektangel vid: ['width:'] gör: { :bredd
+	egen bredd := bredd.
 }.
 
 ```
@@ -1041,16 +1041,16 @@ Denna rektangel kan sedan användas på följande sätt:
 
 
 ```
->> rectangle := Rectangle ny length: 2, width: 3.
-Utdata skriv: rectangle area.
+>> rektangel := Rektangel ny length: 2, width: 3.
+Utdata skriv: rektangel area.
 ```
 
 Om man däremot förbiser att ange längd och bredd från början
 uppstår ett felmeddelande:
 
 ```
->> rectangle := Rectangle ny.
-Utdata skriv: rectangle area.
+>> rektangel := Rektangel ny.
+Utdata skriv: rektangel area.
 ```
 
 ger följande fel:
@@ -1076,13 +1076,13 @@ diskuteras alla dessa kärnobjekt.
 Du kan spara ett objekt (tillsammans med dess aktuella tillstånd) på disk med:
 
 ```
-myobject save-as: ['saved.bin'].
+mittobjekt save-as: ['saved.bin'].
 ```
 
 För att läsa in objektet från disk igen:
 
 ```
->> myobject := Objekt load-from: ['saved.bin'].
+>> mittobjekt := Objekt load-from: ['saved.bin'].
 ```
 
 Ögonblicksbilder kan användas för att spara ett visst tillstånd eller för att förbättra prestandan.
@@ -1202,8 +1202,8 @@ till en variabel och skicka meddelanden efteråt:
 ```
 10 jämn?
 
->> tenner := 10.
-tenner jämn?
+>> tia := 10.
+tia jämn?
 
 ```
 
@@ -1433,10 +1433,10 @@ Här är en viktig fallgrop:
 ```
 {
 	Falsk falsk: {
-		Utdata skriv: ['End the loop.'].
+		Utdata skriv: ['Avsluta loopen.'].
 	}, avbryt.
 	
-	Utdata skriv: ['Dont show me.'].
+	Utdata skriv: ['Visa mig inte.'].
 
 } procedur.
 
@@ -1450,10 +1450,10 @@ ett avbrott måste det skickas som ett meddelande till **Sann**.
 ```
 {
 	Falsk inte sann: {
-		Utdata skriv: ['End the loop.'].
+		Utdata skriv: ['Avsluta loopen.'].
 	}, avbryt.
 	
-	Utdata skriv: ['Dont show me.'].
+	Utdata skriv: ['Visa mig inte.'].
 
 } procedur.
 
@@ -1466,7 +1466,7 @@ Fungerar som förväntat.
 Undantag kan hanteras så här:
 
 ```
-{ Task 1 } fånga: { Task 2 }, starta.
+{ Uppgift 1 } fånga: { Uppgift 2 }, starta.
 ```
 
 Du kan också avsiktligt orsaka ett fel i ditt program och
@@ -1476,9 +1476,9 @@ illustration:
 
 ```
 {
-denna-uppgift fel: ['Whoops!'].
-} fånga: { :mistake
-Utdata skriv: mistake.
+denna-uppgift fel: ['Hoppsan!'].
+} fånga: { :misstag
+Utdata skriv: misstag.
 }, starta.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript ger uppgifter möjlighet att injicera värden. Titta nu
 på uppgiften nedan:
 
 ```
->> sending := {
-	Newsletter till: egen recipient.
+>> utskick := {
+	Nyhetsbrev till: egen recipient.
 }.
-sending sätt: ['recipient']
+utskick sätt: ['recipient']
 värde: ['info@recipient.org'].
-sending starta.
+utskick starta.
 ```
 
 
@@ -1512,20 +1512,20 @@ så här: **{}**, men XOScript betraktar detta som ett språkfel. Om du
 vill deklarera en tom uppgift kan du använda objektet Inget:
 
 ```
->> task := Inget.
+>> uppgift := Inget.
 ```
 
 Även om detta inte är en riktig uppgift utan ett Inget-objekt kan ett starta-meddelande
 ändå skickas:
 
 ```
->> answer := task starta.
+>> svaret := uppgift starta.
 ```
 
 Detta är faktiskt detsamma som:
 
 ```
->> answer := Inget starta.
+>> svaret := Inget starta.
 ```
 
 Eftersom objektet **Inget** inte känner igen meddelandet **starta**
@@ -1699,9 +1699,9 @@ sådan lista är en prislista, som:
 
 
 ```
->> menu := Ordbok ny
-	sätt: ['£5'] vid: ['apple pie'],
-	sätt: ['£6'] vid: ['carrot cake'],
+>> meny := Ordbok ny
+	sätt: ['£5'] vid: ['äppelpaj'],
+	sätt: ['£6'] vid: ['morotskaka'],
 	sätt: ['£3'] vid: ['fudge'].
 ```
 
@@ -1716,13 +1716,13 @@ kan betydelsen hittas. För att till exempel hämta priset på en fudge
 ur listan ovan:
 
 ```
->> price := menu vid: ['fudge'].
+>> price := meny vid: ['fudge'].
 ```
 
 Du kan också använda den koncisa notationen:
 
 ```
->> price := menu ? ['fudge'].
+>> price := meny ? ['fudge'].
 ```
 
 Om de uppslagsord som du använder för att lagra objekt saknar blanksteg
@@ -1730,7 +1730,7 @@ Om de uppslagsord som du använder för att lagra objekt saknar blanksteg
 kan även nästa notation användas:
 
 ```
->> menu := Ordbok ny
+>> meny := Ordbok ny
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1741,7 +1741,7 @@ För att fråga efter priset på en
 fudge kan följande förenklade notation användas:
 
 ```
->> price := menu fudge.
+>> price := meny fudge.
 ```
 
 @api_Dict_collections
@@ -1845,7 +1845,7 @@ Det är också möjligt att fråga Program-objektet om ett
 givet objekt redan finns i programmet:
 
 ```
-Program Tool sann: { ... }.
+Program Verktyg sann: { ... }.
 ```
 
 Om ett objektnamn
@@ -1893,9 +1893,9 @@ Program använd: ['template.xo'].
 Du kan ange följande serverinställningar:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# standardvärden är angivna,
+	# så om du inte ställer in något används
+	# dessa värden...
 
 	Program 
 	inställning: ['max-postfields']
@@ -1923,9 +1923,9 @@ välkänd server.
 Server initiera.
 Program använd: ['webtools.xo'].
 
->> web-document := Webbdokument ny.
+>> webbdok := Webbdokument ny.
 
-web-document skriv-ut: ['
+webbdok skriv-ut: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ då måste du skriva HTTP-huvudena själv:
 ```
 #!/bin/xo
 Utdata skriv: ['Content-type: text/html; charset=utf-8 \n\n'], stop.
-Utdata skriv: ['hello world!'], stop.
+Utdata skriv: ['hallå världen!'], stop.
 ``` 
 
 ## Förfrågan
@@ -1951,13 +1951,13 @@ UPLOAD-data:
 ```
 >> begäran  := HTTP-Förfrågan ny.
 >> search   := begäran get: ['search']. # ?search=books
->> password := begäran post: ['password']. # from form
->> selected := begäran get-lista: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := begäran post-lista: ['sel[]'].
+>> password := begäran post: ['password']. # från formuläret
+>> valda := begäran get-lista: ['sel[]']. #?sel[]=1&sel[]=2
+>> valda := begäran post-lista: ['sel[]'].
 >> cookie   := begäran cookie: ['session-id'].
->> upload   := begäran upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> uppladdning   := begäran upload: ['file'].
+>> tempsökväg := uppladdning ? 1.
+>> filnamn := uppladdning ? 0.
 ```
 
 ## Maxpost/längd
@@ -2007,7 +2007,7 @@ För att infoga en post, använd:
 >> sökparametrar := db fråga: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametrar: ( Lista ny ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametrar: ( Lista ny ; ['abc'] ; 12.35 ; 6 ). # parametriserade frågor
 
 {  sökparametrar utför. db bekräfta. }
 fånga: { :e db återställ.  }, starta.
@@ -2021,7 +2021,7 @@ i SQL-koden.
 Hämta det infogade id:t så här:
 
 ```
-Utdata skriv: ['INSERTED: '] + sökparametrar insert-id, stop. # insert id
+Utdata skriv: ['INFOGAD: '] + sökparametrar insert-id, stop. # infogat id
 ```
 
 För att hämta poster:
@@ -2030,9 +2030,9 @@ För att hämta poster:
 >> sökparametrar :=
 db
 	fråga: ['SELECT * FROM book order by id desc limit 2'], 
-	hämta: { :row 
-		Utdata skriv: row id + [' '] + row description + [': '] + row price, stop.
-	}. # fetching rows
+	hämta: { :raden 
+		Utdata skriv: raden id + [' '] + raden description + [': '] + raden price, stop.
+	}. # hämtning av rader
 
 ```
 
@@ -2053,21 +2053,21 @@ dokumentet som innehåller både huvuden och HTML eller andra data).
 
 
 ```
-# First we make a new Web Document instance
->> web := Webbdokument ny.
+# Först skapar vi en ny Webbdokument-instans
+>> webb := Webbdokument ny.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web starta-session.
+# Nu startar vi en session; det skapar ett huvud för en cookie och
+# en fil för dina data, kopplad till den cookien
+>> sessionen := webb starta-session.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Nu kan vi behandla sessionen som en Ordbok
+sessionen userid: 123.
 ```
 
 För att förstöra sessionen (vid utloggning):
 
 ```
-web förstör-session.
+webb förstör-session.
 ```
 
 ## Huvuden
@@ -2076,7 +2076,7 @@ Webbdokumentet låter dig också sätta andra välkända huvuden.
 Om du till exempel vill omdirigera användaren till en annan URL:
 
 ```
-web gå-till: ['/other.html'].
+webb gå-till: ['/other.html'].
 ```
 
 Under huven genererar detta kommando också det HTTP-huvud som skickas
@@ -2086,7 +2086,7 @@ till den angivna måladressen.
 För att lägga till ett eget huvud:
 
 ```
-web huvud: ( 
+webb huvud: ( 
 	HTTP-Huvud ny
 	nyckel: ['Content-Length']
 	värde: 400
@@ -2096,7 +2096,7 @@ web huvud: (
 För att visa en 404-sida:
 
 ```
-web hittades-inte: ['OOps..'].
+webb hittades-inte: ['Hoppsan..'].
 ```
 
 
@@ -2109,7 +2109,7 @@ mellan presentation och affärslogik.
 För att skapa en mall från en fil:
 
 ```
->> tpl := web mall: ['templates/ux.tpl'].
+>> tpl := webb mall: ['templates/ux.tpl'].
 ```
 
 Mallsystemet använder markörer. 
@@ -2139,7 +2139,7 @@ Du kan göra detta på följande sätt:
 >> gem := tpl klipp: ['gem'], kopiera.
 gem price: 99.
 tpl klistra: gem vid: ['jewels'].
-web skriv-ut: tpl putsa.
+webb skriv-ut: tpl putsa.
 ```
 
 Den sista raden skickar helt enkelt mallen som en text till klienten
@@ -2160,8 +2160,8 @@ Resultat:
 För att servera filer som användare har laddat upp på ett säkert sätt kan du förlita dig på vidarebefordring (passthru):
 
 ```
->> uploaded := ['smile.gif'].
-Server vidarebefordra: uploaded prefix: ['/uploads/images/'].
+>> uppladdad := ['smile.gif'].
+Server vidarebefordra: uppladdad prefix: ['/uploads/images/'].
 Program avsluta.
 ```
 
@@ -2191,7 +2191,7 @@ För att koda ett objekt som JSON:
 För att avkoda JSON till ett xoscript-objekt:
 
 ```
->> dict := ((JSON objekt: json) abc ? 1).
+>> ordb := ((JSON objekt: json) abc ? 1).
 ```
 
 JSON med mer än 500 nivåer av nästling avvisas som ogiltig.
@@ -2199,7 +2199,7 @@ JSON med mer än 500 nivåer av nästling avvisas som ogiltig.
 För att direkt skriva ut en Ordbok som json med rätt huvuden:
 
 ```
-web json: dict.
+webb json: ordb.
 ```
 
 
@@ -2215,7 +2215,7 @@ Mönster ny: ['href="([^"]+)" target="([^"]+)"'].
 Tillämpa nu mönstret på den text som ska undersökas så här:
 
 ```
-pattern matcha: ämne gör: { :m :x .... }
+mönstret matcha: ämne gör: { :m :x .... }
 ```
 
 Fullständigt exempel:
@@ -2225,13 +2225,13 @@ Fullständigt exempel:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Mönster ny: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern matcha: ämne gör: { :m :x
+>> mönstret := Mönster ny: ['href="([^"]+)" target="([^"]+)"'].
+>> resultat  := mönstret matcha: ämne gör: { :m :x
 	Utdata skriv: m, stop.
 	Utdata skriv: x, stop.
 	<- ['XXX'].
 }.
-Utdata skriv: result, stop.
+Utdata skriv: resultat, stop.
 ```
 
 ## Nätverk
@@ -2254,8 +2254,8 @@ Serverinsticksmodulen levereras med kryptering baserad på XChaCha20 och Argon2.
 Exempel:
 
 ```
->> encrypted := Valv kryptera: ['hello'] nyckel: ['world'].
->> decrypted := Valv kryptera: encrypted nyckel: ['world'].
+>> krypterad := Valv kryptera: ['hello'] nyckel: ['world'].
+>> dekrypterad := Valv kryptera: krypterad nyckel: ['world'].
 ```
 
 ## Token
@@ -2263,7 +2263,7 @@ Exempel:
 För att generera en kryptografiskt säker token med en viss längd:
 
 ```
->> mytok := Valv token: 40.
+>> mintok := Valv token: 40.
 ```
 
 Detta genererar en token på 40 tecken.
@@ -2275,7 +2275,7 @@ att lägga till nollor. Det använder printf-syntaxen.
 
 ```
 >> fmt := Format ny: ['%06.0f'].
-fmt tillämpa: 56. # gives 000056
+fmt tillämpa: 56. # ger 000056
 ```
 
 Ett format kan innehålla en konvertering, och den måste passa värdet,
@@ -2305,7 +2305,7 @@ För att säkert injicera användarindata i din HTML utan att riskera XSS-injekt
 använd alltid:
 
 ```
-Server html-koda: ['<harmless>'].
+Server html-koda: ['<ofarlig>'].
 ```
 
 Observera att mallmotorn alltid utför HTML-kodning
@@ -2322,10 +2322,10 @@ Exempel:
 Server initiera.
 Program använd: ['mailtools.xo'].
 
->> e-mail := HTML-E-post ny.
->> img := e-mail bifoga: ( Fil ny: ['myimage.png'] ).
+>> e-brev := HTML-E-post ny.
+>> img := e-brev bifoga: ( Fil ny: ['myimage.png'] ).
 
-e-mail
+e-brev
 avsändare: ['xo@xoscript.com'] namn: ['xo'],
 till: ( Lista ny ; ['xo2@xoscipt.com'] ),
 ämne: ['xoxo'],
@@ -2441,13 +2441,13 @@ själva). Därför måste du frigöra blobbar själv vid behov.
 För att frigöra en blob, använd:
 
 ```
-myblob frigör.
+minblob frigör.
 ```
 
 För att frigöra en struct, använd:
 
 ```
-mystruct frigör-struct frigör.
+minstrukt frigör-struct frigör.
 ```
 
 För en struct måste du alltså skicka två meddelanden: frigör-struct och frigör för att

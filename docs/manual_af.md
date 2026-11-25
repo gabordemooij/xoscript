@@ -394,7 +394,7 @@ Kommentaar in XOScript begin met 'n \#-simbool. Die volgende reël
 word dus geïgnoreer:
 
 ```
-# this is just a comment
+# dit is net kommentaar
 ```
 
 ## Veranderlikes
@@ -413,16 +413,16 @@ Dit is voorbeelde van geldige veranderlikes:
 >> ♡♡♡ := 3.
 >> $ := ['dollar'].
 >> +plus := Ja.
->> user-password := ['Pssst!'].
+>> gebruiker-wagwoord := ['Sjuut!'].
 ```
 
 Ongeldige veranderlikes is byvoorbeeld:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['negatiewe getal'].
+>> password of gebruiker := ['Geklassifiseer'].
+>> password.of:gebruiker := ['Geklassifiseer'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ objek aanmoedig deur 'n opvolgboodskap daaraan te stuur:
 
 ```
 Uitvoer skryf:
-[' hello '] snoei hoofletters.
+[' goeiedag '] snoei hoofletters.
 ```
 
 ```
-HELLO
+GOEIEDAG
 ```
 
 Hier word twee boodskappe aan die **Teks**-objek gestuur: **snoei**, gevolg
@@ -668,7 +668,7 @@ aan óf 'n **Ja**-objek óf 'n **Nee**-objek:
 
 ```
 2 ewe? ja: {
-	Uitvoer skryf: ['Two is an even number'], nuwe-reël.
+	Uitvoer skryf: ['Twee is 'n ewe getal'], nuwe-reël.
 }.
 ```
 In die vorige voorbeeld word die boodskap **ja:** aan **Ja** gestuur (die
@@ -880,9 +880,9 @@ Jy kan voorheen geskrewe kode hergebruik om 'n hiërargie
 van objekte te skep. Byvoorbeeld:
 
 ```
->> Animal := Objek nuut.
->> Dog := Animal nuut.
->> Poodle := Dog nuut.
+>> Dier := Objek nuut.
+>> Hond := Dier nuut.
+>> Poedel := Hond nuut.
 ```
 
 In hierdie geval erf **Dog** al die gedrag en eienskappe
@@ -918,7 +918,7 @@ dat die finale optelling uiteindelik steeds gedoen moet word, wat in werklikheid
 op die volgende reël plaasvind:
 
 ```
->> answer := self + (getal x factor).
+>> antwoord := self + (getal x faktor).
 ```
 
 Hoe verstaan XOScript nou dat hierdie plus**teken** na
@@ -954,14 +954,14 @@ Hoewel xoscript nie klasse bied nie, is dit eenvoudig om klasagtige
 gedrag na te boots. Oorskryf eenvoudig die boodskap nuut.
 
 ```
->> Animal := Objek nuut.
-Animal by: ['nuut'] doen: {
+>> Dier := Objek nuut.
+Dier by: ['nuut'] doen: {
 	<- self nuut inisialiseer.
 }.
 
-Animal by: ['inisialiseer'] doen: {
-	eie sound := ['?'].
-	eie legs  := 4.
+Dier by: ['inisialiseer'] doen: {
+	eie geluid := ['?'].
+	eie bene  := 4.
 }.
 ```
 
@@ -981,7 +981,7 @@ het 'n dier 4 bene en is die klank onbekend (vandaar die vraagteken).
 Om 'n nuwe instansie van ons Animal te skep, kan ons eenvoudig sê:
 
 ```
->> a := Animal nuut.
+>> a := Dier nuut.
 ```
 
 Nou kry ons 'n nuwe instansie van Animal met 4 bene, 'n onbekende klank en
@@ -989,18 +989,18 @@ Nou kry ons 'n nuwe instansie van Animal met 4 bene, 'n onbekende klank en
 ons Animal uitbrei:
 
 ```
->> Dog := Animal nuut.
-Dog by: ['inisialiseer'] doen: {
+>> Hond := Dier nuut.
+Hond by: ['inisialiseer'] doen: {
 	self inisialiseer.
-	eie sound := ['barks'].
+	eie geluid := ['blaf'].
 }.
 ```
 
 Ons kan dit maklik toets deur 'n teks-metode by te voeg:
 
 ```
-Animal by: ['teks'] doen: {
-	<- eie legs teks + eie sound.
+Dier by: ['teks'] doen: {
+	<- eie bene teks + eie geluid.
 }.
 ```
 
@@ -1015,10 +1015,10 @@ om omtrek en oppervlakte te bereken. 'n Moontlike notasie sou wees:
 
 
 ```
->> Rectangle := Objek nuut.
+>> Reghoek := Objek nuut.
 
-Rectangle by: ['area'] doen: {
-	<- eie lengte * eie width.
+Reghoek by: ['oppervlakte'] doen: {
+	<- eie lengte * eie breedte.
 }.
 ```
 
@@ -1027,12 +1027,12 @@ daardie doel kan die boodskappe **length:** en **width:** bygevoeg word:
 
 
 ```
-Rectangle by: ['length:'] doen: { :lengte
+Reghoek by: ['length:'] doen: { :lengte
 	eie lengte := lengte.
 }.
 
-Rectangle by: ['width:'] doen: { :width
-	eie width := width.
+Reghoek by: ['width:'] doen: { :breedte
+	eie breedte := breedte.
 }.
 
 ```
@@ -1041,16 +1041,16 @@ Hierdie reghoek kan dan soos volg gebruik word:
 
 
 ```
->> rectangle := Rectangle nuut length: 2, width: 3.
-Uitvoer skryf: rectangle area.
+>> reghoek := Reghoek nuut length: 2, width: 3.
+Uitvoer skryf: reghoek oppervlakte.
 ```
 
 As die beginwaardes van lengte en breedte egter vergeet word,
 sal 'n foutboodskap verskyn:
 
 ```
->> rectangle := Rectangle nuut.
-Uitvoer skryf: rectangle area.
+>> reghoek := Reghoek nuut.
+Uitvoer skryf: reghoek oppervlakte.
 ```
 
 sal die volgende fout gee:
@@ -1076,13 +1076,13 @@ word al hierdie kernobjekte bespreek.
 Jy kan 'n objek (saam met sy huidige toestand) op skyf stoor met:
 
 ```
-myobject save-as: ['saved.bin'].
+myobjek save-as: ['saved.bin'].
 ```
 
 Om die objek weer van skyf te laai:
 
 ```
->> myobject := Objek load-from: ['saved.bin'].
+>> myobjek := Objek load-from: ['saved.bin'].
 ```
 
 Momentopnames kan gebruik word om 'n sekere toestand te stoor of om werkverrigting te verbeter.
@@ -1202,8 +1202,8 @@ aan 'n veranderlike toeken en daarna boodskappe stuur:
 ```
 10 ewe?
 
->> tenner := 10.
-tenner ewe?
+>> tientjie := 10.
+tientjie ewe?
 
 ```
 
@@ -1433,10 +1433,10 @@ Hier is 'n belangrike slaggat:
 ```
 {
 	Nee nee: {
-		Uitvoer skryf: ['End the loop.'].
+		Uitvoer skryf: ['Beëindig die lus.'].
 	}, onderbreek.
 	
-	Uitvoer skryf: ['Dont show me.'].
+	Uitvoer skryf: ['Moenie my wys nie.'].
 
 } prosedure.
 
@@ -1450,10 +1450,10 @@ omdat **onderbreek** aan Nee gestuur word. As jy
 ```
 {
 	Nee nie ja: {
-		Uitvoer skryf: ['End the loop.'].
+		Uitvoer skryf: ['Beëindig die lus.'].
 	}, onderbreek.
 	
-	Uitvoer skryf: ['Dont show me.'].
+	Uitvoer skryf: ['Moenie my wys nie.'].
 
 } prosedure.
 
@@ -1466,7 +1466,7 @@ Sal werk soos verwag.
 Uitsonderings kan so hanteer word:
 
 ```
-{ Task 1 } vang: { Task 2 }, begin.
+{ Taak 1 } vang: { Taak 2 }, begin.
 ```
 
 Jy kan ook doelbewus 'n fout in jou program laat voorkom en
@@ -1476,9 +1476,9 @@ illustrasie gewys word:
 
 ```
 {
-hierdie-taak fout: ['Whoops!'].
-} vang: { :mistake
-Uitvoer skryf: mistake.
+hierdie-taak fout: ['Oepsie!'].
+} vang: { :vergissing
+Uitvoer skryf: vergissing.
 }, begin.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript bied vir take die opsie om waardes in te spuit. Kyk nou
 na die taak hieronder:
 
 ```
->> sending := {
-	Newsletter aan: eie recipient.
+>> versending := {
+	Nuusbrief aan: eie recipient.
 }.
-sending stel: ['recipient']
+versending stel: ['recipient']
 waarde: ['info@recipient.org'].
-sending begin.
+versending begin.
 ```
 
 
@@ -1512,20 +1512,20 @@ lyk: **{}**, maar XOScript beskou dit as 'n taalfout. As jy
 'n leë taak wil verklaar, kan jy die objek Niks gebruik:
 
 ```
->> task := Niks.
+>> taak := Niks.
 ```
 
 Hoewel dit nie 'n werklike taak is nie, maar 'n Niks-objek, kan 'n begin-boodskap
 steeds gestuur word:
 
 ```
->> answer := task begin.
+>> antwoord := taak begin.
 ```
 
 Dit is in werklikheid dieselfde as:
 
 ```
->> answer := Niks begin.
+>> antwoord := Niks begin.
 ```
 
 Omdat die objek **Niks** nie die boodskap **begin** herken nie, sal
@@ -1699,9 +1699,9 @@ lys is 'n pryslys, soos:
 
 
 ```
->> menu := Woordeboek nuut
-	sit: ['£5'] by: ['apple pie'],
-	sit: ['£6'] by: ['carrot cake'],
+>> spyskaart := Woordeboek nuut
+	sit: ['£5'] by: ['appeltert'],
+	sit: ['£6'] by: ['wortelkoek'],
 	sit: ['£3'] by: ['fudge'].
 ```
 
@@ -1716,13 +1716,13 @@ kan die betekenis gevind word. Om byvoorbeeld uit die
 lys hierbo die prys van 'n fudge te verkry:
 
 ```
->> price := menu by: ['fudge'].
+>> price := spyskaart by: ['fudge'].
 ```
 
 Jy kan ook die bondige notasie gebruik:
 
 ```
->> price := menu ? ['fudge'].
+>> price := spyskaart ? ['fudge'].
 ```
 
 As die inskrywings wat jy gebruik om objekte te stoor geen spasies bevat nie
@@ -1730,7 +1730,7 @@ As die inskrywings wat jy gebruik om objekte te stoor geen spasies bevat nie
 kan die volgende notasie ook gebruik word:
 
 ```
->> menu := Woordeboek nuut
+>> spyskaart := Woordeboek nuut
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1741,7 +1741,7 @@ Om die prys van 'n
 fudge op te vra, kan die volgende vereenvoudigde notasie gebruik word:
 
 ```
->> price := menu fudge.
+>> price := spyskaart fudge.
 ```
 
 @api_Dict_collections
@@ -1845,7 +1845,7 @@ Dit is ook moontlik om die objek Program te vra of 'n
 gegewe objek reeds in die program teenwoordig is:
 
 ```
-Program Tool ja: { ... }.
+Program Gereedskap ja: { ... }.
 ```
 
 In die geval van 'n objek-
@@ -1893,9 +1893,9 @@ Program gebruik: ['template.xo'].
 Jy kan die volgende bedienerinstellings stel:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# verstekwaardes word gegee,
+	# dus as jy niks stel nie, word hierdie
+	# waardes gebruik...
 
 	Program 
 	instelling: ['max-postfields']
@@ -1923,9 +1923,9 @@ bekende bediener.
 Server inisialiseer.
 Program gebruik: ['webtools.xo'].
 
->> web-document := Webdokument nuut.
+>> web-dokument := Webdokument nuut.
 
-web-document uitvoer: ['
+web-dokument uitvoer: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ dan moet jy self die HTTP-kopstukke skryf:
 ```
 #!/bin/xo
 Uitvoer skryf: ['Content-type: text/html; charset=utf-8 \n\n'], nuwe-reël.
-Uitvoer skryf: ['hello world!'], nuwe-reël.
+Uitvoer skryf: ['hallo wêreld!'], nuwe-reël.
 ``` 
 
 ## Versoek
@@ -1951,13 +1951,13 @@ UPLOAD-data te verkry:
 ```
 >> versoek  := HTTP-Versoek nuut.
 >> search   := versoek get: ['search']. # ?search=books
->> password := versoek post: ['password']. # from form
->> selected := versoek get-lys: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := versoek post-lys: ['sel[]'].
->> cookie   := versoek cookie: ['session-id'].
->> upload   := versoek upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> password := versoek post: ['password']. # uit vorm
+>> gekies := versoek get-lys: ['sel[]']. #?sel[]=1&sel[]=2
+>> gekies := versoek post-lys: ['sel[]'].
+>> koekie   := versoek cookie: ['session-id'].
+>> oplaai   := versoek upload: ['file'].
+>> tydpad := oplaai ? 1.
+>> lêernaam := oplaai ? 0.
 ```
 
 ## Maksimum post/lengte
@@ -2007,7 +2007,7 @@ Om 'n rekord in te voeg, gebruik:
 >> soekparameters := db navraag: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parameters: ( Lys nuut ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parameters: ( Lys nuut ; ['abc'] ; 12.35 ; 6 ). # geparametriseerde navrae
 
 {  soekparameters voer-uit. db bevestig. }
 vang: { :e db rol-terug.  }, begin.
@@ -2021,7 +2021,7 @@ by die SQL nie.
 Verkry die ingevoegde id soos volg:
 
 ```
-Uitvoer skryf: ['INSERTED: '] + soekparameters insert-id, nuwe-reël. # insert id
+Uitvoer skryf: ['INGEVOEG: '] + soekparameters insert-id, nuwe-reël. # ingevoegde id
 ```
 
 Om rekords te haal:
@@ -2030,9 +2030,9 @@ Om rekords te haal:
 >> soekparameters :=
 db
 	navraag: ['SELECT * FROM book order by id desc limit 2'], 
-	haal: { :row 
-		Uitvoer skryf: row id + [' '] + row description + [': '] + row price, nuwe-reël.
-	}. # fetching rows
+	haal: { :ry 
+		Uitvoer skryf: ry id + [' '] + ry description + [': '] + ry price, nuwe-reël.
+	}. # rekords haal
 
 ```
 
@@ -2053,15 +2053,15 @@ dokument is wat sowel kopstukke as HTML of ander data bevat).
 
 
 ```
-# First we make a new Web Document instance
+# Eers skep ons 'n nuwe Webdokument-instansie
 >> web := Webdokument nuut.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web sessie-begin.
+# Nou begin ons 'n sessie; dit genereer 'n kopstuk vir 'n cookie en
+# skep 'n lêer om jou data te stoor, gekoppel aan daardie cookie
+>> mysessie := web sessie-begin.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Nou kan ons die sessie soos 'n Woordeboek hanteer
+mysessie userid: 123.
 ```
 
 Om die sessie te vernietig (wanneer jy afmeld):
@@ -2096,7 +2096,7 @@ web kopstuk: (
 Om 'n 404-bladsy te wys:
 
 ```
-web nie-gevind: ['OOps..'].
+web nie-gevind: ['Oeps..'].
 ```
 
 
@@ -2160,8 +2160,8 @@ Resultaat:
 Om lêers wat deur gebruikers opgelaai is veilig te bedien, kan jy op passthru staatmaak:
 
 ```
->> uploaded := ['smile.gif'].
-Server gee-deur: uploaded voorvoegsel: ['/uploads/images/'].
+>> opgelaai := ['smile.gif'].
+Server gee-deur: opgelaai voorvoegsel: ['/uploads/images/'].
 Program einde.
 ```
 
@@ -2191,7 +2191,7 @@ Om 'n objek as JSON te kodeer:
 Om JSON in 'n xoscript-objek te dekodeer:
 
 ```
->> dict := ((JSON objek: json) abc ? 1).
+>> wb := ((JSON objek: json) abc ? 1).
 ```
 
 JSON met meer as 500 vlakke van nesting word as ongeldig verwerp.
@@ -2199,7 +2199,7 @@ JSON met meer as 500 vlakke van nesting word as ongeldig verwerp.
 Om 'n Woordeboek direk as json met die korrekte kopstukke uit te voer:
 
 ```
-web json: dict.
+web json: wb.
 ```
 
 
@@ -2215,7 +2215,7 @@ Patroon nuut: ['href="([^"]+)" target="([^"]+)"'].
 Pas die patroon nou soos volg op die onderwerpteks toe:
 
 ```
-pattern passing: onderwerp doen: { :m :x .... }
+soekpatroon passing: onderwerp doen: { :m :x .... }
 ```
 
 Volledige voorbeeld:
@@ -2225,13 +2225,13 @@ Volledige voorbeeld:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Patroon nuut: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern passing: onderwerp doen: { :m :x
+>> soekpatroon := Patroon nuut: ['href="([^"]+)" target="([^"]+)"'].
+>> resultaat  := soekpatroon passing: onderwerp doen: { :m :x
 	Uitvoer skryf: m, nuwe-reël.
 	Uitvoer skryf: x, nuwe-reël.
 	<- ['XXX'].
 }.
-Uitvoer skryf: result, nuwe-reël.
+Uitvoer skryf: resultaat, nuwe-reël.
 ```
 
 ## Netwerk
@@ -2254,8 +2254,8 @@ Die bedienerinprop kom met enkripsie gebaseer op XChaCha20 en Argon2.
 Voorbeeld:
 
 ```
->> encrypted := Kluis enkripteer: ['hello'] sleutel: ['world'].
->> decrypted := Kluis enkripteer: encrypted sleutel: ['world'].
+>> geënkripteer := Kluis enkripteer: ['hello'] sleutel: ['world'].
+>> gedekripteer := Kluis enkripteer: geënkripteer sleutel: ['world'].
 ```
 
 ## Tokens
@@ -2275,7 +2275,7 @@ die byvoeging van nulle. Dit gebruik die printf-sintaksis.
 
 ```
 >> fmt := Formaat nuut: ['%06.0f'].
-fmt pas-toe: 56. # gives 000056
+fmt pas-toe: 56. # gee 000056
 ```
 
 'n Formaat kan een omskakeling bevat en dit moet by die waarde pas,
@@ -2322,10 +2322,10 @@ Voorbeeld:
 Server inisialiseer.
 Program gebruik: ['mailtools.xo'].
 
->> e-mail := HTML-E-pos nuut.
->> img := e-mail aanheg: ( Lêer nuut: ['myimage.png'] ).
+>> epos := HTML-E-pos nuut.
+>> img := epos aanheg: ( Lêer nuut: ['myimage.png'] ).
 
-e-mail
+epos
 afsender: ['xo@xoscript.com'] naam: ['xo'],
 aan: ( Lys nuut ; ['xo2@xoscipt.com'] ),
 onderwerp: ['xoxo'],

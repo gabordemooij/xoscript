@@ -394,7 +394,7 @@ Los comentarios en XOScript van precedidos del símbolo \#. Así, la siguiente l
 se ignorará:
 
 ```
-# this is just a comment
+# esto es solo un comentario
 ```
 
 ## Variables
@@ -411,18 +411,18 @@ Estos son ejemplos de variables válidas:
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
->> $ := ['dollar'].
+>> $ := ['dólar'].
 >> +plus := Verdadero.
->> user-password := ['Pssst!'].
+>> clave-acceso-usuario := ['¡Chisss!'].
 ```
 
 Variables no válidas son, por ejemplo:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['número negativo'].
+>> password of elUsuario := ['Confidencial'].
+>> password.of:elUsuario := ['Confidencial'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ objeto enviándole un mensaje siguiente:
 
 ```
 Salida escribir:
-[' hello '] recortar mayúsculas.
+[' hola '] recortar mayúsculas.
 ```
 
 ```
-HELLO
+HOLA
 ```
 
 Aquí se envían dos mensajes al objeto **Texto**: **recortar**, seguido
@@ -668,7 +668,7 @@ enviado a un objeto **Verdadero** o a un objeto **Falso**:
 
 ```
 2 ¿par? verdadero: {
-	Salida escribir: ['Two is an even number'], detener.
+	Salida escribir: ['Dos es un número par'], detener.
 }.
 ```
 En el ejemplo anterior, el mensaje **verdadero:** se envía a **Verdadero** (la
@@ -881,8 +881,8 @@ de objetos. Por ejemplo:
 
 ```
 >> Animal := Objeto crear.
->> Dog := Animal crear.
->> Poodle := Dog crear.
+>> Perro := Animal crear.
+>> Caniche := Perro crear.
 ```
 
 En este caso, **Dog** hereda todo el comportamiento y las propiedades
@@ -918,7 +918,7 @@ que, al final, la suma definitiva todavía tiene que realizarse, lo que, de hech
 ocurre en la siguiente línea:
 
 ```
->> answer := yo + (número x factor).
+>> contestación := yo + (número x factor).
 ```
 
 Ahora bien, ¿cómo entiende XOScript que este **signo** más se refiere a
@@ -960,8 +960,8 @@ Animal al: ['crear'] hacer: {
 }.
 
 Animal al: ['iniciar'] hacer: {
-	mi sound := ['?'].
-	mi legs  := 4.
+	mi sonido := ['?'].
+	mi patas  := 4.
 }.
 ```
 
@@ -989,10 +989,10 @@ un método iniciar. Igual que en otros lenguajes de POO, también podemos
 extender nuestro Animal:
 
 ```
->> Dog := Animal crear.
-Dog al: ['iniciar'] hacer: {
+>> Perro := Animal crear.
+Perro al: ['iniciar'] hacer: {
 	yo iniciar.
-	mi sound := ['barks'].
+	mi sonido := ['ladra'].
 }.
 ```
 
@@ -1000,7 +1000,7 @@ Podemos comprobarlo fácilmente añadiendo un método texto:
 
 ```
 Animal al: ['texto'] hacer: {
-	<- mi legs texto + mi sound.
+	<- mi patas texto + mi sonido.
 }.
 ```
 
@@ -1015,10 +1015,10 @@ para calcular el perímetro y el área. Una posible notación sería:
 
 
 ```
->> Rectangle := Objeto crear.
+>> Rectángulo := Objeto crear.
 
-Rectangle al: ['area'] hacer: {
-	<- mi longitud * mi width.
+Rectángulo al: ['área'] hacer: {
+	<- mi longitud * mi anchura.
 }.
 ```
 
@@ -1027,12 +1027,12 @@ se pueden añadir los mensajes **longitud:** y **width:**:
 
 
 ```
-Rectangle al: ['length:'] hacer: { :longitud
+Rectángulo al: ['length:'] hacer: { :longitud
 	mi longitud := longitud.
 }.
 
-Rectangle al: ['width:'] hacer: { :width
-	mi width := width.
+Rectángulo al: ['width:'] hacer: { :anchura
+	mi anchura := anchura.
 }.
 
 ```
@@ -1041,16 +1041,16 @@ Este rectángulo se puede utilizar entonces de la siguiente manera:
 
 
 ```
->> rectangle := Rectangle crear length: 2, width: 3.
-Salida escribir: rectangle area.
+>> rectángulo := Rectángulo crear length: 2, width: 3.
+Salida escribir: rectángulo área.
 ```
 
 Sin embargo, si se olvidan los valores iniciales de longitud y anchura,
 se producirá un mensaje de error:
 
 ```
->> rectangle := Rectangle crear.
-Salida escribir: rectangle area.
+>> rectángulo := Rectángulo crear.
+Salida escribir: rectángulo área.
 ```
 
 producirá el siguiente error:
@@ -1076,13 +1076,13 @@ se analizarán todos estos objetos fundamentales.
 Puedes guardar un objeto (junto con su estado actual) en disco con:
 
 ```
-myobject save-as: ['saved.bin'].
+miobjeto save-as: ['saved.bin'].
 ```
 
 Para volver a cargar el objeto desde el disco:
 
 ```
->> myobject := Objeto load-from: ['saved.bin'].
+>> miobjeto := Objeto load-from: ['saved.bin'].
 ```
 
 Las instantáneas se pueden usar para guardar un estado determinado o para mejorar el rendimiento.
@@ -1202,8 +1202,8 @@ a una variable y enviarle mensajes después:
 ```
 10 ¿par?
 
->> tenner := 10.
-tenner ¿par?
+>> billeteDeDiez := 10.
+billeteDeDiez ¿par?
 
 ```
 
@@ -1433,10 +1433,10 @@ Esta es una trampa importante:
 ```
 {
 	Falso falso: {
-		Salida escribir: ['End the loop.'].
+		Salida escribir: ['Termina el bucle.'].
 	}, salir.
 	
-	Salida escribir: ['Dont show me.'].
+	Salida escribir: ['No me muestres.'].
 
 } proceder.
 
@@ -1450,10 +1450,10 @@ un salir, debe enviarse como mensaje a **Verdadero**.
 ```
 {
 	Falso no verdadero: {
-		Salida escribir: ['End the loop.'].
+		Salida escribir: ['Termina el bucle.'].
 	}, salir.
 	
-	Salida escribir: ['Dont show me.'].
+	Salida escribir: ['No me muestres.'].
 
 } proceder.
 
@@ -1466,7 +1466,7 @@ Funcionará como se espera.
 Las excepciones se pueden gestionar así:
 
 ```
-{ Task 1 } capturar: { Task 2 }, empezar.
+{ Tarea 1 } capturar: { Tarea 2 }, empezar.
 ```
 
 También puedes provocar intencionadamente un error en tu programa y,
@@ -1476,9 +1476,9 @@ ilustración:
 
 ```
 {
-la-tarea-actual error: ['Whoops!'].
-} capturar: { :mistake
-Salida escribir: mistake.
+la-tarea-actual error: ['¡Ups!'].
+} capturar: { :equivocación
+Salida escribir: equivocación.
 }, empezar.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript ofrece a las tareas la opción de inyectar valores. Observa
 la siguiente tarea:
 
 ```
->> sending := {
-	Newsletter destinatario: mi recipient.
+>> envío := {
+	Boletín destinatario: mi recipient.
 }.
-sending valor: ['recipient']
+envío valor: ['recipient']
 asignar: ['info@recipient.org'].
-sending empezar.
+envío empezar.
 ```
 
 
@@ -1512,20 +1512,20 @@ aspecto: **{}**; sin embargo, XOScript lo considera un error del lenguaje. Si
 quieres declarar una tarea vacía, puedes usar el objeto Nulo:
 
 ```
->> task := Nulo.
+>> tarea := Nulo.
 ```
 
 Aunque no es una tarea de verdad, sino un objeto Nulo, aún se le puede
 enviar un mensaje empezar:
 
 ```
->> answer := task empezar.
+>> contestación := tarea empezar.
 ```
 
 De hecho, esto es lo mismo que:
 
 ```
->> answer := Nulo empezar.
+>> contestación := Nulo empezar.
 ```
 
 Como el objeto **Nulo** no reconoce el mensaje **empezar**,
@@ -1699,9 +1699,9 @@ lista es una lista de precios, como:
 
 
 ```
->> menu := Diccionario crear
-	poner: ['£5'] en: ['apple pie'],
-	poner: ['£6'] en: ['carrot cake'],
+>> menú := Diccionario crear
+	poner: ['£5'] en: ['tarta de manzana'],
+	poner: ['£6'] en: ['tarta de zanahoria'],
 	poner: ['£3'] en: ['fudge'].
 ```
 
@@ -1716,13 +1716,13 @@ se puede encontrar el significado. Por ejemplo, para obtener de la
 lista mencionada el precio de un fudge:
 
 ```
->> price := menu en: ['fudge'].
+>> price := menú en: ['fudge'].
 ```
 
 También puedes usar la notación abreviada:
 
 ```
->> price := menu ? ['fudge'].
+>> price := menú ? ['fudge'].
 ```
 
 Si las entradas que utilizas para almacenar objetos no tienen espacios
@@ -1730,7 +1730,7 @@ Si las entradas que utilizas para almacenar objetos no tienen espacios
 también se puede usar la siguiente notación:
 
 ```
->> menu := Diccionario crear
+>> menú := Diccionario crear
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1741,7 +1741,7 @@ Para consultar el precio de un
 fudge, se puede usar la siguiente notación simplificada:
 
 ```
->> price := menu fudge.
+>> price := menú fudge.
 ```
 
 @api_Dict_collections
@@ -1845,7 +1845,7 @@ También es posible preguntar al objeto Programa si un
 objeto determinado ya está presente en el programa:
 
 ```
-Programa Tool verdadero: { ... }.
+Programa Herramienta verdadero: { ... }.
 ```
 
 En el caso de un nombre de objeto
@@ -1893,9 +1893,9 @@ Programa utilizar: ['template.xo'].
 Puedes establecer los siguientes ajustes del servidor:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# se dan valores predeterminados,
+	# así que si no configura nada, se usan
+	# estos valores...
 
 	Programa 
 	establecer: ['campos-máximos']
@@ -1923,9 +1923,9 @@ servidor conocido.
 Server iniciar.
 Programa utilizar: ['webtools.xo'].
 
->> web-document := Documento-Web crear.
+>> documento-web := Documento-Web crear.
 
-web-document salida: ['
+documento-web salida: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ entonces tienes que escribir tú mismo las cabeceras HTTP:
 ```
 #!/bin/xo
 Salida escribir: ['Content-type: text/html; charset=utf-8 \n\n'], detener.
-Salida escribir: ['hello world!'], detener.
+Salida escribir: ['¡hola mundo!'], detener.
 ``` 
 
 ## Petición
@@ -1950,14 +1950,14 @@ UPLOAD:
 
 ```
 >> solicitud  := Petición-HTTP crear.
->> search   := solicitud obtener: ['search']. # ?search=books
->> password := solicitud enviar: ['password']. # from form
->> selected := solicitud obtener-lista: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := solicitud enviar-lista: ['sel[]'].
+>> search   := solicitud obtener: ['search']. # ?búsqueda=libros
+>> password := solicitud enviar: ['password']. # del formulario
+>> seleccionados := solicitud obtener-lista: ['sel[]']. #?sel[]=1&sel[]=2
+>> seleccionados := solicitud enviar-lista: ['sel[]'].
 >> cookie   := solicitud cookie: ['session-id'].
->> upload   := solicitud subir: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> subida   := solicitud subir: ['file'].
+>> rutatemp := subida ? 1.
+>> nombrearchivo := subida ? 0.
 ```
 
 ## Maxpost/length
@@ -1993,7 +1993,7 @@ El objeto Database se puede usar para hacer consultas a MariaDB/MySQL.
 Para conectarte a una base de datos:
 
 ```
->> db := Maria-DB crear host: ['localhost'],
+>> bd := Maria-DB crear host: ['localhost'],
 	usuario: ['xo'],
 	contraseña: ['pass123'],
 	nombre-base-datos: ['xobase'],
@@ -2004,13 +2004,13 @@ Para conectarte a una base de datos:
 Para insertar un registro, usa:
 
 ```
->> consulta := db consultar: ['
+>> consulta := bd consultar: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parámetros: ( Lista crear ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parámetros: ( Lista crear ; ['abc'] ; 12.35 ; 6 ). # consultas parametrizadas
 
-{  consulta ejecutar. db confirmar. }
-capturar: { :e db revertir.  }, empezar.
+{  consulta ejecutar. bd confirmar. }
+capturar: { :e bd revertir.  }, empezar.
 ```
 
 Ten en cuenta que xoscript trabaja *solo* con transacciones y nunca hace autocommit.
@@ -2021,18 +2021,18 @@ al SQL.
 Obtén el id insertado así:
 
 ```
-Salida escribir: ['INSERTED: '] + consulta id-insertado, detener. # insert id
+Salida escribir: ['INSERTADO: '] + consulta id-insertado, detener. # id insertado
 ```
 
 Para obtener registros:
 
 ```
 >> consulta :=
-db
+bd
 	consultar: ['SELECT * FROM book order by id desc limit 2'], 
-	extraer: { :row 
-		Salida escribir: row id + [' '] + row description + [': '] + row price, detener.
-	}. # fetching rows
+	extraer: { :fila 
+		Salida escribir: fila id + [' '] + fila description + [': '] + fila price, detener.
+	}. # obtención de filas
 
 ```
 
@@ -2053,15 +2053,15 @@ que contiene tanto las cabeceras como el HTML u otros datos).
 
 
 ```
-# First we make a new Web Document instance
+# Primero creamos una nueva instancia de Documento-Web
 >> web := Documento-Web crear.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web empezar-sesión.
+# Ahora iniciamos una sesión; esto generará una cabecera para una cookie y
+# creará un archivo para guardar sus datos, asociado a esa cookie
+>> sesión := web empezar-sesión.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Ahora podemos tratar la sesión como un Diccionario
+sesión userid: 123.
 ```
 
 Para destruir la sesión (al cerrar sesión):
@@ -2096,7 +2096,7 @@ web cabezera: (
 Para mostrar una página 404:
 
 ```
-web no-encontrado: ['OOps..'].
+web no-encontrado: ['Uups..'].
 ```
 
 
@@ -2160,8 +2160,8 @@ Resultado:
 Para servir de forma segura archivos subidos por los usuarios, puedes recurrir a passthru:
 
 ```
->> uploaded := ['smile.gif'].
-Server acceso-directo: uploaded prefijo: ['/uploads/images/'].
+>> subido := ['smile.gif'].
+Server acceso-directo: subido prefijo: ['/uploads/images/'].
 Programa finalizar.
 ```
 
@@ -2191,7 +2191,7 @@ Para codificar un objeto como JSON:
 Para decodificar JSON en un objeto xoscript:
 
 ```
->> dict := ((JSON objeto: json) abc ? 1).
+>> dicc := ((JSON objeto: json) abc ? 1).
 ```
 
 Un JSON con más de 500 niveles de anidamiento se rechaza por no válido.
@@ -2199,7 +2199,7 @@ Un JSON con más de 500 niveles de anidamiento se rechaza por no válido.
 Para enviar directamente un Diccionario como json con las cabeceras correctas:
 
 ```
-web json: dict.
+web json: dicc.
 ```
 
 
@@ -2215,7 +2215,7 @@ Patrón crear: ['href="([^"]+)" target="([^"]+)"'].
 Ahora aplica el patrón al texto de entrada de esta manera:
 
 ```
-pattern coincidir: asunto ejecutar: { :m :x .... }
+patrón coincidir: asunto ejecutar: { :m :x .... }
 ```
 
 Ejemplo completo:
@@ -2225,13 +2225,13 @@ Ejemplo completo:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Patrón crear: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern coincidir: asunto ejecutar: { :m :x
+>> patrón := Patrón crear: ['href="([^"]+)" target="([^"]+)"'].
+>> res  := patrón coincidir: asunto ejecutar: { :m :x
 	Salida escribir: m, detener.
 	Salida escribir: x, detener.
 	<- ['XXX'].
 }.
-Salida escribir: result, detener.
+Salida escribir: res, detener.
 ```
 
 ## Redes
@@ -2254,8 +2254,8 @@ El plugin de servidor incluye cifrado basado en XChaCha20 y Argon2.
 Ejemplo:
 
 ```
->> encrypted := Contenedor-seguro cifrar: ['hello'] clave: ['world'].
->> decrypted := Contenedor-seguro cifrar: encrypted clave: ['world'].
+>> cifrado := Contenedor-seguro cifrar: ['hello'] clave: ['world'].
+>> descifrado := Contenedor-seguro cifrar: cifrado clave: ['world'].
 ```
 
 ## Tokens
@@ -2263,7 +2263,7 @@ Ejemplo:
 Para generar un token criptográficamente seguro de una longitud determinada:
 
 ```
->> mytok := Contenedor-seguro token: 40.
+>> mitok := Contenedor-seguro token: 40.
 ```
 
 Esto generará un token de 40 caracteres.
@@ -2275,7 +2275,7 @@ añadir ceros. Usa la sintaxis de printf.
 
 ```
 >> fmt := Formato crear: ['%06.0f'].
-fmt aplicar: 56. # gives 000056
+fmt aplicar: 56. # da 000056
 ```
 
 Un formato puede contener una conversión, y esta tiene que corresponder al valor;
@@ -2305,7 +2305,7 @@ Para inyectar de forma segura la entrada del usuario en tu HTML sin arriesgarte 
 inyecciones XSS, usa siempre:
 
 ```
-Server codificar-html: ['<harmless>'].
+Server codificar-html: ['<inofensivo>'].
 ```
 
 Ten en cuenta que el motor de plantillas siempre realiza la codificación html
@@ -2322,10 +2322,10 @@ Ejemplo:
 Server iniciar.
 Programa utilizar: ['mailtools.xo'].
 
->> e-mail := HTML-Email crear.
->> img := e-mail anexar: ( Archivo crear: ['myimage.png'] ).
+>> correo-e := HTML-Email crear.
+>> img := correo-e anexar: ( Archivo crear: ['myimage.png'] ).
 
-e-mail
+correo-e
 remitente: ['xo@xoscript.com'] nombre: ['xo'],
 destinatario: ( Lista crear ; ['xo2@xoscipt.com'] ),
 asunto: ['xoxo'],
@@ -2441,13 +2441,13 @@ ellas mismas). Por tanto, tienes que liberar los blobs tú mismo cuando sea nece
 Para liberar un blob, usa:
 
 ```
-myblob liberar.
+miblob liberar.
 ```
 
 Para liberar un struct, usa:
 
 ```
-mystruct liberar-estructura liberar.
+miestructura liberar-estructura liberar.
 ```
 
 Así que, para un struct, tienes que enviar dos mensajes: liberar-estructura y liberar para

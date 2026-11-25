@@ -394,7 +394,7 @@ Komentáre v XOScript sa začínajú symbolom \#. Nasledujúci riadok
 sa teda bude ignorovať:
 
 ```
-# this is just a comment
+# toto je len komentár
 ```
 
 ## Premenné
@@ -411,18 +411,18 @@ Toto sú príklady platných premenných:
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
->> $ := ['dollar'].
+>> $ := ['dolár'].
 >> +plus := Pravda.
->> user-password := ['Pssst!'].
+>> heslo-používateľa := ['Pst!'].
 ```
 
 Neplatné premenné sú napríklad:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['záporné číslo'].
+>> password of používateľ := ['Tajné'].
+>> password.of:používateľ := ['Tajné'].
 >> ,x := 10.
 ```
 
@@ -568,11 +568,11 @@ objektom posielaním nadväzujúcej správy:
 
 ```
 Výstup písať:
-[' hello '] orezať veľké-písmená.
+[' ahoj '] orezať veľké-písmená.
 ```
 
 ```
-HELLO
+AHOJ
 ```
 
 Tu sa objektu **Text** posielajú dve správy: **orezať**, a po nej
@@ -667,7 +667,7 @@ poslaná objektu **Pravda** alebo objektu **Nepravda**:
 
 ```
 2 párne? pravda: {
-	Výstup písať: ['Two is an even number'], nový-riadok.
+	Výstup písať: ['Dvojka je párne číslo'], nový-riadok.
 }.
 ```
 V predchádzajúcom príklade sa správa **pravda:** posiela objektu **Pravda** (čo je
@@ -879,9 +879,9 @@ Predtým napísaný kód môžete opätovne použiť na vytvorenie hierarchie
 objektov. Napríklad:
 
 ```
->> Animal := Objekt nový.
->> Dog := Animal nový.
->> Poodle := Dog nový.
+>> Zviera := Objekt nový.
+>> Pes := Zviera nový.
+>> Pudel := Pes nový.
 ```
 
 V tomto prípade **Dog** dedí všetko správanie a vlastnosti
@@ -917,7 +917,7 @@ V predchádzajúcom príklade sa prepisuje **znak** plus. Upozorňujeme,
 deje na nasledujúcom riadku:
 
 ```
->> answer := seba + (číslo x factor).
+>> odpoveď := seba + (číslo x faktor).
 ```
 
 Ako teda XOScript pochopí, že tento **znak** plus odkazuje na
@@ -953,14 +953,14 @@ Hoci xoscript neponúka triedy, napodobniť správanie podobné
 triedam je triviálne. Jednoducho prepíšte správu nový.
 
 ```
->> Animal := Objekt nový.
-Animal pri: ['nový'] urobiť: {
+>> Zviera := Objekt nový.
+Zviera pri: ['nový'] urobiť: {
 	<- seba nový inicializovať.
 }.
 
-Animal pri: ['inicializovať'] urobiť: {
-	vlastný sound := ['?'].
-	vlastný legs  := 4.
+Zviera pri: ['inicializovať'] urobiť: {
+	vlastný zvuk := ['?'].
+	vlastný nohy  := 4.
 }.
 ```
 
@@ -980,7 +980,7 @@ má zviera 4 nohy a zvuk je neznámy (preto otáznik).
 Na vytvorenie novej inštancie nášho objektu Animal by sme mohli jednoducho napísať:
 
 ```
->> a := Animal nový.
+>> a := Zviera nový.
 ```
 
 Teraz dostaneme novú inštanciu objektu Animal so 4 nohami, neznámym zvukom a
@@ -988,18 +988,18 @@ metódou init. Rovnako ako v iných OOP jazykoch môžeme náš objekt Animal
 aj rozšíriť:
 
 ```
->> Dog := Animal nový.
-Dog pri: ['inicializovať'] urobiť: {
+>> Pes := Zviera nový.
+Pes pri: ['inicializovať'] urobiť: {
 	seba inicializovať.
-	vlastný sound := ['barks'].
+	vlastný zvuk := ['šteká'].
 }.
 ```
 
 Ľahko to otestujeme pridaním metódy text:
 
 ```
-Animal pri: ['text'] urobiť: {
-	<- vlastný legs text + vlastný sound.
+Zviera pri: ['text'] urobiť: {
+	<- vlastný nohy text + vlastný zvuk.
 }.
 ```
 
@@ -1014,10 +1014,10 @@ na výpočet obvodu a obsahu. Možný zápis by bol:
 
 
 ```
->> Rectangle := Objekt nový.
+>> Obdĺžnik := Objekt nový.
 
-Rectangle pri: ['area'] urobiť: {
-	<- vlastný dĺžka * vlastný width.
+Obdĺžnik pri: ['rozloha'] urobiť: {
+	<- vlastný dĺžka * vlastný šírka.
 }.
 ```
 
@@ -1026,12 +1026,12 @@ Nastavenie dĺžky a šírky je zjavne predpokladom. Na tento
 
 
 ```
-Rectangle pri: ['length:'] urobiť: { :dĺžka
+Obdĺžnik pri: ['length:'] urobiť: { :dĺžka
 	vlastný dĺžka := dĺžka.
 }.
 
-Rectangle pri: ['width:'] urobiť: { :width
-	vlastný width := width.
+Obdĺžnik pri: ['width:'] urobiť: { :šírka
+	vlastný šírka := šírka.
 }.
 
 ```
@@ -1040,16 +1040,16 @@ Tento obdĺžnik potom možno použiť takto:
 
 
 ```
->> rectangle := Rectangle nový length: 2, width: 3.
-Výstup písať: rectangle area.
+>> obdĺžnik := Obdĺžnik nový length: 2, width: 3.
+Výstup písať: obdĺžnik rozloha.
 ```
 
 Ak sa však počiatočné nastavenie dĺžky a šírky prehliadne,
 objaví sa chybové hlásenie:
 
 ```
->> rectangle := Rectangle nový.
-Výstup písať: rectangle area.
+>> obdĺžnik := Obdĺžnik nový.
+Výstup písať: obdĺžnik rozloha.
 ```
 
 vyvolá nasledujúcu chybu:
@@ -1075,13 +1075,13 @@ budú opísané všetky tieto základné objekty.
 Objekt (spolu s jeho aktuálnym stavom) môžete uložiť na disk pomocou:
 
 ```
-myobject save-as: ['saved.bin'].
+môj-objekt save-as: ['saved.bin'].
 ```
 
 Na opätovné načítanie objektu z disku:
 
 ```
->> myobject := Objekt load-from: ['saved.bin'].
+>> môj-objekt := Objekt load-from: ['saved.bin'].
 ```
 
 Snímky možno použiť na uloženie určitého stavu alebo na zlepšenie výkonu.
@@ -1201,8 +1201,8 @@ priradiť premennej a správy posielať až potom:
 ```
 10 párne?
 
->> tenner := 10.
-tenner párne?
+>> desiatka := 10.
+desiatka párne?
 
 ```
 
@@ -1432,10 +1432,10 @@ Tu je dôležité úskalie:
 ```
 {
 	Nepravda nepravda: {
-		Výstup písať: ['End the loop.'].
+		Výstup písať: ['Ukonči slučku.'].
 	}, prerušiť.
 	
-	Výstup písať: ['Dont show me.'].
+	Výstup písať: ['Neukazuj ma.'].
 
 } procedúra.
 
@@ -1449,10 +1449,10 @@ prerušenie, musí sa poslať ako správa objektu **Pravda**.
 ```
 {
 	Nepravda nie pravda: {
-		Výstup písať: ['End the loop.'].
+		Výstup písať: ['Ukonči slučku.'].
 	}, prerušiť.
 	
-	Výstup písať: ['Dont show me.'].
+	Výstup písať: ['Neukazuj ma.'].
 
 } procedúra.
 
@@ -1465,7 +1465,7 @@ Bude fungovať podľa očakávania.
 Výnimky možno spracovať takto:
 
 ```
-{ Task 1 } zachytiť: { Task 2 }, spustiť.
+{ Úloha 1 } zachytiť: { Úloha 2 }, spustiť.
 ```
 
 Vo svojom programe môžete aj zámerne vyvolať chybu a
@@ -1475,9 +1475,9 @@ ilustrácii:
 
 ```
 {
-táto-úloha chyba: ['Whoops!'].
-} zachytiť: { :mistake
-Výstup písať: mistake.
+táto-úloha chyba: ['Ups!'].
+} zachytiť: { :omyl
+Výstup písať: omyl.
 }, spustiť.
 ```
 
@@ -1487,12 +1487,12 @@ XOScript ponúka pre úlohy možnosť vkladať hodnoty. Pozrite sa
 na úlohu nižšie:
 
 ```
->> sending := {
-	Newsletter komu: vlastný recipient.
+>> odosielanie := {
+	Spravodaj komu: vlastný recipient.
 }.
-sending nastaviť: ['recipient']
+odosielanie nastaviť: ['recipient']
 hodnota: ['info@recipient.org'].
-sending spustiť.
+odosielanie spustiť.
 ```
 
 
@@ -1511,20 +1511,20 @@ takto: **{}**, XOScript to však považuje za jazykovú chybu. Ak
 chcete deklarovať prázdnu úlohu, môžete použiť objekt Nič:
 
 ```
->> task := Nič.
+>> úloha := Nič.
 ```
 
 Hoci to nie je skutočná úloha, ale objekt Nič, správu spustiť
 mu stále možno poslať:
 
 ```
->> answer := task spustiť.
+>> odpoveď := úloha spustiť.
 ```
 
 V skutočnosti je to to isté ako:
 
 ```
->> answer := Nič spustiť.
+>> odpoveď := Nič spustiť.
 ```
 
 Keďže objekt **Nič** nerozpozná správu **spustiť**,
@@ -1698,9 +1698,9 @@ takého zoznamu je cenník, napríklad:
 
 
 ```
->> menu := Slovník nový
-	umiestniť: ['£5'] na: ['apple pie'],
-	umiestniť: ['£6'] na: ['carrot cake'],
+>> ponuka := Slovník nový
+	umiestniť: ['£5'] na: ['jablkový koláč'],
+	umiestniť: ['£6'] na: ['mrkvová torta'],
 	umiestniť: ['£3'] na: ['fudge'].
 ```
 
@@ -1715,13 +1715,13 @@ možno nájsť význam. Napríklad na získanie ceny karamelky
 z vyššie uvedeného zoznamu:
 
 ```
->> price := menu na: ['fudge'].
+>> price := ponuka na: ['fudge'].
 ```
 
 Môžete použiť aj stručný zápis:
 
 ```
->> price := menu ? ['fudge'].
+>> price := ponuka ? ['fudge'].
 ```
 
 Ak heslá, ktoré používate na ukladanie objektov, neobsahujú medzery
@@ -1729,7 +1729,7 @@ Ak heslá, ktoré používate na ukladanie objektov, neobsahujú medzery
 možno použiť aj nasledujúci zápis:
 
 ```
->> menu := Slovník nový
+>> ponuka := Slovník nový
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1740,7 +1740,7 @@ Na zistenie ceny
 karamelky možno použiť nasledujúci zjednodušený zápis:
 
 ```
->> price := menu fudge.
+>> price := ponuka fudge.
 ```
 
 @api_Dict_collections
@@ -1844,7 +1844,7 @@ Objektu Program sa tiež možno opýtať, či je
 daný objekt v programe už prítomný:
 
 ```
-Program Tool pravda: { ... }.
+Program Nástroj pravda: { ... }.
 ```
 
 V prípade názvu objektu,
@@ -1892,9 +1892,9 @@ Program použiť: ['template.xo'].
 Môžete nastaviť nasledujúce nastavenia servera:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# sú dané predvolené hodnoty,
+	# takže ak nič nenastavíte, použijú sa
+	# tieto hodnoty...
 
 	Program 
 	nastavenie: ['max-postfields']
@@ -1922,9 +1922,9 @@ známym serverom.
 Server inicializovať.
 Program použiť: ['webtools.xo'].
 
->> web-document := Webový-dokument nový.
+>> webový-dokument := Webový-dokument nový.
 
-web-document vypísať: ['
+webový-dokument vypísať: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1939,7 +1939,7 @@ potom musíte HTTP hlavičky napísať sami:
 ```
 #!/bin/xo
 Výstup písať: ['Content-type: text/html; charset=utf-8 \n\n'], nový-riadok.
-Výstup písať: ['hello world!'], nový-riadok.
+Výstup písať: ['ahoj svet!'], nový-riadok.
 ``` 
 
 ## Požiadavka
@@ -1950,13 +1950,13 @@ UPLOAD:
 ```
 >> požiadavka  := HTTP-Požiadavka nový.
 >> search   := požiadavka get: ['search']. # ?search=books
->> password := požiadavka post: ['password']. # from form
->> selected := požiadavka get-zoznam: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := požiadavka post-zoznam: ['sel[]'].
+>> password := požiadavka post: ['password']. # z formulára
+>> vybrané := požiadavka get-zoznam: ['sel[]']. #?sel[]=1&sel[]=2
+>> vybrané := požiadavka post-zoznam: ['sel[]'].
 >> cookie   := požiadavka cookie: ['session-id'].
->> upload   := požiadavka upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> nahraný-súbor   := požiadavka upload: ['file'].
+>> dočasná-cesta := nahraný-súbor ? 1.
+>> názov-súboru := nahraný-súbor ? 0.
 ```
 
 ## Maxpost/length
@@ -2006,7 +2006,7 @@ Na vloženie záznamu použite:
 >> parametre-hľadania := db dopyt: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametre: ( Zoznam nový ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametre: ( Zoznam nový ; ['abc'] ; 12.35 ; 6 ). # parametrizované dopyty
 
 {  parametre-hľadania vykonať. db potvrdiť. }
 zachytiť: { :e db vrátiť-späť.  }, spustiť.
@@ -2020,7 +2020,7 @@ do SQL.
 ID vloženého záznamu získate takto:
 
 ```
-Výstup písať: ['INSERTED: '] + parametre-hľadania insert-id, nový-riadok. # insert id
+Výstup písať: ['VLOŽENÉ: '] + parametre-hľadania insert-id, nový-riadok. # id vloženia
 ```
 
 Na načítanie záznamov:
@@ -2029,9 +2029,9 @@ Na načítanie záznamov:
 >> parametre-hľadania :=
 db
 	dopyt: ['SELECT * FROM book order by id desc limit 2'], 
-	načítať: { :row 
-		Výstup písať: row id + [' '] + row description + [': '] + row price, nový-riadok.
-	}. # fetching rows
+	načítať: { :rad 
+		Výstup písať: rad id + [' '] + rad description + [': '] + rad price, nový-riadok.
+	}. # načítanie riadkov
 
 ```
 
@@ -2052,15 +2052,15 @@ dokument obsahujúci hlavičky aj HTML alebo iné údaje).
 
 
 ```
-# First we make a new Web Document instance
+# Najprv vytvoríme novú inštanciu Webový-dokument
 >> web := Webový-dokument nový.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web začať-reláciu.
+# Teraz spustíme reláciu; tým sa vygeneruje hlavička pre cookie a
+# vytvorí sa súbor pre vaše údaje, spojený s týmto cookie
+>> relácia := web začať-reláciu.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Teraz môžeme s reláciou zaobchádzať ako so Slovníkom
+relácia userid: 123.
 ```
 
 Na zničenie relácie (pri odhlásení):
@@ -2095,7 +2095,7 @@ web hlavička: (
 Na zobrazenie stránky 404:
 
 ```
-web nenájdené: ['OOps..'].
+web nenájdené: ['Ojoj..'].
 ```
 
 
@@ -2159,8 +2159,8 @@ Výsledok:
 Na bezpečné poskytovanie súborov nahraných používateľmi sa môžete spoľahnúť na passthru:
 
 ```
->> uploaded := ['smile.gif'].
-Server odovzdať: uploaded prefix: ['/uploads/images/'].
+>> nahrané := ['smile.gif'].
+Server odovzdať: nahrané prefix: ['/uploads/images/'].
 Program koniec.
 ```
 
@@ -2190,7 +2190,7 @@ Na zakódovanie objektu ako JSON:
 Na dekódovanie JSON do objektu xoscript:
 
 ```
->> dict := ((JSON objekt: json) abc ? 1).
+>> slovn := ((JSON objekt: json) abc ? 1).
 ```
 
 JSON s viac ako 500 úrovňami vnorenia sa odmietne ako neplatný.
@@ -2198,7 +2198,7 @@ JSON s viac ako 500 úrovňami vnorenia sa odmietne ako neplatný.
 Na priamy výstup objektu Slovník ako json so správnymi hlavičkami:
 
 ```
-web json: dict.
+web json: slovn.
 ```
 
 
@@ -2214,7 +2214,7 @@ Vzor nový: ['href="([^"]+)" target="([^"]+)"'].
 Teraz použite vzor na skúmaný text takto:
 
 ```
-pattern zhoda: predmet urobiť: { :m :x .... }
+vzorka zhoda: predmet urobiť: { :m :x .... }
 ```
 
 Úplný príklad:
@@ -2224,13 +2224,13 @@ pattern zhoda: predmet urobiť: { :m :x .... }
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Vzor nový: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern zhoda: predmet urobiť: { :m :x
+>> vzorka := Vzor nový: ['href="([^"]+)" target="([^"]+)"'].
+>> výsledok  := vzorka zhoda: predmet urobiť: { :m :x
 	Výstup písať: m, nový-riadok.
 	Výstup písať: x, nový-riadok.
 	<- ['XXX'].
 }.
-Výstup písať: result, nový-riadok.
+Výstup písať: výsledok, nový-riadok.
 ```
 
 ## Sieťová komunikácia
@@ -2253,8 +2253,8 @@ Serverový plugin obsahuje šifrovanie založené na XChaCha20 a Argon2.
 Príklad:
 
 ```
->> encrypted := Trezor šifrovať: ['hello'] kľúč: ['world'].
->> decrypted := Trezor šifrovať: encrypted kľúč: ['world'].
+>> zašifrované := Trezor šifrovať: ['hello'] kľúč: ['world'].
+>> dešifrované := Trezor šifrovať: zašifrované kľúč: ['world'].
 ```
 
 ## Tokeny
@@ -2262,7 +2262,7 @@ Príklad:
 Na vygenerovanie kryptograficky bezpečného tokenu určitej dĺžky:
 
 ```
->> mytok := Trezor token: 40.
+>> môj-token := Trezor token: 40.
 ```
 
 Vygeneruje sa token so 40 znakmi.
@@ -2274,7 +2274,7 @@ dopĺňať nuly. Používa syntax printf.
 
 ```
 >> fmt := Formát nový: ['%06.0f'].
-fmt aplikovať: 56. # gives 000056
+fmt aplikovať: 56. # dáva 000056
 ```
 
 Formát môže obsahovať jednu konverziu a tá musí zodpovedať hodnote,
@@ -2304,7 +2304,7 @@ Na bezpečné vloženie vstupu používateľa do HTML bez rizika XSS
 injekcií vždy použite:
 
 ```
-Server html-kódovať: ['<harmless>'].
+Server html-kódovať: ['<neškodné>'].
 ```
 
 Upozorňujeme, že šablónovací systém pri zápise do značky slotu
@@ -2440,13 +2440,13 @@ samy). Preto musíte bloby v prípade potreby uvoľňovať sami.
 Na uvoľnenie blobu použite:
 
 ```
-myblob uvoľniť.
+môj-blob uvoľniť.
 ```
 
 Na uvoľnenie štruktúry použite:
 
 ```
-mystruct uvoľniť-struct uvoľniť.
+môj-struct uvoľniť-struct uvoľniť.
 ```
 
 Pri štruktúre teda musíte na dealokáciu pamäťového bloku poslať dve správy:

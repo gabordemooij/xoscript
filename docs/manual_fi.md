@@ -160,8 +160,8 @@ ja kirjoita pieni testiohjelma:
 #!/bin/xo
 Server valmistele.
 Ohjelma käytä: ['webtools.xo'].
->> web := Verkkodokumentti uusi.
-web tulosta: ['Hello World'].
+>> verkkosivu := Verkkodokumentti uusi.
+verkkosivu tulosta: ['Hello World'].
 ```
 
 Salli apache2:n suorittaa ohjelmasi CGI:n kautta:
@@ -394,7 +394,7 @@ XOScriptin kommentit alkavat merkillä \#. Seuraava rivi
 siis ohitetaan:
 
 ```
-# this is just a comment
+# tämä on vain kommentti
 ```
 
 ## Muuttujat
@@ -411,18 +411,18 @@ Seuraavat ovat esimerkkejä kelvollisista muuttujista:
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
->> $ := ['dollar'].
+>> $ := ['dollari'].
 >> +plus := Tosi.
->> user-password := ['Pssst!'].
+>> käyttäjän-salasana := ['Pssst!'].
 ```
 
 Kelvottomia muuttujia ovat esimerkiksi:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['negatiivinen luku'].
+>> password of käyttäjä := ['Salainen'].
+>> password.of:käyttäjä := ['Salainen'].
 >> ,x := 10.
 ```
 
@@ -569,11 +569,11 @@ olion kanssa lähettämällä sille jatkoviestin:
 
 ```
 Tuloste kirjoita:
-[' hello '] siisti isot-kirjaimet.
+[' hei '] siisti isot-kirjaimet.
 ```
 
 ```
-HELLO
+HEI
 ```
 
 Tässä **Teksti**-oliolle lähetetään kaksi viestiä: **siisti** ja sen jälkeen
@@ -668,7 +668,7 @@ joko **Tosi**-oliolle tai **Epätosi**-oliolle:
 
 ```
 2 parillinen? tosi: {
-	Tuloste kirjoita: ['Two is an even number'], rivinvaihto.
+	Tuloste kirjoita: ['Kaksi on parillinen luku'], rivinvaihto.
 }.
 ```
 Edellisessä esimerkissä viesti **tosi:** lähetetään oliolle **Tosi** (joka on
@@ -880,9 +880,9 @@ Aiemmin kirjoitettua koodia voi käyttää uudelleen oliohierarkian
 luomiseen. Esimerkiksi:
 
 ```
->> Animal := Olio uusi.
->> Dog := Animal uusi.
->> Poodle := Dog uusi.
+>> Eläin := Olio uusi.
+>> Koira := Eläin uusi.
+>> Villakoira := Koira uusi.
 ```
 
 Tässä tapauksessa **Dog** perii kaiken olion **Animal** käyttäytymisen ja ominaisuudet,
@@ -918,7 +918,7 @@ että lopullinen yhteenlasku on kuitenkin lopulta tehtävä, ja se itse asiassa
 tapahtuu seuraavalla rivillä:
 
 ```
->> answer := itse + (luku x factor).
+>> ratkaisu := itse + (luku x kerroin).
 ```
 
 Miten XOScript sitten ymmärtää, että tämä plus**merkki** viittaa
@@ -954,14 +954,14 @@ Vaikka XOScriptissä ei ole luokkia, luokkamaisen
 käyttäytymisen jäljittely on helppoa. Korvaa vain viesti uusi.
 
 ```
->> Animal := Olio uusi.
-Animal kun: ['uusi'] tee: {
+>> Eläin := Olio uusi.
+Eläin kun: ['uusi'] tee: {
 	<- itse uusi valmistele.
 }.
 
-Animal kun: ['valmistele'] tee: {
-	oma sound := ['?'].
-	oma legs  := 4.
+Eläin kun: ['valmistele'] tee: {
+	oma ääni := ['?'].
+	oma jalat  := 4.
 }.
 ```
 
@@ -981,7 +981,7 @@ eläimellä on 4 jalkaa ja ääni on tuntematon (siksi kysymysmerkki).
 Uuden Animal-instanssin luomiseksi voisimme sanoa yksinkertaisesti:
 
 ```
->> a := Animal uusi.
+>> a := Eläin uusi.
 ```
 
 Nyt saamme uuden Animal-instanssin, jolla on 4 jalkaa, tuntematon ääni ja
@@ -989,18 +989,18 @@ valmistele-metodi. Aivan kuten muissa olio-ohjelmointikielissä, voimme myös
 laajentaa Animal-oliotamme:
 
 ```
->> Dog := Animal uusi.
-Dog kun: ['valmistele'] tee: {
+>> Koira := Eläin uusi.
+Koira kun: ['valmistele'] tee: {
 	itse valmistele.
-	oma sound := ['barks'].
+	oma ääni := ['haukkuu'].
 }.
 ```
 
 Tämän voi helposti testata lisäämällä teksti-metodin:
 
 ```
-Animal kun: ['teksti'] tee: {
-	<- oma legs teksti + oma sound.
+Eläin kun: ['teksti'] tee: {
+	<- oma jalat teksti + oma ääni.
 }.
 ```
 
@@ -1015,10 +1015,10 @@ piirin ja pinta-alan laskemiseksi. Mahdollinen merkintätapa olisi:
 
 
 ```
->> Rectangle := Olio uusi.
+>> Suorakulmio := Olio uusi.
 
-Rectangle kun: ['area'] tee: {
-	<- oma pituus * oma width.
+Suorakulmio kun: ['pinta-ala'] tee: {
+	<- oma pituus * oma leveys.
 }.
 ```
 
@@ -1027,12 +1027,12 @@ varten voidaan lisätä viestit **pituus:** ja **width:**:
 
 
 ```
-Rectangle kun: ['length:'] tee: { :pituus
+Suorakulmio kun: ['length:'] tee: { :pituus
 	oma pituus := pituus.
 }.
 
-Rectangle kun: ['width:'] tee: { :width
-	oma width := width.
+Suorakulmio kun: ['width:'] tee: { :leveys
+	oma leveys := leveys.
 }.
 
 ```
@@ -1041,16 +1041,16 @@ Tätä suorakulmiota voidaan sitten käyttää seuraavasti:
 
 
 ```
->> rectangle := Rectangle uusi length: 2, width: 3.
-Tuloste kirjoita: rectangle area.
+>> suorakulmio := Suorakulmio uusi length: 2, width: 3.
+Tuloste kirjoita: suorakulmio pinta-ala.
 ```
 
 Jos pituuden ja leveyden alkuasetukset kuitenkin unohtuvat,
 seurauksena on virheilmoitus:
 
 ```
->> rectangle := Rectangle uusi.
-Tuloste kirjoita: rectangle area.
+>> suorakulmio := Suorakulmio uusi.
+Tuloste kirjoita: suorakulmio pinta-ala.
 ```
 
 tuottaa seuraavan virheen:
@@ -1076,13 +1076,13 @@ käsitellään kaikki nämä ydinoliot.
 Voit tallentaa olion (ja sen nykyisen tilan) levylle seuraavasti:
 
 ```
-myobject save-as: ['saved.bin'].
+omaolio save-as: ['saved.bin'].
 ```
 
 Olion lataaminen uudelleen levyltä:
 
 ```
->> myobject := Olio load-from: ['saved.bin'].
+>> omaolio := Olio load-from: ['saved.bin'].
 ```
 
 Tilannevedoksilla voi tallentaa tietyn tilan tai parantaa suorituskykyä.
@@ -1202,8 +1202,8 @@ muuttujaan ja lähettää viestit sen jälkeen:
 ```
 10 parillinen?
 
->> tenner := 10.
-tenner parillinen?
+>> kymppi := 10.
+kymppi parillinen?
 
 ```
 
@@ -1433,10 +1433,10 @@ Tässä on tärkeä sudenkuoppa:
 ```
 {
 	Epätosi epätosi: {
-		Tuloste kirjoita: ['End the loop.'].
+		Tuloste kirjoita: ['Lopeta silmukka.'].
 	}, keskeytä.
 	
-	Tuloste kirjoita: ['Dont show me.'].
+	Tuloste kirjoita: ['Älä näytä minua.'].
 
 } proseduuri.
 
@@ -1450,10 +1450,10 @@ keskeytyksen, se on lähetettävä viestinä oliolle **Tosi**.
 ```
 {
 	Epätosi ei tosi: {
-		Tuloste kirjoita: ['End the loop.'].
+		Tuloste kirjoita: ['Lopeta silmukka.'].
 	}, keskeytä.
 	
-	Tuloste kirjoita: ['Dont show me.'].
+	Tuloste kirjoita: ['Älä näytä minua.'].
 
 } proseduuri.
 
@@ -1466,7 +1466,7 @@ Toimii odotetusti.
 Poikkeuksia voi käsitellä näin:
 
 ```
-{ Task 1 } sieppaa: { Task 2 }, käynnistä.
+{ Tehtävä 1 } sieppaa: { Tehtävä 2 }, käynnistä.
 ```
 
 Voit myös tarkoituksella aiheuttaa ohjelmassasi virheen ja
@@ -1476,9 +1476,9 @@ esimerkissä näytetään:
 
 ```
 {
-tämä-tehtävä virhe: ['Whoops!'].
-} sieppaa: { :mistake
-Tuloste kirjoita: mistake.
+tämä-tehtävä virhe: ['Hupsis!'].
+} sieppaa: { :erehdys
+Tuloste kirjoita: erehdys.
 }, käynnistä.
 ```
 
@@ -1488,12 +1488,12 @@ XOScript tarjoaa tehtäville mahdollisuuden injektoida arvoja. Katso
 alla olevaa tehtävää:
 
 ```
->> sending := {
-	Newsletter vastaanottaja: oma recipient.
+>> lähetys := {
+	Uutiskirje vastaanottaja: oma recipient.
 }.
-sending aseta: ['recipient']
+lähetys aseta: ['recipient']
 arvo: ['info@recipient.org'].
-sending käynnistä.
+lähetys käynnistä.
 ```
 
 
@@ -1512,20 +1512,20 @@ tältä: **{}**, mutta XOScript pitää tätä kielivirheenä. Jos
 haluat esitellä tyhjän tehtävän, voit käyttää Tyhjä-oliota:
 
 ```
->> task := Tyhjä.
+>> tehtävä := Tyhjä.
 ```
 
 Vaikka tämä ei ole oikea tehtävä vaan Tyhjä-olio, sille voi
 silti lähettää käynnistä-viestin:
 
 ```
->> answer := task käynnistä.
+>> ratkaisu := tehtävä käynnistä.
 ```
 
 Tämä on itse asiassa sama kuin:
 
 ```
->> answer := Tyhjä käynnistä.
+>> ratkaisu := Tyhjä käynnistä.
 ```
 
 Koska olio **Tyhjä** ei tunnista viestiä **käynnistä**, se
@@ -1699,9 +1699,9 @@ tällaisesta luettelosta on hinnasto, kuten:
 
 
 ```
->> menu := Sanakirja uusi
-	aseta: ['£5'] kohtaan: ['apple pie'],
-	aseta: ['£6'] kohtaan: ['carrot cake'],
+>> ruokalista := Sanakirja uusi
+	aseta: ['£5'] kohtaan: ['omenapiirakka'],
+	aseta: ['£6'] kohtaan: ['porkkanakakku'],
 	aseta: ['£3'] kohtaan: ['fudge'].
 ```
 
@@ -1716,13 +1716,13 @@ löytyy merkitys. Esimerkiksi fudgen hinnan hakeminen
 yllä mainitusta luettelosta:
 
 ```
->> price := menu kohdassa: ['fudge'].
+>> price := ruokalista kohdassa: ['fudge'].
 ```
 
 Voit käyttää myös tiivistä merkintätapaa:
 
 ```
->> price := menu ? ['fudge'].
+>> price := ruokalista ? ['fudge'].
 ```
 
 Jos olioiden tallentamiseen käyttämäsi hakusanat ovat ilman välilyöntejä
@@ -1730,7 +1730,7 @@ Jos olioiden tallentamiseen käyttämäsi hakusanat ovat ilman välilyöntejä
 voidaan käyttää myös seuraavaa merkintätapaa:
 
 ```
->> menu := Sanakirja uusi
+>> ruokalista := Sanakirja uusi
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1741,7 +1741,7 @@ Fudgen hinnan kysymiseen
 voidaan käyttää seuraavaa yksinkertaistettua merkintätapaa:
 
 ```
->> price := menu fudge.
+>> price := ruokalista fudge.
 ```
 
 @api_Dict_collections
@@ -1845,7 +1845,7 @@ Ohjelma-oliolta voi myös kysyä, onko
 tietty olio jo olemassa ohjelmassa:
 
 ```
-Ohjelma Tool tosi: { ... }.
+Ohjelma Työkalu tosi: { ... }.
 ```
 
 Jos olion
@@ -1893,9 +1893,9 @@ Ohjelma käytä: ['template.xo'].
 Voit määrittää seuraavat palvelinasetukset:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# oletusarvot on annettu,
+	# joten jos et aseta mitään, käytetään
+	# näitä arvoja...
 
 	Ohjelma 
 	asetus: ['max-postfields']
@@ -1923,9 +1923,9 @@ tunnetun palvelimen kanssa.
 Server valmistele.
 Ohjelma käytä: ['webtools.xo'].
 
->> web-document := Verkkodokumentti uusi.
+>> verkkoasiakirja := Verkkodokumentti uusi.
 
-web-document tulosta: ['
+verkkoasiakirja tulosta: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1940,7 +1940,7 @@ silloin sinun on kirjoitettava HTTP-otsakkeet itse:
 ```
 #!/bin/xo
 Tuloste kirjoita: ['Content-type: text/html; charset=utf-8 \n\n'], rivinvaihto.
-Tuloste kirjoita: ['hello world!'], rivinvaihto.
+Tuloste kirjoita: ['hei maailma!'], rivinvaihto.
 ``` 
 
 ## Pyyntö
@@ -1951,13 +1951,13 @@ UPLOAD-tietoja:
 ```
 >> pyyntö  := HTTP-Pyyntö uusi.
 >> search   := pyyntö get: ['search']. # ?search=books
->> password := pyyntö post: ['password']. # from form
->> selected := pyyntö get-lista: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := pyyntö post-lista: ['sel[]'].
->> cookie   := pyyntö cookie: ['session-id'].
->> upload   := pyyntö upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> password := pyyntö post: ['password']. # lomakkeesta
+>> valitut := pyyntö get-lista: ['sel[]']. #?sel[]=1&sel[]=2
+>> valitut := pyyntö post-lista: ['sel[]'].
+>> eväste   := pyyntö cookie: ['session-id'].
+>> lataus   := pyyntö upload: ['file'].
+>> väliaikaispolku := lataus ? 1.
+>> tiedostonimi := lataus ? 0.
 ```
 
 ## Maxpost/length
@@ -1993,7 +1993,7 @@ Database-oliolla voi tehdä kyselyjä MariaDB:hen/MySQL:ään.
 Tietokantaan yhdistetään näin:
 
 ```
->> db := Maria-DB uusi isäntä: ['localhost'],
+>> tk := Maria-DB uusi isäntä: ['localhost'],
 	käyttäjänimi: ['xo'],
 	salasana: ['pass123'],
 	tietokannan-nimi: ['xobase'],
@@ -2004,13 +2004,13 @@ Tietokantaan yhdistetään näin:
 Tietueen lisääminen:
 
 ```
->> hakuparametrit := db kysely: ['
+>> hakuparametrit := tk kysely: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametrit: ( Lista uusi ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametrit: ( Lista uusi ; ['abc'] ; 12.35 ; 6 ). # parametrisoidut kyselyt
 
-{  hakuparametrit suorita. db vahvista. }
-sieppaa: { :e db peru.  }, käynnistä.
+{  hakuparametrit suorita. tk vahvista. }
+sieppaa: { :e tk peru.  }, käynnistä.
 ```
 
 Huomaa, että XOScript toimii *ainoastaan* transaktioiden kanssa eikä koskaan vahvista automaattisesti (autocommit).
@@ -2021,18 +2021,18 @@ SQL-lauseeseen.
 Lisätyn tietueen tunnisteen saa näin:
 
 ```
-Tuloste kirjoita: ['INSERTED: '] + hakuparametrit insert-id, rivinvaihto. # insert id
+Tuloste kirjoita: ['LISÄTTY: '] + hakuparametrit insert-id, rivinvaihto. # lisätty id
 ```
 
 Tietueiden hakeminen:
 
 ```
 >> hakuparametrit :=
-db
+tk
 	kysely: ['SELECT * FROM book order by id desc limit 2'], 
-	hae: { :row 
-		Tuloste kirjoita: row id + [' '] + row description + [': '] + row price, rivinvaihto.
-	}. # fetching rows
+	hae: { :vaakarivi 
+		Tuloste kirjoita: vaakarivi id + [' '] + vaakarivi description + [': '] + vaakarivi price, rivinvaihto.
+	}. # rivien haku
 
 ```
 
@@ -2053,21 +2053,21 @@ dokumentti, joka sisältää sekä otsakkeet että HTML:n tai muun datan).
 
 
 ```
-# First we make a new Web Document instance
->> web := Verkkodokumentti uusi.
+# Ensin luomme uuden Verkkodokumentti-instanssin
+>> verkkosivu := Verkkodokumentti uusi.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web aloita-istunto.
+# Nyt aloitamme istunnon; se luo otsakkeen evästeelle ja
+# tiedoston tietojasi varten, liitettynä tuohon evästeeseen
+>> istunto := verkkosivu aloita-istunto.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Nyt voimme käsitellä istuntoa kuin Sanakirjaa
+istunto userid: 123.
 ```
 
 Istunnon tuhoaminen (uloskirjautumisen yhteydessä):
 
 ```
-web tuhoa-istunto.
+verkkosivu tuhoa-istunto.
 ```
 
 ## Otsakkeet
@@ -2076,7 +2076,7 @@ Verkkodokumentilla voi asettaa myös muita tunnettuja otsakkeita.
 Jos esimerkiksi haluat ohjata käyttäjän toiseen URL-osoitteeseen:
 
 ```
-web siirry: ['/other.html'].
+verkkosivu siirry: ['/other.html'].
 ```
 
 Konepellin alla tämä komento luo myös HTTP-otsakkeen, joka lähetetään
@@ -2086,7 +2086,7 @@ annettuun kohdeosoitteeseen.
 Mukautetun otsakkeen lisääminen:
 
 ```
-web otsake: ( 
+verkkosivu otsake: ( 
 	HTTP-Otsake uusi
 	avain: ['Content-Length']
 	arvo: 400
@@ -2096,7 +2096,7 @@ web otsake: (
 404-sivun näyttäminen:
 
 ```
-web ei-löydy: ['OOps..'].
+verkkosivu ei-löydy: ['Hupsista..'].
 ```
 
 
@@ -2109,7 +2109,7 @@ esityksen ja liiketoimintalogiikan välillä.
 Mallipohjan luominen tiedostosta:
 
 ```
->> tpl := web mallipohja: ['templates/ux.tpl'].
+>> tpl := verkkosivu mallipohja: ['templates/ux.tpl'].
 ```
 
 Mallipohjajärjestelmä käyttää merkkejä.
@@ -2139,7 +2139,7 @@ Tämän voi tehdä seuraavasti:
 >> gem := tpl leikkaa: ['gem'], kopioi.
 gem price: 99.
 tpl liimaa: gem kohtaan: ['jewels'].
-web tulosta: tpl puhdista.
+verkkosivu tulosta: tpl puhdista.
 ```
 
 Viimeinen rivi yksinkertaisesti lähettää mallipohjan merkkijonona asiakkaalle
@@ -2160,8 +2160,8 @@ Tulos:
 Käyttäjien lataamia tiedostoja voi tarjota turvallisesti passthrun avulla:
 
 ```
->> uploaded := ['smile.gif'].
-Server välitä: uploaded etuliite: ['/uploads/images/'].
+>> ladattu := ['smile.gif'].
+Server välitä: ladattu etuliite: ['/uploads/images/'].
 Ohjelma lopeta.
 ```
 
@@ -2191,7 +2191,7 @@ Olion koodaaminen JSONiksi:
 JSONin purkaminen XOScript-olioksi:
 
 ```
->> dict := ((JSON olio: json) abc ? 1).
+>> sanak := ((JSON olio: json) abc ? 1).
 ```
 
 JSON, jossa on yli 500 sisäkkäisyystasoa, hylätään virheellisenä.
@@ -2199,7 +2199,7 @@ JSON, jossa on yli 500 sisäkkäisyystasoa, hylätään virheellisenä.
 Sanakirjan tulostaminen suoraan JSONina oikeiden otsakkeiden kanssa:
 
 ```
-web json: dict.
+verkkosivu json: sanak.
 ```
 
 
@@ -2215,7 +2215,7 @@ Malli uusi: ['href="([^"]+)" target="([^"]+)"'].
 Sovella nyt mallia kohdemerkkijonoon näin:
 
 ```
-pattern täsmää: aihe tee: { :m :x .... }
+kuvio täsmää: aihe tee: { :m :x .... }
 ```
 
 Täydellinen esimerkki:
@@ -2225,13 +2225,13 @@ Täydellinen esimerkki:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Malli uusi: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern täsmää: aihe tee: { :m :x
+>> kuvio := Malli uusi: ['href="([^"]+)" target="([^"]+)"'].
+>> tulos  := kuvio täsmää: aihe tee: { :m :x
 	Tuloste kirjoita: m, rivinvaihto.
 	Tuloste kirjoita: x, rivinvaihto.
 	<- ['XXX'].
 }.
-Tuloste kirjoita: result, rivinvaihto.
+Tuloste kirjoita: tulos, rivinvaihto.
 ```
 
 ## Verkkoyhteydet
@@ -2254,8 +2254,8 @@ Palvelinlaajennuksessa on XChaCha20- ja Argon2-pohjainen salaus.
 Esimerkki:
 
 ```
->> encrypted := Holvi salaa: ['hello'] avain: ['world'].
->> decrypted := Holvi salaa: encrypted avain: ['world'].
+>> salattu := Holvi salaa: ['hello'] avain: ['world'].
+>> purettu := Holvi salaa: salattu avain: ['world'].
 ```
 
 ## Tunnisteet
@@ -2263,7 +2263,7 @@ Esimerkki:
 Tietyn pituisen kryptografisesti turvallisen tunnisteen luominen:
 
 ```
->> mytok := Holvi tunniste: 40.
+>> omatunniste := Holvi tunniste: 40.
 ```
 
 Tämä luo 40 merkin pituisen tunnisteen.
@@ -2274,8 +2274,8 @@ Muoto-oliolla voi muotoilla dataa, esimerkiksi täyttää sitä välilyönneill�
 lisätä nollia. Se käyttää printf-syntaksia.
 
 ```
->> fmt := Muoto uusi: ['%06.0f'].
-fmt sovella: 56. # gives 000056
+>> muot := Muoto uusi: ['%06.0f'].
+muot sovella: 56. # antaa 000056
 ```
 
 Muoto voi sisältää yhden muunnoksen, ja sen on sovittava arvoon,
@@ -2289,7 +2289,7 @@ Pyynnön arvot ovat merkkijonoja. Jos haluat muotoilla sellaisen lukuna,
 muunna se ensin:
 
 ```
-fmt sovella: (pyyntö get: ['amount']) luku.
+muot sovella: (pyyntö get: ['amount']) luku.
 ```
 
 ## Koodaimet
@@ -2322,10 +2322,10 @@ Esimerkki:
 Server valmistele.
 Ohjelma käytä: ['mailtools.xo'].
 
->> e-mail := HTML-Sähköposti uusi.
->> img := e-mail liitä: ( Tiedosto uusi: ['myimage.png'] ).
+>> sähköpostiviesti := HTML-Sähköposti uusi.
+>> img := sähköpostiviesti liitä: ( Tiedosto uusi: ['myimage.png'] ).
 
-e-mail
+sähköpostiviesti
 lähettäjä: ['xo@xoscript.com'] nimi: ['xo'],
 vastaanottaja: ( Lista uusi ; ['xo2@xoscipt.com'] ),
 aihe: ['xoxo'],
@@ -2441,13 +2441,13 @@ itse). Siksi blobit on tarvittaessa vapautettava itse.
 Blobin vapauttaminen:
 
 ```
-myblob vapauta.
+omablob vapauta.
 ```
 
 Structin vapauttaminen:
 
 ```
-mystruct vapauta-struct vapauta.
+omastruct vapauta-struct vapauta.
 ```
 
 Structin kohdalla on siis lähetettävä kaksi viestiä, vapauta-struct ja vapauta,

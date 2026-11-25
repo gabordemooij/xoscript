@@ -160,8 +160,8 @@ sudo nano /var/www/html/test.xo
 #!/bin/xo
 Server inicializál.
 Program használ: ['webtools.xo'].
->> web := Webdokumentum új.
-web kiír: ['Hello World'].
+>> weblap := Webdokumentum új.
+weblap kiír: ['Hello World'].
 ```
 
 Engedélyezze, hogy az apache2 CGI-n keresztül futtassa a programot:
@@ -393,7 +393,7 @@ Az XOScriptben a megjegyzéseket \# jel vezeti be. A következő sort
 tehát a program figyelmen kívül hagyja:
 
 ```
-# this is just a comment
+# ez csak egy megjegyzés
 ```
 
 ## Változók
@@ -410,18 +410,18 @@ Néhány példa érvényes változókra:
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
->> $ := ['dollar'].
+>> $ := ['dollár'].
 >> +plus := Igaz.
->> user-password := ['Pssst!'].
+>> felhasználó-jelszava := ['Pszt!'].
 ```
 
 Érvénytelen változók például:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['negatív szám'].
+>> password of felhasználó := ['Titkosított'].
+>> password.of:felhasználó := ['Titkosított'].
 >> ,x := 10.
 ```
 
@@ -568,11 +568,11 @@ az objektummal egy újabb üzenet elküldésével folytassuk:
 
 ```
 Kimenet ír:
-[' hello '] levág nagybetűs.
+[' helló '] levág nagybetűs.
 ```
 
 ```
-HELLO
+HELLó
 ```
 
 Itt két üzenetet küldünk a **Szöveg** objektumnak: a **levág**, majd
@@ -667,7 +667,7 @@ egy **Igaz** vagy egy **Hamis** objektumnak:
 
 ```
 2 páros? igaz: {
-	Kimenet ír: ['Two is an even number'], újsor.
+	Kimenet ír: ['A kettő páros szám'], újsor.
 }.
 ```
 Az előző példában az **igaz:** üzenetet az **Igaz** kapja (a válasz
@@ -878,9 +878,9 @@ A korábban megírt kódot újrafelhasználhatja objektumhierarchia
 létrehozására. Például:
 
 ```
->> Animal := Objektum új.
->> Dog := Animal új.
->> Poodle := Dog új.
+>> Állat := Objektum új.
+>> Kutya := Állat új.
+>> Uszkár := Kutya új.
 ```
 
 Ebben az esetben a **Dog** (kutya) örökli az **Animal** (állat) összes viselkedését
@@ -916,7 +916,7 @@ hogy a végső összeadást végül mégis el kell végezni, ami valójában
 a következő sorban történik:
 
 ```
->> answer := maga + (szám x factor).
+>> felelet := maga + (szám x tényező).
 ```
 
 Honnan tudja az XOScript, hogy ez a plusz **jel**
@@ -952,14 +952,14 @@ Bár az xoscript nem kínál osztályokat, az osztályszerű
 viselkedés utánzása triviális. Egyszerűen írja felül az új üzenetet.
 
 ```
->> Animal := Objektum új.
-Animal ha: ['új'] tedd: {
+>> Állat := Objektum új.
+Állat ha: ['új'] tedd: {
 	<- maga új inicializál.
 }.
 
-Animal ha: ['inicializál'] tedd: {
-	saját sound := ['?'].
-	saját legs  := 4.
+Állat ha: ['inicializál'] tedd: {
+	saját hang := ['?'].
+	saját lábak  := 4.
 }.
 ```
 
@@ -979,7 +979,7 @@ egy állatnak 4 lába van, a hangja pedig ismeretlen (ezért a kérdőjel).
 Az Animal új példányának létrehozásához egyszerűen ezt írhatjuk:
 
 ```
->> a := Animal új.
+>> a := Állat új.
 ```
 
 Így az Animal egy új példányát kapjuk 4 lábbal, ismeretlen hanggal és
@@ -987,18 +987,18 @@ egy init metódussal. Akárcsak más OOP-nyelvekben, az Animal objektumot
 is bővíthetjük:
 
 ```
->> Dog := Animal új.
-Dog ha: ['inicializál'] tedd: {
+>> Kutya := Állat új.
+Kutya ha: ['inicializál'] tedd: {
 	maga inicializál.
-	saját sound := ['barks'].
+	saját hang := ['ugat'].
 }.
 ```
 
 Ezt könnyen kipróbálhatjuk egy szöveg metódus hozzáadásával:
 
 ```
-Animal ha: ['szöveg'] tedd: {
-	<- saját legs szöveg + saját sound.
+Állat ha: ['szöveg'] tedd: {
+	<- saját lábak szöveg + saját hang.
 }.
 ```
 
@@ -1013,10 +1013,10 @@ a kerület és a terület kiszámításához. Egy lehetséges jelölés:
 
 
 ```
->> Rectangle := Objektum új.
+>> Téglalap := Objektum új.
 
-Rectangle ha: ['area'] tedd: {
-	<- saját hossz * saját width.
+Téglalap ha: ['terület'] tedd: {
+	<- saját hossz * saját szélesség.
 }.
 ```
 
@@ -1025,12 +1025,12 @@ a célra hozzáadhatjuk a **length:** és a **width:** üzenetet:
 
 
 ```
-Rectangle ha: ['length:'] tedd: { :hossz
+Téglalap ha: ['length:'] tedd: { :hossz
 	saját hossz := hossz.
 }.
 
-Rectangle ha: ['width:'] tedd: { :width
-	saját width := width.
+Téglalap ha: ['width:'] tedd: { :szélesség
+	saját szélesség := szélesség.
 }.
 
 ```
@@ -1039,16 +1039,16 @@ Ez a téglalap ezután a következőképpen használható:
 
 
 ```
->> rectangle := Rectangle új length: 2, width: 3.
-Kimenet ír: rectangle area.
+>> téglalap := Téglalap új length: 2, width: 3.
+Kimenet ír: téglalap terület.
 ```
 
 Ha azonban a hossz és a szélesség kezdeti beállítása elmarad,
 hibaüzenet jelenik meg:
 
 ```
->> rectangle := Rectangle új.
-Kimenet ír: rectangle area.
+>> téglalap := Téglalap új.
+Kimenet ír: téglalap terület.
 ```
 
 a következő hibát eredményezi:
@@ -1074,13 +1074,13 @@ ezeket az alapobjektumokat tárgyaljuk.
 Egy objektumot (a jelenlegi állapotával együtt) a következővel menthet lemezre:
 
 ```
-myobject save-as: ['saved.bin'].
+objektumom save-as: ['saved.bin'].
 ```
 
 Az objektum újbóli betöltése lemezről:
 
 ```
->> myobject := Objektum load-from: ['saved.bin'].
+>> objektumom := Objektum load-from: ['saved.bin'].
 ```
 
 A pillanatképekkel egy adott állapot menthető el, vagy javítható a teljesítmény.
@@ -1200,8 +1200,8 @@ egy változóhoz, és utána küldhet üzeneteket:
 ```
 10 páros?
 
->> tenner := 10.
-tenner páros?
+>> tízes := 10.
+tízes páros?
 
 ```
 
@@ -1431,10 +1431,10 @@ a kódját.
 ```
 {
 	Hamis hamis: {
-		Kimenet ír: ['End the loop.'].
+		Kimenet ír: ['Fejezd be a ciklust.'].
 	}, megszakít.
 	
-	Kimenet ír: ['Dont show me.'].
+	Kimenet ír: ['Ne mutass meg.'].
 
 } eljárás.
 
@@ -1448,10 +1448,10 @@ megszakítást szeretne végrehajtani, azt üzenetként az **Igaz** objektumnak 
 ```
 {
 	Hamis nem igaz: {
-		Kimenet ír: ['End the loop.'].
+		Kimenet ír: ['Fejezd be a ciklust.'].
 	}, megszakít.
 	
-	Kimenet ír: ['Dont show me.'].
+	Kimenet ír: ['Ne mutass meg.'].
 
 } eljárás.
 
@@ -1464,7 +1464,7 @@ Ez a várt módon fog működni.
 A kivételeket így kezelheti:
 
 ```
-{ Task 1 } elkap: { Task 2 }, indít.
+{ Feladat 1 } elkap: { Feladat 2 }, indít.
 ```
 
 Szándékosan is előidézhet hibát a programjában, és
@@ -1474,9 +1474,9 @@ példa mutatja:
 
 ```
 {
-ez-a-feladat hiba: ['Whoops!'].
-} elkap: { :mistake
-Kimenet ír: mistake.
+ez-a-feladat hiba: ['Hupsz!'].
+} elkap: { :tévedés
+Kimenet ír: tévedés.
 }, indít.
 ```
 
@@ -1486,12 +1486,12 @@ Az XOScript lehetővé teszi, hogy a feladatokba értékeket fecskendezzünk be.
 az alábbi feladatot:
 
 ```
->> sending := {
-	Newsletter címzett: saját recipient.
+>> küldés := {
+	Hírlevél címzett: saját recipient.
 }.
-sending beállít: ['recipient']
+küldés beállít: ['recipient']
 érték: ['info@recipient.org'].
-sending indít.
+küldés indít.
 ```
 
 
@@ -1510,20 +1510,20 @@ nézne ki: **{}**, az XOScript azonban ezt nyelvi hibának tekinti. Ha
 üres feladatot szeretne deklarálni, használhatja a Semmi objektumot:
 
 ```
->> task := Semmi.
+>> feladat := Semmi.
 ```
 
 Bár ez nem valódi feladat, hanem egy Semmi objektum, indít üzenet
 ennek ellenére küldhető neki:
 
 ```
->> answer := task indít.
+>> felelet := feladat indít.
 ```
 
 Ez valójában ugyanaz, mint:
 
 ```
->> answer := Semmi indít.
+>> felelet := Semmi indít.
 ```
 
 Mivel a **Semmi** objektum nem ismeri fel az **indít** üzenetet,
@@ -1697,9 +1697,9 @@ egy ilyen listára az árlista, például:
 
 
 ```
->> menu := Szótár új
-	tesz: ['£5'] ide: ['apple pie'],
-	tesz: ['£6'] ide: ['carrot cake'],
+>> menü := Szótár új
+	tesz: ['£5'] ide: ['almás pite'],
+	tesz: ['£6'] ide: ['répatorta'],
 	tesz: ['£3'] ide: ['fudge'].
 ```
 
@@ -1714,13 +1714,13 @@ megtalálható a jelentés. Például a fenti listából
 egy fudge árának lekérdezése:
 
 ```
->> price := menu itt: ['fudge'].
+>> price := menü itt: ['fudge'].
 ```
 
 Használhatja a tömör jelölést is:
 
 ```
->> price := menu ? ['fudge'].
+>> price := menü ? ['fudge'].
 ```
 
 Ha az objektumok tárolására használt bejegyzések nem tartalmaznak szóközt
@@ -1728,7 +1728,7 @@ Ha az objektumok tárolására használt bejegyzések nem tartalmaznak szóközt
 a következő jelölés is használható:
 
 ```
->> menu := Szótár új
+>> menü := Szótár új
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1739,7 +1739,7 @@ Egy fudge árának
 lekérdezéséhez a következő egyszerűsített jelölés használható:
 
 ```
->> price := menu fudge.
+>> price := menü fudge.
 ```
 
 @api_Dict_collections
@@ -1843,7 +1843,7 @@ A Program objektumtól azt is megkérdezhetjük, hogy egy
 adott objektum jelen van-e már a programban:
 
 ```
-Program Tool igaz: { ... }.
+Program Eszköz igaz: { ... }.
 ```
 
 Ha az objektum
@@ -1891,9 +1891,9 @@ Program használ: ['template.xo'].
 A következő szerverbeállításokat adhatja meg:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# alapértékek vannak megadva,
+	# így ha nem állít be semmit, ezek
+	# az értékek lesznek használva...
 
 	Program 
 	beállítás: ['max-postfields']
@@ -1921,9 +1921,9 @@ ismert szerverrel használhat.
 Server inicializál.
 Program használ: ['webtools.xo'].
 
->> web-document := Webdokumentum új.
+>> web-dok := Webdokumentum új.
 
-web-document kiír: ['
+web-dok kiír: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1938,7 +1938,7 @@ akkor a HTTP-fejléceket saját magának kell megírnia:
 ```
 #!/bin/xo
 Kimenet ír: ['Content-type: text/html; charset=utf-8 \n\n'], újsor.
-Kimenet ír: ['hello world!'], újsor.
+Kimenet ír: ['helló világ!'], újsor.
 ``` 
 
 ## Kérés
@@ -1949,13 +1949,13 @@ UPLOAD adatokat kérhet le:
 ```
 >> kérés  := HTTP-Kérés új.
 >> search   := kérés get: ['search']. # ?search=books
->> password := kérés post: ['password']. # from form
->> selected := kérés get-lista: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := kérés post-lista: ['sel[]'].
->> cookie   := kérés cookie: ['session-id'].
->> upload   := kérés upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> password := kérés post: ['password']. # az űrlapról
+>> kiválasztott := kérés get-lista: ['sel[]']. #?sel[]=1&sel[]=2
+>> kiválasztott := kérés post-lista: ['sel[]'].
+>> süti   := kérés cookie: ['session-id'].
+>> feltöltés   := kérés upload: ['file'].
+>> ideiglenesÚtvonal := feltöltés ? 1.
+>> fájlnév := feltöltés ? 0.
 ```
 
 ## Maxpost/hossz
@@ -1991,7 +1991,7 @@ A Database objektummal MariaDB/MySQL-lekérdezéseket futtathat.
 Adatbázishoz így csatlakozhat:
 
 ```
->> db := Maria-DB új gazdagép: ['localhost'],
+>> adb := Maria-DB új gazdagép: ['localhost'],
 	felhasználónév: ['xo'],
 	jelszó: ['pass123'],
 	adatbázisnév: ['xobase'],
@@ -2002,13 +2002,13 @@ Adatbázishoz így csatlakozhat:
 Rekord beszúrása:
 
 ```
->> keresőparaméterek := db lekérdezés: ['
+>> keresőparaméterek := adb lekérdezés: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], paraméterek: ( Lista új ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], paraméterek: ( Lista új ; ['abc'] ; 12.35 ; 6 ). # paraméteres lekérdezések
 
-{  keresőparaméterek végrehajt. db véglegesít. }
-elkap: { :e db visszavon.  }, indít.
+{  keresőparaméterek végrehajt. adb véglegesít. }
+elkap: { :e adb visszavon.  }, indít.
 ```
 
 Vegye figyelembe, hogy az xoscript *kizárólag* tranzakciókkal dolgozik, és soha nem véglegesít automatikusan.
@@ -2019,18 +2019,18 @@ a felhasználói bemenetet az SQL-hez.
 A beszúrt azonosítót így kérheti le:
 
 ```
-Kimenet ír: ['INSERTED: '] + keresőparaméterek insert-id, újsor. # insert id
+Kimenet ír: ['BESZÚRVA: '] + keresőparaméterek insert-id, újsor. # beszúrt azonosító
 ```
 
 Rekordok lekérése:
 
 ```
 >> keresőparaméterek :=
-db
+adb
 	lekérdezés: ['SELECT * FROM book order by id desc limit 2'], 
-	lekér: { :row 
-		Kimenet ír: row id + [' '] + row description + [': '] + row price, újsor.
-	}. # fetching rows
+	lekér: { :sorAdat 
+		Kimenet ír: sorAdat id + [' '] + sorAdat description + [': '] + sorAdat price, újsor.
+	}. # sorok lekérése
 
 ```
 
@@ -2051,21 +2051,21 @@ dokumentum, amely a fejléceket és a HTML-t vagy más adatokat is tartalmazza).
 
 
 ```
-# First we make a new Web Document instance
->> web := Webdokumentum új.
+# Először létrehozunk egy új Webdokumentum-példányt
+>> weblap := Webdokumentum új.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web munkamenet-indítása.
+# Most elindítunk egy munkamenetet; ez létrehoz egy fejlécet egy sütihez és
+# egy fájlt az adataihoz, amely ahhoz a sütihez tartozik
+>> munkamenetem := weblap munkamenet-indítása.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Most a munkamenetet Szótárként kezelhetjük
+munkamenetem userid: 123.
 ```
 
 A munkamenet megszüntetése (kijelentkezéskor):
 
 ```
-web munkamenet-megszüntetése.
+weblap munkamenet-megszüntetése.
 ```
 
 ## Fejlécek
@@ -2074,7 +2074,7 @@ A Webdokumentum más ismert fejlécek beállítását is lehetővé teszi.
 Ha például a felhasználót egy másik URL-re szeretné átirányítani:
 
 ```
-web ugrás: ['/other.html'].
+weblap ugrás: ['/other.html'].
 ```
 
 A háttérben ez a parancs azt a HTTP-fejlécet is előállítja, amelyet
@@ -2084,7 +2084,7 @@ a megadott célcímre navigáljon.
 Egyéni fejléc hozzáadása:
 
 ```
-web fejléc: ( 
+weblap fejléc: ( 
 	HTTP-Fejléc új
 	kulcs: ['Content-Length']
 	érték: 400
@@ -2094,7 +2094,7 @@ web fejléc: (
 404-es oldal megjelenítése:
 
 ```
-web nem-található: ['OOps..'].
+weblap nem-található: ['Hoppá..'].
 ```
 
 
@@ -2107,7 +2107,7 @@ biztosít a megjelenítés és az üzleti logika között.
 Sablon létrehozása fájlból:
 
 ```
->> tpl := web sablon: ['templates/ux.tpl'].
+>> tpl := weblap sablon: ['templates/ux.tpl'].
 ```
 
 A sablonrendszer jelölőket használ.
@@ -2137,7 +2137,7 @@ Ezt a következőképpen teheti meg:
 >> gem := tpl kivág: ['gem'], másol.
 gem price: 99.
 tpl beilleszt: gem ide: ['jewels'].
-web kiír: tpl tisztít.
+weblap kiír: tpl tisztít.
 ```
 
 Az utolsó sor egyszerűen szövegként küldi el a sablont a kliensnek
@@ -2158,8 +2158,8 @@ Eredmény:
 A felhasználók által feltöltött fájlok biztonságos kiszolgálásához a továbbítási funkcióra (passthru) támaszkodhat:
 
 ```
->> uploaded := ['smile.gif'].
-Server továbbít: uploaded előtag: ['/uploads/images/'].
+>> feltöltött := ['smile.gif'].
+Server továbbít: feltöltött előtag: ['/uploads/images/'].
 Program vége.
 ```
 
@@ -2179,7 +2179,7 @@ számos egyéb biztonsági problémát.
 Objektum kódolása JSON formátumba:
 
 ```
->> json := ( JSON jsonify: ( 
+>> jsonszöveg := ( JSON jsonify: ( 
 	Szótár új tesz: ( 
 		Lista új ; 1 ; 2 ; 3
 	) ide: ['abc']
@@ -2189,7 +2189,7 @@ Objektum kódolása JSON formátumba:
 JSON dekódolása xoscript-objektummá:
 
 ```
->> dict := ((JSON objektum: json) abc ? 1).
+>> szótárelem := ((JSON objektum: jsonszöveg) abc ? 1).
 ```
 
 Az 500-nál több beágyazási szintet tartalmazó JSON-t a rendszer érvénytelenként elutasítja.
@@ -2197,7 +2197,7 @@ Az 500-nál több beágyazási szintet tartalmazó JSON-t a rendszer érvénytel
 Szótár közvetlen kiírása JSON-ként a megfelelő fejlécekkel:
 
 ```
-web json: dict.
+weblap json: szótárelem.
 ```
 
 
@@ -2213,7 +2213,7 @@ Minta új: ['href="([^"]+)" target="([^"]+)"'].
 Ezután alkalmazza a mintát a vizsgált szövegre így:
 
 ```
-pattern egyezés: tárgy tedd: { :m :x .... }
+mintázat egyezés: tárgy tedd: { :m :x .... }
 ```
 
 Teljes példa:
@@ -2223,13 +2223,13 @@ Teljes példa:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Minta új: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern egyezés: tárgy tedd: { :m :x
+>> mintázat := Minta új: ['href="([^"]+)" target="([^"]+)"'].
+>> eredmény  := mintázat egyezés: tárgy tedd: { :m :x
 	Kimenet ír: m, újsor.
 	Kimenet ír: x, újsor.
 	<- ['XXX'].
 }.
-Kimenet ír: result, újsor.
+Kimenet ír: eredmény, újsor.
 ```
 
 ## Hálózatkezelés
@@ -2252,8 +2252,8 @@ A szerverbővítmény XChaCha20 és Argon2 alapú titkosítást tartalmaz.
 Példa:
 
 ```
->> encrypted := Széf titkosít: ['hello'] kulcs: ['world'].
->> decrypted := Széf titkosít: encrypted kulcs: ['world'].
+>> titkosított := Széf titkosít: ['hello'] kulcs: ['world'].
+>> visszafejtett := Széf titkosít: titkosított kulcs: ['world'].
 ```
 
 ## Tokenek
@@ -2261,7 +2261,7 @@ Példa:
 Adott hosszúságú, kriptográfiailag biztonságos token előállítása:
 
 ```
->> mytok := Széf token: 40.
+>> tokenem := Széf token: 40.
 ```
 
 Ez egy 40 karakteres tokent állít elő.
@@ -2273,7 +2273,7 @@ nullák hozzáadásával. A printf szintaxisát használja.
 
 ```
 >> fmt := Formátum új: ['%06.0f'].
-fmt alkalmaz: 56. # gives 000056
+fmt alkalmaz: 56. # eredménye 000056
 ```
 
 Egy formátum egyetlen konverziót tartalmazhat, és ennek illeszkednie kell az értékhez,
@@ -2320,10 +2320,10 @@ Példa:
 Server inicializál.
 Program használ: ['mailtools.xo'].
 
->> e-mail := HTML-Email új.
->> img := e-mail csatol: ( Fájl új: ['myimage.png'] ).
+>> e-levél := HTML-Email új.
+>> img := e-levél csatol: ( Fájl új: ['myimage.png'] ).
 
-e-mail
+e-levél
 feladó: ['xo@xoscript.com'] név: ['xo'],
 címzett: ( Lista új ; ['xo2@xoscipt.com'] ),
 tárgy: ['xoxo'],
@@ -2439,13 +2439,13 @@ felszabadítani őket). Ezért szükség esetén a blobokat saját magának kell
 Blob felszabadítása:
 
 ```
-myblob felszabadít.
+blobom felszabadít.
 ```
 
 Struktúra felszabadítása:
 
 ```
-mystruct struct-felszabadít felszabadít.
+struktúrám struct-felszabadít felszabadít.
 ```
 
 Struktúra esetén tehát két üzenetet kell küldenie: a struct-felszabadít és a felszabadít üzenetet

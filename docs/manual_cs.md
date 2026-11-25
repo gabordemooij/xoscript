@@ -394,7 +394,7 @@ Komentáře v XOScriptu začínají symbolem \#. Následující řádek
 bude tedy ignorován:
 
 ```
-# this is just a comment
+# toto je jen komentář
 ```
 
 ## Proměnné
@@ -411,18 +411,18 @@ Toto jsou příklady platných proměnných:
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
->> $ := ['dollar'].
+>> $ := ['dolar'].
 >> +plus := Pravda.
->> user-password := ['Pssst!'].
+>> heslo-uživatele := ['Pst!'].
 ```
 
 Neplatné proměnné jsou například:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['záporné číslo'].
+>> password of uživatel := ['Tajné'].
+>> password.of:uživatel := ['Tajné'].
 >> ,x := 10.
 ```
 
@@ -568,11 +568,11 @@ objektem posláním navazující zprávy:
 
 ```
 Výstup psát:
-[' hello '] odstranit-okolní-mezery velkými-písmeny.
+[' nazdar '] odstranit-okolní-mezery velkými-písmeny.
 ```
 
 ```
-HELLO
+NAZDAR
 ```
 
 Zde jsou objektu **Řetězec** poslány dvě zprávy: **odstranit-okolní-mezery** a po ní
@@ -667,7 +667,7 @@ poslaná buď objektu **Pravda**, nebo objektu **Nepravda**:
 
 ```
 2 sudý? pravda: {
-	Výstup psát: ['Two is an even number'], nový-řádek.
+	Výstup psát: ['Dvojka je sudé číslo'], nový-řádek.
 }.
 ```
 V předchozím příkladu je zpráva **pravda:** poslána objektu **Pravda** (což je
@@ -879,9 +879,9 @@ Dříve napsaný kód můžete znovu použít k vytvoření hierarchie
 objektů. Například:
 
 ```
->> Animal := Objekt nový.
->> Dog := Animal nový.
->> Poodle := Dog nový.
+>> Zvíře := Objekt nový.
+>> Pes := Zvíře nový.
+>> Pudl := Pes nový.
 ```
 
 V tomto případě **Dog** dědí veškeré chování a vlastnosti
@@ -917,7 +917,7 @@ V předchozím příkladu je přepsáno **znaménko** plus. Všimněte si,
 probíhá na následujícím řádku:
 
 ```
->> answer := sebe + (číslo x factor).
+>> odpověď := sebe + (číslo x faktor).
 ```
 
 Jak tedy XOScript pozná, že toto **znaménko** plus odkazuje na
@@ -953,14 +953,14 @@ Ačkoli xoscript třídy nenabízí, napodobit chování podobné
 třídám je triviální. Stačí přepsat zprávu nový.
 
 ```
->> Animal := Objekt nový.
-Animal při: ['nový'] udělat: {
+>> Zvíře := Objekt nový.
+Zvíře při: ['nový'] udělat: {
 	<- sebe nový inicializovat.
 }.
 
-Animal při: ['inicializovat'] udělat: {
-	vlastní sound := ['?'].
-	vlastní legs  := 4.
+Zvíře při: ['inicializovat'] udělat: {
+	vlastní zvuk := ['?'].
+	vlastní nohy  := 4.
 }.
 ```
 
@@ -980,7 +980,7 @@ má zvíře 4 nohy a jeho zvuk není znám (proto otazník).
 K vytvoření nové instance našeho Animal bychom mohli jednoduše napsat:
 
 ```
->> a := Animal nový.
+>> a := Zvíře nový.
 ```
 
 Nyní získáme novou instanci Animal se 4 nohama, neznámým zvukem a
@@ -988,18 +988,18 @@ metodou inicializovat. Stejně jako v jiných OOP jazycích můžeme také
 náš Animal rozšířit:
 
 ```
->> Dog := Animal nový.
-Dog při: ['inicializovat'] udělat: {
+>> Pes := Zvíře nový.
+Pes při: ['inicializovat'] udělat: {
 	sebe inicializovat.
-	vlastní sound := ['barks'].
+	vlastní zvuk := ['štěká'].
 }.
 ```
 
 Snadno to otestujeme přidáním metody řetězec:
 
 ```
-Animal při: ['řetězec'] udělat: {
-	<- vlastní legs řetězec + vlastní sound.
+Zvíře při: ['řetězec'] udělat: {
+	<- vlastní nohy řetězec + vlastní zvuk.
 }.
 ```
 
@@ -1014,10 +1014,10 @@ pro výpočet obvodu a obsahu. Možný zápis by byl:
 
 
 ```
->> Rectangle := Objekt nový.
+>> Obdélník := Objekt nový.
 
-Rectangle při: ['area'] udělat: {
-	<- vlastní délka * vlastní width.
+Obdélník při: ['plocha'] udělat: {
+	<- vlastní délka * vlastní šířka.
 }.
 ```
 
@@ -1026,12 +1026,12 @@ Nastavení délky a šířky je zjevně předpokladem. Za tímto
 
 
 ```
-Rectangle při: ['length:'] udělat: { :délka
+Obdélník při: ['length:'] udělat: { :délka
 	vlastní délka := délka.
 }.
 
-Rectangle při: ['width:'] udělat: { :width
-	vlastní width := width.
+Obdélník při: ['width:'] udělat: { :šířka
+	vlastní šířka := šířka.
 }.
 
 ```
@@ -1040,16 +1040,16 @@ Tento obdélník pak lze použít takto:
 
 
 ```
->> rectangle := Rectangle nový length: 2, width: 3.
-Výstup psát: rectangle area.
+>> obdélník := Obdélník nový length: 2, width: 3.
+Výstup psát: obdélník plocha.
 ```
 
 Pokud se však na počáteční nastavení délky a šířky zapomene,
 objeví se chybové hlášení:
 
 ```
->> rectangle := Rectangle nový.
-Výstup psát: rectangle area.
+>> obdélník := Obdélník nový.
+Výstup psát: obdélník plocha.
 ```
 
 vyvolá následující chybu:
@@ -1075,13 +1075,13 @@ budou probrány všechny tyto základní objekty.
 Objekt (spolu s jeho aktuálním stavem) můžete uložit na disk pomocí:
 
 ```
-myobject save-as: ['saved.bin'].
+můj-objekt save-as: ['saved.bin'].
 ```
 
 Opětovné načtení objektu z disku:
 
 ```
->> myobject := Objekt load-from: ['saved.bin'].
+>> můj-objekt := Objekt load-from: ['saved.bin'].
 ```
 
 Snímky lze použít k uložení určitého stavu nebo ke zlepšení výkonu.
@@ -1201,8 +1201,8 @@ proměnné a zprávy posílat až potom:
 ```
 10 sudý?
 
->> tenner := 10.
-tenner sudý?
+>> desítka := 10.
+desítka sudý?
 
 ```
 
@@ -1432,10 +1432,10 @@ Zde je důležitá záludnost:
 ```
 {
 	Nepravda nepravda: {
-		Výstup psát: ['End the loop.'].
+		Výstup psát: ['Ukonči smyčku.'].
 	}, přestat.
 	
-	Výstup psát: ['Dont show me.'].
+	Výstup psát: ['Neukazuj mě.'].
 
 } postup.
 
@@ -1449,10 +1449,10 @@ přerušení, musí být posláno jako zpráva objektu **Pravda**.
 ```
 {
 	Nepravda ne pravda: {
-		Výstup psát: ['End the loop.'].
+		Výstup psát: ['Ukonči smyčku.'].
 	}, přestat.
 	
-	Výstup psát: ['Dont show me.'].
+	Výstup psát: ['Neukazuj mě.'].
 
 } postup.
 
@@ -1465,7 +1465,7 @@ Bude fungovat podle očekávání.
 Výjimky lze zpracovat takto:
 
 ```
-{ Task 1 } chytit: { Task 2 }, spustit.
+{ Úkol 1 } chytit: { Úkol 2 }, spustit.
 ```
 
 Ve svém programu můžete také úmyslně vyvolat chybu, a
@@ -1475,9 +1475,9 @@ ukázka:
 
 ```
 {
-tato-úloha chyba: ['Whoops!'].
-} chytit: { :mistake
-Výstup psát: mistake.
+tato-úloha chyba: ['Jejda!'].
+} chytit: { :omyl
+Výstup psát: omyl.
 }, spustit.
 ```
 
@@ -1487,12 +1487,12 @@ XOScript umožňuje do úloh vkládat hodnoty. Podívejte se
 na úlohu níže:
 
 ```
->> sending := {
-	Newsletter komu: vlastní recipient.
+>> odesílání := {
+	Zpravodaj komu: vlastní recipient.
 }.
-sending nastavit: ['recipient']
+odesílání nastavit: ['recipient']
 na: ['info@recipient.org'].
-sending spustit.
+odesílání spustit.
 ```
 
 
@@ -1511,20 +1511,20 @@ takto: **{}**, XOScript to však vnímá jako jazykovou chybu. Pokud
 chcete deklarovat prázdnou úlohu, můžete použít objekt Nic:
 
 ```
->> task := Nic.
+>> úkol := Nic.
 ```
 
 Ačkoli to není skutečná úloha, ale objekt Nic, zprávu spustit
 mu lze přesto poslat:
 
 ```
->> answer := task spustit.
+>> odpověď := úkol spustit.
 ```
 
 Ve skutečnosti je to totéž jako:
 
 ```
->> answer := Nic spustit.
+>> odpověď := Nic spustit.
 ```
 
 Protože objekt **Nic** nerozpozná zprávu **spustit**,
@@ -1698,9 +1698,9 @@ seznamu je ceník, například:
 
 
 ```
->> menu := Slovník nový
-	umístit: ['£5'] na: ['apple pie'],
-	umístit: ['£6'] na: ['carrot cake'],
+>> nabídka := Slovník nový
+	umístit: ['£5'] na: ['jablečný koláč'],
+	umístit: ['£6'] na: ['mrkvový dort'],
 	umístit: ['£3'] na: ['fudge'].
 ```
 
@@ -1715,13 +1715,13 @@ lze najít význam. Například chcete-li z výše
 uvedeného seznamu zjistit cenu karamelky:
 
 ```
->> price := menu na: ['fudge'].
+>> price := nabídka na: ['fudge'].
 ```
 
 Můžete použít také stručný zápis:
 
 ```
->> price := menu ? ['fudge'].
+>> price := nabídka ? ['fudge'].
 ```
 
 Pokud hesla, která používáte k ukládání objektů, neobsahují mezery
@@ -1729,7 +1729,7 @@ Pokud hesla, která používáte k ukládání objektů, neobsahují mezery
 lze použít i následující zápis:
 
 ```
->> menu := Slovník nový
+>> nabídka := Slovník nový
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1740,7 +1740,7 @@ K zjištění ceny
 karamelky lze použít následující zjednodušený zápis:
 
 ```
->> price := menu fudge.
+>> price := nabídka fudge.
 ```
 
 @api_Dict_collections
@@ -1844,7 +1844,7 @@ Objektu Program se lze také zeptat, zda je
 daný objekt již v programu přítomen:
 
 ```
-Program Tool pravda: { ... }.
+Program Nástroj pravda: { ... }.
 ```
 
 V případě názvu objektu,
@@ -1892,9 +1892,9 @@ Program použít: ['template.xo'].
 Můžete nastavit následující nastavení serveru:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# jsou dány výchozí hodnoty,
+	# takže pokud nic nenastavíte, použijí se
+	# tyto hodnoty...
 
 	Program 
 	nastavení: ['max-postfields']
@@ -1922,9 +1922,9 @@ známým serverem.
 Server inicializovat.
 Program použít: ['webtools.xo'].
 
->> web-document := Webový-dokument nový.
+>> webový-dokument := Webový-dokument nový.
 
-web-document vypsat: ['
+webový-dokument vypsat: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1939,7 +1939,7 @@ pak musíte HTTP hlavičky napsat sami:
 ```
 #!/bin/xo
 Výstup psát: ['Content-type: text/html; charset=utf-8 \n\n'], nový-řádek.
-Výstup psát: ['hello world!'], nový-řádek.
+Výstup psát: ['nazdar světe!'], nový-řádek.
 ``` 
 
 ## Požadavek
@@ -1950,13 +1950,13 @@ UPLOAD:
 ```
 >> požadavek  := HTTP-Požadavek nový.
 >> search   := požadavek get: ['search']. # ?search=books
->> password := požadavek post: ['password']. # from form
->> selected := požadavek get-seznam: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := požadavek post-seznam: ['sel[]'].
+>> password := požadavek post: ['password']. # z formuláře
+>> vybrané := požadavek get-seznam: ['sel[]']. #?sel[]=1&sel[]=2
+>> vybrané := požadavek post-seznam: ['sel[]'].
 >> cookie   := požadavek cookie: ['session-id'].
->> upload   := požadavek upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> nahraný-soubor   := požadavek upload: ['file'].
+>> dočasná-cesta := nahraný-soubor ? 1.
+>> název-souboru := nahraný-soubor ? 0.
 ```
 
 ## Maxpost/length
@@ -2006,7 +2006,7 @@ K vložení záznamu použijte:
 >> parametry-hledání := db dotaz: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametry: ( Seznam nový ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametry: ( Seznam nový ; ['abc'] ; 12.35 ; 6 ). # parametrizované dotazy
 
 {  parametry-hledání provést. db potvrdit. }
 chytit: { :e db vrátit-zpět.  }, spustit.
@@ -2020,7 +2020,7 @@ do SQL.
 Vložené id získáte takto:
 
 ```
-Výstup psát: ['INSERTED: '] + parametry-hledání insert-id, nový-řádek. # insert id
+Výstup psát: ['VLOŽENO: '] + parametry-hledání insert-id, nový-řádek. # id vložení
 ```
 
 Načtení záznamů:
@@ -2029,9 +2029,9 @@ Načtení záznamů:
 >> parametry-hledání :=
 db
 	dotaz: ['SELECT * FROM book order by id desc limit 2'], 
-	načíst: { :row 
-		Výstup psát: row id + [' '] + row description + [': '] + row price, nový-řádek.
-	}. # fetching rows
+	načíst: { :řádka 
+		Výstup psát: řádka id + [' '] + řádka description + [': '] + řádka price, nový-řádek.
+	}. # načítání řádků
 
 ```
 
@@ -2052,15 +2052,15 @@ dokument obsahující hlavičky i HTML nebo jiná data).
 
 
 ```
-# First we make a new Web Document instance
+# Nejprve vytvoříme novou instanci Webový-dokument
 >> web := Webový-dokument nový.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web zahájit-relaci.
+# Nyní spustíme relaci; tím se vygeneruje hlavička pro cookie a
+# vytvoří se soubor pro vaše data, spojený s touto cookie
+>> relace := web zahájit-relaci.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Nyní můžeme s relací zacházet jako se Slovníkem
+relace userid: 123.
 ```
 
 Zrušení relace (při odhlášení):
@@ -2095,7 +2095,7 @@ web hlavička: (
 Zobrazení stránky 404:
 
 ```
-web nenalezeno: ['OOps..'].
+web nenalezeno: ['Jejda..'].
 ```
 
 
@@ -2159,8 +2159,8 @@ Výsledek:
 K bezpečnému poskytování souborů nahraných uživateli se můžete spolehnout na passthru:
 
 ```
->> uploaded := ['smile.gif'].
-Server předat: uploaded prefix: ['/uploads/images/'].
+>> nahráno := ['smile.gif'].
+Server předat: nahráno prefix: ['/uploads/images/'].
 Program konec.
 ```
 
@@ -2190,7 +2190,7 @@ Zakódování objektu jako JSON:
 Dekódování JSON do objektu xoscriptu:
 
 ```
->> dict := ((JSON objekt: json) abc ? 1).
+>> slovn := ((JSON objekt: json) abc ? 1).
 ```
 
 JSON s více než 500 úrovněmi vnoření je odmítnut jako neplatný.
@@ -2198,7 +2198,7 @@ JSON s více než 500 úrovněmi vnoření je odmítnut jako neplatný.
 Přímý výstup Slovníku jako json se správnými hlavičkami:
 
 ```
-web json: dict.
+web json: slovn.
 ```
 
 
@@ -2214,7 +2214,7 @@ Vzor nový: ['href="([^"]+)" target="([^"]+)"'].
 Nyní aplikujte vzor na zkoumaný řetězec takto:
 
 ```
-pattern shoda: předmět udělat: { :m :x .... }
+vzorek shoda: předmět udělat: { :m :x .... }
 ```
 
 Úplný příklad:
@@ -2224,13 +2224,13 @@ pattern shoda: předmět udělat: { :m :x .... }
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Vzor nový: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern shoda: předmět udělat: { :m :x
+>> vzorek := Vzor nový: ['href="([^"]+)" target="([^"]+)"'].
+>> výsledek  := vzorek shoda: předmět udělat: { :m :x
 	Výstup psát: m, nový-řádek.
 	Výstup psát: x, nový-řádek.
 	<- ['XXX'].
 }.
-Výstup psát: result, nový-řádek.
+Výstup psát: výsledek, nový-řádek.
 ```
 
 ## Síťová komunikace
@@ -2253,8 +2253,8 @@ Serverový plugin obsahuje šifrování založené na XChaCha20 a Argon2.
 Příklad:
 
 ```
->> encrypted := Trezor šifrovat: ['hello'] klíč: ['world'].
->> decrypted := Trezor šifrovat: encrypted klíč: ['world'].
+>> zašifrováno := Trezor šifrovat: ['hello'] klíč: ['world'].
+>> dešifrováno := Trezor šifrovat: zašifrováno klíč: ['world'].
 ```
 
 ## Tokeny
@@ -2262,7 +2262,7 @@ Příklad:
 Vygenerování kryptograficky bezpečného tokenu určité délky:
 
 ```
->> mytok := Trezor token: 40.
+>> můj-token := Trezor token: 40.
 ```
 
 Tím se vygeneruje token o 40 znacích.
@@ -2274,7 +2274,7 @@ přidávat nuly. Používá syntaxi printf.
 
 ```
 >> fmt := Formát nový: ['%06.0f'].
-fmt aplikovat: 56. # gives 000056
+fmt aplikovat: 56. # dává 000056
 ```
 
 Formát může obsahovat jeden převod a ten musí odpovídat hodnotě,
@@ -2304,7 +2304,7 @@ Chcete-li bezpečně vložit uživatelský vstup do HTML bez rizika
 útoků XSS, vždy použijte:
 
 ```
-Server html-kódovat: ['<harmless>'].
+Server html-kódovat: ['<neškodné>'].
 ```
 
 Upozorňujeme, že šablonovací systém vždy provádí kódování HTML,
@@ -2440,13 +2440,13 @@ samy). Proto musíte bloby v případě potřeby uvolňovat sami.
 Uvolnění blobu:
 
 ```
-myblob uvolnit.
+můj-blob uvolnit.
 ```
 
 Uvolnění struktury:
 
 ```
-mystruct uvolnit-struct uvolnit.
+můj-struct uvolnit-struct uvolnit.
 ```
 
 U struktury tedy musíte k dealokaci paměťového bloku poslat dvě zprávy:

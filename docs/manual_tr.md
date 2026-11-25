@@ -158,8 +158,8 @@ ve küçük bir test programı yazın:
 #!/bin/xo
 Server hazırla.
 Program kullan: ['webtools.xo'].
->> web := Web-Belgesi yeni.
-web çıktıla: ['Hello World'].
+>> belge := Web-Belgesi yeni.
+belge çıktıla: ['Hello World'].
 ```
 
 apache2'nin programınızı CGI üzerinden çalıştırmasına izin verin:
@@ -391,7 +391,7 @@ XOScript'te yorumların başına bir \# simgesi konur. Dolayısıyla aşağıdak
 satır yok sayılır:
 
 ```
-# this is just a comment
+# bu sadece bir yorum
 ```
 
 ## Değişkenler
@@ -408,18 +408,18 @@ Geçerli değişkenlere örnekler:
 ```
 >> password := ['Secret'].
 >> ♡♡♡ := 3.
->> $ := ['dollar'].
+>> $ := ['dolar'].
 >> +plus := Doğru.
->> user-password := ['Pssst!'].
+>> kullanıcı-parolası := ['Pssst!'].
 ```
 
 Geçersiz değişkenlere örnekler:
 
 
 ```
->> -123 := ['negative number'].
->> password of user := ['Classified'].
->> password.of:user := ['Classified'].
+>> -123 := ['negatif sayı'].
+>> password of kullanıcı := ['Çok Gizli'].
+>> password.of:kullanıcı := ['Çok Gizli'].
 >> ,x := 10.
 ```
 
@@ -566,11 +566,11 @@ diyaloğu sürdürmeyi teşvik eder:
 
 ```
 Çıktı yaz:
-[' hello '] kırp büyük-harf.
+[' merhaba '] kırp büyük-harf.
 ```
 
 ```
-HELLO
+MERHABA
 ```
 
 Burada **Metin** nesnesine iki ileti gönderilir: **kırp** ve ardından
@@ -663,7 +663,7 @@ kurallarına gerek yoktur. Bir if ifadesi, bir **Doğru** nesnesine ya da bir
 
 ```
 2 çift? doğru: {
-	Çıktı yaz: ['Two is an even number'], yeni-satır.
+	Çıktı yaz: ['İki bir çift sayıdır'], yeni-satır.
 }.
 ```
 Önceki örnekte **doğru:** iletisi **Doğru** nesnesine gönderilir (2 çift sayı
@@ -874,9 +874,9 @@ Daha önce yazılmış kodu, bir nesne hiyerarşisi oluşturmak için yeniden
 kullanabilirsiniz. Örneğin:
 
 ```
->> Animal := Nesne yeni.
->> Dog := Animal yeni.
->> Poodle := Dog yeni.
+>> Hayvan := Nesne yeni.
+>> Köpek := Hayvan yeni.
+>> Kaniş := Köpek yeni.
 ```
 
 Bu durumda **Dog**, **Animal** nesnesinin tüm davranışlarını ve özelliklerini
@@ -911,7 +911,7 @@ asıl toplamanın yine de yapılması gerektiğine dikkat edin; bu aslında
 şu satırda gerçekleşir:
 
 ```
->> answer := kendi + (sayı x factor).
+>> cevap := kendi + (sayı x çarpan).
 ```
 
 Peki XOScript, bu artı **işaretinin** özgün toplama mantığını kastettiğini
@@ -946,14 +946,14 @@ xoscript sınıf sunmasa da sınıf benzeri bir davranışı taklit etmek
 çok kolaydır. yeni iletisini geçersiz kılmanız yeterlidir.
 
 ```
->> Animal := Nesne yeni.
-Animal olunca: ['yeni'] yap: {
+>> Hayvan := Nesne yeni.
+Hayvan olunca: ['yeni'] yap: {
 	<- kendi yeni hazırla.
 }.
 
-Animal olunca: ['hazırla'] yap: {
-	öz sound := ['?'].
-	öz legs  := 4.
+Hayvan olunca: ['hazırla'] yap: {
+	öz ses := ['?'].
+	öz bacaklar  := 4.
 }.
 ```
 
@@ -974,7 +974,7 @@ olarak bir hayvanın 4 bacağı vardır ve sesi bilinmez (bu yüzden soru işare
 Animal nesnemizin yeni bir örneğini oluşturmak için şunu yazmamız yeterlidir:
 
 ```
->> a := Animal yeni.
+>> a := Hayvan yeni.
 ```
 
 Şimdi 4 bacaklı, sesi bilinmeyen ve bir hazırla yöntemi olan yeni bir
@@ -982,18 +982,18 @@ Animal örneği elde ederiz. Diğer nesne yönelimli dillerde olduğu gibi
 Animal nesnemizi genişletebiliriz de:
 
 ```
->> Dog := Animal yeni.
-Dog olunca: ['hazırla'] yap: {
+>> Köpek := Hayvan yeni.
+Köpek olunca: ['hazırla'] yap: {
 	kendi hazırla.
-	öz sound := ['barks'].
+	öz ses := ['havlar'].
 }.
 ```
 
 Bunu bir metin yöntemi ekleyerek kolayca sınayabiliriz:
 
 ```
-Animal olunca: ['metin'] yap: {
-	<- öz legs metin + öz sound.
+Hayvan olunca: ['metin'] yap: {
+	<- öz bacaklar metin + öz ses.
 }.
 ```
 
@@ -1009,10 +1009,10 @@ Olası bir gösterim şöyle olabilir:
 
 
 ```
->> Rectangle := Nesne yeni.
+>> Dikdörtgen := Nesne yeni.
 
-Rectangle olunca: ['area'] yap: {
-	<- öz uzunluk * öz width.
+Dikdörtgen olunca: ['alan'] yap: {
+	<- öz uzunluk * öz genişlik.
 }.
 ```
 
@@ -1021,12 +1021,12 @@ Açıktır ki bir uzunluk ve genişlik belirlemek bir ön koşuldur. Bu amaçla
 
 
 ```
-Rectangle olunca: ['length:'] yap: { :uzunluk
+Dikdörtgen olunca: ['length:'] yap: { :uzunluk
 	öz uzunluk := uzunluk.
 }.
 
-Rectangle olunca: ['width:'] yap: { :width
-	öz width := width.
+Dikdörtgen olunca: ['width:'] yap: { :genişlik
+	öz genişlik := genişlik.
 }.
 
 ```
@@ -1035,16 +1035,16 @@ Bu dikdörtgen daha sonra şöyle kullanılabilir:
 
 
 ```
->> rectangle := Rectangle yeni length: 2, width: 3.
-Çıktı yaz: rectangle area.
+>> dikdörtgen := Dikdörtgen yeni length: 2, width: 3.
+Çıktı yaz: dikdörtgen alan.
 ```
 
 Ancak uzunluk ve genişliğin başlangıç ayarları unutulursa
 bir hata iletisi oluşur:
 
 ```
->> rectangle := Rectangle yeni.
-Çıktı yaz: rectangle area.
+>> dikdörtgen := Dikdörtgen yeni.
+Çıktı yaz: dikdörtgen alan.
 ```
 
 şu hatayı üretir:
@@ -1070,13 +1070,13 @@ ele alınacaktır.
 Bir nesneyi (geçerli durumuyla birlikte) diske şu şekilde kaydedebilirsiniz:
 
 ```
-myobject save-as: ['saved.bin'].
+nesnem save-as: ['saved.bin'].
 ```
 
 Nesneyi diskten yeniden yüklemek için:
 
 ```
->> myobject := Nesne load-from: ['saved.bin'].
+>> nesnem := Nesne load-from: ['saved.bin'].
 ```
 
 Anlık görüntüler belirli bir durumu kaydetmek veya performansı artırmak için
@@ -1196,8 +1196,8 @@ iletileri daha sonra gönderebilirsiniz:
 ```
 10 çift?
 
->> tenner := 10.
-tenner çift?
+>> onluk := 10.
+onluk çift?
 
 ```
 
@@ -1423,10 +1423,10 @@ okumayı kolaylaştırabilir.
 ```
 {
 	Yanlış yanlış: {
-		Çıktı yaz: ['End the loop.'].
+		Çıktı yaz: ['Döngüyü bitir.'].
 	}, kır.
 	
-	Çıktı yaz: ['Dont show me.'].
+	Çıktı yaz: ['Beni gösterme.'].
 
 } prosedür.
 
@@ -1440,10 +1440,10 @@ yürütmek istiyorsanız, iletinin **Doğru** nesnesine gönderilmesi gerekir.
 ```
 {
 	Yanlış değil doğru: {
-		Çıktı yaz: ['End the loop.'].
+		Çıktı yaz: ['Döngüyü bitir.'].
 	}, kır.
 	
-	Çıktı yaz: ['Dont show me.'].
+	Çıktı yaz: ['Beni gösterme.'].
 
 } prosedür.
 
@@ -1456,7 +1456,7 @@ Beklendiği gibi çalışır.
 İstisnalar şu şekilde ele alınabilir:
 
 ```
-{ Task 1 } yakala: { Task 2 }, başlat.
+{ Görev 1 } yakala: { Görev 2 }, başlat.
 ```
 
 Programınızda bilerek bir hata oluşmasını da sağlayabilir ve
@@ -1466,9 +1466,9 @@ yapılır:
 
 ```
 {
-bu-görev hata: ['Whoops!'].
-} yakala: { :mistake
-Çıktı yaz: mistake.
+bu-görev hata: ['Eyvah!'].
+} yakala: { :yanlışlık
+Çıktı yaz: yanlışlık.
 }, başlat.
 ```
 
@@ -1478,12 +1478,12 @@ XOScript görevlere değer enjekte etme olanağı sunar. Şimdi aşağıdaki
 göreve bir göz atın:
 
 ```
->> sending := {
-	Newsletter alıcı: öz recipient.
+>> gönderim := {
+	Bülten alıcı: öz recipient.
 }.
-sending ayarla: ['recipient']
+gönderim ayarla: ['recipient']
 değer: ['info@recipient.org'].
-sending başlat.
+gönderim başlat.
 ```
 
 
@@ -1501,20 +1501,20 @@ Boş görevlere izin verilmez. Teoride boş bir görev şöyle görünürdü:
 bildirmek istiyorsanız Hiç nesnesini kullanabilirsiniz:
 
 ```
->> task := Hiç.
+>> görev := Hiç.
 ```
 
 Bu gerçek bir görev değil, bir Hiç nesnesi olsa da yine de bir başlat
 iletisi gönderilebilir:
 
 ```
->> answer := task başlat.
+>> cevap := görev başlat.
 ```
 
 Aslında bu şununla aynıdır:
 
 ```
->> answer := Hiç başlat.
+>> cevap := Hiç başlat.
 ```
 
 **Hiç** nesnesi **başlat** iletisini tanımadığından yanıt olarak
@@ -1687,9 +1687,9 @@ aramak için girdi (veya anahtar sözcük) görevi görür. Bunun iyi bir
 
 
 ```
->> menu := Sözlük yeni
-	koy: ['£5'] konum: ['apple pie'],
-	koy: ['£6'] konum: ['carrot cake'],
+>> menü := Sözlük yeni
+	koy: ['£5'] konum: ['elmalı turta'],
+	koy: ['£6'] konum: ['havuçlu kek'],
 	koy: ['£3'] konum: ['fudge'].
 ```
 
@@ -1703,13 +1703,13 @@ sözcük kullanılarak anlamı bulunabilir. Örneğin yukarıda belirtilen
 listeden bir fudge'ın fiyatını almak için:
 
 ```
->> price := menu konum: ['fudge'].
+>> price := menü konum: ['fudge'].
 ```
 
 Kısa gösterimi de kullanabilirsiniz:
 
 ```
->> price := menu ? ['fudge'].
+>> price := menü ? ['fudge'].
 ```
 
 Nesneleri saklamak için kullandığınız girdiler boşluk içermiyorsa
@@ -1717,7 +1717,7 @@ Nesneleri saklamak için kullandığınız girdiler boşluk içermiyorsa
 aşağıdaki gösterim de kullanılabilir:
 
 ```
->> menu := Sözlük yeni
+>> menü := Sözlük yeni
 	pie:   ['£5'],
 	cake:  ['£6'],
 	fudge: ['£3'].
@@ -1728,7 +1728,7 @@ Bir fudge'ın fiyatını
 istemek için aşağıdaki basitleştirilmiş gösterim kullanılabilir:
 
 ```
->> price := menu fudge.
+>> price := menü fudge.
 ```
 
 @api_Dict_collections
@@ -1831,7 +1831,7 @@ Program nesnesine belirli bir nesnenin programda zaten bulunup
 bulunmadığını sormak da mümkündür:
 
 ```
-Program Tool doğru: { ... }.
+Program Araç doğru: { ... }.
 ```
 
 Nesne adı tek bir simgeden oluşuyorsa, karışıklığı önlemek için
@@ -1878,9 +1878,9 @@ Program kullan: ['template.xo'].
 Aşağıdaki sunucu ayarlarını yapabilirsiniz:
 
 ```
-	# default values are given
-	# so if you do not set anything these
-	# values are used...
+	# varsayılan değerler verilmiştir,
+	# yani hiçbir şey ayarlamazsanız
+	# bu değerler kullanılır...
 
 	Program 
 	ayar: ['max-postfields']
@@ -1908,9 +1908,9 @@ programı aşağıdadır.
 Server hazırla.
 Program kullan: ['webtools.xo'].
 
->> web-document := Web-Belgesi yeni.
+>> web-belgesi := Web-Belgesi yeni.
 
-web-document çıktıla: ['
+web-belgesi çıktıla: ['
 <html>
 <body>
 <b>Hello World!</b>
@@ -1925,7 +1925,7 @@ bu durumda HTTP başlıklarını kendiniz yazmanız gerekir:
 ```
 #!/bin/xo
 Çıktı yaz: ['Content-type: text/html; charset=utf-8 \n\n'], yeni-satır.
-Çıktı yaz: ['hello world!'], yeni-satır.
+Çıktı yaz: ['merhaba dünya!'], yeni-satır.
 ``` 
 
 ## İstek
@@ -1936,13 +1936,13 @@ kullanılabilir:
 ```
 >> istek  := HTTP-İstek yeni.
 >> search   := istek get: ['search']. # ?search=books
->> password := istek post: ['password']. # from form
->> selected := istek get-liste: ['sel[]']. #?sel[]=1&sel[]=2
->> selected := istek post-liste: ['sel[]'].
->> cookie   := istek cookie: ['session-id'].
->> upload   := istek upload: ['file'].
->> temppath := upload ? 1.
->> filename := upload ? 0.
+>> password := istek post: ['password']. # formdan
+>> seçilenler := istek get-liste: ['sel[]']. #?sel[]=1&sel[]=2
+>> seçilenler := istek post-liste: ['sel[]'].
+>> çerez   := istek cookie: ['session-id'].
+>> yükleme   := istek upload: ['file'].
+>> geçiciYol := yükleme ? 1.
+>> dosyaAdı := yükleme ? 0.
 ```
 
 ## Azami post/uzunluk
@@ -1978,7 +1978,7 @@ Veritabanı nesnesi MariaDB/MySQL sorgulamak için kullanılabilir.
 Bir veritabanına bağlanmak için:
 
 ```
->> db := Maria-DB yeni sunucu-adı: ['localhost'],
+>> vt := Maria-DB yeni sunucu-adı: ['localhost'],
 	kullanıcı: ['xo'],
 	parola: ['pass123'],
 	veritabanı-adı: ['xobase'],
@@ -1989,13 +1989,13 @@ Bir veritabanına bağlanmak için:
 Bir kayıt eklemek için:
 
 ```
->> arama-parametreleri := db sorgu: ['
+>> arama-parametreleri := vt sorgu: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametreler: ( Liste yeni ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametreler: ( Liste yeni ; ['abc'] ; 12.35 ; 6 ). # parametreli sorgular
 
-{  arama-parametreleri yürüt. db onayla. }
-yakala: { :e db geri-al.  }, başlat.
+{  arama-parametreleri yürüt. vt onayla. }
+yakala: { :e vt geri-al.  }, başlat.
 ```
 
 xoscript'in *yalnızca* işlemlerle (transaction) çalıştığını ve asla otomatik onaylama (autocommit) yapmadığını unutmayın.
@@ -2006,18 +2006,18 @@ doğrudan SQL'e eklemeyin.
 Eklenen kaydın kimliğini şu şekilde alın:
 
 ```
-Çıktı yaz: ['INSERTED: '] + arama-parametreleri insert-id, yeni-satır. # insert id
+Çıktı yaz: ['EKLENDİ: '] + arama-parametreleri insert-id, yeni-satır. # eklenen id
 ```
 
 Kayıtları getirmek için:
 
 ```
 >> arama-parametreleri :=
-db
+vt
 	sorgu: ['SELECT * FROM book order by id desc limit 2'], 
-	getir: { :row 
-		Çıktı yaz: row id + [' '] + row description + [': '] + row price, yeni-satır.
-	}. # fetching rows
+	getir: { :kayıt 
+		Çıktı yaz: kayıt id + [' '] + kayıt description + [': '] + kayıt price, yeni-satır.
+	}. # satırları getirme
 
 ```
 
@@ -2038,21 +2038,21 @@ de HTML'yi veya diğer verileri içeren belgenin tamamıdır).
 
 
 ```
-# First we make a new Web Document instance
->> web := Web-Belgesi yeni.
+# Önce yeni bir Web-Belgesi örneği oluşturuyoruz
+>> belge := Web-Belgesi yeni.
 
-# Now we start a session, this will generate a Header for a cookie and
-# create a file to store your data, associated with that cookie
->> session := web oturumu-başlat.
+# Şimdi bir oturum başlatıyoruz; bu bir çerez için başlık ve
+# o çereze bağlı, verilerinizi saklayan bir dosya oluşturur
+>> oturum := belge oturumu-başlat.
 
-# Now we can treat session like a dict
-session userid: 123.
+# Artık oturumu bir Sözlük gibi kullanabiliriz
+oturum userid: 123.
 ```
 
 Oturumu yok etmek için (çıkış yaparken):
 
 ```
-web oturumu-yok-et.
+belge oturumu-yok-et.
 ```
 
 ## Başlıklar
@@ -2061,7 +2061,7 @@ Web-Belgesi, bilinen diğer başlıkları ayarlamanıza da olanak tanır.
 Örneğin kullanıcıyı başka bir URL'ye yönlendirmek istiyorsanız:
 
 ```
-web git: ['/other.html'].
+belge git: ['/other.html'].
 ```
 
 Perde arkasında bu komut, tarayıcıya belirtilen hedef adrese gitmesini
@@ -2071,7 +2071,7 @@ HTTP başlığını da oluşturur.
 Özel bir başlık eklemek için:
 
 ```
-web başlık: ( 
+belge başlık: ( 
 	HTTP-Başlığı yeni
 	anahtar: ['Content-Length']
 	değer: 400
@@ -2081,7 +2081,7 @@ web başlık: (
 Bir 404 sayfası göstermek için:
 
 ```
-web bulunamadı: ['OOps..'].
+belge bulunamadı: ['Hoppala..'].
 ```
 
 
@@ -2094,7 +2094,7 @@ arasında gerçek bir ayrım sağlar.
 Bir dosyadan şablon oluşturmak için:
 
 ```
->> tpl := web şablon: ['templates/ux.tpl'].
+>> tpl := belge şablon: ['templates/ux.tpl'].
 ```
 
 Şablon sistemi işaretleyiciler kullanır.
@@ -2124,7 +2124,7 @@ Bunu şu şekilde yapabilirsiniz:
 >> gem := tpl kes: ['gem'], kopyala.
 gem price: 99.
 tpl yapıştır: gem konum: ['jewels'].
-web çıktıla: tpl arındır.
+belge çıktıla: tpl arındır.
 ```
 
 Son satır, şablonu gerekli HTTP başlıklarıyla birlikte bir metin olarak
@@ -2145,8 +2145,8 @@ Sonuç:
 Kullanıcıların yüklediği dosyaları güvenli bir şekilde sunmak için passthru'ya güvenebilirsiniz:
 
 ```
->> uploaded := ['smile.gif'].
-Server aktar: uploaded önek: ['/uploads/images/'].
+>> yüklenen := ['smile.gif'].
+Server aktar: yüklenen önek: ['/uploads/images/'].
 Program bitir.
 ```
 
@@ -2184,7 +2184,7 @@ JSON'u bir xoscript nesnesine çözmek için:
 Bir Sözlüğü doğru başlıklarla doğrudan json olarak çıktılamak için:
 
 ```
-web json: dict.
+belge json: dict.
 ```
 
 
@@ -2200,7 +2200,7 @@ Desen yeni: ['href="([^"]+)" target="([^"]+)"'].
 Şimdi deseni konu metnine şu şekilde uygulayın:
 
 ```
-pattern eşleş: konu yap: { :m :x .... }
+örüntü eşleş: konu yap: { :m :x .... }
 ```
 
 Tam örnek:
@@ -2210,13 +2210,13 @@ Tam örnek:
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> pattern := Desen yeni: ['href="([^"]+)" target="([^"]+)"'].
->> result  := pattern eşleş: konu yap: { :m :x
+>> örüntü := Desen yeni: ['href="([^"]+)" target="([^"]+)"'].
+>> sonuç  := örüntü eşleş: konu yap: { :m :x
 	Çıktı yaz: m, yeni-satır.
 	Çıktı yaz: x, yeni-satır.
 	<- ['XXX'].
 }.
-Çıktı yaz: result, yeni-satır.
+Çıktı yaz: sonuç, yeni-satır.
 ```
 
 ## Ağ işlemleri
@@ -2239,8 +2239,8 @@ Sunucu eklentisi XChaCha20 ve Argon2 tabanlı şifreleme ile birlikte gelir.
 Örnek:
 
 ```
->> encrypted := Kasa şifrele: ['hello'] anahtar: ['world'].
->> decrypted := Kasa şifrele: encrypted anahtar: ['world'].
+>> şifreli := Kasa şifrele: ['hello'] anahtar: ['world'].
+>> çözülmüş := Kasa şifrele: şifreli anahtar: ['world'].
 ```
 
 ## Jetonlar
@@ -2248,7 +2248,7 @@ Sunucu eklentisi XChaCha20 ve Argon2 tabanlı şifreleme ile birlikte gelir.
 Belirli uzunlukta kriptografik olarak güvenli bir jeton üretmek için:
 
 ```
->> mytok := Kasa jeton: 40.
+>> jetonum := Kasa jeton: 40.
 ```
 
 Bu, 40 karakterlik bir jeton üretir.
@@ -2260,7 +2260,7 @@ olanak tanır. printf sözdizimini kullanır.
 
 ```
 >> fmt := Biçim yeni: ['%06.0f'].
-fmt uygula: 56. # gives 000056
+fmt uygula: 56. # sonuç 000056
 ```
 
 Bir biçim tek bir dönüştürme içerebilir ve bu dönüştürme değere uymalıdır;
@@ -2307,10 +2307,10 @@ Bir e-posta göndermek için mailtools.xo kütüphanesini kullanın.
 Server hazırla.
 Program kullan: ['mailtools.xo'].
 
->> e-mail := HTML-Eposta yeni.
->> img := e-mail iliştir: ( Dosya yeni: ['myimage.png'] ).
+>> e-posta := HTML-Eposta yeni.
+>> img := e-posta iliştir: ( Dosya yeni: ['myimage.png'] ).
 
-e-mail
+e-posta
 gönderen: ['xo@xoscript.com'] ad: ['xo'],
 alıcı: ( Liste yeni ; ['xo2@xoscipt.com'] ),
 konu: ['xoxo'],
@@ -2429,13 +2429,13 @@ kendiniz serbest bırakmanız gerekir.
 Bir blob'u serbest bırakmak için:
 
 ```
-myblob serbest-bırak.
+blobum serbest-bırak.
 ```
 
 Bir yapıyı serbest bırakmak için:
 
 ```
-mystruct struct-serbest-bırak serbest-bırak.
+structım struct-serbest-bırak serbest-bırak.
 ```
 
 Yani bir yapı için bellek bloğunu serbest bırakmak üzere iki ileti
