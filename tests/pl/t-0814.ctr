@@ -1,39 +1,42 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# format ciasteczka sesji, typ treści json, tylko protokoły web, svg wyświetlane inline
 Server inicjuj.
 Program użyj: ['../../../src/xo/pl/webtools.xo'].
 
->> Fake-Request := Obiekt nowy.
-Fake-Request na: ['value:'] wykonaj: { :wartość
+>> Fałszywe-Żądanie := Obiekt nowy.
+Fałszywe-Żądanie na: ['value:'] wykonaj: { :wartość
 	własny wartość := wartość.
 }.
-Fake-Request na: ['cookie:'] wykonaj: { :nazwa <- własny wartość.
+Fałszywe-Żądanie na: ['cookie:'] wykonaj: { :nazwa
+	<- własny wartość.
 }.
 
->> Test-Session := Sesja-plik-tymczasowy nowy.
-Test-Session na: ['wczytaj'] wykonaj: { <- Słownik nowy.
+>> Testowa-Sesja := Sesja-plik-tymczasowy nowy.
+Testowa-Sesja na: ['wczytaj'] wykonaj: {
+	<- Słownik nowy.
 }.
-Test-Session na: ['session-id'] wykonaj: { <- własny id.
+Testowa-Sesja na: ['identyfikator-sesji'] wykonaj: {
+	<- własny id.
 }.
 
->> cookies := Lista nowy
+>> ciasteczka := Lista nowy
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies każdy: { :i :cookie
-	>> żądanie := Fake-Request nowy.
-	żądanie value: cookie.
-	>> menedżer := Test-Session nowy.
-	>> web := Dokument-Web nowy.
-	web żądanie: żądanie.
-	web menedżer-sesji: menedżer.
-	web rozpocznij-sesję.
-	Wyjście pisz: ( menedżer session-id = cookie ), nowa-linia.
+ciasteczka każdy: { :i :ciasteczko
+	>> żądanie := Fałszywe-Żądanie nowy.
+	żądanie value: ciasteczko.
+	>> menedżer := Testowa-Sesja nowy.
+	>> strona := Dokument-Web nowy.
+	strona żądanie: żądanie.
+	strona menedżer-sesji: menedżer.
+	strona rozpocznij-sesję.
+	Wyjście pisz: ( menedżer identyfikator-sesji = ciasteczko ), nowa-linia.
 }.
 
->> web := Dokument-Web nowy.
-web json: (Słownik nowy umieść: ['b'] w: ['a']).
+>> strona := Dokument-Web nowy.
+strona json: (Słownik nowy umieść: ['b'] w: ['a']).
 Wyjście pisz: ['\n'], nowa-linia.
 
 { Sieć get: ['file:///etc/hostname']. } przechwyć: { :e

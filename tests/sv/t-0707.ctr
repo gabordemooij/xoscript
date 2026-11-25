@@ -1,21 +1,21 @@
-# test type casts / conversions / bindings
+# testa typomvandlingar / konverteringar / bindningar
 Program minneshantering: 4.
 Server init.
 
->> counter := 0.
+>> räknare := 0.
 >> db := Maria-DB ny värd: ['localhost'],
 	användarnamn: ['xo'], lösenord: ['pass123'], databasnamn: ['xobase'], anslut.
 
->> TwoDigitFormat := Format ny: ['%02d'].
+>> TvåsiffrigtFormat := Format ny: ['%02d'].
 
-# Datetime
+# Datum och tid
 {
-	>> år := Tal mellan: 1995 och: 2050, text.
-	>> månad := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 12), text.
-	>> dag := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 28), text.
-	>> timme := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 23), text.
-	>> minut := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 59), text.
-	>> sekund := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 59), text.
+	>> år     := Tal mellan: 1995 och: 2050, text.
+	>> månad    := TvåsiffrigtFormat tillämpa-heltal: (Tal mellan: 1 och: 12), text.
+	>> dag      := TvåsiffrigtFormat tillämpa-heltal: (Tal mellan: 1 och: 28), text.
+	>> timme     := TvåsiffrigtFormat tillämpa-heltal: (Tal mellan: 1 och: 23), text.
+	>> minut   := TvåsiffrigtFormat tillämpa-heltal: (Tal mellan: 1 och: 59), text.
+	>> sekund   := TvåsiffrigtFormat tillämpa-heltal: (Tal mellan: 1 och: 59), text.
 	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
 	datetime
 		YYYY: år,
@@ -31,25 +31,25 @@ Server init.
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
 	'] <datetime>: datetime),
-	hämta: { :row
-		(row mydatetime = datetime) falsk: {
+	hämta: { :raden
+		(raden mydatetime = datetime) falsk: {
 			denna-uppgift fel: (
-				['Expected: <expected> but got: <observation>']
+				['Förväntat: <expected> men fick: <observation>']
 				<expected>: datetime,
-				<observation>: row mydatetime
+				<observation>: raden mydatetime
 			).
 		}.
 	
 	}.
-	counter lägg-till: 1.
+	räknare lägg-till: 1.
 } * 100.
 
-# Date
+# Datum
 {
-	>> år := Tal mellan: 1995 och: 2050, text.
-	>> månad := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 12), text.
-	>> dag := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 28), text.
-	>> date := ['YYYY-MM-DD'].
+	>> år     := Tal mellan: 1995 och: 2050, text.
+	>> månad    := TvåsiffrigtFormat tillämpa-heltal: (Tal mellan: 1 och: 12), text.
+	>> dag      := TvåsiffrigtFormat tillämpa-heltal: (Tal mellan: 1 och: 28), text.
+	>> date     := ['YYYY-MM-DD'].
 	date
 		YYYY: år,
 		MM: månad,
@@ -61,24 +61,24 @@ Server init.
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
 	'] <date>: date),
-	hämta: { :row
-		(row mydate = date) falsk: {
+	hämta: { :raden
+		(raden mydate = date) falsk: {
 			denna-uppgift fel: (
-				['Expected: <expected> but got: <observation>']
+				['Förväntat: <expected> men fick: <observation>']
 				<expected>: date,
-				<observation>: row mydate
+				<observation>: raden mydate
 			).
 		}.
 	}.
-	counter lägg-till: 1.
+	räknare lägg-till: 1.
 } * 100.
 
 
-# Time
+# Tid
 {
-	>> timme := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 23), text.
-	>> minut := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 59), text.
-	>> sekund := TwoDigitFormat tillämpa-heltal: (Tal mellan: 1 och: 59), text.
+	>> timme     := TvåsiffrigtFormat tillämpa-heltal: (Tal mellan: 1 och: 23), text.
+	>> minut   := TvåsiffrigtFormat tillämpa-heltal: (Tal mellan: 1 och: 59), text.
+	>> sekund   := TvåsiffrigtFormat tillämpa-heltal: (Tal mellan: 1 och: 59), text.
 	>> tid := ['HH:II:SS'].
 	tid
 		HH: timme,
@@ -89,20 +89,20 @@ Server init.
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: tid),
-	hämta: { :row
-		(row mytime = tid) falsk: {
+	hämta: { :raden
+		(raden mytime = tid) falsk: {
 			denna-uppgift fel: (
-				['Expected: <expected> but got: <observation>']
+				['Förväntat: <expected> men fick: <observation>']
 				<expected>: datetime,
-				<observation>: row mytime
+				<observation>: raden mytime
 			).
 		}.
 	}.
-	counter lägg-till: 1.
+	räknare lägg-till: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Texter (varchar/text)
 >> str1 := Lista ny fyll: 100000 med: ['x'], sammanfoga: [''].
 {
 	>> str2 := Valv token: 40.
@@ -115,23 +115,23 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	hämta: { :row
-		(row str1 = str1 och: row str2 = str2) falsk: {
+	hämta: { :raden
+		(raden str1 = str1 och: raden str2 = str2) falsk: {
 			denna-uppgift fel: (
-				['Expected: <expected> but got: <observation>']
+				['Förväntat: <expected> men fick: <observation>']
 				<expected>: datetime,
-				<observation>: row mytime
+				<observation>: raden mytime
 			).
 		}.
 	}.
-	counter lägg-till: 1.
+	räknare lägg-till: 1.
 } * 100.
 
 
-# Numbers
+# Tal
 {
-	>> n1 := Tal mellan: 1 och: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Tal mellan: 1 och: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 från-text: ['9223372036854775807'] ) -
 		( Int64 från-text: ['99999'] ) +
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	hämta: { :row
-		(row n1 = n1) falsk: {
+	hämta: { :raden
+		(raden n1 = n1) falsk: {
 			denna-uppgift fel: (
-				['Expected: <expected> but got: <observation>']
+				['Förväntat: <expected> men fick: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: raden n1
 			).
 		}.
-		(row n2 = n2) falsk: {
+		(raden n2 = n2) falsk: {
 			denna-uppgift fel: (
-				['Expected: <expected> but got: <observation>']
+				['Förväntat: <expected> men fick: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: raden n2
 			).
 		}.
-		(row n3 = n2 avrunda) falsk: {
+		(raden n3 = n2 avrunda) falsk: {
 			denna-uppgift fel: (
-				['Expected: <expected> but got: <observation>']
+				['Förväntat: <expected> men fick: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: raden n3
 			).
 		}.
-		(row big = big) falsk: {
+		(raden big = big) falsk: {
 			denna-uppgift fel: (
-				['Expected: <expected> but got: <observation>']
+				['Förväntat: <expected> men fick: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: raden big
 			).
 		}.
 		
 	}.
-	counter lägg-till: 1.
+	räknare lägg-till: 1.
 } * 100.
 
 
 Utdata skriv: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: räknare
 ), stop.

@@ -1,27 +1,27 @@
 Server init.
 
->> conn1 := Maria-DB nou gazdă: ['localhost'],
+>> con1 := Maria-DB nou gazdă: ['localhost'],
 	utilizator: ['xo'],
 	parolă: ['pass123'],
 	nume-bază: ['xobase'],
 	conectează.
 
->> conn2 := Maria-DB nou gazdă: ['localhost'],
+>> con2 := Maria-DB nou gazdă: ['localhost'],
 	utilizator: ['xo'],
 	parolă: ['pass123'],
 	nume-bază: ['xobase'],
 	conectează.
 #...
->> del := conn1 interogare: ['DELETE FROM book WHERE id > 0'].
-{  del execută-interogare. conn1 confirmă. } prinde: { :e conn1 anulează.  }, pornește.
+>> ștergere := con1 interogare: ['DELETE FROM book WHERE id > 0'].
+{  ștergere execută-interogare. con1 confirmă. } prinde: { :e con1 anulează.  }, pornește.
 
->> insert := conn1 interogare: ['INSERT INTO book (id) VALUES(null)'].
-insert execută-interogare.
+>> inserare := con1 interogare: ['INSERT INTO book (id) VALUES(null)'].
+inserare execută-interogare.
 
->> numără := conn1 interogare: ['SELECT COUNT(*) AS num FROM book'].
-numără preia: { :row Ieșire scrie: row num, rând-nou. }.
+>> numără := con1 interogare: ['SELECT COUNT(*) AS num FROM book'].
+numără preia: { :rând Ieșire scrie: rând num, rând-nou. }.
 
-# does not show up
-# insert not committed on connection 1
->> numără := conn2 interogare: ['SELECT COUNT(*) AS num FROM book'].
-numără preia: { :row Ieșire scrie: row num, rând-nou. }.
+# nu apare
+# inserarea nu este confirmată pe conexiunea 1
+>> numără := con2 interogare: ['SELECT COUNT(*) AS num FROM book'].
+numără preia: { :rând Ieșire scrie: rând num, rând-nou. }.

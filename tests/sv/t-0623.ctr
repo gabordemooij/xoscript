@@ -1,10 +1,10 @@
 
 
->> g := Server ny.
->> v := Valv ny.
+>> g  := Server ny.
+>> v  := Valv ny.
 >> ok := 0.
 
->> secrets := Lista ny ; 
+>> hemligheter := Lista ny ; 
 	 ['aaa'] ;
 	 [''] ; 
 	 ['AB'] ;
@@ -14,30 +14,30 @@
 	 ['漢字'] ;
 	 ['==[abc]=='].
 	
->> passwords := secrets kopiera.
-passwords varje: { :i :p
-	secrets varje: { :n :s
+>> lösenorden := hemligheter kopiera.
+lösenorden varje: { :i :p
+	hemligheter varje: { :n :s
 		{
-			>> encrypted := v kryptera: s nyckel: p.
-			>> decrypted := v dekryptera: encrypted nyckel: p.
-			(decrypted = s) sann: {
+			>> krypterad := v kryptera: s nyckel: p.
+			>> dekrypterad := v dekryptera: krypterad nyckel: p.
+			(dekrypterad = s) sann: {
 				ok lägg-till: 1.
 			}, annars: {
-				Utdata skriv: ['failed encrypting/decrypting: '], stop.
+				Utdata skriv: ['kryptering/dekryptering misslyckades: '], stop.
 				Utdata skriv: s, stop.
-				Utdata skriv: ['encrypted: '] + encrypted, stop.
-				Utdata skriv: ['decrypted: '] + encrypted, stop.
+				Utdata skriv: ['krypterat: '] + krypterad, stop.
+				Utdata skriv: ['dekrypterat: '] + krypterad, stop.
 				Program avsluta.
 			}.
-		} fånga: { :err
+		} fånga: { :fl
 			(s = [''] eller: p = ['']) sann: {
 				ok lägg-till: 1.
 			}, annars: {
-				Utdata skriv: err, stop.
+				Utdata skriv: fl, stop.
 				Program avsluta.
 			}.
 		}, starta.
 	}.
 }.
 
-Utdata skriv: ( ok + [' vault encryptions tested.'] ), stop.
+Utdata skriv: ( ok + [' valvkrypteringar testade.'] ), stop.

@@ -1,35 +1,38 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# format for øktens informasjonskapsel, json-innholdstype, bare webprotokoller, svg vises inline
 Server initialiser.
 Program benytt: ['../../../src/xo/no/webtools.xo'].
 
->> Fake-Request := Objekt ny.
-Fake-Request ved: ['value:'] gjør: { :verdi
+>> Juks-Forespørsel := Objekt ny.
+Juks-Forespørsel ved: ['value:'] gjør: { :verdi
 	egen verdi := verdi.
 }.
-Fake-Request ved: ['cookie:'] gjør: { :navn <- egen verdi.
+Juks-Forespørsel ved: ['cookie:'] gjør: { :navn
+	<- egen verdi.
 }.
 
->> Test-Session := Midlertidig-fil-økt ny.
-Test-Session ved: ['last-inn'] gjør: { <- Ordbok ny.
+>> Test-Økt := Midlertidig-fil-økt ny.
+Test-Økt ved: ['last-inn'] gjør: {
+	<- Ordbok ny.
 }.
-Test-Session ved: ['session-id'] gjør: { <- egen id.
+Test-Økt ved: ['øktens-id'] gjør: {
+	<- egen id.
 }.
 
->> cookies := Liste ny
+>> informasjonskapsler := Liste ny
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies hver: { :i :cookie
-	>> forespørsel := Fake-Request ny.
-	forespørsel value: cookie.
-	>> behandler := Test-Session ny.
+informasjonskapsler hver: { :i :informasjonskapsel
+	>> forespørsel := Juks-Forespørsel ny.
+	forespørsel value: informasjonskapsel.
+	>> behandler := Test-Økt ny.
 	>> web := Webdokument ny.
 	web forespørsel: forespørsel.
 	web øktbehandler: behandler.
 	web start-økt.
-	Utdata skriv: ( behandler session-id = cookie ), stop.
+	Utdata skriv: ( behandler øktens-id = informasjonskapsel ), stop.
 }.
 
 >> web := Webdokument ny.

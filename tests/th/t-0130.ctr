@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# ใช้ FFI กับปลั๊กอิน Server
 
-# connect to libc (platform specific)
->> libname := โปรแกรม การตั้งค่า: ['FFITESTLIB'].
+# เชื่อมต่อกับ libc (ขึ้นกับแพลตฟอร์ม)
+>> ชื่อไลบรารี := โปรแกรม การตั้งค่า: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# เชื่อมโยงฟังก์ชัน stdio จาก C สำหรับการทำงานกับไฟล์ขั้นสูง
 Server เชื่อมโยง: ( ลิสต์ สร้างใหม่ ;
- libname ; ['fopen'] ;
+ ชื่อไลบรารี ; ['fopen'] ;
  ( ลิสต์ สร้างใหม่ ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 เชื่อมโยง: ( ลิสต์ สร้างใหม่ ;
- ว่าง ; # means same lib
+ ว่าง ; # หมายถึงไลบรารีเดียวกัน
  ['fread'] ;
  ( ลิสต์ สร้างใหม่ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- ว่าง ; # means same object (i.e. Stream)
+ ว่าง ; # หมายถึงออบเจกต์เดียวกัน (คือ สตรีม)
  ['fread']
 ),
 เชื่อมโยง: (
  ลิสต์ สร้างใหม่ ;
- ว่าง ; # means same lib
+ ว่าง ; # หมายถึงไลบรารีเดียวกัน
  ['fwrite'] ;
  ( ลิสต์ สร้างใหม่ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- ว่าง ; # means same lib
+ ว่าง ; # หมายถึงไลบรารีเดียวกัน
  ['fwrite']
 ),
 เชื่อมโยง: (
  ลิสต์ สร้างใหม่ ;
- ว่าง ; # means same lib
+ ว่าง ; # หมายถึงไลบรารีเดียวกัน
  ['rewind'] ;
  ( ลิสต์ สร้างใหม่ ; ['pointer'] ) ;
  ['int'] ;
- ว่าง ; # means same lib
+ ว่าง ; # หมายถึงไลบรารีเดียวกัน
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> เส้นทาง := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# เปิดไฟล์ด้วย fopen(path, mode)
 >> fd := Stream path: เส้นทาง mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream ส่งข้อความ: ['fwrite'] อาร์กิวเมนต์: (ลิสต์ สร้างใหม่ ; str ; 1 ; 6 ; fd ).
-แสดงผล เขียน: bytes-written, ขึ้นบรรทัดใหม่.
+# เขียนไบต์จากบัฟเฟอร์ str ลงไฟล์
+>> ไบต์ที่เขียน := Stream ส่งข้อความ: ['fwrite'] อาร์กิวเมนต์: (ลิสต์ สร้างใหม่ ; str ; 1 ; 6 ; fd ).
+แสดงผล เขียน: ไบต์ที่เขียน, ขึ้นบรรทัดใหม่.
 
-# rewind file pointer
+# กรอตัวชี้ไฟล์กลับไปต้นไฟล์
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob สร้างใหม่: 20.
+# จองบัฟเฟอร์
+>> บฟ := Blob สร้างใหม่: 20.
 
-# read from file
->> bytes-read := Stream ส่งข้อความ: ['fread'] อาร์กิวเมนต์: (ลิสต์ สร้างใหม่ ; buf ; 1 ; 6 ; fd ).
-แสดงผล เขียน: bytes-read, ขึ้นบรรทัดใหม่.
-แสดงผล เขียน: buf, ขึ้นบรรทัดใหม่.
+# อ่านจากไฟล์
+>> ไบต์ที่อ่าน := Stream ส่งข้อความ: ['fread'] อาร์กิวเมนต์: (ลิสต์ สร้างใหม่ ; บฟ ; 1 ; 6 ; fd ).
+แสดงผล เขียน: ไบต์ที่อ่าน, ขึ้นบรรทัดใหม่.
+แสดงผล เขียน: บฟ, ขึ้นบรรทัดใหม่.
 
-# free memory
+# คืนหน่วยความจำ
 str  คืนหน่วยความจำ.
 เส้นทาง คืนหน่วยความจำ.
 mode คืนหน่วยความจำ.
-buf  คืนหน่วยความจำ.
+บฟ  คืนหน่วยความจำ.
 
 

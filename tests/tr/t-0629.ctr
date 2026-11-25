@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# veritabanı sınaması
+# gerekli yapılandırma için server.xo örneğine bakın
 
 Server init.
-Çıktı yaz: ['Database test'], yeni-satır.
+Çıktı yaz: ['Veritabanı testi'], yeni-satır.
 
->> db := Maria-DB yeni sunucu-adı: ['localhost'],
+>> vt := Maria-DB yeni sunucu-adı: ['localhost'],
 	kullanıcı: ['xo'], parola: ['pass123'], veritabanı-adı: ['xobase'], bağlan.
 
-Çıktı yaz: ['Can we connect? '] + db bağlı?, yeni-satır.
+Çıktı yaz: ['Bağlanabilir miyiz? '] + vt bağlı?, yeni-satır.
 
->> arama-parametreleri := db sorgu: ['
+>> arama-parametreleri := vt sorgu: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametreler: ( Liste yeni ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametreler: ( Liste yeni ; ['abc'] ; 12.35 ; 6 ). # parametreli sorgular
 
-{  arama-parametreleri yürüt. db onayla. } yakala: { :e db geri-al.  }, başlat.
+{  arama-parametreleri yürüt. vt onayla. } yakala: { :e vt geri-al.  }, başlat.
 
-Çıktı yaz: ['Can we insert? '] + ( arama-parametreleri insert-id > 0 ), yeni-satır.
+Çıktı yaz: ['Ekleyebilir miyiz? '] + ( arama-parametreleri insert-id > 0 ), yeni-satır.
 
 >> Obj := Nesne yeni.
-Obj olunca: ['retrieve-rows'] yap: {
+Obj olunca: ['kayıtları-getir'] yap: {
 	öz adet := 0.
 	>> arama-parametreleri :=
-	db sorgu: ['SELECT * FROM book order by id desc limit 2'], 
-	getir: { :row 
+	vt sorgu: ['SELECT * FROM book order by id desc limit 2'], 
+	getir: { :kayıt 
 		öz adet ekle: 1.
 		Doğru kır.
-	}. <- öz adet kopyala.
+	}. # satırları getirme
+	<- öz adet kopyala.
 }.
 
-Çıktı yaz: ['Can we query? '] + ( Obj retrieve-rows > 0 ), yeni-satır.
+Çıktı yaz: ['Sorgulayabilir miyiz? '] + ( Obj kayıtları-getir > 0 ), yeni-satır.

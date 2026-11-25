@@ -1,27 +1,27 @@
 Server init.
 
->> conn1 := Maria-DB új gazdagép: ['localhost'],
+>> kapcs1 := Maria-DB új gazdagép: ['localhost'],
 	felhasználónév: ['xo'],
 	jelszó: ['pass123'],
 	adatbázisnév: ['xobase'],
 	csatlakozik.
 
->> conn2 := Maria-DB új gazdagép: ['localhost'],
+>> kapcs2 := Maria-DB új gazdagép: ['localhost'],
 	felhasználónév: ['xo'],
 	jelszó: ['pass123'],
 	adatbázisnév: ['xobase'],
 	csatlakozik.
 #...
->> del := conn1 lekérdezés: ['DELETE FROM book WHERE id > 0'].
-{  del végrehajt. conn1 véglegesít. } elkap: { :e conn1 visszavon.  }, indít.
+>> törl := kapcs1 lekérdezés: ['DELETE FROM book WHERE id > 0'].
+{  törl végrehajt. kapcs1 véglegesít. } elkap: { :e kapcs1 visszavon.  }, indít.
 
->> insert := conn1 lekérdezés: ['INSERT INTO book (id) VALUES(null)'].
-insert végrehajt.
+>> beszúrás := kapcs1 lekérdezés: ['INSERT INTO book (id) VALUES(null)'].
+beszúrás végrehajt.
 
->> darabszám := conn1 lekérdezés: ['SELECT COUNT(*) AS num FROM book'].
-darabszám lekér: { :row Kimenet ír: row num, újsor. }.
+>> darabszám := kapcs1 lekérdezés: ['SELECT COUNT(*) AS num FROM book'].
+darabszám lekér: { :sorAdat Kimenet ír: sorAdat num, újsor. }.
 
-# does not show up
-# insert not committed on connection 1
->> darabszám := conn2 lekérdezés: ['SELECT COUNT(*) AS num FROM book'].
-darabszám lekér: { :row Kimenet ír: row num, újsor. }.
+# nem jelenik meg
+# a beszúrás nincs véglegesítve az 1. kapcsolaton
+>> darabszám := kapcs2 lekérdezés: ['SELECT COUNT(*) AS num FROM book'].
+darabszám lekér: { :sorAdat Kimenet ír: sorAdat num, újsor. }.

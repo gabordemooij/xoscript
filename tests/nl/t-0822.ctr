@@ -1,4 +1,4 @@
-# fewer parameters than placeholders must give an error, not read past the bindings
+# minder parameters dan plaatshouders moet een fout geven, niet voorbij de bindingen lezen
 Server init.
 
 >> db := Maria-DB nieuw host: ['localhost'],
@@ -9,14 +9,14 @@ Server init.
 
 >> zoekparameters := db query: ['SELECT ? AS a, ? AS b, ? AS c'].
 zoekparameters parameters: (Reeks nieuw ; ['1']).
-{ zoekparameters ophalen: { :row Uit schrijf: row, stop. }. } afhandelen: { :e Uit schrijf: e, stop. }, start.
+{ zoekparameters ophalen: { :rij Uit schrijf: rij, stop. }. } afhandelen: { :e Uit schrijf: e, stop. }, start.
 
 >> zoekparameters := db query: ['SELECT ? AS a'].
-{ zoekparameters ophalen: { :row Uit schrijf: row, stop. }. } afhandelen: { :e Uit schrijf: e, stop. }, start.
+{ zoekparameters ophalen: { :rij Uit schrijf: rij, stop. }. } afhandelen: { :e Uit schrijf: e, stop. }, start.
 
-# the right number still works, more parameters are ignored as before
+# het juiste aantal werkt nog steeds, meer parameters worden zoals voorheen genegeerd
 >> zoekparameters := db query: ['SELECT ? AS a, ? AS b'].
 zoekparameters parameters: (Reeks nieuw ; ['1'] ; ['2']).
-zoekparameters ophalen: { :row Uit schrijf: (row bij: ['a']), schrijf: (row bij: ['b']), stop. }.
+zoekparameters ophalen: { :rij Uit schrijf: (rij bij: ['a']), schrijf: (rij bij: ['b']), stop. }.
 zoekparameters parameters: (Reeks nieuw ; ['1'] ; ['2'] ; ['3']).
-zoekparameters ophalen: { :row Uit schrijf: (row bij: ['a']), schrijf: (row bij: ['b']), stop. }.
+zoekparameters ophalen: { :rij Uit schrijf: (rij bij: ['a']), schrijf: (rij bij: ['b']), stop. }.

@@ -1,27 +1,27 @@
 Server init.
 
->> conn1 := Maria-DB 新規 ホスト: ['localhost'],
+>> 接続1 := Maria-DB 新規 ホスト: ['localhost'],
 	ユーザー名: ['xo'],
 	パスワード: ['pass123'],
 	データベース名: ['xobase'],
 	接続.
 
->> conn2 := Maria-DB 新規 ホスト: ['localhost'],
+>> 接続2 := Maria-DB 新規 ホスト: ['localhost'],
 	ユーザー名: ['xo'],
 	パスワード: ['pass123'],
 	データベース名: ['xobase'],
 	接続.
 #...
->> del := conn1 クエリ: ['DELETE FROM book WHERE id > 0'].
-{  del 実行. conn1 コミット. } 例外時: { :e conn1 ロールバック.  }, 開始.
+>> 削除結果 := 接続1 クエリ: ['DELETE FROM book WHERE id > 0'].
+{  削除結果 実行. 接続1 コミット. } 例外時: { :e 接続1 ロールバック.  }, 開始.
 
->> insert := conn1 クエリ: ['INSERT INTO book (id) VALUES(null)'].
-insert 実行.
+>> 挿入 := 接続1 クエリ: ['INSERT INTO book (id) VALUES(null)'].
+挿入 実行.
 
->> 個数 := conn1 クエリ: ['SELECT COUNT(*) AS num FROM book'].
-個数 取得: { :row 出力 書く: row num, 改行. }.
+>> 個数 := 接続1 クエリ: ['SELECT COUNT(*) AS num FROM book'].
+個数 取得: { :行 出力 書く: 行 num, 改行. }.
 
-# does not show up
-# insert not committed on connection 1
->> 個数 := conn2 クエリ: ['SELECT COUNT(*) AS num FROM book'].
-個数 取得: { :row 出力 書く: row num, 改行. }.
+# 表示されない
+# 接続 1 で挿入はコミットされていない
+>> 個数 := 接続2 クエリ: ['SELECT COUNT(*) AS num FROM book'].
+個数 取得: { :行 出力 書く: 行 num, 改行. }.

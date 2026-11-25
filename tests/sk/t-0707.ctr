@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# test pretypovaní / prevodov / väzieb
 Program správa-pamäte: 4.
 Server init.
 
->> counter := 0.
+>> počítadlo := 0.
 >> db := Maria-DB nový hostiteľ: ['localhost'],
 	používateľ: ['xo'], heslo: ['pass123'], názov-databázy: ['xobase'], pripojiť-sa.
 
->> TwoDigitFormat := Formát nový: ['%02d'].
+>> DvojcifernýFormát := Formát nový: ['%02d'].
 
-# Datetime
+# Dátum a čas
 {
-	>> rok := Číslo medzi: 1995 a: 2050, text.
-	>> mesiac := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 12), text.
-	>> deň := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 28), text.
-	>> hodina := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 23), text.
-	>> minúta := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 59), text.
-	>> sekunda := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 59), text.
-	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
-	datetime
+	>> rok     := Číslo medzi: 1995 a: 2050, text.
+	>> mesiac    := DvojcifernýFormát aplikovať-celé: (Číslo medzi: 1 a: 12), text.
+	>> deň      := DvojcifernýFormát aplikovať-celé: (Číslo medzi: 1 a: 28), text.
+	>> hodina     := DvojcifernýFormát aplikovať-celé: (Číslo medzi: 1 a: 23), text.
+	>> minúta   := DvojcifernýFormát aplikovať-celé: (Číslo medzi: 1 a: 59), text.
+	>> sekunda   := DvojcifernýFormát aplikovať-celé: (Číslo medzi: 1 a: 59), text.
+	>> dátum-čas := ['YYYY-MM-DD HH:II:SS'].	
+	dátum-čas
 		YYYY: rok,
 		MM: mesiac,
 		DD: deň,
@@ -30,27 +30,27 @@ Server init.
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'] <datetime>: datetime),
-	načítať: { :row
-		(row mydatetime = datetime) nepravda: {
+	'] <datetime>: dátum-čas),
+	načítať: { :rad
+		(rad mydatetime = dátum-čas) nepravda: {
 			táto-úloha chyba: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mydatetime
+				['Očakávané: <expected>, ale získané: <observation>']
+				<expected>: dátum-čas,
+				<observation>: rad mydatetime
 			).
 		}.
 	
 	}.
-	counter pridať: 1.
+	počítadlo pridať: 1.
 } * 100.
 
-# Date
+# Dátum
 {
-	>> rok := Číslo medzi: 1995 a: 2050, text.
-	>> mesiac := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 12), text.
-	>> deň := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 28), text.
-	>> date := ['YYYY-MM-DD'].
-	date
+	>> rok     := Číslo medzi: 1995 a: 2050, text.
+	>> mesiac    := DvojcifernýFormát aplikovať-celé: (Číslo medzi: 1 a: 12), text.
+	>> deň      := DvojcifernýFormát aplikovať-celé: (Číslo medzi: 1 a: 28), text.
+	>> dátum     := ['YYYY-MM-DD'].
+	dátum
 		YYYY: rok,
 		MM: mesiac,
 		DD: deň.
@@ -60,25 +60,25 @@ Server init.
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'] <date>: date),
-	načítať: { :row
-		(row mydate = date) nepravda: {
+	'] <date>: dátum),
+	načítať: { :rad
+		(rad mydate = dátum) nepravda: {
 			táto-úloha chyba: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: date,
-				<observation>: row mydate
+				['Očakávané: <expected>, ale získané: <observation>']
+				<expected>: dátum,
+				<observation>: rad mydate
 			).
 		}.
 	}.
-	counter pridať: 1.
+	počítadlo pridať: 1.
 } * 100.
 
 
-# Time
+# Čas
 {
-	>> hodina := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 23), text.
-	>> minúta := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 59), text.
-	>> sekunda := TwoDigitFormat aplikovať-celé: (Číslo medzi: 1 a: 59), text.
+	>> hodina     := DvojcifernýFormát aplikovať-celé: (Číslo medzi: 1 a: 23), text.
+	>> minúta   := DvojcifernýFormát aplikovať-celé: (Číslo medzi: 1 a: 59), text.
+	>> sekunda   := DvojcifernýFormát aplikovať-celé: (Číslo medzi: 1 a: 59), text.
 	>> čas := ['HH:II:SS'].
 	čas
 		HH: hodina,
@@ -89,20 +89,20 @@ Server init.
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: čas),
-	načítať: { :row
-		(row mytime = čas) nepravda: {
+	načítať: { :rad
+		(rad mytime = čas) nepravda: {
 			táto-úloha chyba: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Očakávané: <expected>, ale získané: <observation>']
+				<expected>: dátum-čas,
+				<observation>: rad mytime
 			).
 		}.
 	}.
-	counter pridať: 1.
+	počítadlo pridať: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Texty (varchar/text)
 >> str1 := Zoznam nový naplniť: 100000 čím: ['x'], spojiť: [''].
 {
 	>> str2 := Trezor token: 40.
@@ -115,23 +115,23 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	načítať: { :row
-		(row str1 = str1 a: row str2 = str2) nepravda: {
+	načítať: { :rad
+		(rad str1 = str1 a: rad str2 = str2) nepravda: {
 			táto-úloha chyba: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Očakávané: <expected>, ale získané: <observation>']
+				<expected>: dátum-čas,
+				<observation>: rad mytime
 			).
 		}.
 	}.
-	counter pridať: 1.
+	počítadlo pridať: 1.
 } * 100.
 
 
-# Numbers
+# Čísla
 {
-	>> n1 := Číslo medzi: 1 a: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Číslo medzi: 1 a: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 z-textu: ['9223372036854775807'] ) -
 		( Int64 z-textu: ['99999'] ) +
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	načítať: { :row
-		(row n1 = n1) nepravda: {
+	načítať: { :rad
+		(rad n1 = n1) nepravda: {
 			táto-úloha chyba: (
-				['Expected: <expected> but got: <observation>']
+				['Očakávané: <expected>, ale získané: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: rad n1
 			).
 		}.
-		(row n2 = n2) nepravda: {
+		(rad n2 = n2) nepravda: {
 			táto-úloha chyba: (
-				['Expected: <expected> but got: <observation>']
+				['Očakávané: <expected>, ale získané: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: rad n2
 			).
 		}.
-		(row n3 = n2 zaokrúhliť) nepravda: {
+		(rad n3 = n2 zaokrúhliť) nepravda: {
 			táto-úloha chyba: (
-				['Expected: <expected> but got: <observation>']
+				['Očakávané: <expected>, ale získané: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: rad n3
 			).
 		}.
-		(row big = big) nepravda: {
+		(rad big = big) nepravda: {
 			táto-úloha chyba: (
-				['Expected: <expected> but got: <observation>']
+				['Očakávané: <expected>, ale získané: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: rad big
 			).
 		}.
 		
 	}.
-	counter pridať: 1.
+	počítadlo pridať: 1.
 } * 100.
 
 
 Výstup písať: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: počítadlo
 ), nový-riadok.

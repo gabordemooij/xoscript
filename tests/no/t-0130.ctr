@@ -1,66 +1,66 @@
-# using FFI with the Server plugin
+# bruk av FFI med Server-tillegget
 
-# connect to libc (platform specific)
->> libname := Program innstilling: ['FFITESTLIB'].
+# koble til libc (plattformavhengig)
+>> biblnavn := Program innstilling: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# koble stdio-funksjoner fra C for avanserte filoperasjoner
 Server koble: ( Liste ny ;
- libname ; ['fopen'] ;
+ biblnavn ; ['fopen'] ;
  ( Liste ny ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 koble: ( Liste ny ;
- Ingenting ; # means same lib
+ Ingenting ; # betyr samme bibliotek
  ['fread'] ;
  ( Liste ny ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Ingenting ; # means same object (i.e. Stream)
+ Ingenting ; # betyr samme objekt (dvs. Stream)
  ['fread']
 ),
 koble: (
  Liste ny ;
- Ingenting ; # means same lib
+ Ingenting ; # betyr samme bibliotek
  ['fwrite'] ;
  ( Liste ny ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Ingenting ; # means same lib
+ Ingenting ; # betyr samme bibliotek
  ['fwrite']
 ),
 koble: (
  Liste ny ;
- Ingenting ; # means same lib
+ Ingenting ; # betyr samme bibliotek
  ['rewind'] ;
  ( Liste ny ; ['pointer'] ) ;
  ['int'] ;
- Ingenting ; # means same lib
+ Ingenting ; # betyr samme bibliotek
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> sti := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# åpne en fil med fopen(path, mode)
 >> fd := Stream path: sti mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream beskjed: ['fwrite'] argumenter: (Liste ny ; str ; 1 ; 6 ; fd ).
-Utdata skriv: bytes-written, stop.
+# skriv bytes fra bufferen tegnstreng til filen
+>> bytes-skrevet := Stream beskjed: ['fwrite'] argumenter: (Liste ny ; str ; 1 ; 6 ; fd ).
+Utdata skriv: bytes-skrevet, stop.
 
-# rewind file pointer
+# spol filpekeren tilbake
 Stream rewind: fd.
 
-# allocate a buffer
+# alloker en buffer
 >> buf := Blob ny: 20.
 
-# read from file
->> bytes-read := Stream beskjed: ['fread'] argumenter: (Liste ny ; buf ; 1 ; 6 ; fd ).
-Utdata skriv: bytes-read, stop.
+# les fra filen
+>> bytes-lest := Stream beskjed: ['fread'] argumenter: (Liste ny ; buf ; 1 ; 6 ; fd ).
+Utdata skriv: bytes-lest, stop.
 Utdata skriv: buf, stop.
 
-# free memory
+# frigjør minne
 str  frigjør.
 sti frigjør.
 mode frigjør.

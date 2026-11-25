@@ -1,76 +1,77 @@
 Server init.
 
-# JSON encoder only supports UTF-8, no surrogate pairs
+# JSON-koderen støtter bare UTF-8, ingen surrogatpar
 
->> dicts := Liste ny ;
-	# {"key":"normal"} normal ASCII
+>> ordbøker := Liste ny ;
+	# {"key":"normal"} vanlig ASCII
 	( Ordbok ny sett: ['normal'] ved: ['key'] ) ;
-	# {"key":"hello world"} space character
+	# {"key":"hello world"} mellomromstegn
 	( Ordbok ny sett: ['hello world'] ved: ['key'] ) ;
-	# {"key":"quote: \""} double quote
+	# {"key":"quote: \""} dobbelt anførselstegn
 	( Ordbok ny sett: ['"'] ved: ['key'] ) ;
-	# {"key":"backslash: \\"} backslash
+	# {"key":"backslash: \\"} omvendt skråstrek
 	( Ordbok ny sett: ['backslash: \\'] ved: ['key'] ) ;
-	# {"key":"slash: /"} slash
-	( Ordbok ny sett: ['slash: /'] ved: ['key'] ) ;
-	# {"key":"backspace: \b"} backspace
+	# {"key":"slash: /"} skråstrek
+	( Ordbok ny sett: ['skråstrek: /'] ved: ['key'] ) ;
+	# {"key":"backspace: \b"} tilbaketast
 	( Ordbok ny sett: ['backspace: \b'] ved: ['key'] ) ;
-	# {"key":"formfeed: \f"} form-feed escape
+	# {"key":"formfeed: \f"} sideskift-escape
 	( Ordbok ny sett: ['formfeed: \f'] ved: ['key'] ) ;
-	# {"key":"newline: \n"} newline
+	# {"key":"newline: \n"} linjeskift
 	( Ordbok ny sett: ['newline: \n'] ved: ['key'] ) ;
 	( Ordbok ny sett: ['newline: ↵'] ved: ['key'] ) ;
 	( Ordbok ny sett: ['newline: 
 	'] ved: ['key'] ) ;
-	# {"key":"carriage return: \r"} carriage-return
+	# {"key":"carriage return: \r"} vognretur
 	( Ordbok ny sett: ['carriage return: \r'] ved: ['key'] ) ;
-	# {"key":"tab: \t"} tab
+	# {"key":"tab: \t"} tabulator
 	( Ordbok ny sett: ['tab \t'] ved: ['key'] ) ;
 	( Ordbok ny sett: ['tab ⇿'] ved: ['key'] ) ;
-	( Ordbok ny sett: ['tab  '] ved: ['key'] ) ;
+	( Ordbok ny sett: ['tabulator  '] ved: ['key'] ) ;
 	# {"key":"control: \u0000"} NUL
 	( Ordbok ny sett: ['NUL \u0000'] ved: ['key'] ) ;
 	( Ordbok ny sett: ['NUL \0'] ved: ['key'] ) ;
-	# {"key":"control: \u0001"} control character 0x01
+	# {"key":"control: \u0001"} kontrolltegn 0x01
 	( Ordbok ny sett: ['control: \u0001'] ved: ['key'] ) ;
-	# {"key":"control: \u001F"} control character 0x1F
+	# {"key":"control: \u001F"} kontrolltegn 0x1F
 	( Ordbok ny sett: ['control: \u001F'] ved: ['key'] ) ;
-	# {"key":"unicode: é"} UTF-8, 2-byte char
+	# {"key":"unicode: é"} UTF-8, 2-byte-tegn
 	( Ordbok ny sett: ['unicode: é'] ved: ['key'] ) ;
-	# {"key":"unicode: €"} UTF-8, 3-byte char
+	# {"key":"unicode: €"} UTF-8, 3-byte-tegn
 	( Ordbok ny sett: ['unicode: €'] ved: ['key'] ) ;
-	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	# {"key":"unicode: 日本語"} flere 3-byte UTF-8-tegn
 	( Ordbok ny sett: ['unicode: 日本語'] ved: ['key'] ) ;
-	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	# {"key":"unicode: 😀"} UTF-8, 4-byte-tegn
 	( Ordbok ny sett: ['unicode: 😀'] ved: ['key'] ) ;
-	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	# {"key":"unicode: 🧑‍💻"} emoji + nullbredde-sammenføyer
 	( Ordbok ny sett: ['unicode: 🧑‍💻'] ved: ['key'] ) ;
-	# {"key":"combining: e\u0301"} combining accent
+	# {"key":"combining: é"} kombinerende aksent
 	( Ordbok ny sett: ['combining: e\u0301'] ved: ['key'] ) ;
-	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	# {"key":"escaped unicode: é"} Unicode-escape BMP
 	( Ordbok ny sett: ['escaped unicode: \u00e9'] ved: ['key'] ) ;
-	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	# {"key":"escaped unicode: €"} Unicode-escape BMP
 	( Ordbok ny sett: ['escaped unicode: \u20ac'] ved: ['key'] ) ;
-	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	# {"key":"escaped unicode: 😀"} UTF-16-surrogatpar
 	( Ordbok ny sett: ['escaped unicode: \ud83d\ude00'] ved: ['key'] ) ;
-	# {"key":""} empty value
+	# {"key":""} tom verdi
 	( Ordbok ny sett: [''] ved: ['key'] ) ;
-	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	# {"key":"@ < > & = % + ? #"} spesielle ASCII-tegn
 	( Ordbok ny sett: ['@ < > & = % + ? #'] ved: ['key'] ) ;
-	# {"key":"single quote: '"} single quote
+	# {"key":"single quote: '"} enkelt anførselstegn
 	( Ordbok ny sett: ['''] ved: ['key'] ) ;
-	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	# {"key":"multiple: \" \\ \n \r \t"} flere JSON-escapes
 	( Ordbok ny sett: ['multiple: \" \\ \n \r \t'] ved: ['key'] ) ;
-	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} lengre ASCII-tekst
 	( Ordbok ny sett: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] ved: ['key'] ) ;
-	# {"key":" value"} leading space
-	( Ordbok ny sett: [' value'] ved: ['key'] ) ;
-	# {"key":"value "} trailing space
-	( Ordbok ny sett: ['value '] ved: ['key'] ) ;
-	# {"key":" \t\n\r "} whitespace
-	( Ordbok ny sett: [' \t\n\r '] ved: ['key'] ).
+	# {"key":" value"} mellomrom foran
+	( Ordbok ny sett: [' verdi'] ved: ['key'] ) ;
+	# {"key":"value "} mellomrom bak
+	( Ordbok ny sett: ['verdi '] ved: ['key'] ) ;
+	# {"key":" \t\n\r "} blanktegn
+	( Ordbok ny sett: [' \t\n\r '] ved: ['key'] )
+	.
 
-dicts hver: { :_ :d
+ordbøker hver: { :_ :d
 	>> j := JSON jsonify: d.
 	>> a := JSON jsonify: (Ordbok ny sett: d key ved: ['key']).
 	>> b := JSON jsonify: (Ordbok ny sett: ['value'] ved: d key).
@@ -79,7 +80,7 @@ dicts hver: { :_ :d
 	((e key = d key og: (f ? d key = ['value'])) eller: (e key = ['NUL ?'])) sann: {
 		Utdata skriv: ['OK'], stop.
 	}, ellers: {
-		Utdata skriv: ['Unable to properly encode/decode: '] + d + j, stop.
+		Utdata skriv: ['Kan ikke kode/dekode riktig: '] + d + j, stop.
 		Program slutt.
 	}.
 }.

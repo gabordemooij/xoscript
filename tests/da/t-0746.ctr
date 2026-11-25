@@ -1,11 +1,12 @@
-Uddata skriv: ['Test object'], stop.
+Uddata skriv: ['Testobjekt'], stop.
 >> a := Objekt ny. 
 
-a ved: ['item:'] gør: { :dict
-	egen dict := dict. 
+a ved: ['item:'] gør: { :ordbogen
+	egen ordbogen := ordbogen. 
 }.
 
-a ved: ['item'] gør: { <- egen dict.
+a ved: ['vare'] gør: {
+	<- egen ordbogen.
 }.
 
 a item: (
@@ -13,16 +14,16 @@ Ordbog ny
 	hello: ['world'],
 	world: (Ordbog ny sæt: ['a'] ved: ['b'])).
 
-Uddata skriv: a item, stop.
+Uddata skriv: a vare, stop.
 
->> old-dict-address := a item prototype hukommelsesadresse.
+>> gammel-ordbog-adresse := a vare prototype hukommelsesadresse.
 a save-as: ['/tmp/a.bin'].
-Uddata skriv: ['========== RELOADING SNAP:'], stop.
+Uddata skriv: ['========== GENINDLÆSER SNAP:'], stop.
 
 >> b := Objekt load-from: ['/tmp/a.bin'].
 
-(b item prototype hukommelsesadresse = old-dict-address) sand: {
-	Uddata skriv: ['Object link re-attached.'], stop.
+(b vare prototype hukommelsesadresse = gammel-ordbog-adresse) sand: {
+	Uddata skriv: ['Objektlink genoprettet.'], stop.
 }.
 
-Uddata skriv: b item, stop.
+Uddata skriv: b vare, stop.

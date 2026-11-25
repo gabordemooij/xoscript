@@ -1,21 +1,21 @@
-# test type casts / conversions / bindings
+# prueba de conversiones de tipo / enlaces
 Programa orden: 4.
 Server init.
 
->> counter := 0.
->> db := Maria-DB crear host: ['localhost'],
+>> contador := 0.
+>> bd := Maria-DB crear host: ['localhost'],
 	usuario: ['xo'], contraseña: ['pass123'], nombre-base-datos: ['xobase'], conectar.
 
->> TwoDigitFormat := Formato crear: ['%02d'].
+>> FormatoDosDígitos := Formato crear: ['%02d'].
 
-# Datetime
+# Fecha y hora
 {
-	>> año := Número entre: 1995 y: 2050, texto.
-	>> mes := TwoDigitFormat aplicar-a-entero: (Número entre: 1 y: 12), texto.
-	>> día := TwoDigitFormat aplicar-a-entero: (Número entre: 1 y: 28), texto.
-	>> hora := TwoDigitFormat aplicar-a-entero: (Número entre: 1 y: 23), texto.
-	>> minuto := TwoDigitFormat aplicar-a-entero: (Número entre: 1 y: 59), texto.
-	>> segundo := TwoDigitFormat aplicar-a-entero: (Número entre: 1 y: 59), texto.
+	>> año     := Número entre: 1995 y: 2050, texto.
+	>> mes    := FormatoDosDígitos aplicar-a-entero: (Número entre: 1 y: 12), texto.
+	>> día      := FormatoDosDígitos aplicar-a-entero: (Número entre: 1 y: 28), texto.
+	>> hora     := FormatoDosDígitos aplicar-a-entero: (Número entre: 1 y: 23), texto.
+	>> minuto   := FormatoDosDígitos aplicar-a-entero: (Número entre: 1 y: 59), texto.
+	>> segundo   := FormatoDosDígitos aplicar-a-entero: (Número entre: 1 y: 59), texto.
 	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
 	datetime
 		YYYY: año,
@@ -25,89 +25,89 @@ Server init.
 		II: minuto,
 		SS: segundo.
 	>> consulta :=
-	db consultar: (['
+	bd consultar: (['
 		SELECT 
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
 	'] <datetime>: datetime),
-	extraer: { :row
-		(row mydatetime = datetime) falso: {
+	extraer: { :fila
+		(fila mydatetime = datetime) falso: {
 			la-tarea-actual error: (
-				['Expected: <expected> but got: <observation>']
+				['Se esperaba: <expected> pero se obtuvo: <observation>']
 				<expected>: datetime,
-				<observation>: row mydatetime
+				<observation>: fila mydatetime
 			).
 		}.
 	
 	}.
-	counter añadir: 1.
+	contador añadir: 1.
 } * 100.
 
-# Date
+# Fecha
 {
-	>> año := Número entre: 1995 y: 2050, texto.
-	>> mes := TwoDigitFormat aplicar-a-entero: (Número entre: 1 y: 12), texto.
-	>> día := TwoDigitFormat aplicar-a-entero: (Número entre: 1 y: 28), texto.
-	>> date := ['YYYY-MM-DD'].
+	>> año     := Número entre: 1995 y: 2050, texto.
+	>> mes    := FormatoDosDígitos aplicar-a-entero: (Número entre: 1 y: 12), texto.
+	>> día      := FormatoDosDígitos aplicar-a-entero: (Número entre: 1 y: 28), texto.
+	>> date     := ['YYYY-MM-DD'].
 	date
 		YYYY: año,
 		MM: mes,
 		DD: día.
 	>> consulta :=
-	db consultar: (['
+	bd consultar: (['
 		SELECT
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
 	'] <date>: date),
-	extraer: { :row
-		(row mydate = date) falso: {
+	extraer: { :fila
+		(fila mydate = date) falso: {
 			la-tarea-actual error: (
-				['Expected: <expected> but got: <observation>']
+				['Se esperaba: <expected> pero se obtuvo: <observation>']
 				<expected>: date,
-				<observation>: row mydate
+				<observation>: fila mydate
 			).
 		}.
 	}.
-	counter añadir: 1.
+	contador añadir: 1.
 } * 100.
 
 
-# Time
+# Hora
 {
-	>> hora := TwoDigitFormat aplicar-a-entero: (Número entre: 1 y: 23), texto.
-	>> minuto := TwoDigitFormat aplicar-a-entero: (Número entre: 1 y: 59), texto.
-	>> segundo := TwoDigitFormat aplicar-a-entero: (Número entre: 1 y: 59), texto.
+	>> hora     := FormatoDosDígitos aplicar-a-entero: (Número entre: 1 y: 23), texto.
+	>> minuto   := FormatoDosDígitos aplicar-a-entero: (Número entre: 1 y: 59), texto.
+	>> segundo   := FormatoDosDígitos aplicar-a-entero: (Número entre: 1 y: 59), texto.
 	>> tiempo := ['HH:II:SS'].
 	tiempo
 		HH: hora,
 		II: minuto,
 		SS: segundo.
 	>> consulta :=
-	db consultar: (['
+	bd consultar: (['
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: tiempo),
-	extraer: { :row
-		(row mytime = tiempo) falso: {
+	extraer: { :fila
+		(fila mytime = tiempo) falso: {
 			la-tarea-actual error: (
-				['Expected: <expected> but got: <observation>']
+				['Se esperaba: <expected> pero se obtuvo: <observation>']
 				<expected>: datetime,
-				<observation>: row mytime
+				<observation>: fila mytime
 			).
 		}.
 	}.
-	counter añadir: 1.
+	contador añadir: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Textos (varchar/text)
 >> str1 := Lista crear llenar: 100000 con: ['x'], unir: [''].
 {
 	>> str2 := Contenedor-seguro token: 40.
 	>> consulta :=
-	db consultar: (['
+	bd consultar: (['
 		SELECT
 		"<str1>" AS str1,
 		"<str2>" AS str2
@@ -115,30 +115,30 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	extraer: { :row
-		(row str1 = str1 y: row str2 = str2) falso: {
+	extraer: { :fila
+		(fila str1 = str1 y: fila str2 = str2) falso: {
 			la-tarea-actual error: (
-				['Expected: <expected> but got: <observation>']
+				['Se esperaba: <expected> pero se obtuvo: <observation>']
 				<expected>: datetime,
-				<observation>: row mytime
+				<observation>: fila mytime
 			).
 		}.
 	}.
-	counter añadir: 1.
+	contador añadir: 1.
 } * 100.
 
 
-# Numbers
+# Números
 {
-	>> n1 := Número entre: 1 y: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Número entre: 1 y: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 desde-texto: ['9223372036854775807'] ) -
 		( Int64 desde-texto: ['99999'] ) +
 		( Int64 desde-texto: n1 texto )
 	).
 	>> consulta :=
-	db consultar: (['
+	bd consultar: (['
 		SELECT
 		<n1> AS n1,
 		<n2> AS n2,
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	extraer: { :row
-		(row n1 = n1) falso: {
+	extraer: { :fila
+		(fila n1 = n1) falso: {
 			la-tarea-actual error: (
-				['Expected: <expected> but got: <observation>']
+				['Se esperaba: <expected> pero se obtuvo: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: fila n1
 			).
 		}.
-		(row n2 = n2) falso: {
+		(fila n2 = n2) falso: {
 			la-tarea-actual error: (
-				['Expected: <expected> but got: <observation>']
+				['Se esperaba: <expected> pero se obtuvo: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: fila n2
 			).
 		}.
-		(row n3 = n2 redondeado) falso: {
+		(fila n3 = n2 redondeado) falso: {
 			la-tarea-actual error: (
-				['Expected: <expected> but got: <observation>']
+				['Se esperaba: <expected> pero se obtuvo: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: fila n3
 			).
 		}.
-		(row big = big) falso: {
+		(fila big = big) falso: {
 			la-tarea-actual error: (
-				['Expected: <expected> but got: <observation>']
+				['Se esperaba: <expected> pero se obtuvo: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: fila big
 			).
 		}.
 		
 	}.
-	counter añadir: 1.
+	contador añadir: 1.
 } * 100.
 
 
 Salida escribir: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: contador
 ), detener.

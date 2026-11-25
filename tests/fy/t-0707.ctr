@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# test typekonversjes / omsettingen / bindingen
 Programma geheugenbehear: 4.
 Server init.
 
->> counter := 0.
+>> teller := 0.
 >> db := Maria-DB nĳ host: ['localhost'],
 	brûkersnamme: ['xo'], wachtwurd: ['pass123'], databanknamme: ['xobase'], ferbine.
 
->> TwoDigitFormat := Formaat nĳ: ['%02d'].
+>> TwaSifersFormaat := Formaat nĳ: ['%02d'].
 
-# Datetime
+# Datumtiid
 {
-	>> jier := Getal tusken: 1995 en: 2050, tekst.
-	>> moanne := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 12), tekst.
-	>> dei := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 28), tekst.
-	>> oere := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 23), tekst.
-	>> minút := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 59), tekst.
-	>> sekonde := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 59), tekst.
-	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
-	datetime
+	>> jier     := Getal tusken: 1995 en: 2050, tekst.
+	>> moanne    := TwaSifersFormaat tapasse-int: (Getal tusken: 1 en: 12), tekst.
+	>> dei      := TwaSifersFormaat tapasse-int: (Getal tusken: 1 en: 28), tekst.
+	>> oere     := TwaSifersFormaat tapasse-int: (Getal tusken: 1 en: 23), tekst.
+	>> minút   := TwaSifersFormaat tapasse-int: (Getal tusken: 1 en: 59), tekst.
+	>> sekonde   := TwaSifersFormaat tapasse-int: (Getal tusken: 1 en: 59), tekst.
+	>> datumtiid := ['YYYY-MM-DD HH:II:SS'].	
+	datumtiid
 		YYYY: jier,
 		MM: moanne,
 		DD: dei,
@@ -30,27 +30,27 @@ Server init.
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'] <datetime>: datetime),
-	ophelje: { :row
-		(row mydatetime = datetime) nee: {
+	'] <datetime>: datumtiid),
+	ophelje: { :tabelrige
+		(tabelrige mydatetime = datumtiid) nee: {
 			dizze-taak flater: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mydatetime
+				['Ferwachte: <expected> mar krigen: <observation>']
+				<expected>: datumtiid,
+				<observation>: tabelrige mydatetime
 			).
 		}.
 	
 	}.
-	counter optelle: 1.
+	teller optelle: 1.
 } * 100.
 
-# Date
+# Datum
 {
-	>> jier := Getal tusken: 1995 en: 2050, tekst.
-	>> moanne := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 12), tekst.
-	>> dei := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 28), tekst.
-	>> date := ['YYYY-MM-DD'].
-	date
+	>> jier     := Getal tusken: 1995 en: 2050, tekst.
+	>> moanne    := TwaSifersFormaat tapasse-int: (Getal tusken: 1 en: 12), tekst.
+	>> dei      := TwaSifersFormaat tapasse-int: (Getal tusken: 1 en: 28), tekst.
+	>> datum     := ['YYYY-MM-DD'].
+	datum
 		YYYY: jier,
 		MM: moanne,
 		DD: dei.
@@ -60,25 +60,25 @@ Server init.
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'] <date>: date),
-	ophelje: { :row
-		(row mydate = date) nee: {
+	'] <date>: datum),
+	ophelje: { :tabelrige
+		(tabelrige mydate = datum) nee: {
 			dizze-taak flater: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: date,
-				<observation>: row mydate
+				['Ferwachte: <expected> mar krigen: <observation>']
+				<expected>: datum,
+				<observation>: tabelrige mydate
 			).
 		}.
 	}.
-	counter optelle: 1.
+	teller optelle: 1.
 } * 100.
 
 
-# Time
+# Tiid
 {
-	>> oere := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 23), tekst.
-	>> minút := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 59), tekst.
-	>> sekonde := TwoDigitFormat tapasse-int: (Getal tusken: 1 en: 59), tekst.
+	>> oere     := TwaSifersFormaat tapasse-int: (Getal tusken: 1 en: 23), tekst.
+	>> minút   := TwaSifersFormaat tapasse-int: (Getal tusken: 1 en: 59), tekst.
+	>> sekonde   := TwaSifersFormaat tapasse-int: (Getal tusken: 1 en: 59), tekst.
 	>> tiid := ['HH:II:SS'].
 	tiid
 		HH: oere,
@@ -89,20 +89,20 @@ Server init.
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: tiid),
-	ophelje: { :row
-		(row mytime = tiid) nee: {
+	ophelje: { :tabelrige
+		(tabelrige mytime = tiid) nee: {
 			dizze-taak flater: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Ferwachte: <expected> mar krigen: <observation>']
+				<expected>: datumtiid,
+				<observation>: tabelrige mytime
 			).
 		}.
 	}.
-	counter optelle: 1.
+	teller optelle: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Teksten (varchar/text)
 >> str1 := Rige nĳ folje: 100000 mei: ['x'], gearfoegje: [''].
 {
 	>> str2 := Klûs token: 40.
@@ -115,23 +115,23 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	ophelje: { :row
-		(row str1 = str1 en: row str2 = str2) nee: {
+	ophelje: { :tabelrige
+		(tabelrige str1 = str1 en: tabelrige str2 = str2) nee: {
 			dizze-taak flater: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Ferwachte: <expected> mar krigen: <observation>']
+				<expected>: datumtiid,
+				<observation>: tabelrige mytime
 			).
 		}.
 	}.
-	counter optelle: 1.
+	teller optelle: 1.
 } * 100.
 
 
-# Numbers
+# Getallen
 {
-	>> n1 := Getal tusken: 1 en: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Getal tusken: 1 en: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 út-tekst: ['9223372036854775807'] ) -
 		( Int64 út-tekst: ['99999'] ) +
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	ophelje: { :row
-		(row n1 = n1) nee: {
+	ophelje: { :tabelrige
+		(tabelrige n1 = n1) nee: {
 			dizze-taak flater: (
-				['Expected: <expected> but got: <observation>']
+				['Ferwachte: <expected> mar krigen: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: tabelrige n1
 			).
 		}.
-		(row n2 = n2) nee: {
+		(tabelrige n2 = n2) nee: {
 			dizze-taak flater: (
-				['Expected: <expected> but got: <observation>']
+				['Ferwachte: <expected> mar krigen: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: tabelrige n2
 			).
 		}.
-		(row n3 = n2 ôfrûne) nee: {
+		(tabelrige n3 = n2 ôfrûne) nee: {
 			dizze-taak flater: (
-				['Expected: <expected> but got: <observation>']
+				['Ferwachte: <expected> mar krigen: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: tabelrige n3
 			).
 		}.
-		(row big = big) nee: {
+		(tabelrige big = big) nee: {
 			dizze-taak flater: (
-				['Expected: <expected> but got: <observation>']
+				['Ferwachte: <expected> mar krigen: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: tabelrige big
 			).
 		}.
 		
 	}.
-	counter optelle: 1.
+	teller optelle: 1.
 } * 100.
 
 
 Utfier skriuwe: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: teller
 ), nije-rigel.

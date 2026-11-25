@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# test rzutowania typów / konwersji / powiązań
 Program zarządzanie-pamięcią: 4.
 Server init.
 
->> counter := 0.
->> db := Maria-DB nowy host: ['localhost'],
+>> licznik := 0.
+>> bd := Maria-DB nowy host: ['localhost'],
 	użytkownik: ['xo'], hasło: ['pass123'], nazwa-bazy: ['xobase'], połącz.
 
->> TwoDigitFormat := Format nowy: ['%02d'].
+>> FormatDwucyfrowy := Format nowy: ['%02d'].
 
-# Datetime
+# Data i czas
 {
-	>> rok := Liczba między: 1995 a: 2050, tekst.
-	>> miesiąc := TwoDigitFormat zastosuj-całkowitą: (Liczba między: 1 a: 12), tekst.
-	>> dzień := TwoDigitFormat zastosuj-całkowitą: (Liczba między: 1 a: 28), tekst.
-	>> godzina := TwoDigitFormat zastosuj-całkowitą: (Liczba między: 1 a: 23), tekst.
-	>> minuta := TwoDigitFormat zastosuj-całkowitą: (Liczba między: 1 a: 59), tekst.
-	>> sekunda := TwoDigitFormat zastosuj-całkowitą: (Liczba między: 1 a: 59), tekst.
-	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
-	datetime
+	>> rok     := Liczba między: 1995 a: 2050, tekst.
+	>> miesiąc    := FormatDwucyfrowy zastosuj-całkowitą: (Liczba między: 1 a: 12), tekst.
+	>> dzień      := FormatDwucyfrowy zastosuj-całkowitą: (Liczba między: 1 a: 28), tekst.
+	>> godzina     := FormatDwucyfrowy zastosuj-całkowitą: (Liczba między: 1 a: 23), tekst.
+	>> minuta   := FormatDwucyfrowy zastosuj-całkowitą: (Liczba między: 1 a: 59), tekst.
+	>> sekunda   := FormatDwucyfrowy zastosuj-całkowitą: (Liczba między: 1 a: 59), tekst.
+	>> dataczas := ['YYYY-MM-DD HH:II:SS'].	
+	dataczas
 		YYYY: rok,
 		MM: miesiąc,
 		DD: dzień,
@@ -25,89 +25,89 @@ Server init.
 		II: minuta,
 		SS: sekunda.
 	>> parametry-wyszukiwania :=
-	db zapytanie: (['
+	bd zapytanie: (['
 		SELECT 
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'] <datetime>: datetime),
-	pobierz: { :row
-		(row mydatetime = datetime) fałsz: {
+	'] <datetime>: dataczas),
+	pobierz: { :rząd
+		(rząd mydatetime = dataczas) fałsz: {
 			to-zadanie błąd: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mydatetime
+				['Oczekiwano: <expected>, a otrzymano: <observation>']
+				<expected>: dataczas,
+				<observation>: rząd mydatetime
 			).
 		}.
 	
 	}.
-	counter dodaj: 1.
+	licznik dodaj: 1.
 } * 100.
 
-# Date
+# Data
 {
-	>> rok := Liczba między: 1995 a: 2050, tekst.
-	>> miesiąc := TwoDigitFormat zastosuj-całkowitą: (Liczba między: 1 a: 12), tekst.
-	>> dzień := TwoDigitFormat zastosuj-całkowitą: (Liczba między: 1 a: 28), tekst.
-	>> date := ['YYYY-MM-DD'].
-	date
+	>> rok     := Liczba między: 1995 a: 2050, tekst.
+	>> miesiąc    := FormatDwucyfrowy zastosuj-całkowitą: (Liczba między: 1 a: 12), tekst.
+	>> dzień      := FormatDwucyfrowy zastosuj-całkowitą: (Liczba między: 1 a: 28), tekst.
+	>> data     := ['YYYY-MM-DD'].
+	data
 		YYYY: rok,
 		MM: miesiąc,
 		DD: dzień.
 	>> parametry-wyszukiwania :=
-	db zapytanie: (['
+	bd zapytanie: (['
 		SELECT
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'] <date>: date),
-	pobierz: { :row
-		(row mydate = date) fałsz: {
+	'] <date>: data),
+	pobierz: { :rząd
+		(rząd mydate = data) fałsz: {
 			to-zadanie błąd: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: date,
-				<observation>: row mydate
+				['Oczekiwano: <expected>, a otrzymano: <observation>']
+				<expected>: data,
+				<observation>: rząd mydate
 			).
 		}.
 	}.
-	counter dodaj: 1.
+	licznik dodaj: 1.
 } * 100.
 
 
-# Time
+# Czas
 {
-	>> godzina := TwoDigitFormat zastosuj-całkowitą: (Liczba między: 1 a: 23), tekst.
-	>> minuta := TwoDigitFormat zastosuj-całkowitą: (Liczba między: 1 a: 59), tekst.
-	>> sekunda := TwoDigitFormat zastosuj-całkowitą: (Liczba między: 1 a: 59), tekst.
+	>> godzina     := FormatDwucyfrowy zastosuj-całkowitą: (Liczba między: 1 a: 23), tekst.
+	>> minuta   := FormatDwucyfrowy zastosuj-całkowitą: (Liczba między: 1 a: 59), tekst.
+	>> sekunda   := FormatDwucyfrowy zastosuj-całkowitą: (Liczba między: 1 a: 59), tekst.
 	>> czas := ['HH:II:SS'].
 	czas
 		HH: godzina,
 		II: minuta,
 		SS: sekunda.
 	>> parametry-wyszukiwania :=
-	db zapytanie: (['
+	bd zapytanie: (['
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: czas),
-	pobierz: { :row
-		(row mytime = czas) fałsz: {
+	pobierz: { :rząd
+		(rząd mytime = czas) fałsz: {
 			to-zadanie błąd: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Oczekiwano: <expected>, a otrzymano: <observation>']
+				<expected>: dataczas,
+				<observation>: rząd mytime
 			).
 		}.
 	}.
-	counter dodaj: 1.
+	licznik dodaj: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Teksty (varchar/text)
 >> str1 := Lista nowy wypełnij: 100000 wartością: ['x'], połącz: [''].
 {
 	>> str2 := Sejf token: 40.
 	>> parametry-wyszukiwania :=
-	db zapytanie: (['
+	bd zapytanie: (['
 		SELECT
 		"<str1>" AS str1,
 		"<str2>" AS str2
@@ -115,30 +115,30 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	pobierz: { :row
-		(row str1 = str1 i: row str2 = str2) fałsz: {
+	pobierz: { :rząd
+		(rząd str1 = str1 i: rząd str2 = str2) fałsz: {
 			to-zadanie błąd: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Oczekiwano: <expected>, a otrzymano: <observation>']
+				<expected>: dataczas,
+				<observation>: rząd mytime
 			).
 		}.
 	}.
-	counter dodaj: 1.
+	licznik dodaj: 1.
 } * 100.
 
 
-# Numbers
+# Liczby
 {
-	>> n1 := Liczba między: 1 a: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Liczba między: 1 a: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 z-tekstu: ['9223372036854775807'] ) -
 		( Int64 z-tekstu: ['99999'] ) +
 		( Int64 z-tekstu: n1 tekst )
 	).
 	>> parametry-wyszukiwania :=
-	db zapytanie: (['
+	bd zapytanie: (['
 		SELECT
 		<n1> AS n1,
 		<n2> AS n2,
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	pobierz: { :row
-		(row n1 = n1) fałsz: {
+	pobierz: { :rząd
+		(rząd n1 = n1) fałsz: {
 			to-zadanie błąd: (
-				['Expected: <expected> but got: <observation>']
+				['Oczekiwano: <expected>, a otrzymano: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: rząd n1
 			).
 		}.
-		(row n2 = n2) fałsz: {
+		(rząd n2 = n2) fałsz: {
 			to-zadanie błąd: (
-				['Expected: <expected> but got: <observation>']
+				['Oczekiwano: <expected>, a otrzymano: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: rząd n2
 			).
 		}.
-		(row n3 = n2 zaokrąglij) fałsz: {
+		(rząd n3 = n2 zaokrąglij) fałsz: {
 			to-zadanie błąd: (
-				['Expected: <expected> but got: <observation>']
+				['Oczekiwano: <expected>, a otrzymano: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: rząd n3
 			).
 		}.
-		(row big = big) fałsz: {
+		(rząd big = big) fałsz: {
 			to-zadanie błąd: (
-				['Expected: <expected> but got: <observation>']
+				['Oczekiwano: <expected>, a otrzymano: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: rząd big
 			).
 		}.
 		
 	}.
-	counter dodaj: 1.
+	licznik dodaj: 1.
 } * 100.
 
 
 Wyjście pisz: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: licznik
 ), nowa-linia.

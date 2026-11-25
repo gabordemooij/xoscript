@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> yritä := { :format :value
-	{ Tuloste kirjoita: ( (Muoto uusi: format) sovella: value ), rivinvaihto. } sieppaa: { :e Tuloste kirjoita: e, rivinvaihto. }, käynnistä.
+# muotoilun täytyy sopia arvon tyyppiin, tyyppi voi tulla asiakkaalta
+>> yritä := { :muotoilu :value
+	{ Tuloste kirjoita: ( (Muoto uusi: muotoilu) sovella: value ), rivinvaihto. } sieppaa: { :e Tuloste kirjoita: e, rivinvaihto. }, käynnistä.
 }.
->> try-int := { :format :value
-	{ Tuloste kirjoita: ( (Muoto uusi: format) sovella-kokonaisluku: value ), rivinvaihto. } sieppaa: { :e Tuloste kirjoita: e, rivinvaihto. }, käynnistä.
+>> kokeile-kokonaisluku := { :muotoilu :value
+	{ Tuloste kirjoita: ( (Muoto uusi: muotoilu) sovella-kokonaisluku: value ), rivinvaihto. } sieppaa: { :e Tuloste kirjoita: e, rivinvaihto. }, käynnistä.
 }.
 
-# fits
+# sopii
 yritä sovella: ['|%s|'] ja: ['text'].
 yritä sovella: ['%06.2f'] ja: 5.5.
-yritä sovella: ['100%% %s'] ja: ['sure'].
-try-int sovella: ['%03d'] ja: 7.
-try-int sovella: ['%x'] ja: 255.
+yritä sovella: ['100%% %s'] ja: ['toki'].
+kokeile-kokonaisluku sovella: ['%03d'] ja: 7.
+kokeile-kokonaisluku sovella: ['%x'] ja: 255.
 yritä sovella: ['%d'] ja: (Int64 uusi tekstistä: ['12']).
 yritä sovella: ['%lld'] ja: (Int64 uusi tekstistä: ['12']).
 yritä sovella: ['%.1lf'] ja: 5.5.
-try-int sovella: ['%hd'] ja: 7.
+kokeile-kokonaisluku sovella: ['%hd'] ja: 7.
 
-# does not fit
+# ei sovi
 yritä sovella: ['%s'] ja: 12345.
 yritä sovella: ['%d'] ja: 12345.
 yritä sovella: ['%f'] ja: ['text'].
-try-int sovella: ['%d'] ja: ['text'].
-try-int sovella: ['%s'] ja: 5.
+kokeile-kokonaisluku sovella: ['%d'] ja: ['text'].
+kokeile-kokonaisluku sovella: ['%s'] ja: 5.
 yritä sovella: ['%s %s'] ja: ['text'].
 yritä sovella: ['%n'] ja: ['text'].
 yritä sovella: ['%*s'] ja: ['text'].
 yritä sovella: ['%'] ja: ['text'].
 
-# length modifier does not fit
+# pituusmääre ei sovi
 yritä sovella: ['%ls'] ja: ['text'].
 yritä sovella: ['%Lf'] ja: 5.5.
-try-int sovella: ['%ld'] ja: 7.
-try-int sovella: ['%lld'] ja: 7.
+kokeile-kokonaisluku sovella: ['%ld'] ja: 7.
+kokeile-kokonaisluku sovella: ['%lld'] ja: 7.
 yritä sovella: ['%Ld'] ja: (Int64 uusi tekstistä: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# leveyden, joka ei sovi printf:lle, täytyy antaa virhe eikä kaatua
 yritä sovella: ['%99999999999s'] ja: ['text'].

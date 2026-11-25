@@ -1,18 +1,18 @@
-#ffi test
+#test ffi
 
 
 Server init.
 
 Program upravljanje-pomnilnika: 4.
 
-# for this test you need set a path to libc (puts)
->> libname := Program nastavitev: ['FFITESTLIB'].
+# za ta test moraš nastaviti pot do libc (puts)
+>> imeKnjižnice := Program nastavitev: ['FFITESTLIB'].
 
 
 
 Server poveži: (
  Seznam nov ;
- libname ;
+ imeKnjižnice ;
  ['puts'] ;
  ( Seznam nov ; ['pointer'] ) ;
  ['void'] ;
@@ -25,7 +25,7 @@ Server poveži: (
 Puts str: s.
 s sprosti.
 
-# test with struct
+# test s strukturo
 
 >> a := Blob nov: 8.
 a bytes: (
@@ -34,19 +34,19 @@ a bytes: (
     1  ; 0 ; 0 ; 0
 ).
 
->> struct := Blob struct: (Seznam <<: ['int'], ; ['int']).
+>> struktura := Blob struct: (Seznam <<: ['int'], ; ['int']).
 
 Server poveži: (
 	Seznam <<: ['@structtest'], ;
 	['@structtest'] ;
-	(Seznam <<: struct) ; 
+	(Seznam <<: struktura) ; 
 	['int'] ;	
 	['ffitest'] ;
 	['ffisum:']
 ).
 	
-Izhod piši: ['Sum test:'] + (ffitest ffisum: a), nova-vrstica.
+Izhod piši: ['Test vsote:'] + (ffitest ffisum: a), nova-vrstica.
 
-struct sprosti-struct.
-struct sprosti.
+struktura sprosti-struct.
+struktura sprosti.
 a sprosti.

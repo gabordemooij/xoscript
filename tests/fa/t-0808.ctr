@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# کلیدها و امضاهای گاوصندوق که پس از کدگشایی بیش از حد بلندند نباید پشته را سرریز کنند
 Server init.
 
->> keys := گاوصندوق تولید-کلید.
->> sk := keys نخست.
->> pk := keys آخری.
->> sig := گاوصندوق امضا: ⌝'abc'⌜ با: sk.
+>> جفت-کلید := گاوصندوق تولید-کلید.
+>> sk := جفت-کلید نخست.
+>> pk := جفت-کلید آخری.
+>> امضا := گاوصندوق امضا: ⌝'abc'⌜ با: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+# 88 نویسه بدون padding به 66 بایت کدگشایی می‌شوند
+>> بلند := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
 
-# 44 characters without padding decode to 33 bytes
->> short := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+# 44 نویسه بدون padding به 33 بایت کدگشایی می‌شوند
+>> کوتاه := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
 
-⎬ گاوصندوق امضا: ⌝'abc'⌜ با: long. ⎨ بگیر: ⎬ :e
+⎬ گاوصندوق امضا: ⌝'abc'⌜ با: بلند. ⎨ بگیر: ⎬ :e
 	خروجی بنویس: e, سطر-نو.
 ⎨, اجرا.
 
-⎬ گاوصندوق بررسی: ⌝'abc'⌜ امضا: long با: pk. ⎨ بگیر: ⎬ :e
+⎬ گاوصندوق بررسی: ⌝'abc'⌜ امضا: بلند با: pk. ⎨ بگیر: ⎬ :e
 	خروجی بنویس: e, سطر-نو.
 ⎨, اجرا.
 
-⎬ گاوصندوق بررسی: ⌝'abc'⌜ امضا: sig با: short. ⎨ بگیر: ⎬ :e
+⎬ گاوصندوق بررسی: ⌝'abc'⌜ امضا: امضا با: کوتاه. ⎨ بگیر: ⎬ :e
 	خروجی بنویس: e, سطر-نو.
 ⎨, اجرا.

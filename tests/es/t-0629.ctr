@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# prueba de base de datos
+# ver el ejemplo server.xo para la configuración necesaria
 
 Server init.
-Salida escribir: ['Database test'], detener.
+Salida escribir: ['Prueba de base de datos'], detener.
 
->> db := Maria-DB crear host: ['localhost'],
+>> bd := Maria-DB crear host: ['localhost'],
 	usuario: ['xo'], contraseña: ['pass123'], nombre-base-datos: ['xobase'], conectar.
 
-Salida escribir: ['Can we connect? '] + db ¿conectado?, detener.
+Salida escribir: ['¿Podemos conectar? '] + bd ¿conectado?, detener.
 
->> consulta := db consultar: ['
+>> consulta := bd consultar: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parámetros: ( Lista crear ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parámetros: ( Lista crear ; ['abc'] ; 12.35 ; 6 ). # consultas parametrizadas
 
-{  consulta ejecutar. db confirmar. } capturar: { :e db revertir.  }, empezar.
+{  consulta ejecutar. bd confirmar. } capturar: { :e bd revertir.  }, empezar.
 
-Salida escribir: ['Can we insert? '] + ( consulta id-insertado > 0 ), detener.
+Salida escribir: ['¿Podemos insertar? '] + ( consulta id-insertado > 0 ), detener.
 
 >> Obj := Objeto crear.
-Obj al: ['retrieve-rows'] hacer: {
+Obj al: ['recuperar-filas'] hacer: {
 	mi contar := 0.
 	>> consulta :=
-	db consultar: ['SELECT * FROM book order by id desc limit 2'], 
-	extraer: { :row 
+	bd consultar: ['SELECT * FROM book order by id desc limit 2'], 
+	extraer: { :fila 
 		mi contar añadir: 1.
 		Verdadero salir.
-	}. <- mi contar copiar.
+	}. # obtención de filas
+	<- mi contar copiar.
 }.
 
-Salida escribir: ['Can we query? '] + ( Obj retrieve-rows > 0 ), detener.
+Salida escribir: ['¿Podemos consultar? '] + ( Obj recuperar-filas > 0 ), detener.

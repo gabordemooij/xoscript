@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# type casts / रूपांतरण / bindings का परीक्षण
 प्रोग्राम मेमोरी-प्रबंधन: 4.
 Server init.
 
->> counter := 0.
->> db := Maria-DB नया होस्ट: ['localhost'],
+>> गणक := 0.
+>> डीबी := Maria-DB नया होस्ट: ['localhost'],
 	उपयोगकर्ता-नाम: ['xo'], पासवर्ड: ['pass123'], डेटाबेस-नाम: ['xobase'], जुड़ो.
 
->> TwoDigitFormat := प्रारूप नया: ['%02d'].
+>> दो-अंक-प्रारूप := प्रारूप नया: ['%02d'].
 
-# Datetime
+# दिनांक-समय
 {
-	>> वर्ष := संख्या बीच: 1995 और: 2050, पाठ-में.
-	>> महीना := TwoDigitFormat लागू-पूर्णांक: (संख्या बीच: 1 और: 12), पाठ-में.
-	>> दिन := TwoDigitFormat लागू-पूर्णांक: (संख्या बीच: 1 और: 28), पाठ-में.
-	>> घंटा := TwoDigitFormat लागू-पूर्णांक: (संख्या बीच: 1 और: 23), पाठ-में.
-	>> मिनट := TwoDigitFormat लागू-पूर्णांक: (संख्या बीच: 1 और: 59), पाठ-में.
-	>> सेकंड := TwoDigitFormat लागू-पूर्णांक: (संख्या बीच: 1 और: 59), पाठ-में.
-	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
-	datetime
+	>> वर्ष     := संख्या बीच: 1995 और: 2050, पाठ-में.
+	>> महीना    := दो-अंक-प्रारूप लागू-पूर्णांक: (संख्या बीच: 1 और: 12), पाठ-में.
+	>> दिन      := दो-अंक-प्रारूप लागू-पूर्णांक: (संख्या बीच: 1 और: 28), पाठ-में.
+	>> घंटा     := दो-अंक-प्रारूप लागू-पूर्णांक: (संख्या बीच: 1 और: 23), पाठ-में.
+	>> मिनट   := दो-अंक-प्रारूप लागू-पूर्णांक: (संख्या बीच: 1 और: 59), पाठ-में.
+	>> सेकंड   := दो-अंक-प्रारूप लागू-पूर्णांक: (संख्या बीच: 1 और: 59), पाठ-में.
+	>> दिनांक-समय := ['YYYY-MM-DD HH:II:SS'].	
+	दिनांक-समय
 		YYYY: वर्ष,
 		MM: महीना,
 		DD: दिन,
@@ -25,89 +25,89 @@ Server init.
 		II: मिनट,
 		SS: सेकंड.
 	>> खोज-पैरामीटर :=
-	db क्वेरी: (['
+	डीबी क्वेरी: (['
 		SELECT 
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'] <datetime>: datetime),
-	लाओ: { :row
-		(row mydatetime = datetime) असत्य-हो-तो: {
+	'] <datetime>: दिनांक-समय),
+	लाओ: { :कतार
+		(कतार mydatetime = दिनांक-समय) असत्य-हो-तो: {
 			यह-कार्य त्रुटि: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mydatetime
+				['अपेक्षित: <expected> पर मिला: <observation>']
+				<expected>: दिनांक-समय,
+				<observation>: कतार mydatetime
 			).
 		}.
 	
 	}.
-	counter जमा: 1.
+	गणक जमा: 1.
 } * 100.
 
-# Date
+# दिनांक
 {
-	>> वर्ष := संख्या बीच: 1995 और: 2050, पाठ-में.
-	>> महीना := TwoDigitFormat लागू-पूर्णांक: (संख्या बीच: 1 और: 12), पाठ-में.
-	>> दिन := TwoDigitFormat लागू-पूर्णांक: (संख्या बीच: 1 और: 28), पाठ-में.
-	>> date := ['YYYY-MM-DD'].
-	date
+	>> वर्ष     := संख्या बीच: 1995 और: 2050, पाठ-में.
+	>> महीना    := दो-अंक-प्रारूप लागू-पूर्णांक: (संख्या बीच: 1 और: 12), पाठ-में.
+	>> दिन      := दो-अंक-प्रारूप लागू-पूर्णांक: (संख्या बीच: 1 और: 28), पाठ-में.
+	>> दिनांक     := ['YYYY-MM-DD'].
+	दिनांक
 		YYYY: वर्ष,
 		MM: महीना,
 		DD: दिन.
 	>> खोज-पैरामीटर :=
-	db क्वेरी: (['
+	डीबी क्वेरी: (['
 		SELECT
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'] <date>: date),
-	लाओ: { :row
-		(row mydate = date) असत्य-हो-तो: {
+	'] <date>: दिनांक),
+	लाओ: { :कतार
+		(कतार mydate = दिनांक) असत्य-हो-तो: {
 			यह-कार्य त्रुटि: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: date,
-				<observation>: row mydate
+				['अपेक्षित: <expected> पर मिला: <observation>']
+				<expected>: दिनांक,
+				<observation>: कतार mydate
 			).
 		}.
 	}.
-	counter जमा: 1.
+	गणक जमा: 1.
 } * 100.
 
 
-# Time
+# समय
 {
-	>> घंटा := TwoDigitFormat लागू-पूर्णांक: (संख्या बीच: 1 और: 23), पाठ-में.
-	>> मिनट := TwoDigitFormat लागू-पूर्णांक: (संख्या बीच: 1 और: 59), पाठ-में.
-	>> सेकंड := TwoDigitFormat लागू-पूर्णांक: (संख्या बीच: 1 और: 59), पाठ-में.
+	>> घंटा     := दो-अंक-प्रारूप लागू-पूर्णांक: (संख्या बीच: 1 और: 23), पाठ-में.
+	>> मिनट   := दो-अंक-प्रारूप लागू-पूर्णांक: (संख्या बीच: 1 और: 59), पाठ-में.
+	>> सेकंड   := दो-अंक-प्रारूप लागू-पूर्णांक: (संख्या बीच: 1 और: 59), पाठ-में.
 	>> समय := ['HH:II:SS'].
 	समय
 		HH: घंटा,
 		II: मिनट,
 		SS: सेकंड.
 	>> खोज-पैरामीटर :=
-	db क्वेरी: (['
+	डीबी क्वेरी: (['
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: समय),
-	लाओ: { :row
-		(row mytime = समय) असत्य-हो-तो: {
+	लाओ: { :कतार
+		(कतार mytime = समय) असत्य-हो-तो: {
 			यह-कार्य त्रुटि: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['अपेक्षित: <expected> पर मिला: <observation>']
+				<expected>: दिनांक-समय,
+				<observation>: कतार mytime
 			).
 		}.
 	}.
-	counter जमा: 1.
+	गणक जमा: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# पाठ (varchar/text)
 >> str1 := सूची नया भरो: 100000 मान-से: ['x'], जोड़ो: [''].
 {
 	>> str2 := तिजोरी टोकन: 40.
 	>> खोज-पैरामीटर :=
-	db क्वेरी: (['
+	डीबी क्वेरी: (['
 		SELECT
 		"<str1>" AS str1,
 		"<str2>" AS str2
@@ -115,30 +115,30 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	लाओ: { :row
-		(row str1 = str1 और: row str2 = str2) असत्य-हो-तो: {
+	लाओ: { :कतार
+		(कतार str1 = str1 और: कतार str2 = str2) असत्य-हो-तो: {
 			यह-कार्य त्रुटि: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['अपेक्षित: <expected> पर मिला: <observation>']
+				<expected>: दिनांक-समय,
+				<observation>: कतार mytime
 			).
 		}.
 	}.
-	counter जमा: 1.
+	गणक जमा: 1.
 } * 100.
 
 
-# Numbers
+# संख्याएँ
 {
-	>> n1 := संख्या बीच: 1 और: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := संख्या बीच: 1 और: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 पाठ-से: ['9223372036854775807'] ) -
 		( Int64 पाठ-से: ['99999'] ) +
 		( Int64 पाठ-से: n1 पाठ-में )
 	).
 	>> खोज-पैरामीटर :=
-	db क्वेरी: (['
+	डीबी क्वेरी: (['
 		SELECT
 		<n1> AS n1,
 		<n2> AS n2,
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	लाओ: { :row
-		(row n1 = n1) असत्य-हो-तो: {
+	लाओ: { :कतार
+		(कतार n1 = n1) असत्य-हो-तो: {
 			यह-कार्य त्रुटि: (
-				['Expected: <expected> but got: <observation>']
+				['अपेक्षित: <expected> पर मिला: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: कतार n1
 			).
 		}.
-		(row n2 = n2) असत्य-हो-तो: {
+		(कतार n2 = n2) असत्य-हो-तो: {
 			यह-कार्य त्रुटि: (
-				['Expected: <expected> but got: <observation>']
+				['अपेक्षित: <expected> पर मिला: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: कतार n2
 			).
 		}.
-		(row n3 = n2 पूर्णांकन) असत्य-हो-तो: {
+		(कतार n3 = n2 पूर्णांकन) असत्य-हो-तो: {
 			यह-कार्य त्रुटि: (
-				['Expected: <expected> but got: <observation>']
+				['अपेक्षित: <expected> पर मिला: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: कतार n3
 			).
 		}.
-		(row big = big) असत्य-हो-तो: {
+		(कतार big = big) असत्य-हो-तो: {
 			यह-कार्य त्रुटि: (
-				['Expected: <expected> but got: <observation>']
+				['अपेक्षित: <expected> पर मिला: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: कतार big
 			).
 		}.
 		
 	}.
-	counter जमा: 1.
+	गणक जमा: 1.
 } * 100.
 
 
 निर्गम लिखो: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: गणक
 ), नई-पंक्ति.

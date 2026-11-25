@@ -1,18 +1,18 @@
-#ffi test
+#ffi テスト
 
 
 Server init.
 
 プログラム メモリ管理: 4.
 
-# for this test you need set a path to libc (puts)
->> libname := プログラム 設定値: ['FFITESTLIB'].
+# このテストには libc (puts) へのパスの設定が必要
+>> ライブラリ名 := プログラム 設定値: ['FFITESTLIB'].
 
 
 
 Server リンク: (
  リスト 新規 ;
- libname ;
+ ライブラリ名 ;
  ['puts'] ;
  ( リスト 新規 ; ['pointer'] ) ;
  ['void'] ;
@@ -25,7 +25,7 @@ Server リンク: (
 Puts str: s.
 s 解放.
 
-# test with struct
+# 構造体を使うテスト
 
 >> a := Blob 新規: 8.
 a bytes: (
@@ -34,19 +34,19 @@ a bytes: (
     1  ; 0 ; 0 ; 0
 ).
 
->> struct := Blob struct: (リスト <<: ['int'], ; ['int']).
+>> 構造体 := Blob struct: (リスト <<: ['int'], ; ['int']).
 
 Server リンク: (
 	リスト <<: ['@structtest'], ;
 	['@structtest'] ;
-	(リスト <<: struct) ; 
+	(リスト <<: 構造体) ; 
 	['int'] ;	
 	['ffitest'] ;
 	['ffisum:']
 ).
 	
-出力 書く: ['Sum test:'] + (ffitest ffisum: a), 改行.
+出力 書く: ['合計テスト:'] + (ffitest ffisum: a), 改行.
 
-struct struct-解放.
-struct 解放.
+構造体 struct-解放.
+構造体 解放.
 a 解放.

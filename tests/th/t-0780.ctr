@@ -1,76 +1,77 @@
 Server init.
 
-# JSON encoder only supports UTF-8, no surrogate pairs
+# ตัวเข้ารหัส JSON รองรับเฉพาะ UTF-8 ไม่รองรับ surrogate pair
 
->> dicts := ลิสต์ สร้างใหม่ ;
-	# {"key":"normal"} normal ASCII
+>> พจนานุกรมต่างๆ := ลิสต์ สร้างใหม่ ;
+	# {"key":"normal"} ASCII ปกติ
 	( พจนานุกรม สร้างใหม่ ใส่: ['normal'] ที่: ['key'] ) ;
-	# {"key":"hello world"} space character
+	# {"key":"hello world"} อักขระช่องว่าง
 	( พจนานุกรม สร้างใหม่ ใส่: ['hello world'] ที่: ['key'] ) ;
-	# {"key":"quote: \""} double quote
+	# {"key":"quote: \""} อัญประกาศคู่
 	( พจนานุกรม สร้างใหม่ ใส่: ['"'] ที่: ['key'] ) ;
-	# {"key":"backslash: \\"} backslash
+	# {"key":"backslash: \\"} แบ็กสแลช
 	( พจนานุกรม สร้างใหม่ ใส่: ['backslash: \\'] ที่: ['key'] ) ;
-	# {"key":"slash: /"} slash
+	# {"key":"slash: /"} สแลช
 	( พจนานุกรม สร้างใหม่ ใส่: ['slash: /'] ที่: ['key'] ) ;
-	# {"key":"backspace: \b"} backspace
+	# {"key":"backspace: \b"} แบ็กสเปซ
 	( พจนานุกรม สร้างใหม่ ใส่: ['backspace: \b'] ที่: ['key'] ) ;
-	# {"key":"formfeed: \f"} form-feed escape
+	# {"key":"formfeed: \f"} escape ขึ้นหน้าใหม่ (form-feed)
 	( พจนานุกรม สร้างใหม่ ใส่: ['formfeed: \f'] ที่: ['key'] ) ;
-	# {"key":"newline: \n"} newline
+	# {"key":"newline: \n"} ขึ้นบรรทัดใหม่
 	( พจนานุกรม สร้างใหม่ ใส่: ['newline: \n'] ที่: ['key'] ) ;
 	( พจนานุกรม สร้างใหม่ ใส่: ['newline: ↵'] ที่: ['key'] ) ;
 	( พจนานุกรม สร้างใหม่ ใส่: ['newline: 
 	'] ที่: ['key'] ) ;
-	# {"key":"carriage return: \r"} carriage-return
+	# {"key":"carriage return: \r"} ปัดแคร่ (carriage-return)
 	( พจนานุกรม สร้างใหม่ ใส่: ['carriage return: \r'] ที่: ['key'] ) ;
-	# {"key":"tab: \t"} tab
+	# {"key":"tab: \t"} แท็บ
 	( พจนานุกรม สร้างใหม่ ใส่: ['tab \t'] ที่: ['key'] ) ;
 	( พจนานุกรม สร้างใหม่ ใส่: ['tab ⇿'] ที่: ['key'] ) ;
 	( พจนานุกรม สร้างใหม่ ใส่: ['tab  '] ที่: ['key'] ) ;
 	# {"key":"control: \u0000"} NUL
 	( พจนานุกรม สร้างใหม่ ใส่: ['NUL \u0000'] ที่: ['key'] ) ;
 	( พจนานุกรม สร้างใหม่ ใส่: ['NUL \0'] ที่: ['key'] ) ;
-	# {"key":"control: \u0001"} control character 0x01
+	# {"key":"control: \u0001"} อักขระควบคุม 0x01
 	( พจนานุกรม สร้างใหม่ ใส่: ['control: \u0001'] ที่: ['key'] ) ;
-	# {"key":"control: \u001F"} control character 0x1F
+	# {"key":"control: \u001F"} อักขระควบคุม 0x1F
 	( พจนานุกรม สร้างใหม่ ใส่: ['control: \u001F'] ที่: ['key'] ) ;
-	# {"key":"unicode: é"} UTF-8, 2-byte char
+	# {"key":"unicode: é"} UTF-8 อักขระ 2 ไบต์
 	( พจนานุกรม สร้างใหม่ ใส่: ['unicode: é'] ที่: ['key'] ) ;
-	# {"key":"unicode: €"} UTF-8, 3-byte char
+	# {"key":"unicode: €"} UTF-8 อักขระ 3 ไบต์
 	( พจนานุกรม สร้างใหม่ ใส่: ['unicode: €'] ที่: ['key'] ) ;
-	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	# {"key":"unicode: 日本語"} อักขระ UTF-8 3 ไบต์หลายตัว
 	( พจนานุกรม สร้างใหม่ ใส่: ['unicode: 日本語'] ที่: ['key'] ) ;
-	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	# {"key":"unicode: 😀"} UTF-8 อักขระ 4 ไบต์
 	( พจนานุกรม สร้างใหม่ ใส่: ['unicode: 😀'] ที่: ['key'] ) ;
-	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	# {"key":"unicode: 🧑‍💻"} อีโมจิ + zero-width joiner
 	( พจนานุกรม สร้างใหม่ ใส่: ['unicode: 🧑‍💻'] ที่: ['key'] ) ;
-	# {"key":"combining: e\u0301"} combining accent
+	# {"key":"combining: é"} เครื่องหมายเสริมแบบรวม
 	( พจนานุกรม สร้างใหม่ ใส่: ['combining: e\u0301'] ที่: ['key'] ) ;
-	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	# {"key":"escaped unicode: é"} Unicode escape BMP
 	( พจนานุกรม สร้างใหม่ ใส่: ['escaped unicode: \u00e9'] ที่: ['key'] ) ;
-	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	# {"key":"escaped unicode: €"} Unicode escape BMP
 	( พจนานุกรม สร้างใหม่ ใส่: ['escaped unicode: \u20ac'] ที่: ['key'] ) ;
-	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	# {"key":"escaped unicode: 😀"} UTF-16 surrogate pair
 	( พจนานุกรม สร้างใหม่ ใส่: ['escaped unicode: \ud83d\ude00'] ที่: ['key'] ) ;
-	# {"key":""} empty value
+	# {"key":""} ค่าว่าง
 	( พจนานุกรม สร้างใหม่ ใส่: [''] ที่: ['key'] ) ;
-	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	# {"key":"@ < > & = % + ? #"} อักขระ ASCII พิเศษ
 	( พจนานุกรม สร้างใหม่ ใส่: ['@ < > & = % + ? #'] ที่: ['key'] ) ;
-	# {"key":"single quote: '"} single quote
+	# {"key":"single quote: '"} อัญประกาศเดี่ยว
 	( พจนานุกรม สร้างใหม่ ใส่: ['''] ที่: ['key'] ) ;
-	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	# {"key":"multiple: \" \\ \n \r \t"} escape ของ JSON หลายตัว
 	( พจนานุกรม สร้างใหม่ ใส่: ['multiple: \" \\ \n \r \t'] ที่: ['key'] ) ;
-	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} ข้อความ ASCII ที่ยาวกว่า
 	( พจนานุกรม สร้างใหม่ ใส่: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] ที่: ['key'] ) ;
-	# {"key":" value"} leading space
+	# {"key":" value"} ช่องว่างนำหน้า
 	( พจนานุกรม สร้างใหม่ ใส่: [' value'] ที่: ['key'] ) ;
-	# {"key":"value "} trailing space
+	# {"key":"value "} ช่องว่างต่อท้าย
 	( พจนานุกรม สร้างใหม่ ใส่: ['value '] ที่: ['key'] ) ;
-	# {"key":" \t\n\r "} whitespace
-	( พจนานุกรม สร้างใหม่ ใส่: [' \t\n\r '] ที่: ['key'] ).
+	# {"key":" \t\n\r "} ช่องว่างล้วน
+	( พจนานุกรม สร้างใหม่ ใส่: [' \t\n\r '] ที่: ['key'] )
+	.
 
-dicts แต่ละตัว: { :_ :d
+พจนานุกรมต่างๆ แต่ละตัว: { :_ :d
 	>> j := JSON jsonify: d.
 	>> a := JSON jsonify: (พจนานุกรม สร้างใหม่ ใส่: d key ที่: ['key']).
 	>> b := JSON jsonify: (พจนานุกรม สร้างใหม่ ใส่: ['value'] ที่: d key).
@@ -79,7 +80,7 @@ dicts แต่ละตัว: { :_ :d
 	((e key = d key และ: (f ? d key = ['value'])) หรือ: (e key = ['NUL ?'])) ถ้าจริง: {
 		แสดงผล เขียน: ['OK'], ขึ้นบรรทัดใหม่.
 	}, มิฉะนั้น: {
-		แสดงผล เขียน: ['Unable to properly encode/decode: '] + d + j, ขึ้นบรรทัดใหม่.
+		แสดงผล เขียน: ['เข้ารหัส/ถอดรหัสไม่ถูกต้อง: '] + d + j, ขึ้นบรรทัดใหม่.
 		โปรแกรม จบ.
 	}.
 }.

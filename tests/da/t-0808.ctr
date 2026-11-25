@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# boks-nøgler og signaturer, der afkodes for lange, må ikke få stakken til at løbe over
 Server init.
 
->> keys := Boks generér-nøgler.
->> sk := keys første.
->> pk := keys sidste.
+>> nøgler := Boks generér-nøgler.
+>> sk := nøgler første.
+>> pk := nøgler sidste.
 >> sig := Boks signér: ['abc'] med: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 tegn uden padding afkodes til 66 bytes
+>> lang := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 tegn uden padding afkodes til 33 bytes
+>> kort := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Boks signér: ['abc'] med: long. } fang: { :e
+{ Boks signér: ['abc'] med: lang. } fang: { :e
 	Uddata skriv: e, stop.
 }, start.
 
-{ Boks kontrollér: ['abc'] signatur: long med: pk. } fang: { :e
+{ Boks kontrollér: ['abc'] signatur: lang med: pk. } fang: { :e
 	Uddata skriv: e, stop.
 }, start.
 
-{ Boks kontrollér: ['abc'] signatur: sig med: short. } fang: { :e
+{ Boks kontrollér: ['abc'] signatur: sig med: kort. } fang: { :e
 	Uddata skriv: e, stop.
 }, start.

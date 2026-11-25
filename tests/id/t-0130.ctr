@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# menggunakan FFI dengan plugin Server
 
-# connect to libc (platform specific)
->> libname := Program pengaturan: ['FFITESTLIB'].
+# sambungkan ke libc (tergantung platform)
+>> namapustaka := Program pengaturan: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# tautkan fungsi stdio dari C untuk operasi berkas lanjutan
 Server tautkan: ( Daftar baru ;
- libname ; ['fopen'] ;
+ namapustaka ; ['fopen'] ;
  ( Daftar baru ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 tautkan: ( Daftar baru ;
- Kosong ; # means same lib
+ Kosong ; # berarti pustaka yang sama
  ['fread'] ;
  ( Daftar baru ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Kosong ; # means same object (i.e. Stream)
+ Kosong ; # berarti objek yang sama (yaitu Aliran)
  ['fread']
 ),
 tautkan: (
  Daftar baru ;
- Kosong ; # means same lib
+ Kosong ; # berarti pustaka yang sama
  ['fwrite'] ;
  ( Daftar baru ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Kosong ; # means same lib
+ Kosong ; # berarti pustaka yang sama
  ['fwrite']
 ),
 tautkan: (
  Daftar baru ;
- Kosong ; # means same lib
+ Kosong ; # berarti pustaka yang sama
  ['rewind'] ;
  ( Daftar baru ; ['pointer'] ) ;
  ['int'] ;
- Kosong ; # means same lib
+ Kosong ; # berarti pustaka yang sama
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> jalur := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# buka berkas dengan fopen(path, mode)
 >> fd := Stream path: jalur mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream pesan: ['fwrite'] argumen: (Daftar baru ; str ; 1 ; 6 ; fd ).
-Keluaran tulis: bytes-written, baris-baru.
+# tulis byte dari penyangga untaian ke berkas
+>> bita-tertulis := Stream pesan: ['fwrite'] argumen: (Daftar baru ; str ; 1 ; 6 ; fd ).
+Keluaran tulis: bita-tertulis, baris-baru.
 
-# rewind file pointer
+# putar balik penunjuk berkas
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob baru: 20.
+# alokasikan penyangga
+>> pyg := Blob baru: 20.
 
-# read from file
->> bytes-read := Stream pesan: ['fread'] argumen: (Daftar baru ; buf ; 1 ; 6 ; fd ).
-Keluaran tulis: bytes-read, baris-baru.
-Keluaran tulis: buf, baris-baru.
+# baca dari berkas
+>> bita-terbaca := Stream pesan: ['fread'] argumen: (Daftar baru ; pyg ; 1 ; 6 ; fd ).
+Keluaran tulis: bita-terbaca, baris-baru.
+Keluaran tulis: pyg, baris-baru.
 
-# free memory
+# bebaskan memori
 str  bebaskan.
 jalur bebaskan.
 mode bebaskan.
-buf  bebaskan.
+pyg  bebaskan.
 
 

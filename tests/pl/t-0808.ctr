@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# klucze i podpisy Sejf, które po dekodowaniu są za długie, nie mogą przepełnić stosu
 Server init.
 
->> keys := Sejf generuj-klucze.
->> sk := keys pierwszy.
->> pk := keys ostatni.
->> sig := Sejf podpisz: ['abc'] kluczem: sk.
+>> klucze := Sejf generuj-klucze.
+>> kt := klucze pierwszy.
+>> kp := klucze ostatni.
+>> podp := Sejf podpisz: ['abc'] kluczem: kt.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 znaków bez dopełnienia dekoduje się do 66 bajtów
+>> długi := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 znaki bez dopełnienia dekodują się do 33 bajtów
+>> krótki := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Sejf podpisz: ['abc'] kluczem: long. } przechwyć: { :e
+{ Sejf podpisz: ['abc'] kluczem: długi. } przechwyć: { :e
 	Wyjście pisz: e, nowa-linia.
 }, uruchom.
 
-{ Sejf sprawdź: ['abc'] podpis: long kluczem: pk. } przechwyć: { :e
+{ Sejf sprawdź: ['abc'] podpis: długi kluczem: kp. } przechwyć: { :e
 	Wyjście pisz: e, nowa-linia.
 }, uruchom.
 
-{ Sejf sprawdź: ['abc'] podpis: sig kluczem: short. } przechwyć: { :e
+{ Sejf sprawdź: ['abc'] podpis: podp kluczem: krótki. } przechwyć: { :e
 	Wyjście pisz: e, nowa-linia.
 }, uruchom.

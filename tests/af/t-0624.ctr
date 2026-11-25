@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := Objek nuut.
+# Hierdie toets kyk of string_fill_in nie sy gleuf verloor nie (deur GC opgeruim) in modus 4
+# verwysing in world.c
+>> Logboek := Objek nuut.
 
-Log by: ['say:'] doen: { :str
+Logboek by: ['say:'] doen: { :str
 	Uitvoer skryf: str, nuwe-reël.
 }.
 
->> Item := Objek nuut.
+>> Artikel := Objek nuut.
 
-Item by: ['nuut:'] doen: { :id <- self nuut id: id.
+Artikel by: ['nuut:'] doen: { :id
+	<- self nuut id: id.
 }.
 
-Item by: ['id:'] doen: { :id
+Artikel by: ['id:'] doen: { :id
 	eie id := id.
 }.
 
-Item by: ['id'] doen: { <- eie id. }.
+Artikel by: ['id'] doen: { <- eie id. }.
 
 
-Item by: ['teks'] doen: {
+Artikel by: ['teks'] doen: {
 	>> str := ['Item#~no'].
-	str ~no: eie id. <- str.
+	str ~no: eie id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item by: ['teks'] doen: {
 
 Print by: ['items'] doen: { 
 	
-	eie item := Item nuut: 1.
+	eie artikel := Artikel nuut: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: eie item
+	# óf segfault óf verkeerde teks hier
+	Logboek say: (
+		['~item printed.'] ~item: eie artikel
 	).
 	
 	

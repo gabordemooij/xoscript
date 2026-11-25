@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := বস্তু নতুন.
+# এই পরীক্ষা যাচাই করে যে মোড 4-এ string_fill_in তার স্লট হারায় না (gc'ed)
+# world.c-তে রেফারেন্স
+>> লগবই := বস্তু নতুন.
 
-Log যখন: ['say:'] করো: { :str
+লগবই যখন: ['say:'] করো: { :str
 	আউটপুট লেখো: str, নতুন-লাইন.
 }.
 
->> Item := বস্তু নতুন.
+>> উপকরণ-শ্রেণি := বস্তু নতুন.
 
-Item যখন: ['নতুন:'] করো: { :id <- নিজে নতুন id: id.
+উপকরণ-শ্রেণি যখন: ['নতুন:'] করো: { :id
+	<- নিজে নতুন id: id.
 }.
 
-Item যখন: ['id:'] করো: { :id
+উপকরণ-শ্রেণি যখন: ['id:'] করো: { :id
 	নিজের id := id.
 }.
 
-Item যখন: ['id'] করো: { <- নিজের id. }.
+উপকরণ-শ্রেণি যখন: ['id'] করো: { <- নিজের id. }.
 
 
-Item যখন: ['পাঠে'] করো: {
+উপকরণ-শ্রেণি যখন: ['পাঠে'] করো: {
 	>> str := ['Item#~no'].
-	str ~no: নিজের id. <- str.
+	str ~no: নিজের id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item যখন: ['পাঠে'] করো: {
 
 Print যখন: ['items'] করো: { 
 	
-	নিজের item := Item নতুন: 1.
+	নিজের উপকরণ := উপকরণ-শ্রেণি নতুন: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: নিজের item
+	# এখানে হয় segfault নয়তো ভুল str
+	লগবই say: (
+		['~item printed.'] ~item: নিজের উপকরণ
 	).
 	
 	

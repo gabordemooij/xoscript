@@ -1,18 +1,18 @@
-#ffi test
+#prueba de ffi
 
 
 Server init.
 
 Programa orden: 4.
 
-# for this test you need set a path to libc (puts)
->> libname := Programa configurar: ['FFITESTLIB'].
+# para esta prueba hay que configurar una ruta a libc (puts)
+>> nombrelib := Programa configurar: ['FFITESTLIB'].
 
 
 
 Server vincular: (
  Lista crear ;
- libname ;
+ nombrelib ;
  ['puts'] ;
  ( Lista crear ; ['pointer'] ) ;
  ['void'] ;
@@ -25,7 +25,7 @@ Server vincular: (
 Puts str: s.
 s liberar.
 
-# test with struct
+# prueba con struct
 
 >> a := Blob crear: 8.
 a bytes: (
@@ -34,19 +34,19 @@ a bytes: (
     1  ; 0 ; 0 ; 0
 ).
 
->> struct := Blob estructura: (Lista <<: ['int'], ; ['int']).
+>> estruct := Blob estructura: (Lista <<: ['int'], ; ['int']).
 
 Server vincular: (
 	Lista <<: ['@structtest'], ;
 	['@structtest'] ;
-	(Lista <<: struct) ; 
+	(Lista <<: estruct) ; 
 	['int'] ;	
 	['ffitest'] ;
 	['ffisum:']
 ).
 	
-Salida escribir: ['Sum test:'] + (ffitest ffisum: a), detener.
+Salida escribir: ['Prueba de suma:'] + (ffitest ffisum: a), detener.
 
-struct liberar-estructura.
-struct liberar.
+estruct liberar-estructura.
+estruct liberar.
 a liberar.

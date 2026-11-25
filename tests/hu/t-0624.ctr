@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := Objektum új.
+# Ez a teszt ellenőrzi, hogy a string_fill_in nem veszíti-e el a helyét (gc'ed) 4-es módban
+# hivatkozás a world.c-ben
+>> Napló := Objektum új.
 
-Log ha: ['say:'] tedd: { :str
+Napló ha: ['say:'] tedd: { :str
 	Kimenet ír: str, újsor.
 }.
 
->> Item := Objektum új.
+>> Tétel := Objektum új.
 
-Item ha: ['új:'] tedd: { :id <- maga új id: id.
+Tétel ha: ['új:'] tedd: { :id
+	<- maga új id: id.
 }.
 
-Item ha: ['id:'] tedd: { :id
+Tétel ha: ['id:'] tedd: { :id
 	saját id := id.
 }.
 
-Item ha: ['id'] tedd: { <- saját id. }.
+Tétel ha: ['id'] tedd: { <- saját id. }.
 
 
-Item ha: ['szöveg'] tedd: {
+Tétel ha: ['szöveg'] tedd: {
 	>> str := ['Item#~no'].
-	str ~no: saját id. <- str.
+	str ~no: saját id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item ha: ['szöveg'] tedd: {
 
 Print ha: ['items'] tedd: { 
 	
-	saját item := Item új: 1.
+	saját tétel := Tétel új: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: saját item
+	# vagy segfault, vagy hibás str itt
+	Napló say: (
+		['~item printed.'] ~item: saját tétel
 	).
 	
 	

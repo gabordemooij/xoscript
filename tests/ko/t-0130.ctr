@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# Server 플러그인으로 FFI 사용하기
 
-# connect to libc (platform specific)
->> libname := 프로그램 설정값: ['FFITESTLIB'].
+# libc에 연결 (플랫폼에 따라 다름)
+>> 라이브러리이름 := 프로그램 설정값: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# 고급 파일 작업을 위해 c의 stdio 함수 연결
 Server 연결: ( 리스트 새로 ;
- libname ; ['fopen'] ;
+ 라이브러리이름 ; ['fopen'] ;
  ( 리스트 새로 ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 연결: ( 리스트 새로 ;
- 없음 ; # means same lib
+ 없음 ; # 같은 라이브러리라는 뜻
  ['fread'] ;
  ( 리스트 새로 ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- 없음 ; # means same object (i.e. Stream)
+ 없음 ; # 같은 객체라는 뜻 (즉 스트림)
  ['fread']
 ),
 연결: (
  리스트 새로 ;
- 없음 ; # means same lib
+ 없음 ; # 같은 라이브러리라는 뜻
  ['fwrite'] ;
  ( 리스트 새로 ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- 없음 ; # means same lib
+ 없음 ; # 같은 라이브러리라는 뜻
  ['fwrite']
 ),
 연결: (
  리스트 새로 ;
- 없음 ; # means same lib
+ 없음 ; # 같은 라이브러리라는 뜻
  ['rewind'] ;
  ( 리스트 새로 ; ['pointer'] ) ;
  ['int'] ;
- 없음 ; # means same lib
+ 없음 ; # 같은 라이브러리라는 뜻
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> 파일경로 := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# fopen(path, mode)로 파일 열기
 >> fd := Stream path: 파일경로 mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream 메시지: ['fwrite'] 인수들: (리스트 새로 ; str ; 1 ; 6 ; fd ).
-출력 쓰기: bytes-written, 줄바꿈.
+# 버퍼 str의 바이트를 파일에 쓰기
+>> 쓴바이트 := Stream 메시지: ['fwrite'] 인수들: (리스트 새로 ; str ; 1 ; 6 ; fd ).
+출력 쓰기: 쓴바이트, 줄바꿈.
 
-# rewind file pointer
+# 파일 포인터 되감기
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob 새로: 20.
+# 버퍼 할당
+>> 버퍼값 := Blob 새로: 20.
 
-# read from file
->> bytes-read := Stream 메시지: ['fread'] 인수들: (리스트 새로 ; buf ; 1 ; 6 ; fd ).
-출력 쓰기: bytes-read, 줄바꿈.
-출력 쓰기: buf, 줄바꿈.
+# 파일에서 읽기
+>> 읽은바이트 := Stream 메시지: ['fread'] 인수들: (리스트 새로 ; 버퍼값 ; 1 ; 6 ; fd ).
+출력 쓰기: 읽은바이트, 줄바꿈.
+출력 쓰기: 버퍼값, 줄바꿈.
 
-# free memory
+# 메모리 해제
 str  해제.
 파일경로 해제.
 mode 해제.
-buf  해제.
+버퍼값  해제.
 
 

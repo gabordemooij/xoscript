@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# κλειδιά και υπογραφές Θησαυροφυλάκιο που αποκωδικοποιούνται πολύ μεγάλα δεν πρέπει να υπερχειλίζουν τη στοίβα
 Server init.
 
->> keys := Θησαυροφυλάκιο δημιουργία-κλειδιών.
->> sk := keys πρώτο.
->> pk := keys τελευταίο.
->> sig := Θησαυροφυλάκιο υπογραφή: ['abc'] με: sk.
+>> κλειδιά := Θησαυροφυλάκιο δημιουργία-κλειδιών.
+>> ιδκ := κλειδιά πρώτο.
+>> δκ := κλειδιά τελευταίο.
+>> υπογρ := Θησαυροφυλάκιο υπογραφή: ['abc'] με: ιδκ.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 χαρακτήρες χωρίς padding αποκωδικοποιούνται σε 66 bytes
+>> μακρύ := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 χαρακτήρες χωρίς padding αποκωδικοποιούνται σε 33 bytes
+>> κοντό := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Θησαυροφυλάκιο υπογραφή: ['abc'] με: long. } σύλληψη: { :e
+{ Θησαυροφυλάκιο υπογραφή: ['abc'] με: μακρύ. } σύλληψη: { :e
 	Έξοδος γράψε: e, νέα-γραμμή.
 }, εκκίνηση.
 
-{ Θησαυροφυλάκιο έλεγχος: ['abc'] υπογραφή: long με: pk. } σύλληψη: { :e
+{ Θησαυροφυλάκιο έλεγχος: ['abc'] υπογραφή: μακρύ με: δκ. } σύλληψη: { :e
 	Έξοδος γράψε: e, νέα-γραμμή.
 }, εκκίνηση.
 
-{ Θησαυροφυλάκιο έλεγχος: ['abc'] υπογραφή: sig με: short. } σύλληψη: { :e
+{ Θησαυροφυλάκιο έλεγχος: ['abc'] υπογραφή: υπογρ με: κοντό. } σύλληψη: { :e
 	Έξοδος γράψε: e, νέα-γραμμή.
 }, εκκίνηση.

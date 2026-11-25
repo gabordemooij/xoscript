@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# uporaba FFI z vtičnikom Server
 
-# connect to libc (platform specific)
->> libname := Program nastavitev: ['FFITESTLIB'].
+# poveži se z libc (odvisno od platforme)
+>> imeKnjižnice := Program nastavitev: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# poveži funkcije stdio iz C za napredne operacije z datotekami
 Server poveži: ( Seznam nov ;
- libname ; ['fopen'] ;
+ imeKnjižnice ; ['fopen'] ;
  ( Seznam nov ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 poveži: ( Seznam nov ;
- Nič ; # means same lib
+ Nič ; # pomeni isto knjižnico
  ['fread'] ;
  ( Seznam nov ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Nič ; # means same object (i.e. Stream)
+ Nič ; # pomeni isti objekt (tj. Tok)
  ['fread']
 ),
 poveži: (
  Seznam nov ;
- Nič ; # means same lib
+ Nič ; # pomeni isto knjižnico
  ['fwrite'] ;
  ( Seznam nov ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Nič ; # means same lib
+ Nič ; # pomeni isto knjižnico
  ['fwrite']
 ),
 poveži: (
  Seznam nov ;
- Nič ; # means same lib
+ Nič ; # pomeni isto knjižnico
  ['rewind'] ;
  ( Seznam nov ; ['pointer'] ) ;
  ['int'] ;
- Nič ; # means same lib
+ Nič ; # pomeni isto knjižnico
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> pot := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# odpri datoteko s fopen(path, mode)
 >> fd := Stream path: pot mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream sporočilo: ['fwrite'] argumenti: (Seznam nov ; str ; 1 ; 6 ; fd ).
-Izhod piši: bytes-written, nova-vrstica.
+# zapiši bajte iz medpomnilnika niz v datoteko
+>> zapisani-bajti := Stream sporočilo: ['fwrite'] argumenti: (Seznam nov ; str ; 1 ; 6 ; fd ).
+Izhod piši: zapisani-bajti, nova-vrstica.
 
-# rewind file pointer
+# previj kazalec datoteke na začetek
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob nov: 20.
+# dodeli medpomnilnik
+>> mp := Blob nov: 20.
 
-# read from file
->> bytes-read := Stream sporočilo: ['fread'] argumenti: (Seznam nov ; buf ; 1 ; 6 ; fd ).
-Izhod piši: bytes-read, nova-vrstica.
-Izhod piši: buf, nova-vrstica.
+# beri iz datoteke
+>> prebrani-bajti := Stream sporočilo: ['fread'] argumenti: (Seznam nov ; mp ; 1 ; 6 ; fd ).
+Izhod piši: prebrani-bajti, nova-vrstica.
+Izhod piši: mp, nova-vrstica.
 
-# free memory
+# sprosti pomnilnik
 str  sprosti.
 pot sprosti.
 mode sprosti.
-buf  sprosti.
+mp  sprosti.
 
 

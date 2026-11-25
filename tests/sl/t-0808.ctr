@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# ključi in podpisi trezorja, ki se dekodirajo predolgi, ne smejo prekoračiti sklada
 Server init.
 
->> keys := Sef ustvari-ključe.
->> sk := keys prvi.
->> pk := keys zadnji.
->> sig := Sef podpiši: ['abc'] s: sk.
+>> ključi := Sef ustvari-ključe.
+>> zk := ključi prvi.
+>> jk := ključi zadnji.
+>> podp := Sef podpiši: ['abc'] s: zk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 znakov brez zapolnitve se dekodira v 66 bajtov
+>> dolg := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 znakov brez zapolnitve se dekodira v 33 bajtov
+>> kratko := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Sef podpiši: ['abc'] s: long. } ujemi: { :e
+{ Sef podpiši: ['abc'] s: dolg. } ujemi: { :e
 	Izhod piši: e, nova-vrstica.
 }, zaženi.
 
-{ Sef preveri: ['abc'] podpis: long s: pk. } ujemi: { :e
+{ Sef preveri: ['abc'] podpis: dolg s: jk. } ujemi: { :e
 	Izhod piši: e, nova-vrstica.
 }, zaženi.
 
-{ Sef preveri: ['abc'] podpis: sig s: short. } ujemi: { :e
+{ Sef preveri: ['abc'] podpis: podp s: kratko. } ujemi: { :e
 	Izhod piši: e, nova-vrstica.
 }, zaženi.

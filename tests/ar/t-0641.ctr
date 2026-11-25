@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# اختبار منقي utf8
 Server init.
 
->> utf8cases := قاموس جديد
-	# ASCII only
+>> حالات-utf8 := قاموس جديد
+	# ASCII فقط
 	ضع: ﴿ قائمة جديد ; 65 ; 65 ; 65 ; 65 ; 0 ﴾ عند: ⌝'AAAA'⌜,
-	# valid 2 byte sequence
+	# تسلسل صالح من 2 بايت
 	ضع: ﴿ قائمة جديد ; 194 ; 162 ; 0 ﴾ عند: ⌝'¢'⌜,
-	# Valid 3-byte UTF-8
+	# UTF-8 صالح من 3 بايتات
     ضع: ﴿ قائمة جديد ; 226 ; 130 ; 172 ; 0 ﴾ عند: ⌝'€'⌜,
-	# Valid 4-byte UTF-8
+	# UTF-8 صالح من 4 بايتات
     ضع: ﴿ قائمة جديد ; 240 ; 144 ; 141 ; 136 ; 0 ﴾ عند: ⌝'𐍈'⌜,
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# بايت استمرار غير صالح في التسلسل E2 28 AC -> بداية تسلسل 3b + 28 استمرار خاطئ + AC بايت استمرار، لكنه ينتمي إلى نفس الخطأ
     ضع: ﴿ قائمة جديد ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ﴾ عند: ⌝'A?A'⌜,
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# ترميز مطول لحرف ASCII 'A' (يجب أن يصبح ?)،
     ضع: ﴿ قائمة جديد ; 65 ; 193 ; 129 ; 0 ﴾ عند: ⌝'A?'⌜,
-	# Invalid first byte (0xFF)
+	# بايت أول غير صالح (0xFF)
     ضع: ﴿ قائمة جديد ; 255 ; 0 ﴾ عند: ⌝'?'⌜,
-	# Incomplete multi-byte sequence at end
+	# تسلسل متعدد البايتات غير مكتمل في النهاية
     ضع: ﴿ قائمة جديد ; 66 ; 226 ; 0 ﴾ عند: ⌝'B?'⌜,
-    # Empty string
+    # نص فارغ
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# تسلسلات مختلطة متعددة
     ضع: ﴿ قائمة جديد ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ﴾ عند: ⌝'A€?𐍈B'⌜.
 	 
-utf8cases لكل: ⎬ :key :value
+حالات-utf8 لكل: ⎬ :key :value
 	>> blob := Blob جديد: value عدد-العناصر, بايتات: value.
 	>> str := blob كنص.
 	﴿str = key﴾ إذا-صحيح: ⎬
 		مخرج اكتب: ⌝'OK'⌜, سطر-جديد.
 	⎨, وإلا: ⎬
-		مخرج اكتب: ⌝'UTF8 sanitizer failed on: '⌜ + key + ⌝' got: '⌜ + str, سطر-جديد.
+		مخرج اكتب: ⌝'فشل منقح UTF8 في: '⌜ + key + ⌝' النتيجة: '⌜ + str, سطر-جديد.
 	⎨.
 	blob حرر.
 ⎨.

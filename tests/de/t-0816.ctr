@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> versuchen := { :format :value
-	{ Ausgabe schreiben: ( (Format neu: format) anwenden: value ), stopp. } abfangen: { :e Ausgabe schreiben: e, stopp. }, starten.
+# ein Format muss zum Typ des Werts passen, der Typ kann von einem Client kommen
+>> versuchen := { :formatierung :value
+	{ Ausgabe schreiben: ( (Format neu: formatierung) anwenden: value ), stopp. } abfangen: { :e Ausgabe schreiben: e, stopp. }, starten.
 }.
->> try-int := { :format :value
-	{ Ausgabe schreiben: ( (Format neu: format) anwenden-int: value ), stopp. } abfangen: { :e Ausgabe schreiben: e, stopp. }, starten.
+>> versuche-int := { :formatierung :value
+	{ Ausgabe schreiben: ( (Format neu: formatierung) anwenden-int: value ), stopp. } abfangen: { :e Ausgabe schreiben: e, stopp. }, starten.
 }.
 
-# fits
+# passt
 versuchen anwenden: ['|%s|'] und: ['text'].
 versuchen anwenden: ['%06.2f'] und: 5.5.
-versuchen anwenden: ['100%% %s'] und: ['sure'].
-try-int anwenden: ['%03d'] und: 7.
-try-int anwenden: ['%x'] und: 255.
+versuchen anwenden: ['100%% %s'] und: ['klar'].
+versuche-int anwenden: ['%03d'] und: 7.
+versuche-int anwenden: ['%x'] und: 255.
 versuchen anwenden: ['%d'] und: (Int64 neu aus-text: ['12']).
 versuchen anwenden: ['%lld'] und: (Int64 neu aus-text: ['12']).
 versuchen anwenden: ['%.1lf'] und: 5.5.
-try-int anwenden: ['%hd'] und: 7.
+versuche-int anwenden: ['%hd'] und: 7.
 
-# does not fit
+# passt nicht
 versuchen anwenden: ['%s'] und: 12345.
 versuchen anwenden: ['%d'] und: 12345.
 versuchen anwenden: ['%f'] und: ['text'].
-try-int anwenden: ['%d'] und: ['text'].
-try-int anwenden: ['%s'] und: 5.
+versuche-int anwenden: ['%d'] und: ['text'].
+versuche-int anwenden: ['%s'] und: 5.
 versuchen anwenden: ['%s %s'] und: ['text'].
 versuchen anwenden: ['%n'] und: ['text'].
 versuchen anwenden: ['%*s'] und: ['text'].
 versuchen anwenden: ['%'] und: ['text'].
 
-# length modifier does not fit
+# Längenmodifikator passt nicht
 versuchen anwenden: ['%ls'] und: ['text'].
 versuchen anwenden: ['%Lf'] und: 5.5.
-try-int anwenden: ['%ld'] und: 7.
-try-int anwenden: ['%lld'] und: 7.
+versuche-int anwenden: ['%ld'] und: 7.
+versuche-int anwenden: ['%lld'] und: 7.
 versuchen anwenden: ['%Ld'] und: (Int64 neu aus-text: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# eine Breite, die nicht zu printf passt, muss einen Fehler ergeben, keinen Absturz
 versuchen anwenden: ['%99999999999s'] und: ['text'].

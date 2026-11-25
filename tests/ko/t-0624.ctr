@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := 객체 새로.
+# string_fill_in이 모드 4에서 슬롯을 잃지 않는지(gc'ed) 확인하는 테스트
+# world.c 참고
+>> 로그 := 객체 새로.
 
-Log 받으면: ['say:'] 실행: { :str
+로그 받으면: ['say:'] 실행: { :str
 	출력 쓰기: str, 줄바꿈.
 }.
 
->> Item := 객체 새로.
+>> 항목형 := 객체 새로.
 
-Item 받으면: ['새로:'] 실행: { :id <- 자신 새로 id: id.
+항목형 받으면: ['새로:'] 실행: { :id
+	<- 자신 새로 id: id.
 }.
 
-Item 받으면: ['id:'] 실행: { :id
+항목형 받으면: ['id:'] 실행: { :id
 	자기 id := id.
 }.
 
-Item 받으면: ['id'] 실행: { <- 자기 id. }.
+항목형 받으면: ['id'] 실행: { <- 자기 id. }.
 
 
-Item 받으면: ['문자열로'] 실행: {
+항목형 받으면: ['문자열로'] 실행: {
 	>> str := ['Item#~no'].
-	str ~no: 자기 id. <- str.
+	str ~no: 자기 id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item 받으면: ['문자열로'] 실행: {
 
 Print 받으면: ['items'] 실행: { 
 	
-	자기 item := Item 새로: 1.
+	자기 항목 := 항목형 새로: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: 자기 item
+	# 여기서 segfault가 나거나 str이 잘못됨
+	로그 say: (
+		['~item printed.'] ~item: 자기 항목
 	).
 	
 	

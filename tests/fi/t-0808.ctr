@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# liian pitkiksi purkautuvat holvin avaimet ja allekirjoitukset eivät saa ylivuotaa pinoa
 Server init.
 
->> keys := Holvi luo-avaimet.
->> sk := keys ensimmäinen.
->> pk := keys viimeinen.
->> sig := Holvi allekirjoita: ['abc'] avaimella: sk.
+>> avaimet := Holvi luo-avaimet.
+>> sk := avaimet ensimmäinen.
+>> pk := avaimet viimeinen.
+>> allek := Holvi allekirjoita: ['abc'] avaimella: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 merkkiä ilman täytettä purkautuu 66 tavuksi
+>> pitkä := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 merkkiä ilman täytettä purkautuu 33 tavuksi
+>> lyhyt := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Holvi allekirjoita: ['abc'] avaimella: long. } sieppaa: { :e
+{ Holvi allekirjoita: ['abc'] avaimella: pitkä. } sieppaa: { :e
 	Tuloste kirjoita: e, rivinvaihto.
 }, käynnistä.
 
-{ Holvi tarkista: ['abc'] allekirjoitus: long avaimella: pk. } sieppaa: { :e
+{ Holvi tarkista: ['abc'] allekirjoitus: pitkä avaimella: pk. } sieppaa: { :e
 	Tuloste kirjoita: e, rivinvaihto.
 }, käynnistä.
 
-{ Holvi tarkista: ['abc'] allekirjoitus: sig avaimella: short. } sieppaa: { :e
+{ Holvi tarkista: ['abc'] allekirjoitus: allek avaimella: lyhyt. } sieppaa: { :e
 	Tuloste kirjoita: e, rivinvaihto.
 }, käynnistä.

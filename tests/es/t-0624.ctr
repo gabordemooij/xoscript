@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := Objeto crear.
+# Esta prueba comprueba que string_fill_in no pierde su ranura (recolectada por el GC) en el modo 4
+# referencia en world.c
+>> Registro := Objeto crear.
 
-Log al: ['say:'] hacer: { :str
+Registro al: ['say:'] hacer: { :str
 	Salida escribir: str, detener.
 }.
 
->> Item := Objeto crear.
+>> Artículo := Objeto crear.
 
-Item al: ['crear:'] hacer: { :id <- yo crear id: id.
+Artículo al: ['crear:'] hacer: { :id
+	<- yo crear id: id.
 }.
 
-Item al: ['id:'] hacer: { :id
+Artículo al: ['id:'] hacer: { :id
 	mi id := id.
 }.
 
-Item al: ['id'] hacer: { <- mi id. }.
+Artículo al: ['id'] hacer: { <- mi id. }.
 
 
-Item al: ['texto'] hacer: {
+Artículo al: ['texto'] hacer: {
 	>> str := ['Item#~no'].
-	str ~no: mi id. <- str.
+	str ~no: mi id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item al: ['texto'] hacer: {
 
 Print al: ['items'] hacer: { 
 	
-	mi item := Item crear: 1.
+	mi artículo := Artículo crear: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: mi item
+	# aquí, o un segfault o un texto incorrecto
+	Registro say: (
+		['~item printed.'] ~item: mi artículo
 	).
 	
 	

@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := Nesne yeni.
+# Bu sınama, string_fill_in'in mod 4'te yuvasını kaybetmediğini (gc'lenmediğini) denetler
+# world.c içinde başvuru
+>> Günlük := Nesne yeni.
 
-Log olunca: ['say:'] yap: { :str
+Günlük olunca: ['say:'] yap: { :str
 	Çıktı yaz: str, yeni-satır.
 }.
 
->> Item := Nesne yeni.
+>> Öğe := Nesne yeni.
 
-Item olunca: ['yeni:'] yap: { :id <- kendi yeni id: id.
+Öğe olunca: ['yeni:'] yap: { :id
+	<- kendi yeni id: id.
 }.
 
-Item olunca: ['id:'] yap: { :id
+Öğe olunca: ['id:'] yap: { :id
 	öz id := id.
 }.
 
-Item olunca: ['id'] yap: { <- öz id. }.
+Öğe olunca: ['id'] yap: { <- öz id. }.
 
 
-Item olunca: ['metin'] yap: {
+Öğe olunca: ['metin'] yap: {
 	>> str := ['Item#~no'].
-	str ~no: öz id. <- str.
+	str ~no: öz id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item olunca: ['metin'] yap: {
 
 Print olunca: ['items'] yap: { 
 	
-	öz item := Item yeni: 1.
+	öz öğe := Öğe yeni: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: öz item
+	# burada ya segfault ya da yanlış str olur
+	Günlük say: (
+		['~item printed.'] ~item: öz öğe
 	).
 	
 	

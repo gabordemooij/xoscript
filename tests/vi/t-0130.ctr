@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# dùng FFI với plugin Server
 
-# connect to libc (platform specific)
->> libname := Chương-trình thiết-lập: ['FFITESTLIB'].
+# kết nối với libc (tùy nền tảng)
+>> tên-thư-viện := Chương-trình thiết-lập: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# liên kết các hàm stdio từ C cho các thao tác tệp nâng cao
 Server liên-kết: ( Danh-sách mới ;
- libname ; ['fopen'] ;
+ tên-thư-viện ; ['fopen'] ;
  ( Danh-sách mới ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 liên-kết: ( Danh-sách mới ;
- Rỗng ; # means same lib
+ Rỗng ; # nghĩa là cùng thư viện
  ['fread'] ;
  ( Danh-sách mới ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Rỗng ; # means same object (i.e. Stream)
+ Rỗng ; # nghĩa là cùng đối tượng (tức là Luồng)
  ['fread']
 ),
 liên-kết: (
  Danh-sách mới ;
- Rỗng ; # means same lib
+ Rỗng ; # nghĩa là cùng thư viện
  ['fwrite'] ;
  ( Danh-sách mới ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Rỗng ; # means same lib
+ Rỗng ; # nghĩa là cùng thư viện
  ['fwrite']
 ),
 liên-kết: (
  Danh-sách mới ;
- Rỗng ; # means same lib
+ Rỗng ; # nghĩa là cùng thư viện
  ['rewind'] ;
  ( Danh-sách mới ; ['pointer'] ) ;
  ['int'] ;
- Rỗng ; # means same lib
+ Rỗng ; # nghĩa là cùng thư viện
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> đường-dẫn := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# mở một tệp bằng fopen(path, mode)
 >> fd := Stream path: đường-dẫn mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream thông-điệp: ['fwrite'] đối-số: (Danh-sách mới ; str ; 1 ; 6 ; fd ).
-Xuất ghi: bytes-written, xuống-dòng.
+# ghi các byte từ bộ đệm chuỗi-văn-bản vào tệp
+>> số-byte-đã-ghi := Stream thông-điệp: ['fwrite'] đối-số: (Danh-sách mới ; str ; 1 ; 6 ; fd ).
+Xuất ghi: số-byte-đã-ghi, xuống-dòng.
 
-# rewind file pointer
+# tua lại con trỏ tệp
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob mới: 20.
+# cấp phát một bộ đệm
+>> bđ := Blob mới: 20.
 
-# read from file
->> bytes-read := Stream thông-điệp: ['fread'] đối-số: (Danh-sách mới ; buf ; 1 ; 6 ; fd ).
-Xuất ghi: bytes-read, xuống-dòng.
-Xuất ghi: buf, xuống-dòng.
+# đọc từ tệp
+>> số-byte-đã-đọc := Stream thông-điệp: ['fread'] đối-số: (Danh-sách mới ; bđ ; 1 ; 6 ; fd ).
+Xuất ghi: số-byte-đã-đọc, xuống-dòng.
+Xuất ghi: bđ, xuống-dòng.
 
-# free memory
+# giải phóng bộ nhớ
 str  giải-phóng.
 đường-dẫn giải-phóng.
 mode giải-phóng.
-buf  giải-phóng.
+bđ  giải-phóng.
 
 

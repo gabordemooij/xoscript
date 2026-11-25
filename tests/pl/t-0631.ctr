@@ -1,18 +1,18 @@
-#ffi test
+#test ffi
 
 
 Server init.
 
 Program zarządzanie-pamięcią: 4.
 
-# for this test you need set a path to libc (puts)
->> libname := Program ustawienie: ['FFITESTLIB'].
+# do tego testu musisz ustawić ścieżkę do libc (puts)
+>> nazwaBiblioteki := Program ustawienie: ['FFITESTLIB'].
 
 
 
 Server powiąż: (
  Lista nowy ;
- libname ;
+ nazwaBiblioteki ;
  ['puts'] ;
  ( Lista nowy ; ['pointer'] ) ;
  ['void'] ;
@@ -25,7 +25,7 @@ Server powiąż: (
 Puts str: s.
 s zwolnij.
 
-# test with struct
+# test ze strukturą
 
 >> a := Blob nowy: 8.
 a bytes: (
@@ -34,19 +34,19 @@ a bytes: (
     1  ; 0 ; 0 ; 0
 ).
 
->> struct := Blob struct: (Lista <<: ['int'], ; ['int']).
+>> struktura := Blob struct: (Lista <<: ['int'], ; ['int']).
 
 Server powiąż: (
 	Lista <<: ['@structtest'], ;
 	['@structtest'] ;
-	(Lista <<: struct) ; 
+	(Lista <<: struktura) ; 
 	['int'] ;	
 	['ffitest'] ;
 	['ffisum:']
 ).
 	
-Wyjście pisz: ['Sum test:'] + (ffitest ffisum: a), nowa-linia.
+Wyjście pisz: ['Test sumy:'] + (ffitest ffisum: a), nowa-linia.
 
-struct zwolnij-struct.
-struct zwolnij.
+struktura zwolnij-struct.
+struktura zwolnij.
 a zwolnij.

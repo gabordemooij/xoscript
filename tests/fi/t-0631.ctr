@@ -1,18 +1,18 @@
-#ffi test
+#ffi-testi
 
 
 Server init.
 
 Ohjelma muistinhallinta: 4.
 
-# for this test you need set a path to libc (puts)
->> libname := Ohjelma asetus: ['FFITESTLIB'].
+# tätä testiä varten sinun on asetettava polku libc:hen (puts)
+>> kirjastonimi := Ohjelma asetus: ['FFITESTLIB'].
 
 
 
 Server linkitä: (
  Lista uusi ;
- libname ;
+ kirjastonimi ;
  ['puts'] ;
  ( Lista uusi ; ['pointer'] ) ;
  ['void'] ;
@@ -25,7 +25,7 @@ Server linkitä: (
 Puts str: s.
 s vapauta.
 
-# test with struct
+# testi structilla
 
 >> a := Blob uusi: 8.
 a bytes: (
@@ -34,19 +34,19 @@ a bytes: (
     1  ; 0 ; 0 ; 0
 ).
 
->> struct := Blob struct: (Lista <<: ['int'], ; ['int']).
+>> rakenne := Blob struct: (Lista <<: ['int'], ; ['int']).
 
 Server linkitä: (
 	Lista <<: ['@structtest'], ;
 	['@structtest'] ;
-	(Lista <<: struct) ; 
+	(Lista <<: rakenne) ; 
 	['int'] ;	
 	['ffitest'] ;
 	['ffisum:']
 ).
 	
-Tuloste kirjoita: ['Sum test:'] + (ffitest ffisum: a), rivinvaihto.
+Tuloste kirjoita: ['Summatesti:'] + (ffitest ffisum: a), rivinvaihto.
 
-struct vapauta-struct.
-struct vapauta.
+rakenne vapauta-struct.
+rakenne vapauta.
 a vapauta.

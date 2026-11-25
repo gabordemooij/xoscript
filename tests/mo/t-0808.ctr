@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# cheile și semnăturile seifului care se decodifică prea lung nu trebuie să depășească stiva
 Server init.
 
->> keys := Seif generează-chei.
->> sk := keys primul.
->> pk := keys ultimul.
->> sig := Seif semnează: ['abc'] cu: sk.
+>> chei := Seif generează-chei.
+>> cs := chei primul.
+>> cp := chei ultimul.
+>> semn := Seif semnează: ['abc'] cu: cs.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 de caractere fără padding se decodifică în 66 de octeți
+>> lung := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 de caractere fără padding se decodifică în 33 de octeți
+>> scurt := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Seif semnează: ['abc'] cu: long. } prinde: { :e
+{ Seif semnează: ['abc'] cu: lung. } prinde: { :e
 	Ieșire scrie: e, rând-nou.
 }, pornește.
 
-{ Seif verifică: ['abc'] semnătură: long cu: pk. } prinde: { :e
+{ Seif verifică: ['abc'] semnătură: lung cu: cp. } prinde: { :e
 	Ieșire scrie: e, rând-nou.
 }, pornește.
 
-{ Seif verifică: ['abc'] semnătură: sig cu: short. } prinde: { :e
+{ Seif verifică: ['abc'] semnătură: semn cu: scurt. } prinde: { :e
 	Ieșire scrie: e, rând-nou.
 }, pornește.

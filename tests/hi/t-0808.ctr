@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# बहुत लंबे डिकोड होने वाले vault कुंजियाँ और हस्ताक्षर stack overflow नहीं करने चाहिए
 Server init.
 
->> keys := तिजोरी कुंजी-बनाओ.
->> sk := keys पहला.
->> pk := keys अंतिम.
->> sig := तिजोरी हस्ताक्षर: ['abc'] कुंजी-से: sk.
+>> कुंजी-युग्म := तिजोरी कुंजी-बनाओ.
+>> sk := कुंजी-युग्म पहला.
+>> pk := कुंजी-युग्म अंतिम.
+>> हस्ता := तिजोरी हस्ताक्षर: ['abc'] कुंजी-से: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# padding के बिना 88 वर्ण 66 बाइट में डिकोड होते हैं
+>> लंबा := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# padding के बिना 44 वर्ण 33 बाइट में डिकोड होते हैं
+>> छोटा := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ तिजोरी हस्ताक्षर: ['abc'] कुंजी-से: long. } पकड़ो: { :e
+{ तिजोरी हस्ताक्षर: ['abc'] कुंजी-से: लंबा. } पकड़ो: { :e
 	निर्गम लिखो: e, नई-पंक्ति.
 }, चलाओ.
 
-{ तिजोरी जाँचो: ['abc'] हस्ताक्षर: long कुंजी-से: pk. } पकड़ो: { :e
+{ तिजोरी जाँचो: ['abc'] हस्ताक्षर: लंबा कुंजी-से: pk. } पकड़ो: { :e
 	निर्गम लिखो: e, नई-पंक्ति.
 }, चलाओ.
 
-{ तिजोरी जाँचो: ['abc'] हस्ताक्षर: sig कुंजी-से: short. } पकड़ो: { :e
+{ तिजोरी जाँचो: ['abc'] हस्ताक्षर: हस्ता कुंजी-से: छोटा. } पकड़ो: { :e
 	निर्गम लिखो: e, नई-पंक्ति.
 }, चलाओ.

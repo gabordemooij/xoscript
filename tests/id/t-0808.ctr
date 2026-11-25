@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# kunci dan tanda tangan Brankas yang terlalu panjang setelah didekode tidak boleh meluapkan stack
 Server init.
 
->> keys := Brankas buat-kunci.
->> sk := keys pertama.
->> pk := keys terakhir.
->> sig := Brankas tanda-tangani: ['abc'] dengan: sk.
+>> pasangan-kunci := Brankas buat-kunci.
+>> kpr := pasangan-kunci pertama.
+>> kpu := pasangan-kunci terakhir.
+>> ttd := Brankas tanda-tangani: ['abc'] dengan: kpr.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 karakter tanpa padding didekode menjadi 66 byte
+>> panjang-sekali := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 karakter tanpa padding didekode menjadi 33 byte
+>> pendek := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Brankas tanda-tangani: ['abc'] dengan: long. } tangkap: { :e
+{ Brankas tanda-tangani: ['abc'] dengan: panjang-sekali. } tangkap: { :e
 	Keluaran tulis: e, baris-baru.
 }, mulai.
 
-{ Brankas periksa: ['abc'] tanda-tangan: long dengan: pk. } tangkap: { :e
+{ Brankas periksa: ['abc'] tanda-tangan: panjang-sekali dengan: kpu. } tangkap: { :e
 	Keluaran tulis: e, baris-baru.
 }, mulai.
 
-{ Brankas periksa: ['abc'] tanda-tangan: sig dengan: short. } tangkap: { :e
+{ Brankas periksa: ['abc'] tanda-tangan: ttd dengan: pendek. } tangkap: { :e
 	Keluaran tulis: e, baris-baru.
 }, mulai.

@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# databasistoets
+# sien voorbeeld server.xo vir die vereiste konfigurasie
 
 Server init.
-Uitvoer skryf: ['Database test'], nuwe-reël.
+Uitvoer skryf: ['Databasistoets'], nuwe-reël.
 
 >> db := Maria-DB nuut gasheer: ['localhost'],
 	gebruikersnaam: ['xo'], wagwoord: ['pass123'], databasisnaam: ['xobase'], verbind.
 
-Uitvoer skryf: ['Can we connect? '] + db verbind?, nuwe-reël.
+Uitvoer skryf: ['Kan ons verbind? '] + db verbind?, nuwe-reël.
 
 >> soekparameters := db navraag: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parameters: ( Lys nuut ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parameters: ( Lys nuut ; ['abc'] ; 12.35 ; 6 ). # geparametriseerde navrae
 
 {  soekparameters voer-uit. db bevestig. } vang: { :e db rol-terug.  }, begin.
 
-Uitvoer skryf: ['Can we insert? '] + ( soekparameters insert-id > 0 ), nuwe-reël.
+Uitvoer skryf: ['Kan ons invoeg? '] + ( soekparameters insert-id > 0 ), nuwe-reël.
 
 >> x := 0.
 >> soekparameters :=
 db navraag: ['SELECT * FROM book order by id desc limit 2'], 
-haal: { :row 
+haal: { :ry 
 	x tel-by: 1.
-	Ja onderbreek. # must clean up, no 'Commands out of sync'
+	Ja onderbreek. # moet opruim, geen 'Commands out of sync' nie
 }.
 
 >> soekparameters :=
 db navraag: ['SELECT * FROM book order by id desc limit 2'], 
-haal: { :row
+haal: { :ry
 	x tel-by: 1.
 	Ja onderbreek.
 }.
 
 (x > 0) ja: {
-	Uitvoer skryf: ['Can we break in the middle of a fetch? '].
+	Uitvoer skryf: ['Kan ons in die middel van 'n haal onderbreek? '].
 }.
 
 Uitvoer skryf: Ja, nuwe-reël.

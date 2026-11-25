@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# prova de conversions de tipus / conversions / vinculacions
 Programa gestió-memòria: 4.
 Server init.
 
->> counter := 0.
->> db := Maria-DB nou amfitrió: ['localhost'],
+>> comptador := 0.
+>> bd := Maria-DB nou amfitrió: ['localhost'],
 	usuari: ['xo'], contrasenya: ['pass123'], nom-base: ['xobase'], connecta.
 
->> TwoDigitFormat := Format nou: ['%02d'].
+>> FormatDosDígits := Format nou: ['%02d'].
 
-# Datetime
+# Data i hora
 {
-	>> any := Número entre: 1995 i: 2050, text.
-	>> mes := TwoDigitFormat aplica-enter: (Número entre: 1 i: 12), text.
-	>> dia := TwoDigitFormat aplica-enter: (Número entre: 1 i: 28), text.
-	>> hora := TwoDigitFormat aplica-enter: (Número entre: 1 i: 23), text.
-	>> minut := TwoDigitFormat aplica-enter: (Número entre: 1 i: 59), text.
-	>> segon := TwoDigitFormat aplica-enter: (Número entre: 1 i: 59), text.
-	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
-	datetime
+	>> any     := Número entre: 1995 i: 2050, text.
+	>> mes    := FormatDosDígits aplica-enter: (Número entre: 1 i: 12), text.
+	>> dia      := FormatDosDígits aplica-enter: (Número entre: 1 i: 28), text.
+	>> hora     := FormatDosDígits aplica-enter: (Número entre: 1 i: 23), text.
+	>> minut   := FormatDosDígits aplica-enter: (Número entre: 1 i: 59), text.
+	>> segon   := FormatDosDígits aplica-enter: (Número entre: 1 i: 59), text.
+	>> datahora := ['YYYY-MM-DD HH:II:SS'].	
+	datahora
 		YYYY: any,
 		MM: mes,
 		DD: dia,
@@ -25,89 +25,89 @@ Server init.
 		II: minut,
 		SS: segon.
 	>> paràmetres-de-cerca :=
-	db consulta: (['
+	bd consulta: (['
 		SELECT 
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'] <datetime>: datetime),
-	obtén: { :row
-		(row mydatetime = datetime) fals: {
+	'] <datetime>: datahora),
+	obtén: { :fila
+		(fila mydatetime = datahora) fals: {
 			aquesta-tasca error: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mydatetime
+				['S'esperava: <expected> però s'ha obtingut: <observation>']
+				<expected>: datahora,
+				<observation>: fila mydatetime
 			).
 		}.
 	
 	}.
-	counter suma: 1.
+	comptador suma: 1.
 } * 100.
 
-# Date
+# Data
 {
-	>> any := Número entre: 1995 i: 2050, text.
-	>> mes := TwoDigitFormat aplica-enter: (Número entre: 1 i: 12), text.
-	>> dia := TwoDigitFormat aplica-enter: (Número entre: 1 i: 28), text.
-	>> date := ['YYYY-MM-DD'].
-	date
+	>> any     := Número entre: 1995 i: 2050, text.
+	>> mes    := FormatDosDígits aplica-enter: (Número entre: 1 i: 12), text.
+	>> dia      := FormatDosDígits aplica-enter: (Número entre: 1 i: 28), text.
+	>> data     := ['YYYY-MM-DD'].
+	data
 		YYYY: any,
 		MM: mes,
 		DD: dia.
 	>> paràmetres-de-cerca :=
-	db consulta: (['
+	bd consulta: (['
 		SELECT
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'] <date>: date),
-	obtén: { :row
-		(row mydate = date) fals: {
+	'] <date>: data),
+	obtén: { :fila
+		(fila mydate = data) fals: {
 			aquesta-tasca error: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: date,
-				<observation>: row mydate
+				['S'esperava: <expected> però s'ha obtingut: <observation>']
+				<expected>: data,
+				<observation>: fila mydate
 			).
 		}.
 	}.
-	counter suma: 1.
+	comptador suma: 1.
 } * 100.
 
 
-# Time
+# Hora
 {
-	>> hora := TwoDigitFormat aplica-enter: (Número entre: 1 i: 23), text.
-	>> minut := TwoDigitFormat aplica-enter: (Número entre: 1 i: 59), text.
-	>> segon := TwoDigitFormat aplica-enter: (Número entre: 1 i: 59), text.
+	>> hora     := FormatDosDígits aplica-enter: (Número entre: 1 i: 23), text.
+	>> minut   := FormatDosDígits aplica-enter: (Número entre: 1 i: 59), text.
+	>> segon   := FormatDosDígits aplica-enter: (Número entre: 1 i: 59), text.
 	>> temps := ['HH:II:SS'].
 	temps
 		HH: hora,
 		II: minut,
 		SS: segon.
 	>> paràmetres-de-cerca :=
-	db consulta: (['
+	bd consulta: (['
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: temps),
-	obtén: { :row
-		(row mytime = temps) fals: {
+	obtén: { :fila
+		(fila mytime = temps) fals: {
 			aquesta-tasca error: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['S'esperava: <expected> però s'ha obtingut: <observation>']
+				<expected>: datahora,
+				<observation>: fila mytime
 			).
 		}.
 	}.
-	counter suma: 1.
+	comptador suma: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Textos (varchar/text)
 >> str1 := Llista nou omple: 100000 amb: ['x'], uneix: [''].
 {
 	>> str2 := Caixa-forta token: 40.
 	>> paràmetres-de-cerca :=
-	db consulta: (['
+	bd consulta: (['
 		SELECT
 		"<str1>" AS str1,
 		"<str2>" AS str2
@@ -115,30 +115,30 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	obtén: { :row
-		(row str1 = str1 i: row str2 = str2) fals: {
+	obtén: { :fila
+		(fila str1 = str1 i: fila str2 = str2) fals: {
 			aquesta-tasca error: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['S'esperava: <expected> però s'ha obtingut: <observation>']
+				<expected>: datahora,
+				<observation>: fila mytime
 			).
 		}.
 	}.
-	counter suma: 1.
+	comptador suma: 1.
 } * 100.
 
 
-# Numbers
+# Números
 {
-	>> n1 := Número entre: 1 i: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Número entre: 1 i: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 des-de-text: ['9223372036854775807'] ) -
 		( Int64 des-de-text: ['99999'] ) +
 		( Int64 des-de-text: n1 text )
 	).
 	>> paràmetres-de-cerca :=
-	db consulta: (['
+	bd consulta: (['
 		SELECT
 		<n1> AS n1,
 		<n2> AS n2,
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	obtén: { :row
-		(row n1 = n1) fals: {
+	obtén: { :fila
+		(fila n1 = n1) fals: {
 			aquesta-tasca error: (
-				['Expected: <expected> but got: <observation>']
+				['S'esperava: <expected> però s'ha obtingut: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: fila n1
 			).
 		}.
-		(row n2 = n2) fals: {
+		(fila n2 = n2) fals: {
 			aquesta-tasca error: (
-				['Expected: <expected> but got: <observation>']
+				['S'esperava: <expected> però s'ha obtingut: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: fila n2
 			).
 		}.
-		(row n3 = n2 arrodoneix) fals: {
+		(fila n3 = n2 arrodoneix) fals: {
 			aquesta-tasca error: (
-				['Expected: <expected> but got: <observation>']
+				['S'esperava: <expected> però s'ha obtingut: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: fila n3
 			).
 		}.
-		(row big = big) fals: {
+		(fila big = big) fals: {
 			aquesta-tasca error: (
-				['Expected: <expected> but got: <observation>']
+				['S'esperava: <expected> però s'ha obtingut: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: fila big
 			).
 		}.
 		
 	}.
-	counter suma: 1.
+	comptador suma: 1.
 } * 100.
 
 
 Sortida escriu: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: comptador
 ), salt-de-línia.

@@ -1,66 +1,66 @@
-# using FFI with the Server plugin
+# použitie FFI s pluginom Server
 
-# connect to libc (platform specific)
->> libname := Program nastavenie: ['FFITESTLIB'].
+# pripojenie k libc (závisí od platformy)
+>> názov-knižnice := Program nastavenie: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# prepojenie funkcií stdio z C pre pokročilé operácie so súbormi
 Server prepojiť: ( Zoznam nový ;
- libname ; ['fopen'] ;
+ názov-knižnice ; ['fopen'] ;
  ( Zoznam nový ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 prepojiť: ( Zoznam nový ;
- Nič ; # means same lib
+ Nič ; # znamená tú istú knižnicu
  ['fread'] ;
  ( Zoznam nový ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Nič ; # means same object (i.e. Stream)
+ Nič ; # znamená ten istý objekt (t. j. Stream)
  ['fread']
 ),
 prepojiť: (
  Zoznam nový ;
- Nič ; # means same lib
+ Nič ; # znamená tú istú knižnicu
  ['fwrite'] ;
  ( Zoznam nový ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Nič ; # means same lib
+ Nič ; # znamená tú istú knižnicu
  ['fwrite']
 ),
 prepojiť: (
  Zoznam nový ;
- Nič ; # means same lib
+ Nič ; # znamená tú istú knižnicu
  ['rewind'] ;
  ( Zoznam nový ; ['pointer'] ) ;
  ['int'] ;
- Nič ; # means same lib
+ Nič ; # znamená tú istú knižnicu
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> cesta := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# otvorenie súboru pomocou fopen(path, mode)
 >> fd := Stream path: cesta mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream správa: ['fwrite'] argumenty: (Zoznam nový ; str ; 1 ; 6 ; fd ).
-Výstup písať: bytes-written, nový-riadok.
+# zápis bajtov z bufferu reťazec do súboru
+>> zapísané-bajty := Stream správa: ['fwrite'] argumenty: (Zoznam nový ; str ; 1 ; 6 ; fd ).
+Výstup písať: zapísané-bajty, nový-riadok.
 
-# rewind file pointer
+# pretočenie ukazovateľa súboru na začiatok
 Stream rewind: fd.
 
-# allocate a buffer
+# alokácia bufferu
 >> buf := Blob nový: 20.
 
-# read from file
->> bytes-read := Stream správa: ['fread'] argumenty: (Zoznam nový ; buf ; 1 ; 6 ; fd ).
-Výstup písať: bytes-read, nový-riadok.
+# čítanie zo súboru
+>> prečítané-bajty := Stream správa: ['fread'] argumenty: (Zoznam nový ; buf ; 1 ; 6 ; fd ).
+Výstup písať: prečítané-bajty, nový-riadok.
 Výstup písať: buf, nový-riadok.
 
-# free memory
+# uvoľnenie pamäte
 str  uvoľniť.
 cesta uvoľniť.
 mode uvoľniť.

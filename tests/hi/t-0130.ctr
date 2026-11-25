@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# Server प्लगइन के साथ FFI का उपयोग
 
-# connect to libc (platform specific)
->> libname := प्रोग्राम सेटिंग: ['FFITESTLIB'].
+# libc से जुड़ें (प्लेटफ़ॉर्म पर निर्भर)
+>> लाइब्रेरी-नाम := प्रोग्राम सेटिंग: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# उन्नत फ़ाइल संचालन के लिए c से stdio फ़ंक्शन लिंक करें
 Server लिंक: ( सूची नया ;
- libname ; ['fopen'] ;
+ लाइब्रेरी-नाम ; ['fopen'] ;
  ( सूची नया ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 लिंक: ( सूची नया ;
- शून्य ; # means same lib
+ शून्य ; # मतलब वही लाइब्रेरी
  ['fread'] ;
  ( सूची नया ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- शून्य ; # means same object (i.e. Stream)
+ शून्य ; # मतलब वही वस्तु (यानी Stream)
  ['fread']
 ),
 लिंक: (
  सूची नया ;
- शून्य ; # means same lib
+ शून्य ; # मतलब वही लाइब्रेरी
  ['fwrite'] ;
  ( सूची नया ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- शून्य ; # means same lib
+ शून्य ; # मतलब वही लाइब्रेरी
  ['fwrite']
 ),
 लिंक: (
  सूची नया ;
- शून्य ; # means same lib
+ शून्य ; # मतलब वही लाइब्रेरी
  ['rewind'] ;
  ( सूची नया ; ['pointer'] ) ;
  ['int'] ;
- शून्य ; # means same lib
+ शून्य ; # मतलब वही लाइब्रेरी
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> फ़ाइल-पथ := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# fopen(path, mode) से एक फ़ाइल खोलें
 >> fd := Stream path: फ़ाइल-पथ mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream संदेश: ['fwrite'] तर्क: (सूची नया ; str ; 1 ; 6 ; fd ).
-निर्गम लिखो: bytes-written, नई-पंक्ति.
+# बफ़र str से बाइट फ़ाइल में लिखें
+>> लिखे-बाइट := Stream संदेश: ['fwrite'] तर्क: (सूची नया ; str ; 1 ; 6 ; fd ).
+निर्गम लिखो: लिखे-बाइट, नई-पंक्ति.
 
-# rewind file pointer
+# फ़ाइल पॉइंटर को शुरुआत पर लाएँ
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob नया: 20.
+# एक बफ़र आवंटित करें
+>> बफ़ := Blob नया: 20.
 
-# read from file
->> bytes-read := Stream संदेश: ['fread'] तर्क: (सूची नया ; buf ; 1 ; 6 ; fd ).
-निर्गम लिखो: bytes-read, नई-पंक्ति.
-निर्गम लिखो: buf, नई-पंक्ति.
+# फ़ाइल से पढ़ें
+>> पढ़े-बाइट := Stream संदेश: ['fread'] तर्क: (सूची नया ; बफ़ ; 1 ; 6 ; fd ).
+निर्गम लिखो: पढ़े-बाइट, नई-पंक्ति.
+निर्गम लिखो: बफ़, नई-पंक्ति.
 
-# free memory
+# मेमोरी मुक्त करें
 str  मुक्त.
 फ़ाइल-पथ मुक्त.
 mode मुक्त.
-buf  मुक्त.
+बफ़  मुक्त.
 
 

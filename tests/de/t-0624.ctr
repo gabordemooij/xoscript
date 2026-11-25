@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := Objekt neu.
+# Dieser Test prüft, ob string_fill_in seinen Slot in Modus 4 nicht verliert (gc'ed)
+# Referenz in world.c
+>> Logbuch := Objekt neu.
 
-Log wenn: ['say:'] tun: { :str
+Logbuch wenn: ['say:'] tun: { :str
 	Ausgabe schreiben: str, stopp.
 }.
 
->> Item := Objekt neu.
+>> Posten := Objekt neu.
 
-Item wenn: ['neu:'] tun: { :id <- selbst neu id: id.
+Posten wenn: ['neu:'] tun: { :id
+	<- selbst neu id: id.
 }.
 
-Item wenn: ['id:'] tun: { :id
+Posten wenn: ['id:'] tun: { :id
 	eigen id := id.
 }.
 
-Item wenn: ['id'] tun: { <- eigen id. }.
+Posten wenn: ['id'] tun: { <- eigen id. }.
 
 
-Item wenn: ['text'] tun: {
+Posten wenn: ['text'] tun: {
 	>> str := ['Item#~no'].
-	str ~no: eigen id. <- str.
+	str ~no: eigen id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item wenn: ['text'] tun: {
 
 Print wenn: ['items'] tun: { 
 	
-	eigen item := Item neu: 1.
+	eigen posten := Posten neu: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: eigen item
+	# entweder Segfault oder hier falscher str
+	Logbuch say: (
+		['~item gedruckt.'] ~item: eigen posten
 	).
 	
 	

@@ -1,76 +1,77 @@
 Server init.
 
-# JSON encoder only supports UTF-8, no surrogate pairs
+# Kodirnik JSON podpira samo UTF-8, brez nadomestnih parov
 
->> dicts := Seznam nov ;
-	# {"key":"normal"} normal ASCII
-	( Slovar nov postavi: ['normal'] na: ['key'] ) ;
-	# {"key":"hello world"} space character
+>> slovarji := Seznam nov ;
+	# {"key":"normal"} navaden ASCII
+	( Slovar nov postavi: ['običajno'] na: ['key'] ) ;
+	# {"key":"hello world"} znak za presledek
 	( Slovar nov postavi: ['hello world'] na: ['key'] ) ;
-	# {"key":"quote: \""} double quote
+	# {"key":"quote: \""} dvojni narekovaj
 	( Slovar nov postavi: ['"'] na: ['key'] ) ;
-	# {"key":"backslash: \\"} backslash
+	# {"key":"backslash: \\"} poševnica nazaj
 	( Slovar nov postavi: ['backslash: \\'] na: ['key'] ) ;
-	# {"key":"slash: /"} slash
-	( Slovar nov postavi: ['slash: /'] na: ['key'] ) ;
-	# {"key":"backspace: \b"} backspace
+	# {"key":"slash: /"} poševnica
+	( Slovar nov postavi: ['poševnica: /'] na: ['key'] ) ;
+	# {"key":"backspace: \b"} vračalka
 	( Slovar nov postavi: ['backspace: \b'] na: ['key'] ) ;
-	# {"key":"formfeed: \f"} form-feed escape
+	# {"key":"formfeed: \f"} ubežno zaporedje za pomik strani
 	( Slovar nov postavi: ['formfeed: \f'] na: ['key'] ) ;
-	# {"key":"newline: \n"} newline
+	# {"key":"newline: \n"} nova vrstica
 	( Slovar nov postavi: ['newline: \n'] na: ['key'] ) ;
 	( Slovar nov postavi: ['newline: ↵'] na: ['key'] ) ;
 	( Slovar nov postavi: ['newline: 
 	'] na: ['key'] ) ;
-	# {"key":"carriage return: \r"} carriage-return
+	# {"key":"carriage return: \r"} pomik na začetek vrstice
 	( Slovar nov postavi: ['carriage return: \r'] na: ['key'] ) ;
-	# {"key":"tab: \t"} tab
+	# {"key":"tab: \t"} tabulator
 	( Slovar nov postavi: ['tab \t'] na: ['key'] ) ;
 	( Slovar nov postavi: ['tab ⇿'] na: ['key'] ) ;
-	( Slovar nov postavi: ['tab  '] na: ['key'] ) ;
+	( Slovar nov postavi: ['tabulator  '] na: ['key'] ) ;
 	# {"key":"control: \u0000"} NUL
 	( Slovar nov postavi: ['NUL \u0000'] na: ['key'] ) ;
 	( Slovar nov postavi: ['NUL \0'] na: ['key'] ) ;
-	# {"key":"control: \u0001"} control character 0x01
+	# {"key":"control: \u0001"} krmilni znak 0x01
 	( Slovar nov postavi: ['control: \u0001'] na: ['key'] ) ;
-	# {"key":"control: \u001F"} control character 0x1F
+	# {"key":"control: \u001F"} krmilni znak 0x1F
 	( Slovar nov postavi: ['control: \u001F'] na: ['key'] ) ;
-	# {"key":"unicode: é"} UTF-8, 2-byte char
+	# {"key":"unicode: é"} UTF-8, 2-bajtni znak
 	( Slovar nov postavi: ['unicode: é'] na: ['key'] ) ;
-	# {"key":"unicode: €"} UTF-8, 3-byte char
+	# {"key":"unicode: €"} UTF-8, 3-bajtni znak
 	( Slovar nov postavi: ['unicode: €'] na: ['key'] ) ;
-	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	# {"key":"unicode: 日本語"} več 3-bajtnih znakov UTF-8
 	( Slovar nov postavi: ['unicode: 日本語'] na: ['key'] ) ;
-	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	# {"key":"unicode: 😀"} UTF-8, 4-bajtni znak
 	( Slovar nov postavi: ['unicode: 😀'] na: ['key'] ) ;
-	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	# {"key":"unicode: 🧑‍💻"} emodži + spojnik ničelne širine
 	( Slovar nov postavi: ['unicode: 🧑‍💻'] na: ['key'] ) ;
-	# {"key":"combining: e\u0301"} combining accent
+	# {"key":"combining: é"} kombinirani naglas
 	( Slovar nov postavi: ['combining: e\u0301'] na: ['key'] ) ;
-	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	# {"key":"escaped unicode: é"} ubežni zapis Unicode BMP
 	( Slovar nov postavi: ['escaped unicode: \u00e9'] na: ['key'] ) ;
-	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	# {"key":"escaped unicode: €"} ubežni zapis Unicode BMP
 	( Slovar nov postavi: ['escaped unicode: \u20ac'] na: ['key'] ) ;
-	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	# {"key":"escaped unicode: 😀"} nadomestni par UTF-16
 	( Slovar nov postavi: ['escaped unicode: \ud83d\ude00'] na: ['key'] ) ;
-	# {"key":""} empty value
+	# {"key":""} prazna vrednost
 	( Slovar nov postavi: [''] na: ['key'] ) ;
-	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	# {"key":"@ < > & = % + ? #"} posebni znaki ASCII
 	( Slovar nov postavi: ['@ < > & = % + ? #'] na: ['key'] ) ;
-	# {"key":"single quote: '"} single quote
+	# {"key":"single quote: '"} enojni narekovaj
 	( Slovar nov postavi: ['''] na: ['key'] ) ;
-	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	# {"key":"multiple: \" \\ \n \r \t"} več ubežnih zaporedij JSON
 	( Slovar nov postavi: ['multiple: \" \\ \n \r \t'] na: ['key'] ) ;
-	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} daljši ASCII-niz
 	( Slovar nov postavi: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] na: ['key'] ) ;
-	# {"key":" value"} leading space
-	( Slovar nov postavi: [' value'] na: ['key'] ) ;
-	# {"key":"value "} trailing space
-	( Slovar nov postavi: ['value '] na: ['key'] ) ;
-	# {"key":" \t\n\r "} whitespace
-	( Slovar nov postavi: [' \t\n\r '] na: ['key'] ).
+	# {"key":" value"} presledek na začetku
+	( Slovar nov postavi: [' vrednost'] na: ['key'] ) ;
+	# {"key":"value "} presledek na koncu
+	( Slovar nov postavi: ['vrednost '] na: ['key'] ) ;
+	# {"key":" \t\n\r "} beli prostor
+	( Slovar nov postavi: [' \t\n\r '] na: ['key'] )
+	.
 
-dicts vsak: { :_ :d
+slovarji vsak: { :_ :d
 	>> j := JSON jsonify: d.
 	>> a := JSON jsonify: (Slovar nov postavi: d key na: ['key']).
 	>> b := JSON jsonify: (Slovar nov postavi: ['value'] na: d key).
@@ -79,7 +80,7 @@ dicts vsak: { :_ :d
 	((e key = d key in: (f ? d key = ['value'])) ali: (e key = ['NUL ?'])) resnično: {
 		Izhod piši: ['OK'], nova-vrstica.
 	}, sicer: {
-		Izhod piši: ['Unable to properly encode/decode: '] + d + j, nova-vrstica.
+		Izhod piši: ['Ni mogoče pravilno kodirati/dekodirati: '] + d + j, nova-vrstica.
 		Program konec.
 	}.
 }.

@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# prueba de base de datos
+# ver el ejemplo server.xo para la configuración necesaria
 
 Server init.
-Salida escribir: ['Database test'], detener.
+Salida escribir: ['Prueba de base de datos'], detener.
 
->> db := Maria-DB crear host: ['localhost'],
+>> bd := Maria-DB crear host: ['localhost'],
 	usuario: ['xo'], contraseña: ['pass123'], nombre-base-datos: ['xobase'], conectar.
 
-Salida escribir: ['Can we connect? '] + db ¿conectado?, detener.
+Salida escribir: ['¿Podemos conectar? '] + bd ¿conectado?, detener.
 
->> consulta := db consultar: ['
+>> consulta := bd consultar: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parámetros: ( Lista crear ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parámetros: ( Lista crear ; ['abc'] ; 12.35 ; 6 ). # consultas parametrizadas
 
-{  consulta ejecutar. db confirmar. } capturar: { :e db revertir.  }, empezar.
+{  consulta ejecutar. bd confirmar. } capturar: { :e bd revertir.  }, empezar.
 
-Salida escribir: ['Can we insert? '] + ( consulta id-insertado > 0 ), detener.
+Salida escribir: ['¿Podemos insertar? '] + ( consulta id-insertado > 0 ), detener.
 
 >> x := 0.
 >> consulta :=
-db consultar: ['SELECT * FROM book order by id desc limit 2'], 
-extraer: { :row 
+bd consultar: ['SELECT * FROM book order by id desc limit 2'], 
+extraer: { :fila 
 	x añadir: 1.
-	Verdadero salir. # must clean up, no 'Commands out of sync'
+	Verdadero salir. # debe limpiar, sin 'Commands out of sync'
 }.
 
 >> consulta :=
-db consultar: ['SELECT * FROM book order by id desc limit 2'], 
-extraer: { :row
+bd consultar: ['SELECT * FROM book order by id desc limit 2'], 
+extraer: { :fila
 	x añadir: 1.
 	Verdadero salir.
 }.
 
 (x > 0) verdadero: {
-	Salida escribir: ['Can we break in the middle of a fetch? '].
+	Salida escribir: ['¿Podemos interrumpir en medio de un fetch? '].
 }.
 
 Salida escribir: Verdadero, detener.

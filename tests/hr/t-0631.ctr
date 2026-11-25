@@ -5,14 +5,14 @@ Server init.
 
 Program upravljanje-memorijom: 4.
 
-# for this test you need set a path to libc (puts)
->> libname := Program postavka: ['FFITESTLIB'].
+# za ovaj test morate postaviti putanju do libc (puts)
+>> nazivBiblioteke := Program postavka: ['FFITESTLIB'].
 
 
 
 Server poveži: (
  Popis novi ;
- libname ;
+ nazivBiblioteke ;
  ['puts'] ;
  ( Popis novi ; ['pointer'] ) ;
  ['void'] ;
@@ -25,7 +25,7 @@ Server poveži: (
 Puts str: s.
 s oslobodi.
 
-# test with struct
+# test sa struct
 
 >> a := Blob novi: 8.
 a bytes: (
@@ -34,19 +34,19 @@ a bytes: (
     1  ; 0 ; 0 ; 0
 ).
 
->> struct := Blob struct: (Popis <<: ['int'], ; ['int']).
+>> struktura := Blob struct: (Popis <<: ['int'], ; ['int']).
 
 Server poveži: (
 	Popis <<: ['@structtest'], ;
 	['@structtest'] ;
-	(Popis <<: struct) ; 
+	(Popis <<: struktura) ; 
 	['int'] ;	
 	['ffitest'] ;
 	['ffisum:']
 ).
 	
-Izlaz piši: ['Sum test:'] + (ffitest ffisum: a), novi-red.
+Izlaz piši: ['Test zbroja:'] + (ffitest ffisum: a), novi-red.
 
-struct oslobodi-struct.
-struct oslobodi.
+struktura oslobodi-struct.
+struktura oslobodi.
 a oslobodi.

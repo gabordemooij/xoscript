@@ -1,66 +1,66 @@
-# using FFI with the Server plugin
+# FFI gebruiken met de Server-plugin
 
-# connect to libc (platform specific)
->> libname := Programma instelling: ['FFITESTLIB'].
+# verbinden met libc (platformafhankelijk)
+>> bibnaam := Programma instelling: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# stdio-functies uit C koppelen voor geavanceerde bestandsbewerkingen
 Server koppel: ( Reeks nieuw ;
- libname ; ['fopen'] ;
+ bibnaam ; ['fopen'] ;
  ( Reeks nieuw ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 koppel: ( Reeks nieuw ;
- Niets ; # means same lib
+ Niets ; # betekent dezelfde bibliotheek
  ['fread'] ;
  ( Reeks nieuw ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Niets ; # means same object (i.e. Stream)
+ Niets ; # betekent hetzelfde object (d.w.z. Stroom)
  ['fread']
 ),
 koppel: (
  Reeks nieuw ;
- Niets ; # means same lib
+ Niets ; # betekent dezelfde bibliotheek
  ['fwrite'] ;
  ( Reeks nieuw ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Niets ; # means same lib
+ Niets ; # betekent dezelfde bibliotheek
  ['fwrite']
 ),
 koppel: (
  Reeks nieuw ;
- Niets ; # means same lib
+ Niets ; # betekent dezelfde bibliotheek
  ['rewind'] ;
  ( Reeks nieuw ; ['pointer'] ) ;
  ['int'] ;
- Niets ; # means same lib
+ Niets ; # betekent dezelfde bibliotheek
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> pad := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# open een bestand met fopen(path, mode)
 >> fd := Stream path: pad mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream bericht: ['fwrite'] argumenten: (Reeks nieuw ; str ; 1 ; 6 ; fd ).
-Uit schrijf: bytes-written, stop.
+# schrijf bytes uit buffer tekenreeks naar bestand
+>> bytes-geschreven := Stream bericht: ['fwrite'] argumenten: (Reeks nieuw ; str ; 1 ; 6 ; fd ).
+Uit schrijf: bytes-geschreven, stop.
 
-# rewind file pointer
+# bestandswijzer terugzetten
 Stream rewind: fd.
 
-# allocate a buffer
+# een buffer reserveren
 >> buf := Blob nieuw: 20.
 
-# read from file
->> bytes-read := Stream bericht: ['fread'] argumenten: (Reeks nieuw ; buf ; 1 ; 6 ; fd ).
-Uit schrijf: bytes-read, stop.
+# lezen uit bestand
+>> bytes-gelezen := Stream bericht: ['fread'] argumenten: (Reeks nieuw ; buf ; 1 ; 6 ; fd ).
+Uit schrijf: bytes-gelezen, stop.
 Uit schrijf: buf, stop.
 
-# free memory
+# geheugen vrijgeven
 str  vrij.
 pad vrij.
 mode vrij.

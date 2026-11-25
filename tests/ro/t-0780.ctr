@@ -1,23 +1,23 @@
 Server init.
 
-# JSON encoder only supports UTF-8, no surrogate pairs
+# Encoderul JSON acceptă doar UTF-8, fără perechi surogat
 
->> dicts := Listă nou ;
-	# {"key":"normal"} normal ASCII
+>> dicționare := Listă nou ;
+	# {"key":"normal"} ASCII normal
 	( Dicționar nou pune: ['normal'] la: ['key'] ) ;
-	# {"key":"hello world"} space character
+	# {"key":"hello world"} caracter spațiu
 	( Dicționar nou pune: ['hello world'] la: ['key'] ) ;
-	# {"key":"quote: \""} double quote
+	# {"key":"quote: \""} ghilimele duble
 	( Dicționar nou pune: ['"'] la: ['key'] ) ;
 	# {"key":"backslash: \\"} backslash
 	( Dicționar nou pune: ['backslash: \\'] la: ['key'] ) ;
 	# {"key":"slash: /"} slash
-	( Dicționar nou pune: ['slash: /'] la: ['key'] ) ;
+	( Dicționar nou pune: ['bară: /'] la: ['key'] ) ;
 	# {"key":"backspace: \b"} backspace
 	( Dicționar nou pune: ['backspace: \b'] la: ['key'] ) ;
-	# {"key":"formfeed: \f"} form-feed escape
+	# {"key":"formfeed: \f"} escape form-feed
 	( Dicționar nou pune: ['formfeed: \f'] la: ['key'] ) ;
-	# {"key":"newline: \n"} newline
+	# {"key":"newline: \n"} linie nouă
 	( Dicționar nou pune: ['newline: \n'] la: ['key'] ) ;
 	( Dicționar nou pune: ['newline: ↵'] la: ['key'] ) ;
 	( Dicționar nou pune: ['newline: 
@@ -31,46 +31,47 @@ Server init.
 	# {"key":"control: \u0000"} NUL
 	( Dicționar nou pune: ['NUL \u0000'] la: ['key'] ) ;
 	( Dicționar nou pune: ['NUL \0'] la: ['key'] ) ;
-	# {"key":"control: \u0001"} control character 0x01
+	# {"key":"control: \u0001"} caracter de control 0x01
 	( Dicționar nou pune: ['control: \u0001'] la: ['key'] ) ;
-	# {"key":"control: \u001F"} control character 0x1F
+	# {"key":"control: \u001F"} caracter de control 0x1F
 	( Dicționar nou pune: ['control: \u001F'] la: ['key'] ) ;
-	# {"key":"unicode: é"} UTF-8, 2-byte char
+	# {"key":"unicode: é"} UTF-8, caracter de 2 octeți
 	( Dicționar nou pune: ['unicode: é'] la: ['key'] ) ;
-	# {"key":"unicode: €"} UTF-8, 3-byte char
+	# {"key":"unicode: €"} UTF-8, caracter de 3 octeți
 	( Dicționar nou pune: ['unicode: €'] la: ['key'] ) ;
-	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	# {"key":"unicode: 日本語"} mai multe caractere UTF-8 de 3 octeți
 	( Dicționar nou pune: ['unicode: 日本語'] la: ['key'] ) ;
-	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	# {"key":"unicode: 😀"} UTF-8, caracter de 4 octeți
 	( Dicționar nou pune: ['unicode: 😀'] la: ['key'] ) ;
 	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
 	( Dicționar nou pune: ['unicode: 🧑‍💻'] la: ['key'] ) ;
-	# {"key":"combining: e\u0301"} combining accent
+	# {"key":"combining: é"} accent combinat
 	( Dicționar nou pune: ['combining: e\u0301'] la: ['key'] ) ;
-	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	# {"key":"escaped unicode: é"} escape Unicode BMP
 	( Dicționar nou pune: ['escaped unicode: \u00e9'] la: ['key'] ) ;
-	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	# {"key":"escaped unicode: €"} escape Unicode BMP
 	( Dicționar nou pune: ['escaped unicode: \u20ac'] la: ['key'] ) ;
-	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	# {"key":"escaped unicode: 😀"} pereche surogat UTF-16
 	( Dicționar nou pune: ['escaped unicode: \ud83d\ude00'] la: ['key'] ) ;
-	# {"key":""} empty value
+	# {"key":""} valoare goală
 	( Dicționar nou pune: [''] la: ['key'] ) ;
-	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	# {"key":"@ < > & = % + ? #"} caractere ASCII speciale
 	( Dicționar nou pune: ['@ < > & = % + ? #'] la: ['key'] ) ;
-	# {"key":"single quote: '"} single quote
+	# {"key":"single quote: '"} ghilimele simple
 	( Dicționar nou pune: ['''] la: ['key'] ) ;
-	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	# {"key":"multiple: \" \\ \n \r \t"} mai multe escape-uri JSON
 	( Dicționar nou pune: ['multiple: \" \\ \n \r \t'] la: ['key'] ) ;
-	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} text ASCII mai lung
 	( Dicționar nou pune: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] la: ['key'] ) ;
-	# {"key":" value"} leading space
+	# {"key":" value"} spațiu la început
 	( Dicționar nou pune: [' value'] la: ['key'] ) ;
-	# {"key":"value "} trailing space
+	# {"key":"value "} spațiu la sfârșit
 	( Dicționar nou pune: ['value '] la: ['key'] ) ;
-	# {"key":" \t\n\r "} whitespace
-	( Dicționar nou pune: [' \t\n\r '] la: ['key'] ).
+	# {"key":" \t\n\r "} spații albe
+	( Dicționar nou pune: [' \t\n\r '] la: ['key'] )
+	.
 
-dicts fiecare: { :_ :d
+dicționare fiecare: { :_ :d
 	>> j := JSON jsonify: d.
 	>> a := JSON jsonify: (Dicționar nou pune: d key la: ['key']).
 	>> b := JSON jsonify: (Dicționar nou pune: ['value'] la: d key).
@@ -79,7 +80,7 @@ dicts fiecare: { :_ :d
 	((e key = d key și: (f ? d key = ['value'])) sau: (e key = ['NUL ?'])) adevărat: {
 		Ieșire scrie: ['OK'], rând-nou.
 	}, altfel: {
-		Ieșire scrie: ['Unable to properly encode/decode: '] + d + j, rând-nou.
+		Ieșire scrie: ['Nu se poate codifica/decodifica corect: '] + d + j, rând-nou.
 		Program sfârșit.
 	}.
 }.

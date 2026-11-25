@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# utilizarea FFI cu pluginul Server
 
-# connect to libc (platform specific)
->> libname := Program setare: ['FFITESTLIB'].
+# conectare la libc (specific platformei)
+>> numeBibliotecă := Program setare: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# legăm funcții stdio din C pentru operații avansate cu fișiere
 Server leagă: ( Listă nou ;
- libname ; ['fopen'] ;
+ numeBibliotecă ; ['fopen'] ;
  ( Listă nou ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 leagă: ( Listă nou ;
- Nimic ; # means same lib
+ Nimic ; # înseamnă aceeași bibliotecă
  ['fread'] ;
  ( Listă nou ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Nimic ; # means same object (i.e. Stream)
+ Nimic ; # înseamnă același obiect (adică Flux)
  ['fread']
 ),
 leagă: (
  Listă nou ;
- Nimic ; # means same lib
+ Nimic ; # înseamnă aceeași bibliotecă
  ['fwrite'] ;
  ( Listă nou ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Nimic ; # means same lib
+ Nimic ; # înseamnă aceeași bibliotecă
  ['fwrite']
 ),
 leagă: (
  Listă nou ;
- Nimic ; # means same lib
+ Nimic ; # înseamnă aceeași bibliotecă
  ['rewind'] ;
  ( Listă nou ; ['pointer'] ) ;
  ['int'] ;
- Nimic ; # means same lib
+ Nimic ; # înseamnă aceeași bibliotecă
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> cale := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# deschidem un fișier cu fopen(path, mode)
 >> fd := Stream path: cale mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream mesaj: ['fwrite'] argumente: (Listă nou ; str ; 1 ; 6 ; fd ).
-Ieșire scrie: bytes-written, rând-nou.
+# scriem octeții din tamponul șir în fișier
+>> octeți-scriși := Stream mesaj: ['fwrite'] argumente: (Listă nou ; str ; 1 ; 6 ; fd ).
+Ieșire scrie: octeți-scriși, rând-nou.
 
-# rewind file pointer
+# readucem indicatorul fișierului la început
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob nou: 20.
+# alocăm un tampon
+>> tamp := Blob nou: 20.
 
-# read from file
->> bytes-read := Stream mesaj: ['fread'] argumente: (Listă nou ; buf ; 1 ; 6 ; fd ).
-Ieșire scrie: bytes-read, rând-nou.
-Ieșire scrie: buf, rând-nou.
+# citim din fișier
+>> octeți-citiți := Stream mesaj: ['fread'] argumente: (Listă nou ; tamp ; 1 ; 6 ; fd ).
+Ieșire scrie: octeți-citiți, rând-nou.
+Ieșire scrie: tamp, rând-nou.
 
-# free memory
+# eliberăm memoria
 str  eliberează.
 cale eliberează.
 mode eliberează.
-buf  eliberează.
+tamp  eliberează.
 
 

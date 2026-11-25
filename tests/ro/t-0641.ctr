@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# Test pentru curățarea utf8
 Server init.
 
->> utf8cases := Dicționar nou
-	# ASCII only
+>> cazuriutf8 := Dicționar nou
+	# doar ASCII
 	pune: ( Listă nou ; 65 ; 65 ; 65 ; 65 ; 0 ) la: ['AAAA'],
-	# valid 2 byte sequence
+	# secvență validă de 2 octeți
 	pune: ( Listă nou ; 194 ; 162 ; 0 ) la: ['¢'],
-	# Valid 3-byte UTF-8
+	# UTF-8 valid de 3 octeți
     pune: ( Listă nou ; 226 ; 130 ; 172 ; 0 ) la: ['€'],
-	# Valid 4-byte UTF-8
+	# UTF-8 valid de 4 octeți
     pune: ( Listă nou ; 240 ; 144 ; 141 ; 136 ; 0 ) la: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# Octet de continuare invalid în secvența E2 28 AC -> început secv. 3o + 28 cont. greșit + AC octet cont., dar aparține aceleiași erori
     pune: ( Listă nou ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) la: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# Codificare supralungă a lui ASCII 'A' (ar trebui să devină ?),
     pune: ( Listă nou ; 65 ; 193 ; 129 ; 0 ) la: ['A?'],
-	# Invalid first byte (0xFF)
+	# Primul octet invalid (0xFF)
     pune: ( Listă nou ; 255 ; 0 ) la: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Secvență multi-octet incompletă la sfârșit
     pune: ( Listă nou ; 66 ; 226 ; 0 ) la: ['B?'],
-    # Empty string
+    # Text gol
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Mai multe secvențe amestecate
     pune: ( Listă nou ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) la: ['A€?𐍈B'].
 	 
-utf8cases fiecare: { :key :value
+cazuriutf8 fiecare: { :key :value
 	>> blob := Blob nou: value numără, bytes: value.
 	>> str := blob text.
 	(str = key) adevărat: {
 		Ieșire scrie: ['OK'], rând-nou.
 	}, altfel: {
-		Ieșire scrie: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, rând-nou.
+		Ieșire scrie: ['Curățarea UTF8 a eșuat pe: '] + key + [' primit: '] + str, rând-nou.
 	}.
 	blob eliberează.
 }.

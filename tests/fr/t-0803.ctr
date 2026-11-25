@@ -12,16 +12,16 @@ Server init.
 	nom-base: ['xobase'],
 	connecter.
 #...
->> del := conn1 requête: ['DELETE FROM book WHERE id > 0'].
-{  del exécuter. conn1 valider. } intercepter: { :e conn1 annuler.  }, démarrer.
+>> suppr := conn1 requête: ['DELETE FROM book WHERE id > 0'].
+{  suppr exécuter. conn1 valider. } intercepter: { :e conn1 annuler.  }, démarrer.
 
->> insert := conn1 requête: ['INSERT INTO book (id) VALUES(null)'].
-insert exécuter.
+>> insertion := conn1 requête: ['INSERT INTO book (id) VALUES(null)'].
+insertion exécuter.
 
 >> compter := conn1 requête: ['SELECT COUNT(*) AS num FROM book'].
-compter récupérer: { :row Sortie écrire: row num, stop. }.
+compter récupérer: { :rangée Sortie écrire: rangée num, stop. }.
 
-# does not show up
-# insert not committed on connection 1
+# n'apparaît pas
+# insertion non validée sur la connexion 1
 >> compter := conn2 requête: ['SELECT COUNT(*) AS num FROM book'].
-compter récupérer: { :row Sortie écrire: row num, stop. }.
+compter récupérer: { :rangée Sortie écrire: rangée num, stop. }.

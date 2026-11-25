@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# test de base de données
+# voir l'exemple server.xo pour la configuration requise
 
 Server init.
-Sortie écrire: ['Database test'], stop.
+Sortie écrire: ['Test de base de données'], stop.
 
->> db := Maria-DB nouveau hôte: ['localhost'],
+>> bd := Maria-DB nouveau hôte: ['localhost'],
 	utilisateur: ['xo'], mot-de-passe: ['pass123'], nom-base: ['xobase'], connecter.
 
-Sortie écrire: ['Can we connect? '] + db connecté?, stop.
+Sortie écrire: ['Peut-on se connecter ? '] + bd connecté?, stop.
 
->> paramètres-recherche := db requête: ['
+>> paramètres-recherche := bd requête: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], paramètres: ( Liste nouveau ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], paramètres: ( Liste nouveau ; ['abc'] ; 12.35 ; 6 ). # requêtes paramétrées
 
-{  paramètres-recherche exécuter. db valider. } intercepter: { :e db annuler.  }, démarrer.
+{  paramètres-recherche exécuter. bd valider. } intercepter: { :e bd annuler.  }, démarrer.
 
-Sortie écrire: ['Can we insert? '] + ( paramètres-recherche insert-id > 0 ), stop.
+Sortie écrire: ['Peut-on insérer ? '] + ( paramètres-recherche insert-id > 0 ), stop.
 
 >> x := 0.
 >> paramètres-recherche :=
-db requête: ['SELECT * FROM book order by id desc limit 2'], 
-récupérer: { :row 
+bd requête: ['SELECT * FROM book order by id desc limit 2'], 
+récupérer: { :rangée 
 	x additionner: 1.
-	Oui interrompre. # must clean up, no 'Commands out of sync'
+	Oui interrompre. # doit nettoyer, pas de 'Commands out of sync'
 }.
 
 >> paramètres-recherche :=
-db requête: ['SELECT * FROM book order by id desc limit 2'], 
-récupérer: { :row
+bd requête: ['SELECT * FROM book order by id desc limit 2'], 
+récupérer: { :rangée
 	x additionner: 1.
 	Oui interrompre.
 }.
 
 (x > 0) oui: {
-	Sortie écrire: ['Can we break in the middle of a fetch? '].
+	Sortie écrire: ['Peut-on interrompre au milieu d'un fetch ? '].
 }.
 
 Sortie écrire: Oui, stop.

@@ -1,35 +1,38 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# sessiekoekie-formaat, json-inhoudstipe, slegs webprotokolle, svg inlyn gewys
 Server inisialiseer.
 Program gebruik: ['../../../src/xo/af/webtools.xo'].
 
->> Fake-Request := Objek nuut.
-Fake-Request by: ['value:'] doen: { :waarde
+>> Vals-Versoek := Objek nuut.
+Vals-Versoek by: ['value:'] doen: { :waarde
 	eie waarde := waarde.
 }.
-Fake-Request by: ['cookie:'] doen: { :naam <- eie waarde.
+Vals-Versoek by: ['cookie:'] doen: { :naam
+	<- eie waarde.
 }.
 
->> Test-Session := Tydelike-lêer-sessie nuut.
-Test-Session by: ['laai'] doen: { <- Woordeboek nuut.
+>> Toets-Sessie := Tydelike-lêer-sessie nuut.
+Toets-Sessie by: ['laai'] doen: {
+	<- Woordeboek nuut.
 }.
-Test-Session by: ['session-id'] doen: { <- eie id.
+Toets-Sessie by: ['sessie-kenmerk'] doen: {
+	<- eie id.
 }.
 
->> cookies := Lys nuut
+>> koekies := Lys nuut
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies elk: { :i :cookie
-	>> versoek := Fake-Request nuut.
-	versoek value: cookie.
-	>> bestuurder := Test-Session nuut.
+koekies elk: { :i :koekie
+	>> versoek := Vals-Versoek nuut.
+	versoek value: koekie.
+	>> bestuurder := Toets-Sessie nuut.
 	>> web := Webdokument nuut.
 	web versoek: versoek.
 	web sessiebestuurder: bestuurder.
 	web sessie-begin.
-	Uitvoer skryf: ( bestuurder session-id = cookie ), nuwe-reël.
+	Uitvoer skryf: ( bestuurder sessie-kenmerk = koekie ), nuwe-reël.
 }.
 
 >> web := Webdokument nuut.

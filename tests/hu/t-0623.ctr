@@ -1,10 +1,10 @@
 
 
->> g := Server új.
->> v := Széf új.
->> ok := 0.
+>> g  := Server új.
+>> v  := Széf új.
+>> rendben := 0.
 
->> secrets := Lista új ; 
+>> titkok := Lista új ; 
 	 ['aaa'] ;
 	 [''] ; 
 	 ['AB'] ;
@@ -14,30 +14,30 @@
 	 ['漢字'] ;
 	 ['==[abc]=='].
 	
->> passwords := secrets másol.
-passwords mindegyik: { :i :p
-	secrets mindegyik: { :n :s
+>> jelszavak := titkok másol.
+jelszavak mindegyik: { :i :p
+	titkok mindegyik: { :n :s
 		{
-			>> encrypted := v titkosít: s kulcs: p.
-			>> decrypted := v visszafejt: encrypted kulcs: p.
-			(decrypted = s) igaz: {
-				ok hozzáad: 1.
+			>> titkosított := v titkosít: s kulcs: p.
+			>> visszafejtett := v visszafejt: titkosított kulcs: p.
+			(visszafejtett = s) igaz: {
+				rendben hozzáad: 1.
 			}, különben: {
-				Kimenet ír: ['failed encrypting/decrypting: '], újsor.
+				Kimenet ír: ['titkosítás/visszafejtés sikertelen: '], újsor.
 				Kimenet ír: s, újsor.
-				Kimenet ír: ['encrypted: '] + encrypted, újsor.
-				Kimenet ír: ['decrypted: '] + encrypted, újsor.
+				Kimenet ír: ['titkosítva: '] + titkosított, újsor.
+				Kimenet ír: ['visszafejtve: '] + titkosított, újsor.
 				Program vége.
 			}.
-		} elkap: { :err
+		} elkap: { :hb
 			(s = [''] vagy: p = ['']) igaz: {
-				ok hozzáad: 1.
+				rendben hozzáad: 1.
 			}, különben: {
-				Kimenet ír: err, újsor.
+				Kimenet ír: hb, újsor.
 				Program vége.
 			}.
 		}, indít.
 	}.
 }.
 
-Kimenet ír: ( ok + [' vault encryptions tested.'] ), újsor.
+Kimenet ír: ( rendben + [' széftitkosítás tesztelve.'] ), újsor.

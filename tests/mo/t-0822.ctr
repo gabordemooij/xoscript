@@ -1,22 +1,22 @@
-# fewer parameters than placeholders must give an error, not read past the bindings
+# mai puțini parametri decât substituenți trebuie să dea o eroare, nu să citească dincolo de legături
 Server init.
 
->> db := Maria-DB nou gazdă: ['localhost'],
+>> bd := Maria-DB nou gazdă: ['localhost'],
 	utilizator: ['xo'],
 	parolă: ['pass123'],
 	nume-bază: ['xobase'],
 	conectează.
 
->> parametri-căutare := db interogare: ['SELECT ? AS a, ? AS b, ? AS c'].
+>> parametri-căutare := bd interogare: ['SELECT ? AS a, ? AS b, ? AS c'].
 parametri-căutare parametri: (Listă nou ; ['1']).
-{ parametri-căutare preia: { :row Ieșire scrie: row, rând-nou. }. } prinde: { :e Ieșire scrie: e, rând-nou. }, pornește.
+{ parametri-căutare preia: { :rând Ieșire scrie: rând, rând-nou. }. } prinde: { :e Ieșire scrie: e, rând-nou. }, pornește.
 
->> parametri-căutare := db interogare: ['SELECT ? AS a'].
-{ parametri-căutare preia: { :row Ieșire scrie: row, rând-nou. }. } prinde: { :e Ieșire scrie: e, rând-nou. }, pornește.
+>> parametri-căutare := bd interogare: ['SELECT ? AS a'].
+{ parametri-căutare preia: { :rând Ieșire scrie: rând, rând-nou. }. } prinde: { :e Ieșire scrie: e, rând-nou. }, pornește.
 
-# the right number still works, more parameters are ignored as before
->> parametri-căutare := db interogare: ['SELECT ? AS a, ? AS b'].
+# numărul corect încă funcționează, parametrii în plus sunt ignorați ca înainte
+>> parametri-căutare := bd interogare: ['SELECT ? AS a, ? AS b'].
 parametri-căutare parametri: (Listă nou ; ['1'] ; ['2']).
-parametri-căutare preia: { :row Ieșire scrie: (row la: ['a']), scrie: (row la: ['b']), rând-nou. }.
+parametri-căutare preia: { :rând Ieșire scrie: (rând la: ['a']), scrie: (rând la: ['b']), rând-nou. }.
 parametri-căutare parametri: (Listă nou ; ['1'] ; ['2'] ; ['3']).
-parametri-căutare preia: { :row Ieșire scrie: (row la: ['a']), scrie: (row la: ['b']), rând-nou. }.
+parametri-căutare preia: { :rând Ieșire scrie: (rând la: ['a']), scrie: (rând la: ['b']), rând-nou. }.

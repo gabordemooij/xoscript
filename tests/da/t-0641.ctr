@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# Test utf8-rensning
 Server init.
 
->> utf8cases := Ordbog ny
-	# ASCII only
+>> utf8tilfælde := Ordbog ny
+	# Kun ASCII
 	sæt: ( Liste ny ; 65 ; 65 ; 65 ; 65 ; 0 ) ved: ['AAAA'],
-	# valid 2 byte sequence
+	# gyldig 2-byte-sekvens
 	sæt: ( Liste ny ; 194 ; 162 ; 0 ) ved: ['¢'],
-	# Valid 3-byte UTF-8
+	# Gyldig 3-byte UTF-8
     sæt: ( Liste ny ; 226 ; 130 ; 172 ; 0 ) ved: ['€'],
-	# Valid 4-byte UTF-8
+	# Gyldig 4-byte UTF-8
     sæt: ( Liste ny ; 240 ; 144 ; 141 ; 136 ; 0 ) ved: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# Ugyldig fortsættelsesbyte i sekvensen E2 28 AC -> start 3b-sekv + 28 forkert fortsættelse + AC fortsættelsesbyte, men hører til samme fejl
     sæt: ( Liste ny ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ved: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# Overlang kodning af ASCII 'A' (bør blive ?),
     sæt: ( Liste ny ; 65 ; 193 ; 129 ; 0 ) ved: ['A?'],
-	# Invalid first byte (0xFF)
+	# Ugyldig første byte (0xFF)
     sæt: ( Liste ny ; 255 ; 0 ) ved: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Ufuldstændig multibyte-sekvens til sidst
     sæt: ( Liste ny ; 66 ; 226 ; 0 ) ved: ['B?'],
-    # Empty string
+    # Tom tekst
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Flere blandede sekvenser
     sæt: ( Liste ny ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ved: ['A€?𐍈B'].
 	 
-utf8cases hver: { :key :value
+utf8tilfælde hver: { :key :value
 	>> blob := Blob ny: value antal, bytes: value.
 	>> str := blob tekst.
 	(str = key) sand: {
 		Uddata skriv: ['OK'], stop.
 	}, ellers: {
-		Uddata skriv: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, stop.
+		Uddata skriv: ['UTF8-rensning fejlede på: '] + key + [' fik: '] + str, stop.
 	}.
 	blob frigiv.
 }.

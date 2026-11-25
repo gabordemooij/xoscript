@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# χρήση FFI με το πρόσθετο Server
 
-# connect to libc (platform specific)
->> libname := Πρόγραμμα ρύθμιση: ['FFITESTLIB'].
+# σύνδεση με τη libc (εξαρτάται από την πλατφόρμα)
+>> όνομα-βιβλιοθήκης := Πρόγραμμα ρύθμιση: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# σύνδεση συναρτήσεων stdio από τη C για προχωρημένες λειτουργίες αρχείων
 Server σύνδεση: ( Λίστα νέο ;
- libname ; ['fopen'] ;
+ όνομα-βιβλιοθήκης ; ['fopen'] ;
  ( Λίστα νέο ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 σύνδεση: ( Λίστα νέο ;
- Κενό ; # means same lib
+ Κενό ; # σημαίνει την ίδια βιβλιοθήκη
  ['fread'] ;
  ( Λίστα νέο ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Κενό ; # means same object (i.e. Stream)
+ Κενό ; # σημαίνει το ίδιο αντικείμενο (δηλ. Ροή)
  ['fread']
 ),
 σύνδεση: (
  Λίστα νέο ;
- Κενό ; # means same lib
+ Κενό ; # σημαίνει την ίδια βιβλιοθήκη
  ['fwrite'] ;
  ( Λίστα νέο ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Κενό ; # means same lib
+ Κενό ; # σημαίνει την ίδια βιβλιοθήκη
  ['fwrite']
 ),
 σύνδεση: (
  Λίστα νέο ;
- Κενό ; # means same lib
+ Κενό ; # σημαίνει την ίδια βιβλιοθήκη
  ['rewind'] ;
  ( Λίστα νέο ; ['pointer'] ) ;
  ['int'] ;
- Κενό ; # means same lib
+ Κενό ; # σημαίνει την ίδια βιβλιοθήκη
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> διαδρομή := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# άνοιγμα αρχείου με fopen(path, mode)
 >> fd := Stream path: διαδρομή mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream μήνυμα: ['fwrite'] ορίσματα: (Λίστα νέο ; str ; 1 ; 6 ; fd ).
-Έξοδος γράψε: bytes-written, νέα-γραμμή.
+# εγγραφή bytes από το ενδιάμεσο str στο αρχείο
+>> γραμμένα-bytes := Stream μήνυμα: ['fwrite'] ορίσματα: (Λίστα νέο ; str ; 1 ; 6 ; fd ).
+Έξοδος γράψε: γραμμένα-bytes, νέα-γραμμή.
 
-# rewind file pointer
+# επαναφορά του δείκτη αρχείου στην αρχή
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob νέο: 20.
+# δέσμευση ενδιάμεσης μνήμης
+>> ενδ := Blob νέο: 20.
 
-# read from file
->> bytes-read := Stream μήνυμα: ['fread'] ορίσματα: (Λίστα νέο ; buf ; 1 ; 6 ; fd ).
-Έξοδος γράψε: bytes-read, νέα-γραμμή.
-Έξοδος γράψε: buf, νέα-γραμμή.
+# ανάγνωση από αρχείο
+>> διαβασμένα-bytes := Stream μήνυμα: ['fread'] ορίσματα: (Λίστα νέο ; ενδ ; 1 ; 6 ; fd ).
+Έξοδος γράψε: διαβασμένα-bytes, νέα-γραμμή.
+Έξοδος γράψε: ενδ, νέα-γραμμή.
 
-# free memory
+# αποδέσμευση μνήμης
 str  αποδέσμευση.
 διαδρομή αποδέσμευση.
 mode αποδέσμευση.
-buf  αποδέσμευση.
+ενδ  αποδέσμευση.
 
 

@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# ujian pangkalan data
+# lihat contoh server.xo untuk konfigurasi yang diperlukan
 
 Server init.
-Keluaran tulis: ['Database test'], baris-baharu.
+Keluaran tulis: ['Ujian pangkalan data'], baris-baharu.
 
->> db := Maria-DB baharu hos: ['localhost'],
+>> pd := Maria-DB baharu hos: ['localhost'],
 	nama-pengguna: ['xo'], kata-laluan: ['pass123'], nama-pangkalan-data: ['xobase'], sambung.
 
-Keluaran tulis: ['Can we connect? '] + db bersambung?, baris-baharu.
+Keluaran tulis: ['Bolehkah kita sambung? '] + pd bersambung?, baris-baharu.
 
->> parameter-carian := db pertanyaan: ['
+>> parameter-carian := pd pertanyaan: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parameter: ( Senarai baharu ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parameter: ( Senarai baharu ; ['abc'] ; 12.35 ; 6 ). # pertanyaan berparameter
 
-{  parameter-carian laksana. db sahkan. } tangkap: { :e db batalkan.  }, mula.
+{  parameter-carian laksana. pd sahkan. } tangkap: { :e pd batalkan.  }, mula.
 
-Keluaran tulis: ['Can we insert? '] + ( parameter-carian insert-id > 0 ), baris-baharu.
+Keluaran tulis: ['Bolehkah kita sisip? '] + ( parameter-carian insert-id > 0 ), baris-baharu.
 
 >> x := 0.
 >> parameter-carian :=
-db pertanyaan: ['SELECT * FROM book order by id desc limit 2'], 
-dapatkan: { :row 
+pd pertanyaan: ['SELECT * FROM book order by id desc limit 2'], 
+dapatkan: { :barisan 
 	x tambah: 1.
-	Benar henti. # must clean up, no 'Commands out of sync'
+	Benar henti. # mesti dikemaskan, tiada 'Commands out of sync'
 }.
 
 >> parameter-carian :=
-db pertanyaan: ['SELECT * FROM book order by id desc limit 2'], 
-dapatkan: { :row
+pd pertanyaan: ['SELECT * FROM book order by id desc limit 2'], 
+dapatkan: { :barisan
 	x tambah: 1.
 	Benar henti.
 }.
 
 (x > 0) benar: {
-	Keluaran tulis: ['Can we break in the middle of a fetch? '].
+	Keluaran tulis: ['Bolehkah kita henti di tengah-tengah pengambilan? '].
 }.
 
 Keluaran tulis: Benar, baris-baharu.

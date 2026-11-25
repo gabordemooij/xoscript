@@ -1,18 +1,21 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# format du cookie de session, type de contenu json, protocoles web uniquement, svg affiché en ligne
 Server initialiser.
 Programme utiliser: ['../../../src/xo/fr/webtools.xo'].
 
->> Fake-Request := Objet nouveau.
-Fake-Request quand: ['value:'] faire: { :valeur
+>> Fausse-Requête := Objet nouveau.
+Fausse-Requête quand: ['value:'] faire: { :valeur
 	propre valeur := valeur.
 }.
-Fake-Request quand: ['cookie:'] faire: { :nom <- propre valeur.
+Fausse-Requête quand: ['cookie:'] faire: { :nom
+	<- propre valeur.
 }.
 
->> Test-Session := Session-fichier-temporaire nouveau.
-Test-Session quand: ['charger'] faire: { <- Dictionnaire nouveau.
+>> Session-Test := Session-fichier-temporaire nouveau.
+Session-Test quand: ['charger'] faire: {
+	<- Dictionnaire nouveau.
 }.
-Test-Session quand: ['session-id'] faire: { <- propre id.
+Session-Test quand: ['id-de-session'] faire: {
+	<- propre id.
 }.
 
 >> cookies := Liste nouveau
@@ -22,14 +25,14 @@ Test-Session quand: ['session-id'] faire: { <- propre id.
 	; ['abc\n'].
 
 cookies chaque: { :i :cookie
-	>> demande := Fake-Request nouveau.
+	>> demande := Fausse-Requête nouveau.
 	demande value: cookie.
-	>> gestionnaire := Test-Session nouveau.
+	>> gestionnaire := Session-Test nouveau.
 	>> web := Document-Web nouveau.
 	web demande: demande.
 	web gestionnaire-session: gestionnaire.
 	web démarrer-session.
-	Sortie écrire: ( gestionnaire session-id = cookie ), stop.
+	Sortie écrire: ( gestionnaire id-de-session = cookie ), stop.
 }.
 
 >> web := Document-Web nouveau.

@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# ujian pangkalan data
+# lihat contoh server.xo untuk konfigurasi yang diperlukan
 
 Server init.
-Keluaran tulis: ['Database test'], baris-baharu.
+Keluaran tulis: ['Ujian pangkalan data'], baris-baharu.
 
->> db := Maria-DB baharu hos: ['localhost'],
+>> pd := Maria-DB baharu hos: ['localhost'],
 	nama-pengguna: ['xo'], kata-laluan: ['pass123'], nama-pangkalan-data: ['xobase'], sambung.
 
-Keluaran tulis: ['Can we connect? '] + db bersambung?, baris-baharu.
+Keluaran tulis: ['Bolehkah kita sambung? '] + pd bersambung?, baris-baharu.
 
->> parameter-carian := db pertanyaan: ['
+>> parameter-carian := pd pertanyaan: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parameter: ( Senarai baharu ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parameter: ( Senarai baharu ; ['abc'] ; 12.35 ; 6 ). # pertanyaan berparameter
 
-{  parameter-carian laksana. db sahkan. } tangkap: { :e db batalkan.  }, mula.
+{  parameter-carian laksana. pd sahkan. } tangkap: { :e pd batalkan.  }, mula.
 
-Keluaran tulis: ['Can we insert? '] + ( parameter-carian insert-id > 0 ), baris-baharu.
+Keluaran tulis: ['Bolehkah kita sisip? '] + ( parameter-carian insert-id > 0 ), baris-baharu.
 
 >> Obj := Objek baharu.
-Obj apabila: ['retrieve-rows'] lakukan: {
+Obj apabila: ['ambil-barisan'] lakukan: {
 	milik bilangan := 0.
 	>> parameter-carian :=
-	db pertanyaan: ['SELECT * FROM book order by id desc limit 2'], 
-	dapatkan: { :row 
+	pd pertanyaan: ['SELECT * FROM book order by id desc limit 2'], 
+	dapatkan: { :barisan 
 		milik bilangan tambah: 1.
 		Benar henti.
-	}. <- milik bilangan salin.
+	}. # mengambil baris
+	<- milik bilangan salin.
 }.
 
-Keluaran tulis: ['Can we query? '] + ( Obj retrieve-rows > 0 ), baris-baharu.
+Keluaran tulis: ['Bolehkah kita buat pertanyaan? '] + ( Obj ambil-barisan > 0 ), baris-baharu.

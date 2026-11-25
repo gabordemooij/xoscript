@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# ทดสอบการแปลงชนิด / การแปลง / การผูก
 โปรแกรม จัดการหน่วยความจำ: 4.
 Server init.
 
->> counter := 0.
->> db := Maria-DB สร้างใหม่ โฮสต์: ['localhost'],
+>> ตัวนับ := 0.
+>> ฐข := Maria-DB สร้างใหม่ โฮสต์: ['localhost'],
 	ชื่อผู้ใช้: ['xo'], รหัสผ่าน: ['pass123'], ชื่อฐานข้อมูล: ['xobase'], เชื่อมต่อ.
 
->> TwoDigitFormat := รูปแบบ สร้างใหม่: ['%02d'].
+>> รูปแบบสองหลัก := รูปแบบ สร้างใหม่: ['%02d'].
 
-# Datetime
+# วันเวลา
 {
-	>> ปี := ตัวเลข ระหว่าง: 1995 ถึง: 2050, เป็นข้อความ.
-	>> เดือน := TwoDigitFormat ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 12), เป็นข้อความ.
-	>> วัน := TwoDigitFormat ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 28), เป็นข้อความ.
-	>> ชั่วโมง := TwoDigitFormat ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 23), เป็นข้อความ.
-	>> นาที := TwoDigitFormat ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 59), เป็นข้อความ.
-	>> วินาที := TwoDigitFormat ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 59), เป็นข้อความ.
-	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
-	datetime
+	>> ปี     := ตัวเลข ระหว่าง: 1995 ถึง: 2050, เป็นข้อความ.
+	>> เดือน    := รูปแบบสองหลัก ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 12), เป็นข้อความ.
+	>> วัน      := รูปแบบสองหลัก ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 28), เป็นข้อความ.
+	>> ชั่วโมง     := รูปแบบสองหลัก ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 23), เป็นข้อความ.
+	>> นาที   := รูปแบบสองหลัก ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 59), เป็นข้อความ.
+	>> วินาที   := รูปแบบสองหลัก ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 59), เป็นข้อความ.
+	>> วันเวลา := ['YYYY-MM-DD HH:II:SS'].	
+	วันเวลา
 		YYYY: ปี,
 		MM: เดือน,
 		DD: วัน,
@@ -25,89 +25,89 @@ Server init.
 		II: นาที,
 		SS: วินาที.
 	>> พารามิเตอร์ค้นหา :=
-	db คิวรี: (['
+	ฐข คิวรี: (['
 		SELECT 
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'] <datetime>: datetime),
-	ดึงข้อมูล: { :row
-		(row mydatetime = datetime) ถ้าเท็จ: {
+	'] <datetime>: วันเวลา),
+	ดึงข้อมูล: { :แถว
+		(แถว mydatetime = วันเวลา) ถ้าเท็จ: {
 			งานนี้ ข้อผิดพลาด: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mydatetime
+				['คาดว่า: <expected> แต่ได้: <observation>']
+				<expected>: วันเวลา,
+				<observation>: แถว mydatetime
 			).
 		}.
 	
 	}.
-	counter บวก: 1.
+	ตัวนับ บวก: 1.
 } * 100.
 
-# Date
+# วันที่
 {
-	>> ปี := ตัวเลข ระหว่าง: 1995 ถึง: 2050, เป็นข้อความ.
-	>> เดือน := TwoDigitFormat ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 12), เป็นข้อความ.
-	>> วัน := TwoDigitFormat ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 28), เป็นข้อความ.
-	>> date := ['YYYY-MM-DD'].
-	date
+	>> ปี     := ตัวเลข ระหว่าง: 1995 ถึง: 2050, เป็นข้อความ.
+	>> เดือน    := รูปแบบสองหลัก ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 12), เป็นข้อความ.
+	>> วัน      := รูปแบบสองหลัก ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 28), เป็นข้อความ.
+	>> วันที่     := ['YYYY-MM-DD'].
+	วันที่
 		YYYY: ปี,
 		MM: เดือน,
 		DD: วัน.
 	>> พารามิเตอร์ค้นหา :=
-	db คิวรี: (['
+	ฐข คิวรี: (['
 		SELECT
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'] <date>: date),
-	ดึงข้อมูล: { :row
-		(row mydate = date) ถ้าเท็จ: {
+	'] <date>: วันที่),
+	ดึงข้อมูล: { :แถว
+		(แถว mydate = วันที่) ถ้าเท็จ: {
 			งานนี้ ข้อผิดพลาด: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: date,
-				<observation>: row mydate
+				['คาดว่า: <expected> แต่ได้: <observation>']
+				<expected>: วันที่,
+				<observation>: แถว mydate
 			).
 		}.
 	}.
-	counter บวก: 1.
+	ตัวนับ บวก: 1.
 } * 100.
 
 
-# Time
+# เวลา
 {
-	>> ชั่วโมง := TwoDigitFormat ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 23), เป็นข้อความ.
-	>> นาที := TwoDigitFormat ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 59), เป็นข้อความ.
-	>> วินาที := TwoDigitFormat ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 59), เป็นข้อความ.
+	>> ชั่วโมง     := รูปแบบสองหลัก ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 23), เป็นข้อความ.
+	>> นาที   := รูปแบบสองหลัก ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 59), เป็นข้อความ.
+	>> วินาที   := รูปแบบสองหลัก ใช้กับจำนวนเต็ม: (ตัวเลข ระหว่าง: 1 ถึง: 59), เป็นข้อความ.
 	>> เวลา := ['HH:II:SS'].
 	เวลา
 		HH: ชั่วโมง,
 		II: นาที,
 		SS: วินาที.
 	>> พารามิเตอร์ค้นหา :=
-	db คิวรี: (['
+	ฐข คิวรี: (['
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: เวลา),
-	ดึงข้อมูล: { :row
-		(row mytime = เวลา) ถ้าเท็จ: {
+	ดึงข้อมูล: { :แถว
+		(แถว mytime = เวลา) ถ้าเท็จ: {
 			งานนี้ ข้อผิดพลาด: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['คาดว่า: <expected> แต่ได้: <observation>']
+				<expected>: วันเวลา,
+				<observation>: แถว mytime
 			).
 		}.
 	}.
-	counter บวก: 1.
+	ตัวนับ บวก: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# ข้อความ (varchar/text)
 >> str1 := ลิสต์ สร้างใหม่ เติม: 100000 ด้วย: ['x'], รวม: [''].
 {
 	>> str2 := ตู้นิรภัย โทเค็น: 40.
 	>> พารามิเตอร์ค้นหา :=
-	db คิวรี: (['
+	ฐข คิวรี: (['
 		SELECT
 		"<str1>" AS str1,
 		"<str2>" AS str2
@@ -115,30 +115,30 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	ดึงข้อมูล: { :row
-		(row str1 = str1 และ: row str2 = str2) ถ้าเท็จ: {
+	ดึงข้อมูล: { :แถว
+		(แถว str1 = str1 และ: แถว str2 = str2) ถ้าเท็จ: {
 			งานนี้ ข้อผิดพลาด: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['คาดว่า: <expected> แต่ได้: <observation>']
+				<expected>: วันเวลา,
+				<observation>: แถว mytime
 			).
 		}.
 	}.
-	counter บวก: 1.
+	ตัวนับ บวก: 1.
 } * 100.
 
 
-# Numbers
+# ตัวเลข
 {
-	>> n1 := ตัวเลข ระหว่าง: 1 ถึง: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := ตัวเลข ระหว่าง: 1 ถึง: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 จากข้อความ: ['9223372036854775807'] ) -
 		( Int64 จากข้อความ: ['99999'] ) +
 		( Int64 จากข้อความ: n1 เป็นข้อความ )
 	).
 	>> พารามิเตอร์ค้นหา :=
-	db คิวรี: (['
+	ฐข คิวรี: (['
 		SELECT
 		<n1> AS n1,
 		<n2> AS n2,
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	ดึงข้อมูล: { :row
-		(row n1 = n1) ถ้าเท็จ: {
+	ดึงข้อมูล: { :แถว
+		(แถว n1 = n1) ถ้าเท็จ: {
 			งานนี้ ข้อผิดพลาด: (
-				['Expected: <expected> but got: <observation>']
+				['คาดว่า: <expected> แต่ได้: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: แถว n1
 			).
 		}.
-		(row n2 = n2) ถ้าเท็จ: {
+		(แถว n2 = n2) ถ้าเท็จ: {
 			งานนี้ ข้อผิดพลาด: (
-				['Expected: <expected> but got: <observation>']
+				['คาดว่า: <expected> แต่ได้: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: แถว n2
 			).
 		}.
-		(row n3 = n2 ปัดเศษ) ถ้าเท็จ: {
+		(แถว n3 = n2 ปัดเศษ) ถ้าเท็จ: {
 			งานนี้ ข้อผิดพลาด: (
-				['Expected: <expected> but got: <observation>']
+				['คาดว่า: <expected> แต่ได้: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: แถว n3
 			).
 		}.
-		(row big = big) ถ้าเท็จ: {
+		(แถว big = big) ถ้าเท็จ: {
 			งานนี้ ข้อผิดพลาด: (
-				['Expected: <expected> but got: <observation>']
+				['คาดว่า: <expected> แต่ได้: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: แถว big
 			).
 		}.
 		
 	}.
-	counter บวก: 1.
+	ตัวนับ บวก: 1.
 } * 100.
 
 
 แสดงผล เขียน: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: ตัวนับ
 ), ขึ้นบรรทัดใหม่.

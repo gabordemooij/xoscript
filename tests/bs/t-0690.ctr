@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# test baze podataka
+# vidi primjer server.xo za potrebnu konfiguraciju
 
 Server init.
-Izlaz piši: ['Database test'], novi-red.
+Izlaz piši: ['Test baze podataka'], novi-red.
 
->> db := Maria-DB novi domaćin: ['localhost'],
+>> bp := Maria-DB novi domaćin: ['localhost'],
 	korisnik: ['xo'], lozinka: ['pass123'], naziv-baze: ['xobase'], poveži-se.
 
-Izlaz piši: ['Can we connect? '] + db povezano?, novi-red.
+Izlaz piši: ['Možemo li se povezati? '] + bp povezano?, novi-red.
 
->> parametri-pretrage := db upit: ['
+>> parametri-pretrage := bp upit: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametri: ( Lista novi ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametri: ( Lista novi ; ['abc'] ; 12.35 ; 6 ). # parametrizirani upiti
 
-{  parametri-pretrage izvrši. db potvrdi. } uhvati: { :e db poništi.  }, pokreni.
+{  parametri-pretrage izvrši. bp potvrdi. } uhvati: { :e bp poništi.  }, pokreni.
 
-Izlaz piši: ['Can we insert? '] + ( parametri-pretrage insert-id > 0 ), novi-red.
+Izlaz piši: ['Možemo li umetnuti? '] + ( parametri-pretrage insert-id > 0 ), novi-red.
 
 >> x := 0.
 >> parametri-pretrage :=
-db upit: ['SELECT * FROM book order by id desc limit 2'], 
-dohvati: { :row 
+bp upit: ['SELECT * FROM book order by id desc limit 2'], 
+dohvati: { :redak 
 	x saberi: 1.
-	Tačno prekini. # must clean up, no 'Commands out of sync'
+	Tačno prekini. # mora počistiti, bez 'Commands out of sync'
 }.
 
 >> parametri-pretrage :=
-db upit: ['SELECT * FROM book order by id desc limit 2'], 
-dohvati: { :row
+bp upit: ['SELECT * FROM book order by id desc limit 2'], 
+dohvati: { :redak
 	x saberi: 1.
 	Tačno prekini.
 }.
 
 (x > 0) tačno: {
-	Izlaz piši: ['Can we break in the middle of a fetch? '].
+	Izlaz piši: ['Možemo li prekinuti usred dohvatanja? '].
 }.
 
 Izlaz piši: Tačno, novi-red.

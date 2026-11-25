@@ -1,76 +1,77 @@
 Server init.
 
-# JSON encoder only supports UTF-8, no surrogate pairs
+# el codificador JSON només admet UTF-8, sense parells subrogats
 
->> dicts := Llista nou ;
-	# {"key":"normal"} normal ASCII
+>> diccs := Llista nou ;
+	# {"key":"normal"} ASCII normal
 	( Diccionari nou posa: ['normal'] a: ['key'] ) ;
-	# {"key":"hello world"} space character
+	# {"key":"hello world"} caràcter d'espai
 	( Diccionari nou posa: ['hello world'] a: ['key'] ) ;
-	# {"key":"quote: \""} double quote
+	# {"key":"quote: \""} cometa doble
 	( Diccionari nou posa: ['"'] a: ['key'] ) ;
-	# {"key":"backslash: \\"} backslash
+	# {"key":"backslash: \\"} barra inversa
 	( Diccionari nou posa: ['backslash: \\'] a: ['key'] ) ;
-	# {"key":"slash: /"} slash
-	( Diccionari nou posa: ['slash: /'] a: ['key'] ) ;
-	# {"key":"backspace: \b"} backspace
+	# {"key":"slash: /"} barra
+	( Diccionari nou posa: ['barra: /'] a: ['key'] ) ;
+	# {"key":"backspace: \b"} retrocés
 	( Diccionari nou posa: ['backspace: \b'] a: ['key'] ) ;
-	# {"key":"formfeed: \f"} form-feed escape
+	# {"key":"formfeed: \f"} escapament de salt de pàgina
 	( Diccionari nou posa: ['formfeed: \f'] a: ['key'] ) ;
-	# {"key":"newline: \n"} newline
+	# {"key":"newline: \n"} salt de línia
 	( Diccionari nou posa: ['newline: \n'] a: ['key'] ) ;
 	( Diccionari nou posa: ['newline: ↵'] a: ['key'] ) ;
 	( Diccionari nou posa: ['newline: 
 	'] a: ['key'] ) ;
-	# {"key":"carriage return: \r"} carriage-return
+	# {"key":"carriage return: \r"} retorn de carro
 	( Diccionari nou posa: ['carriage return: \r'] a: ['key'] ) ;
-	# {"key":"tab: \t"} tab
+	# {"key":"tab: \t"} tabulació
 	( Diccionari nou posa: ['tab \t'] a: ['key'] ) ;
 	( Diccionari nou posa: ['tab ⇿'] a: ['key'] ) ;
-	( Diccionari nou posa: ['tab  '] a: ['key'] ) ;
+	( Diccionari nou posa: ['tabulador  '] a: ['key'] ) ;
 	# {"key":"control: \u0000"} NUL
 	( Diccionari nou posa: ['NUL \u0000'] a: ['key'] ) ;
 	( Diccionari nou posa: ['NUL \0'] a: ['key'] ) ;
-	# {"key":"control: \u0001"} control character 0x01
+	# {"key":"control: \u0001"} caràcter de control 0x01
 	( Diccionari nou posa: ['control: \u0001'] a: ['key'] ) ;
-	# {"key":"control: \u001F"} control character 0x1F
+	# {"key":"control: \u001F"} caràcter de control 0x1F
 	( Diccionari nou posa: ['control: \u001F'] a: ['key'] ) ;
-	# {"key":"unicode: é"} UTF-8, 2-byte char
+	# {"key":"unicode: é"} UTF-8, caràcter de 2 bytes
 	( Diccionari nou posa: ['unicode: é'] a: ['key'] ) ;
-	# {"key":"unicode: €"} UTF-8, 3-byte char
+	# {"key":"unicode: €"} UTF-8, caràcter de 3 bytes
 	( Diccionari nou posa: ['unicode: €'] a: ['key'] ) ;
-	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	# {"key":"unicode: 日本語"} diversos caràcters UTF-8 de 3 bytes
 	( Diccionari nou posa: ['unicode: 日本語'] a: ['key'] ) ;
-	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	# {"key":"unicode: 😀"} UTF-8, caràcter de 4 bytes
 	( Diccionari nou posa: ['unicode: 😀'] a: ['key'] ) ;
-	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	# {"key":"unicode: 🧑‍💻"} emoji + unió d'amplada zero
 	( Diccionari nou posa: ['unicode: 🧑‍💻'] a: ['key'] ) ;
-	# {"key":"combining: e\u0301"} combining accent
+	# {"key":"combining: é"} accent combinant
 	( Diccionari nou posa: ['combining: e\u0301'] a: ['key'] ) ;
-	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	# {"key":"escaped unicode: é"} escapament Unicode BMP
 	( Diccionari nou posa: ['escaped unicode: \u00e9'] a: ['key'] ) ;
-	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	# {"key":"escaped unicode: €"} escapament Unicode BMP
 	( Diccionari nou posa: ['escaped unicode: \u20ac'] a: ['key'] ) ;
-	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	# {"key":"escaped unicode: 😀"} parell subrogat UTF-16
 	( Diccionari nou posa: ['escaped unicode: \ud83d\ude00'] a: ['key'] ) ;
-	# {"key":""} empty value
+	# {"key":""} valor buit
 	( Diccionari nou posa: [''] a: ['key'] ) ;
-	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	# {"key":"@ < > & = % + ? #"} caràcters ASCII especials
 	( Diccionari nou posa: ['@ < > & = % + ? #'] a: ['key'] ) ;
-	# {"key":"single quote: '"} single quote
+	# {"key":"single quote: '"} cometa simple
 	( Diccionari nou posa: ['''] a: ['key'] ) ;
-	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	# {"key":"multiple: \" \\ \n \r \t"} diversos escapaments JSON
 	( Diccionari nou posa: ['multiple: \" \\ \n \r \t'] a: ['key'] ) ;
-	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} text ASCII més llarg
 	( Diccionari nou posa: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] a: ['key'] ) ;
-	# {"key":" value"} leading space
-	( Diccionari nou posa: [' value'] a: ['key'] ) ;
-	# {"key":"value "} trailing space
-	( Diccionari nou posa: ['value '] a: ['key'] ) ;
-	# {"key":" \t\n\r "} whitespace
-	( Diccionari nou posa: [' \t\n\r '] a: ['key'] ).
+	# {"key":" value"} espai inicial
+	( Diccionari nou posa: [' valor'] a: ['key'] ) ;
+	# {"key":"value "} espai final
+	( Diccionari nou posa: ['valor '] a: ['key'] ) ;
+	# {"key":" \t\n\r "} espais en blanc
+	( Diccionari nou posa: [' \t\n\r '] a: ['key'] )
+	.
 
-dicts cada: { :_ :d
+diccs cada: { :_ :d
 	>> j := JSON jsonify: d.
 	>> a := JSON jsonify: (Diccionari nou posa: d key a: ['key']).
 	>> b := JSON jsonify: (Diccionari nou posa: ['value'] a: d key).
@@ -79,7 +80,7 @@ dicts cada: { :_ :d
 	((e key = d key i: (f ? d key = ['value'])) o: (e key = ['NUL ?'])) cert: {
 		Sortida escriu: ['OK'], salt-de-línia.
 	}, si-no: {
-		Sortida escriu: ['Unable to properly encode/decode: '] + d + j, salt-de-línia.
+		Sortida escriu: ['No es pot codificar/descodificar bé: '] + d + j, salt-de-línia.
 		Programa final.
 	}.
 }.

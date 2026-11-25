@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# FFI használata a Server bővítménnyel
 
-# connect to libc (platform specific)
->> libname := Program beállítás: ['FFITESTLIB'].
+# csatlakozás a libc-hez (platformfüggő)
+>> könyvtárfájlnév := Program beállítás: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# stdio függvények összekapcsolása C-ből haladó fájlműveletekhez
 Server összekapcsol: ( Lista új ;
- libname ; ['fopen'] ;
+ könyvtárfájlnév ; ['fopen'] ;
  ( Lista új ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 összekapcsol: ( Lista új ;
- Semmi ; # means same lib
+ Semmi ; # ugyanaz a könyvtár
  ['fread'] ;
  ( Lista új ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Semmi ; # means same object (i.e. Stream)
+ Semmi ; # ugyanaz az objektum (azaz Stream)
  ['fread']
 ),
 összekapcsol: (
  Lista új ;
- Semmi ; # means same lib
+ Semmi ; # ugyanaz a könyvtár
  ['fwrite'] ;
  ( Lista új ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Semmi ; # means same lib
+ Semmi ; # ugyanaz a könyvtár
  ['fwrite']
 ),
 összekapcsol: (
  Lista új ;
- Semmi ; # means same lib
+ Semmi ; # ugyanaz a könyvtár
  ['rewind'] ;
  ( Lista új ; ['pointer'] ) ;
  ['int'] ;
- Semmi ; # means same lib
+ Semmi ; # ugyanaz a könyvtár
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> útvonal := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# fájl megnyitása fopen(path, mode) hívással
 >> fd := Stream path: útvonal mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream üzenet: ['fwrite'] érvek: (Lista új ; str ; 1 ; 6 ; fd ).
-Kimenet ír: bytes-written, újsor.
+# bájtok írása a str pufferből a fájlba
+>> kiírt-bájtok := Stream üzenet: ['fwrite'] érvek: (Lista új ; str ; 1 ; 6 ; fd ).
+Kimenet ír: kiírt-bájtok, újsor.
 
-# rewind file pointer
+# fájlmutató visszatekerése
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob új: 20.
+# puffer lefoglalása
+>> puf := Blob új: 20.
 
-# read from file
->> bytes-read := Stream üzenet: ['fread'] érvek: (Lista új ; buf ; 1 ; 6 ; fd ).
-Kimenet ír: bytes-read, újsor.
-Kimenet ír: buf, újsor.
+# olvasás a fájlból
+>> olvasott-bájtok := Stream üzenet: ['fread'] érvek: (Lista új ; puf ; 1 ; 6 ; fd ).
+Kimenet ír: olvasott-bájtok, újsor.
+Kimenet ír: puf, újsor.
 
-# free memory
+# memória felszabadítása
 str  felszabadít.
 útvonal felszabadít.
 mode felszabadít.
-buf  felszabadít.
+puf  felszabadít.
 
 

@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# test bază de date
+# vedeți exemplul server.xo pentru configurația necesară
 
 Server init.
-Ieșire scrie: ['Database test'], rând-nou.
+Ieșire scrie: ['Test bază de date'], rând-nou.
 
->> db := Maria-DB nou gazdă: ['localhost'],
+>> bd := Maria-DB nou gazdă: ['localhost'],
 	utilizator: ['xo'], parolă: ['pass123'], nume-bază: ['xobase'], conectează.
 
-Ieșire scrie: ['Can we connect? '] + db conectat?, rând-nou.
+Ieșire scrie: ['Ne putem conecta? '] + bd conectat?, rând-nou.
 
->> parametri-căutare := db interogare: ['
+>> parametri-căutare := bd interogare: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametri: ( Listă nou ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametri: ( Listă nou ; ['abc'] ; 12.35 ; 6 ). # interogări parametrizate
 
-{  parametri-căutare execută-interogare. db confirmă. } prinde: { :e db anulează.  }, pornește.
+{  parametri-căutare execută-interogare. bd confirmă. } prinde: { :e bd anulează.  }, pornește.
 
-Ieșire scrie: ['Can we insert? '] + ( parametri-căutare insert-id > 0 ), rând-nou.
+Ieșire scrie: ['Putem insera? '] + ( parametri-căutare insert-id > 0 ), rând-nou.
 
->> Obj := Obiect nou.
-Obj la: ['retrieve-rows'] execută: {
+>> Ob := Obiect nou.
+Ob la: ['preia-rânduri'] execută: {
 	propriu numără := 0.
 	>> parametri-căutare :=
-	db interogare: ['SELECT * FROM book order by id desc limit 2'], 
-	preia: { :row 
+	bd interogare: ['SELECT * FROM book order by id desc limit 2'], 
+	preia: { :rând 
 		propriu numără adaugă: 1.
 		Adevărat întrerupe.
-	}. <- propriu numără copiază.
+	}. # preluarea rândurilor
+	<- propriu numără copiază.
 }.
 
-Ieșire scrie: ['Can we query? '] + ( Obj retrieve-rows > 0 ), rând-nou.
+Ieșire scrie: ['Putem interoga? '] + ( Ob preia-rânduri > 0 ), rând-nou.

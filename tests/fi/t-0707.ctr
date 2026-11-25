@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# testaa tyyppimuunnokset / konversiot / sidonnat
 Ohjelma muistinhallinta: 4.
 Server init.
 
->> counter := 0.
->> db := Maria-DB uusi isäntä: ['localhost'],
+>> laskuri := 0.
+>> tk := Maria-DB uusi isäntä: ['localhost'],
 	käyttäjänimi: ['xo'], salasana: ['pass123'], tietokannan-nimi: ['xobase'], yhdistä.
 
->> TwoDigitFormat := Muoto uusi: ['%02d'].
+>> KaksinumeroinenMuoto := Muoto uusi: ['%02d'].
 
-# Datetime
+# Päiväysaika
 {
-	>> vuosi := Luku väliltä: 1995 ja: 2050, teksti.
-	>> kuukausi := TwoDigitFormat sovella-kokonaisluku: (Luku väliltä: 1 ja: 12), teksti.
-	>> päivä := TwoDigitFormat sovella-kokonaisluku: (Luku väliltä: 1 ja: 28), teksti.
-	>> tunti := TwoDigitFormat sovella-kokonaisluku: (Luku väliltä: 1 ja: 23), teksti.
-	>> minuutti := TwoDigitFormat sovella-kokonaisluku: (Luku väliltä: 1 ja: 59), teksti.
-	>> sekunti := TwoDigitFormat sovella-kokonaisluku: (Luku väliltä: 1 ja: 59), teksti.
-	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
-	datetime
+	>> vuosi     := Luku väliltä: 1995 ja: 2050, teksti.
+	>> kuukausi    := KaksinumeroinenMuoto sovella-kokonaisluku: (Luku väliltä: 1 ja: 12), teksti.
+	>> päivä      := KaksinumeroinenMuoto sovella-kokonaisluku: (Luku väliltä: 1 ja: 28), teksti.
+	>> tunti     := KaksinumeroinenMuoto sovella-kokonaisluku: (Luku väliltä: 1 ja: 23), teksti.
+	>> minuutti   := KaksinumeroinenMuoto sovella-kokonaisluku: (Luku väliltä: 1 ja: 59), teksti.
+	>> sekunti   := KaksinumeroinenMuoto sovella-kokonaisluku: (Luku väliltä: 1 ja: 59), teksti.
+	>> päiväysaika := ['YYYY-MM-DD HH:II:SS'].	
+	päiväysaika
 		YYYY: vuosi,
 		MM: kuukausi,
 		DD: päivä,
@@ -25,89 +25,89 @@ Server init.
 		II: minuutti,
 		SS: sekunti.
 	>> hakuparametrit :=
-	db kysely: (['
+	tk kysely: (['
 		SELECT 
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'] <datetime>: datetime),
-	hae: { :row
-		(row mydatetime = datetime) epätosi: {
+	'] <datetime>: päiväysaika),
+	hae: { :vaakarivi
+		(vaakarivi mydatetime = päiväysaika) epätosi: {
 			tämä-tehtävä virhe: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mydatetime
+				['Odotettiin: <expected> mutta saatiin: <observation>']
+				<expected>: päiväysaika,
+				<observation>: vaakarivi mydatetime
 			).
 		}.
 	
 	}.
-	counter lisää: 1.
+	laskuri lisää: 1.
 } * 100.
 
-# Date
+# Päiväys
 {
-	>> vuosi := Luku väliltä: 1995 ja: 2050, teksti.
-	>> kuukausi := TwoDigitFormat sovella-kokonaisluku: (Luku väliltä: 1 ja: 12), teksti.
-	>> päivä := TwoDigitFormat sovella-kokonaisluku: (Luku väliltä: 1 ja: 28), teksti.
-	>> date := ['YYYY-MM-DD'].
-	date
+	>> vuosi     := Luku väliltä: 1995 ja: 2050, teksti.
+	>> kuukausi    := KaksinumeroinenMuoto sovella-kokonaisluku: (Luku väliltä: 1 ja: 12), teksti.
+	>> päivä      := KaksinumeroinenMuoto sovella-kokonaisluku: (Luku väliltä: 1 ja: 28), teksti.
+	>> päiväys     := ['YYYY-MM-DD'].
+	päiväys
 		YYYY: vuosi,
 		MM: kuukausi,
 		DD: päivä.
 	>> hakuparametrit :=
-	db kysely: (['
+	tk kysely: (['
 		SELECT
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'] <date>: date),
-	hae: { :row
-		(row mydate = date) epätosi: {
+	'] <date>: päiväys),
+	hae: { :vaakarivi
+		(vaakarivi mydate = päiväys) epätosi: {
 			tämä-tehtävä virhe: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: date,
-				<observation>: row mydate
+				['Odotettiin: <expected> mutta saatiin: <observation>']
+				<expected>: päiväys,
+				<observation>: vaakarivi mydate
 			).
 		}.
 	}.
-	counter lisää: 1.
+	laskuri lisää: 1.
 } * 100.
 
 
-# Time
+# Aika
 {
-	>> tunti := TwoDigitFormat sovella-kokonaisluku: (Luku väliltä: 1 ja: 23), teksti.
-	>> minuutti := TwoDigitFormat sovella-kokonaisluku: (Luku väliltä: 1 ja: 59), teksti.
-	>> sekunti := TwoDigitFormat sovella-kokonaisluku: (Luku väliltä: 1 ja: 59), teksti.
+	>> tunti     := KaksinumeroinenMuoto sovella-kokonaisluku: (Luku väliltä: 1 ja: 23), teksti.
+	>> minuutti   := KaksinumeroinenMuoto sovella-kokonaisluku: (Luku väliltä: 1 ja: 59), teksti.
+	>> sekunti   := KaksinumeroinenMuoto sovella-kokonaisluku: (Luku väliltä: 1 ja: 59), teksti.
 	>> aika := ['HH:II:SS'].
 	aika
 		HH: tunti,
 		II: minuutti,
 		SS: sekunti.
 	>> hakuparametrit :=
-	db kysely: (['
+	tk kysely: (['
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: aika),
-	hae: { :row
-		(row mytime = aika) epätosi: {
+	hae: { :vaakarivi
+		(vaakarivi mytime = aika) epätosi: {
 			tämä-tehtävä virhe: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Odotettiin: <expected> mutta saatiin: <observation>']
+				<expected>: päiväysaika,
+				<observation>: vaakarivi mytime
 			).
 		}.
 	}.
-	counter lisää: 1.
+	laskuri lisää: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Merkkijonot (varchar/text)
 >> str1 := Lista uusi täytä: 100000 arvolla: ['x'], yhdistä: [''].
 {
 	>> str2 := Holvi tunniste: 40.
 	>> hakuparametrit :=
-	db kysely: (['
+	tk kysely: (['
 		SELECT
 		"<str1>" AS str1,
 		"<str2>" AS str2
@@ -115,30 +115,30 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	hae: { :row
-		(row str1 = str1 ja: row str2 = str2) epätosi: {
+	hae: { :vaakarivi
+		(vaakarivi str1 = str1 ja: vaakarivi str2 = str2) epätosi: {
 			tämä-tehtävä virhe: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Odotettiin: <expected> mutta saatiin: <observation>']
+				<expected>: päiväysaika,
+				<observation>: vaakarivi mytime
 			).
 		}.
 	}.
-	counter lisää: 1.
+	laskuri lisää: 1.
 } * 100.
 
 
-# Numbers
+# Luvut
 {
-	>> n1 := Luku väliltä: 1 ja: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Luku väliltä: 1 ja: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 tekstistä: ['9223372036854775807'] ) -
 		( Int64 tekstistä: ['99999'] ) +
 		( Int64 tekstistä: n1 teksti )
 	).
 	>> hakuparametrit :=
-	db kysely: (['
+	tk kysely: (['
 		SELECT
 		<n1> AS n1,
 		<n2> AS n2,
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	hae: { :row
-		(row n1 = n1) epätosi: {
+	hae: { :vaakarivi
+		(vaakarivi n1 = n1) epätosi: {
 			tämä-tehtävä virhe: (
-				['Expected: <expected> but got: <observation>']
+				['Odotettiin: <expected> mutta saatiin: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: vaakarivi n1
 			).
 		}.
-		(row n2 = n2) epätosi: {
+		(vaakarivi n2 = n2) epätosi: {
 			tämä-tehtävä virhe: (
-				['Expected: <expected> but got: <observation>']
+				['Odotettiin: <expected> mutta saatiin: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: vaakarivi n2
 			).
 		}.
-		(row n3 = n2 pyöristä) epätosi: {
+		(vaakarivi n3 = n2 pyöristä) epätosi: {
 			tämä-tehtävä virhe: (
-				['Expected: <expected> but got: <observation>']
+				['Odotettiin: <expected> mutta saatiin: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: vaakarivi n3
 			).
 		}.
-		(row big = big) epätosi: {
+		(vaakarivi big = big) epätosi: {
 			tämä-tehtävä virhe: (
-				['Expected: <expected> but got: <observation>']
+				['Odotettiin: <expected> mutta saatiin: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: vaakarivi big
 			).
 		}.
 		
 	}.
-	counter lisää: 1.
+	laskuri lisää: 1.
 } * 100.
 
 
 Tuloste kirjoita: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: laskuri
 ), rivinvaihto.

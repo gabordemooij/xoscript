@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> coba := { :format :value
-	{ Keluaran tulis: ( (Format baru: format) terapkan: value ), baris-baru. } tangkap: { :e Keluaran tulis: e, baris-baru. }, mulai.
+# format harus cocok dengan tipe nilai, tipenya bisa berasal dari klien
+>> coba := { :bentuk :value
+	{ Keluaran tulis: ( (Format baru: bentuk) terapkan: value ), baris-baru. } tangkap: { :e Keluaran tulis: e, baris-baru. }, mulai.
 }.
->> try-int := { :format :value
-	{ Keluaran tulis: ( (Format baru: format) terapkan-bilangan-bulat: value ), baris-baru. } tangkap: { :e Keluaran tulis: e, baris-baru. }, mulai.
+>> coba-int := { :bentuk :value
+	{ Keluaran tulis: ( (Format baru: bentuk) terapkan-bilangan-bulat: value ), baris-baru. } tangkap: { :e Keluaran tulis: e, baris-baru. }, mulai.
 }.
 
-# fits
+# cocok
 coba terapkan: ['|%s|'] dan: ['text'].
 coba terapkan: ['%06.2f'] dan: 5.5.
-coba terapkan: ['100%% %s'] dan: ['sure'].
-try-int terapkan: ['%03d'] dan: 7.
-try-int terapkan: ['%x'] dan: 255.
+coba terapkan: ['100%% %s'] dan: ['tentu'].
+coba-int terapkan: ['%03d'] dan: 7.
+coba-int terapkan: ['%x'] dan: 255.
 coba terapkan: ['%d'] dan: (Int64 baru dari-teks: ['12']).
 coba terapkan: ['%lld'] dan: (Int64 baru dari-teks: ['12']).
 coba terapkan: ['%.1lf'] dan: 5.5.
-try-int terapkan: ['%hd'] dan: 7.
+coba-int terapkan: ['%hd'] dan: 7.
 
-# does not fit
+# tidak cocok
 coba terapkan: ['%s'] dan: 12345.
 coba terapkan: ['%d'] dan: 12345.
 coba terapkan: ['%f'] dan: ['text'].
-try-int terapkan: ['%d'] dan: ['text'].
-try-int terapkan: ['%s'] dan: 5.
+coba-int terapkan: ['%d'] dan: ['text'].
+coba-int terapkan: ['%s'] dan: 5.
 coba terapkan: ['%s %s'] dan: ['text'].
 coba terapkan: ['%n'] dan: ['text'].
 coba terapkan: ['%*s'] dan: ['text'].
 coba terapkan: ['%'] dan: ['text'].
 
-# length modifier does not fit
+# pengubah panjang tidak cocok
 coba terapkan: ['%ls'] dan: ['text'].
 coba terapkan: ['%Lf'] dan: 5.5.
-try-int terapkan: ['%ld'] dan: 7.
-try-int terapkan: ['%lld'] dan: 7.
+coba-int terapkan: ['%ld'] dan: 7.
+coba-int terapkan: ['%lld'] dan: 7.
 coba terapkan: ['%Ld'] dan: (Int64 baru dari-teks: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# lebar yang tidak cocok untuk printf harus memberi galat, bukan crash
 coba terapkan: ['%99999999999s'] dan: ['text'].

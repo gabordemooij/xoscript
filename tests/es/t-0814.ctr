@@ -1,18 +1,21 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# formato de cookie de sesión, tipo de contenido json, solo protocolos web, svg mostrado en línea
 Server iniciar.
 Programa utilizar: ['../../../src/xo/es/webtools.xo'].
 
->> Fake-Request := Objeto crear.
-Fake-Request al: ['value:'] hacer: { :valor
+>> Petición-Falsa := Objeto crear.
+Petición-Falsa al: ['value:'] hacer: { :valor
 	mi valor := valor.
 }.
-Fake-Request al: ['cookie:'] hacer: { :nombre <- mi valor.
+Petición-Falsa al: ['cookie:'] hacer: { :nombre
+	<- mi valor.
 }.
 
->> Test-Session := Ficherotemporal-sesión crear.
-Test-Session al: ['cargar'] hacer: { <- Diccionario crear.
+>> Sesión-Prueba := Ficherotemporal-sesión crear.
+Sesión-Prueba al: ['cargar'] hacer: {
+	<- Diccionario crear.
 }.
-Test-Session al: ['session-id'] hacer: { <- mi id.
+Sesión-Prueba al: ['id-de-sesión'] hacer: {
+	<- mi id.
 }.
 
 >> cookies := Lista crear
@@ -22,14 +25,14 @@ Test-Session al: ['session-id'] hacer: { <- mi id.
 	; ['abc\n'].
 
 cookies cada: { :i :cookie
-	>> solicitud := Fake-Request crear.
+	>> solicitud := Petición-Falsa crear.
 	solicitud value: cookie.
-	>> gestor := Test-Session crear.
+	>> gestor := Sesión-Prueba crear.
 	>> web := Documento-Web crear.
 	web solicitud: solicitud.
 	web controlador-sesión: gestor.
 	web empezar-sesión.
-	Salida escribir: ( gestor session-id = cookie ), detener.
+	Salida escribir: ( gestor id-de-sesión = cookie ), detener.
 }.
 
 >> web := Documento-Web crear.

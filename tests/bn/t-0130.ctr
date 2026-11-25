@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# Server প্লাগইন দিয়ে FFI ব্যবহার
 
-# connect to libc (platform specific)
->> libname := প্রোগ্রাম সেটিং: ['FFITESTLIB'].
+# libc-এর সাথে যুক্ত হও (প্ল্যাটফর্ম-নির্ভর)
+>> লাইব্রেরি-নাম := প্রোগ্রাম সেটিং: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# উন্নত ফাইল অপারেশনের জন্য c থেকে stdio ফাংশনগুলো যুক্ত করো
 Server সংযোগ: ( লিস্ট নতুন ;
- libname ; ['fopen'] ;
+ লাইব্রেরি-নাম ; ['fopen'] ;
  ( লিস্ট নতুন ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 সংযোগ: ( লিস্ট নতুন ;
- শূন্য ; # means same lib
+ শূন্য ; # মানে একই লাইব্রেরি
  ['fread'] ;
  ( লিস্ট নতুন ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- শূন্য ; # means same object (i.e. Stream)
+ শূন্য ; # মানে একই বস্তু (অর্থাৎ স্ট্রিম)
  ['fread']
 ),
 সংযোগ: (
  লিস্ট নতুন ;
- শূন্য ; # means same lib
+ শূন্য ; # মানে একই লাইব্রেরি
  ['fwrite'] ;
  ( লিস্ট নতুন ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- শূন্য ; # means same lib
+ শূন্য ; # মানে একই লাইব্রেরি
  ['fwrite']
 ),
 সংযোগ: (
  লিস্ট নতুন ;
- শূন্য ; # means same lib
+ শূন্য ; # মানে একই লাইব্রেরি
  ['rewind'] ;
  ( লিস্ট নতুন ; ['pointer'] ) ;
  ['int'] ;
- শূন্য ; # means same lib
+ শূন্য ; # মানে একই লাইব্রেরি
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> ফাইল-পথ := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# fopen(path, mode) দিয়ে একটি ফাইল খোলো
 >> fd := Stream path: ফাইল-পথ mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream বার্তা: ['fwrite'] আর্গুমেন্ট: (লিস্ট নতুন ; str ; 1 ; 6 ; fd ).
-আউটপুট লেখো: bytes-written, নতুন-লাইন.
+# বাফার str থেকে বাইটগুলো ফাইলে লেখো
+>> লেখা-বাইট := Stream বার্তা: ['fwrite'] আর্গুমেন্ট: (লিস্ট নতুন ; str ; 1 ; 6 ; fd ).
+আউটপুট লেখো: লেখা-বাইট, নতুন-লাইন.
 
-# rewind file pointer
+# ফাইল পয়েন্টার শুরুতে ফেরাও
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob নতুন: 20.
+# একটি বাফার বরাদ্দ করো
+>> বাফ := Blob নতুন: 20.
 
-# read from file
->> bytes-read := Stream বার্তা: ['fread'] আর্গুমেন্ট: (লিস্ট নতুন ; buf ; 1 ; 6 ; fd ).
-আউটপুট লেখো: bytes-read, নতুন-লাইন.
-আউটপুট লেখো: buf, নতুন-লাইন.
+# ফাইল থেকে পড়ো
+>> পড়া-বাইট := Stream বার্তা: ['fread'] আর্গুমেন্ট: (লিস্ট নতুন ; বাফ ; 1 ; 6 ; fd ).
+আউটপুট লেখো: পড়া-বাইট, নতুন-লাইন.
+আউটপুট লেখো: বাফ, নতুন-লাইন.
 
-# free memory
+# মেমরি মুক্ত করো
 str  মুক্ত.
 ফাইল-পথ মুক্ত.
 mode মুক্ত.
-buf  মুক্ত.
+বাফ  মুক্ত.
 
 

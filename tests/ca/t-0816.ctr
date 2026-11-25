@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> intenta := { :format :value
-	{ Sortida escriu: ( (Format nou: format) aplica: value ), salt-de-línia. } captura: { :e Sortida escriu: e, salt-de-línia. }, inicia.
+# un format ha d'encaixar amb el tipus del valor; el tipus pot venir d'un client
+>> intenta := { :formatació :value
+	{ Sortida escriu: ( (Format nou: formatació) aplica: value ), salt-de-línia. } captura: { :e Sortida escriu: e, salt-de-línia. }, inicia.
 }.
->> try-int := { :format :value
-	{ Sortida escriu: ( (Format nou: format) aplica-enter: value ), salt-de-línia. } captura: { :e Sortida escriu: e, salt-de-línia. }, inicia.
+>> prova-enter := { :formatació :value
+	{ Sortida escriu: ( (Format nou: formatació) aplica-enter: value ), salt-de-línia. } captura: { :e Sortida escriu: e, salt-de-línia. }, inicia.
 }.
 
-# fits
+# encaixa
 intenta aplica: ['|%s|'] i: ['text'].
 intenta aplica: ['%06.2f'] i: 5.5.
-intenta aplica: ['100%% %s'] i: ['sure'].
-try-int aplica: ['%03d'] i: 7.
-try-int aplica: ['%x'] i: 255.
+intenta aplica: ['100%% %s'] i: ['segur'].
+prova-enter aplica: ['%03d'] i: 7.
+prova-enter aplica: ['%x'] i: 255.
 intenta aplica: ['%d'] i: (Int64 nou des-de-text: ['12']).
 intenta aplica: ['%lld'] i: (Int64 nou des-de-text: ['12']).
 intenta aplica: ['%.1lf'] i: 5.5.
-try-int aplica: ['%hd'] i: 7.
+prova-enter aplica: ['%hd'] i: 7.
 
-# does not fit
+# no encaixa
 intenta aplica: ['%s'] i: 12345.
 intenta aplica: ['%d'] i: 12345.
 intenta aplica: ['%f'] i: ['text'].
-try-int aplica: ['%d'] i: ['text'].
-try-int aplica: ['%s'] i: 5.
+prova-enter aplica: ['%d'] i: ['text'].
+prova-enter aplica: ['%s'] i: 5.
 intenta aplica: ['%s %s'] i: ['text'].
 intenta aplica: ['%n'] i: ['text'].
 intenta aplica: ['%*s'] i: ['text'].
 intenta aplica: ['%'] i: ['text'].
 
-# length modifier does not fit
+# el modificador de longitud no encaixa
 intenta aplica: ['%ls'] i: ['text'].
 intenta aplica: ['%Lf'] i: 5.5.
-try-int aplica: ['%ld'] i: 7.
-try-int aplica: ['%lld'] i: 7.
+prova-enter aplica: ['%ld'] i: 7.
+prova-enter aplica: ['%lld'] i: 7.
 intenta aplica: ['%Ld'] i: (Int64 nou des-de-text: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# una amplada que no encaixa amb printf ha de donar un error, no un bloqueig
 intenta aplica: ['%99999999999s'] i: ['text'].

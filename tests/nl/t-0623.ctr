@@ -1,10 +1,10 @@
 
 
->> g := Server nieuw.
->> v := Kluis nieuw.
+>> g  := Server nieuw.
+>> v  := Kluis nieuw.
 >> ok := 0.
 
->> secrets := Reeks nieuw ; 
+>> geheimen := Reeks nieuw ; 
 	 ['aaa'] ;
 	 [''] ; 
 	 ['AB'] ;
@@ -14,30 +14,30 @@
 	 ['漢字'] ;
 	 ['==[abc]=='].
 	
->> passwords := secrets kopieer.
-passwords elk: { :i :p
-	secrets elk: { :n :s
+>> wachtwoorden := geheimen kopieer.
+wachtwoorden elk: { :i :p
+	geheimen elk: { :n :s
 		{
-			>> encrypted := v versleutel: s sleutel: p.
-			>> decrypted := v ontsleutel: encrypted sleutel: p.
-			(decrypted = s) ja: {
+			>> versleuteld := v versleutel: s sleutel: p.
+			>> ontsleuteld := v ontsleutel: versleuteld sleutel: p.
+			(ontsleuteld = s) ja: {
 				ok optellen: 1.
 			}, anders: {
-				Uit schrijf: ['failed encrypting/decrypting: '], stop.
+				Uit schrijf: ['versleutelen/ontsleutelen mislukt: '], stop.
 				Uit schrijf: s, stop.
-				Uit schrijf: ['encrypted: '] + encrypted, stop.
-				Uit schrijf: ['decrypted: '] + encrypted, stop.
+				Uit schrijf: ['versleuteld: '] + versleuteld, stop.
+				Uit schrijf: ['ontsleuteld: '] + versleuteld, stop.
 				Programma einde.
 			}.
-		} afhandelen: { :err
+		} afhandelen: { :ft
 			(s = [''] of: p = ['']) ja: {
 				ok optellen: 1.
 			}, anders: {
-				Uit schrijf: err, stop.
+				Uit schrijf: ft, stop.
 				Programma einde.
 			}.
 		}, start.
 	}.
 }.
 
-Uit schrijf: ( ok + [' vault encryptions tested.'] ), stop.
+Uit schrijf: ( ok + [' kluisversleutelingen getest.'] ), stop.

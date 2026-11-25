@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# آزمون پاک‌ساز utf8
 Server init.
 
->> utf8cases := واژه-نامه جدید
-	# ASCII only
+>> حالت-های-utf8 := واژه-نامه جدید
+	# فقط ASCII
 	بگذار: ﴿ لیست جدید ; 65 ; 65 ; 65 ; 65 ; 0 ﴾ کلید: ⌝'AAAA'⌜,
-	# valid 2 byte sequence
+	# دنباله 2 بایتی معتبر
 	بگذار: ﴿ لیست جدید ; 194 ; 162 ; 0 ﴾ کلید: ⌝'¢'⌜,
-	# Valid 3-byte UTF-8
+	# UTF-8 سه بایتی معتبر
     بگذار: ﴿ لیست جدید ; 226 ; 130 ; 172 ; 0 ﴾ کلید: ⌝'€'⌜,
-	# Valid 4-byte UTF-8
+	# UTF-8 چهار بایتی معتبر
     بگذار: ﴿ لیست جدید ; 240 ; 144 ; 141 ; 136 ; 0 ﴾ کلید: ⌝'𐍈'⌜,
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# بایت ادامه نامعتبر در دنباله E2 28 AC -> آغاز دنباله 3b + 28 ادامه نادرست + AC بایت ادامه، اما همه یک خطا به شمار می‌آیند
     بگذار: ﴿ لیست جدید ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ﴾ کلید: ⌝'A?A'⌜,
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# رمزگذاری بیش از حد بلند ASCII 'A' (باید ? شود)،
     بگذار: ﴿ لیست جدید ; 65 ; 193 ; 129 ; 0 ﴾ کلید: ⌝'A?'⌜,
-	# Invalid first byte (0xFF)
+	# بایت نخست نامعتبر (0xFF)
     بگذار: ﴿ لیست جدید ; 255 ; 0 ﴾ کلید: ⌝'?'⌜,
-	# Incomplete multi-byte sequence at end
+	# دنباله چندبایتی ناقص در پایان
     بگذار: ﴿ لیست جدید ; 66 ; 226 ; 0 ﴾ کلید: ⌝'B?'⌜,
-    # Empty string
+    # رشته خالی
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# چند دنباله آمیخته
     بگذار: ﴿ لیست جدید ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ﴾ کلید: ⌝'A€?𐍈B'⌜.
 	 
-utf8cases هرکدام: ⎬ :key :value
+حالت-های-utf8 هرکدام: ⎬ :key :value
 	>> blob := Blob جدید: value تعداد, بایت-ها: value.
 	>> str := blob به-رشته.
 	﴿str = key﴾ اگر-درست: ⎬
 		خروجی بنویس: ⌝'OK'⌜, سطر-نو.
 	⎨, وگرنه: ⎬
-		خروجی بنویس: ⌝'UTF8 sanitizer failed on: '⌜ + key + ⌝' got: '⌜ + str, سطر-نو.
+		خروجی بنویس: ⌝'پاک‌ساز UTF8 شکست خورد روی: '⌜ + key + ⌝' دریافت شد: '⌜ + str, سطر-نو.
 	⎨.
 	blob آزاد-کن.
 ⎨.

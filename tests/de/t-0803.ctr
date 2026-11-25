@@ -1,27 +1,27 @@
 Server init.
 
->> conn1 := Maria-DB neu host: ['localhost'],
+>> verb1 := Maria-DB neu host: ['localhost'],
 	benutzername: ['xo'],
 	passwort: ['pass123'],
 	datenbankname: ['xobase'],
 	verbinden.
 
->> conn2 := Maria-DB neu host: ['localhost'],
+>> verb2 := Maria-DB neu host: ['localhost'],
 	benutzername: ['xo'],
 	passwort: ['pass123'],
 	datenbankname: ['xobase'],
 	verbinden.
 #...
->> del := conn1 abfrage: ['DELETE FROM book WHERE id > 0'].
-{  del ausführen. conn1 bestätigen. } abfangen: { :e conn1 zurückrollen.  }, starten.
+>> lösch := verb1 abfrage: ['DELETE FROM book WHERE id > 0'].
+{  lösch ausführen. verb1 bestätigen. } abfangen: { :e verb1 zurückrollen.  }, starten.
 
->> insert := conn1 abfrage: ['INSERT INTO book (id) VALUES(null)'].
-insert ausführen.
+>> einfügung := verb1 abfrage: ['INSERT INTO book (id) VALUES(null)'].
+einfügung ausführen.
 
->> anzahl := conn1 abfrage: ['SELECT COUNT(*) AS num FROM book'].
-anzahl abrufen: { :row Ausgabe schreiben: row num, stopp. }.
+>> anzahl := verb1 abfrage: ['SELECT COUNT(*) AS num FROM book'].
+anzahl abrufen: { :reihe Ausgabe schreiben: reihe num, stopp. }.
 
-# does not show up
-# insert not committed on connection 1
->> anzahl := conn2 abfrage: ['SELECT COUNT(*) AS num FROM book'].
-anzahl abrufen: { :row Ausgabe schreiben: row num, stopp. }.
+# erscheint nicht
+# Einfügung auf Verbindung 1 nicht festgeschrieben
+>> anzahl := verb2 abfrage: ['SELECT COUNT(*) AS num FROM book'].
+anzahl abrufen: { :reihe Ausgabe schreiben: reihe num, stopp. }.

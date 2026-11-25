@@ -1,66 +1,66 @@
-# using FFI with the Server plugin
+# ús de FFI amb el connector Server
 
-# connect to libc (platform specific)
->> libname := Programa configuració: ['FFITESTLIB'].
+# connecta amb libc (depèn de la plataforma)
+>> nomBiblio := Programa configuració: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# enllaça funcions stdio de C per a operacions avançades amb fitxers
 Server enllaça: ( Llista nou ;
- libname ; ['fopen'] ;
+ nomBiblio ; ['fopen'] ;
  ( Llista nou ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 enllaça: ( Llista nou ;
- Res ; # means same lib
+ Res ; # vol dir la mateixa biblioteca
  ['fread'] ;
  ( Llista nou ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Res ; # means same object (i.e. Stream)
+ Res ; # vol dir el mateix objecte (és a dir, Flux)
  ['fread']
 ),
 enllaça: (
  Llista nou ;
- Res ; # means same lib
+ Res ; # vol dir la mateixa biblioteca
  ['fwrite'] ;
  ( Llista nou ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Res ; # means same lib
+ Res ; # vol dir la mateixa biblioteca
  ['fwrite']
 ),
 enllaça: (
  Llista nou ;
- Res ; # means same lib
+ Res ; # vol dir la mateixa biblioteca
  ['rewind'] ;
  ( Llista nou ; ['pointer'] ) ;
  ['int'] ;
- Res ; # means same lib
+ Res ; # vol dir la mateixa biblioteca
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> camí := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# obre un fitxer amb fopen(path, mode)
 >> fd := Stream path: camí mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream missatge: ['fwrite'] arguments: (Llista nou ; str ; 1 ; 6 ; fd ).
-Sortida escriu: bytes-written, salt-de-línia.
+# escriu bytes del búfer cadena al fitxer
+>> bytes-escrits := Stream missatge: ['fwrite'] arguments: (Llista nou ; str ; 1 ; 6 ; fd ).
+Sortida escriu: bytes-escrits, salt-de-línia.
 
-# rewind file pointer
+# rebobina el punter del fitxer
 Stream rewind: fd.
 
-# allocate a buffer
+# reserva un búfer
 >> buf := Blob nou: 20.
 
-# read from file
->> bytes-read := Stream missatge: ['fread'] arguments: (Llista nou ; buf ; 1 ; 6 ; fd ).
-Sortida escriu: bytes-read, salt-de-línia.
+# llegeix del fitxer
+>> bytes-llegits := Stream missatge: ['fread'] arguments: (Llista nou ; buf ; 1 ; 6 ; fd ).
+Sortida escriu: bytes-llegits, salt-de-línia.
 Sortida escriu: buf, salt-de-línia.
 
-# free memory
+# allibera la memòria
 str  allibera.
 camí allibera.
 mode allibera.

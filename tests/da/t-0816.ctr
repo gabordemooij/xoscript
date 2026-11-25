@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> prøv := { :format :value
-	{ Uddata skriv: ( (Format ny: format) anvend: value ), stop. } fang: { :e Uddata skriv: e, stop. }, start.
+# et format skal passe til værdiens type, typen kan komme fra en klient
+>> prøv := { :formatering :value
+	{ Uddata skriv: ( (Format ny: formatering) anvend: value ), stop. } fang: { :e Uddata skriv: e, stop. }, start.
 }.
->> try-int := { :format :value
-	{ Uddata skriv: ( (Format ny: format) anvend-heltal: value ), stop. } fang: { :e Uddata skriv: e, stop. }, start.
+>> prøv-heltal := { :formatering :value
+	{ Uddata skriv: ( (Format ny: formatering) anvend-heltal: value ), stop. } fang: { :e Uddata skriv: e, stop. }, start.
 }.
 
-# fits
+# passer
 prøv anvend: ['|%s|'] og: ['text'].
 prøv anvend: ['%06.2f'] og: 5.5.
-prøv anvend: ['100%% %s'] og: ['sure'].
-try-int anvend: ['%03d'] og: 7.
-try-int anvend: ['%x'] og: 255.
+prøv anvend: ['100%% %s'] og: ['sikkert'].
+prøv-heltal anvend: ['%03d'] og: 7.
+prøv-heltal anvend: ['%x'] og: 255.
 prøv anvend: ['%d'] og: (Int64 ny fra-tekst: ['12']).
 prøv anvend: ['%lld'] og: (Int64 ny fra-tekst: ['12']).
 prøv anvend: ['%.1lf'] og: 5.5.
-try-int anvend: ['%hd'] og: 7.
+prøv-heltal anvend: ['%hd'] og: 7.
 
-# does not fit
+# passer ikke
 prøv anvend: ['%s'] og: 12345.
 prøv anvend: ['%d'] og: 12345.
 prøv anvend: ['%f'] og: ['text'].
-try-int anvend: ['%d'] og: ['text'].
-try-int anvend: ['%s'] og: 5.
+prøv-heltal anvend: ['%d'] og: ['text'].
+prøv-heltal anvend: ['%s'] og: 5.
 prøv anvend: ['%s %s'] og: ['text'].
 prøv anvend: ['%n'] og: ['text'].
 prøv anvend: ['%*s'] og: ['text'].
 prøv anvend: ['%'] og: ['text'].
 
-# length modifier does not fit
+# længdemodifikatoren passer ikke
 prøv anvend: ['%ls'] og: ['text'].
 prøv anvend: ['%Lf'] og: 5.5.
-try-int anvend: ['%ld'] og: 7.
-try-int anvend: ['%lld'] og: 7.
+prøv-heltal anvend: ['%ld'] og: 7.
+prøv-heltal anvend: ['%lld'] og: 7.
 prøv anvend: ['%Ld'] og: (Int64 ny fra-tekst: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# en bredde, der ikke passer til printf, skal give en fejl, ikke et nedbrud
 prøv anvend: ['%99999999999s'] og: ['text'].

@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# FFI:n käyttö Server-liitännäisen kanssa
 
-# connect to libc (platform specific)
->> libname := Ohjelma asetus: ['FFITESTLIB'].
+# yhdistä libc:hen (alustakohtainen)
+>> kirjastonimi := Ohjelma asetus: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# linkitä C:n stdio-funktiot edistyneitä tiedosto-operaatioita varten
 Server linkitä: ( Lista uusi ;
- libname ; ['fopen'] ;
+ kirjastonimi ; ['fopen'] ;
  ( Lista uusi ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 linkitä: ( Lista uusi ;
- Tyhjä ; # means same lib
+ Tyhjä ; # tarkoittaa samaa kirjastoa
  ['fread'] ;
  ( Lista uusi ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Tyhjä ; # means same object (i.e. Stream)
+ Tyhjä ; # tarkoittaa samaa oliota (eli Stream)
  ['fread']
 ),
 linkitä: (
  Lista uusi ;
- Tyhjä ; # means same lib
+ Tyhjä ; # tarkoittaa samaa kirjastoa
  ['fwrite'] ;
  ( Lista uusi ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Tyhjä ; # means same lib
+ Tyhjä ; # tarkoittaa samaa kirjastoa
  ['fwrite']
 ),
 linkitä: (
  Lista uusi ;
- Tyhjä ; # means same lib
+ Tyhjä ; # tarkoittaa samaa kirjastoa
  ['rewind'] ;
  ( Lista uusi ; ['pointer'] ) ;
  ['int'] ;
- Tyhjä ; # means same lib
+ Tyhjä ; # tarkoittaa samaa kirjastoa
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> polku := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# avaa tiedosto funktiolla fopen(path, mode)
 >> fd := Stream path: polku mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream viesti: ['fwrite'] argumentit: (Lista uusi ; str ; 1 ; 6 ; fd ).
-Tuloste kirjoita: bytes-written, rivinvaihto.
+# kirjoita tavut puskurista merkkijono tiedostoon
+>> tavuja-kirjoitettu := Stream viesti: ['fwrite'] argumentit: (Lista uusi ; str ; 1 ; 6 ; fd ).
+Tuloste kirjoita: tavuja-kirjoitettu, rivinvaihto.
 
-# rewind file pointer
+# kelaa tiedosto-osoitin alkuun
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob uusi: 20.
+# varaa puskuri
+>> pusk := Blob uusi: 20.
 
-# read from file
->> bytes-read := Stream viesti: ['fread'] argumentit: (Lista uusi ; buf ; 1 ; 6 ; fd ).
-Tuloste kirjoita: bytes-read, rivinvaihto.
-Tuloste kirjoita: buf, rivinvaihto.
+# lue tiedostosta
+>> tavuja-luettu := Stream viesti: ['fread'] argumentit: (Lista uusi ; pusk ; 1 ; 6 ; fd ).
+Tuloste kirjoita: tavuja-luettu, rivinvaihto.
+Tuloste kirjoita: pusk, rivinvaihto.
 
-# free memory
+# vapauta muisti
 str  vapauta.
 polku vapauta.
 mode vapauta.
-buf  vapauta.
+pusk  vapauta.
 
 

@@ -1,27 +1,27 @@
 Server init.
 
->> conn1 := Maria-DB mới máy-trạm: ['localhost'],
+>> kn1 := Maria-DB mới máy-trạm: ['localhost'],
 	tên-người-dùng: ['xo'],
 	mật-khẩu: ['pass123'],
 	tên-cơ-sở-dữ-liệu: ['xobase'],
 	kết-nối.
 
->> conn2 := Maria-DB mới máy-trạm: ['localhost'],
+>> kn2 := Maria-DB mới máy-trạm: ['localhost'],
 	tên-người-dùng: ['xo'],
 	mật-khẩu: ['pass123'],
 	tên-cơ-sở-dữ-liệu: ['xobase'],
 	kết-nối.
 #...
->> del := conn1 truy-vấn: ['DELETE FROM book WHERE id > 0'].
-{  del thực-thi. conn1 xác-nhận. } bắt-lỗi: { :e conn1 hoàn-tác.  }, chạy.
+>> xóa-bỏ := kn1 truy-vấn: ['DELETE FROM book WHERE id > 0'].
+{  xóa-bỏ thực-thi. kn1 xác-nhận. } bắt-lỗi: { :e kn1 hoàn-tác.  }, chạy.
 
->> insert := conn1 truy-vấn: ['INSERT INTO book (id) VALUES(null)'].
-insert thực-thi.
+>> chèn := kn1 truy-vấn: ['INSERT INTO book (id) VALUES(null)'].
+chèn thực-thi.
 
->> đếm := conn1 truy-vấn: ['SELECT COUNT(*) AS num FROM book'].
-đếm lấy: { :row Xuất ghi: row num, xuống-dòng. }.
+>> đếm := kn1 truy-vấn: ['SELECT COUNT(*) AS num FROM book'].
+đếm lấy: { :hàng Xuất ghi: hàng num, xuống-dòng. }.
 
-# does not show up
-# insert not committed on connection 1
->> đếm := conn2 truy-vấn: ['SELECT COUNT(*) AS num FROM book'].
-đếm lấy: { :row Xuất ghi: row num, xuống-dòng. }.
+# không hiện ra
+# lệnh chèn chưa được xác nhận trên kết nối 1
+>> đếm := kn2 truy-vấn: ['SELECT COUNT(*) AS num FROM book'].
+đếm lấy: { :hàng Xuất ghi: hàng num, xuống-dòng. }.

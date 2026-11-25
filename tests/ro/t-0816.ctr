@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> încearcă := { :format :value
-	{ Ieșire scrie: ( (Format nou: format) aplică: value ), rând-nou. } prinde: { :e Ieșire scrie: e, rând-nou. }, pornește.
+# un format trebuie să se potrivească tipului valorii, tipul poate veni de la un client
+>> încearcă := { :formatul :value
+	{ Ieșire scrie: ( (Format nou: formatul) aplică: value ), rând-nou. } prinde: { :e Ieșire scrie: e, rând-nou. }, pornește.
 }.
->> try-int := { :format :value
-	{ Ieșire scrie: ( (Format nou: format) aplică-întreg: value ), rând-nou. } prinde: { :e Ieșire scrie: e, rând-nou. }, pornește.
+>> încearcă-întreg := { :formatul :value
+	{ Ieșire scrie: ( (Format nou: formatul) aplică-întreg: value ), rând-nou. } prinde: { :e Ieșire scrie: e, rând-nou. }, pornește.
 }.
 
-# fits
+# se potrivește
 încearcă aplică: ['|%s|'] și: ['text'].
 încearcă aplică: ['%06.2f'] și: 5.5.
-încearcă aplică: ['100%% %s'] și: ['sure'].
-try-int aplică: ['%03d'] și: 7.
-try-int aplică: ['%x'] și: 255.
+încearcă aplică: ['100%% %s'] și: ['sigur'].
+încearcă-întreg aplică: ['%03d'] și: 7.
+încearcă-întreg aplică: ['%x'] și: 255.
 încearcă aplică: ['%d'] și: (Int64 nou din-text: ['12']).
 încearcă aplică: ['%lld'] și: (Int64 nou din-text: ['12']).
 încearcă aplică: ['%.1lf'] și: 5.5.
-try-int aplică: ['%hd'] și: 7.
+încearcă-întreg aplică: ['%hd'] și: 7.
 
-# does not fit
+# nu se potrivește
 încearcă aplică: ['%s'] și: 12345.
 încearcă aplică: ['%d'] și: 12345.
 încearcă aplică: ['%f'] și: ['text'].
-try-int aplică: ['%d'] și: ['text'].
-try-int aplică: ['%s'] și: 5.
+încearcă-întreg aplică: ['%d'] și: ['text'].
+încearcă-întreg aplică: ['%s'] și: 5.
 încearcă aplică: ['%s %s'] și: ['text'].
 încearcă aplică: ['%n'] și: ['text'].
 încearcă aplică: ['%*s'] și: ['text'].
 încearcă aplică: ['%'] și: ['text'].
 
-# length modifier does not fit
+# modificatorul de lungime nu se potrivește
 încearcă aplică: ['%ls'] și: ['text'].
 încearcă aplică: ['%Lf'] și: 5.5.
-try-int aplică: ['%ld'] și: 7.
-try-int aplică: ['%lld'] și: 7.
+încearcă-întreg aplică: ['%ld'] și: 7.
+încearcă-întreg aplică: ['%lld'] și: 7.
 încearcă aplică: ['%Ld'] și: (Int64 nou din-text: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# o lățime care nu încape în printf trebuie să dea o eroare, nu o prăbușire
 încearcă aplică: ['%99999999999s'] și: ['text'].

@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# Test sanitizéru utf8
 Server init.
 
->> utf8cases := Slovník nový
-	# ASCII only
+>> utf8-případy := Slovník nový
+	# Jen ASCII
 	umístit: ( Seznam nový ; 65 ; 65 ; 65 ; 65 ; 0 ) na: ['AAAA'],
-	# valid 2 byte sequence
+	# platná 2bajtová sekvence
 	umístit: ( Seznam nový ; 194 ; 162 ; 0 ) na: ['¢'],
-	# Valid 3-byte UTF-8
+	# Platné 3bajtové UTF-8
     umístit: ( Seznam nový ; 226 ; 130 ; 172 ; 0 ) na: ['€'],
-	# Valid 4-byte UTF-8
+	# Platné 4bajtové UTF-8
     umístit: ( Seznam nový ; 240 ; 144 ; 141 ; 136 ; 0 ) na: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# Neplatný pokračovací bajt v sekvenci E2 28 AC -> začátek 3b sekv. + 28 špatný pokr. + AC pokr. bajt, ale patří ke stejné chybě
     umístit: ( Seznam nový ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) na: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# Příliš dlouhé kódování ASCII 'A' (má se stát ?),
     umístit: ( Seznam nový ; 65 ; 193 ; 129 ; 0 ) na: ['A?'],
-	# Invalid first byte (0xFF)
+	# Neplatný první bajt (0xFF)
     umístit: ( Seznam nový ; 255 ; 0 ) na: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Neúplná vícebajtová sekvence na konci
     umístit: ( Seznam nový ; 66 ; 226 ; 0 ) na: ['B?'],
-    # Empty string
+    # Prázdný řetězec
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Více smíšených sekvencí
     umístit: ( Seznam nový ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) na: ['A€?𐍈B'].
 	 
-utf8cases každý: { :key :value
+utf8-případy každý: { :key :value
 	>> blob := Blob nový: value počet, bytes: value.
 	>> str := blob řetězec.
 	(str = key) pravda: {
 		Výstup psát: ['OK'], nový-řádek.
 	}, jinak: {
-		Výstup psát: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, nový-řádek.
+		Výstup psát: ['Sanitizér UTF8 selhal na: '] + key + [' výsledek: '] + str, nový-řádek.
 	}.
 	blob uvolnit.
 }.

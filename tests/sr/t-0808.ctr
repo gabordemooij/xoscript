@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# кључеви и потписи сефа који се декодирају предуго не смеју да прекораче стек
 Server init.
 
->> keys := Сеф генериши-кључеве.
->> sk := keys први.
->> pk := keys последњи.
->> sig := Сеф потпиши: ['abc'] кључем: sk.
+>> кључеви := Сеф генериши-кључеве.
+>> sk := кључеви први.
+>> pk := кључеви последњи.
+>> потп := Сеф потпиши: ['abc'] кључем: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 знакова без допуне декодира се у 66 бајтова
+>> дуг := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 знака без допуне декодира се у 33 бајта
+>> кратко := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Сеф потпиши: ['abc'] кључем: long. } ухвати: { :e
+{ Сеф потпиши: ['abc'] кључем: дуг. } ухвати: { :e
 	Излаз пиши: e, нови-ред.
 }, покрени.
 
-{ Сеф провери: ['abc'] потпис: long кључем: pk. } ухвати: { :e
+{ Сеф провери: ['abc'] потпис: дуг кључем: pk. } ухвати: { :e
 	Излаз пиши: e, нови-ред.
 }, покрени.
 
-{ Сеф провери: ['abc'] потпис: sig кључем: short. } ухвати: { :e
+{ Сеф провери: ['abc'] потпис: потп кључем: кратко. } ухвати: { :e
 	Излаз пиши: e, нови-ред.
 }, покрени.

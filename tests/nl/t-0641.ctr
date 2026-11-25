@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# Test utf8-opschoner
 Server init.
 
->> utf8cases := Lijst nieuw
-	# ASCII only
+>> utf8gevallen := Lijst nieuw
+	# alleen ASCII
 	zet: ( Reeks nieuw ; 65 ; 65 ; 65 ; 65 ; 0 ) bij: ['AAAA'],
-	# valid 2 byte sequence
+	# geldige reeks van 2 bytes
 	zet: ( Reeks nieuw ; 194 ; 162 ; 0 ) bij: ['¢'],
-	# Valid 3-byte UTF-8
+	# Geldige 3-byte UTF-8
     zet: ( Reeks nieuw ; 226 ; 130 ; 172 ; 0 ) bij: ['€'],
-	# Valid 4-byte UTF-8
+	# Geldige 4-byte UTF-8
     zet: ( Reeks nieuw ; 240 ; 144 ; 141 ; 136 ; 0 ) bij: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# Ongeldige vervolgbyte in reeks E2 28 AC -> start 3b-reeks + 28 fout vervolg + AC vervolgbyte, maar hoort bij dezelfde fout
     zet: ( Reeks nieuw ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) bij: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# Te lange codering van ASCII 'A' (moet ? worden),
     zet: ( Reeks nieuw ; 65 ; 193 ; 129 ; 0 ) bij: ['A?'],
-	# Invalid first byte (0xFF)
+	# Ongeldige eerste byte (0xFF)
     zet: ( Reeks nieuw ; 255 ; 0 ) bij: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Onvolledige multibytereeks aan het einde
     zet: ( Reeks nieuw ; 66 ; 226 ; 0 ) bij: ['B?'],
-    # Empty string
+    # Lege tekst
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Meerdere gemengde reeksen
     zet: ( Reeks nieuw ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) bij: ['A€?𐍈B'].
 	 
-utf8cases elk: { :key :value
+utf8gevallen elk: { :key :value
 	>> blob := Blob nieuw: value aantal, bytes: value.
 	>> str := blob tekst.
 	(str = key) ja: {
 		Uit schrijf: ['OK'], stop.
 	}, anders: {
-		Uit schrijf: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, stop.
+		Uit schrijf: ['UTF8-opschoner faalde op: '] + key + [' kreeg: '] + str, stop.
 	}.
 	blob vrij.
 }.

@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# בדיקת המרות סוגים / המרות / קישורים
 תוכנית ניהול-זיכרון: 4.
 Server init.
 
->> counter := 0.
->> db := Maria-DB חדש מארח: ⌝'localhost'⌜,
+>> מונה := 0.
+>> מסד := Maria-DB חדש מארח: ⌝'localhost'⌜,
 	שם-משתמש: ⌝'xo'⌜, סיסמה: ⌝'pass123'⌜, שם-מסד: ⌝'xobase'⌜, התחבר.
 
->> TwoDigitFormat := תבנית חדש: ⌝'%02d'⌜.
+>> תבנית-דו-ספרתית := תבנית חדש: ⌝'%02d'⌜.
 
-# Datetime
+# תאריך ושעה
 ⎬
-	>> שנה := מספר בין: 1995 לבין: 2050, למחרוזת.
-	>> חודש := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 12﴾, למחרוזת.
-	>> יום := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 28﴾, למחרוזת.
-	>> שעה := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 23﴾, למחרוזת.
-	>> דקה := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 59﴾, למחרוזת.
-	>> שנייה := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 59﴾, למחרוזת.
-	>> datetime := ⌝'YYYY-MM-DD HH:II:SS'⌜.	
-	datetime
+	>> שנה     := מספר בין: 1995 לבין: 2050, למחרוזת.
+	>> חודש    := תבנית-דו-ספרתית החל-שלם: ﴿מספר בין: 1 לבין: 12﴾, למחרוזת.
+	>> יום      := תבנית-דו-ספרתית החל-שלם: ﴿מספר בין: 1 לבין: 28﴾, למחרוזת.
+	>> שעה     := תבנית-דו-ספרתית החל-שלם: ﴿מספר בין: 1 לבין: 23﴾, למחרוזת.
+	>> דקה   := תבנית-דו-ספרתית החל-שלם: ﴿מספר בין: 1 לבין: 59﴾, למחרוזת.
+	>> שנייה   := תבנית-דו-ספרתית החל-שלם: ﴿מספר בין: 1 לבין: 59﴾, למחרוזת.
+	>> תאריך-ושעה := ⌝'YYYY-MM-DD HH:II:SS'⌜.	
+	תאריך-ושעה
 		YYYY: שנה,
 		MM: חודש,
 		DD: יום,
@@ -25,89 +25,89 @@ Server init.
 		II: דקה,
 		SS: שנייה.
 	>> פרמטרי-חיפוש :=
-	db שאילתה: ﴿⌝'
+	מסד שאילתה: ﴿⌝'
 		SELECT 
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'⌜ <datetime>: datetime﴾,
-	שלוף: ⎬ :row
-		﴿row mydatetime = datetime﴾ אם-שקר: ⎬
+	'⌜ <datetime>: תאריך-ושעה﴾,
+	שלוף: ⎬ :שורת-טבלה
+		﴿שורת-טבלה mydatetime = תאריך-ושעה﴾ אם-שקר: ⎬
 			משימה-זו שגיאה: ﴿
-				⌝'Expected: <expected> but got: <observation>'⌜
-				<expected>: datetime,
-				<observation>: row mydatetime
+				⌝'צפוי: <expected> אבל התקבל: <observation>'⌜
+				<expected>: תאריך-ושעה,
+				<observation>: שורת-טבלה mydatetime
 			﴾.
 		⎨.
 	
 	⎨.
-	counter חבר: 1.
+	מונה חבר: 1.
 ⎨ * 100.
 
-# Date
+# תאריך
 ⎬
-	>> שנה := מספר בין: 1995 לבין: 2050, למחרוזת.
-	>> חודש := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 12﴾, למחרוזת.
-	>> יום := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 28﴾, למחרוזת.
-	>> date := ⌝'YYYY-MM-DD'⌜.
-	date
+	>> שנה     := מספר בין: 1995 לבין: 2050, למחרוזת.
+	>> חודש    := תבנית-דו-ספרתית החל-שלם: ﴿מספר בין: 1 לבין: 12﴾, למחרוזת.
+	>> יום      := תבנית-דו-ספרתית החל-שלם: ﴿מספר בין: 1 לבין: 28﴾, למחרוזת.
+	>> תאריך     := ⌝'YYYY-MM-DD'⌜.
+	תאריך
 		YYYY: שנה,
 		MM: חודש,
 		DD: יום.
 	>> פרמטרי-חיפוש :=
-	db שאילתה: ﴿⌝'
+	מסד שאילתה: ﴿⌝'
 		SELECT
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'⌜ <date>: date﴾,
-	שלוף: ⎬ :row
-		﴿row mydate = date﴾ אם-שקר: ⎬
+	'⌜ <date>: תאריך﴾,
+	שלוף: ⎬ :שורת-טבלה
+		﴿שורת-טבלה mydate = תאריך﴾ אם-שקר: ⎬
 			משימה-זו שגיאה: ﴿
-				⌝'Expected: <expected> but got: <observation>'⌜
-				<expected>: date,
-				<observation>: row mydate
+				⌝'צפוי: <expected> אבל התקבל: <observation>'⌜
+				<expected>: תאריך,
+				<observation>: שורת-טבלה mydate
 			﴾.
 		⎨.
 	⎨.
-	counter חבר: 1.
+	מונה חבר: 1.
 ⎨ * 100.
 
 
-# Time
+# שעה
 ⎬
-	>> שעה := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 23﴾, למחרוזת.
-	>> דקה := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 59﴾, למחרוזת.
-	>> שנייה := TwoDigitFormat החל-שלם: ﴿מספר בין: 1 לבין: 59﴾, למחרוזת.
+	>> שעה     := תבנית-דו-ספרתית החל-שלם: ﴿מספר בין: 1 לבין: 23﴾, למחרוזת.
+	>> דקה   := תבנית-דו-ספרתית החל-שלם: ﴿מספר בין: 1 לבין: 59﴾, למחרוזת.
+	>> שנייה   := תבנית-דו-ספרתית החל-שלם: ﴿מספר בין: 1 לבין: 59﴾, למחרוזת.
 	>> זמן := ⌝'HH:II:SS'⌜.
 	זמן
 		HH: שעה,
 		II: דקה,
 		SS: שנייה.
 	>> פרמטרי-חיפוש :=
-	db שאילתה: ﴿⌝'
+	מסד שאילתה: ﴿⌝'
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'⌜ <time>: זמן﴾,
-	שלוף: ⎬ :row
-		﴿row mytime = זמן﴾ אם-שקר: ⎬
+	שלוף: ⎬ :שורת-טבלה
+		﴿שורת-טבלה mytime = זמן﴾ אם-שקר: ⎬
 			משימה-זו שגיאה: ﴿
-				⌝'Expected: <expected> but got: <observation>'⌜
-				<expected>: datetime,
-				<observation>: row mytime
+				⌝'צפוי: <expected> אבל התקבל: <observation>'⌜
+				<expected>: תאריך-ושעה,
+				<observation>: שורת-טבלה mytime
 			﴾.
 		⎨.
 	⎨.
-	counter חבר: 1.
+	מונה חבר: 1.
 ⎨ * 100.
 
 
-# Strings (varchar/text)
+# מחרוזות (varchar/text)
 >> str1 := רשימה חדש מלא: 100000 בערך: ⌝'x'⌜, אחד: ⌝''⌜.
 ⎬
 	>> str2 := כספת אסימון: 40.
 	>> פרמטרי-חיפוש :=
-	db שאילתה: ﴿⌝'
+	מסד שאילתה: ﴿⌝'
 		SELECT
 		"<str1>" AS str1,
 		"<str2>" AS str2
@@ -115,30 +115,30 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	﴾,
-	שלוף: ⎬ :row
-		﴿row str1 = str1 וגם: row str2 = str2﴾ אם-שקר: ⎬
+	שלוף: ⎬ :שורת-טבלה
+		﴿שורת-טבלה str1 = str1 וגם: שורת-טבלה str2 = str2﴾ אם-שקר: ⎬
 			משימה-זו שגיאה: ﴿
-				⌝'Expected: <expected> but got: <observation>'⌜
-				<expected>: datetime,
-				<observation>: row mytime
+				⌝'צפוי: <expected> אבל התקבל: <observation>'⌜
+				<expected>: תאריך-ושעה,
+				<observation>: שורת-טבלה mytime
 			﴾.
 		⎨.
 	⎨.
-	counter חבר: 1.
+	מונה חבר: 1.
 ⎨ * 100.
 
 
-# Numbers
+# מספרים
 ⎬
-	>> n1 := מספר בין: 1 לבין: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := מספר בין: 1 לבין: 99999.
+	>> n2  := n1 / 1000.
 	>> big := ﴿
 		﴿ Int64 ממחרוזת: ⌝'9223372036854775807'⌜ ﴾ -
 		﴿ Int64 ממחרוזת: ⌝'99999'⌜ ﴾ +
 		﴿ Int64 ממחרוזת: n1 למחרוזת ﴾
 	﴾.
 	>> פרמטרי-חיפוש :=
-	db שאילתה: ﴿⌝'
+	מסד שאילתה: ﴿⌝'
 		SELECT
 		<n1> AS n1,
 		<n2> AS n2,
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	﴾,
-	שלוף: ⎬ :row
-		﴿row n1 = n1﴾ אם-שקר: ⎬
+	שלוף: ⎬ :שורת-טבלה
+		﴿שורת-טבלה n1 = n1﴾ אם-שקר: ⎬
 			משימה-זו שגיאה: ﴿
-				⌝'Expected: <expected> but got: <observation>'⌜
+				⌝'צפוי: <expected> אבל התקבל: <observation>'⌜
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: שורת-טבלה n1
 			﴾.
 		⎨.
-		﴿row n2 = n2﴾ אם-שקר: ⎬
+		﴿שורת-טבלה n2 = n2﴾ אם-שקר: ⎬
 			משימה-זו שגיאה: ﴿
-				⌝'Expected: <expected> but got: <observation>'⌜
+				⌝'צפוי: <expected> אבל התקבל: <observation>'⌜
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: שורת-טבלה n2
 			﴾.
 		⎨.
-		﴿row n3 = n2 עיגול﴾ אם-שקר: ⎬
+		﴿שורת-טבלה n3 = n2 עיגול﴾ אם-שקר: ⎬
 			משימה-זו שגיאה: ﴿
-				⌝'Expected: <expected> but got: <observation>'⌜
+				⌝'צפוי: <expected> אבל התקבל: <observation>'⌜
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: שורת-טבלה n3
 			﴾.
 		⎨.
-		﴿row big = big﴾ אם-שקר: ⎬
+		﴿שורת-טבלה big = big﴾ אם-שקר: ⎬
 			משימה-זו שגיאה: ﴿
-				⌝'Expected: <expected> but got: <observation>'⌜
+				⌝'צפוי: <expected> אבל התקבל: <observation>'⌜
 				<expected>: big,
-				<observation>: row big
+				<observation>: שורת-טבלה big
 			﴾.
 		⎨.
 		
 	⎨.
-	counter חבר: 1.
+	מונה חבר: 1.
 ⎨ * 100.
 
 
 פלט כתוב: ﴿
 	⌝'OK, <counter> fuzzy casts/conversions tested.'⌜
-	<counter>: counter
+	<counter>: מונה
 ﴾, שורה-חדשה.

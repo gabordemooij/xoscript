@@ -1,18 +1,21 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# formát relační cookie, typ obsahu json, jen webové protokoly, svg zobrazené přímo
 Server inicializovat.
 Program použít: ['../../../src/xo/cs/webtools.xo'].
 
->> Fake-Request := Objekt nový.
-Fake-Request při: ['value:'] udělat: { :hodnota
+>> Falešný-požadavek := Objekt nový.
+Falešný-požadavek při: ['value:'] udělat: { :hodnota
 	vlastní hodnota := hodnota.
 }.
-Fake-Request při: ['cookie:'] udělat: { :název <- vlastní hodnota.
+Falešný-požadavek při: ['cookie:'] udělat: { :název
+	<- vlastní hodnota.
 }.
 
->> Test-Session := Relace-dočasný-soubor nový.
-Test-Session při: ['načíst'] udělat: { <- Slovník nový.
+>> Testovací-relace := Relace-dočasný-soubor nový.
+Testovací-relace při: ['načíst'] udělat: {
+	<- Slovník nový.
 }.
-Test-Session při: ['session-id'] udělat: { <- vlastní id.
+Testovací-relace při: ['identifikátor-relace'] udělat: {
+	<- vlastní id.
 }.
 
 >> cookies := Seznam nový
@@ -22,14 +25,14 @@ Test-Session při: ['session-id'] udělat: { <- vlastní id.
 	; ['abc\n'].
 
 cookies každý: { :i :cookie
-	>> požadavek := Fake-Request nový.
+	>> požadavek := Falešný-požadavek nový.
 	požadavek value: cookie.
-	>> správce := Test-Session nový.
+	>> správce := Testovací-relace nový.
 	>> web := Webový-dokument nový.
 	web požadavek: požadavek.
 	web správce-relací: správce.
 	web zahájit-relaci.
-	Výstup psát: ( správce session-id = cookie ), nový-řádek.
+	Výstup psát: ( správce identifikátor-relace = cookie ), nový-řádek.
 }.
 
 >> web := Webový-dokument nový.

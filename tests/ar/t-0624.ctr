@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := كائن جديد.
+# هذا الاختبار يتحقق من أن string_fill_in لا يفقد خانته (بجمع المهملات) في الوضع 4
+# المرجع في world.c
+>> صنف-سجل := كائن جديد.
 
-Log عند: ⌝'say:'⌜ نفذ: ⎬ :str
+صنف-سجل عند: ⌝'say:'⌜ نفذ: ⎬ :str
 	مخرج اكتب: str, سطر-جديد.
 ⎨.
 
->> Item := كائن جديد.
+>> صنف-بند := كائن جديد.
 
-Item عند: ⌝'جديد:'⌜ نفذ: ⎬ :id <- ذات جديد id: id.
+صنف-بند عند: ⌝'جديد:'⌜ نفذ: ⎬ :id
+	<- ذات جديد id: id.
 ⎨.
 
-Item عند: ⌝'id:'⌜ نفذ: ⎬ :id
+صنف-بند عند: ⌝'id:'⌜ نفذ: ⎬ :id
 	خاص id := id.
 ⎨.
 
-Item عند: ⌝'id'⌜ نفذ: ⎬ <- خاص id. ⎨.
+صنف-بند عند: ⌝'id'⌜ نفذ: ⎬ <- خاص id. ⎨.
 
 
-Item عند: ⌝'كنص'⌜ نفذ: ⎬
+صنف-بند عند: ⌝'كنص'⌜ نفذ: ⎬
 	>> str := ⌝'Item#~no'⌜.
-	str ~no: خاص id. <- str.
+	str ~no: خاص id.
+	<- str.
 ⎨.
 
 
@@ -28,11 +30,11 @@ Item عند: ⌝'كنص'⌜ نفذ: ⎬
 
 Print عند: ⌝'items'⌜ نفذ: ⎬ 
 	
-	خاص item := Item جديد: 1.
+	خاص بند := صنف-بند جديد: 1.
 	
-	# either segfault or wrong str here
-	Log say: ﴿
-		⌝'~item printed.'⌜ ~item: خاص item
+	# إما خطأ تجزئة أو سلسلة-نصية خاطئة هنا
+	صنف-سجل say: ﴿
+		⌝'~item printed.'⌜ ~item: خاص بند
 	﴾.
 	
 	

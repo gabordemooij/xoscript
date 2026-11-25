@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# ключі та підписи сховища, що декодуються задовгими, не мають переповнювати стек
 Server init.
 
->> keys := Сховище згенерувати-ключі.
->> sk := keys перший.
->> pk := keys останній.
->> sig := Сховище підписати: ['abc'] ключем: sk.
+>> ключі := Сховище згенерувати-ключі.
+>> тк := ключі перший.
+>> вк := ключі останній.
+>> підп := Сховище підписати: ['abc'] ключем: тк.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 символів без доповнення декодуються в 66 байтів
+>> довгий := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 символи без доповнення декодуються в 33 байти
+>> короткий := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Сховище підписати: ['abc'] ключем: long. } перехопити: { :e
+{ Сховище підписати: ['abc'] ключем: довгий. } перехопити: { :e
 	Вивід написати: e, новий-рядок.
 }, запустити.
 
-{ Сховище перевірити: ['abc'] підпис: long ключем: pk. } перехопити: { :e
+{ Сховище перевірити: ['abc'] підпис: довгий ключем: вк. } перехопити: { :e
 	Вивід написати: e, новий-рядок.
 }, запустити.
 
-{ Сховище перевірити: ['abc'] підпис: sig ключем: short. } перехопити: { :e
+{ Сховище перевірити: ['abc'] підпис: підп ключем: короткий. } перехопити: { :e
 	Вивід написати: e, новий-рядок.
 }, запустити.

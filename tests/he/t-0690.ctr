@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# בדיקת מסד נתונים
+# ראו את הדוגמה server.xo להגדרות הנדרשות
 
 Server init.
-פלט כתוב: ⌝'Database test'⌜, שורה-חדשה.
+פלט כתוב: ⌝'בדיקת מסד נתונים'⌜, שורה-חדשה.
 
->> db := Maria-DB חדש מארח: ⌝'localhost'⌜,
+>> מסד := Maria-DB חדש מארח: ⌝'localhost'⌜,
 	שם-משתמש: ⌝'xo'⌜, סיסמה: ⌝'pass123'⌜, שם-מסד: ⌝'xobase'⌜, התחבר.
 
-פלט כתוב: ⌝'Can we connect? '⌜ + db מחובר?, שורה-חדשה.
+פלט כתוב: ⌝'האם אפשר להתחבר? '⌜ + מסד מחובר?, שורה-חדשה.
 
->> פרמטרי-חיפוש := db שאילתה: ⌝'
+>> פרמטרי-חיפוש := מסד שאילתה: ⌝'
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'⌜, פרמטרים: ﴿ רשימה חדש ; ⌝'abc'⌜ ; 12.35 ; 6 ﴾. # parameterized queries
+'⌜, פרמטרים: ﴿ רשימה חדש ; ⌝'abc'⌜ ; 12.35 ; 6 ﴾. # שאילתות עם פרמטרים
 
-⎬  פרמטרי-חיפוש בצע. db אשר. ⎨ תפוס: ⎬ :e db בטל-שינויים.  ⎨, הפעל.
+⎬  פרמטרי-חיפוש בצע. מסד אשר. ⎨ תפוס: ⎬ :e מסד בטל-שינויים.  ⎨, הפעל.
 
-פלט כתוב: ⌝'Can we insert? '⌜ + ﴿ פרמטרי-חיפוש insert-id > 0 ﴾, שורה-חדשה.
+פלט כתוב: ⌝'האם אפשר להוסיף? '⌜ + ﴿ פרמטרי-חיפוש insert-id > 0 ﴾, שורה-חדשה.
 
 >> x := 0.
 >> פרמטרי-חיפוש :=
-db שאילתה: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
-שלוף: ⎬ :row 
+מסד שאילתה: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+שלוף: ⎬ :שורת-טבלה 
 	x חבר: 1.
-	אמת צא. # must clean up, no 'Commands out of sync'
+	אמת צא. # חייב לנקות, בלי 'Commands out of sync'
 ⎨.
 
 >> פרמטרי-חיפוש :=
-db שאילתה: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
-שלוף: ⎬ :row
+מסד שאילתה: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+שלוף: ⎬ :שורת-טבלה
 	x חבר: 1.
 	אמת צא.
 ⎨.
 
 ﴿x > 0﴾ אם-אמת: ⎬
-	פלט כתוב: ⌝'Can we break in the middle of a fetch? '⌜.
+	פלט כתוב: ⌝'האם אפשר לעצור באמצע הורדה? '⌜.
 ⎨.
 
 פלט כתוב: אמת, שורה-חדשה.

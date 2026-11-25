@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# adatbázisteszt
+# a szükséges beállításokat lásd a server.xo példában
 
 Server init.
-Kimenet ír: ['Database test'], újsor.
+Kimenet ír: ['Adatbázis teszt'], újsor.
 
->> db := Maria-DB új gazdagép: ['localhost'],
+>> adb := Maria-DB új gazdagép: ['localhost'],
 	felhasználónév: ['xo'], jelszó: ['pass123'], adatbázisnév: ['xobase'], csatlakozik.
 
-Kimenet ír: ['Can we connect? '] + db csatlakozva?, újsor.
+Kimenet ír: ['Tudunk csatlakozni? '] + adb csatlakozva?, újsor.
 
->> keresőparaméterek := db lekérdezés: ['
+>> keresőparaméterek := adb lekérdezés: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], paraméterek: ( Lista új ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], paraméterek: ( Lista új ; ['abc'] ; 12.35 ; 6 ). # paraméteres lekérdezések
 
-{  keresőparaméterek végrehajt. db véglegesít. } elkap: { :e db visszavon.  }, indít.
+{  keresőparaméterek végrehajt. adb véglegesít. } elkap: { :e adb visszavon.  }, indít.
 
-Kimenet ír: ['Can we insert? '] + ( keresőparaméterek insert-id > 0 ), újsor.
+Kimenet ír: ['Tudunk beszúrni? '] + ( keresőparaméterek insert-id > 0 ), újsor.
 
 >> x := 0.
 >> keresőparaméterek :=
-db lekérdezés: ['SELECT * FROM book order by id desc limit 2'], 
-lekér: { :row 
+adb lekérdezés: ['SELECT * FROM book order by id desc limit 2'], 
+lekér: { :sorAdat 
 	x hozzáad: 1.
-	Igaz megszakít. # must clean up, no 'Commands out of sync'
+	Igaz megszakít. # takarítani kell, nem lehet 'Commands out of sync'
 }.
 
 >> keresőparaméterek :=
-db lekérdezés: ['SELECT * FROM book order by id desc limit 2'], 
-lekér: { :row
+adb lekérdezés: ['SELECT * FROM book order by id desc limit 2'], 
+lekér: { :sorAdat
 	x hozzáad: 1.
 	Igaz megszakít.
 }.
 
 (x > 0) igaz: {
-	Kimenet ír: ['Can we break in the middle of a fetch? '].
+	Kimenet ír: ['Megszakíthatjuk a letöltést menet közben? '].
 }.
 
 Kimenet ír: Igaz, újsor.

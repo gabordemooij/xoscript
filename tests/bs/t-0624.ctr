@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := Objekat novi.
+# Ovaj test provjerava da string_fill_in ne gubi svoj utor (gc'ed) u načinu 4
+# referenca u world.c
+>> Dnevnik := Objekat novi.
 
-Log na: ['say:'] uradi: { :str
+Dnevnik na: ['say:'] uradi: { :str
 	Izlaz piši: str, novi-red.
 }.
 
->> Item := Objekat novi.
+>> Stavka := Objekat novi.
 
-Item na: ['novi:'] uradi: { :id <- sebe novi id: id.
+Stavka na: ['novi:'] uradi: { :id
+	<- sebe novi id: id.
 }.
 
-Item na: ['id:'] uradi: { :id
+Stavka na: ['id:'] uradi: { :id
 	svoj id := id.
 }.
 
-Item na: ['id'] uradi: { <- svoj id. }.
+Stavka na: ['id'] uradi: { <- svoj id. }.
 
 
-Item na: ['tekst'] uradi: {
+Stavka na: ['tekst'] uradi: {
 	>> str := ['Item#~no'].
-	str ~no: svoj id. <- str.
+	str ~no: svoj id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item na: ['tekst'] uradi: {
 
 Print na: ['items'] uradi: { 
 	
-	svoj item := Item novi: 1.
+	svoj stavka := Stavka novi: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: svoj item
+	# ili segfault ili pogrešan niz ovdje
+	Dnevnik say: (
+		['~item printed.'] ~item: svoj stavka
 	).
 	
 	

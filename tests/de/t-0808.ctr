@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# Tresor-Schlüssel und Signaturen, die zu lang dekodieren, dürfen den Stack nicht überlaufen lassen
 Server init.
 
->> keys := Tresor schlüssel-erzeugen.
->> sk := keys erstes.
->> pk := keys letztes.
+>> schlüsselpaar := Tresor schlüssel-erzeugen.
+>> sk := schlüsselpaar erstes.
+>> pk := schlüsselpaar letztes.
 >> sig := Tresor signieren: ['abc'] mit: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 Zeichen ohne Padding dekodieren zu 66 Bytes
+>> lang := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 Zeichen ohne Padding dekodieren zu 33 Bytes
+>> kurz := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Tresor signieren: ['abc'] mit: long. } abfangen: { :e
+{ Tresor signieren: ['abc'] mit: lang. } abfangen: { :e
 	Ausgabe schreiben: e, stopp.
 }, starten.
 
-{ Tresor prüfen: ['abc'] signatur: long mit: pk. } abfangen: { :e
+{ Tresor prüfen: ['abc'] signatur: lang mit: pk. } abfangen: { :e
 	Ausgabe schreiben: e, stopp.
 }, starten.
 
-{ Tresor prüfen: ['abc'] signatur: sig mit: short. } abfangen: { :e
+{ Tresor prüfen: ['abc'] signatur: sig mit: kurz. } abfangen: { :e
 	Ausgabe schreiben: e, stopp.
 }, starten.

@@ -1,10 +1,10 @@
 
 
->> g := Server nový.
->> v := Trezor nový.
+>> g  := Server nový.
+>> v  := Trezor nový.
 >> ok := 0.
 
->> secrets := Zoznam nový ; 
+>> tajnosti := Zoznam nový ; 
 	 ['aaa'] ;
 	 [''] ; 
 	 ['AB'] ;
@@ -14,30 +14,30 @@
 	 ['漢字'] ;
 	 ['==[abc]=='].
 	
->> passwords := secrets kopírovať.
-passwords každý: { :i :p
-	secrets každý: { :n :s
+>> heslá := tajnosti kopírovať.
+heslá každý: { :i :p
+	tajnosti každý: { :n :s
 		{
-			>> encrypted := v šifrovať: s kľúč: p.
-			>> decrypted := v dešifrovať: encrypted kľúč: p.
-			(decrypted = s) pravda: {
+			>> zašifrované := v šifrovať: s kľúč: p.
+			>> dešifrované := v dešifrovať: zašifrované kľúč: p.
+			(dešifrované = s) pravda: {
 				ok pridať: 1.
 			}, inak: {
-				Výstup písať: ['failed encrypting/decrypting: '], nový-riadok.
+				Výstup písať: ['šifrovanie/dešifrovanie zlyhalo: '], nový-riadok.
 				Výstup písať: s, nový-riadok.
-				Výstup písať: ['encrypted: '] + encrypted, nový-riadok.
-				Výstup písať: ['decrypted: '] + encrypted, nový-riadok.
+				Výstup písať: ['zašifrované: '] + zašifrované, nový-riadok.
+				Výstup písať: ['dešifrované: '] + zašifrované, nový-riadok.
 				Program koniec.
 			}.
-		} zachytiť: { :err
+		} zachytiť: { :chyb
 			(s = [''] alebo: p = ['']) pravda: {
 				ok pridať: 1.
 			}, inak: {
-				Výstup písať: err, nový-riadok.
+				Výstup písať: chyb, nový-riadok.
 				Program koniec.
 			}.
 		}, spustiť.
 	}.
 }.
 
-Výstup písať: ( ok + [' vault encryptions tested.'] ), nový-riadok.
+Výstup písať: ( ok + [' šifrovaní trezoru otestovaných.'] ), nový-riadok.

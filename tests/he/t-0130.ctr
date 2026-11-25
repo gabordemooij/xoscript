@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# שימוש ב-FFI עם התוסף Server
 
-# connect to libc (platform specific)
->> libname := תוכנית הגדרה: ⌝'FFITESTLIB'⌜.
+# התחברות ל-libc (תלוי פלטפורמה)
+>> שם-ספרייה := תוכנית הגדרה: ⌝'FFITESTLIB'⌜.
 
-# link stdio functions from c for advances file operations
+# קישור פונקציות stdio מ-C לפעולות קבצים מתקדמות
 Server קשר: ﴿ רשימה חדש ;
- libname ; ⌝'fopen'⌜ ;
+ שם-ספרייה ; ⌝'fopen'⌜ ;
  ﴿ רשימה חדש ; ⌝'pointer'⌜ ; ⌝'pointer'⌜﴾ ;
  ⌝'pointer'⌜ ;
  ⌝'Stream'⌜ ;
  ⌝'path:mode:'⌜
 ﴾,
 קשר: ﴿ רשימה חדש ;
- כלום ; # means same lib
+ כלום ; # פירושו אותה ספרייה
  ⌝'fread'⌜ ;
  ﴿ רשימה חדש ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
  ⌝'int'⌜ ;
- כלום ; # means same object (i.e. Stream)
+ כלום ; # פירושו אותו אובייקט (כלומר זרם)
  ⌝'fread'⌜
 ﴾,
 קשר: ﴿
  רשימה חדש ;
- כלום ; # means same lib
+ כלום ; # פירושו אותה ספרייה
  ⌝'fwrite'⌜ ;
  ﴿ רשימה חדש ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
  ⌝'int'⌜ ;
- כלום ; # means same lib
+ כלום ; # פירושו אותה ספרייה
  ⌝'fwrite'⌜
 ﴾,
 קשר: ﴿
  רשימה חדש ;
- כלום ; # means same lib
+ כלום ; # פירושו אותה ספרייה
  ⌝'rewind'⌜ ;
  ﴿ רשימה חדש ; ⌝'pointer'⌜ ﴾ ;
  ⌝'int'⌜ ;
- כלום ; # means same lib
+ כלום ; # פירושו אותה ספרייה
  ⌝'rewind:'⌜
 ﴾.
 
->> str := Blob utf8: ⌝'abc123'⌜.
+>> str  := Blob utf8: ⌝'abc123'⌜.
 >> נתיב-קובץ := Blob utf8: ⌝'/tmp/bla.txt'⌜.
 >> mode := Blob utf8: ⌝'w+'⌜.
 
-# open a file with fopen(path, mode)
->> fd := Stream path: נתיב-קובץ mode: mode.
+# פתיחת קובץ עם fopen(path, mode)
+>> מתאר-קובץ := Stream path: נתיב-קובץ mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream הודעה: ⌝'fwrite'⌜ ארגומנטים: ﴿רשימה חדש ; str ; 1 ; 6 ; fd ﴾.
-פלט כתוב: bytes-written, שורה-חדשה.
+# כתיבת בתים מהחוצץ str לקובץ
+>> בתים-שנכתבו := Stream הודעה: ⌝'fwrite'⌜ ארגומנטים: ﴿רשימה חדש ; str ; 1 ; 6 ; מתאר-קובץ ﴾.
+פלט כתוב: בתים-שנכתבו, שורה-חדשה.
 
-# rewind file pointer
-Stream rewind: fd.
+# החזרת מצביע הקובץ להתחלה
+Stream rewind: מתאר-קובץ.
 
-# allocate a buffer
->> buf := Blob חדש: 20.
+# הקצאת חוצץ
+>> חוצץ-בתים := Blob חדש: 20.
 
-# read from file
->> bytes-read := Stream הודעה: ⌝'fread'⌜ ארגומנטים: ﴿רשימה חדש ; buf ; 1 ; 6 ; fd ﴾.
-פלט כתוב: bytes-read, שורה-חדשה.
-פלט כתוב: buf, שורה-חדשה.
+# קריאה מהקובץ
+>> בתים-שנקראו := Stream הודעה: ⌝'fread'⌜ ארגומנטים: ﴿רשימה חדש ; חוצץ-בתים ; 1 ; 6 ; מתאר-קובץ ﴾.
+פלט כתוב: בתים-שנקראו, שורה-חדשה.
+פלט כתוב: חוצץ-בתים, שורה-חדשה.
 
-# free memory
+# שחרור זיכרון
 str  שחרר.
 נתיב-קובץ שחרר.
 mode שחרר.
-buf  שחרר.
+חוצץ-בתים  שחרר.
 
 

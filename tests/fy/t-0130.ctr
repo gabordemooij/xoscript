@@ -1,66 +1,66 @@
-# using FFI with the Server plugin
+# FFI brûke mei de Server-plugin
 
-# connect to libc (platform specific)
->> libname := Programma ynstelling: ['FFITESTLIB'].
+# ferbine mei libc (ôfhinklik fan it platfoarm)
+>> bibnamme := Programma ynstelling: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# stdio-funksjes út C keppelje foar avansearre bestânsoperaasjes
 Server keppelje: ( Rige nĳ ;
- libname ; ['fopen'] ;
+ bibnamme ; ['fopen'] ;
  ( Rige nĳ ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 keppelje: ( Rige nĳ ;
- Neat ; # means same lib
+ Neat ; # betsjut deselde bibleteek
  ['fread'] ;
  ( Rige nĳ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Neat ; # means same object (i.e. Stream)
+ Neat ; # betsjut itselde objekt (d.w.s. Stroom)
  ['fread']
 ),
 keppelje: (
  Rige nĳ ;
- Neat ; # means same lib
+ Neat ; # betsjut deselde bibleteek
  ['fwrite'] ;
  ( Rige nĳ ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Neat ; # means same lib
+ Neat ; # betsjut deselde bibleteek
  ['fwrite']
 ),
 keppelje: (
  Rige nĳ ;
- Neat ; # means same lib
+ Neat ; # betsjut deselde bibleteek
  ['rewind'] ;
  ( Rige nĳ ; ['pointer'] ) ;
  ['int'] ;
- Neat ; # means same lib
+ Neat ; # betsjut deselde bibleteek
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> paad := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# in bestân iepenje mei fopen(path, mode)
 >> fd := Stream path: paad mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream berjocht: ['fwrite'] arguminten: (Rige nĳ ; str ; 1 ; 6 ; fd ).
-Utfier skriuwe: bytes-written, nije-rigel.
+# bytes út buffer str nei it bestân skriuwe
+>> bytes-skreaun := Stream berjocht: ['fwrite'] arguminten: (Rige nĳ ; str ; 1 ; 6 ; fd ).
+Utfier skriuwe: bytes-skreaun, nije-rigel.
 
-# rewind file pointer
+# bestânsoanwizer werom nei it begjin
 Stream rewind: fd.
 
-# allocate a buffer
+# in buffer reservearje
 >> buf := Blob nĳ: 20.
 
-# read from file
->> bytes-read := Stream berjocht: ['fread'] arguminten: (Rige nĳ ; buf ; 1 ; 6 ; fd ).
-Utfier skriuwe: bytes-read, nije-rigel.
+# út it bestân lêze
+>> bytes-lêzen := Stream berjocht: ['fread'] arguminten: (Rige nĳ ; buf ; 1 ; 6 ; fd ).
+Utfier skriuwe: bytes-lêzen, nije-rigel.
 Utfier skriuwe: buf, nije-rigel.
 
-# free memory
+# ûnthâld frijjaan
 str  frijjaan.
 paad frijjaan.
 mode frijjaan.

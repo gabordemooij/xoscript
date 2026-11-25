@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# utf8 정화기 테스트
 Server init.
 
->> utf8cases := 사전 새로
-	# ASCII only
+>> utf8사례 := 사전 새로
+	# ASCII만
 	넣기: ( 리스트 새로 ; 65 ; 65 ; 65 ; 65 ; 0 ) 위치: ['AAAA'],
-	# valid 2 byte sequence
+	# 유효한 2바이트 시퀀스
 	넣기: ( 리스트 새로 ; 194 ; 162 ; 0 ) 위치: ['¢'],
-	# Valid 3-byte UTF-8
+	# 유효한 3바이트 UTF-8
     넣기: ( 리스트 새로 ; 226 ; 130 ; 172 ; 0 ) 위치: ['€'],
-	# Valid 4-byte UTF-8
+	# 유효한 4바이트 UTF-8
     넣기: ( 리스트 새로 ; 240 ; 144 ; 141 ; 136 ; 0 ) 위치: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# 시퀀스 E2 28 AC의 잘못된 연속 바이트 -> 3b 시퀀스 시작 + 28 잘못된 cnt + AC cnt 바이트, 하지만 같은 오류에 속함
     넣기: ( 리스트 새로 ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) 위치: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# ASCII 'A'의 과잉 길이 인코딩 (?가 되어야 함),
     넣기: ( 리스트 새로 ; 65 ; 193 ; 129 ; 0 ) 위치: ['A?'],
-	# Invalid first byte (0xFF)
+	# 잘못된 첫 바이트 (0xFF)
     넣기: ( 리스트 새로 ; 255 ; 0 ) 위치: ['?'],
-	# Incomplete multi-byte sequence at end
+	# 끝에 있는 불완전한 멀티바이트 시퀀스
     넣기: ( 리스트 새로 ; 66 ; 226 ; 0 ) 위치: ['B?'],
-    # Empty string
+    # 빈 문자열
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# 여러 혼합 시퀀스
     넣기: ( 리스트 새로 ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) 위치: ['A€?𐍈B'].
 	 
-utf8cases 각각: { :key :value
+utf8사례 각각: { :key :value
 	>> blob := Blob 새로: value 개수, bytes: value.
 	>> str := blob 문자열로.
 	(str = key) 참이면: {
 		출력 쓰기: ['OK'], 줄바꿈.
 	}, 아니면: {
-		출력 쓰기: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, 줄바꿈.
+		출력 쓰기: ['UTF8 정제 실패: '] + key + [' 결과: '] + str, 줄바꿈.
 	}.
 	blob 해제.
 }.

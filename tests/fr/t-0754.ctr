@@ -1,30 +1,31 @@
-Sortie écrire: ['Test object'], stop.
+Sortie écrire: ['Objet de test'], stop.
 >> a := Objet nouveau. 
 
-a quand: ['item:'] faire: { :out
-	propre out := out. 
+a quand: ['item:'] faire: { :flux
+	propre flux := flux. 
 }.
 
-a quand: ['item'] faire: { <- propre out.
+a quand: ['article'] faire: {
+	<- propre flux.
 }.
 
-a quand: ['greet'] faire: {
-	Sortie écrire: ['hi from original out!'], stop.
+a quand: ['saluer'] faire: {
+	Sortie écrire: ['salut depuis la sortie d'origine !'], stop.
 }.
 
 a item: Sortie.
 
-Sortie écrire: a item, stop.
+Sortie écrire: a article, stop.
 
->> old-out-address := a item prototype adresse-mémoire.
+>> ancienne-adresse-flux := a article prototype adresse-mémoire.
 a save-as: ['/tmp/a.bin'].
-Sortie écrire: ['========== RELOADING SNAP:'], stop.
+Sortie écrire: ['========== RECHARGEMENT DU SNAP :'], stop.
 
 >> b := Objet load-from: ['/tmp/a.bin'].
 
-(b item prototype adresse-mémoire = old-out-address) oui: {
-	Sortie écrire: ['Object link re-attached.'], stop.
+(b article prototype adresse-mémoire = ancienne-adresse-flux) oui: {
+	Sortie écrire: ['Lien d'objet rattaché.'], stop.
 }.
 
-b item écrire: ['hello from loaded out!'], stop.
-b greet.
+b article écrire: ['bonjour depuis la sortie chargée !'], stop.
+b saluer.

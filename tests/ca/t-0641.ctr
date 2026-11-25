@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# Prova del sanejador utf8
 Server init.
 
->> utf8cases := Diccionari nou
-	# ASCII only
+>> casosUtf8 := Diccionari nou
+	# Només ASCII
 	posa: ( Llista nou ; 65 ; 65 ; 65 ; 65 ; 0 ) a: ['AAAA'],
-	# valid 2 byte sequence
+	# seqüència vàlida de 2 bytes
 	posa: ( Llista nou ; 194 ; 162 ; 0 ) a: ['¢'],
-	# Valid 3-byte UTF-8
+	# UTF-8 vàlid de 3 bytes
     posa: ( Llista nou ; 226 ; 130 ; 172 ; 0 ) a: ['€'],
-	# Valid 4-byte UTF-8
+	# UTF-8 vàlid de 4 bytes
     posa: ( Llista nou ; 240 ; 144 ; 141 ; 136 ; 0 ) a: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# Byte de continuació no vàlid a la seqüència E2 28 AC -> inici seq 3b + 28 cnt erroni + AC byte cnt, però pertany al mateix error
     posa: ( Llista nou ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) a: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# Codificació massa llarga de l'ASCII 'A' (hauria de ser ?),
     posa: ( Llista nou ; 65 ; 193 ; 129 ; 0 ) a: ['A?'],
-	# Invalid first byte (0xFF)
+	# Primer byte no vàlid (0xFF)
     posa: ( Llista nou ; 255 ; 0 ) a: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Seqüència multibyte incompleta al final
     posa: ( Llista nou ; 66 ; 226 ; 0 ) a: ['B?'],
-    # Empty string
+    # Text buit
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Diverses seqüències barrejades
     posa: ( Llista nou ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) a: ['A€?𐍈B'].
 	 
-utf8cases cada: { :key :value
+casosUtf8 cada: { :key :value
 	>> blob := Blob nou: value compta, bytes: value.
 	>> str := blob text.
 	(str = key) cert: {
 		Sortida escriu: ['OK'], salt-de-línia.
 	}, si-no: {
-		Sortida escriu: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, salt-de-línia.
+		Sortida escriu: ['El sanejador UTF8 ha fallat amb: '] + key + [' obtingut: '] + str, salt-de-línia.
 	}.
 	blob allibera.
 }.

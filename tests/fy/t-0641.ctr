@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# Test utf8-sanearder
 Server init.
 
->> utf8cases := List nĳ
-	# ASCII only
+>> utf8gefallen := List nĳ
+	# allinnich ASCII
 	set: ( Rige nĳ ; 65 ; 65 ; 65 ; 65 ; 0 ) by: ['AAAA'],
-	# valid 2 byte sequence
+	# jildige 2-byte-sekwinsje
 	set: ( Rige nĳ ; 194 ; 162 ; 0 ) by: ['¢'],
-	# Valid 3-byte UTF-8
+	# Jildige 3-byte UTF-8
     set: ( Rige nĳ ; 226 ; 130 ; 172 ; 0 ) by: ['€'],
-	# Valid 4-byte UTF-8
+	# Jildige 4-byte UTF-8
     set: ( Rige nĳ ; 240 ; 144 ; 141 ; 136 ; 0 ) by: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# Unjildige ferfolchbyte yn sekwinsje E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, mar heart by deselde flater
     set: ( Rige nĳ ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) by: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# Te lange kodearring fan ASCII 'A' (moat ? wurde),
     set: ( Rige nĳ ; 65 ; 193 ; 129 ; 0 ) by: ['A?'],
-	# Invalid first byte (0xFF)
+	# Unjildige earste byte (0xFF)
     set: ( Rige nĳ ; 255 ; 0 ) by: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Unfolsleine multi-byte-sekwinsje oan it ein
     set: ( Rige nĳ ; 66 ; 226 ; 0 ) by: ['B?'],
-    # Empty string
+    # Lege tekst
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Meardere mingde sekwinsjes
     set: ( Rige nĳ ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) by: ['A€?𐍈B'].
 	 
-utf8cases elk: { :key :value
+utf8gefallen elk: { :key :value
 	>> blob := Blob nĳ: value telle, bytes: value.
 	>> str := blob tekst.
 	(str = key) ja: {
 		Utfier skriuwe: ['OK'], nije-rigel.
 	}, oars: {
-		Utfier skriuwe: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, nije-rigel.
+		Utfier skriuwe: ['UTF8-sanearder mislearre by: '] + key + [' krige: '] + str, nije-rigel.
 	}.
 	blob frijjaan.
 }.

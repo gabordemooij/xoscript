@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := オブジェクト 新規.
+# このテストは、モード 4 で string_fill_in がスロットを失わない (gc されない) か確認する
+# world.c を参照
+>> 記録係 := オブジェクト 新規.
 
-Log 受信時: ['say:'] 実行: { :str
+記録係 受信時: ['say:'] 実行: { :str
 	出力 書く: str, 改行.
 }.
 
->> Item := オブジェクト 新規.
+>> 品目型 := オブジェクト 新規.
 
-Item 受信時: ['新規:'] 実行: { :id <- 自身 新規 id: id.
+品目型 受信時: ['新規:'] 実行: { :id
+	<- 自身 新規 id: id.
 }.
 
-Item 受信時: ['id:'] 実行: { :id
+品目型 受信時: ['id:'] 実行: { :id
 	自分の id := id.
 }.
 
-Item 受信時: ['id'] 実行: { <- 自分の id. }.
+品目型 受信時: ['id'] 実行: { <- 自分の id. }.
 
 
-Item 受信時: ['文字列化'] 実行: {
+品目型 受信時: ['文字列化'] 実行: {
 	>> str := ['Item#~no'].
-	str ~no: 自分の id. <- str.
+	str ~no: 自分の id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item 受信時: ['文字列化'] 実行: {
 
 Print 受信時: ['items'] 実行: { 
 	
-	自分の item := Item 新規: 1.
+	自分の 品目 := 品目型 新規: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: 自分の item
+	# ここで segfault するか、間違った str になる
+	記録係 say: (
+		['~item printed.'] ~item: 自分の 品目
 	).
 	
 	

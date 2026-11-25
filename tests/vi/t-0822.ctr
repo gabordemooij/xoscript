@@ -1,22 +1,22 @@
-# fewer parameters than placeholders must give an error, not read past the bindings
+# ít tham số hơn chỗ giữ chỗ phải báo lỗi, không được đọc quá các ràng buộc
 Server init.
 
->> db := Maria-DB mới máy-trạm: ['localhost'],
+>> csdl := Maria-DB mới máy-trạm: ['localhost'],
 	tên-người-dùng: ['xo'],
 	mật-khẩu: ['pass123'],
 	tên-cơ-sở-dữ-liệu: ['xobase'],
 	kết-nối.
 
->> tham-số-tìm-kiếm := db truy-vấn: ['SELECT ? AS a, ? AS b, ? AS c'].
+>> tham-số-tìm-kiếm := csdl truy-vấn: ['SELECT ? AS a, ? AS b, ? AS c'].
 tham-số-tìm-kiếm tham-số: (Danh-sách mới ; ['1']).
-{ tham-số-tìm-kiếm lấy: { :row Xuất ghi: row, xuống-dòng. }. } bắt-lỗi: { :e Xuất ghi: e, xuống-dòng. }, chạy.
+{ tham-số-tìm-kiếm lấy: { :hàng Xuất ghi: hàng, xuống-dòng. }. } bắt-lỗi: { :e Xuất ghi: e, xuống-dòng. }, chạy.
 
->> tham-số-tìm-kiếm := db truy-vấn: ['SELECT ? AS a'].
-{ tham-số-tìm-kiếm lấy: { :row Xuất ghi: row, xuống-dòng. }. } bắt-lỗi: { :e Xuất ghi: e, xuống-dòng. }, chạy.
+>> tham-số-tìm-kiếm := csdl truy-vấn: ['SELECT ? AS a'].
+{ tham-số-tìm-kiếm lấy: { :hàng Xuất ghi: hàng, xuống-dòng. }. } bắt-lỗi: { :e Xuất ghi: e, xuống-dòng. }, chạy.
 
-# the right number still works, more parameters are ignored as before
->> tham-số-tìm-kiếm := db truy-vấn: ['SELECT ? AS a, ? AS b'].
+# đúng số lượng vẫn hoạt động, tham số thừa bị bỏ qua như trước
+>> tham-số-tìm-kiếm := csdl truy-vấn: ['SELECT ? AS a, ? AS b'].
 tham-số-tìm-kiếm tham-số: (Danh-sách mới ; ['1'] ; ['2']).
-tham-số-tìm-kiếm lấy: { :row Xuất ghi: (row tại: ['a']), ghi: (row tại: ['b']), xuống-dòng. }.
+tham-số-tìm-kiếm lấy: { :hàng Xuất ghi: (hàng tại: ['a']), ghi: (hàng tại: ['b']), xuống-dòng. }.
 tham-số-tìm-kiếm tham-số: (Danh-sách mới ; ['1'] ; ['2'] ; ['3']).
-tham-số-tìm-kiếm lấy: { :row Xuất ghi: (row tại: ['a']), ghi: (row tại: ['b']), xuống-dòng. }.
+tham-số-tìm-kiếm lấy: { :hàng Xuất ghi: (hàng tại: ['a']), ghi: (hàng tại: ['b']), xuống-dòng. }.

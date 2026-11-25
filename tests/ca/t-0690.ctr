@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# prova de base de dades
+# vegeu l'exemple server.xo per a la configuració necessària
 
 Server init.
-Sortida escriu: ['Database test'], salt-de-línia.
+Sortida escriu: ['Prova de base de dades'], salt-de-línia.
 
->> db := Maria-DB nou amfitrió: ['localhost'],
+>> bd := Maria-DB nou amfitrió: ['localhost'],
 	usuari: ['xo'], contrasenya: ['pass123'], nom-base: ['xobase'], connecta.
 
-Sortida escriu: ['Can we connect? '] + db connectat?, salt-de-línia.
+Sortida escriu: ['Podem connectar? '] + bd connectat?, salt-de-línia.
 
->> paràmetres-de-cerca := db consulta: ['
+>> paràmetres-de-cerca := bd consulta: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], paràmetres: ( Llista nou ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], paràmetres: ( Llista nou ; ['abc'] ; 12.35 ; 6 ). # consultes parametritzades
 
-{  paràmetres-de-cerca executa. db confirma. } captura: { :e db desfés.  }, inicia.
+{  paràmetres-de-cerca executa. bd confirma. } captura: { :e bd desfés.  }, inicia.
 
-Sortida escriu: ['Can we insert? '] + ( paràmetres-de-cerca insert-id > 0 ), salt-de-línia.
+Sortida escriu: ['Podem inserir? '] + ( paràmetres-de-cerca insert-id > 0 ), salt-de-línia.
 
 >> x := 0.
 >> paràmetres-de-cerca :=
-db consulta: ['SELECT * FROM book order by id desc limit 2'], 
-obtén: { :row 
+bd consulta: ['SELECT * FROM book order by id desc limit 2'], 
+obtén: { :fila 
 	x suma: 1.
-	Cert interromp. # must clean up, no 'Commands out of sync'
+	Cert interromp. # cal netejar, sense 'Commands out of sync'
 }.
 
 >> paràmetres-de-cerca :=
-db consulta: ['SELECT * FROM book order by id desc limit 2'], 
-obtén: { :row
+bd consulta: ['SELECT * FROM book order by id desc limit 2'], 
+obtén: { :fila
 	x suma: 1.
 	Cert interromp.
 }.
 
 (x > 0) cert: {
-	Sortida escriu: ['Can we break in the middle of a fetch? '].
+	Sortida escriu: ['Podem interrompre enmig d'una descàrrega? '].
 }.
 
 Sortida escriu: Cert, salt-de-línia.

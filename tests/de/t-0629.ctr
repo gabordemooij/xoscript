@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# Datenbanktest
+# siehe Beispiel server.xo für die nötige Konfiguration
 
 Server init.
-Ausgabe schreiben: ['Database test'], stopp.
+Ausgabe schreiben: ['Datenbanktest'], stopp.
 
 >> db := Maria-DB neu host: ['localhost'],
 	benutzername: ['xo'], passwort: ['pass123'], datenbankname: ['xobase'], verbinden.
 
-Ausgabe schreiben: ['Can we connect? '] + db verbunden?, stopp.
+Ausgabe schreiben: ['Können wir verbinden? '] + db verbunden?, stopp.
 
 >> suchparameter := db abfrage: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parameter: ( Liste neu ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parameter: ( Liste neu ; ['abc'] ; 12.35 ; 6 ). # parametrisierte Abfragen
 
 {  suchparameter ausführen. db bestätigen. } abfangen: { :e db zurückrollen.  }, starten.
 
-Ausgabe schreiben: ['Can we insert? '] + ( suchparameter insert-id > 0 ), stopp.
+Ausgabe schreiben: ['Können wir einfügen? '] + ( suchparameter insert-id > 0 ), stopp.
 
 >> Obj := Objekt neu.
-Obj wenn: ['retrieve-rows'] tun: {
+Obj wenn: ['reihen-abrufen'] tun: {
 	eigen anzahl := 0.
 	>> suchparameter :=
 	db abfrage: ['SELECT * FROM book order by id desc limit 2'], 
-	abrufen: { :row 
+	abrufen: { :reihe 
 		eigen anzahl hinzufügen: 1.
 		Ja abbrechen.
-	}. <- eigen anzahl kopieren.
+	}. # Zeilen abrufen
+	<- eigen anzahl kopieren.
 }.
 
-Ausgabe schreiben: ['Can we query? '] + ( Obj retrieve-rows > 0 ), stopp.
+Ausgabe schreiben: ['Können wir abfragen? '] + ( Obj reihen-abrufen > 0 ), stopp.

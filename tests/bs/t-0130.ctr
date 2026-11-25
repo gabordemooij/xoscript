@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# korištenje FFI s dodatkom Server
 
-# connect to libc (platform specific)
->> libname := Program postavka: ['FFITESTLIB'].
+# povezivanje s libc (zavisi od platforme)
+>> nazivBiblioteke := Program postavka: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# povezivanje stdio funkcija iz C-a za napredne operacije s datotekama
 Server poveži: ( Lista novi ;
- libname ; ['fopen'] ;
+ nazivBiblioteke ; ['fopen'] ;
  ( Lista novi ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 poveži: ( Lista novi ;
- Ništa ; # means same lib
+ Ništa ; # znači ista biblioteka
  ['fread'] ;
  ( Lista novi ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Ništa ; # means same object (i.e. Stream)
+ Ništa ; # znači isti objekat (tj. Tok)
  ['fread']
 ),
 poveži: (
  Lista novi ;
- Ništa ; # means same lib
+ Ništa ; # znači ista biblioteka
  ['fwrite'] ;
  ( Lista novi ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Ništa ; # means same lib
+ Ništa ; # znači ista biblioteka
  ['fwrite']
 ),
 poveži: (
  Lista novi ;
- Ništa ; # means same lib
+ Ništa ; # znači ista biblioteka
  ['rewind'] ;
  ( Lista novi ; ['pointer'] ) ;
  ['int'] ;
- Ništa ; # means same lib
+ Ništa ; # znači ista biblioteka
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> putanja := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# otvaranje datoteke pomoću fopen(path, mode)
 >> fd := Stream path: putanja mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream poruka: ['fwrite'] argumenti: (Lista novi ; str ; 1 ; 6 ; fd ).
-Izlaz piši: bytes-written, novi-red.
+# upisivanje bajtova iz bafera niz u datoteku
+>> upisano-bajtova := Stream poruka: ['fwrite'] argumenti: (Lista novi ; str ; 1 ; 6 ; fd ).
+Izlaz piši: upisano-bajtova, novi-red.
 
-# rewind file pointer
+# vraćanje pokazivača datoteke na početak
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob novi: 20.
+# alociranje bafera
+>> baf := Blob novi: 20.
 
-# read from file
->> bytes-read := Stream poruka: ['fread'] argumenti: (Lista novi ; buf ; 1 ; 6 ; fd ).
-Izlaz piši: bytes-read, novi-red.
-Izlaz piši: buf, novi-red.
+# čitanje iz datoteke
+>> pročitano-bajtova := Stream poruka: ['fread'] argumenti: (Lista novi ; baf ; 1 ; 6 ; fd ).
+Izlaz piši: pročitano-bajtova, novi-red.
+Izlaz piši: baf, novi-red.
 
-# free memory
+# oslobađanje memorije
 str  oslobodi.
 putanja oslobodi.
 mode oslobodi.
-buf  oslobodi.
+baf  oslobodi.
 
 

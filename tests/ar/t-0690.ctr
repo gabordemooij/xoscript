@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# اختبار قاعدة البيانات
+# انظر المثال server.xo للإعدادات المطلوبة
 
 Server init.
-مخرج اكتب: ⌝'Database test'⌜, سطر-جديد.
+مخرج اكتب: ⌝'اختبار قاعدة البيانات'⌜, سطر-جديد.
 
->> db := Maria-DB جديد مضيف: ⌝'localhost'⌜,
+>> قاعدة := Maria-DB جديد مضيف: ⌝'localhost'⌜,
 	اسم-المستخدم: ⌝'xo'⌜, كلمة-السر: ⌝'pass123'⌜, اسم-القاعدة: ⌝'xobase'⌜, اتصل.
 
-مخرج اكتب: ⌝'Can we connect? '⌜ + db متصل?, سطر-جديد.
+مخرج اكتب: ⌝'هل يمكننا الاتصال? '⌜ + قاعدة متصل?, سطر-جديد.
 
->> معاملات-البحث := db استعلام: ⌝'
+>> معاملات-البحث := قاعدة استعلام: ⌝'
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'⌜, معاملات: ﴿ قائمة جديد ; ⌝'abc'⌜ ; 12.35 ; 6 ﴾. # parameterized queries
+'⌜, معاملات: ﴿ قائمة جديد ; ⌝'abc'⌜ ; 12.35 ; 6 ﴾. # استعلامات ذات معاملات
 
-⎬  معاملات-البحث نفذ. db ثبت. ⎨ التقط: ⎬ :e db تراجع.  ⎨, شغل.
+⎬  معاملات-البحث نفذ. قاعدة ثبت. ⎨ التقط: ⎬ :e قاعدة تراجع.  ⎨, شغل.
 
-مخرج اكتب: ⌝'Can we insert? '⌜ + ﴿ معاملات-البحث insert-id > 0 ﴾, سطر-جديد.
+مخرج اكتب: ⌝'هل يمكننا الإدراج? '⌜ + ﴿ معاملات-البحث insert-id > 0 ﴾, سطر-جديد.
 
 >> x := 0.
 >> معاملات-البحث :=
-db استعلام: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
-اجلب: ⎬ :row 
+قاعدة استعلام: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+اجلب: ⎬ :صف 
 	x أضف: 1.
-	صحيح اخرج. # must clean up, no 'Commands out of sync'
+	صحيح اخرج. # يجب التنظيف، بلا 'Commands out of sync'
 ⎨.
 
 >> معاملات-البحث :=
-db استعلام: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
-اجلب: ⎬ :row
+قاعدة استعلام: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+اجلب: ⎬ :صف
 	x أضف: 1.
 	صحيح اخرج.
 ⎨.
 
 ﴿x > 0﴾ إذا-صحيح: ⎬
-	مخرج اكتب: ⌝'Can we break in the middle of a fetch? '⌜.
+	مخرج اكتب: ⌝'هل يمكننا التوقف في منتصف عملية جلب? '⌜.
 ⎨.
 
 مخرج اكتب: صحيح, سطر-جديد.

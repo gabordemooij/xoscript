@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# kluissleutels en handtekeninge wat te lank dekodeer, mag nie die stapel laat oorloop nie
 Server init.
 
->> keys := Kluis genereer-sleutels.
->> sk := keys eerste.
->> pk := keys laaste.
+>> sleutels := Kluis genereer-sleutels.
+>> sk := sleutels eerste.
+>> pk := sleutels laaste.
 >> sig := Kluis onderteken: ['abc'] met: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 tekens sonder opvulling dekodeer na 66 grepe
+>> lank := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 tekens sonder opvulling dekodeer na 33 grepe
+>> kort := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Kluis onderteken: ['abc'] met: long. } vang: { :e
+{ Kluis onderteken: ['abc'] met: lank. } vang: { :e
 	Uitvoer skryf: e, nuwe-reël.
 }, begin.
 
-{ Kluis kontroleer: ['abc'] handtekening: long met: pk. } vang: { :e
+{ Kluis kontroleer: ['abc'] handtekening: lank met: pk. } vang: { :e
 	Uitvoer skryf: e, nuwe-reël.
 }, begin.
 
-{ Kluis kontroleer: ['abc'] handtekening: sig met: short. } vang: { :e
+{ Kluis kontroleer: ['abc'] handtekening: sig met: kort. } vang: { :e
 	Uitvoer skryf: e, nuwe-reël.
 }, begin.

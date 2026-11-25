@@ -1,35 +1,38 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# format kuki sesi, jenis kandungan json, protokol web sahaja, svg dipaparkan sebaris
 Server mulakan-awal.
 Atur-cara guna: ['../../../src/xo/ms/webtools.xo'].
 
->> Fake-Request := Objek baharu.
-Fake-Request apabila: ['value:'] lakukan: { :nilai
+>> Permintaan-Palsu := Objek baharu.
+Permintaan-Palsu apabila: ['value:'] lakukan: { :nilai
 	milik nilai := nilai.
 }.
-Fake-Request apabila: ['cookie:'] lakukan: { :nama <- milik nilai.
+Permintaan-Palsu apabila: ['cookie:'] lakukan: { :nama
+	<- milik nilai.
 }.
 
->> Test-Session := Sesi-fail-sementara baharu.
-Test-Session apabila: ['muatkan'] lakukan: { <- Kamus baharu.
+>> Sesi-Ujian := Sesi-fail-sementara baharu.
+Sesi-Ujian apabila: ['muatkan'] lakukan: {
+	<- Kamus baharu.
 }.
-Test-Session apabila: ['session-id'] lakukan: { <- milik id.
+Sesi-Ujian apabila: ['pengenal-sesi'] lakukan: {
+	<- milik id.
 }.
 
->> cookies := Senarai baharu
+>> kuki-kuki := Senarai baharu
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies setiap: { :i :cookie
-	>> permintaan-http := Fake-Request baharu.
-	permintaan-http value: cookie.
-	>> pengurus := Test-Session baharu.
+kuki-kuki setiap: { :i :kuki
+	>> permintaan-http := Permintaan-Palsu baharu.
+	permintaan-http value: kuki.
+	>> pengurus := Sesi-Ujian baharu.
 	>> web := Dokumen-Web baharu.
 	web permintaan-http: permintaan-http.
 	web pengurus-sesi: pengurus.
 	web mulakan-sesi.
-	Keluaran tulis: ( pengurus session-id = cookie ), baris-baharu.
+	Keluaran tulis: ( pengurus pengenal-sesi = kuki ), baris-baharu.
 }.
 
 >> web := Dokumen-Web baharu.

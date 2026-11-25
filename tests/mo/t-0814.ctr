@@ -1,35 +1,38 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# formatul cookie-ului de sesiune, tip de conținut json, doar protocoale web, svg afișat inline
 Server inițializează.
 Program folosește: ['../../../src/xo/mo/webtools.xo'].
 
->> Fake-Request := Obiect nou.
-Fake-Request la: ['value:'] execută: { :valoare
+>> Cerere-Falsă := Obiect nou.
+Cerere-Falsă la: ['value:'] execută: { :valoare
 	propriu valoare := valoare.
 }.
-Fake-Request la: ['cookie:'] execută: { :nume <- propriu valoare.
+Cerere-Falsă la: ['cookie:'] execută: { :nume
+	<- propriu valoare.
 }.
 
->> Test-Session := Sesiune-fișier-temporar nou.
-Test-Session la: ['încarcă'] execută: { <- Dicționar nou.
+>> Sesiune-Test := Sesiune-fișier-temporar nou.
+Sesiune-Test la: ['încarcă'] execută: {
+	<- Dicționar nou.
 }.
-Test-Session la: ['session-id'] execută: { <- propriu id.
+Sesiune-Test la: ['identificator-sesiune'] execută: {
+	<- propriu id.
 }.
 
->> cookies := Listă nou
+>> cookie-uri := Listă nou
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies fiecare: { :i :cookie
-	>> cerere := Fake-Request nou.
+cookie-uri fiecare: { :i :cookie
+	>> cerere := Cerere-Falsă nou.
 	cerere value: cookie.
-	>> manager := Test-Session nou.
+	>> manager := Sesiune-Test nou.
 	>> web := Document-Web nou.
 	web cerere: cerere.
 	web manager-sesiune: manager.
 	web pornește-sesiune.
-	Ieșire scrie: ( manager session-id = cookie ), rând-nou.
+	Ieșire scrie: ( manager identificator-sesiune = cookie ), rând-nou.
 }.
 
 >> web := Document-Web nou.

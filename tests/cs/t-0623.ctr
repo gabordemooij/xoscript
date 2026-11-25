@@ -1,10 +1,10 @@
 
 
->> g := Server nový.
->> v := Trezor nový.
+>> g  := Server nový.
+>> v  := Trezor nový.
 >> ok := 0.
 
->> secrets := Seznam nový ; 
+>> tajnosti := Seznam nový ; 
 	 ['aaa'] ;
 	 [''] ; 
 	 ['AB'] ;
@@ -14,30 +14,30 @@
 	 ['漢字'] ;
 	 ['==[abc]=='].
 	
->> passwords := secrets kopírovat.
-passwords každý: { :i :p
-	secrets každý: { :n :s
+>> hesla := tajnosti kopírovat.
+hesla každý: { :i :p
+	tajnosti každý: { :n :s
 		{
-			>> encrypted := v šifrovat: s klíč: p.
-			>> decrypted := v dešifrovat: encrypted klíč: p.
-			(decrypted = s) pravda: {
+			>> zašifrováno := v šifrovat: s klíč: p.
+			>> dešifrováno := v dešifrovat: zašifrováno klíč: p.
+			(dešifrováno = s) pravda: {
 				ok přičíst: 1.
 			}, jinak: {
-				Výstup psát: ['failed encrypting/decrypting: '], nový-řádek.
+				Výstup psát: ['šifrování/dešifrování selhalo: '], nový-řádek.
 				Výstup psát: s, nový-řádek.
-				Výstup psát: ['encrypted: '] + encrypted, nový-řádek.
-				Výstup psát: ['decrypted: '] + encrypted, nový-řádek.
+				Výstup psát: ['zašifrováno: '] + zašifrováno, nový-řádek.
+				Výstup psát: ['dešifrováno: '] + zašifrováno, nový-řádek.
 				Program konec.
 			}.
-		} chytit: { :err
+		} chytit: { :chb
 			(s = [''] nebo: p = ['']) pravda: {
 				ok přičíst: 1.
 			}, jinak: {
-				Výstup psát: err, nový-řádek.
+				Výstup psát: chb, nový-řádek.
 				Program konec.
 			}.
 		}, spustit.
 	}.
 }.
 
-Výstup psát: ( ok + [' vault encryptions tested.'] ), nový-řádek.
+Výstup psát: ( ok + [' šifrování trezoru otestováno.'] ), nový-řádek.

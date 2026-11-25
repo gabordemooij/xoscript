@@ -1,39 +1,42 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# định dạng cookie phiên, kiểu nội dung json, chỉ giao thức web, svg hiển thị trực tiếp
 Server khởi-tạo.
 Chương-trình dùng: ['../../../src/xo/vi/webtools.xo'].
 
->> Fake-Request := Đối-tượng mới.
-Fake-Request khi: ['value:'] làm: { :giá-trị
+>> Yêu-cầu-giả := Đối-tượng mới.
+Yêu-cầu-giả khi: ['value:'] làm: { :giá-trị
 	riêng giá-trị := giá-trị.
 }.
-Fake-Request khi: ['cookie:'] làm: { :tên <- riêng giá-trị.
+Yêu-cầu-giả khi: ['cookie:'] làm: { :tên
+	<- riêng giá-trị.
 }.
 
->> Test-Session := Phiên-tệp-tạm mới.
-Test-Session khi: ['tải'] làm: { <- Từ-điển mới.
+>> Phiên-thử-nghiệm := Phiên-tệp-tạm mới.
+Phiên-thử-nghiệm khi: ['tải'] làm: {
+	<- Từ-điển mới.
 }.
-Test-Session khi: ['session-id'] làm: { <- riêng id.
+Phiên-thử-nghiệm khi: ['mã-số-phiên'] làm: {
+	<- riêng id.
 }.
 
->> cookies := Danh-sách mới
+>> các-cookie := Danh-sách mới
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies mỗi: { :i :cookie
-	>> yêu-cầu-http := Fake-Request mới.
+các-cookie mỗi: { :i :cookie
+	>> yêu-cầu-http := Yêu-cầu-giả mới.
 	yêu-cầu-http value: cookie.
-	>> trình-quản-lý := Test-Session mới.
-	>> web := Tài-liệu-Web mới.
-	web yêu-cầu-http: yêu-cầu-http.
-	web trình-quản-lý-phiên: trình-quản-lý.
-	web bắt-đầu-phiên.
-	Xuất ghi: ( trình-quản-lý session-id = cookie ), xuống-dòng.
+	>> trình-quản-lý := Phiên-thử-nghiệm mới.
+	>> trang-web := Tài-liệu-Web mới.
+	trang-web yêu-cầu-http: yêu-cầu-http.
+	trang-web trình-quản-lý-phiên: trình-quản-lý.
+	trang-web bắt-đầu-phiên.
+	Xuất ghi: ( trình-quản-lý mã-số-phiên = cookie ), xuống-dòng.
 }.
 
->> web := Tài-liệu-Web mới.
-web json: (Từ-điển mới đặt: ['b'] tại: ['a']).
+>> trang-web := Tài-liệu-Web mới.
+trang-web json: (Từ-điển mới đặt: ['b'] tại: ['a']).
 Xuất ghi: ['\n'], xuống-dòng.
 
 { Mạng get: ['file:///etc/hostname']. } bắt-lỗi: { :e

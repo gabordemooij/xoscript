@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# test databáze
+# potřebnou konfiguraci viz příklad server.xo
 
 Server init.
-Výstup psát: ['Database test'], nový-řádek.
+Výstup psát: ['Test databáze'], nový-řádek.
 
 >> db := Maria-DB nový hostitel: ['localhost'],
 	uživatel: ['xo'], heslo: ['pass123'], název-databáze: ['xobase'], připojit.
 
-Výstup psát: ['Can we connect? '] + db připojeno?, nový-řádek.
+Výstup psát: ['Lze se připojit? '] + db připojeno?, nový-řádek.
 
 >> parametry-hledání := db dotaz: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametry: ( Seznam nový ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametry: ( Seznam nový ; ['abc'] ; 12.35 ; 6 ). # parametrizované dotazy
 
 {  parametry-hledání provést. db potvrdit. } chytit: { :e db vrátit-zpět.  }, spustit.
 
-Výstup psát: ['Can we insert? '] + ( parametry-hledání insert-id > 0 ), nový-řádek.
+Výstup psát: ['Lze vkládat? '] + ( parametry-hledání insert-id > 0 ), nový-řádek.
 
 >> Obj := Objekt nový.
-Obj při: ['retrieve-rows'] udělat: {
+Obj při: ['načíst-řádky'] udělat: {
 	vlastní počet := 0.
 	>> parametry-hledání :=
 	db dotaz: ['SELECT * FROM book order by id desc limit 2'], 
-	načíst: { :row 
+	načíst: { :řádka 
 		vlastní počet přičíst: 1.
 		Pravda přestat.
-	}. <- vlastní počet kopírovat.
+	}. # načítání řádků
+	<- vlastní počet kopírovat.
 }.
 
-Výstup psát: ['Can we query? '] + ( Obj retrieve-rows > 0 ), nový-řádek.
+Výstup psát: ['Lze dotazovat? '] + ( Obj načíst-řádky > 0 ), nový-řádek.

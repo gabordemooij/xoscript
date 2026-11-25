@@ -1,22 +1,22 @@
-# fewer parameters than placeholders must give an error, not read past the bindings
+# parameter yang kurang daripada pemegang tempat mesti memberi ralat, bukan membaca melepasi pengikatan
 Server init.
 
->> db := Maria-DB baharu hos: ['localhost'],
+>> pd := Maria-DB baharu hos: ['localhost'],
 	nama-pengguna: ['xo'],
 	kata-laluan: ['pass123'],
 	nama-pangkalan-data: ['xobase'],
 	sambung.
 
->> parameter-carian := db pertanyaan: ['SELECT ? AS a, ? AS b, ? AS c'].
+>> parameter-carian := pd pertanyaan: ['SELECT ? AS a, ? AS b, ? AS c'].
 parameter-carian parameter: (Senarai baharu ; ['1']).
-{ parameter-carian dapatkan: { :row Keluaran tulis: row, baris-baharu. }. } tangkap: { :e Keluaran tulis: e, baris-baharu. }, mula.
+{ parameter-carian dapatkan: { :barisan Keluaran tulis: barisan, baris-baharu. }. } tangkap: { :e Keluaran tulis: e, baris-baharu. }, mula.
 
->> parameter-carian := db pertanyaan: ['SELECT ? AS a'].
-{ parameter-carian dapatkan: { :row Keluaran tulis: row, baris-baharu. }. } tangkap: { :e Keluaran tulis: e, baris-baharu. }, mula.
+>> parameter-carian := pd pertanyaan: ['SELECT ? AS a'].
+{ parameter-carian dapatkan: { :barisan Keluaran tulis: barisan, baris-baharu. }. } tangkap: { :e Keluaran tulis: e, baris-baharu. }, mula.
 
-# the right number still works, more parameters are ignored as before
->> parameter-carian := db pertanyaan: ['SELECT ? AS a, ? AS b'].
+# bilangan yang betul masih berfungsi, parameter tambahan diabaikan seperti sebelum ini
+>> parameter-carian := pd pertanyaan: ['SELECT ? AS a, ? AS b'].
 parameter-carian parameter: (Senarai baharu ; ['1'] ; ['2']).
-parameter-carian dapatkan: { :row Keluaran tulis: (row di: ['a']), tulis: (row di: ['b']), baris-baharu. }.
+parameter-carian dapatkan: { :barisan Keluaran tulis: (barisan di: ['a']), tulis: (barisan di: ['b']), baris-baharu. }.
 parameter-carian parameter: (Senarai baharu ; ['1'] ; ['2'] ; ['3']).
-parameter-carian dapatkan: { :row Keluaran tulis: (row di: ['a']), tulis: (row di: ['b']), baris-baharu. }.
+parameter-carian dapatkan: { :barisan Keluaran tulis: (barisan di: ['a']), tulis: (barisan di: ['b']), baris-baharu. }.

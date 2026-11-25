@@ -1,76 +1,77 @@
 Server init.
 
-# JSON encoder only supports UTF-8, no surrogate pairs
+# el codificador JSON solo admite UTF-8, sin pares sustitutos
 
->> dicts := Lista crear ;
-	# {"key":"normal"} normal ASCII
+>> diccs := Lista crear ;
+	# {"key":"normal"} ASCII normal
 	( Diccionario crear poner: ['normal'] en: ['key'] ) ;
-	# {"key":"hello world"} space character
+	# {"key":"hello world"} carácter de espacio
 	( Diccionario crear poner: ['hello world'] en: ['key'] ) ;
-	# {"key":"quote: \""} double quote
+	# {"key":"quote: \""} comilla doble
 	( Diccionario crear poner: ['"'] en: ['key'] ) ;
-	# {"key":"backslash: \\"} backslash
+	# {"key":"backslash: \\"} barra invertida
 	( Diccionario crear poner: ['backslash: \\'] en: ['key'] ) ;
-	# {"key":"slash: /"} slash
-	( Diccionario crear poner: ['slash: /'] en: ['key'] ) ;
-	# {"key":"backspace: \b"} backspace
+	# {"key":"slash: /"} barra
+	( Diccionario crear poner: ['barra: /'] en: ['key'] ) ;
+	# {"key":"backspace: \b"} retroceso
 	( Diccionario crear poner: ['backspace: \b'] en: ['key'] ) ;
-	# {"key":"formfeed: \f"} form-feed escape
+	# {"key":"formfeed: \f"} escape de avance de página
 	( Diccionario crear poner: ['formfeed: \f'] en: ['key'] ) ;
-	# {"key":"newline: \n"} newline
+	# {"key":"newline: \n"} salto de línea
 	( Diccionario crear poner: ['newline: \n'] en: ['key'] ) ;
 	( Diccionario crear poner: ['newline: ↵'] en: ['key'] ) ;
 	( Diccionario crear poner: ['newline: 
 	'] en: ['key'] ) ;
-	# {"key":"carriage return: \r"} carriage-return
+	# {"key":"carriage return: \r"} retorno de carro
 	( Diccionario crear poner: ['carriage return: \r'] en: ['key'] ) ;
-	# {"key":"tab: \t"} tab
+	# {"key":"tab: \t"} tabulador
 	( Diccionario crear poner: ['tab \t'] en: ['key'] ) ;
 	( Diccionario crear poner: ['tab ⇿'] en: ['key'] ) ;
-	( Diccionario crear poner: ['tab  '] en: ['key'] ) ;
+	( Diccionario crear poner: ['tabulador  '] en: ['key'] ) ;
 	# {"key":"control: \u0000"} NUL
 	( Diccionario crear poner: ['NUL \u0000'] en: ['key'] ) ;
 	( Diccionario crear poner: ['NUL \0'] en: ['key'] ) ;
-	# {"key":"control: \u0001"} control character 0x01
+	# {"key":"control: \u0001"} carácter de control 0x01
 	( Diccionario crear poner: ['control: \u0001'] en: ['key'] ) ;
-	# {"key":"control: \u001F"} control character 0x1F
+	# {"key":"control: \u001F"} carácter de control 0x1F
 	( Diccionario crear poner: ['control: \u001F'] en: ['key'] ) ;
-	# {"key":"unicode: é"} UTF-8, 2-byte char
+	# {"key":"unicode: é"} UTF-8, carácter de 2 bytes
 	( Diccionario crear poner: ['unicode: é'] en: ['key'] ) ;
-	# {"key":"unicode: €"} UTF-8, 3-byte char
+	# {"key":"unicode: €"} UTF-8, carácter de 3 bytes
 	( Diccionario crear poner: ['unicode: €'] en: ['key'] ) ;
-	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	# {"key":"unicode: 日本語"} varios caracteres UTF-8 de 3 bytes
 	( Diccionario crear poner: ['unicode: 日本語'] en: ['key'] ) ;
-	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	# {"key":"unicode: 😀"} UTF-8, carácter de 4 bytes
 	( Diccionario crear poner: ['unicode: 😀'] en: ['key'] ) ;
-	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	# {"key":"unicode: 🧑‍💻"} emoji + unión de ancho cero
 	( Diccionario crear poner: ['unicode: 🧑‍💻'] en: ['key'] ) ;
-	# {"key":"combining: e\u0301"} combining accent
+	# {"key":"combining: é"} acento combinado
 	( Diccionario crear poner: ['combining: e\u0301'] en: ['key'] ) ;
-	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	# {"key":"escaped unicode: é"} escape Unicode BMP
 	( Diccionario crear poner: ['escaped unicode: \u00e9'] en: ['key'] ) ;
-	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	# {"key":"escaped unicode: €"} escape Unicode BMP
 	( Diccionario crear poner: ['escaped unicode: \u20ac'] en: ['key'] ) ;
-	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	# {"key":"escaped unicode: 😀"} par sustituto UTF-16
 	( Diccionario crear poner: ['escaped unicode: \ud83d\ude00'] en: ['key'] ) ;
-	# {"key":""} empty value
+	# {"key":""} valor vacío
 	( Diccionario crear poner: [''] en: ['key'] ) ;
-	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	# {"key":"@ < > & = % + ? #"} caracteres ASCII especiales
 	( Diccionario crear poner: ['@ < > & = % + ? #'] en: ['key'] ) ;
-	# {"key":"single quote: '"} single quote
+	# {"key":"single quote: '"} comilla simple
 	( Diccionario crear poner: ['''] en: ['key'] ) ;
-	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	# {"key":"multiple: \" \\ \n \r \t"} varios escapes JSON
 	( Diccionario crear poner: ['multiple: \" \\ \n \r \t'] en: ['key'] ) ;
-	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} texto ASCII más largo
 	( Diccionario crear poner: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] en: ['key'] ) ;
-	# {"key":" value"} leading space
+	# {"key":" value"} espacio inicial
 	( Diccionario crear poner: [' value'] en: ['key'] ) ;
-	# {"key":"value "} trailing space
+	# {"key":"value "} espacio final
 	( Diccionario crear poner: ['value '] en: ['key'] ) ;
-	# {"key":" \t\n\r "} whitespace
-	( Diccionario crear poner: [' \t\n\r '] en: ['key'] ).
+	# {"key":" \t\n\r "} espacios en blanco
+	( Diccionario crear poner: [' \t\n\r '] en: ['key'] )
+	.
 
-dicts cada: { :_ :d
+diccs cada: { :_ :d
 	>> j := JSON jsonificar: d.
 	>> a := JSON jsonificar: (Diccionario crear poner: d key en: ['key']).
 	>> b := JSON jsonificar: (Diccionario crear poner: ['value'] en: d key).
@@ -79,7 +80,7 @@ dicts cada: { :_ :d
 	((e key = d key y: (f ? d key = ['value'])) o: (e key = ['NUL ?'])) verdadero: {
 		Salida escribir: ['OK'], detener.
 	}, otro: {
-		Salida escribir: ['Unable to properly encode/decode: '] + d + j, detener.
+		Salida escribir: ['No se pudo codificar/decodificar correctamente: '] + d + j, detener.
 		Programa finalizar.
 	}.
 }.

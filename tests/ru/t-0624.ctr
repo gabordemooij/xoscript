@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := Объект новый.
+# Этот тест проверяет, что string_fill_in не теряет свой слот (gc'ed) в режиме 4
+# ссылка в world.c
+>> Журнал := Объект новый.
 
-Log в: ['say:'] сделать: { :str
+Журнал в: ['say:'] сделать: { :str
 	Выход написать: str, стоп.
 }.
 
->> Item := Объект новый.
+>> Предмет := Объект новый.
 
-Item в: ['новый:'] сделать: { :id <- сам новый id: id.
+Предмет в: ['новый:'] сделать: { :id
+	<- сам новый id: id.
 }.
 
-Item в: ['id:'] сделать: { :id
+Предмет в: ['id:'] сделать: { :id
 	мой id := id.
 }.
 
-Item в: ['id'] сделать: { <- мой id. }.
+Предмет в: ['id'] сделать: { <- мой id. }.
 
 
-Item в: ['к-тексту'] сделать: {
+Предмет в: ['к-тексту'] сделать: {
 	>> str := ['Item#~no'].
-	str ~no: мой id. <- str.
+	str ~no: мой id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item в: ['к-тексту'] сделать: {
 
 Print в: ['items'] сделать: { 
 	
-	мой item := Item новый: 1.
+	мой предмет := Предмет новый: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: мой item
+	# здесь либо segfault, либо неверная строка
+	Журнал say: (
+		['~item printed.'] ~item: мой предмет
 	).
 	
 	

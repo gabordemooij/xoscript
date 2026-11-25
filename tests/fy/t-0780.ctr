@@ -1,23 +1,23 @@
 Server init.
 
-# JSON encoder only supports UTF-8, no surrogate pairs
+# JSON-encoder stipet allinnich UTF-8, gjin surrogate pairs
 
->> dicts := Rige nĳ ;
-	# {"key":"normal"} normal ASCII
-	( List nĳ set: ['normal'] by: ['key'] ) ;
-	# {"key":"hello world"} space character
+>> wurdboeken := Rige nĳ ;
+	# {"key":"normal"} gewoane ASCII
+	( List nĳ set: ['normaal'] by: ['key'] ) ;
+	# {"key":"hello world"} spaasjeteken
 	( List nĳ set: ['hello world'] by: ['key'] ) ;
-	# {"key":"quote: \""} double quote
+	# {"key":"quote: \""} dûbel oanhellingsteken
 	( List nĳ set: ['"'] by: ['key'] ) ;
 	# {"key":"backslash: \\"} backslash
 	( List nĳ set: ['backslash: \\'] by: ['key'] ) ;
 	# {"key":"slash: /"} slash
-	( List nĳ set: ['slash: /'] by: ['key'] ) ;
+	( List nĳ set: ['skeanstreek: /'] by: ['key'] ) ;
 	# {"key":"backspace: \b"} backspace
 	( List nĳ set: ['backspace: \b'] by: ['key'] ) ;
-	# {"key":"formfeed: \f"} form-feed escape
+	# {"key":"formfeed: \f"} form-feed-escape
 	( List nĳ set: ['formfeed: \f'] by: ['key'] ) ;
-	# {"key":"newline: \n"} newline
+	# {"key":"newline: \n"} nije rigel
 	( List nĳ set: ['newline: \n'] by: ['key'] ) ;
 	( List nĳ set: ['newline: ↵'] by: ['key'] ) ;
 	( List nĳ set: ['newline: 
@@ -31,46 +31,47 @@ Server init.
 	# {"key":"control: \u0000"} NUL
 	( List nĳ set: ['NUL \u0000'] by: ['key'] ) ;
 	( List nĳ set: ['NUL \0'] by: ['key'] ) ;
-	# {"key":"control: \u0001"} control character 0x01
+	# {"key":"control: \u0001"} kontrôleteken 0x01
 	( List nĳ set: ['control: \u0001'] by: ['key'] ) ;
-	# {"key":"control: \u001F"} control character 0x1F
+	# {"key":"control: \u001F"} kontrôleteken 0x1F
 	( List nĳ set: ['control: \u001F'] by: ['key'] ) ;
-	# {"key":"unicode: é"} UTF-8, 2-byte char
+	# {"key":"unicode: é"} UTF-8, 2-byte-teken
 	( List nĳ set: ['unicode: é'] by: ['key'] ) ;
-	# {"key":"unicode: €"} UTF-8, 3-byte char
+	# {"key":"unicode: €"} UTF-8, 3-byte-teken
 	( List nĳ set: ['unicode: €'] by: ['key'] ) ;
-	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	# {"key":"unicode: 日本語"} meardere 3-byte UTF-8-tekens
 	( List nĳ set: ['unicode: 日本語'] by: ['key'] ) ;
-	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	# {"key":"unicode: 😀"} UTF-8, 4-byte-teken
 	( List nĳ set: ['unicode: 😀'] by: ['key'] ) ;
 	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
 	( List nĳ set: ['unicode: 🧑‍💻'] by: ['key'] ) ;
-	# {"key":"combining: e\u0301"} combining accent
+	# {"key":"combining: é"} kombinearjend aksint
 	( List nĳ set: ['combining: e\u0301'] by: ['key'] ) ;
-	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	# {"key":"escaped unicode: é"} Unicode-escape BMP
 	( List nĳ set: ['escaped unicode: \u00e9'] by: ['key'] ) ;
-	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	# {"key":"escaped unicode: €"} Unicode-escape BMP
 	( List nĳ set: ['escaped unicode: \u20ac'] by: ['key'] ) ;
-	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	# {"key":"escaped unicode: 😀"} UTF-16 surrogate pair
 	( List nĳ set: ['escaped unicode: \ud83d\ude00'] by: ['key'] ) ;
-	# {"key":""} empty value
+	# {"key":""} lege wearde
 	( List nĳ set: [''] by: ['key'] ) ;
-	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	# {"key":"@ < > & = % + ? #"} spesjale ASCII-tekens
 	( List nĳ set: ['@ < > & = % + ? #'] by: ['key'] ) ;
-	# {"key":"single quote: '"} single quote
+	# {"key":"single quote: '"} inkeld oanhellingsteken
 	( List nĳ set: ['''] by: ['key'] ) ;
-	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	# {"key":"multiple: \" \\ \n \r \t"} meardere JSON-escapes
 	( List nĳ set: ['multiple: \" \\ \n \r \t'] by: ['key'] ) ;
-	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} langere ASCII-tekst
 	( List nĳ set: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] by: ['key'] ) ;
-	# {"key":" value"} leading space
-	( List nĳ set: [' value'] by: ['key'] ) ;
-	# {"key":"value "} trailing space
-	( List nĳ set: ['value '] by: ['key'] ) ;
-	# {"key":" \t\n\r "} whitespace
-	( List nĳ set: [' \t\n\r '] by: ['key'] ).
+	# {"key":" value"} spaasje foarôf
+	( List nĳ set: [' wearde'] by: ['key'] ) ;
+	# {"key":"value "} spaasje efteroan
+	( List nĳ set: ['wearde '] by: ['key'] ) ;
+	# {"key":" \t\n\r "} wytromte
+	( List nĳ set: [' \t\n\r '] by: ['key'] )
+	.
 
-dicts elk: { :_ :d
+wurdboeken elk: { :_ :d
 	>> j := JSON jsonify: d.
 	>> a := JSON jsonify: (List nĳ set: d key by: ['key']).
 	>> b := JSON jsonify: (List nĳ set: ['value'] by: d key).
@@ -79,7 +80,7 @@ dicts elk: { :_ :d
 	((e key = d key en: (f ? d key = ['value'])) of: (e key = ['NUL ?'])) ja: {
 		Utfier skriuwe: ['OK'], nije-rigel.
 	}, oars: {
-		Utfier skriuwe: ['Unable to properly encode/decode: '] + d + j, nije-rigel.
+		Utfier skriuwe: ['Kin net goed kodearje/dekodearje: '] + d + j, nije-rigel.
 		Programma ein.
 	}.
 }.

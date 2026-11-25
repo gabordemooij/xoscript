@@ -1,39 +1,42 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# format kolačića sesije, json tip sadržaja, samo web protokoli, svg prikazan u liniji
 Server inicijaliziraj.
 Program koristi: ['../../../src/xo/bs/webtools.xo'].
 
->> Fake-Request := Objekat novi.
-Fake-Request na: ['value:'] uradi: { :vrijednost
+>> Lažni-Zahtjev := Objekat novi.
+Lažni-Zahtjev na: ['value:'] uradi: { :vrijednost
 	svoj vrijednost := vrijednost.
 }.
-Fake-Request na: ['cookie:'] uradi: { :naziv <- svoj vrijednost.
+Lažni-Zahtjev na: ['cookie:'] uradi: { :naziv
+	<- svoj vrijednost.
 }.
 
->> Test-Session := Sesija-privremena-datoteka novi.
-Test-Session na: ['učitaj'] uradi: { <- Rječnik novi.
+>> Test-Sesija := Sesija-privremena-datoteka novi.
+Test-Sesija na: ['učitaj'] uradi: {
+	<- Rječnik novi.
 }.
-Test-Session na: ['session-id'] uradi: { <- svoj id.
+Test-Sesija na: ['sesija-id'] uradi: {
+	<- svoj id.
 }.
 
->> cookies := Lista novi
+>> kolačići := Lista novi
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies svaki: { :i :cookie
-	>> zahtjev := Fake-Request novi.
-	zahtjev value: cookie.
-	>> upravitelj := Test-Session novi.
-	>> web := Web-dokument novi.
-	web zahtjev: zahtjev.
-	web upravitelj-sesija: upravitelj.
-	web pokreni-sesiju.
-	Izlaz piši: ( upravitelj session-id = cookie ), novi-red.
+kolačići svaki: { :i :kolačić
+	>> zahtjev := Lažni-Zahtjev novi.
+	zahtjev value: kolačić.
+	>> upravitelj := Test-Sesija novi.
+	>> veb := Web-dokument novi.
+	veb zahtjev: zahtjev.
+	veb upravitelj-sesija: upravitelj.
+	veb pokreni-sesiju.
+	Izlaz piši: ( upravitelj sesija-id = kolačić ), novi-red.
 }.
 
->> web := Web-dokument novi.
-web json: (Rječnik novi stavi: ['b'] na: ['a']).
+>> veb := Web-dokument novi.
+veb json: (Rječnik novi stavi: ['b'] na: ['a']).
 Izlaz piši: ['\n'], novi-red.
 
 { Mreža get: ['file:///etc/hostname']. } uhvati: { :e

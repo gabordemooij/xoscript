@@ -1,10 +1,10 @@
 
 
->> g := Server 新規.
->> v := 金庫 新規.
+>> g  := Server 新規.
+>> v  := 金庫 新規.
 >> ok := 0.
 
->> secrets := リスト 新規 ; 
+>> 秘密一覧 := リスト 新規 ; 
 	 ['aaa'] ;
 	 [''] ; 
 	 ['AB'] ;
@@ -14,19 +14,19 @@
 	 ['漢字'] ;
 	 ['==[abc]=='].
 	
->> passwords := secrets 複製.
-passwords 各要素: { :i :p
-	secrets 各要素: { :n :s
+>> パスワード一覧 := 秘密一覧 複製.
+パスワード一覧 各要素: { :i :p
+	秘密一覧 各要素: { :n :s
 		{
-			>> encrypted := v 暗号化: s 鍵: p.
-			>> decrypted := v 復号: encrypted 鍵: p.
-			(decrypted = s) 真なら: {
+			>> 暗号文 := v 暗号化: s 鍵: p.
+			>> 復号文 := v 復号: 暗号文 鍵: p.
+			(復号文 = s) 真なら: {
 				ok 加算: 1.
 			}, さもなければ: {
-				出力 書く: ['failed encrypting/decrypting: '], 改行.
+				出力 書く: ['暗号化/復号に失敗: '], 改行.
 				出力 書く: s, 改行.
-				出力 書く: ['encrypted: '] + encrypted, 改行.
-				出力 書く: ['decrypted: '] + encrypted, 改行.
+				出力 書く: ['暗号化: '] + 暗号文, 改行.
+				出力 書く: ['復号: '] + 暗号文, 改行.
 				プログラム 終了.
 			}.
 		} 例外時: { :err
@@ -40,4 +40,4 @@ passwords 各要素: { :i :p
 	}.
 }.
 
-出力 書く: ( ok + [' vault encryptions tested.'] ), 改行.
+出力 書く: ( ok + [' 件の金庫暗号化をテストしました。'] ), 改行.

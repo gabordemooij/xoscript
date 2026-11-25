@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# khóa và chữ ký của két giải mã ra quá dài không được làm tràn ngăn xếp
 Server init.
 
->> keys := Két tạo-khóa.
->> sk := keys đầu.
->> pk := keys cuối.
->> sig := Két ký: ['abc'] bằng: sk.
+>> cặp-khóa := Két tạo-khóa.
+>> kbm := cặp-khóa đầu.
+>> kcc := cặp-khóa cuối.
+>> cks := Két ký: ['abc'] bằng: kbm.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 ký tự không có đệm giải mã ra 66 byte
+>> dài := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 ký tự không có đệm giải mã ra 33 byte
+>> ngắn := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Két ký: ['abc'] bằng: long. } bắt-lỗi: { :e
+{ Két ký: ['abc'] bằng: dài. } bắt-lỗi: { :e
 	Xuất ghi: e, xuống-dòng.
 }, chạy.
 
-{ Két kiểm-tra: ['abc'] chữ-ký: long bằng: pk. } bắt-lỗi: { :e
+{ Két kiểm-tra: ['abc'] chữ-ký: dài bằng: kcc. } bắt-lỗi: { :e
 	Xuất ghi: e, xuống-dòng.
 }, chạy.
 
-{ Két kiểm-tra: ['abc'] chữ-ký: sig bằng: short. } bắt-lỗi: { :e
+{ Két kiểm-tra: ['abc'] chữ-ký: cks bằng: ngắn. } bắt-lỗi: { :e
 	Xuất ghi: e, xuống-dòng.
 }, chạy.

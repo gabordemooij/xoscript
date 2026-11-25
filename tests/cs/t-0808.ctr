@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# klíče a podpisy Trezor, které se dekódují na příliš dlouhé, nesmí přetéct zásobník
 Server init.
 
->> keys := Trezor vygenerovat-klíče.
->> sk := keys první.
->> pk := keys poslední.
+>> klíče := Trezor vygenerovat-klíče.
+>> sk := klíče první.
+>> pk := klíče poslední.
 >> sig := Trezor podepsat: ['abc'] klíčem: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 znaků bez paddingu se dekóduje na 66 bajtů
+>> dlouhý := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 znaků bez paddingu se dekóduje na 33 bajtů
+>> krátký := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Trezor podepsat: ['abc'] klíčem: long. } chytit: { :e
+{ Trezor podepsat: ['abc'] klíčem: dlouhý. } chytit: { :e
 	Výstup psát: e, nový-řádek.
 }, spustit.
 
-{ Trezor ověřit: ['abc'] podpis: long klíčem: pk. } chytit: { :e
+{ Trezor ověřit: ['abc'] podpis: dlouhý klíčem: pk. } chytit: { :e
 	Výstup psát: e, nový-řádek.
 }, spustit.
 
-{ Trezor ověřit: ['abc'] podpis: sig klíčem: short. } chytit: { :e
+{ Trezor ověřit: ['abc'] podpis: sig klíčem: krátký. } chytit: { :e
 	Výstup psát: e, nový-řádek.
 }, spustit.

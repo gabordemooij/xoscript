@@ -1,39 +1,42 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# oblika piškotka seje, tip vsebine json, samo spletni protokoli, svg prikazan v vrstici
 Server inicializiraj.
 Program uporabljaj: ['../../../src/xo/sl/webtools.xo'].
 
->> Fake-Request := Objekt nov.
-Fake-Request ob: ['value:'] izvedi: { :vrednost
+>> Lažna-Zahteva := Objekt nov.
+Lažna-Zahteva ob: ['value:'] izvedi: { :vrednost
 	svoj vrednost := vrednost.
 }.
-Fake-Request ob: ['cookie:'] izvedi: { :ime <- svoj vrednost.
+Lažna-Zahteva ob: ['cookie:'] izvedi: { :ime
+	<- svoj vrednost.
 }.
 
->> Test-Session := Seja-začasna-datoteka nov.
-Test-Session ob: ['naloži'] izvedi: { <- Slovar nov.
+>> Testna-Seja := Seja-začasna-datoteka nov.
+Testna-Seja ob: ['naloži'] izvedi: {
+	<- Slovar nov.
 }.
-Test-Session ob: ['session-id'] izvedi: { <- svoj id.
+Testna-Seja ob: ['ident-seje'] izvedi: {
+	<- svoj id.
 }.
 
->> cookies := Seznam nov
+>> piškotki := Seznam nov
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies vsak: { :i :cookie
-	>> zahteva := Fake-Request nov.
-	zahteva value: cookie.
-	>> upravitelj := Test-Session nov.
-	>> web := Spletni-dokument nov.
-	web zahteva: zahteva.
-	web upravitelj-sej: upravitelj.
-	web začni-sejo.
-	Izhod piši: ( upravitelj session-id = cookie ), nova-vrstica.
+piškotki vsak: { :i :piškotek
+	>> zahteva := Lažna-Zahteva nov.
+	zahteva value: piškotek.
+	>> upravitelj := Testna-Seja nov.
+	>> splet := Spletni-dokument nov.
+	splet zahteva: zahteva.
+	splet upravitelj-sej: upravitelj.
+	splet začni-sejo.
+	Izhod piši: ( upravitelj ident-seje = piškotek ), nova-vrstica.
 }.
 
->> web := Spletni-dokument nov.
-web json: (Slovar nov postavi: ['b'] na: ['a']).
+>> splet := Spletni-dokument nov.
+splet json: (Slovar nov postavi: ['b'] na: ['a']).
 Izhod piši: ['\n'], nova-vrstica.
 
 { Omrežje get: ['file:///etc/hostname']. } ujemi: { :e

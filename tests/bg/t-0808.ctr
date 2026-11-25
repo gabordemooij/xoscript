@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# ключове и подписи на трезора, които се декодират твърде дълги, не трябва да препълват стека
 Server init.
 
->> keys := Трезор генерирай-ключове.
->> sk := keys първи.
->> pk := keys последен.
->> sig := Трезор подпиши: ['abc'] с: sk.
+>> ключове := Трезор генерирай-ключове.
+>> тк := ключове първи.
+>> пк := ключове последен.
+>> подп := Трезор подпиши: ['abc'] с: тк.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 знака без padding се декодират до 66 байта
+>> дълъг := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 знака без padding се декодират до 33 байта
+>> кратък := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Трезор подпиши: ['abc'] с: long. } прихвани: { :e
+{ Трезор подпиши: ['abc'] с: дълъг. } прихвани: { :e
 	Изход пиши: e, нов-ред.
 }, стартирай.
 
-{ Трезор провери: ['abc'] подпис: long с: pk. } прихвани: { :e
+{ Трезор провери: ['abc'] подпис: дълъг с: пк. } прихвани: { :e
 	Изход пиши: e, нов-ред.
 }, стартирай.
 
-{ Трезор провери: ['abc'] подпис: sig с: short. } прихвани: { :e
+{ Трезор провери: ['abc'] подпис: подп с: кратък. } прихвани: { :e
 	Изход пиши: e, нов-ред.
 }, стартирай.

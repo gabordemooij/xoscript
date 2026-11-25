@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# test bazy danych
+# wymaganą konfigurację znajdziesz w przykładzie server.xo
 
 Server init.
-Wyjście pisz: ['Database test'], nowa-linia.
+Wyjście pisz: ['Test bazy danych'], nowa-linia.
 
->> db := Maria-DB nowy host: ['localhost'],
+>> bd := Maria-DB nowy host: ['localhost'],
 	użytkownik: ['xo'], hasło: ['pass123'], nazwa-bazy: ['xobase'], połącz.
 
-Wyjście pisz: ['Can we connect? '] + db połączono?, nowa-linia.
+Wyjście pisz: ['Czy możemy się połączyć? '] + bd połączono?, nowa-linia.
 
->> parametry-wyszukiwania := db zapytanie: ['
+>> parametry-wyszukiwania := bd zapytanie: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametry: ( Lista nowy ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametry: ( Lista nowy ; ['abc'] ; 12.35 ; 6 ). # zapytania sparametryzowane
 
-{  parametry-wyszukiwania wykonaj. db zatwierdź. } przechwyć: { :e db wycofaj.  }, uruchom.
+{  parametry-wyszukiwania wykonaj. bd zatwierdź. } przechwyć: { :e bd wycofaj.  }, uruchom.
 
-Wyjście pisz: ['Can we insert? '] + ( parametry-wyszukiwania insert-id > 0 ), nowa-linia.
+Wyjście pisz: ['Czy możemy wstawiać? '] + ( parametry-wyszukiwania insert-id > 0 ), nowa-linia.
 
 >> Obj := Obiekt nowy.
-Obj na: ['retrieve-rows'] wykonaj: {
+Obj na: ['pobierz-wiersze'] wykonaj: {
 	własny liczność := 0.
 	>> parametry-wyszukiwania :=
-	db zapytanie: ['SELECT * FROM book order by id desc limit 2'], 
-	pobierz: { :row 
+	bd zapytanie: ['SELECT * FROM book order by id desc limit 2'], 
+	pobierz: { :rząd 
 		własny liczność dodaj: 1.
 		Prawda przerwij.
-	}. <- własny liczność kopiuj.
+	}. # pobieranie wierszy
+	<- własny liczność kopiuj.
 }.
 
-Wyjście pisz: ['Can we query? '] + ( Obj retrieve-rows > 0 ), nowa-linia.
+Wyjście pisz: ['Czy możemy odpytywać? '] + ( Obj pobierz-wiersze > 0 ), nowa-linia.

@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# デコードすると長すぎる金庫の鍵や署名でスタックがあふれてはならない
 Server init.
 
->> keys := 金庫 鍵生成.
->> sk := keys 最初.
->> pk := keys 最後.
+>> 鍵一覧 := 金庫 鍵生成.
+>> sk := 鍵一覧 最初.
+>> pk := 鍵一覧 最後.
 >> sig := 金庫 署名: ['abc'] 鍵: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# パディングなしの 88 文字は 66 バイトにデコードされる
+>> 長文 := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# パディングなしの 44 文字は 33 バイトにデコードされる
+>> 短文 := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ 金庫 署名: ['abc'] 鍵: long. } 例外時: { :e
+{ 金庫 署名: ['abc'] 鍵: 長文. } 例外時: { :e
 	出力 書く: e, 改行.
 }, 開始.
 
-{ 金庫 確認: ['abc'] 署名: long 鍵: pk. } 例外時: { :e
+{ 金庫 確認: ['abc'] 署名: 長文 鍵: pk. } 例外時: { :e
 	出力 書く: e, 改行.
 }, 開始.
 
-{ 金庫 確認: ['abc'] 署名: sig 鍵: short. } 例外時: { :e
+{ 金庫 確認: ['abc'] 署名: sig 鍵: 短文. } 例外時: { :e
 	出力 書く: e, 改行.
 }, 開始.

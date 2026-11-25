@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# מפתחות וחתימות של כספת שמפוענחים לאורך מדי לא יגלשו מהמחסנית
 Server init.
 
->> keys := כספת צור-מפתחות.
->> sk := keys ראשון.
->> pk := keys אחרון.
->> sig := כספת חתום: ⌝'abc'⌜ במפתח: sk.
+>> מפתחות-שלי := כספת צור-מפתחות.
+>> מפתח-פרטי := מפתחות-שלי ראשון.
+>> מפתח-ציבורי := מפתחות-שלי אחרון.
+>> חתימה := כספת חתום: ⌝'abc'⌜ במפתח: מפתח-פרטי.
 
-# 88 characters without padding decode to 66 bytes
->> long := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+# 88 תווים בלי ריפוד מפוענחים ל-66 בתים
+>> ארוך := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
 
-# 44 characters without padding decode to 33 bytes
->> short := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+# 44 תווים בלי ריפוד מפוענחים ל-33 בתים
+>> קצר := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
 
-⎬ כספת חתום: ⌝'abc'⌜ במפתח: long. ⎨ תפוס: ⎬ :e
+⎬ כספת חתום: ⌝'abc'⌜ במפתח: ארוך. ⎨ תפוס: ⎬ :e
 	פלט כתוב: e, שורה-חדשה.
 ⎨, הפעל.
 
-⎬ כספת בדוק: ⌝'abc'⌜ חתימה: long במפתח: pk. ⎨ תפוס: ⎬ :e
+⎬ כספת בדוק: ⌝'abc'⌜ חתימה: ארוך במפתח: מפתח-ציבורי. ⎨ תפוס: ⎬ :e
 	פלט כתוב: e, שורה-חדשה.
 ⎨, הפעל.
 
-⎬ כספת בדוק: ⌝'abc'⌜ חתימה: sig במפתח: short. ⎨ תפוס: ⎬ :e
+⎬ כספת בדוק: ⌝'abc'⌜ חתימה: חתימה במפתח: קצר. ⎨ תפוס: ⎬ :e
 	פלט כתוב: e, שורה-חדשה.
 ⎨, הפעל.

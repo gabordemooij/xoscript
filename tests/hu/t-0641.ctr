@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# utf8-tisztító tesztje
 Server init.
 
->> utf8cases := Szótár új
-	# ASCII only
+>> utf8esetek := Szótár új
+	# csak ASCII
 	tesz: ( Lista új ; 65 ; 65 ; 65 ; 65 ; 0 ) ide: ['AAAA'],
-	# valid 2 byte sequence
+	# érvényes 2 bájtos sorozat
 	tesz: ( Lista új ; 194 ; 162 ; 0 ) ide: ['¢'],
-	# Valid 3-byte UTF-8
+	# Érvényes 3 bájtos UTF-8
     tesz: ( Lista új ; 226 ; 130 ; 172 ; 0 ) ide: ['€'],
-	# Valid 4-byte UTF-8
+	# Érvényes 4 bájtos UTF-8
     tesz: ( Lista új ; 240 ; 144 ; 141 ; 136 ; 0 ) ide: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# Érvénytelen folytatóbájt az E2 28 AC sorozatban -> 3 bájtos sorozat kezdete + 28 hibás folytatás + AC folytatóbájt, de ugyanahhoz a hibához tartozik
     tesz: ( Lista új ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) ide: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# Az ASCII 'A' túl hosszú kódolása (? lesz belőle),
     tesz: ( Lista új ; 65 ; 193 ; 129 ; 0 ) ide: ['A?'],
-	# Invalid first byte (0xFF)
+	# Érvénytelen első bájt (0xFF)
     tesz: ( Lista új ; 255 ; 0 ) ide: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Befejezetlen többbájtos sorozat a végén
     tesz: ( Lista új ; 66 ; 226 ; 0 ) ide: ['B?'],
-    # Empty string
+    # Üres szöveg
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Több vegyes sorozat
     tesz: ( Lista új ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) ide: ['A€?𐍈B'].
 	 
-utf8cases mindegyik: { :key :value
+utf8esetek mindegyik: { :key :value
 	>> blob := Blob új: value darabszám, bytes: value.
 	>> str := blob szöveg.
 	(str = key) igaz: {
 		Kimenet ír: ['OK'], újsor.
 	}, különben: {
-		Kimenet ír: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, újsor.
+		Kimenet ír: ['Az UTF8-tisztító hibázott ennél: '] + key + [' kapott: '] + str, újsor.
 	}.
 	blob felszabadít.
 }.

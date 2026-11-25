@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# 너무 길게 디코딩되는 금고 키와 서명이 스택을 넘치게 하면 안 됨
 Server init.
 
->> keys := 금고 키생성.
->> sk := keys 첫번째.
->> pk := keys 마지막.
->> sig := 금고 서명: ['abc'] 키로: sk.
+>> 키쌍 := 금고 키생성.
+>> sk := 키쌍 첫번째.
+>> pk := 키쌍 마지막.
+>> 서명 := 금고 서명: ['abc'] 키로: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 패딩 없는 88글자는 66바이트로 디코딩됨
+>> 긴것 := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 패딩 없는 44글자는 33바이트로 디코딩됨
+>> 짧은것 := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ 금고 서명: ['abc'] 키로: long. } 예외시: { :e
+{ 금고 서명: ['abc'] 키로: 긴것. } 예외시: { :e
 	출력 쓰기: e, 줄바꿈.
 }, 시작.
 
-{ 금고 확인: ['abc'] 서명: long 키로: pk. } 예외시: { :e
+{ 금고 확인: ['abc'] 서명: 긴것 키로: pk. } 예외시: { :e
 	출력 쓰기: e, 줄바꿈.
 }, 시작.
 
-{ 금고 확인: ['abc'] 서명: sig 키로: short. } 예외시: { :e
+{ 금고 확인: ['abc'] 서명: 서명 키로: 짧은것. } 예외시: { :e
 	출력 쓰기: e, 줄바꿈.
 }, 시작.

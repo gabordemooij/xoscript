@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# valvnycklar och signaturer som avkodas för långa får inte spränga stacken
 Server init.
 
->> keys := Valv generera-nycklar.
->> sk := keys första.
->> pk := keys sista.
+>> nycklar := Valv generera-nycklar.
+>> sk := nycklar första.
+>> pk := nycklar sista.
 >> sig := Valv signera: ['abc'] med: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 tecken utan utfyllnad avkodas till 66 bytes
+>> lång := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 tecken utan utfyllnad avkodas till 33 bytes
+>> kort := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Valv signera: ['abc'] med: long. } fånga: { :e
+{ Valv signera: ['abc'] med: lång. } fånga: { :e
 	Utdata skriv: e, stop.
 }, starta.
 
-{ Valv kontrollera: ['abc'] signatur: long med: pk. } fånga: { :e
+{ Valv kontrollera: ['abc'] signatur: lång med: pk. } fånga: { :e
 	Utdata skriv: e, stop.
 }, starta.
 
-{ Valv kontrollera: ['abc'] signatur: sig med: short. } fånga: { :e
+{ Valv kontrollera: ['abc'] signatur: sig med: kort. } fånga: { :e
 	Utdata skriv: e, stop.
 }, starta.

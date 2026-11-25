@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> poskusi := { :format :value
-	{ Izhod piši: ( (Format nov: format) uporabi: value ), nova-vrstica. } ujemi: { :e Izhod piši: e, nova-vrstica. }, zaženi.
+# oblika se mora ujemati s tipom vrednosti, tip lahko pride od odjemalca
+>> poskusi := { :oblika :value
+	{ Izhod piši: ( (Format nov: oblika) uporabi: value ), nova-vrstica. } ujemi: { :e Izhod piši: e, nova-vrstica. }, zaženi.
 }.
->> try-int := { :format :value
-	{ Izhod piši: ( (Format nov: format) uporabi-celo: value ), nova-vrstica. } ujemi: { :e Izhod piši: e, nova-vrstica. }, zaženi.
+>> poskusi-celo := { :oblika :value
+	{ Izhod piši: ( (Format nov: oblika) uporabi-celo: value ), nova-vrstica. } ujemi: { :e Izhod piši: e, nova-vrstica. }, zaženi.
 }.
 
-# fits
+# ustreza
 poskusi uporabi: ['|%s|'] in: ['text'].
 poskusi uporabi: ['%06.2f'] in: 5.5.
-poskusi uporabi: ['100%% %s'] in: ['sure'].
-try-int uporabi: ['%03d'] in: 7.
-try-int uporabi: ['%x'] in: 255.
+poskusi uporabi: ['100%% %s'] in: ['seveda'].
+poskusi-celo uporabi: ['%03d'] in: 7.
+poskusi-celo uporabi: ['%x'] in: 255.
 poskusi uporabi: ['%d'] in: (Int64 nov iz-besedila: ['12']).
 poskusi uporabi: ['%lld'] in: (Int64 nov iz-besedila: ['12']).
 poskusi uporabi: ['%.1lf'] in: 5.5.
-try-int uporabi: ['%hd'] in: 7.
+poskusi-celo uporabi: ['%hd'] in: 7.
 
-# does not fit
+# ne ustreza
 poskusi uporabi: ['%s'] in: 12345.
 poskusi uporabi: ['%d'] in: 12345.
 poskusi uporabi: ['%f'] in: ['text'].
-try-int uporabi: ['%d'] in: ['text'].
-try-int uporabi: ['%s'] in: 5.
+poskusi-celo uporabi: ['%d'] in: ['text'].
+poskusi-celo uporabi: ['%s'] in: 5.
 poskusi uporabi: ['%s %s'] in: ['text'].
 poskusi uporabi: ['%n'] in: ['text'].
 poskusi uporabi: ['%*s'] in: ['text'].
 poskusi uporabi: ['%'] in: ['text'].
 
-# length modifier does not fit
+# modifikator dolžine ne ustreza
 poskusi uporabi: ['%ls'] in: ['text'].
 poskusi uporabi: ['%Lf'] in: 5.5.
-try-int uporabi: ['%ld'] in: 7.
-try-int uporabi: ['%lld'] in: 7.
+poskusi-celo uporabi: ['%ld'] in: 7.
+poskusi-celo uporabi: ['%lld'] in: 7.
 poskusi uporabi: ['%Ld'] in: (Int64 nov iz-besedila: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# širina, ki ne ustreza printf, mora dati napako, ne sesutja
 poskusi uporabi: ['%99999999999s'] in: ['text'].

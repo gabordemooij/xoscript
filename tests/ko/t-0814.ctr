@@ -1,39 +1,42 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# 세션 쿠키 형식, json 콘텐츠 유형, 웹 프로토콜만, svg는 인라인으로 표시
 Server 초기화.
 프로그램 사용: ['../../../src/xo/ko/webtools.xo'].
 
->> Fake-Request := 객체 새로.
-Fake-Request 받으면: ['value:'] 실행: { :설정값
+>> 가짜-요청 := 객체 새로.
+가짜-요청 받으면: ['value:'] 실행: { :설정값
 	자기 설정값 := 설정값.
 }.
-Fake-Request 받으면: ['cookie:'] 실행: { :이름 <- 자기 설정값.
+가짜-요청 받으면: ['cookie:'] 실행: { :이름
+	<- 자기 설정값.
 }.
 
->> Test-Session := 임시파일세션 새로.
-Test-Session 받으면: ['불러오기'] 실행: { <- 사전 새로.
+>> 시험-세션 := 임시파일세션 새로.
+시험-세션 받으면: ['불러오기'] 실행: {
+	<- 사전 새로.
 }.
-Test-Session 받으면: ['session-id'] 실행: { <- 자기 id.
+시험-세션 받으면: ['세션-id'] 실행: {
+	<- 자기 id.
 }.
 
->> cookies := 리스트 새로
+>> 쿠키들 := 리스트 새로
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies 각각: { :i :cookie
-	>> http요청 := Fake-Request 새로.
-	http요청 value: cookie.
-	>> 관리자 := Test-Session 새로.
-	>> web := 웹문서 새로.
-	web http요청: http요청.
-	web 세션관리자: 관리자.
-	web 세션시작.
-	출력 쓰기: ( 관리자 session-id = cookie ), 줄바꿈.
+쿠키들 각각: { :i :쿠키
+	>> http요청 := 가짜-요청 새로.
+	http요청 value: 쿠키.
+	>> 관리자 := 시험-세션 새로.
+	>> 웹 := 웹문서 새로.
+	웹 http요청: http요청.
+	웹 세션관리자: 관리자.
+	웹 세션시작.
+	출력 쓰기: ( 관리자 세션-id = 쿠키 ), 줄바꿈.
 }.
 
->> web := 웹문서 새로.
-web json: (사전 새로 넣기: ['b'] 위치: ['a']).
+>> 웹 := 웹문서 새로.
+웹 json: (사전 새로 넣기: ['b'] 위치: ['a']).
 출력 쓰기: ['\n'], 줄바꿈.
 
 { 네트워크 get: ['file:///etc/hostname']. } 예외시: { :e

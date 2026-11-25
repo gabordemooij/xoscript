@@ -1,27 +1,27 @@
 Server init.
 
->> conn1 := Maria-DB нов хост: ['localhost'],
+>> връзка1 := Maria-DB нов хост: ['localhost'],
 	потребител: ['xo'],
 	парола: ['pass123'],
 	име-на-база: ['xobase'],
 	свържи-се.
 
->> conn2 := Maria-DB нов хост: ['localhost'],
+>> връзка2 := Maria-DB нов хост: ['localhost'],
 	потребител: ['xo'],
 	парола: ['pass123'],
 	име-на-база: ['xobase'],
 	свържи-се.
 #...
->> del := conn1 заявка: ['DELETE FROM book WHERE id > 0'].
-{  del изпълни. conn1 потвърди. } прихвани: { :e conn1 отмени.  }, стартирай.
+>> изтр := връзка1 заявка: ['DELETE FROM book WHERE id > 0'].
+{  изтр изпълни. връзка1 потвърди. } прихвани: { :e връзка1 отмени.  }, стартирай.
 
->> insert := conn1 заявка: ['INSERT INTO book (id) VALUES(null)'].
-insert изпълни.
+>> вмъкване := връзка1 заявка: ['INSERT INTO book (id) VALUES(null)'].
+вмъкване изпълни.
 
->> брой := conn1 заявка: ['SELECT COUNT(*) AS num FROM book'].
-брой извлечи: { :row Изход пиши: row num, нов-ред. }.
+>> брой := връзка1 заявка: ['SELECT COUNT(*) AS num FROM book'].
+брой извлечи: { :редица Изход пиши: редица num, нов-ред. }.
 
-# does not show up
-# insert not committed on connection 1
->> брой := conn2 заявка: ['SELECT COUNT(*) AS num FROM book'].
-брой извлечи: { :row Изход пиши: row num, нов-ред. }.
+# не се показва
+# вмъкването не е потвърдено във връзка 1
+>> брой := връзка2 заявка: ['SELECT COUNT(*) AS num FROM book'].
+брой извлечи: { :редица Изход пиши: редица num, нов-ред. }.

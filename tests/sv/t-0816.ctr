@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> försök := { :format :value
-	{ Utdata skriv: ( (Format ny: format) tillämpa: value ), stop. } fånga: { :e Utdata skriv: e, stop. }, starta.
+# ett format måste passa värdets typ, typen kan komma från en klient
+>> försök := { :formatet :value
+	{ Utdata skriv: ( (Format ny: formatet) tillämpa: value ), stop. } fånga: { :e Utdata skriv: e, stop. }, starta.
 }.
->> try-int := { :format :value
-	{ Utdata skriv: ( (Format ny: format) tillämpa-heltal: value ), stop. } fånga: { :e Utdata skriv: e, stop. }, starta.
+>> pröva-heltal := { :formatet :value
+	{ Utdata skriv: ( (Format ny: formatet) tillämpa-heltal: value ), stop. } fånga: { :e Utdata skriv: e, stop. }, starta.
 }.
 
-# fits
+# passar
 försök tillämpa: ['|%s|'] och: ['text'].
 försök tillämpa: ['%06.2f'] och: 5.5.
-försök tillämpa: ['100%% %s'] och: ['sure'].
-try-int tillämpa: ['%03d'] och: 7.
-try-int tillämpa: ['%x'] och: 255.
+försök tillämpa: ['100%% %s'] och: ['säkert'].
+pröva-heltal tillämpa: ['%03d'] och: 7.
+pröva-heltal tillämpa: ['%x'] och: 255.
 försök tillämpa: ['%d'] och: (Int64 ny från-text: ['12']).
 försök tillämpa: ['%lld'] och: (Int64 ny från-text: ['12']).
 försök tillämpa: ['%.1lf'] och: 5.5.
-try-int tillämpa: ['%hd'] och: 7.
+pröva-heltal tillämpa: ['%hd'] och: 7.
 
-# does not fit
+# passar inte
 försök tillämpa: ['%s'] och: 12345.
 försök tillämpa: ['%d'] och: 12345.
 försök tillämpa: ['%f'] och: ['text'].
-try-int tillämpa: ['%d'] och: ['text'].
-try-int tillämpa: ['%s'] och: 5.
+pröva-heltal tillämpa: ['%d'] och: ['text'].
+pröva-heltal tillämpa: ['%s'] och: 5.
 försök tillämpa: ['%s %s'] och: ['text'].
 försök tillämpa: ['%n'] och: ['text'].
 försök tillämpa: ['%*s'] och: ['text'].
 försök tillämpa: ['%'] och: ['text'].
 
-# length modifier does not fit
+# längdmodifieraren passar inte
 försök tillämpa: ['%ls'] och: ['text'].
 försök tillämpa: ['%Lf'] och: 5.5.
-try-int tillämpa: ['%ld'] och: 7.
-try-int tillämpa: ['%lld'] och: 7.
+pröva-heltal tillämpa: ['%ld'] och: 7.
+pröva-heltal tillämpa: ['%lld'] och: 7.
 försök tillämpa: ['%Ld'] och: (Int64 ny från-text: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# en bredd som inte passar printf måste ge ett fel, inte en krasch
 försök tillämpa: ['%99999999999s'] och: ['text'].

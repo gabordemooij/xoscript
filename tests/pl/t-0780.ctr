@@ -1,76 +1,77 @@
 Server init.
 
-# JSON encoder only supports UTF-8, no surrogate pairs
+# koder JSON obsługuje tylko UTF-8, bez par zastępczych
 
->> dicts := Lista nowy ;
-	# {"key":"normal"} normal ASCII
-	( Słownik nowy umieść: ['normal'] w: ['key'] ) ;
-	# {"key":"hello world"} space character
+>> słowniki := Lista nowy ;
+	# {"key":"normal"} zwykłe ASCII
+	( Słownik nowy umieść: ['zwykły'] w: ['key'] ) ;
+	# {"key":"hello world"} znak spacji
 	( Słownik nowy umieść: ['hello world'] w: ['key'] ) ;
-	# {"key":"quote: \""} double quote
+	# {"key":"quote: \""} podwójny cudzysłów
 	( Słownik nowy umieść: ['"'] w: ['key'] ) ;
-	# {"key":"backslash: \\"} backslash
+	# {"key":"backslash: \\"} ukośnik wsteczny
 	( Słownik nowy umieść: ['backslash: \\'] w: ['key'] ) ;
-	# {"key":"slash: /"} slash
-	( Słownik nowy umieść: ['slash: /'] w: ['key'] ) ;
+	# {"key":"slash: /"} ukośnik
+	( Słownik nowy umieść: ['ukośnik: /'] w: ['key'] ) ;
 	# {"key":"backspace: \b"} backspace
 	( Słownik nowy umieść: ['backspace: \b'] w: ['key'] ) ;
-	# {"key":"formfeed: \f"} form-feed escape
+	# {"key":"formfeed: \f"} sekwencja form-feed
 	( Słownik nowy umieść: ['formfeed: \f'] w: ['key'] ) ;
-	# {"key":"newline: \n"} newline
+	# {"key":"newline: \n"} nowa linia
 	( Słownik nowy umieść: ['newline: \n'] w: ['key'] ) ;
 	( Słownik nowy umieść: ['newline: ↵'] w: ['key'] ) ;
 	( Słownik nowy umieść: ['newline: 
 	'] w: ['key'] ) ;
-	# {"key":"carriage return: \r"} carriage-return
+	# {"key":"carriage return: \r"} powrót karetki
 	( Słownik nowy umieść: ['carriage return: \r'] w: ['key'] ) ;
-	# {"key":"tab: \t"} tab
+	# {"key":"tab: \t"} tabulator
 	( Słownik nowy umieść: ['tab \t'] w: ['key'] ) ;
 	( Słownik nowy umieść: ['tab ⇿'] w: ['key'] ) ;
-	( Słownik nowy umieść: ['tab  '] w: ['key'] ) ;
+	( Słownik nowy umieść: ['tabulator  '] w: ['key'] ) ;
 	# {"key":"control: \u0000"} NUL
 	( Słownik nowy umieść: ['NUL \u0000'] w: ['key'] ) ;
 	( Słownik nowy umieść: ['NUL \0'] w: ['key'] ) ;
-	# {"key":"control: \u0001"} control character 0x01
+	# {"key":"control: \u0001"} znak sterujący 0x01
 	( Słownik nowy umieść: ['control: \u0001'] w: ['key'] ) ;
-	# {"key":"control: \u001F"} control character 0x1F
+	# {"key":"control: \u001F"} znak sterujący 0x1F
 	( Słownik nowy umieść: ['control: \u001F'] w: ['key'] ) ;
-	# {"key":"unicode: é"} UTF-8, 2-byte char
+	# {"key":"unicode: é"} UTF-8, znak 2-bajtowy
 	( Słownik nowy umieść: ['unicode: é'] w: ['key'] ) ;
-	# {"key":"unicode: €"} UTF-8, 3-byte char
+	# {"key":"unicode: €"} UTF-8, znak 3-bajtowy
 	( Słownik nowy umieść: ['unicode: €'] w: ['key'] ) ;
-	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	# {"key":"unicode: 日本語"} wiele 3-bajtowych znaków UTF-8
 	( Słownik nowy umieść: ['unicode: 日本語'] w: ['key'] ) ;
-	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	# {"key":"unicode: 😀"} UTF-8, znak 4-bajtowy
 	( Słownik nowy umieść: ['unicode: 😀'] w: ['key'] ) ;
-	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	# {"key":"unicode: 🧑‍💻"} emoji + łącznik zerowej szerokości
 	( Słownik nowy umieść: ['unicode: 🧑‍💻'] w: ['key'] ) ;
-	# {"key":"combining: e\u0301"} combining accent
+	# {"key":"combining: é"} akcent łączący
 	( Słownik nowy umieść: ['combining: e\u0301'] w: ['key'] ) ;
-	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	# {"key":"escaped unicode: é"} sekwencja Unicode BMP
 	( Słownik nowy umieść: ['escaped unicode: \u00e9'] w: ['key'] ) ;
-	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	# {"key":"escaped unicode: €"} sekwencja Unicode BMP
 	( Słownik nowy umieść: ['escaped unicode: \u20ac'] w: ['key'] ) ;
-	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	# {"key":"escaped unicode: 😀"} para zastępcza UTF-16
 	( Słownik nowy umieść: ['escaped unicode: \ud83d\ude00'] w: ['key'] ) ;
-	# {"key":""} empty value
+	# {"key":""} pusta wartość
 	( Słownik nowy umieść: [''] w: ['key'] ) ;
-	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	# {"key":"@ < > & = % + ? #"} specjalne znaki ASCII
 	( Słownik nowy umieść: ['@ < > & = % + ? #'] w: ['key'] ) ;
-	# {"key":"single quote: '"} single quote
+	# {"key":"single quote: '"} pojedynczy cudzysłów
 	( Słownik nowy umieść: ['''] w: ['key'] ) ;
-	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	# {"key":"multiple: \" \\ \n \r \t"} wiele sekwencji JSON
 	( Słownik nowy umieść: ['multiple: \" \\ \n \r \t'] w: ['key'] ) ;
-	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} dłuższy tekst ASCII
 	( Słownik nowy umieść: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] w: ['key'] ) ;
-	# {"key":" value"} leading space
-	( Słownik nowy umieść: [' value'] w: ['key'] ) ;
-	# {"key":"value "} trailing space
-	( Słownik nowy umieść: ['value '] w: ['key'] ) ;
-	# {"key":" \t\n\r "} whitespace
-	( Słownik nowy umieść: [' \t\n\r '] w: ['key'] ).
+	# {"key":" value"} spacja na początku
+	( Słownik nowy umieść: [' wartość'] w: ['key'] ) ;
+	# {"key":"value "} spacja na końcu
+	( Słownik nowy umieść: ['wartość '] w: ['key'] ) ;
+	# {"key":" \t\n\r "} białe znaki
+	( Słownik nowy umieść: [' \t\n\r '] w: ['key'] )
+	.
 
-dicts każdy: { :_ :d
+słowniki każdy: { :_ :d
 	>> j := JSON jsonify: d.
 	>> a := JSON jsonify: (Słownik nowy umieść: d key w: ['key']).
 	>> b := JSON jsonify: (Słownik nowy umieść: ['value'] w: d key).
@@ -79,7 +80,7 @@ dicts każdy: { :_ :d
 	((e key = d key i: (f ? d key = ['value'])) lub: (e key = ['NUL ?'])) prawda: {
 		Wyjście pisz: ['OK'], nowa-linia.
 	}, inaczej: {
-		Wyjście pisz: ['Unable to properly encode/decode: '] + d + j, nowa-linia.
+		Wyjście pisz: ['Nie można poprawnie zakodować/zdekodować: '] + d + j, nowa-linia.
 		Program koniec.
 	}.
 }.

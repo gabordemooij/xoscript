@@ -1,27 +1,27 @@
 Server init.
 
->> conn1 := MariaDB новый хост: ['localhost'],
+>> соед1 := MariaDB новый хост: ['localhost'],
 	пользователь: ['xo'],
 	пароль: ['pass123'],
 	имя-базы: ['xobase'],
 	подключить.
 
->> conn2 := MariaDB новый хост: ['localhost'],
+>> соед2 := MariaDB новый хост: ['localhost'],
 	пользователь: ['xo'],
 	пароль: ['pass123'],
 	имя-базы: ['xobase'],
 	подключить.
 #...
->> del := conn1 запрос: ['DELETE FROM book WHERE id > 0'].
-{  del мутация. conn1 commit. } впоймать: { :e conn1 rollback.  }, запуск.
+>> удл := соед1 запрос: ['DELETE FROM book WHERE id > 0'].
+{  удл мутация. соед1 commit. } впоймать: { :e соед1 rollback.  }, запуск.
 
->> insert := conn1 запрос: ['INSERT INTO book (id) VALUES(null)'].
-insert мутация.
+>> вставка := соед1 запрос: ['INSERT INTO book (id) VALUES(null)'].
+вставка мутация.
 
->> счетчик := conn1 запрос: ['SELECT COUNT(*) AS num FROM book'].
-счетчик получить: { :row Выход написать: row num, стоп. }.
+>> счетчик := соед1 запрос: ['SELECT COUNT(*) AS num FROM book'].
+счетчик получить: { :ряд Выход написать: ряд num, стоп. }.
 
-# does not show up
-# insert not committed on connection 1
->> счетчик := conn2 запрос: ['SELECT COUNT(*) AS num FROM book'].
-счетчик получить: { :row Выход написать: row num, стоп. }.
+# не отображается
+# вставка не зафиксирована в соединении 1
+>> счетчик := соед2 запрос: ['SELECT COUNT(*) AS num FROM book'].
+счетчик получить: { :ряд Выход написать: ряд num, стоп. }.

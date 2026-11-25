@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# ключи и подписи хранилища, которые декодируются в слишком длинное значение, не должны переполнять стек
 Server init.
 
->> keys := Хранилище криптографические-ключи.
->> sk := keys первый.
->> pk := keys последний.
->> sig := Хранилище подписать: ['abc'] с: sk.
+>> пара-ключей := Хранилище криптографические-ключи.
+>> зкл := пара-ключей первый.
+>> откл := пара-ключей последний.
+>> подп := Хранилище подписать: ['abc'] с: зкл.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 символов без дополнения декодируются в 66 байт
+>> длинный := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 символа без дополнения декодируются в 33 байта
+>> короткий := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Хранилище подписать: ['abc'] с: long. } впоймать: { :e
+{ Хранилище подписать: ['abc'] с: длинный. } впоймать: { :e
 	Выход написать: e, стоп.
 }, запуск.
 
-{ Хранилище проверить: ['abc'] подпись: long с: pk. } впоймать: { :e
+{ Хранилище проверить: ['abc'] подпись: длинный с: откл. } впоймать: { :e
 	Выход написать: e, стоп.
 }, запуск.
 
-{ Хранилище проверить: ['abc'] подпись: sig с: short. } впоймать: { :e
+{ Хранилище проверить: ['abc'] подпись: подп с: короткий. } впоймать: { :e
 	Выход написать: e, стоп.
 }, запуск.

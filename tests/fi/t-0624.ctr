@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := Olio uusi.
+# Tämä testi tarkistaa, ettei string_fill_in menetä paikkaansa (gc'ed) tilassa 4
+# viittaus tiedostossa world.c
+>> Loki := Olio uusi.
 
-Log kun: ['say:'] tee: { :str
+Loki kun: ['say:'] tee: { :str
 	Tuloste kirjoita: str, rivinvaihto.
 }.
 
->> Item := Olio uusi.
+>> Esine := Olio uusi.
 
-Item kun: ['uusi:'] tee: { :id <- itse uusi id: id.
+Esine kun: ['uusi:'] tee: { :id
+	<- itse uusi id: id.
 }.
 
-Item kun: ['id:'] tee: { :id
+Esine kun: ['id:'] tee: { :id
 	oma id := id.
 }.
 
-Item kun: ['id'] tee: { <- oma id. }.
+Esine kun: ['id'] tee: { <- oma id. }.
 
 
-Item kun: ['teksti'] tee: {
+Esine kun: ['teksti'] tee: {
 	>> str := ['Item#~no'].
-	str ~no: oma id. <- str.
+	str ~no: oma id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item kun: ['teksti'] tee: {
 
 Print kun: ['items'] tee: { 
 	
-	oma item := Item uusi: 1.
+	oma esine := Esine uusi: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: oma item
+	# joko segfault tai väärä merkkijono tässä
+	Loki say: (
+		['~item printed.'] ~item: oma esine
 	).
 	
 	

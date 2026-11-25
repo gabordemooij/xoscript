@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# используем FFI с плагином Server
 
-# connect to libc (platform specific)
->> libname := Программа конфигурация: ['FFITESTLIB'].
+# подключаемся к libc (зависит от платформы)
+>> имяБиблиотеки := Программа конфигурация: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# связываем функции stdio из C для расширенных операций с файлами
 Server связать: ( Список новый ;
- libname ; ['fopen'] ;
+ имяБиблиотеки ; ['fopen'] ;
  ( Список новый ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 связать: ( Список новый ;
- Пустой ; # means same lib
+ Пустой ; # означает ту же библиотеку
  ['fread'] ;
  ( Список новый ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Пустой ; # means same object (i.e. Stream)
+ Пустой ; # означает тот же объект (т. е. Поток)
  ['fread']
 ),
 связать: (
  Список новый ;
- Пустой ; # means same lib
+ Пустой ; # означает ту же библиотеку
  ['fwrite'] ;
  ( Список новый ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Пустой ; # means same lib
+ Пустой ; # означает ту же библиотеку
  ['fwrite']
 ),
 связать: (
  Список новый ;
- Пустой ; # means same lib
+ Пустой ; # означает ту же библиотеку
  ['rewind'] ;
  ( Список новый ; ['pointer'] ) ;
  ['int'] ;
- Пустой ; # means same lib
+ Пустой ; # означает ту же библиотеку
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> путь := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
->> fd := Stream path: путь mode: mode.
+# открываем файл с помощью fopen(path, mode)
+>> дф := Stream path: путь mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream сообщение: ['fwrite'] аргументы: (Список новый ; str ; 1 ; 6 ; fd ).
-Выход написать: bytes-written, стоп.
+# записываем байты из буфера строчка в файл
+>> записано-байтов := Stream сообщение: ['fwrite'] аргументы: (Список новый ; str ; 1 ; 6 ; дф ).
+Выход написать: записано-байтов, стоп.
 
-# rewind file pointer
-Stream rewind: fd.
+# перематываем указатель файла
+Stream rewind: дф.
 
-# allocate a buffer
->> buf := Blob новый: 20.
+# выделяем буфер
+>> буф := Blob новый: 20.
 
-# read from file
->> bytes-read := Stream сообщение: ['fread'] аргументы: (Список новый ; buf ; 1 ; 6 ; fd ).
-Выход написать: bytes-read, стоп.
-Выход написать: buf, стоп.
+# читаем из файла
+>> прочитано-байтов := Stream сообщение: ['fread'] аргументы: (Список новый ; буф ; 1 ; 6 ; дф ).
+Выход написать: прочитано-байтов, стоп.
+Выход написать: буф, стоп.
 
-# free memory
+# освобождаем память
 str  свободно.
 путь свободно.
 mode свободно.
-buf  свободно.
+буф  свободно.
 
 

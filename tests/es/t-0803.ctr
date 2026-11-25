@@ -1,27 +1,27 @@
 Server init.
 
->> conn1 := Maria-DB crear host: ['localhost'],
+>> con1 := Maria-DB crear host: ['localhost'],
 	usuario: ['xo'],
 	contraseña: ['pass123'],
 	nombre-base-datos: ['xobase'],
 	conectar.
 
->> conn2 := Maria-DB crear host: ['localhost'],
+>> con2 := Maria-DB crear host: ['localhost'],
 	usuario: ['xo'],
 	contraseña: ['pass123'],
 	nombre-base-datos: ['xobase'],
 	conectar.
 #...
->> del := conn1 consultar: ['DELETE FROM book WHERE id > 0'].
-{  del ejecutar. conn1 confirmar. } capturar: { :e conn1 revertir.  }, empezar.
+>> elim := con1 consultar: ['DELETE FROM book WHERE id > 0'].
+{  elim ejecutar. con1 confirmar. } capturar: { :e con1 revertir.  }, empezar.
 
->> insert := conn1 consultar: ['INSERT INTO book (id) VALUES(null)'].
-insert ejecutar.
+>> inserción := con1 consultar: ['INSERT INTO book (id) VALUES(null)'].
+inserción ejecutar.
 
->> contar := conn1 consultar: ['SELECT COUNT(*) AS num FROM book'].
-contar extraer: { :row Salida escribir: row num, detener. }.
+>> contar := con1 consultar: ['SELECT COUNT(*) AS num FROM book'].
+contar extraer: { :fila Salida escribir: fila num, detener. }.
 
-# does not show up
-# insert not committed on connection 1
->> contar := conn2 consultar: ['SELECT COUNT(*) AS num FROM book'].
-contar extraer: { :row Salida escribir: row num, detener. }.
+# no aparece
+# inserción no confirmada en la conexión 1
+>> contar := con2 consultar: ['SELECT COUNT(*) AS num FROM book'].
+contar extraer: { :fila Salida escribir: fila num, detener. }.

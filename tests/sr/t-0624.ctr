@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := Објекат нови.
+# Овај тест проверава да string_fill_in не губи свој утор (gc'ed) у режиму 4
+# референца у world.c
+>> Дневник := Објекат нови.
 
-Log на: ['say:'] уради: { :str
+Дневник на: ['say:'] уради: { :str
 	Излаз пиши: str, нови-ред.
 }.
 
->> Item := Објекат нови.
+>> Ставка := Објекат нови.
 
-Item на: ['нови:'] уради: { :id <- себе нови id: id.
+Ставка на: ['нови:'] уради: { :id
+	<- себе нови id: id.
 }.
 
-Item на: ['id:'] уради: { :id
+Ставка на: ['id:'] уради: { :id
 	свој id := id.
 }.
 
-Item на: ['id'] уради: { <- свој id. }.
+Ставка на: ['id'] уради: { <- свој id. }.
 
 
-Item на: ['текст'] уради: {
+Ставка на: ['текст'] уради: {
 	>> str := ['Item#~no'].
-	str ~no: свој id. <- str.
+	str ~no: свој id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item на: ['текст'] уради: {
 
 Print на: ['items'] уради: { 
 	
-	свој item := Item нови: 1.
+	свој ставка := Ставка нови: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: свој item
+	# овде или segfault или погрешан str
+	Дневник say: (
+		['~item printed.'] ~item: свој ставка
 	).
 	
 	

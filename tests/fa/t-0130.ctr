@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# استفاده از FFI با افزونه Server
 
-# connect to libc (platform specific)
->> libname := برنامه پیکربندی: ⌝'FFITESTLIB'⌜.
+# اتصال به libc (وابسته به سکو)
+>> نام-کتابخانه := برنامه پیکربندی: ⌝'FFITESTLIB'⌜.
 
-# link stdio functions from c for advances file operations
+# پیوند توابع stdio از c برای عملیات پیشرفته روی پرونده
 Server پیوند: ﴿ لیست جدید ;
- libname ; ⌝'fopen'⌜ ;
+ نام-کتابخانه ; ⌝'fopen'⌜ ;
  ﴿ لیست جدید ; ⌝'pointer'⌜ ; ⌝'pointer'⌜﴾ ;
  ⌝'pointer'⌜ ;
  ⌝'Stream'⌜ ;
  ⌝'path:mode:'⌜
 ﴾,
 پیوند: ﴿ لیست جدید ;
- هیچ ; # means same lib
+ هیچ ; # یعنی همان کتابخانه
  ⌝'fread'⌜ ;
  ﴿ لیست جدید ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
  ⌝'int'⌜ ;
- هیچ ; # means same object (i.e. Stream)
+ هیچ ; # یعنی همان شیء (یعنی Stream)
  ⌝'fread'⌜
 ﴾,
 پیوند: ﴿
  لیست جدید ;
- هیچ ; # means same lib
+ هیچ ; # یعنی همان کتابخانه
  ⌝'fwrite'⌜ ;
  ﴿ لیست جدید ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
  ⌝'int'⌜ ;
- هیچ ; # means same lib
+ هیچ ; # یعنی همان کتابخانه
  ⌝'fwrite'⌜
 ﴾,
 پیوند: ﴿
  لیست جدید ;
- هیچ ; # means same lib
+ هیچ ; # یعنی همان کتابخانه
  ⌝'rewind'⌜ ;
  ﴿ لیست جدید ; ⌝'pointer'⌜ ﴾ ;
  ⌝'int'⌜ ;
- هیچ ; # means same lib
+ هیچ ; # یعنی همان کتابخانه
  ⌝'rewind:'⌜
 ﴾.
 
->> str := Blob utf8: ⌝'abc123'⌜.
+>> str  := Blob utf8: ⌝'abc123'⌜.
 >> مسیر-پرونده := Blob utf8: ⌝'/tmp/bla.txt'⌜.
 >> mode := Blob utf8: ⌝'w+'⌜.
 
-# open a file with fopen(path, mode)
+# باز کردن یک پرونده با fopen(path, mode)
 >> fd := Stream path: مسیر-پرونده mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream پیام: ⌝'fwrite'⌜ آرگومان-ها: ﴿لیست جدید ; str ; 1 ; 6 ; fd ﴾.
-خروجی بنویس: bytes-written, سطر-نو.
+# نوشتن بایت‌ها از بافر str در پرونده
+>> بایت-های-نوشته := Stream پیام: ⌝'fwrite'⌜ آرگومان-ها: ﴿لیست جدید ; str ; 1 ; 6 ; fd ﴾.
+خروجی بنویس: بایت-های-نوشته, سطر-نو.
 
-# rewind file pointer
+# برگرداندن اشاره‌گر پرونده به آغاز
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob جدید: 20.
+# تخصیص یک بافر
+>> باف := Blob جدید: 20.
 
-# read from file
->> bytes-read := Stream پیام: ⌝'fread'⌜ آرگومان-ها: ﴿لیست جدید ; buf ; 1 ; 6 ; fd ﴾.
-خروجی بنویس: bytes-read, سطر-نو.
-خروجی بنویس: buf, سطر-نو.
+# خواندن از پرونده
+>> بایت-های-خوانده := Stream پیام: ⌝'fread'⌜ آرگومان-ها: ﴿لیست جدید ; باف ; 1 ; 6 ; fd ﴾.
+خروجی بنویس: بایت-های-خوانده, سطر-نو.
+خروجی بنویس: باف, سطر-نو.
 
-# free memory
+# آزاد کردن حافظه
 str  آزاد-کن.
 مسیر-پرونده آزاد-کن.
 mode آزاد-کن.
-buf  آزاد-کن.
+باف  آزاد-کن.
 
 

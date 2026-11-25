@@ -1,66 +1,66 @@
-# using FFI with the Server plugin
+# utilisation de FFI avec le plugin Serveur
 
-# connect to libc (platform specific)
->> libname := Programme paramètre: ['FFITESTLIB'].
+# connexion à libc (spécifique à la plateforme)
+>> nomlib := Programme paramètre: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# lier les fonctions stdio de C pour des opérations avancées sur les fichiers
 Server lier: ( Liste nouveau ;
- libname ; ['fopen'] ;
+ nomlib ; ['fopen'] ;
  ( Liste nouveau ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 lier: ( Liste nouveau ;
- Rien ; # means same lib
+ Rien ; # signifie même bibliothèque
  ['fread'] ;
  ( Liste nouveau ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Rien ; # means same object (i.e. Stream)
+ Rien ; # signifie même objet (c.-à-d. Stream)
  ['fread']
 ),
 lier: (
  Liste nouveau ;
- Rien ; # means same lib
+ Rien ; # signifie même bibliothèque
  ['fwrite'] ;
  ( Liste nouveau ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Rien ; # means same lib
+ Rien ; # signifie même bibliothèque
  ['fwrite']
 ),
 lier: (
  Liste nouveau ;
- Rien ; # means same lib
+ Rien ; # signifie même bibliothèque
  ['rewind'] ;
  ( Liste nouveau ; ['pointer'] ) ;
  ['int'] ;
- Rien ; # means same lib
+ Rien ; # signifie même bibliothèque
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> chemin := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# ouvrir un fichier avec fopen(path, mode)
 >> fd := Stream path: chemin mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream message: ['fwrite'] arguments: (Liste nouveau ; str ; 1 ; 6 ; fd ).
-Sortie écrire: bytes-written, stop.
+# écrire les octets du tampon str dans le fichier
+>> octets-écrits := Stream message: ['fwrite'] arguments: (Liste nouveau ; str ; 1 ; 6 ; fd ).
+Sortie écrire: octets-écrits, stop.
 
-# rewind file pointer
+# rembobiner le pointeur de fichier
 Stream rewind: fd.
 
-# allocate a buffer
+# allouer un tampon
 >> buf := Blob nouveau: 20.
 
-# read from file
->> bytes-read := Stream message: ['fread'] arguments: (Liste nouveau ; buf ; 1 ; 6 ; fd ).
-Sortie écrire: bytes-read, stop.
+# lire depuis le fichier
+>> octets-lus := Stream message: ['fread'] arguments: (Liste nouveau ; buf ; 1 ; 6 ; fd ).
+Sortie écrire: octets-lus, stop.
 Sortie écrire: buf, stop.
 
-# free memory
+# libérer la mémoire
 str  libérer.
 chemin libérer.
 mode libérer.

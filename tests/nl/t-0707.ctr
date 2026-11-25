@@ -1,21 +1,21 @@
-# test type casts / conversions / bindings
+# test typeconversies / omzettingen / bindingen
 Programma geheugenbeheer: 4.
 Server init.
 
->> counter := 0.
+>> teller := 0.
 >> db := Maria-DB nieuw host: ['localhost'],
 	gebruikersnaam: ['xo'], wachtwoord: ['pass123'], databanknaam: ['xobase'], verbinden.
 
->> TwoDigitFormat := Format nieuw: ['%02d'].
+>> TweeCijferFormaat := Format nieuw: ['%02d'].
 
-# Datetime
+# Datum en tijd
 {
-	>> jaar := Getal tussen: 1995 en: 2050, tekst.
-	>> maand := TwoDigitFormat toepassen-int: (Getal tussen: 1 en: 12), tekst.
-	>> dag := TwoDigitFormat toepassen-int: (Getal tussen: 1 en: 28), tekst.
-	>> uur := TwoDigitFormat toepassen-int: (Getal tussen: 1 en: 23), tekst.
-	>> minuut := TwoDigitFormat toepassen-int: (Getal tussen: 1 en: 59), tekst.
-	>> seconde := TwoDigitFormat toepassen-int: (Getal tussen: 1 en: 59), tekst.
+	>> jaar     := Getal tussen: 1995 en: 2050, tekst.
+	>> maand    := TweeCijferFormaat toepassen-int: (Getal tussen: 1 en: 12), tekst.
+	>> dag      := TweeCijferFormaat toepassen-int: (Getal tussen: 1 en: 28), tekst.
+	>> uur     := TweeCijferFormaat toepassen-int: (Getal tussen: 1 en: 23), tekst.
+	>> minuut   := TweeCijferFormaat toepassen-int: (Getal tussen: 1 en: 59), tekst.
+	>> seconde   := TweeCijferFormaat toepassen-int: (Getal tussen: 1 en: 59), tekst.
 	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
 	datetime
 		YYYY: jaar,
@@ -31,25 +31,25 @@ Server init.
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
 	'] <datetime>: datetime),
-	ophalen: { :row
-		(row mydatetime = datetime) nee: {
+	ophalen: { :rij
+		(rij mydatetime = datetime) nee: {
 			deze-taak fout: (
-				['Expected: <expected> but got: <observation>']
+				['Verwacht: <expected> maar kreeg: <observation>']
 				<expected>: datetime,
-				<observation>: row mydatetime
+				<observation>: rij mydatetime
 			).
 		}.
 	
 	}.
-	counter optellen: 1.
+	teller optellen: 1.
 } * 100.
 
-# Date
+# Datum
 {
-	>> jaar := Getal tussen: 1995 en: 2050, tekst.
-	>> maand := TwoDigitFormat toepassen-int: (Getal tussen: 1 en: 12), tekst.
-	>> dag := TwoDigitFormat toepassen-int: (Getal tussen: 1 en: 28), tekst.
-	>> date := ['YYYY-MM-DD'].
+	>> jaar     := Getal tussen: 1995 en: 2050, tekst.
+	>> maand    := TweeCijferFormaat toepassen-int: (Getal tussen: 1 en: 12), tekst.
+	>> dag      := TweeCijferFormaat toepassen-int: (Getal tussen: 1 en: 28), tekst.
+	>> date     := ['YYYY-MM-DD'].
 	date
 		YYYY: jaar,
 		MM: maand,
@@ -61,24 +61,24 @@ Server init.
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
 	'] <date>: date),
-	ophalen: { :row
-		(row mydate = date) nee: {
+	ophalen: { :rij
+		(rij mydate = date) nee: {
 			deze-taak fout: (
-				['Expected: <expected> but got: <observation>']
+				['Verwacht: <expected> maar kreeg: <observation>']
 				<expected>: date,
-				<observation>: row mydate
+				<observation>: rij mydate
 			).
 		}.
 	}.
-	counter optellen: 1.
+	teller optellen: 1.
 } * 100.
 
 
-# Time
+# Tijd
 {
-	>> uur := TwoDigitFormat toepassen-int: (Getal tussen: 1 en: 23), tekst.
-	>> minuut := TwoDigitFormat toepassen-int: (Getal tussen: 1 en: 59), tekst.
-	>> seconde := TwoDigitFormat toepassen-int: (Getal tussen: 1 en: 59), tekst.
+	>> uur     := TweeCijferFormaat toepassen-int: (Getal tussen: 1 en: 23), tekst.
+	>> minuut   := TweeCijferFormaat toepassen-int: (Getal tussen: 1 en: 59), tekst.
+	>> seconde   := TweeCijferFormaat toepassen-int: (Getal tussen: 1 en: 59), tekst.
 	>> tijd := ['HH:II:SS'].
 	tijd
 		HH: uur,
@@ -89,20 +89,20 @@ Server init.
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: tijd),
-	ophalen: { :row
-		(row mytime = tijd) nee: {
+	ophalen: { :rij
+		(rij mytime = tijd) nee: {
 			deze-taak fout: (
-				['Expected: <expected> but got: <observation>']
+				['Verwacht: <expected> maar kreeg: <observation>']
 				<expected>: datetime,
-				<observation>: row mytime
+				<observation>: rij mytime
 			).
 		}.
 	}.
-	counter optellen: 1.
+	teller optellen: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Teksten (varchar/text)
 >> str1 := Reeks nieuw vul: 100000 met: ['x'], samenvoegen: [''].
 {
 	>> str2 := Kluis token: 40.
@@ -115,23 +115,23 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	ophalen: { :row
-		(row str1 = str1 en: row str2 = str2) nee: {
+	ophalen: { :rij
+		(rij str1 = str1 en: rij str2 = str2) nee: {
 			deze-taak fout: (
-				['Expected: <expected> but got: <observation>']
+				['Verwacht: <expected> maar kreeg: <observation>']
 				<expected>: datetime,
-				<observation>: row mytime
+				<observation>: rij mytime
 			).
 		}.
 	}.
-	counter optellen: 1.
+	teller optellen: 1.
 } * 100.
 
 
-# Numbers
+# Getallen
 {
-	>> n1 := Getal tussen: 1 en: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Getal tussen: 1 en: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 van-string: ['9223372036854775807'] ) -
 		( Int64 van-string: ['99999'] ) +
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	ophalen: { :row
-		(row n1 = n1) nee: {
+	ophalen: { :rij
+		(rij n1 = n1) nee: {
 			deze-taak fout: (
-				['Expected: <expected> but got: <observation>']
+				['Verwacht: <expected> maar kreeg: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: rij n1
 			).
 		}.
-		(row n2 = n2) nee: {
+		(rij n2 = n2) nee: {
 			deze-taak fout: (
-				['Expected: <expected> but got: <observation>']
+				['Verwacht: <expected> maar kreeg: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: rij n2
 			).
 		}.
-		(row n3 = n2 afgerond) nee: {
+		(rij n3 = n2 afgerond) nee: {
 			deze-taak fout: (
-				['Expected: <expected> but got: <observation>']
+				['Verwacht: <expected> maar kreeg: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: rij n3
 			).
 		}.
-		(row big = big) nee: {
+		(rij big = big) nee: {
 			deze-taak fout: (
-				['Expected: <expected> but got: <observation>']
+				['Verwacht: <expected> maar kreeg: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: rij big
 			).
 		}.
 		
 	}.
-	counter optellen: 1.
+	teller optellen: 1.
 } * 100.
 
 
 Uit schrijf: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: teller
 ), stop.

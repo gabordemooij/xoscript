@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# UTF-8-Bereiniger testen
 Server init.
 
->> utf8cases := Wörterbuch neu
-	# ASCII only
+>> utf8fälle := Wörterbuch neu
+	# nur ASCII
 	setzen: ( Liste neu ; 65 ; 65 ; 65 ; 65 ; 0 ) auf: ['AAAA'],
-	# valid 2 byte sequence
+	# gültige 2-Byte-Sequenz
 	setzen: ( Liste neu ; 194 ; 162 ; 0 ) auf: ['¢'],
-	# Valid 3-byte UTF-8
+	# Gültiges 3-Byte-UTF-8
     setzen: ( Liste neu ; 226 ; 130 ; 172 ; 0 ) auf: ['€'],
-	# Valid 4-byte UTF-8
+	# Gültiges 4-Byte-UTF-8
     setzen: ( Liste neu ; 240 ; 144 ; 141 ; 136 ; 0 ) auf: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# Ungültiges Folgebyte in Sequenz E2 28 AC -> Start 3b-Seq. + 28 falsches Folgebyte + AC Folgebyte, gehört aber zum selben Fehler
     setzen: ( Liste neu ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) auf: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# Überlange Kodierung von ASCII 'A' (sollte ? werden),
     setzen: ( Liste neu ; 65 ; 193 ; 129 ; 0 ) auf: ['A?'],
-	# Invalid first byte (0xFF)
+	# Ungültiges erstes Byte (0xFF)
     setzen: ( Liste neu ; 255 ; 0 ) auf: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Unvollständige Mehrbyte-Sequenz am Ende
     setzen: ( Liste neu ; 66 ; 226 ; 0 ) auf: ['B?'],
-    # Empty string
+    # Leerer Text
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Mehrere gemischte Sequenzen
     setzen: ( Liste neu ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) auf: ['A€?𐍈B'].
 	 
-utf8cases jedes: { :key :value
+utf8fälle jedes: { :key :value
 	>> blob := Blob neu: value anzahl, bytes: value.
 	>> str := blob text.
 	(str = key) ja: {
 		Ausgabe schreiben: ['OK'], stopp.
 	}, sonst: {
-		Ausgabe schreiben: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, stopp.
+		Ausgabe schreiben: ['UTF8-Bereinigung fehlgeschlagen bei: '] + key + [' erhalten: '] + str, stopp.
 	}.
 	blob freigeben.
 }.

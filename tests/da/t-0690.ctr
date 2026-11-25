@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# databasetest
+# se eksemplet server.xo for den nødvendige konfiguration
 
 Server init.
-Uddata skriv: ['Database test'], stop.
+Uddata skriv: ['Databasetest'], stop.
 
 >> db := Maria-DB ny vært: ['localhost'],
 	brugernavn: ['xo'], adgangskode: ['pass123'], databasenavn: ['xobase'], tilslut.
 
-Uddata skriv: ['Can we connect? '] + db tilsluttet?, stop.
+Uddata skriv: ['Kan vi forbinde? '] + db tilsluttet?, stop.
 
 >> søgeparametre := db forespørgsel: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametre: ( Liste ny ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametre: ( Liste ny ; ['abc'] ; 12.35 ; 6 ). # parameteriserede forespørgsler
 
 {  søgeparametre udfør. db bekræft. } fang: { :e db rul-tilbage.  }, start.
 
-Uddata skriv: ['Can we insert? '] + ( søgeparametre insert-id > 0 ), stop.
+Uddata skriv: ['Kan vi indsætte? '] + ( søgeparametre insert-id > 0 ), stop.
 
 >> x := 0.
 >> søgeparametre :=
 db forespørgsel: ['SELECT * FROM book order by id desc limit 2'], 
-hent: { :row 
+hent: { :række 
 	x læg-til: 1.
-	Sand afbryd. # must clean up, no 'Commands out of sync'
+	Sand afbryd. # skal rydde op, ingen 'Commands out of sync'
 }.
 
 >> søgeparametre :=
 db forespørgsel: ['SELECT * FROM book order by id desc limit 2'], 
-hent: { :row
+hent: { :række
 	x læg-til: 1.
 	Sand afbryd.
 }.
 
 (x > 0) sand: {
-	Uddata skriv: ['Can we break in the middle of a fetch? '].
+	Uddata skriv: ['Kan vi afbryde midt i en hentning? '].
 }.
 
 Uddata skriv: Sand, stop.

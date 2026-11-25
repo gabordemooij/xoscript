@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# databanktest
+# sjoch foarbyld server.xo foar de nedige konfiguraasje
 
 Server init.
-Utfier skriuwe: ['Database test'], nije-rigel.
+Utfier skriuwe: ['Databanktest'], nije-rigel.
 
 >> db := Maria-DB nĳ host: ['localhost'],
 	brûkersnamme: ['xo'], wachtwurd: ['pass123'], databanknamme: ['xobase'], ferbine.
 
-Utfier skriuwe: ['Can we connect? '] + db ferbûn?, nije-rigel.
+Utfier skriuwe: ['Kinne wy ferbine? '] + db ferbûn?, nije-rigel.
 
 >> sykparameters := db fraach: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parameters: ( Rige nĳ ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parameters: ( Rige nĳ ; ['abc'] ; 12.35 ; 6 ). # parametrisearre fragen
 
 {  sykparameters útfiere. db befêstigje. } fange: { :e db weromdraaie.  }, begjinne.
 
-Utfier skriuwe: ['Can we insert? '] + ( sykparameters insert-id > 0 ), nije-rigel.
+Utfier skriuwe: ['Kinne wy ynfoegje? '] + ( sykparameters insert-id > 0 ), nije-rigel.
 
 >> Obj := Objekt nĳ.
-Obj by: ['retrieve-rows'] dwaan: {
+Obj by: ['rigen-ophelje'] dwaan: {
 	eigen telle := 0.
 	>> sykparameters :=
 	db fraach: ['SELECT * FROM book order by id desc limit 2'], 
-	ophelje: { :row 
+	ophelje: { :tabelrige 
 		eigen telle optelle: 1.
 		Ja ôfbrekke.
-	}. <- eigen telle kopiearje.
+	}. # rigen ophelje
+	<- eigen telle kopiearje.
 }.
 
-Utfier skriuwe: ['Can we query? '] + ( Obj retrieve-rows > 0 ), nije-rigel.
+Utfier skriuwe: ['Kinne wy opfreegje? '] + ( Obj rigen-ophelje > 0 ), nije-rigel.

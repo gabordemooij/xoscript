@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# databastest
+# se exemplet server.xo för nödvändig konfiguration
 
 Server init.
-Utdata skriv: ['Database test'], stop.
+Utdata skriv: ['Databastest'], stop.
 
 >> db := Maria-DB ny värd: ['localhost'],
 	användarnamn: ['xo'], lösenord: ['pass123'], databasnamn: ['xobase'], anslut.
 
-Utdata skriv: ['Can we connect? '] + db ansluten?, stop.
+Utdata skriv: ['Kan vi ansluta? '] + db ansluten?, stop.
 
 >> sökparametrar := db fråga: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametrar: ( Lista ny ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametrar: ( Lista ny ; ['abc'] ; 12.35 ; 6 ). # parametriserade frågor
 
 {  sökparametrar utför. db bekräfta. } fånga: { :e db återställ.  }, starta.
 
-Utdata skriv: ['Can we insert? '] + ( sökparametrar insert-id > 0 ), stop.
+Utdata skriv: ['Kan vi infoga? '] + ( sökparametrar insert-id > 0 ), stop.
 
 >> x := 0.
 >> sökparametrar :=
 db fråga: ['SELECT * FROM book order by id desc limit 2'], 
-hämta: { :row 
+hämta: { :raden 
 	x lägg-till: 1.
-	Sann avbryt. # must clean up, no 'Commands out of sync'
+	Sann avbryt. # måste städa upp, inget 'Commands out of sync'
 }.
 
 >> sökparametrar :=
 db fråga: ['SELECT * FROM book order by id desc limit 2'], 
-hämta: { :row
+hämta: { :raden
 	x lägg-till: 1.
 	Sann avbryt.
 }.
 
 (x > 0) sann: {
-	Utdata skriv: ['Can we break in the middle of a fetch? '].
+	Utdata skriv: ['Kan vi avbryta mitt i en hämtning? '].
 }.
 
 Utdata skriv: Sann, stop.

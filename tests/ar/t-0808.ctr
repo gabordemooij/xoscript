@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# مفاتيح وتواقيع الخزنة التي تُفك إلى طول زائد يجب ألا تتجاوز المكدس
 Server init.
 
->> keys := خزنة ولد-مفاتيح.
->> sk := keys الأول.
->> pk := keys الأخير.
->> sig := خزنة وقع: ⌝'abc'⌜ بمفتاح: sk.
+>> المفاتيح := خزنة ولد-مفاتيح.
+>> مفتاح-خاص := المفاتيح الأول.
+>> مفتاح-عام := المفاتيح الأخير.
+>> توقيع := خزنة وقع: ⌝'abc'⌜ بمفتاح: مفتاح-خاص.
 
-# 88 characters without padding decode to 66 bytes
->> long := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+# 88 حرفا بدون حشو تُفك إلى 66 بايتا
+>> طويل := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
 
-# 44 characters without padding decode to 33 bytes
->> short := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
+# 44 حرفا بدون حشو تُفك إلى 33 بايتا
+>> قصير := ⌝'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'⌜.
 
-⎬ خزنة وقع: ⌝'abc'⌜ بمفتاح: long. ⎨ التقط: ⎬ :e
+⎬ خزنة وقع: ⌝'abc'⌜ بمفتاح: طويل. ⎨ التقط: ⎬ :e
 	مخرج اكتب: e, سطر-جديد.
 ⎨, شغل.
 
-⎬ خزنة افحص: ⌝'abc'⌜ توقيع: long بمفتاح: pk. ⎨ التقط: ⎬ :e
+⎬ خزنة افحص: ⌝'abc'⌜ توقيع: طويل بمفتاح: مفتاح-عام. ⎨ التقط: ⎬ :e
 	مخرج اكتب: e, سطر-جديد.
 ⎨, شغل.
 
-⎬ خزنة افحص: ⌝'abc'⌜ توقيع: sig بمفتاح: short. ⎨ التقط: ⎬ :e
+⎬ خزنة افحص: ⌝'abc'⌜ توقيع: توقيع بمفتاح: قصير. ⎨ التقط: ⎬ :e
 	مخرج اكتب: e, سطر-جديد.
 ⎨, شغل.

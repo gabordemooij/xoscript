@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# utf8 temizleyicisini sına
 Server init.
 
->> utf8cases := Sözlük yeni
-	# ASCII only
+>> utf8durumları := Sözlük yeni
+	# yalnızca ASCII
 	koy: ( Liste yeni ; 65 ; 65 ; 65 ; 65 ; 0 ) konum: ['AAAA'],
-	# valid 2 byte sequence
+	# geçerli 2 baytlık dizi
 	koy: ( Liste yeni ; 194 ; 162 ; 0 ) konum: ['¢'],
-	# Valid 3-byte UTF-8
+	# Geçerli 3 baytlık UTF-8
     koy: ( Liste yeni ; 226 ; 130 ; 172 ; 0 ) konum: ['€'],
-	# Valid 4-byte UTF-8
+	# Geçerli 4 baytlık UTF-8
     koy: ( Liste yeni ; 240 ; 144 ; 141 ; 136 ; 0 ) konum: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# E2 28 AC dizisinde geçersiz devam baytı -> 3b dizisi başlar + 28 yanlış devam + AC devam baytı, ama aynı hataya aittir
     koy: ( Liste yeni ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) konum: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# ASCII 'A' için aşırı uzun kodlama (? olmalı),
     koy: ( Liste yeni ; 65 ; 193 ; 129 ; 0 ) konum: ['A?'],
-	# Invalid first byte (0xFF)
+	# Geçersiz ilk bayt (0xFF)
     koy: ( Liste yeni ; 255 ; 0 ) konum: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Sonda eksik çok baytlı dizi
     koy: ( Liste yeni ; 66 ; 226 ; 0 ) konum: ['B?'],
-    # Empty string
+    # Boş metin
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Birden çok karışık dizi
     koy: ( Liste yeni ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) konum: ['A€?𐍈B'].
 	 
-utf8cases her: { :key :value
+utf8durumları her: { :key :value
 	>> blob := Blob yeni: value adet, bytes: value.
 	>> str := blob metin.
 	(str = key) doğru: {
 		Çıktı yaz: ['OK'], yeni-satır.
 	}, yoksa: {
-		Çıktı yaz: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, yeni-satır.
+		Çıktı yaz: ['UTF8 temizleyici başarısız: '] + key + [' sonuç: '] + str, yeni-satır.
 	}.
 	blob serbest-bırak.
 }.

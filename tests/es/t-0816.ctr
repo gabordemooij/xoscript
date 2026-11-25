@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> intentar := { :format :value
-	{ Salida escribir: ( (Formato crear: format) aplicar: value ), detener. } capturar: { :e Salida escribir: e, detener. }, empezar.
+# un formato debe ajustarse al tipo del valor, el tipo puede venir de un cliente
+>> intentar := { :elFormato :value
+	{ Salida escribir: ( (Formato crear: elFormato) aplicar: value ), detener. } capturar: { :e Salida escribir: e, detener. }, empezar.
 }.
->> try-int := { :format :value
-	{ Salida escribir: ( (Formato crear: format) aplicar-a-entero: value ), detener. } capturar: { :e Salida escribir: e, detener. }, empezar.
+>> probar-entero := { :elFormato :value
+	{ Salida escribir: ( (Formato crear: elFormato) aplicar-a-entero: value ), detener. } capturar: { :e Salida escribir: e, detener. }, empezar.
 }.
 
-# fits
+# cabe
 intentar aplicar: ['|%s|'] y: ['text'].
 intentar aplicar: ['%06.2f'] y: 5.5.
-intentar aplicar: ['100%% %s'] y: ['sure'].
-try-int aplicar: ['%03d'] y: 7.
-try-int aplicar: ['%x'] y: 255.
+intentar aplicar: ['100%% %s'] y: ['claro'].
+probar-entero aplicar: ['%03d'] y: 7.
+probar-entero aplicar: ['%x'] y: 255.
 intentar aplicar: ['%d'] y: (Int64 crear desde-texto: ['12']).
 intentar aplicar: ['%lld'] y: (Int64 crear desde-texto: ['12']).
 intentar aplicar: ['%.1lf'] y: 5.5.
-try-int aplicar: ['%hd'] y: 7.
+probar-entero aplicar: ['%hd'] y: 7.
 
-# does not fit
+# no cabe
 intentar aplicar: ['%s'] y: 12345.
 intentar aplicar: ['%d'] y: 12345.
 intentar aplicar: ['%f'] y: ['text'].
-try-int aplicar: ['%d'] y: ['text'].
-try-int aplicar: ['%s'] y: 5.
+probar-entero aplicar: ['%d'] y: ['text'].
+probar-entero aplicar: ['%s'] y: 5.
 intentar aplicar: ['%s %s'] y: ['text'].
 intentar aplicar: ['%n'] y: ['text'].
 intentar aplicar: ['%*s'] y: ['text'].
 intentar aplicar: ['%'] y: ['text'].
 
-# length modifier does not fit
+# el modificador de longitud no cabe
 intentar aplicar: ['%ls'] y: ['text'].
 intentar aplicar: ['%Lf'] y: 5.5.
-try-int aplicar: ['%ld'] y: 7.
-try-int aplicar: ['%lld'] y: 7.
+probar-entero aplicar: ['%ld'] y: 7.
+probar-entero aplicar: ['%lld'] y: 7.
 intentar aplicar: ['%Ld'] y: (Int64 crear desde-texto: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# un ancho que no cabe en printf debe dar un error, no un fallo grave
 intentar aplicar: ['%99999999999s'] y: ['text'].

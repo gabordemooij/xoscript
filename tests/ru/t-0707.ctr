@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# тест приведения типов / преобразований / привязок
 Программа режим-памяти: 4.
 Server init.
 
->> counter := 0.
->> db := MariaDB новый хост: ['localhost'],
+>> счётчик := 0.
+>> бд := MariaDB новый хост: ['localhost'],
 	пользователь: ['xo'], пароль: ['pass123'], имя-базы: ['xobase'], подключить.
 
->> TwoDigitFormat := Формат новый: ['%02d'].
+>> ДвузначныйФормат := Формат новый: ['%02d'].
 
-# Datetime
+# Дата и время
 {
-	>> год := Число между: 1995 и: 2050, к-тексту.
-	>> месяц := TwoDigitFormat применить-int: (Число между: 1 и: 12), к-тексту.
-	>> день := TwoDigitFormat применить-int: (Число между: 1 и: 28), к-тексту.
-	>> час := TwoDigitFormat применить-int: (Число между: 1 и: 23), к-тексту.
-	>> минут := TwoDigitFormat применить-int: (Число между: 1 и: 59), к-тексту.
-	>> секунд := TwoDigitFormat применить-int: (Число между: 1 и: 59), к-тексту.
-	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
-	datetime
+	>> год     := Число между: 1995 и: 2050, к-тексту.
+	>> месяц    := ДвузначныйФормат применить-int: (Число между: 1 и: 12), к-тексту.
+	>> день      := ДвузначныйФормат применить-int: (Число между: 1 и: 28), к-тексту.
+	>> час     := ДвузначныйФормат применить-int: (Число между: 1 и: 23), к-тексту.
+	>> минут   := ДвузначныйФормат применить-int: (Число между: 1 и: 59), к-тексту.
+	>> секунд   := ДвузначныйФормат применить-int: (Число между: 1 и: 59), к-тексту.
+	>> датавремя := ['YYYY-MM-DD HH:II:SS'].	
+	датавремя
 		YYYY: год,
 		MM: месяц,
 		DD: день,
@@ -25,89 +25,89 @@ Server init.
 		II: минут,
 		SS: секунд.
 	>> параметры :=
-	db запрос: (['
+	бд запрос: (['
 		SELECT 
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'] <datetime>: datetime),
-	получить: { :row
-		(row mydatetime = datetime) ложь: {
+	'] <datetime>: датавремя),
+	получить: { :ряд
+		(ряд mydatetime = датавремя) ложь: {
 			этот-блок-кода ошибка: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mydatetime
+				['Ожидалось: <expected>, но получено: <observation>']
+				<expected>: датавремя,
+				<observation>: ряд mydatetime
 			).
 		}.
 	
 	}.
-	counter добавить: 1.
+	счётчик добавить: 1.
 } * 100.
 
-# Date
+# Дата
 {
-	>> год := Число между: 1995 и: 2050, к-тексту.
-	>> месяц := TwoDigitFormat применить-int: (Число между: 1 и: 12), к-тексту.
-	>> день := TwoDigitFormat применить-int: (Число между: 1 и: 28), к-тексту.
-	>> date := ['YYYY-MM-DD'].
-	date
+	>> год     := Число между: 1995 и: 2050, к-тексту.
+	>> месяц    := ДвузначныйФормат применить-int: (Число между: 1 и: 12), к-тексту.
+	>> день      := ДвузначныйФормат применить-int: (Число между: 1 и: 28), к-тексту.
+	>> дата     := ['YYYY-MM-DD'].
+	дата
 		YYYY: год,
 		MM: месяц,
 		DD: день.
 	>> параметры :=
-	db запрос: (['
+	бд запрос: (['
 		SELECT
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'] <date>: date),
-	получить: { :row
-		(row mydate = date) ложь: {
+	'] <date>: дата),
+	получить: { :ряд
+		(ряд mydate = дата) ложь: {
 			этот-блок-кода ошибка: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: date,
-				<observation>: row mydate
+				['Ожидалось: <expected>, но получено: <observation>']
+				<expected>: дата,
+				<observation>: ряд mydate
 			).
 		}.
 	}.
-	counter добавить: 1.
+	счётчик добавить: 1.
 } * 100.
 
 
-# Time
+# Время
 {
-	>> час := TwoDigitFormat применить-int: (Число между: 1 и: 23), к-тексту.
-	>> минут := TwoDigitFormat применить-int: (Число между: 1 и: 59), к-тексту.
-	>> секунд := TwoDigitFormat применить-int: (Число между: 1 и: 59), к-тексту.
+	>> час     := ДвузначныйФормат применить-int: (Число между: 1 и: 23), к-тексту.
+	>> минут   := ДвузначныйФормат применить-int: (Число между: 1 и: 59), к-тексту.
+	>> секунд   := ДвузначныйФормат применить-int: (Число между: 1 и: 59), к-тексту.
 	>> время := ['HH:II:SS'].
 	время
 		HH: час,
 		II: минут,
 		SS: секунд.
 	>> параметры :=
-	db запрос: (['
+	бд запрос: (['
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: время),
-	получить: { :row
-		(row mytime = время) ложь: {
+	получить: { :ряд
+		(ряд mytime = время) ложь: {
 			этот-блок-кода ошибка: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Ожидалось: <expected>, но получено: <observation>']
+				<expected>: датавремя,
+				<observation>: ряд mytime
 			).
 		}.
 	}.
-	counter добавить: 1.
+	счётчик добавить: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Строки (varchar/text)
 >> str1 := Список новый заполнить: 100000 буквой: ['x'], присоединить: [''].
 {
 	>> str2 := Хранилище токен: 40.
 	>> параметры :=
-	db запрос: (['
+	бд запрос: (['
 		SELECT
 		"<str1>" AS str1,
 		"<str2>" AS str2
@@ -115,30 +115,30 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	получить: { :row
-		(row str1 = str1 и: row str2 = str2) ложь: {
+	получить: { :ряд
+		(ряд str1 = str1 и: ряд str2 = str2) ложь: {
 			этот-блок-кода ошибка: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Ожидалось: <expected>, но получено: <observation>']
+				<expected>: датавремя,
+				<observation>: ряд mytime
 			).
 		}.
 	}.
-	counter добавить: 1.
+	счётчик добавить: 1.
 } * 100.
 
 
-# Numbers
+# Числа
 {
-	>> n1 := Число между: 1 и: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Число между: 1 и: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 от-тексту: ['9223372036854775807'] ) -
 		( Int64 от-тексту: ['99999'] ) +
 		( Int64 от-тексту: n1 к-тексту )
 	).
 	>> параметры :=
-	db запрос: (['
+	бд запрос: (['
 		SELECT
 		<n1> AS n1,
 		<n2> AS n2,
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	получить: { :row
-		(row n1 = n1) ложь: {
+	получить: { :ряд
+		(ряд n1 = n1) ложь: {
 			этот-блок-кода ошибка: (
-				['Expected: <expected> but got: <observation>']
+				['Ожидалось: <expected>, но получено: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: ряд n1
 			).
 		}.
-		(row n2 = n2) ложь: {
+		(ряд n2 = n2) ложь: {
 			этот-блок-кода ошибка: (
-				['Expected: <expected> but got: <observation>']
+				['Ожидалось: <expected>, но получено: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: ряд n2
 			).
 		}.
-		(row n3 = n2 округлить) ложь: {
+		(ряд n3 = n2 округлить) ложь: {
 			этот-блок-кода ошибка: (
-				['Expected: <expected> but got: <observation>']
+				['Ожидалось: <expected>, но получено: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: ряд n3
 			).
 		}.
-		(row big = big) ложь: {
+		(ряд big = big) ложь: {
 			этот-блок-кода ошибка: (
-				['Expected: <expected> but got: <observation>']
+				['Ожидалось: <expected>, но получено: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: ряд big
 			).
 		}.
 		
 	}.
-	counter добавить: 1.
+	счётчик добавить: 1.
 } * 100.
 
 
 Выход написать: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: счётчик
 ), стоп.

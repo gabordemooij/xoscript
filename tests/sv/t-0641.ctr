@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# Testa utf8-sanering
 Server init.
 
->> utf8cases := Ordbok ny
-	# ASCII only
+>> utf8fall := Ordbok ny
+	# Endast ASCII
 	sätt: ( Lista ny ; 65 ; 65 ; 65 ; 65 ; 0 ) vid: ['AAAA'],
-	# valid 2 byte sequence
+	# giltig 2-bytessekvens
 	sätt: ( Lista ny ; 194 ; 162 ; 0 ) vid: ['¢'],
-	# Valid 3-byte UTF-8
+	# Giltig 3-byte UTF-8
     sätt: ( Lista ny ; 226 ; 130 ; 172 ; 0 ) vid: ['€'],
-	# Valid 4-byte UTF-8
+	# Giltig 4-byte UTF-8
     sätt: ( Lista ny ; 240 ; 144 ; 141 ; 136 ; 0 ) vid: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# Ogiltig fortsättningsbyte i sekvensen E2 28 AC -> start 3b-sekv + 28 fel fortsättn + AC fortsättningsbyte, men hör till samma fel
     sätt: ( Lista ny ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) vid: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# För lång kodning av ASCII 'A' (ska bli ?),
     sätt: ( Lista ny ; 65 ; 193 ; 129 ; 0 ) vid: ['A?'],
-	# Invalid first byte (0xFF)
+	# Ogiltig första byte (0xFF)
     sätt: ( Lista ny ; 255 ; 0 ) vid: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Ofullständig flerbytessekvens i slutet
     sätt: ( Lista ny ; 66 ; 226 ; 0 ) vid: ['B?'],
-    # Empty string
+    # Tom text
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Flera blandade sekvenser
     sätt: ( Lista ny ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) vid: ['A€?𐍈B'].
 	 
-utf8cases varje: { :key :value
+utf8fall varje: { :key :value
 	>> blob := Blob ny: value antal, bytes: value.
 	>> str := blob text.
 	(str = key) sann: {
 		Utdata skriv: ['OK'], stop.
 	}, annars: {
-		Utdata skriv: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, stop.
+		Utdata skriv: ['UTF8-sanering misslyckades för: '] + key + [' fick: '] + str, stop.
 	}.
 	blob frigör.
 }.

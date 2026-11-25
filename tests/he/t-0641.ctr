@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# בדיקת מנקה utf8
 Server init.
 
->> utf8cases := מילון חדש
-	# ASCII only
+>> מקרי-utf8 := מילון חדש
+	# ASCII בלבד
 	שים: ﴿ רשימה חדש ; 65 ; 65 ; 65 ; 65 ; 0 ﴾ במפתח: ⌝'AAAA'⌜,
-	# valid 2 byte sequence
+	# רצף תקין של 2 בתים
 	שים: ﴿ רשימה חדש ; 194 ; 162 ; 0 ﴾ במפתח: ⌝'¢'⌜,
-	# Valid 3-byte UTF-8
+	# UTF-8 תקין של 3 בתים
     שים: ﴿ רשימה חדש ; 226 ; 130 ; 172 ; 0 ﴾ במפתח: ⌝'€'⌜,
-	# Valid 4-byte UTF-8
+	# UTF-8 תקין של 4 בתים
     שים: ﴿ רשימה חדש ; 240 ; 144 ; 141 ; 136 ; 0 ﴾ במפתח: ⌝'𐍈'⌜,
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# בית המשך לא תקין ברצף E2 28 AC -> תחילת רצף 3b + 28 בית המשך שגוי + AC בית המשך, אבל שייך לאותה שגיאה
     שים: ﴿ רשימה חדש ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ﴾ במפתח: ⌝'A?A'⌜,
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# קידוד ארוך מדי של ASCII 'A' (אמור להפוך ל-?),
     שים: ﴿ רשימה חדש ; 65 ; 193 ; 129 ; 0 ﴾ במפתח: ⌝'A?'⌜,
-	# Invalid first byte (0xFF)
+	# בית ראשון לא תקין (0xFF)
     שים: ﴿ רשימה חדש ; 255 ; 0 ﴾ במפתח: ⌝'?'⌜,
-	# Incomplete multi-byte sequence at end
+	# רצף רב-בתים לא שלם בסוף
     שים: ﴿ רשימה חדש ; 66 ; 226 ; 0 ﴾ במפתח: ⌝'B?'⌜,
-    # Empty string
+    # מחרוזת ריקה
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# כמה רצפים מעורבים
     שים: ﴿ רשימה חדש ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ﴾ במפתח: ⌝'A€?𐍈B'⌜.
 	 
-utf8cases לכל: ⎬ :key :value
+מקרי-utf8 לכל: ⎬ :key :value
 	>> blob := Blob חדש: value כמות, בתים: value.
 	>> str := blob למחרוזת.
 	﴿str = key﴾ אם-אמת: ⎬
 		פלט כתוב: ⌝'OK'⌜, שורה-חדשה.
 	⎨, אחרת: ⎬
-		פלט כתוב: ⌝'UTF8 sanitizer failed on: '⌜ + key + ⌝' got: '⌜ + str, שורה-חדשה.
+		פלט כתוב: ⌝'מנקה ה-UTF8 נכשל על: '⌜ + key + ⌝' התקבל: '⌜ + str, שורה-חדשה.
 	⎨.
 	blob שחרר.
 ⎨.

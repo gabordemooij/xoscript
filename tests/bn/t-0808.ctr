@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# ডিকোড করে খুব লম্বা হওয়া সিন্দুক চাবি ও স্বাক্ষর স্ট্যাক উপচে দেবে না
 Server init.
 
->> keys := সিন্দুক চাবি-তৈরি.
->> sk := keys প্রথম.
->> pk := keys শেষ-উপাদান.
->> sig := সিন্দুক স্বাক্ষর: ['abc'] চাবি-দিয়ে: sk.
+>> চাবিজোড়া := সিন্দুক চাবি-তৈরি.
+>> sk := চাবিজোড়া প্রথম.
+>> pk := চাবিজোড়া শেষ-উপাদান.
+>> স্বাক্ষর := সিন্দুক স্বাক্ষর: ['abc'] চাবি-দিয়ে: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# প্যাডিং ছাড়া 88 অক্ষর ডিকোড হয়ে 66 বাইট হয়
+>> লম্বা := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# প্যাডিং ছাড়া 44 অক্ষর ডিকোড হয়ে 33 বাইট হয়
+>> ছোট := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ সিন্দুক স্বাক্ষর: ['abc'] চাবি-দিয়ে: long. } ধরো: { :e
+{ সিন্দুক স্বাক্ষর: ['abc'] চাবি-দিয়ে: লম্বা. } ধরো: { :e
 	আউটপুট লেখো: e, নতুন-লাইন.
 }, চালাও.
 
-{ সিন্দুক পরখ: ['abc'] স্বাক্ষর: long চাবি-দিয়ে: pk. } ধরো: { :e
+{ সিন্দুক পরখ: ['abc'] স্বাক্ষর: লম্বা চাবি-দিয়ে: pk. } ধরো: { :e
 	আউটপুট লেখো: e, নতুন-লাইন.
 }, চালাও.
 
-{ সিন্দুক পরখ: ['abc'] স্বাক্ষর: sig চাবি-দিয়ে: short. } ধরো: { :e
+{ সিন্দুক পরখ: ['abc'] স্বাক্ষর: স্বাক্ষর চাবি-দিয়ে: ছোট. } ধরো: { :e
 	আউটপুট লেখো: e, নতুন-লাইন.
 }, চালাও.

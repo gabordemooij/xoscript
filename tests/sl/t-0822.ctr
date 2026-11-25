@@ -1,22 +1,22 @@
-# fewer parameters than placeholders must give an error, not read past the bindings
+# manj parametrov kot ograd mora dati napako, ne branja čez vezave
 Server init.
 
->> db := Maria-DB nov gostitelj: ['localhost'],
+>> pb := Maria-DB nov gostitelj: ['localhost'],
 	uporabnik: ['xo'],
 	geslo: ['pass123'],
 	ime-baze: ['xobase'],
 	poveži-se.
 
->> iskalni-parametri := db poizvedba: ['SELECT ? AS a, ? AS b, ? AS c'].
+>> iskalni-parametri := pb poizvedba: ['SELECT ? AS a, ? AS b, ? AS c'].
 iskalni-parametri parametri: (Seznam nov ; ['1']).
-{ iskalni-parametri pridobi: { :row Izhod piši: row, nova-vrstica. }. } ujemi: { :e Izhod piši: e, nova-vrstica. }, zaženi.
+{ iskalni-parametri pridobi: { :vrsta Izhod piši: vrsta, nova-vrstica. }. } ujemi: { :e Izhod piši: e, nova-vrstica. }, zaženi.
 
->> iskalni-parametri := db poizvedba: ['SELECT ? AS a'].
-{ iskalni-parametri pridobi: { :row Izhod piši: row, nova-vrstica. }. } ujemi: { :e Izhod piši: e, nova-vrstica. }, zaženi.
+>> iskalni-parametri := pb poizvedba: ['SELECT ? AS a'].
+{ iskalni-parametri pridobi: { :vrsta Izhod piši: vrsta, nova-vrstica. }. } ujemi: { :e Izhod piši: e, nova-vrstica. }, zaženi.
 
-# the right number still works, more parameters are ignored as before
->> iskalni-parametri := db poizvedba: ['SELECT ? AS a, ? AS b'].
+# pravo število še vedno deluje, odvečni parametri se kot prej prezrejo
+>> iskalni-parametri := pb poizvedba: ['SELECT ? AS a, ? AS b'].
 iskalni-parametri parametri: (Seznam nov ; ['1'] ; ['2']).
-iskalni-parametri pridobi: { :row Izhod piši: (row na: ['a']), piši: (row na: ['b']), nova-vrstica. }.
+iskalni-parametri pridobi: { :vrsta Izhod piši: (vrsta na: ['a']), piši: (vrsta na: ['b']), nova-vrstica. }.
 iskalni-parametri parametri: (Seznam nov ; ['1'] ; ['2'] ; ['3']).
-iskalni-parametri pridobi: { :row Izhod piši: (row na: ['a']), piši: (row na: ['b']), nova-vrstica. }.
+iskalni-parametri pridobi: { :vrsta Izhod piši: (vrsta na: ['a']), piši: (vrsta na: ['b']), nova-vrstica. }.

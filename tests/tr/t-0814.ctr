@@ -1,39 +1,42 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# oturum çerezi biçimi, json içerik türü, yalnızca web protokolleri, svg satır içinde gösterilir
 Server hazırla.
 Program kullan: ['../../../src/xo/tr/webtools.xo'].
 
->> Fake-Request := Nesne yeni.
-Fake-Request olunca: ['value:'] yap: { :değer
+>> Sahte-İstek := Nesne yeni.
+Sahte-İstek olunca: ['value:'] yap: { :değer
 	öz değer := değer.
 }.
-Fake-Request olunca: ['cookie:'] yap: { :ad <- öz değer.
+Sahte-İstek olunca: ['cookie:'] yap: { :ad
+	<- öz değer.
 }.
 
->> Test-Session := Geçici-dosya-oturumu yeni.
-Test-Session olunca: ['yükle'] yap: { <- Sözlük yeni.
+>> Sınama-Oturumu := Geçici-dosya-oturumu yeni.
+Sınama-Oturumu olunca: ['yükle'] yap: {
+	<- Sözlük yeni.
 }.
-Test-Session olunca: ['session-id'] yap: { <- öz id.
+Sınama-Oturumu olunca: ['oturum-no'] yap: {
+	<- öz id.
 }.
 
->> cookies := Liste yeni
+>> çerezler := Liste yeni
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies her: { :i :cookie
-	>> istek := Fake-Request yeni.
-	istek value: cookie.
-	>> yönetici := Test-Session yeni.
-	>> web := Web-Belgesi yeni.
-	web istek: istek.
-	web oturum-yöneticisi: yönetici.
-	web oturumu-başlat.
-	Çıktı yaz: ( yönetici session-id = cookie ), yeni-satır.
+çerezler her: { :i :çerez
+	>> istek := Sahte-İstek yeni.
+	istek value: çerez.
+	>> yönetici := Sınama-Oturumu yeni.
+	>> belge := Web-Belgesi yeni.
+	belge istek: istek.
+	belge oturum-yöneticisi: yönetici.
+	belge oturumu-başlat.
+	Çıktı yaz: ( yönetici oturum-no = çerez ), yeni-satır.
 }.
 
->> web := Web-Belgesi yeni.
-web json: (Sözlük yeni koy: ['b'] konum: ['a']).
+>> belge := Web-Belgesi yeni.
+belge json: (Sözlük yeni koy: ['b'] konum: ['a']).
 Çıktı yaz: ['\n'], yeni-satır.
 
 { Ağ get: ['file:///etc/hostname']. } yakala: { :e

@@ -1,76 +1,77 @@
 Server init.
 
-# JSON encoder only supports UTF-8, no surrogate pairs
+# кодировщик JSON поддерживает только UTF-8, без суррогатных пар
 
->> dicts := Список новый ;
-	# {"key":"normal"} normal ASCII
-	( Карта новый разместить: ['normal'] в: ['key'] ) ;
-	# {"key":"hello world"} space character
+>> словари := Список новый ;
+	# {"key":"normal"} обычный ASCII
+	( Карта новый разместить: ['обычный'] в: ['key'] ) ;
+	# {"key":"hello world"} символ пробела
 	( Карта новый разместить: ['hello world'] в: ['key'] ) ;
-	# {"key":"quote: \""} double quote
+	# {"key":"quote: \""} двойная кавычка
 	( Карта новый разместить: ['"'] в: ['key'] ) ;
-	# {"key":"backslash: \\"} backslash
+	# {"key":"backslash: \\"} обратная косая черта
 	( Карта новый разместить: ['backslash: \\'] в: ['key'] ) ;
-	# {"key":"slash: /"} slash
-	( Карта новый разместить: ['slash: /'] в: ['key'] ) ;
+	# {"key":"slash: /"} косая черта
+	( Карта новый разместить: ['слэш: /'] в: ['key'] ) ;
 	# {"key":"backspace: \b"} backspace
 	( Карта новый разместить: ['backspace: \b'] в: ['key'] ) ;
-	# {"key":"formfeed: \f"} form-feed escape
+	# {"key":"formfeed: \f"} экранирование перевода страницы
 	( Карта новый разместить: ['formfeed: \f'] в: ['key'] ) ;
-	# {"key":"newline: \n"} newline
+	# {"key":"newline: \n"} перевод строки
 	( Карта новый разместить: ['newline: \n'] в: ['key'] ) ;
 	( Карта новый разместить: ['newline: ↵'] в: ['key'] ) ;
 	( Карта новый разместить: ['newline: 
 	'] в: ['key'] ) ;
-	# {"key":"carriage return: \r"} carriage-return
+	# {"key":"carriage return: \r"} возврат каретки
 	( Карта новый разместить: ['carriage return: \r'] в: ['key'] ) ;
-	# {"key":"tab: \t"} tab
+	# {"key":"tab: \t"} табуляция
 	( Карта новый разместить: ['tab \t'] в: ['key'] ) ;
 	( Карта новый разместить: ['tab ⇿'] в: ['key'] ) ;
-	( Карта новый разместить: ['tab  '] в: ['key'] ) ;
+	( Карта новый разместить: ['табуляция  '] в: ['key'] ) ;
 	# {"key":"control: \u0000"} NUL
 	( Карта новый разместить: ['NUL \u0000'] в: ['key'] ) ;
 	( Карта новый разместить: ['NUL \0'] в: ['key'] ) ;
-	# {"key":"control: \u0001"} control character 0x01
+	# {"key":"control: \u0001"} управляющий символ 0x01
 	( Карта новый разместить: ['control: \u0001'] в: ['key'] ) ;
-	# {"key":"control: \u001F"} control character 0x1F
+	# {"key":"control: \u001F"} управляющий символ 0x1F
 	( Карта новый разместить: ['control: \u001F'] в: ['key'] ) ;
-	# {"key":"unicode: é"} UTF-8, 2-byte char
-	( Карта новый разместить: ['unicode: é'] в: ['key'] ) ;
-	# {"key":"unicode: €"} UTF-8, 3-byte char
-	( Карта новый разместить: ['unicode: €'] в: ['key'] ) ;
-	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
-	( Карта новый разместить: ['unicode: 日本語'] в: ['key'] ) ;
-	# {"key":"unicode: 😀"} UTF-8, 4-byte char
-	( Карта новый разместить: ['unicode: 😀'] в: ['key'] ) ;
-	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
-	( Карта новый разместить: ['unicode: 🧑‍💻'] в: ['key'] ) ;
-	# {"key":"combining: e\u0301"} combining accent
+	# {"key":"unicode: é"} UTF-8, 2-байтовый символ
+	( Карта новый разместить: ['юникод: é'] в: ['key'] ) ;
+	# {"key":"unicode: €"} UTF-8, 3-байтовый символ
+	( Карта новый разместить: ['юникод: €'] в: ['key'] ) ;
+	# {"key":"unicode: 日本語"} несколько 3-байтовых символов UTF-8
+	( Карта новый разместить: ['юникод: 日本語'] в: ['key'] ) ;
+	# {"key":"unicode: 😀"} UTF-8, 4-байтовый символ
+	( Карта новый разместить: ['юникод: 😀'] в: ['key'] ) ;
+	# {"key":"unicode: 🧑‍💻"} эмодзи + соединитель нулевой ширины
+	( Карта новый разместить: ['юникод: 🧑‍💻'] в: ['key'] ) ;
+	# {"key":"combining: é"} комбинируемый диакритический знак
 	( Карта новый разместить: ['combining: e\u0301'] в: ['key'] ) ;
-	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	# {"key":"escaped unicode: é"} Unicode-экранирование BMP
 	( Карта новый разместить: ['escaped unicode: \u00e9'] в: ['key'] ) ;
-	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	# {"key":"escaped unicode: €"} Unicode-экранирование BMP
 	( Карта новый разместить: ['escaped unicode: \u20ac'] в: ['key'] ) ;
-	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	# {"key":"escaped unicode: 😀"} суррогатная пара UTF-16
 	( Карта новый разместить: ['escaped unicode: \ud83d\ude00'] в: ['key'] ) ;
-	# {"key":""} empty value
+	# {"key":""} пустое значение
 	( Карта новый разместить: [''] в: ['key'] ) ;
-	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	# {"key":"@ < > & = % + ? #"} специальные символы ASCII
 	( Карта новый разместить: ['@ < > & = % + ? #'] в: ['key'] ) ;
-	# {"key":"single quote: '"} single quote
+	# {"key":"single quote: '"} одинарная кавычка
 	( Карта новый разместить: ['''] в: ['key'] ) ;
-	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	# {"key":"multiple: \" \\ \n \r \t"} несколько экранирований JSON
 	( Карта новый разместить: ['multiple: \" \\ \n \r \t'] в: ['key'] ) ;
-	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} более длинная ASCII-строка
 	( Карта новый разместить: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] в: ['key'] ) ;
-	# {"key":" value"} leading space
-	( Карта новый разместить: [' value'] в: ['key'] ) ;
-	# {"key":"value "} trailing space
-	( Карта новый разместить: ['value '] в: ['key'] ) ;
-	# {"key":" \t\n\r "} whitespace
-	( Карта новый разместить: [' \t\n\r '] в: ['key'] ).
+	# {"key":" value"} пробел в начале
+	( Карта новый разместить: [' значение'] в: ['key'] ) ;
+	# {"key":"value "} пробел в конце
+	( Карта новый разместить: ['значение '] в: ['key'] ) ;
+	# {"key":" \t\n\r "} пробельные символы
+	( Карта новый разместить: [' \t\n\r '] в: ['key'] )
+	.
 
-dicts каждый: { :_ :d
+словари каждый: { :_ :d
 	>> j := JSON jsonify: d.
 	>> a := JSON jsonify: (Карта новый разместить: d key в: ['key']).
 	>> b := JSON jsonify: (Карта новый разместить: ['value'] в: d key).
@@ -79,7 +80,7 @@ dicts каждый: { :_ :d
 	((e key = d key и: (f ? d key = ['value'])) или: (e key = ['NUL ?'])) истина: {
 		Выход написать: ['OK'], стоп.
 	}, иначе: {
-		Выход написать: ['Unable to properly encode/decode: '] + d + j, стоп.
+		Выход написать: ['Не удалось корректно закодировать/декодировать: '] + d + j, стоп.
 		Программа конец.
 	}.
 }.

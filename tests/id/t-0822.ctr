@@ -1,22 +1,22 @@
-# fewer parameters than placeholders must give an error, not read past the bindings
+# parameter yang lebih sedikit dari placeholder harus memberi galat, bukan membaca melewati binding
 Server init.
 
->> db := Maria-DB baru hos: ['localhost'],
+>> bd := Maria-DB baru hos: ['localhost'],
 	nama-pengguna: ['xo'],
 	kata-sandi: ['pass123'],
 	nama-basis-data: ['xobase'],
 	sambungkan.
 
->> parameter-pencarian := db kueri: ['SELECT ? AS a, ? AS b, ? AS c'].
+>> parameter-pencarian := bd kueri: ['SELECT ? AS a, ? AS b, ? AS c'].
 parameter-pencarian parameter: (Daftar baru ; ['1']).
-{ parameter-pencarian ambil: { :row Keluaran tulis: row, baris-baru. }. } tangkap: { :e Keluaran tulis: e, baris-baru. }, mulai.
+{ parameter-pencarian ambil: { :barisan Keluaran tulis: barisan, baris-baru. }. } tangkap: { :e Keluaran tulis: e, baris-baru. }, mulai.
 
->> parameter-pencarian := db kueri: ['SELECT ? AS a'].
-{ parameter-pencarian ambil: { :row Keluaran tulis: row, baris-baru. }. } tangkap: { :e Keluaran tulis: e, baris-baru. }, mulai.
+>> parameter-pencarian := bd kueri: ['SELECT ? AS a'].
+{ parameter-pencarian ambil: { :barisan Keluaran tulis: barisan, baris-baru. }. } tangkap: { :e Keluaran tulis: e, baris-baru. }, mulai.
 
-# the right number still works, more parameters are ignored as before
->> parameter-pencarian := db kueri: ['SELECT ? AS a, ? AS b'].
+# jumlah yang tepat tetap berfungsi, parameter berlebih diabaikan seperti sebelumnya
+>> parameter-pencarian := bd kueri: ['SELECT ? AS a, ? AS b'].
 parameter-pencarian parameter: (Daftar baru ; ['1'] ; ['2']).
-parameter-pencarian ambil: { :row Keluaran tulis: (row di: ['a']), tulis: (row di: ['b']), baris-baru. }.
+parameter-pencarian ambil: { :barisan Keluaran tulis: (barisan di: ['a']), tulis: (barisan di: ['b']), baris-baru. }.
 parameter-pencarian parameter: (Daftar baru ; ['1'] ; ['2'] ; ['3']).
-parameter-pencarian ambil: { :row Keluaran tulis: (row di: ['a']), tulis: (row di: ['b']), baris-baru. }.
+parameter-pencarian ambil: { :barisan Keluaran tulis: (barisan di: ['a']), tulis: (barisan di: ['b']), baris-baru. }.

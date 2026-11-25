@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# 데이터베이스 테스트
+# 필요한 설정은 예제 server.xo 참고
 
 Server init.
-출력 쓰기: ['Database test'], 줄바꿈.
+출력 쓰기: ['데이터베이스 테스트'], 줄바꿈.
 
 >> db := Maria-DB 새로 호스트: ['localhost'],
 	사용자이름: ['xo'], 비밀번호: ['pass123'], 데이터베이스이름: ['xobase'], 접속.
 
-출력 쓰기: ['Can we connect? '] + db 접속됨?, 줄바꿈.
+출력 쓰기: ['연결할 수 있나? '] + db 접속됨?, 줄바꿈.
 
 >> 검색매개변수 := db 쿼리: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], 매개변수: ( 리스트 새로 ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], 매개변수: ( 리스트 새로 ; ['abc'] ; 12.35 ; 6 ). # 매개변수화된 쿼리
 
 {  검색매개변수 실행. db 커밋. } 예외시: { :e db 롤백.  }, 시작.
 
-출력 쓰기: ['Can we insert? '] + ( 검색매개변수 insert-id > 0 ), 줄바꿈.
+출력 쓰기: ['삽입할 수 있나? '] + ( 검색매개변수 insert-id > 0 ), 줄바꿈.
 
 >> Obj := 객체 새로.
-Obj 받으면: ['retrieve-rows'] 실행: {
+Obj 받으면: ['행-조회'] 실행: {
 	자기 개수 := 0.
 	>> 검색매개변수 :=
 	db 쿼리: ['SELECT * FROM book order by id desc limit 2'], 
-	가져오기: { :row 
+	가져오기: { :행 
 		자기 개수 더하기: 1.
 		참 중단.
-	}. <- 자기 개수 복사.
+	}. # 행 가져오기
+	<- 자기 개수 복사.
 }.
 
-출력 쓰기: ['Can we query? '] + ( Obj retrieve-rows > 0 ), 줄바꿈.
+출력 쓰기: ['조회할 수 있나? '] + ( Obj 행-조회 > 0 ), 줄바꿈.

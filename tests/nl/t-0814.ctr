@@ -1,18 +1,21 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# sessiecookie-formaat, json-contenttype, alleen webprotocollen, svg inline getoond
 Server initialiseren.
 Programma gebruik: ['../../../src/xo/nl/webtools.xo'].
 
->> Fake-Request := Object nieuw.
-Fake-Request bij: ['value:'] doen: { :waarde
+>> Nep-Verzoek := Object nieuw.
+Nep-Verzoek bij: ['value:'] doen: { :waarde
 	eigen waarde := waarde.
 }.
-Fake-Request bij: ['cookie:'] doen: { :naam <- eigen waarde.
+Nep-Verzoek bij: ['cookie:'] doen: { :naam
+	<- eigen waarde.
 }.
 
->> Test-Session := Tijdelijk-bestand-sessie nieuw.
-Test-Session bij: ['laden'] doen: { <- Lijst nieuw.
+>> Test-Sessie := Tijdelijk-bestand-sessie nieuw.
+Test-Sessie bij: ['laden'] doen: {
+	<- Lijst nieuw.
 }.
-Test-Session bij: ['session-id'] doen: { <- eigen id.
+Test-Sessie bij: ['sessie-nummer'] doen: {
+	<- eigen id.
 }.
 
 >> cookies := Reeks nieuw
@@ -22,14 +25,14 @@ Test-Session bij: ['session-id'] doen: { <- eigen id.
 	; ['abc\n'].
 
 cookies elk: { :i :cookie
-	>> verzoek := Fake-Request nieuw.
+	>> verzoek := Nep-Verzoek nieuw.
 	verzoek value: cookie.
-	>> beheerder := Test-Session nieuw.
+	>> beheerder := Test-Sessie nieuw.
 	>> web := Webdocument nieuw.
 	web verzoek: verzoek.
 	web sessiebeheerder: beheerder.
 	web sessie-starten.
-	Uit schrijf: ( beheerder session-id = cookie ), stop.
+	Uit schrijf: ( beheerder sessie-nummer = cookie ), stop.
 }.
 
 >> web := Webdocument nieuw.

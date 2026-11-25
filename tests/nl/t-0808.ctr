@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# kluissleutels en handtekeningen die te lang decoderen mogen de stack niet laten overlopen
 Server init.
 
->> keys := Kluis crypto-sleutels.
->> sk := keys eerste.
->> pk := keys laatste.
->> sig := Kluis onderteken: ['abc'] met: sk.
+>> sleutels := Kluis crypto-sleutels.
+>> gs := sleutels eerste.
+>> ps := sleutels laatste.
+>> handt := Kluis onderteken: ['abc'] met: gs.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 tekens zonder opvulling decoderen naar 66 bytes
+>> lang := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 tekens zonder opvulling decoderen naar 33 bytes
+>> kort := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Kluis onderteken: ['abc'] met: long. } afhandelen: { :e
+{ Kluis onderteken: ['abc'] met: lang. } afhandelen: { :e
 	Uit schrijf: e, stop.
 }, start.
 
-{ Kluis controleer: ['abc'] ondertekening: long met: pk. } afhandelen: { :e
+{ Kluis controleer: ['abc'] ondertekening: lang met: ps. } afhandelen: { :e
 	Uit schrijf: e, stop.
 }, start.
 
-{ Kluis controleer: ['abc'] ondertekening: sig met: short. } afhandelen: { :e
+{ Kluis controleer: ['abc'] ondertekening: handt met: kort. } afhandelen: { :e
 	Uit schrijf: e, stop.
 }, start.

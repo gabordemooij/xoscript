@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# test typekonverteringer / omforminger / bindinger
 Program minnehåndtering: 4.
 Server init.
 
->> counter := 0.
+>> teller := 0.
 >> db := Maria-DB ny vert: ['localhost'],
 	brukernavn: ['xo'], passord: ['pass123'], databasenavn: ['xobase'], koble-til.
 
->> TwoDigitFormat := Format ny: ['%02d'].
+>> TosifretFormat := Format ny: ['%02d'].
 
-# Datetime
+# Datotid
 {
-	>> år := Tall mellom: 1995 og: 2050, tekst.
-	>> måned := TwoDigitFormat bruk-heltall: (Tall mellom: 1 og: 12), tekst.
-	>> dag := TwoDigitFormat bruk-heltall: (Tall mellom: 1 og: 28), tekst.
-	>> time := TwoDigitFormat bruk-heltall: (Tall mellom: 1 og: 23), tekst.
-	>> minutt := TwoDigitFormat bruk-heltall: (Tall mellom: 1 og: 59), tekst.
-	>> sekund := TwoDigitFormat bruk-heltall: (Tall mellom: 1 og: 59), tekst.
-	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
-	datetime
+	>> år     := Tall mellom: 1995 og: 2050, tekst.
+	>> måned    := TosifretFormat bruk-heltall: (Tall mellom: 1 og: 12), tekst.
+	>> dag      := TosifretFormat bruk-heltall: (Tall mellom: 1 og: 28), tekst.
+	>> time     := TosifretFormat bruk-heltall: (Tall mellom: 1 og: 23), tekst.
+	>> minutt   := TosifretFormat bruk-heltall: (Tall mellom: 1 og: 59), tekst.
+	>> sekund   := TosifretFormat bruk-heltall: (Tall mellom: 1 og: 59), tekst.
+	>> datotid := ['YYYY-MM-DD HH:II:SS'].	
+	datotid
 		YYYY: år,
 		MM: måned,
 		DD: dag,
@@ -30,27 +30,27 @@ Server init.
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'] <datetime>: datetime),
-	hent: { :row
-		(row mydatetime = datetime) falsk: {
+	'] <datetime>: datotid),
+	hent: { :rad
+		(rad mydatetime = datotid) falsk: {
 			denne-oppgaven feil: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mydatetime
+				['Forventet: <expected>, men fikk: <observation>']
+				<expected>: datotid,
+				<observation>: rad mydatetime
 			).
 		}.
 	
 	}.
-	counter legg-til: 1.
+	teller legg-til: 1.
 } * 100.
 
-# Date
+# Dato
 {
-	>> år := Tall mellom: 1995 og: 2050, tekst.
-	>> måned := TwoDigitFormat bruk-heltall: (Tall mellom: 1 og: 12), tekst.
-	>> dag := TwoDigitFormat bruk-heltall: (Tall mellom: 1 og: 28), tekst.
-	>> date := ['YYYY-MM-DD'].
-	date
+	>> år     := Tall mellom: 1995 og: 2050, tekst.
+	>> måned    := TosifretFormat bruk-heltall: (Tall mellom: 1 og: 12), tekst.
+	>> dag      := TosifretFormat bruk-heltall: (Tall mellom: 1 og: 28), tekst.
+	>> dato     := ['YYYY-MM-DD'].
+	dato
 		YYYY: år,
 		MM: måned,
 		DD: dag.
@@ -60,25 +60,25 @@ Server init.
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'] <date>: date),
-	hent: { :row
-		(row mydate = date) falsk: {
+	'] <date>: dato),
+	hent: { :rad
+		(rad mydate = dato) falsk: {
 			denne-oppgaven feil: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: date,
-				<observation>: row mydate
+				['Forventet: <expected>, men fikk: <observation>']
+				<expected>: dato,
+				<observation>: rad mydate
 			).
 		}.
 	}.
-	counter legg-til: 1.
+	teller legg-til: 1.
 } * 100.
 
 
-# Time
+# Tid
 {
-	>> time := TwoDigitFormat bruk-heltall: (Tall mellom: 1 og: 23), tekst.
-	>> minutt := TwoDigitFormat bruk-heltall: (Tall mellom: 1 og: 59), tekst.
-	>> sekund := TwoDigitFormat bruk-heltall: (Tall mellom: 1 og: 59), tekst.
+	>> time     := TosifretFormat bruk-heltall: (Tall mellom: 1 og: 23), tekst.
+	>> minutt   := TosifretFormat bruk-heltall: (Tall mellom: 1 og: 59), tekst.
+	>> sekund   := TosifretFormat bruk-heltall: (Tall mellom: 1 og: 59), tekst.
 	>> tid := ['HH:II:SS'].
 	tid
 		HH: time,
@@ -89,20 +89,20 @@ Server init.
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: tid),
-	hent: { :row
-		(row mytime = tid) falsk: {
+	hent: { :rad
+		(rad mytime = tid) falsk: {
 			denne-oppgaven feil: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Forventet: <expected>, men fikk: <observation>']
+				<expected>: datotid,
+				<observation>: rad mytime
 			).
 		}.
 	}.
-	counter legg-til: 1.
+	teller legg-til: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Tekster (varchar/text)
 >> str1 := Liste ny fyll: 100000 med: ['x'], slå-sammen: [''].
 {
 	>> str2 := Hvelv token: 40.
@@ -115,23 +115,23 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	hent: { :row
-		(row str1 = str1 og: row str2 = str2) falsk: {
+	hent: { :rad
+		(rad str1 = str1 og: rad str2 = str2) falsk: {
 			denne-oppgaven feil: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Forventet: <expected>, men fikk: <observation>']
+				<expected>: datotid,
+				<observation>: rad mytime
 			).
 		}.
 	}.
-	counter legg-til: 1.
+	teller legg-til: 1.
 } * 100.
 
 
-# Numbers
+# Tall
 {
-	>> n1 := Tall mellom: 1 og: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Tall mellom: 1 og: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 fra-tekst: ['9223372036854775807'] ) -
 		( Int64 fra-tekst: ['99999'] ) +
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	hent: { :row
-		(row n1 = n1) falsk: {
+	hent: { :rad
+		(rad n1 = n1) falsk: {
 			denne-oppgaven feil: (
-				['Expected: <expected> but got: <observation>']
+				['Forventet: <expected>, men fikk: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: rad n1
 			).
 		}.
-		(row n2 = n2) falsk: {
+		(rad n2 = n2) falsk: {
 			denne-oppgaven feil: (
-				['Expected: <expected> but got: <observation>']
+				['Forventet: <expected>, men fikk: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: rad n2
 			).
 		}.
-		(row n3 = n2 avrund) falsk: {
+		(rad n3 = n2 avrund) falsk: {
 			denne-oppgaven feil: (
-				['Expected: <expected> but got: <observation>']
+				['Forventet: <expected>, men fikk: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: rad n3
 			).
 		}.
-		(row big = big) falsk: {
+		(rad big = big) falsk: {
 			denne-oppgaven feil: (
-				['Expected: <expected> but got: <observation>']
+				['Forventet: <expected>, men fikk: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: rad big
 			).
 		}.
 		
 	}.
-	counter legg-til: 1.
+	teller legg-til: 1.
 } * 100.
 
 
 Utdata skriv: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: teller
 ), stop.

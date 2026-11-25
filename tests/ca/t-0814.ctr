@@ -1,35 +1,38 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# format de galeta de sessió, tipus de contingut json, només protocols web, svg mostrat en línia
 Server inicialitzar.
 Programa utilitza: ['../../../src/xo/ca/webtools.xo'].
 
->> Fake-Request := Objecte nou.
-Fake-Request en: ['value:'] fes: { :valor
+>> Petició-Falsa := Objecte nou.
+Petició-Falsa en: ['value:'] fes: { :valor
 	propi valor := valor.
 }.
-Fake-Request en: ['cookie:'] fes: { :nom <- propi valor.
+Petició-Falsa en: ['cookie:'] fes: { :nom
+	<- propi valor.
 }.
 
->> Test-Session := Sessió-fitxer-temporal nou.
-Test-Session en: ['carregar'] fes: { <- Diccionari nou.
+>> Sessió-De-Prova := Sessió-fitxer-temporal nou.
+Sessió-De-Prova en: ['carregar'] fes: {
+	<- Diccionari nou.
 }.
-Test-Session en: ['session-id'] fes: { <- propi id.
+Sessió-De-Prova en: ['id-de-sessió'] fes: {
+	<- propi id.
 }.
 
->> cookies := Llista nou
+>> galetes := Llista nou
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies cada: { :i :cookie
-	>> petició := Fake-Request nou.
-	petició value: cookie.
-	>> gestor := Test-Session nou.
+galetes cada: { :i :galeta
+	>> petició := Petició-Falsa nou.
+	petició value: galeta.
+	>> gestor := Sessió-De-Prova nou.
 	>> web := Document-Web nou.
 	web petició: petició.
 	web gestor-sessió: gestor.
 	web iniciar-sessió.
-	Sortida escriu: ( gestor session-id = cookie ), salt-de-línia.
+	Sortida escriu: ( gestor id-de-sessió = galeta ), salt-de-línia.
 }.
 
 >> web := Document-Web nou.

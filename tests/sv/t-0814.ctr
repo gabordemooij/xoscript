@@ -1,18 +1,21 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# sessionskakans format, json-innehållstyp, endast webbprotokoll, svg visas inline
 Server initiera.
 Program använd: ['../../../src/xo/sv/webtools.xo'].
 
->> Fake-Request := Objekt ny.
-Fake-Request vid: ['value:'] gör: { :värde
+>> Falsk-Förfrågan := Objekt ny.
+Falsk-Förfrågan vid: ['value:'] gör: { :värde
 	egen värde := värde.
 }.
-Fake-Request vid: ['cookie:'] gör: { :namn <- egen värde.
+Falsk-Förfrågan vid: ['cookie:'] gör: { :namn
+	<- egen värde.
 }.
 
->> Test-Session := Tillfällig-fil-session ny.
-Test-Session vid: ['läs-in'] gör: { <- Ordbok ny.
+>> Testsession := Tillfällig-fil-session ny.
+Testsession vid: ['läs-in'] gör: {
+	<- Ordbok ny.
 }.
-Test-Session vid: ['session-id'] gör: { <- egen id.
+Testsession vid: ['sessionsid'] gör: {
+	<- egen id.
 }.
 
 >> cookies := Lista ny
@@ -22,18 +25,18 @@ Test-Session vid: ['session-id'] gör: { <- egen id.
 	; ['abc\n'].
 
 cookies varje: { :i :cookie
-	>> begäran := Fake-Request ny.
+	>> begäran := Falsk-Förfrågan ny.
 	begäran value: cookie.
-	>> hanterare := Test-Session ny.
-	>> web := Webbdokument ny.
-	web begäran: begäran.
-	web sessionshanterare: hanterare.
-	web starta-session.
-	Utdata skriv: ( hanterare session-id = cookie ), stop.
+	>> hanterare := Testsession ny.
+	>> webb := Webbdokument ny.
+	webb begäran: begäran.
+	webb sessionshanterare: hanterare.
+	webb starta-session.
+	Utdata skriv: ( hanterare sessionsid = cookie ), stop.
 }.
 
->> web := Webbdokument ny.
-web json: (Ordbok ny sätt: ['b'] vid: ['a']).
+>> webb := Webbdokument ny.
+webb json: (Ordbok ny sätt: ['b'] vid: ['a']).
 Utdata skriv: ['\n'], stop.
 
 { Nätverk get: ['file:///etc/hostname']. } fånga: { :e

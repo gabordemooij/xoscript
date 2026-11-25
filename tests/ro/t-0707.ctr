@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# test conversii de tip / conversii / legări
 Program gestiune-memorie: 4.
 Server init.
 
->> counter := 0.
->> db := Maria-DB nou gazdă: ['localhost'],
+>> contor := 0.
+>> bd := Maria-DB nou gazdă: ['localhost'],
 	utilizator: ['xo'], parolă: ['pass123'], nume-bază: ['xobase'], conectează.
 
->> TwoDigitFormat := Format nou: ['%02d'].
+>> FormatDouăCifre := Format nou: ['%02d'].
 
-# Datetime
+# Dată și oră
 {
-	>> an := Număr între: 1995 și: 2050, text.
-	>> lună := TwoDigitFormat aplică-întreg: (Număr între: 1 și: 12), text.
-	>> zi := TwoDigitFormat aplică-întreg: (Număr între: 1 și: 28), text.
-	>> oră := TwoDigitFormat aplică-întreg: (Număr între: 1 și: 23), text.
-	>> minut := TwoDigitFormat aplică-întreg: (Număr între: 1 și: 59), text.
-	>> secundă := TwoDigitFormat aplică-întreg: (Număr între: 1 și: 59), text.
-	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
-	datetime
+	>> an     := Număr între: 1995 și: 2050, text.
+	>> lună    := FormatDouăCifre aplică-întreg: (Număr între: 1 și: 12), text.
+	>> zi      := FormatDouăCifre aplică-întreg: (Număr între: 1 și: 28), text.
+	>> oră     := FormatDouăCifre aplică-întreg: (Număr între: 1 și: 23), text.
+	>> minut   := FormatDouăCifre aplică-întreg: (Număr între: 1 și: 59), text.
+	>> secundă   := FormatDouăCifre aplică-întreg: (Număr între: 1 și: 59), text.
+	>> dataora := ['YYYY-MM-DD HH:II:SS'].	
+	dataora
 		YYYY: an,
 		MM: lună,
 		DD: zi,
@@ -25,89 +25,89 @@ Server init.
 		II: minut,
 		SS: secundă.
 	>> parametri-căutare :=
-	db interogare: (['
+	bd interogare: (['
 		SELECT 
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'] <datetime>: datetime),
-	preia: { :row
-		(row mydatetime = datetime) fals: {
+	'] <datetime>: dataora),
+	preia: { :rând
+		(rând mydatetime = dataora) fals: {
 			această-sarcină eroare: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mydatetime
+				['Așteptat: <expected> dar primit: <observation>']
+				<expected>: dataora,
+				<observation>: rând mydatetime
 			).
 		}.
 	
 	}.
-	counter adaugă: 1.
+	contor adaugă: 1.
 } * 100.
 
-# Date
+# Dată
 {
-	>> an := Număr între: 1995 și: 2050, text.
-	>> lună := TwoDigitFormat aplică-întreg: (Număr între: 1 și: 12), text.
-	>> zi := TwoDigitFormat aplică-întreg: (Număr între: 1 și: 28), text.
-	>> date := ['YYYY-MM-DD'].
-	date
+	>> an     := Număr între: 1995 și: 2050, text.
+	>> lună    := FormatDouăCifre aplică-întreg: (Număr între: 1 și: 12), text.
+	>> zi      := FormatDouăCifre aplică-întreg: (Număr între: 1 și: 28), text.
+	>> data     := ['YYYY-MM-DD'].
+	data
 		YYYY: an,
 		MM: lună,
 		DD: zi.
 	>> parametri-căutare :=
-	db interogare: (['
+	bd interogare: (['
 		SELECT
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'] <date>: date),
-	preia: { :row
-		(row mydate = date) fals: {
+	'] <date>: data),
+	preia: { :rând
+		(rând mydate = data) fals: {
 			această-sarcină eroare: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: date,
-				<observation>: row mydate
+				['Așteptat: <expected> dar primit: <observation>']
+				<expected>: data,
+				<observation>: rând mydate
 			).
 		}.
 	}.
-	counter adaugă: 1.
+	contor adaugă: 1.
 } * 100.
 
 
-# Time
+# Oră
 {
-	>> oră := TwoDigitFormat aplică-întreg: (Număr între: 1 și: 23), text.
-	>> minut := TwoDigitFormat aplică-întreg: (Număr între: 1 și: 59), text.
-	>> secundă := TwoDigitFormat aplică-întreg: (Număr între: 1 și: 59), text.
+	>> oră     := FormatDouăCifre aplică-întreg: (Număr între: 1 și: 23), text.
+	>> minut   := FormatDouăCifre aplică-întreg: (Număr între: 1 și: 59), text.
+	>> secundă   := FormatDouăCifre aplică-întreg: (Număr între: 1 și: 59), text.
 	>> timp := ['HH:II:SS'].
 	timp
 		HH: oră,
 		II: minut,
 		SS: secundă.
 	>> parametri-căutare :=
-	db interogare: (['
+	bd interogare: (['
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: timp),
-	preia: { :row
-		(row mytime = timp) fals: {
+	preia: { :rând
+		(rând mytime = timp) fals: {
 			această-sarcină eroare: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Așteptat: <expected> dar primit: <observation>']
+				<expected>: dataora,
+				<observation>: rând mytime
 			).
 		}.
 	}.
-	counter adaugă: 1.
+	contor adaugă: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Texte (varchar/text)
 >> str1 := Listă nou umple: 100000 cu: ['x'], unește: [''].
 {
 	>> str2 := Seif jeton: 40.
 	>> parametri-căutare :=
-	db interogare: (['
+	bd interogare: (['
 		SELECT
 		"<str1>" AS str1,
 		"<str2>" AS str2
@@ -115,30 +115,30 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	preia: { :row
-		(row str1 = str1 și: row str2 = str2) fals: {
+	preia: { :rând
+		(rând str1 = str1 și: rând str2 = str2) fals: {
 			această-sarcină eroare: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Așteptat: <expected> dar primit: <observation>']
+				<expected>: dataora,
+				<observation>: rând mytime
 			).
 		}.
 	}.
-	counter adaugă: 1.
+	contor adaugă: 1.
 } * 100.
 
 
-# Numbers
+# Numere
 {
-	>> n1 := Număr între: 1 și: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Număr între: 1 și: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 din-text: ['9223372036854775807'] ) -
 		( Int64 din-text: ['99999'] ) +
 		( Int64 din-text: n1 text )
 	).
 	>> parametri-căutare :=
-	db interogare: (['
+	bd interogare: (['
 		SELECT
 		<n1> AS n1,
 		<n2> AS n2,
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	preia: { :row
-		(row n1 = n1) fals: {
+	preia: { :rând
+		(rând n1 = n1) fals: {
 			această-sarcină eroare: (
-				['Expected: <expected> but got: <observation>']
+				['Așteptat: <expected> dar primit: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: rând n1
 			).
 		}.
-		(row n2 = n2) fals: {
+		(rând n2 = n2) fals: {
 			această-sarcină eroare: (
-				['Expected: <expected> but got: <observation>']
+				['Așteptat: <expected> dar primit: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: rând n2
 			).
 		}.
-		(row n3 = n2 rotunjește) fals: {
+		(rând n3 = n2 rotunjește) fals: {
 			această-sarcină eroare: (
-				['Expected: <expected> but got: <observation>']
+				['Așteptat: <expected> dar primit: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: rând n3
 			).
 		}.
-		(row big = big) fals: {
+		(rând big = big) fals: {
 			această-sarcină eroare: (
-				['Expected: <expected> but got: <observation>']
+				['Așteptat: <expected> dar primit: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: rând big
 			).
 		}.
 		
 	}.
-	counter adaugă: 1.
+	contor adaugă: 1.
 } * 100.
 
 
 Ieșire scrie: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: contor
 ), rând-nou.

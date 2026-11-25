@@ -1,66 +1,66 @@
-# using FFI with the Server plugin
+# FFI med Server-pluginet
 
-# connect to libc (platform specific)
->> libname := Program inställning: ['FFITESTLIB'].
+# anslut till libc (plattformsberoende)
+>> biblnamn := Program inställning: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# länka stdio-funktioner från C för avancerade filoperationer
 Server länka: ( Lista ny ;
- libname ; ['fopen'] ;
+ biblnamn ; ['fopen'] ;
  ( Lista ny ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 länka: ( Lista ny ;
- Inget ; # means same lib
+ Inget ; # betyder samma bibliotek
  ['fread'] ;
  ( Lista ny ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Inget ; # means same object (i.e. Stream)
+ Inget ; # betyder samma objekt (dvs. Stream)
  ['fread']
 ),
 länka: (
  Lista ny ;
- Inget ; # means same lib
+ Inget ; # betyder samma bibliotek
  ['fwrite'] ;
  ( Lista ny ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Inget ; # means same lib
+ Inget ; # betyder samma bibliotek
  ['fwrite']
 ),
 länka: (
  Lista ny ;
- Inget ; # means same lib
+ Inget ; # betyder samma bibliotek
  ['rewind'] ;
  ( Lista ny ; ['pointer'] ) ;
  ['int'] ;
- Inget ; # means same lib
+ Inget ; # betyder samma bibliotek
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> sökväg := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# öppna en fil med fopen(path, mode)
 >> fd := Stream path: sökväg mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream meddelande: ['fwrite'] argument: (Lista ny ; str ; 1 ; 6 ; fd ).
-Utdata skriv: bytes-written, stop.
+# skriv bytes från bufferten str till filen
+>> skrivna-bytes := Stream meddelande: ['fwrite'] argument: (Lista ny ; str ; 1 ; 6 ; fd ).
+Utdata skriv: skrivna-bytes, stop.
 
-# rewind file pointer
+# spola tillbaka filpekaren
 Stream rewind: fd.
 
-# allocate a buffer
+# allokera en buffert
 >> buf := Blob ny: 20.
 
-# read from file
->> bytes-read := Stream meddelande: ['fread'] argument: (Lista ny ; buf ; 1 ; 6 ; fd ).
-Utdata skriv: bytes-read, stop.
+# läs från filen
+>> lästa-bytes := Stream meddelande: ['fread'] argument: (Lista ny ; buf ; 1 ; 6 ; fd ).
+Utdata skriv: lästa-bytes, stop.
 Utdata skriv: buf, stop.
 
-# free memory
+# frigör minnet
 str  frigör.
 sökväg frigör.
 mode frigör.

@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# ključevi i potpisi sefa koji se dekodiraju predugo ne smiju prepuniti stek
 Server init.
 
->> keys := Sef generiši-ključeve.
->> sk := keys prvi.
->> pk := keys zadnji.
->> sig := Sef potpiši: ['abc'] ključem: sk.
+>> ključevi := Sef generiši-ključeve.
+>> tk := ključevi prvi.
+>> jk := ključevi zadnji.
+>> potp := Sef potpiši: ['abc'] ključem: tk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 znakova bez dopune dekodira se u 66 bajtova
+>> dugačak := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 znaka bez dopune dekodira se u 33 bajta
+>> kratak := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Sef potpiši: ['abc'] ključem: long. } uhvati: { :e
+{ Sef potpiši: ['abc'] ključem: dugačak. } uhvati: { :e
 	Izlaz piši: e, novi-red.
 }, pokreni.
 
-{ Sef provjeri: ['abc'] potpis: long ključem: pk. } uhvati: { :e
+{ Sef provjeri: ['abc'] potpis: dugačak ključem: jk. } uhvati: { :e
 	Izlaz piši: e, novi-red.
 }, pokreni.
 
-{ Sef provjeri: ['abc'] potpis: sig ključem: short. } uhvati: { :e
+{ Sef provjeri: ['abc'] potpis: potp ključem: kratak. } uhvati: { :e
 	Izlaz piši: e, novi-red.
 }, pokreni.

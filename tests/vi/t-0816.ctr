@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> thử := { :format :value
-	{ Xuất ghi: ( (Định-dạng mới: format) áp-dụng: value ), xuống-dòng. } bắt-lỗi: { :e Xuất ghi: e, xuống-dòng. }, chạy.
+# một định dạng phải hợp với kiểu của giá trị, kiểu có thể đến từ phía máy khách
+>> thử := { :khuôn-dạng :value
+	{ Xuất ghi: ( (Định-dạng mới: khuôn-dạng) áp-dụng: value ), xuống-dòng. } bắt-lỗi: { :e Xuất ghi: e, xuống-dòng. }, chạy.
 }.
->> try-int := { :format :value
-	{ Xuất ghi: ( (Định-dạng mới: format) áp-dụng-số-nguyên: value ), xuống-dòng. } bắt-lỗi: { :e Xuất ghi: e, xuống-dòng. }, chạy.
+>> thử-số-nguyên := { :khuôn-dạng :value
+	{ Xuất ghi: ( (Định-dạng mới: khuôn-dạng) áp-dụng-số-nguyên: value ), xuống-dòng. } bắt-lỗi: { :e Xuất ghi: e, xuống-dòng. }, chạy.
 }.
 
-# fits
+# vừa
 thử áp-dụng: ['|%s|'] và: ['text'].
 thử áp-dụng: ['%06.2f'] và: 5.5.
-thử áp-dụng: ['100%% %s'] và: ['sure'].
-try-int áp-dụng: ['%03d'] và: 7.
-try-int áp-dụng: ['%x'] và: 255.
+thử áp-dụng: ['100%% %s'] và: ['chắc chắn'].
+thử-số-nguyên áp-dụng: ['%03d'] và: 7.
+thử-số-nguyên áp-dụng: ['%x'] và: 255.
 thử áp-dụng: ['%d'] và: (Int64 mới từ-chuỗi: ['12']).
 thử áp-dụng: ['%lld'] và: (Int64 mới từ-chuỗi: ['12']).
 thử áp-dụng: ['%.1lf'] và: 5.5.
-try-int áp-dụng: ['%hd'] và: 7.
+thử-số-nguyên áp-dụng: ['%hd'] và: 7.
 
-# does not fit
+# không vừa
 thử áp-dụng: ['%s'] và: 12345.
 thử áp-dụng: ['%d'] và: 12345.
 thử áp-dụng: ['%f'] và: ['text'].
-try-int áp-dụng: ['%d'] và: ['text'].
-try-int áp-dụng: ['%s'] và: 5.
+thử-số-nguyên áp-dụng: ['%d'] và: ['text'].
+thử-số-nguyên áp-dụng: ['%s'] và: 5.
 thử áp-dụng: ['%s %s'] và: ['text'].
 thử áp-dụng: ['%n'] và: ['text'].
 thử áp-dụng: ['%*s'] và: ['text'].
 thử áp-dụng: ['%'] và: ['text'].
 
-# length modifier does not fit
+# bổ ngữ độ dài không vừa
 thử áp-dụng: ['%ls'] và: ['text'].
 thử áp-dụng: ['%Lf'] và: 5.5.
-try-int áp-dụng: ['%ld'] và: 7.
-try-int áp-dụng: ['%lld'] và: 7.
+thử-số-nguyên áp-dụng: ['%ld'] và: 7.
+thử-số-nguyên áp-dụng: ['%lld'] và: 7.
 thử áp-dụng: ['%Ld'] và: (Int64 mới từ-chuỗi: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# một độ rộng không hợp với printf phải báo lỗi, không được sập
 thử áp-dụng: ['%99999999999s'] và: ['text'].

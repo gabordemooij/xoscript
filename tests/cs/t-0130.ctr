@@ -1,66 +1,66 @@
-# using FFI with the Server plugin
+# použití FFI s pluginem Server
 
-# connect to libc (platform specific)
->> libname := Program nastavení: ['FFITESTLIB'].
+# připojení k libc (závisí na platformě)
+>> název-knihovny := Program nastavení: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# propojit funkce stdio z C pro pokročilé operace se soubory
 Server propojit: ( Seznam nový ;
- libname ; ['fopen'] ;
+ název-knihovny ; ['fopen'] ;
  ( Seznam nový ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 propojit: ( Seznam nový ;
- Nic ; # means same lib
+ Nic ; # znamená stejnou knihovnu
  ['fread'] ;
  ( Seznam nový ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Nic ; # means same object (i.e. Stream)
+ Nic ; # znamená stejný objekt (tj. Stream)
  ['fread']
 ),
 propojit: (
  Seznam nový ;
- Nic ; # means same lib
+ Nic ; # znamená stejnou knihovnu
  ['fwrite'] ;
  ( Seznam nový ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Nic ; # means same lib
+ Nic ; # znamená stejnou knihovnu
  ['fwrite']
 ),
 propojit: (
  Seznam nový ;
- Nic ; # means same lib
+ Nic ; # znamená stejnou knihovnu
  ['rewind'] ;
  ( Seznam nový ; ['pointer'] ) ;
  ['int'] ;
- Nic ; # means same lib
+ Nic ; # znamená stejnou knihovnu
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> cesta := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# otevřít soubor pomocí fopen(path, mode)
 >> fd := Stream path: cesta mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream zpráva: ['fwrite'] parametry: (Seznam nový ; str ; 1 ; 6 ; fd ).
-Výstup psát: bytes-written, nový-řádek.
+# zapsat bajty z bufferu textový-řetězec do souboru
+>> zapsané-bajty := Stream zpráva: ['fwrite'] parametry: (Seznam nový ; str ; 1 ; 6 ; fd ).
+Výstup psát: zapsané-bajty, nový-řádek.
 
-# rewind file pointer
+# přetočit ukazatel souboru na začátek
 Stream rewind: fd.
 
-# allocate a buffer
+# alokovat buffer
 >> buf := Blob nový: 20.
 
-# read from file
->> bytes-read := Stream zpráva: ['fread'] parametry: (Seznam nový ; buf ; 1 ; 6 ; fd ).
-Výstup psát: bytes-read, nový-řádek.
+# číst ze souboru
+>> přečtené-bajty := Stream zpráva: ['fread'] parametry: (Seznam nový ; buf ; 1 ; 6 ; fd ).
+Výstup psát: přečtené-bajty, nový-řádek.
 Výstup psát: buf, nový-řádek.
 
-# free memory
+# uvolnit paměť
 str  uvolnit.
 cesta uvolnit.
 mode uvolnit.

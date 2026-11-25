@@ -1,22 +1,22 @@
-# fewer parameters than placeholders must give an error, not read past the bindings
+# manje parametara nego rezerviranih mjesta mora dati grešku, ne čitati izvan povezivanja
 Server init.
 
->> db := Maria-DB novi domaćin: ['localhost'],
+>> bp := Maria-DB novi domaćin: ['localhost'],
 	korisnik: ['xo'],
 	lozinka: ['pass123'],
 	naziv-baze: ['xobase'],
 	poveži-se.
 
->> parametri-pretrage := db upit: ['SELECT ? AS a, ? AS b, ? AS c'].
+>> parametri-pretrage := bp upit: ['SELECT ? AS a, ? AS b, ? AS c'].
 parametri-pretrage parametri: (Lista novi ; ['1']).
-{ parametri-pretrage dohvati: { :row Izlaz piši: row, novi-red. }. } uhvati: { :e Izlaz piši: e, novi-red. }, pokreni.
+{ parametri-pretrage dohvati: { :redak Izlaz piši: redak, novi-red. }. } uhvati: { :e Izlaz piši: e, novi-red. }, pokreni.
 
->> parametri-pretrage := db upit: ['SELECT ? AS a'].
-{ parametri-pretrage dohvati: { :row Izlaz piši: row, novi-red. }. } uhvati: { :e Izlaz piši: e, novi-red. }, pokreni.
+>> parametri-pretrage := bp upit: ['SELECT ? AS a'].
+{ parametri-pretrage dohvati: { :redak Izlaz piši: redak, novi-red. }. } uhvati: { :e Izlaz piši: e, novi-red. }, pokreni.
 
-# the right number still works, more parameters are ignored as before
->> parametri-pretrage := db upit: ['SELECT ? AS a, ? AS b'].
+# tačan broj i dalje radi, višak parametara se zanemaruje kao i prije
+>> parametri-pretrage := bp upit: ['SELECT ? AS a, ? AS b'].
 parametri-pretrage parametri: (Lista novi ; ['1'] ; ['2']).
-parametri-pretrage dohvati: { :row Izlaz piši: (row na: ['a']), piši: (row na: ['b']), novi-red. }.
+parametri-pretrage dohvati: { :redak Izlaz piši: (redak na: ['a']), piši: (redak na: ['b']), novi-red. }.
 parametri-pretrage parametri: (Lista novi ; ['1'] ; ['2'] ; ['3']).
-parametri-pretrage dohvati: { :row Izlaz piši: (row na: ['a']), piši: (row na: ['b']), novi-red. }.
+parametri-pretrage dohvati: { :redak Izlaz piši: (redak na: ['a']), piši: (redak na: ['b']), novi-red. }.

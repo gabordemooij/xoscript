@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# les claus i signatures de Caixa-forta que es descodifiquen massa llargues no han de desbordar la pila
 Server init.
 
->> keys := Caixa-forta genera-claus.
->> sk := keys primer.
->> pk := keys últim.
+>> claus := Caixa-forta genera-claus.
+>> sk := claus primer.
+>> pk := claus últim.
 >> sig := Caixa-forta signa: ['abc'] amb: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 caràcters sense farciment es descodifiquen en 66 bytes
+>> llarg := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 caràcters sense farciment es descodifiquen en 33 bytes
+>> curt := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Caixa-forta signa: ['abc'] amb: long. } captura: { :e
+{ Caixa-forta signa: ['abc'] amb: llarg. } captura: { :e
 	Sortida escriu: e, salt-de-línia.
 }, inicia.
 
-{ Caixa-forta comprova: ['abc'] signatura: long amb: pk. } captura: { :e
+{ Caixa-forta comprova: ['abc'] signatura: llarg amb: pk. } captura: { :e
 	Sortida escriu: e, salt-de-línia.
 }, inicia.
 
-{ Caixa-forta comprova: ['abc'] signatura: sig amb: short. } captura: { :e
+{ Caixa-forta comprova: ['abc'] signatura: sig amb: curt. } captura: { :e
 	Sortida escriu: e, salt-de-línia.
 }, inicia.

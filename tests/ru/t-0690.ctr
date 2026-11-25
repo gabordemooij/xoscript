@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# тест базы данных
+# нужную конфигурацию см. в примере server.xo
 
 Server init.
-Выход написать: ['Database test'], стоп.
+Выход написать: ['Тест базы данных'], стоп.
 
->> db := MariaDB новый хост: ['localhost'],
+>> бд := MariaDB новый хост: ['localhost'],
 	пользователь: ['xo'], пароль: ['pass123'], имя-базы: ['xobase'], подключить.
 
-Выход написать: ['Can we connect? '] + db подключено?, стоп.
+Выход написать: ['Можем ли подключиться? '] + бд подключено?, стоп.
 
->> параметры := db запрос: ['
+>> параметры := бд запрос: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], параметры: ( Список новый ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], параметры: ( Список новый ; ['abc'] ; 12.35 ; 6 ). # параметризованные запросы
 
-{  параметры мутация. db commit. } впоймать: { :e db rollback.  }, запуск.
+{  параметры мутация. бд commit. } впоймать: { :e бд rollback.  }, запуск.
 
-Выход написать: ['Can we insert? '] + ( параметры insert-id > 0 ), стоп.
+Выход написать: ['Можем ли вставить? '] + ( параметры insert-id > 0 ), стоп.
 
 >> x := 0.
 >> параметры :=
-db запрос: ['SELECT * FROM book order by id desc limit 2'], 
-получить: { :row 
+бд запрос: ['SELECT * FROM book order by id desc limit 2'], 
+получить: { :ряд 
 	x добавить: 1.
-	Истина разрыв. # must clean up, no 'Commands out of sync'
+	Истина разрыв. # нужно очистить, без 'Commands out of sync'
 }.
 
 >> параметры :=
-db запрос: ['SELECT * FROM book order by id desc limit 2'], 
-получить: { :row
+бд запрос: ['SELECT * FROM book order by id desc limit 2'], 
+получить: { :ряд
 	x добавить: 1.
 	Истина разрыв.
 }.
 
 (x > 0) истина: {
-	Выход написать: ['Can we break in the middle of a fetch? '].
+	Выход написать: ['Можно ли прервать посреди fetch? '].
 }.
 
 Выход написать: Истина, стоп.

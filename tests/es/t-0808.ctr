@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# las claves y firmas de Contenedor-seguro que decodifican demasiado largas no deben desbordar la pila
 Server init.
 
->> keys := Contenedor-seguro claves-criptográficas.
->> sk := keys primero.
->> pk := keys último.
->> sig := Contenedor-seguro firmar: ['abc'] con: sk.
+>> claves := Contenedor-seguro claves-criptográficas.
+>> sk := claves primero.
+>> pk := claves último.
+>> firma := Contenedor-seguro firmar: ['abc'] con: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 caracteres sin relleno decodifican a 66 bytes
+>> largo := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 caracteres sin relleno decodifican a 33 bytes
+>> corto := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Contenedor-seguro firmar: ['abc'] con: long. } capturar: { :e
+{ Contenedor-seguro firmar: ['abc'] con: largo. } capturar: { :e
 	Salida escribir: e, detener.
 }, empezar.
 
-{ Contenedor-seguro verificar: ['abc'] firma: long con: pk. } capturar: { :e
+{ Contenedor-seguro verificar: ['abc'] firma: largo con: pk. } capturar: { :e
 	Salida escribir: e, detener.
 }, empezar.
 
-{ Contenedor-seguro verificar: ['abc'] firma: sig con: short. } capturar: { :e
+{ Contenedor-seguro verificar: ['abc'] firma: firma con: corto. } capturar: { :e
 	Salida escribir: e, detener.
 }, empezar.

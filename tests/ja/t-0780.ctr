@@ -1,76 +1,77 @@
 Server init.
 
-# JSON encoder only supports UTF-8, no surrogate pairs
+# JSON エンコーダーは UTF-8 のみ対応、サロゲートペアは不可
 
->> dicts := リスト 新規 ;
-	# {"key":"normal"} normal ASCII
-	( 辞書 新規 格納: ['normal'] 場所: ['key'] ) ;
-	# {"key":"hello world"} space character
+>> 辞書群 := リスト 新規 ;
+	# {"key":"normal"} 通常の ASCII
+	( 辞書 新規 格納: ['通常'] 場所: ['key'] ) ;
+	# {"key":"hello world"} 空白文字
 	( 辞書 新規 格納: ['hello world'] 場所: ['key'] ) ;
-	# {"key":"quote: \""} double quote
+	# {"key":"quote: \""} 二重引用符
 	( 辞書 新規 格納: ['"'] 場所: ['key'] ) ;
-	# {"key":"backslash: \\"} backslash
+	# {"key":"backslash: \\"} バックスラッシュ
 	( 辞書 新規 格納: ['backslash: \\'] 場所: ['key'] ) ;
-	# {"key":"slash: /"} slash
-	( 辞書 新規 格納: ['slash: /'] 場所: ['key'] ) ;
-	# {"key":"backspace: \b"} backspace
+	# {"key":"slash: /"} スラッシュ
+	( 辞書 新規 格納: ['スラッシュ: /'] 場所: ['key'] ) ;
+	# {"key":"backspace: \b"} バックスペース
 	( 辞書 新規 格納: ['backspace: \b'] 場所: ['key'] ) ;
-	# {"key":"formfeed: \f"} form-feed escape
+	# {"key":"formfeed: \f"} 改ページのエスケープ
 	( 辞書 新規 格納: ['formfeed: \f'] 場所: ['key'] ) ;
-	# {"key":"newline: \n"} newline
+	# {"key":"newline: \n"} 改行
 	( 辞書 新規 格納: ['newline: \n'] 場所: ['key'] ) ;
 	( 辞書 新規 格納: ['newline: ↵'] 場所: ['key'] ) ;
 	( 辞書 新規 格納: ['newline: 
 	'] 場所: ['key'] ) ;
-	# {"key":"carriage return: \r"} carriage-return
+	# {"key":"carriage return: \r"} 復帰
 	( 辞書 新規 格納: ['carriage return: \r'] 場所: ['key'] ) ;
-	# {"key":"tab: \t"} tab
+	# {"key":"tab: \t"} タブ
 	( 辞書 新規 格納: ['tab \t'] 場所: ['key'] ) ;
 	( 辞書 新規 格納: ['tab ⇿'] 場所: ['key'] ) ;
-	( 辞書 新規 格納: ['tab  '] 場所: ['key'] ) ;
+	( 辞書 新規 格納: ['タブ  '] 場所: ['key'] ) ;
 	# {"key":"control: \u0000"} NUL
 	( 辞書 新規 格納: ['NUL \u0000'] 場所: ['key'] ) ;
 	( 辞書 新規 格納: ['NUL \0'] 場所: ['key'] ) ;
-	# {"key":"control: \u0001"} control character 0x01
+	# {"key":"control: \u0001"} 制御文字 0x01
 	( 辞書 新規 格納: ['control: \u0001'] 場所: ['key'] ) ;
-	# {"key":"control: \u001F"} control character 0x1F
+	# {"key":"control: \u001F"} 制御文字 0x1F
 	( 辞書 新規 格納: ['control: \u001F'] 場所: ['key'] ) ;
-	# {"key":"unicode: é"} UTF-8, 2-byte char
+	# {"key":"unicode: é"} UTF-8、2 バイト文字
 	( 辞書 新規 格納: ['unicode: é'] 場所: ['key'] ) ;
-	# {"key":"unicode: €"} UTF-8, 3-byte char
+	# {"key":"unicode: €"} UTF-8、3 バイト文字
 	( 辞書 新規 格納: ['unicode: €'] 場所: ['key'] ) ;
-	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	# {"key":"unicode: 日本語"} 複数の 3 バイト UTF-8 文字
 	( 辞書 新規 格納: ['unicode: 日本語'] 場所: ['key'] ) ;
-	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	# {"key":"unicode: 😀"} UTF-8、4 バイト文字
 	( 辞書 新規 格納: ['unicode: 😀'] 場所: ['key'] ) ;
-	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	# {"key":"unicode: 🧑‍💻"} 絵文字 + ゼロ幅接合子
 	( 辞書 新規 格納: ['unicode: 🧑‍💻'] 場所: ['key'] ) ;
-	# {"key":"combining: e\u0301"} combining accent
+	# {"key":"combining: é"} 結合アクセント
 	( 辞書 新規 格納: ['combining: e\u0301'] 場所: ['key'] ) ;
-	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	# {"key":"escaped unicode: é"} Unicode エスケープ BMP
 	( 辞書 新規 格納: ['escaped unicode: \u00e9'] 場所: ['key'] ) ;
-	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	# {"key":"escaped unicode: €"} Unicode エスケープ BMP
 	( 辞書 新規 格納: ['escaped unicode: \u20ac'] 場所: ['key'] ) ;
-	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	# {"key":"escaped unicode: 😀"} UTF-16 サロゲートペア
 	( 辞書 新規 格納: ['escaped unicode: \ud83d\ude00'] 場所: ['key'] ) ;
-	# {"key":""} empty value
+	# {"key":""} 空の値
 	( 辞書 新規 格納: [''] 場所: ['key'] ) ;
-	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	# {"key":"@ < > & = % + ? #"} ASCII の特殊文字
 	( 辞書 新規 格納: ['@ < > & = % + ? #'] 場所: ['key'] ) ;
-	# {"key":"single quote: '"} single quote
+	# {"key":"single quote: '"} 一重引用符
 	( 辞書 新規 格納: ['''] 場所: ['key'] ) ;
-	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	# {"key":"multiple: \" \\ \n \r \t"} 複数の JSON エスケープ
 	( 辞書 新規 格納: ['multiple: \" \\ \n \r \t'] 場所: ['key'] ) ;
-	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} 長めの ASCII 文字列
 	( 辞書 新規 格納: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] 場所: ['key'] ) ;
-	# {"key":" value"} leading space
-	( 辞書 新規 格納: [' value'] 場所: ['key'] ) ;
-	# {"key":"value "} trailing space
-	( 辞書 新規 格納: ['value '] 場所: ['key'] ) ;
-	# {"key":" \t\n\r "} whitespace
-	( 辞書 新規 格納: [' \t\n\r '] 場所: ['key'] ).
+	# {"key":" value"} 先頭の空白
+	( 辞書 新規 格納: [' 値'] 場所: ['key'] ) ;
+	# {"key":"value "} 末尾の空白
+	( 辞書 新規 格納: ['値 '] 場所: ['key'] ) ;
+	# {"key":" \t\n\r "} 空白類
+	( 辞書 新規 格納: [' \t\n\r '] 場所: ['key'] )
+	.
 
-dicts 各要素: { :_ :d
+辞書群 各要素: { :_ :d
 	>> j := JSON jsonify: d.
 	>> a := JSON jsonify: (辞書 新規 格納: d key 場所: ['key']).
 	>> b := JSON jsonify: (辞書 新規 格納: ['value'] 場所: d key).
@@ -79,7 +80,7 @@ dicts 各要素: { :_ :d
 	((e key = d key かつ: (f ? d key = ['value'])) または: (e key = ['NUL ?'])) 真なら: {
 		出力 書く: ['OK'], 改行.
 	}, さもなければ: {
-		出力 書く: ['Unable to properly encode/decode: '] + d + j, 改行.
+		出力 書く: ['正しくエンコード/デコードできない: '] + d + j, 改行.
 		プログラム 終了.
 	}.
 }.

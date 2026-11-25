@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# çok uzun çözülen kasa anahtarları ve imzalar yığını taşırmamalı
 Server init.
 
->> keys := Kasa anahtar-üret.
->> sk := keys ilk.
->> pk := keys sonuncu.
->> sig := Kasa imzala: ['abc'] anahtar: sk.
+>> anahtarlar := Kasa anahtar-üret.
+>> sk := anahtarlar ilk.
+>> pk := anahtarlar sonuncu.
+>> imza := Kasa imzala: ['abc'] anahtar: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# dolgusuz 88 karakter 66 bayta çözülür
+>> uzun := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# dolgusuz 44 karakter 33 bayta çözülür
+>> kısa := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Kasa imzala: ['abc'] anahtar: long. } yakala: { :e
+{ Kasa imzala: ['abc'] anahtar: uzun. } yakala: { :e
 	Çıktı yaz: e, yeni-satır.
 }, başlat.
 
-{ Kasa denetle: ['abc'] imza: long anahtar: pk. } yakala: { :e
+{ Kasa denetle: ['abc'] imza: uzun anahtar: pk. } yakala: { :e
 	Çıktı yaz: e, yeni-satır.
 }, başlat.
 
-{ Kasa denetle: ['abc'] imza: sig anahtar: short. } yakala: { :e
+{ Kasa denetle: ['abc'] imza: imza anahtar: kısa. } yakala: { :e
 	Çıktı yaz: e, yeni-satır.
 }, başlat.

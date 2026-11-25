@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# test pretvaranja tipova / konverzija / povezivanja
 Program upravljanje-memorijom: 4.
 Server init.
 
->> counter := 0.
->> db := Maria-DB novi domaćin: ['localhost'],
+>> brojač := 0.
+>> bp := Maria-DB novi domaćin: ['localhost'],
 	korisnik: ['xo'], lozinka: ['pass123'], naziv-baze: ['xobase'], poveži-se.
 
->> TwoDigitFormat := Format novi: ['%02d'].
+>> DvocifreniFormat := Format novi: ['%02d'].
 
-# Datetime
+# Datum i vrijeme
 {
-	>> godina := Broj između: 1995 i: 2050, tekst.
-	>> mjesec := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 12), tekst.
-	>> dan := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 28), tekst.
-	>> sat := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 23), tekst.
-	>> minuta := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 59), tekst.
-	>> sekunda := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 59), tekst.
-	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
-	datetime
+	>> godina     := Broj između: 1995 i: 2050, tekst.
+	>> mjesec    := DvocifreniFormat primijeni-cijeli: (Broj između: 1 i: 12), tekst.
+	>> dan      := DvocifreniFormat primijeni-cijeli: (Broj između: 1 i: 28), tekst.
+	>> sat     := DvocifreniFormat primijeni-cijeli: (Broj između: 1 i: 23), tekst.
+	>> minuta   := DvocifreniFormat primijeni-cijeli: (Broj između: 1 i: 59), tekst.
+	>> sekunda   := DvocifreniFormat primijeni-cijeli: (Broj između: 1 i: 59), tekst.
+	>> datumvrijeme := ['YYYY-MM-DD HH:II:SS'].	
+	datumvrijeme
 		YYYY: godina,
 		MM: mjesec,
 		DD: dan,
@@ -25,89 +25,89 @@ Server init.
 		II: minuta,
 		SS: sekunda.
 	>> parametri-pretrage :=
-	db upit: (['
+	bp upit: (['
 		SELECT 
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'] <datetime>: datetime),
-	dohvati: { :row
-		(row mydatetime = datetime) netačno: {
+	'] <datetime>: datumvrijeme),
+	dohvati: { :redak
+		(redak mydatetime = datumvrijeme) netačno: {
 			ovaj-zadatak greška: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mydatetime
+				['Očekivano: <expected>, a dobijeno: <observation>']
+				<expected>: datumvrijeme,
+				<observation>: redak mydatetime
 			).
 		}.
 	
 	}.
-	counter saberi: 1.
+	brojač saberi: 1.
 } * 100.
 
-# Date
+# Datum
 {
-	>> godina := Broj između: 1995 i: 2050, tekst.
-	>> mjesec := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 12), tekst.
-	>> dan := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 28), tekst.
-	>> date := ['YYYY-MM-DD'].
-	date
+	>> godina     := Broj između: 1995 i: 2050, tekst.
+	>> mjesec    := DvocifreniFormat primijeni-cijeli: (Broj između: 1 i: 12), tekst.
+	>> dan      := DvocifreniFormat primijeni-cijeli: (Broj između: 1 i: 28), tekst.
+	>> datum     := ['YYYY-MM-DD'].
+	datum
 		YYYY: godina,
 		MM: mjesec,
 		DD: dan.
 	>> parametri-pretrage :=
-	db upit: (['
+	bp upit: (['
 		SELECT
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'] <date>: date),
-	dohvati: { :row
-		(row mydate = date) netačno: {
+	'] <date>: datum),
+	dohvati: { :redak
+		(redak mydate = datum) netačno: {
 			ovaj-zadatak greška: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: date,
-				<observation>: row mydate
+				['Očekivano: <expected>, a dobijeno: <observation>']
+				<expected>: datum,
+				<observation>: redak mydate
 			).
 		}.
 	}.
-	counter saberi: 1.
+	brojač saberi: 1.
 } * 100.
 
 
-# Time
+# Vrijeme
 {
-	>> sat := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 23), tekst.
-	>> minuta := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 59), tekst.
-	>> sekunda := TwoDigitFormat primijeni-cijeli: (Broj između: 1 i: 59), tekst.
+	>> sat     := DvocifreniFormat primijeni-cijeli: (Broj između: 1 i: 23), tekst.
+	>> minuta   := DvocifreniFormat primijeni-cijeli: (Broj između: 1 i: 59), tekst.
+	>> sekunda   := DvocifreniFormat primijeni-cijeli: (Broj između: 1 i: 59), tekst.
 	>> vrijeme := ['HH:II:SS'].
 	vrijeme
 		HH: sat,
 		II: minuta,
 		SS: sekunda.
 	>> parametri-pretrage :=
-	db upit: (['
+	bp upit: (['
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: vrijeme),
-	dohvati: { :row
-		(row mytime = vrijeme) netačno: {
+	dohvati: { :redak
+		(redak mytime = vrijeme) netačno: {
 			ovaj-zadatak greška: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Očekivano: <expected>, a dobijeno: <observation>']
+				<expected>: datumvrijeme,
+				<observation>: redak mytime
 			).
 		}.
 	}.
-	counter saberi: 1.
+	brojač saberi: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Tekstovi (varchar/text)
 >> str1 := Lista novi popuni: 100000 sa: ['x'], spoji: [''].
 {
 	>> str2 := Sef token: 40.
 	>> parametri-pretrage :=
-	db upit: (['
+	bp upit: (['
 		SELECT
 		"<str1>" AS str1,
 		"<str2>" AS str2
@@ -115,30 +115,30 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	dohvati: { :row
-		(row str1 = str1 i: row str2 = str2) netačno: {
+	dohvati: { :redak
+		(redak str1 = str1 i: redak str2 = str2) netačno: {
 			ovaj-zadatak greška: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Očekivano: <expected>, a dobijeno: <observation>']
+				<expected>: datumvrijeme,
+				<observation>: redak mytime
 			).
 		}.
 	}.
-	counter saberi: 1.
+	brojač saberi: 1.
 } * 100.
 
 
-# Numbers
+# Brojevi
 {
-	>> n1 := Broj između: 1 i: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Broj između: 1 i: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 iz-teksta: ['9223372036854775807'] ) -
 		( Int64 iz-teksta: ['99999'] ) +
 		( Int64 iz-teksta: n1 tekst )
 	).
 	>> parametri-pretrage :=
-	db upit: (['
+	bp upit: (['
 		SELECT
 		<n1> AS n1,
 		<n2> AS n2,
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	dohvati: { :row
-		(row n1 = n1) netačno: {
+	dohvati: { :redak
+		(redak n1 = n1) netačno: {
 			ovaj-zadatak greška: (
-				['Expected: <expected> but got: <observation>']
+				['Očekivano: <expected>, a dobijeno: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: redak n1
 			).
 		}.
-		(row n2 = n2) netačno: {
+		(redak n2 = n2) netačno: {
 			ovaj-zadatak greška: (
-				['Expected: <expected> but got: <observation>']
+				['Očekivano: <expected>, a dobijeno: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: redak n2
 			).
 		}.
-		(row n3 = n2 zaokruži) netačno: {
+		(redak n3 = n2 zaokruži) netačno: {
 			ovaj-zadatak greška: (
-				['Expected: <expected> but got: <observation>']
+				['Očekivano: <expected>, a dobijeno: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: redak n3
 			).
 		}.
-		(row big = big) netačno: {
+		(redak big = big) netačno: {
 			ovaj-zadatak greška: (
-				['Expected: <expected> but got: <observation>']
+				['Očekivano: <expected>, a dobijeno: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: redak big
 			).
 		}.
 		
 	}.
-	counter saberi: 1.
+	brojač saberi: 1.
 } * 100.
 
 
 Izlaz piši: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: brojač
 ), novi-red.

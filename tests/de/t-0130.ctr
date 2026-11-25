@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# FFI mit dem Server-Plugin verwenden
 
-# connect to libc (platform specific)
->> libname := Programm einstellung: ['FFITESTLIB'].
+# mit libc verbinden (plattformabhängig)
+>> bibname := Programm einstellung: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# stdio-Funktionen aus C für erweiterte Dateioperationen verknüpfen
 Server verknüpfen: ( Liste neu ;
- libname ; ['fopen'] ;
+ bibname ; ['fopen'] ;
  ( Liste neu ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 verknüpfen: ( Liste neu ;
- Nichts ; # means same lib
+ Nichts ; # bedeutet dieselbe Bibliothek
  ['fread'] ;
  ( Liste neu ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Nichts ; # means same object (i.e. Stream)
+ Nichts ; # bedeutet dasselbe Objekt (d. h. Datenstrom)
  ['fread']
 ),
 verknüpfen: (
  Liste neu ;
- Nichts ; # means same lib
+ Nichts ; # bedeutet dieselbe Bibliothek
  ['fwrite'] ;
  ( Liste neu ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Nichts ; # means same lib
+ Nichts ; # bedeutet dieselbe Bibliothek
  ['fwrite']
 ),
 verknüpfen: (
  Liste neu ;
- Nichts ; # means same lib
+ Nichts ; # bedeutet dieselbe Bibliothek
  ['rewind'] ;
  ( Liste neu ; ['pointer'] ) ;
  ['int'] ;
- Nichts ; # means same lib
+ Nichts ; # bedeutet dieselbe Bibliothek
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> pfad := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# eine Datei mit fopen(path, mode) öffnen
 >> fd := Stream path: pfad mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream nachricht: ['fwrite'] argumente: (Liste neu ; str ; 1 ; 6 ; fd ).
-Ausgabe schreiben: bytes-written, stopp.
+# Bytes aus dem Puffer str in die Datei schreiben
+>> bytes-geschrieben := Stream nachricht: ['fwrite'] argumente: (Liste neu ; str ; 1 ; 6 ; fd ).
+Ausgabe schreiben: bytes-geschrieben, stopp.
 
-# rewind file pointer
+# Dateizeiger zurücksetzen
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob neu: 20.
+# einen Puffer anlegen
+>> puf := Blob neu: 20.
 
-# read from file
->> bytes-read := Stream nachricht: ['fread'] argumente: (Liste neu ; buf ; 1 ; 6 ; fd ).
-Ausgabe schreiben: bytes-read, stopp.
-Ausgabe schreiben: buf, stopp.
+# aus der Datei lesen
+>> bytes-gelesen := Stream nachricht: ['fread'] argumente: (Liste neu ; puf ; 1 ; 6 ; fd ).
+Ausgabe schreiben: bytes-gelesen, stopp.
+Ausgabe schreiben: puf, stopp.
 
-# free memory
+# Speicher freigeben
 str  freigeben.
 pfad freigeben.
 mode freigeben.
-buf  freigeben.
+puf  freigeben.
 
 

@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# тест приведення типів / перетворень / привʼязок
 Програма керування-памʼяттю: 4.
 Server init.
 
->> counter := 0.
->> db := Maria-DB новий хост: ['localhost'],
+>> лічильник := 0.
+>> бд := Maria-DB новий хост: ['localhost'],
 	користувач: ['xo'], пароль: ['pass123'], назва-бази: ['xobase'], підключити.
 
->> TwoDigitFormat := Формат новий: ['%02d'].
+>> Двоцифровий-формат := Формат новий: ['%02d'].
 
-# Datetime
+# Дата й час
 {
-	>> рік := Число між: 1995 і: 2050, текст.
-	>> місяць := TwoDigitFormat застосувати-ціле: (Число між: 1 і: 12), текст.
-	>> день := TwoDigitFormat застосувати-ціле: (Число між: 1 і: 28), текст.
-	>> година := TwoDigitFormat застосувати-ціле: (Число між: 1 і: 23), текст.
-	>> хвилина := TwoDigitFormat застосувати-ціле: (Число між: 1 і: 59), текст.
-	>> секунда := TwoDigitFormat застосувати-ціле: (Число між: 1 і: 59), текст.
-	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
-	datetime
+	>> рік     := Число між: 1995 і: 2050, текст.
+	>> місяць    := Двоцифровий-формат застосувати-ціле: (Число між: 1 і: 12), текст.
+	>> день      := Двоцифровий-формат застосувати-ціле: (Число між: 1 і: 28), текст.
+	>> година     := Двоцифровий-формат застосувати-ціле: (Число між: 1 і: 23), текст.
+	>> хвилина   := Двоцифровий-формат застосувати-ціле: (Число між: 1 і: 59), текст.
+	>> секунда   := Двоцифровий-формат застосувати-ціле: (Число між: 1 і: 59), текст.
+	>> дата-час := ['YYYY-MM-DD HH:II:SS'].	
+	дата-час
 		YYYY: рік,
 		MM: місяць,
 		DD: день,
@@ -25,89 +25,89 @@ Server init.
 		II: хвилина,
 		SS: секунда.
 	>> параметри-пошуку :=
-	db запит: (['
+	бд запит: (['
 		SELECT 
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'] <datetime>: datetime),
-	отримати: { :row
-		(row mydatetime = datetime) хиба: {
+	'] <datetime>: дата-час),
+	отримати: { :ряд
+		(ряд mydatetime = дата-час) хиба: {
 			це-завдання помилка: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mydatetime
+				['Очікувалося: <expected>, отримано: <observation>']
+				<expected>: дата-час,
+				<observation>: ряд mydatetime
 			).
 		}.
 	
 	}.
-	counter додати: 1.
+	лічильник додати: 1.
 } * 100.
 
-# Date
+# Дата
 {
-	>> рік := Число між: 1995 і: 2050, текст.
-	>> місяць := TwoDigitFormat застосувати-ціле: (Число між: 1 і: 12), текст.
-	>> день := TwoDigitFormat застосувати-ціле: (Число між: 1 і: 28), текст.
-	>> date := ['YYYY-MM-DD'].
-	date
+	>> рік     := Число між: 1995 і: 2050, текст.
+	>> місяць    := Двоцифровий-формат застосувати-ціле: (Число між: 1 і: 12), текст.
+	>> день      := Двоцифровий-формат застосувати-ціле: (Число між: 1 і: 28), текст.
+	>> дата     := ['YYYY-MM-DD'].
+	дата
 		YYYY: рік,
 		MM: місяць,
 		DD: день.
 	>> параметри-пошуку :=
-	db запит: (['
+	бд запит: (['
 		SELECT
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'] <date>: date),
-	отримати: { :row
-		(row mydate = date) хиба: {
+	'] <date>: дата),
+	отримати: { :ряд
+		(ряд mydate = дата) хиба: {
 			це-завдання помилка: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: date,
-				<observation>: row mydate
+				['Очікувалося: <expected>, отримано: <observation>']
+				<expected>: дата,
+				<observation>: ряд mydate
 			).
 		}.
 	}.
-	counter додати: 1.
+	лічильник додати: 1.
 } * 100.
 
 
-# Time
+# Час
 {
-	>> година := TwoDigitFormat застосувати-ціле: (Число між: 1 і: 23), текст.
-	>> хвилина := TwoDigitFormat застосувати-ціле: (Число між: 1 і: 59), текст.
-	>> секунда := TwoDigitFormat застосувати-ціле: (Число між: 1 і: 59), текст.
+	>> година     := Двоцифровий-формат застосувати-ціле: (Число між: 1 і: 23), текст.
+	>> хвилина   := Двоцифровий-формат застосувати-ціле: (Число між: 1 і: 59), текст.
+	>> секунда   := Двоцифровий-формат застосувати-ціле: (Число між: 1 і: 59), текст.
 	>> час := ['HH:II:SS'].
 	час
 		HH: година,
 		II: хвилина,
 		SS: секунда.
 	>> параметри-пошуку :=
-	db запит: (['
+	бд запит: (['
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: час),
-	отримати: { :row
-		(row mytime = час) хиба: {
+	отримати: { :ряд
+		(ряд mytime = час) хиба: {
 			це-завдання помилка: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Очікувалося: <expected>, отримано: <observation>']
+				<expected>: дата-час,
+				<observation>: ряд mytime
 			).
 		}.
 	}.
-	counter додати: 1.
+	лічильник додати: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Тексти (varchar/text)
 >> str1 := Список новий заповнити: 100000 чим: ['x'], зʼєднати: [''].
 {
 	>> str2 := Сховище токен: 40.
 	>> параметри-пошуку :=
-	db запит: (['
+	бд запит: (['
 		SELECT
 		"<str1>" AS str1,
 		"<str2>" AS str2
@@ -115,30 +115,30 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	отримати: { :row
-		(row str1 = str1 і: row str2 = str2) хиба: {
+	отримати: { :ряд
+		(ряд str1 = str1 і: ряд str2 = str2) хиба: {
 			це-завдання помилка: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Очікувалося: <expected>, отримано: <observation>']
+				<expected>: дата-час,
+				<observation>: ряд mytime
 			).
 		}.
 	}.
-	counter додати: 1.
+	лічильник додати: 1.
 } * 100.
 
 
-# Numbers
+# Числа
 {
-	>> n1 := Число між: 1 і: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Число між: 1 і: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 з-тексту: ['9223372036854775807'] ) -
 		( Int64 з-тексту: ['99999'] ) +
 		( Int64 з-тексту: n1 текст )
 	).
 	>> параметри-пошуку :=
-	db запит: (['
+	бд запит: (['
 		SELECT
 		<n1> AS n1,
 		<n2> AS n2,
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	отримати: { :row
-		(row n1 = n1) хиба: {
+	отримати: { :ряд
+		(ряд n1 = n1) хиба: {
 			це-завдання помилка: (
-				['Expected: <expected> but got: <observation>']
+				['Очікувалося: <expected>, отримано: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: ряд n1
 			).
 		}.
-		(row n2 = n2) хиба: {
+		(ряд n2 = n2) хиба: {
 			це-завдання помилка: (
-				['Expected: <expected> but got: <observation>']
+				['Очікувалося: <expected>, отримано: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: ряд n2
 			).
 		}.
-		(row n3 = n2 округлити) хиба: {
+		(ряд n3 = n2 округлити) хиба: {
 			це-завдання помилка: (
-				['Expected: <expected> but got: <observation>']
+				['Очікувалося: <expected>, отримано: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: ряд n3
 			).
 		}.
-		(row big = big) хиба: {
+		(ряд big = big) хиба: {
 			це-завдання помилка: (
-				['Expected: <expected> but got: <observation>']
+				['Очікувалося: <expected>, отримано: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: ряд big
 			).
 		}.
 		
 	}.
-	counter додати: 1.
+	лічильник додати: 1.
 } * 100.
 
 
 Вивід написати: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: лічильник
 ), новий-рядок.

@@ -1,25 +1,25 @@
 Server init.
 
-# write a test file
+# schrijf een testbestand
 >> f := Bestand nieuw: ['/tmp/test.gif'].
 f schrijf: ['GIF87a01234567810'].
 
-# serve the file
+# serveer het bestand
 Server doorgave: ['test.gif'] prefix: ['/tmp/'].
 
 Uit stop.
 
-Uit schrijf: ['Outside container (security):'], stop.
+Uit schrijf: ['Buiten de container (beveiliging):'], stop.
 { Server doorgave: ['../passwd'] prefix: ['/tmp/']. }
 afhandelen: { :e Uit schrijf: e, stop. },
 start.
 
-Uit schrijf: ['Invalid prefix:'], stop.
+Uit schrijf: ['Ongeldig voorvoegsel:'], stop.
 { Server doorgave: ['test.gif'] prefix: ['z:\\']. }
 afhandelen: { :e Uit schrijf: e, stop. },
 start.
 
-Uit schrijf: ['Non-existant file:'], stop.
+Uit schrijf: ['Niet-bestaand bestand:'], stop.
 { Server doorgave: ['xxx.xxx'] prefix: ['/tmp/']. }
 afhandelen: { :e Uit schrijf: e, stop. },
 start.

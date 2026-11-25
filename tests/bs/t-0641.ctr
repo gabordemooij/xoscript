@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# Test utf8 sanitizera
 Server init.
 
->> utf8cases := Rječnik novi
-	# ASCII only
+>> utf8slučajevi := Rječnik novi
+	# samo ASCII
 	stavi: ( Lista novi ; 65 ; 65 ; 65 ; 65 ; 0 ) na: ['AAAA'],
-	# valid 2 byte sequence
+	# ispravna sekvenca od 2 bajta
 	stavi: ( Lista novi ; 194 ; 162 ; 0 ) na: ['¢'],
-	# Valid 3-byte UTF-8
+	# Ispravan 3-bajtni UTF-8
     stavi: ( Lista novi ; 226 ; 130 ; 172 ; 0 ) na: ['€'],
-	# Valid 4-byte UTF-8
+	# Ispravan 4-bajtni UTF-8
     stavi: ( Lista novi ; 240 ; 144 ; 141 ; 136 ; 0 ) na: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# Neispravan bajt nastavka u sekvenci E2 28 AC -> početak 3b sekv. + 28 pogr. nast. + AC bajt nast., ali pripada istoj grešci
     stavi: ( Lista novi ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) na: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# Predugo kodiranje ASCII 'A' (treba postati ?),
     stavi: ( Lista novi ; 65 ; 193 ; 129 ; 0 ) na: ['A?'],
-	# Invalid first byte (0xFF)
+	# Neispravan prvi bajt (0xFF)
     stavi: ( Lista novi ; 255 ; 0 ) na: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Nepotpuna višebajtna sekvenca na kraju
     stavi: ( Lista novi ; 66 ; 226 ; 0 ) na: ['B?'],
-    # Empty string
+    # Prazan tekst
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Više mješovitih sekvenci
     stavi: ( Lista novi ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) na: ['A€?𐍈B'].
 	 
-utf8cases svaki: { :key :value
+utf8slučajevi svaki: { :key :value
 	>> blob := Blob novi: value broj-elemenata, bytes: value.
 	>> str := blob tekst.
 	(str = key) tačno: {
 		Izlaz piši: ['OK'], novi-red.
 	}, inače: {
-		Izlaz piši: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, novi-red.
+		Izlaz piši: ['UTF8 čistač nije uspio na: '] + key + [' dobijeno: '] + str, novi-red.
 	}.
 	blob oslobodi.
 }.

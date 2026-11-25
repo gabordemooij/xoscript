@@ -1,23 +1,23 @@
-# test type casts / conversions / bindings
+# tür dönüşümlerini / çevirmeleri / bağlamaları sına
 Program bellek-yönetimi: 4.
 Server init.
 
->> counter := 0.
->> db := Maria-DB yeni sunucu-adı: ['localhost'],
+>> sayaç := 0.
+>> vt := Maria-DB yeni sunucu-adı: ['localhost'],
 	kullanıcı: ['xo'], parola: ['pass123'], veritabanı-adı: ['xobase'], bağlan.
 
->> TwoDigitFormat := Biçim yeni: ['%02d'].
+>> İkiHaneliBiçim := Biçim yeni: ['%02d'].
 
-# Datetime
+# Tarih-saat
 {
-	>> yıl := Sayı arasında: 1995 ve: 2050, metin.
-	>> ay := TwoDigitFormat uygula-tamsayı: (Sayı arasında: 1 ve: 12), metin.
-	>> gün := TwoDigitFormat uygula-tamsayı: (Sayı arasında: 1 ve: 28), metin.
-	>> saat := TwoDigitFormat uygula-tamsayı: (Sayı arasında: 1 ve: 23), metin.
-	>> dakika := TwoDigitFormat uygula-tamsayı: (Sayı arasında: 1 ve: 59), metin.
-	>> saniye := TwoDigitFormat uygula-tamsayı: (Sayı arasında: 1 ve: 59), metin.
-	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
-	datetime
+	>> yıl     := Sayı arasında: 1995 ve: 2050, metin.
+	>> ay    := İkiHaneliBiçim uygula-tamsayı: (Sayı arasında: 1 ve: 12), metin.
+	>> gün      := İkiHaneliBiçim uygula-tamsayı: (Sayı arasında: 1 ve: 28), metin.
+	>> saat     := İkiHaneliBiçim uygula-tamsayı: (Sayı arasında: 1 ve: 23), metin.
+	>> dakika   := İkiHaneliBiçim uygula-tamsayı: (Sayı arasında: 1 ve: 59), metin.
+	>> saniye   := İkiHaneliBiçim uygula-tamsayı: (Sayı arasında: 1 ve: 59), metin.
+	>> tarihSaat := ['YYYY-MM-DD HH:II:SS'].	
+	tarihSaat
 		YYYY: yıl,
 		MM: ay,
 		DD: gün,
@@ -25,89 +25,89 @@ Server init.
 		II: dakika,
 		SS: saniye.
 	>> arama-parametreleri :=
-	db sorgu: (['
+	vt sorgu: (['
 		SELECT 
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
-	'] <datetime>: datetime),
-	getir: { :row
-		(row mydatetime = datetime) yanlış: {
+	'] <datetime>: tarihSaat),
+	getir: { :kayıt
+		(kayıt mydatetime = tarihSaat) yanlış: {
 			bu-görev hata: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mydatetime
+				['Beklenen: <expected> ama alınan: <observation>']
+				<expected>: tarihSaat,
+				<observation>: kayıt mydatetime
 			).
 		}.
 	
 	}.
-	counter ekle: 1.
+	sayaç ekle: 1.
 } * 100.
 
-# Date
+# Tarih
 {
-	>> yıl := Sayı arasında: 1995 ve: 2050, metin.
-	>> ay := TwoDigitFormat uygula-tamsayı: (Sayı arasında: 1 ve: 12), metin.
-	>> gün := TwoDigitFormat uygula-tamsayı: (Sayı arasında: 1 ve: 28), metin.
-	>> date := ['YYYY-MM-DD'].
-	date
+	>> yıl     := Sayı arasında: 1995 ve: 2050, metin.
+	>> ay    := İkiHaneliBiçim uygula-tamsayı: (Sayı arasında: 1 ve: 12), metin.
+	>> gün      := İkiHaneliBiçim uygula-tamsayı: (Sayı arasında: 1 ve: 28), metin.
+	>> tarih     := ['YYYY-MM-DD'].
+	tarih
 		YYYY: yıl,
 		MM: ay,
 		DD: gün.
 	>> arama-parametreleri :=
-	db sorgu: (['
+	vt sorgu: (['
 		SELECT
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
-	'] <date>: date),
-	getir: { :row
-		(row mydate = date) yanlış: {
+	'] <date>: tarih),
+	getir: { :kayıt
+		(kayıt mydate = tarih) yanlış: {
 			bu-görev hata: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: date,
-				<observation>: row mydate
+				['Beklenen: <expected> ama alınan: <observation>']
+				<expected>: tarih,
+				<observation>: kayıt mydate
 			).
 		}.
 	}.
-	counter ekle: 1.
+	sayaç ekle: 1.
 } * 100.
 
 
-# Time
+# Saat
 {
-	>> saat := TwoDigitFormat uygula-tamsayı: (Sayı arasında: 1 ve: 23), metin.
-	>> dakika := TwoDigitFormat uygula-tamsayı: (Sayı arasında: 1 ve: 59), metin.
-	>> saniye := TwoDigitFormat uygula-tamsayı: (Sayı arasında: 1 ve: 59), metin.
+	>> saat     := İkiHaneliBiçim uygula-tamsayı: (Sayı arasında: 1 ve: 23), metin.
+	>> dakika   := İkiHaneliBiçim uygula-tamsayı: (Sayı arasında: 1 ve: 59), metin.
+	>> saniye   := İkiHaneliBiçim uygula-tamsayı: (Sayı arasında: 1 ve: 59), metin.
 	>> zaman := ['HH:II:SS'].
 	zaman
 		HH: saat,
 		II: dakika,
 		SS: saniye.
 	>> arama-parametreleri :=
-	db sorgu: (['
+	vt sorgu: (['
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: zaman),
-	getir: { :row
-		(row mytime = zaman) yanlış: {
+	getir: { :kayıt
+		(kayıt mytime = zaman) yanlış: {
 			bu-görev hata: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Beklenen: <expected> ama alınan: <observation>']
+				<expected>: tarihSaat,
+				<observation>: kayıt mytime
 			).
 		}.
 	}.
-	counter ekle: 1.
+	sayaç ekle: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Metinler (varchar/text)
 >> str1 := Liste yeni doldur: 100000 değer: ['x'], birleştir: [''].
 {
 	>> str2 := Kasa jeton: 40.
 	>> arama-parametreleri :=
-	db sorgu: (['
+	vt sorgu: (['
 		SELECT
 		"<str1>" AS str1,
 		"<str2>" AS str2
@@ -115,30 +115,30 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	getir: { :row
-		(row str1 = str1 ve: row str2 = str2) yanlış: {
+	getir: { :kayıt
+		(kayıt str1 = str1 ve: kayıt str2 = str2) yanlış: {
 			bu-görev hata: (
-				['Expected: <expected> but got: <observation>']
-				<expected>: datetime,
-				<observation>: row mytime
+				['Beklenen: <expected> ama alınan: <observation>']
+				<expected>: tarihSaat,
+				<observation>: kayıt mytime
 			).
 		}.
 	}.
-	counter ekle: 1.
+	sayaç ekle: 1.
 } * 100.
 
 
-# Numbers
+# Sayılar
 {
-	>> n1 := Sayı arasında: 1 ve: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Sayı arasında: 1 ve: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 metinden: ['9223372036854775807'] ) -
 		( Int64 metinden: ['99999'] ) +
 		( Int64 metinden: n1 metin )
 	).
 	>> arama-parametreleri :=
-	db sorgu: (['
+	vt sorgu: (['
 		SELECT
 		<n1> AS n1,
 		<n2> AS n2,
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	getir: { :row
-		(row n1 = n1) yanlış: {
+	getir: { :kayıt
+		(kayıt n1 = n1) yanlış: {
 			bu-görev hata: (
-				['Expected: <expected> but got: <observation>']
+				['Beklenen: <expected> ama alınan: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: kayıt n1
 			).
 		}.
-		(row n2 = n2) yanlış: {
+		(kayıt n2 = n2) yanlış: {
 			bu-görev hata: (
-				['Expected: <expected> but got: <observation>']
+				['Beklenen: <expected> ama alınan: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: kayıt n2
 			).
 		}.
-		(row n3 = n2 yuvarla) yanlış: {
+		(kayıt n3 = n2 yuvarla) yanlış: {
 			bu-görev hata: (
-				['Expected: <expected> but got: <observation>']
+				['Beklenen: <expected> ama alınan: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: kayıt n3
 			).
 		}.
-		(row big = big) yanlış: {
+		(kayıt big = big) yanlış: {
 			bu-görev hata: (
-				['Expected: <expected> but got: <observation>']
+				['Beklenen: <expected> ama alınan: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: kayıt big
 			).
 		}.
 		
 	}.
-	counter ekle: 1.
+	sayaç ekle: 1.
 } * 100.
 
 
 Çıktı yaz: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: sayaç
 ), yeni-satır.

@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# กุญแจและลายเซ็นของ ตู้นิรภัย ที่ถอดรหัสแล้วยาวเกินต้องไม่ทำให้ stack ล้น
 Server init.
 
->> keys := ตู้นิรภัย สร้างกุญแจ.
->> sk := keys ตัวแรก.
->> pk := keys ตัวสุดท้าย.
+>> กุญแจต่างๆ := ตู้นิรภัย สร้างกุญแจ.
+>> sk := กุญแจต่างๆ ตัวแรก.
+>> pk := กุญแจต่างๆ ตัวสุดท้าย.
 >> sig := ตู้นิรภัย ลงนาม: ['abc'] ด้วย: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 อักขระโดยไม่มี padding ถอดรหัสได้ 66 ไบต์
+>> ยาว := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 อักขระโดยไม่มี padding ถอดรหัสได้ 33 ไบต์
+>> สั้น := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ ตู้นิรภัย ลงนาม: ['abc'] ด้วย: long. } ดักจับ: { :e
+{ ตู้นิรภัย ลงนาม: ['abc'] ด้วย: ยาว. } ดักจับ: { :e
 	แสดงผล เขียน: e, ขึ้นบรรทัดใหม่.
 }, เริ่ม.
 
-{ ตู้นิรภัย ตรวจ: ['abc'] ลายเซ็น: long ด้วย: pk. } ดักจับ: { :e
+{ ตู้นิรภัย ตรวจ: ['abc'] ลายเซ็น: ยาว ด้วย: pk. } ดักจับ: { :e
 	แสดงผล เขียน: e, ขึ้นบรรทัดใหม่.
 }, เริ่ม.
 
-{ ตู้นิรภัย ตรวจ: ['abc'] ลายเซ็น: sig ด้วย: short. } ดักจับ: { :e
+{ ตู้นิรภัย ตรวจ: ['abc'] ลายเซ็น: sig ด้วย: สั้น. } ดักจับ: { :e
 	แสดงผล เขียน: e, ขึ้นบรรทัดใหม่.
 }, เริ่ม.

@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := Obiekt nowy.
+# Ten test sprawdza, czy string_fill_in nie traci swojego miejsca (usuniętego przez gc) w trybie 4
+# odwołanie w world.c
+>> Dziennik := Obiekt nowy.
 
-Log na: ['say:'] wykonaj: { :str
+Dziennik na: ['say:'] wykonaj: { :str
 	Wyjście pisz: str, nowa-linia.
 }.
 
->> Item := Obiekt nowy.
+>> Przedmiot := Obiekt nowy.
 
-Item na: ['nowy:'] wykonaj: { :id <- sam nowy id: id.
+Przedmiot na: ['nowy:'] wykonaj: { :id
+	<- sam nowy id: id.
 }.
 
-Item na: ['id:'] wykonaj: { :id
+Przedmiot na: ['id:'] wykonaj: { :id
 	własny id := id.
 }.
 
-Item na: ['id'] wykonaj: { <- własny id. }.
+Przedmiot na: ['id'] wykonaj: { <- własny id. }.
 
 
-Item na: ['tekst'] wykonaj: {
+Przedmiot na: ['tekst'] wykonaj: {
 	>> str := ['Item#~no'].
-	str ~no: własny id. <- str.
+	str ~no: własny id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item na: ['tekst'] wykonaj: {
 
 Print na: ['items'] wykonaj: { 
 	
-	własny item := Item nowy: 1.
+	własny przedmiot := Przedmiot nowy: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: własny item
+	# albo segfault, albo tu błędny łańcuch
+	Dziennik say: (
+		['~item printed.'] ~item: własny przedmiot
 	).
 	
 	

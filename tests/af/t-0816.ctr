@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> probeer := { :format :value
-	{ Uitvoer skryf: ( (Formaat nuut: format) pas-toe: value ), nuwe-reël. } vang: { :e Uitvoer skryf: e, nuwe-reël. }, begin.
+# 'n formaat moet by die tipe van die waarde pas; die tipe kan van 'n kliënt kom
+>> probeer := { :opmaak :value
+	{ Uitvoer skryf: ( (Formaat nuut: opmaak) pas-toe: value ), nuwe-reël. } vang: { :e Uitvoer skryf: e, nuwe-reël. }, begin.
 }.
->> try-int := { :format :value
-	{ Uitvoer skryf: ( (Formaat nuut: format) pas-toe-heelgetal: value ), nuwe-reël. } vang: { :e Uitvoer skryf: e, nuwe-reël. }, begin.
+>> probeer-heelgetal := { :opmaak :value
+	{ Uitvoer skryf: ( (Formaat nuut: opmaak) pas-toe-heelgetal: value ), nuwe-reël. } vang: { :e Uitvoer skryf: e, nuwe-reël. }, begin.
 }.
 
-# fits
+# pas
 probeer pas-toe: ['|%s|'] en: ['text'].
 probeer pas-toe: ['%06.2f'] en: 5.5.
-probeer pas-toe: ['100%% %s'] en: ['sure'].
-try-int pas-toe: ['%03d'] en: 7.
-try-int pas-toe: ['%x'] en: 255.
+probeer pas-toe: ['100%% %s'] en: ['seker'].
+probeer-heelgetal pas-toe: ['%03d'] en: 7.
+probeer-heelgetal pas-toe: ['%x'] en: 255.
 probeer pas-toe: ['%d'] en: (Int64 nuut vanuit-teks: ['12']).
 probeer pas-toe: ['%lld'] en: (Int64 nuut vanuit-teks: ['12']).
 probeer pas-toe: ['%.1lf'] en: 5.5.
-try-int pas-toe: ['%hd'] en: 7.
+probeer-heelgetal pas-toe: ['%hd'] en: 7.
 
-# does not fit
+# pas nie
 probeer pas-toe: ['%s'] en: 12345.
 probeer pas-toe: ['%d'] en: 12345.
 probeer pas-toe: ['%f'] en: ['text'].
-try-int pas-toe: ['%d'] en: ['text'].
-try-int pas-toe: ['%s'] en: 5.
+probeer-heelgetal pas-toe: ['%d'] en: ['text'].
+probeer-heelgetal pas-toe: ['%s'] en: 5.
 probeer pas-toe: ['%s %s'] en: ['text'].
 probeer pas-toe: ['%n'] en: ['text'].
 probeer pas-toe: ['%*s'] en: ['text'].
 probeer pas-toe: ['%'] en: ['text'].
 
-# length modifier does not fit
+# lengtemodifiseerder pas nie
 probeer pas-toe: ['%ls'] en: ['text'].
 probeer pas-toe: ['%Lf'] en: 5.5.
-try-int pas-toe: ['%ld'] en: 7.
-try-int pas-toe: ['%lld'] en: 7.
+probeer-heelgetal pas-toe: ['%ld'] en: 7.
+probeer-heelgetal pas-toe: ['%lld'] en: 7.
 probeer pas-toe: ['%Ld'] en: (Int64 nuut vanuit-teks: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# 'n breedte wat nie in printf pas nie, moet 'n fout gee, nie 'n ineenstorting nie
 probeer pas-toe: ['%99999999999s'] en: ['text'].

@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# استخدام FFI مع إضافة Server
 
-# connect to libc (platform specific)
->> libname := برنامج إعداد: ⌝'FFITESTLIB'⌜.
+# الاتصال بـ libc (يعتمد على المنصة)
+>> اسم-المكتبة := برنامج إعداد: ⌝'FFITESTLIB'⌜.
 
-# link stdio functions from c for advances file operations
+# ربط دوال stdio من C لعمليات ملفات متقدمة
 Server اربط: ﴿ قائمة جديد ;
- libname ; ⌝'fopen'⌜ ;
+ اسم-المكتبة ; ⌝'fopen'⌜ ;
  ﴿ قائمة جديد ; ⌝'pointer'⌜ ; ⌝'pointer'⌜﴾ ;
  ⌝'pointer'⌜ ;
  ⌝'Stream'⌜ ;
  ⌝'path:mode:'⌜
 ﴾,
 اربط: ﴿ قائمة جديد ;
- لاشيء ; # means same lib
+ لاشيء ; # تعني المكتبة نفسها
  ⌝'fread'⌜ ;
  ﴿ قائمة جديد ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
  ⌝'int'⌜ ;
- لاشيء ; # means same object (i.e. Stream)
+ لاشيء ; # تعني الكائن نفسه (أي تيار)
  ⌝'fread'⌜
 ﴾,
 اربط: ﴿
  قائمة جديد ;
- لاشيء ; # means same lib
+ لاشيء ; # تعني المكتبة نفسها
  ⌝'fwrite'⌜ ;
  ﴿ قائمة جديد ; ⌝'pointer'⌜ ; ⌝'int'⌜ ; ⌝'int'⌜ ; ⌝'pointer'⌜ ﴾ ;
  ⌝'int'⌜ ;
- لاشيء ; # means same lib
+ لاشيء ; # تعني المكتبة نفسها
  ⌝'fwrite'⌜
 ﴾,
 اربط: ﴿
  قائمة جديد ;
- لاشيء ; # means same lib
+ لاشيء ; # تعني المكتبة نفسها
  ⌝'rewind'⌜ ;
  ﴿ قائمة جديد ; ⌝'pointer'⌜ ﴾ ;
  ⌝'int'⌜ ;
- لاشيء ; # means same lib
+ لاشيء ; # تعني المكتبة نفسها
  ⌝'rewind:'⌜
 ﴾.
 
->> str := Blob utf8: ⌝'abc123'⌜.
+>> str  := Blob utf8: ⌝'abc123'⌜.
 >> مسار-الملف := Blob utf8: ⌝'/tmp/bla.txt'⌜.
 >> mode := Blob utf8: ⌝'w+'⌜.
 
-# open a file with fopen(path, mode)
->> fd := Stream path: مسار-الملف mode: mode.
+# فتح ملف باستخدام fopen(path, mode)
+>> واصف-ملف := Stream path: مسار-الملف mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream رسالة: ⌝'fwrite'⌜ معطيات: ﴿قائمة جديد ; str ; 1 ; 6 ; fd ﴾.
-مخرج اكتب: bytes-written, سطر-جديد.
+# كتابة البايتات من المخزن سلسلة-نصية إلى الملف
+>> بايتات-مكتوبة := Stream رسالة: ⌝'fwrite'⌜ معطيات: ﴿قائمة جديد ; str ; 1 ; 6 ; واصف-ملف ﴾.
+مخرج اكتب: بايتات-مكتوبة, سطر-جديد.
 
-# rewind file pointer
-Stream rewind: fd.
+# إرجاع مؤشر الملف إلى البداية
+Stream rewind: واصف-ملف.
 
-# allocate a buffer
->> buf := Blob جديد: 20.
+# حجز مخزن
+>> مخزن := Blob جديد: 20.
 
-# read from file
->> bytes-read := Stream رسالة: ⌝'fread'⌜ معطيات: ﴿قائمة جديد ; buf ; 1 ; 6 ; fd ﴾.
-مخرج اكتب: bytes-read, سطر-جديد.
-مخرج اكتب: buf, سطر-جديد.
+# القراءة من الملف
+>> بايتات-مقروءة := Stream رسالة: ⌝'fread'⌜ معطيات: ﴿قائمة جديد ; مخزن ; 1 ; 6 ; واصف-ملف ﴾.
+مخرج اكتب: بايتات-مقروءة, سطر-جديد.
+مخرج اكتب: مخزن, سطر-جديد.
 
-# free memory
+# تحرير الذاكرة
 str  حرر.
 مسار-الملف حرر.
 mode حرر.
-buf  حرر.
+مخزن  حرر.
 
 

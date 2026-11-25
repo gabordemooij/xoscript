@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# коришћење FFI са додатком Server
 
-# connect to libc (platform specific)
->> libname := Програм подешавање: ['FFITESTLIB'].
+# повезивање са libc (зависи од платформе)
+>> имебибл := Програм подешавање: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# повезивање stdio функција из C-а за напредне операције над датотекама
 Server повежи: ( Листа нови ;
- libname ; ['fopen'] ;
+ имебибл ; ['fopen'] ;
  ( Листа нови ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 повежи: ( Листа нови ;
- Ништа ; # means same lib
+ Ништа ; # значи иста библиотека
  ['fread'] ;
  ( Листа нови ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Ништа ; # means same object (i.e. Stream)
+ Ништа ; # значи исти објекат (тј. Ток)
  ['fread']
 ),
 повежи: (
  Листа нови ;
- Ништа ; # means same lib
+ Ништа ; # значи иста библиотека
  ['fwrite'] ;
  ( Листа нови ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Ништа ; # means same lib
+ Ништа ; # значи иста библиотека
  ['fwrite']
 ),
 повежи: (
  Листа нови ;
- Ништа ; # means same lib
+ Ништа ; # значи иста библиотека
  ['rewind'] ;
  ( Листа нови ; ['pointer'] ) ;
  ['int'] ;
- Ништа ; # means same lib
+ Ништа ; # значи иста библиотека
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> путања := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# отварање датотеке помоћу fopen(path, mode)
 >> fd := Stream path: путања mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream порука: ['fwrite'] аргументи: (Листа нови ; str ; 1 ; 6 ; fd ).
-Излаз пиши: bytes-written, нови-ред.
+# уписивање бајтова из бафера str у датотеку
+>> записано-бајтова := Stream порука: ['fwrite'] аргументи: (Листа нови ; str ; 1 ; 6 ; fd ).
+Излаз пиши: записано-бајтова, нови-ред.
 
-# rewind file pointer
+# враћање показивача датотеке на почетак
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := Blob нови: 20.
+# алоцирање бафера
+>> баф := Blob нови: 20.
 
-# read from file
->> bytes-read := Stream порука: ['fread'] аргументи: (Листа нови ; buf ; 1 ; 6 ; fd ).
-Излаз пиши: bytes-read, нови-ред.
-Излаз пиши: buf, нови-ред.
+# читање из датотеке
+>> прочитано-бајтова := Stream порука: ['fread'] аргументи: (Листа нови ; баф ; 1 ; 6 ; fd ).
+Излаз пиши: прочитано-бајтова, нови-ред.
+Излаз пиши: баф, нови-ред.
 
-# free memory
+# ослобађање меморије
 str  ослободи.
 путања ослободи.
 mode ослободи.
-buf  ослободи.
+баф  ослободи.
 
 

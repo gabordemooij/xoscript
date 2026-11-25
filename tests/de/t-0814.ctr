@@ -1,18 +1,21 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# Format des Sitzungscookies, JSON-Inhaltstyp, nur Web-Protokolle, SVG wird inline angezeigt
 Server initialisieren.
 Programm verwenden: ['../../../src/xo/de/webtools.xo'].
 
->> Fake-Request := Objekt neu.
-Fake-Request wenn: ['value:'] tun: { :wert
+>> Schein-Anfrage := Objekt neu.
+Schein-Anfrage wenn: ['value:'] tun: { :wert
 	eigen wert := wert.
 }.
-Fake-Request wenn: ['cookie:'] tun: { :name <- eigen wert.
+Schein-Anfrage wenn: ['cookie:'] tun: { :name
+	<- eigen wert.
 }.
 
->> Test-Session := Tempdatei-Sitzung neu.
-Test-Session wenn: ['laden'] tun: { <- Wörterbuch neu.
+>> Test-Sitzung := Tempdatei-Sitzung neu.
+Test-Sitzung wenn: ['laden'] tun: {
+	<- Wörterbuch neu.
 }.
-Test-Session wenn: ['session-id'] tun: { <- eigen id.
+Test-Sitzung wenn: ['sitzungskennung'] tun: {
+	<- eigen id.
 }.
 
 >> cookies := Liste neu
@@ -22,18 +25,18 @@ Test-Session wenn: ['session-id'] tun: { <- eigen id.
 	; ['abc\n'].
 
 cookies jedes: { :i :cookie
-	>> anfrage := Fake-Request neu.
+	>> anfrage := Schein-Anfrage neu.
 	anfrage value: cookie.
-	>> verwalter := Test-Session neu.
-	>> web := Web-Dokument neu.
-	web anfrage: anfrage.
-	web sitzungsverwalter: verwalter.
-	web sitzung-starten.
-	Ausgabe schreiben: ( verwalter session-id = cookie ), stopp.
+	>> verwalter := Test-Sitzung neu.
+	>> webdok := Web-Dokument neu.
+	webdok anfrage: anfrage.
+	webdok sitzungsverwalter: verwalter.
+	webdok sitzung-starten.
+	Ausgabe schreiben: ( verwalter sitzungskennung = cookie ), stopp.
 }.
 
->> web := Web-Dokument neu.
-web json: (Wörterbuch neu setzen: ['b'] auf: ['a']).
+>> webdok := Web-Dokument neu.
+webdok json: (Wörterbuch neu setzen: ['b'] auf: ['a']).
 Ausgabe schreiben: ['\n'], stopp.
 
 { Netz get: ['file:///etc/hostname']. } abfangen: { :e

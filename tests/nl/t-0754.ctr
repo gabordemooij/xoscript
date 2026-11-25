@@ -1,30 +1,31 @@
-Uit schrijf: ['Test object'], stop.
+Uit schrijf: ['Testobject'], stop.
 >> a := Object nieuw. 
 
-a bij: ['item:'] doen: { :out
-	eigen out := out. 
+a bij: ['item:'] doen: { :uitv
+	eigen uitv := uitv. 
 }.
 
-a bij: ['item'] doen: { <- eigen out.
+a bij: ['onderdeel'] doen: {
+	<- eigen uitv.
 }.
 
-a bij: ['greet'] doen: {
-	Uit schrijf: ['hi from original out!'], stop.
+a bij: ['groet'] doen: {
+	Uit schrijf: ['hoi van de originele out!'], stop.
 }.
 
 a item: Uit.
 
-Uit schrijf: a item, stop.
+Uit schrijf: a onderdeel, stop.
 
->> old-out-address := a item prototype geheugenadres.
+>> oud-uitv-adres := a onderdeel prototype geheugenadres.
 a save-as: ['/tmp/a.bin'].
-Uit schrijf: ['========== RELOADING SNAP:'], stop.
+Uit schrijf: ['========== SNAP HERLADEN:'], stop.
 
 >> b := Object load-from: ['/tmp/a.bin'].
 
-(b item prototype geheugenadres = old-out-address) ja: {
-	Uit schrijf: ['Object link re-attached.'], stop.
+(b onderdeel prototype geheugenadres = oud-uitv-adres) ja: {
+	Uit schrijf: ['Objectkoppeling opnieuw verbonden.'], stop.
 }.
 
-b item schrijf: ['hello from loaded out!'], stop.
-b greet.
+b onderdeel schrijf: ['hallo van de geladen out!'], stop.
+b groet.

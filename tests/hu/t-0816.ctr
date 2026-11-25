@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> próbál := { :format :value
-	{ Kimenet ír: ( (Formátum új: format) alkalmaz: value ), újsor. } elkap: { :e Kimenet ír: e, újsor. }, indít.
+# a formátumnak illeszkednie kell az érték típusához, a típus jöhet egy klienstől is
+>> próbál := { :formátumminta :value
+	{ Kimenet ír: ( (Formátum új: formátumminta) alkalmaz: value ), újsor. } elkap: { :e Kimenet ír: e, újsor. }, indít.
 }.
->> try-int := { :format :value
-	{ Kimenet ír: ( (Formátum új: format) alkalmaz-egész: value ), újsor. } elkap: { :e Kimenet ír: e, újsor. }, indít.
+>> egész-próba := { :formátumminta :value
+	{ Kimenet ír: ( (Formátum új: formátumminta) alkalmaz-egész: value ), újsor. } elkap: { :e Kimenet ír: e, újsor. }, indít.
 }.
 
-# fits
+# illeszkedik
 próbál alkalmaz: ['|%s|'] és: ['text'].
 próbál alkalmaz: ['%06.2f'] és: 5.5.
-próbál alkalmaz: ['100%% %s'] és: ['sure'].
-try-int alkalmaz: ['%03d'] és: 7.
-try-int alkalmaz: ['%x'] és: 255.
+próbál alkalmaz: ['100%% %s'] és: ['persze'].
+egész-próba alkalmaz: ['%03d'] és: 7.
+egész-próba alkalmaz: ['%x'] és: 255.
 próbál alkalmaz: ['%d'] és: (Int64 új szövegből: ['12']).
 próbál alkalmaz: ['%lld'] és: (Int64 új szövegből: ['12']).
 próbál alkalmaz: ['%.1lf'] és: 5.5.
-try-int alkalmaz: ['%hd'] és: 7.
+egész-próba alkalmaz: ['%hd'] és: 7.
 
-# does not fit
+# nem illeszkedik
 próbál alkalmaz: ['%s'] és: 12345.
 próbál alkalmaz: ['%d'] és: 12345.
 próbál alkalmaz: ['%f'] és: ['text'].
-try-int alkalmaz: ['%d'] és: ['text'].
-try-int alkalmaz: ['%s'] és: 5.
+egész-próba alkalmaz: ['%d'] és: ['text'].
+egész-próba alkalmaz: ['%s'] és: 5.
 próbál alkalmaz: ['%s %s'] és: ['text'].
 próbál alkalmaz: ['%n'] és: ['text'].
 próbál alkalmaz: ['%*s'] és: ['text'].
 próbál alkalmaz: ['%'] és: ['text'].
 
-# length modifier does not fit
+# a hosszmódosító nem illeszkedik
 próbál alkalmaz: ['%ls'] és: ['text'].
 próbál alkalmaz: ['%Lf'] és: 5.5.
-try-int alkalmaz: ['%ld'] és: 7.
-try-int alkalmaz: ['%lld'] és: 7.
+egész-próba alkalmaz: ['%ld'] és: 7.
+egész-próba alkalmaz: ['%lld'] és: 7.
 próbál alkalmaz: ['%Ld'] és: (Int64 új szövegből: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# a printf-be nem illő szélesség hibát kell adjon, nem összeomlást
 próbál alkalmaz: ['%99999999999s'] és: ['text'].

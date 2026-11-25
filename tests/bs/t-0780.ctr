@@ -1,76 +1,77 @@
 Server init.
 
-# JSON encoder only supports UTF-8, no surrogate pairs
+# JSON enkoder podržava samo UTF-8, bez surogatnih parova
 
->> dicts := Lista novi ;
-	# {"key":"normal"} normal ASCII
-	( Rječnik novi stavi: ['normal'] na: ['key'] ) ;
-	# {"key":"hello world"} space character
+>> rječnici := Lista novi ;
+	# {"key":"normal"} običan ASCII
+	( Rječnik novi stavi: ['normalno'] na: ['key'] ) ;
+	# {"key":"hello world"} znak razmaka
 	( Rječnik novi stavi: ['hello world'] na: ['key'] ) ;
-	# {"key":"quote: \""} double quote
+	# {"key":"quote: \""} dvostruki navodnik
 	( Rječnik novi stavi: ['"'] na: ['key'] ) ;
-	# {"key":"backslash: \\"} backslash
+	# {"key":"backslash: \\"} obrnuta kosa crta
 	( Rječnik novi stavi: ['backslash: \\'] na: ['key'] ) ;
-	# {"key":"slash: /"} slash
-	( Rječnik novi stavi: ['slash: /'] na: ['key'] ) ;
+	# {"key":"slash: /"} kosa crta
+	( Rječnik novi stavi: ['kosa crta: /'] na: ['key'] ) ;
 	# {"key":"backspace: \b"} backspace
 	( Rječnik novi stavi: ['backspace: \b'] na: ['key'] ) ;
 	# {"key":"formfeed: \f"} form-feed escape
 	( Rječnik novi stavi: ['formfeed: \f'] na: ['key'] ) ;
-	# {"key":"newline: \n"} newline
+	# {"key":"newline: \n"} novi red
 	( Rječnik novi stavi: ['newline: \n'] na: ['key'] ) ;
 	( Rječnik novi stavi: ['newline: ↵'] na: ['key'] ) ;
 	( Rječnik novi stavi: ['newline: 
 	'] na: ['key'] ) ;
-	# {"key":"carriage return: \r"} carriage-return
+	# {"key":"carriage return: \r"} povratak na početak reda
 	( Rječnik novi stavi: ['carriage return: \r'] na: ['key'] ) ;
-	# {"key":"tab: \t"} tab
+	# {"key":"tab: \t"} tabulator
 	( Rječnik novi stavi: ['tab \t'] na: ['key'] ) ;
 	( Rječnik novi stavi: ['tab ⇿'] na: ['key'] ) ;
-	( Rječnik novi stavi: ['tab  '] na: ['key'] ) ;
+	( Rječnik novi stavi: ['tabulator  '] na: ['key'] ) ;
 	# {"key":"control: \u0000"} NUL
 	( Rječnik novi stavi: ['NUL \u0000'] na: ['key'] ) ;
 	( Rječnik novi stavi: ['NUL \0'] na: ['key'] ) ;
-	# {"key":"control: \u0001"} control character 0x01
+	# {"key":"control: \u0001"} kontrolni znak 0x01
 	( Rječnik novi stavi: ['control: \u0001'] na: ['key'] ) ;
-	# {"key":"control: \u001F"} control character 0x1F
+	# {"key":"control: \u001F"} kontrolni znak 0x1F
 	( Rječnik novi stavi: ['control: \u001F'] na: ['key'] ) ;
-	# {"key":"unicode: é"} UTF-8, 2-byte char
+	# {"key":"unicode: é"} UTF-8, 2-bajtni znak
 	( Rječnik novi stavi: ['unicode: é'] na: ['key'] ) ;
-	# {"key":"unicode: €"} UTF-8, 3-byte char
+	# {"key":"unicode: €"} UTF-8, 3-bajtni znak
 	( Rječnik novi stavi: ['unicode: €'] na: ['key'] ) ;
-	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	# {"key":"unicode: 日本語"} više 3-bajtnih UTF-8 znakova
 	( Rječnik novi stavi: ['unicode: 日本語'] na: ['key'] ) ;
-	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	# {"key":"unicode: 😀"} UTF-8, 4-bajtni znak
 	( Rječnik novi stavi: ['unicode: 😀'] na: ['key'] ) ;
-	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	# {"key":"unicode: 🧑‍💻"} emoji + spojnik nulte širine
 	( Rječnik novi stavi: ['unicode: 🧑‍💻'] na: ['key'] ) ;
-	# {"key":"combining: e\u0301"} combining accent
+	# {"key":"combining: é"} kombinirajući akcent
 	( Rječnik novi stavi: ['combining: e\u0301'] na: ['key'] ) ;
-	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	# {"key":"escaped unicode: é"} Unicode escape BMP
 	( Rječnik novi stavi: ['escaped unicode: \u00e9'] na: ['key'] ) ;
-	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	# {"key":"escaped unicode: €"} Unicode escape BMP
 	( Rječnik novi stavi: ['escaped unicode: \u20ac'] na: ['key'] ) ;
-	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	# {"key":"escaped unicode: 😀"} UTF-16 surogatni par
 	( Rječnik novi stavi: ['escaped unicode: \ud83d\ude00'] na: ['key'] ) ;
-	# {"key":""} empty value
+	# {"key":""} prazna vrijednost
 	( Rječnik novi stavi: [''] na: ['key'] ) ;
-	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	# {"key":"@ < > & = % + ? #"} posebni ASCII znakovi
 	( Rječnik novi stavi: ['@ < > & = % + ? #'] na: ['key'] ) ;
-	# {"key":"single quote: '"} single quote
+	# {"key":"single quote: '"} jednostruki navodnik
 	( Rječnik novi stavi: ['''] na: ['key'] ) ;
-	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	# {"key":"multiple: \" \\ \n \r \t"} više JSON escape znakova
 	( Rječnik novi stavi: ['multiple: \" \\ \n \r \t'] na: ['key'] ) ;
-	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} duži ASCII tekst
 	( Rječnik novi stavi: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] na: ['key'] ) ;
-	# {"key":" value"} leading space
-	( Rječnik novi stavi: [' value'] na: ['key'] ) ;
-	# {"key":"value "} trailing space
-	( Rječnik novi stavi: ['value '] na: ['key'] ) ;
-	# {"key":" \t\n\r "} whitespace
-	( Rječnik novi stavi: [' \t\n\r '] na: ['key'] ).
+	# {"key":" value"} razmak na početku
+	( Rječnik novi stavi: [' vrijednost'] na: ['key'] ) ;
+	# {"key":"value "} razmak na kraju
+	( Rječnik novi stavi: ['vrijednost '] na: ['key'] ) ;
+	# {"key":" \t\n\r "} bjeline
+	( Rječnik novi stavi: [' \t\n\r '] na: ['key'] )
+	.
 
-dicts svaki: { :_ :d
+rječnici svaki: { :_ :d
 	>> j := JSON jsonify: d.
 	>> a := JSON jsonify: (Rječnik novi stavi: d key na: ['key']).
 	>> b := JSON jsonify: (Rječnik novi stavi: ['value'] na: d key).
@@ -79,7 +80,7 @@ dicts svaki: { :_ :d
 	((e key = d key i: (f ? d key = ['value'])) ili: (e key = ['NUL ?'])) tačno: {
 		Izlaz piši: ['OK'], novi-red.
 	}, inače: {
-		Izlaz piši: ['Unable to properly encode/decode: '] + d + j, novi-red.
+		Izlaz piši: ['Nije moguće ispravno kodirati/dekodirati: '] + d + j, novi-red.
 		Program kraj.
 	}.
 }.

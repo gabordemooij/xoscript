@@ -1,39 +1,42 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# istuntoevästeen muoto, json-sisältötyyppi, vain verkkoprotokollat, svg näytetään sivun sisällä
 Server valmistele.
 Ohjelma käytä: ['../../../src/xo/fi/webtools.xo'].
 
->> Fake-Request := Olio uusi.
-Fake-Request kun: ['value:'] tee: { :arvo
+>> Vale-Pyyntö := Olio uusi.
+Vale-Pyyntö kun: ['value:'] tee: { :arvo
 	oma arvo := arvo.
 }.
-Fake-Request kun: ['cookie:'] tee: { :nimi <- oma arvo.
+Vale-Pyyntö kun: ['cookie:'] tee: { :nimi
+	<- oma arvo.
 }.
 
->> Test-Session := Väliaikaistiedosto-istunto uusi.
-Test-Session kun: ['lataa'] tee: { <- Sanakirja uusi.
+>> Testi-Istunto := Väliaikaistiedosto-istunto uusi.
+Testi-Istunto kun: ['lataa'] tee: {
+	<- Sanakirja uusi.
 }.
-Test-Session kun: ['session-id'] tee: { <- oma id.
+Testi-Istunto kun: ['istunnon-id'] tee: {
+	<- oma id.
 }.
 
->> cookies := Lista uusi
+>> evästeet := Lista uusi
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies jokainen: { :i :cookie
-	>> pyyntö := Fake-Request uusi.
-	pyyntö value: cookie.
-	>> hallinta := Test-Session uusi.
-	>> web := Verkkodokumentti uusi.
-	web pyyntö: pyyntö.
-	web istunnonhallinta: hallinta.
-	web aloita-istunto.
-	Tuloste kirjoita: ( hallinta session-id = cookie ), rivinvaihto.
+evästeet jokainen: { :i :eväste
+	>> pyyntö := Vale-Pyyntö uusi.
+	pyyntö value: eväste.
+	>> hallinta := Testi-Istunto uusi.
+	>> verkkosivu := Verkkodokumentti uusi.
+	verkkosivu pyyntö: pyyntö.
+	verkkosivu istunnonhallinta: hallinta.
+	verkkosivu aloita-istunto.
+	Tuloste kirjoita: ( hallinta istunnon-id = eväste ), rivinvaihto.
 }.
 
->> web := Verkkodokumentti uusi.
-web json: (Sanakirja uusi aseta: ['b'] kohtaan: ['a']).
+>> verkkosivu := Verkkodokumentti uusi.
+verkkosivu json: (Sanakirja uusi aseta: ['b'] kohtaan: ['a']).
 Tuloste kirjoita: ['\n'], rivinvaihto.
 
 { Verkko get: ['file:///etc/hostname']. } sieppaa: { :e

@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# test podatkovne baze
+# za potrebno konfiguracijo glej primer server.xo
 
 Server init.
-Izhod piši: ['Database test'], nova-vrstica.
+Izhod piši: ['Test podatkovne baze'], nova-vrstica.
 
->> db := Maria-DB nov gostitelj: ['localhost'],
+>> pb := Maria-DB nov gostitelj: ['localhost'],
 	uporabnik: ['xo'], geslo: ['pass123'], ime-baze: ['xobase'], poveži-se.
 
-Izhod piši: ['Can we connect? '] + db povezano?, nova-vrstica.
+Izhod piši: ['Se lahko povežemo? '] + pb povezano?, nova-vrstica.
 
->> iskalni-parametri := db poizvedba: ['
+>> iskalni-parametri := pb poizvedba: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametri: ( Seznam nov ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametri: ( Seznam nov ; ['abc'] ; 12.35 ; 6 ). # parametrizirane poizvedbe
 
-{  iskalni-parametri izvedi. db potrdi. } ujemi: { :e db razveljavi.  }, zaženi.
+{  iskalni-parametri izvedi. pb potrdi. } ujemi: { :e pb razveljavi.  }, zaženi.
 
-Izhod piši: ['Can we insert? '] + ( iskalni-parametri insert-id > 0 ), nova-vrstica.
+Izhod piši: ['Lahko vstavimo? '] + ( iskalni-parametri insert-id > 0 ), nova-vrstica.
 
 >> x := 0.
 >> iskalni-parametri :=
-db poizvedba: ['SELECT * FROM book order by id desc limit 2'], 
-pridobi: { :row 
+pb poizvedba: ['SELECT * FROM book order by id desc limit 2'], 
+pridobi: { :vrsta 
 	x prištej: 1.
-	Resnično prekini. # must clean up, no 'Commands out of sync'
+	Resnično prekini. # mora počistiti, brez 'Commands out of sync'
 }.
 
 >> iskalni-parametri :=
-db poizvedba: ['SELECT * FROM book order by id desc limit 2'], 
-pridobi: { :row
+pb poizvedba: ['SELECT * FROM book order by id desc limit 2'], 
+pridobi: { :vrsta
 	x prištej: 1.
 	Resnično prekini.
 }.
 
 (x > 0) resnično: {
-	Izhod piši: ['Can we break in the middle of a fetch? '].
+	Izhod piši: ['Ali lahko prekinemo sredi prenosa? '].
 }.
 
 Izhod piši: Resnično, nova-vrstica.

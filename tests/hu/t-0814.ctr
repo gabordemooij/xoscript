@@ -1,39 +1,42 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# munkamenet-süti formátuma, json tartalomtípus, csak webes protokollok, svg beágyazva megjelenítve
 Server inicializál.
 Program használ: ['../../../src/xo/hu/webtools.xo'].
 
->> Fake-Request := Objektum új.
-Fake-Request ha: ['value:'] tedd: { :érték
+>> Ál-Kérés := Objektum új.
+Ál-Kérés ha: ['value:'] tedd: { :érték
 	saját érték := érték.
 }.
-Fake-Request ha: ['cookie:'] tedd: { :név <- saját érték.
+Ál-Kérés ha: ['cookie:'] tedd: { :név
+	<- saját érték.
 }.
 
->> Test-Session := Ideiglenes-fájl-munkamenet új.
-Test-Session ha: ['betölt'] tedd: { <- Szótár új.
+>> Teszt-Munkamenet := Ideiglenes-fájl-munkamenet új.
+Teszt-Munkamenet ha: ['betölt'] tedd: {
+	<- Szótár új.
 }.
-Test-Session ha: ['session-id'] tedd: { <- saját id.
+Teszt-Munkamenet ha: ['munkamenet-id'] tedd: {
+	<- saját id.
 }.
 
->> cookies := Lista új
+>> sütik := Lista új
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies mindegyik: { :i :cookie
-	>> kérés := Fake-Request új.
-	kérés value: cookie.
-	>> kezelő := Test-Session új.
-	>> web := Webdokumentum új.
-	web kérés: kérés.
-	web munkamenet-kezelő: kezelő.
-	web munkamenet-indítása.
-	Kimenet ír: ( kezelő session-id = cookie ), újsor.
+sütik mindegyik: { :i :süti
+	>> kérés := Ál-Kérés új.
+	kérés value: süti.
+	>> kezelő := Teszt-Munkamenet új.
+	>> weblap := Webdokumentum új.
+	weblap kérés: kérés.
+	weblap munkamenet-kezelő: kezelő.
+	weblap munkamenet-indítása.
+	Kimenet ír: ( kezelő munkamenet-id = süti ), újsor.
 }.
 
->> web := Webdokumentum új.
-web json: (Szótár új tesz: ['b'] ide: ['a']).
+>> weblap := Webdokumentum új.
+weblap json: (Szótár új tesz: ['b'] ide: ['a']).
 Kimenet ír: ['\n'], újsor.
 
 { Hálózat get: ['file:///etc/hostname']. } elkap: { :e

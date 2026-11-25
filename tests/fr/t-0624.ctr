@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := Objet nouveau.
+# Ce test vérifie que string_fill_in ne perd pas son emplacement (gc'ed) en mode 4
+# référence dans world.c
+>> Journal := Objet nouveau.
 
-Log quand: ['say:'] faire: { :str
+Journal quand: ['say:'] faire: { :str
 	Sortie écrire: str, stop.
 }.
 
->> Item := Objet nouveau.
+>> Article := Objet nouveau.
 
-Item quand: ['nouveau:'] faire: { :id <- soi nouveau id: id.
+Article quand: ['nouveau:'] faire: { :id
+	<- soi nouveau id: id.
 }.
 
-Item quand: ['id:'] faire: { :id
+Article quand: ['id:'] faire: { :id
 	propre id := id.
 }.
 
-Item quand: ['id'] faire: { <- propre id. }.
+Article quand: ['id'] faire: { <- propre id. }.
 
 
-Item quand: ['texte'] faire: {
+Article quand: ['texte'] faire: {
 	>> str := ['Item#~no'].
-	str ~no: propre id. <- str.
+	str ~no: propre id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item quand: ['texte'] faire: {
 
 Print quand: ['items'] faire: { 
 	
-	propre item := Item nouveau: 1.
+	propre article := Article nouveau: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: propre item
+	# soit un segfault, soit un mauvais str ici
+	Journal say: (
+		['~item printed.'] ~item: propre article
 	).
 	
 	

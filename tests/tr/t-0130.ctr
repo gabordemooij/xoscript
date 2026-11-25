@@ -1,66 +1,66 @@
-# using FFI with the Server plugin
+# Server eklentisiyle FFI kullanımı
 
-# connect to libc (platform specific)
->> libname := Program ayar: ['FFITESTLIB'].
+# libc'ye bağlan (platforma özgü)
+>> kütüphaneAdı := Program ayar: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# gelişmiş dosya işlemleri için C'deki stdio fonksiyonlarını bağla
 Server bağla: ( Liste yeni ;
- libname ; ['fopen'] ;
+ kütüphaneAdı ; ['fopen'] ;
  ( Liste yeni ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 bağla: ( Liste yeni ;
- Hiç ; # means same lib
+ Hiç ; # aynı kütüphane anlamına gelir
  ['fread'] ;
  ( Liste yeni ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Hiç ; # means same object (i.e. Stream)
+ Hiç ; # aynı nesne anlamına gelir (yani Akış)
  ['fread']
 ),
 bağla: (
  Liste yeni ;
- Hiç ; # means same lib
+ Hiç ; # aynı kütüphane anlamına gelir
  ['fwrite'] ;
  ( Liste yeni ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Hiç ; # means same lib
+ Hiç ; # aynı kütüphane anlamına gelir
  ['fwrite']
 ),
 bağla: (
  Liste yeni ;
- Hiç ; # means same lib
+ Hiç ; # aynı kütüphane anlamına gelir
  ['rewind'] ;
  ( Liste yeni ; ['pointer'] ) ;
  ['int'] ;
- Hiç ; # means same lib
+ Hiç ; # aynı kütüphane anlamına gelir
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> yol := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# fopen(path, mode) ile bir dosya aç
 >> fd := Stream path: yol mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream ileti: ['fwrite'] argümanlar: (Liste yeni ; str ; 1 ; 6 ; fd ).
-Çıktı yaz: bytes-written, yeni-satır.
+# tampondaki str baytlarını dosyaya yaz
+>> yazılan-baytlar := Stream ileti: ['fwrite'] argümanlar: (Liste yeni ; str ; 1 ; 6 ; fd ).
+Çıktı yaz: yazılan-baytlar, yeni-satır.
 
-# rewind file pointer
+# dosya işaretçisini başa sar
 Stream rewind: fd.
 
-# allocate a buffer
+# bir tampon ayır
 >> buf := Blob yeni: 20.
 
-# read from file
->> bytes-read := Stream ileti: ['fread'] argümanlar: (Liste yeni ; buf ; 1 ; 6 ; fd ).
-Çıktı yaz: bytes-read, yeni-satır.
+# dosyadan oku
+>> okunan-baytlar := Stream ileti: ['fread'] argümanlar: (Liste yeni ; buf ; 1 ; 6 ; fd ).
+Çıktı yaz: okunan-baytlar, yeni-satır.
 Çıktı yaz: buf, yeni-satır.
 
-# free memory
+# belleği serbest bırak
 str  serbest-bırak.
 yol serbest-bırak.
 mode serbest-bırak.

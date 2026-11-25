@@ -1,18 +1,18 @@
-#ffi test
+#ffi-teszt
 
 
 Server init.
 
 Program memóriakezelés: 4.
 
-# for this test you need set a path to libc (puts)
->> libname := Program beállítás: ['FFITESTLIB'].
+# ehhez a teszthez meg kell adni a libc útvonalát (puts)
+>> könyvtárfájlnév := Program beállítás: ['FFITESTLIB'].
 
 
 
 Server összekapcsol: (
  Lista új ;
- libname ;
+ könyvtárfájlnév ;
  ['puts'] ;
  ( Lista új ; ['pointer'] ) ;
  ['void'] ;
@@ -25,7 +25,7 @@ Server összekapcsol: (
 Puts str: s.
 s felszabadít.
 
-# test with struct
+# teszt struct-tal
 
 >> a := Blob új: 8.
 a bytes: (
@@ -34,19 +34,19 @@ a bytes: (
     1  ; 0 ; 0 ; 0
 ).
 
->> struct := Blob struct: (Lista <<: ['int'], ; ['int']).
+>> szerkezet := Blob struct: (Lista <<: ['int'], ; ['int']).
 
 Server összekapcsol: (
 	Lista <<: ['@structtest'], ;
 	['@structtest'] ;
-	(Lista <<: struct) ; 
+	(Lista <<: szerkezet) ; 
 	['int'] ;	
 	['ffitest'] ;
 	['ffisum:']
 ).
 	
-Kimenet ír: ['Sum test:'] + (ffitest ffisum: a), újsor.
+Kimenet ír: ['Összeg teszt:'] + (ffitest ffisum: a), újsor.
 
-struct struct-felszabadít.
-struct felszabadít.
+szerkezet struct-felszabadít.
+szerkezet felszabadít.
 a felszabadít.

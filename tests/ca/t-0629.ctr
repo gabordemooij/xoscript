@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# prova de base de dades
+# vegeu l'exemple server.xo per a la configuració necessària
 
 Server init.
-Sortida escriu: ['Database test'], salt-de-línia.
+Sortida escriu: ['Prova de base de dades'], salt-de-línia.
 
->> db := Maria-DB nou amfitrió: ['localhost'],
+>> bd := Maria-DB nou amfitrió: ['localhost'],
 	usuari: ['xo'], contrasenya: ['pass123'], nom-base: ['xobase'], connecta.
 
-Sortida escriu: ['Can we connect? '] + db connectat?, salt-de-línia.
+Sortida escriu: ['Podem connectar? '] + bd connectat?, salt-de-línia.
 
->> paràmetres-de-cerca := db consulta: ['
+>> paràmetres-de-cerca := bd consulta: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], paràmetres: ( Llista nou ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], paràmetres: ( Llista nou ; ['abc'] ; 12.35 ; 6 ). # consultes parametritzades
 
-{  paràmetres-de-cerca executa. db confirma. } captura: { :e db desfés.  }, inicia.
+{  paràmetres-de-cerca executa. bd confirma. } captura: { :e bd desfés.  }, inicia.
 
-Sortida escriu: ['Can we insert? '] + ( paràmetres-de-cerca insert-id > 0 ), salt-de-línia.
+Sortida escriu: ['Podem inserir? '] + ( paràmetres-de-cerca insert-id > 0 ), salt-de-línia.
 
 >> Obj := Objecte nou.
-Obj en: ['retrieve-rows'] fes: {
+Obj en: ['recupera-files'] fes: {
 	propi compta := 0.
 	>> paràmetres-de-cerca :=
-	db consulta: ['SELECT * FROM book order by id desc limit 2'], 
-	obtén: { :row 
+	bd consulta: ['SELECT * FROM book order by id desc limit 2'], 
+	obtén: { :fila 
 		propi compta suma: 1.
 		Cert interromp.
-	}. <- propi compta copia.
+	}. # obtenció de files
+	<- propi compta copia.
 }.
 
-Sortida escriu: ['Can we query? '] + ( Obj retrieve-rows > 0 ), salt-de-línia.
+Sortida escriu: ['Podem consultar? '] + ( Obj recupera-files > 0 ), salt-de-línia.

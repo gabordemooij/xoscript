@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# tietokantatesti
+# katso vaadittavat asetukset esimerkistä server.xo
 
 Server init.
-Tuloste kirjoita: ['Database test'], rivinvaihto.
+Tuloste kirjoita: ['Tietokantatesti'], rivinvaihto.
 
->> db := Maria-DB uusi isäntä: ['localhost'],
+>> tk := Maria-DB uusi isäntä: ['localhost'],
 	käyttäjänimi: ['xo'], salasana: ['pass123'], tietokannan-nimi: ['xobase'], yhdistä.
 
-Tuloste kirjoita: ['Can we connect? '] + db yhdistetty?, rivinvaihto.
+Tuloste kirjoita: ['Voimmeko yhdistää? '] + tk yhdistetty?, rivinvaihto.
 
->> hakuparametrit := db kysely: ['
+>> hakuparametrit := tk kysely: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametrit: ( Lista uusi ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametrit: ( Lista uusi ; ['abc'] ; 12.35 ; 6 ). # parametrisoidut kyselyt
 
-{  hakuparametrit suorita. db vahvista. } sieppaa: { :e db peru.  }, käynnistä.
+{  hakuparametrit suorita. tk vahvista. } sieppaa: { :e tk peru.  }, käynnistä.
 
-Tuloste kirjoita: ['Can we insert? '] + ( hakuparametrit insert-id > 0 ), rivinvaihto.
+Tuloste kirjoita: ['Voimmeko lisätä? '] + ( hakuparametrit insert-id > 0 ), rivinvaihto.
 
->> Obj := Olio uusi.
-Obj kun: ['retrieve-rows'] tee: {
+>> Ol := Olio uusi.
+Ol kun: ['hae-rivit'] tee: {
 	oma lukumäärä := 0.
 	>> hakuparametrit :=
-	db kysely: ['SELECT * FROM book order by id desc limit 2'], 
-	hae: { :row 
+	tk kysely: ['SELECT * FROM book order by id desc limit 2'], 
+	hae: { :vaakarivi 
 		oma lukumäärä lisää: 1.
 		Tosi keskeytä.
-	}. <- oma lukumäärä kopioi.
+	}. # rivien haku
+	<- oma lukumäärä kopioi.
 }.
 
-Tuloste kirjoita: ['Can we query? '] + ( Obj retrieve-rows > 0 ), rivinvaihto.
+Tuloste kirjoita: ['Voimmeko kysellä? '] + ( Ol hae-rivit > 0 ), rivinvaihto.

@@ -1,76 +1,77 @@
 Server init.
 
-# JSON encoder only supports UTF-8, no surrogate pairs
+# Bộ mã hóa JSON chỉ hỗ trợ UTF-8, không hỗ trợ cặp thay thế (surrogate)
 
->> dicts := Danh-sách mới ;
-	# {"key":"normal"} normal ASCII
-	( Từ-điển mới đặt: ['normal'] tại: ['key'] ) ;
-	# {"key":"hello world"} space character
+>> các-từ-điển := Danh-sách mới ;
+	# {"key":"normal"} ASCII thông thường
+	( Từ-điển mới đặt: ['bình thường'] tại: ['key'] ) ;
+	# {"key":"hello world"} ký tự khoảng trắng
 	( Từ-điển mới đặt: ['hello world'] tại: ['key'] ) ;
-	# {"key":"quote: \""} double quote
+	# {"key":"quote: \""} dấu nháy kép
 	( Từ-điển mới đặt: ['"'] tại: ['key'] ) ;
-	# {"key":"backslash: \\"} backslash
+	# {"key":"backslash: \\"} dấu gạch chéo ngược
 	( Từ-điển mới đặt: ['backslash: \\'] tại: ['key'] ) ;
-	# {"key":"slash: /"} slash
-	( Từ-điển mới đặt: ['slash: /'] tại: ['key'] ) ;
-	# {"key":"backspace: \b"} backspace
+	# {"key":"slash: /"} dấu gạch chéo
+	( Từ-điển mới đặt: ['gạch chéo: /'] tại: ['key'] ) ;
+	# {"key":"backspace: \b"} phím lùi (backspace)
 	( Từ-điển mới đặt: ['backspace: \b'] tại: ['key'] ) ;
-	# {"key":"formfeed: \f"} form-feed escape
+	# {"key":"formfeed: \f"} ký tự thoát sang trang (form-feed)
 	( Từ-điển mới đặt: ['formfeed: \f'] tại: ['key'] ) ;
-	# {"key":"newline: \n"} newline
+	# {"key":"newline: \n"} xuống dòng
 	( Từ-điển mới đặt: ['newline: \n'] tại: ['key'] ) ;
 	( Từ-điển mới đặt: ['newline: ↵'] tại: ['key'] ) ;
 	( Từ-điển mới đặt: ['newline: 
 	'] tại: ['key'] ) ;
-	# {"key":"carriage return: \r"} carriage-return
+	# {"key":"carriage return: \r"} về đầu dòng (carriage-return)
 	( Từ-điển mới đặt: ['carriage return: \r'] tại: ['key'] ) ;
 	# {"key":"tab: \t"} tab
 	( Từ-điển mới đặt: ['tab \t'] tại: ['key'] ) ;
 	( Từ-điển mới đặt: ['tab ⇿'] tại: ['key'] ) ;
-	( Từ-điển mới đặt: ['tab  '] tại: ['key'] ) ;
+	( Từ-điển mới đặt: ['dấu tab  '] tại: ['key'] ) ;
 	# {"key":"control: \u0000"} NUL
 	( Từ-điển mới đặt: ['NUL \u0000'] tại: ['key'] ) ;
 	( Từ-điển mới đặt: ['NUL \0'] tại: ['key'] ) ;
-	# {"key":"control: \u0001"} control character 0x01
+	# {"key":"control: \u0001"} ký tự điều khiển 0x01
 	( Từ-điển mới đặt: ['control: \u0001'] tại: ['key'] ) ;
-	# {"key":"control: \u001F"} control character 0x1F
+	# {"key":"control: \u001F"} ký tự điều khiển 0x1F
 	( Từ-điển mới đặt: ['control: \u001F'] tại: ['key'] ) ;
-	# {"key":"unicode: é"} UTF-8, 2-byte char
+	# {"key":"unicode: é"} UTF-8, ký tự 2 byte
 	( Từ-điển mới đặt: ['unicode: é'] tại: ['key'] ) ;
-	# {"key":"unicode: €"} UTF-8, 3-byte char
+	# {"key":"unicode: €"} UTF-8, ký tự 3 byte
 	( Từ-điển mới đặt: ['unicode: €'] tại: ['key'] ) ;
-	# {"key":"unicode: 日本語"} multiple 3-byte UTF-8 chars
+	# {"key":"unicode: 日本語"} nhiều ký tự UTF-8 3 byte
 	( Từ-điển mới đặt: ['unicode: 日本語'] tại: ['key'] ) ;
-	# {"key":"unicode: 😀"} UTF-8, 4-byte char
+	# {"key":"unicode: 😀"} UTF-8, ký tự 4 byte
 	( Từ-điển mới đặt: ['unicode: 😀'] tại: ['key'] ) ;
-	# {"key":"unicode: 🧑‍💻"} emoji + zero-width joiner
+	# {"key":"unicode: 🧑‍💻"} emoji + ký tự nối độ rộng 0
 	( Từ-điển mới đặt: ['unicode: 🧑‍💻'] tại: ['key'] ) ;
-	# {"key":"combining: e\u0301"} combining accent
+	# {"key":"combining: é"} dấu kết hợp
 	( Từ-điển mới đặt: ['combining: e\u0301'] tại: ['key'] ) ;
-	# {"key":"escaped unicode: \u00e9"} Unicode escape BMP
+	# {"key":"escaped unicode: é"} mã thoát Unicode BMP
 	( Từ-điển mới đặt: ['escaped unicode: \u00e9'] tại: ['key'] ) ;
-	# {"key":"escaped unicode: \u20ac"} Unicode escape BMP
+	# {"key":"escaped unicode: €"} mã thoát Unicode BMP
 	( Từ-điển mới đặt: ['escaped unicode: \u20ac'] tại: ['key'] ) ;
-	# {"key":"escaped unicode: \ud83d\ude00"} UTF-16 surrogate pair
+	# {"key":"escaped unicode: 😀"} cặp thay thế UTF-16
 	( Từ-điển mới đặt: ['escaped unicode: \ud83d\ude00'] tại: ['key'] ) ;
-	# {"key":""} empty value
+	# {"key":""} giá trị rỗng
 	( Từ-điển mới đặt: [''] tại: ['key'] ) ;
-	# {"key":"@ < > & = % + ? #"} special ASCII chars
+	# {"key":"@ < > & = % + ? #"} các ký tự ASCII đặc biệt
 	( Từ-điển mới đặt: ['@ < > & = % + ? #'] tại: ['key'] ) ;
-	# {"key":"single quote: '"} single quote
+	# {"key":"single quote: '"} dấu nháy đơn
 	( Từ-điển mới đặt: ['''] tại: ['key'] ) ;
-	# {"key":"multiple: \" \\ \n \r \t"} multiple JSON escapes
+	# {"key":"multiple: \" \\ \n \r \t"} nhiều mã thoát JSON
 	( Từ-điển mới đặt: ['multiple: \" \\ \n \r \t'] tại: ['key'] ) ;
-	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} longer ASCII-string
+	# {"key":"aaaaaaaaaaaaaaaaaaaaaaaaaa"} chuỗi ASCII dài hơn
 	( Từ-điển mới đặt: ['aaaaaaaaaaaaaaaaaaaaaaaaaa'] tại: ['key'] ) ;
-	# {"key":" value"} leading space
-	( Từ-điển mới đặt: [' value'] tại: ['key'] ) ;
-	# {"key":"value "} trailing space
-	( Từ-điển mới đặt: ['value '] tại: ['key'] ) ;
-	# {"key":" \t\n\r "} whitespace
-	( Từ-điển mới đặt: [' \t\n\r '] tại: ['key'] ).
+	# {"key":" value"} khoảng trắng ở đầu
+	( Từ-điển mới đặt: [' giá trị'] tại: ['key'] ) ;
+	# {"key":"value "} khoảng trắng ở cuối
+	( Từ-điển mới đặt: ['giá trị '] tại: ['key'] ) ;
+	# {"key":" \t\n\r "} khoảng trắng
+	( Từ-điển mới đặt: [' \t\n\r '] tại: ['key'] )
+	.
 
-dicts mỗi: { :_ :d
+các-từ-điển mỗi: { :_ :d
 	>> j := JSON jsonify: d.
 	>> a := JSON jsonify: (Từ-điển mới đặt: d key tại: ['key']).
 	>> b := JSON jsonify: (Từ-điển mới đặt: ['value'] tại: d key).
@@ -79,7 +80,7 @@ dicts mỗi: { :_ :d
 	((e key = d key và: (f ? d key = ['value'])) hoặc: (e key = ['NUL ?'])) đúng: {
 		Xuất ghi: ['OK'], xuống-dòng.
 	}, ngược-lại: {
-		Xuất ghi: ['Unable to properly encode/decode: '] + d + j, xuống-dòng.
+		Xuất ghi: ['Không thể mã hóa/giải mã đúng cách: '] + d + j, xuống-dòng.
 		Chương-trình kết-thúc.
 	}.
 }.

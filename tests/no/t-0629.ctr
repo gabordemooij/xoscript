@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# databasetest
+# se eksempelet server.xo for nødvendig konfigurasjon
 
 Server init.
-Utdata skriv: ['Database test'], stop.
+Utdata skriv: ['Databasetest'], stop.
 
 >> db := Maria-DB ny vert: ['localhost'],
 	brukernavn: ['xo'], passord: ['pass123'], databasenavn: ['xobase'], koble-til.
 
-Utdata skriv: ['Can we connect? '] + db tilkoblet?, stop.
+Utdata skriv: ['Kan vi koble til? '] + db tilkoblet?, stop.
 
 >> søkeparametere := db spørring: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametere: ( Liste ny ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametere: ( Liste ny ; ['abc'] ; 12.35 ; 6 ). # parameteriserte spørringer
 
 {  søkeparametere utfør. db bekreft. } fang: { :e db rull-tilbake.  }, start.
 
-Utdata skriv: ['Can we insert? '] + ( søkeparametere insert-id > 0 ), stop.
+Utdata skriv: ['Kan vi sette inn? '] + ( søkeparametere insert-id > 0 ), stop.
 
 >> Obj := Objekt ny.
-Obj ved: ['retrieve-rows'] gjør: {
+Obj ved: ['hent-rader'] gjør: {
 	egen antall := 0.
 	>> søkeparametere :=
 	db spørring: ['SELECT * FROM book order by id desc limit 2'], 
-	hent: { :row 
+	hent: { :rad 
 		egen antall legg-til: 1.
 		Sann avbryt.
-	}. <- egen antall kopier.
+	}. # henting av rader
+	<- egen antall kopier.
 }.
 
-Utdata skriv: ['Can we query? '] + ( Obj retrieve-rows > 0 ), stop.
+Utdata skriv: ['Kan vi spørre? '] + ( Obj hent-rader > 0 ), stop.

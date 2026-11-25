@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# Test sanitizera utf8
 Server init.
 
->> utf8cases := Słownik nowy
-	# ASCII only
+>> przypadkiUtf8 := Słownik nowy
+	# tylko ASCII
 	umieść: ( Lista nowy ; 65 ; 65 ; 65 ; 65 ; 0 ) w: ['AAAA'],
-	# valid 2 byte sequence
+	# poprawna sekwencja 2-bajtowa
 	umieść: ( Lista nowy ; 194 ; 162 ; 0 ) w: ['¢'],
-	# Valid 3-byte UTF-8
+	# Poprawny 3-bajtowy UTF-8
     umieść: ( Lista nowy ; 226 ; 130 ; 172 ; 0 ) w: ['€'],
-	# Valid 4-byte UTF-8
+	# Poprawny 4-bajtowy UTF-8
     umieść: ( Lista nowy ; 240 ; 144 ; 141 ; 136 ; 0 ) w: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# Niepoprawny bajt kontynuacji w sekwencji E2 28 AC -> początek sekwencji 3b + 28 zły bajt kont. + AC bajt kont., ale należy do tego samego błędu
     umieść: ( Lista nowy ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) w: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# Zbyt długie kodowanie ASCII 'A' (powinno stać się ?),
     umieść: ( Lista nowy ; 65 ; 193 ; 129 ; 0 ) w: ['A?'],
-	# Invalid first byte (0xFF)
+	# Niepoprawny pierwszy bajt (0xFF)
     umieść: ( Lista nowy ; 255 ; 0 ) w: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Niekompletna sekwencja wielobajtowa na końcu
     umieść: ( Lista nowy ; 66 ; 226 ; 0 ) w: ['B?'],
-    # Empty string
+    # Pusty tekst
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Wiele mieszanych sekwencji
     umieść: ( Lista nowy ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) w: ['A€?𐍈B'].
 	 
-utf8cases każdy: { :key :value
+przypadkiUtf8 każdy: { :key :value
 	>> blob := Blob nowy: value liczność, bytes: value.
 	>> str := blob tekst.
 	(str = key) prawda: {
 		Wyjście pisz: ['OK'], nowa-linia.
 	}, inaczej: {
-		Wyjście pisz: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, nowa-linia.
+		Wyjście pisz: ['Sanityzacja UTF8 nie powiodła się dla: '] + key + [' otrzymano: '] + str, nowa-linia.
 	}.
 	blob zwolnij.
 }.

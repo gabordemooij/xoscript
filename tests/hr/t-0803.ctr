@@ -1,27 +1,27 @@
 Server init.
 
->> conn1 := Maria-DB novi domaćin: ['localhost'],
+>> veza1 := Maria-DB novi domaćin: ['localhost'],
 	korisnik: ['xo'],
 	lozinka: ['pass123'],
 	naziv-baze: ['xobase'],
 	poveži-se.
 
->> conn2 := Maria-DB novi domaćin: ['localhost'],
+>> veza2 := Maria-DB novi domaćin: ['localhost'],
 	korisnik: ['xo'],
 	lozinka: ['pass123'],
 	naziv-baze: ['xobase'],
 	poveži-se.
 #...
->> del := conn1 upit: ['DELETE FROM book WHERE id > 0'].
-{  del izvrši. conn1 potvrdi. } uhvati: { :e conn1 poništi.  }, pokreni.
+>> bris := veza1 upit: ['DELETE FROM book WHERE id > 0'].
+{  bris izvrši. veza1 potvrdi. } uhvati: { :e veza1 poništi.  }, pokreni.
 
->> insert := conn1 upit: ['INSERT INTO book (id) VALUES(null)'].
-insert izvrši.
+>> umetni := veza1 upit: ['INSERT INTO book (id) VALUES(null)'].
+umetni izvrši.
 
->> broj-elemenata := conn1 upit: ['SELECT COUNT(*) AS num FROM book'].
-broj-elemenata dohvati: { :row Izlaz piši: row num, novi-red. }.
+>> broj-elemenata := veza1 upit: ['SELECT COUNT(*) AS num FROM book'].
+broj-elemenata dohvati: { :red Izlaz piši: red num, novi-red. }.
 
-# does not show up
-# insert not committed on connection 1
->> broj-elemenata := conn2 upit: ['SELECT COUNT(*) AS num FROM book'].
-broj-elemenata dohvati: { :row Izlaz piši: row num, novi-red. }.
+# ne prikazuje se
+# umetanje nije potvrđeno na vezi 1
+>> broj-elemenata := veza2 upit: ['SELECT COUNT(*) AS num FROM book'].
+broj-elemenata dohvati: { :red Izlaz piši: red num, novi-red. }.

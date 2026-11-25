@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := Objekt nov.
+# Ta test preveri, ali string_fill_in ne izgubi svoje reže (gc'ed) v načinu 4
+# sklic v world.c
+>> Dnevnik := Objekt nov.
 
-Log ob: ['say:'] izvedi: { :str
+Dnevnik ob: ['say:'] izvedi: { :str
 	Izhod piši: str, nova-vrstica.
 }.
 
->> Item := Objekt nov.
+>> Predmet := Objekt nov.
 
-Item ob: ['nov:'] izvedi: { :id <- sebe nov id: id.
+Predmet ob: ['nov:'] izvedi: { :id
+	<- sebe nov id: id.
 }.
 
-Item ob: ['id:'] izvedi: { :id
+Predmet ob: ['id:'] izvedi: { :id
 	svoj id := id.
 }.
 
-Item ob: ['id'] izvedi: { <- svoj id. }.
+Predmet ob: ['id'] izvedi: { <- svoj id. }.
 
 
-Item ob: ['besedilo'] izvedi: {
+Predmet ob: ['besedilo'] izvedi: {
 	>> str := ['Item#~no'].
-	str ~no: svoj id. <- str.
+	str ~no: svoj id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item ob: ['besedilo'] izvedi: {
 
 Print ob: ['items'] izvedi: { 
 	
-	svoj item := Item nov: 1.
+	svoj predmet := Predmet nov: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: svoj item
+	# tu bodisi segfault bodisi napačen niz
+	Dnevnik say: (
+		['~item printed.'] ~item: svoj predmet
 	).
 	
 	
