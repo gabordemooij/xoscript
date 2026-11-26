@@ -1,18 +1,18 @@
-#ffi test
+#test FFI
 
 
 Server init.
 
 Programma gcmode: 4.
 
-# for this test you need set a path to libc (puts)
->> libname := Programma instelling: ['FFITESTLIB'].
+# per questo test devi impostare un percorso a libc (puts)
+>> nomelib := Programma instelling: ['FFITESTLIB'].
 
 
 
 Server collega: (
  Serie nuovo ;
- libname ;
+ nomelib ;
  ['puts'] ;
  ( Serie nuovo ; ['pointer'] ) ;
  ['void'] ;
@@ -25,7 +25,7 @@ Server collega: (
 Puts str: s.
 s libero.
 
-# test with struct
+# test con struct
 
 >> a := Blob nuovo: 8.
 a bytes: (
@@ -34,19 +34,19 @@ a bytes: (
     1  ; 0 ; 0 ; 0
 ).
 
->> struct := Blob struttura: (Serie <<: ['int'], ; ['int']).
+>> strutt := Blob struttura: (Serie <<: ['int'], ; ['int']).
 
 Server collega: (
 	Serie <<: ['@structtest'], ;
 	['@structtest'] ;
-	(Serie <<: struct) ; 
+	(Serie <<: strutt) ; 
 	['int'] ;	
 	['ffitest'] ;
 	['ffisum:']
 ).
 	
-Uscita scrivi: ['Sum test:'] + (ffitest ffisum: a), stop.
+Uscita scrivi: ['Test della somma:'] + (ffitest ffisum: a), stop.
 
-struct strutturalibera.
-struct libero.
+strutt strutturalibera.
+strutt libero.
 a libero.

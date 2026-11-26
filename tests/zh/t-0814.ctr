@@ -1,18 +1,21 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# 会话 cookie 格式、json 内容类型、仅限 web 协议、svg 内联显示
 Server 初始化.
 程序 使用: ['../../../src/xo/zh/webtools.xo'].
 
->> Fake-Request := 对象 新建.
-Fake-Request 在: ['value:'] 执行: { :取值
+>> 假请求 := 对象 新建.
+假请求 在: ['value:'] 执行: { :取值
 	拥有 取值 := 取值.
 }.
-Fake-Request 在: ['曲奇饼:'] 执行: { :名称 <- 拥有 取值.
+假请求 在: ['曲奇饼:'] 执行: { :名称
+	<- 拥有 取值.
 }.
 
->> Test-Session := 临时文件会话 新建.
-Test-Session 在: ['加载'] 执行: { <- 映射对象 新建.
+>> 测试会话 := 临时文件会话 新建.
+测试会话 在: ['加载'] 执行: {
+	<- 映射对象 新建.
 }.
-Test-Session 在: ['session-id'] 执行: { <- 拥有 id.
+测试会话 在: ['会话ID'] 执行: {
+	<- 拥有 id.
 }.
 
 >> cookies := 数组对象 新建
@@ -22,18 +25,18 @@ Test-Session 在: ['session-id'] 执行: { <- 拥有 id.
 	; ['abc\n'].
 
 cookies 每个: { :i :cookie
-	>> http请求 := Fake-Request 新建.
+	>> http请求 := 假请求 新建.
 	http请求 value: cookie.
-	>> 管理器 := Test-Session 新建.
-	>> web := 网页文档 新建.
-	web http请求: http请求.
-	web 会话管理器: 管理器.
-	web 开始会话.
-	输出 写入: ( 管理器 session-id = cookie ), 停止.
+	>> 管理器 := 测试会话 新建.
+	>> 网页 := 网页文档 新建.
+	网页 http请求: http请求.
+	网页 会话管理器: 管理器.
+	网页 开始会话.
+	输出 写入: ( 管理器 会话ID = cookie ), 停止.
 }.
 
->> web := 网页文档 新建.
-web json: (映射对象 新建 放: ['b'] 在: ['a']).
+>> 网页 := 网页文档 新建.
+网页 json: (映射对象 新建 放: ['b'] 在: ['a']).
 输出 写入: ['\n'], 停止.
 
 { 网络 搜索词: ['file:///etc/hostname']. } 捕获: { :e

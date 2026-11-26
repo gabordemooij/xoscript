@@ -12,16 +12,16 @@ Server init.
 	nome-database: ['xobase'],
 	connetti.
 #...
->> del := conn1 query: ['DELETE FROM book WHERE id > 0'].
-{  del esegui. conn1 commit. } catturare: { :e conn1 rollback.  }, correre.
+>> canc := conn1 query: ['DELETE FROM book WHERE id > 0'].
+{  canc esegui. conn1 commit. } catturare: { :e conn1 rollback.  }, correre.
 
->> insert := conn1 query: ['INSERT INTO book (id) VALUES(null)'].
-insert esegui.
+>> inserimento := conn1 query: ['INSERT INTO book (id) VALUES(null)'].
+inserimento esegui.
 
 >> contare := conn1 query: ['SELECT COUNT(*) AS num FROM book'].
-contare recupera: { :row Uscita scrivi: row num, stop. }.
+contare recupera: { :fila Uscita scrivi: fila num, stop. }.
 
-# does not show up
-# insert not committed on connection 1
+# non compare
+# inserimento non confermato sulla connessione 1
 >> contare := conn2 query: ['SELECT COUNT(*) AS num FROM book'].
-contare recupera: { :row Uscita scrivi: row num, stop. }.
+contare recupera: { :fila Uscita scrivi: fila num, stop. }.

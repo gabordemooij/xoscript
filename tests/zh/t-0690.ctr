@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# 数据库测试
+# 所需配置请参见示例 server.xo
 
 Server init.
-输出 写入: ['Database test'], 停止.
+输出 写入: ['数据库测试'], 停止.
 
 >> db := 数据库 新建 主机: ['localhost'],
 	用户名: ['xo'], 密码: ['pass123'], 数据库名: ['xobase'], 连接.
 
-输出 写入: ['Can we connect? '] + db 已连接?, 停止.
+输出 写入: ['能连接吗？ '] + db 已连接?, 停止.
 
 >> 参数 := db 查询: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], 参数: ( 数组对象 新建 ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], 参数: ( 数组对象 新建 ; ['abc'] ; 12.35 ; 6 ). # 参数化查询
 
 {  参数 突变. db 提交. } 捕获: { :e db 回滚.  }, 运行.
 
-输出 写入: ['Can we insert? '] + ( 参数 新数据库行 > 0 ), 停止.
+输出 写入: ['能插入吗？ '] + ( 参数 新数据库行 > 0 ), 停止.
 
 >> x := 0.
 >> 参数 :=
 db 查询: ['SELECT * FROM book order by id desc limit 2'], 
-获取: { :row 
+获取: { :行数据 
 	x 加: 1.
-	是 中断. # must clean up, no 'Commands out of sync'
+	是 中断. # 必须清理，不能出现 'Commands out of sync'
 }.
 
 >> 参数 :=
 db 查询: ['SELECT * FROM book order by id desc limit 2'], 
-获取: { :row
+获取: { :行数据
 	x 加: 1.
 	是 中断.
 }.
 
 (x > 0) 是: {
-	输出 写入: ['Can we break in the middle of a fetch? '].
+	输出 写入: ['能在获取过程中中断吗？ '].
 }.
 
 输出 写入: 是, 停止.

@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# test del database
+# vedi l'esempio server.xo per la configurazione necessaria
 
 Server init.
-Uscita scrivi: ['Database test'], stop.
+Uscita scrivi: ['Test del database'], stop.
 
 >> db := MariaDB nuovo host: ['localhost'],
 	utente: ['xo'], password: ['pass123'], nome-database: ['xobase'], connetti.
 
-Uscita scrivi: ['Can we connect? '] + db connesso?, stop.
+Uscita scrivi: ['Possiamo connetterci? '] + db connesso?, stop.
 
 >> parametri := db query: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametri: ( Serie nuovo ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametri: ( Serie nuovo ; ['abc'] ; 12.35 ; 6 ). # query parametrizzate
 
 {  parametri esegui. db commit. } catturare: { :e db rollback.  }, correre.
 
-Uscita scrivi: ['Can we insert? '] + ( parametri insert-id > 0 ), stop.
+Uscita scrivi: ['Possiamo inserire? '] + ( parametri insert-id > 0 ), stop.
 
->> Obj := Oggetto nuovo.
-Obj on: ['retrieve-rows'] fare: {
+>> Ogg := Oggetto nuovo.
+Ogg on: ['recupera-righe'] fare: {
 	mio contare := 0.
 	>> parametri :=
 	db query: ['SELECT * FROM book order by id desc limit 2'], 
-	recupera: { :row 
+	recupera: { :fila 
 		mio contare inserisci: 1.
 		Vero interrompere.
-	}. <- mio contare copia.
+	}. # lettura delle righe
+	<- mio contare copia.
 }.
 
-Uscita scrivi: ['Can we query? '] + ( Obj retrieve-rows > 0 ), stop.
+Uscita scrivi: ['Possiamo interrogare? '] + ( Ogg recupera-righe > 0 ), stop.

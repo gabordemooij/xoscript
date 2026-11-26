@@ -1,21 +1,21 @@
-# test type casts / conversions / bindings
+# test di cast di tipo / conversioni / binding
 Programma gcmode: 4.
 Server init.
 
->> counter := 0.
+>> contatore := 0.
 >> db := MariaDB nuovo host: ['localhost'],
 	utente: ['xo'], password: ['pass123'], nome-database: ['xobase'], connetti.
 
->> TwoDigitFormat := Formato nuovo: ['%02d'].
+>> FormatoDueCifre := Formato nuovo: ['%02d'].
 
-# Datetime
+# Data e ora
 {
-	>> anno := Numero tra: 1995 e: 2050, testo.
-	>> mese := TwoDigitFormat applica-int: (Numero tra: 1 e: 12), testo.
-	>> giorno := TwoDigitFormat applica-int: (Numero tra: 1 e: 28), testo.
-	>> ora := TwoDigitFormat applica-int: (Numero tra: 1 e: 23), testo.
-	>> minuto := TwoDigitFormat applica-int: (Numero tra: 1 e: 59), testo.
-	>> secondo := TwoDigitFormat applica-int: (Numero tra: 1 e: 59), testo.
+	>> anno     := Numero tra: 1995 e: 2050, testo.
+	>> mese    := FormatoDueCifre applica-int: (Numero tra: 1 e: 12), testo.
+	>> giorno      := FormatoDueCifre applica-int: (Numero tra: 1 e: 28), testo.
+	>> ora     := FormatoDueCifre applica-int: (Numero tra: 1 e: 23), testo.
+	>> minuto   := FormatoDueCifre applica-int: (Numero tra: 1 e: 59), testo.
+	>> secondo   := FormatoDueCifre applica-int: (Numero tra: 1 e: 59), testo.
 	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
 	datetime
 		YYYY: anno,
@@ -31,25 +31,25 @@ Server init.
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
 	'] <datetime>: datetime),
-	recupera: { :row
-		(row mydatetime = datetime) falso: {
+	recupera: { :fila
+		(fila mydatetime = datetime) falso: {
 			questo-compito errore: (
-				['Expected: <expected> but got: <observation>']
+				['Atteso: <expected> ma ottenuto: <observation>']
 				<expected>: datetime,
-				<observation>: row mydatetime
+				<observation>: fila mydatetime
 			).
 		}.
 	
 	}.
-	counter inserisci: 1.
+	contatore inserisci: 1.
 } * 100.
 
-# Date
+# Data
 {
-	>> anno := Numero tra: 1995 e: 2050, testo.
-	>> mese := TwoDigitFormat applica-int: (Numero tra: 1 e: 12), testo.
-	>> giorno := TwoDigitFormat applica-int: (Numero tra: 1 e: 28), testo.
-	>> date := ['YYYY-MM-DD'].
+	>> anno     := Numero tra: 1995 e: 2050, testo.
+	>> mese    := FormatoDueCifre applica-int: (Numero tra: 1 e: 12), testo.
+	>> giorno      := FormatoDueCifre applica-int: (Numero tra: 1 e: 28), testo.
+	>> date     := ['YYYY-MM-DD'].
 	date
 		YYYY: anno,
 		MM: mese,
@@ -61,24 +61,24 @@ Server init.
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
 	'] <date>: date),
-	recupera: { :row
-		(row mydate = date) falso: {
+	recupera: { :fila
+		(fila mydate = date) falso: {
 			questo-compito errore: (
-				['Expected: <expected> but got: <observation>']
+				['Atteso: <expected> ma ottenuto: <observation>']
 				<expected>: date,
-				<observation>: row mydate
+				<observation>: fila mydate
 			).
 		}.
 	}.
-	counter inserisci: 1.
+	contatore inserisci: 1.
 } * 100.
 
 
-# Time
+# Ora
 {
-	>> ora := TwoDigitFormat applica-int: (Numero tra: 1 e: 23), testo.
-	>> minuto := TwoDigitFormat applica-int: (Numero tra: 1 e: 59), testo.
-	>> secondo := TwoDigitFormat applica-int: (Numero tra: 1 e: 59), testo.
+	>> ora     := FormatoDueCifre applica-int: (Numero tra: 1 e: 23), testo.
+	>> minuto   := FormatoDueCifre applica-int: (Numero tra: 1 e: 59), testo.
+	>> secondo   := FormatoDueCifre applica-int: (Numero tra: 1 e: 59), testo.
 	>> tempo := ['HH:II:SS'].
 	tempo
 		HH: ora,
@@ -89,20 +89,20 @@ Server init.
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: tempo),
-	recupera: { :row
-		(row mytime = tempo) falso: {
+	recupera: { :fila
+		(fila mytime = tempo) falso: {
 			questo-compito errore: (
-				['Expected: <expected> but got: <observation>']
+				['Atteso: <expected> ma ottenuto: <observation>']
 				<expected>: datetime,
-				<observation>: row mytime
+				<observation>: fila mytime
 			).
 		}.
 	}.
-	counter inserisci: 1.
+	contatore inserisci: 1.
 } * 100.
 
 
-# Strings (varchar/text)
+# Testi (varchar/text)
 >> str1 := Serie nuovo riempire: 100000 con: ['x'], aderire: [''].
 {
 	>> str2 := Caveau token: 40.
@@ -115,23 +115,23 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	recupera: { :row
-		(row str1 = str1 e: row str2 = str2) falso: {
+	recupera: { :fila
+		(fila str1 = str1 e: fila str2 = str2) falso: {
 			questo-compito errore: (
-				['Expected: <expected> but got: <observation>']
+				['Atteso: <expected> ma ottenuto: <observation>']
 				<expected>: datetime,
-				<observation>: row mytime
+				<observation>: fila mytime
 			).
 		}.
 	}.
-	counter inserisci: 1.
+	contatore inserisci: 1.
 } * 100.
 
 
-# Numbers
+# Numeri
 {
-	>> n1 := Numero tra: 1 e: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Numero tra: 1 e: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 da-testo: ['9223372036854775807'] ) -
 		( Int64 da-testo: ['99999'] ) +
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	recupera: { :row
-		(row n1 = n1) falso: {
+	recupera: { :fila
+		(fila n1 = n1) falso: {
 			questo-compito errore: (
-				['Expected: <expected> but got: <observation>']
+				['Atteso: <expected> ma ottenuto: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: fila n1
 			).
 		}.
-		(row n2 = n2) falso: {
+		(fila n2 = n2) falso: {
 			questo-compito errore: (
-				['Expected: <expected> but got: <observation>']
+				['Atteso: <expected> ma ottenuto: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: fila n2
 			).
 		}.
-		(row n3 = n2 arrotondato) falso: {
+		(fila n3 = n2 arrotondato) falso: {
 			questo-compito errore: (
-				['Expected: <expected> but got: <observation>']
+				['Atteso: <expected> ma ottenuto: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: fila n3
 			).
 		}.
-		(row big = big) falso: {
+		(fila big = big) falso: {
 			questo-compito errore: (
-				['Expected: <expected> but got: <observation>']
+				['Atteso: <expected> ma ottenuto: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: fila big
 			).
 		}.
 		
 	}.
-	counter inserisci: 1.
+	contatore inserisci: 1.
 } * 100.
 
 
 Uscita scrivi: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: contatore
 ), stop.

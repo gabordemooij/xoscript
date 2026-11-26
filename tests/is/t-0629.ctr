@@ -1,32 +1,33 @@
-# database test
-# see example server.xo for required config
+# gagnagrunnspróf
+# sjá dæmið server.xo fyrir nauðsynlegar stillingar
 
 Server init.
-Úttak skrifa: ['Database test'], ný-lína.
+Úttak skrifa: ['Gagnagrunnsprófun'], ný-lína.
 
->> db := Maria-DB nýtt hýsill: ['localhost'],
+>> gg := Maria-DB nýtt hýsill: ['localhost'],
 	notandanafn: ['xo'], lykilorð: ['pass123'], nafn-gagnagrunns: ['xobase'], tengjast.
 
-Úttak skrifa: ['Can we connect? '] + db tengt?, ný-lína.
+Úttak skrifa: ['Getum við tengst? '] + gg tengt?, ný-lína.
 
->> leitarfæribreytur := db fyrirspurn: ['
+>> leitarfæribreytur := gg fyrirspurn: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], færibreytur: ( Listi nýtt ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], færibreytur: ( Listi nýtt ; ['abc'] ; 12.35 ; 6 ). # fyrirspurnir með færibreytum
 
-{  leitarfæribreytur keyra. db staðfesta. } grípa: { :e db afturkalla.  }, ræsa.
+{  leitarfæribreytur keyra. gg staðfesta. } grípa: { :e gg afturkalla.  }, ræsa.
 
-Úttak skrifa: ['Can we insert? '] + ( leitarfæribreytur insert-id > 0 ), ný-lína.
+Úttak skrifa: ['Getum við sett inn? '] + ( leitarfæribreytur insert-id > 0 ), ný-lína.
 
 >> Obj := Hlutur nýtt.
-Obj við: ['retrieve-rows'] gera: {
+Obj við: ['sækja-raðir'] gera: {
 	eigin fjöldi := 0.
 	>> leitarfæribreytur :=
-	db fyrirspurn: ['SELECT * FROM book order by id desc limit 2'], 
-	sækja: { :row 
+	gg fyrirspurn: ['SELECT * FROM book order by id desc limit 2'], 
+	sækja: { :röð 
 		eigin fjöldi leggja-við: 1.
 		Satt rjúfa.
-	}. <- eigin fjöldi afrita.
+	}. # sækja raðir
+	<- eigin fjöldi afrita.
 }.
 
-Úttak skrifa: ['Can we query? '] + ( Obj retrieve-rows > 0 ), ný-lína.
+Úttak skrifa: ['Getum við sent fyrirspurn? '] + ( Obj sækja-raðir > 0 ), ný-lína.

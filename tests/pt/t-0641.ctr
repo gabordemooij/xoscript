@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# Testar o sanitizador utf8
 Server init.
 
->> utf8cases := Mapa novo
-	# ASCII only
+>> casosutf8 := Mapa novo
+	# Só ASCII
 	colocar: ( Listar novo ; 65 ; 65 ; 65 ; 65 ; 0 ) em: ['AAAA'],
-	# valid 2 byte sequence
+	# sequência válida de 2 bytes
 	colocar: ( Listar novo ; 194 ; 162 ; 0 ) em: ['¢'],
-	# Valid 3-byte UTF-8
+	# UTF-8 válido de 3 bytes
     colocar: ( Listar novo ; 226 ; 130 ; 172 ; 0 ) em: ['€'],
-	# Valid 4-byte UTF-8
+	# UTF-8 válido de 4 bytes
     colocar: ( Listar novo ; 240 ; 144 ; 141 ; 136 ; 0 ) em: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# Byte de continuação inválido na sequência E2 28 AC -> início seq. 3b + 28 cont. errada + AC byte cont., mas pertence ao mesmo erro
     colocar: ( Listar novo ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) em: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# Codificação demasiado longa do ASCII 'A' (deve passar a ?),
     colocar: ( Listar novo ; 65 ; 193 ; 129 ; 0 ) em: ['A?'],
-	# Invalid first byte (0xFF)
+	# Primeiro byte inválido (0xFF)
     colocar: ( Listar novo ; 255 ; 0 ) em: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Sequência multibyte incompleta no fim
     colocar: ( Listar novo ; 66 ; 226 ; 0 ) em: ['B?'],
-    # Empty string
+    # String vazia
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Várias sequências mistas
     colocar: ( Listar novo ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) em: ['A€?𐍈B'].
 	 
-utf8cases cada-um: { :key :value
+casosutf8 cada-um: { :key :value
 	>> blob := Blob novo: value conta, bytes: value.
 	>> str := blob string.
 	(str = key) sim: {
 		Saída escrever: ['OK'], stop.
 	}, senão: {
-		Saída escrever: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, stop.
+		Saída escrever: ['O sanitizador UTF8 falhou em: '] + key + [' obteve: '] + str, stop.
 	}.
 	blob livre.
 }.

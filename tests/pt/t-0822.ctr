@@ -1,22 +1,22 @@
-# fewer parameters than placeholders must give an error, not read past the bindings
+# menos parâmetros do que marcadores devem dar um erro, não ler além das ligações
 Server init.
 
->> db := MariaDB novo host: ['localhost'],
+>> bd := MariaDB novo host: ['localhost'],
 	utilizador: ['xo'],
 	palavra-passe: ['pass123'],
 	nome-database: ['xobase'],
 	conectar.
 
->> parametros := db consulta: ['SELECT ? AS a, ? AS b, ? AS c'].
+>> parametros := bd consulta: ['SELECT ? AS a, ? AS b, ? AS c'].
 parametros parametros: (Listar novo ; ['1']).
-{ parametros buscar: { :row Saída escrever: row, stop. }. } pegar: { :e Saída escrever: e, stop. }, iniciar.
+{ parametros buscar: { :fila Saída escrever: fila, stop. }. } pegar: { :e Saída escrever: e, stop. }, iniciar.
 
->> parametros := db consulta: ['SELECT ? AS a'].
-{ parametros buscar: { :row Saída escrever: row, stop. }. } pegar: { :e Saída escrever: e, stop. }, iniciar.
+>> parametros := bd consulta: ['SELECT ? AS a'].
+{ parametros buscar: { :fila Saída escrever: fila, stop. }. } pegar: { :e Saída escrever: e, stop. }, iniciar.
 
-# the right number still works, more parameters are ignored as before
->> parametros := db consulta: ['SELECT ? AS a, ? AS b'].
+# o número certo continua a funcionar, parâmetros a mais são ignorados como antes
+>> parametros := bd consulta: ['SELECT ? AS a, ? AS b'].
 parametros parametros: (Listar novo ; ['1'] ; ['2']).
-parametros buscar: { :row Saída escrever: (row em: ['a']), escrever: (row em: ['b']), stop. }.
+parametros buscar: { :fila Saída escrever: (fila em: ['a']), escrever: (fila em: ['b']), stop. }.
 parametros parametros: (Listar novo ; ['1'] ; ['2'] ; ['3']).
-parametros buscar: { :row Saída escrever: (row em: ['a']), escrever: (row em: ['b']), stop. }.
+parametros buscar: { :fila Saída escrever: (fila em: ['a']), escrever: (fila em: ['b']), stop. }.

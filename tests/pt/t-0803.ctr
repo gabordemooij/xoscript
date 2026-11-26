@@ -1,27 +1,27 @@
 Server init.
 
->> conn1 := MariaDB novo host: ['localhost'],
+>> lig1 := MariaDB novo host: ['localhost'],
 	utilizador: ['xo'],
 	palavra-passe: ['pass123'],
 	nome-database: ['xobase'],
 	conectar.
 
->> conn2 := MariaDB novo host: ['localhost'],
+>> lig2 := MariaDB novo host: ['localhost'],
 	utilizador: ['xo'],
 	palavra-passe: ['pass123'],
 	nome-database: ['xobase'],
 	conectar.
 #...
->> del := conn1 consulta: ['DELETE FROM book WHERE id > 0'].
-{  del executar. conn1 commit. } pegar: { :e conn1 rollback.  }, iniciar.
+>> apag := lig1 consulta: ['DELETE FROM book WHERE id > 0'].
+{  apag executar. lig1 commit. } pegar: { :e lig1 rollback.  }, iniciar.
 
->> insert := conn1 consulta: ['INSERT INTO book (id) VALUES(null)'].
-insert executar.
+>> inserção := lig1 consulta: ['INSERT INTO book (id) VALUES(null)'].
+inserção executar.
 
->> conta := conn1 consulta: ['SELECT COUNT(*) AS num FROM book'].
-conta buscar: { :row Saída escrever: row num, stop. }.
+>> conta := lig1 consulta: ['SELECT COUNT(*) AS num FROM book'].
+conta buscar: { :fila Saída escrever: fila num, stop. }.
 
-# does not show up
-# insert not committed on connection 1
->> conta := conn2 consulta: ['SELECT COUNT(*) AS num FROM book'].
-conta buscar: { :row Saída escrever: row num, stop. }.
+# não aparece
+# insert não confirmado na ligação 1
+>> conta := lig2 consulta: ['SELECT COUNT(*) AS num FROM book'].
+conta buscar: { :fila Saída escrever: fila num, stop. }.

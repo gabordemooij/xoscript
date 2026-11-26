@@ -1,66 +1,66 @@
-# using FFI with the Server plugin
+# uso di FFI con il plugin Server
 
-# connect to libc (platform specific)
->> libname := Programma instelling: ['FFITESTLIB'].
+# collegamento a libc (dipende dalla piattaforma)
+>> nomelib := Programma instelling: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# collega le funzioni stdio dal C per operazioni avanzate sui file
 Server collega: ( Serie nuovo ;
- libname ; ['fopen'] ;
+ nomelib ; ['fopen'] ;
  ( Serie nuovo ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 collega: ( Serie nuovo ;
- Nil ; # means same lib
+ Nil ; # significa stessa libreria
  ['fread'] ;
  ( Serie nuovo ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Nil ; # means same object (i.e. Stream)
+ Nil ; # significa stesso oggetto (cioè Flusso)
  ['fread']
 ),
 collega: (
  Serie nuovo ;
- Nil ; # means same lib
+ Nil ; # significa stessa libreria
  ['fwrite'] ;
  ( Serie nuovo ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- Nil ; # means same lib
+ Nil ; # significa stessa libreria
  ['fwrite']
 ),
 collega: (
  Serie nuovo ;
- Nil ; # means same lib
+ Nil ; # significa stessa libreria
  ['rewind'] ;
  ( Serie nuovo ; ['pointer'] ) ;
  ['int'] ;
- Nil ; # means same lib
+ Nil ; # significa stessa libreria
  ['rewind:']
 ).
 
->> str := Blob utf8: ['abc123'].
+>> str  := Blob utf8: ['abc123'].
 >> sentiero := Blob utf8: ['/tmp/bla.txt'].
 >> mode := Blob utf8: ['w+'].
 
-# open a file with fopen(path, mode)
+# apri un file con fopen(path, mode)
 >> fd := Stream path: sentiero mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream messaggio: ['fwrite'] argomenti: (Serie nuovo ; str ; 1 ; 6 ; fd ).
-Uscita scrivi: bytes-written, stop.
+# scrivi i byte dal buffer stringa nel file
+>> byte-scritti := Stream messaggio: ['fwrite'] argomenti: (Serie nuovo ; str ; 1 ; 6 ; fd ).
+Uscita scrivi: byte-scritti, stop.
 
-# rewind file pointer
+# riavvolgi il puntatore del file
 Stream rewind: fd.
 
-# allocate a buffer
+# alloca un buffer
 >> buf := Blob nuovo: 20.
 
-# read from file
->> bytes-read := Stream messaggio: ['fread'] argomenti: (Serie nuovo ; buf ; 1 ; 6 ; fd ).
-Uscita scrivi: bytes-read, stop.
+# leggi dal file
+>> byte-letti := Stream messaggio: ['fread'] argomenti: (Serie nuovo ; buf ; 1 ; 6 ; fd ).
+Uscita scrivi: byte-letti, stop.
 Uscita scrivi: buf, stop.
 
-# free memory
+# libera la memoria
 str  libero.
 sentiero libero.
 mode libero.

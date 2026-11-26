@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# teste de base de dados
+# ver o exemplo server.xo para a configuração necessária
 
 Server init.
-Saída escrever: ['Database test'], stop.
+Saída escrever: ['Teste da base de dados'], stop.
 
->> db := MariaDB novo host: ['localhost'],
+>> bd := MariaDB novo host: ['localhost'],
 	utilizador: ['xo'], palavra-passe: ['pass123'], nome-database: ['xobase'], conectar.
 
-Saída escrever: ['Can we connect? '] + db conectado?, stop.
+Saída escrever: ['Conseguimos ligar? '] + bd conectado?, stop.
 
->> parametros := db consulta: ['
+>> parametros := bd consulta: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], parametros: ( Listar novo ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], parametros: ( Listar novo ; ['abc'] ; 12.35 ; 6 ). # consultas parametrizadas
 
-{  parametros executar. db commit. } pegar: { :e db rollback.  }, iniciar.
+{  parametros executar. bd commit. } pegar: { :e bd rollback.  }, iniciar.
 
-Saída escrever: ['Can we insert? '] + ( parametros insert-id > 0 ), stop.
+Saída escrever: ['Conseguimos inserir? '] + ( parametros insert-id > 0 ), stop.
 
 >> x := 0.
 >> parametros :=
-db consulta: ['SELECT * FROM book order by id desc limit 2'], 
-buscar: { :row 
+bd consulta: ['SELECT * FROM book order by id desc limit 2'], 
+buscar: { :fila 
 	x adicionar: 1.
-	Sim parar. # must clean up, no 'Commands out of sync'
+	Sim parar. # tem de limpar, sem 'Commands out of sync'
 }.
 
 >> parametros :=
-db consulta: ['SELECT * FROM book order by id desc limit 2'], 
-buscar: { :row
+bd consulta: ['SELECT * FROM book order by id desc limit 2'], 
+buscar: { :fila
 	x adicionar: 1.
 	Sim parar.
 }.
 
 (x > 0) sim: {
-	Saída escrever: ['Can we break in the middle of a fetch? '].
+	Saída escrever: ['Conseguimos interromper a meio de um fetch? '].
 }.
 
 Saída escrever: Sim, stop.

@@ -1,40 +1,40 @@
-# database test
-# see example server.xo for required config
+# gagnagrunnspróf
+# sjá dæmið server.xo fyrir nauðsynlegar stillingar
 
 Server init.
-Úttak skrifa: ['Database test'], ný-lína.
+Úttak skrifa: ['Gagnagrunnsprófun'], ný-lína.
 
->> db := Maria-DB nýtt hýsill: ['localhost'],
+>> gg := Maria-DB nýtt hýsill: ['localhost'],
 	notandanafn: ['xo'], lykilorð: ['pass123'], nafn-gagnagrunns: ['xobase'], tengjast.
 
-Úttak skrifa: ['Can we connect? '] + db tengt?, ný-lína.
+Úttak skrifa: ['Getum við tengst? '] + gg tengt?, ný-lína.
 
->> leitarfæribreytur := db fyrirspurn: ['
+>> leitarfæribreytur := gg fyrirspurn: ['
 	INSERT INTO book (id, description, price, rating) 
 	VALUES (NULL, ?, ?, ?)
-'], færibreytur: ( Listi nýtt ; ['abc'] ; 12.35 ; 6 ). # parameterized queries
+'], færibreytur: ( Listi nýtt ; ['abc'] ; 12.35 ; 6 ). # fyrirspurnir með færibreytum
 
-{  leitarfæribreytur keyra. db staðfesta. } grípa: { :e db afturkalla.  }, ræsa.
+{  leitarfæribreytur keyra. gg staðfesta. } grípa: { :e gg afturkalla.  }, ræsa.
 
-Úttak skrifa: ['Can we insert? '] + ( leitarfæribreytur insert-id > 0 ), ný-lína.
+Úttak skrifa: ['Getum við sett inn? '] + ( leitarfæribreytur insert-id > 0 ), ný-lína.
 
 >> x := 0.
 >> leitarfæribreytur :=
-db fyrirspurn: ['SELECT * FROM book order by id desc limit 2'], 
-sækja: { :row 
+gg fyrirspurn: ['SELECT * FROM book order by id desc limit 2'], 
+sækja: { :röð 
 	x leggja-við: 1.
-	Satt rjúfa. # must clean up, no 'Commands out of sync'
+	Satt rjúfa. # verður að taka til, ekkert 'Commands out of sync'
 }.
 
 >> leitarfæribreytur :=
-db fyrirspurn: ['SELECT * FROM book order by id desc limit 2'], 
-sækja: { :row
+gg fyrirspurn: ['SELECT * FROM book order by id desc limit 2'], 
+sækja: { :röð
 	x leggja-við: 1.
 	Satt rjúfa.
 }.
 
 (x > 0) satt: {
-	Úttak skrifa: ['Can we break in the middle of a fetch? '].
+	Úttak skrifa: ['Getum við rofið í miðri sókn? '].
 }.
 
 Úttak skrifa: Satt, ný-lína.

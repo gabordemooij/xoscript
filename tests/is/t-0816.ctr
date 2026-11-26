@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> reyna := { :format :value
-	{ Úttak skrifa: ( (Snið nýtt: format) beita: value ), ný-lína. } grípa: { :e Úttak skrifa: e, ný-lína. }, ræsa.
+# snið verður að passa við gerð gildisins, gerðin getur komið frá biðlara
+>> reyna := { :sniðið :value
+	{ Úttak skrifa: ( (Snið nýtt: sniðið) beita: value ), ný-lína. } grípa: { :e Úttak skrifa: e, ný-lína. }, ræsa.
 }.
->> try-int := { :format :value
-	{ Úttak skrifa: ( (Snið nýtt: format) beita-heiltölu: value ), ný-lína. } grípa: { :e Úttak skrifa: e, ný-lína. }, ræsa.
+>> prófa-heiltölu := { :sniðið :value
+	{ Úttak skrifa: ( (Snið nýtt: sniðið) beita-heiltölu: value ), ný-lína. } grípa: { :e Úttak skrifa: e, ný-lína. }, ræsa.
 }.
 
-# fits
+# passar
 reyna beita: ['|%s|'] og: ['text'].
 reyna beita: ['%06.2f'] og: 5.5.
-reyna beita: ['100%% %s'] og: ['sure'].
-try-int beita: ['%03d'] og: 7.
-try-int beita: ['%x'] og: 255.
+reyna beita: ['100%% %s'] og: ['vissulega'].
+prófa-heiltölu beita: ['%03d'] og: 7.
+prófa-heiltölu beita: ['%x'] og: 255.
 reyna beita: ['%d'] og: (Int64 nýtt úr-texta: ['12']).
 reyna beita: ['%lld'] og: (Int64 nýtt úr-texta: ['12']).
 reyna beita: ['%.1lf'] og: 5.5.
-try-int beita: ['%hd'] og: 7.
+prófa-heiltölu beita: ['%hd'] og: 7.
 
-# does not fit
+# passar ekki
 reyna beita: ['%s'] og: 12345.
 reyna beita: ['%d'] og: 12345.
 reyna beita: ['%f'] og: ['text'].
-try-int beita: ['%d'] og: ['text'].
-try-int beita: ['%s'] og: 5.
+prófa-heiltölu beita: ['%d'] og: ['text'].
+prófa-heiltölu beita: ['%s'] og: 5.
 reyna beita: ['%s %s'] og: ['text'].
 reyna beita: ['%n'] og: ['text'].
 reyna beita: ['%*s'] og: ['text'].
 reyna beita: ['%'] og: ['text'].
 
-# length modifier does not fit
+# lengdarbreytir passar ekki
 reyna beita: ['%ls'] og: ['text'].
 reyna beita: ['%Lf'] og: 5.5.
-try-int beita: ['%ld'] og: 7.
-try-int beita: ['%lld'] og: 7.
+prófa-heiltölu beita: ['%ld'] og: 7.
+prófa-heiltölu beita: ['%lld'] og: 7.
 reyna beita: ['%Ld'] og: (Int64 nýtt úr-texta: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# breidd sem passar ekki í printf verður að gefa villu, ekki hrun
 reyna beita: ['%99999999999s'] og: ['text'].

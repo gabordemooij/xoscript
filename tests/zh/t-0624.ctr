@@ -1,26 +1,28 @@
-# This test checks if string_fill_in does not lose its slot (gc'ed) in mode 4
-# reference in world.c
->> Log := 对象 新建.
+# 此测试检查 string_fill_in 在模式 4 下不会丢失其槽位（被 gc 回收）
+# 参见 world.c
+>> 日志器 := 对象 新建.
 
-Log 在: ['say:'] 执行: { :str
+日志器 在: ['say:'] 执行: { :str
 	输出 写入: str, 停止.
 }.
 
->> Item := 对象 新建.
+>> 物品类 := 对象 新建.
 
-Item 在: ['新建:'] 执行: { :id <- 自身 新建 id: id.
+物品类 在: ['新建:'] 执行: { :id
+	<- 自身 新建 id: id.
 }.
 
-Item 在: ['id:'] 执行: { :id
+物品类 在: ['id:'] 执行: { :id
 	拥有 id := id.
 }.
 
-Item 在: ['id'] 执行: { <- 拥有 id. }.
+物品类 在: ['id'] 执行: { <- 拥有 id. }.
 
 
-Item 在: ['转文本'] 执行: {
+物品类 在: ['转文本'] 执行: {
 	>> str := ['Item#~no'].
-	str ~no: 拥有 id. <- str.
+	str ~no: 拥有 id.
+	<- str.
 }.
 
 
@@ -28,11 +30,11 @@ Item 在: ['转文本'] 执行: {
 
 Print 在: ['items'] 执行: { 
 	
-	拥有 item := Item 新建: 1.
+	拥有 物品 := 物品类 新建: 1.
 	
-	# either segfault or wrong str here
-	Log say: (
-		['~item printed.'] ~item: 拥有 item
+	# 否则这里会段错误或字符串出错
+	日志器 say: (
+		['~item printed.'] ~item: 拥有 物品
 	).
 	
 	

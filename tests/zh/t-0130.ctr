@@ -1,69 +1,69 @@
-# using FFI with the Server plugin
+# 通过 Server 插件使用 FFI
 
-# connect to libc (platform specific)
->> libname := 程序 环境变量: ['FFITESTLIB'].
+# 连接到 libc（与平台相关）
+>> 库名 := 程序 环境变量: ['FFITESTLIB'].
 
-# link stdio functions from c for advances file operations
+# 从 C 链接 stdio 函数，用于高级文件操作
 Server 链接: ( 数组对象 新建 ;
- libname ; ['fopen'] ;
+ 库名 ; ['fopen'] ;
  ( 数组对象 新建 ; ['pointer'] ; ['pointer']) ;
  ['pointer'] ;
  ['Stream'] ;
  ['path:mode:']
 ),
 链接: ( 数组对象 新建 ;
- 空 ; # means same lib
+ 空 ; # 表示同一个库
  ['fread'] ;
  ( 数组对象 新建 ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- 空 ; # means same object (i.e. Stream)
+ 空 ; # 表示同一个对象（即 流）
  ['fread']
 ),
 链接: (
  数组对象 新建 ;
- 空 ; # means same lib
+ 空 ; # 表示同一个库
  ['fwrite'] ;
  ( 数组对象 新建 ; ['pointer'] ; ['int'] ; ['int'] ; ['pointer'] ) ;
  ['int'] ;
- 空 ; # means same lib
+ 空 ; # 表示同一个库
  ['fwrite']
 ),
 链接: (
  数组对象 新建 ;
- 空 ; # means same lib
+ 空 ; # 表示同一个库
  ['rewind'] ;
  ( 数组对象 新建 ; ['pointer'] ) ;
  ['int'] ;
- 空 ; # means same lib
+ 空 ; # 表示同一个库
  ['rewind:']
 ).
 
->> str := 二进制 可读的: ['abc123'].
+>> str  := 二进制 可读的: ['abc123'].
 >> 路径 := 二进制 可读的: ['/tmp/bla.txt'].
 >> mode := 二进制 可读的: ['w+'].
 
-# open a file with fopen(path, mode)
+# 用 fopen(path, mode) 打开文件
 >> fd := Stream path: 路径 mode: mode.
 
-# write bytes from buffer str to file
->> bytes-written := Stream 消息: ['fwrite'] 参数: (数组对象 新建 ; str ; 1 ; 6 ; fd ).
-输出 写入: bytes-written, 停止.
+# 把缓冲区 str 中的字节写入文件
+>> 已写字节数 := Stream 消息: ['fwrite'] 参数: (数组对象 新建 ; str ; 1 ; 6 ; fd ).
+输出 写入: 已写字节数, 停止.
 
-# rewind file pointer
+# 将文件指针倒回开头
 Stream rewind: fd.
 
-# allocate a buffer
->> buf := 二进制 新建: 20.
+# 分配缓冲区
+>> 缓冲 := 二进制 新建: 20.
 
-# read from file
->> bytes-read := Stream 消息: ['fread'] 参数: (数组对象 新建 ; buf ; 1 ; 6 ; fd ).
-输出 写入: bytes-read, 停止.
-输出 写入: buf, 停止.
+# 从文件读取
+>> 已读字节数 := Stream 消息: ['fread'] 参数: (数组对象 新建 ; 缓冲 ; 1 ; 6 ; fd ).
+输出 写入: 已读字节数, 停止.
+输出 写入: 缓冲, 停止.
 
-# free memory
+# 释放内存
 str  释放.
 路径 释放.
 mode 释放.
-buf  释放.
+缓冲  释放.
 
 

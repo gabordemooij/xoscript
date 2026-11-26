@@ -1,21 +1,21 @@
-# test type casts / conversions / bindings
+# testar conversões de tipo / conversões / ligações
 Programa arranjo: 4.
 Server init.
 
->> counter := 0.
->> db := MariaDB novo host: ['localhost'],
+>> contador := 0.
+>> bd := MariaDB novo host: ['localhost'],
 	utilizador: ['xo'], palavra-passe: ['pass123'], nome-database: ['xobase'], conectar.
 
->> TwoDigitFormat := Formato novo: ['%02d'].
+>> FormatoDoisDígitos := Formato novo: ['%02d'].
 
-# Datetime
+# Data e hora
 {
-	>> ano := Número entre: 1995 e: 2050, string.
-	>> mês := TwoDigitFormat aplicar-int: (Número entre: 1 e: 12), string.
-	>> dia := TwoDigitFormat aplicar-int: (Número entre: 1 e: 28), string.
-	>> hora := TwoDigitFormat aplicar-int: (Número entre: 1 e: 23), string.
-	>> minuto := TwoDigitFormat aplicar-int: (Número entre: 1 e: 59), string.
-	>> segundo := TwoDigitFormat aplicar-int: (Número entre: 1 e: 59), string.
+	>> ano     := Número entre: 1995 e: 2050, string.
+	>> mês    := FormatoDoisDígitos aplicar-int: (Número entre: 1 e: 12), string.
+	>> dia      := FormatoDoisDígitos aplicar-int: (Número entre: 1 e: 28), string.
+	>> hora     := FormatoDoisDígitos aplicar-int: (Número entre: 1 e: 23), string.
+	>> minuto   := FormatoDoisDígitos aplicar-int: (Número entre: 1 e: 59), string.
+	>> segundo   := FormatoDoisDígitos aplicar-int: (Número entre: 1 e: 59), string.
 	>> datetime := ['YYYY-MM-DD HH:II:SS'].	
 	datetime
 		YYYY: ano,
@@ -25,80 +25,80 @@ Server init.
 		II: minuto,
 		SS: segundo.
 	>> parametros :=
-	db consulta: (['
+	bd consulta: (['
 		SELECT 
 		"extra" AS paddingA,
 		CAST("<datetime>" AS DATETIME) AS mydatetime,
 		"extra" AS paddingB
 	'] <datetime>: datetime),
-	buscar: { :row
-		(row mydatetime = datetime) não: {
+	buscar: { :fila
+		(fila mydatetime = datetime) não: {
 			este-bloco-de-código erro: (
-				['Expected: <expected> but got: <observation>']
+				['Esperado: <expected> mas obtido: <observation>']
 				<expected>: datetime,
-				<observation>: row mydatetime
+				<observation>: fila mydatetime
 			).
 		}.
 	
 	}.
-	counter adicionar: 1.
+	contador adicionar: 1.
 } * 100.
 
-# Date
+# Data
 {
-	>> ano := Número entre: 1995 e: 2050, string.
-	>> mês := TwoDigitFormat aplicar-int: (Número entre: 1 e: 12), string.
-	>> dia := TwoDigitFormat aplicar-int: (Número entre: 1 e: 28), string.
-	>> date := ['YYYY-MM-DD'].
+	>> ano     := Número entre: 1995 e: 2050, string.
+	>> mês    := FormatoDoisDígitos aplicar-int: (Número entre: 1 e: 12), string.
+	>> dia      := FormatoDoisDígitos aplicar-int: (Número entre: 1 e: 28), string.
+	>> date     := ['YYYY-MM-DD'].
 	date
 		YYYY: ano,
 		MM: mês,
 		DD: dia.
 	>> parametros :=
-	db consulta: (['
+	bd consulta: (['
 		SELECT
 		"extra" AS paddingA,
 		CAST("<date>" AS DATE) AS mydate,
 		"extra" AS paddingB
 	'] <date>: date),
-	buscar: { :row
-		(row mydate = date) não: {
+	buscar: { :fila
+		(fila mydate = date) não: {
 			este-bloco-de-código erro: (
-				['Expected: <expected> but got: <observation>']
+				['Esperado: <expected> mas obtido: <observation>']
 				<expected>: date,
-				<observation>: row mydate
+				<observation>: fila mydate
 			).
 		}.
 	}.
-	counter adicionar: 1.
+	contador adicionar: 1.
 } * 100.
 
 
-# Time
+# Hora
 {
-	>> hora := TwoDigitFormat aplicar-int: (Número entre: 1 e: 23), string.
-	>> minuto := TwoDigitFormat aplicar-int: (Número entre: 1 e: 59), string.
-	>> segundo := TwoDigitFormat aplicar-int: (Número entre: 1 e: 59), string.
+	>> hora     := FormatoDoisDígitos aplicar-int: (Número entre: 1 e: 23), string.
+	>> minuto   := FormatoDoisDígitos aplicar-int: (Número entre: 1 e: 59), string.
+	>> segundo   := FormatoDoisDígitos aplicar-int: (Número entre: 1 e: 59), string.
 	>> tempo := ['HH:II:SS'].
 	tempo
 		HH: hora,
 		II: minuto,
 		SS: segundo.
 	>> parametros :=
-	db consulta: (['
+	bd consulta: (['
 		SELECT CAST("<time>" AS TIME)
 		AS mytime
 	'] <time>: tempo),
-	buscar: { :row
-		(row mytime = tempo) não: {
+	buscar: { :fila
+		(fila mytime = tempo) não: {
 			este-bloco-de-código erro: (
-				['Expected: <expected> but got: <observation>']
+				['Esperado: <expected> mas obtido: <observation>']
 				<expected>: datetime,
-				<observation>: row mytime
+				<observation>: fila mytime
 			).
 		}.
 	}.
-	counter adicionar: 1.
+	contador adicionar: 1.
 } * 100.
 
 
@@ -107,7 +107,7 @@ Server init.
 {
 	>> str2 := Cofre token: 40.
 	>> parametros :=
-	db consulta: (['
+	bd consulta: (['
 		SELECT
 		"<str1>" AS str1,
 		"<str2>" AS str2
@@ -115,30 +115,30 @@ Server init.
 	<str1>: str1,
 	<str2>: str2
 	),
-	buscar: { :row
-		(row str1 = str1 e: row str2 = str2) não: {
+	buscar: { :fila
+		(fila str1 = str1 e: fila str2 = str2) não: {
 			este-bloco-de-código erro: (
-				['Expected: <expected> but got: <observation>']
+				['Esperado: <expected> mas obtido: <observation>']
 				<expected>: datetime,
-				<observation>: row mytime
+				<observation>: fila mytime
 			).
 		}.
 	}.
-	counter adicionar: 1.
+	contador adicionar: 1.
 } * 100.
 
 
-# Numbers
+# Números
 {
-	>> n1 := Número entre: 1 e: 99999.
-	>> n2 := n1 / 1000.
+	>> n1  := Número entre: 1 e: 99999.
+	>> n2  := n1 / 1000.
 	>> big := (
 		( Int64 de-string: ['9223372036854775807'] ) -
 		( Int64 de-string: ['99999'] ) +
 		( Int64 de-string: n1 string )
 	).
 	>> parametros :=
-	db consulta: (['
+	bd consulta: (['
 		SELECT
 		<n1> AS n1,
 		<n2> AS n2,
@@ -149,42 +149,42 @@ Server init.
 	<n2>: n2,
 	<big>: big
 	),
-	buscar: { :row
-		(row n1 = n1) não: {
+	buscar: { :fila
+		(fila n1 = n1) não: {
 			este-bloco-de-código erro: (
-				['Expected: <expected> but got: <observation>']
+				['Esperado: <expected> mas obtido: <observation>']
 				<expected>: n1,
-				<observation>: row n1
+				<observation>: fila n1
 			).
 		}.
-		(row n2 = n2) não: {
+		(fila n2 = n2) não: {
 			este-bloco-de-código erro: (
-				['Expected: <expected> but got: <observation>']
+				['Esperado: <expected> mas obtido: <observation>']
 				<expected>: n1,
-				<observation>: row n2
+				<observation>: fila n2
 			).
 		}.
-		(row n3 = n2 arredondado) não: {
+		(fila n3 = n2 arredondado) não: {
 			este-bloco-de-código erro: (
-				['Expected: <expected> but got: <observation>']
+				['Esperado: <expected> mas obtido: <observation>']
 				<expected>: n1,
-				<observation>: row n3
+				<observation>: fila n3
 			).
 		}.
-		(row big = big) não: {
+		(fila big = big) não: {
 			este-bloco-de-código erro: (
-				['Expected: <expected> but got: <observation>']
+				['Esperado: <expected> mas obtido: <observation>']
 				<expected>: big,
-				<observation>: row big
+				<observation>: fila big
 			).
 		}.
 		
 	}.
-	counter adicionar: 1.
+	contador adicionar: 1.
 } * 100.
 
 
 Saída escrever: (
 	['OK, <counter> fuzzy casts/conversions tested.']
-	<counter>: counter
+	<counter>: contador
 ), stop.

@@ -1,4 +1,4 @@
-# fewer parameters than placeholders must give an error, not read past the bindings
+# meno parametri dei segnaposto devono dare un errore, non leggere oltre i binding
 Server init.
 
 >> db := MariaDB nuovo host: ['localhost'],
@@ -9,14 +9,14 @@ Server init.
 
 >> parametri := db query: ['SELECT ? AS a, ? AS b, ? AS c'].
 parametri parametri: (Serie nuovo ; ['1']).
-{ parametri recupera: { :row Uscita scrivi: row, stop. }. } catturare: { :e Uscita scrivi: e, stop. }, correre.
+{ parametri recupera: { :fila Uscita scrivi: fila, stop. }. } catturare: { :e Uscita scrivi: e, stop. }, correre.
 
 >> parametri := db query: ['SELECT ? AS a'].
-{ parametri recupera: { :row Uscita scrivi: row, stop. }. } catturare: { :e Uscita scrivi: e, stop. }, correre.
+{ parametri recupera: { :fila Uscita scrivi: fila, stop. }. } catturare: { :e Uscita scrivi: e, stop. }, correre.
 
-# the right number still works, more parameters are ignored as before
+# il numero giusto funziona ancora, i parametri in più vengono ignorati come prima
 >> parametri := db query: ['SELECT ? AS a, ? AS b'].
 parametri parametri: (Serie nuovo ; ['1'] ; ['2']).
-parametri recupera: { :row Uscita scrivi: (row a: ['a']), scrivi: (row a: ['b']), stop. }.
+parametri recupera: { :fila Uscita scrivi: (fila a: ['a']), scrivi: (fila a: ['b']), stop. }.
 parametri parametri: (Serie nuovo ; ['1'] ; ['2'] ; ['3']).
-parametri recupera: { :row Uscita scrivi: (row a: ['a']), scrivi: (row a: ['b']), stop. }.
+parametri recupera: { :fila Uscita scrivi: (fila a: ['a']), scrivi: (fila a: ['b']), stop. }.

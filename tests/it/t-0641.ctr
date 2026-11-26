@@ -1,35 +1,35 @@
-# Test utf8 sanitizer
+# Test del sanificatore utf8
 Server init.
 
->> utf8cases := Elenco nuovo
-	# ASCII only
+>> casiutf8 := Elenco nuovo
+	# Solo ASCII
 	met: ( Serie nuovo ; 65 ; 65 ; 65 ; 65 ; 0 ) a: ['AAAA'],
-	# valid 2 byte sequence
+	# sequenza valida di 2 byte
 	met: ( Serie nuovo ; 194 ; 162 ; 0 ) a: ['¢'],
-	# Valid 3-byte UTF-8
+	# UTF-8 valido di 3 byte
     met: ( Serie nuovo ; 226 ; 130 ; 172 ; 0 ) a: ['€'],
-	# Valid 4-byte UTF-8
+	# UTF-8 valido di 4 byte
     met: ( Serie nuovo ; 240 ; 144 ; 141 ; 136 ; 0 ) a: ['𐍈'],
-	# Invalid continuation byte in sequence E2 28 AC -> start 3b seq + 28 wrng cnt + AC cnt byte, but belongs to same error
+	# Byte di continuazione non valido nella sequenza E2 28 AC -> inizia seq. di 3b + 28 cont. errato + AC byte cont., ma appartiene allo stesso errore
     met: ( Serie nuovo ; 65 ; 226 ; 40 ; 172 ; 65 ; 0 ) a: ['A?A'],
-	# Overlong encoding of ASCII 'A' (should become ?),
+	# Codifica troppo lunga della 'A' ASCII (dovrebbe diventare ?),
     met: ( Serie nuovo ; 65 ; 193 ; 129 ; 0 ) a: ['A?'],
-	# Invalid first byte (0xFF)
+	# Primo byte non valido (0xFF)
     met: ( Serie nuovo ; 255 ; 0 ) a: ['?'],
-	# Incomplete multi-byte sequence at end
+	# Sequenza multibyte incompleta alla fine
     met: ( Serie nuovo ; 66 ; 226 ; 0 ) a: ['B?'],
-    # Empty string
+    # Testo vuoto
     #put: ( List new ) at: [''],
-	# Multiple mixed sequences
+	# Più sequenze miste
     met: ( Serie nuovo ; 65 ; 226 ; 130 ; 172 ; 192 ; 175 ; 240 ; 144 ; 141 ; 136 ; 66 ; 0 ) a: ['A€?𐍈B'].
 	 
-utf8cases ogni: { :key :value
+casiutf8 ogni: { :key :value
 	>> blob := Blob nuovo: value contare, bytes: value.
 	>> str := blob testo.
 	(str = key) vero: {
 		Uscita scrivi: ['OK'], stop.
 	}, altro: {
-		Uscita scrivi: ['UTF8 sanitizer failed on: '] + key + [' got: '] + str, stop.
+		Uscita scrivi: ['Il sanificatore UTF8 ha fallito su: '] + key + [' ottenuto: '] + str, stop.
 	}.
 	blob libero.
 }.

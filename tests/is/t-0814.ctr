@@ -1,39 +1,42 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# snið setuköku, json-efnisgerð, aðeins vefsamskiptareglur, svg birt innfellt
 Server frumstilla.
 Forrit nota: ['../../../src/xo/is/webtools.xo'].
 
->> Fake-Request := Hlutur nýtt.
-Fake-Request við: ['value:'] gera: { :gildið
+>> Fölsk-Beiðni := Hlutur nýtt.
+Fölsk-Beiðni við: ['value:'] gera: { :gildið
 	eigin gildið := gildið.
 }.
-Fake-Request við: ['cookie:'] gera: { :nafn <- eigin gildið.
+Fölsk-Beiðni við: ['cookie:'] gera: { :nafn
+	<- eigin gildið.
 }.
 
->> Test-Session := Bráðabirgðaskrár-seta nýtt.
-Test-Session við: ['hlaða'] gera: { <- Orðabók nýtt.
+>> Prófunar-Seta := Bráðabirgðaskrár-seta nýtt.
+Prófunar-Seta við: ['hlaða'] gera: {
+	<- Orðabók nýtt.
 }.
-Test-Session við: ['session-id'] gera: { <- eigin id.
+Prófunar-Seta við: ['auðkenni-setu'] gera: {
+	<- eigin id.
 }.
 
->> cookies := Listi nýtt
+>> vafrakökur := Listi nýtt
 	; ['abc123']
 	; ['../outside']
 	; ['']
 	; ['abc\n'].
 
-cookies hver: { :i :cookie
-	>> beiðni := Fake-Request nýtt.
-	beiðni value: cookie.
-	>> stjóri := Test-Session nýtt.
-	>> web := Vefskjal nýtt.
-	web beiðni: beiðni.
-	web setustjóri: stjóri.
-	web hefja-setu.
-	Úttak skrifa: ( stjóri session-id = cookie ), ný-lína.
+vafrakökur hver: { :i :vafrakaka
+	>> beiðni := Fölsk-Beiðni nýtt.
+	beiðni value: vafrakaka.
+	>> stjóri := Prófunar-Seta nýtt.
+	>> vefur := Vefskjal nýtt.
+	vefur beiðni: beiðni.
+	vefur setustjóri: stjóri.
+	vefur hefja-setu.
+	Úttak skrifa: ( stjóri auðkenni-setu = vafrakaka ), ný-lína.
 }.
 
->> web := Vefskjal nýtt.
-web json: (Orðabók nýtt setja: ['b'] við: ['a']).
+>> vefur := Vefskjal nýtt.
+vefur json: (Orðabók nýtt setja: ['b'] við: ['a']).
 Úttak skrifa: ['\n'], ný-lína.
 
 { Net get: ['file:///etc/hostname']. } grípa: { :e

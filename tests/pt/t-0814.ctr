@@ -1,18 +1,21 @@
-# session cookie format, json content type, web protocols only, svg shown inline
+# formato do cookie de sessão, tipo de conteúdo json, só protocolos web, svg mostrado inline
 Server inicializar.
 Programa usar: ['../../../src/xo/pt/webtools.xo'].
 
->> Fake-Request := Objeto novo.
-Fake-Request em: ['value:'] fazer: { :valor
+>> Pedido-Falso := Objeto novo.
+Pedido-Falso em: ['value:'] fazer: { :valor
 	prop valor := valor.
 }.
-Fake-Request em: ['cookie:'] fazer: { :nome <- prop valor.
+Pedido-Falso em: ['cookie:'] fazer: { :nome
+	<- prop valor.
 }.
 
->> Test-Session := Sessão-ficheiro-temporário novo.
-Test-Session em: ['carregar'] fazer: { <- Mapa novo.
+>> Sessão-Teste := Sessão-ficheiro-temporário novo.
+Sessão-Teste em: ['carregar'] fazer: {
+	<- Mapa novo.
 }.
-Test-Session em: ['session-id'] fazer: { <- prop id.
+Sessão-Teste em: ['id-de-sessão'] fazer: {
+	<- prop id.
 }.
 
 >> cookies := Listar novo
@@ -22,14 +25,14 @@ Test-Session em: ['session-id'] fazer: { <- prop id.
 	; ['abc\n'].
 
 cookies cada-um: { :i :cookie
-	>> pedido := Fake-Request novo.
+	>> pedido := Pedido-Falso novo.
 	pedido value: cookie.
-	>> gestor := Test-Session novo.
+	>> gestor := Sessão-Teste novo.
 	>> web := Documento-Web novo.
 	web pedido: pedido.
 	web gestor-sessão: gestor.
 	web iniciar-sessão.
-	Saída escrever: ( gestor session-id = cookie ), stop.
+	Saída escrever: ( gestor id-de-sessão = cookie ), stop.
 }.
 
 >> web := Documento-Web novo.

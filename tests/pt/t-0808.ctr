@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# chaves e assinaturas do cofre que descodificam demasiado longas não devem fazer overflow da stack
 Server init.
 
->> keys := Cofre chaves-criptográficas.
->> sk := keys primeiro.
->> pk := keys último.
->> sig := Cofre assinar: ['abc'] com: sk.
+>> chaves := Cofre chaves-criptográficas.
+>> sk := chaves primeiro.
+>> pk := chaves último.
+>> assin := Cofre assinar: ['abc'] com: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 caracteres sem padding descodificam para 66 bytes
+>> longo := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 caracteres sem padding descodificam para 33 bytes
+>> curto := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Cofre assinar: ['abc'] com: long. } pegar: { :e
+{ Cofre assinar: ['abc'] com: longo. } pegar: { :e
 	Saída escrever: e, stop.
 }, iniciar.
 
-{ Cofre verificar: ['abc'] assinatura: long com: pk. } pegar: { :e
+{ Cofre verificar: ['abc'] assinatura: longo com: pk. } pegar: { :e
 	Saída escrever: e, stop.
 }, iniciar.
 
-{ Cofre verificar: ['abc'] assinatura: sig com: short. } pegar: { :e
+{ Cofre verificar: ['abc'] assinatura: assin com: curto. } pegar: { :e
 	Saída escrever: e, stop.
 }, iniciar.

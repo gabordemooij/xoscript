@@ -1,39 +1,39 @@
-# a format must fit the type of the value, the type can come from a client
->> tentar := { :format :value
-	{ Saída escrever: ( (Formato novo: format) aplicar: value ), stop. } pegar: { :e Saída escrever: e, stop. }, iniciar.
+# um formato deve corresponder ao tipo do valor, o tipo pode vir de um cliente
+>> tentar := { :oFormato :value
+	{ Saída escrever: ( (Formato novo: oFormato) aplicar: value ), stop. } pegar: { :e Saída escrever: e, stop. }, iniciar.
 }.
->> try-int := { :format :value
-	{ Saída escrever: ( (Formato novo: format) aplicar-int: value ), stop. } pegar: { :e Saída escrever: e, stop. }, iniciar.
+>> tentar-inteiro := { :oFormato :value
+	{ Saída escrever: ( (Formato novo: oFormato) aplicar-int: value ), stop. } pegar: { :e Saída escrever: e, stop. }, iniciar.
 }.
 
-# fits
+# cabe
 tentar aplicar: ['|%s|'] e: ['text'].
 tentar aplicar: ['%06.2f'] e: 5.5.
-tentar aplicar: ['100%% %s'] e: ['sure'].
-try-int aplicar: ['%03d'] e: 7.
-try-int aplicar: ['%x'] e: 255.
+tentar aplicar: ['100%% %s'] e: ['claro'].
+tentar-inteiro aplicar: ['%03d'] e: 7.
+tentar-inteiro aplicar: ['%x'] e: 255.
 tentar aplicar: ['%d'] e: (Int64 novo de-string: ['12']).
 tentar aplicar: ['%lld'] e: (Int64 novo de-string: ['12']).
 tentar aplicar: ['%.1lf'] e: 5.5.
-try-int aplicar: ['%hd'] e: 7.
+tentar-inteiro aplicar: ['%hd'] e: 7.
 
-# does not fit
+# não cabe
 tentar aplicar: ['%s'] e: 12345.
 tentar aplicar: ['%d'] e: 12345.
 tentar aplicar: ['%f'] e: ['text'].
-try-int aplicar: ['%d'] e: ['text'].
-try-int aplicar: ['%s'] e: 5.
+tentar-inteiro aplicar: ['%d'] e: ['text'].
+tentar-inteiro aplicar: ['%s'] e: 5.
 tentar aplicar: ['%s %s'] e: ['text'].
 tentar aplicar: ['%n'] e: ['text'].
 tentar aplicar: ['%*s'] e: ['text'].
 tentar aplicar: ['%'] e: ['text'].
 
-# length modifier does not fit
+# o modificador de comprimento não cabe
 tentar aplicar: ['%ls'] e: ['text'].
 tentar aplicar: ['%Lf'] e: 5.5.
-try-int aplicar: ['%ld'] e: 7.
-try-int aplicar: ['%lld'] e: 7.
+tentar-inteiro aplicar: ['%ld'] e: 7.
+tentar-inteiro aplicar: ['%lld'] e: 7.
 tentar aplicar: ['%Ld'] e: (Int64 novo de-string: ['12']).
 
-# a width that does not fit printf must give an error, not a crash
+# uma largura que não cabe no printf deve dar um erro, não um crash
 tentar aplicar: ['%99999999999s'] e: ['text'].

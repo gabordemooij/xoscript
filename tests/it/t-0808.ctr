@@ -1,25 +1,25 @@
-# vault keys and signatures that decode too long must not overflow the stack
+# chiavi e firme del caveau che decodificano troppo lunghe non devono far traboccare lo stack
 Server init.
 
->> keys := Caveau chiavi-crittografiche.
->> sk := keys primo.
->> pk := keys scorso.
->> sig := Caveau firma: ['abc'] con: sk.
+>> chiavi := Caveau chiavi-crittografiche.
+>> sk := chiavi primo.
+>> pk := chiavi scorso.
+>> firma := Caveau firma: ['abc'] con: sk.
 
-# 88 characters without padding decode to 66 bytes
->> long := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 88 caratteri senza padding decodificano in 66 byte
+>> lungo := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-# 44 characters without padding decode to 33 bytes
->> short := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
+# 44 caratteri senza padding decodificano in 33 byte
+>> corto := ['AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].
 
-{ Caveau firma: ['abc'] con: long. } catturare: { :e
+{ Caveau firma: ['abc'] con: lungo. } catturare: { :e
 	Uscita scrivi: e, stop.
 }, correre.
 
-{ Caveau verifica: ['abc'] firma: long con: pk. } catturare: { :e
+{ Caveau verifica: ['abc'] firma: lungo con: pk. } catturare: { :e
 	Uscita scrivi: e, stop.
 }, correre.
 
-{ Caveau verifica: ['abc'] firma: sig con: short. } catturare: { :e
+{ Caveau verifica: ['abc'] firma: firma con: corto. } catturare: { :e
 	Uscita scrivi: e, stop.
 }, correre.
