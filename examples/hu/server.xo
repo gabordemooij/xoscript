@@ -1,0 +1,142 @@
+# Mindent-egyben szerver bemutató
+#
+# - HTTP-kéréskezelő
+# - Alapszintű munkamenet-kezelő
+# - Adatbázis-objektum (MariaDB)
+# - CURL
+# - JSON
+# - Titkosítás
+#
+# SQL-példa:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Program memóriakezelés: 4.
+
+# ~ HTTP-kérések ~
+Server inicializál.
+>> kérelem := HTTP-Kérés új.
+Kimenet ír: ['HTTP-GET a='] + ( kérelem get: ['a'] ), újsor. # GET
+Kimenet ír: ['HTTP-POST c='] + ( kérelem post: ['c'] ), újsor. # POST
+
+
+# ~ Adatbázis ~
+>> adb := Maria-DB új gazdagép: ['localhost'],
+	felhasználónév: ['xo'], jelszó: ['pass123'], adatbázisnév: ['xobase'], csatlakozik.
+
+>> lekérdezés := adb lekérdezés: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], paraméterek: ( Lista új ; ['abc'] ; 12.35 ; 6 ). # paraméteres lekérdezések
+
+{  lekérdezés végrehajt. adb véglegesít. } elkap: { :e adb visszavon.  }, indít. # tranzakciók
+Kimenet ír: ['BESZÚRVA: '] + lekérdezés insert-id, újsor. # beszúrt azonosító
+
+>> lekérdezés :=
+adb lekérdezés: ['SELECT * FROM book order by id desc limit 2'], 
+lekér: { :rekord 
+	Kimenet ír: rekord id + [' '] + rekord description + [': '] + rekord price, újsor.
+	#True break.
+}. # sorok lekérése
+
+>> lekérdezés :=
+adb lekérdezés: ['SELECT * FROM book order by id desc limit 2'], 
+lekér: { :rekord 
+	Kimenet ír: rekord id + [' '] + rekord description + [': '] + rekord price, újsor.
+	#True break.
+}. # sorok lekérése
+
+
+# ~ CURL ~
+Kimenet ír: ( Hálózat post: Semmi ide: ['https://xoscript.com'] ) hossz, újsor. # üres post = GET
+
+# ~ JSON ~
+>> jsonszöveg := (JSON jsonify: (Szótár új tesz: (Lista új ; 1 ; 2 ; 3) ide: ['abc'])).
+Kimenet ír: jsonszöveg, újsor.
+Kimenet ír: ((JSON objektum: jsonszöveg) abc ? 1), újsor.
+
+# ~ Titkosítás ~
+>> széf := Széf új: ['Encryptor'].
+Kimenet ír: ['titkosítás:'], újsor.
+>> x := Széf titkosít: ['hello'] kulcs: ['world'].
+Kimenet ír: x, újsor.
+Kimenet ír: ['visszafejtés:'], újsor.
+Kimenet ír: (Széf visszafejt: x kulcs: ['world']), újsor.
+
+
+# ~ Munkamenet-kezelő (alapértelmezés szerint a /tmp könyvtárban tárol) ~
+Program használ: ['hu/webtools.xo'].
+>> weblap := Webdokumentum új.
+>> x := weblap munkamenet-indítása.
+Kimenet ír: x, újsor.
+x user: 123.
+weblap munkamenet-megszüntetése.
+weblap ugrás: ['/'].
+
+# ~ Sablon ~
+Program használ: ['hu/template.xo'].
+>> html-kód := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> sablon := Sablon új tartalom: html-kód.
+>> greeting := sablon kivág: ['greeting'], másol greeting: ['Helló, világ!'].
+sablon beilleszt: greeting ide: ['greetings'].
+
+Kimenet ír: ['========================='], újsor.
+>> weblap := Webdokumentum új.
+weblap kiír: sablon mindent-tisztít.
+
+# ~ Reguláris kifejezések ~
+>> forrásszöveg := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> minta := Minta új: ['href="([^"]+)" target="([^"]+)"'].
+>> eredmény  := minta egyezés: forrásszöveg tedd: { :m :x
+	Kimenet ír: m, újsor.
+	Kimenet ír: x, újsor.
+	<- ['XXX'].
+}.
+Kimenet ír: eredmény, újsor.
+
+# ~ Segédeszközök ~
+Kimenet ír: (Server html-kódolás: ['<&"' hello '"&>']), újsor.
+Kimenet ír: (Server url-kódolás: ['https://example.com?a=6&b=1 2']), újsor.
+Kimenet ír: (Formátum új: ['Number format: %06.0f \n'], alkalmaz: 56), újsor.
+Kimenet ír: (Széf token: 20), újsor.
+Kimenet ír: (Pillanat új formátum: ['%a, %d %b %Y %H:%M:%S']), újsor.
+>> a := Server base64-kódolás: ['abc123'].
+Kimenet ír: a, újsor.
+Kimenet ír: (Server base64-dekódolás: a), újsor.
+
+>> u := URL új.
+u protokoll: ['http'], gazdagép: ['example.com'], útvonal: ['path'], url-paraméterek: (
+	Szótár új
+	a: ['1+'],
+	b: 2
+).
+Kimenet ír: u, újsor.

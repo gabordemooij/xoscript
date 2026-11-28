@@ -1,0 +1,142 @@
+# Hammasi bir joyda: server namoyishi
+#
+# - HTTP soʻrovlar ishlovchisi
+# - Oddiy sessiya ishlovchisi
+# - Maʼlumotlar bazasi obyekti (MariaDB)
+# - CURL
+# - JSON
+# - Shifrlash
+#
+# SQL misoli:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Dastur xotira-boshqaruvi: 4.
+
+# ~ HTTP soʻrovlar ~
+Server ishga-tushir.
+>> kiruvchi-soʻrov := HTTP-Soʻrov yangi.
+Chiqish yozish: ['HTTP-GET a='] + ( kiruvchi-soʻrov get: ['a'] ), yangi-qator. # GET
+Chiqish yozish: ['HTTP-POST c='] + ( kiruvchi-soʻrov post: ['c'] ), yangi-qator. # POST
+
+
+# ~ Maʼlumotlar bazasi ~
+>> mb := Maria-DB yangi xost: ['localhost'],
+	foydalanuvchi-nomi: ['xo'], parol: ['pass123'], baza-nomi: ['xobase'], ulanish.
+
+>> sql-soʻrov := mb soʻrov: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametrlar: ( Roʻyxat yangi ; ['abc'] ; 12.35 ; 6 ). # parametrlangan soʻrovlar
+
+{  sql-soʻrov bajarish. mb tasdiqlash. } ushlash: { :e mb ortga-qaytarish.  }, ishga-tushirish. # tranzaksiyalar
+Chiqish yozish: ['QOʻSHILDI: '] + sql-soʻrov insert-id, yangi-qator. # kiritilgan id
+
+>> sql-soʻrov :=
+mb soʻrov: ['SELECT * FROM book order by id desc limit 2'], 
+olish: { :yozuv 
+	Chiqish yozish: yozuv id + [' '] + yozuv description + [': '] + yozuv price, yangi-qator.
+	#True break.
+}. # qatorlarni olish
+
+>> sql-soʻrov :=
+mb soʻrov: ['SELECT * FROM book order by id desc limit 2'], 
+olish: { :yozuv 
+	Chiqish yozish: yozuv id + [' '] + yozuv description + [': '] + yozuv price, yangi-qator.
+	#True break.
+}. # qatorlarni olish
+
+
+# ~ CURL ~
+Chiqish yozish: ( Tarmoq post: Hech manzilga: ['https://xoscript.com'] ) uzunlik, yangi-qator. # boʻsh post = GET
+
+# ~ JSON ~
+>> json-matn := (JSON jsonify: (Lugʻat yangi qoʻyish: (Roʻyxat yangi ; 1 ; 2 ; 3) kalit: ['abc'])).
+Chiqish yozish: json-matn, yangi-qator.
+Chiqish yozish: ((JSON obyekt: json-matn) abc ? 1), yangi-qator.
+
+# ~ Shifrlash ~
+>> xazina := Seyf yangi: ['Encryptor'].
+Chiqish yozish: ['shifrlash:'], yangi-qator.
+>> x := Seyf shifrlash: ['hello'] kalit: ['world'].
+Chiqish yozish: x, yangi-qator.
+Chiqish yozish: ['deshifrlash:'], yangi-qator.
+Chiqish yozish: (Seyf shifrni-ochish: x kalit: ['world']), yangi-qator.
+
+
+# ~ Sessiya ishlovchisi (standart boʻyicha /tmp da saqlanadi) ~
+Dastur foydalanish: ['uz/webtools.xo'].
+>> veb := Veb-hujjat yangi.
+>> x := veb seansni-boshla.
+Chiqish yozish: x, yangi-qator.
+x user: 123.
+veb seansni-yoʻq-qil.
+veb oʻt: ['/'].
+
+# ~ Shablon ~
+Dastur foydalanish: ['uz/template.xo'].
+>> html-kod := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> shablon := Qolip yangi mazmun: html-kod.
+>> greeting := shablon kes: ['greeting'], nusxa greeting: ['Salom, dunyo!'].
+shablon joylashtir: greeting kalit: ['greetings'].
+
+Chiqish yozish: ['========================='], yangi-qator.
+>> veb := Veb-hujjat yangi.
+veb chiqar: shablon hammasini-tartibla.
+
+# ~ Muntazam ifodalar ~
+>> manba-matn := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> naqsh := Andoza yangi: ['href="([^"]+)" target="([^"]+)"'].
+>> almashtirish-natijasi  := naqsh moslik: manba-matn bajar: { :m :x
+	Chiqish yozish: m, yangi-qator.
+	Chiqish yozish: x, yangi-qator.
+	<- ['XXX'].
+}.
+Chiqish yozish: almashtirish-natijasi, yangi-qator.
+
+# ~ Yordamchi vositalar ~
+Chiqish yozish: (Server html-kodlash: ['<&"' hello '"&>']), yangi-qator.
+Chiqish yozish: (Server url-kodlash: ['https://example.com?a=6&b=1 2']), yangi-qator.
+Chiqish yozish: (Format yangi: ['Number format: %06.0f \n'], qoʻllash: 56), yangi-qator.
+Chiqish yozish: (Seyf token: 20), yangi-qator.
+Chiqish yozish: (Lahza yangi format: ['%a, %d %b %Y %H:%M:%S']), yangi-qator.
+>> a := Server base64-kodlash: ['abc123'].
+Chiqish yozish: a, yangi-qator.
+Chiqish yozish: (Server base64-dekodlash: a), yangi-qator.
+
+>> u := URL yangi.
+u protokol: ['http'], xost: ['example.com'], yoʻl: ['path'], url-parametrlari: (
+	Lugʻat yangi
+	a: ['1+'],
+	b: 2
+).
+Chiqish yozish: u, yangi-qator.

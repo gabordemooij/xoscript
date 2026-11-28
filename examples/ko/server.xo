@@ -1,0 +1,142 @@
+# 올인원 서버 데모
+#
+# - HTTP 요청 핸들러
+# - 기본 세션 핸들러
+# - 데이터베이스 객체 (MariaDB)
+# - CURL
+# - JSON
+# - 암호화
+#
+# SQL 예제:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+프로그램 메모리관리: 4.
+
+# ~ HTTP 요청 ~
+Server 초기화.
+>> 요청 := HTTP-요청 새로.
+출력 쓰기: ['HTTP-GET a='] + ( 요청 get: ['a'] ), 줄바꿈. # GET
+출력 쓰기: ['HTTP-POST c='] + ( 요청 post: ['c'] ), 줄바꿈. # POST
+
+
+# ~ 데이터베이스 ~
+>> db := Maria-DB 새로 호스트: ['localhost'],
+	사용자이름: ['xo'], 비밀번호: ['pass123'], 데이터베이스이름: ['xobase'], 접속.
+
+>> 쿼리 := db 쿼리: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], 매개변수: ( 리스트 새로 ; ['abc'] ; 12.35 ; 6 ). # 매개변수화된 쿼리
+
+{  쿼리 실행. db 커밋. } 예외시: { :e db 롤백.  }, 시작. # 트랜잭션
+출력 쓰기: ['삽입됨: '] + 쿼리 insert-id, 줄바꿈. # 삽입된 id
+
+>> 쿼리 :=
+db 쿼리: ['SELECT * FROM book order by id desc limit 2'], 
+가져오기: { :행 
+	출력 쓰기: 행 id + [' '] + 행 description + [': '] + 행 price, 줄바꿈.
+	#True break.
+}. # 행 가져오기
+
+>> 쿼리 :=
+db 쿼리: ['SELECT * FROM book order by id desc limit 2'], 
+가져오기: { :행 
+	출력 쓰기: 행 id + [' '] + 행 description + [': '] + 행 price, 줄바꿈.
+	#True break.
+}. # 행 가져오기
+
+
+# ~ CURL ~
+출력 쓰기: ( 네트워크 post: 없음 대상: ['https://xoscript.com'] ) 길이, 줄바꿈. # 빈 post = GET
+
+# ~ JSON ~
+>> json := (JSON jsonify: (사전 새로 넣기: (리스트 새로 ; 1 ; 2 ; 3) 위치: ['abc'])).
+출력 쓰기: json, 줄바꿈.
+출력 쓰기: ((JSON 객체: json) abc ? 1), 줄바꿈.
+
+# ~ 암호화 ~
+>> 보관함 := 금고 새로: ['Encryptor'].
+출력 쓰기: ['암호화:'], 줄바꿈.
+>> x := 금고 암호화: ['hello'] 키: ['world'].
+출력 쓰기: x, 줄바꿈.
+출력 쓰기: ['복호화:'], 줄바꿈.
+출력 쓰기: (금고 복호화: x 키: ['world']), 줄바꿈.
+
+
+# ~ 세션 핸들러 (기본적으로 /tmp에 저장됨) ~
+프로그램 사용: ['ko/webtools.xo'].
+>> 웹 := 웹문서 새로.
+>> x := 웹 세션시작.
+출력 쓰기: x, 줄바꿈.
+x user: 123.
+웹 세션파기.
+웹 이동: ['/'].
+
+# ~ 템플릿 ~
+프로그램 사용: ['ko/template.xo'].
+>> HTML텍스트 := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> 템플릿객체 := 템플릿 새로 내용: HTML텍스트.
+>> greeting := 템플릿객체 잘라내기: ['greeting'], 복사 greeting: ['안녕하세요, 세계!'].
+템플릿객체 붙여넣기: greeting 위치: ['greetings'].
+
+출력 쓰기: ['========================='], 줄바꿈.
+>> 웹 := 웹문서 새로.
+웹 출력: 템플릿객체 모두제거.
+
+# ~ 정규식 ~
+>> 대상 := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> 정규식 := 패턴 새로: ['href="([^"]+)" target="([^"]+)"'].
+>> 결과  := 정규식 일치: 대상 실행: { :m :x
+	출력 쓰기: m, 줄바꿈.
+	출력 쓰기: x, 줄바꿈.
+	<- ['XXX'].
+}.
+출력 쓰기: 결과, 줄바꿈.
+
+# ~ 유틸리티 ~
+출력 쓰기: (Server html-인코딩: ['<&"' hello '"&>']), 줄바꿈.
+출력 쓰기: (Server url-인코딩: ['https://example.com?a=6&b=1 2']), 줄바꿈.
+출력 쓰기: (형식 새로: ['Number format: %06.0f \n'], 적용: 56), 줄바꿈.
+출력 쓰기: (금고 토큰: 20), 줄바꿈.
+출력 쓰기: (시점 새로 형식: ['%a, %d %b %Y %H:%M:%S']), 줄바꿈.
+>> a := Server base64-인코딩: ['abc123'].
+출력 쓰기: a, 줄바꿈.
+출력 쓰기: (Server base64-디코딩: a), 줄바꿈.
+
+>> u := URL 새로.
+u 프로토콜: ['http'], 호스트: ['example.com'], 파일경로: ['path'], url매개변수: (
+	사전 새로
+	a: ['1+'],
+	b: 2
+).
+출력 쓰기: u, 줄바꿈.

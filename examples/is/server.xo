@@ -1,0 +1,142 @@
+# Allt-í-einu sýnidæmi fyrir netþjón
+#
+# - Meðhöndlun HTTP-beiðna
+# - Einföld setustjórnun
+# - Gagnagrunnshlutur (MariaDB)
+# - CURL
+# - JSON
+# - Dulkóðun
+#
+# SQL-dæmi:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Forrit minnisstjórnun: 4.
+
+# ~ HTTP-beiðnir ~
+Server frumstilla.
+>> vefbeiðni := HTTP-Beiðni nýtt.
+Úttak skrifa: ['HTTP-GET a='] + ( vefbeiðni get: ['a'] ), ný-lína. # GET
+Úttak skrifa: ['HTTP-POST c='] + ( vefbeiðni post: ['c'] ), ný-lína. # POST
+
+
+# ~ Gagnagrunnur ~
+>> gg := Maria-DB nýtt hýsill: ['localhost'],
+	notandanafn: ['xo'], lykilorð: ['pass123'], nafn-gagnagrunns: ['xobase'], tengjast.
+
+>> fyrirspurn := gg fyrirspurn: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], færibreytur: ( Listi nýtt ; ['abc'] ; 12.35 ; 6 ). # fyrirspurnir með færibreytum
+
+{  fyrirspurn keyra. gg staðfesta. } grípa: { :e gg afturkalla.  }, ræsa. # færslur
+Úttak skrifa: ['SETT INN: '] + fyrirspurn insert-id, ný-lína. # auðkenni innsetningar
+
+>> fyrirspurn :=
+gg fyrirspurn: ['SELECT * FROM book order by id desc limit 2'], 
+sækja: { :röð 
+	Úttak skrifa: röð id + [' '] + röð description + [': '] + röð price, ný-lína.
+	#True break.
+}. # sækja raðir
+
+>> fyrirspurn :=
+gg fyrirspurn: ['SELECT * FROM book order by id desc limit 2'], 
+sækja: { :röð 
+	Úttak skrifa: röð id + [' '] + röð description + [': '] + röð price, ný-lína.
+	#True break.
+}. # sækja raðir
+
+
+# ~ CURL ~
+Úttak skrifa: ( Net post: Ekkert til: ['https://xoscript.com'] ) lengd, ný-lína. # tómt post = GET
+
+# ~ JSON ~
+>> json := (JSON jsonify: (Orðabók nýtt setja: (Listi nýtt ; 1 ; 2 ; 3) við: ['abc'])).
+Úttak skrifa: json, ný-lína.
+Úttak skrifa: ((JSON hlutur: json) abc ? 1), ný-lína.
+
+# ~ Dulkóðun ~
+>> hvelfing := Hvelfing nýtt: ['Encryptor'].
+Úttak skrifa: ['dulkóða:'], ný-lína.
+>> x := Hvelfing dulkóða: ['hello'] lykill: ['world'].
+Úttak skrifa: x, ný-lína.
+Úttak skrifa: ['afkóða:'], ný-lína.
+Úttak skrifa: (Hvelfing afkóða-dulmál: x lykill: ['world']), ný-lína.
+
+
+# ~ Setustjórnun (sjálfgefið vistað í /tmp) ~
+Forrit nota: ['is/webtools.xo'].
+>> vefur := Vefskjal nýtt.
+>> x := vefur hefja-setu.
+Úttak skrifa: x, ný-lína.
+x user: 123.
+vefur eyða-setu.
+vefur fara-á: ['/'].
+
+# ~ Sniðmát ~
+Forrit nota: ['is/template.xo'].
+>> html-kóði := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> sniðmát := Sniðmát nýtt innihald: html-kóði.
+>> greeting := sniðmát klippa: ['greeting'], afrita greeting: ['Halló heimur!'].
+sniðmát líma: greeting við: ['greetings'].
+
+Úttak skrifa: ['========================='], ný-lína.
+>> vefur := Vefskjal nýtt.
+vefur skrifa-út: sniðmát fága-allt.
+
+# ~ Reglulegar segðir ~
+>> frumtexti := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> mynstur := Mynstur nýtt: ['href="([^"]+)" target="([^"]+)"'].
+>> niðurstaða  := mynstur samsvörun: frumtexti gera: { :m :x
+	Úttak skrifa: m, ný-lína.
+	Úttak skrifa: x, ný-lína.
+	<- ['XXX'].
+}.
+Úttak skrifa: niðurstaða, ný-lína.
+
+# ~ Hjálpartól ~
+Úttak skrifa: (Server html-kóða: ['<&"' hello '"&>']), ný-lína.
+Úttak skrifa: (Server url-kóða: ['https://example.com?a=6&b=1 2']), ný-lína.
+Úttak skrifa: (Snið nýtt: ['Number format: %06.0f \n'], beita: 56), ný-lína.
+Úttak skrifa: (Hvelfing tóki: 20), ný-lína.
+Úttak skrifa: (Stund nýtt snið: ['%a, %d %b %Y %H:%M:%S']), ný-lína.
+>> a := Server base64-kóða: ['abc123'].
+Úttak skrifa: a, ný-lína.
+Úttak skrifa: (Server base64-afkóða: a), ný-lína.
+
+>> u := URL nýtt.
+u samskiptaregla: ['http'], hýsill: ['example.com'], slóð: ['path'], url-færibreytur: (
+	Orðabók nýtt
+	a: ['1+'],
+	b: 2
+).
+Úttak skrifa: u, ný-lína.

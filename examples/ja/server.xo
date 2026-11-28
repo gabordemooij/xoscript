@@ -1,0 +1,142 @@
+# オールインワン・サーバーデモ
+#
+# - HTTPリクエストハンドラー
+# - 基本的なセッションハンドラー
+# - データベースオブジェクト (MariaDB)
+# - CURL
+# - JSON
+# - 暗号化
+#
+# SQLの例:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+プログラム メモリ管理: 4.
+
+# ~ HTTPリクエスト ~
+Server 初期化.
+>> リクエスト := HTTP-リクエスト 新規.
+出力 書く: ['HTTP-GET a='] + ( リクエスト get: ['a'] ), 改行. # GET
+出力 書く: ['HTTP-POST c='] + ( リクエスト post: ['c'] ), 改行. # POST
+
+
+# ~ データベース ~
+>> db := Maria-DB 新規 ホスト: ['localhost'],
+	ユーザー名: ['xo'], パスワード: ['pass123'], データベース名: ['xobase'], 接続.
+
+>> クエリ := db クエリ: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], パラメータ: ( リスト 新規 ; ['abc'] ; 12.35 ; 6 ). # パラメーター化クエリ
+
+{  クエリ 実行. db コミット. } 例外時: { :e db ロールバック.  }, 開始. # トランザクション
+出力 書く: ['挿入済み: '] + クエリ insert-id, 改行. # 挿入された ID
+
+>> クエリ :=
+db クエリ: ['SELECT * FROM book order by id desc limit 2'], 
+取得: { :行 
+	出力 書く: 行 id + [' '] + 行 description + [': '] + 行 price, 改行.
+	#True break.
+}. # 行の取得
+
+>> クエリ :=
+db クエリ: ['SELECT * FROM book order by id desc limit 2'], 
+取得: { :行 
+	出力 書く: 行 id + [' '] + 行 description + [': '] + 行 price, 改行.
+	#True break.
+}. # 行の取得
+
+
+# ~ CURL ~
+出力 書く: ( ネットワーク post: 無 宛先: ['https://xoscript.com'] ) 長さ, 改行. # 空のpost = GET
+
+# ~ JSON ~
+>> json := (JSON jsonify: (辞書 新規 格納: (リスト 新規 ; 1 ; 2 ; 3) 場所: ['abc'])).
+出力 書く: json, 改行.
+出力 書く: ((JSON オブジェクト: json) abc ? 1), 改行.
+
+# ~ 暗号化 ~
+>> 保管庫 := 金庫 新規: ['Encryptor'].
+出力 書く: ['暗号化:'], 改行.
+>> x := 金庫 暗号化: ['hello'] 鍵: ['world'].
+出力 書く: x, 改行.
+出力 書く: ['復号:'], 改行.
+出力 書く: (金庫 復号: x 鍵: ['world']), 改行.
+
+
+# ~ セッションハンドラー (デフォルトでは /tmp に保存) ~
+プログラム 使用: ['ja/webtools.xo'].
+>> ウェブ := ウェブ文書 新規.
+>> x := ウェブ セッション開始.
+出力 書く: x, 改行.
+x user: 123.
+ウェブ セッション破棄.
+ウェブ 移動: ['/'].
+
+# ~ テンプレート ~
+プログラム 使用: ['ja/template.xo'].
+>> HTMLテキスト := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> テンプレ := テンプレート 新規 内容: HTMLテキスト.
+>> greeting := テンプレ 切り取り: ['greeting'], 複製 greeting: ['こんにちは、世界!'].
+テンプレ 貼り付け: greeting 場所: ['greetings'].
+
+出力 書く: ['========================='], 改行.
+>> ウェブ := ウェブ文書 新規.
+ウェブ 出力: テンプレ 全部除去.
+
+# ~ 正規表現 ~
+>> 対象文字列 := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> 正規パターン := パターン 新規: ['href="([^"]+)" target="([^"]+)"'].
+>> 結果  := 正規パターン 一致: 対象文字列 実行: { :m :x
+	出力 書く: m, 改行.
+	出力 書く: x, 改行.
+	<- ['XXX'].
+}.
+出力 書く: 結果, 改行.
+
+# ~ ユーティリティ ~
+出力 書く: (Server html-エンコード: ['<&"' hello '"&>']), 改行.
+出力 書く: (Server url-エンコード: ['https://example.com?a=6&b=1 2']), 改行.
+出力 書く: (書式 新規: ['Number format: %06.0f \n'], 適用: 56), 改行.
+出力 書く: (金庫 トークン: 20), 改行.
+出力 書く: (時点 新規 書式: ['%a, %d %b %Y %H:%M:%S']), 改行.
+>> a := Server base64-エンコード: ['abc123'].
+出力 書く: a, 改行.
+出力 書く: (Server base64-デコード: a), 改行.
+
+>> u := URL 新規.
+u プロトコル: ['http'], ホスト: ['example.com'], 経路: ['path'], url引数: (
+	辞書 新規
+	a: ['1+'],
+	b: 2
+).
+出力 書く: u, 改行.

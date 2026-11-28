@@ -1,0 +1,142 @@
+# Allt-i-ett-serverdemo
+#
+# - HTTP-förfrågningshanterare
+# - Enkel sessionshanterare
+# - Databasobjekt (MariaDB)
+# - CURL
+# - JSON
+# - Kryptering
+#
+# SQL-exempel:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Program minneshantering: 4.
+
+# ~ HTTP-förfrågningar ~
+Server initiera.
+>> förfrågan := HTTP-Förfrågan ny.
+Utdata skriv: ['HTTP-GET a='] + ( förfrågan get: ['a'] ), stop. # GET
+Utdata skriv: ['HTTP-POST c='] + ( förfrågan post: ['c'] ), stop. # POST
+
+
+# ~ Databas ~
+>> db := Maria-DB ny värd: ['localhost'],
+	användarnamn: ['xo'], lösenord: ['pass123'], databasnamn: ['xobase'], anslut.
+
+>> sqlfråga := db fråga: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametrar: ( Lista ny ; ['abc'] ; 12.35 ; 6 ). # parametriserade frågor
+
+{  sqlfråga utför. db bekräfta. } fånga: { :e db återställ.  }, starta. # transaktioner
+Utdata skriv: ['INFOGAD: '] + sqlfråga insert-id, stop. # infogat id
+
+>> sqlfråga :=
+db fråga: ['SELECT * FROM book order by id desc limit 2'], 
+hämta: { :dbrad 
+	Utdata skriv: dbrad id + [' '] + dbrad description + [': '] + dbrad price, stop.
+	#True break.
+}. # hämtning av rader
+
+>> sqlfråga :=
+db fråga: ['SELECT * FROM book order by id desc limit 2'], 
+hämta: { :dbrad 
+	Utdata skriv: dbrad id + [' '] + dbrad description + [': '] + dbrad price, stop.
+	#True break.
+}. # hämtning av rader
+
+
+# ~ CURL ~
+Utdata skriv: ( Nätverk post: Inget till: ['https://xoscript.com'] ) längd, stop. # post utan data = GET
+
+# ~ JSON ~
+>> json-text := (JSON jsonify: (Ordbok ny sätt: (Lista ny ; 1 ; 2 ; 3) vid: ['abc'])).
+Utdata skriv: json-text, stop.
+Utdata skriv: ((JSON objekt: json-text) abc ? 1), stop.
+
+# ~ Kryptering ~
+>> kassaskåp := Valv ny: ['Encryptor'].
+Utdata skriv: ['kryptera:'], stop.
+>> x := Valv kryptera: ['hello'] nyckel: ['world'].
+Utdata skriv: x, stop.
+Utdata skriv: ['dekryptera:'], stop.
+Utdata skriv: (Valv dekryptera: x nyckel: ['world']), stop.
+
+
+# ~ Sessionshanterare (lagras som standard i /tmp) ~
+Program använd: ['sv/webtools.xo'].
+>> webb := Webbdokument ny.
+>> x := webb starta-session.
+Utdata skriv: x, stop.
+x user: 123.
+webb förstör-session.
+webb gå-till: ['/'].
+
+# ~ Mall ~
+Program använd: ['sv/template.xo'].
+>> html-kod := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> mallobjekt := Mall ny innehåll: html-kod.
+>> greeting := mallobjekt klipp: ['greeting'], kopiera greeting: ['Hej världen!'].
+mallobjekt klistra: greeting vid: ['greetings'].
+
+Utdata skriv: ['========================='], stop.
+>> webb := Webbdokument ny.
+webb skriv-ut: mallobjekt putsa-allt.
+
+# ~ Reguljära uttryck ~
+>> källtext := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> regex-mönster := Mönster ny: ['href="([^"]+)" target="([^"]+)"'].
+>> resultat  := regex-mönster matcha: källtext gör: { :m :x
+	Utdata skriv: m, stop.
+	Utdata skriv: x, stop.
+	<- ['XXX'].
+}.
+Utdata skriv: resultat, stop.
+
+# ~ Verktyg ~
+Utdata skriv: (Server html-koda: ['<&"' hello '"&>']), stop.
+Utdata skriv: (Server url-koda: ['https://example.com?a=6&b=1 2']), stop.
+Utdata skriv: (Format ny: ['Number format: %06.0f \n'], tillämpa: 56), stop.
+Utdata skriv: (Valv token: 20), stop.
+Utdata skriv: (Moment ny format: ['%a, %d %b %Y %H:%M:%S']), stop.
+>> a := Server base64-koda: ['abc123'].
+Utdata skriv: a, stop.
+Utdata skriv: (Server base64-avkoda: a), stop.
+
+>> u := URL ny.
+u protokoll: ['http'], värd: ['example.com'], sökväg: ['path'], url-parametrar: (
+	Ordbok ny
+	a: ['1+'],
+	b: 2
+).
+Utdata skriv: u, stop.

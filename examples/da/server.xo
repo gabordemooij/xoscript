@@ -1,0 +1,142 @@
+# Alt-i-en-serverdemo
+#
+# - HTTP-anmodningshåndtering
+# - Grundlæggende sessionshåndtering
+# - Databaseobjekt (MariaDB)
+# - CURL
+# - JSON
+# - Kryptering
+#
+# SQL-eksempel:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Program hukommelsesstyring: 4.
+
+# ~ HTTP-anmodninger ~
+Server initialiser.
+>> anmodning := HTTP-Forespørgsel ny.
+Uddata skriv: ['HTTP-GET a='] + ( anmodning get: ['a'] ), stop. # GET
+Uddata skriv: ['HTTP-POST c='] + ( anmodning post: ['c'] ), stop. # POST
+
+
+# ~ Database ~
+>> db := Maria-DB ny vært: ['localhost'],
+	brugernavn: ['xo'], adgangskode: ['pass123'], databasenavn: ['xobase'], tilslut.
+
+>> sql-forespørgsel := db forespørgsel: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametre: ( Liste ny ; ['abc'] ; 12.35 ; 6 ). # parameteriserede forespørgsler
+
+{  sql-forespørgsel udfør. db bekræft. } fang: { :e db rul-tilbage.  }, start. # transaktioner
+Uddata skriv: ['INDSAT: '] + sql-forespørgsel insert-id, stop. # indsat id
+
+>> sql-forespørgsel :=
+db forespørgsel: ['SELECT * FROM book order by id desc limit 2'], 
+hent: { :række 
+	Uddata skriv: række id + [' '] + række description + [': '] + række price, stop.
+	#True break.
+}. # hentning af rækker
+
+>> sql-forespørgsel :=
+db forespørgsel: ['SELECT * FROM book order by id desc limit 2'], 
+hent: { :række 
+	Uddata skriv: række id + [' '] + række description + [': '] + række price, stop.
+	#True break.
+}. # hentning af rækker
+
+
+# ~ CURL ~
+Uddata skriv: ( Netværk post: Intet til: ['https://xoscript.com'] ) længde, stop. # post intet = GET
+
+# ~ JSON ~
+>> json-tekst := (JSON jsonify: (Ordbog ny sæt: (Liste ny ; 1 ; 2 ; 3) ved: ['abc'])).
+Uddata skriv: json-tekst, stop.
+Uddata skriv: ((JSON objekt: json-tekst) abc ? 1), stop.
+
+# ~ Kryptering ~
+>> boks := Boks ny: ['Encryptor'].
+Uddata skriv: ['krypter:'], stop.
+>> x := Boks kryptér: ['hello'] nøgle: ['world'].
+Uddata skriv: x, stop.
+Uddata skriv: ['dekrypter:'], stop.
+Uddata skriv: (Boks dekryptér: x nøgle: ['world']), stop.
+
+
+# ~ Sessionshåndtering (gemmes som standard i /tmp) ~
+Program brug: ['da/webtools.xo'].
+>> side := Webdokument ny.
+>> x := side start-session.
+Uddata skriv: x, stop.
+x user: 123.
+side ødelæg-session.
+side gå-til: ['/'].
+
+# ~ Skabelon ~
+Program brug: ['da/template.xo'].
+>> htmlkode := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> skabelonen := Skabelon ny indhold: htmlkode.
+>> greeting := skabelonen klip: ['greeting'], kopiér greeting: ['Hej verden!'].
+skabelonen indsæt: greeting ved: ['greetings'].
+
+Uddata skriv: ['========================='], stop.
+>> side := Webdokument ny.
+side udskriv: skabelonen rens-alt.
+
+# ~ Regulære udtryk ~
+>> kildetekst := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> mønster := Mønster ny: ['href="([^"]+)" target="([^"]+)"'].
+>> resultat  := mønster match: kildetekst gør: { :m :x
+	Uddata skriv: m, stop.
+	Uddata skriv: x, stop.
+	<- ['XXX'].
+}.
+Uddata skriv: resultat, stop.
+
+# ~ Værktøjer ~
+Uddata skriv: (Server html-kode: ['<&"' hello '"&>']), stop.
+Uddata skriv: (Server url-kode: ['https://example.com?a=6&b=1 2']), stop.
+Uddata skriv: (Format ny: ['Number format: %06.0f \n'], anvend: 56), stop.
+Uddata skriv: (Boks token: 20), stop.
+Uddata skriv: (Øjeblik ny format: ['%a, %d %b %Y %H:%M:%S']), stop.
+>> a := Server base64-kode: ['abc123'].
+Uddata skriv: a, stop.
+Uddata skriv: (Server base64-afkode: a), stop.
+
+>> u := URL ny.
+u protokol: ['http'], vært: ['example.com'], sti: ['path'], url-parametre: (
+	Ordbog ny
+	a: ['1+'],
+	b: 2
+).
+Uddata skriv: u, stop.

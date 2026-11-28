@@ -1,0 +1,142 @@
+# Demo Server Serba Ada
+#
+# - Penangan Permintaan HTTP
+# - Penangan Sesi Dasar
+# - Objek Basis Data (MariaDB)
+# - CURL
+# - JSON
+# - Enkripsi
+#
+# Contoh SQL:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Program manajemen-memori: 4.
+
+# ~ Permintaan HTTP ~
+Server inisialisasi.
+>> permintaan := Permintaan-HTTP baru.
+Keluaran tulis: ['HTTP-GET a='] + ( permintaan get: ['a'] ), baris-baru. # GET
+Keluaran tulis: ['HTTP-POST c='] + ( permintaan post: ['c'] ), baris-baru. # POST
+
+
+# ~ Basis Data ~
+>> bd := Maria-DB baru hos: ['localhost'],
+	nama-pengguna: ['xo'], kata-sandi: ['pass123'], nama-basis-data: ['xobase'], sambungkan.
+
+>> kueri := bd kueri: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameter: ( Daftar baru ; ['abc'] ; 12.35 ; 6 ). # kueri berparameter
+
+{  kueri jalankan. bd komit. } tangkap: { :e bd batalkan.  }, mulai. # transaksi
+Keluaran tulis: ['DISISIPKAN: '] + kueri insert-id, baris-baru. # id sisipan
+
+>> kueri :=
+bd kueri: ['SELECT * FROM book order by id desc limit 2'], 
+ambil: { :rekaman 
+	Keluaran tulis: rekaman id + [' '] + rekaman description + [': '] + rekaman price, baris-baru.
+	#True break.
+}. # mengambil baris
+
+>> kueri :=
+bd kueri: ['SELECT * FROM book order by id desc limit 2'], 
+ambil: { :rekaman 
+	Keluaran tulis: rekaman id + [' '] + rekaman description + [': '] + rekaman price, baris-baru.
+	#True break.
+}. # mengambil baris
+
+
+# ~ CURL ~
+Keluaran tulis: ( Jaringan post: Kosong ke: ['https://xoscript.com'] ) panjang, baris-baru. # post kosong = GET
+
+# ~ JSON ~
+>> data-json := (JSON jsonify: (Kamus baru taruh: (Daftar baru ; 1 ; 2 ; 3) di: ['abc'])).
+Keluaran tulis: data-json, baris-baru.
+Keluaran tulis: ((JSON objek: data-json) abc ? 1), baris-baru.
+
+# ~ Enkripsi ~
+>> brankas := Brankas baru: ['Encryptor'].
+Keluaran tulis: ['enkripsi:'], baris-baru.
+>> x := Brankas enkripsi: ['hello'] kunci: ['world'].
+Keluaran tulis: x, baris-baru.
+Keluaran tulis: ['dekripsi:'], baris-baru.
+Keluaran tulis: (Brankas dekripsi: x kunci: ['world']), baris-baru.
+
+
+# ~ Penangan sesi (secara bawaan disimpan di /tmp) ~
+Program gunakan: ['id/webtools.xo'].
+>> web := Dokumen-Web baru.
+>> x := web mulai-sesi.
+Keluaran tulis: x, baris-baru.
+x user: 123.
+web hancurkan-sesi.
+web pergi-ke: ['/'].
+
+# ~ Templat ~
+Program gunakan: ['id/template.xo'].
+>> kode-html := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> templat := Templat baru konten: kode-html.
+>> greeting := templat potong: ['greeting'], salin greeting: ['Halo Dunia!'].
+templat tempel: greeting di: ['greetings'].
+
+Keluaran tulis: ['========================='], baris-baru.
+>> web := Dokumen-Web baru.
+web keluarkan: templat rapikan-semua.
+
+# ~ Ekspresi Reguler ~
+>> teks-sumber := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> pola := Pola baru: ['href="([^"]+)" target="([^"]+)"'].
+>> hasil  := pola cocok: teks-sumber lakukan: { :m :x
+	Keluaran tulis: m, baris-baru.
+	Keluaran tulis: x, baris-baru.
+	<- ['XXX'].
+}.
+Keluaran tulis: hasil, baris-baru.
+
+# ~ Utilitas ~
+Keluaran tulis: (Server html-enkode: ['<&"' hello '"&>']), baris-baru.
+Keluaran tulis: (Server url-enkode: ['https://example.com?a=6&b=1 2']), baris-baru.
+Keluaran tulis: (Format baru: ['Number format: %06.0f \n'], terapkan: 56), baris-baru.
+Keluaran tulis: (Brankas token: 20), baris-baru.
+Keluaran tulis: (Momen baru format: ['%a, %d %b %Y %H:%M:%S']), baris-baru.
+>> a := Server base64-enkode: ['abc123'].
+Keluaran tulis: a, baris-baru.
+Keluaran tulis: (Server base64-dekode: a), baris-baru.
+
+>> u := URL baru.
+u protokol: ['http'], hos: ['example.com'], jalur: ['path'], parameter-url: (
+	Kamus baru
+	a: ['1+'],
+	b: 2
+).
+Keluaran tulis: u, baris-baru.

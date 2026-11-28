@@ -1,0 +1,142 @@
+# Predstavitev strežnika vse v enem
+#
+# - Obdelovalnik zahtev HTTP
+# - Osnovni upravljalnik sej
+# - Objekt podatkovne baze (MariaDB)
+# - CURL
+# - JSON
+# - Šifriranje
+#
+# Primer SQL:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Program upravljanje-pomnilnika: 4.
+
+# ~ Zahteve HTTP ~
+Server inicializiraj.
+>> vhodna-zahteva := HTTP-Zahteva nov.
+Izhod piši: ['HTTP-GET a='] + ( vhodna-zahteva get: ['a'] ), nova-vrstica. # GET
+Izhod piši: ['HTTP-POST c='] + ( vhodna-zahteva post: ['c'] ), nova-vrstica. # POST
+
+
+# ~ Podatkovna baza ~
+>> pb := Maria-DB nov gostitelj: ['localhost'],
+	uporabnik: ['xo'], geslo: ['pass123'], ime-baze: ['xobase'], poveži-se.
+
+>> sql-poizvedba := pb poizvedba: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametri: ( Seznam nov ; ['abc'] ; 12.35 ; 6 ). # parametrizirane poizvedbe
+
+{  sql-poizvedba izvedi. pb potrdi. } ujemi: { :e pb razveljavi.  }, zaženi. # transakcije
+Izhod piši: ['VSTAVLJENO: '] + sql-poizvedba insert-id, nova-vrstica. # id vstavljanja
+
+>> sql-poizvedba :=
+pb poizvedba: ['SELECT * FROM book order by id desc limit 2'], 
+pridobi: { :zapis 
+	Izhod piši: zapis id + [' '] + zapis description + [': '] + zapis price, nova-vrstica.
+	#True break.
+}. # pridobivanje vrstic
+
+>> sql-poizvedba :=
+pb poizvedba: ['SELECT * FROM book order by id desc limit 2'], 
+pridobi: { :zapis 
+	Izhod piši: zapis id + [' '] + zapis description + [': '] + zapis price, nova-vrstica.
+	#True break.
+}. # pridobivanje vrstic
+
+
+# ~ CURL ~
+Izhod piši: ( Omrežje post: Nič na: ['https://xoscript.com'] ) dolžina, nova-vrstica. # post brez podatkov = GET
+
+# ~ JSON ~
+>> json-besedilo := (JSON jsonify: (Slovar nov postavi: (Seznam nov ; 1 ; 2 ; 3) na: ['abc'])).
+Izhod piši: json-besedilo, nova-vrstica.
+Izhod piši: ((JSON objekt: json-besedilo) abc ? 1), nova-vrstica.
+
+# ~ Šifriranje ~
+>> trezor := Sef nov: ['Encryptor'].
+Izhod piši: ['šifriraj:'], nova-vrstica.
+>> x := Sef šifriraj: ['hello'] ključ: ['world'].
+Izhod piši: x, nova-vrstica.
+Izhod piši: ['dešifriraj:'], nova-vrstica.
+Izhod piši: (Sef dešifriraj: x ključ: ['world']), nova-vrstica.
+
+
+# ~ Upravljalnik sej (privzeto shranjeno v /tmp) ~
+Program uporabljaj: ['sl/webtools.xo'].
+>> splet := Spletni-dokument nov.
+>> x := splet začni-sejo.
+Izhod piši: x, nova-vrstica.
+x user: 123.
+splet uniči-sejo.
+splet pojdi-na: ['/'].
+
+# ~ Predloga ~
+Program uporabljaj: ['sl/template.xo'].
+>> html-koda := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> predl := Predloga nov vsebina: html-koda.
+>> greeting := predl izreži: ['greeting'], kopiraj greeting: ['Pozdravljen, svet!'].
+predl prilepi: greeting na: ['greetings'].
+
+Izhod piši: ['========================='], nova-vrstica.
+>> splet := Spletni-dokument nov.
+splet izpiši: predl pospravi-vse.
+
+# ~ Regularni izrazi ~
+>> vir := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> regvzorec := Vzorec nov: ['href="([^"]+)" target="([^"]+)"'].
+>> rezultat  := regvzorec ujemanje: vir izvedi: { :m :x
+	Izhod piši: m, nova-vrstica.
+	Izhod piši: x, nova-vrstica.
+	<- ['XXX'].
+}.
+Izhod piši: rezultat, nova-vrstica.
+
+# ~ Pripomočki ~
+Izhod piši: (Server html-kodiraj: ['<&"' hello '"&>']), nova-vrstica.
+Izhod piši: (Server url-kodiraj: ['https://example.com?a=6&b=1 2']), nova-vrstica.
+Izhod piši: (Format nov: ['Number format: %06.0f \n'], uporabi: 56), nova-vrstica.
+Izhod piši: (Sef žeton: 20), nova-vrstica.
+Izhod piši: (Trenutek nov format: ['%a, %d %b %Y %H:%M:%S']), nova-vrstica.
+>> a := Server base64-kodiraj: ['abc123'].
+Izhod piši: a, nova-vrstica.
+Izhod piši: (Server base64-dekodiraj: a), nova-vrstica.
+
+>> u := URL nov.
+u protokol: ['http'], gostitelj: ['example.com'], pot: ['path'], parametri-url: (
+	Slovar nov
+	a: ['1+'],
+	b: 2
+).
+Izhod piši: u, nova-vrstica.

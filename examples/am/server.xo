@@ -1,0 +1,142 @@
+# ሁሉን-በአንድ የሰርቨር ማሳያ
+#
+# - የHTTP ጥያቄ ተቆጣጣሪ
+# - መሰረታዊ የክፍለ-ጊዜ ተቆጣጣሪ
+# - የውሂብ ጎታ ነገር (MariaDB)
+# - CURL
+# - JSON
+# - ምስጠራ
+#
+# የSQL ምሳሌ:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+ፕሮግራም የትውስታ-አስተዳደር: 4.
+
+# ~ የHTTP ጥያቄዎች ~
+Server አዘጋጅ.
+>> ጥያቄ := HTTP-ጥያቄ አዲስ.
+ውጤት ፃፍ: ['HTTP-GET a='] + ( ጥያቄ get: ['a'] ), አዲስ-መስመር. # GET
+ውጤት ፃፍ: ['HTTP-POST c='] + ( ጥያቄ post: ['c'] ), አዲስ-መስመር. # POST
+
+
+# ~ የውሂብ ጎታ ~
+>> db := Maria-DB አዲስ አስተናጋጅ: ['localhost'],
+	የተጠቃሚ-ስም: ['xo'], የይለፍ-ቃል: ['pass123'], የውሂብ-ጎታ-ስም: ['xobase'], ተገናኝ.
+
+>> sql-መጠይቅ := db መጠይቅ: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], መለኪያዎች: ( ሰልፍ አዲስ ; ['abc'] ; 12.35 ; 6 ). # በመለኪያ የተዘጋጁ መጠይቆች
+
+{  sql-መጠይቅ አስፈጽም. db አጽድቅ. } ያዝ: { :e db ወደኋላ-መልስ.  }, ጀምር. # ግብይቶች
+ውጤት ፃፍ: ['ገብቷል: '] + sql-መጠይቅ insert-id, አዲስ-መስመር. # የገባው id
+
+>> sql-መጠይቅ :=
+db መጠይቅ: ['SELECT * FROM book order by id desc limit 2'], 
+አምጣ: { :ረድፍ 
+	ውጤት ፃፍ: ረድፍ id + [' '] + ረድፍ description + [': '] + ረድፍ price, አዲስ-መስመር.
+	#True break.
+}. # ረድፎችን ማምጣት
+
+>> sql-መጠይቅ :=
+db መጠይቅ: ['SELECT * FROM book order by id desc limit 2'], 
+አምጣ: { :ረድፍ 
+	ውጤት ፃፍ: ረድፍ id + [' '] + ረድፍ description + [': '] + ረድፍ price, አዲስ-መስመር.
+	#True break.
+}. # ረድፎችን ማምጣት
+
+
+# ~ CURL ~
+ውጤት ፃፍ: ( መረብ post: ባዶ ወደ: ['https://xoscript.com'] ) ርዝመት, አዲስ-መስመር. # ምንም አለመላክ = GET
+
+# ~ JSON ~
+>> json-ጽሑፍ := (JSON jsonify: (መዝገበ-ቃላት አዲስ አኑር: (ሰልፍ አዲስ ; 1 ; 2 ; 3) ቁልፍ: ['abc'])).
+ውጤት ፃፍ: json-ጽሑፍ, አዲስ-መስመር.
+ውጤት ፃፍ: ((JSON ነገር: json-ጽሑፍ) abc ? 1), አዲስ-መስመር.
+
+# ~ ምስጠራ ~
+>> ምስጢር-ካዝና := ካዝና አዲስ: ['Encryptor'].
+ውጤት ፃፍ: ['አመስጥር:'], አዲስ-መስመር.
+>> x := ካዝና መስጥር: ['hello'] ቁልፍ: ['world'].
+ውጤት ፃፍ: x, አዲስ-መስመር.
+ውጤት ፃፍ: ['ፍታ:'], አዲስ-መስመር.
+ውጤት ፃፍ: (ካዝና ምስጢር-ፍታ: x ቁልፍ: ['world']), አዲስ-መስመር.
+
+
+# ~ የክፍለ-ጊዜ ተቆጣጣሪ (በነባሪ በ/tmp ውስጥ ይቀመጣል) ~
+ፕሮግራም ተጠቀም: ['am/webtools.xo'].
+>> ገጽ := የድር-ሰነድ አዲስ.
+>> x := ገጽ ክፍለ-ጊዜ-ጀምር.
+ውጤት ፃፍ: x, አዲስ-መስመር.
+x user: 123.
+ገጽ ክፍለ-ጊዜ-አጥፋ.
+ገጽ ሂድ-ወደ: ['/'].
+
+# ~ አብነት ~
+ፕሮግራም ተጠቀም: ['am/template.xo'].
+>> html-ኮድ := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> አብነት-ነገር := አብነት አዲስ ይዘት: html-ኮድ.
+>> greeting := አብነት-ነገር ቁረጥ: ['greeting'], ቅዳ greeting: ['ሰላም ዓለም!'].
+አብነት-ነገር ለጥፍ: greeting ቁልፍ: ['greetings'].
+
+ውጤት ፃፍ: ['========================='], አዲስ-መስመር.
+>> ገጽ := የድር-ሰነድ አዲስ.
+ገጽ አውጣ: አብነት-ነገር ሁሉንም-አስወግድ.
+
+# ~ መደበኛ አገላለጽ ~
+>> ምንጭ-ጽሑፍ := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> መፈለጊያ-ንድፍ := ንድፍ አዲስ: ['href="([^"]+)" target="([^"]+)"'].
+>> የመተካት-ውጤት  := መፈለጊያ-ንድፍ ግጥሚያ: ምንጭ-ጽሑፍ አድርግ: { :m :x
+	ውጤት ፃፍ: m, አዲስ-መስመር.
+	ውጤት ፃፍ: x, አዲስ-መስመር.
+	<- ['XXX'].
+}.
+ውጤት ፃፍ: የመተካት-ውጤት, አዲስ-መስመር.
+
+# ~ መገልገያዎች ~
+ውጤት ፃፍ: (Server html-ኮድ-አድርግ: ['<&"' hello '"&>']), አዲስ-መስመር.
+ውጤት ፃፍ: (Server url-ኮድ-አድርግ: ['https://example.com?a=6&b=1 2']), አዲስ-መስመር.
+ውጤት ፃፍ: (ቅርጸት አዲስ: ['Number format: %06.0f \n'], ተግብር: 56), አዲስ-መስመር.
+ውጤት ፃፍ: (ካዝና ቶከን: 20), አዲስ-መስመር.
+ውጤት ፃፍ: (አፍታ አዲስ በቅርጸት: ['%a, %d %b %Y %H:%M:%S']), አዲስ-መስመር.
+>> a := Server base64-ኮድ-አድርግ: ['abc123'].
+ውጤት ፃፍ: a, አዲስ-መስመር.
+ውጤት ፃፍ: (Server base64-ኮድ-ፍታ: a), አዲስ-መስመር.
+
+>> u := URL አዲስ.
+u ፕሮቶኮል: ['http'], አስተናጋጅ: ['example.com'], የፋይል-መንገድ: ['path'], url-መለኪያዎች: (
+	መዝገበ-ቃላት አዲስ
+	a: ['1+'],
+	b: 2
+).
+ውጤት ፃፍ: u, አዲስ-መስመር.

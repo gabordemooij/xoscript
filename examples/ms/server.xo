@@ -1,0 +1,142 @@
+# Demo Pelayan Serba Lengkap
+#
+# - Pengendali Permintaan HTTP
+# - Pengendali Sesi Asas
+# - Objek Pangkalan Data (MariaDB)
+# - CURL
+# - JSON
+# - Penyulitan
+#
+# Contoh SQL:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Atur-cara pengurusan-ingatan: 4.
+
+# ~ Permintaan HTTP ~
+Server mulakan-awal.
+>> permintaan := Permintaan-HTTP baharu.
+Keluaran tulis: ['HTTP-GET a='] + ( permintaan get: ['a'] ), baris-baharu. # GET
+Keluaran tulis: ['HTTP-POST c='] + ( permintaan post: ['c'] ), baris-baharu. # POST
+
+
+# ~ Pangkalan Data ~
+>> pd := Maria-DB baharu hos: ['localhost'],
+	nama-pengguna: ['xo'], kata-laluan: ['pass123'], nama-pangkalan-data: ['xobase'], sambung.
+
+>> kueri := pd pertanyaan: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameter: ( Senarai baharu ; ['abc'] ; 12.35 ; 6 ). # pertanyaan berparameter
+
+{  kueri laksana. pd sahkan. } tangkap: { :e pd batalkan.  }, mula. # transaksi
+Keluaran tulis: ['DISISIPKAN: '] + kueri insert-id, baris-baharu. # id sisipan
+
+>> kueri :=
+pd pertanyaan: ['SELECT * FROM book order by id desc limit 2'], 
+dapatkan: { :rekod 
+	Keluaran tulis: rekod id + [' '] + rekod description + [': '] + rekod price, baris-baharu.
+	#True break.
+}. # mengambil baris
+
+>> kueri :=
+pd pertanyaan: ['SELECT * FROM book order by id desc limit 2'], 
+dapatkan: { :rekod 
+	Keluaran tulis: rekod id + [' '] + rekod description + [': '] + rekod price, baris-baharu.
+	#True break.
+}. # mengambil baris
+
+
+# ~ CURL ~
+Keluaran tulis: ( Rangkaian post: Tiada ke: ['https://xoscript.com'] ) panjang, baris-baharu. # post tiada = GET
+
+# ~ JSON ~
+>> data-json := (JSON jsonify: (Kamus baharu letak: (Senarai baharu ; 1 ; 2 ; 3) di: ['abc'])).
+Keluaran tulis: data-json, baris-baharu.
+Keluaran tulis: ((JSON objek: data-json) abc ? 1), baris-baharu.
+
+# ~ Penyulitan ~
+>> bilik-kebal := Peti-besi baharu: ['Encryptor'].
+Keluaran tulis: ['sulitkan:'], baris-baharu.
+>> x := Peti-besi sulitkan: ['hello'] kunci: ['world'].
+Keluaran tulis: x, baris-baharu.
+Keluaran tulis: ['nyahsulit:'], baris-baharu.
+Keluaran tulis: (Peti-besi nyahsulit: x kunci: ['world']), baris-baharu.
+
+
+# ~ Pengendali sesi (disimpan dalam /tmp secara lalai) ~
+Atur-cara guna: ['ms/webtools.xo'].
+>> web := Dokumen-Web baharu.
+>> x := web mulakan-sesi.
+Keluaran tulis: x, baris-baharu.
+x user: 123.
+web musnahkan-sesi.
+web pergi-ke: ['/'].
+
+# ~ Templat ~
+Atur-cara guna: ['ms/template.xo'].
+>> html := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> acuan := Templat baharu kandungan: html.
+>> greeting := acuan potong: ['greeting'], salin greeting: ['Helo Dunia!'].
+acuan tampal: greeting di: ['greetings'].
+
+Keluaran tulis: ['========================='], baris-baharu.
+>> web := Dokumen-Web baharu.
+web keluarkan: acuan rapikan-semua.
+
+# ~ Regex ~
+>> sasaran := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> pola := Corak baharu: ['href="([^"]+)" target="([^"]+)"'].
+>> hasil  := pola padan: sasaran lakukan: { :m :x
+	Keluaran tulis: m, baris-baharu.
+	Keluaran tulis: x, baris-baharu.
+	<- ['XXX'].
+}.
+Keluaran tulis: hasil, baris-baharu.
+
+# ~ Utiliti ~
+Keluaran tulis: (Server html-kodkan: ['<&"' hello '"&>']), baris-baharu.
+Keluaran tulis: (Server url-kodkan: ['https://example.com?a=6&b=1 2']), baris-baharu.
+Keluaran tulis: (Format baharu: ['Number format: %06.0f \n'], gunakan-pada: 56), baris-baharu.
+Keluaran tulis: (Peti-besi token: 20), baris-baharu.
+Keluaran tulis: (Detik baharu format: ['%a, %d %b %Y %H:%M:%S']), baris-baharu.
+>> a := Server base64-kodkan: ['abc123'].
+Keluaran tulis: a, baris-baharu.
+Keluaran tulis: (Server base64-nyahkod: a), baris-baharu.
+
+>> u := URL baharu.
+u protokol: ['http'], hos: ['example.com'], laluan: ['path'], parameter-url: (
+	Kamus baharu
+	a: ['1+'],
+	b: 2
+).
+Keluaran tulis: u, baris-baharu.

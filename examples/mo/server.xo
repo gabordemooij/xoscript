@@ -1,0 +1,142 @@
+# Demonstrație de server totul-în-unu
+#
+# - Handler pentru cereri HTTP
+# - Handler de bază pentru sesiuni
+# - Obiect bază de date (MariaDB)
+# - CURL
+# - JSON
+# - Criptare
+#
+# Exemplu SQL:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Program gestiune-memorie: 4.
+
+# ~ Cereri HTTP ~
+Server inițializează.
+>> solicitare := Cerere-HTTP nou.
+Ieșire scrie: ['HTTP-GET a='] + ( solicitare get: ['a'] ), rând-nou. # GET
+Ieșire scrie: ['HTTP-POST c='] + ( solicitare post: ['c'] ), rând-nou. # POST
+
+
+# ~ Bază de date ~
+>> bd := Maria-DB nou gazdă: ['localhost'],
+	utilizator: ['xo'], parolă: ['pass123'], nume-bază: ['xobase'], conectează.
+
+>> interogare := bd interogare: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametri: ( Listă nou ; ['abc'] ; 12.35 ; 6 ). # interogări parametrizate
+
+{  interogare execută-interogare. bd confirmă. } prinde: { :e bd anulează.  }, pornește. # tranzacții
+Ieșire scrie: ['INSERAT: '] + interogare insert-id, rând-nou. # id-ul inserat
+
+>> interogare :=
+bd interogare: ['SELECT * FROM book order by id desc limit 2'], 
+preia: { :rând 
+	Ieșire scrie: rând id + [' '] + rând description + [': '] + rând price, rând-nou.
+	#True break.
+}. # preluarea rândurilor
+
+>> interogare :=
+bd interogare: ['SELECT * FROM book order by id desc limit 2'], 
+preia: { :rând 
+	Ieșire scrie: rând id + [' '] + rând description + [': '] + rând price, rând-nou.
+	#True break.
+}. # preluarea rândurilor
+
+
+# ~ CURL ~
+Ieșire scrie: ( Rețea post: Nimic către: ['https://xoscript.com'] ) lungime, rând-nou. # post gol = GET
+
+# ~ JSON ~
+>> json := (JSON jsonify: (Dicționar nou pune: (Listă nou ; 1 ; 2 ; 3) la: ['abc'])).
+Ieșire scrie: json, rând-nou.
+Ieșire scrie: ((JSON obiect: json) abc ? 1), rând-nou.
+
+# ~ Criptare ~
+>> seif := Seif nou: ['Encryptor'].
+Ieșire scrie: ['criptează:'], rând-nou.
+>> x := Seif criptează: ['hello'] cheie: ['world'].
+Ieșire scrie: x, rând-nou.
+Ieșire scrie: ['decriptează:'], rând-nou.
+Ieșire scrie: (Seif decriptează: x cheie: ['world']), rând-nou.
+
+
+# ~ Handler de sesiuni (implicit stocate în /tmp) ~
+Program folosește: ['mo/webtools.xo'].
+>> web := Document-Web nou.
+>> x := web pornește-sesiune.
+Ieșire scrie: x, rând-nou.
+x user: 123.
+web distruge-sesiune.
+web mergi-la: ['/'].
+
+# ~ Șablon ~
+Program folosește: ['mo/template.xo'].
+>> cod-html := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> model := Model nou conținut: cod-html.
+>> greeting := model taie: ['greeting'], copiază greeting: ['Salut, lume!'].
+model lipește: greeting la: ['greetings'].
+
+Ieșire scrie: ['========================='], rând-nou.
+>> web := Document-Web nou.
+web scrie-ieșire: model epurează-tot.
+
+# ~ Expresii regulate ~
+>> sursă := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> tipar := Șablon nou: ['href="([^"]+)" target="([^"]+)"'].
+>> rezultat  := tipar potrivire: sursă fă: { :m :x
+	Ieșire scrie: m, rând-nou.
+	Ieșire scrie: x, rând-nou.
+	<- ['XXX'].
+}.
+Ieșire scrie: rezultat, rând-nou.
+
+# ~ Utilitare ~
+Ieșire scrie: (Server html-codifică: ['<&"' hello '"&>']), rând-nou.
+Ieșire scrie: (Server url-codifică: ['https://example.com?a=6&b=1 2']), rând-nou.
+Ieșire scrie: (Format nou: ['Number format: %06.0f \n'], aplică: 56), rând-nou.
+Ieșire scrie: (Seif jeton: 20), rând-nou.
+Ieșire scrie: (Moment nou format: ['%a, %d %b %Y %H:%M:%S']), rând-nou.
+>> a := Server base64-codifică: ['abc123'].
+Ieșire scrie: a, rând-nou.
+Ieșire scrie: (Server base64-decodifică: a), rând-nou.
+
+>> u := URL nou.
+u protocol: ['http'], gazdă: ['example.com'], cale: ['path'], parametri-url: (
+	Dicționar nou
+	a: ['1+'],
+	b: 2
+).
+Ieșire scrie: u, rând-nou.

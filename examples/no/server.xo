@@ -1,0 +1,142 @@
+# Alt-i-ett-serverdemo
+#
+# - Håndtering av HTTP-forespørsler
+# - Enkel økthåndtering
+# - Databaseobjekt (MariaDB)
+# - CURL
+# - JSON
+# - Kryptering
+#
+# SQL-eksempel:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Program minnehåndtering: 4.
+
+# ~ HTTP-forespørsler ~
+Server initialiser.
+>> forespørselen := HTTP-Forespørsel ny.
+Utdata skriv: ['HTTP-GET a='] + ( forespørselen get: ['a'] ), stop. # GET
+Utdata skriv: ['HTTP-POST c='] + ( forespørselen post: ['c'] ), stop. # POST
+
+
+# ~ Database ~
+>> db := Maria-DB ny vert: ['localhost'],
+	brukernavn: ['xo'], passord: ['pass123'], databasenavn: ['xobase'], koble-til.
+
+>> spørringen := db spørring: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametere: ( Liste ny ; ['abc'] ; 12.35 ; 6 ). # parameteriserte spørringer
+
+{  spørringen utfør. db bekreft. } fang: { :e db rull-tilbake.  }, start. # transaksjoner
+Utdata skriv: ['SATT INN: '] + spørringen insert-id, stop. # innsatt id
+
+>> spørringen :=
+db spørring: ['SELECT * FROM book order by id desc limit 2'], 
+hent: { :rad 
+	Utdata skriv: rad id + [' '] + rad description + [': '] + rad price, stop.
+	#True break.
+}. # henting av rader
+
+>> spørringen :=
+db spørring: ['SELECT * FROM book order by id desc limit 2'], 
+hent: { :rad 
+	Utdata skriv: rad id + [' '] + rad description + [': '] + rad price, stop.
+	#True break.
+}. # henting av rader
+
+
+# ~ CURL ~
+Utdata skriv: ( Nettverk post: Ingenting til: ['https://xoscript.com'] ) lengde, stop. # post ingenting = GET
+
+# ~ JSON ~
+>> json := (JSON jsonify: (Ordbok ny sett: (Liste ny ; 1 ; 2 ; 3) ved: ['abc'])).
+Utdata skriv: json, stop.
+Utdata skriv: ((JSON objekt: json) abc ? 1), stop.
+
+# ~ Kryptering ~
+>> hvelvet := Hvelv ny: ['Encryptor'].
+Utdata skriv: ['krypter:'], stop.
+>> x := Hvelv krypter: ['hello'] nøkkel: ['world'].
+Utdata skriv: x, stop.
+Utdata skriv: ['dekrypter:'], stop.
+Utdata skriv: (Hvelv dekrypter: x nøkkel: ['world']), stop.
+
+
+# ~ Økthåndtering (lagres som standard i /tmp) ~
+Program benytt: ['no/webtools.xo'].
+>> nett := Webdokument ny.
+>> x := nett start-økt.
+Utdata skriv: x, stop.
+x user: 123.
+nett avslutt-økt.
+nett gå-til: ['/'].
+
+# ~ Mal ~
+Program benytt: ['no/template.xo'].
+>> html := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> malen := Mal ny innhold: html.
+>> greeting := malen klipp: ['greeting'], kopier greeting: ['Hei verden!'].
+malen lim-inn: greeting ved: ['greetings'].
+
+Utdata skriv: ['========================='], stop.
+>> nett := Webdokument ny.
+nett skriv-ut: malen rens-alt.
+
+# ~ Regex ~
+>> teksten := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> mønsteret := Mønster ny: ['href="([^"]+)" target="([^"]+)"'].
+>> resultat  := mønsteret treff: teksten gjør: { :m :x
+	Utdata skriv: m, stop.
+	Utdata skriv: x, stop.
+	<- ['XXX'].
+}.
+Utdata skriv: resultat, stop.
+
+# ~ Verktøy ~
+Utdata skriv: (Server html-kode: ['<&"' hello '"&>']), stop.
+Utdata skriv: (Server url-kode: ['https://example.com?a=6&b=1 2']), stop.
+Utdata skriv: (Format ny: ['Number format: %06.0f \n'], bruk: 56), stop.
+Utdata skriv: (Hvelv token: 20), stop.
+Utdata skriv: (Moment ny format: ['%a, %d %b %Y %H:%M:%S']), stop.
+>> a := Server base64-kode: ['abc123'].
+Utdata skriv: a, stop.
+Utdata skriv: (Server base64-dekode: a), stop.
+
+>> u := URL ny.
+u protokoll: ['http'], vert: ['example.com'], sti: ['path'], url-parametere: (
+	Ordbok ny
+	a: ['1+'],
+	b: 2
+).
+Utdata skriv: u, stop.

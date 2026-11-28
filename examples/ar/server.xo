@@ -1,0 +1,142 @@
+# عرض توضيحي شامل للخادم
+#
+# - معالج طلبات HTTP
+# - معالج جلسات أساسي
+# - كائن قاعدة البيانات (MariaDB)
+# - CURL
+# - JSON
+# - التشفير
+#
+# مثال SQL:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+برنامج إدارة-الذاكرة: 4.
+
+# ~ طلبات HTTP ~
+Server هيئ.
+>> طلب := طلب-HTTP جديد.
+مخرج اكتب: ⌝'HTTP-GET a='⌜ + ﴿ طلب get: ⌝'a'⌜ ﴾, سطر-جديد. # GET
+مخرج اكتب: ⌝'HTTP-POST c='⌜ + ﴿ طلب post: ⌝'c'⌜ ﴾, سطر-جديد. # POST
+
+
+# ~ قاعدة البيانات ~
+>> قاعدة := Maria-DB جديد مضيف: ⌝'localhost'⌜,
+	اسم-المستخدم: ⌝'xo'⌜, كلمة-السر: ⌝'pass123'⌜, اسم-القاعدة: ⌝'xobase'⌜, اتصل.
+
+>> الاستعلام := قاعدة استعلام: ⌝'
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'⌜, معاملات: ﴿ قائمة جديد ; ⌝'abc'⌜ ; 12.35 ; 6 ﴾. # استعلامات ذات معاملات
+
+⎬  الاستعلام نفذ. قاعدة ثبت. ⎨ التقط: ⎬ :e قاعدة تراجع.  ⎨, شغل. # المعاملات
+مخرج اكتب: ⌝'تم الإدراج: '⌜ + الاستعلام insert-id, سطر-جديد. # معرّف الإدراج
+
+>> الاستعلام :=
+قاعدة استعلام: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+اجلب: ⎬ :صف 
+	مخرج اكتب: صف id + ⌝' '⌜ + صف description + ⌝': '⌜ + صف price, سطر-جديد.
+	#True break.
+⎨. # جلب الصفوف
+
+>> الاستعلام :=
+قاعدة استعلام: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+اجلب: ⎬ :صف 
+	مخرج اكتب: صف id + ⌝' '⌜ + صف description + ⌝': '⌜ + صف price, سطر-جديد.
+	#True break.
+⎨. # جلب الصفوف
+
+
+# ~ CURL ~
+مخرج اكتب: ﴿ شبكة post: لاشيء إلى: ⌝'https://xoscript.com'⌜ ﴾ طول, سطر-جديد. # إرسال لا شيء = GET
+
+# ~ JSON ~
+>> نص-json := ﴿JSON jsonify: ﴿قاموس جديد ضع: ﴿قائمة جديد ; 1 ; 2 ; 3﴾ عند: ⌝'abc'⌜﴾﴾.
+مخرج اكتب: نص-json, سطر-جديد.
+مخرج اكتب: ﴿﴿JSON كائن: نص-json﴾ abc ? 1﴾, سطر-جديد.
+
+# ~ التشفير ~
+>> الخزنة := خزنة جديد: ⌝'Encryptor'⌜.
+مخرج اكتب: ⌝'تشفير:'⌜, سطر-جديد.
+>> x := خزنة شفر: ⌝'hello'⌜ مفتاح: ⌝'world'⌜.
+مخرج اكتب: x, سطر-جديد.
+مخرج اكتب: ⌝'فك التشفير:'⌜, سطر-جديد.
+مخرج اكتب: ﴿خزنة فك-التشفير: x مفتاح: ⌝'world'⌜﴾, سطر-جديد.
+
+
+# ~ معالج الجلسات (تُخزَّن افتراضيًا في /tmp) ~
+برنامج استخدم: ⌝'ar/webtools.xo'⌜.
+>> صفحة := مستند-ويب جديد.
+>> x := صفحة ابدأ-الجلسة.
+مخرج اكتب: x, سطر-جديد.
+x user: 123.
+صفحة دمر-الجلسة.
+صفحة اذهب-إلى: ⌝'/'⌜.
+
+# ~ القالب ~
+برنامج استخدم: ⌝'ar/template.xo'⌜.
+>> شفرة-html := ⌝'
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'⌜.
+
+>> القالب := قالب جديد محتوى: شفرة-html.
+>> greeting := القالب قص: ⌝'greeting'⌜, انسخ greeting: ⌝'مرحبا بالعالم!'⌜.
+القالب ألصق: greeting عند: ⌝'greetings'⌜.
+
+مخرج اكتب: ⌝'========================='⌜, سطر-جديد.
+>> صفحة := مستند-ويب جديد.
+صفحة أخرج: القالب هذب-الكل.
+
+# ~ التعابير النمطية ~
+>> المدخل := ⌝'<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'⌜.
+>> النمط := نمط جديد: ⌝'href="([^"]+)" target="([^"]+)"'⌜.
+>> نتيجة  := النمط طابق: المدخل نفذ: ⎬ :m :x
+	مخرج اكتب: m, سطر-جديد.
+	مخرج اكتب: x, سطر-جديد.
+	<- ⌝'XXX'⌜.
+⎨.
+مخرج اكتب: نتيجة, سطر-جديد.
+
+# ~ أدوات مساعدة ~
+مخرج اكتب: ﴿Server html-ترميز: ⌝'<&"' hello '"&>'⌜﴾, سطر-جديد.
+مخرج اكتب: ﴿Server url-ترميز: ⌝'https://example.com?a=6&b=1 2'⌜﴾, سطر-جديد.
+مخرج اكتب: ﴿تنسيق جديد: ⌝'Number format: %06.0f \n'⌜, طبق: 56﴾, سطر-جديد.
+مخرج اكتب: ﴿خزنة رمز-مميز: 20﴾, سطر-جديد.
+مخرج اكتب: ﴿لحظة جديد بتنسيق: ⌝'%a, %d %b %Y %H:%M:%S'⌜﴾, سطر-جديد.
+>> a := Server base64-ترميز: ⌝'abc123'⌜.
+مخرج اكتب: a, سطر-جديد.
+مخرج اكتب: ﴿Server base64-فك-ترميز: a﴾, سطر-جديد.
+
+>> u := URL جديد.
+u بروتوكول: ⌝'http'⌜, مضيف: ⌝'example.com'⌜, مسار-الملف: ⌝'path'⌜, معاملات-url: ﴿
+	قاموس جديد
+	a: ⌝'1+'⌜,
+	b: 2
+﴾.
+مخرج اكتب: u, سطر-جديد.

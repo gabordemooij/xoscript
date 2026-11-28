@@ -1,0 +1,142 @@
+# Ukázka serveru vše v jednom
+#
+# - Obsluha HTTP požadavků
+# - Základní obsluha relací
+# - Databázový objekt (MariaDB)
+# - CURL
+# - JSON
+# - Šifrování
+#
+# Příklad SQL:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Program správa-paměti: 4.
+
+# ~ HTTP požadavky ~
+Server inicializovat.
+>> http-požadavek := HTTP-Požadavek nový.
+Výstup psát: ['HTTP-GET a='] + ( http-požadavek get: ['a'] ), nový-řádek. # GET
+Výstup psát: ['HTTP-POST c='] + ( http-požadavek post: ['c'] ), nový-řádek. # POST
+
+
+# ~ Databáze ~
+>> db := Maria-DB nový hostitel: ['localhost'],
+	uživatel: ['xo'], heslo: ['pass123'], název-databáze: ['xobase'], připojit.
+
+>> sql-dotaz := db dotaz: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametry: ( Seznam nový ; ['abc'] ; 12.35 ; 6 ). # parametrizované dotazy
+
+{  sql-dotaz provést. db potvrdit. } chytit: { :e db vrátit-zpět.  }, spustit. # transakce
+Výstup psát: ['VLOŽENO: '] + sql-dotaz insert-id, nový-řádek. # id vložení
+
+>> sql-dotaz :=
+db dotaz: ['SELECT * FROM book order by id desc limit 2'], 
+načíst: { :záznam 
+	Výstup psát: záznam id + [' '] + záznam description + [': '] + záznam price, nový-řádek.
+	#True break.
+}. # načítání řádků
+
+>> sql-dotaz :=
+db dotaz: ['SELECT * FROM book order by id desc limit 2'], 
+načíst: { :záznam 
+	Výstup psát: záznam id + [' '] + záznam description + [': '] + záznam price, nový-řádek.
+	#True break.
+}. # načítání řádků
+
+
+# ~ CURL ~
+Výstup psát: ( Síť post: Nic na: ['https://xoscript.com'] ) délka, nový-řádek. # post nic = GET
+
+# ~ JSON ~
+>> json-text := (JSON jsonify: (Slovník nový umístit: (Seznam nový ; 1 ; 2 ; 3) na: ['abc'])).
+Výstup psát: json-text, nový-řádek.
+Výstup psát: ((JSON objekt: json-text) abc ? 1), nový-řádek.
+
+# ~ Šifrování ~
+>> trezor := Trezor nový: ['Encryptor'].
+Výstup psát: ['zašifrovat:'], nový-řádek.
+>> x := Trezor šifrovat: ['hello'] klíč: ['world'].
+Výstup psát: x, nový-řádek.
+Výstup psát: ['dešifrovat:'], nový-řádek.
+Výstup psát: (Trezor dešifrovat: x klíč: ['world']), nový-řádek.
+
+
+# ~ Obsluha relací (ve výchozím stavu ukládány do /tmp) ~
+Program použít: ['cs/webtools.xo'].
+>> stránka := Webový-dokument nový.
+>> x := stránka zahájit-relaci.
+Výstup psát: x, nový-řádek.
+x user: 123.
+stránka zničit-relaci.
+stránka přejít-na: ['/'].
+
+# ~ Šablona ~
+Program použít: ['cs/template.xo'].
+>> html-kód := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> předloha := Šablona nový obsah: html-kód.
+>> greeting := předloha vyříznout: ['greeting'], kopírovat greeting: ['Ahoj světe!'].
+předloha vložit: greeting na: ['greetings'].
+
+Výstup psát: ['========================='], nový-řádek.
+>> stránka := Webový-dokument nový.
+stránka vypsat: předloha uklidit-vše.
+
+# ~ Regulární výrazy ~
+>> zdroj := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> vzor := Vzor nový: ['href="([^"]+)" target="([^"]+)"'].
+>> výsledek  := vzor shoda: zdroj udělat: { :m :x
+	Výstup psát: m, nový-řádek.
+	Výstup psát: x, nový-řádek.
+	<- ['XXX'].
+}.
+Výstup psát: výsledek, nový-řádek.
+
+# ~ Nástroje ~
+Výstup psát: (Server html-kódovat: ['<&"' hello '"&>']), nový-řádek.
+Výstup psát: (Server url-kódovat: ['https://example.com?a=6&b=1 2']), nový-řádek.
+Výstup psát: (Formát nový: ['Number format: %06.0f \n'], aplikovat: 56), nový-řádek.
+Výstup psát: (Trezor token: 20), nový-řádek.
+Výstup psát: (Okamžik nový formát: ['%a, %d %b %Y %H:%M:%S']), nový-řádek.
+>> a := Server base64-kódovat: ['abc123'].
+Výstup psát: a, nový-řádek.
+Výstup psát: (Server base64-dekódovat: a), nový-řádek.
+
+>> u := URL nový.
+u protokol: ['http'], hostitel: ['example.com'], cesta: ['path'], url-parametry: (
+	Slovník nový
+	a: ['1+'],
+	b: 2
+).
+Výstup psát: u, nový-řádek.

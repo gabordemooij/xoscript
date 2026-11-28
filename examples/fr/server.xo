@@ -1,0 +1,142 @@
+# Démo de serveur tout-en-un
+#
+# - Gestionnaire de requêtes HTTP
+# - Gestionnaire de sessions de base
+# - Objet base de données (MariaDB)
+# - CURL
+# - JSON
+# - Chiffrement
+#
+# Exemple SQL :
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Programme gestion-mémoire: 4.
+
+# ~ Requêtes HTTP ~
+Server initialiser.
+>> requete-http := Requête-HTTP nouveau.
+Sortie écrire: ['HTTP-GET a='] + ( requete-http get: ['a'] ), stop. # GET
+Sortie écrire: ['HTTP-POST c='] + ( requete-http post: ['c'] ), stop. # POST
+
+
+# ~ Base de données ~
+>> bd := Maria-DB nouveau hôte: ['localhost'],
+	utilisateur: ['xo'], mot-de-passe: ['pass123'], nom-base: ['xobase'], connecter.
+
+>> requete := bd requête: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], paramètres: ( Liste nouveau ; ['abc'] ; 12.35 ; 6 ). # requêtes paramétrées
+
+{  requete exécuter. bd valider. } intercepter: { :e bd annuler.  }, démarrer. # transactions
+Sortie écrire: ['INSÉRÉ : '] + requete insert-id, stop. # id inséré
+
+>> requete :=
+bd requête: ['SELECT * FROM book order by id desc limit 2'], 
+récupérer: { :rangee 
+	Sortie écrire: rangee id + [' '] + rangee description + [': '] + rangee price, stop.
+	#True break.
+}. # récupération des lignes
+
+>> requete :=
+bd requête: ['SELECT * FROM book order by id desc limit 2'], 
+récupérer: { :rangee 
+	Sortie écrire: rangee id + [' '] + rangee description + [': '] + rangee price, stop.
+	#True break.
+}. # récupération des lignes
+
+
+# ~ CURL ~
+Sortie écrire: ( Réseau post: Rien vers: ['https://xoscript.com'] ) longueur, stop. # post vide = GET
+
+# ~ JSON ~
+>> texte-json := (JSON jsonify: (Dictionnaire nouveau mettre: (Liste nouveau ; 1 ; 2 ; 3) à: ['abc'])).
+Sortie écrire: texte-json, stop.
+Sortie écrire: ((JSON objet: texte-json) abc ? 1), stop.
+
+# ~ Chiffrement ~
+>> coffre-fort := Coffre nouveau: ['Encryptor'].
+Sortie écrire: ['chiffrer :'], stop.
+>> x := Coffre chiffrer: ['hello'] clé: ['world'].
+Sortie écrire: x, stop.
+Sortie écrire: ['déchiffrer :'], stop.
+Sortie écrire: (Coffre déchiffrer: x clé: ['world']), stop.
+
+
+# ~ Gestionnaire de sessions (stockées par défaut dans /tmp) ~
+Programme utiliser: ['fr/webtools.xo'].
+>> page := Document-Web nouveau.
+>> x := page démarrer-session.
+Sortie écrire: x, stop.
+x user: 123.
+page détruire-session.
+page aller-à: ['/'].
+
+# ~ Modèle ~
+Programme utiliser: ['fr/template.xo'].
+>> code-html := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> modele := Modèle nouveau contenu: code-html.
+>> greeting := modele couper: ['greeting'], copier greeting: ['Bonjour le monde !'].
+modele coller: greeting à: ['greetings'].
+
+Sortie écrire: ['========================='], stop.
+>> page := Document-Web nouveau.
+page sortir: modele tout-purger.
+
+# ~ Expressions régulières ~
+>> source := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> filtre := Motif nouveau: ['href="([^"]+)" target="([^"]+)"'].
+>> resultat  := filtre correspondance: source faire: { :m :x
+	Sortie écrire: m, stop.
+	Sortie écrire: x, stop.
+	<- ['XXX'].
+}.
+Sortie écrire: resultat, stop.
+
+# ~ Utilitaires ~
+Sortie écrire: (Server html-encoder: ['<&"' hello '"&>']), stop.
+Sortie écrire: (Server url-encoder: ['https://example.com?a=6&b=1 2']), stop.
+Sortie écrire: (Format nouveau: ['Number format: %06.0f \n'], appliquer: 56), stop.
+Sortie écrire: (Coffre jeton: 20), stop.
+Sortie écrire: (Moment nouveau format: ['%a, %d %b %Y %H:%M:%S']), stop.
+>> a := Server base64-encoder: ['abc123'].
+Sortie écrire: a, stop.
+Sortie écrire: (Server base64-décoder: a), stop.
+
+>> lien := URL nouveau.
+lien protocole: ['http'], hôte: ['example.com'], chemin: ['path'], paramètres-url: (
+	Dictionnaire nouveau
+	a: ['1+'],
+	b: 2
+).
+Sortie écrire: lien, stop.

@@ -1,0 +1,142 @@
+# Bản demo máy chủ tất cả trong một
+#
+# - Bộ xử lý yêu cầu HTTP
+# - Bộ xử lý phiên cơ bản
+# - Đối tượng cơ sở dữ liệu (MariaDB)
+# - CURL
+# - JSON
+# - Mã hóa
+#
+# Ví dụ SQL:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Chương-trình quản-lý-bộ-nhớ: 4.
+
+# ~ Yêu cầu HTTP ~
+Server khởi-tạo.
+>> yêu-cầu := Yêu-cầu-HTTP mới.
+Xuất ghi: ['HTTP-GET a='] + ( yêu-cầu get: ['a'] ), xuống-dòng. # GET
+Xuất ghi: ['HTTP-POST c='] + ( yêu-cầu post: ['c'] ), xuống-dòng. # POST
+
+
+# ~ Cơ sở dữ liệu ~
+>> csdl := Maria-DB mới máy-trạm: ['localhost'],
+	tên-người-dùng: ['xo'], mật-khẩu: ['pass123'], tên-cơ-sở-dữ-liệu: ['xobase'], kết-nối.
+
+>> câu-truy-vấn := csdl truy-vấn: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], tham-số: ( Danh-sách mới ; ['abc'] ; 12.35 ; 6 ). # truy vấn có tham số
+
+{  câu-truy-vấn thực-thi. csdl xác-nhận. } bắt-lỗi: { :e csdl hoàn-tác.  }, chạy. # giao dịch
+Xuất ghi: ['ĐÃ CHÈN: '] + câu-truy-vấn insert-id, xuống-dòng. # id vừa chèn
+
+>> câu-truy-vấn :=
+csdl truy-vấn: ['SELECT * FROM book order by id desc limit 2'], 
+lấy: { :hàng 
+	Xuất ghi: hàng id + [' '] + hàng description + [': '] + hàng price, xuống-dòng.
+	#True break.
+}. # lấy các hàng
+
+>> câu-truy-vấn :=
+csdl truy-vấn: ['SELECT * FROM book order by id desc limit 2'], 
+lấy: { :hàng 
+	Xuất ghi: hàng id + [' '] + hàng description + [': '] + hàng price, xuống-dòng.
+	#True break.
+}. # lấy các hàng
+
+
+# ~ CURL ~
+Xuất ghi: ( Mạng post: Rỗng tới: ['https://xoscript.com'] ) độ-dài, xuống-dòng. # post rỗng = GET
+
+# ~ JSON ~
+>> chuỗi-json := (JSON jsonify: (Từ-điển mới đặt: (Danh-sách mới ; 1 ; 2 ; 3) tại: ['abc'])).
+Xuất ghi: chuỗi-json, xuống-dòng.
+Xuất ghi: ((JSON đối-tượng: chuỗi-json) abc ? 1), xuống-dòng.
+
+# ~ Mã hóa ~
+>> két-sắt := Két mới: ['Encryptor'].
+Xuất ghi: ['mã hóa:'], xuống-dòng.
+>> x := Két mã-hóa: ['hello'] khóa: ['world'].
+Xuất ghi: x, xuống-dòng.
+Xuất ghi: ['giải mã:'], xuống-dòng.
+Xuất ghi: (Két giải-mã: x khóa: ['world']), xuống-dòng.
+
+
+# ~ Bộ xử lý phiên (mặc định lưu trong /tmp) ~
+Chương-trình dùng: ['vi/webtools.xo'].
+>> trang-web := Tài-liệu-Web mới.
+>> x := trang-web bắt-đầu-phiên.
+Xuất ghi: x, xuống-dòng.
+x user: 123.
+trang-web hủy-phiên.
+trang-web đi-đến: ['/'].
+
+# ~ Mẫu ~
+Chương-trình dùng: ['vi/template.xo'].
+>> mã-html := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> đối-tượng-mẫu := Mẫu-trang mới nội-dung: mã-html.
+>> greeting := đối-tượng-mẫu cắt: ['greeting'], sao-chép greeting: ['Xin chào thế giới!'].
+đối-tượng-mẫu dán: greeting tại: ['greetings'].
+
+Xuất ghi: ['========================='], xuống-dòng.
+>> trang-web := Tài-liệu-Web mới.
+trang-web xuất: đối-tượng-mẫu tinh-chỉnh-tất-cả.
+
+# ~ Biểu thức chính quy ~
+>> văn-bản-nguồn := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> biểu-thức := Mẫu mới: ['href="([^"]+)" target="([^"]+)"'].
+>> kết-quả-thay-thế  := biểu-thức khớp: văn-bản-nguồn làm: { :m :x
+	Xuất ghi: m, xuống-dòng.
+	Xuất ghi: x, xuống-dòng.
+	<- ['XXX'].
+}.
+Xuất ghi: kết-quả-thay-thế, xuống-dòng.
+
+# ~ Tiện ích ~
+Xuất ghi: (Server html-mã-hóa: ['<&"' hello '"&>']), xuống-dòng.
+Xuất ghi: (Server url-mã-hóa: ['https://example.com?a=6&b=1 2']), xuống-dòng.
+Xuất ghi: (Định-dạng mới: ['Number format: %06.0f \n'], áp-dụng: 56), xuống-dòng.
+Xuất ghi: (Két mã-thông-báo: 20), xuống-dòng.
+Xuất ghi: (Thời-điểm mới định-dạng: ['%a, %d %b %Y %H:%M:%S']), xuống-dòng.
+>> a := Server base64-mã-hóa: ['abc123'].
+Xuất ghi: a, xuống-dòng.
+Xuất ghi: (Server base64-giải-mã: a), xuống-dòng.
+
+>> u := URL mới.
+u tên-giao-thức: ['http'], máy-trạm: ['example.com'], đường-dẫn: ['path'], tham-số-url: (
+	Từ-điển mới
+	a: ['1+'],
+	b: 2
+).
+Xuất ghi: u, xuống-dòng.

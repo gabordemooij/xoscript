@@ -1,0 +1,142 @@
+# Demostració de servidor tot en un
+#
+# - Gestor de peticions HTTP
+# - Gestor bàsic de sessions
+# - Objecte de base de dades (MariaDB)
+# - CURL
+# - JSON
+# - Xifratge
+#
+# Exemple SQL:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Programa gestió-memòria: 4.
+
+# ~ Peticions HTTP ~
+Server inicialitzar.
+>> petició-http := Petició-HTTP nou.
+Sortida escriu: ['HTTP-GET a='] + ( petició-http get: ['a'] ), salt-de-línia. # GET
+Sortida escriu: ['HTTP-POST c='] + ( petició-http post: ['c'] ), salt-de-línia. # POST
+
+
+# ~ Base de dades ~
+>> bd := Maria-DB nou amfitrió: ['localhost'],
+	usuari: ['xo'], contrasenya: ['pass123'], nom-base: ['xobase'], connecta.
+
+>> consulta-sql := bd consulta: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], paràmetres: ( Llista nou ; ['abc'] ; 12.35 ; 6 ). # consultes parametritzades
+
+{  consulta-sql executa. bd confirma. } captura: { :e bd desfés.  }, inicia. # transaccions
+Sortida escriu: ['INSERIT: '] + consulta-sql insert-id, salt-de-línia. # id inserit
+
+>> consulta-sql :=
+bd consulta: ['SELECT * FROM book order by id desc limit 2'], 
+obtén: { :fila 
+	Sortida escriu: fila id + [' '] + fila description + [': '] + fila price, salt-de-línia.
+	#True break.
+}. # obtenció de files
+
+>> consulta-sql :=
+bd consulta: ['SELECT * FROM book order by id desc limit 2'], 
+obtén: { :fila 
+	Sortida escriu: fila id + [' '] + fila description + [': '] + fila price, salt-de-línia.
+	#True break.
+}. # obtenció de files
+
+
+# ~ CURL ~
+Sortida escriu: ( Xarxa post: Res a: ['https://xoscript.com'] ) longitud, salt-de-línia. # post res = GET
+
+# ~ JSON ~
+>> text-json := (JSON jsonify: (Diccionari nou posa: (Llista nou ; 1 ; 2 ; 3) a: ['abc'])).
+Sortida escriu: text-json, salt-de-línia.
+Sortida escriu: ((JSON objecte: text-json) abc ? 1), salt-de-línia.
+
+# ~ Xifratge ~
+>> cofre := Caixa-forta nou: ['Encryptor'].
+Sortida escriu: ['xifra:'], salt-de-línia.
+>> x := Caixa-forta xifra: ['hello'] clau: ['world'].
+Sortida escriu: x, salt-de-línia.
+Sortida escriu: ['desxifra:'], salt-de-línia.
+Sortida escriu: (Caixa-forta desxifra: x clau: ['world']), salt-de-línia.
+
+
+# ~ Gestor de sessions (per defecte desades a /tmp) ~
+Programa utilitza: ['ca/webtools.xo'].
+>> pàgina := Document-Web nou.
+>> x := pàgina iniciar-sessió.
+Sortida escriu: x, salt-de-línia.
+x user: 123.
+pàgina destruir-sessió.
+pàgina anar-a: ['/'].
+
+# ~ Plantilla ~
+Programa utilitza: ['ca/template.xo'].
+>> codi-html := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> plt := Plantilla nou contingut: codi-html.
+>> greeting := plt retallar: ['greeting'], copia greeting: ['Hola món!'].
+plt enganxar: greeting a: ['greetings'].
+
+Sortida escriu: ['========================='], salt-de-línia.
+>> pàgina := Document-Web nou.
+pàgina emetre: plt netejar-tot.
+
+# ~ Expressions regulars ~
+>> text-origen := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> patró := Patró nou: ['href="([^"]+)" target="([^"]+)"'].
+>> resultat  := patró coincidència: text-origen fes: { :m :x
+	Sortida escriu: m, salt-de-línia.
+	Sortida escriu: x, salt-de-línia.
+	<- ['XXX'].
+}.
+Sortida escriu: resultat, salt-de-línia.
+
+# ~ Utilitats ~
+Sortida escriu: (Server html-codifica: ['<&"' hello '"&>']), salt-de-línia.
+Sortida escriu: (Server url-codifica: ['https://example.com?a=6&b=1 2']), salt-de-línia.
+Sortida escriu: (Format nou: ['Number format: %06.0f \n'], aplica: 56), salt-de-línia.
+Sortida escriu: (Caixa-forta token: 20), salt-de-línia.
+Sortida escriu: (Moment nou format: ['%a, %d %b %Y %H:%M:%S']), salt-de-línia.
+>> a := Server base64-codifica: ['abc123'].
+Sortida escriu: a, salt-de-línia.
+Sortida escriu: (Server base64-descodifica: a), salt-de-línia.
+
+>> u := URL nou.
+u protocol: ['http'], amfitrió: ['example.com'], camí: ['path'], paràmetres-url: (
+	Diccionari nou
+	clau1: ['1+'],
+	clau2: 2
+).
+Sortida escriu: u, salt-de-línia.

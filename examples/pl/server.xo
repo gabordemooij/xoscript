@@ -1,0 +1,142 @@
+# Demo serwera typu wszystko w jednym
+#
+# - Obsługa żądań HTTP
+# - Podstawowa obsługa sesji
+# - Obiekt bazy danych (MariaDB)
+# - CURL
+# - JSON
+# - Szyfrowanie
+#
+# Przykład SQL:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Program zarządzanie-pamięcią: 4.
+
+# ~ Żądania HTTP ~
+Server inicjuj.
+>> żądanie-klienta := Żądanie-HTTP nowy.
+Wyjście pisz: ['HTTP-GET a='] + ( żądanie-klienta get: ['a'] ), nowa-linia. # GET
+Wyjście pisz: ['HTTP-POST c='] + ( żądanie-klienta post: ['c'] ), nowa-linia. # POST
+
+
+# ~ Baza danych ~
+>> bd := Maria-DB nowy host: ['localhost'],
+	użytkownik: ['xo'], hasło: ['pass123'], nazwa-bazy: ['xobase'], połącz.
+
+>> kwerenda := bd zapytanie: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametry: ( Lista nowy ; ['abc'] ; 12.35 ; 6 ). # zapytania sparametryzowane
+
+{  kwerenda wykonaj. bd zatwierdź. } przechwyć: { :e bd wycofaj.  }, uruchom. # transakcje
+Wyjście pisz: ['WSTAWIONO: '] + kwerenda insert-id, nowa-linia. # id wstawienia
+
+>> kwerenda :=
+bd zapytanie: ['SELECT * FROM book order by id desc limit 2'], 
+pobierz: { :rekord 
+	Wyjście pisz: rekord id + [' '] + rekord description + [': '] + rekord price, nowa-linia.
+	#True break.
+}. # pobieranie wierszy
+
+>> kwerenda :=
+bd zapytanie: ['SELECT * FROM book order by id desc limit 2'], 
+pobierz: { :rekord 
+	Wyjście pisz: rekord id + [' '] + rekord description + [': '] + rekord price, nowa-linia.
+	#True break.
+}. # pobieranie wierszy
+
+
+# ~ CURL ~
+Wyjście pisz: ( Sieć post: Nic do: ['https://xoscript.com'] ) długość, nowa-linia. # post bez danych = GET
+
+# ~ JSON ~
+>> json := (JSON jsonify: (Słownik nowy umieść: (Lista nowy ; 1 ; 2 ; 3) w: ['abc'])).
+Wyjście pisz: json, nowa-linia.
+Wyjście pisz: ((JSON obiekt: json) abc ? 1), nowa-linia.
+
+# ~ Szyfrowanie ~
+>> skarbiec := Sejf nowy: ['Encryptor'].
+Wyjście pisz: ['szyfruj:'], nowa-linia.
+>> x := Sejf szyfruj: ['hello'] klucz: ['world'].
+Wyjście pisz: x, nowa-linia.
+Wyjście pisz: ['deszyfruj:'], nowa-linia.
+Wyjście pisz: (Sejf odszyfruj: x klucz: ['world']), nowa-linia.
+
+
+# ~ Obsługa sesji (domyślnie przechowywanych w /tmp) ~
+Program użyj: ['pl/webtools.xo'].
+>> strona := Dokument-Web nowy.
+>> x := strona rozpocznij-sesję.
+Wyjście pisz: x, nowa-linia.
+x user: 123.
+strona zniszcz-sesję.
+strona przejdź-do: ['/'].
+
+# ~ Szablon ~
+Program użyj: ['pl/template.xo'].
+>> html := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> szbl := Szablon nowy treść: html.
+>> greeting := szbl wytnij: ['greeting'], kopiuj greeting: ['Witaj, świecie!'].
+szbl wklej: greeting w: ['greetings'].
+
+Wyjście pisz: ['========================='], nowa-linia.
+>> strona := Dokument-Web nowy.
+strona wypisz: szbl uporządkuj-wszystko.
+
+# ~ Regex ~
+>> źródło := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> wyrażenie := Wzorzec nowy: ['href="([^"]+)" target="([^"]+)"'].
+>> wynik  := wyrażenie dopasuj: źródło wykonaj: { :m :x
+	Wyjście pisz: m, nowa-linia.
+	Wyjście pisz: x, nowa-linia.
+	<- ['XXX'].
+}.
+Wyjście pisz: wynik, nowa-linia.
+
+# ~ Narzędzia ~
+Wyjście pisz: (Server html-koduj: ['<&"' hello '"&>']), nowa-linia.
+Wyjście pisz: (Server url-koduj: ['https://example.com?a=6&b=1 2']), nowa-linia.
+Wyjście pisz: (Format nowy: ['Number format: %06.0f \n'], zastosuj: 56), nowa-linia.
+Wyjście pisz: (Sejf token: 20), nowa-linia.
+Wyjście pisz: (Moment nowy format: ['%a, %d %b %Y %H:%M:%S']), nowa-linia.
+>> a := Server base64-koduj: ['abc123'].
+Wyjście pisz: a, nowa-linia.
+Wyjście pisz: (Server base64-dekoduj: a), nowa-linia.
+
+>> u := URL nowy.
+u protokół: ['http'], host: ['example.com'], ścieżka: ['path'], parametry-url: (
+	Słownik nowy
+	a: ['1+'],
+	b: 2
+).
+Wyjście pisz: u, nowa-linia.

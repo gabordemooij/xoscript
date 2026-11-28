@@ -1,0 +1,142 @@
+# 一体化服务器演示
+#
+# - HTTP 请求处理器
+# - 基本会话处理器
+# - 数据库对象 (MariaDB)
+# - CURL
+# - JSON
+# - 加密
+#
+# SQL 示例:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+程序 GC模式: 4.
+
+# ~ HTTP 请求 ~
+Server 初始化.
+>> 请求 := 互联网请求 新建.
+输出 写入: ['HTTP-GET a='] + ( 请求 搜索词: ['a'] ), 停止. # GET
+输出 写入: ['HTTP-POST c='] + ( 请求 表单输入: ['c'] ), 停止. # POST
+
+
+# ~ 数据库 ~
+>> db := 数据库 新建 主机: ['localhost'],
+	用户名: ['xo'], 密码: ['pass123'], 数据库名: ['xobase'], 连接.
+
+>> 查询语句 := db 查询: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], 参数: ( 数组对象 新建 ; ['abc'] ; 12.35 ; 6 ). # 参数化查询
+
+{  查询语句 突变. db 提交. } 捕获: { :e db 回滚.  }, 运行. # 事务
+输出 写入: ['已插入: '] + 查询语句 新数据库行, 停止. # 插入的 id
+
+>> 查询语句 :=
+db 查询: ['SELECT * FROM book order by id desc limit 2'], 
+获取: { :数据行 
+	输出 写入: 数据行 id + [' '] + 数据行 description + [': '] + 数据行 price, 停止.
+	#True break.
+}. # 获取行
+
+>> 查询语句 :=
+db 查询: ['SELECT * FROM book order by id desc limit 2'], 
+获取: { :数据行 
+	输出 写入: 数据行 id + [' '] + 数据行 description + [': '] + 数据行 price, 停止.
+	#True break.
+}. # 获取行
+
+
+# ~ CURL ~
+输出 写入: ( 网络 表单数据: 空 到: ['https://xoscript.com'] ) 长度, 停止. # post 空值 = GET
+
+# ~ JSON ~
+>> json文本 := (杰森 杰森风格: (映射对象 新建 放: (数组对象 新建 ; 1 ; 2 ; 3) 在: ['abc'])).
+输出 写入: json文本, 停止.
+输出 写入: ((杰森 对象: json文本) abc ? 1), 停止.
+
+# ~ 加密 ~
+>> 加密库 := 保险库 新建: ['Encryptor'].
+输出 写入: ['加密:'], 停止.
+>> x := 保险库 加密: ['hello'] 密钥: ['world'].
+输出 写入: x, 停止.
+输出 写入: ['解密:'], 停止.
+输出 写入: (保险库 解密: x 密钥: ['world']), 停止.
+
+
+# ~ 会话处理器(默认存储在 /tmp 中) ~
+程序 使用: ['zh/webtools.xo'].
+>> 网页 := 网页文档 新建.
+>> x := 网页 开始会话.
+输出 写入: x, 停止.
+x user: 123.
+网页 销毁会话.
+网页 跳转: ['/'].
+
+# ~ 模板 ~
+程序 使用: ['zh/template.xo'].
+>> html文本 := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> 模板对象 := 模板 新建 内容: html文本.
+>> greeting := 模板对象 剪切: ['greeting'], 复制 greeting: ['你好，世界！'].
+模板对象 粘贴: greeting 在: ['greetings'].
+
+输出 写入: ['========================='], 停止.
+>> 网页 := 网页文档 新建.
+网页 输出: 模板对象 全部清理.
+
+# ~ 正则表达式 ~
+>> 源文本 := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> 正则模式 := 模式 新建: ['href="([^"]+)" target="([^"]+)"'].
+>> 结果  := 正则模式 匹配: 源文本 执行: { :m :x
+	输出 写入: m, 停止.
+	输出 写入: x, 停止.
+	<- ['XXX'].
+}.
+输出 写入: 结果, 停止.
+
+# ~ 实用工具 ~
+输出 写入: (Server 互联网文档编码: ['<&"' hello '"&>']), 停止.
+输出 写入: (Server 网站网址: ['https://example.com?a=6&b=1 2']), 停止.
+输出 写入: (格式 新建: ['Number format: %06.0f \n'], 应用: 56), 停止.
+输出 写入: (保险库 令牌: 20), 停止.
+输出 写入: (时间对象 新建 格式: ['%a, %d %b %Y %H:%M:%S']), 停止.
+>> a := Server 互联网编码: ['abc123'].
+输出 写入: a, 停止.
+输出 写入: (Server 互联网解码: a), 停止.
+
+>> u := URL 新建.
+u 协议名: ['http'], 主机: ['example.com'], 路径: ['path'], url参数: (
+	映射对象 新建
+	a: ['1+'],
+	b: 2
+).
+输出 写入: u, 停止.

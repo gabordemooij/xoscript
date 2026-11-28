@@ -1,0 +1,142 @@
+# Demo server tutto-in-uno
+#
+# - Gestore delle richieste HTTP
+# - Gestore di sessione di base
+# - Oggetto database (MariaDB)
+# - CURL
+# - JSON
+# - Crittografia
+#
+# Esempio SQL:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Programma gcmode: 4.
+
+# ~ Richieste HTTP ~
+Server inizializzare.
+>> rich := Richiesta-HTTP nuovo.
+Uscita scrivi: ['HTTP-GET a='] + ( rich get: ['a'] ), stop. # GET
+Uscita scrivi: ['HTTP-POST c='] + ( rich post: ['c'] ), stop. # POST
+
+
+# ~ Database ~
+>> db := MariaDB nuovo host: ['localhost'],
+	utente: ['xo'], password: ['pass123'], nome-database: ['xobase'], connetti.
+
+>> parametri := db query: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametri: ( Serie nuovo ; ['abc'] ; 12.35 ; 6 ). # query parametrizzate
+
+{  parametri esegui. db commit. } catturare: { :e db rollback.  }, correre. # transazioni
+Uscita scrivi: ['INSERITO: '] + parametri insert-id, stop. # id di inserimento
+
+>> parametri :=
+db query: ['SELECT * FROM book order by id desc limit 2'], 
+recupera: { :record 
+	Uscita scrivi: record id + [' '] + record description + [': '] + record price, stop.
+	#True break.
+}. # lettura delle righe
+
+>> parametri :=
+db query: ['SELECT * FROM book order by id desc limit 2'], 
+recupera: { :record 
+	Uscita scrivi: record id + [' '] + record description + [': '] + record price, stop.
+	#True break.
+}. # lettura delle righe
+
+
+# ~ CURL ~
+Uscita scrivi: ( Rete post: Nil a: ['https://xoscript.com'] ) lunghezza, stop. # post vuoto = GET
+
+# ~ JSON ~
+>> json := (JSON jsonifica: (Elenco nuovo met: (Serie nuovo ; 1 ; 2 ; 3) a: ['abc'])).
+Uscita scrivi: json, stop.
+Uscita scrivi: ((JSON oggetto: json) abc ? 1), stop.
+
+# ~ Crittografia ~
+>> caveau := Caveau nuovo: ['Encryptor'].
+Uscita scrivi: ['cifra:'], stop.
+>> x := Caveau critta: ['hello'] chiave: ['world'].
+Uscita scrivi: x, stop.
+Uscita scrivi: ['decifra:'], stop.
+Uscita scrivi: (Caveau decritta: x chiave: ['world']), stop.
+
+
+# ~ Gestore di sessione (per impostazione predefinita i dati vengono salvati in /tmp) ~
+Programma uso: ['it/webtools.xo'].
+>> web := Documento-Web nuovo.
+>> x := web avviare-sessione.
+Uscita scrivi: x, stop.
+x user: 123.
+web distruggere-sessione.
+web vai-a: ['/'].
+
+# ~ Template ~
+Programma uso: ['it/template.xo'].
+>> codice-html := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> sagoma := Sagoma nuovo contenuto: codice-html.
+>> greeting := sagoma tagliare: ['greeting'], copia greeting: ['Ciao mondo!'].
+sagoma incollare: greeting a: ['greetings'].
+
+Uscita scrivi: ['========================='], stop.
+>> web := Documento-Web nuovo.
+web emettere: sagoma pulire-tutto.
+
+# ~ Espressioni regolari ~
+>> sorgente := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> modello := Modello nuovo: ['href="([^"]+)" target="([^"]+)"'].
+>> risultato  := modello corrispondenza: sorgente fai: { :m :x
+	Uscita scrivi: m, stop.
+	Uscita scrivi: x, stop.
+	<- ['XXX'].
+}.
+Uscita scrivi: risultato, stop.
+
+# ~ Utilità ~
+Uscita scrivi: (Server html-codifica: ['<&"' hello '"&>']), stop.
+Uscita scrivi: (Server url-codifica: ['https://example.com?a=6&b=1 2']), stop.
+Uscita scrivi: (Formato nuovo: ['Number format: %06.0f \n'], applica: 56), stop.
+Uscita scrivi: (Caveau token: 20), stop.
+Uscita scrivi: (Momento nuovo format: ['%a, %d %b %Y %H:%M:%S']), stop.
+>> a := Server base64-codifica: ['abc123'].
+Uscita scrivi: a, stop.
+Uscita scrivi: (Server base64-decodifica: a), stop.
+
+>> u := URL nuovo.
+u protocollo: ['http'], host: ['example.com'], sentiero: ['path'], parametri-url: (
+	Elenco nuovo
+	chiave1: ['1+'],
+	chiave2: 2
+).
+Uscita scrivi: u, stop.

@@ -1,0 +1,142 @@
+# Kaikki yhdessä -palvelindemo
+#
+# - HTTP-pyyntöjen käsittelijä
+# - Yksinkertainen istuntojen käsittelijä
+# - Tietokantaolio (MariaDB)
+# - CURL
+# - JSON
+# - Salaus
+#
+# SQL-esimerkki:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Ohjelma muistinhallinta: 4.
+
+# ~ HTTP-pyynnöt ~
+Server valmistele.
+>> pyyntöolio := HTTP-Pyyntö uusi.
+Tuloste kirjoita: ['HTTP-GET a='] + ( pyyntöolio get: ['a'] ), rivinvaihto. # GET
+Tuloste kirjoita: ['HTTP-POST c='] + ( pyyntöolio post: ['c'] ), rivinvaihto. # POST
+
+
+# ~ Tietokanta ~
+>> tk := Maria-DB uusi isäntä: ['localhost'],
+	käyttäjänimi: ['xo'], salasana: ['pass123'], tietokannan-nimi: ['xobase'], yhdistä.
+
+>> sql-kysely := tk kysely: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametrit: ( Lista uusi ; ['abc'] ; 12.35 ; 6 ). # parametrisoidut kyselyt
+
+{  sql-kysely suorita. tk vahvista. } sieppaa: { :e tk peru.  }, käynnistä. # transaktiot
+Tuloste kirjoita: ['LISÄTTY: '] + sql-kysely insert-id, rivinvaihto. # lisätty id
+
+>> sql-kysely :=
+tk kysely: ['SELECT * FROM book order by id desc limit 2'], 
+hae: { :tietue 
+	Tuloste kirjoita: tietue id + [' '] + tietue description + [': '] + tietue price, rivinvaihto.
+	#True break.
+}. # rivien haku
+
+>> sql-kysely :=
+tk kysely: ['SELECT * FROM book order by id desc limit 2'], 
+hae: { :tietue 
+	Tuloste kirjoita: tietue id + [' '] + tietue description + [': '] + tietue price, rivinvaihto.
+	#True break.
+}. # rivien haku
+
+
+# ~ CURL ~
+Tuloste kirjoita: ( Verkko post: Tyhjä kohteeseen: ['https://xoscript.com'] ) pituus, rivinvaihto. # tyhjä post = GET
+
+# ~ JSON ~
+>> json-teksti := (JSON jsonify: (Sanakirja uusi aseta: (Lista uusi ; 1 ; 2 ; 3) kohtaan: ['abc'])).
+Tuloste kirjoita: json-teksti, rivinvaihto.
+Tuloste kirjoita: ((JSON olio: json-teksti) abc ? 1), rivinvaihto.
+
+# ~ Salaus ~
+>> kassakaappi := Holvi uusi: ['Encryptor'].
+Tuloste kirjoita: ['salaa:'], rivinvaihto.
+>> x := Holvi salaa: ['hello'] avain: ['world'].
+Tuloste kirjoita: x, rivinvaihto.
+Tuloste kirjoita: ['pura:'], rivinvaihto.
+Tuloste kirjoita: (Holvi pura-salaus: x avain: ['world']), rivinvaihto.
+
+
+# ~ Istuntojen käsittelijä (tallennetaan oletuksena hakemistoon /tmp) ~
+Ohjelma käytä: ['fi/webtools.xo'].
+>> sivu := Verkkodokumentti uusi.
+>> x := sivu aloita-istunto.
+Tuloste kirjoita: x, rivinvaihto.
+x user: 123.
+sivu tuhoa-istunto.
+sivu siirry: ['/'].
+
+# ~ Mallipohja ~
+Ohjelma käytä: ['fi/template.xo'].
+>> html-koodi := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> pohja := Mallipohja uusi sisältö: html-koodi.
+>> greeting := pohja leikkaa: ['greeting'], kopioi greeting: ['Hei maailma!'].
+pohja liimaa: greeting kohtaan: ['greetings'].
+
+Tuloste kirjoita: ['========================='], rivinvaihto.
+>> sivu := Verkkodokumentti uusi.
+sivu tulosta: pohja puhdista-kaikki.
+
+# ~ Säännölliset lausekkeet ~
+>> lähdeteksti := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> kuvio := Malli uusi: ['href="([^"]+)" target="([^"]+)"'].
+>> tulos  := kuvio täsmää: lähdeteksti tee: { :m :x
+	Tuloste kirjoita: m, rivinvaihto.
+	Tuloste kirjoita: x, rivinvaihto.
+	<- ['XXX'].
+}.
+Tuloste kirjoita: tulos, rivinvaihto.
+
+# ~ Apuvälineet ~
+Tuloste kirjoita: (Server html-koodaa: ['<&"' hello '"&>']), rivinvaihto.
+Tuloste kirjoita: (Server url-koodaa: ['https://example.com?a=6&b=1 2']), rivinvaihto.
+Tuloste kirjoita: (Muoto uusi: ['Number format: %06.0f \n'], sovella: 56), rivinvaihto.
+Tuloste kirjoita: (Holvi tunniste: 20), rivinvaihto.
+Tuloste kirjoita: (Hetki uusi muoto: ['%a, %d %b %Y %H:%M:%S']), rivinvaihto.
+>> a := Server base64-koodaa: ['abc123'].
+Tuloste kirjoita: a, rivinvaihto.
+Tuloste kirjoita: (Server base64-pura: a), rivinvaihto.
+
+>> linkki := URL uusi.
+linkki protokolla: ['http'], isäntä: ['example.com'], polku: ['path'], url-parametrit: (
+	Sanakirja uusi
+	a: ['1+'],
+	b: 2
+).
+Tuloste kirjoita: linkki, rivinvaihto.

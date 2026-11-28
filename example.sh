@@ -42,7 +42,7 @@ elif [[ $ISO = "en" ]]; then
 elif [[ $ISO = "es" ]]; then
 	ISOKEY=0
 else
-	echo "Example for this language not supported yet."
+	ISOKEY=1
 fi
 
 server_plugin_name[0]="servidor"
@@ -59,10 +59,10 @@ if [[ $OS = "Linux" ]]; then
 	fi
 	make
 	PACKAGE="server" NAME="${server_plugin_name[$ISOKEY]}" make plugin
-	cd examples/${EXAMPLE}
+	cd examples/${ISO}
 	rm mods
 	ln -s ../../build/Linux/bin/mods mods
-	ln -s ../../src/xo/* .
+	ln -s ../../src/xo/${ISO} .
 	echo 'c=3' > /tmp/xo_fxt_stdin
 	CITRINE_MEMORY_MODE=4 \
 	REQUEST_METHOD="POST" \
@@ -80,10 +80,10 @@ if [[ $OS = "OBSD" ]]; then
 	fi
 	make -f makefile.obsd
 	PACKAGE="server" NAME="${server_plugin_name[$ISOKEY]}" make -f makefile.obsd plugin
-	cd examples/${EXAMPLE}
+	cd examples/${ISO}
 	rm mods
 	ln -s ../../build/OpenBSD/bin/mods mods
-	ln -s ../../src/xo/* .
+	ln -s ../../src/xo/${ISO} .
 	printf 'c=3' > /tmp/xo_fxt_stdin
 	CITRINE_MEMORY_MODE=4 \
 	REQUEST_METHOD="POST" \

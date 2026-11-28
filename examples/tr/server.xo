@@ -1,0 +1,142 @@
+# Hepsi Bir Arada Sunucu Demosu
+#
+# - HTTP İstek İşleyici
+# - Temel Oturum İşleyici
+# - Veritabanı Nesnesi (MariaDB)
+# - CURL
+# - JSON
+# - Şifreleme
+#
+# SQL Örneği:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Program bellek-yönetimi: 4.
+
+# ~ HTTP İstekleri ~
+Server hazırla.
+>> http-istek := HTTP-İstek yeni.
+Çıktı yaz: ['HTTP-GET a='] + ( http-istek get: ['a'] ), yeni-satır. # GET
+Çıktı yaz: ['HTTP-POST c='] + ( http-istek post: ['c'] ), yeni-satır. # POST
+
+
+# ~ Veritabanı ~
+>> vt := Maria-DB yeni sunucu-adı: ['localhost'],
+	kullanıcı: ['xo'], parola: ['pass123'], veritabanı-adı: ['xobase'], bağlan.
+
+>> sql-sorgu := vt sorgu: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametreler: ( Liste yeni ; ['abc'] ; 12.35 ; 6 ). # parametreli sorgular
+
+{  sql-sorgu yürüt. vt onayla. } yakala: { :e vt geri-al.  }, başlat. # işlemler (transaction)
+Çıktı yaz: ['EKLENDİ: '] + sql-sorgu insert-id, yeni-satır. # eklenen id
+
+>> sql-sorgu :=
+vt sorgu: ['SELECT * FROM book order by id desc limit 2'], 
+getir: { :kayıt 
+	Çıktı yaz: kayıt id + [' '] + kayıt description + [': '] + kayıt price, yeni-satır.
+	#True break.
+}. # satırları getirme
+
+>> sql-sorgu :=
+vt sorgu: ['SELECT * FROM book order by id desc limit 2'], 
+getir: { :kayıt 
+	Çıktı yaz: kayıt id + [' '] + kayıt description + [': '] + kayıt price, yeni-satır.
+	#True break.
+}. # satırları getirme
+
+
+# ~ CURL ~
+Çıktı yaz: ( Ağ post: Hiç hedef: ['https://xoscript.com'] ) uzunluk, yeni-satır. # boş post = GET
+
+# ~ JSON ~
+>> json-metin := (JSON jsonify: (Sözlük yeni koy: (Liste yeni ; 1 ; 2 ; 3) konum: ['abc'])).
+Çıktı yaz: json-metin, yeni-satır.
+Çıktı yaz: ((JSON nesne: json-metin) abc ? 1), yeni-satır.
+
+# ~ Şifreleme ~
+>> şifre-kasası := Kasa yeni: ['Encryptor'].
+Çıktı yaz: ['şifrele:'], yeni-satır.
+>> x := Kasa şifrele: ['hello'] anahtar: ['world'].
+Çıktı yaz: x, yeni-satır.
+Çıktı yaz: ['şifreyi çöz:'], yeni-satır.
+Çıktı yaz: (Kasa şifre-çöz: x anahtar: ['world']), yeni-satır.
+
+
+# ~ Oturum işleyici (varsayılan olarak /tmp içinde saklanır) ~
+Program kullan: ['tr/webtools.xo'].
+>> belge := Web-Belgesi yeni.
+>> x := belge oturumu-başlat.
+Çıktı yaz: x, yeni-satır.
+x user: 123.
+belge oturumu-yok-et.
+belge git: ['/'].
+
+# ~ Şablon ~
+Program kullan: ['tr/template.xo'].
+>> html-kodu := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> şablon-nesnesi := Şablon yeni içerik: html-kodu.
+>> greeting := şablon-nesnesi kes: ['greeting'], kopyala greeting: ['Merhaba Dünya!'].
+şablon-nesnesi yapıştır: greeting konum: ['greetings'].
+
+Çıktı yaz: ['========================='], yeni-satır.
+>> belge := Web-Belgesi yeni.
+belge çıktıla: şablon-nesnesi tümünü-arındır.
+
+# ~ Düzenli İfadeler ~
+>> kaynak-metin := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> regex-desen := Desen yeni: ['href="([^"]+)" target="([^"]+)"'].
+>> sonuç  := regex-desen eşleş: kaynak-metin yap: { :m :x
+	Çıktı yaz: m, yeni-satır.
+	Çıktı yaz: x, yeni-satır.
+	<- ['XXX'].
+}.
+Çıktı yaz: sonuç, yeni-satır.
+
+# ~ Yardımcı Araçlar ~
+Çıktı yaz: (Server html-kodla: ['<&"' hello '"&>']), yeni-satır.
+Çıktı yaz: (Server url-kodla: ['https://example.com?a=6&b=1 2']), yeni-satır.
+Çıktı yaz: (Biçim yeni: ['Number format: %06.0f \n'], uygula: 56), yeni-satır.
+Çıktı yaz: (Kasa jeton: 20), yeni-satır.
+Çıktı yaz: (An yeni biçim: ['%a, %d %b %Y %H:%M:%S']), yeni-satır.
+>> a := Server base64-kodla: ['abc123'].
+Çıktı yaz: a, yeni-satır.
+Çıktı yaz: (Server base64-kod-çöz: a), yeni-satır.
+
+>> u := URL yeni.
+u protokol: ['http'], sunucu-adı: ['example.com'], yol: ['path'], url-parametreleri: (
+	Sözlük yeni
+	a: ['1+'],
+	b: 2
+).
+Çıktı yaz: u, yeni-satır.

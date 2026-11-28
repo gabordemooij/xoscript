@@ -1,0 +1,142 @@
+# Demonstração de servidor tudo-em-um
+#
+# - Manipulador de requisições HTTP
+# - Manipulador básico de sessões
+# - Objeto de banco de dados (MariaDB)
+# - CURL
+# - JSON
+# - Criptografia
+#
+# Exemplo de SQL:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Programa arranjo: 4.
+
+# ~ Requisições HTTP ~
+Server inicializar.
+>> req := Requisição-HTTP novo.
+Saída escrever: ['HTTP-GET a='] + ( req get: ['a'] ), stop. # GET
+Saída escrever: ['HTTP-POST c='] + ( req post: ['c'] ), stop. # POST
+
+
+# ~ Banco de dados ~
+>> bd := MariaDB novo host: ['localhost'],
+	usuário: ['xo'], senha: ['pass123'], nome-database: ['xobase'], conectar.
+
+>> consulta-bd := bd consulta: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametros: ( Listar novo ; ['abc'] ; 12.35 ; 6 ). # consultas parametrizadas
+
+{  consulta-bd executar. bd commit. } pegar: { :falha bd rollback.  }, iniciar. # transações
+Saída escrever: ['INSERIDO: '] + consulta-bd insert-id, stop. # id inserido
+
+>> consulta-bd :=
+bd consulta: ['SELECT * FROM book order by id desc limit 2'], 
+buscar: { :registro 
+	Saída escrever: registro id + [' '] + registro description + [': '] + registro price, stop.
+	#True break.
+}. # obter linhas
+
+>> consulta-bd :=
+bd consulta: ['SELECT * FROM book order by id desc limit 2'], 
+buscar: { :registro 
+	Saída escrever: registro id + [' '] + registro description + [': '] + registro price, stop.
+	#True break.
+}. # obter linhas
+
+
+# ~ CURL ~
+Saída escrever: ( Rede post: Nulo para: ['https://xoscript.com'] ) comprimento, stop. # post nada = GET
+
+# ~ JSON ~
+>> json := (JSON jsonificar: (Mapa novo colocar: (Listar novo ; 1 ; 2 ; 3) em: ['abc'])).
+Saída escrever: json, stop.
+Saída escrever: ((JSON objeto: json) abc ? 1), stop.
+
+# ~ Criptografia ~
+>> caixa-forte := Cofre novo: ['Encryptor'].
+Saída escrever: ['criptografar:'], stop.
+>> x := Cofre encriptar: ['hello'] chave: ['world'].
+Saída escrever: x, stop.
+Saída escrever: ['descriptografar:'], stop.
+Saída escrever: (Cofre desencriptar: x chave: ['world']), stop.
+
+
+# ~ Manipulador de sessões (armazenadas por padrão em /tmp) ~
+Programa usar: ['pt_br/webtools.xo'].
+>> web := Documento-Web novo.
+>> x := web iniciar-sessão.
+Saída escrever: x, stop.
+x user: 123.
+web destruir-sessão.
+web ir-para: ['/'].
+
+# ~ Modelo ~
+Programa usar: ['pt_br/template.xo'].
+>> html := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> gabarito := Modelo novo conteúdo: html.
+>> greeting := gabarito cortar: ['greeting'], copiar greeting: ['Olá, Mundo!'].
+gabarito colar: greeting em: ['greetings'].
+
+Saída escrever: ['========================='], stop.
+>> web := Documento-Web novo.
+web emitir: gabarito depurar-tudo.
+
+# ~ Regex ~
+>> texto := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> expressão := Padrão novo: ['href="([^"]+)" target="([^"]+)"'].
+>> resultado  := expressão corresponder: texto fazer: { :m :x
+	Saída escrever: m, stop.
+	Saída escrever: x, stop.
+	<- ['XXX'].
+}.
+Saída escrever: resultado, stop.
+
+# ~ Utilitários ~
+Saída escrever: (Server html-codificar: ['<&"' hello '"&>']), stop.
+Saída escrever: (Server url-codificar: ['https://example.com?a=6&b=1 2']), stop.
+Saída escrever: (Formato novo: ['Number format: %06.0f \n'], aplicar: 56), stop.
+Saída escrever: (Cofre token: 20), stop.
+Saída escrever: (Momento novo format: ['%a, %d %b %Y %H:%M:%S']), stop.
+>> a := Server base64-codificar: ['abc123'].
+Saída escrever: a, stop.
+Saída escrever: (Server base64-decodificar: a), stop.
+
+>> u := URL novo.
+u protocolo: ['http'], host: ['example.com'], caminho: ['path'], parâmetros: (
+	Mapa novo
+	a: ['1+'],
+	b: 2
+).
+Saída escrever: u, stop.

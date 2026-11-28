@@ -1,0 +1,142 @@
+# Alles-in-een-bedienerdemo
+#
+# - HTTP-versoekhanteerder
+# - Basiese sessiehanteerder
+# - Databasisobjek (MariaDB)
+# - CURL
+# - JSON
+# - Enkripsie
+#
+# SQL-voorbeeld:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Program geheuebestuur: 4.
+
+# ~ HTTP-versoeke ~
+Server inisialiseer.
+>> http-versoek := HTTP-Versoek nuut.
+Uitvoer skryf: ['HTTP-GET a='] + ( http-versoek get: ['a'] ), nuwe-reël. # GET
+Uitvoer skryf: ['HTTP-POST c='] + ( http-versoek post: ['c'] ), nuwe-reël. # POST
+
+
+# ~ Databasis ~
+>> db := Maria-DB nuut gasheer: ['localhost'],
+	gebruikersnaam: ['xo'], wagwoord: ['pass123'], databasisnaam: ['xobase'], verbind.
+
+>> sql-navraag := db navraag: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameters: ( Lys nuut ; ['abc'] ; 12.35 ; 6 ). # geparametriseerde navrae
+
+{  sql-navraag voer-uit. db bevestig. } vang: { :e db rol-terug.  }, begin. # transaksies
+Uitvoer skryf: ['INGEVOEG: '] + sql-navraag insert-id, nuwe-reël. # ingevoegde id
+
+>> sql-navraag :=
+db navraag: ['SELECT * FROM book order by id desc limit 2'], 
+haal: { :ry 
+	Uitvoer skryf: ry id + [' '] + ry description + [': '] + ry price, nuwe-reël.
+	#True break.
+}. # rekords haal
+
+>> sql-navraag :=
+db navraag: ['SELECT * FROM book order by id desc limit 2'], 
+haal: { :ry 
+	Uitvoer skryf: ry id + [' '] + ry description + [': '] + ry price, nuwe-reël.
+	#True break.
+}. # rekords haal
+
+
+# ~ CURL ~
+Uitvoer skryf: ( Netwerk post: Niks na: ['https://xoscript.com'] ) lengte, nuwe-reël. # pos niks = GET
+
+# ~ JSON ~
+>> json-teks := (JSON jsonify: (Woordeboek nuut sit: (Lys nuut ; 1 ; 2 ; 3) by: ['abc'])).
+Uitvoer skryf: json-teks, nuwe-reël.
+Uitvoer skryf: ((JSON objek: json-teks) abc ? 1), nuwe-reël.
+
+# ~ Enkripsie ~
+>> kluis := Kluis nuut: ['Encryptor'].
+Uitvoer skryf: ['enkripteer:'], nuwe-reël.
+>> x := Kluis enkripteer: ['hello'] sleutel: ['world'].
+Uitvoer skryf: x, nuwe-reël.
+Uitvoer skryf: ['dekripteer:'], nuwe-reël.
+Uitvoer skryf: (Kluis dekripteer: x sleutel: ['world']), nuwe-reël.
+
+
+# ~ Sessiehanteerder (by verstek in /tmp gestoor) ~
+Program gebruik: ['af/webtools.xo'].
+>> blad := Webdokument nuut.
+>> x := blad sessie-begin.
+Uitvoer skryf: x, nuwe-reël.
+x user: 123.
+blad sessie-vernietig.
+blad gaan-na: ['/'].
+
+# ~ Sjabloon ~
+Program gebruik: ['af/template.xo'].
+>> html-kode := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> sjabloonobjek := Sjabloon nuut inhoud: html-kode.
+>> greeting := sjabloonobjek uitknip: ['greeting'], kopieer greeting: ['Hallo Wêreld!'].
+sjabloonobjek plak: greeting by: ['greetings'].
+
+Uitvoer skryf: ['========================='], nuwe-reël.
+>> blad := Webdokument nuut.
+blad uitvoer: sjabloonobjek alles-skoonmaak.
+
+# ~ Reguliere uitdrukkings ~
+>> bronteks := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> patroon := Patroon nuut: ['href="([^"]+)" target="([^"]+)"'].
+>> resultaat  := patroon passing: bronteks doen: { :m :x
+	Uitvoer skryf: m, nuwe-reël.
+	Uitvoer skryf: x, nuwe-reël.
+	<- ['XXX'].
+}.
+Uitvoer skryf: resultaat, nuwe-reël.
+
+# ~ Hulpmiddels ~
+Uitvoer skryf: (Server html-kodeer: ['<&"' hello '"&>']), nuwe-reël.
+Uitvoer skryf: (Server url-kodeer: ['https://example.com?a=6&b=1 2']), nuwe-reël.
+Uitvoer skryf: (Formaat nuut: ['Number format: %06.0f \n'], pas-toe: 56), nuwe-reël.
+Uitvoer skryf: (Kluis token: 20), nuwe-reël.
+Uitvoer skryf: (Oomblik nuut formaat: ['%a, %d %b %Y %H:%M:%S']), nuwe-reël.
+>> a := Server base64-kodeer: ['abc123'].
+Uitvoer skryf: a, nuwe-reël.
+Uitvoer skryf: (Server base64-dekodeer: a), nuwe-reël.
+
+>> u := URL nuut.
+u protokol: ['http'], gasheer: ['example.com'], pad: ['path'], url-parameters: (
+	Woordeboek nuut
+	a: ['1+'],
+	b: 2
+).
+Uitvoer skryf: u, nuwe-reël.

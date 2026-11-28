@@ -1,0 +1,142 @@
+# הדגמת שרת הכול-באחד
+#
+# - מטפל בבקשות HTTP
+# - ניהול סשנים בסיסי
+# - אובייקט מסד נתונים (MariaDB)
+# - CURL
+# - JSON
+# - הצפנה
+#
+# דוגמת SQL:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+תוכנית ניהול-זיכרון: 4.
+
+# ~ בקשות HTTP ~
+Server אתחל.
+>> בקשה := בקשת-HTTP חדש.
+פלט כתוב: ⌝'HTTP-GET a='⌜ + ﴿ בקשה get: ⌝'a'⌜ ﴾, שורה-חדשה. # GET
+פלט כתוב: ⌝'HTTP-POST c='⌜ + ﴿ בקשה post: ⌝'c'⌜ ﴾, שורה-חדשה. # POST
+
+
+# ~ מסד נתונים ~
+>> מסד := Maria-DB חדש מארח: ⌝'localhost'⌜,
+	שם-משתמש: ⌝'xo'⌜, סיסמה: ⌝'pass123'⌜, שם-מסד: ⌝'xobase'⌜, התחבר.
+
+>> שאילתת-מסד := מסד שאילתה: ⌝'
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'⌜, פרמטרים: ﴿ רשימה חדש ; ⌝'abc'⌜ ; 12.35 ; 6 ﴾. # שאילתות עם פרמטרים
+
+⎬  שאילתת-מסד בצע. מסד אשר. ⎨ תפוס: ⎬ :e מסד בטל-שינויים.  ⎨, הפעל. # טרנזקציות
+פלט כתוב: ⌝'נוסף: '⌜ + שאילתת-מסד insert-id, שורה-חדשה. # מזהה ההוספה
+
+>> שאילתת-מסד :=
+מסד שאילתה: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+שלוף: ⎬ :רשומה 
+	פלט כתוב: רשומה id + ⌝' '⌜ + רשומה description + ⌝': '⌜ + רשומה price, שורה-חדשה.
+	#True break.
+⎨. # שליפת שורות
+
+>> שאילתת-מסד :=
+מסד שאילתה: ⌝'SELECT * FROM book order by id desc limit 2'⌜, 
+שלוף: ⎬ :רשומה 
+	פלט כתוב: רשומה id + ⌝' '⌜ + רשומה description + ⌝': '⌜ + רשומה price, שורה-חדשה.
+	#True break.
+⎨. # שליפת שורות
+
+
+# ~ CURL ~
+פלט כתוב: ﴿ רשת post: כלום אל: ⌝'https://xoscript.com'⌜ ﴾ אורך, שורה-חדשה. # שליחה ריקה = GET
+
+# ~ JSON ~
+>> גייסון := ﴿JSON jsonify: ﴿מילון חדש שים: ﴿רשימה חדש ; 1 ; 2 ; 3﴾ במפתח: ⌝'abc'⌜﴾﴾.
+פלט כתוב: גייסון, שורה-חדשה.
+פלט כתוב: ﴿﴿JSON אובייקט: גייסון﴾ abc ? 1﴾, שורה-חדשה.
+
+# ~ הצפנה ~
+>> כספת-הצפנה := כספת חדש: ⌝'Encryptor'⌜.
+פלט כתוב: ⌝'הצפנה:'⌜, שורה-חדשה.
+>> x := כספת הצפן: ⌝'hello'⌜ מפתח: ⌝'world'⌜.
+פלט כתוב: x, שורה-חדשה.
+פלט כתוב: ⌝'פענוח:'⌜, שורה-חדשה.
+פלט כתוב: ﴿כספת פענח-הצפנה: x מפתח: ⌝'world'⌜﴾, שורה-חדשה.
+
+
+# ~ ניהול סשנים (נשמרים כברירת מחדל ב-/tmp) ~
+תוכנית השתמש: ⌝'he/webtools.xo'⌜.
+>> דף := מסמך-רשת חדש.
+>> x := דף התחל-הפעלה.
+פלט כתוב: x, שורה-חדשה.
+x user: 123.
+דף השמד-הפעלה.
+דף עבור-אל: ⌝'/'⌜.
+
+# ~ תבנית ~
+תוכנית השתמש: ⌝'he/template.xo'⌜.
+>> סימון := ⌝'
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'⌜.
+
+>> תבנית-דף := שבלונה חדש תוכן: סימון.
+>> greeting := תבנית-דף גזור: ⌝'greeting'⌜, העתק greeting: ⌝'שלום עולם!'⌜.
+תבנית-דף הדבק: greeting במפתח: ⌝'greetings'⌜.
+
+פלט כתוב: ⌝'========================='⌜, שורה-חדשה.
+>> דף := מסמך-רשת חדש.
+דף פלוט: תבנית-דף טהר-הכל.
+
+# ~ ביטויים רגולריים ~
+>> מקור := ⌝'<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'⌜.
+>> ביטוי := דפוס חדש: ⌝'href="([^"]+)" target="([^"]+)"'⌜.
+>> תוצר  := ביטוי התאמה: מקור בצע: ⎬ :m :x
+	פלט כתוב: m, שורה-חדשה.
+	פלט כתוב: x, שורה-חדשה.
+	<- ⌝'XXX'⌜.
+⎨.
+פלט כתוב: תוצר, שורה-חדשה.
+
+# ~ כלי עזר ~
+פלט כתוב: ﴿Server html-קידוד: ⌝'<&"' hello '"&>'⌜﴾, שורה-חדשה.
+פלט כתוב: ﴿Server url-קידוד: ⌝'https://example.com?a=6&b=1 2'⌜﴾, שורה-חדשה.
+פלט כתוב: ﴿תבנית חדש: ⌝'Number format: %06.0f \n'⌜, החל: 56﴾, שורה-חדשה.
+פלט כתוב: ﴿כספת אסימון: 20﴾, שורה-חדשה.
+פלט כתוב: ﴿רגע חדש בתבנית: ⌝'%a, %d %b %Y %H:%M:%S'⌜﴾, שורה-חדשה.
+>> a := Server base64-קידוד: ⌝'abc123'⌜.
+פלט כתוב: a, שורה-חדשה.
+פלט כתוב: ﴿Server base64-פענוח: a﴾, שורה-חדשה.
+
+>> קישור := URL חדש.
+קישור פרוטוקול: ⌝'http'⌜, מארח: ⌝'example.com'⌜, נתיב-קובץ: ⌝'path'⌜, פרמטרי-url: ﴿
+	מילון חדש
+	a: ⌝'1+'⌜,
+	b: 2
+﴾.
+פלט כתוב: קישור, שורה-חדשה.

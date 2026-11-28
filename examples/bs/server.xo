@@ -1,0 +1,142 @@
+# Demo servera sve-u-jednom
+#
+# - Rukovalac HTTP zahtjevima
+# - Osnovni rukovalac sesijama
+# - Objekat baze podataka (MariaDB)
+# - CURL
+# - JSON
+# - Enkripcija
+#
+# SQL primjer:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Program upravljanje-memorijom: 4.
+
+# ~ HTTP zahtjevi ~
+Server inicijaliziraj.
+>> http-zahtjev := HTTP-Zahtjev novi.
+Izlaz piši: ['HTTP-GET a='] + ( http-zahtjev get: ['a'] ), novi-red. # GET
+Izlaz piši: ['HTTP-POST c='] + ( http-zahtjev post: ['c'] ), novi-red. # POST
+
+
+# ~ Baza podataka ~
+>> bp := Maria-DB novi domaćin: ['localhost'],
+	korisnik: ['xo'], lozinka: ['pass123'], naziv-baze: ['xobase'], poveži-se.
+
+>> sql-upit := bp upit: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parametri: ( Lista novi ; ['abc'] ; 12.35 ; 6 ). # parametrizirani upiti
+
+{  sql-upit izvrši. bp potvrdi. } uhvati: { :e bp poništi.  }, pokreni. # transakcije
+Izlaz piši: ['UMETNUTO: '] + sql-upit insert-id, novi-red. # id umetanja
+
+>> sql-upit :=
+bp upit: ['SELECT * FROM book order by id desc limit 2'], 
+dohvati: { :zapis 
+	Izlaz piši: zapis id + [' '] + zapis description + [': '] + zapis price, novi-red.
+	#True break.
+}. # dohvatanje redova
+
+>> sql-upit :=
+bp upit: ['SELECT * FROM book order by id desc limit 2'], 
+dohvati: { :zapis 
+	Izlaz piši: zapis id + [' '] + zapis description + [': '] + zapis price, novi-red.
+	#True break.
+}. # dohvatanje redova
+
+
+# ~ CURL ~
+Izlaz piši: ( Mreža post: Ništa na: ['https://xoscript.com'] ) dužina, novi-red. # post bez podataka = GET
+
+# ~ JSON ~
+>> json-tekst := (JSON jsonify: (Rječnik novi stavi: (Lista novi ; 1 ; 2 ; 3) na: ['abc'])).
+Izlaz piši: json-tekst, novi-red.
+Izlaz piši: ((JSON objekat: json-tekst) abc ? 1), novi-red.
+
+# ~ Enkripcija ~
+>> trezor := Sef novi: ['Encryptor'].
+Izlaz piši: ['šifriraj:'], novi-red.
+>> x := Sef šifriraj: ['hello'] ključ: ['world'].
+Izlaz piši: x, novi-red.
+Izlaz piši: ['dešifriraj:'], novi-red.
+Izlaz piši: (Sef dešifriraj: x ključ: ['world']), novi-red.
+
+
+# ~ Rukovalac sesijama (podrazumijevano pohranjene u /tmp) ~
+Program koristi: ['bs/webtools.xo'].
+>> stranica := Web-dokument novi.
+>> x := stranica pokreni-sesiju.
+Izlaz piši: x, novi-red.
+x user: 123.
+stranica uništi-sesiju.
+stranica idi-na: ['/'].
+
+# ~ Šablon ~
+Program koristi: ['bs/template.xo'].
+>> html-kod := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> predložak := Šablon novi sadržaj: html-kod.
+>> greeting := predložak izreži: ['greeting'], kopiraj greeting: ['Zdravo svijete!'].
+predložak zalijepi: greeting na: ['greetings'].
+
+Izlaz piši: ['========================='], novi-red.
+>> stranica := Web-dokument novi.
+stranica ispiši: predložak očisti-sve.
+
+# ~ Regularni izrazi ~
+>> izvorni-tekst := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> uzorak := Uzorak novi: ['href="([^"]+)" target="([^"]+)"'].
+>> rezultat  := uzorak podudaranje: izvorni-tekst uradi: { :m :x
+	Izlaz piši: m, novi-red.
+	Izlaz piši: x, novi-red.
+	<- ['XXX'].
+}.
+Izlaz piši: rezultat, novi-red.
+
+# ~ Pomoćni alati ~
+Izlaz piši: (Server html-kodiraj: ['<&"' hello '"&>']), novi-red.
+Izlaz piši: (Server url-kodiraj: ['https://example.com?a=6&b=1 2']), novi-red.
+Izlaz piši: (Format novi: ['Number format: %06.0f \n'], primijeni: 56), novi-red.
+Izlaz piši: (Sef token: 20), novi-red.
+Izlaz piši: (Trenutak novi format: ['%a, %d %b %Y %H:%M:%S']), novi-red.
+>> a := Server base64-kodiraj: ['abc123'].
+Izlaz piši: a, novi-red.
+Izlaz piši: (Server base64-dekodiraj: a), novi-red.
+
+>> u := URL novi.
+u protokol: ['http'], domaćin: ['example.com'], putanja: ['path'], parametri-url: (
+	Rječnik novi
+	a: ['1+'],
+	b: 2
+).
+Izlaz piši: u, novi-red.

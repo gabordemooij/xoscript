@@ -1,0 +1,142 @@
+# Alles-yn-ien-serverdemo
+#
+# - HTTP-fersykferwurker
+# - Ienfâldige sesjeferwurker
+# - Databankobjekt (MariaDB)
+# - CURL
+# - JSON
+# - Fersifering
+#
+# SQL-foarbyld:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Programma geheugenbehear: 4.
+
+# ~ HTTP-fersiken ~
+Server inisjalisearje.
+>> fersykobjekt := HTTP-Fersyk nĳ.
+Utfier skriuwe: ['HTTP-GET a='] + ( fersykobjekt get: ['a'] ), nije-rigel. # GET
+Utfier skriuwe: ['HTTP-POST c='] + ( fersykobjekt post: ['c'] ), nije-rigel. # POST
+
+
+# ~ Databank ~
+>> db := Maria-DB nĳ host: ['localhost'],
+	brûkersnamme: ['xo'], wachtwurd: ['pass123'], databanknamme: ['xobase'], ferbine.
+
+>> sql-fraach := db fraach: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameters: ( Rige nĳ ; ['abc'] ; 12.35 ; 6 ). # parametrisearre fragen
+
+{  sql-fraach útfiere. db befêstigje. } fange: { :e db weromdraaie.  }, begjinne. # transaksjes
+Utfier skriuwe: ['YNFOEGE: '] + sql-fraach insert-id, nije-rigel. # ynfoege id
+
+>> sql-fraach :=
+db fraach: ['SELECT * FROM book order by id desc limit 2'], 
+ophelje: { :rekord 
+	Utfier skriuwe: rekord id + [' '] + rekord description + [': '] + rekord price, nije-rigel.
+	#True break.
+}. # rigen ophelje
+
+>> sql-fraach :=
+db fraach: ['SELECT * FROM book order by id desc limit 2'], 
+ophelje: { :rekord 
+	Utfier skriuwe: rekord id + [' '] + rekord description + [': '] + rekord price, nije-rigel.
+	#True break.
+}. # rigen ophelje
+
+
+# ~ CURL ~
+Utfier skriuwe: ( Netwurk post: Neat nei: ['https://xoscript.com'] ) lingte, nije-rigel. # neat poste = GET
+
+# ~ JSON ~
+>> json-tekst := (JSON jsonify: (List nĳ set: (Rige nĳ ; 1 ; 2 ; 3) by: ['abc'])).
+Utfier skriuwe: json-tekst, nije-rigel.
+Utfier skriuwe: ((JSON objekt: json-tekst) abc ? 1), nije-rigel.
+
+# ~ Fersifering ~
+>> brânkast := Klûs nĳ: ['Encryptor'].
+Utfier skriuwe: ['fersiferje:'], nije-rigel.
+>> x := Klûs fersiferje: ['hello'] kaai: ['world'].
+Utfier skriuwe: x, nije-rigel.
+Utfier skriuwe: ['ûntsiferje:'], nije-rigel.
+Utfier skriuwe: (Klûs ûntsiferje: x kaai: ['world']), nije-rigel.
+
+
+# ~ Sesjeferwurker (standert bewarre yn /tmp) ~
+Programma brûke: ['fy/webtools.xo'].
+>> side := Webdokumint nĳ.
+>> x := side sesje-begjinne.
+Utfier skriuwe: x, nije-rigel.
+x user: 123.
+side sesje-fernielje.
+side gean-nei: ['/'].
+
+# ~ Sjabloan ~
+Programma brûke: ['fy/template.xo'].
+>> html-koade := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> mal := Sjabloan nĳ ynhâld: html-koade.
+>> greeting := mal knippe: ['greeting'], kopiearje greeting: ['Hallo Wrâld!'].
+mal plakke: greeting by: ['greetings'].
+
+Utfier skriuwe: ['========================='], nije-rigel.
+>> side := Webdokumint nĳ.
+side útfiere: mal alles-skjinje.
+
+# ~ Reguliere ekspresjes ~
+>> boarnetekst := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> sykpatroan := Patroan nĳ: ['href="([^"]+)" target="([^"]+)"'].
+>> útkomst  := sykpatroan oerienkomst: boarnetekst dwaan: { :m :x
+	Utfier skriuwe: m, nije-rigel.
+	Utfier skriuwe: x, nije-rigel.
+	<- ['XXX'].
+}.
+Utfier skriuwe: útkomst, nije-rigel.
+
+# ~ Helpmiddels ~
+Utfier skriuwe: (Server html-kodearje: ['<&"' hello '"&>']), nije-rigel.
+Utfier skriuwe: (Server url-kodearje: ['https://example.com?a=6&b=1 2']), nije-rigel.
+Utfier skriuwe: (Formaat nĳ: ['Number format: %06.0f \n'], tapasse: 56), nije-rigel.
+Utfier skriuwe: (Klûs token: 20), nije-rigel.
+Utfier skriuwe: (Momint nĳ formaat: ['%a, %d %b %Y %H:%M:%S']), nije-rigel.
+>> a := Server base64-kodearje: ['abc123'].
+Utfier skriuwe: a, nije-rigel.
+Utfier skriuwe: (Server base64-dekodearje: a), nije-rigel.
+
+>> webadres := URL nĳ.
+webadres protokol: ['http'], host: ['example.com'], paad: ['path'], url-parameters: (
+	List nĳ
+	a: ['1+'],
+	b: 2
+).
+Utfier skriuwe: webadres, nije-rigel.

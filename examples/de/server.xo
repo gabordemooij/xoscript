@@ -1,0 +1,142 @@
+# Alles-in-einem-Serverdemo
+#
+# - HTTP-Anfrageverarbeitung
+# - Einfache Sitzungsverwaltung
+# - Datenbankobjekt (MariaDB)
+# - CURL
+# - JSON
+# - Verschlüsselung
+#
+# SQL-Beispiel:
+# CREATE DATABASE xobase;
+# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
+# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
+# FLUSH PRIVILEGES;
+# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+
+Programm speicherverwaltung: 4.
+
+# ~ HTTP-Anfragen ~
+Server initialisieren.
+>> webanfrage := HTTP-Anfrage neu.
+Ausgabe schreiben: ['HTTP-GET a='] + ( webanfrage get: ['a'] ), stopp. # GET
+Ausgabe schreiben: ['HTTP-POST c='] + ( webanfrage post: ['c'] ), stopp. # POST
+
+
+# ~ Datenbank ~
+>> db := Maria-DB neu host: ['localhost'],
+	benutzername: ['xo'], passwort: ['pass123'], datenbankname: ['xobase'], verbinden.
+
+>> sql-abfrage := db abfrage: ['
+	INSERT INTO book (id, description, price, rating) 
+	VALUES (NULL, ?, ?, ?)
+'], parameter: ( Liste neu ; ['abc'] ; 12.35 ; 6 ). # parametrisierte Abfragen
+
+{  sql-abfrage ausführen. db bestätigen. } abfangen: { :e db zurückrollen.  }, starten. # Transaktionen
+Ausgabe schreiben: ['EINGEFÜGT: '] + sql-abfrage insert-id, stopp. # eingefügte ID
+
+>> sql-abfrage :=
+db abfrage: ['SELECT * FROM book order by id desc limit 2'], 
+abrufen: { :datensatz 
+	Ausgabe schreiben: datensatz id + [' '] + datensatz description + [': '] + datensatz price, stopp.
+	#True break.
+}. # Zeilen abrufen
+
+>> sql-abfrage :=
+db abfrage: ['SELECT * FROM book order by id desc limit 2'], 
+abrufen: { :datensatz 
+	Ausgabe schreiben: datensatz id + [' '] + datensatz description + [': '] + datensatz price, stopp.
+	#True break.
+}. # Zeilen abrufen
+
+
+# ~ CURL ~
+Ausgabe schreiben: ( Netz post: Nichts an: ['https://xoscript.com'] ) länge, stopp. # nichts posten = GET
+
+# ~ JSON ~
+>> json-text := (JSON jsonify: (Wörterbuch neu setzen: (Liste neu ; 1 ; 2 ; 3) auf: ['abc'])).
+Ausgabe schreiben: json-text, stopp.
+Ausgabe schreiben: ((JSON objekt: json-text) abc ? 1), stopp.
+
+# ~ Verschlüsselung ~
+>> safe := Tresor neu: ['Encryptor'].
+Ausgabe schreiben: ['verschlüsseln:'], stopp.
+>> x := Tresor verschlüsseln: ['hello'] schlüssel: ['world'].
+Ausgabe schreiben: x, stopp.
+Ausgabe schreiben: ['entschlüsseln:'], stopp.
+Ausgabe schreiben: (Tresor entschlüsseln: x schlüssel: ['world']), stopp.
+
+
+# ~ Sitzungsverwaltung (standardmäßig in /tmp gespeichert) ~
+Programm verwenden: ['de/webtools.xo'].
+>> seite := Web-Dokument neu.
+>> x := seite sitzung-starten.
+Ausgabe schreiben: x, stopp.
+x user: 123.
+seite sitzung-beenden.
+seite gehe-zu: ['/'].
+
+# ~ Vorlage ~
+Programm verwenden: ['de/template.xo'].
+>> html-code := ['
+	<!-- cut:garbage -->
+	<trash>
+	<!-- /cut:garbage -->
+	
+	<p>
+		
+		<!-- cut:greeting -->
+			<b><!-- slot:greeting --></b>
+		<!-- /cut:greeting -->
+		<!-- paste:greetings -->
+		
+		
+    </p>
+    
+    <!-- cut:unused -->
+    <span>remove this</span>
+		<!-- cut:also -->
+		<also>
+		<!-- /cut:also -->
+    <!-- /cut:unused -->
+'].
+
+>> seitenvorlage := Vorlage neu inhalt: html-code.
+>> greeting := seitenvorlage ausschneiden: ['greeting'], kopieren greeting: ['Hallo Welt!'].
+seitenvorlage einfügen: greeting auf: ['greetings'].
+
+Ausgabe schreiben: ['========================='], stopp.
+>> seite := Web-Dokument neu.
+seite ausgeben: seitenvorlage alles-säubern.
+
+# ~ Reguläre Ausdrücke ~
+>> quelltext := ['<html>
+	<a href="http://link1" target="_blank">
+	<a href="http://link2" target="_blank">
+</html>'].
+>> suchmuster := Muster neu: ['href="([^"]+)" target="([^"]+)"'].
+>> resultat  := suchmuster treffer: quelltext tun: { :m :x
+	Ausgabe schreiben: m, stopp.
+	Ausgabe schreiben: x, stopp.
+	<- ['XXX'].
+}.
+Ausgabe schreiben: resultat, stopp.
+
+# ~ Hilfsfunktionen ~
+Ausgabe schreiben: (Server html-kodieren: ['<&"' hello '"&>']), stopp.
+Ausgabe schreiben: (Server url-kodieren: ['https://example.com?a=6&b=1 2']), stopp.
+Ausgabe schreiben: (Format neu: ['Number format: %06.0f \n'], anwenden: 56), stopp.
+Ausgabe schreiben: (Tresor token: 20), stopp.
+Ausgabe schreiben: (Moment neu format: ['%a, %d %b %Y %H:%M:%S']), stopp.
+>> a := Server base64-kodieren: ['abc123'].
+Ausgabe schreiben: a, stopp.
+Ausgabe schreiben: (Server base64-dekodieren: a), stopp.
+
+>> link := URL neu.
+link protokoll: ['http'], host: ['example.com'], pfad: ['path'], url-parameter: (
+	Wörterbuch neu
+	a: ['1+'],
+	b: 2
+).
+Ausgabe schreiben: link, stopp.
