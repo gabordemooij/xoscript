@@ -63,6 +63,7 @@ if [[ $OS = "Linux" ]]; then
 	rm mods
 	ln -s ../../build/Linux/bin/mods mods
 	ln -s ../../src/xo/${ISO} .
+	ln -s ../../misc/shared/* .
 	echo 'c=3' > /tmp/xo_fxt_stdin
 	CITRINE_MEMORY_MODE=4 \
 	REQUEST_METHOD="POST" \
@@ -84,6 +85,7 @@ if [[ $OS = "OBSD" ]]; then
 	rm mods
 	ln -s ../../build/OpenBSD/bin/mods mods
 	ln -s ../../src/xo/${ISO} .
+	ln -s ../../misc/shared/* .
 	printf 'c=3' > /tmp/xo_fxt_stdin
 	CITRINE_MEMORY_MODE=4 \
 	REQUEST_METHOD="POST" \
