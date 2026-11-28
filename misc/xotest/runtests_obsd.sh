@@ -1,6 +1,9 @@
 #!/bin/ksh
 ulimit -c 0 # avoid core dumps bc pledge/unveil
 
+FFITESTLIB=$(ldconfig -r | awk '$3 ~ /libc\.so/ {print $3}')
+export FFITESTLIB 
+
 . misc/xotest/setup1.inc
 . misc/xotest/setup2.inc
 . misc/xotest/setup3.inc

@@ -1,6 +1,14 @@
 #!/bin/bash
 ulimit -S -c unlimited # allow core dumps (unlike on obsd!)
 
+FFITESTLIB=$(ldconfig -p | awk '$NF ~ /.*x86.*libc\.so/ {print $NF}') 
+export FFITESTLIB
+
+. misc/xotest/setup1.inc
+. misc/xotest/setup2.inc
+. misc/xotest/setup3.inc
+. misc/xotest/setup_mapping.inc
+
 CITRINE_MEMORY_LIMIT_MB=10
 export CITRINE_MEMORY_LIMIT_MB
 
@@ -25,50 +33,12 @@ NAME="server" make plugin
 
 fi
 
-setup1() {
-	i=$1
-	REQUEST_METHOD="POST" \
-	CONTENT_TYPE="application/x-www-form-urlencoded" \
-	CONTENT_LENGTH=20 \
-	QUERY_STRING="a=2&b=4&d[]=a&d[]=b&f[]=1&f[]=2" \
-	HTTP_COOKIE="xsid=abc123" \
-	FFITESTLIB="/usr/lib/x86_64-linux-gnu/libc.so.6" \
-	./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err < <(echo -n 'c=3&e[]=1&e[]=2&xx=1')
-}
-
-setup2() {
-	i=$1
-	BOUNDARY='------------------------abcdef1234567890'
-	BODY=$(printf -- '--%s\r\nContent-Disposition: form-data; name="c"\r\n\r\n2\r\n--%s\r\nContent-Disposition: form-data; name="file"; filename="hello.txt"\r\nContent-Type: text/plain\r\n\r\nhello file\r\n--%s--\r\n' "$BOUNDARY" "$BOUNDARY" "$BOUNDARY")
-	printf '%s' "$BODY" | \
-	CONTENT_TYPE="multipart/form-data; boundary=$BOUNDARY" \
-	CONTENT_LENGTH=${#BODY} \
-	REQUEST_METHOD=POST \
-	./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err
-}
-
-setup3() {
-	i=$1
-	CITRINE_MEMORY_PROFILE=1 \
-	./xo ../../../tests/t-$i.ctr 1>/tmp/rs 2>/tmp/err
-}
-
 unittest() {
 	i=$1
 	mmode=$2
 	CITRINE_MEMORY_MODE=$mmode
 	export CITRINE_MEMORY_MODE
-	if ((
-	( 10#$i >= 132 && 10#$i <= 218 ) ||
-	( 10#$i >= 310 && 10#$i <= 311 ) ||
-	( 10#$i >= 351 && 10#$i <= 351 )
-	)); then
-		setup3 $i
-	elif [[ $i == "0635" ]]; then
-		setup2 $i
-	else
-		setup1 $i
-	fi
+	setup_mapping $i
 	cat /tmp/rs /tmp/err > /tmp/out
 
 	if ! test -f ../../../tests/exp/en/test${i}en.exp; then
@@ -112,7 +82,7 @@ unittest() {
 }
 
 # select range
-FROM=1
+FROM=549
 TIL=822
 
 # run tests for linux
