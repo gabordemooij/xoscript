@@ -82,7 +82,7 @@ unittest() {
 }
 
 # select range
-FROM=549
+FROM=1
 TIL=822
 
 # run tests for linux
