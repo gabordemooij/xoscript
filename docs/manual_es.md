@@ -2123,13 +2123,13 @@ Así, por ejemplo, dada la siguiente plantilla, vamos a meter la
 gema en el joyero y añadir una etiqueta de precio.
 
 ```
-<!-- cut:gem -->
+<!-- cortar:gem -->
 <img src="gem.gif">
-<b>$<!-- slot:price --></b>
-<!-- /cut:gem -->
+<b>$<!-- ranura:price --></b>
+<!-- /cortar:gem -->
 
 <div id="box">
-<!-- paste:jewels -->
+<!-- pegar:jewels -->
 </div>
 ```
 
