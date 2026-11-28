@@ -1,142 +1,168 @@
-# Demostración de servidor todo en uno
-#
-# - Manejador de peticiones HTTP
-# - Manejador básico de sesiones
-# - Objeto de base de datos (MariaDB)
-# - CURL
-# - JSON
-# - Cifrado
-#
-# Ejemplo de SQL:
-# CREATE DATABASE xobase;
-# CREATE USER 'xo'@'localhost' IDENTIFIED BY 'pass123';
-# GRANT ALL PRIVILEGES ON xobase.* TO 'xo'@'localhost';
-# FLUSH PRIVILEGES;
-# ALTER DATABASE xobase CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
-# CREATE TABLE book ( id INT PRIMARY KEY AUTO_INCREMENT, description VARCHAR(255), price DECIMAL(10,2), rating INT(10) ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_520_ci;
+# Quick demo for Spanish version
 
-Programa orden: 4.
+# Run like: ./example.sh spanish Linux clean es
 
-# ~ Peticiones HTTP ~
-Server iniciar.
->> peticion := Petición-HTTP crear.
-Salida escribir: ['HTTP-GET a='] + ( peticion obtener: ['a'] ), detener. # GET
-Salida escribir: ['HTTP-POST c='] + ( peticion enviar: ['c'] ), detener. # POST
+Servidor iniciar.
+
+# Ejemplo de configuración del servidor
+# Servidor establecer: ['campos-máximos'] valor: X
+# Servidor establecer: ['contenido-máximo'] valor: X
+# Servidor establecer: ['tiempo-máximo'] valor: X
+
+# ~ Solicitudes HTTP ~
+>> rq := Petición-HTTP crear.
+Salida escribir: ['HTTP-GET a='] + ( rq obtener: ['a'] ), detener. # GET
+Salida escribir: ['HTTP-POST c='] + ( rq enviar: ['c'] ), detener. # POST
 
 
-# ~ Base de datos ~
->> bd := Maria-DB crear host: ['localhost'],
-	usuario: ['xo'], contraseña: ['pass123'], nombre-base-datos: ['xobase'], conectar.
+# ~ Database ~
+>> base-de-datos := Maria-DB crear host: ['localhost'],
+		usuario: ['xo'],
+		contraseña: ['pass123'],
+		nombre-base-datos: ['xobase'],
+		conectar.
 
->> sentencia := bd consultar: ['
-	INSERT INTO book (id, description, price, rating) 
-	VALUES (NULL, ?, ?, ?)
-'], parámetros: ( Lista crear ; ['abc'] ; 12.35 ; 6 ). # consultas parametrizadas
+>> query := 
+	base-de-datos 
+	consultar: ['
+		INSERT INTO book (id, description, price, rating) 
+		VALUES (NULL, ?, ?, ?)
+	'], 
+	parámetros: ( Lista crear ; ['abc'] ; 12.35 ; 6 ).
 
-{  sentencia ejecutar. bd confirmar. } capturar: { :e bd revertir.  }, empezar. # transacciones
-Salida escribir: ['INSERTADO: '] + sentencia id-insertado, detener. # id insertado
+{
+	query ejecutar. 
+	base-de-datos confirmar.
+} capturar: { :e 
+	base-de-datos revertir.
+}, empezar.
 
->> sentencia :=
-bd consultar: ['SELECT * FROM book order by id desc limit 2'], 
-extraer: { :fila 
-	Salida escribir: fila id + [' '] + fila description + [': '] + fila price, detener.
-	#True break.
-}. # obtención de filas
+Salida escribir: ['ID: '] + query id-insertado, detener.
 
->> sentencia :=
-bd consultar: ['SELECT * FROM book order by id desc limit 2'], 
-extraer: { :fila 
-	Salida escribir: fila id + [' '] + fila description + [': '] + fila price, detener.
-	#True break.
-}. # obtención de filas
+>> query :=
+	base-de-datos
+	consultar: ['
+		SELECT * FROM book 
+		ORDER BY id DESC LIMIT 2
+	'], 
+	extraer: { :row 
+		Salida escribir:
+		row id + [' '] + 
+		row description + [': '] + 
+		row price,
+		detener.
+}.
+
+>> query :=
+base-de-datos
+	query: ['SELECT * FROM book order by id desc limit 2'], 
+	fetch: { :row 
+		Salida escribir: row id + [' '] + row description + [': '] + row price, detener.
+	}.
 
 
 # ~ CURL ~
-Salida escribir: ( Red enviar: Nulo a: ['https://xoscript.com'] ) longitud, detener. # post vacío = GET
+Salida escribir: ( Red 
+	obtener: ['https://xoscript.com'] )
+	longitud, 
+	detener.
 
 # ~ JSON ~
->> texto-json := (JSON jsonificar: (Diccionario crear poner: (Lista crear ; 1 ; 2 ; 3) en: ['abc'])).
-Salida escribir: texto-json, detener.
-Salida escribir: ((JSON objeto: texto-json) abc ? 1), detener.
+>> json := (
+	JSON jsonificar: (
+		Diccionario crear
+		poner: (
+			Lista crear ; 1 ; 2 ; 3
+		) en: ['abc']
+	)).
 
-# ~ Cifrado ~
->> boveda := Contenedor-seguro crear: ['Encryptor'].
+Salida escribir: 
+	json,
+	detener.
+
+Salida escribir: (
+	(JSON objeto: json) abc ? 1
+), detener.
+
+# ~ Encryption ~
+>> cs := Contenedor-seguro crear: ['Contenedor Seguro'].
 Salida escribir: ['cifrar:'], detener.
->> x := Contenedor-seguro cifrar: ['hello'] clave: ['world'].
-Salida escribir: x, detener.
-Salida escribir: ['descifrar:'], detener.
-Salida escribir: (Contenedor-seguro descifrar: x clave: ['world']), detener.
+>> clave := ['world'].
+>> a := cs cifrar: ['hello'] clave: clave.
+>> b := cs descifrar: a clave: clave.
+Salida escribir: (
+	['cifrar: <a> descifrar: <b>']
+	<a>: a,
+	<b>: b
+), detener.
 
-
-# ~ Manejador de sesiones (por defecto se guardan en /tmp) ~
+# ~ Session handler (by default stored in /tmp) ~
 Programa utilizar: ['es/webtools.xo'].
->> pagina := Documento-Web crear.
->> x := pagina empezar-sesión.
+>> web := Documento-Web crear.
+>> x := web empezar-sesión.
 Salida escribir: x, detener.
 x user: 123.
-pagina borrar-sesión.
-pagina ir-a: ['/'].
+web borrar-sesión.
+web ir-a: ['/'].
+
 
 # ~ Plantilla ~
 Programa utilizar: ['es/template.xo'].
->> codigo-html := ['
+>> html := ['
 	<!-- cortar:garbage -->
 	<trash>
 	<!-- /cortar:garbage -->
-	
 	<p>
-		
 		<!-- cortar:greeting -->
 			<b><!-- ranura:greeting --></b>
 		<!-- /cortar:greeting -->
 		<!-- pegar:greetings -->
-		
-		
-    </p>
-    
-    <!-- cortar:unused -->
-    <span>remove this</span>
+	</p>
+	<!-- cortar:unused -->
+	<span>remove this</span>
 		<!-- cortar:also -->
 		<also>
 		<!-- /cortar:also -->
-    <!-- /cortar:unused -->
+	<!-- /cortar:unused -->
 '].
 
->> molde := Plantilla crear contenido: codigo-html.
->> greeting := molde cortar: ['greeting'], copy greeting: ['¡Hola Mundo!'].
-molde pegar: greeting en: ['greetings'].
+>> tpl := Plantilla crear contenido: html.
+>> greeting := tpl cortar: ['greeting'], copiar greeting: ['Hello World!'].
+tpl pegar: greeting en: ['greetings'].
 
-Salida escribir: ['========================='], detener.
->> pagina := Documento-Web crear.
-pagina salida: molde limpiar-todo.
+>> web := Documento-Web crear.
+Salida escribir: ['============================'], detener.
+web salida: tpl limpiar-todo.
 
-# ~ Expresiones regulares ~
->> origen := ['<html>
+# ~ Regex ~
+>> subject := ['<html>
 	<a href="http://link1" target="_blank">
 	<a href="http://link2" target="_blank">
 </html>'].
->> patron := Patrón crear: ['href="([^"]+)" target="([^"]+)"'].
->> texto-final  := patron coincidir: origen ejecutar: { :m :x
+>> pattern := Patrón crear: ['href="([^"]+)" target="([^"]+)"'].
+>> result := pattern coincidir: subject ejecutar: { :m :x
 	Salida escribir: m, detener.
 	Salida escribir: x, detener.
 	<- ['XXX'].
 }.
-Salida escribir: texto-final, detener.
+Salida escribir: result, detener.
 
-# ~ Utilidades ~
-Salida escribir: (Server codificar-html: ['<&"' hello '"&>']), detener.
-Salida escribir: (Server codificar-url: ['https://example.com?a=6&b=1 2']), detener.
-Salida escribir: (Formato crear: ['Number format: %06.0f \n'], aplicar: 56), detener.
+# ~ Utilities ~
+Salida escribir: (Server codificación-html: ['<&"' hello '"&>']), detener.
+Salida escribir: (Server codificación-url: ['https://example.com?a=6&b=1 2']), detener.
+Salida escribir: (Formato crear: ['Number format: %06.0f'], aplicar: 56), detener.
 Salida escribir: (Contenedor-seguro token: 20), detener.
 Salida escribir: (Momento crear formato: ['%a, %d %b %Y %H:%M:%S']), detener.
 >> a := Server codificar-base64: ['abc123'].
 Salida escribir: a, detener.
 Salida escribir: (Server decodificar-base64: a), detener.
 
->> enlace := URL crear.
-enlace protocolo: ['http'], host: ['example.com'], path: ['path'], parámetros: (
+>> u := URL crear.
+u protocolo: ['http'], host: ['example.com'], path: ['path'], parámetros: (
 	Diccionario crear
 	a: ['1+'],
 	b: 2
 ).
-Salida escribir: enlace, detener.
+Salida escribir: u, detener.
+
+
